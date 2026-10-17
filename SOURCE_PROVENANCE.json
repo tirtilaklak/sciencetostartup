@@ -1,0 +1,851 @@
+{
+  "snapshot": "ScienceToStartup public v30",
+  "source_commit": "8bc0017148bcd37bf4410135c204cea713616f0d",
+  "public_url": "https://sciencetostartup.com",
+  "sites_version": 30,
+  "published_application_html_sha256": "a4a20fa9b9d4f3a4660c44cc634e6218bfc46eb29dc50d35f17c14c32692e84a",
+  "dataset_version": "2.5.0",
+  "schema_version": "1.3.0",
+  "import_method": "Reviewed file snapshot appended to existing GitHub history; no earlier Sites Git commits imported.",
+  "excluded": [
+    "raw research inputs",
+    "internal reports",
+    "unpublished personal records",
+    "historical snapshots other than current2.5.0",
+    "local output and browser artifacts",
+    "credentials and hosting/deployment configuration",
+    "old migration scripts"
+  ],
+  "snapshot_files": [
+    {
+      "path": "data/canonical.json",
+      "sha256": "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061",
+      "bytes": 3200171
+    },
+    {
+      "path": "data/editorial.json",
+      "sha256": "4a9aa83d4619add19d6ec5403ea5ad59084aaea076e05b7e2e7d5e08584a7c07",
+      "bytes": 29214
+    },
+    {
+      "path": "data/investor-image-provenance.json",
+      "sha256": "116d90d844b84a07a01f423e5ac0e0e671c85d0a065bbe9534cc629dd4dacc78",
+      "bytes": 1607
+    },
+    {
+      "path": "data/link-health.json",
+      "sha256": "3c29631dc8d33f88e56ca3bf3ab8aed4897bab555a8ca1cd1339857f70542021",
+      "bytes": 2193
+    },
+    {
+      "path": "data/logo-provenance.json",
+      "sha256": "e2de4f728b6d5852638a330545e19c462c461311d77eb6a7c82196e48fbc94d1",
+      "bytes": 24852
+    },
+    {
+      "path": "data/medalists.json",
+      "sha256": "e2e342f9141e009dc5068bfa3f4356c03010ab2a0170abdf089035ba4bb29b23",
+      "bytes": 352450
+    },
+    {
+      "path": "data/portrait-provenance.json",
+      "sha256": "7b40f5a051e39b986f78f78f59f6cd1d6adefc0c443d8c664f17241b3a1b715e",
+      "bytes": 1231
+    },
+    {
+      "path": "data/profile-afterquery.json",
+      "sha256": "dc2290a48f91683a1320b8db7cd72d8beb504038d9aad32da99b5d8a0c294f17",
+      "bytes": 10116
+    },
+    {
+      "path": "data/profile-content.json",
+      "sha256": "09e666cd128b2775c9e653368bd4cc60a9feb9d2ef3d327142707717358fb1c7",
+      "bytes": 151843
+    },
+    {
+      "path": "data/source-updates.json",
+      "sha256": "f1f8a2c76cadcd01a666e66ab962122e9b24b9d6b9b03ebeabe0b19209378592",
+      "bytes": 56685
+    },
+    {
+      "path": "data/versions/2.5.0.json",
+      "sha256": "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061",
+      "bytes": 3200171
+    },
+    {
+      "path": "data/work-routes.json",
+      "sha256": "3699c2ca8f286170c9a59899c9e9192cd79907b3f36b08a0a5cf0dba8457d613",
+      "bytes": 441462
+    },
+    {
+      "path": "dist/assessments.csv",
+      "sha256": "233349f716fdf4e6f085032f10db98aaeb26a344691bfb227d665e797834be9a",
+      "bytes": 55105
+    },
+    {
+      "path": "dist/assets/Investor_Snapshot_Human_Depth.png",
+      "sha256": "c84869ef05fd9727d3e0d4705211126d102d7d101751364de394af7ad5130ab0",
+      "bytes": 2537604
+    },
+    {
+      "path": "dist/assets/logos/a-team.svg",
+      "sha256": "cacf596b4c21c103ba446ecd990a27fdc9fb12d0676412f68be1b626051fe984",
+      "bytes": 4275
+    },
+    {
+      "path": "dist/assets/logos/abundant_ai.png",
+      "sha256": "c23386394d6794ff2aad8a50d24cf32da0b1cd9ff18ffc7d1a8c0d6b9160966a",
+      "bytes": 5471
+    },
+    {
+      "path": "dist/assets/logos/afterquery.svg",
+      "sha256": "4415dc37f59697346bb9e6fc13de4abfa4a6a0dfb6cf25db7fef225bc380b4e4",
+      "bytes": 2885
+    },
+    {
+      "path": "dist/assets/logos/aixi.jpg",
+      "sha256": "376487cf23d44a13f1f2fce687e2f1cf08b83ab27e0da70ce2aec2dbea5310e9",
+      "bytes": 13837
+    },
+    {
+      "path": "dist/assets/logos/alinia.svg",
+      "sha256": "2803391d7be310c28b9c0ae43d426f202417b843a59d8902a64705c1cc56bae2",
+      "bytes": 1755
+    },
+    {
+      "path": "dist/assets/logos/appen.svg",
+      "sha256": "b3e7442af862dfb70ed36a30c99d50a083a18c9abd1f2c316db382ef180eec9b",
+      "bytes": 4032
+    },
+    {
+      "path": "dist/assets/logos/apto.svg",
+      "sha256": "e859777783c7721b51241b4239072814f876c7923b036f768e816abd3819459a",
+      "bytes": 1995
+    },
+    {
+      "path": "dist/assets/logos/benchflow.svg",
+      "sha256": "4c06cec2ea8d225bc33d2d006db26984c7d09b36a0c3ab57360b2494ca650cdb",
+      "bytes": 786
+    },
+    {
+      "path": "dist/assets/logos/bespoke_labs.png",
+      "sha256": "ef581a93cf46202566a867d90b96653a34eaae0d9e156a4544a1ca8934959f08",
+      "bytes": 358
+    },
+    {
+      "path": "dist/assets/logos/datacurve.svg",
+      "sha256": "74878b66ea43a189fce16e83b4cae0dd7d5ac3b2c1223b4b033f6203a97ee648",
+      "bytes": 1020
+    },
+    {
+      "path": "dist/assets/logos/elorian.svg",
+      "sha256": "61e3c1ee6373335100574ad3bbc12228144870e0a83edd3088e1ca2438a69899",
+      "bytes": 10630
+    },
+    {
+      "path": "dist/assets/logos/g2i.svg",
+      "sha256": "f24c0c230608c1e3d88dfe817ef6b30af41916a2767ca9a782e0db3683075e70",
+      "bytes": 1488
+    },
+    {
+      "path": "dist/assets/logos/giskard.svg",
+      "sha256": "fbda4e3af3b723ae268185ba76a69db2336d8d8340dbae86ed13a1fb6a36e033",
+      "bytes": 6859
+    },
+    {
+      "path": "dist/assets/logos/hackerrank.svg",
+      "sha256": "131a7769d766302c77fa3f2a26af9a3dde279fbadef72bebc2715bcad1290b87",
+      "bytes": 14461
+    },
+    {
+      "path": "dist/assets/logos/handshake_ai.svg",
+      "sha256": "3942a07858c0b7ea6206a624cc8af50bd36e07ffb0d08c2477118697f35c1e44",
+      "bytes": 1809
+    },
+    {
+      "path": "dist/assets/logos/imerit.svg",
+      "sha256": "3441d9a79ebbc926f3ed1f81a65af3823232fabf924b9e4b0ed348fd850c8a77",
+      "bytes": 5159
+    },
+    {
+      "path": "dist/assets/logos/invisible.svg",
+      "sha256": "adf39b0b115240881574790b18e1298801e45ca7f8579ed85d21ff3c557872c4",
+      "bytes": 3076
+    },
+    {
+      "path": "dist/assets/logos/labelbox.svg",
+      "sha256": "6bdaa67f5681288e32582769b126bd20078d3dea89f191824f0bdd6638cc12b1",
+      "bytes": 4535
+    },
+    {
+      "path": "dist/assets/logos/laude.svg",
+      "sha256": "814fa2653d5a0504a669662ad0b2588f057532443baaef4b125c2fe05e4e9748",
+      "bytes": 4142
+    },
+    {
+      "path": "dist/assets/logos/mercor.svg",
+      "sha256": "fefbd52e5c8713968e5f6ab0dc6008341b59d38b4c1dae438e93eff39c32cd45",
+      "bytes": 3158
+    },
+    {
+      "path": "dist/assets/logos/micro1.svg",
+      "sha256": "b41362125cfe9ff587fbdd4c9aab2c725731f1d61e3d82c4afd849b09cae6f75",
+      "bytes": 3738
+    },
+    {
+      "path": "dist/assets/logos/ooak.svg",
+      "sha256": "78030f4fb388fd93d3c8fb7bc03232009dc94b7f6e6a249c47d173c274e283a2",
+      "bytes": 4764
+    },
+    {
+      "path": "dist/assets/logos/pareto.svg",
+      "sha256": "8e7dab4a69c0b03cc328615d6f84005173ca9586283fb607561e8af51629eb1e",
+      "bytes": 6488
+    },
+    {
+      "path": "dist/assets/logos/polymath_ai_labs.svg",
+      "sha256": "d530f54fdd9f1541bc365d0198994e476bf233853745e6850b5d945e55e7e355",
+      "bytes": 2711
+    },
+    {
+      "path": "dist/assets/logos/prime_intellect.svg",
+      "sha256": "108fb8057cf432b47c07329812c980d928b5d9b400fea3cfe9df9c37e85b7e24",
+      "bytes": 18673
+    },
+    {
+      "path": "dist/assets/logos/prolific.svg",
+      "sha256": "920e0a88b08167ada500574578c0e1d72ec0ae12e27154d05db8fdd92c941976",
+      "bytes": 4942
+    },
+    {
+      "path": "dist/assets/logos/proximal.svg",
+      "sha256": "cdf22dfbeef3b5d8f970d39180e96461e4d6934d212c3587724b1ccb0419b3e6",
+      "bytes": 3158
+    },
+    {
+      "path": "dist/assets/logos/quesma.png",
+      "sha256": "9c04c3d851cf72df085cbd483a1779381c3252a342ab577b04ab1b615418a832",
+      "bytes": 24109
+    },
+    {
+      "path": "dist/assets/logos/refresh.png",
+      "sha256": "8dd3f5cd5cb2730f2241684acab4cd54f04fc7645194ce84d387ee1b3bb3f2a6",
+      "bytes": 125911
+    },
+    {
+      "path": "dist/assets/logos/rws_trainai.svg",
+      "sha256": "dd6e307d41264b54d1b4328e4964b17e053ec9db50b455425de90ebbcb145da0",
+      "bytes": 2241
+    },
+    {
+      "path": "dist/assets/logos/sama.svg",
+      "sha256": "a498f7a30a2dca41066b50ced7d4952581947840dc4db364847bb5677edb6da4",
+      "bytes": 3079
+    },
+    {
+      "path": "dist/assets/logos/scale_ai.svg",
+      "sha256": "b310c0fe1a24b65391786fa7d819b62522fc6ebf68fe628852e71d7787b7c220",
+      "bytes": 1047
+    },
+    {
+      "path": "dist/assets/logos/snorkel_ai.svg",
+      "sha256": "297fe068bb08b4f9ae9dc63ddc002b69e8469172f8e14db1704437cf06411964",
+      "bytes": 17437
+    },
+    {
+      "path": "dist/assets/logos/surge_ai.svg",
+      "sha256": "3de51ea915c0fc41b1bf57b1f0d24bc58a81667ecc157d8de757dd288b5307fe",
+      "bytes": 3679
+    },
+    {
+      "path": "dist/assets/logos/taskus.svg",
+      "sha256": "4c0d23a7d5786e77ab62de3149edf0ff2ba6db91cddaa7fbf5738fe57cf4f85a",
+      "bytes": 8954
+    },
+    {
+      "path": "dist/assets/logos/terac.svg",
+      "sha256": "15ed05af409bf567a9efa09555020e252ecefb5a78ab1b2b2704c91d886f5791",
+      "bytes": 2626
+    },
+    {
+      "path": "dist/assets/logos/toloka.svg",
+      "sha256": "c800451ea5d44b96c786012bfec1fea88a425996e4336f8edc7e1be663669c27",
+      "bytes": 323
+    },
+    {
+      "path": "dist/assets/logos/trajectory_labs_pbc.svg",
+      "sha256": "daf19b0e3c13c17c7957d47235792852fbb03c2c57ec76f96d20ccb788dff319",
+      "bytes": 1185
+    },
+    {
+      "path": "dist/assets/logos/turing.png",
+      "sha256": "ca991262473b3f98eeb2a5ec3df777610a45fe0a0fb39a2aa1b722b55eae2246",
+      "bytes": 15603
+    },
+    {
+      "path": "dist/assets/people/afterquery-carlos-georgescu.jpg",
+      "sha256": "5b16d795114de5d74b6ea7370e8dcbf83f0dc8dbce834cc4bdf989c9a6293816",
+      "bytes": 61100
+    },
+    {
+      "path": "dist/assets/people/afterquery-spencer-mateega.jpg",
+      "sha256": "1ebeabc97a98ee8674accedc879be5731d813984e3ce48ef1bc4eff3ac16cd35",
+      "bytes": 12866
+    },
+    {
+      "path": "dist/assets/products/imerit-exl-visual.png",
+      "sha256": "b1acd6d64bea01499990cc7ddf0f7d04fbef861c30abbcab10b6cd6d1030d029",
+      "bytes": 103906
+    },
+    {
+      "path": "dist/assets/products/labelbox-visual.png",
+      "sha256": "cd1f6f8ce4df0d88909e15859ce8761593cc115817c22e967f751e6418cc2f86",
+      "bytes": 95856
+    },
+    {
+      "path": "dist/assets/products/sama-visual.png",
+      "sha256": "febd6139a47f841c0c28e8d759ee6ac865ad54db7c26962fb92d016773884383",
+      "bytes": 84946
+    },
+    {
+      "path": "dist/claims.csv",
+      "sha256": "683e5d73d390aab90370c1a4d68e9ec7f7b1cfb71dc04be07bff1de03ef64a5b",
+      "bytes": 1223970
+    },
+    {
+      "path": "dist/classifications.csv",
+      "sha256": "260c4dfa3b8f830605c6e162362a6b85f47c87b55029f7567de0e6e9fc433117",
+      "bytes": 11208
+    },
+    {
+      "path": "dist/companies.csv",
+      "sha256": "19a7d6c438335230e41de2fd7b850bed33d3516ee60c8bbeeab604d9c7a702fb",
+      "bytes": 19886
+    },
+    {
+      "path": "dist/company_investors.csv",
+      "sha256": "dcabbfb0ebccbf9df4b32f0f058be5ca2747d55bbbc33f9b718cbcd15609b066",
+      "bytes": 3479
+    },
+    {
+      "path": "dist/company_people.csv",
+      "sha256": "e20bdb8215e39c23b9287fbfcb9594bc6c798293382843e4f8848f50845a2750",
+      "bytes": 12723
+    },
+    {
+      "path": "dist/company_relationships.csv",
+      "sha256": "c0b36b94409a7b84fa102193ee32187de086326a292331f6cec3f6b305bd5100",
+      "bytes": 840
+    },
+    {
+      "path": "dist/customer_evidence.csv",
+      "sha256": "2aa60d36c6be419b25eef2c98f317872914e493881d8ac20b83de4690ff2c556",
+      "bytes": 40515
+    },
+    {
+      "path": "dist/editorial.json",
+      "sha256": "4a9aa83d4619add19d6ec5403ea5ad59084aaea076e05b7e2e7d5e08584a7c07",
+      "bytes": 29214
+    },
+    {
+      "path": "dist/editorial_readouts.csv",
+      "sha256": "8f178ce867808fca5f2696c3a0dfdabac41a376a80f0d86844f8bc9de7e1f226",
+      "bytes": 19086
+    },
+    {
+      "path": "dist/funding_rounds.csv",
+      "sha256": "9699fd03f27d47db99e22460e089d16db2349157a8fc112c91c33a472120f1a2",
+      "bytes": 34927
+    },
+    {
+      "path": "dist/index.html",
+      "sha256": "a4a20fa9b9d4f3a4660c44cc634e6218bfc46eb29dc50d35f17c14c32692e84a",
+      "bytes": 4520737
+    },
+    {
+      "path": "dist/investor-image-provenance.json",
+      "sha256": "116d90d844b84a07a01f423e5ac0e0e671c85d0a065bbe9534cc629dd4dacc78",
+      "bytes": 1607
+    },
+    {
+      "path": "dist/investors.csv",
+      "sha256": "e29e8685a652a866447c5dd7f744fbbc1c285bb2226b44dbefa94fb3a9644c2f",
+      "bytes": 12064
+    },
+    {
+      "path": "dist/link-health.json",
+      "sha256": "3c29631dc8d33f88e56ca3bf3ab8aed4897bab555a8ca1cd1339857f70542021",
+      "bytes": 2193
+    },
+    {
+      "path": "dist/logo-provenance.json",
+      "sha256": "e2de4f728b6d5852638a330545e19c462c461311d77eb6a7c82196e48fbc94d1",
+      "bytes": 24852
+    },
+    {
+      "path": "dist/manifest.json",
+      "sha256": "9cd7464fe5f51b732e1359a4f64fedb3d68bff611dcf17299ad7c0e910136301",
+      "bytes": 7340
+    },
+    {
+      "path": "dist/metrics.csv",
+      "sha256": "e2c0befaba8f73aca42646e6a26f79eeb43e49b8a376af1faae2873cd0ebcd26",
+      "bytes": 113536
+    },
+    {
+      "path": "dist/observatory.sqlite",
+      "sha256": "0b663a116bd49e0367d961cfe047dc8ab69aa39d5e19458e4c6da658f714195d",
+      "bytes": 9383936
+    },
+    {
+      "path": "dist/people.csv",
+      "sha256": "405a2c8a576e5051657744f4cc482c452b9d2056d208a24e5da261a8357b43ce",
+      "bytes": 3935
+    },
+    {
+      "path": "dist/portrait-provenance.json",
+      "sha256": "7b40f5a051e39b986f78f78f59f6cd1d6adefc0c443d8c664f17241b3a1b715e",
+      "bytes": 1231
+    },
+    {
+      "path": "dist/products.csv",
+      "sha256": "cc337ef1ac3171fa09e7fdd8ff1edd7e9d6bf0e9410262a80a3967a7aefd9e66",
+      "bytes": 65436
+    },
+    {
+      "path": "dist/profile-content.json",
+      "sha256": "cc7b37f32717511dbb2aee0298b25f1dfbd85c53accc6417cce9332f945fbd4d",
+      "bytes": 163020
+    },
+    {
+      "path": "dist/research.json",
+      "sha256": "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061",
+      "bytes": 3200171
+    },
+    {
+      "path": "dist/round_investors.csv",
+      "sha256": "d98c47248c77f0b852aa053a5bed59361933259470ed9b3ef0df26f945b8a867",
+      "bytes": 52627
+    },
+    {
+      "path": "dist/source-updates.json",
+      "sha256": "f1f8a2c76cadcd01a666e66ab962122e9b24b9d6b9b03ebeabe0b19209378592",
+      "bytes": 56685
+    },
+    {
+      "path": "dist/sources.csv",
+      "sha256": "39657f93b70d751dfcffae80eb741d16c46376f6661eae4c226cd5635520e14e",
+      "bytes": 249248
+    },
+    {
+      "path": "dist/work-routes.json",
+      "sha256": "3699c2ca8f286170c9a59899c9e9192cd79907b3f36b08a0a5cf0dba8457d613",
+      "bytes": 441462
+    },
+    {
+      "path": "docs/research-id-crosswalk.json",
+      "sha256": "9e675e98a7c8caad48fd65c5962a316f392f73d2d92ceb3528a2184cefadacb8",
+      "bytes": 536
+    },
+    {
+      "path": "schema/database.sql",
+      "sha256": "29258ca1df4b3f7c4a8a032a93af771b7d5f9adca6cec36f26767646490be246",
+      "bytes": 6328
+    },
+    {
+      "path": "schema/medalists.schema.json",
+      "sha256": "e32ca4db5c145823a49c4959bc004604a241db1e09f8fdb591c23c4768e08622",
+      "bytes": 23189
+    },
+    {
+      "path": "schema/observatory.schema.json",
+      "sha256": "2a856015fe1cf30771f67c62ee2b6c441cbb13c1a9aa13dcf78a6ef1424c2538",
+      "bytes": 42399
+    },
+    {
+      "path": "scripts/observatory.py",
+      "sha256": "c001223b5b6d949df5d57b7f8dffe14880312f39a17d24228207226797dec015",
+      "bytes": 58227
+    },
+    {
+      "path": "scripts/schema_def.py",
+      "sha256": "46362e8838699eb260297a43e857d5492d9499cbcf6738248b53f97c5051fa70",
+      "bytes": 10066
+    },
+    {
+      "path": "tests/build_identity.py",
+      "sha256": "b688456edb65f9d3686eef48267793159a9ef9cca28fb893372a780ebf90d06f",
+      "bytes": 7890
+    },
+    {
+      "path": "tests/fixtures.py",
+      "sha256": "d850681ff0a62f7cb82bcba49bac79a42bfe9b477ffbf37530f8b16972136daf",
+      "bytes": 2472
+    },
+    {
+      "path": "tests/js_logic.py",
+      "sha256": "edf66f5e7dff0c9096e985aa0d206ac6c6ae13bc952a085a8d760727bf73562f",
+      "bytes": 28261
+    },
+    {
+      "path": "tests/redesign_checks.py",
+      "sha256": "6c6e33907180825642ae8341ecd4146e7618fb3f2c31f601b4d7bcde1ce80ffd",
+      "bytes": 16588
+    },
+    {
+      "path": "tests/reliability_copy_context_logic.py",
+      "sha256": "2fa45b879880f8eed0f9cff8b4fa3f723ea1f5325181a60fbd72d696ab256268",
+      "bytes": 6155
+    },
+    {
+      "path": "tests/reliability_failure_state_logic.py",
+      "sha256": "c0869ee3d0c13aed4a5cd81bcf5b6b65b3495409d455c9877e9135fe5e631cc2",
+      "bytes": 8755
+    },
+    {
+      "path": "tests/revision_app_logic.py",
+      "sha256": "fe5bc299ba65945f406530c59b3953d9c196ab464508e176bff2338aabefd8ee",
+      "bytes": 15166
+    },
+    {
+      "path": "tests/revision_work_logic.py",
+      "sha256": "7141749b7b3f328632e260df112b297649898326375d5a410b8c266361e7d162",
+      "bytes": 3683
+    },
+    {
+      "path": "tests/test_build_identity.py",
+      "sha256": "f8d8c8ab487c02c48cb2790dad5d6b5bca034794ff38d2fa59d9a14c4ac4b949",
+      "bytes": 3733
+    },
+    {
+      "path": "tests/test_link_health.py",
+      "sha256": "9584f2b7c70a4b156c0c10bdbf98786f8c25e9d1fb60fa09866861fa2e5b0c1f",
+      "bytes": 8680
+    },
+    {
+      "path": "tests/test_pipeline.py",
+      "sha256": "bbd15b07b2544d467c883170a55e4693a5a641f997ca017f45da9fbc366ea896",
+      "bytes": 8571
+    },
+    {
+      "path": "tests/test_static_file_metadata.py",
+      "sha256": "e08aa0cb144ca5a2470ed47a962439f21c10f935cd4f36dc32cabc0808cb59fd",
+      "bytes": 5198
+    },
+    {
+      "path": "tests/work_route_summary_logic.py",
+      "sha256": "e2af33e09f0f515e01d06de6a4667c0bd1e657a80efc3ffe1a05cd39f93ec5ac",
+      "bytes": 3263
+    },
+    {
+      "path": "web/app.js",
+      "sha256": "f0146615dc11432e4b598d6f0f0bcfb7054ffaa0ebef2b7f7487a05499f684dc",
+      "bytes": 123978
+    },
+    {
+      "path": "web/assets/Investor_Snapshot_Human_Depth.png",
+      "sha256": "c84869ef05fd9727d3e0d4705211126d102d7d101751364de394af7ad5130ab0",
+      "bytes": 2537604
+    },
+    {
+      "path": "web/assets/logos/a-team.svg",
+      "sha256": "cacf596b4c21c103ba446ecd990a27fdc9fb12d0676412f68be1b626051fe984",
+      "bytes": 4275
+    },
+    {
+      "path": "web/assets/logos/abundant_ai.png",
+      "sha256": "c23386394d6794ff2aad8a50d24cf32da0b1cd9ff18ffc7d1a8c0d6b9160966a",
+      "bytes": 5471
+    },
+    {
+      "path": "web/assets/logos/afterquery.svg",
+      "sha256": "4415dc37f59697346bb9e6fc13de4abfa4a6a0dfb6cf25db7fef225bc380b4e4",
+      "bytes": 2885
+    },
+    {
+      "path": "web/assets/logos/aixi.jpg",
+      "sha256": "376487cf23d44a13f1f2fce687e2f1cf08b83ab27e0da70ce2aec2dbea5310e9",
+      "bytes": 13837
+    },
+    {
+      "path": "web/assets/logos/alinia.svg",
+      "sha256": "2803391d7be310c28b9c0ae43d426f202417b843a59d8902a64705c1cc56bae2",
+      "bytes": 1755
+    },
+    {
+      "path": "web/assets/logos/appen.svg",
+      "sha256": "b3e7442af862dfb70ed36a30c99d50a083a18c9abd1f2c316db382ef180eec9b",
+      "bytes": 4032
+    },
+    {
+      "path": "web/assets/logos/apto.svg",
+      "sha256": "e859777783c7721b51241b4239072814f876c7923b036f768e816abd3819459a",
+      "bytes": 1995
+    },
+    {
+      "path": "web/assets/logos/benchflow.svg",
+      "sha256": "4c06cec2ea8d225bc33d2d006db26984c7d09b36a0c3ab57360b2494ca650cdb",
+      "bytes": 786
+    },
+    {
+      "path": "web/assets/logos/bespoke_labs.png",
+      "sha256": "ef581a93cf46202566a867d90b96653a34eaae0d9e156a4544a1ca8934959f08",
+      "bytes": 358
+    },
+    {
+      "path": "web/assets/logos/datacurve.svg",
+      "sha256": "74878b66ea43a189fce16e83b4cae0dd7d5ac3b2c1223b4b033f6203a97ee648",
+      "bytes": 1020
+    },
+    {
+      "path": "web/assets/logos/elorian.svg",
+      "sha256": "61e3c1ee6373335100574ad3bbc12228144870e0a83edd3088e1ca2438a69899",
+      "bytes": 10630
+    },
+    {
+      "path": "web/assets/logos/g2i.svg",
+      "sha256": "f24c0c230608c1e3d88dfe817ef6b30af41916a2767ca9a782e0db3683075e70",
+      "bytes": 1488
+    },
+    {
+      "path": "web/assets/logos/giskard.svg",
+      "sha256": "fbda4e3af3b723ae268185ba76a69db2336d8d8340dbae86ed13a1fb6a36e033",
+      "bytes": 6859
+    },
+    {
+      "path": "web/assets/logos/hackerrank.svg",
+      "sha256": "131a7769d766302c77fa3f2a26af9a3dde279fbadef72bebc2715bcad1290b87",
+      "bytes": 14461
+    },
+    {
+      "path": "web/assets/logos/handshake_ai.svg",
+      "sha256": "3942a07858c0b7ea6206a624cc8af50bd36e07ffb0d08c2477118697f35c1e44",
+      "bytes": 1809
+    },
+    {
+      "path": "web/assets/logos/imerit.svg",
+      "sha256": "3441d9a79ebbc926f3ed1f81a65af3823232fabf924b9e4b0ed348fd850c8a77",
+      "bytes": 5159
+    },
+    {
+      "path": "web/assets/logos/invisible.svg",
+      "sha256": "adf39b0b115240881574790b18e1298801e45ca7f8579ed85d21ff3c557872c4",
+      "bytes": 3076
+    },
+    {
+      "path": "web/assets/logos/labelbox.svg",
+      "sha256": "6bdaa67f5681288e32582769b126bd20078d3dea89f191824f0bdd6638cc12b1",
+      "bytes": 4535
+    },
+    {
+      "path": "web/assets/logos/laude.svg",
+      "sha256": "814fa2653d5a0504a669662ad0b2588f057532443baaef4b125c2fe05e4e9748",
+      "bytes": 4142
+    },
+    {
+      "path": "web/assets/logos/mercor.svg",
+      "sha256": "fefbd52e5c8713968e5f6ab0dc6008341b59d38b4c1dae438e93eff39c32cd45",
+      "bytes": 3158
+    },
+    {
+      "path": "web/assets/logos/micro1.svg",
+      "sha256": "b41362125cfe9ff587fbdd4c9aab2c725731f1d61e3d82c4afd849b09cae6f75",
+      "bytes": 3738
+    },
+    {
+      "path": "web/assets/logos/ooak.svg",
+      "sha256": "78030f4fb388fd93d3c8fb7bc03232009dc94b7f6e6a249c47d173c274e283a2",
+      "bytes": 4764
+    },
+    {
+      "path": "web/assets/logos/pareto.svg",
+      "sha256": "8e7dab4a69c0b03cc328615d6f84005173ca9586283fb607561e8af51629eb1e",
+      "bytes": 6488
+    },
+    {
+      "path": "web/assets/logos/polymath_ai_labs.svg",
+      "sha256": "d530f54fdd9f1541bc365d0198994e476bf233853745e6850b5d945e55e7e355",
+      "bytes": 2711
+    },
+    {
+      "path": "web/assets/logos/prime_intellect.svg",
+      "sha256": "108fb8057cf432b47c07329812c980d928b5d9b400fea3cfe9df9c37e85b7e24",
+      "bytes": 18673
+    },
+    {
+      "path": "web/assets/logos/prolific.svg",
+      "sha256": "920e0a88b08167ada500574578c0e1d72ec0ae12e27154d05db8fdd92c941976",
+      "bytes": 4942
+    },
+    {
+      "path": "web/assets/logos/proximal.svg",
+      "sha256": "cdf22dfbeef3b5d8f970d39180e96461e4d6934d212c3587724b1ccb0419b3e6",
+      "bytes": 3158
+    },
+    {
+      "path": "web/assets/logos/quesma.png",
+      "sha256": "9c04c3d851cf72df085cbd483a1779381c3252a342ab577b04ab1b615418a832",
+      "bytes": 24109
+    },
+    {
+      "path": "web/assets/logos/refresh.png",
+      "sha256": "8dd3f5cd5cb2730f2241684acab4cd54f04fc7645194ce84d387ee1b3bb3f2a6",
+      "bytes": 125911
+    },
+    {
+      "path": "web/assets/logos/rws_trainai.svg",
+      "sha256": "dd6e307d41264b54d1b4328e4964b17e053ec9db50b455425de90ebbcb145da0",
+      "bytes": 2241
+    },
+    {
+      "path": "web/assets/logos/sama.svg",
+      "sha256": "a498f7a30a2dca41066b50ced7d4952581947840dc4db364847bb5677edb6da4",
+      "bytes": 3079
+    },
+    {
+      "path": "web/assets/logos/scale_ai.svg",
+      "sha256": "b310c0fe1a24b65391786fa7d819b62522fc6ebf68fe628852e71d7787b7c220",
+      "bytes": 1047
+    },
+    {
+      "path": "web/assets/logos/snorkel_ai.svg",
+      "sha256": "297fe068bb08b4f9ae9dc63ddc002b69e8469172f8e14db1704437cf06411964",
+      "bytes": 17437
+    },
+    {
+      "path": "web/assets/logos/surge_ai.svg",
+      "sha256": "3de51ea915c0fc41b1bf57b1f0d24bc58a81667ecc157d8de757dd288b5307fe",
+      "bytes": 3679
+    },
+    {
+      "path": "web/assets/logos/taskus.svg",
+      "sha256": "4c0d23a7d5786e77ab62de3149edf0ff2ba6db91cddaa7fbf5738fe57cf4f85a",
+      "bytes": 8954
+    },
+    {
+      "path": "web/assets/logos/terac.svg",
+      "sha256": "15ed05af409bf567a9efa09555020e252ecefb5a78ab1b2b2704c91d886f5791",
+      "bytes": 2626
+    },
+    {
+      "path": "web/assets/logos/toloka.svg",
+      "sha256": "c800451ea5d44b96c786012bfec1fea88a425996e4336f8edc7e1be663669c27",
+      "bytes": 323
+    },
+    {
+      "path": "web/assets/logos/trajectory_labs_pbc.svg",
+      "sha256": "daf19b0e3c13c17c7957d47235792852fbb03c2c57ec76f96d20ccb788dff319",
+      "bytes": 1185
+    },
+    {
+      "path": "web/assets/logos/turing.png",
+      "sha256": "ca991262473b3f98eeb2a5ec3df777610a45fe0a0fb39a2aa1b722b55eae2246",
+      "bytes": 15603
+    },
+    {
+      "path": "web/assets/people/afterquery-carlos-georgescu.jpg",
+      "sha256": "5b16d795114de5d74b6ea7370e8dcbf83f0dc8dbce834cc4bdf989c9a6293816",
+      "bytes": 61100
+    },
+    {
+      "path": "web/assets/people/afterquery-spencer-mateega.jpg",
+      "sha256": "1ebeabc97a98ee8674accedc879be5731d813984e3ce48ef1bc4eff3ac16cd35",
+      "bytes": 12866
+    },
+    {
+      "path": "web/assets/products/imerit-exl-visual.png",
+      "sha256": "b1acd6d64bea01499990cc7ddf0f7d04fbef861c30abbcab10b6cd6d1030d029",
+      "bytes": 103906
+    },
+    {
+      "path": "web/assets/products/labelbox-visual.png",
+      "sha256": "cd1f6f8ce4df0d88909e15859ce8761593cc115817c22e967f751e6418cc2f86",
+      "bytes": 95856
+    },
+    {
+      "path": "web/assets/products/sama-visual.png",
+      "sha256": "febd6139a47f841c0c28e8d759ee6ac865ad54db7c26962fb92d016773884383",
+      "bytes": 84946
+    },
+    {
+      "path": "web/edition.css",
+      "sha256": "d6f7b51c209afee8d2c45408bb21d2721e44ded3b2f27a7ba521a8addacdce24",
+      "bytes": 79225
+    },
+    {
+      "path": "web/editorial.js",
+      "sha256": "cc09b2d5f4265d6f049d1e74a62c8fba3f6b224fb4434acb9603a23abb504cc9",
+      "bytes": 8029
+    },
+    {
+      "path": "web/icons.css",
+      "sha256": "eec7242765510baa9cb45c4d374036135519309c9409049192328aeac68efcd4",
+      "bytes": 549
+    },
+    {
+      "path": "web/icons.js",
+      "sha256": "84261cfd8583d1de960f031388f48df4ad3c493bd7e7df5252e327000986e36f",
+      "bytes": 1434
+    },
+    {
+      "path": "web/index.html",
+      "sha256": "7af883f490a31edbb479390b1c0c2e14d79965d564f515adfe3961df08b79aba",
+      "bytes": 20275
+    },
+    {
+      "path": "web/investor.css",
+      "sha256": "0ad5f0d0c31c100d89f64bc9b6f61371dd4c0574e51c86f03647266095d86ca8",
+      "bytes": 2323
+    },
+    {
+      "path": "web/link-health.js",
+      "sha256": "7ce4392050357ba228b61d4921ee52658cbc448927174a3addca62b0c1793b95",
+      "bytes": 2512
+    },
+    {
+      "path": "web/outreach.css",
+      "sha256": "8f90920bf02ab683c96f8997f9eef4ad179644da713d52f758ae6e6ea7190192",
+      "bytes": 8185
+    },
+    {
+      "path": "web/outreach.js",
+      "sha256": "db82820a5b7fff9f00e40d1101c15c92a9cb5170bb52577cff0a535142ee2b4a",
+      "bytes": 15747
+    },
+    {
+      "path": "web/profiles-v2.css",
+      "sha256": "90f897fc394bd4bbb45e36d3748294cd998164a575fd4a9ddbfaee7f5c1a8ca5",
+      "bytes": 13110
+    },
+    {
+      "path": "web/profiles-v2.js",
+      "sha256": "c039790747bbeed140dd9184f8195cbd9ef356f50131a3f1e9c819cf81380a38",
+      "bytes": 34336
+    },
+    {
+      "path": "web/source-updates.js",
+      "sha256": "70d3659ea35a2e85ea0079527f190b7b21b0dddf04db2f3b8c4b886a346eb81e",
+      "bytes": 28527
+    },
+    {
+      "path": "web/style.css",
+      "sha256": "ad3294485f3cedc0ccaa18268071d7817731b6b5262578e4ada76c51a558076a",
+      "bytes": 23941
+    },
+    {
+      "path": "web/work-v3.js",
+      "sha256": "c7fda1d6e4d35d3800980725858b73e061d2b6eae0060ace2704e47f54282788",
+      "bytes": 10773
+    },
+    {
+      "path": "web/work-v4.css",
+      "sha256": "cac1589c7bc5563ee0e039a50a20866629a6aea76f20a1ef17b22a8aff251f00",
+      "bytes": 9214
+    },
+    {
+      "path": "web/work-v4.js",
+      "sha256": "380f388e306ffe6a8635a579bc918867d535c25176af2322eb5dab36898872a9",
+      "bytes": 29592
+    }
+  ]
+}

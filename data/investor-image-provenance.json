@@ -1,0 +1,42 @@
+{
+  "asset_path": "assets/Investor_Snapshot_Human_Depth.png",
+  "file_name": "Investor_Snapshot_Human_Depth.png",
+  "mime_type": "image/png",
+  "width": 1672,
+  "height": 941,
+  "file_size_bytes": 2537604,
+  "sha256": "c84869ef05fd9727d3e0d4705211126d102d7d101751364de394af7ad5130ab0",
+  "source": {
+    "type": "user_approved_library_asset",
+    "library_file_id": "libfile_bd98e896bf4c8191a962d48a373396a5",
+    "file_id": "file_00000000aa2881f59b555a1666f04ce4",
+    "approval_message_id": "Sentinel_1ca3814204d4819185f878fa544fb179",
+    "approval_text": "Ok that is good very good"
+  },
+  "presentation": {
+    "original_bytes_preserved": true,
+    "crop": "none",
+    "placement": "Below the opening homepage hero",
+    "accessible_text": "Concise alternative text, visible qualifications and a complete image transcript",
+    "full_image_link": true
+  },
+  "qualifications": [
+    {
+      "figure": "170",
+      "meaning": "Talent profiles mapped",
+      "qualification": "Sourcing research, not a signed team"
+    },
+    {
+      "figure": "$1B+",
+      "meaning": "Mercor annualized revenue run rate",
+      "qualification": "Company-reported, May 2026; not our revenue"
+    },
+    {
+      "figure": "$65.5B",
+      "meaning": "AI agents & assistants, 2027 forecast",
+      "qualification": "Gartner, Sep 2026; downstream market, not our TAM"
+    }
+  ],
+  "venture_status": "Proposed venture. Learning gains and commercial demand remain unproven.",
+  "verification_note": "These figures are part of the user-approved image. They are not added as audited company metrics in the research database."
+}

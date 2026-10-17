@@ -1,0 +1,1154 @@
+{
+  "version": "1.0.0",
+  "baseline_dataset_version": "2.5.0",
+  "description": "Append-only presentation and evidence-context corrections. Original dataset records remain historical snapshot context; metric values, qualifiers and entity scopes are unchanged.",
+  "evidence_context": {
+    "version": "1.0.0",
+    "corrections": [
+      {
+        "id": "handshake-reporting-context-2026-10-17",
+        "kind": "metric_reporting_context",
+        "company_id": "handshake_ai",
+        "checked_at": null,
+        "review_basis": "retained_public_evidence",
+        "target": {
+          "metric_id": "handshake_ai.metric.major-growth_metrics-0",
+          "claim_id": "handshake_ai.claim.oct14-major-financial-0"
+        },
+        "display_period": "April 2026 · reported",
+        "context": "Dealroom reported nearly $1B in gross annualized AI revenue on 14 April 2026. An investor interview on 23 April separately reported a near-$1B AI run rate without stating gross or net basis.",
+        "sources": [
+          {
+            "source_id": "handshake_ai.source.oct14-e0de0f3911dc",
+            "claim_id": "handshake_ai.claim.oct14-major-financial-0",
+            "publication_date": "2026-04-14",
+            "role": "bound_gross_observation",
+            "access_status": "retained_readable_page",
+            "publication_date_basis": "retained_page_text"
+          },
+          {
+            "source_id": "handshake_ai.source.audit-h4",
+            "claim_id": "handshake_ai.claim.audit-readout",
+            "publication_date": "2026-04-23",
+            "role": "separate_investor_corroboration",
+            "access_status": "retained_readable_page",
+            "publication_date_basis": "retained_page_text"
+          }
+        ],
+        "historical_snapshot": {
+          "dataset_version": "2.5.0",
+          "metrics": [
+            {
+              "as_of": "2026-04-23",
+              "basis": "Scope: Handshake AI business; Original period/date: 2026-04; Revenue/accounting basis: gross before contractor payments",
+              "claim_id": "handshake_ai.claim.oct14-major-financial-0",
+              "company_id": "handshake_ai",
+              "currency": "USD",
+              "gross_vs_net": "gross",
+              "id": "handshake_ai.metric.major-growth_metrics-0",
+              "kind": "annualized_revenue_run_rate",
+              "label": "Nearly $1B AI gross annualized revenue",
+              "observation_status": "reported",
+              "preferred_for_comparison": true,
+              "qualifier": "nearly",
+              "reported_vs_estimated": "reported",
+              "scope_detail": "ai_data",
+              "segment_scope": "ai_data",
+              "unit": "currency",
+              "value": 1000000000
+            }
+          ],
+          "claims": [
+            {
+              "as_of": "2026-04-23",
+              "caveat": "Scope: Handshake AI business; Original period/date: 2026-04; Revenue/accounting basis: gross before contractor payments",
+              "company_id": "handshake_ai",
+              "confidence": "C",
+              "confidence_reason": "Attributed public reporting or database summary; not direct issuer confirmation or an independent financial audit.",
+              "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+              "evidence_label": "Attributed primary-source evidence",
+              "id": "handshake_ai.claim.oct14-major-financial-0",
+              "observed_on": "2026-10-14",
+              "segment_scope": "ai_data",
+              "self_reported": false,
+              "source_ids": [
+                "handshake_ai.source.oct14-e0de0f3911dc"
+              ],
+              "statement": "Nearly $1B AI gross annualized revenue. Scope: Handshake AI business; Original period/date: 2026-04; Revenue/accounting basis: gross before contractor payments",
+              "status": "supported",
+              "subject": "financial metrics"
+            },
+            {
+              "as_of": "2026-10-12",
+              "caveat": "",
+              "company_id": "handshake_ai",
+              "confidence": "B",
+              "confidence_reason": "Researcher synthesis from cited public evidence",
+              "date_note": "",
+              "evidence_label": "Researcher synthesis from cited public evidence",
+              "id": "handshake_ai.claim.audit-readout",
+              "observed_on": "2026-10-12",
+              "raw_path": "data/raw/major-audit/major-ten-corrections.json",
+              "raw_pointer": "/companies/2/commercial_verdict",
+              "segment_scope": "company",
+              "source_ids": [
+                "handshake_ai.source.audit-h1",
+                "handshake_ai.source.audit-h4",
+                "handshake_ai.source.audit-h5",
+                "handshake_ai.source.audit-h7",
+                "handshake_ai.source.audit-audit_h15"
+              ],
+              "statement": "Handshake has a decade-old recruiting network and institutional backing, but its AI operation is a distinct new business. The near-$1B April 2026 run-rate is an investor-published operating claim, not an audited annual revenue figure. Cleanlab adds real research capability in evaluations and data quality. The obvious advantage is access to educated specialist talent; the public gap is named AI-data buyers, segment margins and a consistent dated revenue series. Historical parent funding and valuation should remain visible without being attributed to the AI division.",
+              "status": "supported",
+              "subject": "editorial readout"
+            }
+          ],
+          "sources": [
+            {
+              "accessed_on": "2026-10-14",
+              "company_id": "handshake_ai",
+              "id": "handshake_ai.source.oct14-e0de0f3911dc",
+              "notes": "Reviewed public source in the October 14 research pass. Source and claim dates remain separate; company statements are not independent audits.",
+              "publisher": "dealroom.co",
+              "retrieval_status": "checked",
+              "source_type": "database",
+              "title": "Dealroom: Handshake AI revenue",
+              "url": "https://dealroom.co/news/127345-handshakes-arr-crosses-1b-as-ai-training-revenue-surges/"
+            },
+            {
+              "accessed_on": "2026-10-12",
+              "company_id": "handshake_ai",
+              "id": "handshake_ai.source.audit-h4",
+              "notes": "Review status: reopened and reverified 2026-10-12. ",
+              "published_on": "2026-04-23",
+              "publisher": "www.notablecap.com",
+              "retrieval_status": "checked",
+              "source_type": "investor",
+              "title": "AI business run-rate",
+              "url": "https://www.notablecap.com/blog/garrett-lord-went-all-in-on-handshake-ai-now-its-at-nearly-1b"
+            }
+          ]
+        },
+        "reviewed_on": "2026-10-17"
+      },
+      {
+        "id": "prolific-readout-support-2026-10-17",
+        "kind": "claim_source_supplement",
+        "company_id": "prolific",
+        "checked_at": null,
+        "review_basis": "retained_public_evidence",
+        "target": {
+          "claim_id": "prolific.claim.audit-readout"
+        },
+        "context": "The financial figures in this readout refer to the retained CEO-post evidence linked below.",
+        "access_note": "The post was not reverified for this correction. Recent reader attempts returned an error or sign-in page. The original research claim remains available.",
+        "sources": [
+          {
+            "source_id": "prolific.source.audit-f1a6aacb51",
+            "claim_id": "prolific.claim.audit-0-metric",
+            "publication_date": null,
+            "role": "direct_financial_support",
+            "access_status": "not_refetched",
+            "publication_date_basis": "not_established"
+          }
+        ],
+        "historical_snapshot": {
+          "dataset_version": "2.5.0",
+          "metrics": [],
+          "claims": [
+            {
+              "as_of": "undated",
+              "caveat": "",
+              "company_id": "prolific",
+              "confidence": "B",
+              "confidence_reason": "Reviewed public evidence",
+              "date_note": "",
+              "evidence_label": "Reviewed public evidence",
+              "id": "prolific.claim.audit-readout",
+              "observed_on": "2026-10-12",
+              "raw_path": "data/raw/final-core/core-priority-audit.json",
+              "raw_pointer": "/companies/1",
+              "segment_scope": "company",
+              "source_ids": [
+                "prolific.source.d_pro4",
+                "prolific.source.d_pro6",
+                "prolific.source.d_pro1",
+                "prolific.source.d_pro2",
+                "prolific.source.d_pro7",
+                "prolific.source.d_pro3",
+                "prolific.source.d_pro12",
+                "prolific.source.d_pro5",
+                "prolific.source.d_pro8",
+                "prolific.source.d_pro9",
+                "prolific.source.d_pro10"
+              ],
+              "statement": "Established verified-participant platform with substantial AI-data delivery. The CEO reports $300M+ annualized revenue in spring 2026 and a $10M revenue week; these are company claims with unresolved gross-versus-net basis, not audited annual revenue. The prior profile materially understated commercial scale by omitting them.",
+              "status": "supported",
+              "subject": "editorial readout"
+            },
+            {
+              "as_of": "2026-04 (inferred)",
+              "caveat": "",
+              "company_id": "prolific",
+              "confidence": "B",
+              "confidence_reason": "CEO-reported operating figures; unaudited",
+              "date_note": "The page currently shows a relative age and Edited, not an absolute date. LinkedIn activity-ID timestamp decodes to 2026-05-11 17:03:50 UTC; therefore previous month is inferred April 2026. Do not present this inferred date as a printed publication date. Gross/net accounting basis is unspecified in CEO post.",
+              "evidence_label": "CEO-reported operating figures; unaudited",
+              "id": "prolific.claim.audit-0-metric",
+              "observed_on": "2026-10-12",
+              "raw_path": "data/raw/final-core/core-priority-audit.json",
+              "raw_pointer": "/companies/1/metrics_to_add/0",
+              "segment_scope": "company",
+              "source_ids": [
+                "prolific.source.audit-f1a6aacb51"
+              ],
+              "statement": "CEO Phelim Bradley reported that Prolific had crossed $300M annualized revenue in the previous month and completed a $10M revenue week. He separately projected $500M annualized revenue by end-May and said cumulative participant payouts exceeded $500M. The target is a forecast; payouts are neither revenue nor funding.",
+              "status": "supported",
+              "subject": "growth metrics"
+            }
+          ],
+          "sources": [
+            {
+              "accessed_on": "2026-10-12",
+              "company_id": "prolific",
+              "id": "prolific.source.audit-f1a6aacb51",
+              "publisher": "www.linkedin.com",
+              "retrieval_status": "checked",
+              "source_type": "company",
+              "title": "CEO-reported operating figures; unaudited",
+              "url": "https://www.linkedin.com/posts/phelim-bradley-84300826_prolific-just-finished-a-10m-revenue-week-activity-7459649483899891713-2DAA"
+            }
+          ]
+        },
+        "reviewed_on": "2026-10-17"
+      },
+      {
+        "id": "mercor-gross-basis-support-2026-10-17",
+        "kind": "financial-basis-source-supplement",
+        "company_id": "mercor",
+        "reviewed_on": "2026-10-17",
+        "checked_at": null,
+        "review_basis": "retained_public_evidence",
+        "target": {
+          "metric_id": "mercor.metric.oct14-major-financial-2",
+          "claim_id": "mercor.claim.oct14-major-financial-2"
+        },
+        "display_basis": "gross (Sacra estimate)",
+        "display_attribution": "Felicis reports the pace; Sacra estimates the gross basis.",
+        "context": "Felicis published Mercor’s statement that annualized revenue reached $2B by June 2026, without defining gross or net basis. Sacra separately estimates $2B of annualized gross revenue in June and defines gross as customer spend before contractor payouts. The June pace is not full-year revenue.",
+        "sources": [
+          {
+            "source_id": "mercor.source.oct14-88dab2271689",
+            "claim_id": "mercor.claim.oct14-major-financial-2",
+            "publication_date": "2026-07-21",
+            "publication_date_basis": "retained_page_text",
+            "role": "bound_investor_run_rate",
+            "access_status": "retained_readable_page"
+          },
+          {
+            "source_id": "mercor.source.audit-m6",
+            "claim_id": "mercor.claim.major-growth_metrics-0",
+            "publication_date": null,
+            "publication_date_basis": "not_established",
+            "role": "secondary_gross_basis_estimate",
+            "access_status": "retained_readable_page"
+          }
+        ],
+        "historical_snapshot": {
+          "dataset_version": "2.5.0",
+          "metrics": [
+            {
+              "as_of": "2026-06",
+              "basis": "Gross basis corroborated at https://sacra.com/c/mercor/ . Not net revenue or FY revenue.; Scope: company; Original period/date: 2026-06; Revenue/accounting basis: gross, per Sacra corroboration",
+              "claim_id": "mercor.claim.oct14-major-financial-2",
+              "company_id": "mercor",
+              "currency": "USD",
+              "gross_vs_net": "gross",
+              "id": "mercor.metric.oct14-major-financial-2",
+              "kind": "annualized_revenue_run_rate",
+              "label": "$2B annualized gross revenue",
+              "observation_status": "reported",
+              "qualifier": "exact",
+              "reported_vs_estimated": "reported",
+              "segment_scope": "company",
+              "unit": "currency",
+              "value": 2000000000
+            }
+          ],
+          "claims": [
+            {
+              "as_of": "2026-06",
+              "caveat": "Gross basis corroborated at https://sacra.com/c/mercor/ . Not net revenue or FY revenue.; Scope: company; Original period/date: 2026-06; Revenue/accounting basis: gross, per Sacra corroboration",
+              "company_id": "mercor",
+              "confidence": "B",
+              "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+              "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+              "evidence_label": "Investor-reported",
+              "id": "mercor.claim.oct14-major-financial-2",
+              "observed_on": "2026-10-14",
+              "segment_scope": "company",
+              "self_reported": false,
+              "source_ids": [
+                "mercor.source.oct14-88dab2271689"
+              ],
+              "statement": "$2B annualized gross revenue. Gross basis corroborated at https://sacra.com/c/mercor/ . Not net revenue or FY revenue.; Scope: company; Original period/date: 2026-06; Revenue/accounting basis: gross, per Sacra corroboration",
+              "status": "supported",
+              "subject": "financial metrics"
+            },
+            {
+              "as_of": "2026-06",
+              "caveat": "",
+              "company_id": "mercor",
+              "confidence": "C",
+              "confidence_reason": "independent estimate corroborated by investor published company claim",
+              "date_note": "",
+              "evidence_label": "independent estimate corroborated by investor published company claim",
+              "id": "mercor.claim.major-growth_metrics-0",
+              "observed_on": "2026-10-12",
+              "raw_path": "data/raw/major-audit/major-ten-corrections.json",
+              "raw_pointer": "/companies/0/growth_metrics/0",
+              "segment_scope": "ai_data",
+              "source_ids": [
+                "mercor.source.audit-m6",
+                "mercor.source.audit-audit_m18"
+              ],
+              "statement": "Annualized gross revenue run rate: 2,000,000,000 USD. Period: 2026-06.",
+              "status": "supported",
+              "subject": "growth metrics"
+            }
+          ],
+          "sources": [
+            {
+              "accessed_on": "2026-10-14",
+              "company_id": "mercor",
+              "id": "mercor.source.oct14-88dab2271689",
+              "notes": "Reviewed public source in the October 14 research pass. Source and claim dates remain separate; company statements are not independent audits.",
+              "publisher": "www.felicis.com",
+              "retrieval_status": "checked",
+              "source_type": "investor",
+              "title": "Felicis investor profile",
+              "url": "https://www.felicis.com/blog/mercor-profile-organizing-human-intelligence-to-power-the-ai-economy"
+            },
+            {
+              "accessed_on": "2026-10-12",
+              "company_id": "mercor",
+              "id": "mercor.source.audit-m6",
+              "notes": "Review status: reopened and reverified 2026-10-12. ",
+              "publisher": "sacra.com",
+              "retrieval_status": "checked",
+              "source_type": "independent_reporting",
+              "title": "Mercor financial profile",
+              "url": "https://sacra.com/c/mercor/"
+            }
+          ]
+        }
+      },
+      {
+        "id": "terac-dialogue-assessment-scope-2026-10-17",
+        "kind": "relationship-assessment-scope-context",
+        "company_id": "terac",
+        "reviewed_on": "2026-10-17",
+        "checked_at": null,
+        "review_basis": "retained_public_evidence",
+        "target": {
+          "claim_id": "terac.claim.customers-0",
+          "customer_record_id": "terac.customer.0",
+          "assessment_id": "terac.assessment.ai_data"
+        },
+        "affected_claim_ids": [
+          "terac.claim.customers-0",
+          "terac.claim.assessment-evidence-p",
+          "terac.claim.assessment-evidence-c",
+          "terac.claim.assessment-evidence-r"
+        ],
+        "display_scope": "Market research",
+        "context": "Dialogue’s case describes participant recruitment for market research. AI-assisted screening does not make that engagement evidence of AI training or evaluation work.",
+        "relationship_context": "The named Dialogue case covers participant recruitment for market research.",
+        "assessment_context": "The original Demonstrated delivery assessment is retained. Separate Spade testimony describes delivered expert annotation; Dialogue’s market-research engagement is not AI-data delivery. The cited payout forecast does not establish a completed paid AI-data project or repeat business.",
+        "criterion_context": {
+          "P": "Dialogue is a market-research engagement. The separately cited June 2026 API article describes a dated expert-labor workflow for AI work.",
+          "C": "Dialogue is a market-research engagement. Separate Spade CTO testimony on Terac’s about page describes delivered annotation of cattle video and sensor data. Terac publishes that testimony; it is not independent buyer corroboration.",
+          "R": "Dialogue is a market-research engagement. The August 2026 source forecasts expert payouts; it does not establish a completed paid AI-data project or repeat business."
+        },
+        "sources": [
+          {
+            "source_id": "terac.source.terac-4",
+            "claim_id": "terac.claim.customers-0",
+            "publication_date": "2026-05-31",
+            "publication_date_basis": "retained_page_text",
+            "role": "market_research_engagement",
+            "access_status": "retained_readable_page"
+          },
+          {
+            "source_id": "terac.source.terac-1",
+            "claim_id": "terac.claim.assessment-evidence-c",
+            "publication_date": null,
+            "publication_date_basis": "not_established",
+            "role": "separate_annotation_testimony",
+            "access_status": "retained_readable_page"
+          },
+          {
+            "source_id": "terac.source.terac-2",
+            "claim_id": "terac.claim.assessment-evidence-p",
+            "publication_date": "2026-06-18",
+            "publication_date_basis": "retained_page_text",
+            "role": "dated_ai_workflow",
+            "access_status": "retained_readable_page"
+          },
+          {
+            "source_id": "terac.source.terac-7",
+            "claim_id": "terac.claim.assessment-evidence-r",
+            "publication_date": "2026-08-12",
+            "publication_date_basis": "retained_page_text",
+            "role": "expert_payout_forecast",
+            "access_status": "retained_readable_page"
+          }
+        ],
+        "historical_snapshot": {
+          "dataset_version": "2.5.0",
+          "metrics": [],
+          "claims": [
+            {
+              "as_of": "2026-05-31",
+              "company_id": "terac",
+              "confidence": "B",
+              "confidence_reason": "Attributed company, investor, or named primary statement. Research label: researcher-assigned evidence grade.",
+              "date_note": "Date label preserved from research; access dates are not substituted.",
+              "id": "terac.claim.customers-0",
+              "observed_on": "2026-10-12",
+              "raw_path": "data/raw/library-v1/market-research-v1.json",
+              "raw_pointer": "/companies/25/customers/0",
+              "segment_scope": "ai_data",
+              "self_reported": true,
+              "source_ids": [
+                "terac.source.terac-4"
+              ],
+              "statement": "Supplier-published Dialogue case study says it recruited 25 startup-founder participants in under four days. Supports a specific engagement, not disclosed contract value.",
+              "status": "supported",
+              "subject": "customers"
+            },
+            {
+              "as_of": "2026-10-12",
+              "company_id": "terac",
+              "confidence": "B",
+              "confidence_reason": "Attributed company, investor, or named primary statement. Research label: researcher-assigned evidence grade.",
+              "date_note": "Date label preserved from research; access dates are not substituted.",
+              "id": "terac.claim.assessment-evidence-p",
+              "observed_on": "2026-10-12",
+              "raw_path": "data/raw/library-v1/market-research-v1.json",
+              "raw_pointer": "/companies/25/assessment/evidence/P",
+              "segment_scope": "ai_data",
+              "source_ids": [
+                "terac.source.terac-2",
+                "terac.source.terac-4"
+              ],
+              "statement": "Concrete expert-recruitment, screening and delivery workflow, dated 2026 API/program activity.",
+              "status": "supported",
+              "subject": "ai data gate P"
+            },
+            {
+              "as_of": "2026-10-12",
+              "company_id": "terac",
+              "confidence": "B",
+              "confidence_reason": "Attributed company, investor, or named primary statement. Research label: researcher-assigned evidence grade.",
+              "date_note": "Date label preserved from research; access dates are not substituted.",
+              "id": "terac.claim.assessment-evidence-c",
+              "observed_on": "2026-10-12",
+              "raw_path": "data/raw/library-v1/market-research-v1.json",
+              "raw_pointer": "/companies/25/assessment/evidence/C",
+              "segment_scope": "ai_data",
+              "source_ids": [
+                "terac.source.terac-4",
+                "terac.source.terac-1"
+              ],
+              "statement": "Detailed named Dialogue deployment; attributed Maze/Spade/Vetto testimonials corroborate supplier account only.",
+              "status": "supported",
+              "subject": "ai data gate C"
+            },
+            {
+              "as_of": "2026-10-12",
+              "company_id": "terac",
+              "confidence": "B",
+              "confidence_reason": "Attributed company, investor, or named primary statement. Research label: researcher-assigned evidence grade.",
+              "date_note": "Date label preserved from research; access dates are not substituted.",
+              "id": "terac.claim.assessment-evidence-r",
+              "observed_on": "2026-10-12",
+              "raw_path": "data/raw/library-v1/market-research-v1.json",
+              "raw_pointer": "/companies/25/assessment/evidence/R",
+              "segment_scope": "ai_data",
+              "source_ids": [
+                "terac.source.terac-4",
+                "terac.source.terac-7"
+              ],
+              "statement": "Dated completed Dialogue delivery and explicit expert payouts. No R2-qualified time series or renewal.",
+              "status": "supported",
+              "subject": "ai data gate R"
+            }
+          ],
+          "sources": [
+            {
+              "accessed_on": "2026-10-12",
+              "company_id": "terac",
+              "id": "terac.source.terac-4",
+              "notes": "supplier_customer_case_study",
+              "published_on": "2026-05-31",
+              "publisher": "Terac",
+              "retrieval_status": "checked",
+              "source_type": "company",
+              "title": "How Dialogue sourced 25 startup founders in under 4 days",
+              "url": "https://terac.com/customers/dialogue-startup-founders"
+            },
+            {
+              "accessed_on": "2026-10-12",
+              "company_id": "terac",
+              "id": "terac.source.terac-1",
+              "notes": "company_primary Selected primary page rechecked October 15, 2026; redirects retain their historical source URL. Current HackerRank brand is Bench; current Invisible page identifies Francis as founder. Undated operating claims retain undated labels.",
+              "publisher": "Terac",
+              "retrieval_status": "checked",
+              "source_type": "company",
+              "title": "About: Efficiently Allocating the World’s Labor",
+              "url": "https://terac.com/about"
+            },
+            {
+              "accessed_on": "2026-10-12",
+              "company_id": "terac",
+              "id": "terac.source.terac-2",
+              "notes": "company_primary",
+              "published_on": "2026-06-18",
+              "publisher": "Terac",
+              "retrieval_status": "checked",
+              "source_type": "company",
+              "title": "Terac x Berkeley AI: Our Hackathon Challenge",
+              "url": "https://terac.com/blog/terac-x-berkeley-ai-hackathon"
+            },
+            {
+              "accessed_on": "2026-10-12",
+              "company_id": "terac",
+              "id": "terac.source.terac-7",
+              "notes": "company_primary",
+              "published_on": "2026-08-12",
+              "publisher": "Terac",
+              "retrieval_status": "checked",
+              "source_type": "company",
+              "title": "The World’s First Zero Human Company Hackathon",
+              "url": "https://terac.com/blog/zero-human-company-hackathon"
+            }
+          ],
+          "assessments": [
+            {
+              "as_of": "2026-10-12",
+              "company_id": "terac",
+              "gates": {
+                "C": {
+                  "claim_ids": [
+                    "terac.claim.assessment-evidence-c"
+                  ],
+                  "level": "2",
+                  "rationale": "Detailed named Dialogue deployment; attributed Maze/Spade/Vetto testimonials corroborate supplier account only."
+                },
+                "O": {
+                  "claim_ids": [
+                    "terac.claim.assessment-evidence-o"
+                  ],
+                  "level": "1",
+                  "rationale": "Named accountable founders, screening/verification and payout process. Inconsistent headcount does not erase team identity, but current operational controls lack independent scope."
+                },
+                "P": {
+                  "claim_ids": [
+                    "terac.claim.assessment-evidence-p"
+                  ],
+                  "level": "2",
+                  "rationale": "Concrete expert-recruitment, screening and delivery workflow, dated 2026 API/program activity."
+                },
+                "R": {
+                  "claim_ids": [
+                    "terac.claim.assessment-evidence-r"
+                  ],
+                  "level": "1",
+                  "rationale": "Dated completed Dialogue delivery and explicit expert payouts. No R2-qualified time series or renewal."
+                }
+              },
+              "id": "terac.assessment.ai_data",
+              "material_conflict": false,
+              "reviewer": "Public research batch integrated final v1",
+              "rubric_version": "1.0.0",
+              "segment_scope": "ai_data",
+              "stage_limitations": "A dated named research delivery supports demonstrated delivery. Current evidence does not establish renewal/expansion or two dated commercial deliveries six months apart; specific buyer-facing QA/security documentation was not fully reviewed."
+            }
+          ],
+          "customer_evidence": [
+            {
+              "claim_id": "terac.claim.customers-0",
+              "company_id": "terac",
+              "disclosure": "company_named",
+              "id": "terac.customer.0",
+              "organization": "Supplier-published Dialogue case study says it recruited 25 startup-founder participants in under four days. Supports a specific engagement, not disclosed contract value.",
+              "paid_status": "unknown",
+              "relationship": "claimed_customer",
+              "segment_scope": "ai_data",
+              "use_case": "Supplier-published Dialogue case study says it recruited 25 startup-founder participants in under four days. Supports a specific engagement, not disclosed contract value."
+            }
+          ],
+          "profile_relationships": [
+            {
+              "company_id": "terac",
+              "relationship": {
+                "name": "Dialogue",
+                "relationship": "claimed_customer",
+                "description": "Terac’s case study describes recruiting 25 startup founders in under four days. Contract value is undisclosed.",
+                "record_ids": [
+                  "terac.customer.0"
+                ],
+                "claim_ids": [
+                  "terac.claim.customers-0"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "ooak-data-partner-offer-context-2026-10-17",
+        "kind": "historical-offer-source-context",
+        "company_id": "ooak",
+        "reviewed_on": "2026-10-17",
+        "checked_at": null,
+        "review_basis": "retained_public_evidence",
+        "target": {
+          "metric_id": "ooak.metric.oct14-4-data-partner-payout-cap",
+          "claim_id": "ooak.claim.oct14-metric-4-data-partner-payout-cap",
+          "product_id": "ooak.product.1"
+        },
+        "affected_claim_ids": [
+          "ooak.claim.oct14-metric-4-data-partner-payout-cap",
+          "ooak.claim.products-1"
+        ],
+        "display_label": "Original data-partner offer cap",
+        "display_period": "Original snapshot recorded 14 Oct 2026 · Source date not stated",
+        "context": "Original research records from 12 and 14 October 2026 list up to $300K for company-data licensing. In a retained read from 16 October, the official partner page advertises up to $1M for the same offer. These are marketing ceilings for payment to the company, subject to a data audit; they are not individual pay rates or guaranteed payments. The change date is not established.",
+        "sources": [
+          {
+            "source_id": "ooak.source.oct14-5bc8f134e0b5",
+            "claim_id": "ooak.claim.oct14-metric-4-data-partner-payout-cap",
+            "publication_date": null,
+            "publication_date_basis": "not_established",
+            "role": "retained_issuer_offer",
+            "access_status": "retained_readable_page"
+          }
+        ],
+        "retained_read": {
+          "started_at": "2026-10-16 23:56:42 UTC",
+          "completed_at": "2026-10-16 23:56:43 UTC",
+          "raw_evidence_file": "output/reliability-20261016-2247/link-reader-1/batch-166-166-raw.json",
+          "sha256": "1cb6464c6c50bef5794381345afefd2436cf5b87a501b9c6339ad86186b3da77",
+          "source_publication_date": null,
+          "change_date": null
+        },
+        "historical_snapshot": {
+          "dataset_version": "2.5.0",
+          "metrics": [
+            {
+              "as_of": "undated",
+              "basis": "Advertised company-data licensing offer; Marketing ceiling, not hourly work pay or guaranteed offer.; Source type: data_partner_payout_cap; original value: 300000 USD, up to",
+              "claim_id": "ooak.claim.oct14-metric-4-data-partner-payout-cap",
+              "company_id": "ooak",
+              "currency": "USD",
+              "gross_vs_net": "unspecified",
+              "id": "ooak.metric.oct14-4-data-partner-payout-cap",
+              "kind": "other",
+              "label": "Data partner payout cap",
+              "observation_status": "reported",
+              "qualifier": "at_most",
+              "reported_vs_estimated": "reported",
+              "segment_scope": "company",
+              "unit": "currency",
+              "value": 300000
+            }
+          ],
+          "claims": [
+            {
+              "as_of": "undated",
+              "caveat": "Advertised company-data licensing offer; Marketing ceiling, not hourly work pay or guaranteed offer.; Source type: data_partner_payout_cap; original value: 300000 USD, up to",
+              "company_id": "ooak",
+              "confidence": "B",
+              "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+              "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+              "evidence_label": "Company-reported",
+              "id": "ooak.claim.oct14-metric-4-data-partner-payout-cap",
+              "observed_on": "2026-10-14",
+              "segment_scope": "company",
+              "self_reported": true,
+              "source_ids": [
+                "ooak.source.oct14-5bc8f134e0b5"
+              ],
+              "statement": "Data partner payout cap: 300000 USD, up to. Advertised company-data licensing offer; Marketing ceiling, not hourly work pay or guaranteed offer.; Source type: data_partner_payout_cap; original value: 300000 USD, up to",
+              "status": "supported",
+              "subject": "operating metric"
+            },
+            {
+              "as_of": "2026-10-12",
+              "company_id": "ooak",
+              "confidence": "B",
+              "confidence_reason": "Attributed company, investor, or named primary statement. Research label: researcher-assigned evidence grade.",
+              "date_note": "Date label preserved from research; access dates are not substituted.",
+              "id": "ooak.claim.products-1",
+              "observed_on": "2026-10-12",
+              "raw_path": "data/raw/library-v1/market-research-v1.json",
+              "raw_pointer": "/companies/23/products/1",
+              "segment_scope": "ai_data",
+              "self_reported": true,
+              "source_ids": [
+                "ooak.source.ooak-5"
+              ],
+              "statement": "Data-partner business licenses company operational data, advertises up to $300,000 to eligible data partners and a 2–4 week process. This is company-data licensing compensation, not contractor salary or Ooak revenue.",
+              "status": "supported",
+              "subject": "products"
+            }
+          ],
+          "sources": [
+            {
+              "accessed_on": "2026-10-14",
+              "company_id": "ooak",
+              "id": "ooak.source.oct14-5bc8f134e0b5",
+              "notes": "Reviewed public source in the October 14 research pass. Source and claim dates remain separate; company statements are not independent audits.",
+              "publisher": "ooakdata.com",
+              "retrieval_status": "checked",
+              "source_type": "company",
+              "title": "Ooak Data: /partner",
+              "url": "https://ooakdata.com/partner"
+            },
+            {
+              "accessed_on": "2026-10-12",
+              "company_id": "ooak",
+              "id": "ooak.source.ooak-5",
+              "notes": "company_primary",
+              "publisher": "Ooak Data",
+              "retrieval_status": "checked",
+              "source_type": "company",
+              "title": "Turn your data into revenue",
+              "url": "https://ooakdata.com/partner"
+            }
+          ],
+          "products": [
+            {
+              "claim_id": "ooak.claim.products-1",
+              "company_id": "ooak",
+              "delivery_model": "",
+              "id": "ooak.product.1",
+              "name": "Offer / product evidence 2",
+              "segment_scope": "ai_data",
+              "work_performed": "Data-partner business licenses company operational data, advertises up to $300,000 to eligible data partners and a 2–4 week process. This is company-data licensing compensation, not contractor salary or Ooak revenue."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "updates": [
+    {
+      "id": "elorian-platform-availability-2026-10-16",
+      "company_id": "elorian",
+      "target": {
+        "product_name": "Visual-thinking foundation model",
+        "record_ids": [
+          "elorian.product.oct14-0"
+        ],
+        "claim_ids": [
+          "elorian.claim.oct14-product-0"
+        ]
+      },
+      "previous_fields": {
+        "description": "An unreleased model for spatial and physical reasoning. Early access has a waitlist.",
+        "status": "Unreleased; early-access waitlist"
+      },
+      "replacement_fields": {
+        "description": "Glimpse is a visual-thinking model, offered through API and chat as a research preview.",
+        "status": "Research preview available · company-reported"
+      },
+      "source": {
+        "url": "https://elorian.ai/blog/introducing-glimpse",
+        "title": "Introducing Glimpse",
+        "observed_on": "2026-10-16",
+        "published_on": "2026-10-16"
+      },
+      "supporting_sources": [
+        {
+          "url": "https://elorian.ai/models",
+          "title": "Models | Elorian",
+          "observed_on": "2026-10-16",
+          "published_on": null
+        }
+      ],
+      "qualification": "Company-reported research preview. Signup and access conditions, pricing and usage were not independently verified. This corrects availability wording only; no new paying-customer or revenue evidence is established.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "elorian.claim.products-0",
+            "company_id": "elorian",
+            "delivery_model": "",
+            "id": "elorian.product.0",
+            "name": "Offer / product evidence 1",
+            "segment_scope": "ai_data",
+            "work_performed": "Develops native visual reasoning across spatial relationships, physical constraints and design. Current models page still says first foundation visual-thinking model will be released later in 2026 and offers an early-access waitlist."
+          },
+          {
+            "claim_id": "elorian.claim.oct14-product-0",
+            "company_id": "elorian",
+            "delivery_model": "",
+            "id": "elorian.product.oct14-0",
+            "name": "Visual-thinking foundation model",
+            "segment_scope": "company",
+            "work_performed": "Research targets native visual reasoning about spatial relationships, physical constraints, and design intent."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "2026-10-12",
+            "company_id": "elorian",
+            "confidence": "B",
+            "confidence_reason": "Attributed company, investor, or named primary statement. Research label: researcher-assigned evidence grade.",
+            "date_note": "Date label preserved from research; access dates are not substituted.",
+            "id": "elorian.claim.products-0",
+            "observed_on": "2026-10-12",
+            "raw_path": "data/raw/library-v1/market-research-v1.json",
+            "raw_pointer": "/companies/24/products/0",
+            "segment_scope": "ai_data",
+            "self_reported": true,
+            "source_ids": [
+              "elorian.source.elorian-1",
+              "elorian.source.elorian-5"
+            ],
+            "statement": "Develops native visual reasoning across spatial relationships, physical constraints and design. Current models page still says first foundation visual-thinking model will be released later in 2026 and offers an early-access waitlist.",
+            "status": "supported",
+            "subject": "products"
+          },
+          {
+            "as_of": "2026-10-12",
+            "company_id": "elorian",
+            "confidence": "B",
+            "confidence_reason": "Attributed company, investor, or named primary statement. Research label: researcher-assigned evidence grade.",
+            "date_note": "Date label preserved from research; access dates are not substituted.",
+            "id": "elorian.claim.customers-0",
+            "observed_on": "2026-10-12",
+            "raw_path": "data/raw/library-v1/market-research-v1.json",
+            "raw_pointer": "/companies/24/customers/0",
+            "segment_scope": "ai_data",
+            "self_reported": true,
+            "source_ids": [
+              "elorian.source.elorian-1",
+              "elorian.source.elorian-2",
+              "elorian.source.elorian-5"
+            ],
+            "statement": "No named paying customers verified. Current public product is a waitlist; staff pedigrees and investor names are not customer evidence.",
+            "status": "supported",
+            "subject": "customers"
+          },
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "elorian",
+            "confidence": "B",
+            "confidence_reason": "Reviewed public evidence",
+            "date_note": "",
+            "evidence_label": "Reviewed public evidence",
+            "id": "elorian.claim.audit-readout",
+            "observed_on": "2026-10-12",
+            "raw_path": "data/raw/final-core/core-priority-audit.json",
+            "raw_pointer": "/companies/3",
+            "segment_scope": "company",
+            "source_ids": [
+              "elorian.source.elorian-1",
+              "elorian.source.elorian-2",
+              "elorian.source.elorian-3",
+              "elorian.source.elorian-4",
+              "elorian.source.elorian-5",
+              "elorian.source.elorian-7",
+              "elorian.source.elorian-6"
+            ],
+            "statement": "Well-funded visual-reasoning model developer with an accomplished research team, not a third-party data-labeling supplier. Public model access remains waitlisted as of this review; no production revenue or named paying customers were established. Funding is evidence of financing, not product-market fit.",
+            "status": "supported",
+            "subject": "editorial readout"
+          },
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "elorian",
+            "confidence": "B",
+            "confidence_reason": "current company product page",
+            "date_note": "",
+            "evidence_label": "current company product page",
+            "id": "elorian.claim.audit-model-access-status",
+            "observed_on": "2026-10-12",
+            "raw_path": "data/raw/final-core/core-priority-audit.json",
+            "raw_pointer": "/companies/3/claims_to_add/1",
+            "segment_scope": "company",
+            "source_ids": [
+              "elorian.source.elorian-5"
+            ],
+            "statement": "The models page says the first visual-thinking foundation model will be released later in the year and invites early-access waitlist registrations. This demonstrates a publicly pre-release product state on the reviewed page, not proof the company has no private pilots.",
+            "status": "supported",
+            "subject": "product availability"
+          },
+          {
+            "as_of": "undated",
+            "caveat": "Not a generic human-data marketplace or primarily an RL-environment vendor. No named paying customers verified; product is in waitlist stage. Do not infer mentorship from working alongside researchers. Dustin Tran is Chief Reasoning Architect; official page does not label him co-founder.",
+            "company_id": "elorian",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "elorian.claim.oct14-identity",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "elorian.source.oct14-05d9ea1894cf"
+            ],
+            "statement": "Develops foundation models that reason visually about space, physics, and creative problems.",
+            "status": "supported",
+            "subject": "category"
+          },
+          {
+            "as_of": "undated",
+            "caveat": "Unreleased; early-access waitlist",
+            "company_id": "elorian",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "elorian.claim.oct14-product-0",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "elorian.source.oct14-05d9ea1894cf"
+            ],
+            "statement": "Visual-thinking foundation model: Research targets native visual reasoning about spatial relationships, physical constraints, and design intent.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "elorian.claim.products-0",
+        "elorian.claim.oct14-product-0",
+        "elorian.claim.customers-0",
+        "elorian.claim.audit-readout",
+        "elorian.claim.audit-model-access-status",
+        "elorian.claim.oct14-identity"
+      ],
+      "affected_record_ids": [
+        "elorian.product.0",
+        "elorian.product.oct14-0"
+      ]
+    },
+    {
+      "id": "a-team-intelligence-layer-2026-10-16",
+      "company_id": "a-team",
+      "target": {
+        "product_name": "Intelligence Layer",
+        "record_ids": [
+          "a-team.product.oct14-1"
+        ],
+        "claim_ids": [
+          "a-team.claim.oct14-product-1"
+        ]
+      },
+      "previous_fields": {
+        "description": "Senior engineering teams build and run business AI systems."
+      },
+      "replacement_fields": {
+        "description": "Shared context and accumulated learning that the AI teammates read and update."
+      },
+      "source": {
+        "url": "https://www.a.team/",
+        "title": "Agentic AI Teammates for Consumer Brands | A.Team",
+        "observed_on": "2026-10-16",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Curated product description and source binding correction. Earlier company-level engineering statements retain their original scope.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "a-team.claim.oct14-product-1",
+            "company_id": "a-team",
+            "delivery_model": "Current homepage sells embedded AI systems and forward-deployed engineering; the talent network supplies delivery teams.",
+            "id": "a-team.product.oct14-1",
+            "name": "Intelligence Layer",
+            "segment_scope": "company",
+            "work_performed": "Embeds senior engineering teams to build and operate enterprise agentic AI systems"
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "a-team",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "a-team.claim.oct14-product-1",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "a-team.source.oct14-2ed4834592cc"
+            ],
+            "statement": "Intelligence Layer: Embeds senior engineering teams to build and operate enterprise agentic AI systems",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "a-team.claim.oct14-product-1"
+      ],
+      "affected_record_ids": [
+        "a-team.product.oct14-1"
+      ]
+    },
+    {
+      "id": "a-team-forward-deployed-engineers-2026-10-16",
+      "company_id": "a-team",
+      "target": {
+        "product_name": "Forward Deployed Engineers",
+        "record_ids": [
+          "a-team.product.oct14-2",
+          "a-team.product.0",
+          "a-team.product.1"
+        ],
+        "claim_ids": [
+          "a-team.claim.oct14-product-2",
+          "a-team.claim.products-0",
+          "a-team.claim.products-1"
+        ]
+      },
+      "previous_fields": {
+        "description": "Engineers build task evaluations and systems for further model training."
+      },
+      "replacement_fields": {
+        "description": "Senior engineers embed with customers to integrate, deploy and harden AI software."
+      },
+      "source": {
+        "url": "https://www.a.team/hire-forward-deployed-engineers",
+        "title": "Hire Forward Deployed Engineers On Demand | A.Team Deployed",
+        "observed_on": "2026-10-16",
+        "published_on": null
+      },
+      "supporting_sources": [
+        {
+          "url": "https://www.a.team/hire-rl-engineers",
+          "title": "Hire Senior RL & Environments Engineers | A.Team",
+          "observed_on": "2026-10-16",
+          "published_on": null
+        }
+      ],
+      "qualification": "Curated product description and source binding correction. Earlier reinforcement-learning engineering evidence remains associated with the separate RL engineering offering.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "a-team.claim.products-0",
+            "company_id": "a-team",
+            "delivery_model": "",
+            "id": "a-team.product.0",
+            "name": "Offer / product evidence 1",
+            "segment_scope": "ai_data",
+            "work_performed": "RL engineers build environments, task/eval suites, graders, rollout infrastructure and post-training pipelines. Hourly, contract-to-hire, ongoing and advisory engagements; builders set their rates and client sees an all-in price."
+          },
+          {
+            "claim_id": "a-team.claim.products-1",
+            "company_id": "a-team",
+            "delivery_model": "",
+            "id": "a-team.product.1",
+            "name": "Offer / product evidence 2",
+            "segment_scope": "ai_data",
+            "work_performed": "Also develops client-owned enterprise agentic systems and supplies technical talent; customer environment/IP ownership and milestone or time-and-materials services model."
+          },
+          {
+            "claim_id": "a-team.claim.oct14-product-2",
+            "company_id": "a-team",
+            "delivery_model": "Current homepage sells embedded AI systems and forward-deployed engineering; the talent network supplies delivery teams.",
+            "id": "a-team.product.oct14-2",
+            "name": "Forward Deployed Engineers",
+            "segment_scope": "company",
+            "work_performed": "Embeds senior engineering teams to build and operate enterprise agentic AI systems"
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "2026-10-12",
+            "company_id": "a-team",
+            "confidence": "B",
+            "confidence_reason": "Attributed company, investor, or named primary statement. Research label: researcher-assigned evidence grade.",
+            "date_note": "Date label preserved from research; access dates are not substituted.",
+            "id": "a-team.claim.products-0",
+            "observed_on": "2026-10-12",
+            "raw_path": "data/raw/library-v1/market-research-v1.json",
+            "raw_pointer": "/companies/20/products/0",
+            "segment_scope": "ai_data",
+            "self_reported": true,
+            "source_ids": [
+              "a-team.source.ateam-1"
+            ],
+            "statement": "RL engineers build environments, task/eval suites, graders, rollout infrastructure and post-training pipelines. Hourly, contract-to-hire, ongoing and advisory engagements; builders set their rates and client sees an all-in price.",
+            "status": "supported",
+            "subject": "products"
+          },
+          {
+            "as_of": "2026-10-12",
+            "company_id": "a-team",
+            "confidence": "B",
+            "confidence_reason": "Attributed company, investor, or named primary statement. Research label: researcher-assigned evidence grade.",
+            "date_note": "Date label preserved from research; access dates are not substituted.",
+            "id": "a-team.claim.products-1",
+            "observed_on": "2026-10-12",
+            "raw_path": "data/raw/library-v1/market-research-v1.json",
+            "raw_pointer": "/companies/20/products/1",
+            "segment_scope": "ai_data",
+            "self_reported": true,
+            "source_ids": [
+              "a-team.source.ateam-12"
+            ],
+            "statement": "Also develops client-owned enterprise agentic systems and supplies technical talent; customer environment/IP ownership and milestone or time-and-materials services model.",
+            "status": "supported",
+            "subject": "products"
+          },
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "a-team",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "a-team.claim.oct14-product-2",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "a-team.source.oct14-2ed4834592cc"
+            ],
+            "statement": "Forward Deployed Engineers: Embeds senior engineering teams to build and operate enterprise agentic AI systems",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "a-team.claim.products-0",
+        "a-team.claim.products-1",
+        "a-team.claim.oct14-product-2"
+      ],
+      "affected_record_ids": [
+        "a-team.product.0",
+        "a-team.product.1",
+        "a-team.product.oct14-2"
+      ]
+    }
+  ]
+}

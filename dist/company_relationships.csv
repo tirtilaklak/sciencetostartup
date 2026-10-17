@@ -1,0 +1,8 @@
+id,company_id,related_company_id,related_entity_name,relationship,claim_id,as_of
+handshake_ai.entity-boundary,handshake_ai,,Handshake parent,division_of,handshake_ai.claim.category,2026-10-12
+labelbox.entity-boundary,labelbox,,Alignerr,has_brand,labelbox.claim.category,2026-10-12
+hackerrank.entity-boundary,hackerrank,,HackerRank parent; Astra AI-data line,division_of,hackerrank.claim.category,2026-10-12
+invisible.entity-boundary,invisible,,Meridial,has_brand,invisible.claim.category,2026-10-12
+toloka.entity-boundary,toloka,,Mindrift,has_brand,toloka.claim.category,2026-10-12
+rws_trainai.entity-boundary,rws_trainai,,RWS parent; TrainAI business line,division_of,rws_trainai.claim.category,2026-10-12
+imerit.acquired-by,imerit,,"EXL (ExlService Holdings, Inc.)",acquired_by,imerit.claim.oct14-acquisition-completed,2026-08-03

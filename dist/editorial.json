@@ -1,0 +1,811 @@
+{
+  "version": "3.0.0",
+  "entries": [
+    {
+      "company_id": "mercor",
+      "primary_offering": "Expert data & evaluation",
+      "summary": "Connects specialists with AI training and testing work. It also helps businesses put AI programs to work.",
+      "capability_tags": [
+        "AI practice tasks",
+        "AI performance tests",
+        "Licensed training data"
+      ],
+      "claim_id": "mercor.claim.major-category-0",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Expert networks & human feedback",
+      "research_id": "mercor",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://www.mercor.com/"
+      ]
+    },
+    {
+      "company_id": "snorkel_ai",
+      "primary_offering": "Frontier data & RL environments",
+      "summary": "Builds specialist training data and tools to test AI. It also creates practice tasks for AI systems.",
+      "capability_tags": [
+        "Data preparation software",
+        "AI task tests",
+        "Specialist AI tools"
+      ],
+      "claim_id": "snorkel_ai.claim.oct14-major-identity",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Frontier data & RL environments",
+      "research_id": "snorkel-ai",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://snorkel.ai/"
+      ]
+    },
+    {
+      "company_id": "handshake_ai",
+      "primary_offering": "Expert data & evaluation",
+      "summary": "Brings professionals into AI training and testing work. Their expertise also shapes practice tasks for AI.",
+      "capability_tags": [
+        "AI practice tasks",
+        "AI testing",
+        "Business AI"
+      ],
+      "claim_id": "handshake_ai.claim.major-category-0",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Expert networks & human feedback",
+      "research_id": "handshake-ai",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://joinhandshake.com/ai/"
+      ]
+    },
+    {
+      "company_id": "micro1",
+      "primary_offering": "Expert data & evaluation",
+      "summary": "Uses specialist knowledge to create AI training data and realistic practice tasks. It also tests how AI performs those tasks.",
+      "capability_tags": [
+        "Expert network",
+        "AI task tests",
+        "Robot training data"
+      ],
+      "claim_id": "micro1.claim.major-category-0",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Frontier data & RL environments",
+      "research_id": "micro1",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://www.micro1.ai/"
+      ]
+    },
+    {
+      "company_id": "scale_ai",
+      "primary_offering": "Managed AI & data services",
+      "summary": "Provides expert training data and AI testing. It also builds AI applications for businesses and governments.",
+      "capability_tags": [
+        "Human feedback",
+        "AI testing",
+        "Business AI"
+      ],
+      "claim_id": "scale_ai.claim.major-category-0",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Frontier data & RL environments",
+      "research_id": "scale-ai",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://scale.com/"
+      ]
+    },
+    {
+      "company_id": "turing",
+      "primary_offering": "Expert data & evaluation",
+      "summary": "Uses specialist knowledge to build AI training data and practice tasks. It also helps businesses use AI in their existing work.",
+      "capability_tags": [
+        "Coding data",
+        "Expert network",
+        "Science & engineering"
+      ],
+      "claim_id": "turing.claim.major-category-0",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Frontier data & RL environments",
+      "research_id": "turing",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://www.turing.com/"
+      ]
+    },
+    {
+      "company_id": "labelbox",
+      "primary_offering": "Frontier data & RL environments",
+      "summary": "Builds practice tasks and expert feedback for AI training. Its business software runs AI programs that carry out tasks.",
+      "capability_tags": [
+        "Business AI software",
+        "Expert training data",
+        "Robot training data"
+      ],
+      "claim_id": "labelbox.claim.oct14-identity",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Frontier data & RL environments",
+      "research_id": "labelbox",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://labelbox.com/"
+      ],
+      "product_media": {
+        "local_path": "assets/products/labelbox-visual.png",
+        "url": "https://images.ctfassets.net/j20krz61k3rk/59Hit6KHsSEcXJkwicFcek/bc68448fabedd5e78eb0beaeb20b3c48/Horizon.png",
+        "source_page": "https://labelbox.com/products/horizon/",
+        "title": "Horizon RL environments",
+        "kind": "official product graphic",
+        "caption": "Horizon RL environments · Official product illustration.",
+        "reviewed_on": "2026-10-14"
+      }
+    },
+    {
+      "company_id": "prime_intellect",
+      "primary_offering": "Compute & model research",
+      "summary": "Provides computing resources and tools for teams that train and run their own AI systems.",
+      "capability_tags": [
+        "AI computing",
+        "Publicly released AI systems"
+      ],
+      "claim_id": "prime_intellect.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "prime-intellect",
+      "precise_category": "AI compute and post-training infrastructure",
+      "description_source_urls": [
+        "prime_home",
+        "prime_seriesa",
+        "prime_founders",
+        "prime_env",
+        "prime_careers"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "abundant_ai",
+      "primary_offering": "Frontier data & RL environments",
+      "summary": "Builds simulated tasks and training data for AI programs that carry out work.",
+      "capability_tags": [
+        "Simulated tasks",
+        "Training data",
+        "Coding"
+      ],
+      "claim_id": "abundant_ai.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "abundant",
+      "precise_category": "RL environments",
+      "description_source_urls": [
+        "https://www.abundant.ai/"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json"
+    },
+    {
+      "company_id": "afterquery",
+      "primary_offering": "Expert data & evaluation",
+      "summary": "Turns professional expertise into AI training data and practice tasks.",
+      "capability_tags": [
+        "AI practice tasks",
+        "Professional expertise",
+        "Training from examples"
+      ],
+      "claim_id": "afterquery.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "afterquery",
+      "precise_category": "Expert training data",
+      "description_source_urls": [
+        "https://www.afterquery.com/"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json"
+    },
+    {
+      "company_id": "bespoke_labs",
+      "primary_offering": "Frontier data & RL environments",
+      "summary": "Builds realistic practice tasks for AI programs that carry out work. Its tools help teams train and test those programs.",
+      "capability_tags": [
+        "AI task tests",
+        "Better AI instructions",
+        "AI-generated training data"
+      ],
+      "claim_id": "bespoke_labs.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "bespoke_labs",
+      "precise_category": "RL environment infrastructure",
+      "description_source_urls": [
+        "https://bespokelabs.ai/"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json"
+    },
+    {
+      "company_id": "polymath_ai_labs",
+      "primary_offering": "Frontier data & RL environments",
+      "summary": "Builds simulated software tasks that train AI to complete extended engineering work.",
+      "capability_tags": [
+        "Simulated tasks",
+        "AI task training"
+      ],
+      "claim_id": "polymath_ai_labs.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "polymath",
+      "precise_category": "RL environments",
+      "description_source_urls": [],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json"
+    },
+    {
+      "company_id": "proximal",
+      "primary_offering": "Frontier data & RL environments",
+      "summary": "Turns records of human and AI work into training data. Its tests measure AI performance on demanding technical tasks.",
+      "capability_tags": [
+        "Coding data",
+        "FrontierSWE coding tests"
+      ],
+      "claim_id": "proximal.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "proximal",
+      "precise_category": "Post-training data research",
+      "description_source_urls": [],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json"
+    },
+    {
+      "company_id": "trajectory_labs_pbc",
+      "primary_offering": "AI evaluation & safety",
+      "summary": "Builds tests that look for harmful AI behavior. It also creates practice tasks for AI training.",
+      "capability_tags": [
+        "AI attack tests",
+        "AI safety"
+      ],
+      "claim_id": "trajectory_labs_pbc.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "trajectory-labs-pbc",
+      "precise_category": "AI safety evaluations",
+      "description_source_urls": [],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json"
+    },
+    {
+      "company_id": "refresh",
+      "primary_offering": "Frontier data & RL environments",
+      "summary": "Creates software practice tasks for AI, including Blender (software for making and animating three-dimensional scenes).",
+      "capability_tags": [
+        "Using software",
+        "Simulated tasks"
+      ],
+      "claim_id": "refresh.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "refresh",
+      "precise_category": "RL environments",
+      "description_source_urls": [],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json"
+    },
+    {
+      "company_id": "surge_ai",
+      "primary_offering": "Expert data & evaluation",
+      "summary": "Uses expert work to train and test AI. It also builds practice tasks for AI systems.",
+      "capability_tags": [
+        "Expert network",
+        "Feedback on AI answers",
+        "Training from examples"
+      ],
+      "claim_id": "surge_ai.claim.category",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Frontier data & RL environments",
+      "research_id": "surge-ai",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://surgehq.ai/"
+      ]
+    },
+    {
+      "company_id": "quesma",
+      "primary_offering": "AI software & analytics",
+      "summary": "Examines how AI writes code to explain costs and find failures.",
+      "capability_tags": [
+        "AI coding tools",
+        "Cost analysis"
+      ],
+      "claim_id": "quesma.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "quesma",
+      "precise_category": "Agent analytics",
+      "description_source_urls": [],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json"
+    },
+    {
+      "company_id": "datacurve",
+      "primary_offering": "Frontier data & RL environments",
+      "summary": "Recruits experienced developers to create coding data and test AI coding tools.",
+      "capability_tags": [
+        "AI practice tasks",
+        "Coding",
+        "Recorded AI actions"
+      ],
+      "claim_id": "datacurve.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "datacurve",
+      "precise_category": "Expert coding data",
+      "description_source_urls": [
+        "https://www.ycombinator.com/companies/datacurve",
+        "https://www.chemistry.vc/post/staying-ahead-of-the-curve"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json"
+    },
+    {
+      "company_id": "benchflow",
+      "primary_offering": "Frontier data & RL environments",
+      "summary": "Builds practice tasks and tests for AI programs that carry out work. It also provides tools to run those tests.",
+      "capability_tags": [
+        "AI task tests",
+        "AI performance tests"
+      ],
+      "claim_id": "benchflow.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "benchflow",
+      "precise_category": "Agent environments and evals",
+      "description_source_urls": [],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json",
+      "category_review": {
+        "reviewed_on": "2026-10-17",
+        "previous_primary_offering": "AI evaluation & safety",
+        "primary_offering": "Frontier data & RL environments",
+        "reason": "The official homepage centers environments that AI agents learn in, across benchmarks, workplace and robot simulations, post-training and runtime tooling. Testing and safety are capabilities within that broader environment offering.",
+        "scope": "Main-business grouping only; individual product descriptions and statuses are unchanged.",
+        "source": {
+          "url": "https://www.benchflow.ai/",
+          "role": "Official company homepage",
+          "source_id": "benchflow.source.b_bf1",
+          "claim_id": "benchflow.claim.category",
+          "publication_date": null,
+          "observed_between_utc": {
+            "after": "2026-10-17T03:05:58Z",
+            "before": "2026-10-17T03:05:59Z"
+          }
+        }
+      }
+    },
+    {
+      "company_id": "g2i",
+      "primary_offering": "Managed AI & data services",
+      "summary": "Supplies experienced engineers who build AI practice tasks and training data. Their work also includes AI testing.",
+      "capability_tags": [
+        "Engineering talent",
+        "AI practice tasks"
+      ],
+      "claim_id": "g2i.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "g2i",
+      "precise_category": "Expert engineering and AI data services",
+      "description_source_urls": [
+        "g2i_home",
+        "g2i_company",
+        "g2i_talent"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "a-team",
+      "primary_offering": "Managed AI & data services",
+      "summary": "Places experienced engineering teams inside businesses to build and run AI systems that carry out work.",
+      "capability_tags": [
+        "AI engineering",
+        "Teams working with clients"
+      ],
+      "claim_id": "a-team.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "a-team",
+      "precise_category": "AI engineering services and expert talent",
+      "description_source_urls": [
+        "ateam_home",
+        "ateam_about",
+        "ateam_join",
+        "ateam_funding"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "hackerrank",
+      "primary_offering": "AI software & analytics",
+      "summary": "Sells software that tests developers’ skills. Its AI business also supplies coding data and practice tasks for AI.",
+      "capability_tags": [
+        "Developer skills tests",
+        "Bench coding tests"
+      ],
+      "claim_id": "hackerrank.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "hackerrank-astra",
+      "precise_category": "Developer assessment software with AI data business",
+      "description_source_urls": [
+        "hackerrank_bench",
+        "hackerrank_astra_legacy",
+        "hackerrank_team",
+        "hackerrank_funding"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "pareto",
+      "primary_offering": "Expert data & evaluation",
+      "summary": "Uses specialists’ judgment to create AI training data and tests.",
+      "capability_tags": [
+        "Expert training data",
+        "Forte work platform"
+      ],
+      "claim_id": "pareto.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "pareto-ai",
+      "precise_category": "Expert training data",
+      "description_source_urls": [],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json"
+    },
+    {
+      "company_id": "ooak",
+      "primary_offering": "Frontier data & RL environments",
+      "summary": "Turns real business work into AI practice tasks while removing identifying details from the data.",
+      "capability_tags": [
+        "Copies of business tasks",
+        "Licensed training data",
+        "Removing identifying details"
+      ],
+      "claim_id": "ooak.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "ooak_data",
+      "precise_category": "Enterprise-data RL environments",
+      "description_source_urls": [
+        "https://ooakdata.com/"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json"
+    },
+    {
+      "company_id": "elorian",
+      "primary_offering": "Compute & model research",
+      "summary": "Researches AI systems that reason from images about physical space and design.",
+      "capability_tags": [
+        "Reasoning from images",
+        "General-purpose AI systems"
+      ],
+      "claim_id": "elorian.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "elorian",
+      "precise_category": "Foundation-model lab",
+      "description_source_urls": [],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "rl_companies.json"
+    },
+    {
+      "company_id": "terac",
+      "primary_offering": "Expert data & evaluation",
+      "summary": "Connects verified specialists with paid research and AI training work.",
+      "capability_tags": [
+        "Expert network",
+        "Research tools"
+      ],
+      "claim_id": "terac.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "terac",
+      "precise_category": "Expert marketplace and research panel infrastructure",
+      "description_source_urls": [
+        "terac_home",
+        "terac_ai",
+        "terac_about",
+        "terac_team",
+        "terac_rl_job",
+        "terac_eval_job"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "laude",
+      "primary_offering": "Nonprofit research",
+      "summary": "Funds public computing research and helps develop Terminal-Bench, which tests AI on practical computer tasks.",
+      "capability_tags": [
+        "Nonprofit",
+        "Terminal-Bench"
+      ],
+      "claim_id": "laude.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "laude-terminal-bench",
+      "precise_category": "Nonprofit research institute and open benchmarks",
+      "description_source_urls": [
+        "laude_home",
+        "laude_about",
+        "laude_careers",
+        "tbench_home",
+        "tbench_paper",
+        "tbench_news"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "invisible",
+      "primary_offering": "Managed AI & data services",
+      "summary": "Combines expert data and AI testing with software that helps businesses automate their work.",
+      "capability_tags": [
+        "Expert network",
+        "Training data",
+        "AI task tests"
+      ],
+      "claim_id": "invisible.claim.major-category-0",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Enterprise AI & human-in-the-loop operations",
+      "research_id": "invisible-technologies",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://invisibletech.ai/"
+      ]
+    },
+    {
+      "company_id": "toloka",
+      "primary_offering": "Managed AI & data services",
+      "summary": "Uses specialist work to create training data and test AI. It also builds practice tasks for AI systems.",
+      "capability_tags": [
+        "Expert training data",
+        "Mindrift expert work"
+      ],
+      "claim_id": "toloka.claim.major-category-0",
+      "reviewed_on": "2026-10-14",
+      "research_id": "toloka",
+      "precise_category": "Managed expert AI data services",
+      "description_source_urls": [
+        "toloka_home",
+        "toloka_funding",
+        "toloka_amount",
+        "toloka_workers"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "prolific",
+      "primary_offering": "Expert data & evaluation",
+      "summary": "Connects researchers and AI teams with verified participants who are paid to provide feedback.",
+      "capability_tags": [
+        "Research participants",
+        "Human feedback"
+      ],
+      "claim_id": "prolific.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "prolific",
+      "precise_category": "Research participant and human-data platform",
+      "description_source_urls": [
+        "prolific_home",
+        "prolific_about",
+        "prolific_funding",
+        "prolific_founder",
+        "prolific_participants",
+        "prolific_pay",
+        "prolific_eligibility"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "aixi",
+      "primary_offering": "Nonprofit research",
+      "summary": "Studies the mathematics behind AI decision-making and ways to reduce AI risks.",
+      "capability_tags": [
+        "Nonprofit",
+        "AI safety research"
+      ],
+      "claim_id": "aixi.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "aixi-labs",
+      "precise_category": "Nonprofit AI safety research",
+      "description_source_urls": [
+        "aixi_home",
+        "aixi_team",
+        "aixi_research",
+        "aixi_fellowship",
+        "aixi_scientist"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "appen",
+      "primary_offering": "Managed AI & data services",
+      "summary": "Uses people to prepare and check AI training data. Its work includes speech data and AI programs that act in the physical world.",
+      "capability_tags": [
+        "Worldwide contributors",
+        "AI behavior training",
+        "Speech data"
+      ],
+      "claim_id": "appen.claim.major-category-0",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Managed annotation & multimodal data",
+      "research_id": "appen",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://www.appen.com/"
+      ]
+    },
+    {
+      "company_id": "giskard",
+      "primary_offering": "AI evaluation & safety",
+      "summary": "Tests business AI software for security weaknesses and unreliable answers.",
+      "capability_tags": [
+        "AI security",
+        "AI testing"
+      ],
+      "claim_id": "giskard.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "giskard",
+      "precise_category": "AI testing and security software",
+      "description_source_urls": [
+        "giskard_home",
+        "giskard_about"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "alinia",
+      "primary_offering": "AI evaluation & safety",
+      "summary": "Builds software that checks business AI against company rules and legal requirements.",
+      "capability_tags": [
+        "AI rules",
+        "Legal requirements"
+      ],
+      "claim_id": "alinia.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "alinia-ai",
+      "precise_category": "AI compliance software and implementation",
+      "description_source_urls": [
+        "alinia_home",
+        "alinia_company",
+        "alinia_seed",
+        "alinia_preseed"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "apto",
+      "primary_offering": "Managed AI & data services",
+      "summary": "Creates AI training data with specialist workers and its harBest software.",
+      "capability_tags": [
+        "Expert training data",
+        "Data preparation"
+      ],
+      "claim_id": "apto.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "apto",
+      "precise_category": "Managed AI data services",
+      "description_source_urls": [
+        "apto_home",
+        "apto_company",
+        "apto_careers"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "rws_trainai",
+      "primary_offering": "Managed AI & data services",
+      "summary": "Prepares AI training data in many languages. Specialists also review AI answers and test systems for harmful behavior.",
+      "capability_tags": [
+        "Data in many languages",
+        "TrainAI"
+      ],
+      "claim_id": "rws_trainai.claim.category",
+      "reviewed_on": "2026-10-14",
+      "research_id": "rws-trainai",
+      "precise_category": "Managed multilingual AI data services",
+      "description_source_urls": [
+        "rws_home",
+        "rws_community",
+        "rws_launch"
+      ],
+      "delivery_model": null,
+      "organization_type": null,
+      "research_file": "adjacent_companies.json"
+    },
+    {
+      "company_id": "imerit",
+      "primary_offering": "Managed AI & data services",
+      "summary": "Combines specialist workers and software to prepare AI training data and test AI systems.",
+      "capability_tags": [
+        "Specialist workforce",
+        "Feedback on AI answers",
+        "Healthcare data"
+      ],
+      "claim_id": "imerit.claim.identity",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Managed annotation & multimodal data",
+      "research_id": "imerit-exl",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://imerit.ai/"
+      ],
+      "product_media": {
+        "local_path": "assets/products/imerit-exl-visual.png",
+        "url": "https://imerit.ai/wp-content/uploads/2025/06/ANGO-HUB-SUPERCHARGE-YOUR-DATA-2-1024x576.png",
+        "source_page": "https://imerit.ai/",
+        "title": "Ango Hub medical-image annotation examples",
+        "kind": "official product screenshot",
+        "caption": "Ango Hub medical-image annotation examples · Official product example.",
+        "reviewed_on": "2026-10-14"
+      }
+    },
+    {
+      "company_id": "sama",
+      "primary_offering": "Managed AI & data services",
+      "summary": "Uses people to label and check training data. It also tests AI performance on image and other data.",
+      "capability_tags": [
+        "AI image training",
+        "Data quality checks",
+        "AI performance tests"
+      ],
+      "claim_id": "sama.claim.identity",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Managed annotation & multimodal data",
+      "research_id": "sama",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://www.sama.com/"
+      ],
+      "product_media": {
+        "local_path": "assets/products/sama-visual.png",
+        "url": "https://cdn.prod.website-files.com/65844ee8089ad9744a76677c/65fd6043b7a09a6e88c7856d_Reporting.png",
+        "source_page": "https://www.sama.com/data-annotation-and-validation-platform",
+        "title": "SamaHub reporting interface",
+        "kind": "official product screenshot",
+        "caption": "SamaHub reporting interface · Illustrative interface data, not company performance.",
+        "reviewed_on": "2026-10-14"
+      }
+    },
+    {
+      "company_id": "taskus",
+      "primary_offering": "Managed AI & data services",
+      "summary": "Runs customer support and content safety services for other businesses. Its AI work supplies training data and tests AI systems.",
+      "capability_tags": [
+        "Outsourced business work",
+        "Content safety",
+        "AI training data"
+      ],
+      "claim_id": "taskus.claim.identity",
+      "reviewed_on": "2026-10-14",
+      "precise_category": "Enterprise AI & human-in-the-loop operations",
+      "research_id": "taskus",
+      "research_file": "major_labs.json",
+      "description_source_urls": [
+        "https://www.taskus.com/"
+      ]
+    }
+  ]
+}

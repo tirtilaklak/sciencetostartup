@@ -1,0 +1,120 @@
+/* Load after existing dashboard styles. Scoped to the compact work renderer. */
+.work-card.work-card-v4 {
+  --w4-ink: var(--ink, #142a29);
+  --w4-muted: var(--muted, #52645e);
+  --w4-border: var(--border, #d8ded4);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--w4-border);
+  border-radius: 10px;
+  background: var(--paper, #fffef9);
+  color: var(--w4-ink);
+  box-shadow: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.w4-card-front { display: flex; flex: 1; flex-direction: column; padding: 17px 18px 15px; }
+.w4-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.w4-company { display: inline-flex; min-width: 0; gap: 9px; align-items: center; color: var(--w4-muted); font-size: 12px; line-height: 1.3; text-decoration: none; }
+.w4-company:hover { color: var(--w4-ink); text-decoration: underline; text-underline-offset: 3px; }
+.w4-logo { display: inline-flex; flex: 0 0 48px; align-items: center; }
+.work-card-v4 .w4-logo .brand-asset { display: flex; width: 48px; height: 27px; padding: 3px; border-radius: 3px; justify-content: center; background: transparent; }
+.work-card-v4 .w4-logo .brand-asset img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
+.w4-status { flex: 0 1 auto; max-width: 142px; padding: 3px 6px; border-radius: 3px; background: #f1ede4; color: #695139; font-size: 10px; line-height: 1.3; text-align: right; }
+.w4-status-closed, .w4-status-historical, .w4-status-no_route { background: #eeefea; color: #59625d; }
+.w4-status-pay_conflict, .w4-status-paused { background: #f6eadb; color: #7c4b24; }
+.w4-status-contributions, .w4-status-information, .w4-status-inquiry { background: #edf0ea; color: #52645e; }
+.work-card-v4 h3.w4-role { margin: 0 0 13px; font: 600 18px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; letter-spacing: -.25px; overflow-wrap: anywhere; }
+.w4-offer { margin-bottom: 10px; }
+.work-card-v4 .w4-pay { margin: 0; font-family: inherit; }
+.w4-pay strong { display: block; font-size: 23px; line-height: 1.25; font-weight: 550; letter-spacing: -.6px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.w4-pay.w4-pay-unspecified strong { font-size: 17px; font-weight: 500; letter-spacing: -.15px; }
+.w4-pay-note { display: block; max-width: 38em; margin-top: 4px; color: var(--w4-muted); font-size: 11px; line-height: 1.45; }
+.w4-commitment { margin: 6px 0 0; font-size: 12px; line-height: 1.4; color: var(--w4-ink); }
+.w4-schedule-note { margin: 8px 0 0; padding-left: 9px; border-left: 2px solid #b39367; color: var(--w4-muted); font-size: 11px; line-height: 1.45; }
+.w4-location { margin: 0 0 9px; color: var(--w4-muted); font-size: 12px; line-height: 1.4; }
+.w4-requirements { display: grid; gap: 4px; margin: 0 0 14px; padding: 0 0 0 14px; color: var(--w4-muted); font-size: 12px; line-height: 1.45; }
+.w4-requirements li::marker { color: #9ba79b; font-size: .75em; }
+.w4-card-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 9px; }
+.w4-dates { display: flex; flex-wrap: wrap; gap: 3px 10px; margin: 0; color: var(--w4-muted); font-size: 10px; line-height: 1.45; }
+.w4-dates span { white-space: nowrap; }
+.w4-open { flex: 0 0 auto; color: var(--green, #285644); font-size: 12px; font-weight: 550; text-decoration: none; white-space: nowrap; }
+.w4-open:hover { text-decoration: underline; text-underline-offset: 3px; }
+.work-card-v4 .w4-details { margin: 0; border: 0; border-top: 1px solid var(--w4-border); padding: 0; }
+.work-card-v4 .w4-details > summary { display: flex; align-items: center; justify-content: space-between; min-height: 39px; padding: 9px 18px; color: var(--w4-muted); font-size: 11px; line-height: 1.4; cursor: pointer; list-style: none; }
+.w4-details > summary::-webkit-details-marker { display: none; }
+.w4-details > summary > span { font-size: 17px; font-weight: 400; line-height: 1; transition: transform .15s; }
+.w4-details[open] > summary > span { transform: rotate(45deg); }
+.w4-details[open] > summary { background: #f3f4ed; }
+.w4-detail-content { padding: 16px 18px 18px; border-top: 1px solid var(--w4-border); font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+.w4-detail-content > p { margin: 0 0 14px; font-size: 12px; }
+.w4-detail-content h4 { margin: 0 0 7px; font: 600 12px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.w4-detail-block { margin-top: 17px; }
+.w4-detail-block > ul { display: grid; gap: 5px; margin: 0; padding-left: 17px; }
+.w4-term-table { display: grid; gap: 6px; margin: 0; }
+.w4-term-table > div { display: grid; grid-template-columns: 85px minmax(0, 1fr); gap: 10px; }
+.w4-term-table dt { color: var(--w4-muted); font-weight: 400; }
+.w4-term-table dd { margin: 0; }
+.w4-availability-note { margin-top: 16px !important; color: var(--w4-muted); }
+.w4-sources { padding-top: 14px; border-top: 1px solid var(--w4-border); }
+.w4-source-dates { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 12px; color: var(--w4-muted); font-size: 11px; }
+.w4-sources > ul { padding: 0; list-style: none; gap: 11px; }
+.w4-sources li > a { display: inline; font-size: 12px; text-underline-offset: 3px; }
+.w4-sources li > small { display: block; margin-top: 2px; color: var(--w4-muted); font-size: 10px; }
+.w4-sources blockquote { margin: 15px 0; padding: 0 0 0 12px; border-left: 2px solid var(--w4-border); font-size: 12px; }
+.w4-source-notes { margin: 13px 0 0; }
+.work-card-v4 .w4-source-notes summary { color: var(--w4-muted); font-size: 11px; cursor: pointer; }
+.w4-source-notes p { margin: 8px 0; font-size: 11px; }
+.w4-evidence-links { display: flex; flex-wrap: wrap; gap: 7px 13px; margin-top: 14px; }
+.w4-evidence-links .evidence-action { padding: 2px 0; font-size: 11px; }
+.w4-compare { margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--w4-border); }
+.w4-compare .compare-check { display: inline-flex; font-size: 11px; }
+.work-v4-profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.work-v4-profile .w4-related { margin-top: 18px; color: var(--muted, #52645e); font-size: 12px; }
+.w4-route-group { width: 100%; margin: 4px 0 0; padding: 13px 0 0; }
+.work-v4-profile .w4-route-group { margin-top: 17px; }
+.w4-route-group > summary { cursor: pointer; }
+.w4-route-group > summary > span { margin-left: 7px; font-variant-numeric: tabular-nums; }
+.w4-secondary-list { display: grid; gap: 8px; margin-top: 12px; }
+.work-card.work-card-v4.w4-compact-card { border-radius: 6px; }
+.work-card-v4 .w4-compact-toggle { margin: 0; padding: 0; }
+.work-card-v4 .w4-compact-toggle > summary { display: flex; gap: 16px; align-items: center; padding: 11px 14px; list-style: none; cursor: pointer; }
+.w4-compact-toggle > summary::-webkit-details-marker { display: none; }
+.w4-compact-title { display: grid; gap: 3px; flex: 1; min-width: 0; }
+.w4-compact-title small { color: var(--w4-muted); font-size: 10px; line-height: 1.3; }
+.w4-compact-title strong { font-size: 13px; line-height: 1.4; font-weight: 550; }
+.w4-compact-pay { display: grid; justify-items: end; gap: 4px; flex: 0 1 210px; text-align: right; }
+.w4-compact-pay > strong { font-size: 12px; line-height: 1.4; font-weight: 500; }
+.w4-compact-pay .w4-pay-note { margin-top: 0; font-size: 10px; }
+.w4-toggle-icon { font-size: 17px; color: var(--w4-muted); line-height: 1; }
+.w4-compact-toggle[open] > summary { border-bottom: 1px solid var(--w4-border); background: #f3f4ed; }
+.w4-compact-toggle[open] > summary .w4-toggle-icon { transform: rotate(45deg); }
+.w4-compact-company { margin-bottom: 10px; }
+.w4-compact-card .w4-card-front { padding: 14px; }
+.w4-empty { color: var(--muted, #52645e); font-size: 13px; }
+.work-card-v4 a:focus-visible, .work-card-v4 summary:focus-visible, .work-card-v4 button:focus-visible, .work-card-v4 input:focus-visible { outline: 3px solid #a46b36; outline-offset: 3px; }
+.work-card-v4 summary:focus-visible { outline-offset: -3px; }
+@media (min-width: 1180px) {
+  .work-grid:has(> .work-card-v4) { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+}
+@media (max-width: 800px) and (min-width: 621px) {
+  .work-grid:has(> .work-card-v4) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+}
+@media (max-width: 620px) {
+  .work-grid:has(> .work-card-v4), .work-v4-profile-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .w4-card-front { padding: 16px; }
+  .work-card-v4 h3.w4-role { font-size: 18px; }
+  .w4-pay strong { font-size: 23px; }
+  .w4-dates { display: block; }
+  .w4-dates span { display: block; }
+  .work-card-v4 .w4-details > summary { padding-right: 16px; padding-left: 16px; }
+  .w4-detail-content { padding: 15px 16px 16px; }
+  .work-card-v4 .w4-compact-toggle > summary { gap: 8px; padding: 11px 12px; }
+  .w4-compact-pay { flex-basis: 118px; }
+  .w4-compact-title strong { font-size: 12px; }
+  .w4-compact-pay > strong { font-size: 11px; }
+  .w4-compact-pay .w4-status { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) { .w4-details > summary > span { transition: none; } }

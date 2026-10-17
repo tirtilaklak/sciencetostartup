@@ -1,0 +1,22 @@
+id,company_id,investor_id,claim_id,allocation
+apto.backer.mitsui-sumitomo-insurance-venture-capital,apto,investor.mitsui-sumitomo-insurance-venture-capital,apto.claim.audit-apto-investors,Company-level backers; individual round amounts unallocated
+apto.backer.anobaka,apto,investor.anobaka,apto.claim.audit-apto-investors,Company-level backers; individual round amounts unallocated
+apto.backer.gree-ventures,apto,investor.gree-ventures,apto.claim.audit-apto-investors,Company-level backers; individual round amounts unallocated
+apto.backer.ntvp,apto,investor.ntvp,apto.claim.audit-apto-investors,Company-level backers; individual round amounts unallocated
+apto.backer.kazutaka-muraguchi,apto,investor.kazutaka-muraguchi,apto.claim.audit-apto-investors,Company-level backers; individual round amounts unallocated
+apto.backer.canal-ventures,apto,investor.canal-ventures,apto.claim.audit-apto-investors,Company-level backers; individual round amounts unallocated
+polymath_ai_labs.backer.base10-partners,polymath_ai_labs,investor.base10-partners,polymath_ai_labs.claim.backer-0,Company-level backing; round allocation not established
+polymath_ai_labs.backer.cervin-ventures,polymath_ai_labs,investor.cervin-ventures,polymath_ai_labs.claim.backer-1,Company-level backing; round allocation not established
+polymath_ai_labs.backer.founders-future,polymath_ai_labs,investor.founders-future,polymath_ai_labs.claim.backer-2,Company-level backing; round allocation not established
+polymath_ai_labs.backer.y-combinator,polymath_ai_labs,investor.y-combinator,polymath_ai_labs.claim.backer-3,Company-level backing; round allocation not established
+proximal.backer.scribble-ventures,proximal,investor.scribble-ventures,proximal.claim.backer-4,Company-level backing; round allocation not established
+quesma.backer.firestreak,quesma,investor.firestreak,quesma.claim.backer-5,Company-level backing; round allocation not established
+quesma.backer.christian-beedgen,quesma,investor.christian-beedgen,quesma.claim.backer-6,Company-level backing; round allocation not established
+datacurve.backer.ivan-zhang,datacurve,investor.ivan-zhang,datacurve.claim.backer-7,Company-level backing; round allocation not established
+datacurve.backer.umesh-khanna,datacurve,investor.umesh-khanna,datacurve.claim.backer-8,Company-level backing; round allocation not established
+datacurve.backer.soheil-koushan,datacurve,investor.soheil-koushan,datacurve.claim.backer-9,Company-level backing; round allocation not established
+datacurve.backer.shyamal-hitesh-anadkat,datacurve,investor.shyamal-hitesh-anadkat,datacurve.claim.backer-10,Company-level backing; round allocation not established
+imerit.backer.british-international-investment-cdc-group,imerit,investor.british-international-investment-cdc-group,imerit.claim.expansion-imerit-investors,Historical pre-acquisition investors; current individual stakes not disclosed
+imerit.backer.omidyar-network,imerit,investor.omidyar-network,imerit.claim.expansion-imerit-investors,Historical pre-acquisition investors; current individual stakes not disclosed
+imerit.backer.michael-and-susan-dell-foundation,imerit,investor.michael-and-susan-dell-foundation,imerit.claim.expansion-imerit-investors,Historical pre-acquisition investors; current individual stakes not disclosed
+imerit.backer.khosla-impact,imerit,investor.khosla-impact,imerit.claim.expansion-imerit-investors,Historical pre-acquisition investors; current individual stakes not disclosed

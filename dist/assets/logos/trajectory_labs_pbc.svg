@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!--
+    Favicon. There is no brand mark asset, so this is drawn from the custom
+    properties in `app/globals.css`: the field is the color-accent token
+    (#ee6018) and the glyph is the color-text-primary token (#141414). An SVG
+    cannot read those variables, so the hexes are hard-coded here, the same
+    sanctioned exception as `app/opengraph-image.tsx`; if a token changes,
+    change it here too. (Token names are written without their leading double
+    hyphen on purpose: that sequence is illegal inside an XML comment and makes
+    the whole file fail to parse as an image.)
+
+    The mark is a geometric "T" rather than a text glyph, since favicons render
+    at 16 to 32px and a font-dependent glyph renders differently per platform.
+    Accent carries the whole field here (not just a rule, as on the OG card)
+    because at tab size the orange is the only thing that identifies us. Dark
+    glyph on orange clears 4.5:1 contrast; the inverse would not.
+  -->
+  <rect width="64" height="64" rx="12" fill="#ee6018" />
+  <path fill="#141414" d="M14 16h36v9H36.5v23h-9V25H14z" />
+</svg>

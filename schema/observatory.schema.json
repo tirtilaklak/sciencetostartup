@@ -1,0 +1,1695 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:data-labs-observatory:schema:1.2.0",
+  "title": "Data Labs Observatory public research",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "1.0.0",
+        "1.1.0",
+        "1.2.0",
+        "1.3.0"
+      ]
+    },
+    "dataset_version": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "raw_inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "library_file_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "library_version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "description"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "public_company_research"
+          ]
+        },
+        "research_status": {
+          "type": "string",
+          "enum": [
+            "awaiting_research",
+            "partial",
+            "complete"
+          ]
+        },
+        "coverage_notes": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requested_companies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "title",
+        "as_of",
+        "scope",
+        "research_status",
+        "coverage_notes",
+        "requested_companies"
+      ],
+      "additionalProperties": false
+    },
+    "rubric": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "final"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "enum": [
+                  "P",
+                  "C",
+                  "R",
+                  "O"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "levels": {
+                "type": "object",
+                "properties": {
+                  "1": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "2": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "3": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "1",
+                  "2",
+                  "3"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "levels"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z0-9][a-z0-9._-]*$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "definition": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minimums": {
+                "type": "object",
+                "properties": {
+                  "P": {
+                    "type": "string",
+                    "enum": [
+                      "1",
+                      "2",
+                      "3"
+                    ]
+                  },
+                  "C": {
+                    "type": "string",
+                    "enum": [
+                      "1",
+                      "2",
+                      "3"
+                    ]
+                  },
+                  "R": {
+                    "type": "string",
+                    "enum": [
+                      "1",
+                      "2",
+                      "3"
+                    ]
+                  },
+                  "O": {
+                    "type": "string",
+                    "enum": [
+                      "1",
+                      "2",
+                      "3"
+                    ]
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "definition",
+              "minimums"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "version",
+        "status",
+        "title",
+        "notes",
+        "dimensions",
+        "stages"
+      ],
+      "additionalProperties": false
+    },
+    "editorial_readouts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "company_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "segment": {
+            "type": "string"
+          },
+          "readout": {
+            "type": "string",
+            "minLength": 1
+          },
+          "signal": {
+            "type": "string"
+          },
+          "claim_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "segment",
+          "readout",
+          "signal",
+          "claim_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "companies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "website": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "entity_type": {
+            "type": "string",
+            "enum": [
+              "commercial",
+              "adjacent_research",
+              "unknown"
+            ]
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "legal_entity_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "founded_year": {
+            "type": "number",
+            "minimum": 1800
+          },
+          "headquarters_country": {
+            "type": "string",
+            "minLength": 1
+          },
+          "headquarters_city": {
+            "type": "string",
+            "minLength": 1
+          },
+          "incorporation_country": {
+            "type": "string",
+            "minLength": 1
+          },
+          "original_scope": {
+            "type": "boolean"
+          },
+          "identity_claim_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "profile_claim_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z0-9][a-z0-9._-]*$"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "website",
+          "description",
+          "categories",
+          "entity_type",
+          "identity_claim_id",
+          "profile_claim_ids"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "company_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "publisher": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_type": {
+            "type": "string",
+            "enum": [
+              "company",
+              "customer",
+              "investor",
+              "filing",
+              "independent_reporting",
+              "database",
+              "other"
+            ]
+          },
+          "published_on": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "accessed_on": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "retrieval_status": {
+            "type": "string",
+            "enum": [
+              "checked",
+              "summary_only",
+              "inaccessible",
+              "unverified"
+            ]
+          },
+          "evidence_chain_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "archive_url": {
+            "type": "string",
+            "minLength": 1
+          },
+          "previous_checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "accessed_on": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "retrieval_status": {
+                  "type": "string",
+                  "enum": [
+                    "checked",
+                    "summary_only",
+                    "inaccessible",
+                    "unverified"
+                  ]
+                }
+              },
+              "required": [
+                "accessed_on",
+                "retrieval_status"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "title",
+          "publisher",
+          "source_type",
+          "accessed_on",
+          "retrieval_status"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "company_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "subject": {
+            "type": "string",
+            "minLength": 1
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "as_of": {
+            "type": "string",
+            "minLength": 1
+          },
+          "observed_on": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "date_note": {
+            "type": "string"
+          },
+          "raw_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "raw_pointer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "segment_scope": {
+            "type": "string",
+            "enum": [
+              "company",
+              "ai_data",
+              "research",
+              "other_segment"
+            ]
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "U"
+            ]
+          },
+          "confidence_reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_label": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "supported",
+              "contested",
+              "superseded",
+              "unverified"
+            ]
+          },
+          "source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z0-9][a-z0-9._-]*$"
+            },
+            "uniqueItems": true
+          },
+          "historical_source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z0-9][a-z0-9._-]*$"
+            },
+            "uniqueItems": true
+          },
+          "contradicting_source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z0-9][a-z0-9._-]*$"
+            },
+            "uniqueItems": true
+          },
+          "evidence_excerpt": {
+            "type": "string"
+          },
+          "self_reported": {
+            "type": "boolean"
+          },
+          "caveat": {
+            "type": "string"
+          },
+          "conflict_group_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "confidence_basis_claim_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z0-9][a-z0-9._-]*$"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "subject",
+          "statement",
+          "as_of",
+          "observed_on",
+          "segment_scope",
+          "confidence",
+          "confidence_reason",
+          "status",
+          "source_ids"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "company_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "claim_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "segment_scope": {
+            "type": "string",
+            "enum": [
+              "company",
+              "ai_data",
+              "research",
+              "other_segment"
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "funding_total_reported",
+              "funding_total_calculated",
+              "valuation",
+              "arr",
+              "annualized_revenue_run_rate",
+              "revenue",
+              "gmv",
+              "headcount",
+              "expert_network",
+              "active_paid_experts",
+              "customer_count",
+              "growth_rate",
+              "other"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "number"
+          },
+          "upper_value": {
+            "type": "number",
+            "minimum": 0
+          },
+          "qualifier": {
+            "type": "string",
+            "enum": [
+              "exact",
+              "approximate",
+              "at_least",
+              "at_most",
+              "greater_than",
+              "less_than",
+              "nearly",
+              "range"
+            ]
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "currency",
+              "people",
+              "percent",
+              "count",
+              "multiple",
+              "other"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Z]{3}$"
+          },
+          "as_of": {
+            "type": "string",
+            "minLength": 1
+          },
+          "period_label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "period_type": {
+            "type": "string",
+            "enum": [
+              "annual",
+              "half",
+              "quarter",
+              "week",
+              "ttm",
+              "partial",
+              "point",
+              "unspecified"
+            ]
+          },
+          "scope_detail": {
+            "type": "string"
+          },
+          "preferred_for_comparison": {
+            "type": "boolean"
+          },
+          "period_start": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "period_end": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "basis": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reported_vs_estimated": {
+            "type": "string",
+            "enum": [
+              "reported",
+              "estimated"
+            ]
+          },
+          "observation_status": {
+            "type": "string",
+            "enum": [
+              "reported",
+              "forecast",
+              "talks",
+              "target"
+            ]
+          },
+          "gross_vs_net": {
+            "type": "string",
+            "enum": [
+              "gross",
+              "net",
+              "unspecified"
+            ]
+          },
+          "comparable_series_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "claim_id",
+          "segment_scope",
+          "kind",
+          "label",
+          "value",
+          "qualifier",
+          "unit",
+          "as_of",
+          "basis",
+          "reported_vs_estimated",
+          "gross_vs_net"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "products": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "company_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "claim_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "segment_scope": {
+            "type": "string",
+            "enum": [
+              "company",
+              "ai_data",
+              "research",
+              "other_segment"
+            ]
+          },
+          "delivery_model": {
+            "type": "string"
+          },
+          "work_performed": {
+            "type": "string",
+            "minLength": 1
+          },
+          "quality_method": {
+            "type": "string"
+          },
+          "buyer_type": {
+            "type": "string"
+          },
+          "modalities": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "differentiators_claimed": {
+            "type": "string"
+          },
+          "differentiators_demonstrated": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "claim_id",
+          "name",
+          "segment_scope",
+          "delivery_model",
+          "work_performed"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "funding_rounds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "company_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "claim_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "event_key": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "round_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "closed",
+              "announced",
+              "talks",
+              "rumored",
+              "cancelled",
+              "committed"
+            ]
+          },
+          "announced_on": {
+            "type": "string",
+            "minLength": 1
+          },
+          "closed_on": {
+            "type": "string",
+            "minLength": 1
+          },
+          "segment_scope": {
+            "type": "string",
+            "enum": [
+              "company",
+              "ai_data",
+              "research",
+              "other_segment"
+            ]
+          },
+          "qualifier": {
+            "type": "string",
+            "enum": [
+              "exact",
+              "approximate",
+              "at_least",
+              "at_most",
+              "greater_than",
+              "less_than",
+              "nearly",
+              "range"
+            ]
+          },
+          "amount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Z]{3}$"
+          },
+          "capital_type": {
+            "type": "string",
+            "enum": [
+              "equity",
+              "debt",
+              "grant",
+              "secondary",
+              "mixed",
+              "undisclosed"
+            ]
+          },
+          "amount_basis": {
+            "type": "string",
+            "enum": [
+              "new_capital",
+              "mixed_transaction",
+              "cumulative_to_date",
+              "includes_prior_round",
+              "undisclosed"
+            ]
+          },
+          "include_in_total": {
+            "type": "boolean"
+          },
+          "inclusion_reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_round_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "include_in_disclosed_primary_sum": {
+            "type": "boolean"
+          },
+          "first_sale_on": {
+            "type": "string",
+            "minLength": 1
+          },
+          "filing_on": {
+            "type": "string",
+            "minLength": 1
+          },
+          "offering_ceiling": {
+            "type": "number",
+            "minimum": 0
+          },
+          "remaining_unsold_at_filing": {
+            "type": "number",
+            "minimum": 0
+          },
+          "primary_component": {
+            "type": "number",
+            "minimum": 0
+          },
+          "secondary_component": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "claim_id",
+          "event_key",
+          "round_name",
+          "status",
+          "announced_on",
+          "segment_scope",
+          "qualifier",
+          "capital_type",
+          "amount_basis",
+          "include_in_total",
+          "inclusion_reason"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "company_relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "company_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "related_company_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "related_entity_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "relationship": {
+            "type": "string",
+            "enum": [
+              "brand_of",
+              "has_brand",
+              "subsidiary_of",
+              "acquired_by",
+              "formerly_known_as",
+              "division_of"
+            ]
+          },
+          "claim_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "as_of": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "related_entity_name",
+          "relationship",
+          "claim_id",
+          "as_of"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "people": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "company_people": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "company_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "person_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "founder",
+              "cofounder",
+              "ceo",
+              "executive"
+            ]
+          },
+          "claim_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "role_start": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "role_end": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "background_claim_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z0-9][a-z0-9._-]*$"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "person_id",
+          "role",
+          "claim_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "investors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "round_investors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "round_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "investor_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "lead",
+              "participant",
+              "undisclosed"
+            ]
+          },
+          "claim_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          }
+        },
+        "required": [
+          "id",
+          "round_id",
+          "investor_id",
+          "role",
+          "claim_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "company_investors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "company_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "investor_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "claim_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "allocation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "investor_id",
+          "claim_id",
+          "allocation"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "customer_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "company_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "organization": {
+            "type": "string",
+            "minLength": 1
+          },
+          "segment_scope": {
+            "type": "string",
+            "enum": [
+              "company",
+              "ai_data",
+              "research",
+              "other_segment"
+            ]
+          },
+          "relationship": {
+            "type": "string",
+            "enum": [
+              "customer",
+              "pilot",
+              "partner",
+              "claimed_customer",
+              "research_collaborator",
+              "displayed_logo",
+              "former_employer",
+              "unverified",
+              "research_adopter",
+              "research_citation",
+              "implementation_partner",
+              "grantor",
+              "former_customer",
+              "commissioned_evaluation",
+              "dataset_user",
+              "technology_vendor"
+            ]
+          },
+          "claim_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "disclosure": {
+            "type": "string",
+            "enum": [
+              "customer_confirmed",
+              "company_named",
+              "third_party",
+              "anonymous"
+            ]
+          },
+          "paid_status": {
+            "type": "string",
+            "enum": [
+              "paid",
+              "unpaid",
+              "unknown"
+            ]
+          },
+          "use_case": {
+            "type": "string"
+          },
+          "relationship_detail": {
+            "type": "string"
+          },
+          "period_label": {
+            "type": "string"
+          },
+          "production_status": {
+            "type": "string",
+            "enum": [
+              "production",
+              "pilot",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "organization",
+          "segment_scope",
+          "relationship",
+          "claim_id",
+          "disclosure",
+          "paid_status"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "assessments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "company_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "segment_scope": {
+            "type": "string",
+            "enum": [
+              "company",
+              "ai_data",
+              "research",
+              "other_segment"
+            ]
+          },
+          "rubric_version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "as_of": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "reviewer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "stage_limitations": {
+            "type": "string",
+            "minLength": 1
+          },
+          "material_conflict": {
+            "type": "boolean"
+          },
+          "stale_source_caveat": {
+            "type": "string"
+          },
+          "headline_metric_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "business_headline": {
+            "type": "string",
+            "minLength": 1
+          },
+          "business_verdict": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope_label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope_exclusions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "stage_use": {
+            "type": "string",
+            "minLength": 1
+          },
+          "formal_stage_details_only": {
+            "type": "boolean"
+          },
+          "raw_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "raw_pointer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "gates": {
+            "type": "object",
+            "properties": {
+              "P": {
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "U",
+                      "1",
+                      "2",
+                      "3"
+                    ]
+                  },
+                  "claim_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                    },
+                    "uniqueItems": true
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "corroboration_basis": {
+                    "type": "string",
+                    "enum": [
+                      "reported_buyer_statement"
+                    ]
+                  }
+                },
+                "required": [
+                  "level",
+                  "claim_ids",
+                  "rationale"
+                ],
+                "additionalProperties": false
+              },
+              "C": {
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "U",
+                      "1",
+                      "2",
+                      "3"
+                    ]
+                  },
+                  "claim_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                    },
+                    "uniqueItems": true
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "corroboration_basis": {
+                    "type": "string",
+                    "enum": [
+                      "reported_buyer_statement"
+                    ]
+                  }
+                },
+                "required": [
+                  "level",
+                  "claim_ids",
+                  "rationale"
+                ],
+                "additionalProperties": false
+              },
+              "R": {
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "U",
+                      "1",
+                      "2",
+                      "3"
+                    ]
+                  },
+                  "claim_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                    },
+                    "uniqueItems": true
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "corroboration_basis": {
+                    "type": "string",
+                    "enum": [
+                      "reported_buyer_statement"
+                    ]
+                  }
+                },
+                "required": [
+                  "level",
+                  "claim_ids",
+                  "rationale"
+                ],
+                "additionalProperties": false
+              },
+              "O": {
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "U",
+                      "1",
+                      "2",
+                      "3"
+                    ]
+                  },
+                  "claim_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                    },
+                    "uniqueItems": true
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "corroboration_basis": {
+                    "type": "string",
+                    "enum": [
+                      "reported_buyer_statement"
+                    ]
+                  }
+                },
+                "required": [
+                  "level",
+                  "claim_ids",
+                  "rationale"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "P",
+              "C",
+              "R",
+              "O"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "company_id",
+          "segment_scope",
+          "rubric_version",
+          "as_of",
+          "reviewer",
+          "stage_limitations",
+          "material_conflict",
+          "gates"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "dataset_version",
+    "raw_inputs",
+    "meta",
+    "rubric",
+    "editorial_readouts",
+    "companies",
+    "sources",
+    "claims",
+    "metrics",
+    "products",
+    "funding_rounds",
+    "company_relationships",
+    "people",
+    "company_people",
+    "investors",
+    "round_investors",
+    "company_investors",
+    "customer_evidence",
+    "assessments"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,265 @@
+{
+  "company_id": "afterquery",
+  "summary": "Experts create data and practice environments to train AI models. AfterQuery also builds custom models and AI tools that carry out tasks for businesses.",
+  "product_heading": "Training data products",
+  "featured_case": {
+    "title": "Inside NVIDIA’s office-task training",
+    "eyebrow": "Dataset use",
+    "description": "NVIDIA used AfterQuery tasks to train models for office work. Model-generated action records supported initial student-model training and later training with rewards.",
+    "qualifier": "NVIDIA confirms task use. Payment and contract value are undisclosed.",
+    "claim_ids": [
+      "afterquery.claim.round2-relationship-0"
+    ]
+  },
+  "products": [
+    {
+      "name": "Office Agent Training Dataset",
+      "description": "Professional assignments based on files. Tasks require analysis across several steps, with graded outputs.",
+      "record_ids": [
+        "afterquery.product.round2-office-agent-data",
+        "afterquery.product.oct14-0",
+        "afterquery.product.oct14-1"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-product-office-agent-data",
+        "afterquery.claim.oct14-product-0",
+        "afterquery.claim.oct14-product-1"
+      ],
+      "aliases": [
+        "Off-the-shelf Data",
+        "Off-The-Shelf Office Agent Training Dataset"
+      ]
+    },
+    {
+      "name": "SWE agent training datasets",
+      "description": "Experts write tasks from private business codebases. Automated tests check the results.",
+      "record_ids": [
+        "afterquery.product.round2-swe-agent-data"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-product-swe-agent-data"
+      ]
+    },
+    {
+      "name": "Terminal-agent training data",
+      "description": "Successful action records from command-line tasks (text commands used to operate a computer). Tasks run in isolated environments and earn rewards from tests.",
+      "record_ids": [
+        "afterquery.product.round2-terminal-agent-data"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-product-terminal-agent-data"
+      ]
+    },
+    {
+      "name": "Customer-service tool-use data",
+      "description": "Service tasks with several steps. Checks confirm whether calls to software tools work correctly.",
+      "record_ids": [
+        "afterquery.product.round2-customer-service-tools"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-product-customer-service-tools"
+      ]
+    },
+    {
+      "name": "Custom RL environments",
+      "description": "Training tasks using connected software tools or browser and desktop applications. Expert action records and grading support reinforcement learning (models learn by trying tasks and receiving scores).",
+      "record_ids": [
+        "afterquery.product.round2-custom-environments",
+        "afterquery.product.oct14-2",
+        "afterquery.product.oct14-3"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-product-custom-environments",
+        "afterquery.claim.oct14-product-2",
+        "afterquery.claim.oct14-product-3"
+      ],
+      "aliases": [
+        "Tool-calling RL Environments",
+        "Computer-use and Browser-use Environments"
+      ]
+    },
+    {
+      "name": "Expert demonstrations and feedback",
+      "description": "Examples teach desired responses, with comparisons showing which answers experts prefer. Expert grading rules are paired with automated checks.",
+      "record_ids": [
+        "afterquery.product.round2-expert-signals",
+        "afterquery.product.oct14-4"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-product-expert-signals",
+        "afterquery.claim.oct14-product-4"
+      ],
+      "aliases": [
+        "Rubric and Verifier-based RL"
+      ]
+    },
+    {
+      "name": "Enterprise model services",
+      "description": "Identifies gaps in a model’s abilities and prepares training data. Further training adapts a specialist model or agent for deployment.",
+      "record_ids": [
+        "afterquery.product.round2-enterprise-model-work",
+        "afterquery.product.oct14-5"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-product-enterprise-model-work",
+        "afterquery.claim.oct14-product-5"
+      ],
+      "aliases": [
+        "Custom Evals and Training Datasets"
+      ]
+    },
+    {
+      "name": "Atlas and Raine Search",
+      "description": "Atlas helps label and organize data. Raine Search finds past deals using everyday-language queries. Deployed for a named client; general self-service availability is undisclosed.",
+      "record_ids": [
+        "afterquery.product.round2-atlas-raine-search"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-product-atlas-raine-search"
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "name": "NVIDIA",
+      "relationship": "dataset_user",
+      "description": "NVIDIA used AfterQuery tasks to train models for office work. Model-generated action records supported initial student-model training and later training with rewards.",
+      "record_ids": [
+        "afterquery.customer.round2-0"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-relationship-0"
+      ]
+    },
+    {
+      "name": "Thinking Machines Lab",
+      "relationship": "dataset_user",
+      "description": "AfterQuery says it supplied training data for Inkling.",
+      "record_ids": [
+        "afterquery.customer.round2-1"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-relationship-1"
+      ]
+    },
+    {
+      "name": "Thinking Machines Lab",
+      "relationship": "technology_vendor",
+      "description": "AfterQuery used Tinker for further terminal-agent training and office-task distillation (training one model with outputs from another model).",
+      "record_ids": [
+        "afterquery.customer.round2-2"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-relationship-2"
+      ]
+    },
+    {
+      "name": "Legora",
+      "relationship": "research_collaborator",
+      "description": "Legora credits AfterQuery with co-creating a public synthetic BAR case. AfterQuery also reviewed how Legora prepared its data.",
+      "record_ids": [
+        "afterquery.customer.round2-3"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-relationship-3"
+      ]
+    },
+    {
+      "name": "The Raine Group",
+      "relationship": "implementation_partner",
+      "description": "An investor and Raine Search deployment partner. AfterQuery worked with Raine bankers to search past deals using Atlas and deal categories specific to the firm.",
+      "record_ids": [
+        "afterquery.customer.round2-4"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-relationship-4"
+      ]
+    },
+    {
+      "name": "Motif Technologies",
+      "relationship": "dataset_user",
+      "description": "AfterQuery identifies itself as the sole data partner for Motif 3.",
+      "record_ids": [
+        "afterquery.customer.round2-5"
+      ],
+      "claim_ids": [
+        "afterquery.claim.round2-relationship-5"
+      ]
+    }
+  ],
+  "people": [
+    {
+      "person_id": "afterquery.person.spencer-mateega",
+      "role": "Co-founder · CEO",
+      "bio": "Studied finance and statistics at Wharton, with computer science at Penn. His internships spanned finance and software engineering.",
+      "claim_ids": [
+        "afterquery.claim.round2-person-spencer-mateega"
+      ],
+      "portrait": "assets/people/afterquery-spencer-mateega.jpg",
+      "portrait_source_url": "https://www.ycombinator.com/companies/afterquery"
+    },
+    {
+      "person_id": "afterquery.person.carlos-georgescu",
+      "role": "Co-founder · CTO",
+      "bio": "Previously founded an education-technology business that was acquired. His software-engineering internships included Citadel Securities and Google.",
+      "claim_ids": [
+        "afterquery.claim.round2-person-carlos-georgescu"
+      ],
+      "portrait": "assets/people/afterquery-carlos-georgescu.jpg",
+      "portrait_source_url": "https://www.ycombinator.com/companies/afterquery"
+    },
+    {
+      "person_id": "afterquery.person.danny-tang",
+      "role": "Early founding team · FinanceQA coauthor",
+      "bio": "The launch describes his Wharton connection and an earlier startup with Spencer. Current title and employment status are unverified.",
+      "claim_ids": [
+        "afterquery.claim.round2-person-danny-tang"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "text": "Y Combinator’s current founder list names Spencer and Carlos. Launch material and the CEO’s account also name Danny Tang as an early team member. Danny’s current title and employment status are unverified.",
+      "claim_ids": [
+        "afterquery.claim.round2-early-team-context"
+      ]
+    }
+  ],
+  "performance_chart": {
+    "title": "NVIDIA’s GDPval warmup comparison",
+    "subtitle": "Nemotron 3 Ultra · Table 4: initial training comparison",
+    "series": [
+      {
+        "label": "Without warmup",
+        "value": 35.3
+      },
+      {
+        "label": "With warmup",
+        "value": 46.7
+      }
+    ],
+    "qualification": "The 11.4-point difference compares the warmup stage within NVIDIA’s training method. It does not isolate the effect of changing data suppliers.",
+    "claim_ids": [
+      "afterquery.claim.round2-research-nvidia-warmup"
+    ]
+  },
+  "operating_case": {
+    "title": "Legal evaluation with Legora",
+    "description": "Legora’s full evaluation set has 5,161 cases and 11,075 documents across 28 practice areas. BAR uses a subset of hundreds. One co-created synthetic case is public.",
+    "claim_ids": [
+      "afterquery.claim.round2-research-legora-bar"
+    ]
+  },
+  "combine_round_and_valuation": true,
+  "capital_note": "The company says the round closed several months earlier. The exact closing date is undisclosed.",
+  "metric_ids": [
+    "afterquery.metric.round2-financial-2",
+    "afterquery.metric.oct14-2-expert-network"
+  ],
+  "metric_context": {
+    "afterquery.metric.oct14-2-expert-network": {
+      "scope": "Professional network",
+      "note": "Undated company claim"
+    }
+  }
+}

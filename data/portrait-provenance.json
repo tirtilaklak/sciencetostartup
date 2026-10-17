@@ -1,0 +1,28 @@
+{
+  "portraits": [
+    {
+      "path": "assets/people/afterquery-spencer-mateega.jpg",
+      "subject": "Spencer Mateega",
+      "source_page": "https://www.ycombinator.com/companies/afterquery",
+      "kind": "founder_portrait",
+      "pixel_width": 200,
+      "pixel_height": 200,
+      "verified_at": "2026-10-14",
+      "verification": "Downloaded from the image labeled Spencer Mateega on YC, then visually inspected.",
+      "rights_note": "Public availability supplies no blanket reuse license. Retain source attribution.",
+      "sha256": "1ebeabc97a98ee8674accedc879be5731d813984e3ce48ef1bc4eff3ac16cd35"
+    },
+    {
+      "path": "assets/people/afterquery-carlos-georgescu.jpg",
+      "subject": "Carlos Georgescu",
+      "source_page": "https://www.ycombinator.com/companies/afterquery",
+      "kind": "founder_portrait",
+      "pixel_width": 200,
+      "pixel_height": 200,
+      "verified_at": "2026-10-14",
+      "verification": "Downloaded from the image labeled Carlos Georgescu on YC, then visually inspected.",
+      "rights_note": "Public availability supplies no blanket reuse license. Retain source attribution.",
+      "sha256": "5b16d795114de5d74b6ea7370e8dcbf83f0dc8dbce834cc4bdf989c9a6293816"
+    }
+  ]
+}

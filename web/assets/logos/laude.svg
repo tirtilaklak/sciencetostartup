@@ -1,0 +1,57 @@
+<svg viewBox="0 0 296 296" xmlns="http://www.w3.org/2000/svg">
+  <!-- Yellow circles with dual animations plus size pulsing -->
+  <circle cx="60" cy="60" r="28" fill="#E0CC69">
+    <animate id="circle1-fast" attributeName="fill" values="#E0CC69;#7592FC;#E0CC69" dur="500ms" begin="0s" repeatCount="3" />
+    <animate id="circle1-subtle" attributeName="fill" values="#E0CC69;#7592FC;#E0CC69" dur="8s" begin="1.5s" repeatCount="indefinite" />
+    <animate attributeName="r" values="28;33;28" dur="8s" begin="1.5s" repeatCount="indefinite" />
+  </circle>
+  
+  <circle cx="236" cy="60" r="28" fill="#E0CC69">
+    <animate id="circle3-fast" attributeName="fill" values="#E0CC69;#7592FC;#E0CC69" dur="500ms" begin="100ms" repeatCount="3" />
+    <animate id="circle3-subtle" attributeName="fill" values="#E0CC69;#7592FC;#E0CC69" dur="7s" begin="2.3s" repeatCount="indefinite" />
+    <animate attributeName="r" values="28;32;35;32;28" dur="7s" begin="2.3s" repeatCount="indefinite" />
+  </circle>
+  
+  <circle cx="60" cy="236" r="28" fill="#E0CC69">
+    <animate id="circle7-fast" attributeName="fill" values="#E0CC69;#7592FC;#E0CC69" dur="500ms" begin="300ms" repeatCount="3" />
+    <animate id="circle7-subtle" attributeName="fill" values="#E0CC69;#7592FC;#E0CC69" dur="9s" begin="3.7s" repeatCount="indefinite" />
+    <animate attributeName="r" values="28;30;32;30;28" dur="9s" begin="3.7s" repeatCount="indefinite" />
+  </circle>
+  
+  <circle cx="236" cy="236" r="28" fill="#E0CC69">
+    <animate id="circle9-fast" attributeName="fill" values="#E0CC69;#7592FC;#E0CC69" dur="500ms" begin="400ms" repeatCount="3" />
+    <animate id="circle9-subtle" attributeName="fill" values="#E0CC69;#7592FC;#E0CC69" dur="6.5s" begin="1.9s" repeatCount="indefinite" />
+    <animate attributeName="r" values="28;31;34;31;28" dur="6.5s" begin="1.9s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Blue circles with dual animations plus size pulsing -->
+  <circle cx="148" cy="60" r="28" fill="#7592FC">
+    <animate id="circle2-fast" attributeName="fill" values="#7592FC;#E0CC69;#7592FC" dur="500ms" begin="50ms" repeatCount="3" />
+    <animate id="circle2-subtle" attributeName="fill" values="#7592FC;#E0CC69;#7592FC" dur="7.5s" begin="2.8s" repeatCount="indefinite" />
+    <animate attributeName="r" values="28;31;33;31;28" dur="7.5s" begin="2.8s" repeatCount="indefinite" />
+  </circle>
+  
+  <circle cx="60" cy="148" r="28" fill="#7592FC">
+    <animate id="circle4-fast" attributeName="fill" values="#7592FC;#E0CC69;#7592FC" dur="500ms" begin="150ms" repeatCount="3" />
+    <animate id="circle4-subtle" attributeName="fill" values="#7592FC;#E0CC69;#7592FC" dur="8.5s" begin="1.65s" repeatCount="indefinite" />
+    <animate attributeName="r" values="28;35;28" dur="8.5s" begin="1.65s" repeatCount="indefinite" />
+  </circle>
+  
+  <circle cx="148" cy="148" r="28" fill="#7592FC">
+    <animate id="circle5-fast" attributeName="fill" values="#7592FC;#E0CC69;#7592FC" dur="500ms" begin="200ms" repeatCount="3" />
+    <animate id="circle5-subtle" attributeName="fill" values="#7592FC;#E0CC69;#7592FC" dur="6s" begin="3.2s" repeatCount="indefinite" />
+    <animate attributeName="r" values="28;30;32;30;28" dur="6s" begin="3.2s" repeatCount="indefinite" />
+  </circle>
+  
+  <circle cx="236" cy="148" r="28" fill="#7592FC">
+    <animate id="circle6-fast" attributeName="fill" values="#7592FC;#E0CC69;#7592FC" dur="500ms" begin="250ms" repeatCount="3" />
+    <animate id="circle6-subtle" attributeName="fill" values="#7592FC;#E0CC69;#7592FC" dur="9.5s" begin="2.1s" repeatCount="indefinite" />
+    <animate attributeName="r" values="28;30;32;34;32;30;28" dur="9.5s" begin="2.1s" repeatCount="indefinite" />
+  </circle>
+  
+  <circle cx="148" cy="236" r="28" fill="#7592FC">
+    <animate id="circle8-fast" attributeName="fill" values="#7592FC;#E0CC69;#7592FC" dur="500ms" begin="350ms" repeatCount="3" />
+    <animate id="circle8-subtle" attributeName="fill" values="#7592FC;#E0CC69;#7592FC" dur="7.2s" begin="4.1s" repeatCount="indefinite" />
+    <animate attributeName="r" values="28;31;33;31;28" dur="7.2s" begin="4.1s" repeatCount="indefinite" />
+  </circle>
+</svg>

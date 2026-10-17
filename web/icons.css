@@ -1,0 +1,5 @@
+/* Fixed geometry keeps icons consistent across devices and font families. */
+.ui-icon.ui-icon{display:inline-block;width:16px;height:16px;min-height:0;max-width:none;max-height:none;margin:0;flex:none;vertical-align:-3px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.mark .ui-icon{width:12px;height:12px;vertical-align:0}
+.feature-bottom>a>.ui-icon{width:26px;height:26px;vertical-align:0}
+.story-close>.ui-icon,.dialog-top button>.ui-icon{width:20px;height:20px;vertical-align:0}

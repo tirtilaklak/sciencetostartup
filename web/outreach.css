@@ -1,0 +1,50 @@
+/* Professional directory. All provenance remains available in native disclosures. */
+#outreach-view{--outreach-paper:#f5f3ed;--outreach-ink:#142a29;--outreach-teal:#285f54;--outreach-accent:#d99862;--outreach-muted:#576861;--outreach-border:#d9ded5;color:var(--outreach-ink)}
+.outreach-hero{padding:34px 0 24px;display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:40px;align-items:end}
+.outreach-hero h1{font-size:clamp(36px,4vw,52px);letter-spacing:-1.8px;margin:0 0 12px;line-height:1.05}
+.outreach-hero .intro{max-width:620px;font-size:17px;line-height:1.5;margin:0}
+.outreach-context{border-left:2px solid var(--outreach-accent);padding-left:20px;max-width:335px;font-size:13px;color:var(--outreach-muted)}
+.outreach-context p{margin:0 0 10px}.outreach-context p:last-child{margin:0}
+.outreach-kicker{display:block;color:var(--outreach-teal);font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:650;margin-bottom:8px}
+.outreach-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-block:1px solid var(--outreach-border);padding:16px 0;margin-bottom:22px;gap:24px}
+.outreach-stat{display:flex;align-items:baseline;gap:10px}.outreach-stat strong{font-size:28px;font-weight:550;letter-spacing:-.8px;line-height:1.2;color:var(--outreach-teal)}
+.outreach-stat span{font-size:12px;color:var(--outreach-muted);line-height:1.4}
+.outreach-principles{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:18px 0 0;color:var(--outreach-muted);font-size:12px}
+.outreach-principles p{margin:0}.outreach-principles strong{color:var(--outreach-ink);font-weight:600}
+.outreach-filters{display:grid;grid-template-columns:minmax(240px,1.5fr) repeat(3,minmax(0,1fr));gap:12px}
+.outreach-filters label{min-width:0;color:var(--outreach-muted);font-size:12px}
+.outreach-filters input,.outreach-filters select{width:100%;background:#fffefa;min-height:44px;border:1px solid var(--outreach-border);border-radius:8px;color:var(--outreach-ink);padding:10px 12px;font-size:13px;margin-top:6px}
+.outreach-result-bar{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:12px 0}
+.outreach-result-bar p{margin:0;font-size:12px;color:var(--outreach-muted)}
+.outreach-result-bar button{font-size:12px;min-height:44px}
+.outreach-list-heading{display:none}.outreach-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.medalist{min-width:0;border:1px solid var(--outreach-border);border-radius:14px;padding:24px 24px 0;background:#fffefa}
+.medalist-main{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 16px;align-items:end}
+.medalist-identity{grid-column:1/-1;min-width:0}
+.medalist-name{font-size:23px;line-height:1.2;letter-spacing:-.6px;margin:0 0 9px;color:var(--outreach-ink);overflow-wrap:anywhere}
+.medalist-alias{font-size:12px;color:var(--outreach-muted);margin:0 0 8px}
+.medalist-role{font-size:13px;line-height:1.55;color:var(--outreach-muted);margin:0;overflow-wrap:anywhere}
+.medalist-role>span{font-size:11px}
+.medalist-representation{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--outreach-teal);font-weight:600;margin:0 0 12px;line-height:1.5}
+.medalist-record{font-size:11px;align-self:end;min-width:0}.medalist-record strong{font-weight:550;color:var(--outreach-muted);line-height:1.5}
+.medal-line{display:flex;gap:5px;flex-wrap:wrap;margin:7px 0 0}.medal-line:empty{display:none}
+.medal-chip{display:inline-block;padding:4px 8px;border:1px solid #dfdfd5;border-radius:6px;font-size:10px;line-height:1.3;white-space:nowrap}
+.medal-chip.gold{background:#f6edd9;color:#70551b;border-color:#e7d9b7}.medal-chip.silver{background:#edf0ef;color:#4f5f5e;border-color:#dce2df}.medal-chip.bronze{background:#f5e8de;color:#775335;border-color:#e9d6c7}
+.medalist-awards{font-size:11px;color:var(--outreach-muted);margin:8px 0 0}
+.medalist-contact{font-size:12px;min-width:0}.medalist-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.medalist-actions a{display:inline-flex;gap:10px;align-items:center;justify-content:center;min-height:44px;padding:9px 12px;text-decoration:none;border:1px solid var(--outreach-border);border-radius:8px;white-space:nowrap;color:var(--outreach-teal);font-size:12px;font-weight:550;transition:background .15s,border-color .15s}
+.medalist-actions a.email-action{background:var(--outreach-teal);color:#fffefa;border-color:var(--outreach-teal)}
+.medalist-actions a:hover{background:#edf1e9;border-color:#92aaa0}.medalist-actions a.email-action:hover{background:#1d4a40;border-color:#1d4a40}
+#outreach-view :is(a,button,input,select,summary):focus-visible{outline:3px solid var(--outreach-teal);outline-offset:3px}
+.medalist-evidence{margin-top:20px;border-top:1px solid #e7e9e1;font-size:12px}
+.medalist-evidence>summary{cursor:pointer;color:var(--outreach-muted);width:100%;padding:14px 0;min-height:44px;font-size:11px;line-height:1.5}
+.medalist-evidence>summary::marker{color:var(--outreach-teal)}
+.evidence-details{margin:0 -8px 16px;padding:16px;background:var(--outreach-paper);border:1px solid var(--outreach-border);border-radius:9px;display:grid;grid-template-columns:1fr;gap:18px;overflow-wrap:anywhere;color:var(--outreach-muted);line-height:1.6}
+.evidence-details h4{font-size:12px;margin:0 0 8px;color:var(--outreach-ink)}.evidence-details p,.evidence-details ul{margin:0 0 8px}.evidence-details ul{padding-left:18px}.evidence-details li{margin-bottom:7px}.evidence-details a{color:var(--outreach-teal);line-height:1.7;text-underline-offset:3px}.evidence-wide{grid-column:1/-1}
+.medal-history{display:flex;flex-wrap:wrap;gap:8px 16px;padding:0!important;list-style:none}.historical-contact{color:#755321}.medal-caveat{color:#755321;font-size:12px;margin:6px 0 12px!important}
+.outreach-empty{text-align:center;background:#fffefa;border:1px solid var(--outreach-border);padding:48px 20px;margin-top:10px;border-radius:14px}.outreach-empty>span{font-size:36px;color:var(--outreach-muted)}.outreach-empty h2{font-size:24px}.outreach-empty p{color:var(--outreach-muted);font-size:14px}
+.outreach-method{margin-top:28px;font-size:13px;line-height:1.7;color:var(--outreach-muted);max-width:900px}.outreach-method>summary{color:var(--outreach-ink);font-weight:550;cursor:pointer;padding:14px 0;min-height:44px}.outreach-method p{margin-top:14px}.outreach-method li{margin:8px 0}.outreach-method strong{color:var(--outreach-ink)}
+@media(max-width:1000px){.outreach-hero{gap:24px}.outreach-filters{grid-template-columns:repeat(3,minmax(0,1fr))}.outreach-search{grid-column:1/-1}.medalist{padding:20px 20px 0}.medalist-main{grid-template-columns:1fr;gap:16px}.medalist-actions{justify-content:flex-start}.medalist-contact{grid-column:1/-1}.medalist-name{font-size:21px}.outreach-stat{align-items:flex-start;flex-direction:column;gap:4px}}
+@media(max-width:700px){.outreach-hero{display:block;padding:26px 0 20px}.outreach-hero h1{font-size:36px;letter-spacing:-1.2px}.outreach-hero .intro{font-size:16px}.outreach-context{margin-top:18px;padding-left:14px;font-size:12px;max-width:none}.outreach-context .outreach-kicker{display:none}.outreach-stats{gap:16px;padding:16px 0;margin-bottom:20px}.outreach-stat strong{font-size:27px}.outreach-stat span{font-size:11px}.outreach-principles{grid-template-columns:1fr;gap:12px}.outreach-filters{grid-template-columns:1fr 1fr;gap:12px}.outreach-filters select{font-size:12px;padding:10px 8px}.outreach-search{grid-column:1/-1}.outreach-list{grid-template-columns:1fr;gap:14px}.medalist{padding:22px 20px 0}.medalist-name{font-size:23px}.medalist-main{grid-template-columns:minmax(0,1fr) auto;gap:18px 12px}.medalist-contact{grid-column:auto}.medalist-actions{justify-content:flex-end}.medalist-actions a{padding:9px 11px}.medalist-evidence{margin-top:18px}.evidence-details{padding:14px}.outreach-result-bar p{font-size:12px}.outreach-method{font-size:12px}}
+@media(max-width:440px){.medalist-main{grid-template-columns:1fr;gap:16px}.medalist-actions{justify-content:flex-start}.outreach-hero h1{font-size:32px}.outreach-result-bar{gap:12px}}
+@media(max-width:360px){.outreach-filters{grid-template-columns:1fr}.outreach-search{grid-column:auto}}

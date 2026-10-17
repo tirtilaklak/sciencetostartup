@@ -1,0 +1,285 @@
+id,name
+investor.general-catalyst,General Catalyst
+investor.scott-sandell,Scott Sandell
+investor.soma-capital,Soma Capital
+investor.link-ventures,Link Ventures
+investor.2-twelve-angels,2 | Twelve Angels
+investor.benchmark,Benchmark
+investor.peter-thiel,Peter Thiel
+investor.jack-dorsey,Jack Dorsey
+investor.adam-d-angelo,Adam D’Angelo
+investor.larry-summers,Larry Summers
+investor.chris-r,Chris Ré
+investor.felicis,Felicis
+investor.menlo-ventures,Menlo Ventures
+investor.robinhood-ventures,Robinhood Ventures
+investor.greylock,Greylock
+investor.gv,GV
+investor.in-q-tel,In-Q-Tel
+investor.lightspeed-venture-partners,Lightspeed Venture Partners
+investor.nepenthe-capital,Nepenthe Capital
+investor.walden,Walden
+investor.blackrock-managed-funds,BlackRock-managed funds
+investor.addition,Addition
+investor.lightspeed,Lightspeed
+investor.nepenthe,Nepenthe
+investor.prosperity7-ventures,Prosperity7 Ventures
+investor.qbe-ventures,QBE Ventures
+investor.accenture-ventures,Accenture Ventures
+investor.insight-partners,Insight Partners
+investor.s32,S32
+investor.third-point,Third Point
+investor.march,March
+investor.blumberg,Blumberg
+investor.allegis,Allegis
+investor.standard-vc,Standard VC
+investor.frontline,Frontline
+investor.prosperity7,Prosperity7
+investor.wells-fargo,Wells Fargo
+investor.walden-catalyst,Walden Catalyst
+investor.factory,Factory
+investor.eqt-ventures,EQT Ventures
+investor.chan-zuckerberg-initiative,Chan Zuckerberg Initiative
+investor.omidyar-network,Omidyar Network
+investor.reach-capital,Reach Capital
+investor.ggv-capital,GGV Capital
+investor.kleiner-perkins,Kleiner Perkins
+investor.spark-capital,Spark Capital
+investor.true-ventures,True Ventures
+investor.emerson-collective,Emerson Collective
+investor.imaginable-futures,Imaginable Futures
+investor.coatue-management,Coatue Management
+investor.valiant-peregrine-fund,Valiant Peregrine Fund
+investor.base10-advancement-initiative,Base10 Advancement Initiative
+investor.01a,01A
+investor.two-unnamed-frontier-labs,two unnamed frontier labs
+investor.two-unnamed-xai-cofounders,two unnamed xAI cofounders
+investor.tiger-global,Tiger Global
+investor.dragoneer,Dragoneer
+investor.greenoaks-capital,Greenoaks Capital
+investor.wellington-management,Wellington Management
+investor.durable-capital,Durable Capital
+investor.coatue,Coatue
+investor.index,Index
+investor.founders-fund,Founders Fund
+investor.y-combinator,Y Combinator
+investor.accel,Accel
+investor.nat-friedman,Nat Friedman
+investor.index-ventures,Index Ventures
+investor.thrive-capital,Thrive Capital
+investor.nvidia,NVIDIA
+investor.greenoaks,Greenoaks
+investor.wellington,Wellington
+investor.cisco-investments,Cisco Investments
+investor.dfj-growth,DFJ Growth
+investor.intel-capital,Intel Capital
+investor.servicenow-ventures,ServiceNow Ventures
+investor.amd-ventures,AMD Ventures
+investor.wcm,WCM
+investor.amazon,Amazon
+investor.elad-gil,Elad Gil
+investor.meta,Meta
+investor.qualcomm-ventures,Qualcomm Ventures
+investor.foundation-capital,Foundation Capital
+investor.westbridge-capital,WestBridge Capital
+investor.altair-capital,AltaIR Capital
+investor.mindset-ventures,Mindset Ventures
+investor.frontier-ventures,Frontier Ventures
+investor.gaingels,Gaingels
+investor.stepstone-group,StepStone Group
+investor.khazanah-nasional-berhad,Khazanah Nasional Berhad
+investor.sozo-ventures,Sozo Ventures
+investor.uphonest-capital,UpHonest Capital
+investor.amino-capital,Amino Capital
+investor.plug-and-play,Plug and Play
+investor.mvp-ventures,MVP Ventures
+investor.fortius-ventures,Fortius Ventures
+investor.mastodon-capital-management,Mastodon Capital Management
+investor.first-round-capital,First Round Capital
+investor.gradient-ventures,Gradient Ventures
+investor.andreessen-horowitz,Andreessen Horowitz
+investor.b-capital-group,B Capital Group
+investor.databricks-ventures,Databricks Ventures
+investor.snowpoint-ventures,Snowpoint Ventures
+investor.distributed-global,Distributed Global
+investor.coinfund,CoinFund
+investor.compound,Compound
+investor.collab-currency,Collab+Currency
+investor.juan-benet-protocol-labs,Juan Benet / Protocol Labs
+investor.clem-delangue,Clem Delangue
+investor.andrej-karpathy,Andrej Karpathy
+investor.dylan-patel,Dylan Patel
+investor.tri-dao,Tri Dao
+investor.emad-mostaque,Emad Mostaque
+investor.jake-medwell,Jake Medwell
+investor.radical-ventures,Radical Ventures
+investor.nvidia-ventures,NVIDIA Ventures
+investor.dell-technologies-capital,Dell Technologies Capital
+investor.existing-investors-and-angels,existing investors and angels
+investor.nfx-lead,NFX (lead)
+investor.insight-partners-co-lead,Insight Partners (co-lead)
+investor.tiger-global-co-lead,Tiger Global (co-lead)
+investor.spruce-house-the-spruce-house-partnership-co-lead,Spruce House / The Spruce House Partnership (co-lead)
+investor.khosla-ventures,Khosla Ventures
+investor.battery-ventures,Battery Ventures
+investor.peeyush-ranjan,Peeyush Ranjan
+investor.greg-badros,Greg Badros
+investor.dan-rubinstein,Dan Rubinstein
+investor.jmi-equity-lead,JMI Equity (lead)
+investor.randstad,Randstad
+investor.chartline-capital-partners,Chartline Capital Partners
+investor.susquehanna-growth-equity-lead,Susquehanna Growth Equity (lead)
+investor.foothill-ventures,Foothill Ventures
+investor.sogal-ventures,SoGal Ventures
+investor.mac-venture-capital-lead,MaC Venture Capital (lead)
+investor.seabed-vc,Seabed VC
+investor.fearless-fund,Fearless Fund
+investor.liquid-2-ventures,Liquid 2 Ventures
+investor.slope,Slope
+investor.jonathan-swanson-and-other-angels,Jonathan Swanson and other angels
+investor.49-palms,49 Palms
+investor.emergence,Emergence
+investor.signalfire,SignalFire
+investor.audacious,Audacious
+investor.z-fellows,Z Fellows
+investor.andy-konwinski,Andy Konwinski
+investor.altos-ventures,Altos Ventures
+investor.the-raine-group,The Raine Group
+investor.boxgroup,BoxGroup
+investor.latitude-capital,Latitude Capital
+investor.pioneer-fund,Pioneer Fund
+investor.partech,Partech
+investor.oxford-science-enterprises,Oxford Science Enterprises
+investor.striker-ventures,Striker Ventures
+investor.altimeter,Altimeter
+investor.jeff-dean,Jeff Dean
+investor.john-schulman,John Schulman
+investor.karim-atiyeh,Karim Atiyeh
+investor.aaron-levie,Aaron Levie
+investor.dwarkesh-patel,Dwarkesh Patel
+investor.milan-kovac,Milan Kovac
+investor.winston-weinberg,Winston Weinberg
+investor.mike-knoop,Mike Knoop
+investor.asher-spector,Asher Spector
+investor.jeff-wang,Jeff Wang
+investor.rohan-anil,Rohan Anil
+investor.matthew-prince,Matthew Prince
+investor.brendan-foody,Brendan Foody
+investor.devansh-pandey,Devansh Pandey
+investor.harrison-chase,Harrison Chase
+investor.nic-ouporov,Nic Ouporov
+investor.recruit-holdings-hr-technology-fund,Recruit Holdings HR Technology Fund
+investor.elaia,Elaia
+investor.bessemer-venture-partners,Bessemer Venture Partners
+investor.julien-chaumond,Julien Chaumond
+investor.oscar-salazar,Oscar Salazar
+investor.christine-balagu,Christine Balagué
+investor.nathalie-gaveau,Nathalie Gaveau
+investor.charles-gorintin,Charles Gorintin
+investor.nick-hernandez,Nick Hernandez
+investor.vincent-huguet,Vincent Huguet
+investor.sh-h-razade-semsar-de-boiss-son,Shéhérazade Semsar de Boisséson
+investor.chris-schagen,Chris Schagen
+investor.victor-coisne,Victor Coisne
+investor.speedinvest,Speedinvest
+investor.precursor-ventures,Precursor Ventures
+investor.k-fund,K Fund
+investor.preston-werner-ventures,Preston-Werner Ventures
+investor.cl-ment-delangue,Clément Delangue
+investor.thomas-wolf,Thomas Wolf
+investor.tom-preston-werner,Tom Preston-Werner
+investor.xavier-amatriain,Xavier Amatriain
+investor.oriol-vinyals,Oriol Vinyals
+investor.mouro-capital,Mouro Capital
+investor.raise-seed-for-good,Raise Seed For Good
+investor.mitsui-sumitomo-insurance-venture-capital,Mitsui Sumitomo Insurance Venture Capital
+investor.anobaka,ANOBAKA
+investor.gree-ventures,Gree Ventures
+investor.ntvp,NTVP
+investor.kazutaka-muraguchi,Kazutaka Muraguchi
+investor.canal-ventures,Canal Ventures
+investor.8vc,8VC
+investor.spiros-xanthos,Spiros Xanthos
+investor.dheeraj-pandey,Dheeraj Pandey
+investor.wing-venture-capital,Wing Venture Capital
+investor.mayfield,Mayfield
+investor.the-house-fund,The House Fund
+investor.tristan-handy,Tristan Handy
+investor.sv-angel,SV Angel
+investor.chemistry,Chemistry
+investor.diede-van-lamoen-go-global-ventures,Diede van Lamoen / Go Global Ventures
+investor.liam-fedus,Liam Fedus
+investor.kevin-weil,Kevin Weil
+investor.erik-bernhardsson,Erik Bernhardsson
+investor.heartcore-capital,Heartcore Capital
+investor.inovo,Inovo
+investor.afore-capital,Afore Capital
+investor.homebrew,Homebrew
+investor.balaji-srinivasan,Balaji Srinivasan
+investor.base10-partners,Base10 Partners
+investor.cervin-ventures,Cervin Ventures
+investor.founders-future,Founders Future
+investor.scribble-ventures,Scribble Ventures
+investor.firestreak,Firestreak
+investor.christian-beedgen,Christian Beedgen
+investor.ivan-zhang,Ivan Zhang
+investor.umesh-khanna,Umesh Khanna
+investor.soheil-koushan,Soheil Koushan
+investor.shyamal-hitesh-anadkat,Shyamal Hitesh Anadkat
+investor.dst-global-partners,DST Global Partners
+investor.antler-elevate,Antler Elevate
+investor.greg-brockman,Greg Brockman
+investor.charlie-cheever,Charlie Cheever
+investor.jonathan-swanson,Jonathan Swanson
+investor.guillermo-rauch,Guillermo Rauch
+investor.ilya-sukhar,Ilya Sukhar
+investor.drew-houston,Drew Houston
+investor.justin-kan,Justin Kan
+investor.kevin-systrom,Kevin Systrom
+investor.mike-krieger,Mike Krieger
+investor.catherine-wood,Catherine Wood
+investor.softbank-vision-fund-2,SoftBank Vision Fund 2
+investor.backed-ventures,Backed Ventures
+investor.loup-ventures,Loup Ventures
+investor.horizons-alpha,Horizons Alpha
+investor.greycroft,Greycroft
+investor.vanara-capital,Vanara Capital
+investor.princeville-capital,Princeville Capital
+investor.hof-capital,HOF Capital
+investor.freestyle-capital,Freestyle Capital
+investor.rocketeer-management,Rocketeer Management
+investor.tallwoods-capital,Tallwoods Capital
+investor.acrew-capital,Acrew Capital
+investor.backed-vc,Backed VC
+investor.by-ventures,BY Ventures
+investor.deepwater-asset-management,Deepwater Asset Management
+investor.bezos-expeditions,Bezos Expeditions
+investor.mikhail-parakhin,Mikhail Parakhin
+investor.nebius-group,Nebius Group
+investor.anacacia-capital,Anacacia Capital
+investor.public-and-institutional-investors,Public and institutional investors
+investor.unnamed-institutional-and-professional-investors,Unnamed institutional and professional investors
+investor.eligible-existing-shareholders,Eligible existing shareholders
+investor.unnamed-institutional-investors,Unnamed institutional investors
+investor.public-market-investors-names-not-disclosed,Public-market investors; names not disclosed
+investor.michael-and-susan-dell-foundation,Michael and Susan Dell Foundation
+investor.khosla-impact,Khosla Impact
+investor.cdc-group-now-british-international-investment,CDC Group (now British International Investment)
+investor.british-international-investment-cdc-group,British International Investment / CDC Group
+investor.social-impact-ventures,Social Impact Ventures
+investor.bestseller-foundation,BESTSELLER Foundation
+investor.bluecrest-limited-capital,Bluecrest Limited Capital
+investor.ridge-ventures,Ridge Ventures
+investor.first-ascent-ventures,First Ascent Ventures
+investor.salesforce-ventures,Salesforce Ventures
+investor.vistara-growth,Vistara Growth
+investor.caisse-de-d-p-t-et-placement-du-qu-bec-cdpq-now-branded-la-caisse,Caisse de dépôt et placement du Québec (CDPQ; now branded La Caisse)
+investor.navegar,Navegar
+investor.blackstone-managed-private-equity-funds,Blackstone-managed private equity funds
+investor.dream-ventures,Dream Ventures
+investor.microsoft,Microsoft
+investor.javelin,Javelin
+investor.flybridge,Flybridge
+investor.g-squared,G Squared
+investor.up-partners,Up Partners
+investor.lg,LG

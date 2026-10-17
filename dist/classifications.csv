@@ -1,0 +1,157 @@
+company_id,company,segment_scope,stage,confidence,rubric_version,as_of
+mercor,Mercor,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+mercor,Mercor,company,pending,unclassified,1.0.0,2026-10-15
+mercor,Mercor,research,pending,unclassified,1.0.0,2026-10-15
+mercor,Mercor,other_segment,pending,unclassified,1.0.0,2026-10-15
+snorkel_ai,Snorkel AI,ai_data,pending,unclassified,1.0.0,2026-10-15
+snorkel_ai,Snorkel AI,company,repeatable_commercial_evidence,medium,1.0.0,2026-10-15
+snorkel_ai,Snorkel AI,research,pending,unclassified,1.0.0,2026-10-15
+snorkel_ai,Snorkel AI,other_segment,pending,unclassified,1.0.0,2026-10-15
+handshake_ai,Handshake AI,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+handshake_ai,Handshake AI,company,pending,unclassified,1.0.0,2026-10-15
+handshake_ai,Handshake AI,research,pending,unclassified,1.0.0,2026-10-15
+handshake_ai,Handshake AI,other_segment,pending,unclassified,1.0.0,2026-10-15
+micro1,micro1,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+micro1,micro1,company,pending,unclassified,1.0.0,2026-10-15
+micro1,micro1,research,pending,unclassified,1.0.0,2026-10-15
+micro1,micro1,other_segment,pending,unclassified,1.0.0,2026-10-15
+scale_ai,Scale AI,ai_data,pending,unclassified,1.0.0,2026-10-15
+scale_ai,Scale AI,company,established_commercial_evidence,medium,1.0.0,2026-10-15
+scale_ai,Scale AI,research,pending,unclassified,1.0.0,2026-10-15
+scale_ai,Scale AI,other_segment,pending,unclassified,1.0.0,2026-10-15
+turing,Turing,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+turing,Turing,company,pending,unclassified,1.0.0,2026-10-15
+turing,Turing,research,pending,unclassified,1.0.0,2026-10-15
+turing,Turing,other_segment,pending,unclassified,1.0.0,2026-10-15
+labelbox,Labelbox,ai_data,pending,unclassified,1.0.0,2026-10-15
+labelbox,Labelbox,company,repeatable_commercial_evidence,high,1.0.0,2026-10-15
+labelbox,Labelbox,research,pending,unclassified,1.0.0,2026-10-15
+labelbox,Labelbox,other_segment,pending,unclassified,1.0.0,2026-10-15
+prime_intellect,Prime Intellect,ai_data,demonstrated_delivery,medium,1.0.0,2026-10-15
+prime_intellect,Prime Intellect,company,pending,unclassified,1.0.0,2026-10-15
+prime_intellect,Prime Intellect,research,pending,unclassified,1.0.0,2026-10-15
+prime_intellect,Prime Intellect,other_segment,pending,unclassified,1.0.0,2026-10-15
+abundant_ai,Abundant,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+abundant_ai,Abundant,company,pending,unclassified,1.0.0,2026-10-15
+abundant_ai,Abundant,research,pending,unclassified,1.0.0,2026-10-15
+abundant_ai,Abundant,other_segment,pending,unclassified,1.0.0,2026-10-15
+afterquery,AfterQuery,ai_data,demonstrated_delivery,high,1.0.0,2026-10-15
+afterquery,AfterQuery,company,pending,unclassified,1.0.0,2026-10-15
+afterquery,AfterQuery,research,pending,unclassified,1.0.0,2026-10-15
+afterquery,AfterQuery,other_segment,pending,unclassified,1.0.0,2026-10-15
+bespoke_labs,Bespoke Labs,ai_data,demonstrated_delivery,medium,1.0.0,2026-10-15
+bespoke_labs,Bespoke Labs,company,pending,unclassified,1.0.0,2026-10-15
+bespoke_labs,Bespoke Labs,research,pending,unclassified,1.0.0,2026-10-15
+bespoke_labs,Bespoke Labs,other_segment,pending,unclassified,1.0.0,2026-10-15
+polymath_ai_labs,Polymath,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+polymath_ai_labs,Polymath,company,pending,unclassified,1.0.0,2026-10-15
+polymath_ai_labs,Polymath,research,pending,unclassified,1.0.0,2026-10-15
+polymath_ai_labs,Polymath,other_segment,pending,unclassified,1.0.0,2026-10-15
+proximal,Proximal,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+proximal,Proximal,company,pending,unclassified,1.0.0,2026-10-15
+proximal,Proximal,research,pending,unclassified,1.0.0,2026-10-15
+proximal,Proximal,other_segment,pending,unclassified,1.0.0,2026-10-15
+trajectory_labs_pbc,"Trajectory Labs, PBC",ai_data,demonstrated_delivery,high,1.0.0,2026-10-15
+trajectory_labs_pbc,"Trajectory Labs, PBC",company,pending,unclassified,1.0.0,2026-10-15
+trajectory_labs_pbc,"Trajectory Labs, PBC",research,pending,unclassified,1.0.0,2026-10-15
+trajectory_labs_pbc,"Trajectory Labs, PBC",other_segment,pending,unclassified,1.0.0,2026-10-15
+refresh,Refresh,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+refresh,Refresh,company,pending,unclassified,1.0.0,2026-10-15
+refresh,Refresh,research,pending,unclassified,1.0.0,2026-10-15
+refresh,Refresh,other_segment,pending,unclassified,1.0.0,2026-10-15
+surge_ai,Surge AI,ai_data,demonstrated_delivery,medium,1.0.0,2026-10-15
+surge_ai,Surge AI,company,pending,unclassified,1.0.0,2026-10-15
+surge_ai,Surge AI,research,pending,unclassified,1.0.0,2026-10-15
+surge_ai,Surge AI,other_segment,pending,unclassified,1.0.0,2026-10-15
+quesma,Quesma,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+quesma,Quesma,company,pending,unclassified,1.0.0,2026-10-15
+quesma,Quesma,research,pending,unclassified,1.0.0,2026-10-15
+quesma,Quesma,other_segment,pending,unclassified,1.0.0,2026-10-15
+datacurve,Datacurve,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+datacurve,Datacurve,company,pending,unclassified,1.0.0,2026-10-15
+datacurve,Datacurve,research,pending,unclassified,1.0.0,2026-10-15
+datacurve,Datacurve,other_segment,pending,unclassified,1.0.0,2026-10-15
+benchflow,BenchFlow,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+benchflow,BenchFlow,company,pending,unclassified,1.0.0,2026-10-15
+benchflow,BenchFlow,research,pending,unclassified,1.0.0,2026-10-15
+benchflow,BenchFlow,other_segment,pending,unclassified,1.0.0,2026-10-15
+g2i,G2i,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+g2i,G2i,company,repeatable_commercial_evidence,medium,1.0.0,2026-10-15
+g2i,G2i,research,pending,unclassified,1.0.0,2026-10-15
+g2i,G2i,other_segment,pending,unclassified,1.0.0,2026-10-15
+a-team,A.Team,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+a-team,A.Team,company,repeatable_commercial_evidence,medium,1.0.0,2026-10-15
+a-team,A.Team,research,pending,unclassified,1.0.0,2026-10-15
+a-team,A.Team,other_segment,pending,unclassified,1.0.0,2026-10-15
+hackerrank,HackerRank Bench,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+hackerrank,HackerRank Bench,company,pending,unclassified,1.0.0,2026-10-15
+hackerrank,HackerRank Bench,research,pending,unclassified,1.0.0,2026-10-15
+hackerrank,HackerRank Bench,other_segment,pending,unclassified,1.0.0,2026-10-15
+pareto,Pareto AI,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+pareto,Pareto AI,company,pending,unclassified,1.0.0,2026-10-15
+pareto,Pareto AI,research,pending,unclassified,1.0.0,2026-10-15
+pareto,Pareto AI,other_segment,pending,unclassified,1.0.0,2026-10-15
+ooak,Ooak Data,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+ooak,Ooak Data,company,pending,unclassified,1.0.0,2026-10-15
+ooak,Ooak Data,research,pending,unclassified,1.0.0,2026-10-15
+ooak,Ooak Data,other_segment,pending,unclassified,1.0.0,2026-10-15
+elorian,Elorian,ai_data,insufficient_public_evidence,unclassified,1.0.0,2026-10-15
+elorian,Elorian,company,pending,unclassified,1.0.0,2026-10-15
+elorian,Elorian,research,pending,unclassified,1.0.0,2026-10-15
+elorian,Elorian,other_segment,pending,unclassified,1.0.0,2026-10-15
+terac,Terac,ai_data,demonstrated_delivery,medium,1.0.0,2026-10-15
+terac,Terac,company,pending,unclassified,1.0.0,2026-10-15
+terac,Terac,research,pending,unclassified,1.0.0,2026-10-15
+terac,Terac,other_segment,pending,unclassified,1.0.0,2026-10-15
+laude,Laude Institute / Terminal-Bench,ai_data,not_applicable,unclassified,1.0.0,2026-10-15
+laude,Laude Institute / Terminal-Bench,company,not_applicable,unclassified,1.0.0,2026-10-15
+laude,Laude Institute / Terminal-Bench,research,not_applicable,unclassified,1.0.0,2026-10-15
+laude,Laude Institute / Terminal-Bench,other_segment,not_applicable,unclassified,1.0.0,2026-10-15
+invisible,Invisible Technologies,ai_data,demonstrated_delivery,medium,1.0.0,2026-10-15
+invisible,Invisible Technologies,company,pending,unclassified,1.0.0,2026-10-15
+invisible,Invisible Technologies,research,pending,unclassified,1.0.0,2026-10-15
+invisible,Invisible Technologies,other_segment,pending,unclassified,1.0.0,2026-10-15
+toloka,Toloka,ai_data,repeatable_commercial_evidence,high,1.0.0,2026-10-15
+toloka,Toloka,company,pending,unclassified,1.0.0,2026-10-15
+toloka,Toloka,research,pending,unclassified,1.0.0,2026-10-15
+toloka,Toloka,other_segment,pending,unclassified,1.0.0,2026-10-15
+prolific,Prolific,ai_data,repeatable_commercial_evidence,medium,1.0.0,2026-10-15
+prolific,Prolific,company,pending,unclassified,1.0.0,2026-10-15
+prolific,Prolific,research,pending,unclassified,1.0.0,2026-10-15
+prolific,Prolific,other_segment,pending,unclassified,1.0.0,2026-10-15
+aixi,AIXI Labs,ai_data,not_applicable,unclassified,1.0.0,2026-10-15
+aixi,AIXI Labs,company,not_applicable,unclassified,1.0.0,2026-10-15
+aixi,AIXI Labs,research,not_applicable,unclassified,1.0.0,2026-10-15
+aixi,AIXI Labs,other_segment,not_applicable,unclassified,1.0.0,2026-10-15
+appen,Appen,ai_data,pending,unclassified,1.0.0,2026-10-15
+appen,Appen,company,established_commercial_evidence,high,1.0.0,2026-10-15
+appen,Appen,research,pending,unclassified,1.0.0,2026-10-15
+appen,Appen,other_segment,pending,unclassified,1.0.0,2026-10-15
+giskard,Giskard,ai_data,demonstrated_delivery,medium,1.0.0,2026-10-15
+giskard,Giskard,company,pending,unclassified,1.0.0,2026-10-15
+giskard,Giskard,research,pending,unclassified,1.0.0,2026-10-15
+giskard,Giskard,other_segment,pending,unclassified,1.0.0,2026-10-15
+alinia,Alinia AI,ai_data,demonstrated_delivery,medium,1.0.0,2026-10-15
+alinia,Alinia AI,company,pending,unclassified,1.0.0,2026-10-15
+alinia,Alinia AI,research,pending,unclassified,1.0.0,2026-10-15
+alinia,Alinia AI,other_segment,pending,unclassified,1.0.0,2026-10-15
+apto,APTO,ai_data,demonstrated_delivery,medium,1.0.0,2026-10-15
+apto,APTO,company,pending,unclassified,1.0.0,2026-10-15
+apto,APTO,research,pending,unclassified,1.0.0,2026-10-15
+apto,APTO,other_segment,pending,unclassified,1.0.0,2026-10-15
+rws_trainai,RWS / TrainAI,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+rws_trainai,RWS / TrainAI,company,pending,unclassified,1.0.0,2026-10-15
+rws_trainai,RWS / TrainAI,research,pending,unclassified,1.0.0,2026-10-15
+rws_trainai,RWS / TrainAI,other_segment,pending,unclassified,1.0.0,2026-10-15
+imerit,iMerit / EXL,ai_data,pending,unclassified,1.0.0,2026-10-15
+imerit,iMerit / EXL,company,repeatable_commercial_evidence,high,1.0.0,2026-10-15
+imerit,iMerit / EXL,research,pending,unclassified,1.0.0,2026-10-15
+imerit,iMerit / EXL,other_segment,pending,unclassified,1.0.0,2026-10-15
+sama,Sama,ai_data,pending,unclassified,1.0.0,2026-10-15
+sama,Sama,company,established_commercial_evidence,low_provisional,1.0.0,2026-10-15
+sama,Sama,research,pending,unclassified,1.0.0,2026-10-15
+sama,Sama,other_segment,pending,unclassified,1.0.0,2026-10-15
+taskus,TaskUs,ai_data,visible_operating_offer,medium,1.0.0,2026-10-15
+taskus,TaskUs,company,pending,unclassified,1.0.0,2026-10-15
+taskus,TaskUs,research,pending,unclassified,1.0.0,2026-10-15
+taskus,TaskUs,other_segment,pending,unclassified,1.0.0,2026-10-15

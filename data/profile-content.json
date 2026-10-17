@@ -1,0 +1,4808 @@
+{
+  "entries": [
+    {
+      "company_id": "scale_ai",
+      "products": [
+        {
+          "name": "Scale Data Engine",
+          "description": "Training data and annotation (labels added to data so models can learn).",
+          "record_ids": [
+            "scale_ai.product.oct14-0",
+            "scale_ai.product.major-0"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.oct14-product-0",
+            "scale_ai.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Scale GenAI Portfolio",
+          "description": "AI applications for work inside businesses.",
+          "record_ids": [
+            "scale_ai.product.oct14-1",
+            "scale_ai.product.major-0"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.oct14-product-1",
+            "scale_ai.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Scale Donovan",
+          "description": "AI applications for government users.",
+          "record_ids": [
+            "scale_ai.product.oct14-2",
+            "scale_ai.product.major-0"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.oct14-product-2",
+            "scale_ai.claim.major-products-0"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Defense Innovation Unit",
+          "relationship": "customer",
+          "description": "The buyer announced the Thunderforge prototype contract. Completed deployment is unverified.",
+          "record_ids": [
+            "scale_ai.customer.major-0"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.major-customers-0"
+          ]
+        },
+        {
+          "name": "Toyota",
+          "relationship": "historical_customer",
+          "description": "Scale described this customer’s work in April 2021. Current status is unverified.",
+          "record_ids": [
+            "scale_ai.customer.major-1"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "States Title",
+          "relationship": "historical_customer",
+          "description": "Scale described this customer’s work in April 2021. Current status is unverified.",
+          "record_ids": [
+            "scale_ai.customer.major-1"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "PayPal",
+          "relationship": "historical_customer",
+          "description": "Scale described this customer’s work in April 2021. Current status is unverified.",
+          "record_ids": [
+            "scale_ai.customer.major-1"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "Brex",
+          "relationship": "historical_customer",
+          "description": "Scale described this customer’s work in April 2021. Current status is unverified.",
+          "record_ids": [
+            "scale_ai.customer.major-1"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "Flexport",
+          "relationship": "historical_customer",
+          "description": "Scale described this customer’s work in April 2021. Current status is unverified.",
+          "record_ids": [
+            "scale_ai.customer.major-1"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "Mayo Clinic",
+          "relationship": "claimed_customer",
+          "description": "Scale named this company in new business bookings for Q4 2025.",
+          "record_ids": [
+            "scale_ai.customer.major-2"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.major-customers-2"
+          ]
+        },
+        {
+          "name": "BP",
+          "relationship": "claimed_customer",
+          "description": "Scale named this company in new business bookings for Q4 2025.",
+          "record_ids": [
+            "scale_ai.customer.major-2"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.major-customers-2"
+          ]
+        },
+        {
+          "name": "Allianz",
+          "relationship": "claimed_customer",
+          "description": "Scale named this company in new business bookings for Q4 2025.",
+          "record_ids": [
+            "scale_ai.customer.major-2"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.major-customers-2"
+          ]
+        },
+        {
+          "name": "Meta",
+          "relationship": "strategic_investor",
+          "description": "Strategic equity investor. Customer contract value is undisclosed.",
+          "record_ids": [
+            "scale_ai.customer.major-3"
+          ],
+          "claim_ids": [
+            "scale_ai.claim.major-funding_rounds-6",
+            "scale_ai.claim.major-customers-3"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "scale_ai.person.alexandr-wang",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "scale_ai.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "scale_ai.person.lucy-guo",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "scale_ai.claim.major-founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "surge_ai",
+      "products": [
+        {
+          "name": "RL Environments and Agents",
+          "description": "Coding tasks for training and testing AI agents (software that takes actions to complete a task).",
+          "record_ids": [
+            "surge_ai.product.oct14-0",
+            "surge_ai.product.0",
+            "surge_ai.product.1"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.oct14-product-0",
+            "surge_ai.claim.products-0",
+            "surge_ai.claim.products-1"
+          ]
+        },
+        {
+          "name": "Rubrics and Verifiers",
+          "description": "Grading rules and checks for model outputs.",
+          "record_ids": [
+            "surge_ai.product.oct14-1"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "RLHF",
+          "description": "Human feedback for model training (people rate responses to guide model training).",
+          "record_ids": [
+            "surge_ai.product.oct14-2"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "SFT",
+          "description": "Supervised fine-tuning (models learn from examples of desired responses).",
+          "record_ids": [
+            "surge_ai.product.oct14-3"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.oct14-product-3"
+          ]
+        },
+        {
+          "name": "Human Evaluation",
+          "description": "Experts assess model responses and behavior.",
+          "record_ids": [
+            "surge_ai.product.oct14-4",
+            "surge_ai.product.0",
+            "surge_ai.product.1"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.oct14-product-4",
+            "surge_ai.claim.products-0",
+            "surge_ai.claim.products-1"
+          ]
+        },
+        {
+          "name": "Off-The-Shelf Data",
+          "description": "Ready-made datasets for model training.",
+          "record_ids": [
+            "surge_ai.product.oct14-5",
+            "surge_ai.product.0",
+            "surge_ai.product.1"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.oct14-product-5",
+            "surge_ai.claim.products-0",
+            "surge_ai.claim.products-1"
+          ]
+        },
+        {
+          "name": "Post-Training Runs",
+          "description": "Post-training (additional training to improve an existing model).",
+          "record_ids": [
+            "surge_ai.product.oct14-6"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.oct14-product-6"
+          ]
+        },
+        {
+          "name": "EnterpriseBench: CoreCraft",
+          "description": null,
+          "record_ids": [
+            "surge_ai.product.oct14-7"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.oct14-product-7"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "OpenAI",
+          "relationship": "historical_customer",
+          "description": "OpenAI credits Surge for past WebGPT data collection. Current contract status and value are unverified.",
+          "record_ids": [
+            "surge_ai.customer.0"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Anthropic",
+          "relationship": "customer",
+          "description": "Anthropic credits Surge with recruiting participants for persuasion research.",
+          "record_ids": [
+            "surge_ai.customer.1"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Anthropic",
+          "relationship": "claimed_partner",
+          "description": "Surge lists Anthropic as a partner. Contract scope is undisclosed.",
+          "record_ids": [
+            "surge_ai.customer.2"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.customers-2"
+          ]
+        },
+        {
+          "name": "Google",
+          "relationship": "claimed_partner",
+          "description": "Surge lists Google as a partner. Contract scope is undisclosed.",
+          "record_ids": [
+            "surge_ai.customer.2"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.customers-2"
+          ]
+        },
+        {
+          "name": "Microsoft",
+          "relationship": "claimed_partner",
+          "description": "Surge lists Microsoft as a partner. Contract scope is undisclosed.",
+          "record_ids": [
+            "surge_ai.customer.2"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.customers-2"
+          ]
+        },
+        {
+          "name": "Meta",
+          "relationship": "claimed_partner",
+          "description": "Surge lists Meta as a partner. Contract scope is undisclosed.",
+          "record_ids": [
+            "surge_ai.customer.2"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.customers-2"
+          ]
+        },
+        {
+          "name": "Meta",
+          "relationship": "customer",
+          "description": "Meta papers name Surge as a provider of expert prompts and grading rules, plus a data-labeling platform. Contract value is undisclosed.",
+          "record_ids": [
+            "surge_ai.customer.audit-0"
+          ],
+          "claim_ids": [
+            "surge_ai.claim.audit-meta-advancedif",
+            "surge_ai.claim.audit-meta-mmrb2"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "surge_ai.person.edwin-chen",
+          "role": "Founder and CEO",
+          "bio": "",
+          "claim_ids": [
+            "surge_ai.claim.founders"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "mercor",
+      "products": [
+        {
+          "name": "Human data & evals",
+          "description": "Expert-authored training data and evaluations.",
+          "record_ids": [
+            "mercor.product.oct14-0",
+            "mercor.product.major-0"
+          ],
+          "claim_ids": [
+            "mercor.claim.oct14-product-0",
+            "mercor.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "APEX Benchmarks",
+          "description": "Tests of professional work, with task datasets for AI agents.",
+          "record_ids": [
+            "mercor.product.major-0"
+          ],
+          "claim_ids": [
+            "mercor.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "APEX-Agents",
+          "description": "Tests extended professional work across several applications.",
+          "record_ids": [
+            "mercor.product.round2-apex-agents"
+          ],
+          "claim_ids": [
+            "mercor.claim.round2-product-apex-agents"
+          ]
+        },
+        {
+          "name": "APEX-Accounting",
+          "description": "Tests accounting work across applications. Developed with Ramp.",
+          "record_ids": [
+            "mercor.product.round2-apex-accounting"
+          ],
+          "claim_ids": [
+            "mercor.claim.round2-product-apex-accounting"
+          ]
+        },
+        {
+          "name": "APEX-SWE",
+          "description": "Tests software integration and observability (checking what software does while it runs). Developed with Cognition.",
+          "record_ids": [
+            "mercor.product.round2-apex-swe"
+          ],
+          "claim_ids": [
+            "mercor.claim.round2-product-apex-swe"
+          ]
+        },
+        {
+          "name": "Enterprise AI",
+          "description": "Builds AI agents for business tasks.",
+          "record_ids": [
+            "mercor.product.oct14-1",
+            "mercor.product.major-0"
+          ],
+          "claim_ids": [
+            "mercor.claim.oct14-product-1",
+            "mercor.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Data monetization",
+          "description": "Licenses data from businesses’ day-to-day operations.",
+          "record_ids": [
+            "mercor.product.oct14-2",
+            "mercor.product.major-0"
+          ],
+          "claim_ids": [
+            "mercor.claim.oct14-product-2",
+            "mercor.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Robotics",
+          "description": "Robotics data for model training.",
+          "record_ids": [
+            "mercor.product.major-0"
+          ],
+          "claim_ids": [
+            "mercor.claim.major-products-0"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "OpenAI",
+          "relationship": "reported_customer",
+          "description": "Sacra reports an AI-data customer relationship. Current contracts and buyer confirmation are unverified.",
+          "record_ids": [
+            "mercor.customer.major-0"
+          ],
+          "claim_ids": [
+            "mercor.claim.major-customers-0"
+          ]
+        },
+        {
+          "name": "Anthropic",
+          "relationship": "reported_customer",
+          "description": "Sacra reports an AI-data customer relationship. Current contracts and buyer confirmation are unverified.",
+          "record_ids": [
+            "mercor.customer.major-0"
+          ],
+          "claim_ids": [
+            "mercor.claim.major-customers-0"
+          ]
+        },
+        {
+          "name": "Meta",
+          "relationship": "reported_customer",
+          "description": "Sacra reports an AI-data customer relationship. Current contracts and buyer confirmation are unverified.",
+          "record_ids": [
+            "mercor.customer.major-0"
+          ],
+          "claim_ids": [
+            "mercor.claim.major-customers-0"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "mercor.person.brendan-foody",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "mercor.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "mercor.person.adarsh-hiremath",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "mercor.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "mercor.person.surya-midha",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "mercor.claim.major-founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "handshake_ai",
+      "products": [
+        {
+          "name": "Handshake AI Fellowship",
+          "description": "A network of professionals who create training data and test AI models.",
+          "record_ids": [
+            "handshake_ai.product.oct14-0",
+            "handshake_ai.product.major-0"
+          ],
+          "claim_ids": [
+            "handshake_ai.claim.oct14-product-0",
+            "handshake_ai.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Handshake AI Employer Data Partnerships",
+          "description": null,
+          "record_ids": [
+            "handshake_ai.product.oct14-1"
+          ],
+          "claim_ids": [
+            "handshake_ai.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "Enterprise AI",
+          "description": null,
+          "record_ids": [
+            "handshake_ai.product.oct14-2"
+          ],
+          "claim_ids": [
+            "handshake_ai.claim.oct14-product-2"
+          ]
+        }
+      ],
+      "relationships": [],
+      "people": [
+        {
+          "person_id": "handshake_ai.person.garrett-lord",
+          "role": "Handshake co-founder",
+          "bio": "",
+          "claim_ids": [
+            "handshake_ai.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "handshake_ai.person.ben-christensen",
+          "role": "Handshake co-founder",
+          "bio": "",
+          "claim_ids": [
+            "handshake_ai.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "handshake_ai.person.scott-ringwelski",
+          "role": "Handshake co-founder",
+          "bio": "",
+          "claim_ids": [
+            "handshake_ai.claim.major-founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "micro1",
+      "products": [
+        {
+          "name": "Realm",
+          "description": "Tests advanced AI models and provides reinforcement learning environments (models learn by trying tasks and receiving scores).",
+          "record_ids": [
+            "micro1.product.major-0",
+            "micro1.product.oct14-0"
+          ],
+          "claim_ids": [
+            "micro1.claim.major-products-0",
+            "micro1.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "Cortex",
+          "description": "Tests AI agents in live use and helps improve their performance.",
+          "record_ids": [
+            "micro1.product.major-0",
+            "micro1.product.oct14-1"
+          ],
+          "claim_ids": [
+            "micro1.claim.major-products-0",
+            "micro1.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "Robotics",
+          "description": "Training data from experts demonstrating real-world tasks.",
+          "record_ids": [
+            "micro1.product.major-0",
+            "micro1.product.oct14-2"
+          ],
+          "claim_ids": [
+            "micro1.claim.major-products-0",
+            "micro1.claim.oct14-product-2"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Microsoft",
+          "relationship": "claimed_customer",
+          "description": "micro1 names this customer. The reviewed material does not say how it uses the service.",
+          "record_ids": [
+            "micro1.customer.major-0"
+          ],
+          "claim_ids": [
+            "micro1.claim.major-customers-0"
+          ]
+        },
+        {
+          "name": "Amazon",
+          "relationship": "claimed_customer",
+          "description": "Named as a customer in Forbes reporting.",
+          "record_ids": [
+            "micro1.customer.major-1"
+          ],
+          "claim_ids": [
+            "micro1.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "1X",
+          "relationship": "claimed_customer",
+          "description": "Named as a customer in Forbes reporting.",
+          "record_ids": [
+            "micro1.customer.major-1"
+          ],
+          "claim_ids": [
+            "micro1.claim.major-customers-1"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "micro1.person.ali-ansari",
+          "role": "Founder",
+          "bio": "",
+          "claim_ids": [
+            "micro1.claim.major-founders-0"
+          ]
+        }
+      ],
+      "notes": [
+        {
+          "text": "The October 12 company update values the company at $4 billion in its Series B (a funding round that helps a company expand). The amount of new funding and exact closing date remain undisclosed.",
+          "claim_ids": [
+            "micro1.claim.oct14-series-b-priced"
+          ]
+        },
+        {
+          "text": "Zara provides tools for recruiting and screening experts.",
+          "claim_ids": [
+            "micro1.claim.major-products-0"
+          ]
+        }
+      ]
+    },
+    {
+      "company_id": "turing",
+      "products": [
+        {
+          "name": "Frontier AI",
+          "description": "Verified specialists produce coding and reasoning data for advanced AI models.",
+          "record_ids": [
+            "turing.product.oct14-0",
+            "turing.product.major-0"
+          ],
+          "claim_ids": [
+            "turing.claim.oct14-product-0",
+            "turing.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Off-The-Shelf Datasets",
+          "description": "Ready-made datasets for model training.",
+          "record_ids": [
+            "turing.product.oct14-1"
+          ],
+          "claim_ids": [
+            "turing.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "RL Environments",
+          "description": "Training tasks with prompts and scoring tools.",
+          "record_ids": [
+            "turing.product.oct14-2",
+            "turing.product.major-0"
+          ],
+          "claim_ids": [
+            "turing.claim.oct14-product-2",
+            "turing.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Experts",
+          "description": "Specialists who contribute to AI data work.",
+          "record_ids": [
+            "turing.product.oct14-3"
+          ],
+          "claim_ids": [
+            "turing.claim.oct14-product-3"
+          ]
+        },
+        {
+          "name": "Enterprise AI",
+          "description": "Custom AI agents and deployment support for business tasks.",
+          "record_ids": [
+            "turing.product.oct14-4",
+            "turing.product.major-0"
+          ],
+          "claim_ids": [
+            "turing.claim.oct14-product-4",
+            "turing.claim.major-products-0"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "OpenAI",
+          "relationship": "claimed_customer",
+          "description": "Turing names this lab relationship. The buyer has not confirmed a paid AI-data contract in the reviewed evidence.",
+          "record_ids": [
+            "turing.customer.major-0"
+          ],
+          "claim_ids": [
+            "turing.claim.major-customers-0"
+          ]
+        },
+        {
+          "name": "Google",
+          "relationship": "claimed_customer",
+          "description": "Turing names this lab relationship. The buyer has not confirmed a paid AI-data contract in the reviewed evidence.",
+          "record_ids": [
+            "turing.customer.major-0"
+          ],
+          "claim_ids": [
+            "turing.claim.major-customers-0"
+          ]
+        },
+        {
+          "name": "Anthropic",
+          "relationship": "claimed_customer",
+          "description": "Turing names this lab relationship. The buyer has not confirmed a paid AI-data contract in the reviewed evidence.",
+          "record_ids": [
+            "turing.customer.major-0"
+          ],
+          "claim_ids": [
+            "turing.claim.major-customers-0"
+          ]
+        },
+        {
+          "name": "Coinbase",
+          "relationship": "historical_customer",
+          "description": "Named as a past talent-services customer. This evidence covers work outside AI data.",
+          "record_ids": [
+            "turing.customer.major-1"
+          ],
+          "claim_ids": [
+            "turing.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "Red Bull",
+          "relationship": "historical_customer",
+          "description": "Named as a past talent-services customer. This evidence covers work outside AI data.",
+          "record_ids": [
+            "turing.customer.major-1"
+          ],
+          "claim_ids": [
+            "turing.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "Reddit",
+          "relationship": "historical_customer",
+          "description": "Named as a past talent-services customer. This evidence covers work outside AI data.",
+          "record_ids": [
+            "turing.customer.major-1"
+          ],
+          "claim_ids": [
+            "turing.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "AWS",
+          "relationship": "implementation_partner",
+          "description": "Turing is an AWS Pattern Partner. AI-data purchasing by AWS is unverified.",
+          "record_ids": [
+            "turing.customer.major-2"
+          ],
+          "claim_ids": [
+            "turing.claim.major-customers-2"
+          ]
+        },
+        {
+          "name": "Anthropic",
+          "relationship": "implementation_partner",
+          "description": "Turing announced a Claude deployment partnership for healthcare and life sciences.",
+          "record_ids": [
+            "turing.customer.major-3"
+          ],
+          "claim_ids": [
+            "turing.claim.major-customers-3"
+          ]
+        },
+        {
+          "name": "HUMAIN",
+          "relationship": "implementation_partner",
+          "description": "Turing announced a marketplace for business AI agents. Financial terms are undisclosed.",
+          "record_ids": [
+            "turing.customer.major-4"
+          ],
+          "claim_ids": [
+            "turing.claim.major-customers-4"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "turing.person.jonathan-siddharth",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "turing.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "turing.person.vijay-krishnan",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "turing.claim.major-founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "snorkel_ai",
+      "products": [
+        {
+          "name": "Snorkel Data Series",
+          "description": "Specialist training data and reinforcement learning environments (models learn by trying tasks and receiving scores).",
+          "record_ids": [
+            "snorkel_ai.product.oct14-0",
+            "snorkel_ai.product.major-0"
+          ],
+          "claim_ids": [
+            "snorkel_ai.claim.oct14-product-0",
+            "snorkel_ai.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Agentic Data Platform",
+          "description": "Combines expert work with AI quality checks.",
+          "record_ids": [
+            "snorkel_ai.product.oct14-1",
+            "snorkel_ai.product.major-0"
+          ],
+          "claim_ids": [
+            "snorkel_ai.claim.oct14-product-1",
+            "snorkel_ai.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Specialized agents",
+          "description": "AI agents built for business applications.",
+          "record_ids": [
+            "snorkel_ai.product.oct14-2",
+            "snorkel_ai.product.major-0"
+          ],
+          "claim_ids": [
+            "snorkel_ai.claim.oct14-product-2",
+            "snorkel_ai.claim.major-products-0"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "BNY",
+          "relationship": "claimed_customer",
+          "description": "Snorkel announced a software and expertise agreement with a quote from BNY’s AI head.",
+          "record_ids": [
+            "snorkel_ai.customer.major-0"
+          ],
+          "claim_ids": [
+            "snorkel_ai.claim.major-customers-0"
+          ]
+        },
+        {
+          "name": "Experian",
+          "relationship": "claimed_customer",
+          "description": "Snorkel’s case study describes support emails handled with an adapted Llama model. Contract size is undisclosed.",
+          "record_ids": [
+            "snorkel_ai.customer.major-1"
+          ],
+          "claim_ids": [
+            "snorkel_ai.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "Wayfair",
+          "relationship": "historical_customer",
+          "description": "Named in past Snorkel releases. Current paid status is unverified.",
+          "record_ids": [
+            "snorkel_ai.customer.major-2"
+          ],
+          "claim_ids": [
+            "snorkel_ai.claim.major-customers-2"
+          ]
+        },
+        {
+          "name": "Chubb",
+          "relationship": "historical_customer",
+          "description": "Named in past Snorkel releases. Current paid status is unverified.",
+          "record_ids": [
+            "snorkel_ai.customer.major-2"
+          ],
+          "claim_ids": [
+            "snorkel_ai.claim.major-customers-2"
+          ]
+        },
+        {
+          "name": "Accenture",
+          "relationship": "strategic_partner",
+          "description": "Accenture confirmed investment and collaboration. Paid data purchasing is unverified.",
+          "record_ids": [
+            "snorkel_ai.customer.major-3"
+          ],
+          "claim_ids": [
+            "snorkel_ai.claim.major-customers-3"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "snorkel_ai.person.alex-ratner",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "snorkel_ai.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "snorkel_ai.person.christopher-r",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "snorkel_ai.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "snorkel_ai.person.paroma-varma",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "snorkel_ai.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "snorkel_ai.person.braden-hancock",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "snorkel_ai.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "snorkel_ai.person.henry-ehrenberg",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "snorkel_ai.claim.major-founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "labelbox",
+      "products": [
+        {
+          "name": "Horizon",
+          "description": "Training environments where experts grade and evaluate model behavior.",
+          "record_ids": [
+            "labelbox.product.oct14-1",
+            "labelbox.product.major-0"
+          ],
+          "claim_ids": [
+            "labelbox.claim.oct14-product-1",
+            "labelbox.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "WorldSim",
+          "description": "Simulates business applications and data for agents training in Horizon.",
+          "record_ids": [
+            "labelbox.product.round2-worldsim"
+          ],
+          "claim_ids": [
+            "labelbox.claim.round2-product-worldsim"
+          ]
+        },
+        {
+          "name": "Recursion Managed Agents",
+          "description": "AI agents for business tasks, with output scoring to improve specialist models.",
+          "record_ids": [
+            "labelbox.product.oct14-0",
+            "labelbox.product.major-0"
+          ],
+          "claim_ids": [
+            "labelbox.claim.oct14-product-0",
+            "labelbox.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Terra",
+          "description": "Robotics datasets from first-person recordings and remotely controlled demonstrations.",
+          "record_ids": [
+            "labelbox.product.oct14-2"
+          ],
+          "claim_ids": [
+            "labelbox.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "Alignerr",
+          "description": "Qualified experts create preference data (ratings that show which responses people prefer). They also grade step-by-step task records.",
+          "record_ids": [
+            "labelbox.product.oct14-3",
+            "labelbox.product.major-0"
+          ],
+          "claim_ids": [
+            "labelbox.claim.oct14-product-3",
+            "labelbox.claim.major-products-0"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Walmart",
+          "relationship": "customer",
+          "description": "Walmart engineering describes labeling for shopping and service AI. Use expanded beyond a pilot to more teams.",
+          "record_ids": [
+            "labelbox.customer.major-0"
+          ],
+          "claim_ids": [
+            "labelbox.claim.major-customers-0"
+          ]
+        },
+        {
+          "name": "Burberry",
+          "relationship": "claimed_customer",
+          "description": "Labelbox’s case study includes named Burberry comments about image labeling with Databricks.",
+          "record_ids": [
+            "labelbox.customer.major-1"
+          ],
+          "claim_ids": [
+            "labelbox.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "FLIR",
+          "relationship": "claimed_customer",
+          "description": "Labelbox’s Series C release quotes FLIR on operational use and planned expansion.",
+          "record_ids": [
+            "labelbox.customer.major-2"
+          ],
+          "claim_ids": [
+            "labelbox.claim.major-customers-2"
+          ]
+        },
+        {
+          "name": "Genentech",
+          "relationship": "claimed_customer",
+          "description": "Named in Labelbox’s Series C release. Buyer confirmation and 2026 contract status are unverified.",
+          "record_ids": [
+            "labelbox.customer.major-3"
+          ],
+          "claim_ids": [
+            "labelbox.claim.major-customers-3"
+          ]
+        },
+        {
+          "name": "Warner Brothers",
+          "relationship": "claimed_customer",
+          "description": "Named in Labelbox’s Series C release. Buyer confirmation and 2026 contract status are unverified.",
+          "record_ids": [
+            "labelbox.customer.major-3"
+          ],
+          "claim_ids": [
+            "labelbox.claim.major-customers-3"
+          ]
+        },
+        {
+          "name": "Bayer",
+          "relationship": "claimed_customer",
+          "description": "Named in Labelbox’s Series C release. Buyer confirmation and 2026 contract status are unverified.",
+          "record_ids": [
+            "labelbox.customer.major-3"
+          ],
+          "claim_ids": [
+            "labelbox.claim.major-customers-3"
+          ]
+        },
+        {
+          "name": "BASF",
+          "relationship": "claimed_customer",
+          "description": "Named in Labelbox’s Series C release. Buyer confirmation and 2026 contract status are unverified.",
+          "record_ids": [
+            "labelbox.customer.major-3"
+          ],
+          "claim_ids": [
+            "labelbox.claim.major-customers-3"
+          ]
+        },
+        {
+          "name": "Condé Nast",
+          "relationship": "historical_customer",
+          "description": "Named in Labelbox’s seed release. Current customer status is unverified.",
+          "record_ids": [
+            "labelbox.customer.major-4"
+          ],
+          "claim_ids": [
+            "labelbox.claim.major-customers-4"
+          ]
+        },
+        {
+          "name": "Lytx",
+          "relationship": "historical_customer",
+          "description": "Named in Labelbox’s seed release. Current customer status is unverified.",
+          "record_ids": [
+            "labelbox.customer.major-4"
+          ],
+          "claim_ids": [
+            "labelbox.claim.major-customers-4"
+          ]
+        },
+        {
+          "name": "Genius Sports",
+          "relationship": "historical_customer",
+          "description": "Named in Labelbox’s seed release. Current customer status is unverified.",
+          "record_ids": [
+            "labelbox.customer.major-4"
+          ],
+          "claim_ids": [
+            "labelbox.claim.major-customers-4"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "labelbox.person.manu-sharma",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "labelbox.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "labelbox.person.ysiad-ferreiras",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "labelbox.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "labelbox.person.daniel-rasmuson",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "labelbox.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "labelbox.person.brian-rieger",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "labelbox.claim.major-founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "invisible",
+      "products": [
+        {
+          "name": "Neuron",
+          "description": "Data systems for business AI applications.",
+          "record_ids": [
+            "invisible.product.oct14-0",
+            "invisible.product.major-0"
+          ],
+          "claim_ids": [
+            "invisible.claim.oct14-product-0",
+            "invisible.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Atomic",
+          "description": "Systems for day-to-day business workflows.",
+          "record_ids": [
+            "invisible.product.oct14-1",
+            "invisible.product.major-0"
+          ],
+          "claim_ids": [
+            "invisible.claim.oct14-product-1",
+            "invisible.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Meridial",
+          "description": "An expert network for validation work.",
+          "record_ids": [
+            "invisible.product.oct14-2",
+            "invisible.product.major-0"
+          ],
+          "claim_ids": [
+            "invisible.claim.oct14-product-2",
+            "invisible.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Synapse",
+          "description": "Tools for labeling data and evaluating models.",
+          "record_ids": [
+            "invisible.product.oct14-3",
+            "invisible.product.major-0"
+          ],
+          "claim_ids": [
+            "invisible.claim.oct14-product-3",
+            "invisible.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Axon",
+          "description": "AI agents that automate business operations.",
+          "record_ids": [
+            "invisible.product.oct14-4",
+            "invisible.product.major-0"
+          ],
+          "claim_ids": [
+            "invisible.claim.oct14-product-4",
+            "invisible.claim.major-products-0"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Cohere",
+          "relationship": "claimed_customer",
+          "description": "Invisible’s case study includes named buyer comments about evaluating Command A. Work also covered expert labeling and tasks in several languages.",
+          "record_ids": [
+            "invisible.customer.major-0"
+          ],
+          "claim_ids": [
+            "invisible.claim.major-customers-0"
+          ]
+        },
+        {
+          "name": "Charlotte Hornets",
+          "relationship": "claimed_customer",
+          "description": "Buyer comments on Invisible’s site describe use for the 2025 draft and checks of computer-vision results.",
+          "record_ids": [
+            "invisible.customer.major-1"
+          ],
+          "claim_ids": [
+            "invisible.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "Microsoft",
+          "relationship": "claimed_customer",
+          "description": "Invisible’s financing release names Microsoft as a model builder using its services. Contract details are unverified.",
+          "record_ids": [
+            "invisible.customer.major-2"
+          ],
+          "claim_ids": [
+            "invisible.claim.major-customers-2"
+          ]
+        },
+        {
+          "name": "AWS",
+          "relationship": "claimed_customer",
+          "description": "Invisible’s financing release names AWS as a model builder using its services. Contract details are unverified.",
+          "record_ids": [
+            "invisible.customer.major-2"
+          ],
+          "claim_ids": [
+            "invisible.claim.major-customers-2"
+          ]
+        },
+        {
+          "name": "SwissGear",
+          "relationship": "claimed_customer",
+          "description": "Named enterprise customer example in Invisible’s financing release.",
+          "record_ids": [
+            "invisible.customer.major-3"
+          ],
+          "claim_ids": [
+            "invisible.claim.major-customers-3"
+          ]
+        },
+        {
+          "name": "SAIC",
+          "relationship": "claimed_customer",
+          "description": "Named enterprise customer example in Invisible’s financing release.",
+          "record_ids": [
+            "invisible.customer.major-3"
+          ],
+          "claim_ids": [
+            "invisible.claim.major-customers-3"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "invisible.person.francis-pedraza",
+          "role": "Founder",
+          "bio": "",
+          "claim_ids": [
+            "invisible.claim.major-founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "appen",
+      "products": [
+        {
+          "name": "Frontier Alignment",
+          "description": "Human data and evaluation for post-training (additional training to improve an existing model).",
+          "record_ids": [
+            "appen.product.oct14-0",
+            "appen.product.major-0"
+          ],
+          "claim_ids": [
+            "appen.claim.oct14-product-0",
+            "appen.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Agentic AI",
+          "description": null,
+          "record_ids": [
+            "appen.product.oct14-1"
+          ],
+          "claim_ids": [
+            "appen.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "Multimodal and Speech AI",
+          "description": null,
+          "record_ids": [
+            "appen.product.oct14-2"
+          ],
+          "claim_ids": [
+            "appen.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "Physical AI",
+          "description": null,
+          "record_ids": [
+            "appen.product.oct14-3"
+          ],
+          "claim_ids": [
+            "appen.claim.oct14-product-3"
+          ]
+        },
+        {
+          "name": "Model Integrity",
+          "description": null,
+          "record_ids": [
+            "appen.product.oct14-4"
+          ],
+          "claim_ids": [
+            "appen.claim.oct14-product-4"
+          ]
+        },
+        {
+          "name": "Research Services",
+          "description": null,
+          "record_ids": [
+            "appen.product.oct14-5"
+          ],
+          "claim_ids": [
+            "appen.claim.oct14-product-5"
+          ]
+        },
+        {
+          "name": "CrowdGen",
+          "description": "A platform where contributors collect and label data.",
+          "record_ids": [
+            "appen.product.oct14-6",
+            "appen.product.major-0"
+          ],
+          "claim_ids": [
+            "appen.claim.oct14-product-6",
+            "appen.claim.major-products-0"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Cohere",
+          "relationship": "claimed_customer",
+          "description": "Appen’s case study describes adapting models with specialist data and ranking preferred responses. Buyer-authored confirmation was not reviewed.",
+          "record_ids": [
+            "appen.customer.major-0"
+          ],
+          "claim_ids": [
+            "appen.claim.major-customers-0"
+          ]
+        },
+        {
+          "name": "Airbus",
+          "relationship": "claimed_customer",
+          "description": "Appen’s case study includes buyer comments about an image-labeling pilot.",
+          "record_ids": [
+            "appen.customer.major-1"
+          ],
+          "claim_ids": [
+            "appen.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "Google",
+          "relationship": "historical_customer",
+          "description": "Appen disclosed termination in January 2024 and wind-down of all Google projects by March 19, 2024.",
+          "record_ids": [
+            "appen.customer.major-2"
+          ],
+          "claim_ids": [
+            "appen.claim.major-customers-2"
+          ]
+        },
+        {
+          "name": "AWS",
+          "relationship": "implementation_partner",
+          "description": "Cloud provider and sales partner through AWS Marketplace. Appen data purchasing by AWS is unverified.",
+          "record_ids": [
+            "appen.customer.major-3"
+          ],
+          "claim_ids": [
+            "appen.claim.major-customers-3"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "appen.person.julie-vonwiller",
+          "role": "Founder",
+          "bio": "Founded Appen in 1996.",
+          "claim_ids": [
+            "appen.claim.major-founders-0"
+          ]
+        },
+        {
+          "person_id": "appen.person.chris-vonwiller",
+          "role": "Co-founder",
+          "bio": "Joined Appen after its founding.",
+          "claim_ids": [
+            "appen.claim.major-founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "taskus",
+      "products": [
+        {
+          "name": "AI & Data Operations",
+          "description": "People collect and label data. Experts also write responses for model training.",
+          "record_ids": [
+            "taskus.product.0",
+            "taskus.product.oct14-0"
+          ],
+          "claim_ids": [
+            "taskus.claim.product-0",
+            "taskus.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "AI Safety & Alignment",
+          "description": "Red teaming (deliberate attacks that reveal model weaknesses) and human feedback support safer model behavior.",
+          "record_ids": [
+            "taskus.product.1",
+            "taskus.product.oct14-1",
+            "taskus.product.oct14-2"
+          ],
+          "claim_ids": [
+            "taskus.claim.product-1",
+            "taskus.claim.oct14-product-1",
+            "taskus.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "Digital customer experience and Trust & Safety",
+          "description": "Outsourced customer support, plus review of content and financial crime.",
+          "record_ids": [
+            "taskus.product.2"
+          ],
+          "claim_ids": [
+            "taskus.claim.product-2"
+          ]
+        },
+        {
+          "name": "TaskVerse",
+          "description": "Gig workers collect and label data for projects.",
+          "record_ids": [
+            "taskus.product.0",
+            "taskus.product.oct14-8"
+          ],
+          "claim_ids": [
+            "taskus.claim.product-0",
+            "taskus.claim.oct14-product-8"
+          ]
+        },
+        {
+          "name": "Data Feedback & Evaluations",
+          "description": "Experts review responses and design tests of model performance.",
+          "record_ids": [
+            "taskus.product.oct14-2",
+            "taskus.product.0",
+            "taskus.product.1"
+          ],
+          "claim_ids": [
+            "taskus.claim.oct14-product-2",
+            "taskus.claim.product-0",
+            "taskus.claim.product-1"
+          ]
+        },
+        {
+          "name": "TaskGPT",
+          "description": null,
+          "record_ids": [
+            "taskus.product.oct14-3"
+          ],
+          "claim_ids": [
+            "taskus.claim.oct14-product-3"
+          ]
+        },
+        {
+          "name": "AssistAI",
+          "description": null,
+          "record_ids": [
+            "taskus.product.oct14-4"
+          ],
+          "claim_ids": [
+            "taskus.claim.oct14-product-4"
+          ]
+        },
+        {
+          "name": "PromptAI",
+          "description": null,
+          "record_ids": [
+            "taskus.product.oct14-5"
+          ],
+          "claim_ids": [
+            "taskus.claim.oct14-product-5"
+          ]
+        },
+        {
+          "name": "CallAI",
+          "description": null,
+          "record_ids": [
+            "taskus.product.oct14-6"
+          ],
+          "claim_ids": [
+            "taskus.claim.oct14-product-6"
+          ]
+        },
+        {
+          "name": "AuthorAI",
+          "description": null,
+          "record_ids": [
+            "taskus.product.oct14-7"
+          ],
+          "claim_ids": [
+            "taskus.claim.oct14-product-7"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Meta",
+          "relationship": "customer",
+          "description": "A filing identifies Meta as a paying customer responsible for 26% of FY2025 group revenue. This spans multiple businesses.",
+          "record_ids": [
+            "taskus.customer.0"
+          ],
+          "claim_ids": [
+            "taskus.claim.customer-0"
+          ]
+        },
+        {
+          "name": "NVIDIA",
+          "relationship": "technology_vendor",
+          "description": "Provides technology supporting TaskGPT.",
+          "record_ids": [
+            "taskus.customer.3"
+          ],
+          "claim_ids": [
+            "taskus.claim.customer-3"
+          ]
+        },
+        {
+          "name": "Amazon Web Services",
+          "relationship": "technology_vendor",
+          "description": "Provides technology supporting TaskGPT.",
+          "record_ids": [
+            "taskus.customer.3"
+          ],
+          "claim_ids": [
+            "taskus.claim.customer-3"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "taskus.person.bryce-maddock",
+          "role": "Co-founder, CEO and chairperson",
+          "bio": "Previously worked at Rodman & Renshaw and co-founded MW Entertainment. Holds a BA from New York University.",
+          "claim_ids": [
+            "taskus.claim.founder-0"
+          ]
+        },
+        {
+          "person_id": "taskus.person.jaspar-weir",
+          "role": "Co-founder and president",
+          "bio": "Previously co-founded MW Entertainment. Holds a bachelor’s degree from the University of Southern California.",
+          "claim_ids": [
+            "taskus.claim.founder-1"
+          ]
+        }
+      ],
+      "notes": [
+        {
+          "text": "AI Services is one business line reported by TaskUs. Whole-company figures also include its broader outsourcing work.",
+          "claim_ids": [
+            "taskus.claim.identity"
+          ]
+        },
+        {
+          "text": "TaskUs remained publicly listed after its proposed 2025 buyout failed to win shareholder approval.",
+          "claim_ids": [
+            "taskus.claim.ownership"
+          ]
+        }
+      ]
+    },
+    {
+      "company_id": "imerit",
+      "products": [
+        {
+          "name": "Ango Hub",
+          "description": "Software for labeling and reviewing data, including medical images and LiDAR (laser measurements used to map three-dimensional surroundings).",
+          "record_ids": [
+            "imerit.product.imerit-ango",
+            "imerit.product.oct14-0"
+          ],
+          "claim_ids": [
+            "imerit.claim.expansion-imerit-ango",
+            "imerit.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "Deep Reasoning Lab",
+          "description": "Experts design tasks with several steps. They use model errors to create corrective training data.",
+          "record_ids": [
+            "imerit.product.imerit-deep-reasoning",
+            "imerit.product.oct14-2"
+          ],
+          "claim_ids": [
+            "imerit.claim.expansion-imerit-deep-reasoning",
+            "imerit.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "iMerit Scholars",
+          "description": "Domain specialists create training data and evaluate model reasoning.",
+          "record_ids": [
+            "imerit.product.imerit-scholars",
+            "imerit.product.oct14-1"
+          ],
+          "claim_ids": [
+            "imerit.claim.expansion-imerit-scholars",
+            "imerit.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "Specialized data services",
+          "description": "Managed data labeling and evaluation for healthcare and robotics, including autonomous vehicles.",
+          "record_ids": [
+            "imerit.product.imerit-services"
+          ],
+          "claim_ids": [
+            "imerit.claim.expansion-imerit-services"
+          ]
+        },
+        {
+          "name": "3D Multi Sensor Fusion",
+          "description": null,
+          "record_ids": [
+            "imerit.product.oct14-3"
+          ],
+          "claim_ids": [
+            "imerit.claim.oct14-product-3"
+          ]
+        },
+        {
+          "name": "Radiology Annotation Co-Pilot",
+          "description": null,
+          "record_ids": [
+            "imerit.product.oct14-4"
+          ],
+          "claim_ids": [
+            "imerit.claim.oct14-product-4"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Carbon Robotics",
+          "relationship": "customer",
+          "description": "Carbon confirms plant-image labeling work. iMerit’s case study reports roughly one million images. The team grew from five to over 80 specialists.",
+          "record_ids": [
+            "imerit.customer.imerit-carbon",
+            "imerit.customer.imerit-carbon-results"
+          ],
+          "claim_ids": [
+            "imerit.claim.expansion-imerit-carbon",
+            "imerit.claim.expansion-imerit-carbon-results"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "imerit.person.radha-ramaswami-basu",
+          "role": "Founder; EXL Executive Vice President, Head of iMerit",
+          "bio": "Spent 20 years at HP and later led Support.com through its IPO (the first sale of company shares to the public). Founded iMerit in 2012.",
+          "claim_ids": [
+            "imerit.claim.expansion-imerit-founder",
+            "imerit.claim.oct14-acquisition-completed"
+          ]
+        }
+      ],
+      "notes": [
+        {
+          "text": "EXL completed its acquisition of iMerit on August 3, 2026.",
+          "claim_ids": [
+            "imerit.claim.oct14-acquisition-completed"
+          ]
+        }
+      ]
+    },
+    {
+      "company_id": "sama",
+      "products": [
+        {
+          "name": "Data annotation",
+          "description": "A dedicated workforce labels images and video, as well as 3D data.",
+          "record_ids": [
+            "sama.product.oct14-0",
+            "sama.product.sama-annotate"
+          ],
+          "claim_ids": [
+            "sama.claim.oct14-product-0",
+            "sama.claim.expansion-sama-annotate"
+          ]
+        },
+        {
+          "name": "Data validation",
+          "description": "Human review and correction of model predictions.",
+          "record_ids": [
+            "sama.product.oct14-1",
+            "sama.product.sama-validate"
+          ],
+          "claim_ids": [
+            "sama.claim.oct14-product-1",
+            "sama.claim.expansion-sama-validate"
+          ]
+        },
+        {
+          "name": "Model evaluation",
+          "description": "Human evaluation of factual accuracy and instruction following.",
+          "record_ids": [
+            "sama.product.oct14-2",
+            "sama.product.sama-genai"
+          ],
+          "claim_ids": [
+            "sama.claim.oct14-product-2",
+            "sama.claim.expansion-sama-genai"
+          ]
+        },
+        {
+          "name": "Professional services",
+          "description": null,
+          "record_ids": [
+            "sama.product.oct14-3"
+          ],
+          "claim_ids": [
+            "sama.claim.oct14-product-3"
+          ]
+        },
+        {
+          "name": "Sama Assure",
+          "description": "A quality guarantee for delivered data.",
+          "record_ids": [
+            "sama.product.oct14-4",
+            "sama.product.sama-genai"
+          ],
+          "claim_ids": [
+            "sama.claim.oct14-product-4",
+            "sama.claim.expansion-sama-genai"
+          ]
+        },
+        {
+          "name": "Sama Hub",
+          "description": "A shared workspace for data projects.",
+          "record_ids": [
+            "sama.product.oct14-5",
+            "sama.product.sama-genai"
+          ],
+          "claim_ids": [
+            "sama.claim.oct14-product-5",
+            "sama.claim.expansion-sama-genai"
+          ]
+        },
+        {
+          "name": "Sama IQ",
+          "description": "Information about how data workflows perform.",
+          "record_ids": [
+            "sama.product.oct14-6",
+            "sama.product.sama-genai"
+          ],
+          "claim_ids": [
+            "sama.claim.oct14-product-6",
+            "sama.claim.expansion-sama-genai"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Walmart",
+          "relationship": "claimed_customer",
+          "description": "Supplier case with named buyer testimony describes product-catalogue labeling and search relevance through 2019.",
+          "record_ids": [
+            "sama.customer.sama-walmart"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-walmart"
+          ]
+        },
+        {
+          "name": "Google",
+          "relationship": "claimed_customer",
+          "description": "Supplier case with named buyer testimony describes polygon annotations for Project Guideline beginning July 2020.",
+          "record_ids": [
+            "sama.customer.sama-google"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-google"
+          ]
+        },
+        {
+          "name": "Getty Images",
+          "relationship": "claimed_customer",
+          "description": "Supplier-hosted testimony from CTO Steve Heck discusses data volumes and quality.",
+          "record_ids": [
+            "sama.customer.sama-testimonials"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-testimonials"
+          ]
+        },
+        {
+          "name": "Continental",
+          "relationship": "claimed_customer",
+          "description": "Supplier-hosted testimony from AI and Robotics Labs leader Demetrio Aiello discusses training-data strategy.",
+          "record_ids": [
+            "sama.customer.sama-testimonials"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-testimonials"
+          ]
+        },
+        {
+          "name": "Microsoft",
+          "relationship": "displayed_logo",
+          "description": "Sama displays this logo. Separate evidence of contract scope and payment is unavailable.",
+          "record_ids": [
+            "sama.customer.sama-logo-evidence"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-logo-evidence"
+          ]
+        },
+        {
+          "name": "eBay",
+          "relationship": "displayed_logo",
+          "description": "Sama displays this logo. Separate evidence of contract scope and payment is unavailable.",
+          "record_ids": [
+            "sama.customer.sama-logo-evidence"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-logo-evidence"
+          ]
+        },
+        {
+          "name": "NASA",
+          "relationship": "displayed_logo",
+          "description": "Sama displays this logo. Separate evidence of contract scope and payment is unavailable.",
+          "record_ids": [
+            "sama.customer.sama-logo-evidence"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-logo-evidence"
+          ]
+        },
+        {
+          "name": "Sony",
+          "relationship": "displayed_logo",
+          "description": "Sama displays this logo. Separate evidence of contract scope and payment is unavailable.",
+          "record_ids": [
+            "sama.customer.sama-logo-evidence"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-logo-evidence"
+          ]
+        },
+        {
+          "name": "Qualcomm",
+          "relationship": "displayed_logo",
+          "description": "Sama displays this logo. Separate evidence of contract scope and payment is unavailable.",
+          "record_ids": [
+            "sama.customer.sama-logo-evidence"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-logo-evidence"
+          ]
+        },
+        {
+          "name": "Verizon",
+          "relationship": "displayed_logo",
+          "description": "Sama displays this logo. Separate evidence of contract scope and payment is unavailable.",
+          "record_ids": [
+            "sama.customer.sama-logo-evidence"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-logo-evidence"
+          ]
+        },
+        {
+          "name": "Siemens",
+          "relationship": "displayed_logo",
+          "description": "Sama displays this logo. Separate evidence of contract scope and payment is unavailable.",
+          "record_ids": [
+            "sama.customer.sama-logo-evidence"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-logo-evidence"
+          ]
+        },
+        {
+          "name": "OpenAI",
+          "relationship": "historical_customer",
+          "description": "Independent reporting with buyer and supplier confirmation documents safety-labeling work ending in March 2022.",
+          "record_ids": [
+            "sama.customer.sama-openai-historical"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-openai-historical"
+          ]
+        },
+        {
+          "name": "Meta",
+          "relationship": "historical_customer",
+          "description": "Independent reporting with buyer confirmation documents termination of the Nairobi AI-data labeling engagement in April 2026.",
+          "record_ids": [
+            "sama.customer.sama-meta-termination"
+          ],
+          "claim_ids": [
+            "sama.claim.expansion-sama-meta-termination"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "sama.person.leila-janah",
+          "role": "Founder (died 2020)",
+          "bio": "Founded Samasource in 2008 to expand paid digital work in underserved communities.",
+          "claim_ids": [
+            "sama.claim.expansion-sama-founder"
+          ]
+        },
+        {
+          "person_id": "sama.person.wendy-gonzalez",
+          "role": "CEO",
+          "bio": "Joined in 2015 and became CEO in 2020.",
+          "claim_ids": [
+            "sama.claim.expansion-sama-current-ceo"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "abundant_ai",
+      "products": [
+        {
+          "name": "Custom RL environments and datasets",
+          "description": "Simulation and model-training work for coding and physical science. Also covers recursive self-improvement (models working to improve their own capabilities) and alignment (guiding models toward intended and safe behavior).",
+          "record_ids": [
+            "abundant_ai.product.oct14-0"
+          ],
+          "claim_ids": [
+            "abundant_ai.claim.oct14-product-0"
+          ],
+          "kind": "Commercial service"
+        },
+        {
+          "name": "SWE-gen",
+          "description": "Turns code changes into verified coding tasks. Rebuilds a buggy starting point from working code to reduce errors caused by broken tests.",
+          "record_ids": [
+            "abundant_ai.product.oct14-1"
+          ],
+          "claim_ids": [
+            "abundant_ai.claim.oct14-product-1"
+          ],
+          "kind": "Open-source environment generation"
+        },
+        {
+          "name": "SWE-Marathon",
+          "description": "Tests extended software work, including rebuilding libraries and complete applications. Also covers machine-learning engineering.",
+          "record_ids": [
+            "abundant_ai.product.oct14-2"
+          ],
+          "claim_ids": [
+            "abundant_ai.claim.oct14-product-2"
+          ],
+          "kind": "Research benchmark"
+        },
+        {
+          "name": "TheoremSmith",
+          "description": "Creates difficult proof tasks in Lean (software that checks whether mathematical proofs are correct). Uses isolated checks to detect attempts to game rewards.",
+          "record_ids": [
+            "abundant_ai.product.oct14-3"
+          ],
+          "claim_ids": [
+            "abundant_ai.claim.oct14-product-3"
+          ],
+          "kind": "Open-source research pipeline"
+        }
+      ],
+      "relationships": [],
+      "people": [
+        {
+          "person_id": "abundant_ai.person.jesse-hu",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "abundant_ai.claim.founders"
+          ]
+        },
+        {
+          "person_id": "abundant_ai.person.meji-abidoye",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "abundant_ai.claim.founders"
+          ]
+        },
+        {
+          "person_id": "abundant_ai.person.ke-huang",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "abundant_ai.claim.founders"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "bespoke_labs",
+      "products": [
+        {
+          "name": "RL Environments & Infrastructure",
+          "description": "Simulates company systems using real codebases and small connected services. Provides tools to build, run and improve these environments.",
+          "record_ids": [
+            "bespoke_labs.product.oct14-0"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.oct14-product-0"
+          ],
+          "kind": "Commercial platform/service"
+        },
+        {
+          "name": "GEPA",
+          "description": "Uses task feedback to improve prompts and model behavior.",
+          "record_ids": [
+            "bespoke_labs.product.oct14-1"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.oct14-product-1"
+          ],
+          "kind": "Open research/optimizer"
+        },
+        {
+          "name": "Curator",
+          "description": "Prepares synthetic data (examples generated by software rather than collected directly) for further training and structured extraction.",
+          "record_ids": [
+            "bespoke_labs.product.oct14-2"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.oct14-product-2"
+          ],
+          "kind": "Open-source library"
+        },
+        {
+          "name": "OpenThoughts",
+          "description": "Open research on preparing data for reasoning models.",
+          "record_ids": [
+            "bespoke_labs.product.oct14-3"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.oct14-product-3"
+          ],
+          "kind": "Open reasoning datasets"
+        },
+        {
+          "name": "Terminal-Bench",
+          "description": "Contributes tests of agent work in command-line environments (text-based interfaces for running commands on computers).",
+          "record_ids": [
+            "bespoke_labs.product.oct14-4"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.oct14-product-4"
+          ],
+          "kind": "Research contribution"
+        },
+        {
+          "name": "Nimble",
+          "description": "Returns probabilities for allowed answers. Nimble-v4 and Nimble-v4-max support grading and agent decisions, including routing tasks.",
+          "record_ids": [
+            "bespoke_labs.product.oct14-5"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.oct14-product-5"
+          ],
+          "kind": "Hosted decision-model API"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Intuit Credit Karma",
+          "relationship": "research_collaborator",
+          "description": "Bespoke reports further training for SeeWhy and results from offline tests. Live deployment and payment are unverified.",
+          "record_ids": [
+            "bespoke_labs.customer.0"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.audit-seewhy"
+          ]
+        },
+        {
+          "name": "Intuit",
+          "relationship": "reported_customer",
+          "description": "Silicon Valley Business Journal names Intuit as a customer.",
+          "record_ids": [
+            "bespoke_labs.customer.1"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Meta",
+          "relationship": "dataset_user",
+          "description": "Bespoke’s blog reports use of OpenThoughts datasets. Purchased services are unverified.",
+          "record_ids": [
+            "bespoke_labs.customer.2"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.audit-dataset-relationships"
+          ]
+        },
+        {
+          "name": "Amazon",
+          "relationship": "dataset_user",
+          "description": "Bespoke’s blog reports use of OpenThoughts datasets. Purchased services are unverified.",
+          "record_ids": [
+            "bespoke_labs.customer.2"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.audit-dataset-relationships"
+          ]
+        },
+        {
+          "name": "AI2",
+          "relationship": "dataset_user",
+          "description": "Bespoke’s blog reports use of OpenThoughts datasets. Purchased services are unverified.",
+          "record_ids": [
+            "bespoke_labs.customer.2"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.audit-dataset-relationships"
+          ]
+        },
+        {
+          "name": "Thinking Machines Lab",
+          "relationship": "dataset_citer",
+          "description": "Bespoke’s blog names citations of OpenThoughts. Purchased services are unverified.",
+          "record_ids": [
+            "bespoke_labs.customer.2"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.audit-dataset-relationships"
+          ]
+        },
+        {
+          "name": "Microsoft",
+          "relationship": "dataset_citer",
+          "description": "Bespoke’s blog names citations of OpenThoughts. Purchased services are unverified.",
+          "record_ids": [
+            "bespoke_labs.customer.2"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.audit-dataset-relationships"
+          ]
+        },
+        {
+          "name": "NVIDIA",
+          "relationship": "dataset_citer",
+          "description": "Bespoke’s blog names citations of OpenThoughts. Purchased services are unverified.",
+          "record_ids": [
+            "bespoke_labs.customer.2"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.audit-dataset-relationships"
+          ]
+        },
+        {
+          "name": "Snowflake",
+          "relationship": "research_collaborator",
+          "description": "Snowflake AI Research confirms joint data-eng-bench work. Payment is undisclosed.",
+          "record_ids": [
+            "bespoke_labs.customer.audit-snowflake"
+          ],
+          "claim_ids": [
+            "bespoke_labs.claim.audit-snowflake-partnership"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "bespoke_labs.person.mahesh-sathiamoorthy",
+          "role": "Co-founder",
+          "bio": "Previously a staff engineer at Google DeepMind/Brain. Worked on systems for YouTube recommendations.",
+          "claim_ids": [
+            "bespoke_labs.claim.audit-mahesh-sathiamoorthy-background"
+          ]
+        },
+        {
+          "person_id": "bespoke_labs.person.alex-dimakis",
+          "role": "Co-founder",
+          "bio": "UC Berkeley electrical engineering and computer science professor and IEEE Fellow. Researches generative AI and information theory.",
+          "claim_ids": [
+            "bespoke_labs.claim.audit-alex-dimakis-background"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "datacurve",
+      "products": [
+        {
+          "name": "RL environments",
+          "description": "Extended tasks with natural instructions and realistic tools. Measures partial progress across software and data science, plus cybersecurity, machine learning and research.",
+          "record_ids": [
+            "datacurve.product.oct14-0"
+          ],
+          "claim_ids": [
+            "datacurve.claim.oct14-product-0"
+          ],
+          "kind": "Commercial service"
+        },
+        {
+          "name": "OTS Datasets",
+          "description": "Ready-made, reviewed datasets. Custom work includes supervised fine-tuning (models learn from examples of desired responses), expert task records and evaluations.",
+          "record_ids": [
+            "datacurve.product.oct14-1"
+          ],
+          "claim_ids": [
+            "datacurve.claim.oct14-product-1"
+          ],
+          "kind": "Dataset catalog"
+        },
+        {
+          "name": "DeepSWE",
+          "description": "Original engineering tasks written from scratch. Handwritten checks assess behavior; tasks are not adapted from existing code changes.",
+          "record_ids": [
+            "datacurve.product.oct14-2"
+          ],
+          "claim_ids": [
+            "datacurve.claim.oct14-product-2"
+          ],
+          "kind": "Public benchmark"
+        },
+        {
+          "name": "Shipd",
+          "description": "Pays for approved technical challenge submissions. Mars covers software engineering; Eris covers machine learning. Monte covers data science.",
+          "record_ids": [
+            "datacurve.product.oct14-3"
+          ],
+          "claim_ids": [
+            "datacurve.claim.oct14-product-3"
+          ],
+          "kind": "Contributor marketplace"
+        }
+      ],
+      "relationships": [],
+      "people": [
+        {
+          "person_id": "datacurve.person.serena-ge",
+          "role": "Co-founder",
+          "bio": "Studied computer science at Waterloo. Worked on synthetic-data reasoning and coding at Cohere.",
+          "claim_ids": [
+            "datacurve.claim.audit-serena-ge-background"
+          ]
+        },
+        {
+          "person_id": "datacurve.person.charley-lee",
+          "role": "Co-founder",
+          "bio": "Studied computer science at Waterloo. Researched reinforcement learning across data formats and browser agents.",
+          "claim_ids": [
+            "datacurve.claim.audit-charley-lee-background"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "ooak",
+      "products": [
+        {
+          "name": "Enterprise digital twins",
+          "description": "Removes identifying details from connected company communications, documents and tools. Preserves their relationships and the company’s structure.",
+          "record_ids": [
+            "ooak.product.oct14-0"
+          ],
+          "claim_ids": [
+            "ooak.claim.oct14-product-0"
+          ],
+          "kind": "Custom data infrastructure"
+        },
+        {
+          "name": "RL environments",
+          "description": "Tasks with several steps, based on real company work and calibrated against advanced models.",
+          "record_ids": [
+            "ooak.product.oct14-1"
+          ],
+          "claim_ids": [
+            "ooak.claim.oct14-product-1"
+          ],
+          "kind": "Custom environments"
+        },
+        {
+          "name": "Company data licensing",
+          "description": "Acquires connected business datasets. Handles extraction and delivery while removing identifying details across sources.",
+          "record_ids": [
+            "ooak.product.oct14-2"
+          ],
+          "claim_ids": [
+            "ooak.claim.oct14-product-2"
+          ],
+          "kind": "Data-supply partnership"
+        },
+        {
+          "name": "Data Hub",
+          "description": "Instructions for connecting and exporting company data. Named in the official first product-manager job description.",
+          "record_ids": [
+            "ooak.product.oct14-3"
+          ],
+          "claim_ids": [
+            "ooak.claim.oct14-product-3"
+          ],
+          "kind": "Partner onboarding surface"
+        }
+      ],
+      "relationships": [],
+      "people": [
+        {
+          "person_id": "ooak.person.pierre-louis-vouteau",
+          "role": "Co-founder and CEO",
+          "bio": "",
+          "claim_ids": [
+            "ooak.claim.founders-0"
+          ]
+        },
+        {
+          "person_id": "ooak.person.thomas-aubry",
+          "role": "Co-founder and CTO",
+          "bio": "",
+          "claim_ids": [
+            "ooak.claim.founders-0"
+          ]
+        },
+        {
+          "person_id": "ooak.person.gr-goire-lamy",
+          "role": "Co-founder and COO",
+          "bio": "",
+          "claim_ids": [
+            "ooak.claim.founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "pareto",
+      "products": [
+        {
+          "name": "Expert training data",
+          "description": "Captures specialist judgment in medicine and law. Also covers STEM, finance, software and the humanities.",
+          "record_ids": [
+            "pareto.product.oct14-0"
+          ],
+          "claim_ids": [
+            "pareto.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "Forte",
+          "description": "Experts register and are matched to projects. Matching is reviewed on an ongoing basis.",
+          "record_ids": [
+            "pareto.product.oct14-1"
+          ],
+          "claim_ids": [
+            "pareto.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "LEAPBench",
+          "description": "Measures how efficiently models learn across repeated scientific design tasks. Also assesses their final results.",
+          "record_ids": [
+            "pareto.product.oct14-2"
+          ],
+          "claim_ids": [
+            "pareto.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "AttuneBench",
+          "description": "Tests conversational emotional intelligence using participants’ own ratings.",
+          "record_ids": [
+            "pareto.product.oct14-3"
+          ],
+          "claim_ids": [
+            "pareto.claim.oct14-product-3"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Anthropic",
+          "relationship": "claimed_customer",
+          "description": "An April 4, 2026 employer posting claims work in live use. Current status and completed renewals are unconfirmed.",
+          "record_ids": [
+            "pareto.customer.0"
+          ],
+          "claim_ids": [
+            "pareto.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Google DeepMind",
+          "relationship": "claimed_customer",
+          "description": "An April 4, 2026 employer posting claims work in live use. Current status and completed renewals are unconfirmed.",
+          "record_ids": [
+            "pareto.customer.0"
+          ],
+          "claim_ids": [
+            "pareto.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Character.AI",
+          "relationship": "research_collaborator",
+          "description": "Older employer materials describe research collaboration. Payment is unverified.",
+          "record_ids": [
+            "pareto.customer.1"
+          ],
+          "claim_ids": [
+            "pareto.claim.customers-1",
+            "pareto.claim.audit-pareto-collaborator-tag-pareto.customer.1"
+          ]
+        },
+        {
+          "name": "Imbue",
+          "relationship": "research_collaborator",
+          "description": "Older employer materials describe research collaboration. Payment is unverified.",
+          "record_ids": [
+            "pareto.customer.1"
+          ],
+          "claim_ids": [
+            "pareto.claim.customers-1",
+            "pareto.claim.audit-pareto-collaborator-tag-pareto.customer.1"
+          ]
+        },
+        {
+          "name": "Stanford",
+          "relationship": "research_collaborator",
+          "description": "Older employer materials describe research collaboration. Payment is unverified.",
+          "record_ids": [
+            "pareto.customer.1"
+          ],
+          "claim_ids": [
+            "pareto.claim.customers-1",
+            "pareto.claim.audit-pareto-collaborator-tag-pareto.customer.1"
+          ]
+        },
+        {
+          "name": "UPenn",
+          "relationship": "research_collaborator",
+          "description": "Older employer materials describe research collaboration. Payment is unverified.",
+          "record_ids": [
+            "pareto.customer.1"
+          ],
+          "claim_ids": [
+            "pareto.claim.customers-1",
+            "pareto.claim.audit-pareto-collaborator-tag-pareto.customer.1"
+          ]
+        },
+        {
+          "name": "UK AI Security Institute",
+          "relationship": "customer",
+          "description": "The buyer confirms expert recruitment and grading rules for evaluating harm. Work also included training data to detect harmful advice.",
+          "record_ids": [
+            "pareto.customer.uk-aisi",
+            "pareto.customer.audit-pareto-aisi-outcome"
+          ],
+          "claim_ids": [
+            "pareto.claim.audit-pareto-aisi-customer",
+            "pareto.claim.audit-pareto-aisi-outcome"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "pareto.person.phoebe-yao",
+          "role": "Founder and CEO",
+          "bio": "",
+          "claim_ids": [
+            "pareto.claim.founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "polymath_ai_labs",
+      "products": [
+        {
+          "name": "Simulation environments",
+          "description": "Simulated working systems whose data and tools change over time. Outcomes can be checked.",
+          "record_ids": [
+            "polymath_ai_labs.product.oct14-0"
+          ],
+          "claim_ids": [
+            "polymath_ai_labs.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "Horizon-SWE",
+          "description": "Tests software work from start to finish inside a simulated company, including deployment and monitoring.",
+          "record_ids": [
+            "polymath_ai_labs.product.oct14-1"
+          ],
+          "claim_ids": [
+            "polymath_ai_labs.claim.oct14-product-1"
+          ]
+        }
+      ],
+      "relationships": [],
+      "people": [
+        {
+          "person_id": "polymath_ai_labs.person.dylan-ma",
+          "role": "Co-founder",
+          "bio": "Previously led further model-training research and data at Hume AI. Studied computer science at Berkeley.",
+          "claim_ids": [
+            "polymath_ai_labs.claim.audit-dylan-ma-background"
+          ]
+        },
+        {
+          "person_id": "polymath_ai_labs.person.naren-yenuganti",
+          "role": "Co-founder",
+          "bio": "Built credit-monitoring systems at Plaid. Worked on machine-learning logistics systems at Amazon.",
+          "claim_ids": [
+            "polymath_ai_labs.claim.audit-naren-yenuganti-background"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "proximal",
+      "products": [
+        {
+          "name": "Data research and post-training infrastructure",
+          "description": "Turns work records and outputs into tests of model abilities and targeted training data.",
+          "record_ids": [
+            "proximal.product.oct14-0"
+          ],
+          "claim_ids": [
+            "proximal.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "FrontierSWE v2",
+          "description": "Tests extended technical work in implementation and performance. Tasks also cover science, visual reasoning and AI research.",
+          "record_ids": [
+            "proximal.product.oct14-1"
+          ],
+          "claim_ids": [
+            "proximal.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "Proximus",
+          "description": "A testing system designed to keep agents working within a 20-hour task budget.",
+          "record_ids": [
+            "proximal.product.oct14-2"
+          ],
+          "claim_ids": [
+            "proximal.claim.oct14-product-2"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Modular",
+          "relationship": "research_collaborator",
+          "description": "FrontierSWE acknowledgements name this research partner. A buying relationship is unverified.",
+          "record_ids": [],
+          "claim_ids": [
+            "proximal.claim.audit-research-partners"
+          ]
+        },
+        {
+          "name": "Prime Intellect",
+          "relationship": "research_collaborator",
+          "description": "FrontierSWE acknowledgements name this research partner. A buying relationship is unverified.",
+          "record_ids": [],
+          "claim_ids": [
+            "proximal.claim.audit-research-partners"
+          ]
+        },
+        {
+          "name": "Thoughtful Lab",
+          "relationship": "research_collaborator",
+          "description": "FrontierSWE acknowledgements name this research partner. A buying relationship is unverified.",
+          "record_ids": [],
+          "claim_ids": [
+            "proximal.claim.audit-research-partners"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "proximal.person.calvin-chen",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "proximal.claim.audit-calvin-chen-background"
+          ]
+        },
+        {
+          "person_id": "proximal.person.justus-mattern",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "proximal.claim.audit-justus-mattern-background"
+          ]
+        },
+        {
+          "person_id": "proximal.person.navid-pour",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "proximal.claim.audit-third-founder",
+            "proximal.claim.audit-navid-background"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "quesma",
+      "products": [
+        {
+          "name": "Quesma coding-agent analytics",
+          "description": "Analyzes coding-agent sessions and costs. The reviewed product has an early-access waitlist.",
+          "record_ids": [
+            "quesma.product.0",
+            "quesma.product.2",
+            "quesma.product.oct14-0"
+          ],
+          "claim_ids": [
+            "quesma.claim.products-0",
+            "quesma.claim.products-2",
+            "quesma.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "Quesma Shipper",
+          "description": "An open-source collector that saves agent-session transcripts in the user’s Amazon S3 storage.",
+          "record_ids": [
+            "quesma.product.oct14-1"
+          ],
+          "claim_ids": [
+            "quesma.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "CompileBench / OTelBench / BinaryAudit / BabaIsBench",
+          "description": "These four benchmarks (shared tests for comparing model performance) cover specific engineering or puzzle tasks.",
+          "record_ids": [
+            "quesma.product.1",
+            "quesma.product.oct14-2"
+          ],
+          "claim_ids": [
+            "quesma.claim.products-1",
+            "quesma.claim.oct14-product-2"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Hydrolix",
+          "relationship": "former_customer",
+          "description": "Hydrolix confirms a past reseller relationship. It also bought the intellectual property for Quesma’s database gateway.",
+          "record_ids": [
+            "quesma.customer.0"
+          ],
+          "claim_ids": [
+            "quesma.claim.audit-historical-delivery"
+          ]
+        },
+        {
+          "name": "OpenAI",
+          "relationship": "research_citation",
+          "description": "OpenAI cited Quesma authors’ Baba Is You research.",
+          "record_ids": [
+            "quesma.customer.2"
+          ],
+          "claim_ids": [
+            "quesma.claim.audit-relationship-0"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "quesma.person.jacek-migda",
+          "role": "Co-founder and CEO",
+          "bio": "Spent a decade at Sumo Logic and built its Warsaw engineering office. Also worked on NVIDIA CUDA and at Facebook.",
+          "claim_ids": [
+            "quesma.claim.founders",
+            "quesma.claim.audit-jacek-migda-background"
+          ]
+        },
+        {
+          "person_id": "quesma.person.pawe-brzoska",
+          "role": "Co-founder; advisor, former CPO",
+          "bio": "Former Sumo Logic colleague. Left Quesma’s operational team in January 2025 and remained an advisor.",
+          "claim_ids": [
+            "quesma.claim.founders",
+            "quesma.claim.audit-pawe-brzoska-background"
+          ]
+        }
+      ],
+      "notes": [],
+      "traction_heading": "Product and research activity",
+      "metric_ids": [
+        "quesma.metric.oct14-0-customer-benchmark-result"
+      ],
+      "activity": {
+        "title": "Benchmark audit",
+        "description": "The 66.5% result belongs to Blitzy on SWE-bench Pro Public, using Blitzy’s testing setup. Quesma also publishes tests of AI software that writes code.",
+        "claim_ids": [
+          "quesma.claim.oct14-metric-0-customer-benchmark-result",
+          "quesma.claim.oct14-product-2"
+        ]
+      },
+      "metric_context": {
+        "quesma.metric.oct14-0-customer-benchmark-result": {
+          "scope": "Blitzy · SWE-bench Pro Public",
+          "note": "Blitzy harness"
+        }
+      }
+    },
+    {
+      "company_id": "refresh",
+      "products": [
+        {
+          "name": "Computer-use software worlds",
+          "description": "Realistic, connected applications for business tasks, including electronic health records.",
+          "record_ids": [
+            "refresh.product.oct14-0"
+          ],
+          "claim_ids": [
+            "refresh.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "BlenderBench",
+          "description": "Expert-built tasks for modeling and animation, including rigging and materials. Also covers physics simulation, with versioned checks of results.",
+          "record_ids": [
+            "refresh.product.oct14-1"
+          ],
+          "claim_ids": [
+            "refresh.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "computer-1",
+          "description": "A tool for testing computer use across models, contributed to Harbor.",
+          "record_ids": [
+            "refresh.product.oct14-2"
+          ],
+          "claim_ids": [
+            "refresh.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "Trajectories",
+          "description": "Step-by-step records of agent actions, with benchmark results.",
+          "record_ids": [
+            "refresh.product.oct14-3"
+          ],
+          "claim_ids": [
+            "refresh.claim.oct14-product-3"
+          ]
+        }
+      ],
+      "relationships": [],
+      "people": [
+        {
+          "person_id": "refresh.person.christopher-settles",
+          "role": "Co-founder and CEO",
+          "bio": "",
+          "claim_ids": [
+            "refresh.claim.founders"
+          ]
+        },
+        {
+          "person_id": "refresh.person.erik-quintanilla",
+          "role": "Co-founder and CTO",
+          "bio": "",
+          "claim_ids": [
+            "refresh.claim.founders"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "benchflow",
+      "products": [
+        {
+          "name": "SkillsBench",
+          "description": "Tests whether reusable instructions improve agents’ task performance.",
+          "record_ids": [
+            "benchflow.product.oct14-0"
+          ],
+          "claim_ids": [
+            "benchflow.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "ClawsBench",
+          "description": "Replicas of Gmail and Calendar, plus Docs, Drive and Slack, that retain changes between actions. Scores capability and safety separately.",
+          "record_ids": [
+            "benchflow.product.oct14-1"
+          ],
+          "claim_ids": [
+            "benchflow.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "Robo Use",
+          "description": "Lets coding agents operate simulated robots through shell commands.",
+          "record_ids": [
+            "benchflow.product.oct14-2"
+          ],
+          "claim_ids": [
+            "benchflow.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "PostTrain Arena",
+          "description": "Community environments tested using a fixed training recipe. Training runs are currently paused.",
+          "record_ids": [
+            "benchflow.product.oct14-3"
+          ],
+          "claim_ids": [
+            "benchflow.claim.oct14-product-3"
+          ],
+          "status": "Training paused"
+        },
+        {
+          "name": "BenchFlow runtime",
+          "description": "Open-source tools for running and scoring agents in test environments.",
+          "record_ids": [
+            "benchflow.product.oct14-4"
+          ],
+          "claim_ids": [
+            "benchflow.claim.oct14-product-4"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Hugging Face",
+          "relationship": "compute_provider",
+          "description": "Named computing provider for PostTrain. Paying-customer status is unverified.",
+          "record_ids": [
+            "benchflow.customer.1"
+          ],
+          "claim_ids": [
+            "benchflow.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Fireworks",
+          "relationship": "compute_provider",
+          "description": "Named computing provider for PostTrain. Paying-customer status is unverified.",
+          "record_ids": [
+            "benchflow.customer.1"
+          ],
+          "claim_ids": [
+            "benchflow.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Prime Intellect",
+          "relationship": "compute_provider",
+          "description": "Named computing provider for PostTrain. Paying-customer status is unverified.",
+          "record_ids": [
+            "benchflow.customer.1"
+          ],
+          "claim_ids": [
+            "benchflow.claim.customers-1"
+          ]
+        },
+        {
+          "name": "DeepMind",
+          "relationship": "event_collaborator",
+          "description": "Named event collaborator. A sales relationship is unverified.",
+          "record_ids": [
+            "benchflow.customer.1"
+          ],
+          "claim_ids": [
+            "benchflow.claim.customers-1"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "benchflow.person.xiangyi-li",
+          "role": "Founder",
+          "bio": "",
+          "claim_ids": [
+            "benchflow.claim.founders"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "trajectory_labs_pbc",
+      "products": [
+        {
+          "name": "Safety evaluations and red teaming",
+          "description": "Experts design new attacks to test weaknesses in advanced agents and their cybersecurity safeguards.",
+          "record_ids": [
+            "trajectory_labs_pbc.product.oct14-0"
+          ],
+          "claim_ids": [
+            "trajectory_labs_pbc.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "Safety RL environments",
+          "description": "Tasks and attack examples reveal failures and help train safer behavior.",
+          "record_ids": [
+            "trajectory_labs_pbc.product.oct14-1"
+          ],
+          "claim_ids": [
+            "trajectory_labs_pbc.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "Search-PI Complex",
+          "description": "A benchmark developed with Meta for prompt injection (malicious instructions that try to redirect an AI). Uses proprietary attacks generated by attacker models.",
+          "record_ids": [
+            "trajectory_labs_pbc.product.oct14-2"
+          ],
+          "claim_ids": [
+            "trajectory_labs_pbc.claim.oct14-product-2"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Meta",
+          "relationship": "research_collaborator",
+          "description": "Meta confirms Search-PI Complex development and delivery of prompt-injection attacks. Payment is undisclosed.",
+          "record_ids": [
+            "trajectory_labs_pbc.customer.0"
+          ],
+          "claim_ids": [
+            "trajectory_labs_pbc.claim.audit-meta-delivery"
+          ]
+        },
+        {
+          "name": "Anthropic",
+          "relationship": "commissioned_evaluation",
+          "description": "Anthropic confirms external cyber testing and a commissioned prompt-injection evaluation. Contract value and payment are undisclosed.",
+          "record_ids": [
+            "trajectory_labs_pbc.customer.1",
+            "trajectory_labs_pbc.customer.audit-anthropic-commission"
+          ],
+          "claim_ids": [
+            "trajectory_labs_pbc.claim.customers-1",
+            "trajectory_labs_pbc.claim.audit-anthropic-commission"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "trajectory_labs_pbc.person.peter-mcintyre",
+          "role": "Co-founder and CEO",
+          "bio": "Former Centre for the Governance of AI research scholar and early 80,000 Hours employee.",
+          "claim_ids": [
+            "trajectory_labs_pbc.claim.audit-peter-mcintyre-background",
+            "trajectory_labs_pbc.claim.founders"
+          ]
+        },
+        {
+          "person_id": "trajectory_labs_pbc.person.ben-west",
+          "role": "Co-founder and CTO",
+          "bio": "Former METR engineering head and author of time-horizons research.",
+          "claim_ids": [
+            "trajectory_labs_pbc.claim.audit-ben-west-background",
+            "trajectory_labs_pbc.claim.founders"
+          ]
+        },
+        {
+          "person_id": "trajectory_labs_pbc.person.sami-jawhar",
+          "role": "Founding team",
+          "bio": "Former METR engineering head and research engineer with AI-safety publications.",
+          "claim_ids": [
+            "trajectory_labs_pbc.claim.audit-sami-jawhar-background",
+            "trajectory_labs_pbc.claim.founders"
+          ]
+        },
+        {
+          "person_id": "trajectory_labs_pbc.person.ryan-carey",
+          "role": "Founding team",
+          "bio": "Former technical AI-safety lead at Oxford’s Future of Humanity Institute. Holds an Oxford statistics PhD.",
+          "claim_ids": [
+            "trajectory_labs_pbc.claim.audit-ryan-carey-background",
+            "trajectory_labs_pbc.claim.founders"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "elorian",
+      "products": [
+        {
+          "name": "Visual-thinking foundation model",
+          "description": "An unreleased model for spatial and physical reasoning. Early access has a waitlist.",
+          "record_ids": [
+            "elorian.product.oct14-0"
+          ],
+          "claim_ids": [
+            "elorian.claim.oct14-product-0"
+          ],
+          "status": "Unreleased; early-access waitlist"
+        }
+      ],
+      "relationships": [],
+      "people": [
+        {
+          "person_id": "elorian.person.andrew-dai",
+          "role": "Co-founder and CEO",
+          "bio": "",
+          "claim_ids": [
+            "elorian.claim.founders-0"
+          ]
+        },
+        {
+          "person_id": "elorian.person.yinfei-yang",
+          "role": "Co-founder and Chief Multimodal Architect",
+          "bio": "",
+          "claim_ids": [
+            "elorian.claim.founders-0"
+          ]
+        },
+        {
+          "person_id": "elorian.person.seth-neel",
+          "role": "Co-founder and Member of Technical Staff",
+          "bio": "",
+          "claim_ids": [
+            "elorian.claim.founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "a-team",
+      "products": [
+        {
+          "name": "Agentic Teammates",
+          "description": "Teams build business AI agents that the client owns.",
+          "record_ids": [
+            "a-team.product.oct14-0",
+            "a-team.product.0",
+            "a-team.product.1"
+          ],
+          "claim_ids": [
+            "a-team.claim.oct14-product-0",
+            "a-team.claim.products-0",
+            "a-team.claim.products-1"
+          ]
+        },
+        {
+          "name": "Intelligence Layer",
+          "description": "Senior engineering teams build and run business AI systems.",
+          "record_ids": [
+            "a-team.product.oct14-1"
+          ],
+          "claim_ids": [
+            "a-team.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "Forward Deployed Engineers",
+          "description": "Engineers build task evaluations and systems for further model training.",
+          "record_ids": [
+            "a-team.product.oct14-2",
+            "a-team.product.0",
+            "a-team.product.1"
+          ],
+          "claim_ids": [
+            "a-team.claim.oct14-product-2",
+            "a-team.claim.products-0",
+            "a-team.claim.products-1"
+          ]
+        },
+        {
+          "name": "Technical Talent",
+          "description": "Technical specialists join hourly or ongoing work, including advisory engagements.",
+          "record_ids": [
+            "a-team.product.oct14-3",
+            "a-team.product.0",
+            "a-team.product.1"
+          ],
+          "claim_ids": [
+            "a-team.claim.oct14-product-3",
+            "a-team.claim.products-0",
+            "a-team.claim.products-1"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Blank Street",
+          "relationship": "claimed_customer",
+          "description": "A.Team’s case study describes an ordering app in live use and three years of product-engineering work.",
+          "record_ids": [
+            "a-team.customer.0",
+            "a-team.customer.2"
+          ],
+          "claim_ids": [
+            "a-team.claim.customers-0",
+            "a-team.claim.customers-2"
+          ]
+        },
+        {
+          "name": "Apprentice",
+          "relationship": "claimed_customer",
+          "description": "Named in A.Team’s case studies. Revenue from the work is not independently verified.",
+          "record_ids": [
+            "a-team.customer.0"
+          ],
+          "claim_ids": [
+            "a-team.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Chief",
+          "relationship": "claimed_customer",
+          "description": "Named in A.Team’s case studies. Revenue from the work is not independently verified.",
+          "record_ids": [
+            "a-team.customer.0"
+          ],
+          "claim_ids": [
+            "a-team.claim.customers-0"
+          ]
+        },
+        {
+          "name": "D-ID",
+          "relationship": "claimed_customer",
+          "description": "Named in A.Team’s case studies. Revenue from the work is not independently verified.",
+          "record_ids": [
+            "a-team.customer.0"
+          ],
+          "claim_ids": [
+            "a-team.claim.customers-0"
+          ]
+        },
+        {
+          "name": "EY",
+          "relationship": "claimed_customer",
+          "description": "Named in A.Team’s case studies. Revenue from the work is not independently verified.",
+          "record_ids": [
+            "a-team.customer.0"
+          ],
+          "claim_ids": [
+            "a-team.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Accrue",
+          "relationship": "claimed_customer",
+          "description": "Named in A.Team’s case studies. Revenue from the work is not independently verified.",
+          "record_ids": [
+            "a-team.customer.0"
+          ],
+          "claim_ids": [
+            "a-team.claim.customers-0"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "a-team.person.raphael-ouzan",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "a-team.claim.founders-0"
+          ]
+        },
+        {
+          "person_id": "a-team.person.kobi-mastri",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "a-team.claim.founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "aixi",
+      "products": [
+        {
+          "name": "AIXI safety research",
+          "description": "Connects mathematical theories of AI agents with practical research on model safety.",
+          "record_ids": [
+            "aixi.product.0",
+            "aixi.product.oct14-0"
+          ],
+          "claim_ids": [
+            "aixi.claim.products-0",
+            "aixi.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "Research Fellowship",
+          "description": "About three months of research, with supervision and computing support.",
+          "record_ids": [
+            "aixi.product.1",
+            "aixi.product.oct14-1"
+          ],
+          "claim_ids": [
+            "aixi.claim.products-1",
+            "aixi.claim.oct14-product-1"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Principles of Intelligence",
+          "relationship": "fiscal_sponsor",
+          "description": "The Minnesota nonprofit serves as fiscal sponsor (a nonprofit that manages funds for another project).",
+          "record_ids": [],
+          "claim_ids": [
+            "aixi.claim.audit-aixi-entity"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "aixi.person.cole-wyeth",
+          "role": "Founder and Executive Director",
+          "bio": "Pursued computer-science PhD research at Waterloo under Ming Li, with advice from Marcus Hutter. Holds an MS in mathematics from Minnesota.",
+          "claim_ids": [
+            "aixi.claim.founders",
+            "aixi.claim.audit-aixi-founder-background"
+          ]
+        }
+      ],
+      "notes": [
+        {
+          "text": "Marcus Hutter serves as part-time Research Director. Aram Ebtekar is Founding Research Scientist.",
+          "claim_ids": [
+            "aixi.claim.founders",
+            "aixi.claim.audit-aixi-entity"
+          ]
+        }
+      ],
+      "traction_heading": "Research activity",
+      "metric_ids": [],
+      "activity": {
+        "title": "Foundations of agent safety",
+        "description": "Research connects mathematical ideas about programs and information with tests of AI model safety. The fellowship provides supervision and computing support.",
+        "claim_ids": [
+          "aixi.claim.products-0",
+          "aixi.claim.products-1"
+        ]
+      }
+    },
+    {
+      "company_id": "alinia",
+      "products": [
+        {
+          "name": "Alinia Judges",
+          "description": "Models trained to judge outputs against institutional and legal policies.",
+          "record_ids": [
+            "alinia.product.oct14-0",
+            "alinia.product.0"
+          ],
+          "claim_ids": [
+            "alinia.claim.oct14-product-0",
+            "alinia.claim.products-0"
+          ]
+        },
+        {
+          "name": "Guardrails API",
+          "description": "Applies policy checks while AI systems are running.",
+          "record_ids": [
+            "alinia.product.oct14-1",
+            "alinia.product.0"
+          ],
+          "claim_ids": [
+            "alinia.claim.oct14-product-1",
+            "alinia.claim.products-0"
+          ]
+        },
+        {
+          "name": "AI Compliance Platform",
+          "description": "Expert review and audit records support deployment into live use.",
+          "record_ids": [
+            "alinia.product.oct14-2",
+            "alinia.product.0"
+          ],
+          "claim_ids": [
+            "alinia.claim.oct14-product-2",
+            "alinia.claim.products-0"
+          ]
+        },
+        {
+          "name": "Seny",
+          "description": "A specialized legal-compliance model released in October 2026.",
+          "record_ids": [
+            "alinia.product.oct14-3",
+            "alinia.product.1"
+          ],
+          "claim_ids": [
+            "alinia.claim.oct14-product-3",
+            "alinia.claim.products-1"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Santander Group",
+          "relationship": "claimed_customer",
+          "description": "Named in the December 2025 seed announcement, with named executive comments. Contract fees and deployment scope are undisclosed.",
+          "record_ids": [
+            "alinia.customer.0"
+          ],
+          "claim_ids": [
+            "alinia.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Origin Financial",
+          "relationship": "claimed_customer",
+          "description": "Named in the December 2025 seed announcement, with named executive comments. Contract fees and deployment scope are undisclosed.",
+          "record_ids": [
+            "alinia.customer.0"
+          ],
+          "claim_ids": [
+            "alinia.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Barcelona Supercomputing Center",
+          "relationship": "compute_support",
+          "description": "Alinia reports research and computing support for Seny through EuroHPC AI Factory. Purchasing is unverified.",
+          "record_ids": [
+            "alinia.customer.1"
+          ],
+          "claim_ids": [
+            "alinia.claim.customers-1",
+            "alinia.claim.audit-alinia-bsc-tag"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "alinia.person.ariadna-font-llitj-s",
+          "role": "Co-founder and CEO",
+          "bio": "",
+          "claim_ids": [
+            "alinia.claim.founders"
+          ]
+        },
+        {
+          "person_id": "alinia.person.carlos-mu-oz-ferrandis",
+          "role": "Co-founder and COO",
+          "bio": "",
+          "claim_ids": [
+            "alinia.claim.founders"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "apto",
+      "products": [
+        {
+          "name": "harBest Annotation",
+          "description": "Managed data collection and labeling.",
+          "record_ids": [
+            "apto.product.oct14-0",
+            "apto.product.0"
+          ],
+          "claim_ids": [
+            "apto.claim.oct14-product-0",
+            "apto.claim.products-0"
+          ]
+        },
+        {
+          "name": "harBest Expert",
+          "description": "Specialists create instruction data and evaluate model quality.",
+          "record_ids": [
+            "apto.product.oct14-1",
+            "apto.product.0"
+          ],
+          "claim_ids": [
+            "apto.claim.oct14-product-1",
+            "apto.claim.products-0"
+          ]
+        },
+        {
+          "name": "AI Solutions",
+          "description": null,
+          "record_ids": [
+            "apto.product.oct14-2"
+          ],
+          "claim_ids": [
+            "apto.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "AI Datasets",
+          "description": null,
+          "record_ids": [
+            "apto.product.oct14-3"
+          ],
+          "claim_ids": [
+            "apto.claim.oct14-product-3"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Micro Control Systems",
+          "relationship": "claimed_customer",
+          "description": "A customer interview on Aptō’s site describes paid factory-image labeling and use in production. It reports improved image recognition.",
+          "record_ids": [
+            "apto.customer.0",
+            "apto.customer.audit-apto-case-outcome"
+          ],
+          "claim_ids": [
+            "apto.claim.customers-0",
+            "apto.claim.audit-apto-case-classification-apto.customer.0",
+            "apto.claim.audit-apto-case-outcome"
+          ]
+        },
+        {
+          "name": "RIKEN",
+          "relationship": "reported_customer",
+          "description": "An investor interview reports RIKEN use. Contract scope and payment are unverified.",
+          "record_ids": [
+            "apto.customer.1"
+          ],
+          "claim_ids": [
+            "apto.claim.customers-1"
+          ]
+        },
+        {
+          "name": "ORIX",
+          "relationship": "reported_customer",
+          "description": "An investor interview reports ORIX use. Contract scope and payment are unverified.",
+          "record_ids": [
+            "apto.customer.1"
+          ],
+          "claim_ids": [
+            "apto.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Cohere",
+          "relationship": "displayed_logo",
+          "description": "Aptō displays Cohere’s logo. Paid contract scope is unverified.",
+          "record_ids": [
+            "apto.customer.1"
+          ],
+          "claim_ids": [
+            "apto.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Fujitsu",
+          "relationship": "displayed_logo",
+          "description": "Aptō displays Fujitsu’s logo. Paid contract scope is unverified.",
+          "record_ids": [
+            "apto.customer.1"
+          ],
+          "claim_ids": [
+            "apto.claim.customers-1"
+          ]
+        },
+        {
+          "name": "SoftBank",
+          "relationship": "displayed_logo",
+          "description": "Aptō displays SoftBank’s logo. Paid contract scope is unverified.",
+          "record_ids": [
+            "apto.customer.1"
+          ],
+          "claim_ids": [
+            "apto.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Canon",
+          "relationship": "displayed_logo",
+          "description": "Aptō displays Canon’s logo. Paid contract scope is unverified.",
+          "record_ids": [
+            "apto.customer.1"
+          ],
+          "claim_ids": [
+            "apto.claim.customers-1"
+          ]
+        },
+        {
+          "name": "NTT Data",
+          "relationship": "displayed_logo",
+          "description": "Aptō displays NTT Data’s logo. Paid contract scope is unverified.",
+          "record_ids": [
+            "apto.customer.1"
+          ],
+          "claim_ids": [
+            "apto.claim.customers-1"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "apto.person.ryo-takashina",
+          "role": "Founder and CEO",
+          "bio": "Worked in backend development and IT consulting. Founded APTO in 2020.",
+          "claim_ids": [
+            "apto.claim.founders",
+            "apto.claim.audit-apto-founder-background"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "g2i",
+      "products": [
+        {
+          "name": "RLHF Pipelines",
+          "description": "Engineers build human-feedback systems through teams embedded with clients or managed projects.",
+          "record_ids": [
+            "g2i.product.oct14-0",
+            "g2i.product.0"
+          ],
+          "claim_ids": [
+            "g2i.claim.oct14-product-0",
+            "g2i.claim.products-0"
+          ]
+        },
+        {
+          "name": "SFT Datasets",
+          "description": "Supervised fine-tuning datasets (examples that teach models to produce desired responses).",
+          "record_ids": [
+            "g2i.product.oct14-1"
+          ],
+          "claim_ids": [
+            "g2i.claim.oct14-product-1"
+          ]
+        },
+        {
+          "name": "Evaluations",
+          "description": "Tests of model performance.",
+          "record_ids": [
+            "g2i.product.oct14-2"
+          ],
+          "claim_ids": [
+            "g2i.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "RL Environments",
+          "description": "Custom training environments with evaluations and grading rules.",
+          "record_ids": [
+            "g2i.product.oct14-3",
+            "g2i.product.0"
+          ],
+          "claim_ids": [
+            "g2i.claim.oct14-product-3",
+            "g2i.claim.products-0"
+          ]
+        },
+        {
+          "name": "Seed Data",
+          "description": null,
+          "record_ids": [
+            "g2i.product.oct14-4"
+          ],
+          "claim_ids": [
+            "g2i.claim.oct14-product-4"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Automattic",
+          "relationship": "claimed_customer",
+          "description": "G2i names Automattic as a staffing reference. AI-data purchasing is unverified.",
+          "record_ids": [
+            "g2i.customer.0"
+          ],
+          "claim_ids": [
+            "g2i.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Discover Card",
+          "relationship": "claimed_customer",
+          "description": "G2i names Discover Card as a staffing reference. AI-data purchasing is unverified.",
+          "record_ids": [
+            "g2i.customer.0"
+          ],
+          "claim_ids": [
+            "g2i.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Webflow",
+          "relationship": "claimed_customer",
+          "description": "G2i names Webflow as a staffing reference. AI-data purchasing is unverified.",
+          "record_ids": [
+            "g2i.customer.0"
+          ],
+          "claim_ids": [
+            "g2i.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Shopmonkey",
+          "relationship": "claimed_customer",
+          "description": "G2i’s case study includes engineering-leader comments describing 20 hires and staffing services.",
+          "record_ids": [
+            "g2i.customer.2"
+          ],
+          "claim_ids": [
+            "g2i.claim.customers-2"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "g2i.person.gabe-greenberg",
+          "role": "Founder and CEO",
+          "bio": "",
+          "claim_ids": [
+            "g2i.claim.founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "giskard",
+      "products": [
+        {
+          "name": "Continuous Red Teaming",
+          "description": "Deliberate attacks test security risks and failures specific to a business.",
+          "record_ids": [
+            "giskard.product.oct14-0",
+            "giskard.product.0"
+          ],
+          "claim_ids": [
+            "giskard.claim.oct14-product-0",
+            "giskard.claim.products-0"
+          ]
+        },
+        {
+          "name": "LLM Evaluation",
+          "description": "Automated checks and expert review assess model behavior.",
+          "record_ids": [
+            "giskard.product.oct14-1",
+            "giskard.product.0"
+          ],
+          "claim_ids": [
+            "giskard.claim.oct14-product-1",
+            "giskard.claim.products-0"
+          ]
+        },
+        {
+          "name": "AI Guardrails",
+          "description": null,
+          "record_ids": [
+            "giskard.product.oct14-2"
+          ],
+          "claim_ids": [
+            "giskard.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "Giskard Hub",
+          "description": "A platform for businesses to test and review AI.",
+          "record_ids": [
+            "giskard.product.oct14-3",
+            "giskard.product.0"
+          ],
+          "claim_ids": [
+            "giskard.claim.oct14-product-3",
+            "giskard.claim.products-0"
+          ]
+        },
+        {
+          "name": "Phare LLM Benchmark",
+          "description": null,
+          "record_ids": [
+            "giskard.product.oct14-4"
+          ],
+          "claim_ids": [
+            "giskard.claim.oct14-product-4"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Michelin",
+          "relationship": "claimed_customer",
+          "description": "Named comments on Giskard’s site describe its use in Michelin’s language-model evaluations.",
+          "record_ids": [
+            "giskard.customer.0"
+          ],
+          "claim_ids": [
+            "giskard.claim.customers-0"
+          ]
+        },
+        {
+          "name": "BNP Paribas",
+          "relationship": "claimed_customer",
+          "description": "Giskard hosts attributable customer testimony from BNP Paribas. Contract value is undisclosed.",
+          "record_ids": [
+            "giskard.customer.0"
+          ],
+          "claim_ids": [
+            "giskard.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Decathlon",
+          "relationship": "claimed_customer",
+          "description": "Giskard hosts attributable customer testimony from Decathlon. Contract value is undisclosed.",
+          "record_ids": [
+            "giskard.customer.0"
+          ],
+          "claim_ids": [
+            "giskard.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Google DeepMind",
+          "relationship": "research_collaborator",
+          "description": "Giskard names a Phare research collaboration. Paying software-customer status is unverified.",
+          "record_ids": [
+            "giskard.customer.1"
+          ],
+          "claim_ids": [
+            "giskard.claim.customers-1",
+            "giskard.claim.audit-giskard-partners-not-customers"
+          ]
+        },
+        {
+          "name": "European Commission",
+          "relationship": "funding_support",
+          "description": "Giskard names funding support for Phare research. Paying software-customer status is unverified.",
+          "record_ids": [
+            "giskard.customer.1"
+          ],
+          "claim_ids": [
+            "giskard.claim.customers-1",
+            "giskard.claim.audit-giskard-partners-not-customers"
+          ]
+        },
+        {
+          "name": "Bpifrance",
+          "relationship": "funding_support",
+          "description": "Giskard names funding support for Phare research. Paying software-customer status is unverified.",
+          "record_ids": [
+            "giskard.customer.1"
+          ],
+          "claim_ids": [
+            "giskard.claim.customers-1",
+            "giskard.claim.audit-giskard-partners-not-customers"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "giskard.person.alex-combessie",
+          "role": "Co-founder and co-CEO",
+          "bio": "",
+          "claim_ids": [
+            "giskard.claim.founders"
+          ]
+        },
+        {
+          "person_id": "giskard.person.jean-marie-john-mathews",
+          "role": "Co-founder and co-CEO",
+          "bio": "",
+          "claim_ids": [
+            "giskard.claim.founders"
+          ]
+        },
+        {
+          "person_id": "giskard.person.andrey-avtomonov",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "giskard.claim.founders"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "hackerrank",
+      "products": [
+        {
+          "name": "HackerRank Bench",
+          "description": "Private, extended engineering tasks. Hand-built checks score how the agent behaves.",
+          "record_ids": [
+            "hackerrank.product.oct14-0",
+            "hackerrank.product.1"
+          ],
+          "claim_ids": [
+            "hackerrank.claim.oct14-product-0",
+            "hackerrank.claim.products-1"
+          ]
+        },
+        {
+          "name": "ASTRA benchmark",
+          "description": "Extended engineering tasks in environments that can be reproduced.",
+          "record_ids": [
+            "hackerrank.product.oct14-1",
+            "hackerrank.product.0"
+          ],
+          "claim_ids": [
+            "hackerrank.claim.oct14-product-1",
+            "hackerrank.claim.products-0"
+          ]
+        },
+        {
+          "name": "Coding datasets",
+          "description": "Coding examples for training models.",
+          "record_ids": [
+            "hackerrank.product.oct14-2"
+          ],
+          "claim_ids": [
+            "hackerrank.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "Private benchmarking",
+          "description": "Private tests of model performance.",
+          "record_ids": [
+            "hackerrank.product.oct14-3"
+          ],
+          "claim_ids": [
+            "hackerrank.claim.oct14-product-3"
+          ]
+        },
+        {
+          "name": "RL environments",
+          "description": "Reinforcement learning environments (models learn by trying tasks and receiving scores).",
+          "record_ids": [
+            "hackerrank.product.oct14-4"
+          ],
+          "claim_ids": [
+            "hackerrank.claim.oct14-product-4"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Airbnb",
+          "relationship": "historical_customer",
+          "description": "Named as a past customer of HackerRank. Astra customer status is unverified.",
+          "record_ids": [
+            "hackerrank.customer.1"
+          ],
+          "claim_ids": [
+            "hackerrank.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Box",
+          "relationship": "historical_customer",
+          "description": "Named as a past customer of HackerRank. Astra customer status is unverified.",
+          "record_ids": [
+            "hackerrank.customer.1"
+          ],
+          "claim_ids": [
+            "hackerrank.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Amazon",
+          "relationship": "historical_customer",
+          "description": "Named as a past customer of HackerRank. Astra customer status is unverified.",
+          "record_ids": [
+            "hackerrank.customer.1"
+          ],
+          "claim_ids": [
+            "hackerrank.claim.customers-1"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "hackerrank.person.vivek-ravisankar",
+          "role": "HackerRank co-founder and CEO",
+          "bio": "",
+          "claim_ids": [
+            "hackerrank.claim.founders-0"
+          ]
+        },
+        {
+          "person_id": "hackerrank.person.harishankaran-karunanidhi",
+          "role": "HackerRank co-founder and CTO",
+          "bio": "",
+          "claim_ids": [
+            "hackerrank.claim.founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "laude",
+      "products": [
+        {
+          "name": "Terminal-Bench",
+          "description": "Open tests of agent work in command-line environments (text-based interfaces for running commands on computers). The reviewed homepage shows version 4.0.",
+          "record_ids": [
+            "laude.product.0",
+            "laude.product.oct14-0"
+          ],
+          "claim_ids": [
+            "laude.claim.products-0",
+            "laude.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "Slingshots",
+          "description": "Grants and hands-on support for research projects.",
+          "record_ids": [
+            "laude.product.0",
+            "laude.product.oct14-2"
+          ],
+          "claim_ids": [
+            "laude.claim.products-0",
+            "laude.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "Moonshots",
+          "description": "Support for research labs pursuing work over longer periods.",
+          "record_ids": [
+            "laude.product.0",
+            "laude.product.oct14-3"
+          ],
+          "claim_ids": [
+            "laude.claim.products-0",
+            "laude.claim.oct14-product-3"
+          ]
+        },
+        {
+          "name": "Harbor",
+          "description": null,
+          "record_ids": [
+            "laude.product.oct14-1"
+          ],
+          "claim_ids": [
+            "laude.claim.oct14-product-1"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Anthropic",
+          "relationship": "benchmark_adoption",
+          "description": "Anthropic reports using Terminal-Bench to evaluate Claude.",
+          "record_ids": [
+            "laude.customer.0"
+          ],
+          "claim_ids": [
+            "laude.claim.customers-0",
+            "laude.claim.audit-laude-noncustomers-laude.customer.0"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "laude.person.andy-konwinski",
+          "role": "Co-founder",
+          "bio": "His UC Berkeley PhD work on Hadoop led into Apache Spark and Databricks. He also helped build Perplexity.",
+          "claim_ids": [
+            "laude.claim.founders-0",
+            "laude.claim.audit-laude-founder-background"
+          ]
+        },
+        {
+          "person_id": "laude.person.chris-rytting",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "laude.claim.founders-0"
+          ]
+        },
+        {
+          "person_id": "laude.person.k.-tighe",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "laude.claim.founders-0"
+          ]
+        },
+        {
+          "person_id": "laude.person.justin-fiedler",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "laude.claim.founders-0"
+          ]
+        },
+        {
+          "person_id": "laude.person.lindsey-gregory",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "laude.claim.founders-0"
+          ]
+        }
+      ],
+      "notes": [
+        {
+          "text": "Andy Konwinski pledged $100 million in donations. How much cash the Institute received is unverified.",
+          "claim_ids": [
+            "laude.claim.funding_rounds-0",
+            "laude.claim.total_funding",
+            "laude.claim.audit-laude-pledge"
+          ]
+        },
+        {
+          "text": "The Institute reports $4.1 million in seed grants (early funding to help research projects get started) across 25 teams.",
+          "claim_ids": [
+            "laude.claim.audit-laude-deployed-grants-metric"
+          ]
+        }
+      ],
+      "traction_heading": "Research and grantmaking",
+      "metric_ids": [
+        "laude.metric.audit-laude-deployed-grants",
+        "laude.metric.oct14-0-benchmark-dataset-size"
+      ],
+      "activity": {
+        "title": "Open research support",
+        "description": "Slingshots and Moonshots support research teams. Terminal-Bench tests how well AI software completes computer tasks using text commands.",
+        "claim_ids": [
+          "laude.claim.products-0"
+        ]
+      },
+      "metric_context": {
+        "laude.metric.audit-laude-deployed-grants": {
+          "scope": "Grants paid to research teams"
+        },
+        "laude.metric.oct14-0-benchmark-dataset-size": {
+          "scope": "Terminal-Bench 2.0 · historical"
+        }
+      }
+    },
+    {
+      "company_id": "prime_intellect",
+      "products": [
+        {
+          "name": "Lab",
+          "description": "A platform for reinforcement learning (models learn by trying tasks and receiving scores) and further model training.",
+          "record_ids": [
+            "prime_intellect.product.oct14-0",
+            "prime_intellect.product.0"
+          ],
+          "claim_ids": [
+            "prime_intellect.claim.oct14-product-0",
+            "prime_intellect.claim.products"
+          ]
+        },
+        {
+          "name": "Environment Hub",
+          "description": "Environments for model training and evaluation.",
+          "record_ids": [
+            "prime_intellect.product.oct14-1",
+            "prime_intellect.product.0"
+          ],
+          "claim_ids": [
+            "prime_intellect.claim.oct14-product-1",
+            "prime_intellect.claim.products"
+          ]
+        },
+        {
+          "name": "Verifiers",
+          "description": null,
+          "record_ids": [
+            "prime_intellect.product.oct14-2"
+          ],
+          "claim_ids": [
+            "prime_intellect.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "Prime-RL",
+          "description": null,
+          "record_ids": [
+            "prime_intellect.product.oct14-3"
+          ],
+          "claim_ids": [
+            "prime_intellect.claim.oct14-product-3"
+          ]
+        },
+        {
+          "name": "Prime Inference Gateway",
+          "description": null,
+          "record_ids": [
+            "prime_intellect.product.oct14-4"
+          ],
+          "claim_ids": [
+            "prime_intellect.claim.oct14-product-4"
+          ]
+        },
+        {
+          "name": "Sandboxes",
+          "description": "Isolated environments for training and evaluation.",
+          "record_ids": [
+            "prime_intellect.product.oct14-5",
+            "prime_intellect.product.0"
+          ],
+          "claim_ids": [
+            "prime_intellect.claim.oct14-product-5",
+            "prime_intellect.claim.products"
+          ]
+        },
+        {
+          "name": "INTELLECT",
+          "description": "Open model research from Prime Intellect.",
+          "record_ids": [
+            "prime_intellect.product.oct14-6",
+            "prime_intellect.product.0"
+          ],
+          "claim_ids": [
+            "prime_intellect.claim.oct14-product-6",
+            "prime_intellect.claim.products"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Ramp",
+          "relationship": "claimed_customer",
+          "description": "Prime Intellect’s case study describes training the search component of Ramp’s FastAsk agent. Independent buyer confirmation and paid terms are unverified.",
+          "record_ids": [
+            "prime_intellect.customer.0",
+            "prime_intellect.customer.audit-pi-ramp-proof"
+          ],
+          "claim_ids": [
+            "prime_intellect.claim.audit-pi-ramp-classification-prime_intellect.customer.0",
+            "prime_intellect.claim.audit-pi-ramp-proof"
+          ]
+        },
+        {
+          "name": "Langdock",
+          "relationship": "product_endorsement",
+          "description": "Named product testimonial. Paid terms are unconfirmed.",
+          "record_ids": [
+            "prime_intellect.customer.1"
+          ],
+          "claim_ids": [
+            "prime_intellect.claim.customers-1"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "prime_intellect.person.vincent-weisser",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "prime_intellect.claim.founders"
+          ]
+        },
+        {
+          "person_id": "prime_intellect.person.johannes-hagemann",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "prime_intellect.claim.founders"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "prolific",
+      "products": [
+        {
+          "name": "Prolific platform",
+          "description": "Recruits verified participants for research studies.",
+          "record_ids": [
+            "prolific.product.oct14-0",
+            "prolific.product.0"
+          ],
+          "claim_ids": [
+            "prolific.claim.oct14-product-0",
+            "prolific.claim.products-0"
+          ]
+        },
+        {
+          "name": "Human Feedback API",
+          "description": "Connects software directly to human feedback for AI training and evaluation.",
+          "record_ids": [
+            "prolific.product.oct14-1",
+            "prolific.product.0"
+          ],
+          "claim_ids": [
+            "prolific.claim.oct14-product-1",
+            "prolific.claim.products-0"
+          ]
+        },
+        {
+          "name": "HUMAINE",
+          "description": null,
+          "record_ids": [
+            "prolific.product.oct14-2"
+          ],
+          "claim_ids": [
+            "prolific.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "Prolific Expert Network",
+          "description": "Groups of experts recruited for specialist research.",
+          "record_ids": [
+            "prolific.product.oct14-3",
+            "prolific.product.0"
+          ],
+          "claim_ids": [
+            "prolific.claim.oct14-product-3",
+            "prolific.claim.products-0"
+          ]
+        },
+        {
+          "name": "Managed Research Services",
+          "description": "Managed projects that collect human feedback and evaluate models.",
+          "record_ids": [
+            "prolific.product.oct14-4",
+            "prolific.product.0"
+          ],
+          "claim_ids": [
+            "prolific.claim.oct14-product-4",
+            "prolific.claim.products-0"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Ai2",
+          "relationship": "claimed_customer",
+          "description": "Prolific’s case study includes named Ai2 comments about delivered work on data across multiple formats.",
+          "record_ids": [
+            "prolific.customer.0"
+          ],
+          "claim_ids": [
+            "prolific.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Google",
+          "relationship": "historical_customer",
+          "description": "Prolific’s 2023 financing release names Google as a customer/user. Current relationship status is unconfirmed.",
+          "record_ids": [
+            "prolific.customer.1"
+          ],
+          "claim_ids": [
+            "prolific.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Stanford",
+          "relationship": "historical_customer",
+          "description": "Prolific’s 2023 financing release names Stanford as a customer/user. Current relationship status is unconfirmed.",
+          "record_ids": [
+            "prolific.customer.1"
+          ],
+          "claim_ids": [
+            "prolific.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Oxford",
+          "relationship": "historical_customer",
+          "description": "Prolific’s 2023 financing release names Oxford as a customer/user. Current relationship status is unconfirmed.",
+          "record_ids": [
+            "prolific.customer.1"
+          ],
+          "claim_ids": [
+            "prolific.claim.customers-1"
+          ]
+        },
+        {
+          "name": "King’s College London",
+          "relationship": "historical_customer",
+          "description": "Prolific’s 2023 financing release names King’s College London as a customer/user. Current relationship status is unconfirmed.",
+          "record_ids": [
+            "prolific.customer.1"
+          ],
+          "claim_ids": [
+            "prolific.claim.customers-1"
+          ]
+        },
+        {
+          "name": "European Commission",
+          "relationship": "historical_customer",
+          "description": "Prolific’s 2023 financing release names European Commission as a customer/user. Current relationship status is unconfirmed.",
+          "record_ids": [
+            "prolific.customer.1"
+          ],
+          "claim_ids": [
+            "prolific.claim.customers-1"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "prolific.person.phelim-bradley",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "prolific.claim.founders"
+          ]
+        },
+        {
+          "person_id": "prolific.person.ekaterina-damer",
+          "role": "Co-founder",
+          "bio": "",
+          "claim_ids": [
+            "prolific.claim.founders"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "rws_trainai",
+      "products": [
+        {
+          "name": "TrainAI",
+          "description": "Managed training data in multiple languages, with expert feedback.",
+          "record_ids": [
+            "rws_trainai.product.oct14-0",
+            "rws_trainai.product.0"
+          ],
+          "claim_ids": [
+            "rws_trainai.claim.oct14-product-0",
+            "rws_trainai.claim.products-0"
+          ]
+        },
+        {
+          "name": "TrainAI Community",
+          "description": "A screened specialist network for AI data work.",
+          "record_ids": [
+            "rws_trainai.product.oct14-1",
+            "rws_trainai.product.0"
+          ],
+          "claim_ids": [
+            "rws_trainai.claim.oct14-product-1",
+            "rws_trainai.claim.products-0"
+          ]
+        },
+        {
+          "name": "AI data consulting",
+          "description": null,
+          "record_ids": [
+            "rws_trainai.product.oct14-2"
+          ],
+          "claim_ids": [
+            "rws_trainai.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "Generative AI training and fine-tuning",
+          "description": "Expert data for model training, including human feedback and carefully designed prompts.",
+          "record_ids": [
+            "rws_trainai.product.oct14-3",
+            "rws_trainai.product.0"
+          ],
+          "claim_ids": [
+            "rws_trainai.claim.oct14-product-3",
+            "rws_trainai.claim.products-0"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Cohere",
+          "relationship": "strategic_partner",
+          "description": "Strategic partner for RWS Language Weaver Pro. TrainAI customer status is unverified.",
+          "record_ids": [
+            "rws_trainai.customer.1"
+          ],
+          "claim_ids": [
+            "rws_trainai.claim.customers-1"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "rws_trainai.person.vasagi-kothandapani",
+          "role": "TrainAI CEO",
+          "bio": "Previously led an AI-data-services business at Appen. Held senior roles at Cognizant and CoreLogic.",
+          "claim_ids": [
+            "rws_trainai.claim.audit-rws-leadership",
+            "rws_trainai.claim.audit-rws-leadership-background"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "terac",
+      "products": [
+        {
+          "name": "Terac Expert Network",
+          "description": "Recruits and verifies experts for AI training programs.",
+          "record_ids": [
+            "terac.product.oct14-0",
+            "terac.product.0"
+          ],
+          "claim_ids": [
+            "terac.claim.oct14-product-0",
+            "terac.claim.products-0"
+          ]
+        },
+        {
+          "name": "Terac API",
+          "description": "Connects software directly to expert labor services.",
+          "record_ids": [
+            "terac.product.oct14-1",
+            "terac.product.0"
+          ],
+          "claim_ids": [
+            "terac.claim.oct14-product-1",
+            "terac.claim.products-0"
+          ]
+        },
+        {
+          "name": "Agent MCP",
+          "description": null,
+          "record_ids": [
+            "terac.product.oct14-2"
+          ],
+          "claim_ids": [
+            "terac.claim.oct14-product-2"
+          ]
+        },
+        {
+          "name": "AI interviewer",
+          "description": "AI screening and interviews for expert recruitment.",
+          "record_ids": [
+            "terac.product.oct14-3",
+            "terac.product.0"
+          ],
+          "claim_ids": [
+            "terac.claim.oct14-product-3",
+            "terac.claim.products-0"
+          ]
+        },
+        {
+          "name": "Terac ChatGPT App",
+          "description": null,
+          "record_ids": [
+            "terac.product.oct14-4"
+          ],
+          "claim_ids": [
+            "terac.claim.oct14-product-4"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Dialogue",
+          "relationship": "claimed_customer",
+          "description": "Terac’s case study describes recruiting 25 startup founders in under four days. Contract value is undisclosed.",
+          "record_ids": [
+            "terac.customer.0"
+          ],
+          "claim_ids": [
+            "terac.claim.customers-0"
+          ]
+        },
+        {
+          "name": "Maze",
+          "relationship": "claimed_customer",
+          "description": "Terac hosts an attributed testimonial from Maze. Payment is unverified.",
+          "record_ids": [
+            "terac.customer.1"
+          ],
+          "claim_ids": [
+            "terac.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Spade",
+          "relationship": "claimed_customer",
+          "description": "Terac hosts an attributed testimonial from Spade. Payment is unverified.",
+          "record_ids": [
+            "terac.customer.1"
+          ],
+          "claim_ids": [
+            "terac.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Vetto",
+          "relationship": "claimed_customer",
+          "description": "Terac hosts an attributed testimonial from Vetto. Payment is unverified.",
+          "record_ids": [
+            "terac.customer.1"
+          ],
+          "claim_ids": [
+            "terac.claim.customers-1"
+          ]
+        },
+        {
+          "name": "Patronus AI",
+          "relationship": "displayed_logo",
+          "description": "The logo appears on Terac’s homepage. A paid relationship is unverified.",
+          "record_ids": [
+            "terac.customer.1"
+          ],
+          "claim_ids": [
+            "terac.claim.customers-1"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "terac.person.zac-baker",
+          "role": "Co-founder and CEO",
+          "bio": "",
+          "claim_ids": [
+            "terac.claim.founders-0"
+          ]
+        },
+        {
+          "person_id": "terac.person.jack-blair",
+          "role": "Co-founder and CTO",
+          "bio": "",
+          "claim_ids": [
+            "terac.claim.founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "company_id": "toloka",
+      "products": [
+        {
+          "name": "Toloka Arena",
+          "description": null,
+          "record_ids": [
+            "toloka.product.oct14-0"
+          ],
+          "claim_ids": [
+            "toloka.claim.oct14-product-0"
+          ]
+        },
+        {
+          "name": "Agent Data",
+          "description": "Expert task records and human evaluation for agent training.",
+          "record_ids": [
+            "toloka.product.oct14-1",
+            "toloka.product.major-0"
+          ],
+          "claim_ids": [
+            "toloka.claim.oct14-product-1",
+            "toloka.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Coding Data",
+          "description": "Coding datasets written by experts for model training.",
+          "record_ids": [
+            "toloka.product.oct14-2",
+            "toloka.product.major-0"
+          ],
+          "claim_ids": [
+            "toloka.claim.oct14-product-2",
+            "toloka.claim.major-products-0"
+          ]
+        },
+        {
+          "name": "Physical AI",
+          "description": null,
+          "record_ids": [
+            "toloka.product.oct14-3"
+          ],
+          "claim_ids": [
+            "toloka.claim.oct14-product-3"
+          ]
+        },
+        {
+          "name": "Mindrift",
+          "description": null,
+          "record_ids": [
+            "toloka.product.oct14-4"
+          ],
+          "claim_ids": [
+            "toloka.claim.oct14-product-4"
+          ]
+        },
+        {
+          "name": "Tendem",
+          "description": null,
+          "record_ids": [
+            "toloka.product.oct14-5"
+          ],
+          "claim_ids": [
+            "toloka.claim.oct14-product-5"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "Shopify",
+          "relationship": "customer",
+          "description": "Shopify engineering confirms that Toloka experts correct and score conversations for Sidekick’s ongoing training.",
+          "record_ids": [
+            "toloka.customer.major-0"
+          ],
+          "claim_ids": [
+            "toloka.claim.major-customers-0"
+          ]
+        },
+        {
+          "name": "Anthropic",
+          "relationship": "claimed_customer",
+          "description": "Named as a customer in Toloka’s investment announcement. Separate buyer confirmation was not reviewed.",
+          "record_ids": [
+            "toloka.customer.major-1"
+          ],
+          "claim_ids": [
+            "toloka.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "Amazon",
+          "relationship": "claimed_customer",
+          "description": "Named as a customer in Toloka’s investment announcement. Separate buyer confirmation was not reviewed.",
+          "record_ids": [
+            "toloka.customer.major-1"
+          ],
+          "claim_ids": [
+            "toloka.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "Microsoft",
+          "relationship": "claimed_customer",
+          "description": "Named as a customer in Toloka’s investment announcement. Separate buyer confirmation was not reviewed.",
+          "record_ids": [
+            "toloka.customer.major-1"
+          ],
+          "claim_ids": [
+            "toloka.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "poolside",
+          "relationship": "claimed_customer",
+          "description": "Named as a customer in Toloka’s investment announcement. Separate buyer confirmation was not reviewed.",
+          "record_ids": [
+            "toloka.customer.major-1"
+          ],
+          "claim_ids": [
+            "toloka.claim.major-customers-1"
+          ]
+        },
+        {
+          "name": "Recraft",
+          "relationship": "claimed_customer",
+          "description": "Named as a customer in Toloka’s investment announcement. Separate buyer confirmation was not reviewed.",
+          "record_ids": [
+            "toloka.customer.major-1"
+          ],
+          "claim_ids": [
+            "toloka.claim.major-customers-1"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "person_id": "toloka.person.olga-megorskaya",
+          "role": "Founder",
+          "bio": "",
+          "claim_ids": [
+            "toloka.claim.major-founders-0"
+          ]
+        }
+      ],
+      "notes": []
+    }
+  ]
+}

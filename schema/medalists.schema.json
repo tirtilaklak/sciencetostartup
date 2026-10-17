@@ -1,0 +1,877 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mathematics Olympiad Outreach Web Dataset",
+  "description": "Read-only, adult-eligible, source-supported email/LinkedIn outreach projection from the final v2 directory.",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "contactMeaning": {
+          "type": "string"
+        },
+        "coverageNote": {
+          "type": "string"
+        },
+        "freshnessNote": {
+          "type": "string"
+        },
+        "historicalContactNote": {
+          "type": "string"
+        },
+        "preparedAtUtc": {
+          "type": "string"
+        },
+        "privacyNote": {
+          "type": "string"
+        },
+        "representationNote": {
+          "type": "string"
+        },
+        "selection": {
+          "type": "string"
+        },
+        "sourceArchiveName": {
+          "type": "string"
+        },
+        "sourceArchiveSha256": {
+          "type": "string"
+        },
+        "sourceCheckedDate": {
+          "type": "string"
+        },
+        "sourceDirectoryCounts": {
+          "type": "object",
+          "properties": {
+            "adultEligible": {
+              "type": "integer"
+            },
+            "currentProfessionalEmails": {
+              "type": "integer"
+            },
+            "internationalSelections": {
+              "type": "integer"
+            },
+            "linkedinProfiles": {
+              "type": "integer"
+            },
+            "medalRecords": {
+              "type": "integer"
+            },
+            "otherAwardRecords": {
+              "type": "integer"
+            },
+            "people": {
+              "type": "integer"
+            },
+            "turkeyRepresentatives": {
+              "type": "integer"
+            },
+            "universityPrizeHolders": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "adultEligible",
+            "currentProfessionalEmails",
+            "internationalSelections",
+            "linkedinProfiles",
+            "medalRecords",
+            "otherAwardRecords",
+            "people",
+            "turkeyRepresentatives",
+            "universityPrizeHolders"
+          ],
+          "additionalProperties": false
+        },
+        "sourceLibraryFileId": {
+          "type": "string"
+        },
+        "sourceVersion": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "uiSafetyNote": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "contactMeaning",
+        "coverageNote",
+        "freshnessNote",
+        "historicalContactNote",
+        "preparedAtUtc",
+        "privacyNote",
+        "representationNote",
+        "selection",
+        "sourceArchiveName",
+        "sourceArchiveSha256",
+        "sourceCheckedDate",
+        "sourceDirectoryCounts",
+        "sourceLibraryFileId",
+        "sourceVersion",
+        "title",
+        "uiSafetyNote"
+      ],
+      "additionalProperties": false
+    },
+    "people": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "citizenshipStatus": {
+            "type": "string"
+          },
+          "cohort": {
+            "type": "string"
+          },
+          "competitions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "contact": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "address": {
+                        "type": "string"
+                      },
+                      "deliverability": {
+                        "type": "string"
+                      },
+                      "detail": {
+                        "type": "string"
+                      },
+                      "href": {
+                        "type": "string"
+                      },
+                      "sourceUrl": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "address",
+                      "deliverability",
+                      "detail",
+                      "href",
+                      "sourceUrl",
+                      "status"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "emailStatus": {
+                "type": "string"
+              },
+              "emailStatusDetail": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "historicalEmail": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "address": {
+                        "type": "string"
+                      },
+                      "detail": {
+                        "type": "string"
+                      },
+                      "href": {
+                        "type": "null"
+                      },
+                      "sourceUrl": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "address",
+                      "detail",
+                      "href",
+                      "sourceUrl",
+                      "status"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "linkedin": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "matchConfidence": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      },
+                      "verification": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "matchConfidence",
+                      "status",
+                      "url",
+                      "verification"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "organizationEmail": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "address": {
+                        "type": "string"
+                      },
+                      "detail": {
+                        "type": "string"
+                      },
+                      "href": {
+                        "type": "string"
+                      },
+                      "sourceUrl": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "address",
+                      "detail",
+                      "href",
+                      "sourceUrl",
+                      "status"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [
+              "email",
+              "emailStatus",
+              "emailStatusDetail",
+              "historicalEmail",
+              "linkedin",
+              "organizationEmail"
+            ],
+            "additionalProperties": false
+          },
+          "coverageNote": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "medalCount": {
+            "type": "integer"
+          },
+          "medalCounts": {
+            "type": "object",
+            "properties": {
+              "bronze": {
+                "type": "integer"
+              },
+              "gold": {
+                "type": "integer"
+              },
+              "silver": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "bronze",
+              "gold",
+              "silver"
+            ],
+            "additionalProperties": false
+          },
+          "medalSummary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "medals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "additionalSourceUrls": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "award": {
+                  "type": "string"
+                },
+                "awardType": {
+                  "type": "string"
+                },
+                "checkedDate": {
+                  "type": "string"
+                },
+                "competition": {
+                  "type": "string"
+                },
+                "displayPosition": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "integer"
+                    }
+                  ]
+                },
+                "id": {
+                  "type": "string"
+                },
+                "maximumPoints": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "points": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "rank": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "integer"
+                    }
+                  ]
+                },
+                "rankNote": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "representedTeam": {
+                  "type": "string"
+                },
+                "sourceCaveat": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "sourceUrl": {
+                  "type": "string"
+                },
+                "verificationStatus": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "year": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "additionalSourceUrls",
+                "award",
+                "awardType",
+                "checkedDate",
+                "competition",
+                "displayPosition",
+                "id",
+                "maximumPoints",
+                "points",
+                "rank",
+                "rankNote",
+                "representedTeam",
+                "sourceCaveat",
+                "sourceUrl",
+                "verificationStatus",
+                "year"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameVariants": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "organization": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "otherAwards": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "additionalSourceUrls": {
+                  "type": "array",
+                  "items": {}
+                },
+                "award": {
+                  "type": "string"
+                },
+                "awardType": {
+                  "type": "string"
+                },
+                "checkedDate": {
+                  "type": "string"
+                },
+                "competition": {
+                  "type": "string"
+                },
+                "displayPosition": {
+                  "type": "null"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "maximumPoints": {
+                  "type": "null"
+                },
+                "points": {
+                  "type": "null"
+                },
+                "rank": {
+                  "type": "integer"
+                },
+                "rankNote": {
+                  "type": "null"
+                },
+                "representedTeam": {
+                  "type": "string"
+                },
+                "sourceCaveat": {
+                  "type": "null"
+                },
+                "sourceUrl": {
+                  "type": "string"
+                },
+                "verificationStatus": {
+                  "type": "null"
+                },
+                "year": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "additionalSourceUrls",
+                "award",
+                "awardType",
+                "checkedDate",
+                "competition",
+                "displayPosition",
+                "id",
+                "maximumPoints",
+                "points",
+                "rank",
+                "rankNote",
+                "representedTeam",
+                "sourceCaveat",
+                "sourceUrl",
+                "verificationStatus",
+                "year"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "professionalName": {
+            "type": "string"
+          },
+          "professionalRelevance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "representedCountry": {
+            "type": "string"
+          },
+          "representedTurkey": {
+            "type": "boolean"
+          },
+          "role": {
+            "type": "string"
+          },
+          "roleSourceUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "roleStatus": {
+            "type": "string"
+          },
+          "selectionRule": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "checkedDate": {
+                  "type": "string"
+                },
+                "supports": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "checkedDate",
+                "supports",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "verification": {
+            "type": "object",
+            "properties": {
+              "adultEligibility": {
+                "type": "string"
+              },
+              "adultEligibilityNote": {
+                "type": "string"
+              },
+              "adultEligible": {
+                "type": "boolean"
+              },
+              "adultEvidenceUrls": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "checkedDate": {
+                "type": "string"
+              },
+              "identityEvidence": {
+                "type": "string"
+              },
+              "identityMatchConfidence": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "identitySourceUrls": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "linkedinMatchConfidence": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "adultEligibility",
+              "adultEligibilityNote",
+              "adultEligible",
+              "adultEvidenceUrls",
+              "checkedDate",
+              "identityEvidence",
+              "identityMatchConfidence",
+              "identitySourceUrls",
+              "linkedinMatchConfidence"
+            ],
+            "additionalProperties": false
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "citizenshipStatus",
+          "cohort",
+          "competitions",
+          "contact",
+          "coverageNote",
+          "id",
+          "medalCount",
+          "medalCounts",
+          "medalSummary",
+          "medals",
+          "name",
+          "nameVariants",
+          "notes",
+          "organization",
+          "otherAwards",
+          "professionalName",
+          "professionalRelevance",
+          "representedCountry",
+          "representedTurkey",
+          "role",
+          "roleSourceUrls",
+          "roleStatus",
+          "selectionRule",
+          "sources",
+          "verification",
+          "website"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "schemaVersion": {
+      "type": "string"
+    },
+    "stats": {
+      "type": "object",
+      "properties": {
+        "bothEmailAndLinkedin": {
+          "type": "integer"
+        },
+        "byCohort": {
+          "type": "object",
+          "properties": {
+            "EGMO repeat gold / winner": {
+              "type": "integer"
+            },
+            "IMO exceptional / repeat gold": {
+              "type": "integer"
+            },
+            "IMO repeat gold + EGMO repeat gold": {
+              "type": "integer"
+            },
+            "Regional repeat gold: PAMO": {
+              "type": "integer"
+            },
+            "Regional winner: PAMO": {
+              "type": "integer"
+            },
+            "Türkiye represented team": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "EGMO repeat gold / winner",
+            "IMO exceptional / repeat gold",
+            "IMO repeat gold + EGMO repeat gold",
+            "Regional repeat gold: PAMO",
+            "Regional winner: PAMO",
+            "Türkiye represented team"
+          ],
+          "additionalProperties": false
+        },
+        "byCompetition": {
+          "type": "object",
+          "properties": {
+            "BMO": {
+              "type": "integer"
+            },
+            "EGMO": {
+              "type": "integer"
+            },
+            "IMO": {
+              "type": "integer"
+            },
+            "JBMO": {
+              "type": "integer"
+            },
+            "PAMO": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "BMO",
+            "EGMO",
+            "IMO",
+            "JBMO",
+            "PAMO"
+          ],
+          "additionalProperties": false
+        },
+        "currentProfessionalEmails": {
+          "type": "integer"
+        },
+        "emailOnly": {
+          "type": "integer"
+        },
+        "historicalEmailsNotContactReady": {
+          "type": "integer"
+        },
+        "historicalOnlyEmailStatus": {
+          "type": "integer"
+        },
+        "internationalSelections": {
+          "type": "integer"
+        },
+        "linkedinOnly": {
+          "type": "integer"
+        },
+        "linkedinProfiles": {
+          "type": "integer"
+        },
+        "medalRecords": {
+          "type": "integer"
+        },
+        "organizationInboxesSeparate": {
+          "type": "integer"
+        },
+        "otherAwardRecords": {
+          "type": "integer"
+        },
+        "people": {
+          "type": "integer"
+        },
+        "turkeyRepresentatives": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "bothEmailAndLinkedin",
+        "byCohort",
+        "byCompetition",
+        "currentProfessionalEmails",
+        "emailOnly",
+        "historicalEmailsNotContactReady",
+        "historicalOnlyEmailStatus",
+        "internationalSelections",
+        "linkedinOnly",
+        "linkedinProfiles",
+        "medalRecords",
+        "organizationInboxesSeparate",
+        "otherAwardRecords",
+        "people",
+        "turkeyRepresentatives"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "metadata",
+    "people",
+    "schemaVersion",
+    "stats"
+  ],
+  "additionalProperties": false
+}
