@@ -279,11 +279,13 @@ function financialSignal(id){const m=preferredFinancial(id);return m?`${numberBu
 function compareCheck(id){return `<label class="compare-check"><input type="checkbox" data-compare="${esc(id)}" aria-label="Compare ${attr(companies[id]?.name||id)}" ${state.selected.includes(id)?'checked':''}> Compare</label>`;}
 function filtered(){
  const tokens=state.query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+ // Match literal term prefixes at word starts; keep letters, numbers and combining marks together.
+ const prefixes=tokens.map(token=>new RegExp('(?:^|[^\\p{L}\\p{N}\\p{M}])'+token.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'u'));
  return DATA.companies.filter(c=>{
   const products=DATA.products.filter(p=>p.company_id===c.id).flatMap(p=>[p.name,p.work_performed]);
   const offerings=typeof profileProducts==='function'?profileProducts(c.id).flatMap(p=>[p.name,p.description,...(p.aliases||[])]):[];
   const searchable=[c.name,...(c.aliases||[]),c.description,modelFor(c.id),...products,...offerings].filter(Boolean).join(' ').toLowerCase();
-  return tokens.every(token=>searchable.includes(token))&&(!state.category||modelGroup(c.id)===state.category)&&(!state.stage||stageFor(c.id)===state.stage)&&(!state.financial||preferredFinancial(c.id))&&(!state.work||hasWorkRoute(c.id));
+  return prefixes.every(prefix=>prefix.test(searchable))&&(!state.category||modelGroup(c.id)===state.category)&&(!state.stage||stageFor(c.id)===state.stage)&&(!state.financial||preferredFinancial(c.id))&&(!state.work||hasWorkRoute(c.id));
  }).sort((a,b)=>(state.sort==='name-desc'?-1:1)*a.name.localeCompare(b.name));
 }
 function latestByScope(rows){const seen=new Set();return rows.sort(byRecent).filter(m=>{const key=m.company_id+'|'+m.segment_scope+'|'+(['company','ai_data','research','other_segment'].includes(m.scope_detail)?'':m.scope_detail||'');if(seen.has(key))return false;seen.add(key);return true;});}
@@ -626,7 +628,18 @@ function initialize(){const overview=document.querySelector('.download-list a[hr
 
 // Native disclosures used as overlays retain predictable dismissal and focus.
 const OVERLAY_DETAILS='.responsive-filter-panel,.more-filters,.mobile-column-options';
-function dismissDisclosure(panel,restoreFocus){if(!panel?.open)return;panel.open=false;if(restoreFocus)panel.querySelector('summary')?.focus({preventScroll:true});}
+function dismissDisclosure(panel,restoreFocus){
+ if(!panel?.open)return;
+ panel.open=false;
+ const target=restoreFocus?panel.querySelector('summary'):document.activeElement;
+ if(restoreFocus)target?.focus({preventScroll:true});
+ if(!target||target===document.body||!target.getClientRects().length)return;
+ const header=document.querySelector('.topbar');
+ if(header?.contains(target))return;
+ const box=target.getBoundingClientRect(),top=(header?.getBoundingClientRect().bottom||0)+8,bottom=window.innerHeight-8;
+ if(box.top<top)window.scrollBy({top:box.top-top,behavior:'instant'});
+ else if(box.bottom>bottom)window.scrollBy({top:box.bottom-bottom,behavior:'instant'});
+}
 document.addEventListener('keydown',event=>{if(event.key!=='Escape')return;const panel=event.target.closest?.(OVERLAY_DETAILS);if(panel?.open&&panel.querySelector('summary')?.getClientRects().length){event.preventDefault();dismissDisclosure(panel,true);}});
 document.addEventListener('click',event=>{document.querySelectorAll(OVERLAY_DETAILS).forEach(panel=>{if(panel.open&&!panel.contains(event.target)&&panel.querySelector('summary')?.getClientRects().length)dismissDisclosure(panel,panel.contains(document.activeElement));});});
 document.addEventListener('focusin',event=>{document.querySelectorAll(OVERLAY_DETAILS).forEach(panel=>{if(panel.open&&!panel.contains(event.target)&&panel.querySelector('summary')?.getClientRects().length)dismissDisclosure(panel,false);});});

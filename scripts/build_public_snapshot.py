@@ -25,7 +25,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "build/public-snapshot")
     parser.add_argument("--verify", action="store_true",
-                        help="Build in a temporary directory and compare every v30 payload.")
+                        help="Build in a temporary directory and compare every reviewed public payload.")
     args = parser.parse_args()
     data = json.loads((ROOT / "data/canonical.json").read_text())
     if args.verify:

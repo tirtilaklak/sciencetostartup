@@ -149,11 +149,11 @@
       "research_id": "prime-intellect",
       "precise_category": "AI compute and post-training infrastructure",
       "description_source_urls": [
-        "prime_home",
-        "prime_seriesa",
-        "prime_founders",
-        "prime_env",
-        "prime_careers"
+        "https://www.primeintellect.ai/",
+        "https://www.primeintellect.ai/blog/series-a",
+        "https://www.linkedin.com/posts/johannes-hagemann-393b72142_today-vincent-weisser-and-i-are-excited-activity-7188580146453372931-5fhB",
+        "https://www.primeintellect.ai/blog/environments",
+        "https://www.primeintellect.ai/careers"
       ],
       "delivery_model": null,
       "organization_type": null,
@@ -391,9 +391,9 @@
       "research_id": "g2i",
       "precise_category": "Expert engineering and AI data services",
       "description_source_urls": [
-        "g2i_home",
-        "g2i_company",
-        "g2i_talent"
+        "https://www.g2i.ai/",
+        "https://www.g2i.ai/our-company",
+        "https://www.g2i.ai/for-talent"
       ],
       "delivery_model": null,
       "organization_type": null,
@@ -412,10 +412,10 @@
       "research_id": "a-team",
       "precise_category": "AI engineering services and expert talent",
       "description_source_urls": [
-        "ateam_home",
-        "ateam_about",
-        "ateam_join",
-        "ateam_funding"
+        "https://www.a.team/",
+        "https://www.a.team/about",
+        "https://www.a.team/join",
+        "https://www.prnewswire.com/news-releases/ateam-comes-out-of-stealth-with-60m-in-funding-to-rethink-techs-talent-crisis-with-elite-cloud-based-teams-backed-by-a-list-investors-301548530.html"
       ],
       "delivery_model": null,
       "organization_type": null,
@@ -434,10 +434,10 @@
       "research_id": "hackerrank-astra",
       "precise_category": "Developer assessment software with AI data business",
       "description_source_urls": [
-        "hackerrank_bench",
-        "hackerrank_astra_legacy",
-        "hackerrank_team",
-        "hackerrank_funding"
+        "https://www.hackerrank.com/bench",
+        "https://www.hackerrank.com/ai/leaderboard",
+        "https://www.hackerrank.com/about-us/our-team/",
+        "https://www.prnewswire.com/news-releases/hackerrank-raises-60-million-series-d-to-accelerate-the-worlds-innovation-301512548.html"
       ],
       "delivery_model": null,
       "organization_type": null,
@@ -510,12 +510,12 @@
       "research_id": "terac",
       "precise_category": "Expert marketplace and research panel infrastructure",
       "description_source_urls": [
-        "terac_home",
-        "terac_ai",
-        "terac_about",
-        "terac_team",
-        "terac_rl_job",
-        "terac_eval_job"
+        "https://terac.com/",
+        "https://terac.com/ai",
+        "https://terac.com/about",
+        "https://terac.com/team",
+        "https://terac.com/opportunities/KZwfXOQhfpdjGT8k",
+        "https://terac.com/opportunities/TKd76RUIQxw3wy-x"
       ],
       "delivery_model": null,
       "organization_type": null,
@@ -534,12 +534,12 @@
       "research_id": "laude-terminal-bench",
       "precise_category": "Nonprofit research institute and open benchmarks",
       "description_source_urls": [
-        "laude_home",
-        "laude_about",
-        "laude_careers",
-        "tbench_home",
-        "tbench_paper",
-        "tbench_news"
+        "https://www.laude.org/",
+        "https://www.laude.org/about",
+        "https://www.laude.org/careers",
+        "https://www.tbench.ai/",
+        "https://arxiv.org/abs/2601.11868",
+        "https://www.tbench.ai/news"
       ],
       "delivery_model": null,
       "organization_type": null,
@@ -576,10 +576,10 @@
       "research_id": "toloka",
       "precise_category": "Managed expert AI data services",
       "description_source_urls": [
-        "toloka_home",
-        "toloka_funding",
-        "toloka_amount",
-        "toloka_workers"
+        "https://toloka.ai/",
+        "https://toloka.ai/blog/toloka-strategic-investment-led-by-bezos-expeditions/",
+        "https://toloka.ai/blog/introducing-tendem/",
+        "https://toloka.ai/annotators/"
       ],
       "delivery_model": null,
       "organization_type": null,
@@ -598,13 +598,13 @@
       "research_id": "prolific",
       "precise_category": "Research participant and human-data platform",
       "description_source_urls": [
-        "prolific_home",
-        "prolific_about",
-        "prolific_funding",
-        "prolific_founder",
-        "prolific_participants",
-        "prolific_pay",
-        "prolific_eligibility"
+        "https://www.prolific.com/",
+        "https://www.prolific.com/about",
+        "https://www.prolific.com/blog/series-a-fundraise",
+        "https://www.linkedin.com/posts/ekaterina-damer_prolific-turned-7-this-month-how-it-activity-6791355181490552832-HNK4",
+        "https://www.prolific.com/participants",
+        "https://researcher-help.prolific.com/en/articles/445230-prolific-s-payment-model",
+        "https://participant-help.prolific.com/en/articles/445007-who-can-participate-in-studies-on-prolific"
       ],
       "delivery_model": null,
       "organization_type": null,
@@ -623,11 +623,11 @@
       "research_id": "aixi-labs",
       "precise_category": "Nonprofit AI safety research",
       "description_source_urls": [
-        "aixi_home",
-        "aixi_team",
-        "aixi_research",
-        "aixi_fellowship",
-        "aixi_scientist"
+        "https://www.aixi.uk/",
+        "https://www.aixi.uk/team/",
+        "https://www.aixi.uk/research/",
+        "https://www.aixi.uk/team/opportunities/aixi-labs-fellowship/",
+        "https://www.aixi.uk/team/opportunities/ml-research-scientist/"
       ],
       "delivery_model": null,
       "organization_type": null,
@@ -664,8 +664,8 @@
       "research_id": "giskard",
       "precise_category": "AI testing and security software",
       "description_source_urls": [
-        "giskard_home",
-        "giskard_about"
+        "https://www.giskard.ai/",
+        "https://www.giskard.ai/about"
       ],
       "delivery_model": null,
       "organization_type": null,
@@ -684,10 +684,10 @@
       "research_id": "alinia-ai",
       "precise_category": "AI compliance software and implementation",
       "description_source_urls": [
-        "alinia_home",
-        "alinia_company",
-        "alinia_seed",
-        "alinia_preseed"
+        "https://www.alinia.ai/",
+        "https://www.alinia.ai/company",
+        "https://alinia.ai/alinia-seed-round-7-5-milions/",
+        "https://www.alinia.ai/resources/announcing-a-2-4m-in-pre-seed-round"
       ],
       "delivery_model": null,
       "organization_type": null,
@@ -706,9 +706,9 @@
       "research_id": "apto",
       "precise_category": "Managed AI data services",
       "description_source_urls": [
-        "apto_home",
-        "apto_company",
-        "apto_careers"
+        "https://apto.co.jp/en/",
+        "https://apto.co.jp/en/company/",
+        "https://apto.co.jp/en/careers/"
       ],
       "delivery_model": null,
       "organization_type": null,
@@ -727,9 +727,9 @@
       "research_id": "rws-trainai",
       "precise_category": "Managed multilingual AI data services",
       "description_source_urls": [
-        "rws_home",
-        "rws_community",
-        "rws_launch"
+        "https://www.rws.com/artificial-intelligence/train-ai-data-services/",
+        "https://www.rws.com/artificial-intelligence/train-ai-data-services/trainai-community/",
+        "https://www.rws.com/about/news/2023/launches-train-ai/"
       ],
       "delivery_model": null,
       "organization_type": null,

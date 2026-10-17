@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sciencetostartup.com/sitemap.xml

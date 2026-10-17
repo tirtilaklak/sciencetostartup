@@ -38,5 +38,19 @@
     }
   ],
   "venture_status": "Proposed venture. Learning gains and commercial demand remain unproven.",
-  "verification_note": "These figures are part of the user-approved image. They are not added as audited company metrics in the research database."
+  "verification_note": "These figures are part of the user-approved image. They are not added as audited company metrics in the research database.",
+  "display_derivative": {
+    "asset_path": "assets/Investor_Snapshot_Human_Depth.webp",
+    "mime_type": "image/webp",
+    "width": 1672,
+    "height": 941,
+    "file_size_bytes": 1668890,
+    "sha256": "89261c607bad4e2dba37ad9d02d8b0c67ba167e4a5a83bb58d223e9577f1a375",
+    "encoding": "Lossless WebP",
+    "pixels_identical_to_original": true,
+    "crop": "none",
+    "resize": "none",
+    "created_on": "2026-10-17",
+    "purpose": "Smaller inline transfer. Full-image links and the PNG fallback retain the approved original."
+  }
 }

@@ -546,8 +546,75 @@ def render_static_file_metadata(html, destination):
         html = html.replace("{{FILE_META_" + key + "}}", file_type + " · " + size).replace("{{FILE_SIZE_" + key + "}}", size)
     return html
 
+def validate_work_routes(work, data):
+    """Check the curated sidecar without rebuilding or changing its evidence."""
+    require(isinstance(work, dict) and work.get("schema_version") == "1.0.0", "work-routes: unsupported format")
+    require(isinstance(work.get("source_dataset_version"), str) and work["source_dataset_version"], "work-routes: source dataset version missing")
+    # This sidecar includes later reviewed overlays for the current snapshot.
+    # Other selected versions and synthetic fixtures keep structural checks only.
+    # The selected dataset, never sidecar metadata, controls reference checks.
+    current = data["dataset_version"] == "2.5.0"
+    rows = work.get("routes")
+    require(isinstance(rows, list) and (rows or not current), "work-routes: reviewed routes missing")
+    companies = {row["id"] for row in data["companies"]}
+    claims = {row["id"] for row in data["claims"]}
+    sources = {row["id"] for row in data["sources"]}
+    seen, reviewed, used_claims = set(), set(), set()
+    for row in rows:
+        require(isinstance(row, dict), "work-routes: route must be an object")
+        for field in ("id", "company_id", "role", "summary", "group", "status", "pay_label", "pay_basis", "url"):
+            require(isinstance(row.get(field), str) and row[field].strip(), f"work-routes: route {field} missing")
+        require(row["id"] not in seen, "work-routes: duplicate route ID")
+        seen.add(row["id"])
+        reviewed.add(row["company_id"])
+        for field in ("claim_ids", "source_ids", "requirements"):
+            require(isinstance(row.get(field), list) and all(isinstance(value, str) and value for value in row[field]), f"work-routes: invalid {field}")
+        for field in ("claim_ids", "source_ids"):
+            require(len(row[field]) == len(set(row[field])), f"work-routes: duplicate {field}")
+        for field in ("sources", "evidence"):
+            require(isinstance(row.get(field), list) and all(isinstance(value, dict) and isinstance(value.get("id"), str) and value["id"] for value in row[field]), f"work-routes: invalid {field}")
+        related = row.get("related_company_ids", [])
+        require(isinstance(related, list) and all(isinstance(value, str) and value for value in related), "work-routes: invalid related_company_ids")
+        require(isinstance(row.get("numeric_pay"), bool), "work-routes: numeric_pay must be boolean")
+        try:
+            url = urlsplit(row["url"])
+            url.port
+            public_url = url.scheme in ("https", "http") and url.hostname and not url.username and not url.password
+        except ValueError:
+            public_url = False
+        require(public_url and not re.search(r"[\s\x00-\x1f]", row["url"]), "work-routes: invalid route URL")
+        used_claims.update(row["claim_ids"])
+        if current:
+            require(row["company_id"] in companies, "work-routes: unknown company reference")
+            require(set(related) <= companies, "work-routes: unknown related company reference")
+            require(set(row["claim_ids"]) <= claims, "work-routes: unknown claim reference")
+            # Inline source records may include separately reviewed entry points.
+            # source_ids still identifies the canonical research references.
+            require(set(row["source_ids"]) <= sources, "work-routes: unknown source reference")
+            # Some reviewed routes intentionally cite another company's claim.
+            require({entry["id"] for entry in row["evidence"]} <= claims, "work-routes: unknown evidence reference")
+    coverage = work.get("coverage")
+    require(isinstance(coverage, dict) and coverage.get("route_count") == len(rows), "work-routes: route coverage count mismatch")
+    require(coverage.get("organizations_with_reviewed_routes") == len(reviewed), "work-routes: organization coverage count mismatch")
+    require(coverage.get("canonical_work_claims_preserved") == len(used_claims), "work-routes: claim coverage count mismatch")
+    if current:
+        require(reviewed == companies and coverage.get("organizations_total") == len(companies), "work-routes: current dataset company coverage incomplete")
+    return work
+
+
+def load_work_routes(path, data):
+    require(path.is_file(), "work-routes: required curated data/work-routes.json is missing")
+    try:
+        work = json.loads(path.read_text())
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise ValidationError("work-routes: curated data/work-routes.json is not readable JSON") from error
+    return validate_work_routes(work, data)
+
+
 def build(data, destination):
     validate(data)
+    work_path = ROOT / "data/work-routes.json"
+    work_data = load_work_routes(work_path, data)
     destination.mkdir(parents=True, exist_ok=True)
     blob = canonical_bytes(data)
     (destination / "research.json").write_bytes(blob)
@@ -556,20 +623,18 @@ def build(data, destination):
     classification_rows = [{"company_id": c["id"], "company": c["name"], "segment_scope": segment, "stage": classify(data, c["id"], segment), "confidence": stage_confidence(data, c["id"], segment), "rubric_version": data["rubric"]["version"], "as_of": data["meta"]["as_of"]} for c in data["companies"] for segment in ("ai_data", "company", "research", "other_segment")]
     write_csv(destination / "classifications.csv", classification_rows, ["company_id", "company", "segment_scope", "stage", "confidence", "rubric_version", "as_of"])
     # JSON is inert and HTML-sensitive characters are escaped before embedding.
-    embedded = blob.decode().replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
+    embedded = json.dumps(data, ensure_ascii=False, separators=(",", ":"), sort_keys=True, allow_nan=False).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
     html = (ROOT / "web/index.html").read_text().replace("/* OBSERVATORY_CSS */", (ROOT / "web/style.css").read_text()).replace("/* OBSERVATORY_JS */", (ROOT / "web/link-health.js").read_text() + "\n" + (ROOT / "web/app.js").read_text()).replace("<!-- OBSERVATORY_DATA -->", embedded)
     outreach_path = ROOT / "data/medalists.json"
     if not outreach_path.is_file():
         raise ValueError("Verified outreach dataset missing: data/medalists.json")
     outreach_blob = outreach_path.read_text()
     outreach_data = json.loads(outreach_blob)
-    outreach_embedded = outreach_blob.replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
+    outreach_embedded = json.dumps(outreach_data, ensure_ascii=False, separators=(",", ":"), sort_keys=True, allow_nan=False).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
     html = html.replace("/* OUTREACH_CSS */", (ROOT / "web/outreach.css").read_text()).replace("/* OUTREACH_JS */", (ROOT / "web/outreach.js").read_text()).replace("<!-- OUTREACH_DATA -->", outreach_embedded)
     editorial = json.loads((ROOT / "data/editorial.json").read_text())
     logo_path = ROOT / "data/logo-provenance.json"
     logo_data = json.loads(logo_path.read_text()) if logo_path.exists() else {"logos": []}
-    work_path = ROOT / "data/work-routes.json"
-    work_data = json.loads(work_path.read_text()) if work_path.exists() else []
     link_health_path = ROOT / "data/link-health.json"
     link_health = validate_link_health(json.loads(link_health_path.read_text()) if link_health_path.exists() else {"version": "1.0.0", "entries": []})
     profile_content = json.loads((ROOT / "data/profile-content.json").read_text())
@@ -594,6 +659,8 @@ def build(data, destination):
     import shutil
     assets = ROOT / "web/assets"
     if assets.exists(): shutil.copytree(assets, destination / "assets", dirs_exist_ok=True)
+    for name in ("robots.txt", "sitemap.xml"):
+        shutil.copy2(ROOT / "web" / name, destination / name)
     for source in [ROOT / "data/editorial.json", ROOT / "data/portrait-provenance.json", ROOT / "data/investor-image-provenance.json", logo_path, work_path, link_health_path, source_updates_path]:
         if source.exists(): shutil.copy2(source, destination / source.name)
     (destination / "profile-content.json").write_text(json.dumps(profile_content, indent=2, ensure_ascii=False) + "\n")

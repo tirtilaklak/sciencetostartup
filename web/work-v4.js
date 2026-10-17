@@ -19,7 +19,7 @@ function w4Uncertain(route){
 function w4Status(route){
   if(route.status==='program'&&/waitlist/i.test(route.availability_note||''))return 'Waitlist may apply';
   const labels={intake_unverified:'Availability unconfirmed',unverified:'Availability unconfirmed',pay_conflict:'Pay conflict',historical:'Historical',closed:'Closed',paused:'Training paused',contributions:'Research contribution',no_route:'No route verified',inquiry:'Inquiry only',information:'Information only'};
-  if(route.status==='historical'&&route.last_route_check?.result==='official_role_not_found_redirect')return 'Historical · listing unavailable';
+  if(route.status==='historical'&&['official_role_not_found_redirect','official_role_not_found'].includes(route.last_route_check?.result))return 'Historical · listing unavailable';
   return labels[route.status]||(w4Uncertain(route)?'Availability unconfirmed':'');
 }
 function w4SplitPay(route){

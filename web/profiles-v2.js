@@ -217,11 +217,22 @@ function settleInitialProfileAnchor(hash,destination){
     cancel();if(profileInitialAnchorCleanup===cancel)profileInitialAnchorCleanup=null;
   })));
 }
+// The Navigation API distinguishes a new fragment from history traversal.
+// Without it, retain the browser's existing scroll behavior.
+let profileFragmentNavigation=null;
+window.navigation?.addEventListener('navigate',event=>{
+  profileFragmentNavigation=event.hashChange&&event.destination.sameDocument?{url:event.destination.url,type:event.navigationType}:null;
+});
 const profileRoute=route;
 route=function(event){
   const initial=!profileHasRouted;profileHasRouted=true;
   profileInitialAnchorCleanup?.();profileInitialAnchorCleanup=null;
+  const previousCompany=previousRoute==='company'?document.querySelector('.profile-v2')?.dataset.profileCompany:null;
+  const fragmentNavigation=profileFragmentNavigation;
+  if(event?.type==='hashchange')profileFragmentNavigation=null;
   const result=profileRoute.apply(this,arguments),parts=routeParts();
+  const newFragment=event?.type==='hashchange'&&fragmentNavigation&&fragmentNavigation.url===event.newURL&&['push','replace'].includes(fragmentNavigation.type);
+  if(newFragment&&previousCompany&&parts[0]==='company'&&isCompanyId(parts[1])&&parts[1]!==previousCompany&&!parts[2])window.scrollTo({left:0,top:0,behavior:'instant'});
   if(parts[0]==='company'&&isCompanyId(parts[1])&&parts[2]){
     const section=profileRouteSection(parts[2]);
     const primary=['business','traction','people','work'].includes(section);

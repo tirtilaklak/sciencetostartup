@@ -3,11 +3,11 @@
 ScienceToStartup is a static, evidence-linked field guide to AI data organizations.
 The current public site is https://sciencetostartup.com.
 
-## Reviewed public v30 snapshot
+## Reviewed public v31 snapshot
 
 This repository preserves the reviewed public source and distribution for Sites
-version 30. Its source snapshot comes from commit
-`8bc0017148bcd37bf4410135c204cea713616f0d`; `SOURCE_PROVENANCE.json` records
+version 31. Its source snapshot comes from commit
+`65e67210b80abc2b93d5f84a34a3975abbb03cc0`; `SOURCE_PROVENANCE.json` records
 individual source-file hashes. The GitHub history starts with this repository's
 existing initial commit. Earlier Sites Git history was not imported.
 
@@ -20,11 +20,12 @@ internal reports, credentials, browser output and deployment configuration.
 
 - `web/`: editable HTML, CSS, JavaScript and local assets.
 - `data/canonical.json`: authoritative research dataset 2.5.0.
-- Other `data/*.json`: public profile, editorial, Work, outreach and source context.
+- `data/work-routes.json`: curated Work routes, including reviewed additions and availability checks.
+- Other `data/*.json`: public profiles, editorial context, adult outreach and source updates.
 - `schema/`: data and relational contracts.
-- `scripts/observatory.py`, `scripts/schema_def.py`: unchanged v30 builder.
+- `scripts/observatory.py`, `scripts/schema_def.py`: research and export builder.
 - `scripts/build_public_snapshot.py`: build the approved public snapshot.
-- `dist/`: exact v30 HTML, assets, JSON/CSV exports and portable SQLite database.
+- `dist/`: exact v31 HTML, assets, JSON/CSV exports and portable SQLite database.
 - `docs/research-id-crosswalk.json`: public profile aliases required by the builder.
 
 ## View or reproduce
@@ -54,11 +55,11 @@ The included standalone Python unit modules can be run with:
 ```sh
 python3 -m unittest discover -s tests -p 'test_*.py'
 python3 tests/js_logic.py
+python3 tests/company_search_prefix_logic.py
 ```
 
-Historical comparison tests and local audit reports are not part of this public
-snapshot. The snapshot includes 46 standalone unit tests, rather than the full
-private/local research verification environment.
+The snapshot includes 55 standalone unit tests and public logic checks. Historical
+comparison tests and local audit reports remain in the research repository.
 
 ## Hosting
 

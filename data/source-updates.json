@@ -1149,6 +1149,1252 @@
         "a-team.product.1",
         "a-team.product.oct14-2"
       ]
+    },
+    {
+      "id": "appen-agentic-ai-description-2026-10-17",
+      "company_id": "appen",
+      "target": {
+        "product_name": "Agentic AI",
+        "record_ids": [
+          "appen.product.oct14-1"
+        ],
+        "claim_ids": [
+          "appen.claim.oct14-product-1"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "Creates example task runs and practice environments to train and test AI agents."
+      },
+      "source": {
+        "url": "https://www.appen.com/",
+        "title": "AI Training Data & Human Data for AI Models | Appen",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank curated description from the official product page. Capabilities are company-described. No financial, adoption or performance figure is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "appen.claim.oct14-product-1",
+            "company_id": "appen",
+            "delivery_model": "",
+            "id": "appen.product.oct14-1",
+            "name": "Agentic AI",
+            "segment_scope": "company",
+            "work_performed": "Scaled human-data delivery is the business; new six-capability lineup spans agentic, multimodal, and physical AI."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "appen",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "appen.claim.oct14-product-1",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "appen.source.oct14-e15271dfebb4"
+            ],
+            "statement": "Agentic AI: Scaled human-data delivery is the business; new six-capability lineup spans agentic, multimodal, and physical AI.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "appen.claim.oct14-product-1"
+      ],
+      "affected_record_ids": [
+        "appen.product.oct14-1"
+      ]
+    },
+    {
+      "id": "appen-multimodal-and-speech-ai-description-2026-10-17",
+      "company_id": "appen",
+      "target": {
+        "product_name": "Multimodal and Speech AI",
+        "record_ids": [
+          "appen.product.oct14-2"
+        ],
+        "claim_ids": [
+          "appen.claim.oct14-product-2"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "Prepares speech, image and video data for AI training. It also evaluates voice agents."
+      },
+      "source": {
+        "url": "https://www.appen.com/",
+        "title": "AI Training Data & Human Data for AI Models | Appen",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank curated description from the official product page. Capabilities are company-described. No financial, adoption or performance figure is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "appen.claim.oct14-product-2",
+            "company_id": "appen",
+            "delivery_model": "",
+            "id": "appen.product.oct14-2",
+            "name": "Multimodal and Speech AI",
+            "segment_scope": "company",
+            "work_performed": "Scaled human-data delivery is the business; new six-capability lineup spans agentic, multimodal, and physical AI."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "appen",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "appen.claim.oct14-product-2",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "appen.source.oct14-e15271dfebb4"
+            ],
+            "statement": "Multimodal and Speech AI: Scaled human-data delivery is the business; new six-capability lineup spans agentic, multimodal, and physical AI.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "appen.claim.oct14-product-2"
+      ],
+      "affected_record_ids": [
+        "appen.product.oct14-2"
+      ]
+    },
+    {
+      "id": "appen-physical-ai-description-2026-10-17",
+      "company_id": "appen",
+      "target": {
+        "product_name": "Physical AI",
+        "record_ids": [
+          "appen.product.oct14-3"
+        ],
+        "claim_ids": [
+          "appen.claim.oct14-product-3"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "Labels sensor data and records robot demonstrations for AI systems that operate in the physical world."
+      },
+      "source": {
+        "url": "https://www.appen.com/",
+        "title": "AI Training Data & Human Data for AI Models | Appen",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank curated description from the official product page. Capabilities are company-described. No financial, adoption or performance figure is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "appen.claim.oct14-product-3",
+            "company_id": "appen",
+            "delivery_model": "",
+            "id": "appen.product.oct14-3",
+            "name": "Physical AI",
+            "segment_scope": "company",
+            "work_performed": "Scaled human-data delivery is the business; new six-capability lineup spans agentic, multimodal, and physical AI."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "appen",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "appen.claim.oct14-product-3",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "appen.source.oct14-e15271dfebb4"
+            ],
+            "statement": "Physical AI: Scaled human-data delivery is the business; new six-capability lineup spans agentic, multimodal, and physical AI.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "appen.claim.oct14-product-3"
+      ],
+      "affected_record_ids": [
+        "appen.product.oct14-3"
+      ]
+    },
+    {
+      "id": "appen-model-integrity-description-2026-10-17",
+      "company_id": "appen",
+      "target": {
+        "product_name": "Model Integrity",
+        "record_ids": [
+          "appen.product.oct14-4"
+        ],
+        "claim_ids": [
+          "appen.claim.oct14-product-4"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "Checks models for unsupported answers and bias. It also provides regulatory audits and ongoing monitoring."
+      },
+      "source": {
+        "url": "https://www.appen.com/",
+        "title": "AI Training Data & Human Data for AI Models | Appen",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank curated description from the official product page. Capabilities are company-described. No financial, adoption or performance figure is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "appen.claim.oct14-product-4",
+            "company_id": "appen",
+            "delivery_model": "",
+            "id": "appen.product.oct14-4",
+            "name": "Model Integrity",
+            "segment_scope": "company",
+            "work_performed": "Scaled human-data delivery is the business; new six-capability lineup spans agentic, multimodal, and physical AI."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "appen",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "appen.claim.oct14-product-4",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "appen.source.oct14-e15271dfebb4"
+            ],
+            "statement": "Model Integrity: Scaled human-data delivery is the business; new six-capability lineup spans agentic, multimodal, and physical AI.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "appen.claim.oct14-product-4"
+      ],
+      "affected_record_ids": [
+        "appen.product.oct14-4"
+      ]
+    },
+    {
+      "id": "appen-research-services-description-2026-10-17",
+      "company_id": "appen",
+      "target": {
+        "product_name": "Research Services",
+        "record_ids": [
+          "appen.product.oct14-5"
+        ],
+        "claim_ids": [
+          "appen.claim.oct14-product-5"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "Helps research teams prepare model context and synthetic data. It also builds custom tests and AI-based scoring systems."
+      },
+      "source": {
+        "url": "https://www.appen.com/",
+        "title": "AI Training Data & Human Data for AI Models | Appen",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank curated description from the official product page. Capabilities are company-described. No financial, adoption or performance figure is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "appen.claim.oct14-product-5",
+            "company_id": "appen",
+            "delivery_model": "",
+            "id": "appen.product.oct14-5",
+            "name": "Research Services",
+            "segment_scope": "company",
+            "work_performed": "Scaled human-data delivery is the business; new six-capability lineup spans agentic, multimodal, and physical AI."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "appen",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "appen.claim.oct14-product-5",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "appen.source.oct14-e15271dfebb4"
+            ],
+            "statement": "Research Services: Scaled human-data delivery is the business; new six-capability lineup spans agentic, multimodal, and physical AI.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "appen.claim.oct14-product-5"
+      ],
+      "affected_record_ids": [
+        "appen.product.oct14-5"
+      ]
+    },
+    {
+      "id": "taskus-taskgpt-description-2026-10-17",
+      "company_id": "taskus",
+      "target": {
+        "product_name": "TaskGPT",
+        "record_ids": [
+          "taskus.product.oct14-3"
+        ],
+        "claim_ids": [
+          "taskus.claim.oct14-product-3"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "A generative AI platform that powers TaskUs tools for customer-support teams."
+      },
+      "source": {
+        "url": "https://www.taskus.com/our-technology/",
+        "title": "Our Technology | TaskUs",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank curated description from the official technology page. This is customer-support software. No standalone AI-data revenue or independently verified productivity claim is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "taskus.claim.oct14-product-3",
+            "company_id": "taskus",
+            "delivery_model": "",
+            "id": "taskus.product.oct14-3",
+            "name": "TaskGPT",
+            "segment_scope": "ai_data",
+            "work_performed": "AI Services is one revenue line within a diversified outsourcing company; group sales are not AI-data sales."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "taskus",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "taskus.claim.oct14-product-3",
+            "observed_on": "2026-10-14",
+            "segment_scope": "ai_data",
+            "self_reported": true,
+            "source_ids": [
+              "taskus.source.oct14-95ac92a3ef1f"
+            ],
+            "statement": "TaskGPT: AI Services is one revenue line within a diversified outsourcing company; group sales are not AI-data sales.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "taskus.claim.oct14-product-3"
+      ],
+      "affected_record_ids": [
+        "taskus.product.oct14-3"
+      ]
+    },
+    {
+      "id": "taskus-assistai-description-2026-10-17",
+      "company_id": "taskus",
+      "target": {
+        "product_name": "AssistAI",
+        "record_ids": [
+          "taskus.product.oct14-4"
+        ],
+        "claim_ids": [
+          "taskus.claim.oct14-product-4"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "Answers support workers’ questions using a model trained on the client’s knowledge base."
+      },
+      "source": {
+        "url": "https://www.taskus.com/our-technology/",
+        "title": "Our Technology | TaskUs",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank curated description from the official technology page. This is customer-support software. No standalone AI-data revenue or independently verified productivity claim is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "taskus.claim.oct14-product-4",
+            "company_id": "taskus",
+            "delivery_model": "",
+            "id": "taskus.product.oct14-4",
+            "name": "AssistAI",
+            "segment_scope": "ai_data",
+            "work_performed": "AI Services is one revenue line within a diversified outsourcing company; group sales are not AI-data sales."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "taskus",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "taskus.claim.oct14-product-4",
+            "observed_on": "2026-10-14",
+            "segment_scope": "ai_data",
+            "self_reported": true,
+            "source_ids": [
+              "taskus.source.oct14-95ac92a3ef1f"
+            ],
+            "statement": "AssistAI: AI Services is one revenue line within a diversified outsourcing company; group sales are not AI-data sales.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "taskus.claim.oct14-product-4"
+      ],
+      "affected_record_ids": [
+        "taskus.product.oct14-4"
+      ]
+    },
+    {
+      "id": "taskus-promptai-description-2026-10-17",
+      "company_id": "taskus",
+      "target": {
+        "product_name": "PromptAI",
+        "record_ids": [
+          "taskus.product.oct14-5"
+        ],
+        "claim_ids": [
+          "taskus.claim.oct14-product-5"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "Suggests replies while support workers handle live customer chats."
+      },
+      "source": {
+        "url": "https://www.taskus.com/our-technology/",
+        "title": "Our Technology | TaskUs",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank curated description from the official technology page. This is customer-support software. No standalone AI-data revenue or independently verified productivity claim is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "taskus.claim.oct14-product-5",
+            "company_id": "taskus",
+            "delivery_model": "",
+            "id": "taskus.product.oct14-5",
+            "name": "PromptAI",
+            "segment_scope": "ai_data",
+            "work_performed": "AI Services is one revenue line within a diversified outsourcing company; group sales are not AI-data sales."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "taskus",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "taskus.claim.oct14-product-5",
+            "observed_on": "2026-10-14",
+            "segment_scope": "ai_data",
+            "self_reported": true,
+            "source_ids": [
+              "taskus.source.oct14-95ac92a3ef1f"
+            ],
+            "statement": "PromptAI: AI Services is one revenue line within a diversified outsourcing company; group sales are not AI-data sales.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "taskus.claim.oct14-product-5"
+      ],
+      "affected_record_ids": [
+        "taskus.product.oct14-5"
+      ]
+    },
+    {
+      "id": "taskus-callai-description-2026-10-17",
+      "company_id": "taskus",
+      "target": {
+        "product_name": "CallAI",
+        "record_ids": [
+          "taskus.product.oct14-6"
+        ],
+        "claim_ids": [
+          "taskus.claim.oct14-product-6"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "Analyzes voice conversations as they happen to reduce manual note-taking by support workers."
+      },
+      "source": {
+        "url": "https://www.taskus.com/our-technology/",
+        "title": "Our Technology | TaskUs",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank curated description from the official technology page. This is customer-support software. No standalone AI-data revenue or independently verified productivity claim is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "taskus.claim.oct14-product-6",
+            "company_id": "taskus",
+            "delivery_model": "",
+            "id": "taskus.product.oct14-6",
+            "name": "CallAI",
+            "segment_scope": "ai_data",
+            "work_performed": "AI Services is one revenue line within a diversified outsourcing company; group sales are not AI-data sales."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "taskus",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "taskus.claim.oct14-product-6",
+            "observed_on": "2026-10-14",
+            "segment_scope": "ai_data",
+            "self_reported": true,
+            "source_ids": [
+              "taskus.source.oct14-95ac92a3ef1f"
+            ],
+            "statement": "CallAI: AI Services is one revenue line within a diversified outsourcing company; group sales are not AI-data sales.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "taskus.claim.oct14-product-6"
+      ],
+      "affected_record_ids": [
+        "taskus.product.oct14-6"
+      ]
+    },
+    {
+      "id": "taskus-authorai-description-2026-10-17",
+      "company_id": "taskus",
+      "target": {
+        "product_name": "AuthorAI",
+        "record_ids": [
+          "taskus.product.oct14-7"
+        ],
+        "claim_ids": [
+          "taskus.claim.oct14-product-7"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "Revises support workers’ writing for grammar, spelling and clarity."
+      },
+      "source": {
+        "url": "https://www.taskus.com/our-technology/",
+        "title": "Our Technology | TaskUs",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank curated description from the official technology page. This is customer-support software. No standalone AI-data revenue or independently verified productivity claim is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "taskus.claim.oct14-product-7",
+            "company_id": "taskus",
+            "delivery_model": "",
+            "id": "taskus.product.oct14-7",
+            "name": "AuthorAI",
+            "segment_scope": "ai_data",
+            "work_performed": "AI Services is one revenue line within a diversified outsourcing company; group sales are not AI-data sales."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "taskus",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "taskus.claim.oct14-product-7",
+            "observed_on": "2026-10-14",
+            "segment_scope": "ai_data",
+            "self_reported": true,
+            "source_ids": [
+              "taskus.source.oct14-95ac92a3ef1f"
+            ],
+            "statement": "AuthorAI: AI Services is one revenue line within a diversified outsourcing company; group sales are not AI-data sales.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "taskus.claim.oct14-product-7"
+      ],
+      "affected_record_ids": [
+        "taskus.product.oct14-7"
+      ]
+    },
+    {
+      "id": "imerit-3d-multi-sensor-fusion-description-2026-10-17",
+      "company_id": "imerit",
+      "target": {
+        "product_name": "3D Multi Sensor Fusion",
+        "record_ids": [
+          "imerit.product.oct14-3"
+        ],
+        "claim_ids": [
+          "imerit.claim.oct14-product-3"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "Combines LiDAR, radar and camera data so annotators can label objects consistently across sensors."
+      },
+      "source": {
+        "url": "https://imerit.ai/products/3d-point-cloud-multi-sensor-fusion/",
+        "title": "Multi-Sensor Data Labeling Tool | 3D Point Cloud Annotation",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank curated description from the official product page. Capabilities are company-described. No financial, adoption or performance figure is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "imerit.claim.oct14-product-3",
+            "company_id": "imerit",
+            "delivery_model": "",
+            "id": "imerit.product.oct14-3",
+            "name": "3D Multi Sensor Fusion",
+            "segment_scope": "company",
+            "work_performed": "Managed expert delivery plus Ango Hub software supports specialized multimodal workflows; now an EXL business."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "imerit",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "imerit.claim.oct14-product-3",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "imerit.source.oct14-52afa64366c0"
+            ],
+            "statement": "3D Multi Sensor Fusion: Managed expert delivery plus Ango Hub software supports specialized multimodal workflows; now an EXL business.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "imerit.claim.oct14-product-3"
+      ],
+      "affected_record_ids": [
+        "imerit.product.oct14-3"
+      ]
+    },
+    {
+      "id": "imerit-radiology-annotation-co-pilot-description-2026-10-17",
+      "company_id": "imerit",
+      "target": {
+        "product_name": "Radiology Annotation Co-Pilot",
+        "record_ids": [
+          "imerit.product.oct14-4"
+        ],
+        "claim_ids": [
+          "imerit.claim.oct14-product-4"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "Helps radiologists label medical images in Ango Hub. It automates repetitive work and applies project-specific annotation rules."
+      },
+      "source": {
+        "url": "https://imerit.ai/products/radiology-annotation-suite-medical-imaging-ai/radiology-image-annotation-co-pilot/",
+        "title": "Medical Image Data Annotation Co-pilot iMerit",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank curated description from the official product page. This supports medical-image annotation; the source does not establish autonomous clinical diagnosis or regulatory approval.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "imerit.claim.oct14-product-4",
+            "company_id": "imerit",
+            "delivery_model": "",
+            "id": "imerit.product.oct14-4",
+            "name": "Radiology Annotation Co-Pilot",
+            "segment_scope": "company",
+            "work_performed": "Managed expert delivery plus Ango Hub software supports specialized multimodal workflows; now an EXL business."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "imerit",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "imerit.claim.oct14-product-4",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "imerit.source.oct14-52afa64366c0"
+            ],
+            "statement": "Radiology Annotation Co-Pilot: Managed expert delivery plus Ango Hub software supports specialized multimodal workflows; now an EXL business.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "imerit.claim.oct14-product-4"
+      ],
+      "affected_record_ids": [
+        "imerit.product.oct14-4"
+      ]
+    },
+    {
+      "id": "quesma-quesma-coding-agent-analytics-2026-10-17",
+      "company_id": "quesma",
+      "target": {
+        "product_name": "Quesma coding-agent analytics",
+        "record_ids": [
+          "quesma.product.0",
+          "quesma.product.2",
+          "quesma.product.oct14-0"
+        ],
+        "claim_ids": [
+          "quesma.claim.products-0",
+          "quesma.claim.products-2",
+          "quesma.claim.oct14-product-0"
+        ]
+      },
+      "previous_fields": {
+        "description": "Analyzes coding-agent sessions and costs. The reviewed product has an early-access waitlist."
+      },
+      "replacement_fields": {
+        "description": "Analyzes coding-agent sessions and costs. The product page offers installers and a self-service app link; the homepage still says early access opens soon."
+      },
+      "source": {
+        "url": "https://quesma.com/product/",
+        "title": "Quesma | Coding Agent Analytics",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [
+        {
+          "url": "https://quesma.com/",
+          "title": "AI Coding Agent Analytics & Cost Intelligence | Quesma",
+          "observed_on": "2026-10-17",
+          "published_on": null
+        }
+      ],
+      "qualification": "Official pages give different access signals. This describes the visible product-page links without claiming general availability or a successful signup. The application redirected to authentication and was not inspected.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "quesma.claim.products-0",
+            "company_id": "quesma",
+            "delivery_model": "",
+            "id": "quesma.product.0",
+            "name": "Offer / product evidence 1",
+            "segment_scope": "ai_data",
+            "work_performed": "Agent-session analytics for Claude Code/Codex/Cursor; open-source collector and customer-cloud storage, early access forthcoming"
+          },
+          {
+            "claim_id": "quesma.claim.products-2",
+            "company_id": "quesma",
+            "delivery_model": "",
+            "id": "quesma.product.2",
+            "name": "Offer / product evidence 3",
+            "segment_scope": "ai_data",
+            "work_performed": "Current analytics product is on a waitlist. Public workflow documents local secret redaction, customer-owned storage and role-gated session access; these are design claims, not audited controls"
+          },
+          {
+            "claim_id": "quesma.claim.oct14-product-0",
+            "company_id": "quesma",
+            "delivery_model": "",
+            "id": "quesma.product.oct14-0",
+            "name": "Quesma coding-agent analytics",
+            "segment_scope": "company",
+            "work_performed": "Explains what Claude Code, Codex, and Cursor sessions did, cost, and achieved; early access opening soon."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "2026-10-12",
+            "company_id": "quesma",
+            "confidence": "B",
+            "confidence_reason": "Attributed company, investor, or named primary statement. Research label: primary self report.",
+            "date_note": "Date label preserved from research; access dates are not substituted.",
+            "id": "quesma.claim.products-0",
+            "observed_on": "2026-10-12",
+            "raw_path": "data/raw/library-v1/market-research-v1.json",
+            "raw_pointer": "/companies/16/products/0",
+            "segment_scope": "ai_data",
+            "source_ids": [
+              "quesma.source.b_q1"
+            ],
+            "statement": "Agent-session analytics for Claude Code/Codex/Cursor; open-source collector and customer-cloud storage, early access forthcoming",
+            "status": "supported",
+            "subject": "products"
+          },
+          {
+            "as_of": "2026-10-12",
+            "company_id": "quesma",
+            "confidence": "B",
+            "confidence_reason": "Attributed company, investor, or named primary statement. Research label: attributed primary.",
+            "date_note": "Date label preserved from research; access dates are not substituted.",
+            "id": "quesma.claim.products-2",
+            "observed_on": "2026-10-12",
+            "raw_path": "data/raw/library-v1/market-research-v1.json",
+            "raw_pointer": "/companies/16/products/2",
+            "segment_scope": "ai_data",
+            "source_ids": [
+              "quesma.source.b_q10"
+            ],
+            "statement": "Current analytics product is on a waitlist. Public workflow documents local secret redaction, customer-owned storage and role-gated session access; these are design claims, not audited controls",
+            "status": "supported",
+            "subject": "products"
+          },
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "quesma",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "quesma.claim.oct14-product-0",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "quesma.source.oct14-6d9989b89a5f"
+            ],
+            "statement": "Quesma coding-agent analytics: Explains what Claude Code, Codex, and Cursor sessions did, cost, and achieved; early access opening soon.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "quesma.claim.products-0",
+        "quesma.claim.products-2",
+        "quesma.claim.oct14-product-0"
+      ],
+      "affected_record_ids": [
+        "quesma.product.0",
+        "quesma.product.2",
+        "quesma.product.oct14-0"
+      ]
+    },
+    {
+      "id": "quesma-quesma-shipper-2026-10-17",
+      "company_id": "quesma",
+      "target": {
+        "product_name": "Quesma Shipper",
+        "record_ids": [
+          "quesma.product.oct14-1"
+        ],
+        "claim_ids": [
+          "quesma.claim.oct14-product-1"
+        ]
+      },
+      "previous_fields": {
+        "description": "An open-source collector that saves agent-session transcripts in the user’s Amazon S3 storage."
+      },
+      "replacement_fields": {
+        "description": "An open-source collector that removes secrets and encrypts coding-agent sessions before uploading them to configured cloud storage."
+      },
+      "source": {
+        "url": "https://quesma.com/product/",
+        "title": "Quesma | Coding Agent Analytics",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [
+        {
+          "url": "https://quesma.com/architecture/",
+          "title": "Architecture | Quesma",
+          "observed_on": "2026-10-17",
+          "published_on": null
+        }
+      ],
+      "qualification": "Storage ownership varies by deployment mode. The architecture describes Quesma-hosted Professional storage, customer-cloud Business/Enterprise SaaS, and Enterprise BYOC; the prior description implies every deployment uses the user's own Amazon S3. These remain company-described capabilities, not independently audited controls.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "quesma.claim.oct14-product-1",
+            "company_id": "quesma",
+            "delivery_model": "",
+            "id": "quesma.product.oct14-1",
+            "name": "Quesma Shipper",
+            "segment_scope": "company",
+            "work_performed": "Open-source session collector storing transcripts in the user's Amazon S3."
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "quesma",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "quesma.claim.oct14-product-1",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "quesma.source.oct14-6d9989b89a5f"
+            ],
+            "statement": "Quesma Shipper: Open-source session collector storing transcripts in the user's Amazon S3.",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "quesma.claim.oct14-product-1"
+      ],
+      "affected_record_ids": [
+        "quesma.product.oct14-1"
+      ]
+    },
+    {
+      "id": "prime-intellect-verifiers-2026-10-17",
+      "company_id": "prime_intellect",
+      "target": {
+        "product_name": "Verifiers",
+        "record_ids": [
+          "prime_intellect.product.oct14-2"
+        ],
+        "claim_ids": [
+          "prime_intellect.claim.oct14-product-2"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "An open-source library for creating environments that train and evaluate language models."
+      },
+      "source": {
+        "url": "https://github.com/PrimeIntellect-ai/verifiers",
+        "title": "PrimeIntellect-ai/verifiers",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [
+        {
+          "url": "https://www.primeintellect.ai/",
+          "title": "Prime Intellect - The Open Superintelligence Stack",
+          "observed_on": "2026-10-17",
+          "published_on": null
+        }
+      ],
+      "qualification": "Fills a blank product description from the official repository overview and MIT license. No adoption or performance claim is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "prime_intellect.claim.oct14-product-2",
+            "company_id": "prime_intellect",
+            "delivery_model": "Sells GPU/compute and a managed model-training stack; community environments and open models are supporting infrastructure, not a human-data workforce.",
+            "id": "prime_intellect.product.oct14-2",
+            "name": "Verifiers",
+            "segment_scope": "company",
+            "work_performed": "Provides compute, training, inference, and environments for teams building their own models"
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "prime_intellect",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "prime_intellect.claim.oct14-product-2",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "prime_intellect.source.oct14-54768add28ff"
+            ],
+            "statement": "Verifiers: Provides compute, training, inference, and environments for teams building their own models",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "prime_intellect.claim.oct14-product-2"
+      ],
+      "affected_record_ids": [
+        "prime_intellect.product.oct14-2"
+      ]
+    },
+    {
+      "id": "prime-intellect-prime-rl-2026-10-17",
+      "company_id": "prime_intellect",
+      "target": {
+        "product_name": "Prime-RL",
+        "record_ids": [
+          "prime_intellect.product.oct14-3"
+        ],
+        "claim_ids": [
+          "prime_intellect.claim.oct14-product-3"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "An open-source framework for large-scale reinforcement learning, with training and model evaluation tools."
+      },
+      "source": {
+        "url": "https://github.com/PrimeIntellect-ai/prime-rl",
+        "title": "PrimeIntellect-ai/prime-rl",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [
+        {
+          "url": "https://www.primeintellect.ai/",
+          "title": "Prime Intellect - The Open Superintelligence Stack",
+          "observed_on": "2026-10-17",
+          "published_on": null
+        }
+      ],
+      "qualification": "Fills a blank product description from the official repository overview, post-training feature list, and Apache 2.0 license. No unverified scaling figure is added.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "prime_intellect.claim.oct14-product-3",
+            "company_id": "prime_intellect",
+            "delivery_model": "Sells GPU/compute and a managed model-training stack; community environments and open models are supporting infrastructure, not a human-data workforce.",
+            "id": "prime_intellect.product.oct14-3",
+            "name": "Prime-RL",
+            "segment_scope": "company",
+            "work_performed": "Provides compute, training, inference, and environments for teams building their own models"
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "prime_intellect",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "prime_intellect.claim.oct14-product-3",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "prime_intellect.source.oct14-54768add28ff"
+            ],
+            "statement": "Prime-RL: Provides compute, training, inference, and environments for teams building their own models",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "prime_intellect.claim.oct14-product-3"
+      ],
+      "affected_record_ids": [
+        "prime_intellect.product.oct14-3"
+      ]
+    },
+    {
+      "id": "prime-intellect-prime-inference-gateway-2026-10-17",
+      "company_id": "prime_intellect",
+      "target": {
+        "product_name": "Prime Inference Gateway",
+        "record_ids": [
+          "prime_intellect.product.oct14-4"
+        ],
+        "claim_ids": [
+          "prime_intellect.claim.oct14-product-4"
+        ]
+      },
+      "previous_fields": {
+        "description": null
+      },
+      "replacement_fields": {
+        "description": "Provides one OpenAI-compatible API for accessing models served by third-party providers."
+      },
+      "source": {
+        "url": "https://www.primeintellect.ai/",
+        "title": "Prime Intellect - The Open Superintelligence Stack",
+        "observed_on": "2026-10-17",
+        "published_on": null
+      },
+      "supporting_sources": [],
+      "qualification": "Fills a blank product description. The homepage distinguishes the gateway to third-party providers from Prime Hosted Models; this wording preserves that distinction.",
+      "historical_snapshot": {
+        "dataset_version": "2.5.0",
+        "products": [
+          {
+            "claim_id": "prime_intellect.claim.oct14-product-4",
+            "company_id": "prime_intellect",
+            "delivery_model": "Sells GPU/compute and a managed model-training stack; community environments and open models are supporting infrastructure, not a human-data workforce.",
+            "id": "prime_intellect.product.oct14-4",
+            "name": "Prime Inference Gateway",
+            "segment_scope": "company",
+            "work_performed": "Provides compute, training, inference, and environments for teams building their own models"
+          }
+        ],
+        "claims": [
+          {
+            "as_of": "undated",
+            "caveat": "",
+            "company_id": "prime_intellect",
+            "confidence": "B",
+            "confidence_reason": "Attributed primary-source statement reviewed in the October 14 research pass; not independently audited.",
+            "date_note": "The observation date is October 14. An undated page is not assigned a synthetic publication date.",
+            "evidence_label": "Company-reported",
+            "id": "prime_intellect.claim.oct14-product-4",
+            "observed_on": "2026-10-14",
+            "segment_scope": "company",
+            "self_reported": true,
+            "source_ids": [
+              "prime_intellect.source.oct14-54768add28ff"
+            ],
+            "statement": "Prime Inference Gateway: Provides compute, training, inference, and environments for teams building their own models",
+            "status": "supported",
+            "subject": "products"
+          }
+        ]
+      },
+      "affected_claim_ids": [
+        "prime_intellect.claim.oct14-product-4"
+      ],
+      "affected_record_ids": [
+        "prime_intellect.product.oct14-4"
+      ]
     }
   ]
 }
