@@ -665,6 +665,7 @@ def build(data, destination):
     html = render_snapshot_metadata(html, data)
     html = render_static_file_metadata(html, destination)
     (destination / "index.html").write_text(html)
+    from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}
     (destination / "manifest.json").write_text(json.dumps({"dataset_version": data["dataset_version"], "schema_version": data["schema_version"], "sha256": files}, indent=2) + "\n")
 

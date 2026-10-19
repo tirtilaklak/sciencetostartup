@@ -55,13 +55,20 @@ class PublicEntrypointTests(unittest.TestCase):
         root = ET.parse(self.dist / "sitemap.xml").getroot()
         namespace = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
         self.assertEqual(root.tag, namespace + "urlset")
-        self.assertEqual([node.text for node in root.iter(namespace + "loc")],
-                         [ORIGIN + "/"], "Hash views share one public document")
+        locs = [node.text for node in root.iter(namespace + "loc")]
+        companies = json.loads((ROOT / "data/canonical.json").read_text())["companies"]
+        self.assertEqual(locs[0], ORIGIN + "/", "The app document stays first")
+        self.assertIn(ORIGIN + "/companies/", locs)
+        self.assertEqual(len(locs), 2 + len(companies), "One static page per company")
+        for company in companies:
+            self.assertIn(ORIGIN + "/company/" + company["id"] + "/", locs)
+            self.assertTrue((self.dist / "company" / company["id"] / "index.html").is_file(), company["id"])
+        self.assertEqual(len(list(root.iter(namespace + "lastmod"))), len(locs), "Every URL carries lastmod")
         manifest = json.loads((self.dist / "manifest.json").read_text())["sha256"]
+        robots_raw = (self.dist / "robots.txt").read_bytes()
+        self.assertEqual(robots_raw, (ROOT / "web/robots.txt").read_bytes())
         for name in ("robots.txt", "sitemap.xml"):
-            raw = (self.dist / name).read_bytes()
-            self.assertEqual(raw, (ROOT / "web" / name).read_bytes())
-            self.assertEqual(hashlib.sha256(raw).hexdigest(), manifest[name])
+            self.assertEqual(hashlib.sha256((self.dist / name).read_bytes()).hexdigest(), manifest[name])
 
 
 if __name__ == "__main__":
