@@ -133,7 +133,8 @@
         "date": "2026-10-14",
         "result": "official_entry_point",
         "note": "Official entry point linked or opened. Specific role availability, pay and application acceptance were not assessed in this check."
-      }
+      },
+      "pay_indicator": "Company-reported network average over $95/hour (newsroom, undated); not a rate for any role."
     },
     {
       "id": "snorkel_ai.work.expert-community",
@@ -215,7 +216,8 @@
         "date": "2026-10-14",
         "result": "official_entry_point",
         "note": "Official entry point linked or opened. Specific role availability, pay and application acceptance were not assessed in this check."
-      }
+      },
+      "pay_indicator": "Marketing claim: top experts earn $3,000+/week; not a typical guarantee."
     },
     {
       "id": "handshake_ai.work.ai-program",
@@ -847,7 +849,7 @@
           "retrieval_status": "checked"
         }
       ],
-      "availability_note": "The reviewed source labels this a salary; no hourly conversion is made."
+      "availability_note": "The reviewed source labels this a salary; no hourly conversion is made. Listing URL points to the YC company page; a direct listing was not found on 2026-10-19."
     },
     {
       "id": "afterquery.work.world-models",
@@ -1198,7 +1200,7 @@
       "status": "historical",
       "geography": "Remote",
       "eligibility": "Check project / unverified",
-      "url": "https://jobs.ashbyhq.com/bespokelabs/1548fb45-e179-4c28-aec1-d1f3461028e8",
+      "url": "https://jobs.ashbyhq.com/bespokelabs",
       "requirements": [
         "AWS, Kubernetes and production infrastructure experience."
       ],
@@ -1230,7 +1232,7 @@
           "retrieval_status": "summary_only"
         }
       ],
-      "availability_note": "The official listing showed “Job not found” on 17 October 2026. Original terms are retained as historical evidence.",
+      "availability_note": "The official listing showed “Job not found” on 17 October 2026. Original terms are retained as historical evidence. Original posting returns 'Job not found'; link goes to the employer's job board (checked 2026-10-19).",
       "availability_checked_on": "2026-10-17",
       "last_route_check": {
         "date": "2026-10-17",
@@ -1257,7 +1259,7 @@
       "status": "historical",
       "geography": "Remote",
       "eligibility": "Check project / unverified",
-      "url": "https://jobs.ashbyhq.com/bespokelabs/4402a6fd-0785-49d6-8bd8-d8b033907f0b/",
+      "url": "https://jobs.ashbyhq.com/bespokelabs",
       "requirements": [],
       "claim_ids": [
         "bespoke_labs.claim.worker_opportunities-1"
@@ -1289,7 +1291,7 @@
       ],
       "hours": "35–40 hours/week",
       "duration": "1–2 months; possible extension",
-      "availability_note": "The official listing showed “Job not found” on 17 October 2026. Original terms are retained as historical evidence.",
+      "availability_note": "The official listing showed “Job not found” on 17 October 2026. Original terms are retained as historical evidence. Original posting returns 'Job not found'; link goes to the employer's job board (checked 2026-10-19).",
       "availability_checked_on": "2026-10-17",
       "last_route_check": {
         "date": "2026-10-17",
@@ -1409,7 +1411,7 @@
       "status": "historical",
       "geography": "Remote",
       "eligibility": "Check project / unverified",
-      "url": "https://jobs.ashbyhq.com/polymath/feac8f33-2e28-4434-bff5-cf26c849f270",
+      "url": "https://jobs.ashbyhq.com/polymath",
       "requirements": [
         "Current MS/PhD student with RL or post-training and publication experience."
       ],
@@ -1442,7 +1444,7 @@
         }
       ],
       "hours": "Full- or part-time",
-      "availability_note": "The official listing showed “Job not found” on 17 October 2026. Original terms are retained as historical evidence.",
+      "availability_note": "The official listing showed “Job not found” on 17 October 2026. Original terms are retained as historical evidence. Original posting returns 'Job not found'; link goes to the employer's job board (checked 2026-10-19).",
       "availability_checked_on": "2026-10-17",
       "last_route_check": {
         "date": "2026-10-17",
@@ -2520,7 +2522,7 @@
       "status": "historical",
       "geography": "Remote US",
       "eligibility": "US listing evidence",
-      "url": "https://jobs.ashbyhq.com/g2i/6ea6a53a-7689-45f2-b429-1146965d3cd7",
+      "url": "https://jobs.ashbyhq.com/g2i",
       "requirements": [
         "Senior/staff/principal experience; TypeScript/JavaScript or Python.",
         "Take-home evaluation and recorded walkthrough."
@@ -2554,7 +2556,7 @@
         }
       ],
       "hours": "10–20 hours/week",
-      "availability_note": "The official listing showed “Job not found” on 17 October 2026. Original terms are retained as historical evidence. Earlier listing note: A start depends on passing evaluation and an available project seat.",
+      "availability_note": "The official listing showed “Job not found” on 17 October 2026. Original terms are retained as historical evidence. Earlier listing note: A start depends on passing evaluation and an available project seat. Original posting returns 'Job not found'; link goes to the employer's job board (checked 2026-10-19).",
       "availability_checked_on": "2026-10-17",
       "last_route_check": {
         "date": "2026-10-17",
@@ -2672,7 +2674,8 @@
         "upper_bound_open": true,
         "scope": "FAQ typical range; hero separately advertises $75–$200/hr",
         "guaranteed": false
-      }
+      },
+      "pay_indicator": "Talent page FAQ: $50–$200+/hour across projects; hero advertises $75–200/hour."
     },
     {
       "id": "a-team.work.expert-network",
@@ -2810,7 +2813,8 @@
         ],
         "guaranteed": false
       },
-      "pay_context": "Company-reported US builder booked rates over the past two years: $115/hour median; middle 50% $90–130/hour. Typical full-time monthly bookings $15,500–19,000. These are network statistics, not a role offer or guaranteed earnings."
+      "pay_context": "Company-reported US builder booked rates over the past two years: $115/hour median; middle 50% $90–130/hour. Typical full-time monthly bookings $15,500–19,000. These are network statistics, not a role offer or guaranteed earnings.",
+      "pay_indicator": "Company-reported US builder booked rates: $115/hour median, middle 50% $90–130/hour."
     },
     {
       "id": "hackerrank.work.bench-network",
@@ -4108,7 +4112,8 @@
         "source_published_on": "2026-07-17",
         "reviewed_on": "2026-10-14"
       },
-      "pay_context": "Platform study-reward policy: minimum £6/$8 per hour; recommended £9/$12 per hour. This is a study policy, not guaranteed hours or weekly earnings. Specialist tasks can require assessments."
+      "pay_context": "Platform study-reward policy: minimum £6/$8 per hour; recommended £9/$12 per hour. This is a study policy, not guaranteed hours or weekly earnings. Specialist tasks can require assessments.",
+      "pay_indicator": "Platform study-reward policy: minimum £6/$8 per hour, recommended £9/$12 per hour."
     },
     {
       "id": "aixi.work.research-fellowship",
@@ -4734,7 +4739,7 @@
       "numeric_pay": true,
       "as_of": "2026-10-12",
       "reviewed_on": "2026-10-15",
-      "status": "intake_unverified",
+      "status": "closed",
       "geography": "Remote US",
       "eligibility": "US listing evidence",
       "url": "https://app.tai.rws.com/opportunities",
@@ -4790,7 +4795,7 @@
           "notes": "The exact portal displayed zero opportunities. The separate general RWS careers board does not establish availability of this role. Review uses standard public content retrieval, not an origin HTTP status or successful application."
         }
       ],
-      "availability_note": "The opportunities portal showed zero listings in the 15 October review. Polaris and its $16/hour rate were recorded on 12 October 2026. Current availability is unconfirmed.",
+      "availability_note": "The opportunities portal showed zero listings in the 15 October review. Polaris and its $16/hour rate were recorded on 12 October 2026. Current availability is unconfirmed. Portal showed 0 open roles on 2026-10-19; route marked closed.",
       "last_route_check": {
         "date": "2026-10-15",
         "result": "public_portal_zero_listings",
@@ -5573,7 +5578,7 @@
       "status": "historical",
       "geography": "Palo Alto · on-site / hybrid wording",
       "eligibility": "Check project / unverified",
-      "url": "https://jobs.ashbyhq.com/elorian-ai-inc/7fc67724-f805-4715-a157-fa00e050bf8d",
+      "url": "https://jobs.ashbyhq.com/elorian-ai-inc",
       "requirements": [
         "Palo Alto; 3+ years distributed systems including RL pipelines; Python and PyTorch/JAX; GPU orchestration."
       ],
@@ -5624,7 +5629,7 @@
       },
       "source_publication_date": "undated",
       "hours": "Full-time",
-      "availability_note": "The exact official role URL now renders “Job not found”. Historical pay and requirements are retained; a separate Inference Infrastructure Engineer, Serving role is not merged into this record.",
+      "availability_note": "The exact official role URL now renders “Job not found”. Historical pay and requirements are retained; a separate Inference Infrastructure Engineer, Serving role is not merged into this record. Original posting returns 'Job not found'; link goes to the employer's job board (checked 2026-10-19).",
       "availability_checked_on": "2026-10-14"
     },
     {
@@ -6048,7 +6053,7 @@
       "status": "program",
       "geography": "Remote · geographic restrictions",
       "eligibility": "Check project / unverified",
-      "url": "https://toloka.ai/annotators/",
+      "url": "https://mindrift.ai/",
       "requirements": [
         "General tasks plus qualification-gated specialist projects; geographic restrictions apply"
       ],
@@ -7028,9 +7033,9 @@
       "primaryRole": "Software Engineer - Platform/Applied AI",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$260K–$290K salary band + equity; $200K–$400K separate bonus band",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -7101,7 +7106,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Software Engineer - Platform/Applied AI. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$260K – $290K • Offers Equity • $200K – $400K Bonus\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.software-engineering-intern",
@@ -7110,9 +7116,9 @@
       "primaryRole": "Software Engineering Intern",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$10K / month",
+      "pay_basis": "month_stipend",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -7183,7 +7189,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Software Engineering Intern. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$10K per month\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.software-engineer-platform-infrastructure",
@@ -7192,9 +7199,9 @@
       "primaryRole": "Software Engineer - Platform Infrastructure",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$250K–$350K salary band + equity; $0–$100K separate bonus band",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -7265,7 +7272,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Software Engineer - Platform Infrastructure. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$250K – $350K • Offers Equity • $0 – $100K Bonus\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.senior-software-engineer-security-infrastructure",
@@ -7274,9 +7282,9 @@
       "primaryRole": "Senior Software Engineer - Security/Infrastructure",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$200K–$350K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -7347,7 +7355,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Senior Software Engineer - Security/Infrastructure. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$200K – $350K • Offers Equity • Offers Bonus\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.software-engineer-rl-environments",
@@ -7521,9 +7530,9 @@
       "primaryRole": "Machine Learning Engineer, Data Privacy & Anonymization",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$260K–$290K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -7594,7 +7603,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Machine Learning Engineer, Data Privacy & Anonymization. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$260K – $290K • Offers Equity • Offers Bonus\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.software-engineer-marketplace",
@@ -7603,9 +7613,9 @@
       "primaryRole": "Software Engineer - Marketplace",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$250K–$300K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -7676,7 +7686,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Software Engineer - Marketplace. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$250K – $300K • Offers Equity • Offers Bonus\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.product-manager",
@@ -7685,9 +7696,9 @@
       "primaryRole": "Product Manager",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$180K–$300K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -7758,7 +7769,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Product Manager. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$180K – $300K • Offers Equity • Offers Bonus\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.growth-associate",
@@ -7767,9 +7779,9 @@
       "primaryRole": "Growth Associate",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$100K–$130K salary band + equity; $20K–$30K separate bonus band",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -7840,7 +7852,9 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Growth Associate. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$100K – $130K • Offers Equity • $20K – $30K Bonus\"), fetched 2026-10-19.",
+      "ai_data_work": false
     },
     {
       "id": "afterquery.work.head-of-growth",
@@ -7849,9 +7863,9 @@
       "primaryRole": "Head of Growth",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$230K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -7922,7 +7936,9 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Head of Growth. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $230K • Offers Equity • Offers Bonus\"), fetched 2026-10-19.",
+      "ai_data_work": false
     },
     {
       "id": "afterquery.work.business-operations-generalist",
@@ -7931,9 +7947,9 @@
       "primaryRole": "Business Operations Generalist",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$250K salary band + equity",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8004,7 +8020,9 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Business Operations Generalist. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $250K • Offers Equity\"), fetched 2026-10-19.",
+      "ai_data_work": false
     },
     {
       "id": "afterquery.work.people-programs-lead",
@@ -8013,9 +8031,9 @@
       "primaryRole": "People Programs Lead",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$160K–$230K salary band + equity",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8086,7 +8104,9 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for People Programs Lead. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$160K – $230K • Offers Equity\"), fetched 2026-10-19.",
+      "ai_data_work": false
     },
     {
       "id": "afterquery.work.technical-recruiter",
@@ -8095,9 +8115,9 @@
       "primaryRole": "Technical Recruiter",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$230K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8168,7 +8188,9 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Technical Recruiter. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $230K • Offers Equity • Offers Bonus\"), fetched 2026-10-19.",
+      "ai_data_work": false
     },
     {
       "id": "afterquery.work.corporate-counsel",
@@ -8177,9 +8199,9 @@
       "primaryRole": "Corporate Counsel",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$225K–$250K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8250,7 +8272,9 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Corporate Counsel. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$225K – $250K • Offers Equity • Offers Bonus\"), fetched 2026-10-19.",
+      "ai_data_work": false
     },
     {
       "id": "afterquery.work.recruiter",
@@ -8259,9 +8283,9 @@
       "primaryRole": "Recruiter",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$225K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8332,7 +8356,9 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Recruiter. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $225K • Offers Equity • Offers Bonus\"), fetched 2026-10-19.",
+      "ai_data_work": false
     },
     {
       "id": "afterquery.work.strategic-projects-lead",
@@ -8341,9 +8367,9 @@
       "primaryRole": "Strategic Projects Lead",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$225K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8414,7 +8440,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $225K • Offers Equity • Offers Bonus • On average, total cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers)\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.strategic-projects-lead-coding",
@@ -8423,9 +8450,9 @@
       "primaryRole": "Strategic Projects Lead - Coding",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$225K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8496,7 +8523,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead - Coding. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $225K • Offers Equity • Offers Bonus • On average, total cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers)\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.strategic-projects-associate-coding",
@@ -8505,9 +8533,9 @@
       "primaryRole": "Strategic Projects Associate - Coding",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$130K salary band + equity; performance bonus up to $80K",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8578,7 +8606,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Associate - Coding. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$130K • Offers Equity • Offers Bonus • Offers performance based bonus of up to $80k\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.strategic-projects-lead-healthcare",
@@ -8587,9 +8616,9 @@
       "primaryRole": "Strategic Projects Lead - Healthcare",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$225K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8660,7 +8689,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead - Healthcare. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $225K • Offers Equity • Offers Bonus • On average, total cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.strategic-projects-lead-engineering",
@@ -8669,9 +8699,9 @@
       "primaryRole": "Strategic Projects Lead - Engineering",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$225K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8742,7 +8772,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead - Engineering. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $225K • Offers Equity • Offers Bonus • On average, total cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers)\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.data-acquisition-lead",
@@ -8751,9 +8782,9 @@
       "primaryRole": "Data Acquisition Lead",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$275K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8824,7 +8855,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Data Acquisition Lead. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $275K • Offers Equity • Offers Bonus\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.quality-control-lead",
@@ -8833,9 +8865,9 @@
       "primaryRole": "Quality Control Lead",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$275K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8906,7 +8938,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Quality Control Lead. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $275K • Offers Equity • Offers Bonus\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.strategic-projects-lead-consulting",
@@ -8915,9 +8948,9 @@
       "primaryRole": "Strategic Projects Lead - Consulting",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$225K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -8988,7 +9021,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead - Consulting. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $225K • Offers Equity • Offers Bonus • On average, total cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers)\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.strategic-projects-lead-legal",
@@ -8997,9 +9031,9 @@
       "primaryRole": "Strategic Projects Lead - Legal",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$225K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -9070,7 +9104,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead - Legal. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $225K • Offers Equity • Offers Bonus • On average, total cash cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers)\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.strategic-projects-lead-ai-safety",
@@ -9079,9 +9114,9 @@
       "primaryRole": "Strategic Projects Lead - AI Safety",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$225K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -9152,7 +9187,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead - AI Safety. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $225K • Offers Equity • Offers Bonus • On average, total cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers)\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.strategic-projects-lead-stem",
@@ -9161,9 +9197,9 @@
       "primaryRole": "Strategic Projects Lead - STEM",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$225K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -9234,7 +9270,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "9 inputs and a visible Submit Application control rendered for Strategic Projects Lead - STEM. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $225K • Offers Equity • Offers Bonus • On average, total comp regularly exceeds base by 2-3x (and by 4-5x for top performers)\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.ai-ml-research-intern",
@@ -9243,9 +9280,9 @@
       "primaryRole": "AI/ML Research Intern",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$8K / month",
+      "pay_basis": "month_stipend",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -9316,7 +9353,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for AI/ML Research Intern. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$8K per month\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.research-scientist-post-training",
@@ -9498,9 +9536,9 @@
       "primaryRole": "Research Scholar",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$1K–$10K one-time award",
+      "pay_basis": "one_time",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -9571,7 +9609,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "12 inputs and a visible Submit Application control rendered for Research Scholar. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$1K – $10K once\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.research-engineer",
@@ -9580,9 +9619,9 @@
       "primaryRole": "Research Engineer",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$210K–$450K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -9653,7 +9692,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Research Engineer. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$210K – $450K • Offers Equity • Offers Bonus • $250k-450k total compensation + equity\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.research-technical-program-manager",
@@ -9662,9 +9702,9 @@
       "primaryRole": "Research Technical Program Manager",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$210K–$450K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -9735,7 +9775,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Research Technical Program Manager. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$210K – $450K • Offers Equity • Offers Bonus • $250k-450k total compensation + equity\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.research-scientist-frontier-evaluations",
@@ -9744,9 +9785,9 @@
       "primaryRole": "Research Scientist – Frontier Evaluations",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$210K–$450K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -9817,7 +9858,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Research Scientist – Frontier Evaluations. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$210K – $450K • Offers Equity • Offers Bonus\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.research-program-manager",
@@ -9826,9 +9868,9 @@
       "primaryRole": "Research Program Manager",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$175K–$191K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -9899,7 +9941,8 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Research Program Manager. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$175K – $191K • Offers Equity • Offers Bonus\"), fetched 2026-10-19."
     },
     {
       "id": "afterquery.work.marketing-lead",
@@ -9908,9 +9951,9 @@
       "primaryRole": "Marketing Lead",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$160K–$220K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -9981,7 +10024,9 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Marketing Lead. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$160K – $220K • Offers Equity • Offers Bonus\"), fetched 2026-10-19.",
+      "ai_data_work": false
     },
     {
       "id": "afterquery.work.gtm-operations-lead",
@@ -9990,9 +10035,9 @@
       "primaryRole": "GTM Operations Lead",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$190K–$250K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -10063,7 +10108,9 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for GTM Operations Lead. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$190K – $250K • Offers Equity • Offers Bonus\"), fetched 2026-10-19.",
+      "ai_data_work": false
     },
     {
       "id": "afterquery.work.engagement-manager",
@@ -10072,9 +10119,9 @@
       "primaryRole": "Engagement Manager",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$150K–$225K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -10145,7 +10192,9 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Engagement Manager. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$150K – $225K • Offers Equity • Offers Bonus • Annual Target Compensation: $300-450k OTE (50% base / 50% variable) depending on experience.\"), fetched 2026-10-19.",
+      "ai_data_work": false
     },
     {
       "id": "afterquery.work.sales-operations-associate",
@@ -10154,9 +10203,9 @@
       "primaryRole": "Sales Operations Associate",
       "group": "Employment",
       "summary": "Employer application available; role-specific terms not reviewed.",
-      "pay_label": "Pay not reviewed",
-      "pay_basis": "unreviewed",
-      "numeric_pay": false,
+      "pay_label": "$100K–$150K salary band + equity; bonus offered",
+      "pay_basis": "salary_period_unspecified",
+      "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-14",
       "status": "listed",
@@ -10227,7 +10276,9 @@
         "date": "2026-10-14",
         "result": "application_form_available",
         "note": "10 inputs and a visible Submit Application control rendered for Sales Operations Associate. No application submitted."
-      }
+      },
+      "pay_context": "Pay band from the AfterQuery job board (Ashby posting API compensationTierSummary: \"$100K – $150K • Offers Equity • Offers Bonus\"), fetched 2026-10-19.",
+      "ai_data_work": false
     },
     {
       "id": "afterquery.work.technical-content-writer-contract",
