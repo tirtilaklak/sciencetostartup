@@ -21,3 +21,4 @@ docs/*
 *.tar
 *.tar.gz
 *.zip
+data/medalists.json

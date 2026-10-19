@@ -10,7 +10,8 @@ function w4SourcePublicationDate(source){
   const recorded=[source.published_on,source.source_publication_date,source.published_at].find(value=>value&&value!=='undated');
   return recorded||(typeof sources!=='undefined'?sources[source.id]?.published_on:null);
 }
-function w4Checked(route){return [route.availability_checked_on,route.last_route_check?.date,route.reviewed_on].filter(Boolean).sort().at(-1)||null;}
+function w4Checked(route){return [route.availability_checked_on,route.last_route_check?.date].filter(Boolean).sort().at(-1)||null;}
+function w4CheckedLabel(route){const checked=w4Checked(route);return checked?w4Date(checked):'Not yet checked';}
 function w4Uncertain(route){
   if(['unverified','intake_unverified','pay_conflict'].includes(route.status))return true;
   const check=[route.last_route_check?.result,route.last_route_check?.note].filter(Boolean).join(' ');
@@ -214,7 +215,7 @@ function w4Details(route){
     ${route.pay_context?`<p>${w4Escape(route.pay_context)}${route.pay_policy?.source_url?` ${w4SourceLink(route.pay_policy.source_url,'Payment policy')}`:''}</p>`:''}
     ${route.historical_pay_context?`<details class="w4-source-notes"><summary>Past payment offer</summary><p>${w4Escape(route.historical_pay_context.label)}: ${w4Escape(route.historical_pay_context.amount)}.</p><p>${w4Escape(route.historical_pay_context.note)}</p>${w4SourceLink(route.historical_pay_context.url,'Historical source')}</details>`:''}
     <div class="w4-detail-block w4-sources"><h4>Sources</h4>
-      <p class="w4-source-dates"><span>Terms recorded: ${w4Escape(w4Date(route.as_of))}</span><span>Checked: ${w4Escape(w4Date(w4Checked(route)))}</span></p>
+      <p class="w4-source-dates"><span>Terms recorded: ${w4Escape(w4Date(route.as_of))}</span><span>Checked: ${w4Escape(w4CheckedLabel(route))}</span></p>
       ${sourceRows.length?`<ul>${sourceRows.map(s=>`<li>${w4SourceLink(s.url,s.title||s.publisher||'Source')}<small>Published ${w4Escape(w4Date(w4SourcePublicationDate(s)))}${s.accessed_on?` · Read ${w4Escape(w4Date(s.accessed_on))}`:''}</small></li>`).join('')}</ul>`:''}
       ${route.source_quote?`<blockquote>${w4Escape(route.source_quote)}</blockquote>`:''}
       ${route.last_route_check?.note?`<details class="w4-source-notes"><summary>Availability check</summary><p>${w4Escape(route.last_route_check.note)}</p></details>`:''}
@@ -230,11 +231,11 @@ function workCard(route,mode){
   if(!company)return '';
   const status=w4Status(route),payNote=w4PayNote(route),payQualification=w4PayQualification(route),commitment=w4Hours(route),scheduleNote=w4ScheduleNote(route),requirements=w4Requirements(route);
   const logo=typeof logoHTML==='function'&&(typeof logoFor!=='function'||logoFor(company.id))?logoHTML(company.id,'w4-company-logo'):'';
-  const terms=w4Date(route.as_of),checked=w4Date(w4Checked(route));
+  const terms=w4Date(route.as_of),checked=w4CheckedLabel(route);
   const compact=mode==='compact';
   const identity=`<a class="w4-company" href="#company/${w4Escape(company.id)}/work">${logo?`<span class="w4-logo" aria-hidden="true">${logo}</span>`:''}<span>${w4Escape(company.name)}</span></a>`;
   const badge=status?`<span class="w4-status w4-status-${w4Escape(route.status)}">${w4Escape(status)}</span>`:'';
-  const payNotes=`${payNote?`<span class="w4-pay-note">${w4Escape(payNote)}</span>`:''}${payQualification?`<span class="w4-pay-note w4-pay-qualification">${w4Escape(payQualification)}</span>`:''}`;
+  const payNotes=`${route.pay_indicator?`<span class="w4-pay-note w4-pay-indicator">${w4Escape(route.pay_indicator)}</span>`:''}${payNote?`<span class="w4-pay-note">${w4Escape(payNote)}</span>`:''}${payQualification?`<span class="w4-pay-note w4-pay-qualification">${w4Escape(payQualification)}</span>`:''}`;
   const offer=`<div class="w4-offer">${compact?'':`<p class="w4-pay ${route.numeric_pay?'':'w4-pay-unspecified'}"><strong>${w4Escape(w4Pay(route))}</strong>${payNotes}</p>`}${commitment?`<p class="w4-commitment">${w4Escape(commitment)}</p>`:''}${scheduleNote?`<p class="w4-schedule-note">${w4Escape(scheduleNote)}</p>`:''}</div>`;
   const body=`${offer}<p class="w4-location">${w4Escape(w4Location(route))}</p>${requirements.length?`<ul class="w4-requirements" aria-label="Requirements">${requirements.map(text=>`<li>${w4Escape(text)}</li>`).join('')}</ul>`:''}<div class="w4-card-bottom"><p class="w4-dates"><span>${terms==='Undated'?'Undated terms':'Terms '+w4Escape(terms)}</span><span>Checked ${w4Escape(checked)}</span></p>${w4SourceLink(route.url,w4Action(route),'class="w4-open"')}</div>`;
   const details=`<details class="w4-details"><summary>Terms & sources<span aria-hidden="true">+</span></summary>${w4Details(route)}</details>`;
@@ -244,10 +245,11 @@ function w4RouteGroups(rows){
   const groups={primary:[],careers:[],other:[]};
   for(const route of rows){
     if(route.status==='careers')groups.careers.push(route);
-    else if(WORK_ROUTE_ARCHIVE.has(route.status)||w4Uncertain(route))groups.other.push(route);
+    else if(WORK_ROUTE_ARCHIVE.has(route.status)||route.research_record?.route?.live_application_verified===false||route.ai_data_work===false)groups.other.push(route);
     else groups.primary.push(route);
   }
-  const rank=route=>route.research_record?.route?.live_application_verified===true?0:route.last_route_check?.result==='public_page_live'?1:route.status==='listed'?2:3;
+  const remoteHourly=route=>route.numeric_pay&&/^hour/.test(route.pay_basis||'')&&/remote|worldwide|at home|anywhere|global/i.test(route.geography||'');
+  const rank=route=>(remoteHourly(route)?0:10)+(route.research_record?.route?.live_application_verified===true?0:route.last_route_check?.result==='public_page_live'?1:route.status==='listed'?2:3);
   groups.primary.sort((a,b)=>rank(a)-rank(b)||(w4Checked(b)||'').localeCompare(w4Checked(a)||'')||companies[a.company_id].name.localeCompare(companies[b.company_id].name)||a.role.localeCompare(b.role));
   return groups;
 }
@@ -279,10 +281,11 @@ function renderWork(){
   workReturnFocus=null;
   const rows=filteredWork(),groups=w4RouteGroups(rows),orgs=new Set(rows.map(r=>r.company_id));
   const filtered=Boolean((state.workQuery||'').trim()||state.workGroup||state.workPay||state.workEligibility);
-  const visibleCount=filtered?groups.primary.length:12;
+  if(!filtered){const perCompany={},kept=[],overflow=[];for(const route of groups.primary){perCompany[route.company_id]=(perCompany[route.company_id]||0)+1;(perCompany[route.company_id]<=3?kept:overflow).push(route);}groups.primary=kept.concat(overflow);}
+  const visibleCount=filtered?groups.primary.length:20;
   const filterCount=[state.workGroup,state.workPay,state.workEligibility].filter(Boolean).length,summary=document.querySelector('.work-filters .responsive-filter-panel>summary');
   if(summary)summary.textContent=filterCount?`Filters (${filterCount})`:'Filters';
-  $('work-count').textContent=`${rows.length} recorded links across ${orgs.size} ${orgs.size===1?'organization':'organizations'}.`;if($('work-overview'))$('work-overview').innerHTML=`<span>${rows.length} links</span><button data-work-section="work-listed" ${groups.primary.length?'':'disabled'}>${groups.primary.length} roles/programs</button><button data-work-section="work-careers" ${groups.careers.length?'':'disabled'}>${groups.careers.length} careers</button><button data-work-section="work-other" ${groups.other.length?'':'disabled'}>${groups.other.length} other</button>`;
+  $('work-count').textContent=`${rows.length} recorded ${rows.length===1?'link':'links'} across ${orgs.size} ${orgs.size===1?'organization':'organizations'}.`;if($('work-overview'))$('work-overview').innerHTML=`<span>${rows.length} ${rows.length===1?'link':'links'}</span><button data-work-section="work-listed" ${groups.primary.length?'':'disabled'}>${groups.primary.length} roles/programs</button><button data-work-section="work-careers" ${groups.careers.length?'':'disabled'}>${groups.careers.length} careers</button><button data-work-section="work-other" ${groups.other.length?'':'disabled'}>${groups.other.length} other</button>`;
   $('work-cards').innerHTML=(groups.primary.length?`<h2 id="work-listed" class="work-list-heading">Roles and programs <span>${groups.primary.length} recorded links</span></h2>`:'')+groups.primary.slice(0,visibleCount).map(route=>workCard(route)).join('')+w4GroupDisclosure(groups.primary.slice(visibleCount),'More listed routes')+w4GroupDisclosure(groups.careers,'Careers pages',filtered,'work-careers')+w4GroupDisclosure(groups.other,'Uncertain, historical and research links',filtered,'work-other')+(rows.length?'':'<p class="w4-empty">No matching routes. Clear a filter to see more.</p>');
   syncSelection();
 }
@@ -293,7 +296,8 @@ function workSummary(id){
   const primary=w4ProfilePrimary(groups.primary,id);
   const covered=new Set(rows.flatMap(r=>r.claim_ids||[]));
   const related=typeof workClaims==='function'?workClaims(id).filter(c=>!covered.has(c.id)).map(c=>c.id):[];
-  return `<div class="work-v4-profile">${primary.length?`<div class="work-v4-profile-grid">${primary.slice(0,4).map(route=>workCard(route)).join('')}</div>`:''}${w4GroupDisclosure(primary.slice(4),'More listed roles')}${w4GroupDisclosure(groups.careers,'Career directories')}${w4GroupDisclosure(groups.other,'Other work & research routes')}${related.length?`<details class="w4-related"><summary>Related work evidence</summary><div class="w4-evidence-links">${w4ClaimAccess(related)}</div></details>`:''}</div>`;
+  const openCareers=!primary.length&&groups.careers.length>0,openOther=!primary.length&&!groups.careers.length;
+  return `<div class="work-v4-profile">${primary.length?`<div class="work-v4-profile-grid">${primary.slice(0,4).map(route=>workCard(route)).join('')}</div>`:`<p class="w4-empty">No verified public pay listing recorded. ${groups.careers.length+groups.other.length} career and research ${groups.careers.length+groups.other.length===1?'link':'links'} below.</p>`}${w4GroupDisclosure(primary.slice(4),'More listed roles')}${w4GroupDisclosure(groups.careers,'Career directories',openCareers)}${w4GroupDisclosure(groups.other,'Other work & research routes',openOther)}${related.length?`<details class="w4-related"><summary>Related work evidence</summary><div class="w4-evidence-links">${w4ClaimAccess(related)}</div></details>`:''}</div>`;
 }
 
 document.addEventListener('click',event=>{const button=event.target.closest?.('[data-work-section]');if(!button)return;const target=document.getElementById(button.dataset.workSection);if(target){if(target.tagName==='DETAILS')target.open=true;const focus=target.tagName==='DETAILS'?target.querySelector('summary'):target;if(focus&&focus.tagName!=='SUMMARY')focus.setAttribute('tabindex','-1');focus?.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});}});

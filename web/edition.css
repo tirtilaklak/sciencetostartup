@@ -67,8 +67,9 @@ h1[tabindex="-1"]:focus{outline:none}.work-overview button:disabled{opacity:.55;
 /* Dated negative link observations stay beside the original destination. */
 .source-link-status{display:inline;max-width:100%;margin:0 .25rem;color:#71633c;font-size:.7rem;font-weight:400;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
 
-/* Keep the shortlist in document flow so it cannot cover page controls. */
-#compare-tray{position:static;left:auto;bottom:auto;transform:none;width:fit-content;max-width:100%;margin:18px 0 0 auto;box-shadow:none;z-index:auto;flex-wrap:wrap;gap:8px 16px}
+/* The shortlist stays fixed at the bottom; main gets room so it never covers the last card's controls. */
+#compare-tray{flex-wrap:wrap;gap:8px 16px}
+body:has(#compare-tray:not([hidden])) main{padding-bottom:120px}
 #compare-tray a,#compare-tray .quiet{min-height:44px;display:inline-flex;align-items:center}
 
 

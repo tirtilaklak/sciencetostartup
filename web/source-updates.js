@@ -102,7 +102,13 @@ function historicalOfferContextValid(update){
  const product=snapshot.products[0];if(product.company_id!=='ooak'||product.claim_id!==claimIds[1]||product.segment_scope!=='ai_data'||product.work_performed!==claims[claimIds[1]].statement)return false;
  return Array.isArray(update.sources)&&update.sources.length===1&&exact(update.sources[0],{source_id:sourceIds[0],claim_id:claimIds[0],publication_date:null,publication_date_basis:'not_established',role:'retained_issuer_offer',access_status:'retained_readable_page'});
 }
+let evidenceContextCache=null,evidenceContextCacheSource;
 function evidenceContextCorrections(){
+ if(evidenceContextCache&&evidenceContextCacheSource===window.SOURCE_UPDATES)return evidenceContextCache;
+ evidenceContextCacheSource=window.SOURCE_UPDATES;
+ return evidenceContextCache=evidenceContextCorrectionsCompute();
+}
+function evidenceContextCorrectionsCompute(){
  const document=window.SOURCE_UPDATES,section=document?.evidence_context;
  if(document?.baseline_dataset_version!==DATA.dataset_version||section?.version!=='1.0.0'||!Array.isArray(section.corrections))return [];
  return section.corrections.filter(update=>{

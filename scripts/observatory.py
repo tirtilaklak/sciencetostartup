@@ -278,6 +278,10 @@ def create_database(path, data):
         require(not con.execute("PRAGMA foreign_key_check").fetchall(), "SQLite foreign key failure")
         require(con.execute("PRAGMA integrity_check").fetchone()[0] == "ok", "SQLite integrity failure")
     finally: con.close()
+    # Bytes 96-100 hold the SQLite library version that wrote the file. They are informational only;
+    # zeroing them keeps the database byte-identical across machines so --verify is reproducible.
+    with open(path, "r+b") as handle:
+        handle.seek(96); handle.write(b"\x00" * 4)
 
 def render_snapshot_metadata(html, data):
     compiled = date.fromisoformat(data["meta"]["as_of"])
@@ -625,13 +629,6 @@ def build(data, destination):
     # JSON is inert and HTML-sensitive characters are escaped before embedding.
     embedded = json.dumps(data, ensure_ascii=False, separators=(",", ":"), sort_keys=True, allow_nan=False).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
     html = (ROOT / "web/index.html").read_text().replace("/* OBSERVATORY_CSS */", (ROOT / "web/style.css").read_text()).replace("/* OBSERVATORY_JS */", (ROOT / "web/link-health.js").read_text() + "\n" + (ROOT / "web/app.js").read_text()).replace("<!-- OBSERVATORY_DATA -->", embedded)
-    outreach_path = ROOT / "data/medalists.json"
-    if not outreach_path.is_file():
-        raise ValueError("Verified outreach dataset missing: data/medalists.json")
-    outreach_blob = outreach_path.read_text()
-    outreach_data = json.loads(outreach_blob)
-    outreach_embedded = json.dumps(outreach_data, ensure_ascii=False, separators=(",", ":"), sort_keys=True, allow_nan=False).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
-    html = html.replace("/* OUTREACH_CSS */", (ROOT / "web/outreach.css").read_text()).replace("/* OUTREACH_JS */", (ROOT / "web/outreach.js").read_text()).replace("<!-- OUTREACH_DATA -->", outreach_embedded)
     editorial = json.loads((ROOT / "data/editorial.json").read_text())
     logo_path = ROOT / "data/logo-provenance.json"
     logo_data = json.loads(logo_path.read_text()) if logo_path.exists() else {"logos": []}
@@ -664,12 +661,12 @@ def build(data, destination):
     for source in [ROOT / "data/editorial.json", ROOT / "data/portrait-provenance.json", ROOT / "data/investor-image-provenance.json", logo_path, work_path, link_health_path, source_updates_path]:
         if source.exists(): shutil.copy2(source, destination / source.name)
     (destination / "profile-content.json").write_text(json.dumps(profile_content, indent=2, ensure_ascii=False) + "\n")
-    html = html.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{GROUP_COUNT}}", str(len({e["primary_offering"] for e in editorial["entries"]}))).replace("{{OUTREACH_COUNT}}", str(len(outreach_data["people"])))
+    html = html.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{GROUP_COUNT}}", str(len({e["primary_offering"] for e in editorial["entries"]})))
     html = render_snapshot_metadata(html, data)
     html = render_static_file_metadata(html, destination)
     (destination / "index.html").write_text(html)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}
-    (destination / "manifest.json").write_text(json.dumps({"dataset_version": data["dataset_version"], "schema_version": data["schema_version"], "outreach_schema_version": json.loads(outreach_blob)["schemaVersion"], "outreach_sha256": hashlib.sha256(outreach_path.read_bytes()).hexdigest(), "sha256": files}, indent=2) + "\n")
+    (destination / "manifest.json").write_text(json.dumps({"dataset_version": data["dataset_version"], "schema_version": data["schema_version"], "sha256": files}, indent=2) + "\n")
 
 def release(input_path, root=ROOT):
     data = json.loads(input_path.read_text())

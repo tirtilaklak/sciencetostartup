@@ -31,13 +31,16 @@ class PublicEntrypointTests(unittest.TestCase):
         cls.html = (cls.dist / "index.html").read_text()
 
     def test_embedded_data_matches_preserved_downloads(self):
-        for element, source in (("research-data", "data/canonical.json"),
-                                ("outreach-data", "data/medalists.json")):
+        for element, source in (("research-data", "data/canonical.json"),):
             match = re.search(r'<script\b[^>]*\bid="' + element +
                               r'"[^>]*>(.*?)</script>', self.html, re.S)
             self.assertIsNotNone(match, element)
             self.assertEqual(json.loads(match.group(1)),
                              json.loads((ROOT / source).read_text()), element)
+        self.assertNotIn('id="outreach-data"', self.html,
+                         "The alumni directory must not ship in the public page")
+        self.assertNotIn("mailto:", self.html.split("<footer>")[0].split('id="method-view"')[0],
+                         "No personal mailto links outside the About panel")
         self.assertEqual((self.dist / "research.json").read_bytes(),
                          (ROOT / "data/canonical.json").read_bytes())
         self.assertLess(len(self.html.encode("utf-8")), 4 * 1024 * 1024,

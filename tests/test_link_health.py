@@ -57,18 +57,10 @@ class LinkHealthTests(unittest.TestCase):
         tree = ast.parse((ROOT / "tests/js_logic.py").read_text())
         stub = next(ast.literal_eval(node.value) for node in tree.body if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == "STUB" for target in node.targets))
         checks = r'''
-const canonicalBefore=run('JSON.stringify(DATA)'),outreach=readJSON('data/medalists.json'),outreachBefore=JSON.stringify(outreach);
-node('outreach-data').textContent=JSON.stringify(outreach);node('outreach-view').querySelector=()=>null;
-// Contact markup is created when this view is first visited.
-location.hash='#outreach';
-vm.runInContext(fs.readFileSync(path.join(root,'web/outreach.js'),'utf8'),context);
-const contactAnchors=html=>html.match(/<a class="(?:email-action|linkedin-action)"[^>]*>/g)||[];
-const originalContacts=contactAnchors(node('outreach-list').innerHTML);
-assert.ok(originalContacts.length>57,'Actual verified-contact fixtures missing');
+const canonicalBefore=run('JSON.stringify(DATA)');
 assert.ok(!run(`external('https://example.org/missing','Original source')`).includes('source-link-status'),'Missing helper fallback failed');
-const identityURL=outreach.people.flatMap(person=>person.verification?.identitySourceUrls||[]).find(url=>/^https:\/\//.test(url));
 const entry=(url,status='not_found',checked_on='2026-10-15')=>({url,status,checked_on});
-window.LINK_HEALTH={entries:[entry('https://example.org/missing'),entry('https://example.org/gone','gone'),entry('https://example.org/sign-in','sign_in'),entry(identityURL,'sign_in'),...['blocked','tls_error','javascript_only'].map(status=>entry('https://example.org/'+status,status)),entry('https://example.org/invalid-date','not_found','2026-02-30'),entry('https://user:password@example.org/private'),entry('http://127.0.0.1/private'),entry('http://10.1.1.1/private'),entry('https://example.org/private?access_token=secret'),entry('https://example.org/injection','<img onerror=alert(1)>')]};
+window.LINK_HEALTH={entries:[entry('https://example.org/missing'),entry('https://example.org/gone','gone'),entry('https://example.org/sign-in','sign_in'),...['blocked','tls_error','javascript_only'].map(status=>entry('https://example.org/'+status,status)),entry('https://example.org/invalid-date','not_found','2026-02-30'),entry('https://user:password@example.org/private'),entry('http://127.0.0.1/private'),entry('http://10.1.1.1/private'),entry('https://example.org/private?access_token=secret'),entry('https://example.org/injection','<img onerror=alert(1)>')]};
 vm.runInContext(fs.readFileSync(path.join(root,'web/link-health.js'),'utf8'),context);
 const cue=url=>run(`window.linkAvailabilityHTML(${JSON.stringify(url)})`);
 for(const url of ['https://example.org/missing','https://example.org/gone']){
@@ -82,15 +74,11 @@ for(const html of [run(`external('https://example.org/missing','Original source'
 }
 assert.ok(!run(`external('https://example.org/healthy','Healthy source')`).includes('source-link-status'));
 assert.ok(!run(`external('https://example.org/missing','<img>')`).includes('><img>'),'Arbitrary anchor label was not escaped');
-vm.runInContext(fs.readFileSync(path.join(root,'web/outreach.js'),'utf8'),context);
-assert.deepEqual(contactAnchors(node('outreach-list').innerHTML),originalContacts,'Availability cues changed verified professional contacts');
-assert.ok(node('outreach-list').innerHTML.includes('source-link-status'),'Outreach source helper was not connected');
 assert.equal(run('JSON.stringify(DATA)'),canonicalBefore,'Availability cues changed canonical research');
-assert.equal(JSON.stringify(outreach),outreachBefore,'Availability cues changed the professional directory');
 delete window.LINK_HEALTH;
 vm.runInContext(fs.readFileSync(path.join(root,'web/link-health.js'),'utf8'),context);
 assert.equal(cue('https://example.org/missing'),'','Missing metadata should be a silent fallback');
-console.log(JSON.stringify({negative_categories:3,inconclusive_categories_unchanged:3,verified_contact_anchors:originalContacts.length,claims_unchanged:true,directory_unchanged:true,browser_verified:false}));
+console.log(JSON.stringify({negative_categories:3,inconclusive_categories_unchanged:3,claims_unchanged:true,browser_verified:false}));
 '''
         result = subprocess.run([shutil.which("node") or "/opt/homebrew/bin/node", "-", str(ROOT / "data/canonical.json"), str(ROOT)], input=stub.split("(async()=>{", 1)[0] + checks, text=True, cwd=ROOT, capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)

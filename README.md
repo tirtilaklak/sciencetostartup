@@ -12,8 +12,8 @@ individual source-file hashes. The GitHub history starts with this repository's
 existing initial commit. Earlier Sites Git history was not imported.
 
 The existing MIT license is preserved. The snapshot includes the already-public
-research data, verified adult outreach projection, official assets and their
-provenance. It excludes raw research archives, unpublished personal records,
+research data, official assets and their provenance. The alumni outreach
+directory is no longer published or tracked here. It excludes raw research archives, unpublished personal records,
 internal reports, credentials, browser output and deployment configuration.
 
 ## Files
@@ -21,7 +21,7 @@ internal reports, credentials, browser output and deployment configuration.
 - `web/`: editable HTML, CSS, JavaScript and local assets.
 - `data/canonical.json`: authoritative research dataset 2.5.0.
 - `data/work-routes.json`: curated Work routes, including reviewed additions and availability checks.
-- Other `data/*.json`: public profiles, editorial context, adult outreach and source updates.
+- Other `data/*.json`: public profiles, editorial context and source updates.
 - `schema/`: data and relational contracts.
 - `scripts/observatory.py`, `scripts/schema_def.py`: research and export builder.
 - `scripts/build_public_snapshot.py`: build the approved public snapshot.
