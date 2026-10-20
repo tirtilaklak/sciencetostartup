@@ -3,6 +3,8 @@
   "schema_version": "1.3.0",
   "sha256": {
     "404.html": "06b8aadc9191a14a8a3c8c5e979a7aabd134d5caac161954ba09cd906fc01766",
+    "_headers": "3943d82b8d865569e62633d79eff660d5c5167e9d03a30c23f81ea9a3a1d6c88",
+    "_redirects": "34fa1b5da30458b63f2a2c38aeceb675c5e37e2b8725e95b6f9834e3873a71e1",
     "assessments.csv": "233349f716fdf4e6f085032f10db98aaeb26a344691bfb227d665e797834be9a",
     "assets/Investor_Snapshot_Human_Depth-1000.webp": "af93397a8177810d2a1f4643b289d774176ba4a16e5838dfad5c1282f6754f73",
     "assets/Investor_Snapshot_Human_Depth.jpg": "6e01df2664fdc085a543d133528943a97b92f21e4c397a98910b6fe85ed20d65",
