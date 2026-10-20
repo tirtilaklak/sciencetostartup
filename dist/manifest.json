@@ -2,6 +2,7 @@
   "dataset_version": "2.5.0",
   "schema_version": "1.3.0",
   "sha256": {
+    "404.html": "06b8aadc9191a14a8a3c8c5e979a7aabd134d5caac161954ba09cd906fc01766",
     "assessments.csv": "233349f716fdf4e6f085032f10db98aaeb26a344691bfb227d665e797834be9a",
     "assets/Investor_Snapshot_Human_Depth-1000.webp": "af93397a8177810d2a1f4643b289d774176ba4a16e5838dfad5c1282f6754f73",
     "assets/Investor_Snapshot_Human_Depth.jpg": "6e01df2664fdc085a543d133528943a97b92f21e4c397a98910b6fe85ed20d65",
@@ -101,7 +102,7 @@
     "editorial.json": "ba4ecccc50c5fd2af1a61ea8a2a6cb1c85487034e1e6247c5bbaa6826210478e",
     "editorial_readouts.csv": "8f178ce867808fca5f2696c3a0dfdabac41a376a80f0d86844f8bc9de7e1f226",
     "funding_rounds.csv": "9699fd03f27d47db99e22460e089d16db2349157a8fc112c91c33a472120f1a2",
-    "index.html": "d298a3fddecc411c1299e5712fde418e30fdae6920d6772727017f7d82e1ec20",
+    "index.html": "6a46538907238c24153efce954aca47a9b1d7a2f06d17b7475fc2ff8ace9f990",
     "investor-image-provenance.json": "d2d629da067c8e5db55097c9158dfa66fa035ffe34c92d5db62e2653aa596315",
     "investors.csv": "e29e8685a652a866447c5dd7f744fbbc1c285bb2226b44dbefa94fb3a9644c2f",
     "link-health.json": "3c29631dc8d33f88e56ca3bf3ab8aed4897bab555a8ca1cd1339857f70542021",
