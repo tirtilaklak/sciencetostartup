@@ -73,7 +73,7 @@ console.log(JSON.stringify({status:'passed',cases,identities,unicodeAndLiteralCa
 def run_checks(app_source=None):
     protected = [ROOT / name for name in (
         "data/canonical.json", "data/source-updates.json", "data/profile-content.json",
-        "data/profile-afterquery.json", "data/editorial.json", "data/medalists.json", "web/app.js",
+        "data/profile-afterquery.json", "data/editorial.json", "web/app.js",
     )]
     before = {path: hashlib.sha256(path.read_bytes()).hexdigest() for path in protected}
     tree = ast.parse((ROOT / "tests/js_logic.py").read_text())

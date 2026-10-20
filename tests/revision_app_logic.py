@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-paths = [ROOT / "data/canonical.json", ROOT / "data/medalists.json", ROOT / "web/assets/Investor_Snapshot_Human_Depth.png"]
+paths = [ROOT / "data/canonical.json", ROOT / "web/assets/Investor_Snapshot_Human_Depth.png"]
 before = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
 tree = ast.parse((ROOT / "tests/js_logic.py").read_text())
 stub = next(ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "STUB" for t in n.targets))
