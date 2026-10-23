@@ -343,9 +343,8 @@ const REVIEWED_TRENDS={
 };
 function growthHTML(id){const config=REVIEWED_TRENDS[id],rows=config?config.ids.map(mid=>DATA.metrics.find(m=>m.id===mid)).filter(Boolean):[],changes=eligibleMetrics(id,'growth_rate'),max=Math.max(1,...rows.map(m=>m.value));return (rows.length>1?`<div class="growth-trend" data-growth-trend="${esc(id)}"><h3>Comparable annual revenue</h3><p class="sub">${esc(config.note)}</p>${rows.map(m=>`<div class="chart-row"><div class="chart-line"><span>${esc(m.period_label)}</span>${numberButton(m)}</div><div class="bar-track" aria-hidden="true"><span class="bar" style="width:${m.value/max*100}%"></span></div><span class="sub">${esc(evidenceLabel(claims[m.claim_id]))}</span></div>`).join('')}<p class="sub">Linear bars start at zero. Missing periods are not filled.</p></div>`:'<p class="muted">No reviewed like-for-like time series is charted. Dated observations retain their own periods and bases below.</p>')+changes.map(m=>`<article class="record" data-growth="${esc(m.id)}"><h3>${esc(m.label)} · ${numberButton(m)}</h3>${provenance(claims[m.claim_id])}<p>${esc(m.basis)}</p>${claims[m.claim_id].caveat?`<p class="sub">${esc(claims[m.claim_id].caveat)}</p>`:''}</article>`).join('');}
 /* Presentation-only profile replacement. Canonical data is never changed. */
-/* Presentation-only profile replacement. Canonical data is never changed. */
 function profileSection(name,label,html){
-  return `<section class="profile-section" id="profile-${name}" data-profile-section="${name}"><h2>${label}</h2>${html||'<p class="muted">Not established in the reviewed sources.</p>'}</section>`;
+  return `<section class="profile-section" id="profile-${name}" data-profile-section="${name}"><h2>${esc(label)}</h2>${html||'<p class="muted">Not established in the reviewed sources.</p>'}</section>`;
 }
 
 // Decode company fragment components once. Malformed escapes stay unknown.

@@ -176,6 +176,11 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  run('setSelection([])');assert.equal((node('compare-content').innerHTML.match(/data-mobile-compare=/g)||[]).length,3);assert.ok(node('compare-content').innerHTML.includes('TaskUs + Appen'));assert.ok(node('compare-content').innerHTML.includes('data-mobile-compare="2"'));click(button({mobileCompare:'1'}));assert.equal(run('state.mobileCompare'),1,'Default example must reach final company');
  assert.ok(/data-comparison-company="scale_ai" class=""/.test(node('compare-content').innerHTML));run('setSelection([])');
 
+ // Curated profile headings render as text.
+ const headed=curated.find(entry=>entry.traction_heading),heading=headed.traction_heading;headed.traction_heading='<b>x</b>';
+ const tractionHeading=run(`profileHTML(${JSON.stringify(headed.company_id)})`).match(/data-profile-section="traction"><h2>([\s\S]*?)<\/h2>/)[1];headed.traction_heading=heading;
+ assert.equal(tractionHeading,'&lt;b&gt;x&lt;/b&gt;');assert.ok(!tractionHeading.includes('<'),'Profile heading h2 must have no element children');
+
  // Role routes, pay units and availability remain separate, with no company pay band.
  const routes=window.WORK_ROUTES.routes;assert.equal(run('filteredWork().length'),routes.length);
  assert.ok(routes.length>39);assert.equal(new Set(routes.map(r=>r.id)).size,routes.length);
