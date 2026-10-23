@@ -144,7 +144,8 @@ Object.assign(PUBLIC_COPY_EDITS,{
   "Do not repeat the Reuters annual-revenue wording; the primary company release explicitly says annual revenue runrate.": "The primary company release calls this an annual revenue run rate; Reuters described it as annual revenue.",
   "Keep version 2 separate from the 912-task original benchmark.": "The original benchmark is a separate, 912-task version.",
   "No exact amount is established; do not synthesize a numeric revenue or profitability metric.": "No numeric revenue or profitability figure is established.",
-  "Named accountable founders, screening/verification and payout process. Inconsistent headcount does not erase team identity, but current operational controls lack independent scope.": "Named founders are identified. The company describes screening and verification, alongside its payout process. Headcount reports conflict. Independent evidence about current operational controls is limited."
+  "Named accountable founders, screening/verification and payout process. Inconsistent headcount does not erase team identity, but current operational controls lack independent scope.": "Named founders are identified. The company describes screening and verification, alongside its payout process. Headcount reports conflict. Independent evidence about current operational controls is limited.",
+  "Current site invites contact at xiangyi@benchflow.ai and open research contributions": "Current site invites contact via its About page and open research contributions"
 });
 const PUBLIC_RECORD_IDS=new Set(Object.values(DATA).filter(Array.isArray).flatMap(rows=>rows.map(r=>r?.id).filter(Boolean)).concat(DATA.rubric.stages.map(s=>s.id),['not_applicable','pending']));
 const PUBLIC_TEXT_CACHE=new Map();
@@ -357,7 +358,7 @@ function routeParts(hash=location.hash){
 function isCompanyId(id){return typeof id==='string'&&Object.hasOwn(companies,id);}
 // Linkable sections that live inside a view.
 const PAGE_SECTIONS={venture:'market',about:'method'};
-const PROFILE_ROUTE_SECTIONS=new Set(['business','products','customers','traction','growth','people','finance','capital','work','method','questions','sources','observations']);
+const PROFILE_ROUTE_SECTIONS=new Set(['business','products','customers','risks','traction','growth','people','finance','capital','work','method','questions','sources','observations']);
 function profileRouteSection(value){return PROFILE_ROUTE_SECTIONS.has(value)?value==='capital'?'finance':value:'';}
 function profileRouteDestination(value){
   const section=profileRouteSection(value);if(!section)return null;
