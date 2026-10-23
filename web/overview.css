@@ -102,7 +102,7 @@
 .grade-counts li{display:flex;align-items:center;gap:6px}
 .check-item .sub{font-size:13px}
 /* From the publisher: the proposed lab, kept apart from the research in a tinted band. */
-.venture-band{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);gap:40px;align-items:start;margin:52px 0 0;padding:32px;background:var(--pale);border-top:2px solid var(--green)}
+.venture-band{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);gap:40px;align-items:start;margin:60px 0 0;padding:32px;background:var(--pale);border-top:2px solid var(--green)}
 .venture-copy h2{font-size:26px;margin:0 0 14px}
 .venture-copy>p{font-size:15px;line-height:1.6;color:var(--ink);margin:0 0 14px;max-width:560px}
 #market-view .venture-copy .investor-status,#market-view .venture-copy .investor-lab-positioning{font-size:14px;line-height:1.55;color:var(--muted);margin:0 0 12px}
