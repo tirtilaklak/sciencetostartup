@@ -253,7 +253,8 @@ function w4RouteGroups(rows){
   groups.primary.sort((a,b)=>rank(a)-rank(b)||(w4Checked(b)||'').localeCompare(w4Checked(a)||'')||companies[a.company_id].name.localeCompare(companies[b.company_id].name)||a.role.localeCompare(b.role));
   return groups;
 }
-// A closed group carries only its route ids. Its cards render on first open.
+// A closed group carries only its route ids. Its cards render on first open, which keeps the Work view light.
+// The trade-off: browser find-in-page cannot reach cards in a closed group. The Work search covers every route.
 function w4GroupDisclosure(rows,label,open=false,key=''){
   return rows.length?`<details class="work-route-archive-group w4-route-group" ${key?`id="${w4Escape(key)}"`:""} ${open?'open':''}><summary>${w4Escape(label)} <span>(${rows.length})</span></summary><div class="w4-secondary-list"${open?'':` data-w4-routes="${w4Escape(rows.map(route=>route.id).join(' '))}"`}>${open?rows.map(route=>workCard(route,'compact')).join(''):''}</div></details>`:'';
 }
@@ -289,11 +290,13 @@ function renderWork(){
   const rows=filteredWork(),groups=w4RouteGroups(rows),orgs=new Set(rows.map(r=>r.company_id));
   const filtered=Boolean((state.workQuery||'').trim()||state.workGroup||state.workPay||state.workEligibility);
   if(!filtered){const perCompany={},kept=[],overflow=[];for(const route of groups.primary){perCompany[route.company_id]=(perCompany[route.company_id]||0)+1;(perCompany[route.company_id]<=3?kept:overflow).push(route);}groups.primary=kept.concat(overflow);}
-  const visibleCount=filtered?groups.primary.length:20;
+  // Searches keep the same budget as the default view: 20 full cards, the rest in the closed More group.
+  // Careers and other links open only when a filter leaves a short list, so a one-letter query stays fast.
+  const visibleCount=20,shortList=list=>filtered&&list.length<=12;
   const filterCount=[state.workGroup,state.workPay,state.workEligibility].filter(Boolean).length,summary=document.querySelector('.work-filters .responsive-filter-panel>summary');
   if(summary)summary.textContent=filterCount?`Filters (${filterCount})`:'Filters';
   $('work-count').textContent=`${rows.length} recorded ${rows.length===1?'link':'links'} across ${orgs.size} ${orgs.size===1?'organization':'organizations'}.`;if($('work-overview'))$('work-overview').innerHTML=`<span>${rows.length} ${rows.length===1?'link':'links'}</span><button data-work-section="work-listed" ${groups.primary.length?'':'disabled'}>${groups.primary.length} roles/programs</button><button data-work-section="work-careers" ${groups.careers.length?'':'disabled'}>${groups.careers.length} careers</button><button data-work-section="work-other" ${groups.other.length?'':'disabled'}>${groups.other.length} other</button>`;
-  $('work-cards').innerHTML=(groups.primary.length?`<h2 id="work-listed" class="work-list-heading">Roles and programs <span>${groups.primary.length} recorded links</span></h2>`:'')+groups.primary.slice(0,visibleCount).map(route=>workCard(route)).join('')+w4GroupDisclosure(groups.primary.slice(visibleCount),'More listed routes')+w4GroupDisclosure(groups.careers,'Careers pages',filtered,'work-careers')+w4GroupDisclosure(groups.other,'Uncertain, historical and research links',filtered,'work-other')+(rows.length?'':'<p class="w4-empty">No matching routes. Clear a filter to see more.</p>');
+  $('work-cards').innerHTML=(groups.primary.length?`<h2 id="work-listed" class="work-list-heading">Roles and programs <span>${groups.primary.length} recorded links</span></h2>`:'')+groups.primary.slice(0,visibleCount).map(route=>workCard(route)).join('')+w4GroupDisclosure(groups.primary.slice(visibleCount),'More listed routes')+w4GroupDisclosure(groups.careers,'Careers pages',shortList(groups.careers),'work-careers')+w4GroupDisclosure(groups.other,'Uncertain, historical and research links',shortList(groups.other),'work-other')+(rows.length?'':'<p class="w4-empty">No matching routes. Clear a filter to see more.</p>');
   syncSelection();
 }
 function workSummary(id){

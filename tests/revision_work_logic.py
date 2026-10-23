@@ -1,4 +1,4 @@
-"""Verify work search spacing does not change disclosure state or filter results."""
+"""Verify work search spacing does not change disclosure state or filter results, and searches keep the 20-card budget."""
 import ast
 import shutil
 import subprocess
@@ -17,7 +17,7 @@ function snapshot(query,filters={}){
  const html=node('work-cards').innerHTML;
  return{ids:plain(run('filteredWork().map(route=>route.id)')),html:clean(html),
   beforeGroups:(html.split('<details class="work-route-archive-group w4-route-group"')[0].match(/data-work-route=/g)||[]).length,
-  more:html.includes('More listed routes'),
+  more:html.includes('More listed routes'),primary:run('w4RouteGroups(filteredWork()).primary.length'),
   openGroups:(html.match(/<details class="work-route-archive-group w4-route-group"[^>]*\bopen\b/g)||[]).length,
   count:node('work-count').textContent,overview:node('work-overview').innerHTML};
 }
@@ -33,7 +33,8 @@ let nonemptyCases=0;
 for(const query of ['AfterQuery','Python','no-such-work-route-qqz']){
  const exact=snapshot(query),padded=snapshot(' \t'+query+'\n ');
  assert.deepEqual(padded,exact,'Padding changed a genuine search: '+query);
- assert.equal(exact.more,false,'An active search should reveal all matching primary roles');
+ assert.equal(exact.beforeGroups,Math.min(20,exact.primary),'An active search shows up to 20 matching roles as full cards');
+ assert.equal(exact.more,exact.primary>20,'Matching roles beyond 20 belong in the closed More listed routes group');
  if(query==='AfterQuery')assert.equal(exact.ids.length,45,'AfterQuery search coverage changed');
  if(query==='no-such-work-route-qqz')assert.equal(exact.ids.length,0,'Unknown query should remain empty');
  nonemptyCases++;
@@ -44,7 +45,8 @@ for(const filters of [{workGroup:'Employment'},{workPay:'numeric'},
  {workGroup:'Employment',workPay:'numeric',workEligibility:'US listing evidence'}]){
  const filtered=snapshot('',filters);
  assert.ok(filtered.ids.length>0,'Filter intersection lost its fixture results');
- assert.equal(filtered.more,false,'A real filter should reveal matching primary roles');
+ assert.equal(filtered.beforeGroups,Math.min(20,filtered.primary),'A real filter shows up to 20 matching roles as full cards');
+ assert.equal(filtered.more,filtered.primary>20,'Matching roles beyond 20 belong in the closed More listed routes group');
  for(const query of whitespace)assert.deepEqual(snapshot(query,filters),filtered,
   'Whitespace bypassed or changed an active filter: '+JSON.stringify(filters));
  filterCases++;
