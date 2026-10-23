@@ -32,7 +32,7 @@ for(const c of data.companies){
  assert.equal(html.includes('id="profile-risks"'),expected.length>0,c.id+' hidden when empty');
  assert.equal(run(`profileHTML(${JSON.stringify(c.id)})`).includes('id="profile-risks"'),expected.length>0);
  if(!expected.length)continue;riskCompanies++;
- assert.ok(!html.includes('Dated events'));assert.ok(html.includes('Risks named in the evidence'));assert.equal(html.split(note).length,2);
+ assert.ok(!html.includes('Dated events'));assert.ok(html.includes('Risks named in the evidence'));assert.ok(!html.includes('Lawsuit entries'),c.id+' a section without dated events has no lawsuit note');
  for(const id of expected)assert.ok(new RegExp(`<button[^>]*data-claim="${id.replace(/\./g,'\\.')}"[^>]*>Source</button>`).test(html),id+' source button');
 }
 assert.ok(riskCompanies>=30,'Supported risk claims disappeared');
@@ -56,6 +56,8 @@ window.COMPANY_EVENTS={version:'1.0.0',reviewed_on:'2026-10-23',events:[
 const withEvents=section('mercor');
 assert.deepEqual(ids(withEvents,'event'),['mercor.event.aa','mercor.event.c','mercor.event.b','mercor.event.a'],'Newest first; same date by id');
 assert.ok(withEvents.indexOf('Dated events')<withEvents.indexOf('Risks named in the evidence'));assert.equal(withEvents.split(note).length,2);
+assert.ok(withEvents.includes(note+' Statuses were checked on 23 Oct 2026.</p>'),'One note line, with the status check date');
+window.COMPANY_EVENTS.events[1]={...window.COMPANY_EVENTS.events[1],status_checked_on:'2026-09-01'};assert.ok(section('mercor').includes(note+' Statuses were checked between 1 Sep 2026 and 23 Oct 2026.</p>'),'A range when checks differ');window.COMPANY_EVENTS.events[1].status_checked_on='2026-10-23';
 const text=visible(withEvents);
 for(const label of ['Apr 2026 Workforce change','Apr 2026 Data incident','Apr 2026 Customer change','Sep 2025 Lawsuit'])assert.ok(text.includes(label),label);
 assert.ok(withEvents.includes('<time datetime="2026-04">Apr 2026</time>'));

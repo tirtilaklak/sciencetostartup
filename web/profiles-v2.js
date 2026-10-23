@@ -40,12 +40,17 @@ function profileRelationshipGrid(id){const rows=profileRelationships(id),feature
 const PROFILE_EVENT_KINDS={lawsuit:'Lawsuit',data_incident:'Data incident',customer_change:'Customer change',workforce_change:'Workforce change',filing:'Filing'};
 function profileMonthHTML(value,prefix=''){return /^\d{4}-\d{2}(-\d{2})?$/.test(value)?`${prefix}<time datetime="${attr(value)}">${esc(new Date(value.slice(0,7)+'-01T12:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'}))}</time>`:esc(dateText(value));}
 function profileEvents(id){return (window.COMPANY_EVENTS?.events||[]).filter(e=>e.company_id===id||e.related_company_ids.includes(id)).sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id));}
+// Event statuses carry the date they were checked, since a pending case can change after review.
+function profileStatusesChecked(events){
+ const days=[...new Set(events.map(e=>e.status_checked_on).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)))].sort(),label=d=>`${Number(d.slice(8))} ${new Date(d+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',timeZone:'UTC'})} ${d.slice(0,4)}`;
+ return !days.length?'':days.length===1?`Statuses were checked on ${label(days[0])}.`:`Statuses were checked between ${label(days[0])} and ${label(days.at(-1))}.`;
+}
 function profileRiskClaims(id){return currentClaims(id).filter(c=>c.subject==='risks'&&c.status==='supported').sort(byRecent);}
 function profileRisks(id){
  const events=profileEvents(id),risks=profileRiskClaims(id);if(!events.length&&!risks.length)return '';
  const eventRows=events.map(e=>`<article class="relationship-card" data-profile-event="${attr(e.id)}"><div><p class="risk-date">${profileMonthHTML(e.date)}</p><p class="relationship-kind">${esc(PROFILE_EVENT_KINDS[e.kind]||title(e.kind))}</p></div><div class="relationship-account"><h4>${esc(e.title)}</h4><p>${esc(e.detail)}</p><p class="risk-meta">${esc(e.status)}${e.sources.map(s=>' · '+external(s.url,s.publisher)).join('')}</p></div></article>`).join('');
  const riskRows=risks.map(c=>`<article class="relationship-card" data-profile-risk="${attr(c.id)}"><div><p class="risk-date">${profileMonthHTML(c.as_of,'As of ')}</p></div><div class="relationship-account"><p>${esc(c.statement)}</p></div><div class="profile-card-source">${profileReferences([c.id])}</div></article>`).join('');
- return profileSection('risks','Risks and disputes',`<div class="profile-risks">${events.length?`<h3 class="eyebrow">Dated events</h3><div class="profile-relationship-grid">${eventRows}</div>`:''}${risks.length?`<h3 class="eyebrow">Risks named in the evidence</h3><div class="profile-relationship-grid">${riskRows}</div>`:''}<p class="sub">Lawsuit entries describe allegations and court filings, not findings. Dates show when a case was filed or an event was reported.</p></div>`);
+ return profileSection('risks','Risks and disputes',`<div class="profile-risks">${events.length?`<h3 class="eyebrow">Dated events</h3><div class="profile-relationship-grid">${eventRows}</div>`:''}${risks.length?`<h3 class="eyebrow">Risks named in the evidence</h3><div class="profile-relationship-grid">${riskRows}</div>`:''}${events.length?`<p class="sub">Lawsuit entries describe allegations and court filings, not findings. Dates show when a case was filed or an event was reported. ${esc(profileStatusesChecked(events))}</p>`:''}</div>`);
 }
 function profilePeopleRows(id){
   const curated=profileContent(id).people;
