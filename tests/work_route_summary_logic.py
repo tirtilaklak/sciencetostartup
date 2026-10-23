@@ -24,8 +24,8 @@ for(const row of workLabels){
  }else assert.equal(row.label,row.careers.length?'Careers directory':'No current paid route verified',row.id+' unsupported current route label');
 }
 assert.equal(run('workType("apto")'),'Employment roles · Expert & contractor projects');
-assert.equal(run('workType("elorian")'),'Expert & contractor projects');
-assert.equal(run('hasWorkRoute("elorian")'),true);
+assert.equal(run('workType("elorian")'),'No current paid route verified');
+assert.equal(run('hasWorkRoute("elorian")'),false);
 assert.equal(run('workType("taskus")'),'Careers directory');
 assert.equal(run('workType("sama")'),'Careers directory');
 assert.equal(run('hasWorkRoute("hackerrank")'),false);
@@ -42,7 +42,7 @@ for(const mode of ['', 'compact']){
 }
 const revised={...writer,availability_note:'No schedule conflict stated.'};
 assert.equal(run(`w4ScheduleNote(${JSON.stringify(revised)})`),'','Do not retain an obsolete conflict after source text changes');
-console.log(JSON.stringify({companies_checked:workLabels.length,summary_filter_alignment:true,apto_employment:true,elorian_listed:true,writer_card_variants:2,writer_qualifications:true,browser_verified:false}));
+console.log(JSON.stringify({companies_checked:workLabels.length,summary_filter_alignment:true,apto_employment:true,elorian_uncertainty:true,writer_card_variants:2,writer_qualifications:true,browser_verified:false}));
 '''
 node = shutil.which("node") or "/opt/homebrew/bin/node"
 result = subprocess.run(
