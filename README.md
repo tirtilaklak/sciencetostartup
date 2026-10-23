@@ -53,7 +53,7 @@ from this public repository. The public snapshot wrapper calls the same
 validated `build()` function without changing or weakening that release check.
 It reproduces an approved snapshot; it does not attest to a new research release.
 
-CI runs the same checks on every push and pull request:
+CI runs the same checks on pushes to `main` and on pull requests:
 
 ```sh
 python3 -m unittest discover -s tests -p 'test_*.py'
@@ -66,10 +66,12 @@ python3 tests/revision_work_logic.py
 python3 tests/work_route_summary_logic.py
 python3 tests/reliability_copy_context_logic.py
 python3 tests/reliability_failure_state_logic.py
+python3 tests/risk_section_logic.py
 ```
 
-The 71 unit tests cover the pipeline, the build, static pages, Work routes, link
-health and a privacy scan of the published text files and database. The eight logic checks run
+The 94 unit tests cover the pipeline, the build, static pages, company events,
+Work routes, link health and a privacy scan of the published text files and
+database. The nine logic checks run
 the page scripts in Node against a DOM stub; they are not browser proof.
 Historical comparison tests and local audit reports remain in the research
 repository.
