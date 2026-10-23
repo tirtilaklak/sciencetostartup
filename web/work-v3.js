@@ -9,6 +9,10 @@ function workRouteRows(){
 function workRoutesFor(id){return workRouteRows().filter(r=>r.company_id===id);}
 // Attribute identifiers must not pass through the prose-normalizing esc().
 function workRouteAttr(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+// One formatter for every work date: building a new one per label made the first #work render slow.
+const WORK_DAY_FORMAT=new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}),WORK_MONTH_FORMAT=new Intl.DateTimeFormat('en-GB',{month:'short',year:'numeric',timeZone:'UTC'});
+function workDayLabel(value){return WORK_DAY_FORMAT.format(new Date(value+'T12:00:00Z'));}
+function workMonthLabel(value){return WORK_MONTH_FORMAT.format(new Date(value+'-15T12:00:00Z'));}
 const WORK_ROUTE_STATUS={
   listed:'Listing reviewed',program:'Project network',careers:'Careers route',
   intake_unverified:'Intake unconfirmed',pay_conflict:'Pay conflict',unverified:'Not reverified',
@@ -29,7 +33,7 @@ function workTerms(id){
 }
 function workRouteDate(value){
   if(!value||value==='undated')return 'Undated source';
-  if(/^\d{4}-\d{2}-\d{2}$/.test(value))return new Date(value+'T12:00:00Z').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});
+  if(/^\d{4}-\d{2}-\d{2}$/.test(value))return workDayLabel(value);
   return value;
 }
 function workRoutePayBasis(route){
@@ -88,13 +92,13 @@ function workCard(route){
     <details class="work-requirements"><summary>Requirements & sources</summary>${workRouteEvidence(route)}</details>
   </article>`;
 }
+// Search, pay and place helpers (w4QueryMatcher, w4PayMatches, w4WhereMatches) live in work-v4.js.
+// A whole-phrase match wins; otherwise every word must match, with worker synonyms.
 function filteredWork(){
-  const tokens=(state.workQuery||'').toLowerCase().split(/\s+/).filter(Boolean);
-  return workRouteRows().filter(route=>{
-    const c=companies[route.company_id];
-    const searchable=[c?.name,...(c?.aliases||[]),route.role,route.summary,route.group,route.geography,route.pay_label,...(route.requirements||[])].join(' ').toLowerCase();
-    return tokens.every(token=>searchable.includes(token))&&(!state.workGroup||route.group===state.workGroup)&&(!state.workPay||(state.workPay==='numeric')===Boolean(route.numeric_pay))&&(!state.workEligibility||route.eligibility===state.workEligibility);
-  }).sort((a,b)=>(WORK_ROUTE_ORDER[a.status]??10)-(WORK_ROUTE_ORDER[b.status]??10)||Number(b.numeric_pay)-Number(a.numeric_pay)||companies[a.company_id].name.localeCompare(companies[b.company_id].name)||a.role.localeCompare(b.role));
+  const matcher=w4QueryMatcher(state.workQuery);
+  let rows=workRouteRows().filter(route=>(!state.workGroup||route.group===state.workGroup)&&w4PayMatches(route,state.workPay)&&w4WhereMatches(route,state.workEligibility));
+  if(matcher){const text=new Map(rows.map(route=>[route,w4SearchText(route)])),phrase=rows.filter(route=>matcher.phrase(text.get(route)));rows=phrase.length?phrase:rows.filter(route=>matcher.all(text.get(route)));}
+  return rows.sort((a,b)=>(WORK_ROUTE_ORDER[a.status]??10)-(WORK_ROUTE_ORDER[b.status]??10)||Number(b.numeric_pay)-Number(a.numeric_pay)||companies[a.company_id].name.localeCompare(companies[b.company_id].name)||a.role.localeCompare(b.role));
 }
 function renderWork(){
   const rows=filteredWork(),active=rows.filter(r=>!WORK_ROUTE_ARCHIVE.has(r.status)&&r.status!=='careers'),careers=rows.filter(r=>r.status==='careers'),archive=rows.filter(r=>WORK_ROUTE_ARCHIVE.has(r.status)),orgs=new Set(rows.map(r=>r.company_id));

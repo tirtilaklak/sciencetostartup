@@ -179,7 +179,7 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  // Role routes, pay units and availability remain separate, with no company pay band.
  const routes=window.WORK_ROUTES.routes;assert.equal(run('filteredWork().length'),routes.length);
  assert.ok(routes.length>39);assert.equal(new Set(routes.map(r=>r.id)).size,routes.length);
- run(`state.workQuery='AIXI';renderWork()`);assert.deepEqual(plain(run('filteredWork().map(r=>r.company_id)')),routes.filter(r=>r.company_id==='aixi').map(r=>r.company_id));assert.ok(node('work-count').textContent.includes('1 organization'));node('work-reset').callbacks.click();
+ run(`state.workQuery='AIXI';renderWork()`);assert.deepEqual(plain(run('filteredWork().map(r=>r.company_id)')),routes.filter(r=>r.company_id==='aixi').map(r=>r.company_id));assert.ok(node('work-count').textContent.includes('1 company'));node('work-reset').callbacks.click();
  for(const route of routes){
   const html=run(`workCard(${JSON.stringify(route)})`),details=html.slice(html.indexOf('<details class="w4-details">'));
   assert.ok(html.includes('data-work-route="'+route.id+'"'),route.id);assert.ok(html.includes(run(`esc(${JSON.stringify(route.role)})`)));
