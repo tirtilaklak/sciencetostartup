@@ -22,7 +22,7 @@ const sentence='Analyzes voice conversations as they happen to reduce manual not
 assert.ok(run(`profileProducts('taskus')`).some(product=>product.description===sentence),'Retain the TaskUs offering sentence');
 const results=query=>{run(`Object.assign(state,{query:${JSON.stringify(query)},category:'',stage:'',financial:false,work:false,sort:'name'});renderDirectory()`);return plain(run('filtered().map(company=>company.id)'));};
 const cases=[];
-function exact(query,expected){const actual=results(query);assert.deepEqual(actual,expected,query);assert.equal(node('result-count').textContent,`Showing ${expected.length} of 39 organizations`);cases.push({query,ids:actual});}
+function exact(query,expected){const actual=results(query);assert.deepEqual(actual,expected,query);assert.equal(node('result-count').textContent,`Showing ${expected.length} of 39 companies`);cases.push({query,ids:actual});}
 for(const query of ['Appen','APPEN',' \t appen \n','Appen Appen'])exact(query,['appen']);
 for(const query of ['happen','TaskUs happen','happen TASKUS'])exact(query,['taskus']);
 assert.ok(results('App').includes('appen'),'Company prefixes must remain searchable');
