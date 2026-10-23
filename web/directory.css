@@ -45,6 +45,7 @@ html:has(#compare-tray:not([hidden])){scroll-padding-bottom:96px}
  .compare-add label{flex:1;min-width:0}
  .compare-controls select{width:100%;min-width:0}
 }
+@media(max-width:420px){.compare-controls{grid-template-columns:minmax(0,1fr)}.compare-controls>button{justify-self:start}}
 .comparison-mode{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px}
 .comparison-mode p{margin:0}
 .comparison-mode .text-link{min-height:32px;font-size:13px}
