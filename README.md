@@ -69,7 +69,7 @@ python3 tests/reliability_failure_state_logic.py
 python3 tests/risk_section_logic.py
 ```
 
-The 94 unit tests cover the pipeline, the build, static pages, company events,
+The 98 unit tests cover the pipeline, the build, static pages, company events,
 Work routes, link health and a privacy scan of the published text files and
 database. The nine logic checks run
 the page scripts in Node against a DOM stub; they are not browser proof.
@@ -88,7 +88,8 @@ is the source repository and reviewed backup. No deployment workflow was added.
 1. Analytics. Create a GoatCounter site with the code `sciencetostartup`. Set
    the `sts-analytics` meta content in `web/index.html` to
    `https://sciencetostartup.goatcounter.com/count`, then rebuild and deploy.
-   While the content is empty, nothing loads and nothing is counted.
+   The static company pages pick up the same setting at build time. While
+   the content is empty, nothing loads and nothing is counted.
 2. Search. Verify the domain in Google Search Console and Bing Webmaster Tools,
    and submit `https://sciencetostartup.com/sitemap.xml` in each.
 3. Dataset corrections. Corrections that need a new dataset version are listed
