@@ -571,7 +571,7 @@ STYLE = (
     "tbody tr{display:flex;flex-wrap:wrap;column-gap:18px;padding:12px 0;border-bottom:1px solid var(--border)}th,td{padding:0;border:0}td{margin-top:4px}td.value{white-space:normal}tbody th,td.wide-cell{flex-basis:100%}"
     "td[data-label]::before{content:attr(data-label) ': ';content:attr(data-label) ': ' / '';font-size:13px;font-weight:400;color:var(--muted)}"
     ".site-footer nav{grid-template-columns:1fr 1fr}}"
-    "@media(max-width:380px){:root{--gutter:16px}.site-nav a{font-size:12px}h1{font-size:32px}}"
+    "@media(max-width:380px){:root{--gutter:16px}.site-nav{gap:4px}.site-nav a{padding:0;font-size:11.5px;white-space:nowrap}h1{font-size:32px}}"
     "@media(forced-colors:active){.ext::after{background:LinkText}.tag,.mark{border-color:CanvasText}}"
 )
 WORDMARK_ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg>'
@@ -651,7 +651,8 @@ def figure_row(research, metric, context=None):
     notes = [research.correction(metric, "display_attribution"), clean((context or {}).get("note"))]
     head = f'<th scope="row">{escape(figure_label(research, metric))}<span class="sub">{escape(" · ".join(d for d in details if d))}</span>' + "".join(f'<span class="sub">{escape(note)}</span>' for note in notes if note and note != "Undated company claim") + "</th>"
     value = f'<td class="value" data-label="Value">{escape(value_text(metric))}' + (' <span class="tag">Estimate</span>' if metric.get("reported_vs_estimated") == "estimated" else "") + "</td>"
-    period = f'<td data-label="Date">{escape(metric_period(research, metric))}' + (' <span class="tag">Historical</span>' if research.historical_year(metric) else "") + "</td>"
+    when = metric_period(research, metric)
+    period = f'<td data-label="Date">{escape("Not stated" if when == "Date not stated" else when)}' + (' <span class="tag">Historical</span>' if research.historical_year(metric) else "") + "</td>"
     return f'<tr data-metric="{escape(metric["id"])}">{head}{value}{period}<td data-label="Grade">{escape(research.grade(metric) or "Not graded")}</td><td class="wide-cell" data-label="Source">{source_html(research, metric)}</td></tr>'
 
 
