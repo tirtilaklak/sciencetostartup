@@ -157,12 +157,14 @@ class CompanyEventsBuildTests(unittest.TestCase):
         self.assertLess(text.index("<h2>Headline metrics</h2>"), text.index("<h2>Risks and disputes</h2>"))
         self.assertLess(text.index("<h2>Risks and disputes</h2>"), text.index("<h2>Paid work and open routes</h2>"))
         self.assertLess(text.index("Test complaint &amp; reply"), text.index("Test customer pause"))
-        for fragment in ["<h3>Dated events</h3>", ">Sep 2025<br>", ">Lawsuit<", ">Jun 2025<br>", ">Customer change<", '<td class="status">Pending</td>', '<a href="https://example.org/docket" rel="noopener">Test Court</a>', '<a href="https://example.org/report" rel="noopener">Test Wire</a>', f'<p class="muted">{EVENTS_NOTE}</p>']:
+        for fragment in ["<h3>Dated events</h3>", ">Sep 2025<br>", ">Lawsuit<", ">Jun 2025<br>", ">Customer change<", '<td class="status">Pending</td>', '<a href="https://example.org/docket" rel="noopener">Test Court</a>', '<a href="https://example.org/report" rel="noopener">Test Wire</a>', f'<p class="muted">{EVENTS_NOTE} Statuses were checked on 23 Oct 2026.</p>']:
             self.assertIn(fragment, text)
         related = self.page("mercor")
         self.assertIn("Test complaint &amp; reply", related)
         self.assertNotIn("Test customer pause", related)
         self.assertNotIn("<h3>Dated events</h3>", self.page("prolific"))
+        self.assertIn("<h3>Risks named in the evidence</h3>", self.page("appen"))
+        self.assertNotIn(EVENTS_NOTE, self.page("appen"), "the lawsuit note goes with dated events only")
 
     def test_supported_risk_claims_render_newest_first(self):
         risks = [c for c in self.data["claims"] if c["subject"] == "risks"]

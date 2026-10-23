@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from observatory import build
-from static_pages import METRIC_LIMIT, REWORDED_FIELDS, STYLE, headline_metrics, load_copy_edits, public_wording
+from static_pages import METRIC_LIMIT, REWORDED_FIELDS, STYLE, analytics_endpoint, document, headline_metrics, load_copy_edits, public_wording
 
 ORIGIN = "https://sciencetostartup.com"
 NAMESPACE = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
@@ -114,7 +114,11 @@ class StaticPageTests(unittest.TestCase):
         locs = [u.find(NAMESPACE + "loc").text for u in urls]
         self.assertEqual(locs[:2], [ORIGIN + "/", ORIGIN + "/companies/"])
         self.assertEqual(sorted(locs[2:]), sorted(f"{ORIGIN}/company/{cid}/" for cid in self.companies))
-        for url in urls: self.assertEqual(url.find(NAMESPACE + "lastmod").text, self.data["meta"]["as_of"], url.find(NAMESPACE + "loc").text)
+        reviewed = json.loads((ROOT / "data/company-events.json").read_text())["reviewed_on"]
+        modified = max(self.data["meta"]["as_of"], reviewed)  # events reviewed after the dataset change the pages too
+        for url in urls: self.assertEqual(url.find(NAMESPACE + "lastmod").text, modified, url.find(NAMESPACE + "loc").text)
+        for text in list(self.pages.values()) + [(self.dist / "companies/index.html").read_text()]:
+            self.assertIn(f'"dateModified":"{modified}"', text)
 
     def test_index_page_links_every_company_and_the_app(self):
         text = (self.dist / "companies/index.html").read_text()
@@ -194,6 +198,36 @@ class StaticPageTests(unittest.TestCase):
             changed += say(claim["statement"]) != claim["statement"]
         self.assertGreater(changed, 10)
 
+    def test_headline_rows_name_their_scope_and_revenue_period(self):
+        taskus = self.pages["taskus"]
+        self.assertIn("trailing twelve month revenue · AI Services service line</span></td><td class=\"value\">$244.2M", taskus)
+        self.assertIn("revenue growth yoy percent · AI Services service line", taskus)
+        self.assertIn("CEO-reported revenue week · One week; exact week-end unspecified", self.pages["prolific"])
+        self.assertIn("Older or partial figure", self.pages["labelbox"])
+        self.assertNotIn("Not preferred", "".join(self.pages.values()))
+        self.assertNotIn("DeepSWE pass@1, base", self.pages["afterquery"])
+
+    def test_dead_evidence_links_carry_the_link_check(self):
+        self.assertIn('elorian-ai-inc/69acef27-d755-4b22-8257-94759edb0efb" rel="noopener">', self.pages["elorian"])
+        self.assertIn("(page unavailable when checked 23 Oct 2026)", self.pages["elorian"])
+        self.assertIn("(page unavailable when checked 23 Oct 2026)", self.pages["labelbox"])
+        self.assertNotIn("when checked", self.pages["mercor"])
+
+    def test_risk_dates_read_as_months_like_the_app(self):
+        mercor = self.pages["mercor"].split("<h3>Risks named in the evidence</h3>", 1)[1].split("</table>", 1)[0]
+        self.assertIn('<td class="date asof">Jun 2026</td>', mercor)
+        self.assertIn('<td class="date">Source date not stated</td>', mercor)
+        self.assertIn("td.asof::before{content:'As of '", STYLE)
+
+    def test_analytics_loader_follows_the_index_meta(self):
+        self.assertEqual(analytics_endpoint((ROOT / "web/index.html").read_text()), "")
+        self.assertEqual(analytics_endpoint('<meta name="sts-analytics" content="https://sciencetostartup.goatcounter.com/count">'), "https://sciencetostartup.goatcounter.com/count")
+        for other in ("https://example.com/count", "javascript:alert(1)", "https://x.goatcounter.com/count?x=1"):
+            self.assertEqual(analytics_endpoint(f'<meta name="sts-analytics" content="{other}">'), "", other)
+        page = document("T", "D.", ORIGIN + "/", "", {}, analytics="https://sciencetostartup.goatcounter.com/count")
+        self.assertIn('<script async src="https://gc.zgo.at/count.js" data-goatcounter="https://sciencetostartup.goatcounter.com/count"></script>\n</head>', page)
+        self.assertNotIn("gc.zgo.at", document("T", "D.", ORIGIN + "/", "", {}))
+
     def test_scale_leads_with_reported_revenue_not_the_unverified_run_rate(self):
         table, rest = self.pages["scale_ai"].split("<h3>Other reported figures, not used for comparison</h3>", 1)
         table = table[table.index("<h2>Headline metrics</h2>"):]
@@ -243,7 +277,7 @@ class StaticPageTests(unittest.TestCase):
         text = (self.dist / "companies/index.html").read_text()
         self.assertIn("Coverage is a selected market study of 39 organizations, not an exhaustive census.", text)
         self.assertIn("Coverage is a selected market study, not an exhaustive census.", (ROOT / "web/app.js").read_text())
-        missing = re.search(r"Large firms not yet profiled include ([^<]+)", text).group(1)
+        missing = re.search(r"Other firms not yet profiled include ([^<]+)", text).group(1)
         self.assertEqual(missing, "Uber AI Solutions, TELUS Digital, CloudFactory, SuperAnnotate, Encord, Defined.ai, LXT and Welocalize.")
         self.assertIn("<p>Company names and logos belong to their owners and identify them here.</p>\n</footer>", text)
 
