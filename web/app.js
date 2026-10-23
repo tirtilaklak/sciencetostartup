@@ -143,8 +143,7 @@ Object.assign(PUBLIC_COPY_EDITS,{
   "Do not repeat the Reuters annual-revenue wording; the primary company release explicitly says annual revenue runrate.": "The primary company release calls this an annual revenue run rate; Reuters described it as annual revenue.",
   "Keep version 2 separate from the 912-task original benchmark.": "The original benchmark is a separate, 912-task version.",
   "No exact amount is established; do not synthesize a numeric revenue or profitability metric.": "No numeric revenue or profitability figure is established.",
-  "Named accountable founders, screening/verification and payout process. Inconsistent headcount does not erase team identity, but current operational controls lack independent scope.": "Named founders are identified. The company describes screening and verification, alongside its payout process. Headcount reports conflict. Independent evidence about current operational controls is limited.",
-  "Current site invites contact at xiangyi@benchflow.ai and open research contributions": "Current site invites contact via its About page and open research contributions"
+  "Named accountable founders, screening/verification and payout process. Inconsistent headcount does not erase team identity, but current operational controls lack independent scope.": "Named founders are identified. The company describes screening and verification, alongside its payout process. Headcount reports conflict. Independent evidence about current operational controls is limited."
 });
 const PUBLIC_RECORD_IDS=new Set(Object.values(DATA).filter(Array.isArray).flatMap(rows=>rows.map(r=>r?.id).filter(Boolean)).concat(DATA.rubric.stages.map(s=>s.id),['not_applicable','pending']));
 const PUBLIC_TEXT_CACHE=new Map();
@@ -157,6 +156,8 @@ function publicTextCompute(value){
  let text=String(value??'');
  if(PUBLIC_RECORD_IDS.has(text)||/^https?:\/\//i.test(text))return text;
  for(const [original,copy] of Object.entries(PUBLIC_COPY_EDITS))text=text.split(original).join(copy);
+ // Research notes can quote a person's address from a source page; say how contact works instead of repeating it.
+ text=text.replace(/\bcontact at [A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,'contact by email');
  text=text.replace(/Superseded by the final [^.]+\./g,'Replaced by later research.').replace(/Retained as historical provenance; excluded from active fact selectors\./g,'Historical observation; excluded from current comparisons.');
  text=text.replace(/Final audit source [\w.-]+: /g,'').replace(/Earlier registry status: /g,'Earlier source check: ').replace(/Review status: /g,'Source check: ').replace(/Retain claim: Yes\.?/g,'');
  text=text.replace(/Source support was inherited[^.]*\./g,'Source support has not been rechecked.').replace(/Historical statements are preserved[^.]*\./g,'Historical statements are dated and may not describe current conditions.');
