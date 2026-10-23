@@ -662,22 +662,27 @@ function initialize(){$('snapshot').textContent=compiledSnapshotLabel(DATA.meta.
 }
 
 // Native disclosures used as overlays retain predictable dismissal and focus.
+// A press of the mouse or a tap moves focus before its click lands. Collapsing the panel then
+// would shift the page under the pointer and lose the click, so pointer presses leave closing
+// to the outside-click listener; Tab and Escape still close the panel.
 const OVERLAY_DETAILS='.responsive-filter-panel,.more-filters,.mobile-column-options';
+let overlayPointerFocus=false;
 function dismissDisclosure(panel,restoreFocus){
  if(!panel?.open)return;
  panel.open=false;
  const target=restoreFocus?panel.querySelector('summary'):document.activeElement;
  if(restoreFocus)target?.focus({preventScroll:true});
- if(!target||target===document.body||!target.getClientRects().length)return;
+ if(!target||target===document.body||!target.getClientRects().length||target.closest('dialog'))return;
  const header=document.querySelector('.topbar');
  if(header?.contains(target))return;
  const box=target.getBoundingClientRect(),top=(header?.getBoundingClientRect().bottom||0)+8,bottom=window.innerHeight-8;
  if(box.top<top)window.scrollBy({top:box.top-top,behavior:'instant'});
  else if(box.bottom>bottom)window.scrollBy({top:box.bottom-bottom,behavior:'instant'});
 }
-document.addEventListener('keydown',event=>{if(event.key!=='Escape')return;const panel=event.target.closest?.(OVERLAY_DETAILS);if(panel?.open&&panel.querySelector('summary')?.getClientRects().length){event.preventDefault();dismissDisclosure(panel,true);}});
+document.addEventListener('keydown',event=>{overlayPointerFocus=false;if(event.key!=='Escape')return;const panel=event.target.closest?.(OVERLAY_DETAILS);if(panel?.open&&panel.querySelector('summary')?.getClientRects().length){event.preventDefault();dismissDisclosure(panel,true);}});
+document.addEventListener('pointerdown',()=>{overlayPointerFocus=true;},true);
 document.addEventListener('click',event=>{document.querySelectorAll(OVERLAY_DETAILS).forEach(panel=>{if(panel.open&&!panel.contains(event.target)&&panel.querySelector('summary')?.getClientRects().length)dismissDisclosure(panel,panel.contains(document.activeElement));});});
-document.addEventListener('focusin',event=>{document.querySelectorAll(OVERLAY_DETAILS).forEach(panel=>{if(panel.open&&!panel.contains(event.target)&&panel.querySelector('summary')?.getClientRects().length)dismissDisclosure(panel,false);});});
+document.addEventListener('focusin',event=>{if(overlayPointerFocus)return;document.querySelectorAll(OVERLAY_DETAILS).forEach(panel=>{if(panel.open&&!panel.contains(event.target)&&panel.querySelector('summary')?.getClientRects().length)dismissDisclosure(panel,false);});});
 
 // Page titles for each main view.
-const VIEW_TITLES={market:'Market · ScienceToStartup',companies:'Companies · ScienceToStartup',compare:'Compare · ScienceToStartup',work:'Paid work · ScienceToStartup',outreach:'Math competition alumni · ScienceToStartup',method:'Sources and method · ScienceToStartup'};
+const VIEW_TITLES={market:'ScienceToStartup · The AI data field guide',companies:'Companies · ScienceToStartup',compare:'Compare · ScienceToStartup',work:'Paid work · ScienceToStartup',method:'Method · ScienceToStartup'};
