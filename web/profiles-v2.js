@@ -1,18 +1,16 @@
 /* Public, source-linked profile presentation. Raw records remain in the archive. */
 function profileContent(id){return (window.PROFILE_CONTENT?.entries||[]).find(e=>e.company_id===id)||{};}
-// Date formatters are built once (profiles render many dates). Output matches toLocaleDateString('en-GB').
+// Formatters built once; output matches toLocaleDateString('en-GB').
 const PROFILE_DAY_FORMAT=new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}),PROFILE_MONTH_FORMAT=new Intl.DateTimeFormat('en-GB',{month:'short',year:'numeric',timeZone:'UTC'});
-// Readable dates inside date text: 2026-06-30 becomes 30 Jun 2026, 2026-06 becomes Jun 2026, FY ended 2025-12-31 becomes FY2025.
+// 2026-06-30 -> 30 Jun 2026, 2026-06 -> Jun 2026, FY ended 2025-12-31 -> FY2025.
 function readableDate(text){
  const valid=(y,m,d=1)=>{const date=new Date(Date.UTC(+y,+m-1,+d,12));return date.getUTCMonth()===+m-1&&date.getUTCDate()===+d?date:null;};
  return String(text??'').replace(/\bFY ended (\d{4})-12-31\b/g,'FY$1').replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g,(all,y,m,d)=>{const date=valid(y,m,d);return date?PROFILE_DAY_FORMAT.format(date):all;}).replace(/\b(\d{4})-(\d{2})\b(?!-\d)/g,(all,y,m)=>{const date=valid(y,m);return date?PROFILE_MONTH_FORMAT.format(date):all;});
 }
 function profileDate(value){return readableDate(dateText(value));}
-// Who published a source, when, and when the research last checked it.
 function profileSourceMeta(s){const added=profileDate(s.accessed_on);return [s.publisher,s.published_on?'Published '+profileDate(s.published_on):'Publication date not stated',s.retrieval_status==='checked'?'Checked '+added:s.retrieval_status==='summary_only'?'Summary only, page not reviewed · recorded '+added:s.retrieval_status==='unverified'?'Not checked again · recorded '+added:'Recorded '+added].filter(Boolean).join(' · ');}
-// Record line for archive claims: status, readable date, business covered, evidence label and its source button.
 function profileProvenance(cl){return `<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(evidenceContextArchiveDate(cl,profileDate(cl.as_of)))}</span><span>· ${esc(evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id)))}</span><span>· ${esc(profileEvidenceLabel(cl))}</span>${claimButton(cl.id,'Source')}</div>`;}
-// The company a profile route names, after case and alias fixes (#company/MERCOR works like #company/mercor).
+// Canonical company id for a route value (case and alias fixes).
 function profileRouteCompany(value=routeParts()[1]){const raw=String(value??''),lower=raw.toLowerCase(),aliases=window.RESEARCH_ALIASES;return isCompanyId(raw)?raw:isCompanyId(lower)?lower:aliases&&Object.hasOwn(aliases,lower)&&isCompanyId(aliases[lower])?aliases[lower]:'';}
 function profileReferences(ids,label='Source',topic=''){
   const unique=[...new Set(ids||[])].filter(id=>claims[id]);
@@ -20,9 +18,9 @@ function profileReferences(ids,label='Source',topic=''){
   const visibleLabel=label==='Source'?'Sources':label,access=evidenceAccess(unique,visibleLabel,topic);
   return `<button type="button" class="evidence-link" data-profile-evidence="${attr(unique.join('|'))}" ${access.attributes}>${esc(visibleLabel)}</button>${access.description}`;
 }
-// Grouped sources open the first claim; the dialog lists the others so each stays one click away.
+// Grouped sources: the dialog lists the other claims.
 document.addEventListener('click',event=>{const button=event.target.closest?.('[data-profile-evidence]');if(!button)return;const ids=button.dataset.profileEvidence.split('|').filter(id=>claims[id]);if(!ids.length)return;showEvidence(ids[0],ids);});
-// Copy the record link shown in the evidence dialog. Without clipboard access, show the link to copy by hand.
+// Copy the record link; without clipboard access, show it.
 document.addEventListener('click',event=>{const button=event.target.closest?.('[data-copy-record]');if(!button)return;const url=new URL(button.dataset.copyRecord,location.href).href,status=$('evidence-copy-status'),say=text=>{if(status)status.textContent=text;};const copy=navigator.clipboard?.writeText?navigator.clipboard.writeText(url):Promise.reject();copy.then(()=>say('Link copied.'),()=>say('Copy this link: '+url));});
 function profileProducts(id){
   const curated=profileContent(id).products;if(curated?.length)return typeof applyProductSourceUpdates==='function'?applyProductSourceUpdates(id,curated):curated;
@@ -88,14 +86,12 @@ function profileCapital(id){
  const valuations=uniqueMetrics(id).filter(m=>m.kind==='valuation'&&!unconfirmedValuation(m)),combined=config.combine_round_and_valuation&&current.length===1?valuations.find(m=>m.as_of===current[0].announced_on):null;
  const outcomes=rounds.filter(r=>r.status==='cancelled'&&claims[r.claim_id]?.status==='supported'&&profileCapitalContext(r).outcome);
  const outcomeHTML=outcomes.map(r=>{const context=profileCapitalContext(r);return `<div class="capital-outcome"><p class="sub">${esc(context.outcome)}</p>${profileReferences([r.claim_id],context.outcomeSourceLabel||'Outcome source')}</div>`;}).join('');
- // Point to the funding records the tab leaves out, and say when they include unconfirmed reports.
  const unconfirmed=rounds.some(r=>claims[r.claim_id]?.status!=='supported'||uncertainStatus.slice(0,4).includes(r.status))||uniqueMetrics(id).some(unconfirmedValuation),more=unconfirmed||rounds.some(r=>r.status==='cancelled')||current.length>3||valuations.filter(m=>m!==combined).length>1;
  return `<div class="capital-grid">${current.slice(0,3).map(r=>{
   const context=profileCapitalContext(r),leads=DATA.round_investors.filter(x=>x.round_id===r.id&&claims[x.claim_id||r.claim_id]?.status==='supported'&&/lead/i.test(x.role)).map(x=>investors[x.investor_id].name);
   return `<article class="capital-event" data-capital-round="${attr(r.id)}"><div class="capital-time"><p class="capital-date">${esc(context.dateLabel||'Announced')}<span>${esc(profileDate(r.announced_on))}</span></p>${r.closed_on?`<p class="sub">Closed ${esc(profileDate(r.closed_on))}</p>`:''}</div><div class="capital-data"><p class="capital-label">${esc(capitalLabel(r))}</p><h3><span class="sr-only">${esc(capitalLabel(r))}: </span>${'amount'in r?esc(metricValue({value:r.amount,unit:'currency',currency:r.currency,qualifier:r.qualifier})):'Amount undisclosed'}</h3>${r.capital_type==='mixed'&&r.amount_basis==='undisclosed'?'<p class="sub capital-scope">Company-reported financing includes equity and credit. Component amounts and credit drawdown are undisclosed.</p>':''}${r.amount_basis==='mixed_transaction'?'<p class="sub capital-scope">Includes existing shares sold by shareholders. The total is not all new company funding.</p>':''}${context.qualification?`<p class="sub capital-scope">${esc(context.qualification)}</p>`:''}${leads.length?`<p class="sub">Led by ${esc(leads.join(', '))}</p>`:''}${combined?`<div class="capital-valuation">${numberButton(combined)}<span>Valuation at the round</span></div>`:''}<p class="sub">${config.capital_note?esc(config.capital_note):r.status==='announced'?'':esc(title(r.status))}${r.capital_type==='secondary'?' · Existing shares':''}</p>${profileReferences([r.claim_id],'Source')}</div></article>`;
  }).join('')}${valuations.filter(m=>m!==combined).slice(0,1).map(m=>`<article class="capital-event valuation-event"><div class="capital-time"><p class="capital-date">As of<span>${esc(profileDate(m.as_of))}</span></p></div><div class="capital-data"><p class="capital-label">${esc(/pre.money/i.test(m.label)?'Pre-money valuation':/post.money/i.test(m.label)?'Post-money valuation':'Valuation')}</p><h3>${numberButton(m)}</h3><p class="sub">${esc(scopeText(m.segment_scope,id))}</p>${/pre.money/i.test(m.label)?'<p class="sub">Company value before the new investment is added.</p>':''}<p class="sub">${esc(evidenceLabel(claims[m.claim_id]))}</p></div></article>`).join('')}</div>${!current.length&&!valuations.length?'<p class="profile-empty">No quantified financing is established in the reviewed sources.</p>':''}${outcomeHTML}${more?`<p class="sub profile-more-records">More funding records${unconfirmed?', including unconfirmed reports,':''} are in <a href="#company/${attr(id)}/financing">Sources and review</a>.</p>`:''}`;
 }
-// Research labels can start in lower case ("headcount"); headings start with a capital.
 function profileSentenceCase(text){const value=String(text??'');return value.charAt(0).toUpperCase()+value.slice(1);}
 function profileMetricLabel(m){
   if(m.id==='ooak.metric.audit-ooak-headcount-scope'&&m.company_id==='ooak'&&m.kind==='headcount'&&m.label==='directory_team_size')return 'YC-listed team size';
@@ -107,16 +103,13 @@ function profileMetricDate(m){
  const corrected=metricCurrentPeriod(m);if(corrected)return corrected;
  if(m.kind==='revenue')return readableDate(m.period_label||financialPeriod(m));
  if(m.as_of==='undated')return 'Undated · checked '+profileDate(claims[m.claim_id].observed_on);
- // Dates read "As of Jun 2026"; period wording such as "end of 2025" or "FY2024" stands alone.
  const date=profileDate(String(m.as_of).replace(/^as of\s+/i,''));return /^(\d|[A-Z][a-z]{2,3} \d{4})/.test(date)?'As of '+date:date.charAt(0).toUpperCase()+date.slice(1);
 }
-// The year a figure describes, by the same rule as the company cards (null when undated).
 function profileMetricYear(m){const rank=dateRank(m.as_of);return rank==='0000'?null:Number(rank.slice(0,4));}
-// "Historical · 2022" for figures two or more calendar years older than the snapshot, as on the company cards.
+// Same Historical rule as compactSignal() on the cards.
 function profileMetricHistory(m){const year=profileMetricYear(m);return year&&year<Number(DATA.meta.as_of.slice(0,4))-1?'Historical · '+year:'';}
-// Flags that say what kind of headline figure this is: estimates, forecasts and talks say so, and old figures are marked.
 function profileMetricTags(m){const tags=[metricStatusLabel(m),profileMetricHistory(m)].filter(tag=>tag&&tag!=='Reported');return tags.length?`<p class="observation-tags">${tags.map(tag=>`<span>${esc(tag)}</span>`).join('')}</p>`:'';}
-// Growth changes carry a sign (+58.6%, −1.5%) so a rise never reads as a level.
+// Signed growth: +58.6%, −1.5%.
 function profileMetricValue(m){const value=metricValue(m);return m.kind!=='growth_rate'||m.unit!=='percent'?value:m.value>0?value.replace(/\d/,'+$&'):value.replace('-','−');}
 function profileNumberButton(m){const label=profileMetricValue(m);if(label===metricValue(m))return numberButton(m);const access=evidenceAccess([m.claim_id],label,metricEvidenceTopic(m,m.label||metricLabels[m.kind]));return `<button class="number-button" data-claim="${esc(m.claim_id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;}
 const PROFILE_METRIC_ATTRIBUTIONS={
@@ -125,7 +118,7 @@ const PROFILE_METRIC_ATTRIBUTIONS={
  'ooak.claim.audit-ooak-headcount-scope-metric':'Y Combinator profile snapshot',
  'laude.claim.audit-laude-deployed-grants-metric':'Institute-reported grantmaking'
 };
-// TaskUs and Appen revenue comes from annual reports; the site never calls those figures "audited".
+// Lead decision: TaskUs and Appen figures are annual-report figures, never "audited".
 const PROFILE_EVIDENCE_LABELS={'Audited filing':'Annual report filing','Audited public company':'Public company annual report'};
 function profileEvidenceLabel(cl){const label=evidenceLabel(cl);return ['taskus','appen'].includes(cl.company_id)&&PROFILE_EVIDENCE_LABELS[label]||label;}
 function profileMetricAttribution(m){
@@ -140,13 +133,11 @@ function profilePerformance(id){
   return visual||context?`<div class="profile-performance-layout">${visual}${context}</div>`:'';
 }
 function profileOperatingMetrics(id,metrics=uniqueMetrics(id)){return metrics.filter(m=>!['valuation','funding_total_reported','funding_total_calculated'].includes(m.kind));}
-// Headline figures: the curated list, or the headline revenue figure plus up to two size measures.
 function profileHeadlineMetrics(id,all=uniqueMetrics(id)){
  const config=profileContent(id),primary=preferredFinancial(id),extras=all.filter(m=>['expert_network','headcount','active_paid_experts'].includes(m.kind)&&m.segment_scope!=='other_segment');
  const selected=config.metric_ids?config.metric_ids.map(mid=>all.find(m=>m.id===mid)).filter(Boolean):primary?[primary]:[];if(!config.metric_ids)for(const m of extras)if(!selected.some(x=>x.kind===m.kind)&&selected.length<3)selected.push(m);
  return selected;
 }
-// "Reported figures" only when every headline figure is a plain reported one; otherwise each tile says what it is.
 function profileFiguresHeading(id){return profileContent(id).traction_heading||(profileHeadlineMetrics(id).every(m=>metricStatusLabel(m)==='Reported')?'Reported figures':'Key figures');}
 function profileTraction(id){
  const config=profileContent(id),all=uniqueMetrics(id),selected=profileHeadlineMetrics(id,all);
@@ -171,17 +162,15 @@ function profileArchive(id){
   const finances=financeHTML?`<details class="profile-disclosure" id="profile-financing" data-profile-section="financing"><summary>Funding records</summary>${financeHTML}</details>`:'';
   return `<div class="profile-archive"><div class="archive-intro">${typeof sourceUpdatesArchiveHTML==='function'?sourceUpdatesArchiveHTML(id):''}${evidenceContextArchiveHTML(id)}<p>${companyClaims(id).length} claims and ${registry.length} sources</p><nav aria-label="Evidence sections">${operatingMetrics.length?`<a href="#company/${attr(id)}/observations">All dated figures</a>`:''}${finances?`<a href="#company/${attr(id)}/financing">Funding records</a>`:''}<a href="#company/${attr(id)}/questions">All claims</a><a href="#company/${attr(id)}/sources">All sources</a></nav></div>${products?profileDisclosure('Product records',products):''}${relationships?profileDisclosure('Relationship records',relationships):''}${peopleRows?profileDisclosure('Leadership records',peopleRows):''}${finances}${observations}${scope?`<section id="profile-method" data-profile-section="method"><h2>Assessment and scope</h2>${scope}</section>`:''}${profileDisclosure('All claims and historical evidence',`<div id="profile-questions" data-profile-section="questions">${companyClaims(id).map(claimRecord).join('')}</div>`)}${brand}${sourceHTML}</div>`;
 }
-// Archive sections a route can open: they live inside "Sources and review".
 const PROFILE_ARCHIVE_SECTIONS=['method','questions','sources','observations','financing'];
-// The section a route asks for. A record link (#company/<id>/claim/<claim-id>) opens the tab that holds the record.
+// A record link opens the tab that holds the record.
 function profileTarget(id,parts=routeParts()){
  const claim=parts[2]==='claim'?claims[parts[3]]:null;
  if(claim?.company_id===id){const section=narrativeSection(claim);return ['products','customers','traction','people','finance','work'].includes(section)?section:'business';}
  return profileRouteSection(parts[2])||'business';
 }
-// Logos sit beside the visible name, so screen readers skip them.
-function profileLogoHTML(id,extra){return logoHTML(id,extra).replace(/ alt="[^"]*"/,' alt=""');}
-// Similar companies: the rest of this business group, A to Z, then the company list filtered to the group.
+// Logos beside a visible name are decorative.
+function profileLogoHTML(id,extra){return logoHTML(id,extra,true).replace(/ alt="[^"]*"/,' alt=""');}
 function profilePeersHTML(id){
  const group=modelGroup(id),members=(MODEL_GROUPS[group]||[]).filter(peer=>companies[peer]),peers=members.filter(peer=>peer!==id).sort((a,b)=>companies[a].name.localeCompare(companies[b].name));
  if(!peers.length)return '';
@@ -289,7 +278,7 @@ route=function(event){
   const fragmentNavigation=profileFragmentNavigation;
   if(event?.type==='hashchange')profileFragmentNavigation=null;
   const result=profileRoute.apply(this,arguments);let parts=routeParts();
-  // Case-variant links (#company/MERCOR) render the right profile; rewrite the address to the canonical id so tabs and record links work.
+  // Rewrite case-variant addresses (#company/MERCOR) to the canonical id.
   const company=String(parts[0]).toLowerCase()==='company'?profileRouteCompany(parts[1]):'';
   if(company&&(company!==parts[1]||parts[0]!=='company')){parts[0]='company';parts[1]=company;history.replaceState(history.state??null,'','#'+parts.map(encodeURIComponent).join('/'));parts=routeParts();}
   const newFragment=event?.type==='hashchange'&&fragmentNavigation&&fragmentNavigation.url===event.newURL&&['push','replace'].includes(fragmentNavigation.type);
@@ -307,16 +296,13 @@ route=function(event){
       if(initial&&!primary)settleInitialProfileAnchor(location.hash,destination);
     }
   }
-  // A record link (#company/<id>/claim/<claim-id>) opens that record's sources over the profile.
   if(company&&parts[2]==='claim'&&claims[parts[3]]?.company_id===company)showEvidence(parts[3]);
   return result;
 };
-// The profile address for the tab on screen, used when a record dialog closes.
 function profileTabHash(id){const tab=document.querySelector('#profile-view .profile-tabs [aria-selected="true"]')?.dataset?.profileTab;return '#company/'+id+(tab&&tab!=='business'?'/'+tab:'');}
 document.addEventListener('keydown',event=>{
   const tab=event.target.closest?.('[data-profile-tab]');if(!tab||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
   const ids=['business','traction','people','work'],index=ids.indexOf(tab.dataset.profileTab),next=event.key==='Home'?0:event.key==='End'?3:(index+(event.key==='ArrowRight'?1:3))%4;
-  // Tabs switch in place (no hashchange), so focus moves once: straight to the new tab.
   event.preventDefault();activateProfileTab(ids[next]);
   document.getElementById('profile-tab-'+ids[next])?.focus({preventScroll:true});
 });
