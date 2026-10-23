@@ -145,6 +145,21 @@ Object.assign(PUBLIC_COPY_EDITS,{
   "No exact amount is established; do not synthesize a numeric revenue or profitability metric.": "No numeric revenue or profitability figure is established.",
   "Named accountable founders, screening/verification and payout process. Inconsistent headcount does not erase team identity, but current operational controls lack independent scope.": "Named founders are identified. The company describes screening and verification, alongside its payout process. Headcount reports conflict. Independent evidence about current operational controls is limited."
 });
+// Risk statements shown under Risks and disputes, written as public sentences rather than reviewer instructions.
+Object.assign(PUBLIC_COPY_EDITS,{
+  "Latest financing reported without company confirmation; unnamed lab participants should not be fabricated.": "Latest financing was reported without company confirmation, and the participating labs are not named.",
+  "Do not label its full 11,000-builder network as AI-data contributors or interpret unnamed RL delivery cases as named customer validation.": "Its full 11,000-builder network is not a count of AI-data contributors, and unnamed RL delivery cases are not named-customer validation.",
+  "Prefer official founders and record headcount as unresolved.": "Headcount is unresolved; the founders listed here follow official pages.",
+  "High margins, run rate and $150M valuation originate in recruiting copy; require diligence before using as current financial facts": "High margins, the run rate and the $150M valuation come from recruiting copy and are not verified current financial figures.",
+  "Press release contrasts its team with contractor-heavy competitors, but official listings explicitly recruit contractors; interpret as positioning, not absence of contract work": "A press release contrasts its team with contractor-heavy competitors, but official listings recruit contractors. The contrast is positioning and does not mean the company uses no contract work.",
+  "Do not silently normalize into an incorporation year.": "None of these dates is an established incorporation year.",
+  "Largest verified revenue scale in this batch, but old financial snapshot. Financing targets, secondary-market estimates and run-rate figures are widely conflated": "Its verified revenue is among the largest profiled here, but the financial snapshot is old. Financing targets, secondary-market estimates and run-rate figures are often conflated.",
+  "Do not confuse pareto.ai with Pareto Securities, Pareto Holdings, trypareto.ai, Brazilian Pareto/Tess or other unrelated businesses.": "pareto.ai is unrelated to Pareto Securities, Pareto Holdings, trypareto.ai, Brazilian Pareto/Tess and other businesses with similar names.",
+  "Meta ownership triggered customer-independence concerns and reported Google withdrawal plans.": "Meta’s 49% stake raised customer-independence concerns, and Google reportedly planned to cut ties with Scale.",
+  "Do not count CEO’s historical $100M raised for a hedge fund as Trajectory funding.": "The $100M the CEO earlier raised for a hedge fund is not Trajectory funding.",
+  "Do not compare the $100M philanthropy pledge, Institute grants, Laude Ventures capital or benchmark grant support with a commercial vendor’s revenue/venture funding.": "The $100M philanthropy pledge, Institute grants, Laude Ventures capital and benchmark grant support are not comparable with a commercial vendor’s revenue or venture funding.",
+  "Job-board compensation/location mirrors conflict, so current employer pages take precedence": "Job-board copies of its listings give conflicting pay and locations; this profile follows the current employer pages."
+});
 const PUBLIC_RECORD_IDS=new Set(Object.values(DATA).filter(Array.isArray).flatMap(rows=>rows.map(r=>r?.id).filter(Boolean)).concat(DATA.rubric.stages.map(s=>s.id),['not_applicable','pending']));
 const PUBLIC_TEXT_CACHE=new Map();
 function publicText(value){

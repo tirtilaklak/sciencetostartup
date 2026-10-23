@@ -178,9 +178,15 @@ class StaticPageTests(unittest.TestCase):
         for text, app in zip(sidecar, shown[len(research):]): self.assertEqual(text, app, "the app rewords this sidecar text; reword it at the source or pass it through public_wording")
 
     def test_risk_statements_read_as_public_sentences(self):
-        self.assertIn("The evidence does not support comparing the $100M philanthropy pledge", self.pages["laude"])
-        self.assertNotIn("Do not compare the $100M", self.pages["laude"])
-        self.assertIn("The evidence does not support confusing pareto.ai with Pareto Securities", self.pages["pareto"])
+        for cid, sentence, instruction in (
+            ("laude", "The $100M philanthropy pledge, Institute grants, Laude Ventures capital and benchmark grant support are not comparable", "Do not compare the $100M"),
+            ("pareto", "pareto.ai is unrelated to Pareto Securities", "Do not confuse pareto.ai"),
+            ("micro1", "Latest financing was reported without company confirmation, and the participating labs are not named.", "fabricated"),
+            ("a-team", "Its full 11,000-builder network is not a count of AI-data contributors, and unnamed RL delivery cases are not named-customer validation.", "or interpret unnamed RL"),
+            ("scale_ai", "Meta’s 49% stake raised customer-independence concerns", "Meta ownership triggered"),
+        ):
+            self.assertIn(html.escape(sentence), self.pages[cid], cid)
+            self.assertNotIn(html.escape(instruction), self.pages[cid], cid)
         say, changed = public_wording(self.data, load_copy_edits()), 0
         for claim in self.data["claims"]:
             if claim.get("subject") != "risks" or claim.get("status") != "supported": continue
