@@ -35,6 +35,8 @@ Add one company source and re-source both claims:
 - `sama.claim.expansion-sama-founder`: in `source_ids`, replace `sama.source.audit-sa-leila` with `sama.source.sama-founder-page` and move the old id to `historical_source_ids`. The statement stays. The TED 2009 guide still supports the Ashoka India and Katzenbach details.
 - `sama.claim.expansion-sama-ownership-history`: set `source_ids` to `["sama.source.sama-founder-page", "sama.source.audit-sa-interview"]` and move `sama.source.audit-sa-ljf` to `historical_source_ids`. No live source states the 2020 renaming year, so drop that clause unless the retained raw read supports it. This also fixes the "2,019" rendering. New statement: `Nonprofit origin; the Leila Janah Foundation remains a major owner. Samasource became the for-profit Sama in 2019, with the original nonprofit, now the Leila Janah Foundation, as its largest shareholder. The CEO described the foundation as primary shareholder in November 2024.` Keep confidence B: one company page plus the CEO interview (pulse2.com, live).
 
+**5. Figures from undated recruiting copy.** Two headline figures come only from undated job listings: `datacurve.metric.specialist-12` (the $150M "recruiting valuation claim"; the Datacurve risk row already says it is unverified) and `polymath_ai_labs.metric.specialist-5` (more than $8M raised). Set `preferred_for_comparison` to `false` on both, so the app and the static pages show them under "Other reported figures" instead of as headline figures.
+
 **Optional.** `elorian.claim.worker_opportunities-0` says "Live Model Safety Contractor role" as of 2026-10-12. The listing showed "Job not found" on 2026-10-23. The work sidecar already marks the route historical.
 
 ## Release mechanics
