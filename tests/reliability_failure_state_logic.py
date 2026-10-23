@@ -72,7 +72,7 @@ console.log(JSON.stringify({cases:reports.length,checks:reports.reduce((total,re
 
 source_paths = [
     "web/icons.js", "web/link-health.js", "web/app.js", "web/editorial.js",
-    "web/work-v3.js", "web/work-v4.js", "web/profiles-v2.js", "web/source-updates.js",
+    "web/work-v3.js", "web/work-v4.js", "web/profiles-v2.js", "web/source-updates.js", "web/site-nav.js",
     "data/canonical.json", "data/editorial.json", "data/logo-provenance.json",
     "data/work-routes.json", "data/profile-content.json", "data/profile-afterquery.json",
     "data/source-updates.json", "data/link-health.json", "docs/research-id-crosswalk.json",

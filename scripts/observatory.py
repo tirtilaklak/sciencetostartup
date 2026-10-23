@@ -615,6 +615,11 @@ def load_work_routes(path, data):
     return validate_work_routes(work, data)
 
 
+# Presentation layers in cascade order. Each page area owns one file loaded after edition.css.
+REDESIGN_CSS = ("profiles-v2.css", "work-v4.css", "investor.css", "edition.css", "site-nav.css", "overview.css", "directory.css", "profiles-v3.css", "work-v5.css", "method.css")
+# Scripts concatenated after work-v3.js and before initialize(); later declarations replace earlier ones.
+PRESENTATION_JS = ("work-v4.js", "profiles-v2.js", "source-updates.js", "site-nav.js")
+
 def build(data, destination):
     validate(data)
     work_path = ROOT / "data/work-routes.json"
@@ -647,12 +652,12 @@ def build(data, destination):
     injected = "window.EDITORIAL=" + json.dumps(editorial) + ";window.RESEARCH_ALIASES=" + (ROOT / "docs/research-id-crosswalk.json").read_text() + ";window.LOGOS=" + json.dumps(logo_data) + ";window.WORK_ROUTES=" + json.dumps(work_data) + ";window.PROFILE_CONTENT=" + json.dumps(profile_content) + ";window.LINK_HEALTH=" + json.dumps(link_health) + ";"
     injected += "window.SOURCE_UPDATES=" + json.dumps(source_updates) + ";"
     html = html.replace("/* EDITORIAL_DATA */", injected.replace("<", "\\u003c").replace(">", "\\u003e"))
-    html = html.replace("/* REDESIGN_CSS */", (ROOT / "web/profiles-v2.css").read_text() + (ROOT / "web/work-v4.css").read_text() + (ROOT / "web/investor.css").read_text() + (ROOT / "web/edition.css").read_text())
+    html = html.replace("/* REDESIGN_CSS */", "".join((ROOT / "web" / name).read_text() for name in REDESIGN_CSS))
     html = html.replace("/* ICONS_CSS */", (ROOT / "web/icons.css").read_text())
     html = html.replace("/* ICONS_JS */", (ROOT / "web/icons.js").read_text())
     html = html.replace("/* EDITORIAL_JS */", (ROOT / "web/editorial.js").read_text())
     work_js = ROOT / "web/work-v3.js"
-    html = html.replace("/* WORK_V3_JS */", (work_js.read_text() if work_js.exists() else "") + (ROOT / "web/work-v4.js").read_text() + (ROOT / "web/profiles-v2.js").read_text() + (ROOT / "web/source-updates.js").read_text())
+    html = html.replace("/* WORK_V3_JS */", (work_js.read_text() if work_js.exists() else "") + "".join((ROOT / "web" / name).read_text() for name in PRESENTATION_JS))
     import shutil
     assets = ROOT / "web/assets"
     if assets.exists(): shutil.copytree(assets, destination / "assets", dirs_exist_ok=True)
