@@ -177,6 +177,6 @@ function initSiteNav(){
  const params=String(location.search||'');
  if(/[?&](?:search|q)(?:[=&]|$)/.test(params)){
   const match=params.match(/[?&](?:q|search)=([^&]*)/);let text='';try{text=match?decodeURIComponent(match[1].replace(/\+/g,' ')):'';}catch{}
-  history.replaceState(history.state,'',location.pathname+location.hash);siteSearchOpen(text);
+  history.replaceState(history.state,'',location.pathname.replace(/^\/{2,}/,'/')+location.hash);siteSearchOpen(text);
  }
 }

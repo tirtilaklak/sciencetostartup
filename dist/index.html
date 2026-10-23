@@ -319,6 +319,82 @@ body:has(#compare-tray:not([hidden])) main{padding-bottom:120px}
 /* Keep failure-state guidance and plain-text logo fallbacks legible. */
 .availability-notice{margin:24px 0;padding:18px 20px;border:1px solid var(--border);background:var(--paper);font-size:15px;line-height:1.6}.availability-notice p{margin:0 0 10px}.availability-notice p:last-child{margin:0}.availability-notice a{display:inline-block;margin-right:18px;min-height:32px;overflow-wrap:anywhere}.brand-dark.brand-text{color:#f7f8f3}
 /* Site menus, global search and footer. Loaded after edition.css. */
+
+/* Header: wordmark, four menu links and search. Its edges line up with the page content at
+   every width; % resolves against the page width, so a classic scrollbar no longer shifts it. */
+.topbar{padding:0 max(48px,calc((100% - 1232px)/2));gap:28px}
+.wordmark{gap:10px}
+.wordmark small{font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.topbar nav{gap:20px}
+/* The focus ring sits inside the bar instead of losing its top edge above the window. */
+.topbar nav a{font-size:14px;padding-inline:8px;margin-inline:-8px}
+.topbar nav a:focus-visible{outline-offset:-4px}
+#nav-count:empty{display:none}
+.site-search-open{display:flex;align-items:center;gap:8px;flex:none;min-width:180px;min-height:40px;margin:0;padding:0 8px 0 12px;border:1px solid #7b8978;border-radius:6px;background:#fff;color:var(--muted);font-size:14px;font-weight:400;line-height:1;white-space:nowrap}
+.site-search-open:hover{background:#fff;border-color:var(--green);color:var(--ink)}
+.site-search-open>.ui-icon{width:18px;height:18px;vertical-align:0}
+.site-search-open kbd,.site-search-enter{min-width:22px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--muted);font:12px/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:center}
+.site-search-open kbd{margin-left:auto}
+@media(max-width:1100px){.topbar{padding-left:32px;padding-right:32px;gap:20px}.topbar nav{gap:18px}.site-search-open{min-width:0;padding-right:12px}.site-search-open kbd{display:none}}
+@media(max-width:900px){.wordmark small{font-size:11px}.topbar{gap:16px}.topbar nav{gap:16px}.site-search-open{width:40px;padding:0;justify-content:center}.site-search-open .site-search-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
+/* Phones: the wordmark and a 44 px search button, then the four links across the full width. */
+@media(max-width:700px){
+ .topbar{padding:8px 20px 0;align-items:center;row-gap:4px;column-gap:12px}
+ .wordmark{gap:9px}
+ .site-search-open{order:1;margin-left:auto;width:44px;height:44px}
+ .topbar nav{order:2;height:42px;gap:0}
+ .topbar nav a{height:42px;font-size:14px;padding:0 8px 8px}
+}
+@media(max-width:380px){.topbar{padding-left:16px;padding-right:16px}.topbar nav a{font-size:13px;padding-inline:6px;margin-inline:-6px}}
+
+/* Global search: a 640 px panel on wide screens, the full screen on phones. */
+.site-search{width:min(640px,calc(100% - 32px));max-width:none;max-height:calc(100vh - 144px);margin:72px auto auto;padding:0;border:1px solid #aebba8;border-radius:8px;background:var(--bg);color:var(--ink);box-shadow:0 18px 60px #10221033;overflow:hidden}
+.site-search::backdrop{background:#16271d70}
+.site-search-panel{display:flex;flex-direction:column;max-height:inherit;height:100%}
+.site-search-bar{position:relative;display:flex;align-items:center;gap:8px;padding:12px;border-bottom:1px solid var(--border)}
+.site-search-bar>.ui-icon{position:absolute;left:25px;top:50%;width:20px;height:20px;transform:translateY(-50%);color:var(--muted)}
+.site-search-input{flex:1;min-width:0;height:48px;margin:0;padding:0 12px 0 42px;border:1px solid #7b8978;border-radius:6px;background:#fff;color:var(--ink);font-size:17px;-webkit-appearance:none;appearance:none}
+.site-search-input::-webkit-search-cancel-button,.site-search-input::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
+.site-search-input:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.site-search-close{flex:none;display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;background:none;color:var(--ink)}
+.site-search-close>.ui-icon{width:22px;height:22px}
+.site-search-message{margin:0;padding:12px 20px 4px;font-size:14px;line-height:1.5;color:var(--muted)}
+.site-search-message:empty{display:none}
+.site-search-results{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 8px 12px}
+.site-search-group-label{padding:14px 12px 6px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.site-search-option{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;align-items:center;min-height:52px;padding:7px 12px 7px 9px;border-left:3px solid transparent;border-radius:4px;cursor:pointer}
+.site-search-option:hover{background:#eef1eb}
+.site-search-option.is-first{background:var(--pale)}
+.site-search-option.is-active{background:#e2e9dd;border-left-color:var(--green)}
+.site-search-name{grid-column:1;font-size:15px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
+.site-search-meta{grid-column:1;font-size:13px;line-height:1.45;color:var(--muted);overflow-wrap:anywhere}
+.site-search-badge{font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+.site-search-option mark{background:#dce7d0;color:inherit;border-radius:2px}
+.site-search-enter{grid-column:2;grid-row:1/span 2;display:none}
+.site-search-option.is-first .site-search-enter,.site-search-option.is-active .site-search-enter{display:block}
+.site-search-target{outline:2px solid var(--green);outline-offset:6px;border-radius:2px}
+@media(forced-colors:active){.site-search-option{border-left-color:Canvas}.site-search-option.is-active{border-left-color:Highlight;outline:2px solid Highlight;outline-offset:-2px}}
+@media(max-width:700px){
+ .site-search{width:100%;height:100%;max-height:none;margin:0;border:0;border-radius:0;box-shadow:none}
+ .site-search-bar{padding:10px 6px 10px 12px}
+ .site-search-option.is-first .site-search-enter,.site-search-option.is-active .site-search-enter{display:none}
+}
+
+/* Footer: a site map with three columns, then the snapshot and dataset version. */
+footer{display:block;margin-top:64px;padding-top:28px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;line-height:1.5}
+.site-map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 40px}
+.site-map h2,.site-map h3{margin:0 0 6px;font-size:12px;font-weight:600;line-height:1.5;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.site-map h3{margin-top:16px}
+.site-map ul{margin:0;padding:0;list-style:none}
+.site-map a{display:inline-flex;align-items:center;min-height:32px;font-size:14px}
+.footer-meta{margin:24px 0 0;font-size:12px}
+@media(max-width:700px){footer{margin-top:40px;padding-top:22px}.site-map{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 20px}.site-map a{min-height:40px}}
+@media(max-width:380px){.site-map{grid-template-columns:minmax(0,1fr)}}
+
+/* Without JavaScript only the plain notice can work: hide search, the app menus and the empty overview. */
+.availability-notice h1{margin:0 0 12px;font-size:32px}
+@media(scripting:none){.site-search-open,.topbar nav,.site-map,#market-view{display:none}}
+@media(scripting:none) and (max-width:700px){.topbar{height:auto;min-height:0;padding-bottom:12px}}
 /* Overview page (#market): hero, evidence stories, paid work, business groups, how we check and the publisher's proposed lab. */
 /* Hero: what the guide is, who publishes it, and the two main paths. */
 #market-view .market-hero{grid-template-columns:minmax(0,740px) minmax(220px,1fr);align-items:center;padding:48px 0 20px}
@@ -748,9 +824,9 @@ html:has(#compare-tray:not([hidden])){scroll-padding-bottom:96px}
 </style></head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="topbar"><a class="wordmark" href="#market" aria-label="ScienceToStartup home"><span class="mark" aria-hidden="true">S<span><svg class="ui-icon" data-icon="external" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></span><span>ScienceToStartup<small>THE AI DATA FIELD GUIDE</small></span></a><nav aria-label="Main"><a href="#market" data-nav="market">Overview</a><a href="#companies" data-nav="companies">Companies</a><a href="#compare" data-nav="compare">Compare <span id="nav-count"></span></a><a href="#work" data-nav="work">Work</a><a href="#method" data-nav="method">Method</a></nav><a class="header-source" href="#method">Sources &amp; method <svg class="ui-icon" data-icon="external" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></a></header>
+<header class="topbar"><a class="wordmark" href="#market" data-nav="market"><span class="mark" aria-hidden="true">S<span><svg class="ui-icon" data-icon="external" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></span><span>ScienceToStartup <small>The AI data field guide</small></span></a><nav aria-label="Main"><a href="#companies" data-nav="companies">Companies</a><a href="#work" data-nav="work">Paid work</a><a href="#compare" data-nav="compare">Compare <span id="nav-count"></span></a><a href="#method" data-nav="method">Method</a></nav><button type="button" id="site-search-open" class="site-search-open" aria-haspopup="dialog" aria-expanded="false" aria-keyshortcuts="/ Control+K Meta+K"><svg class="ui-icon" data-icon="search" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span class="site-search-label">Search</span><kbd aria-hidden="true">/</kbd></button></header><dialog id="site-search" class="site-search" aria-labelledby="site-search-title"><div class="site-search-panel"><div class="site-search-bar"><label id="site-search-title" class="sr-only" for="site-search-input">Search the guide</label><svg class="ui-icon" data-icon="search" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input id="site-search-input" class="site-search-input" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="site-search-results" aria-describedby="site-search-message" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="Try “Outlier” or “remote”"><button type="button" id="site-search-close" class="site-search-close" aria-label="Close search"><svg class="ui-icon" data-icon="close" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><p id="site-search-message" class="site-search-message"></p><div id="site-search-results" class="site-search-results" role="listbox" aria-label="Search results" hidden></div><p id="site-search-status" class="sr-only" role="status"></p></div></dialog>
 <main id="main" tabindex="-1">
-<noscript><section class="availability-notice" aria-label="Dashboard availability"><p><strong>JavaScript is disabled.</strong> Enable it to browse the dashboard. The research downloads remain available.</p><p><a href="research.json" download>Research database · JSON</a> <a href="observatory.sqlite" download>Research database · SQLite · 9.4 MB</a></p><p>The downloads preserve the compiled research snapshot. <a href="source-updates.json" download>Read the later source corrections · JSON · 106.3 kB</a></p></section></noscript>
+<noscript><section class="availability-notice" aria-labelledby="noscript-title"><h1 id="noscript-title">ScienceToStartup: the AI data field guide</h1><p>Research on 39 AI data companies, with sourced profiles and public work listings. Turn on JavaScript to use the interactive guide. These plain pages work without it:</p><p><a href="/companies/">Company list</a> <a href="/work/">Paid work list</a> <a href="/method/">Method page</a></p><p>Download the research: <a href="research.json" download>Research database · JSON</a> <a href="observatory.sqlite" download>Research database · SQLite · 9.4 MB</a> <a href="source-updates.json" download>Later source corrections · JSON · 106.3 kB</a></p></section></noscript>
 
 <aside id="compare-tray" hidden aria-label="Comparison shortlist"><span id="tray-text" role="status" aria-live="polite" aria-atomic="true"></span><a href="#compare" class="primary-link"><span>Compare<span class="tray-link-extra"> selection</span></span> <svg class="ui-icon" data-icon="right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg></a><button type="button" data-clear-compare class="quiet">Clear<span class="sr-only"> selection</span></button></aside>
 
@@ -801,7 +877,7 @@ html:has(#compare-tray:not([hidden])){scroll-padding-bottom:96px}
 
 <section id="method-view" class="view" hidden><div class="page-heading"><p class="eyebrow">METHOD</p><h1>How we check the research.</h1><p class="intro">Every figure on this site links to a dated source. This page explains our labels and grades, and how to ask for a correction.</p><nav class="method-toc" aria-labelledby="method-toc-title"><span id="method-toc-title">On this page</span><a href="#labels">Labels and grades</a><a href="#about">About the publisher</a><a href="#corrections">Request a correction</a><a href="#downloads">Download the data</a></nav></div><div class="method-layout"><article class="panel" id="labels"><h2>What the labels mean</h2><h3>Confidence grades</h3><p>Every claim gets a grade for how strongly its sources support it.</p><dl class="grade-list"><div><dt>A</dt><dd>Independent or buyer-side evidence, such as a filing or a customer who confirms the work.</dd></div><div><dt>B</dt><dd>The company, an investor or another named first-hand source says it.</dd></div><div><dt>C</dt><dd>Reporting by others, an estimate, or indirect evidence.</dd></div><div><dt>U</dt><dd>Not confirmed. The fact may be undisclosed or still unresolved.</dd></div></dl><p class="method-note" id="grade-note">Tap or click a figure anywhere on the site to see its sources and grade.</p><p><strong>Evidence labels.</strong> Each claim also names who stands behind it, such as Company-reported or Filed disclosure. A buyer’s confirmation and a company’s own statement get different labels.</p><h3>Delivery evidence levels</h3><p>Each company also gets a delivery evidence level (public proof that it sells and delivers its offer). The level covers one part of the business, such as the whole company or its AI data work.</p><div id="rubric-content"></div></article><article class="panel" id="about"><h2>About and corrections</h2><p>ScienceToStartup is published by Musa Ozdem. It is a guide to the companies that produce AI training data, built from public sources. No profiled company has paid for coverage, and none is a customer, investor or affiliate of the publisher.</p><p><strong>Disclosure.</strong> The publisher is also proposing an AI research lab, described <a href="#venture">on the overview page</a>. That proposal is separate from this research, which applies the same rules to every company.</p><div class="correction-box" id="corrections"><h3>Request a correction</h3><p>If a figure, date or listing is wrong, email us the company name and a link to a source that shows the right value.</p><p class="correction-email"><svg class="ui-icon" data-icon="mail" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><a href="mailto:musaeminozdem@gmail.com?subject=ScienceToStartup%20correction&amp;body=Company%3A%20%0D%0AWhat%20is%20wrong%3A%20%0D%0ALink%20to%20a%20source%20with%20the%20right%20value%3A%20%0D%0A">musaeminozdem@gmail.com</a></p><p>We review requests within seven days. When we change a record, the earlier version stays on file.</p><p><strong>Personal data and removal.</strong> Company profiles name founders and executives from public company sources only. We do not publish personal contact details. If you are named here and want a record corrected or removed, email the same address.</p></div></article><section class="panel" id="coverage" aria-labelledby="coverage-title"><h2 id="coverage-title">Research coverage</h2><div id="coverage-notes"></div></section><section class="panel" id="downloads" aria-labelledby="downloads-title"><h2 id="downloads-title">Download the data</h2><p class="download-version" id="download-version">Dataset v2.5.0</p><h3>Main files</h3><ul class="download-list"><li><button id="download-json">Core research data · JSON (structured text for software to read)</button><p>The complete research dataset, including every claim with its grade and sources.</p></li><li><button id="download-csv">Current company results · CSV (a table format for spreadsheet software)</button><p>One row per company with its headline figure and sources. It follows your filters on the Companies page.</p></li><li><a href="observatory.sqlite" download="observatory.sqlite">Database · SQLite (a database stored in one portable file) <span class="download-file-meta">· 9.4 MB</span></a><p>The same research data as linked tables, for database tools.</p></li></ul><h3>Supporting files</h3><ul class="download-list"><li><a href="source-updates.json" download>Later source corrections <span class="download-file-meta">· JSON · 106.3 kB</span></a><p>Fixes made after this snapshot, each with the version it replaced.</p></li><li><a href="work-routes.json" download>Paid work listings <span class="download-file-meta">· JSON · 454.5 kB</span></a><p>Every listing with its pay, location rules and sources.</p></li><li><a href="profile-content.json" download>Profile details <span class="download-file-meta">· JSON · 163 kB</span></a><p>The products, people and partners shown on each profile.</p></li><li><a href="editorial.json" download>Business groups and summaries <span class="download-file-meta">· JSON · 31 kB</span></a><p>Each company’s business group and short description.</p></li><li><a href="logo-provenance.json" download>Logo sources <span class="download-file-meta">· JSON · 24.9 kB</span></a><p>Where each logo came from. We use only official company images.</p></li><li><a href="link-health.json" download>Link checks <span class="download-file-meta">· JSON · 2.2 kB</span></a><p>Source links that were down or asked for sign-in when we checked.</p></li></ul><p class="download-doc">Background reading: <a href="https://docs.google.com/document/d/1H0tKd3zVlMQEp3965eMyNPA5z54ymF9l6zl1NMF30eA/edit?tab=t.z8d9spr0il0x" target="_blank" rel="noopener noreferrer">Research overview (Google Doc) <svg class="ui-icon" data-icon="external" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg><span class="sr-only">(opens a new tab)</span></a></p></section></div></section>
 
-<footer><span id="snapshot">Public research · compiled 15 Oct 2026</span> <a href="#method">About, contact and sources</a><span id="footer-version">Dataset v2.5.0</span></footer>
+<footer><nav class="site-map" aria-label="Site map"><div><h2>Explore</h2><ul><li><a href="#market">Overview</a></li><li><a href="#companies">Companies</a></li><li><a href="#work">Paid work</a></li><li><a href="#compare">Compare</a></li></ul></div><div><h2>Research</h2><ul><li><a href="#method">Method</a></li><li><a href="#labels">What the labels mean</a></li><li><a href="#downloads">Download the data</a></li></ul><h3>Plain pages to share</h3><ul><li><a href="/companies/">Company list</a></li><li><a href="/work/">Paid work list</a></li><li><a href="/method/">Method page</a></li></ul></div><div><h2>About</h2><ul><li><a href="#about">About the publisher</a></li><li><a href="#corrections">Request a correction</a></li><li><a href="#venture">Our proposed AI lab</a></li></ul></div></nav><p class="footer-meta"><span id="snapshot">Public research · compiled 15 Oct 2026</span> · <span id="footer-version">Dataset v2.5.0</span> · Published by Musa Ozdem</p></footer>
 </main>
 
 <dialog id="company-dialog" aria-labelledby="company-story-title"><button type="button" id="close-company" class="story-close" aria-label="Close quick summary"><svg class="ui-icon" data-icon="close" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button><div id="company-story"></div></dialog>
@@ -1621,25 +1697,30 @@ function initialize(){$('snapshot').textContent=compiledSnapshotLabel(DATA.meta.
 }
 
 // Native disclosures used as overlays retain predictable dismissal and focus.
+// A press of the mouse or a tap moves focus before its click lands. Collapsing the panel then
+// would shift the page under the pointer and lose the click, so pointer presses leave closing
+// to the outside-click listener; Tab and Escape still close the panel.
 const OVERLAY_DETAILS='.responsive-filter-panel,.more-filters,.mobile-column-options';
+let overlayPointerFocus=false;
 function dismissDisclosure(panel,restoreFocus){
  if(!panel?.open)return;
  panel.open=false;
  const target=restoreFocus?panel.querySelector('summary'):document.activeElement;
  if(restoreFocus)target?.focus({preventScroll:true});
- if(!target||target===document.body||!target.getClientRects().length)return;
+ if(!target||target===document.body||!target.getClientRects().length||target.closest('dialog'))return;
  const header=document.querySelector('.topbar');
  if(header?.contains(target))return;
  const box=target.getBoundingClientRect(),top=(header?.getBoundingClientRect().bottom||0)+8,bottom=window.innerHeight-8;
  if(box.top<top)window.scrollBy({top:box.top-top,behavior:'instant'});
  else if(box.bottom>bottom)window.scrollBy({top:box.bottom-bottom,behavior:'instant'});
 }
-document.addEventListener('keydown',event=>{if(event.key!=='Escape')return;const panel=event.target.closest?.(OVERLAY_DETAILS);if(panel?.open&&panel.querySelector('summary')?.getClientRects().length){event.preventDefault();dismissDisclosure(panel,true);}});
+document.addEventListener('keydown',event=>{overlayPointerFocus=false;if(event.key!=='Escape')return;const panel=event.target.closest?.(OVERLAY_DETAILS);if(panel?.open&&panel.querySelector('summary')?.getClientRects().length){event.preventDefault();dismissDisclosure(panel,true);}});
+document.addEventListener('pointerdown',()=>{overlayPointerFocus=true;},true);
 document.addEventListener('click',event=>{document.querySelectorAll(OVERLAY_DETAILS).forEach(panel=>{if(panel.open&&!panel.contains(event.target)&&panel.querySelector('summary')?.getClientRects().length)dismissDisclosure(panel,panel.contains(document.activeElement));});});
-document.addEventListener('focusin',event=>{document.querySelectorAll(OVERLAY_DETAILS).forEach(panel=>{if(panel.open&&!panel.contains(event.target)&&panel.querySelector('summary')?.getClientRects().length)dismissDisclosure(panel,false);});});
+document.addEventListener('focusin',event=>{if(overlayPointerFocus)return;document.querySelectorAll(OVERLAY_DETAILS).forEach(panel=>{if(panel.open&&!panel.contains(event.target)&&panel.querySelector('summary')?.getClientRects().length)dismissDisclosure(panel,false);});});
 
 // Page titles for each main view.
-const VIEW_TITLES={market:'Market · ScienceToStartup',companies:'Companies · ScienceToStartup',compare:'Compare · ScienceToStartup',work:'Paid work · ScienceToStartup',outreach:'Math competition alumni · ScienceToStartup',method:'Sources and method · ScienceToStartup'};
+const VIEW_TITLES={market:'ScienceToStartup · The AI data field guide',companies:'Companies · ScienceToStartup',compare:'Compare · ScienceToStartup',work:'Paid work · ScienceToStartup',method:'Method · ScienceToStartup'};
 
 /* Editorial presentation layer. Canonical claims and measures remain inspectable. */
 const attr=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2789,6 +2870,186 @@ function evidenceContextArchiveHTML(id){
  return evidenceContextCorrections().filter(update=>update.company_id===id).map(update=>evidenceContextUpdateHTML(update)).join('');
 }
 /* Site menus, global search and footer. Loaded after source-updates.js and before initialize(). */
-function initSiteNav(){}
+
+// Global search over companies, business groups, products, paid work listings and pages.
+// The index is built from data already in the page on first use, never at load.
+const SITE_SEARCH_GROUPS={company:['Companies',5],group:['Business groups',2],work:['Paid work',5],product:['Products',3],page:['Pages',3]};
+const SITE_SEARCH_SUGGESTED=['scale_ai','mercor','surge_ai','labelbox'];
+let siteSearchEntries=null,siteSearchItems=[],siteSearchActive=-1,siteSearchStatusTimer=0;
+const siteSearchFold=v=>String(v??'').normalize('NFKD').replace(/\p{M}+/gu,'').toLowerCase();
+const siteSearchWords=v=>siteSearchFold(Array.isArray(v)?v.join(' '):v).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+// "Outlier (contributor brand)" is matched as "Outlier"; the note stays with it in the result.
+function siteSearchAlias(value){const m=String(value).match(/^(.+?)\s*\((.+)\)$/);return m?{name:m[1],note:m[2]}:{name:String(value),note:''};}
+function siteSearchTopRate(label){const m=String(label||'').match(/\$\s?([\d,.]+)(?:\s*[–-]\s*\$?([\d,.]+))?\+?\s*\/\s*(?:approved\s+)?hour/i);return m?Number((m[2]||m[1]).replace(/,/g,''))||0:0;}
+function siteSearchPages(){
+ const listings=typeof workRouteRows==='function'?workRouteRows().length:0;
+ return [
+  ['market','Overview','The front page, with the main figures and business groups','home start charts market'],
+  ['companies','Companies',`All ${DATA.companies.length} companies, with search and filters`,'index directory list organizations organisations firms startups'],
+  ['work','Paid work',`${listings} listings, with pay and location`,'jobs gigs hiring careers contract contractor freelance hourly pay earn'],
+  ['compare','Compare','Put up to three companies side by side','versus vs comparison'],
+  ['method','Method','How each figure is checked and graded','methodology sources evidence research'],
+  ['labels','What the labels mean','Evidence labels and confidence grades','grades confidence rubric'],
+  ['about','About the publisher','Who publishes this guide, and the disclosure','contact publisher musa ozdem email disclosure removal privacy'],
+  ['corrections','Request a correction','Tell us when a figure or listing is wrong','corrections error mistake wrong fix report'],
+  ['downloads','Download the data','JSON, CSV and SQLite files','downloads csv json sqlite dataset export'],
+  ['venture','Our proposed AI lab','The publisher’s proposal, separate from the research','venture neolab investor pitch proposal']
+ ].map(([id,name,meta,keys])=>({type:'page',id,name,meta,keys:keys.split(' '),href:'#'+id}));
+}
+function siteSearchIndex(){
+ if(siteSearchEntries)return siteSearchEntries;
+ const rows=[],aliasesOf=c=>(c.aliases||[]).map(siteSearchAlias);
+ for(const c of DATA.companies){const key=modelGroup(c.id);rows.push({type:'company',id:c.id,company:c.id,name:c.name,aliases:aliasesOf(c),ctx:[groupLabel(key),key],text:[c.description,modelFor(c.id),...(c.categories||[])],meta:groupLabel(key),href:'#company/'+c.id});}
+ for(const [key,ids] of Object.entries(MODEL_GROUPS))rows.push({type:'group',id:groupSlug(key),name:groupLabel(key),aliases:[{name:key,note:''}],meta:`${ids.length} ${ids.length===1?'company':'companies'}`,href:'#companies/'+groupSlug(key)});
+ for(const c of DATA.companies)for(const p of typeof profileProducts==='function'?profileProducts(c.id):[])rows.push({type:'product',id:c.id+'/'+p.name,company:c.id,product:p.name,name:p.name,aliases:[...(p.aliases||[]),typeof publicOfferingName==='function'?publicOfferingName(p.name):''].filter(Boolean).map(siteSearchAlias),ctx:[c.name],text:[p.description,p.kind],meta:'From '+c.name,href:`#company/${c.id}/products`});
+ for(const r of typeof workRouteRows==='function'?workRouteRows():[]){const c=companies[r.company_id];if(!c)continue;
+  const pay=typeof w4Pay==='function'?w4Pay(r):r.pay_label,place=typeof w4Location==='function'?w4Location(r):r.geography,status=typeof w4Status==='function'?w4Status(r):'';
+  rows.push({type:'work',id:r.id,company:c.id,name:r.role,ctx:[c.name,...aliasesOf(c).map(a=>a.name),r.group,r.geography,r.pay_label],text:[r.summary,r.hours,...(r.requirements||[])],meta:[c.name,pay,place].filter(Boolean).join(' · '),badge:status,order:WORK_ROUTE_ORDER[r.status]??10,rate:siteSearchTopRate(r.pay_label),href:`#company/${c.id}/work`});}
+ rows.push(...siteSearchPages());
+ return siteSearchEntries=rows.map(row=>{
+  const name=siteSearchWords(row.name),aliases=(row.aliases||[]).map(a=>siteSearchWords(a.name)).filter(w=>w.length),keys=siteSearchWords(row.keys||[]),core=[...name,...aliases.flat(),...keys,...siteSearchWords(row.ctx||[])];
+  return Object.assign(row,{nameKey:name.join(' '),nameWords:name,aliasKeys:aliases.map(w=>w.join(' ')),labelWords:[...name,...aliases.flat(),...keys],keyWords:keys,coreWords:core,allWords:[...core,...siteSearchWords(row.text||[])]});
+ });
+}
+// Lower is better: 0 exact name or alias, 1 name starts with the query, 2 an alias or page keyword starts with it,
+// 3 every word starts a word of the name, 4 of the name, aliases or context, 5 of anything in the entry.
+function siteSearchRank(e,tokens,key){
+ const has=words=>tokens.every(t=>words.some(w=>w.startsWith(t)));
+ if(e.nameKey===key||e.aliasKeys.includes(key))return 0;
+ if(e.nameKey.startsWith(key))return 1;
+ if(e.aliasKeys.some(k=>k.startsWith(key))||(e.keyWords.length&&has(e.keyWords)))return 2;
+ if(has(e.nameWords))return 3;
+ if(has(e.coreWords))return 4;
+ return has(e.allWords)?5:-1;
+}
+const siteSearchStem=t=>t.length>3&&t.endsWith('s')?t.replace(/ies$/,'y').replace(/s$/,''):t;
+function siteSearchDistance(a,b){const d=[...Array(a.length+1)].map((_,i)=>[i]);for(let j=1;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++){d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1])d[i][j]=Math.min(d[i][j],d[i-2][j-2]+1);}return d[a.length][b.length];}
+// Typo tolerance, used only when nothing matches exactly: names and aliases, same first letter,
+// one slip in a short word and two in a long one.
+function siteSearchNear(t,words){if(t.length<3)return words.some(w=>w.startsWith(t));const max=t.length>6?2:1;return words.some(w=>w[0]===t[0]&&[t.length-1,t.length,t.length+1].some(n=>siteSearchDistance(t,w.slice(0,n))<=max));}
+// siteSearch('outlier') -> [{type:'company',id:'scale_ai',...}, ...]: results in display order, grouped by type.
+function siteSearch(query,opts={}){
+ const o=typeof opts==='number'?{limit:opts}:opts||{},tokens=siteSearchWords(query);
+ if(!tokens.length)return [];
+ const key=tokens.join(' '),stems=tokens.map(siteSearchStem),entries=siteSearchIndex().filter(e=>!o.types||o.types.includes(e.type));
+ // One or two letters match names, aliases and context only; descriptions join from three letters.
+ const most=key.length<3?4:5;
+ let hits=entries.map(e=>{let rank=siteSearchRank(e,tokens,key);if(rank<0&&stems.join(' ')!==key&&siteSearchRank(e,stems,stems.join(' '))>=0)rank=5;return [rank,e];}).filter(([rank])=>rank>=0&&rank<=most);
+ if(!hits.length)hits=entries.filter(e=>tokens.every(t=>siteSearchNear(t,e.labelWords))).map(e=>[6,e]);
+ // Groups follow their best match. On a tie the default order holds, except that listings lead
+ // when only descriptions match (skill words such as "python" are usually a worker's search).
+ const groups=Object.keys(SITE_SEARCH_GROUPS).map((type,order)=>{
+  const rows=hits.filter(([,e])=>e.type===type).sort(([ra,a],[rb,b])=>ra-rb||(type==='work'?a.order-b.order||b.rate-a.rate||companies[a.company].name.localeCompare(companies[b.company].name)||a.name.localeCompare(b.name):a.name.length-b.name.length||a.name.localeCompare(b.name)));
+  return {type,order,best:rows[0]?.[0],total:rows.length,rows:rows.slice(0,o.limit||SITE_SEARCH_GROUPS[type][1])};
+ }).filter(g=>g.total).sort((a,b)=>a.best-b.best||(a.best===5?(b.type==='work')-(a.type==='work'):0)||a.order-b.order);
+ return groups.flatMap(g=>g.rows.map(([rank,e])=>{
+  const has=words=>tokens.every(t=>words.some(w=>w.startsWith(t))),alias=e.type==='company'&&!has(e.nameWords)?(e.aliases||[]).find(a=>has(siteSearchWords(a.name))):null;
+  return {type:e.type,id:e.id,name:e.name,meta:alias?`Also known as ${alias.name}${alias.note?' ('+alias.note+')':''}`:e.meta,badge:e.badge||'',href:e.href,company:e.company||'',product:e.product||'',rank,group:SITE_SEARCH_GROUPS[e.type][0],total:g.total};
+ }));
+}
+// Listing count as the Paid work page will show it after the query is applied to its own search.
+function siteSearchWorkCount(query){if(typeof filteredWork!=='function')return 0;const saved=state.workQuery;try{state.workQuery=query;return filteredWork().length;}catch{return 0;}finally{state.workQuery=saved;}}
+function siteSearchView(query){
+ const tokens=siteSearchWords(query);
+ if(!tokens.length){const pages=siteSearchPages();return [{label:'Suggested',items:[...SITE_SEARCH_SUGGESTED.filter(isCompanyId).map(id=>({type:'company',name:companies[id].name,meta:groupLabel(modelGroup(id)),href:'#company/'+id})),...['work','compare','method'].map(id=>pages.find(p=>p.id===id))]}];}
+ const results=siteSearch(query),groups=[];
+ for(const item of results){if(groups.at(-1)?.type!==item.type)groups.push({type:item.type,label:item.group,items:[]});groups.at(-1).items.push(item);}
+ const work=groups.find(g=>g.type==='work'),text=tokens.join(' '),count=work?siteSearchWorkCount(text):0;
+ if(work&&count){const all={type:'action',action:'work',query:text,name:`See all ${count} ${count===1?'listing':'listings'} for “${query.trim()}”`,meta:'Opens Paid work with this search',href:'#work'};if(work.items[0].rank>=4)work.items.unshift(all);else work.items.push(all);}
+ if(!groups.length)groups.push({label:'Try instead',items:[{type:'page',name:`Browse all ${DATA.companies.length} companies`,meta:'The full company list',href:'#companies'},{type:'page',name:'See all paid work',meta:'Every listing, with filters',href:'#work'}]});
+ return groups;
+}
+function siteSearchMark(text,tokens){
+ const value=publicText(String(text??''));let html='',last=0;
+ if(tokens.length)for(const m of value.matchAll(/[\p{L}\p{N}\p{M}]+/gu)){
+  const word=m[0],folded=siteSearchFold(word),token=tokens.filter(t=>folded.startsWith(t)).sort((a,b)=>b.length-a.length)[0];if(!token)continue;
+  let end=0,length=0;for(const ch of word){if(length>=token.length)break;length+=siteSearchFold(ch).length;end+=ch.length;}
+  html+=attr(value.slice(last,m.index))+'<mark>'+attr(word.slice(0,end))+'</mark>';last=m.index+end;
+ }
+ return html+attr(value.slice(last));
+}
+function siteSearchAnnounce(text){clearTimeout(siteSearchStatusTimer);siteSearchStatusTimer=setTimeout(()=>{$('site-search-status').textContent=text;},450);}
+function siteSearchRender(){
+ const input=$('site-search-input'),list=$('site-search-results'),query=input.value.trim(),tokens=siteSearchWords(query),groups=siteSearchView(query);
+ siteSearchItems=groups.flatMap(g=>g.items);siteSearchActive=-1;let index=0;
+ list.innerHTML=groups.map(g=>`<div class="site-search-group" role="group" aria-label="${attr(g.label)}"><div class="site-search-group-label" aria-hidden="true">${esc(g.label)}</div>${g.items.map(item=>{const i=index++;return `<div class="site-search-option${i||!tokens.length?'':' is-first'}" id="site-search-option-${i}" role="option" aria-selected="false" data-site-search-index="${i}"><span class="site-search-name">${siteSearchMark(item.name,item.type==='action'?[]:tokens)}${item.badge?` <span class="site-search-badge">${esc(item.badge)}</span>`:''}</span>${item.meta?`<span class="site-search-meta">${siteSearchMark(item.meta,item.type==='action'?[]:tokens)}</span>`:''}<kbd class="site-search-enter" aria-hidden="true">Enter</kbd></div>`;}).join('')}</div>`).join('');
+ list.hidden=!siteSearchItems.length;input.setAttribute('aria-expanded',String(siteSearchItems.length>0));input.removeAttribute('aria-activedescendant');
+ const results=siteSearchItems.filter(i=>i.rank!==undefined).length,exact=siteSearchItems.some(i=>i.rank<6);
+ $('site-search-message').textContent=!tokens.length?'Type a name or a role. Press Enter to open the first result.':!results?`No match for “${query}”.`:exact?'':`No exact match for “${query}”. Showing close matches.`;
+ if(tokens.length)siteSearchAnnounce(results?`${results} ${results===1?'result':'results'}. Top result: ${siteSearchItems[0].name}.`:'No results.');
+}
+function siteSearchSetActive(index){
+ siteSearchActive=index;
+ document.querySelectorAll('#site-search-results [role=option]').forEach((option,i)=>{const on=i===index;option.setAttribute('aria-selected',String(on));option.classList.toggle('is-active',on);option.classList.remove('is-first');if(on)option.scrollIntoView({block:'nearest'});});
+ $('site-search-input').setAttribute('aria-activedescendant','site-search-option-'+index);
+}
+// Land on the exact product or listing card once the profile has rendered.
+function siteSearchReveal(item){
+ const product=item.type==='product',card=[...document.querySelectorAll(product?'#profile-view [data-profile-product]':'#profile-view [data-work-route]')].find(el=>product?el.dataset.profileProduct===item.product:el.dataset.workRoute===item.id);
+ if(!card)return;
+ for(let el=card;el;el=el.parentElement)if(el.tagName==='DETAILS')el.open=true;
+ const toggle=card.querySelector('.w4-compact-toggle');if(toggle)toggle.open=true;
+ const target=card.querySelector('h3')||toggle?.querySelector('summary')||card;
+ if(target.tagName!=='SUMMARY')target.setAttribute('tabindex','-1');
+ target.focus({preventScroll:true});card.scrollIntoView({block:'start',behavior:'instant'});
+ // Keep the card clear of the sticky header and profile tabs.
+ const covered=Math.max(0,...['.topbar','#profile-view .profile-tabs'].map(s=>document.querySelector(s)?.getBoundingClientRect().bottom||0)),gap=card.getBoundingClientRect().top-covered-16;
+ if(gap<0)window.scrollBy({top:gap,behavior:'instant'});
+ card.classList.add('site-search-target');target.addEventListener('blur',()=>card.classList.remove('site-search-target'),{once:true});
+}
+function siteSearchChoose(item){
+ if(!item)return;
+ if(item.action==='work'){const field=$('work-search');field.value=item.query;field.dispatchEvent(new Event('input',{bubbles:true}));}
+ $('site-search').close();
+ const reveal=item.type==='product'||item.type==='work'?()=>siteSearchReveal(item):null;
+ if(location.hash===item.href){route({type:'hashchange'});reveal?.();return;}
+ if(reveal)window.addEventListener('hashchange',reveal,{once:true});
+ location.hash=item.href;
+}
+function siteSearchKey(event){
+ if(event.isComposing)return;
+ const n=siteSearchItems.length,down=event.key==='ArrowDown';
+ if(down||event.key==='ArrowUp'){if(!n)return;event.preventDefault();siteSearchSetActive(siteSearchActive<0?(down?0:n-1):(siteSearchActive+(down?1:n-1))%n);}
+ else if(event.key==='Enter'){event.preventDefault();siteSearchChoose(siteSearchItems[siteSearchActive]||(siteSearchWords(event.target.value).length?siteSearchItems[0]:null));}
+ else if(event.key==='Escape'&&event.target.value){event.preventDefault();event.target.value='';siteSearchRender();}
+}
+function siteSearchOpen(text){
+ const dialog=$('site-search'),input=$('site-search-input');
+ if(dialog.open)return;
+ if(typeof text==='string')input.value=text;
+ dialog.showModal();$('site-search-open').setAttribute('aria-expanded','true');
+ siteSearchRender();input.focus();input.select();
+}
+// "/" and Ctrl or Cmd+K open search, except while typing in a field or while another dialog is open.
+function siteSearchTyping(el){return Boolean(el?.isContentEditable||el?.closest?.('textarea,select')||(el?.matches?.('input')&&!/^(?:checkbox|radio|button|submit|reset|range|color|file|image)$/.test(el.type)));}
+function siteSearchShortcut(event){
+ if(event.defaultPrevented||event.isComposing||event.altKey)return;
+ const command=(event.ctrlKey||event.metaKey)&&!event.shiftKey&&(String(event.key).toLowerCase()==='k'||event.code==='KeyK');
+ if(!command&&!(event.key==='/'&&!event.ctrlKey&&!event.metaKey))return;
+ if(siteSearchTyping(event.target)||document.querySelector('dialog[open]'))return;
+ event.preventDefault();siteSearchOpen();
+}
+
+function initSiteNav(){
+ const button=$('site-search-open'),dialog=$('site-search'),input=$('site-search-input'),list=$('site-search-results');
+ button.addEventListener('click',()=>siteSearchOpen());
+ $('site-search-close').addEventListener('click',()=>dialog.close());
+ input.addEventListener('input',siteSearchRender);
+ input.addEventListener('keydown',siteSearchKey);
+ // Options keep focus in the field; a click chooses one.
+ list.addEventListener('mousedown',event=>event.preventDefault());
+ list.addEventListener('click',event=>{const option=event.target.closest?.('[role=option]');if(option)siteSearchChoose(siteSearchItems[Number(option.dataset.siteSearchIndex)]);});
+ dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});
+ // Focus returns to the opener. When search opened with nothing focused (on load, or "/" on the page), it goes to the button.
+ dialog.addEventListener('close',()=>{button.setAttribute('aria-expanded','false');$('site-search-status').textContent='';const active=document.activeElement;if(!active||active===document.body||dialog.contains(active))button.focus();});
+ document.addEventListener('keydown',siteSearchShortcut);
+ window.addEventListener('hashchange',()=>{if(dialog.open)dialog.close();});
+ // Static pages link to /?search (or /?q=text): open search once, then drop the query from the address.
+ const params=String(location.search||'');
+ if(/[?&](?:search|q)(?:[=&]|$)/.test(params)){
+  const match=params.match(/[?&](?:q|search)=([^&]*)/);let text='';try{text=match?decodeURIComponent(match[1].replace(/\+/g,' ')):'';}catch{}
+  history.replaceState(history.state,'',location.pathname.replace(/^\/{2,}/,'/')+location.hash);siteSearchOpen(text);
+ }
+}
 
 initialize();</script></body></html>
