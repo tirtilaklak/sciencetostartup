@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import observatory
 from observatory import ValidationError, build, load_company_events, validate_company_events
 from fixtures import fixture
-from static_pages import EVENTS_NOTE, date_rank
+from static_pages import EVENTS_NOTE, date_rank, load_copy_edits, public_wording
 
 EMPTY = {"version": "1.0.0", "events": []}
 
@@ -156,15 +156,17 @@ class CompanyEventsBuildTests(unittest.TestCase):
 
     def test_supported_risk_claims_render_newest_first(self):
         risks = [c for c in self.data["claims"] if c["subject"] == "risks"]
+        say = public_wording(self.data, load_copy_edits())
+        shown = lambda claim: html.escape(say(claim["statement"]))  # static pages print the app's public wording
         for company in self.data["companies"]:
             text, cid = self.page(company["id"]), company["id"]
             own = [c for c in risks if c["company_id"] == cid]
             supported = [c for c in own if c["status"] == "supported"]
             self.assertEqual("<h3>Risks named in the evidence</h3>" in text, bool(supported), cid)
-            ranks = [date_rank(c["as_of"]) for c in sorted(supported, key=lambda c: text.index(html.escape(c["statement"])))]
+            ranks = [date_rank(c["as_of"]) for c in sorted(supported, key=lambda c: text.index(shown(c)))]
             self.assertEqual(ranks, sorted(ranks, reverse=True), cid)
             for claim in own:
-                if claim["status"] != "supported": self.assertNotIn(html.escape(claim["statement"]), text, claim["id"])
+                if claim["status"] != "supported": self.assertNotIn(shown(claim), text, claim["id"])
 
     def test_section_is_hidden_when_empty(self):
         quiet = [c["id"] for c in self.data["companies"] if c["id"] not in ("scale_ai", "mercor") and not any(x["company_id"] == c["id"] and x["subject"] == "risks" and x["status"] == "supported" for x in self.data["claims"])]
