@@ -678,12 +678,13 @@ def figures_html(research, company, figures, pending, profile_entry):
     if pending:
         items = "".join(f'<li data-metric="{escape(m["id"])}"><strong>{escape(figure_label(research, m))}: {escape(value_text(m))}</strong> · {escape(metric_period(research, m))} · {escape(figure_scope(research, m))}. {escape(status_words(research, m))} {source_html(research, m, inline=True)}</li>' for m in pending)
         body += f'<h3 id="unconfirmed">Not confirmed</h3>\n<p class="muted">These figures were reported, but we could not confirm them. They stay out of the key figures.</p>\n<ul class="listings">{items}</ul>\n'
-    year = re.match(r"[0-9]{4}", research.as_of)
-    notes = ["Each figure keeps its own date and the part of the business it covers."]
-    if any(m.get("kind") == "annualized_revenue_run_rate" for m in figures): notes.append("Annualized pace is recent revenue projected across a full year.")
-    if year: notes.append(f"Historical marks figures from {int(year.group(0)) - 2} or earlier.")
-    notes.append("Estimates are labeled. Forecasts and targets are left out.")
-    body += f'<p class="muted">{" ".join(notes)} Grade is our confidence in the sources, from A (a filing or independent evidence) to U (unverified). <a href="{ORIGIN}/method/#grades">How we grade</a>.</p>\n'
+    if figures or pending:
+        year = re.match(r"[0-9]{4}", research.as_of)
+        notes = ["Each figure keeps its own date and the part of the business it covers."]
+        if any(m.get("kind") == "annualized_revenue_run_rate" for m in figures + pending): notes.append("Annualized pace is recent revenue projected across a full year.")
+        if year: notes.append(f"Historical marks figures from {int(year.group(0)) - 2} or earlier.")
+        notes.append("Estimates are labeled. Forecasts and targets are left out.")
+        body += f'<p class="muted">{" ".join(notes)} Grade is our confidence in the sources, from A (a filing or independent evidence) to U (unverified). <a href="{ORIGIN}/method/#grades">How we grade</a>.</p>\n'
     return '<h2 id="figures">Key figures</h2>\n' + body
 
 
@@ -778,7 +779,7 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     tabs = (("Figures", "traction"), ("Funding and people", "people"), ("Paid work", "work"), ("Sources", "sources"))
     body.append(f'<h2 id="full-profile">In the full profile</h2>\n<p>The full profile shows each sourced claim with its confidence grade, including funding rounds and customer relationships.</p>\n<ul class="inline-list">'
                 + "".join(f'<li><a href="{app_url}/{part}">{label}</a></li>' for label, part in tabs) + f'</ul>\n<p class="actions">{cta(app_url, "Open the full profile")}</p>\n'
-                + f'<p class="muted">{SITE_NAME} is a public guide to {plural(len(research.companies), "AI data company", "AI data companies")}, published by {PUBLISHER_NAME}. Each figure links to its source. No profiled company has paid for coverage. <a href="{ORIGIN}/method/">How we check the research</a>.</p>\n')
+                + f'<p class="muted">{SITE_NAME} is a public guide to {plural(len(research.companies), "AI data company", "AI data companies")}, published by {PUBLISHER_NAME}. Each figure links to its source. We do not confirm any company\'s current status. No profiled company has paid for coverage. <a href="{ORIGIN}/method/">How we check the research</a>.</p>\n')
     organization = {"@type": "Organization", "@id": canonical + "#organization", "name": name, "description": clean(company.get("description")) or summary}
     if is_web_url(company.get("website")): organization["url"] = company["website"]
     if company.get("founded_year"): organization["foundingDate"] = str(company["founded_year"])
