@@ -3,10 +3,10 @@
 ScienceToStartup is a static, evidence-linked field guide to AI data organizations.
 The current public site is https://sciencetostartup.com.
 
-## Reviewed public v31 snapshot
+## Reviewed research and current dashboard
 
-This repository preserves the reviewed public source and distribution for Sites
-version 31. Its source snapshot comes from commit
+This repository began with the reviewed public source and distribution for Sites
+version 31. That source snapshot comes from commit
 `65e67210b80abc2b93d5f84a34a3975abbb03cc0`; `SOURCE_PROVENANCE.json` records
 individual source-file hashes. The GitHub history starts with this repository's
 existing initial commit. Earlier Sites Git history was not imported.
@@ -25,7 +25,8 @@ internal reports, credentials, browser output and deployment configuration.
 - `schema/`: data and relational contracts.
 - `scripts/observatory.py`, `scripts/schema_def.py`: research and export builder.
 - `scripts/build_public_snapshot.py`: build the approved public snapshot.
-- `dist/`: exact v31 HTML, assets, JSON/CSV exports and portable SQLite database.
+- `data/business-health.json`: sourced business observations, reporting cohorts and calculations for the interactive dashboard.
+- `dist/`: generated current HTML, assets, JSON/CSV exports and portable SQLite database.
 - `docs/research-id-crosswalk.json`: public profile aliases required by the builder.
 
 ## View or reproduce
@@ -58,12 +59,28 @@ python3 tests/js_logic.py
 python3 tests/company_search_prefix_logic.py
 ```
 
-The snapshot includes 55 standalone unit tests and public logic checks. Historical
+The snapshot includes standalone unit tests and public logic checks. Historical
 comparison tests and local audit reports remain in the research repository.
 
 ## Hosting
 
-The live website remains on the existing ChatGPT Sites project through
-Cloudflare. GitHub is the source repository and reviewed backup. No deployment
-workflow or hosting migration was added; pushing this repository does not change
-our configured Sites deployment.
+The live website is served by the `sciencetostartup` Cloudflare Worker with Static
+Assets on the apex and www custom domains. Deployment publishes the reviewed
+`dist/` build; a GitHub push alone does not trigger deployment.
+
+The Worker staging omits the domain-level `_redirects` file because Workers
+Static Assets accepts relative source paths. Equivalent zone redirects enforce
+HTTPS and the apex hostname while preserving paths and queries. `_headers` is
+deployed unchanged.
+
+## Business health dashboard
+
+The overview explores revenue growth, delivery margins, customer durability, paid
+expert activity and cash resilience. It covers all 39 organizations, with 98 dated
+observations linked to 65 sources, explicit missing values and a separate
+hypothetical margin calculator. Employee and registered-expert counts are context.
+The recommended north star is gross profit from repeat paying customers.
+
+See [dashboard definitions and evidence limits](docs/business-health-dashboard.md).
+The underlying research remains dataset v2.5.0; the October 23 dashboard curation
+does not imply all source material was freshly verified.
