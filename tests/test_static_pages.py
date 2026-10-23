@@ -1,6 +1,9 @@
 """Crawlable static company pages and the generated sitemap, built into a scratch directory."""
+import html
 import json
 import re
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -11,24 +14,37 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from observatory import build
+from static_pages import METRIC_LIMIT, STYLE, headline_metrics
 
 ORIGIN = "https://sciencetostartup.com"
 NAMESPACE = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
 EMAIL = re.compile(r"@[A-Za-z0-9-]+\.[A-Za-z]{2,}")
 PAGE_LIMIT = 120_000
+OG_IMAGE = ORIGIN + "/assets/og/sciencetostartup-og-v1.png"
+# eligibleMetrics in web/app.js decides which figure the app compares; the static pages must agree with it.
+APP_RULE = "m.preferred_for_comparison!==false&&claims[m.claim_id].status==='supported'&&(!m.observation_status||m.observation_status==='reported')"
+APP_PICKS = r"""
+const fs=require('fs'),app=fs.readFileSync(process.argv[1],'utf8'),DATA=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+const claims=Object.fromEntries(DATA.claims.map(c=>[c.id,c])),grab=re=>{const m=app.match(re);if(!m)throw new Error('web/app.js changed: '+re);return m[1]??m[0];};
+eval(grab(/function dateRank\(s\)\{.*/));const byRecent=eval(grab(/const byRecent=(.*?);\n/));eval(grab(/function eligibleMetrics\(id,kind\)\{.*/));
+const picks={};for(const m of DATA.metrics){const first=eligibleMetrics(m.company_id,m.kind)[0];if(first)picks[m.company_id+'|'+m.kind]=first.id;}
+console.log(JSON.stringify(picks));
+"""
 
 
 class PageFacts(HTMLParser):
-    """Canonical links, h1 headings, title and script tags of a static page."""
+    """Canonical links, h1 headings, title, meta tags, icon links and script tags of a static page."""
     def __init__(self, text):
         super().__init__()
-        self.canonicals, self.headings, self.scripts, self.title = [], [], [], ""
+        self.canonicals, self.headings, self.scripts, self.icons, self.meta, self.title = [], [], [], [], {}, ""
         self._capture, self._buffer = None, []
         self.feed(text)
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
         if tag == "link" and attrs.get("rel") == "canonical": self.canonicals.append(attrs.get("href"))
+        if tag == "link" and "icon" in attrs.get("rel", ""): self.icons.append(attrs)
+        if tag == "meta" and (attrs.get("property") or attrs.get("name")): self.meta[attrs.get("property") or attrs.get("name")] = attrs.get("content")
         if tag == "script": self.scripts.append(attrs)
         if tag in ("h1", "title"): self._capture, self._buffer = tag, []
 
@@ -106,6 +122,85 @@ class StaticPageTests(unittest.TestCase):
         manifest = json.loads((self.dist / "manifest.json").read_text())["sha256"]
         for name in ("sitemap.xml", "companies/index.html", "company/mercor/index.html"): self.assertIn(name, manifest)
         self.assertEqual(sum(1 for n in manifest if n.startswith("company/") and n.endswith("/index.html")), 39)
+
+    def test_headline_rows_pass_the_app_comparison_rule(self):
+        self.assertIn(APP_RULE, (ROOT / "web/app.js").read_text(), "eligibleMetrics changed in web/app.js; update static_pages.exclusion and this port")
+        claims, metrics = {c["id"]: c for c in self.data["claims"]}, {m["id"]: m for m in self.data["metrics"]}
+        eligible = lambda m: m.get("preferred_for_comparison") is not False and claims[m["claim_id"]]["status"] == "supported" and (not m.get("observation_status") or m["observation_status"] == "reported")
+        shown = 0
+        for cid in self.companies:
+            rows, others = headline_metrics(self.data, cid)
+            for row in rows: self.assertTrue(eligible(metrics[row["id"]]), (cid, row["id"]))
+            for row in others:
+                self.assertFalse(eligible(metrics[row["id"]]), (cid, row["id"]))
+                self.assertIn(row["status"], ("unverified", "contested", "talks", "forecast", "target", "not preferred"), (cid, row["id"]))
+            shown += len(rows)
+        self.assertGreater(shown, 100)
+        found = {(cid, row["value"], row["status"]) for cid in self.companies for row in headline_metrics(self.data, cid)[1]}
+        self.assertLessEqual({("scale_ai", "$200M", "unverified"), ("invisible", "more than $2B", "unverified"), ("afterquery", "$3.2B", "talks"), ("micro1", "$1B", "target"), ("labelbox", "$189M", "not preferred"), ("prolific", "$500M", "forecast")}, found)
+
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    def test_headline_pick_matches_the_app_code(self):
+        picks = json.loads(subprocess.run(["node", "-e", APP_PICKS, str(ROOT / "web/app.js"), str(ROOT / "data/canonical.json")], check=True, capture_output=True, text=True).stdout)
+        kinds = {m["id"]: m["kind"] for m in self.data["metrics"]}
+        for cid in self.companies:
+            expected = {kind: mid for key, mid in picks.items() for company, kind in [key.split("|")] if company == cid}
+            rows = headline_metrics(self.data, cid)[0]
+            self.assertEqual(len(rows), min(len(expected), METRIC_LIMIT), cid)
+            for row in rows: self.assertEqual(row["id"], expected[kinds[row["id"]]], (cid, row["kind"]))
+
+    def test_scale_leads_with_reported_revenue_not_the_unverified_run_rate(self):
+        table, rest = self.pages["scale_ai"].split("<h3>Other reported figures, not used for comparison</h3>", 1)
+        table = table[table.index("<h2>Headline metrics</h2>"):]
+        self.assertNotIn("$200M", table)
+        self.assertRegex(re.search(r"<tbody><tr>(.*?)</tr>", table).group(1), r"^<td>Revenue<br>.*\$870M")
+        self.assertIn('Annualized revenue run rate: <strong>$200M</strong> <span class="muted">· Unverified</span>', rest.split("</ul>", 1)[0])
+
+    def test_head_tags_make_every_page_share_ready(self):
+        for path in self.public_files()[:-1]:
+            facts, name = PageFacts(path.read_text()), str(path.relative_to(self.dist))
+            meta = facts.meta
+            self.assertLess(len(facts.title), 60, name)
+            self.assertLessEqual(len(meta["description"]), 155, name)
+            self.assertTrue(meta["description"].endswith("."), name)
+            self.assertEqual((meta["og:title"], meta["twitter:title"]), (facts.title, facts.title), name)
+            self.assertEqual((meta["og:description"], meta["twitter:description"]), (meta["description"], meta["description"]), name)
+            self.assertEqual((meta["og:image"], meta["og:image:width"], meta["og:image:height"], meta["og:image:alt"], meta["twitter:card"]), (OG_IMAGE, "1200", "630", "ScienceToStartup, the AI data field guide", "summary_large_image"), name)
+            self.assertEqual([(i["rel"], i["href"]) for i in facts.icons], [("icon", "/assets/favicon.svg"), ("icon", "/assets/favicon-48.png"), ("apple-touch-icon", "/assets/apple-touch-icon.png")], name)
+            self.assertEqual(facts.icons[0]["type"], "image/svg+xml", name)
+
+    def test_company_descriptions_are_whole_sentences_without_the_summary(self):
+        editorial = {e["company_id"]: e for e in json.loads((ROOT / "data/editorial.json").read_text())["entries"]}
+        for cid, text in self.pages.items():
+            description, name = PageFacts(text).meta["description"], self.companies[cid]["name"]
+            self.assertTrue(description.startswith(name + " "), (cid, description))
+            self.assertNotIn(editorial[cid]["summary"][:40], description, cid)
+            first = re.split(r"(?<=[.!?]) ", " ".join(self.companies[cid]["description"].split()))[0].rstrip(".")
+            self.assertIn(first[1:] + ". ", description + " ", cid)
+
+    def test_header_main_and_footer_share_one_column(self):
+        widths = re.findall(r"(?<=[{;])max-width:([^;}]+)", STYLE)
+        self.assertEqual(widths, ["45rem"])
+        self.assertIn("main,header,footer{max-width:45rem;", STYLE)
+
+    def test_footer_names_publisher_disclosure_and_corrections(self):
+        about = re.search(r'<article[^>]*\bid="about"[^>]*>.*?</article>', (ROOT / "web/index.html").read_text(), re.S).group(0)
+        disclosure = re.sub(r"<[^>]+>", "", re.search(r"<strong>Disclosure\.</strong>\s*(.*?)</p>", about, re.S).group(1)).strip()
+        publisher = re.search(r"ScienceToStartup is published by [^.]+\.", about).group(0)
+        for path in self.public_files()[:-1]:
+            footer = re.search(r"<footer>.*?</footer>", path.read_text(), re.S).group(0)
+            plain = html.unescape(re.sub(r"<[^>]+>", "", footer))
+            self.assertIn(publisher, plain, path)
+            self.assertIn(disclosure, plain, path)
+            self.assertIn(f'<a href="{ORIGIN}/#about">Corrections</a>', footer, path)
+
+    def test_index_states_coverage_limits(self):
+        text = (self.dist / "companies/index.html").read_text()
+        self.assertIn("Coverage is a selected market study of 39 organizations, not an exhaustive census.", text)
+        self.assertIn("Coverage is a selected market study, not an exhaustive census.", (ROOT / "web/app.js").read_text())
+        missing = re.search(r"Large firms not yet profiled include ([^<]+)", text).group(1)
+        self.assertEqual(missing, "Uber AI Solutions, TELUS Digital, CloudFactory, SuperAnnotate, Encord, Defined.ai, LXT and Welocalize.")
+        self.assertIn("<p>Company names and logos belong to their owners and identify them here.</p>\n</footer>", text)
 
     def test_static_pages_are_reproducible(self):
         with tempfile.TemporaryDirectory(prefix="static-pages-again-") as temp:
