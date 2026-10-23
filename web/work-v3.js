@@ -11,8 +11,8 @@ function workRoutesFor(id){return workRouteRows().filter(r=>r.company_id===id);}
 function workRouteAttr(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 // One formatter for every work date: building a new one per label made the first #work render slow.
 const WORK_DAY_FORMAT=new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}),WORK_MONTH_FORMAT=new Intl.DateTimeFormat('en-GB',{month:'short',year:'numeric',timeZone:'UTC'});
-function workDayLabel(value){return WORK_DAY_FORMAT.format(new Date(value+'T12:00:00Z'));}
-function workMonthLabel(value){return WORK_MONTH_FORMAT.format(new Date(value+'-15T12:00:00Z'));}
+function workDayLabel(value){return WORK_DAY_FORMAT.format(new Date(value+'T12:00:00Z')).replace('Sept','Sep');}
+function workMonthLabel(value){return WORK_MONTH_FORMAT.format(new Date(value+'-15T12:00:00Z')).replace('Sept','Sep');}
 const WORK_ROUTE_STATUS={
   listed:'Listing reviewed',program:'Project network',careers:'Careers route',
   intake_unverified:'Intake unconfirmed',pay_conflict:'Pay conflict',unverified:'Not reverified',

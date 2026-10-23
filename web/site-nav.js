@@ -11,18 +11,18 @@ const siteSearchWords=v=>siteSearchFold(Array.isArray(v)?v.join(' '):v).split(/[
 function siteSearchAlias(value){const m=String(value).match(/^(.+?)\s*\((.+)\)$/);return m?{name:m[1],note:m[2]}:{name:String(value),note:''};}
 function siteSearchTopRate(label){const m=String(label||'').match(/\$\s?([\d,.]+)(?:\s*[–-]\s*\$?([\d,.]+))?\+?\s*\/\s*(?:approved\s+)?hour/i);return m?Number((m[2]||m[1]).replace(/,/g,''))||0:0;}
 function siteSearchPages(){
- const listings=typeof workRouteRows==='function'?workRouteRows().length:0;
+ const listings=typeof workRouteRows==='function'?workRouteRows().filter(route=>typeof w4Bucket!=='function'||['contract','jobs'].includes(w4Bucket(route))).length:0;
  return [
   ['market','Overview','The front page, with the main figures and business groups','home start charts market'],
   ['companies','Companies',`All ${DATA.companies.length} companies, with search and filters`,'index directory list organizations organisations firms startups'],
-  ['work','Paid work',`${listings} listings, with pay and location`,'jobs gigs hiring careers contract contractor freelance hourly pay earn'],
+  ['work','Paid work',`${listings} open listings, with pay and location`,'jobs gigs hiring careers contract contractor freelance hourly pay earn'],
   ['compare','Compare','Put up to three companies side by side','versus vs comparison'],
   ['method','Method','How each figure is checked and graded','methodology sources evidence research'],
   ['labels','What the labels mean','Evidence labels and confidence grades','grades confidence rubric'],
   ['about','About the publisher','Who publishes this guide, and the disclosure','contact publisher musa ozdem email disclosure removal privacy'],
   ['corrections','Request a correction','Tell us when a figure or listing is wrong','corrections error mistake wrong fix report'],
   ['downloads','Download the data','JSON, CSV and SQLite files','downloads csv json sqlite dataset export'],
-  ['venture','Our proposed AI lab','The publisher’s proposal, separate from the research','venture neolab investor pitch proposal']
+  ['venture','The publisher’s proposed AI lab','The publisher’s proposal, separate from the research','venture neolab investor pitch proposal']
  ].map(([id,name,meta,keys])=>({type:'page',id,name,meta,keys:keys.split(' '),href:'#'+id}));
 }
 function siteSearchIndex(){

@@ -256,7 +256,7 @@ function workCard(route,mode,level=3){
   return `<article class="work-card work-card-v4 ${compact?'w4-compact-card':''}" data-work-route="${w4Escape(route.id)}" data-work-company="${w4Escape(company.id)}" aria-label="${w4Escape(company.name+': '+route.role)}">${compact?`<details class="w4-compact-toggle"><summary><span class="w4-compact-title"><small>${w4Escape(company.name)}</small><strong>${w4Escape(route.role)}</strong></span><span class="w4-compact-pay"><strong>${w4Escape(w4Pay(route))}</strong>${payNotes}${badge}</span><span class="w4-toggle-icon" aria-hidden="true">+</span></summary><div class="w4-card-front"><div class="w4-compact-company">${identity}</div>${offer}${conditions}<div class="w4-card-bottom">${dates}${action}</div></div>${details}</details>`:`<div class="w4-card-front"><div class="w4-role-column"><header class="w4-card-heading">${identity}${badge}</header><h${heading} class="w4-role">${w4Escape(route.role)}</h${heading}>${dates}</div><div class="w4-offer-column">${offer}</div><div class="w4-conditions-column">${conditions}</div><div class="w4-action-column">${action}</div></div>${details}`}</article>`;
 }
 // Work type options keep the research group values (tests and links use them); labels use plain words.
-const W4_TYPE_LABELS={'Expert & contractor projects':'Contract and expert projects','Employment':'Jobs','Research fellowship':'Research fellowships','Contributor bounties':'Bounties for contributions','Unverified route':'Type not confirmed'};
+const W4_TYPE_LABELS={'Expert & contractor projects':'Contract and task work','Employment':'Jobs','Research fellowship':'Research fellowships','Contributor bounties':'Bounties for contributions','Unverified route':'Type not confirmed'};
 // Pay and place come from each listing's own fields. Nothing is converted between currencies or pay periods.
 const W4_CONTRACT_GROUPS=new Set(['Expert & contractor projects','Contributor bounties']);
 const W4_TASK_PAY=new Set(['per_completed_task','task','accepted_task','approved_recording','approved_submission']);
@@ -391,7 +391,7 @@ const W4_SAFETY_SOURCES={
 const W4_SAFETY_TIPS=[
   ['Never pay to get work or to get your earnings out. Real employers pay you.',['ftcJobs','ftcTasks','fbiHome']],
   ['Ignore job offers you did not ask for that arrive by text or on apps such as WhatsApp or Telegram. Find the job on the company’s own website and apply there.',['ftcTexts','fbiPosts','india']],
-  ['Share bank or tax details only after you are hired, and only on the company’s own site. Some platforms check your ID when you sign up. Do that on their site, never in a chat.',['fbiPosts','fbiData']],
+  ['Share bank or tax details only after you are hired. First confirm who the employer is, in person or on a video call.',['fbiPosts','fbiData']],
   ['Never deposit a check from a new employer and send part of the money on. A bank can take weeks to spot a fake check, and then you must pay the money back.',['ftcJobs','ftcChecks']]
 ];
 function workSafetyHTML(rows=[]){

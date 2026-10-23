@@ -28,7 +28,7 @@
   const dayFormat=new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}),badges=new Map();
   const availabilityHTML=url=>{
     const entry=entries.get(publicURL(url));if(!entry)return '';
-    const display=dayFormat.format(new Date(entry.checked_on+'T12:00:00Z'));
+    const display=dayFormat.format(new Date(entry.checked_on+'T12:00:00Z')).replace('Sept','Sep');
     const observation=entry.status==='sign_in'?`When we checked on ${display} without an account, the page asked us to sign in.`:`Page unavailable when checked ${display}.`;
     return `<span class="source-link-status" data-link-status="${entry.status}" title="${observation}"><span aria-hidden="true">${labels[entry.status]} · <time datetime="${entry.checked_on}">${display}</time></span><span class="sr-only">${observation}</span></span>`;
   };

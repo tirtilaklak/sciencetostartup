@@ -319,7 +319,7 @@ LABELLED_KINDS = ("growth_rate", "headcount", "expert_network", "active_paid_exp
 NOTED_KINDS = ("valuation", "funding_total_reported", "funding_total_calculated")
 GENERIC_LABELS = {"valuation", "round valuation", "transaction valuation", "total funding", "funding total reported", "funding total calculated", "reported aggregate funding", "reported total raised"}
 LEADING_VALUE = re.compile(r"^(?:[$£€]|[A-Z]{3} )?[0-9][0-9.,]*\s*(?:[KMBkmb]n?)?\+?\s+")
-LABEL_WORDS = {"directory_team_size": "YC-listed team size", "employer_headcount_claim": "Team size, employer claim", "parent_arr_growth_percent": "Parent company growth in yearly recurring subscription revenue", "benchmark_task_count": "Benchmark tasks", "worker_payout_ambiguous_period": "Worker payouts, period unclear", "worker_payout_company_claim": "Worker payouts, company claim"}
+LABEL_WORDS = {"directory_team_size": "Team size listed by Y Combinator (a startup investor)", "employer_headcount_claim": "Team size, employer claim", "parent_arr_growth_percent": "Parent company growth in yearly recurring subscription revenue", "benchmark_task_count": "Benchmark tasks", "worker_payout_ambiguous_period": "Worker payouts, period unclear", "worker_payout_company_claim": "Worker payouts, company claim"}
 QUALIFIER_WORDS = {"at_least": "at least ", "greater_than": "more than ", "less_than": "less than ", "approximate": "about ", "nearly": "nearly ", "at_most": "up to "}
 CURRENCY_SYMBOLS = {"USD": "$", "GBP": "£", "EUR": "€"}
 ORIGINAL_VALUE = re.compile(r"original value:\s*[^0-9;]*[0-9][0-9,.]*\s*\+?\s*([^;]*)", re.I)
@@ -471,6 +471,8 @@ WORK_BUCKETS = (
     ("closed", "Closed or unpaid listings", "Past or paused listings, and pages with no confirmed paid work. We keep them for the record."),
 )
 OPEN_BUCKETS = ("contract", "jobs", "boards", "outside")
+# Open listings for paid work, the count the app shows: contract and task work plus jobs and fellowships.
+PAID_OPEN_BUCKETS = ("contract", "jobs")
 WORK_STATUS = {"intake_unverified": "Availability unconfirmed", "unverified": "Availability unconfirmed", "pay_conflict": "Pay conflict", "historical": "Historical", "closed": "Closed", "paused": "Training paused", "contributions": "Research contribution", "no_route": "No listing confirmed", "inquiry": "Inquiry only", "information": "Information only"}
 PAY_WORDS = {"Paid route not established": "Pay unconfirmed", "Paid opening unconfirmed": "Pay unconfirmed", "Compensation not promised": "Pay not promised", "No published offer": "Pay not listed", "Hourly; rate not published": "Hourly · rate unlisted"}
 SALARY_SPLIT = re.compile(r"^(\$[\d,.]+K?\s*[–-]\s*\$[\d,.]+K?) salary band \+ equity;\s*(\$[\d,.]+K?\s*[–-]\s*\$[\d,.]+K?) separate bonus band$", re.I)
@@ -608,7 +610,7 @@ def site_header(current=None, state="page"):
 def site_footer(research):
     groups = (("Explore", (("Overview", "/"), ("Companies", "/companies/"), ("Paid work", "/work/"), ("Compare", "/#compare"))),
               ("Research", (("Method", "/method/"), ("What the labels mean", "/method/#labels"), ("Download the data", "/method/#downloads"))),
-              ("About", (("About the publisher", "/method/#about"), ("Request a correction", "/#corrections"), ("Our proposed AI lab", "/#venture"))))
+              ("About", (("About the publisher", "/method/#about"), ("Request a correction", "/#corrections"), ("The publisher’s proposed AI lab", "/#venture"))))
     columns = "".join(f"<div><h2>{heading}</h2><ul>" + "".join(f'<li><a href="{ORIGIN}{path}">{label}</a></li>' for label, path in links) + "</ul></div>" for heading, links in groups)
     line = " · ".join(part for part in (f"Public research by {PUBLISHER_NAME}", f"compiled {format_date(research.as_of)}" if research.as_of else "", f"Dataset v{research.data.get('dataset_version')}" if research.data.get("dataset_version") else "") if part)
     return f'<footer class="site-footer"><nav aria-label="Site map">{columns}</nav><p>{escape(line)}</p></footer>\n'
@@ -751,12 +753,14 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     figures = key_figures(research, cid, profile_entry)
     pending = unconfirmed_figures(research, cid, figures)
     open_routes = [r for r in routes if work_bucket(r) in OPEN_BUCKETS]
+    paid_open = [r for r in open_routes if work_bucket(r) in PAID_OPEN_BUCKETS]
     title = company_title(name, figures, bool(open_routes))
     description = company_description(research, name, summary, figures)
     page_crumbs = [("Overview", f"{ORIGIN}/"), ("Companies", f"{ORIGIN}/companies/"), (name, canonical)]
     visible_crumbs = page_crumbs[:2] + ([(group_name, f"{ORIGIN}/companies/#{group_slug(group)}")] if group else []) + page_crumbs[2:]
     compiled = f" · research compiled {format_date(research.as_of)}" if research.as_of else ""
-    work_link = f'<a href="#work">Paid work at {escape(name)} ({plural(len(open_routes), "open listing")})</a>' if open_routes else ""
+    work_link = (f'<a href="#work">Paid work at {escape(name)} ({plural(len(paid_open), "open listing")})</a>' if paid_open
+                 else f'<a href="#work">Paid work at {escape(name)}</a>' if open_routes else "")
     body = [crumb_nav(visible_crumbs), f'<p class="eyebrow">Company profile{escape(compiled)}</p>\n<h1>{escape(name)}</h1>\n<p class="lede">{escape(summary)}</p>\n',
             f'<p class="actions">{cta(app_url, "Open the full profile")}{work_link}</p>\n', figures_html(research, company, figures, pending, profile_entry)]
     facts = []
@@ -800,7 +804,7 @@ def group_order(groups):
 def render_index(research, companies, editorial_by_id, labels, work_count, modified):
     canonical, count = f"{ORIGIN}/companies/", len(companies)
     title = f"AI data companies: {count} sourced profiles{SUFFIX}"
-    description = f"Profiles of {count} AI data companies, grouped by what they sell. Each figure links to a dated source."
+    description = f"Profiles of {count} AI data companies, grouped by what they sell. Each figure links to its source and the date we checked it."
     crumbs = [("Overview", f"{ORIGIN}/"), ("Companies", canonical)]
     groups = {}
     for c in companies: groups.setdefault((editorial_by_id.get(c["id"]) or {}).get("primary_offering") or "Other", []).append(c)
@@ -808,8 +812,8 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
     nonprofit = len(groups.get("Nonprofit research", []))
     compiled = f" · research compiled {format_date(research.as_of)}" if research.as_of else ""
     body = [crumb_nav(crumbs), f'<p class="eyebrow">Companies{escape(compiled)}</p>\n<h1>AI data companies</h1>\n',
-            f'<p class="lede">Profiles of {count} AI data companies. Each figure links to a dated source, and each profile lists the company\'s paid work.' + (f" {count_word(nonprofit)} of the {count} are nonprofit research groups." if nonprofit else "") + "</p>\n",
-            f'<p class="actions">{cta(ORIGIN + "/#companies", "Open the interactive list")}' + (f'<a href="{ORIGIN}/work/">See all {plural(work_count, "paid work listing")}</a>' if work_count else "") + "</p>\n",
+            f'<p class="lede">Profiles of {count} AI data companies. Each figure links to its source and the date we checked it, and each profile lists any paid work we found.' + (f" {count_word(nonprofit)} of the {count} are nonprofit research groups." if nonprofit else "") + "</p>\n",
+            f'<p class="actions">{cta(ORIGIN + "/#companies", "Open the interactive list")}' + (f'<a href="{ORIGIN}/work/">See {plural(work_count, "open paid work listing")}</a>' if work_count else "") + "</p>\n",
             '<nav aria-label="Business groups"><ul class="chips">' + "".join(f'<li><a href="#{group_slug(g)}">{escape(labels.get(g, g))} ({len(groups[g])})</a></li>' for g in order) + "</ul></nav>\n"]
     for g in order:
         items = "".join(f'<li><a href="{ORIGIN}/company/{escape(c["id"])}/">{escape(clean(c["name"]))}</a><span class="sub">{escape(clean((editorial_by_id.get(c["id"]) or {}).get("summary")) or clean(c.get("description")))}</span></li>' for c in groups[g])
@@ -837,8 +841,10 @@ def render_work(research, routes, names, modified):
     rows = [r for r in routes if r.get("company_id") in names]
     count, companies = len(rows), len({r["company_id"] for r in rows})
     checked = latest(*(d for r in rows for d in (r.get("availability_checked_on"), (r.get("last_route_check") or {}).get("date"))))
-    title = f"AI training jobs and pay: {count} listings{SUFFIX}"
-    description = truncate(f"Paid AI training work at {plural(companies, 'AI data company', 'AI data companies')}: {count} public listings with pay as published and the date we last checked each one.")
+    open_rows = [r for r in rows if work_bucket(r) in PAID_OPEN_BUCKETS]
+    open_count, open_companies = len(open_rows), len({r["company_id"] for r in open_rows})
+    title = f"AI training jobs and pay: {open_count} open listings{SUFFIX}"
+    description = truncate(f"{open_count} open listings for paid AI training work at {plural(open_companies, 'AI data company', 'AI data companies')}, with pay as published and the date we last checked each one.")
     crumbs = [("Overview", f"{ORIGIN}/"), ("Paid work", canonical)]
     buckets = {key: sort_routes([r for r in rows if work_bucket(r) == key], names) for key, _, _ in WORK_BUCKETS}
     body = [crumb_nav(crumbs), f'<p class="eyebrow">Paid work' + (f" · links checked up to {escape(format_date(checked))}" if checked else "") + "</p>\n<h1>Paid AI training work</h1>\n",
@@ -854,7 +860,7 @@ def render_work(research, routes, names, modified):
 DOWNLOADS = (("research.json", "JSON", "application/json", "The core research data in one file"), ("observatory.sqlite", "SQLite", "application/vnd.sqlite3", "The same data as one database file"),
              ("work-routes.json", "JSON", "application/json", "Paid work listings and their sources"), ("source-updates.json", "JSON", "application/json", "Later source corrections and the values they replace"),
              ("profile-content.json", "JSON", "application/json", "Profile summaries and the records they cite"), ("editorial.json", "JSON", "application/json", "Business groups and plain-language summaries"))
-GRADES = (("A", "Independent or buyer-side evidence, such as a filing or a confirmed customer."), ("B", "Attributed company, investor, or named primary statement."), ("C", "Secondary reporting, an estimate, or indirect evidence."), ("U", "Unverified, undisclosed, or unresolved."))
+GRADES = (("A", "Independent or buyer-side evidence, such as a filing or a customer who confirms the work."), ("B", "The company, an investor or another named first-hand source says it."), ("C", "Reporting by others, an estimate, or indirect evidence."), ("U", "Not confirmed. The fact may be undisclosed or still unresolved."))
 
 
 def render_method(research, sizes, modified):
@@ -885,9 +891,9 @@ def render_method(research, sizes, modified):
     dimensions = (data.get("rubric") or {}).get("dimensions") or []
     if dimensions:
         rows = "".join(f'<tr><th scope="row">{escape(d.get("id"))} · {escape(clean(d.get("label")))}</th>' + "".join(f'<td data-label="Level {n}">{escape(clean((d.get("levels") or {}).get(n)))}</td>' for n in ("1", "2", "3")) + "</tr>" for d in dimensions)
-        body.append('<h2 id="labels">What the labels mean</h2>\n<p>Delivery evidence (public support for a company\'s commercial activity) is rated on four measures, each from level 1 to level 3. Each rating covers the business described in that record. Funding and valuations do not count toward these ratings.</p>\n'
+        body.append('<h2 id="labels">What the labels mean</h2>\n<p>Each company also gets a delivery evidence level (public proof that it sells and delivers its offer). The level comes from four measures, each rated from level 1 to level 3, and covers one part of the business, such as the whole company or its AI data work. Funding and valuations do not count toward it.</p>\n'
                     f'<table class="wide"><thead><tr><th scope="col">Measure</th><th scope="col">Level 1</th><th scope="col">Level 2</th><th scope="col">Level 3</th></tr></thead><tbody>{rows}</tbody></table>\n')
-    body.append(f'<h2 id="coverage">Research coverage</h2>\n<p>{plural(len(research.companies), "company profile")} · {plural(len(data.get("assessments", [])), "scoped assessment")} · {plural(len(data.get("sources", [])), "source record")}.</p>\n'
+    body.append(f'<h2 id="coverage">Research coverage</h2>\n<p>{plural(len(research.companies), "company profile")} · {plural(len(data.get("assessments", [])), "delivery evidence rating")} · {plural(len(data.get("sources", [])), "source record")}.</p>\n'
                 f"<p>{plural(doubtful, 'claim is', 'claims are')} unverified or contested, and they stay labeled. The guide is a selected study of the market. It does not list every company.</p>\n")
     files = [(name, kind, mime, text) for name, kind, mime, text in DOWNLOADS if name in sizes] + [(name, "CSV", "text/csv", f"The {name[:-4].replace('_', ' ')} table") for name in sorted(n for n in sizes if n.endswith(".csv"))]
     if files:
@@ -896,10 +902,11 @@ def render_method(research, sizes, modified):
         body.append(f'<h2 id="downloads">Download the data</h2>\n<p>Dataset version {escape(version)}{escape(compiled.replace(" · research", ", research"))}. The files keep every original record, including claims that later sources replaced.</p>\n'
                     f'<table class="wide"><thead><tr><th scope="col">File</th><th scope="col">Format</th><th scope="col">Size</th><th scope="col">Contents</th></tr></thead><tbody>{rows}</tbody></table>\n')
     counts = {key: len(data.get(key, [])) for key in ("companies", "claims", "sources", "metrics", "funding_rounds", "products")}
+    counts["current_claims"] = sum(1 for claim in data.get("claims", []) if claim.get("status") != "superseded")
     measured = sorted({KIND_LABELS.get(m.get("kind"), "") for m in data.get("metrics", [])} - {"", KIND_LABELS["other"]})
     dataset = {"@context": "https://schema.org", "@type": "Dataset", "@id": canonical + "#dataset", "name": f"{SITE_NAME} research data on AI data companies", "alternateName": clean((data.get("meta") or {}).get("title")) or SITE_NAME,
-               "description": f"Public-source research on {counts['companies']} AI data companies: {counts['claims']:,} claims from {counts['sources']:,} sources, with {counts['metrics']} figures, {counts['funding_rounds']} funding rounds and {counts['products']} products. Each claim keeps its sources, business scope and confidence grade.",
-               "url": canonical, "version": data.get("dataset_version", ""), "dateModified": research.as_of, "isAccessibleForFree": True, "creator": PUBLISHER, "publisher": {"@id": PUBLISHER["@id"]},
+               "description": f"Public-source research on {counts['companies']} AI data companies: {counts['current_claims']:,} current claims ({counts['claims']:,} including earlier versions) from {counts['sources']:,} sources, with {counts['metrics']} figures, {counts['funding_rounds']} funding rounds and {counts['products']} products. Each claim keeps its sources, business scope and confidence grade.",
+               "url": canonical, "version": data.get("dataset_version", ""), "dateModified": research.as_of, "isAccessibleForFree": True, "publisher": PUBLISHER,
                "measurementTechnique": "Public-source research. Each claim is graded A, B, C or U by the strength of its sources.", "variableMeasured": measured,
                "distribution": [{"@type": "DataDownload", "name": name, "contentUrl": f"{ORIGIN}/{name}", "encodingFormat": mime} for name, kind, mime, text in files]}
     structured = [page_node("AboutPage", title, description, canonical, modified, crumbs, about={"@id": WEBSITE["@id"]}), dataset]
@@ -963,7 +970,7 @@ def write_static_pages(data, destination, work_data=None, profile_content=None, 
     work_modified = latest(research.as_of, SITE_REVISED, *(d for r in routes for d in route_dates(r))) or research.as_of
     method_modified = latest(research.as_of, SITE_REVISED) or research.as_of
     sizes = {path.name: file_size(path.stat().st_size) for path in sorted(destination.iterdir()) if path.is_file() and (path.suffix == ".csv" or path.name in {d[0] for d in DOWNLOADS})}
-    pages = {"companies": render_index(research, by_name, editorial_by_id, labels, len(routes), index_modified), "work": render_work(research, routes, names, work_modified), "method": render_method(research, sizes, method_modified)}
+    pages = {"companies": render_index(research, by_name, editorial_by_id, labels, sum(1 for r in routes if work_bucket(r) in PAID_OPEN_BUCKETS), index_modified), "work": render_work(research, routes, names, work_modified), "method": render_method(research, sizes, method_modified)}
     for name, page in pages.items():
         (destination / name).mkdir(parents=True, exist_ok=True)
         (destination / name / "index.html").write_text(page, encoding="utf-8")

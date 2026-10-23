@@ -62,7 +62,7 @@ class StaticFileMetadataTests(unittest.TestCase):
                     self.assertIn(format_file_size((target / filename).stat().st_size), match["text"])
                     self.assertRegex(match["text"], r"\d(?:\.\d)? (?:kB|MB|B)")
                     if key == "INVESTOR":
-                        self.assertIn("(opens a new tab)", match["text"])
+                        self.assertIn("(opens in a new tab)", match["text"])
             for button in ["download-json", "download-csv"]:
                 pattern = r'<button id="' + button + r'">[\s\S]*?</button>'
                 self.assertEqual(re.search(pattern, rendered).group(), re.search(pattern, self.template).group(), "Generated download received a false static size")
