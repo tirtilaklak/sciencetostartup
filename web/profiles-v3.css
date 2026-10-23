@@ -1,1 +1,68 @@
 /* Company profiles (#company/<id>) and the evidence dialog. Loaded after edition.css. */
+
+/* Header links reach the content edge (VIS-12). */
+.profile-v2 .profile-hero{max-width:none}
+
+/* Tabs: the focus ring sits inside each tab, so the scrolling tab bar never clips it (A11Y-6, VIS-6). */
+.profile-v2 .profile-tabs{gap:20px}
+.profile-v2 .profile-tabs [role=tab]{padding-inline:6px}
+.profile-v2 .profile-tabs [role=tab]:focus-visible{outline-offset:-3px}
+
+/* One column grid for the intro, products and relationships, so their text lines up (VIS-12). */
+@media(min-width:701px){
+.profile-business-intro{max-width:none;grid-template-columns:minmax(160px,1fr) minmax(0,2fr) 4.5rem;gap:24px}
+.profile-v2 .offering-card,.profile-v2 .relationship-card{grid-template-columns:minmax(160px,1fr) minmax(0,2fr) 4.5rem;gap:24px}
+.offering-card .profile-card-source,.relationship-card .profile-card-source{grid-column:3;grid-row:1;justify-self:end}
+}
+
+/* The business group links to the company list filtered to that group. */
+.profile-category-link{display:inline-flex;align-items:center;gap:6px;align-self:start;margin:3px 0 0;min-height:24px;color:var(--green);text-decoration:none}
+.profile-category-link .profile-category{margin:0;color:inherit;text-decoration:underline;text-underline-offset:4px}
+.profile-category-link .ui-icon{flex:none;width:14px;height:14px}
+
+/* Headline figures say when they are an estimate, a forecast or historical. */
+.observation-tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.observation-tags span{font-size:12px;line-height:1.4;padding:2px 8px;border:1px solid currentColor;border-radius:2px;color:var(--amber)}
+
+/* Funding comes first on the "Funding & people" tab. */
+@media(min-width:901px){.profile-people-layout{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}}
+.profile-more-records{margin:14px 0 0}
+
+/* The path onward: corrections, then similar companies. */
+.profile-v2 .profile-correction{margin:0;padding:18px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.55;color:var(--muted)}
+.profile-correction a,.profile-peers-all{display:inline-flex;align-items:center;gap:5px;min-height:24px}
+.profile-peers{border-top:1px solid var(--line);padding:26px 0 6px}
+.profile-v2 .profile-peers h2{font-size:22px;margin:0 0 14px}
+.profile-peers ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0 20px}
+.profile-peers li{border-top:1px solid var(--line);min-width:0}
+.profile-peers li a{display:flex;align-items:center;gap:10px;min-height:52px;padding:8px 0;color:var(--ink);font-size:14px;font-weight:600;line-height:1.3;text-decoration:none}
+.profile-peers li a span:last-child{min-width:0;overflow-wrap:anywhere}
+.profile-peers li a:hover span:last-child{color:var(--green);text-decoration:underline;text-underline-offset:4px}
+.profile-peers .peer-logo{width:52px;height:30px;flex:none;padding:3px}
+.profile-peers .peer-logo.brand-dark{padding:5px}
+.profile-peers p{margin:14px 0 0;font-size:14px}
+
+/* Evidence dialog: what the figure is, then the statement and sources, then details and the paths onward. */
+#evidence-content>.evidence-metric-context{margin:14px 0 18px;padding:14px 16px;border:0;background:var(--pale)}
+#evidence-content>.evidence-metric-context .evidence-metric-heading strong{font-size:13px;line-height:1.5;font-weight:500;color:var(--muted);min-width:0;overflow-wrap:anywhere}
+#evidence-content>.evidence-metric-context .evidence-metric-value{font-size:24px;font-weight:600;color:var(--ink)}
+#evidence-content>.evidence-metric-context p{font-size:14px;color:var(--ink)}
+#evidence-content>h3{font-size:16px;margin:22px 0 8px}
+.evidence-related{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:2px 18px}
+.evidence-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;margin:22px 0 0;padding:16px 0 0;border-top:1px solid var(--line)}
+.evidence-copy{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:6px 12px;border:1px solid var(--green);border-radius:2px;background:none;color:var(--green);font-size:14px}
+.evidence-copy:hover{background:var(--pale)}
+.evidence-actions .evidence-correction{margin:0;font-size:14px}
+.evidence-correction a{display:inline-flex;align-items:center;gap:5px}
+#evidence-copy-status{order:3;flex-basis:100%;margin:0;overflow-wrap:anywhere}
+#evidence-copy-status:empty{display:none}
+
+@media(max-width:700px){
+.profile-v2 .profile-tabs{gap:8px}
+.profile-v2 .profile-tabs [role=tab]{padding-inline:5px}
+.profile-category-link{margin:0 0 12px}
+.profile-v2 .profile-peers h2{font-size:20px}
+.profile-peers ul{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0 16px}
+.profile-v2 .profile-correction{font-size:13px}
+#evidence-content>.evidence-metric-context .evidence-metric-value{font-size:22px}
+}
