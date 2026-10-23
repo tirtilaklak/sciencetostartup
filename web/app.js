@@ -600,9 +600,10 @@ const ANALYTICS_URL=(()=>{try{const url=document.querySelector('meta[name="sts-a
 const analyticsQueue=[];let lastPageview='';
 function track(hit){if(!ANALYTICS_URL)return;try{if(typeof window.goatcounter?.count==='function')window.goatcounter.count(hit);else if(analyticsQueue.length<50)analyticsQueue.push(hit);}catch{}}
 function trackPageview(path){if(path===lastPageview)return;lastPageview=path;track({path,title:document.title});}
-if(ANALYTICS_URL)try{const script=document.createElement('script');script.async=true;script.src='https://gc.zgo.at/count.js';script.dataset.goatcounter=ANALYTICS_URL;script.dataset.goatcounterSettings='{"no_onload":true}';script.addEventListener('load',()=>analyticsQueue.splice(0).forEach(track));document.head.appendChild(script);}catch{}
+if(ANALYTICS_URL)try{document.getElementById('analytics-note')?.removeAttribute('hidden');const script=document.createElement('script');script.async=true;script.src='https://gc.zgo.at/count.js';script.dataset.goatcounter=ANALYTICS_URL;script.dataset.goatcounterSettings='{"no_onload":true}';script.addEventListener('load',()=>analyticsQueue.splice(0).forEach(track));document.head.appendChild(script);}catch{}
 document.addEventListener('click',event=>{if(!ANALYTICS_URL)return;try{const el=event.target.closest?.('a,button'),card=el?.closest('.work-card');
- if(!el)return;if(el.matches('#venture a[href="#about"]'))track({path:'lab-inquiry',title:'Lab inquiry',event:true});
+ if(!el)return;if(el.matches('a[href^="mailto:"][href*="ScienceToStartup%20lab"]'))track({path:'lab-inquiry',title:'Lab inquiry',event:true});
+ else if(el.matches('#venture a[href="#about"]'))track({path:'lab-cta',title:'Lab call to action',event:true});
  else if(el.matches('#download-json,#download-csv,a[download]'))track({path:'download/'+({'download-json':'observatory-research.json','download-csv':'observatory-company-comparison.csv'}[el.id]||el.getAttribute('href')),title:'Dataset download',event:true});
  else if(card&&/^https?:/i.test(el.getAttribute('href')||''))track({path:'work-route/'+(card.dataset.workRoute||card.dataset.workCompany),title:new URL(el.href).hostname,event:true});
 }catch{}});
