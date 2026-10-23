@@ -15,7 +15,7 @@
 <meta name="twitter:image:alt" content="ScienceToStartup, the AI data field guide: the businesses behind AI data. Company profiles and paid work listings, with every figure linked to its source.">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","@id":"https://sciencetostartup.com/#website","name":"ScienceToStartup","url":"https://sciencetostartup.com/","description":"Sourced profiles of {{COMPANY_COUNT}} AI data companies and the paid AI training work they offer. Every figure links to its source.","inLanguage":"en","publisher":{"@type":"Person","@id":"https://sciencetostartup.com/#publisher","name":"Musa Ozdem","url":"https://sciencetostartup.com/method/#about"}}</script>
 
-<script>if(location.hash&&!/^#(market)?$/.test(location.hash))document.documentElement.setAttribute("data-route","other");</script><style>html[data-route=other] #market-view{display:none}
+<script>document.documentElement.style.scrollBehavior="auto";if(location.hash&&!/^#(market|venture)?$/i.test(location.hash))document.documentElement.setAttribute("data-route","other");</script><style>html[data-route=other] #market-view{display:none}html[data-route=other] main::before,html[data-app=failed] main::before{content:"Loading the page\2026";display:block;min-height:100vh;padding:40px 0;color:var(--muted);font-size:15px}html[data-app=failed] main::before{content:"This page could not finish loading. Please reload it.";min-height:0}
 /* OBSERVATORY_CSS */
 /* REDESIGN_CSS */
 /* ICONS_CSS */</style></head>
@@ -81,7 +81,7 @@
 
 <dialog id="evidence-dialog" aria-labelledby="evidence-title" aria-describedby="evidence-statement"><div class="dialog-top"><h2 id="evidence-title">Sources for this claim</h2><button id="close-evidence" aria-label="Close sources"><svg class="ui-icon" data-icon="close" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div id="evidence-content"></div></dialog>
 
-<script>/* ICONS_JS */</script><script>/* EDITORIAL_DATA */</script><script id="research-data" type="application/json"><!-- OBSERVATORY_DATA --></script><script>/* OBSERVATORY_JS */
+<script>/* ICONS_JS */</script><script data-bundle="data">/* EDITORIAL_DATA */</script><script>(()=>{const files=/* BUNDLES */[],preload=()=>{for(const href of files){const link=document.createElement("link");link.rel="preload";link.as="script";link.href=href;document.head.append(link);}};if(document.documentElement.hasAttribute("data-route"))preload();else requestAnimationFrame(()=>setTimeout(preload));})();</script><script id="research-data" type="application/json"><!-- OBSERVATORY_DATA --></script><script data-bundle="app">/* OBSERVATORY_JS */
 /* EDITORIAL_JS */
 /* WORK_V3_JS */
-initialize();</script></body></html>
+initialize();</script><script>(()=>{const files=/* BUNDLES */[];let started=false;const load=()=>{if(started)return;started=true;for(const src of files){const script=document.createElement("script");script.src=src;script.async=false;script.onerror=()=>document.documentElement.setAttribute("data-app","failed");document.body.append(script);}};requestAnimationFrame(()=>setTimeout(load));setTimeout(load,1500);})();</script></body></html>
