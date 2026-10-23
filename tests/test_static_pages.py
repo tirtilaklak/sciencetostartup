@@ -382,6 +382,14 @@ class StaticPageTests(unittest.TestCase):
         self.assertNotRegex(plain(text), r"\((?:listed|program|intake unverified|careers|no route)\)|\b(?:intake_unverified|no_route|pay_conflict)\b")
         self.assertEqual(structured_data(text)["@type"], "CollectionPage")
 
+    def test_work_groups_match_the_app(self):
+        app = (ROOT / "web/work-v4.js").read_text() + (ROOT / "web/work-v3.js").read_text()
+        for _, label, note in sp.WORK_BUCKETS:
+            self.assertIn(label, app, "static work group label drifted from the app")
+            self.assertIn(note, app, "static work group note drifted from the app")
+        archive = re.search(r"const WORK_ROUTE_ARCHIVE=new Set\(\[([^\]]*)\]\)", app).group(1)
+        self.assertEqual(set(re.findall(r"'([a-z_]+)'", archive)), set(sp.WORK_ARCHIVE))
+
     def test_company_pages_list_their_listings_in_worker_groups(self):
         labels = [label for _, label, _ in sp.WORK_BUCKETS]
         for cid, text in self.pages.items():

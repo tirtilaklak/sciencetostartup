@@ -465,10 +465,10 @@ WORK_ARCHIVE = frozenset(("historical", "closed", "contributions", "paused", "no
 WORK_ORDER = {"listed": 0, "pay_conflict": 2, "program": 3, "intake_unverified": 4, "careers": 5, "unverified": 6, "closed": 7, "historical": 8, "paused": 9, "contributions": 10, "inquiry": 10, "information": 10, "no_route": 11}
 WORK_BUCKETS = (
     ("contract", "Contract and task work", "Freelance and project work for AI training."),
-    ("jobs", "Jobs and fellowships", "Salaried roles and paid research programs at these companies."),
-    ("boards", "Company job boards", "Each link opens a company's full list of openings. These pages do not show pay."),
-    ("outside", "Company jobs outside AI training", "Open roles in areas such as recruiting and legal work."),
-    ("closed", "Closed or unpaid links", "Past listings and pages where pay is not promised. Kept for the record."),
+    ("jobs", "Jobs and fellowships", "Staff jobs and paid fellowships at these companies."),
+    ("boards", "Career pages", "Each link opens a company’s full list of openings. We did not record pay for these pages."),
+    ("outside", "Company jobs outside AI training", "Open staff roles that are not AI training work."),
+    ("closed", "Closed or unpaid listings", "Past or paused listings, and pages with no confirmed paid work. We keep them for the record."),
 )
 OPEN_BUCKETS = ("contract", "jobs", "boards", "outside")
 WORK_STATUS = {"intake_unverified": "Availability unconfirmed", "unverified": "Availability unconfirmed", "pay_conflict": "Pay conflict", "historical": "Historical", "closed": "Closed", "paused": "Training paused", "contributions": "Research contribution", "no_route": "No listing confirmed", "inquiry": "Inquiry only", "information": "Information only"}
