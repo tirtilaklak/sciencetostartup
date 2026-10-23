@@ -179,9 +179,15 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  // Routes ignore hash queries and letter case, land on in-page sections and carry the comparison.
  for(const [hash,view] of [['#work?utm_source=x','work'],['#venture','market'],['#about','method']]){location.hash=hash;run('route()');assert.equal(node(view+'-view').hidden,false,hash);assert.equal(location.hash,hash,hash+' must stay linkable');}
  location.hash='#market';run('route()');assert.equal(run('document.title'),'Overview · ScienceToStartup');
+ // A plain view link after #venture or #about starts at the top of that view, even though the view is unchanged.
+ const scrolls=[];window.scrollTo=options=>scrolls.push(options);
+ for(const [section,next] of [['#venture','#market'],['#about','#method']]){location.hash=section;run('route()');scrolls.length=0;location.hash=next;run('route()');assert.deepEqual(scrolls.map(options=>options.top),[0],section+' then '+next+' must scroll to the top');}
+ window.scrollTo=()=>{};location.hash='#market';run('route()');
  location.hash='#company/Scale_AI/WORK';run('route()');assert.ok(node('profile-view').innerHTML.includes('data-profile-pane="work">'),'Section case must not hide the Paid work tab');
+ assert.equal(location.hash,'#company/scale_ai/work','Mixed-case company links are rewritten to their canonical form');run(`activateProfileTab('traction')`);assert.equal(location.hash,'#company/scale_ai/traction','Profile tabs work after a mixed-case link');
  location.hash='#compare/mercor,Handshake_AI,unknown,mercor';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai']);assert.equal(location.hash,'#compare/mercor,handshake_ai');
- run(`chooseCompare('appen',true)`);assert.equal(location.hash,'#compare/mercor,handshake_ai,appen');run('setSelection([])');assert.equal(location.hash,'#compare');location.hash='#market';run('route()');
+ run(`chooseCompare('appen',true)`);assert.equal(location.hash,'#compare/mercor,handshake_ai,appen');
+ location.hash='#compare/junk,nope';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai','appen'],'A compare link naming no known company keeps the selection');assert.equal(location.hash,'#compare/mercor,handshake_ai,appen');run('setSelection([])');assert.equal(location.hash,'#compare');location.hash='#market';run('route()');
 
  // Curated profile headings render as text.
  const headed=curated.find(entry=>entry.traction_heading),heading=headed.traction_heading;headed.traction_heading='<b>x</b>';
