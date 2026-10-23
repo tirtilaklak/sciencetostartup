@@ -18,6 +18,10 @@ from schema_def import SCHEMA, TABLES
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIDENCE = {"U": 0, "C": 1, "B": 2, "A": 3}
+# The dataset release that the reviewed sidecars (work routes, source updates, company events) were checked against.
+# Any other dataset, including the pipeline fixtures, gets structural checks only, no source updates and no events.
+# Change it once per release, together with the new dataset, after rechecking the sidecars.
+SIDECAR_DATASET_VERSION = "2.5.0"
 
 class ValidationError(ValueError): pass
 
@@ -104,8 +108,8 @@ def validate_company_events(events, data):
     return events
 
 def load_company_events(path, data):
-    """Events were reviewed against dataset 2.5.0; other datasets, including the pipeline fixtures, receive none."""
-    if not path.exists() or data["dataset_version"] != "2.5.0": return {"version": "1.0.0", "events": []}
+    """Events were reviewed against SIDECAR_DATASET_VERSION; other datasets, including the pipeline fixtures, receive none."""
+    if not path.exists() or data["dataset_version"] != SIDECAR_DATASET_VERSION: return {"version": "1.0.0", "events": []}
     return validate_company_events(json.loads(path.read_text()), data)
 
 def validate_shape(value, spec, path="$",):
@@ -615,7 +619,7 @@ def validate_work_routes(work, data):
     # This sidecar includes later reviewed overlays for the current snapshot.
     # Other selected versions and synthetic fixtures keep structural checks only.
     # The selected dataset, never sidecar metadata, controls reference checks.
-    current = data["dataset_version"] == "2.5.0"
+    current = data["dataset_version"] == SIDECAR_DATASET_VERSION
     rows = work.get("routes")
     require(isinstance(rows, list) and (rows or not current), "work-routes: reviewed routes missing")
     companies = {row["id"] for row in data["companies"]}
@@ -703,7 +707,7 @@ def build(data, destination):
     source_updates = json.loads(source_updates_path.read_text())
     # The actual dataset selects validation; sidecar metadata cannot disable it.
     # Other datasets, including the pipeline fixtures, receive no replacements.
-    source_updates = validate_source_updates(source_updates, data, profile_content) if data["dataset_version"] == "2.5.0" else None
+    source_updates = validate_source_updates(source_updates, data, profile_content) if data["dataset_version"] == SIDECAR_DATASET_VERSION else None
     injected = "window.EDITORIAL=" + json.dumps(editorial) + ";window.RESEARCH_ALIASES=" + (ROOT / "docs/research-id-crosswalk.json").read_text() + ";window.LOGOS=" + json.dumps(logo_data) + ";window.WORK_ROUTES=" + json.dumps(work_data) + ";window.PROFILE_CONTENT=" + json.dumps(profile_content) + ";window.LINK_HEALTH=" + json.dumps(link_health) + ";window.COMPANY_EVENTS=" + json.dumps(company_events) + ";"
     injected += "window.SOURCE_UPDATES=" + json.dumps(source_updates) + ";"
     html = html.replace("/* EDITORIAL_DATA */", injected.replace("<", "\\u003c").replace(">", "\\u003e"))
