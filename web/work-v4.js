@@ -253,9 +253,16 @@ function w4RouteGroups(rows){
   groups.primary.sort((a,b)=>rank(a)-rank(b)||(w4Checked(b)||'').localeCompare(w4Checked(a)||'')||companies[a.company_id].name.localeCompare(companies[b.company_id].name)||a.role.localeCompare(b.role));
   return groups;
 }
+// A closed group carries only its route ids. Its cards render on first open.
 function w4GroupDisclosure(rows,label,open=false,key=''){
-  return rows.length?`<details class="work-route-archive-group w4-route-group" ${key?`id="${w4Escape(key)}"`:""} ${open?'open':''}><summary>${w4Escape(label)} <span>(${rows.length})</span></summary><div class="w4-secondary-list">${rows.map(route=>workCard(route,'compact')).join('')}</div></details>`:'';
+  return rows.length?`<details class="work-route-archive-group w4-route-group" ${key?`id="${w4Escape(key)}"`:""} ${open?'open':''}><summary>${w4Escape(label)} <span>(${rows.length})</span></summary><div class="w4-secondary-list"${open?'':` data-w4-routes="${w4Escape(rows.map(route=>route.id).join(' '))}"`}>${open?rows.map(route=>workCard(route,'compact')).join(''):''}</div></details>`:'';
 }
+function w4FillGroup(group){
+  const list=group?.querySelector?.(':scope>.w4-secondary-list[data-w4-routes]');if(!list)return;
+  const routes=new Map(workRouteRows().map(route=>[route.id,route]));
+  list.innerHTML=list.dataset.w4Routes.split(' ').map(id=>routes.get(id)).filter(Boolean).map(route=>workCard(route,'compact')).join('');list.removeAttribute('data-w4-routes');
+}
+document.addEventListener('toggle',event=>{if(event.target.open)w4FillGroup(event.target);},true);
 function w4ProfilePrimary(rows,id){
   const preferred=id==='afterquery'?['research-fellow','research-engineer','research-scientist-post-training','technical-content-writer-contract'].map(role=>`afterquery.work.${role}`):[];
   const rank=route=>{const index=preferred.indexOf(route.id);return index<0?preferred.length:index;};
@@ -300,7 +307,7 @@ function workSummary(id){
   return `<div class="work-v4-profile">${primary.length?`<div class="work-v4-profile-grid">${primary.slice(0,4).map(route=>workCard(route)).join('')}</div>`:`<p class="w4-empty">No verified public pay listing recorded. ${groups.careers.length+groups.other.length} career and research ${groups.careers.length+groups.other.length===1?'link':'links'} below.</p>`}${w4GroupDisclosure(primary.slice(4),'More listed roles')}${w4GroupDisclosure(groups.careers,'Career directories',openCareers)}${w4GroupDisclosure(groups.other,'Other work & research routes',openOther)}${related.length?`<details class="w4-related"><summary>Related work evidence</summary><div class="w4-evidence-links">${w4ClaimAccess(related)}</div></details>`:''}</div>`;
 }
 
-document.addEventListener('click',event=>{const button=event.target.closest?.('[data-work-section]');if(!button)return;const target=document.getElementById(button.dataset.workSection);if(target){if(target.tagName==='DETAILS')target.open=true;const focus=target.tagName==='DETAILS'?target.querySelector('summary'):target;if(focus&&focus.tagName!=='SUMMARY')focus.setAttribute('tabindex','-1');focus?.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});}});
+document.addEventListener('click',event=>{const button=event.target.closest?.('[data-work-section]');if(!button)return;const target=document.getElementById(button.dataset.workSection);if(target){if(target.tagName==='DETAILS'){w4FillGroup(target);target.open=true;}const focus=target.tagName==='DETAILS'?target.querySelector('summary'):target;if(focus&&focus.tagName!=='SUMMARY')focus.setAttribute('tabindex','-1');focus?.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});}});
 
 let responsiveFiltersWide,responsiveFilterFocus;
 document.addEventListener('focusin',event=>{
