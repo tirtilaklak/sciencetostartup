@@ -52,6 +52,8 @@ def validate_link_health(data):
 
 EVENT_FIELDS = {"id", "company_id", "related_company_ids", "kind", "date", "date_basis", "title", "detail", "status", "status_checked_on", "sources"}
 EVENT_SOURCE_FIELDS = {"url", "title", "publisher", "published_on", "source_type"}
+# Markup, C0 and C1 controls, line and paragraph separators, and bidirectional marks, embeddings, overrides and isolates.
+UNSAFE_EVENT_TEXT = re.compile(r"[<>\x00-\x1f\x7f-\x9f\u200e\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069]")
 
 def validate_company_events(events, data):
     """Dated public events reviewed after the pinned dataset. Lawsuit rows describe allegations and filings, not findings."""
@@ -64,7 +66,7 @@ def validate_company_events(events, data):
         return value
     def text(value, label, limit=None):
         require(isinstance(value, str) and value.strip(), f"{label} must be non-empty text")
-        require(not re.search(r"[<>\x00-\x1f\x7f]", value), f"{label} must be plain text without < > or control characters")
+        require(not UNSAFE_EVENT_TEXT.search(value), f"{label} must be plain text without < > or control characters")
         require(limit is None or len(value) <= limit, f"{label} is longer than {limit} characters")
     reviewed_on = checked_date(events["reviewed_on"], "company-events: reviewed_on")
     text(events["note"], "company-events: note")
@@ -77,21 +79,23 @@ def validate_company_events(events, data):
         seen.add(event["id"])
         where = "company-events: " + event["id"]
         require(isinstance(event["company_id"], str) and event["company_id"] in companies, f"{where}: unknown company_id {event['company_id']!r}")
+        require(event["id"].startswith(event["company_id"] + ".event."), f"{where}: event id must start with its company_id")
         require(isinstance(event["related_company_ids"], list) and all(isinstance(value, str) and value in companies for value in event["related_company_ids"]), f"{where}: related_company_ids must list known company IDs")
+        require(event["company_id"] not in event["related_company_ids"] and len(set(event["related_company_ids"])) == len(event["related_company_ids"]), f"{where}: related_company_ids must not repeat the company or each other")
         require(event["kind"] in ("lawsuit", "data_incident", "customer_change", "workforce_change", "filing"), f"{where}: unsupported kind {event['kind']!r}")
         require(checked_date(event["date"], f"{where}: date", month=True) <= reviewed_on, f"{where}: date is after reviewed_on")
         require(event["date_basis"] in ("filed", "reported", "published", "announced"), f"{where}: unsupported date_basis {event['date_basis']!r}")
         text(event["title"], f"{where}: title", 110)
         text(event["detail"], f"{where}: detail", 320)
         text(event["status"], f"{where}: status", 40)
-        checked_date(event["status_checked_on"], f"{where}: status_checked_on")
+        require(checked_date(event["status_checked_on"], f"{where}: status_checked_on") <= reviewed_on, f"{where}: status_checked_on is after reviewed_on")
         require(isinstance(event["sources"], list) and event["sources"], f"{where}: sources must be a non-empty list")
         for source in event["sources"]:
             require(isinstance(source, dict) and set(source) == EVENT_SOURCE_FIELDS, f"{where}: each source must hold exactly " + ", ".join(sorted(EVENT_SOURCE_FIELDS)))
             text(source["title"], f"{where}: source title")
             text(source["publisher"], f"{where}: source publisher")
             require(source["source_type"] in ("court_record", "filing", "company", "news"), f"{where}: unsupported source_type {source['source_type']!r}")
-            if source["published_on"] is not None: checked_date(source["published_on"], f"{where}: source published_on")
+            if source["published_on"] is not None: require(checked_date(source["published_on"], f"{where}: source published_on") <= reviewed_on, f"{where}: source published_on is after reviewed_on")
             unsafe = f"{where}: source url must be https with a hostname and no credentials"
             require(isinstance(source["url"], str) and not re.search(r"[\s\x00-\x1f\x7f]", source["url"]), unsafe)
             try: url = urlsplit(source["url"]); url.port

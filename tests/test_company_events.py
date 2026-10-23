@@ -67,6 +67,9 @@ class CompanyEventsValidationTests(unittest.TestCase):
         self.rejects("unknown company_id", self.event("company_id", ["scale_ai"]))
         self.rejects("related_company_ids must list known company IDs", self.event("related_company_ids", ["not_profiled"]))
         self.rejects("related_company_ids must list known company IDs", self.event("related_company_ids", "mercor"))
+        self.rejects("must start with its company_id", self.event("id", "mercor.event.test-complaint"))
+        self.rejects("related_company_ids must not repeat", self.event("related_company_ids", ["scale_ai"]))
+        self.rejects("related_company_ids must not repeat", self.event("related_company_ids", ["mercor", "mercor"]))
 
     def test_rejects_unsupported_vocabulary(self):
         self.rejects("unsupported kind", self.event("kind", "verdict"))
@@ -83,6 +86,8 @@ class CompanyEventsValidationTests(unittest.TestCase):
         self.rejects("reviewed_on must be YYYY-MM-DD", lambda e: e.update(reviewed_on="23 Oct 2026"))
         self.rejects("status_checked_on must be YYYY-MM-DD", self.event("status_checked_on", "2026-10"))
         self.rejects("published_on must be YYYY-MM-DD", self.source("published_on", "2025-09"))
+        self.rejects("status_checked_on is after reviewed_on", self.event("status_checked_on", "2026-10-24"))
+        self.rejects("published_on is after reviewed_on", self.source("published_on", "2026-10-24"))
 
     def test_rejects_long_markup_and_control_text(self):
         self.rejects("title is longer than 110", self.event("title", "T" * 111))
@@ -90,6 +95,11 @@ class CompanyEventsValidationTests(unittest.TestCase):
         self.rejects("status is longer than 40", self.event("status", "S" * 41))
         for value in ["<b>Bold</b>", "a > b", "Line\nbreak", "Tab\tstop", "Delete\x7f"]:
             self.rejects("title must be plain text", self.event("title", value))
+            self.rejects("source publisher must be plain text", self.source("publisher", value))
+        for value in ["Next\x85line", "Escape\x9b", "Line\u2028separator", "Override\u202e", "Isolate\u2066", "Mark\u200f"]:
+            self.rejects("title must be plain text", self.event("title", value))
+            self.rejects("detail must be plain text", self.event("detail", value))
+            self.rejects("status must be plain text", self.event("status", value))
             self.rejects("source publisher must be plain text", self.source("publisher", value))
         self.rejects("note must be plain text", lambda e: e.update(note="<script>"))
         self.rejects("source title must be plain text", self.source("title", "a<b"))
