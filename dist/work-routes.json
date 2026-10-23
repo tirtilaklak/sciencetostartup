@@ -707,14 +707,19 @@
         {
           "id": "labelbox.source.l10",
           "title": "Contributor pay rules",
-          "url": "https://help.labelbox.com/en/articles/13600616-alignerr-payment-faqs",
-          "publisher": "help.labelbox.com",
-          "accessed_on": "2026-10-12",
+          "url": "https://intercom.help/alignerr/en/articles/13600616-alignerr-payment-faqs",
+          "publisher": "intercom.help",
+          "accessed_on": "2026-10-23",
           "retrieval_status": "checked"
         }
       ],
       "hours": "10–40 hours/week advertised",
-      "availability_note": "Assignments can pay hourly or per accepted task; rejected tasks can be unpaid."
+      "availability_note": "Assignments can pay hourly or per accepted task; rejected tasks can be unpaid.",
+      "last_route_check": {
+        "date": "2026-10-23",
+        "result": "public_page_live",
+        "note": "The official listing rendered with $35–60/hour and 10–40 hours/week. The payment FAQ now loads from Alignerr’s Intercom help center; the old help.labelbox.com address fails its security check. No application submitted."
+      }
     },
     {
       "id": "prime_intellect.work.research-careers",
@@ -2425,7 +2430,7 @@
       "evidence": [
         {
           "id": "benchflow.claim.worker_opportunities-0",
-          "statement": "Current site invites contact at xiangyi@benchflow.ai and open research contributions; no current paid remote-contract opening verified",
+          "statement": "Current site invites contact via its About page and open research contributions; no current paid remote-contract opening verified",
           "status": "supported",
           "as_of": "2026-10-12",
           "observed_on": "2026-10-12",
@@ -2519,10 +2524,10 @@
       "numeric_pay": true,
       "as_of": "2026-10-12",
       "reviewed_on": "2026-10-12",
-      "status": "historical",
+      "status": "listed",
       "geography": "Remote US",
       "eligibility": "US listing evidence",
-      "url": "https://jobs.ashbyhq.com/g2i",
+      "url": "https://jobs.ashbyhq.com/g2i/6ea6a53a-7689-45f2-b429-1146965d3cd7",
       "requirements": [
         "Senior/staff/principal experience; TypeScript/JavaScript or Python.",
         "Take-home evaluation and recorded walkthrough."
@@ -2556,16 +2561,13 @@
         }
       ],
       "hours": "10–20 hours/week",
-      "availability_note": "The official listing showed “Job not found” on 17 October 2026. Original terms are retained as historical evidence. Earlier listing note: A start depends on passing evaluation and an available project seat. Original posting returns 'Job not found'; link goes to the employer's job board (checked 2026-10-19).",
-      "availability_checked_on": "2026-10-17",
+      "availability_note": "The official listing was live again on 23 October 2026 after showing “Job not found” on 17 October. Rate, hours and process match the earlier listing. The header also says remote, worldwide, and eligibility may vary by location. A start depends on passing evaluation and an available project seat.",
+      "availability_checked_on": "2026-10-23",
       "last_route_check": {
-        "date": "2026-10-17",
-        "checked_at": "2026-10-17T21:34:46.533Z",
-        "result": "official_role_not_found",
+        "date": "2026-10-23",
+        "result": "application_form_available",
         "url": "https://jobs.ashbyhq.com/g2i/6ea6a53a-7689-45f2-b429-1146965d3cd7",
-        "http_status": 200,
-        "redirected": false,
-        "note": "The exact official Ashby page displayed “Job not found” in a rendered browser. The HTTP response was 200. This records listing availability only; the reason and removal date are unknown."
+        "note": "The exact official Ashby page rendered the role and a visible Submit Application control, and the public Ashby job board lists it. No application submitted."
       }
     },
     {
@@ -3256,10 +3258,10 @@
       "numeric_pay": true,
       "as_of": "2026-10-12",
       "reviewed_on": "2026-10-14",
-      "status": "listed",
+      "status": "historical",
       "geography": "Remote US / Palo Alto",
       "eligibility": "US listing evidence",
-      "url": "https://jobs.ashbyhq.com/elorian-ai-inc/69acef27-d755-4b22-8257-94759edb0efb",
+      "url": "https://jobs.ashbyhq.com/elorian-ai-inc",
       "requirements": [
         "Remote or Palo Alto; experience in LLM safety evaluation, red teaming, or safety data annotation; harm taxonomies and clear writing.",
         "LLM safety, red-teaming or data-annotation experience."
@@ -3302,12 +3304,13 @@
         }
       ],
       "hours": "Estimated 40 hours/week",
-      "availability_note": "The US job location is established; exact work-authorization requirements are not stated.",
+      "availability_note": "The official listing showed “Job not found” on 23 October 2026 and is absent from Elorian’s job board. Original terms are retained as historical evidence; the link goes to the employer’s job board.",
+      "availability_checked_on": "2026-10-23",
       "source_quote": "Compensation: $75-125/hr, depending on experience.",
       "last_route_check": {
-        "date": "2026-10-14",
-        "result": "Official posting indexed as current; direct page requires JavaScript",
-        "note": "Official posting indexed as current; direct page requires JavaScript Official Ashby posting indexed today. Direct text fetch is JavaScript-only; application acceptance was not tested."
+        "date": "2026-10-23",
+        "result": "official_role_not_found",
+        "note": "The exact official Ashby page displayed “Job not found” in a rendered browser, and the public Ashby job board no longer lists the role. This records listing availability only; the reason and removal date are unknown."
       },
       "research_record": {
         "company_id": "elorian",

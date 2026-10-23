@@ -1,0 +1,287 @@
+{
+  "version": "1.0.0",
+  "reviewed_on": "2026-10-23",
+  "note": "Dated public events reviewed after dataset 2.5.0. Lawsuit entries describe allegations and filings, not findings.",
+  "events": [
+    {
+      "id": "prolific.event.2025-audited-accounts",
+      "company_id": "prolific",
+      "related_company_ids": [],
+      "kind": "filing",
+      "date": "2026-09-29",
+      "date_basis": "published",
+      "title": "Prolific Academic Ltd filed audited 2025 accounts at Companies House",
+      "detail": "Revenue was £28.6 million (2024: £19.4 million) with an operating loss of £2.9 million. Revenue is £19.3 million of commissions plus £9.3 million recharged to a group company, so it is not comparable with gross run-rate figures.",
+      "status": "Filed accounts",
+      "status_checked_on": "2026-10-23",
+      "sources": [
+        {
+          "url": "https://find-and-update.company-information.service.gov.uk/company/08991598/filing-history",
+          "title": "Prolific Academic Ltd filing history: full accounts made up to 31 December 2025",
+          "publisher": "Companies House",
+          "published_on": "2026-09-29",
+          "source_type": "filing"
+        }
+      ]
+    },
+    {
+      "id": "handshake_ai.event.boggs-misclassification-suit",
+      "company_id": "handshake_ai",
+      "related_company_ids": [],
+      "kind": "lawsuit",
+      "date": "2026-07-20",
+      "date_basis": "filed",
+      "title": "An AI trainer sued Handshake alleging trainers are misclassified as contractors",
+      "detail": "The proposed class action in N.D. Cal. names Stryder Corp., which does business as Handshake, and Handshake AI Solutions. It seeks unpaid wages and other remedies under federal and California law.",
+      "status": "Pending",
+      "status_checked_on": "2026-10-23",
+      "sources": [
+        {
+          "url": "https://www.courtlistener.com/docket/73643581/boggs-v-stryder-corp/",
+          "title": "Boggs v. Stryder Corp., No. 3:26-cv-07498 (N.D. Cal.), docket",
+          "publisher": "CourtListener",
+          "published_on": null,
+          "source_type": "court_record"
+        },
+        {
+          "url": "https://storage.courtlistener.com/recap/gov.uscourts.cand.474660/gov.uscourts.cand.474660.1.0.pdf",
+          "title": "Class action complaint, Boggs v. Stryder Corp.",
+          "publisher": "U.S. District Court, N.D. Cal.",
+          "published_on": "2026-07-20",
+          "source_type": "court_record"
+        },
+        {
+          "url": "https://www.law360.com/employment-authority/wage-hour/articles/2504072/ai-training-platform-misclassifies-college-workers-suit-says",
+          "title": "AI Training Platform Misclassifies College Workers, Suit Says",
+          "publisher": "Law360",
+          "published_on": "2026-07-22",
+          "source_type": "news"
+        }
+      ]
+    },
+    {
+      "id": "mercor.event.white-misclassification-suit",
+      "company_id": "mercor",
+      "related_company_ids": [],
+      "kind": "lawsuit",
+      "date": "2026-05-08",
+      "date_basis": "filed",
+      "title": "An expert sued Mercor alleging experts are misclassified as contractors",
+      "detail": "The proposed class action in N.D. Tex. seeks employee benefits, including under ERISA, plus tax and contract remedies. Law360 reported in June 2026 that Mercor asked the court to send the claims to individual arbitration.",
+      "status": "Pending",
+      "status_checked_on": "2026-10-23",
+      "sources": [
+        {
+          "url": "https://www.courtlistener.com/docket/73320005/white-v-mercorio-corporation/",
+          "title": "White v. Mercor.io Corporation, No. 6:26-cv-00201 (N.D. Tex.), docket",
+          "publisher": "CourtListener",
+          "published_on": null,
+          "source_type": "court_record"
+        },
+        {
+          "url": "https://storage.courtlistener.com/recap/gov.uscourts.txnd.419346/gov.uscourts.txnd.419346.16.0.pdf",
+          "title": "First amended class action complaint, White v. Mercor.io Corporation",
+          "publisher": "U.S. District Court, N.D. Tex.",
+          "published_on": "2026-06-25",
+          "source_type": "court_record"
+        },
+        {
+          "url": "https://www.law360.com/employment-authority/articles/2488001/ai-startup-says-worker-must-arbitrate-misclassification-suit",
+          "title": "AI Startup Says Worker Must Arbitrate Misclassification Suit",
+          "publisher": "Law360",
+          "published_on": "2026-06-10",
+          "source_type": "news"
+        }
+      ]
+    },
+    {
+      "id": "mercor.event.meta-paused-work",
+      "company_id": "mercor",
+      "related_company_ids": [],
+      "kind": "customer_change",
+      "date": "2026-04-03",
+      "date_basis": "reported",
+      "title": "Meta reportedly paused its work with Mercor after the March 2026 breach",
+      "detail": "Wired first reported the pause and Business Insider confirmed it with a person familiar with the matter. Meta declined to comment.",
+      "status": "Reported",
+      "status_checked_on": "2026-10-23",
+      "sources": [
+        {
+          "url": "https://www.businessinsider.com/meta-pauses-work-mercor-ai-training-investigating-data-breach-2026-4",
+          "title": "Meta paused its work with AI training startup Mercor after a data breach",
+          "publisher": "Business Insider",
+          "published_on": "2026-04-04",
+          "source_type": "news"
+        },
+        {
+          "url": "https://techcrunch.com/2026/04/09/after-data-breach-10b-valued-startup-mercor-is-having-a-month/",
+          "title": "After data breach, $10B-valued startup Mercor is having a month",
+          "publisher": "TechCrunch",
+          "published_on": "2026-04-09",
+          "source_type": "news"
+        }
+      ]
+    },
+    {
+      "id": "mercor.event.data-breach-class-actions",
+      "company_id": "mercor",
+      "related_company_ids": [],
+      "kind": "lawsuit",
+      "date": "2026-04-01",
+      "date_basis": "filed",
+      "title": "Contractors and applicants sued Mercor over the March 2026 data breach",
+      "detail": "Seven proposed class actions filed in N.D. Cal. in April 2026 were consolidated as In re Mercor.io Corporation Data Breach Litigation. On July 21, 2026 the court stayed the case while the parties mediate.",
+      "status": "Stayed pending mediation",
+      "status_checked_on": "2026-10-23",
+      "sources": [
+        {
+          "url": "https://www.courtlistener.com/docket/73129103/deboni-v-mercorio-corporation/",
+          "title": "In re Mercor.io Corporation Data Breach Litigation, No. 3:26-cv-02821 (N.D. Cal.), docket",
+          "publisher": "CourtListener",
+          "published_on": null,
+          "source_type": "court_record"
+        },
+        {
+          "url": "https://storage.courtlistener.com/recap/gov.uscourts.cand.467003/gov.uscourts.cand.467003.44.0.pdf",
+          "title": "Order granting stipulation to stay proceedings pending mediation",
+          "publisher": "U.S. District Court, N.D. Cal.",
+          "published_on": "2026-07-21",
+          "source_type": "court_record"
+        },
+        {
+          "url": "https://www.hrdive.com/news/ai-industry-recruiting-platform-faces-multiple-lawsuits-data-breach/817319/",
+          "title": "AI industry recruiting platform faces multiple lawsuits over data breach",
+          "publisher": "HR Dive",
+          "published_on": "2026-04-13",
+          "source_type": "news"
+        }
+      ]
+    },
+    {
+      "id": "mercor.event.scale-ai-trade-secrets-suit",
+      "company_id": "mercor",
+      "related_company_ids": ["scale_ai"],
+      "kind": "lawsuit",
+      "date": "2025-09-03",
+      "date_basis": "filed",
+      "title": "Scale AI sued Mercor and a former employee over trade secrets",
+      "detail": "Scale alleged that a former employee took confidential customer documents when he joined Mercor, which Mercor said it never accessed. The parties settled on confidential terms and the case was dismissed with prejudice in January 2026.",
+      "status": "Settled, dismissed with prejudice",
+      "status_checked_on": "2026-10-23",
+      "sources": [
+        {
+          "url": "https://storage.courtlistener.com/recap/gov.uscourts.cand.455638/gov.uscourts.cand.455638.30.0.pdf",
+          "title": "Stipulation of voluntary dismissal with prejudice, Scale AI, Inc. v. Mercor.io Corporation, No. 3:25-cv-07402",
+          "publisher": "U.S. District Court, N.D. Cal.",
+          "published_on": "2026-01-02",
+          "source_type": "court_record"
+        },
+        {
+          "url": "https://techcrunch.com/2025/09/03/scale-ai-is-suing-a-former-employee-and-rival-mercor-alleging-they-tried-to-steal-its-biggest-customers/",
+          "title": "Scale AI is suing a former employee and rival Mercor, alleging they tried to steal its biggest customers",
+          "publisher": "TechCrunch",
+          "published_on": "2025-09-03",
+          "source_type": "news"
+        }
+      ]
+    },
+    {
+      "id": "scale_ai.event.july-2025-layoffs",
+      "company_id": "scale_ai",
+      "related_company_ids": [],
+      "kind": "workforce_change",
+      "date": "2025-07-16",
+      "date_basis": "announced",
+      "title": "Scale AI cut about 14% of staff and ended work with about 500 contractors",
+      "detail": "A spokesperson confirmed cuts of 200 full-time roles and about 500 contractors. In a staff memo, interim CEO Jason Droege wrote that Scale had ramped up its generative AI capacity too quickly.",
+      "status": "Confirmed by company",
+      "status_checked_on": "2026-10-23",
+      "sources": [
+        {
+          "url": "https://www.sfgate.com/tech/article/sf-tech-startup-layoffs-after-meta-poaches-ceo-20773129.php",
+          "title": "SF tech startup lays off 200 a month after Meta poaches CEO",
+          "publisher": "SFGATE",
+          "published_on": "2025-07-16",
+          "source_type": "news"
+        },
+        {
+          "url": "https://techcrunch.com/2025/07/16/scale-ai-lays-off-14-of-staff-largely-in-data-labeling-business/",
+          "title": "Scale AI lays off 14% of staff, largely in data-labeling business",
+          "publisher": "TechCrunch",
+          "published_on": "2025-07-16",
+          "source_type": "news"
+        }
+      ]
+    },
+    {
+      "id": "surge_ai.event.cavalier-misclassification-suit",
+      "company_id": "surge_ai",
+      "related_company_ids": [],
+      "kind": "lawsuit",
+      "date": "2025-05-20",
+      "date_basis": "filed",
+      "title": "A former annotator sued Surge AI alleging annotators are misclassified as contractors",
+      "detail": "The proposed class action in San Francisco Superior Court alleges that Surge Labs, which runs DataAnnotation, failed to pay annotators minimum wage, provide breaks or reimburse expenses under California law.",
+      "status": "Filed, outcome not confirmed",
+      "status_checked_on": "2026-10-23",
+      "sources": [
+        {
+          "url": "https://clarksonlawfirm.com/wp-content/uploads/2025/05/2025.05.20-Surge-Labs.pdf",
+          "title": "Class action complaint, Cavalier v. Surge Labs, Inc., No. CGC-25-625502",
+          "publisher": "Clarkson Law Firm, plaintiff's counsel",
+          "published_on": "2025-05-20",
+          "source_type": "court_record"
+        },
+        {
+          "url": "https://news.bloomberglaw.com/litigation/ai-training-firm-surge-ai-hit-with-worker-misclassification-suit",
+          "title": "AI Training Firm Surge AI Hit With Worker Misclassification Suit",
+          "publisher": "Bloomberg Law",
+          "published_on": "2025-05-20",
+          "source_type": "news"
+        },
+        {
+          "url": "https://www.latimes.com/business/story/2025-05-21/surge-ai-is-latest-san-francisco-start-up-to-face-lawsuit-for-allegedly-misclassifying-data-labeling-workers",
+          "title": "Surge AI is latest San Francisco startup accused of misclassifying its workers",
+          "publisher": "Los Angeles Times",
+          "published_on": "2025-05-21",
+          "source_type": "news"
+        }
+      ]
+    },
+    {
+      "id": "scale_ai.event.mckinney-misclassification-suit",
+      "company_id": "scale_ai",
+      "related_company_ids": [],
+      "kind": "lawsuit",
+      "date": "2024-12-10",
+      "date_basis": "filed",
+      "title": "Contributors sued Scale AI alleging they were misclassified as contractors",
+      "detail": "Led by McKinney v. Scale AI in San Francisco Superior Court, the suits sought unpaid wages for California contributors. Scale denies the claims, and a $12.5 million settlement awaits a final approval hearing on October 30, 2026.",
+      "status": "Settlement awaiting final approval",
+      "status_checked_on": "2026-10-23",
+      "sources": [
+        {
+          "url": "https://cw.simpluris.com/docs/public/downloads/SMH7/CLASS_NOTICE",
+          "title": "Court approved notice of class action settlement, McKinney v. Scale AI, Inc., No. CGC24620481",
+          "publisher": "Simpluris, settlement administrator",
+          "published_on": null,
+          "source_type": "court_record"
+        },
+        {
+          "url": "https://www.sfgate.com/tech/article/sf-tech-startup-scale-ai-sued-wage-theft-19976761.php",
+          "title": "SF tech startup, 27-year-old billionaire CEO accused of wage theft",
+          "publisher": "SFGATE",
+          "published_on": "2024-12-12",
+          "source_type": "news"
+        },
+        {
+          "url": "https://techcrunch.com/2025/01/09/scale-ai-hit-by-its-second-employee-wage-lawsuit-in-less-than-a-month/",
+          "title": "Scale AI hit by its second employee wage lawsuit in less than a month",
+          "publisher": "TechCrunch",
+          "published_on": "2025-01-09",
+          "source_type": "news"
+        }
+      ]
+    }
+  ]
+}
