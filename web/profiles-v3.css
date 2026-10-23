@@ -9,8 +9,8 @@
 
 /* One grid for intro, products and relationships. */
 @media(min-width:701px){
-.profile-business-intro,.profile-v2 .offering-card,.profile-v2 .relationship-card{max-width:none;grid-template-columns:minmax(160px,1fr) minmax(0,2fr) 4.5rem;gap:24px}
-.offering-card .profile-card-source,.relationship-card .profile-card-source{grid-column:3;grid-row:1;justify-self:end}
+.profile-business-intro,.profile-business-layout:not(.has-case) .offering-card,.profile-v2 .relationship-card{max-width:none;grid-template-columns:minmax(160px,1fr) minmax(0,2fr) 4.5rem;gap:24px}
+.profile-business-layout:not(.has-case) .offering-card .profile-card-source,.relationship-card .profile-card-source{grid-column:3;grid-row:1;justify-self:end}
 }
 
 .profile-category-link{display:inline-flex;align-items:center;gap:6px;align-self:start;margin:3px 0 0;min-height:24px;color:var(--green);text-decoration:none}
