@@ -94,7 +94,6 @@
 .w4-compact-company { margin-bottom: 10px; }
 .w4-compact-card .w4-card-front { padding: 14px; }
 .w4-empty { color: var(--muted, #52645e); font-size: 13px; }
-.work-card-v4 a:focus-visible, .work-card-v4 summary:focus-visible, .work-card-v4 button:focus-visible, .work-card-v4 input:focus-visible { outline: 3px solid #a46b36; outline-offset: 3px; }
 .work-card-v4 summary:focus-visible { outline-offset: -3px; }
 @media (min-width: 1180px) {
   .work-grid:has(> .work-card-v4) { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
