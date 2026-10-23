@@ -11,7 +11,7 @@
       "date": "2026-09-29",
       "date_basis": "published",
       "title": "Prolific Academic Ltd filed audited 2025 accounts at Companies House",
-      "detail": "Revenue was £28.6 million (2024: £19.4 million) with an operating loss of £2.9 million. Revenue is £19.3 million of commissions plus £9.3 million recharged to a group company, so it is not comparable with gross run-rate figures.",
+      "detail": "Revenue was £28.6 million (2024: £19.4 million) with an operating loss of £2.9 million. The accounts cover one UK company. Its revenue is £19.3 million of commissions plus £9.3 million recharged to another group company, so it is not comparable with the CEO's run-rate figures, whose basis is not stated.",
       "status": "Filed accounts",
       "status_checked_on": "2026-10-23",
       "sources": [
@@ -32,7 +32,7 @@
       "date": "2026-07-20",
       "date_basis": "filed",
       "title": "An AI trainer sued Handshake alleging trainers are misclassified as contractors",
-      "detail": "The proposed class action in N.D. Cal. names Stryder Corp., which does business as Handshake, and Handshake AI Solutions. It seeks unpaid wages and other remedies under federal and California law.",
+      "detail": "The proposed class action in federal court in Northern California names Stryder Corp., which does business as Handshake, and Handshake AI Solutions. It seeks unpaid wages and other remedies under federal and California law.",
       "status": "Pending",
       "status_checked_on": "2026-10-23",
       "sources": [
@@ -67,7 +67,7 @@
       "date": "2026-05-08",
       "date_basis": "filed",
       "title": "An expert sued Mercor alleging experts are misclassified as contractors",
-      "detail": "The proposed class action in N.D. Tex. seeks employee benefits, including under ERISA, plus tax and contract remedies. Law360 reported in June 2026 that Mercor asked the court to send the claims to individual arbitration.",
+      "detail": "The proposed class action in federal court in Texas seeks employee benefits, including under ERISA, plus tax and contract remedies. Law360 reported in June 2026 that Mercor asked the court to send the claims to individual arbitration.",
       "status": "Pending",
       "status_checked_on": "2026-10-23",
       "sources": [
@@ -102,7 +102,7 @@
       "date": "2026-04-03",
       "date_basis": "reported",
       "title": "Meta reportedly paused its work with Mercor after the March 2026 breach",
-      "detail": "Wired first reported the pause and Business Insider confirmed it with a person familiar with the matter. Meta declined to comment.",
+      "detail": "Wired first reported the pause and Business Insider confirmed it with a person familiar with the matter. Meta declined to comment. In June 2026 Mercor said all frontier labs had increased their work with it over the previous few months. It did not name Meta.",
       "status": "Reported",
       "status_checked_on": "2026-10-23",
       "sources": [
@@ -119,6 +119,13 @@
           "publisher": "TechCrunch",
           "published_on": "2026-04-09",
           "source_type": "news"
+        },
+        {
+          "url": "https://www.mercor.com/blog/update-on-mercor-security-incident/",
+          "title": "Security investigation update",
+          "publisher": "Mercor",
+          "published_on": "2026-06-25",
+          "source_type": "company"
         }
       ]
     },
@@ -130,7 +137,7 @@
       "date": "2026-04-01",
       "date_basis": "filed",
       "title": "Contractors and applicants sued Mercor over the March 2026 data breach",
-      "detail": "Seven proposed class actions filed in N.D. Cal. in April 2026 were consolidated as In re Mercor.io Corporation Data Breach Litigation. On July 21, 2026 the court stayed the case while the parties mediate.",
+      "detail": "Seven proposed class actions filed in federal court in Northern California in April 2026 were consolidated as In re Mercor.io Corporation Data Breach Litigation. On July 21, 2026 the court stayed the case while the parties mediate.",
       "status": "Stayed pending mediation",
       "status_checked_on": "2026-10-23",
       "sources": [
