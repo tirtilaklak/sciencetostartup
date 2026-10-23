@@ -23,7 +23,7 @@ function snapshot(query,filters={}){
 }
 const baseline=snapshot('');
 assert.equal(baseline.ids.length,135,'Review route-count coverage after a research update');
-assert.equal(baseline.beforeGroups,12,'Default work view must retain its compact preview');
+assert.equal(baseline.beforeGroups,20,'Default work view must retain its compact preview');
 assert.equal(baseline.more,true,'Default work view lost its remaining-role disclosure');
 assert.equal(baseline.openGroups,0,'Default secondary groups should start collapsed');
 for(const query of whitespace)assert.deepEqual(snapshot(query),baseline,

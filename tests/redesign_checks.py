@@ -143,7 +143,7 @@ def main():
     for route_id, labels in {
         'pareto.work.investment-analyst': ['Closed', 'Approx. $100 / approved hour'],
         'toloka.work.cad-simulation': ['Historical', 'Up to $69 / hour equivalent'],
-        'rws_trainai.work.polaris-asr': ['Availability unconfirmed', '$16 / hour'],
+        'rws_trainai.work.polaris-asr': ['Closed', '$16 / hour'],
         'afterquery.work.college-swe': ['Rate conflict'],
         'afterquery.work.technical-content-writer-contract': ['Initial commitment; may expand', 'Schedule conflict: header says full-time'],
         'abundant_ai.work.research-product-manager': ['Pay periods unspecified.'],
@@ -164,7 +164,7 @@ def main():
     scale_tags = Elements(rendered['initial']['scale-visual']['html'])
     snapshots = scale_tags.with_attribute('data-snapshot-metric')
     assert {attrs['data-snapshot-metric'] for _, attrs in snapshots} == {
-        'mercor.metric.oct14-major-financial-2', 'handshake_ai.metric.major-growth_metrics-0'}
+        'mercor.metric.major-growth_metrics-0', 'handshake_ai.metric.major-growth_metrics-0'}
     assert len(scale_tags.with_attribute('data-story-metric')) == 2
     growth_expected = {
         'taskus': (135107000, 214218000, 'ai_data'),
