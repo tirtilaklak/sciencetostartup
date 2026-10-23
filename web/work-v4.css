@@ -115,6 +115,6 @@
   .w4-compact-pay { flex-basis: 118px; }
   .w4-compact-title strong { font-size: 12px; }
   .w4-compact-pay > strong { font-size: 11px; }
-  .w4-compact-pay .w4-status { font-size: 9px; }
+  .w4-compact-pay .w4-status { font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) { .w4-details > summary > span { transition: none; } }

@@ -1,1 +1,86 @@
 /* Work listings (#work and profile work tabs). Loaded after edition.css. */
+
+/* Before you apply: one short line, with sourced tips behind a disclosure. */
+.w4-safety{max-width:860px;margin:0 0 22px;padding:12px 16px 2px;border-left:3px solid var(--amber);background:#f3efe6}
+.w4-safety>p{margin:0;font-size:14px;line-height:1.55;color:var(--ink)}
+.w4-safety-tips{margin:2px 0 0}
+.w4-safety-tips>summary{display:inline-flex;align-items:center;gap:8px;min-height:40px;font-size:13px;font-weight:500;color:var(--green);list-style:none}
+.w4-safety-tips>summary::-webkit-details-marker{display:none}
+.w4-safety-tips>summary::after{content:'+';font-size:17px;font-weight:400;line-height:1}
+.w4-safety-tips[open]>summary::after{content:'−'}
+.w4-safety-tips ul{display:grid;gap:12px;margin:2px 0 12px;padding-left:18px;font-size:14px;line-height:1.55}
+.w4-safety-tips li p{margin:0}
+.w4-safety-tips .w4-safety-sources{margin-top:2px}
+.w4-safety-sources,.w4-safety-report{font-size:12px;line-height:1.6;color:var(--muted)}
+.w4-safety-report{margin:0 0 12px}
+.w4-safety a{text-underline-offset:3px}
+.work-v4-profile .w4-safety{margin:0 0 20px}
+
+/* Section jumps: the number leads, the words follow. */
+#work-overview button strong{margin:0 6px 0 0}
+#work-overview button:disabled{opacity:.55;cursor:default;text-decoration:none}
+
+/* Result count with the sort beside it; the note says what the sort covers. */
+.w4-results-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px;margin:12px 0 18px}
+.w4-results-bar #work-count{position:static;width:auto;height:auto;overflow:visible;clip-path:none;margin:0;font-size:13px;color:var(--muted)}
+.w4-sort{display:flex;flex-direction:row;align-items:center;gap:8px;font-size:12px;color:var(--muted);white-space:nowrap}
+.w4-sort select{min-height:40px;padding:8px 10px;font-size:13px;background:#fffefa;border:1px solid #7b8978;border-radius:3px}
+.w4-sort-note{max-width:720px;margin:-10px 0 18px;font-size:12px;line-height:1.5;color:var(--muted)}
+
+/* Sections, pay blocks and in-section jumps. Each heading keeps its count beside it. */
+.w4-section>.work-list-heading{justify-content:flex-start;align-items:baseline;gap:10px;margin-top:6px}
+.w4-section #work-listed span{display:inline}
+.w4-block-heading,.w4-section .work-list-heading{scroll-margin-top:calc(var(--header-height,64px) + 20px)}
+.w4-section-note{margin:-8px 0 8px;font-size:13px;line-height:1.5;color:var(--muted)}
+.w4-section-intro{display:flex;flex-wrap:wrap;align-items:center;gap:0 28px;margin:-8px 0 4px}
+.w4-section-intro>.w4-section-note{margin:0}
+.w4-jumps{display:flex;flex-wrap:wrap;gap:0 20px;margin:0}
+.w4-jumps button{min-height:36px;padding:0;border:0;border-radius:0;background:none;font-size:13px;color:var(--green);text-decoration:underline;text-underline-offset:4px}
+.w4-jumps button span{color:var(--muted)}
+.w4-block-heading,.w4-profile-heading{display:flex;align-items:baseline;gap:6px;margin:16px 0 0;padding:10px 0 6px;font-size:15px;line-height:1.4;font-weight:600;letter-spacing:0}
+.w4-block-heading span,.w4-profile-heading span{font-size:13px;font-weight:400;color:var(--muted)}
+.work-v4-profile .w4-profile-heading{margin-top:22px;font-size:17px}
+.work-v4-profile .w4-compact-title small{display:none}
+.w4-group-note{margin:-8px 0 10px;font-size:13px;line-height:1.5;color:var(--muted)}
+
+/* The role heading is h3 under a section and h4 under a pay block; both look the same. */
+.work-card-v4 .w4-role{margin:0 0 10px;font-family:inherit;font-size:18px;line-height:1.4;font-weight:600;letter-spacing:-.3px;overflow-wrap:normal}
+.w4-detail-content :is(h4,h5,h6){margin:0 0 7px;font-size:14px;line-height:1.4;font-weight:600}
+
+/* Empty and thin results. */
+.w4-empty-state{padding:22px 0 8px;border-top:1px solid var(--border)}
+.w4-empty-state .w4-empty{margin:0 0 12px;font-size:15px;color:var(--ink)}
+.w4-empty-actions{display:flex;flex-wrap:wrap;gap:10px;margin:0}
+.w4-empty-actions button{min-height:44px;font-size:13px}
+
+/* 701-1100 px: the action sits under the pay, next to the role (VIS-11). */
+@media(min-width:701px) and (max-width:1100px){
+ #work-cards .w4-card-front{grid-template-rows:auto 1fr}
+ #work-cards .w4-role-column{grid-column:1;grid-row:1/3}
+ #work-cards .w4-offer-column{grid-column:2;grid-row:1}
+ #work-cards .w4-action-column{grid-column:2;grid-row:2;justify-self:start;align-self:start;margin:0}
+ #work-cards .w4-conditions-column{grid-column:3;grid-row:1/3}
+}
+@media(max-width:700px){
+ .work-card-v4 .w4-role{margin-bottom:8px}
+ .w4-safety{margin-bottom:16px;padding:10px 14px 0}
+ .w4-safety>p{font-size:13px}
+ .w4-results-bar{gap:4px 12px;margin:8px 0 12px}
+ .w4-results-bar #work-count{font-size:12px}
+ .w4-sort select{min-height:40px;padding:6px 8px;font-size:12px}
+ .w4-section-intro{margin-bottom:0}
+ .w4-block-heading{margin-top:10px;padding-top:8px}
+ /* Three equal columns, number above words, so long labels wrap instead of running off screen. */
+ #work-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;flex-wrap:wrap}
+ #work-overview button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:44px;font-size:12px;line-height:1.35;text-align:left;white-space:normal}
+ #work-overview button strong{margin:0;font-size:18px;line-height:1.2}
+}
+/* Phones: one filter per row so option text such as "Contract and expert projects" is not cut off. */
+@media(max-width:520px){
+ .work-filters .responsive-filter-panel[open]>.responsive-filter-fields{grid-template-columns:1fr}
+}
+/* Very narrow phones: text stays at 11 px or more. */
+@media(max-width:380px){
+ #work-overview{gap:8px}
+ #work-overview button{font-size:11px}
+}
