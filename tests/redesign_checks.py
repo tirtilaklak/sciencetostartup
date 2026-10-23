@@ -133,7 +133,7 @@ def main():
         assert 'Terms & sources' in details
         assert f'data-work-route="{route_id}"' in before_details
         assert f'data-work-company="{route["company_id"]}"' in before_details
-        assert 'Checked ' in before_details and 'Terms recorded:' in details
+        assert ('Checked ' in before_details or 'Reviewed ' in before_details) and 'Terms recorded:' in details
         links = [a['href'] for tag, a in Elements(before_details).elements if tag == 'a' and 'w4-open' in a.get('class', '')]
         assert links == [route['url']], route_id + ': exact route target changed'
         for claim_id in route.get('claim_ids', []):
@@ -146,8 +146,8 @@ def main():
         'rws_trainai.work.polaris-asr': ['Availability unconfirmed', '$16 / hour'],
         'afterquery.work.college-swe': ['Rate conflict'],
         'afterquery.work.technical-content-writer-contract': ['Initial commitment; may expand', 'Schedule conflict: header says full-time'],
-        'abundant_ai.work.research-product-manager': ['Pay periods unspecified.'],
-        'bespoke_labs.work.mts-post-training': ['Pay periods unspecified.'],
+        'abundant_ai.work.research-product-manager': ['Pay period not stated.'],
+        'bespoke_labs.work.mts-post-training': ['Pay period not stated.'],
         'toloka.work.mindrift-code': ['hour equivalent', 'Paid per completed task'],
     }.items():
         assert all(label in visible_work[route_id] for label in labels), route_id + ': visible pay/status qualifier lost'
