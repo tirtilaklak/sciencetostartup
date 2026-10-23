@@ -344,7 +344,7 @@ def render_snapshot_metadata(html, data):
     return html.replace("{{SNAPSHOT_LABEL}}", label).replace("{{DATASET_VERSION}}", data["dataset_version"])
 
 STATIC_DOWNLOAD_FILES = {
-    "INVESTOR": ("assets/Investor_Snapshot_Human_Depth.png", "PNG"),
+    "INVESTOR": ("assets/Investor_Snapshot_Human_Depth_v2.png", "PNG"),
     "SQLITE": ("observatory.sqlite", "SQLite"),
     "WORK": ("work-routes.json", "JSON"),
     "PROFILES": ("profile-content.json", "JSON"),
