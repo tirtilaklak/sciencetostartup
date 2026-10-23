@@ -16,7 +16,7 @@
 .site-search-open kbd,.site-search-enter{min-width:22px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--muted);font:12px/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:center}
 .site-search-open kbd{margin-left:auto}
 @media(max-width:1100px){.topbar{padding-left:32px;padding-right:32px;gap:20px}.topbar nav{gap:18px}.site-search-open{min-width:0;padding-right:12px}.site-search-open kbd{display:none}}
-@media(max-width:900px){.wordmark small{font-size:11px;letter-spacing:.06em}.topbar{gap:16px}.topbar nav{gap:16px}.site-search-open{width:40px;padding:0;justify-content:center}}
+@media(max-width:900px){.wordmark small{font-size:11px}.topbar{gap:16px}.topbar nav{gap:16px}.site-search-open{width:40px;padding:0;justify-content:center}}
 /* Phones: the wordmark and a 44 px search button, then the four links across the full width. */
 @media(max-width:700px){
  .topbar{padding:8px 20px 0;align-items:center;row-gap:4px;column-gap:12px}
@@ -54,6 +54,7 @@
 .site-search-enter{grid-column:2;grid-row:1/span 2;display:none}
 .site-search-option.is-first .site-search-enter,.site-search-option.is-active .site-search-enter{display:block}
 .site-search-target{outline:2px solid var(--green);outline-offset:6px;border-radius:2px}
+@media(forced-colors:active){.site-search-option{border-left-color:Canvas}.site-search-option.is-active{border-left-color:Highlight;outline:2px solid Highlight;outline-offset:-2px}}
 @media(max-width:700px){
  .site-search{width:100%;height:100%;max-height:none;margin:0;border:0;border-radius:0;box-shadow:none}
  .site-search-bar{padding:10px 6px 10px 12px}
