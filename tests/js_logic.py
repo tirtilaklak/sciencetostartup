@@ -176,6 +176,13 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  run('setSelection([])');assert.equal((node('compare-content').innerHTML.match(/data-mobile-compare=/g)||[]).length,3);assert.ok(node('compare-content').innerHTML.includes('TaskUs + Appen'));assert.ok(node('compare-content').innerHTML.includes('data-mobile-compare="2"'));click(button({mobileCompare:'1'}));assert.equal(run('state.mobileCompare'),1,'Default example must reach final company');
  assert.ok(/data-comparison-company="scale_ai" class=""/.test(node('compare-content').innerHTML));run('setSelection([])');
 
+ // Routes ignore hash queries and letter case, land on in-page sections and carry the comparison.
+ for(const [hash,view] of [['#work?utm_source=x','work'],['#venture','market'],['#about','method']]){location.hash=hash;run('route()');assert.equal(node(view+'-view').hidden,false,hash);assert.equal(location.hash,hash,hash+' must stay linkable');}
+ location.hash='#market';run('route()');assert.equal(run('document.title'),'Overview · ScienceToStartup');
+ location.hash='#company/Scale_AI/WORK';run('route()');assert.ok(node('profile-view').innerHTML.includes('data-profile-pane="work">'),'Section case must not hide the Paid work tab');
+ location.hash='#compare/mercor,Handshake_AI,unknown,mercor';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai']);assert.equal(location.hash,'#compare/mercor,handshake_ai');
+ run(`chooseCompare('appen',true)`);assert.equal(location.hash,'#compare/mercor,handshake_ai,appen');run('setSelection([])');assert.equal(location.hash,'#compare');location.hash='#market';run('route()');
+
  // Curated profile headings render as text.
  const headed=curated.find(entry=>entry.traction_heading),heading=headed.traction_heading;headed.traction_heading='<b>x</b>';
  const tractionHeading=run(`profileHTML(${JSON.stringify(headed.company_id)})`).match(/data-profile-section="traction"><h2>([\s\S]*?)<\/h2>/)[1];headed.traction_heading=heading;
