@@ -28,8 +28,7 @@ renderStory=function(){originalRenderStory();$('source-count').textContent=DATA.
 const originalRenderCompare=renderCompare;
 renderCompare=function(){originalRenderCompare();document.querySelectorAll('.comparison-table thead th:not(:first-child)').forEach((th,i)=>{const id=compareIds()[i];if(id)th.insertAdjacentHTML('afterbegin',logoHTML(id,'compare-logo',true));});};
 
-const originalProfileHTML=profileHTML;
-profileHTML=function(id){const html=originalProfileHTML(id);const a=logoFor(id),e=entryFor(id);const assetEvidence=a?`<details class="profile-disclosure"><summary>Official logo source</summary><p>${external(a.source_page,'Official source')} · ${external(a.asset_url,'Original image')} · Retrieved ${esc(a.retrieved_on||window.LOGOS.retrieved_on)}</p><p class="sub">${esc(a.notes||'Official company logo.')}</p></details>`:'';return html.replace(/(<h1[^>]*>)/,'<div class="profile-brand">'+logoHTML(id,'profile-logo')+'</div>$1')+assetEvidence;};
+// Profiles render in profiles-v2.js (profileHTML).
 
 const originalOpenCompanyStory=openCompanyStory;
 openCompanyStory=function(id){originalOpenCompanyStory(id);$('company-story').insertAdjacentHTML('afterbegin',logoHTML(id,'dialog-logo',true));const e=entryFor(id);$('company-story').insertAdjacentHTML('beforeend',`<div class="capability-tags">${(e?.capability_tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div>`);};
