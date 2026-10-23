@@ -117,10 +117,6 @@
 #market-view .venture-band .investor-full-image{display:inline-flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:2px 6px;min-height:44px;margin:0;font-size:14px}
 #market-view .venture-band .investor-link-note{font-size:12px;color:var(--muted)}
 #market-view .venture-band .investor-transcript>summary{min-height:44px;font-size:13px}
-.investor-transcript>div{max-width:780px;padding:3px 0 4px}
-.investor-transcript p{margin:0 0 12px}
-.investor-transcript dt{font-weight:600;color:var(--ink)}
-.investor-transcript dd{margin:3px 0 0}
 .investor-terms{font-size:12px}
 @media(max-width:1100px){
   #market-view .market-hero{grid-template-columns:minmax(0,1fr) 230px;column-gap:40px}
@@ -155,7 +151,7 @@
   #market-view .hero-actions a{justify-content:space-between}
   .hero-byline{font-size:14px;margin-top:16px}
   #market-view .hero-logo-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 12px}
-  #market-view .hero-logo-grid .brand-asset{width:90px;height:28px}
+  #market-view .hero-logo-grid .brand-asset{width:90px;max-width:100%;height:28px}
   .grade-key{margin:0;font-size:13px}
   .grade-key dl{display:grid;grid-template-columns:1fr;gap:6px}
   #scale-visual .scale-observation{grid-template-columns:84px minmax(0,1fr) 84px;gap:10px;margin:20px 0}
@@ -179,4 +175,6 @@
 @media(forced-colors:active){
   .grade-bar{display:none}
   .grade-key dt,.story-grade{border-color:CanvasText}
+  .growth-span,.growth-dot,.growth-dot.is-end{forced-color-adjust:none;background:CanvasText}
+  .growth-dot.is-start{background:Canvas;box-shadow:inset 0 0 0 2px CanvasText}
 }
