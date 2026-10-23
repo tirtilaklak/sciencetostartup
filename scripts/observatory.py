@@ -661,7 +661,7 @@ def build(data, destination):
     import shutil
     assets = ROOT / "web/assets"
     if assets.exists(): shutil.copytree(assets, destination / "assets", dirs_exist_ok=True)
-    for name in ("robots.txt", "sitemap.xml", "404.html", "_headers", "_redirects"):
+    for name in ("robots.txt", "sitemap.xml", "_headers", "_redirects", "favicon.ico"):
         shutil.copy2(ROOT / "web" / name, destination / name)
     for source in [ROOT / "data/editorial.json", ROOT / "data/portrait-provenance.json", ROOT / "data/investor-image-provenance.json", logo_path, work_path, link_health_path, source_updates_path]:
         if source.exists(): shutil.copy2(source, destination / source.name)
