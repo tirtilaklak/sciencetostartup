@@ -477,12 +477,13 @@
         {
           "name": "Meta",
           "relationship": "reported_customer",
-          "description": "Sacra reports an AI-data customer relationship. Current contracts and buyer confirmation are unverified.",
+          "description": "Sacra reports an AI-data customer relationship. Current contracts and buyer confirmation are unverified. Meta reportedly paused work with Mercor in April 2026 after the data incident.",
           "record_ids": [
             "mercor.customer.major-0"
           ],
           "claim_ids": [
-            "mercor.claim.major-customers-0"
+            "mercor.claim.major-customers-0",
+            "mercor.claim.risks-0"
           ]
         }
       ],
