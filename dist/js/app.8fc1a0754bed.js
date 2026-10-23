@@ -1452,7 +1452,7 @@ function w4OtherSection(groups,open){
 const W4_PROJECT_RULES=/project|role-specific|country varies|eligibility varies|geographic restrictions|global/i;
 function w4NetworkSuggestions(shown){
   const seen=new Set(shown.map(route=>route.id)),rows=workRouteRows().filter(route=>w4Bucket(route)==='contract'&&W4_PROJECT_RULES.test(route.geography||'')&&!seen.has(route.id)).sort(w4BestOrder);
-  return rows.length?`<section class="w4-section w4-suggestions"><h2 id="work-suggested" class="work-list-heading">Networks that set country rules per project <span>(${rows.length})</span></h2><p class="w4-section-note">Many expert networks decide who can join each project, including from which countries. These may still have work for you.</p><div class="w4-secondary-list">${rows.map(route=>workCard(route,'compact')).join('')}</div></section>`:'';
+  return rows.length?`<section class="w4-section w4-suggestions"><h2 id="work-suggested" class="work-list-heading">Expert networks worth checking <span>(${rows.length})</span></h2><p class="w4-section-note">These networks pick people for each project by skill and country. They may have work that your search words did not match.</p><div class="w4-secondary-list">${rows.map(route=>workCard(route,'compact')).join('')}</div></section>`:'';
 }
 function w4EmptyState(query,filters){
   if(!workRouteRows().length)return '<p class="w4-empty">No listings are available right now.</p>';
