@@ -1,1 +1,57 @@
 /* Company index (#companies), company cards, quick summaries and the compare page. */
+
+/* "More filters" opens as an overlay under the whole filter block, so no control moves
+   and none is covered (VIS-5, QA-1). */
+.filters{position:relative}
+.filters>.more-filters,.filters>.more-filters[open]{position:static;align-self:end;width:auto;max-width:none;margin:0;padding:0;border:0;background:none;box-shadow:none}
+.more-filters>summary{border-radius:3px}
+.more-filters[open]>summary{background:#eef1ea;color:var(--ink)}
+.more-filters-panel{position:absolute;right:0;top:calc(100% + 6px);z-index:35;width:290px;box-sizing:border-box;padding:4px 16px 14px;background:var(--bg);border:1px solid #cbd4c5;border-radius:3px;box-shadow:0 6px 20px #162a1822}
+.more-filters-panel>label{margin:12px 0 0}
+.more-filters-panel select{width:100%}
+@media(max-width:700px){.filters>.more-filters,.filters>.more-filters[open]{grid-column:2;grid-row:2}.more-filters-panel{left:0;width:auto}}
+
+.directory-note{max-width:72ch;margin:0 0 12px;font-size:12px;line-height:1.5;color:var(--muted)}
+
+/* Logos sit in one tile size, so no row shows an empty slot while an image loads (VIS-10). */
+.company-brand .brand-asset,.comparison-table .compare-logo,#company-story>.brand-asset{justify-content:center;padding:5px;background:#eef1ea;border-radius:2px}
+.company-brand .brand-asset.brand-dark,.comparison-table .compare-logo.brand-dark,#company-story>.brand-asset.brand-dark{background:#162d29}
+.company-brand .brand-asset:not(.brand-dark) img,.comparison-table .compare-logo:not(.brand-dark) img,#company-story>.brand-asset:not(.brand-dark) img{mix-blend-mode:multiply}
+.brand-asset.brand-text{font:600 13px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.5px;color:var(--muted)}
+@media(forced-colors:active){.company-brand .brand-asset,.comparison-table .compare-logo,#company-story>.brand-asset{forced-color-adjust:none}}
+
+/* Compare tray: one row on phones, a ring that shows on the dark bar, and room so the
+   tray never hides the control that has focus (VIS-4, A11Y-1, A11Y-3, QA-5). */
+#compare-tray{width:max-content;flex-wrap:nowrap;gap:10px 18px}
+#compare-tray #tray-text{min-width:0;font-size:12px;line-height:1.4}
+#compare-tray a,#compare-tray .quiet{flex:none}
+#compare-tray :focus-visible{outline-color:#fff;outline-offset:2px}
+html:has(#compare-tray:not([hidden])){scroll-padding-bottom:96px}
+@media(max-width:700px){
+ #compare-tray{left:10px;right:10px;bottom:10px;width:auto;max-width:none;transform:none;justify-content:space-between;gap:10px;padding:6px 8px 6px 14px}
+ #compare-tray #tray-text{flex:1 1 auto;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:12px}
+}
+@media(max-width:480px){#compare-tray .tray-link-extra{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
+
+/* Compare page controls: add a company, examples, clear. */
+.compare-controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px 16px;margin:0 0 18px}
+.compare-add{display:flex;align-items:end;gap:8px}
+.compare-controls label{gap:6px;font-size:12px;color:var(--muted)}
+.compare-controls select{min-width:240px;min-height:44px;background:#fffefa;border:1px solid #7b8978;border-radius:3px;font-size:14px}
+.compare-controls button{min-height:44px}
+@media(max-width:700px){
+ .compare-controls{display:grid;grid-template-columns:minmax(0,1fr) auto}
+ .compare-add{grid-column:1/-1}
+ .compare-add label{flex:1;min-width:0}
+ .compare-controls select{width:100%;min-width:0}
+}
+.comparison-mode{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px}
+.comparison-mode p{margin:0}
+.comparison-mode .text-link{min-height:32px;font-size:13px}
+@media(max-width:700px){.comparison-swipe{display:block}}
+
+/* A shorter period shown under the full-year figure (RED-8). */
+.comparison-table .comparison-later{margin:12px 0 0;padding-top:10px;border-top:1px dashed #cbd4c5;font-size:13px;line-height:1.5}
+.comparison-later-label{display:block;font-size:12px;color:var(--muted)}
+.comparison-table .comparison-later .number-button{font-size:18px;font-weight:500}
+.comparison-table .comparison-later .row-period{display:block;margin-top:2px;font-size:12px;color:var(--muted);white-space:normal}
