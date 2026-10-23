@@ -2,6 +2,7 @@
 import ast
 import copy
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -47,6 +48,8 @@ class LinkHealthTests(unittest.TestCase):
             target = Path(folder)
             build(data, target)
             html = (target / "index.html").read_text()
+            # The data and app scripts load from js/ files in page order; check the order across them.
+            html += "".join((target / src).read_text() for src in dict.fromkeys(re.findall(r'"(js/[^"]+[.]js)"', html)))
             self.assertLess(html.index("window.LINK_HEALTH="), html.index("window.linkAvailabilityHTML=url=>"))
             self.assertLess(html.index("window.linkAvailabilityHTML=url=>"), html.index("const external=(url,label)=>"))
             self.assertEqual(json.loads((target / "link-health.json").read_text()), json.loads((ROOT / "data/link-health.json").read_text()))

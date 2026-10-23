@@ -44,12 +44,13 @@ document.addEventListener('click',e=>{
 
 // Route first, then focus the newly visible heading for hash navigation only.
 // initialize() registers this wrapper and calls it without an event on first load.
+// In-page anchors such as #about keep the focus that route() gave their element.
 const originalRoute=route;
 route=function(event){
   const returningToWork=event?.type==='hashchange'&&location.hash.slice(1).split('/')[0]==='work'&&previousRoute==='company';
-  const returningToCompanies=event?.type==='hashchange'&&location.hash==='#companies'&&previousRoute==='company';
+  const returningToCompanies=event?.type==='hashchange'&&location.hash.slice(1).split('/')[0].toLowerCase()==='companies'&&previousRoute==='company';
   const result=originalRoute.apply(this,arguments);
-  if(event?.type==='hashchange'&&location.hash!=='#main'){
+  if(event?.type==='hashchange'&&location.hash!=='#main'&&!viewAnchorId()){
     const workLink=returningToWork&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():null;
     const companyOrigin=returningToCompanies?companyReturnFocusTarget():null;
     if(companyOrigin)companyOrigin.focus({preventScroll:true});

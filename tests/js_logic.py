@@ -222,7 +222,7 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  for(const id of ['aixi','rws_trainai'])assert.equal(run(`DATA.funding_rounds.filter(r=>r.company_id==='${id}').length`),0);
  for(const [id,value] of [['handshake_ai',1500000000],['scale_ai',3500000000],['scale_ai',29000000000]])assert.equal(run(`uniqueMetrics('${id}').filter(m=>m.kind==='valuation'&&m.value===${value}).length`),1);
  assert.ok(run(`profileHTML('toloka')`).includes('First sale: 2025-05-02'));assert.ok(run(`profileHTML('appen')`).includes('New company funding: AUD 9.85M'));
- assert.ok(run(`fundingSummary('handshake_ai')`).includes('$434M'));assert.ok(run(`profileHTML('labelbox')`).includes('2026-10-14'));
+ assert.ok(run(`fundingSummary('handshake_ai')`).includes('$434M'));assert.ok(/2026-10-14|14 Oct 2026/.test(run(`profileHTML('labelbox')`)),'Labelbox shows its 14 Oct 2026 record date');
  const labelboxMixed=data.funding_rounds.find(r=>r.id==='labelbox.round.oct14-equity');assert.equal(labelboxMixed.capital_type,'mixed');assert.equal(labelboxMixed.amount_basis,'undisclosed');assert.equal(labelboxMixed.qualifier,'greater_than');assert.equal(labelboxMixed.include_in_total,false);assert.equal(data.funding_rounds.find(r=>r.id==='labelbox.round.oct14-credit').parent_round_id,labelboxMixed.id);assert.ok(run(`profileCapital('labelbox')`).includes('Pre-money valuation'));const selectedLabelbox=data.funding_rounds.filter(r=>r.company_id==='labelbox'&&r.include_in_disclosed_primary_sum);assert.ok(selectedLabelbox.every(r=>r.qualifier==='exact'&&r.capital_type==='equity'));
  assert.ok(run(`disclosedPrimarySummary('labelbox')`).includes(run(`metricValue({value:${selectedLabelbox.reduce((n,r)=>n+r.amount,0)},unit:'currency',currency:'USD',qualifier:'exact'})`)));
 
