@@ -56,6 +56,67 @@ def escape(value):
     return html.escape("" if value is None else str(value), quote=True)
 
 
+# Research records carry reviewer notes ("Do not compare ...", snake_case labels). The app shows them through
+# publicText in web/app.js; the port below lets the static pages print the same words. The copy table itself is
+# read from web/app.js so it lives in one place, and tests/test_static_pages.py runs both versions to keep them equal.
+APP_SCRIPT = Path(__file__).resolve().parents[1] / "web" / "app.js"
+COPY_EDIT_BLOCK = re.compile(r"(?:const PUBLIC_COPY_EDITS=|Object\.assign\(PUBLIC_COPY_EDITS,)(\{.*?\n\})", re.S)
+JS_SPACE = "\t\n\v\f\r                  　﻿"
+SPACE = f"[{JS_SPACE}]"  # JavaScript's \s, which also sets what trim() removes
+DO_NOT_VERBS = {"add": "adding", "assume": "assuming", "attribute": "attributing", "call": "calling", "characterize": "characterizing", "choose": "choosing", "compare": "comparing", "confuse": "confusing", "convert": "converting", "count": "counting", "directly": "directly", "display": "displaying", "equate": "equating", "force": "forcing", "imply": "implying", "import": "importing", "infer": "inferring", "invent": "inventing", "label": "labelling", "mark": "marking", "mechanically": "mechanically", "mislabel": "mislabelling", "normalize": "normalizing", "present": "presenting", "promote": "promoting", "replace": "replacing", "set": "setting", "silently": "silently", "substitute": "substituting", "transfer": "transferring", "treat": "treating", "turn": "turning", "upgrade": "upgrading", "use": "using", "guess": "guessing", "fabricate": "fabricating", "annualize": "annualizing", "erase": "erasing"}
+WORDING_RULES = (  # (pattern, replacement) in publicTextCompute order; ASCII matches JavaScript's \b, \w and \d
+    (re.compile(r"Superseded by the final [^.]+\."), "Replaced by later research."),
+    (re.compile(r"Retained as historical provenance; excluded from active fact selectors\."), "Historical observation; excluded from current comparisons."),
+    (re.compile(r"Final audit source [\w.-]+: ", re.A), ""),
+    (re.compile(r"Earlier registry status: "), "Earlier source check: "),
+    (re.compile(r"Review status: "), "Source check: "),
+    (re.compile(r"Retain claim: Yes\.?"), ""),
+    (re.compile(r"Source support was inherited[^.]*\."), "Source support has not been rechecked."),
+    (re.compile(r"Historical statements are preserved[^.]*\."), "Historical statements are dated and may not describe current conditions."),
+    (re.compile(r"\b([Ff]ound(?:ed|ing)(?: year)?[^.\d]{0,12})([12]),(\d{3})\b", re.A), r"\1\2\3"),
+    (re.compile(r"\b([Dd])o not (silently |mechanically |directly )?([a-z]+)\b", re.A), lambda m: (("The" if m[1] == "D" else "the") + " evidence does not support " + (m[2] or "") + DO_NOT_VERBS[m[3]]) if m[3] in DO_NOT_VERBS else m[0]),
+    (re.compile(r"\bmust not be (shown|presented|represented|treated|counted|reported|label(?:l)?ed|equated|added|summed|merged|transferred)\b", re.A), r"cannot be \1"),
+    (re.compile(r"\bshould not be (treated|mistaken|equated|relabeled|fabricated|read|combined|reported|substituted)\b", re.A), r"cannot be \1"),
+    (re.compile(rf"\b(?:Round id|Id): [a-z0-9_.-]+\.(?:{SPACE}|\Z)", re.A | re.I), ""),
+    (re.compile(r"\b[a-zA-Z][a-zA-Z0-9]*(?:_[a-zA-Z0-9]+)+\b", re.A), lambda m: m[0].replace("_", " ")),
+    (re.compile(f"{SPACE}{{2,}}"), " "),
+    (re.compile(r" \."), "."),
+)
+REWORDED_FIELDS = {"claims": ("statement",), "metrics": ("label",), "sources": ("title",), "companies": ("description",)}
+
+
+def load_copy_edits(script=APP_SCRIPT):
+    """PUBLIC_COPY_EDITS from web/app.js, in the order the app applies them."""
+    source = Path(script).read_text(encoding="utf-8")
+    blocks = COPY_EDIT_BLOCK.findall(source)
+    if not blocks or len(blocks) != source.count("Object.assign(PUBLIC_COPY_EDITS,") + 1: raise ValueError("static pages: cannot read PUBLIC_COPY_EDITS from web/app.js")
+    edits = {}
+    for block in blocks: edits.update(json.loads(block))
+    return edits
+
+
+def public_wording(data, edits):
+    """publicText from web/app.js: record ids and URLs pass through, research notes become public sentences."""
+    record_ids = {row["id"] for rows in data.values() if isinstance(rows, list) for row in rows if isinstance(row, dict) and isinstance(row.get("id"), str) and row["id"]}
+    record_ids |= {stage.get("id") for stage in data.get("rubric", {}).get("stages", [])} | {"not_applicable", "pending"}
+    def say(value):
+        text = "" if value is None else str(value)
+        if text in record_ids or re.match(r"https?://", text, re.I): return text
+        for original, copy in edits.items(): text = text.replace(original, copy)
+        for pattern, replacement in WORDING_RULES: text = pattern.sub(replacement, text)
+        return text.strip(JS_SPACE)
+    return say
+
+
+def reworded(data, say):
+    """The dataset with its research text (claim statements, metric labels, source titles, descriptions) in public wording.
+    The sidecars are written as public copy already; tests/test_static_pages.py checks that the app leaves them as they are."""
+    copy = dict(data)
+    for table, fields in REWORDED_FIELDS.items():
+        copy[table] = [{**row, **{field: say(row[field]) for field in fields if isinstance(row.get(field), str)}} for row in data.get(table, [])]
+    return copy
+
+
 def truncate(text, limit=DESCRIPTION_LIMIT):
     text = " ".join(str(text or "").split())
     if len(text) <= limit: return text
@@ -317,6 +378,7 @@ def render_sitemap(company_ids, lastmod):
 def write_static_pages(data, destination, work_data=None, profile_content=None, editorial=None, events=None):
     """Write /company/<id>/index.html for every company, /companies/index.html and sitemap.xml."""
     destination = Path(destination)
+    data = reworded(data, public_wording(data, load_copy_edits()))
     as_of = str(data.get("meta", {}).get("as_of", ""))
     editorial_by_id = {e["company_id"]: e for e in (editorial or {}).get("entries", []) if isinstance(e, dict) and e.get("company_id")}
     profile_by_id = {e["company_id"]: e for e in (profile_content or {}).get("entries", []) if isinstance(e, dict) and e.get("company_id")}

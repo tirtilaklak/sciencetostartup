@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from observatory import build
-from static_pages import METRIC_LIMIT, STYLE, headline_metrics
+from static_pages import METRIC_LIMIT, REWORDED_FIELDS, STYLE, headline_metrics, load_copy_edits, public_wording
 
 ORIGIN = "https://sciencetostartup.com"
 NAMESPACE = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
@@ -29,6 +29,14 @@ const claims=Object.fromEntries(DATA.claims.map(c=>[c.id,c])),grab=re=>{const m=
 eval(grab(/function dateRank\(s\)\{.*/));const byRecent=eval(grab(/const byRecent=(.*?);\n/));eval(grab(/function eligibleMetrics\(id,kind\)\{.*/));
 const picks={};for(const m of DATA.metrics){const first=eligibleMetrics(m.company_id,m.kind)[0];if(first)picks[m.company_id+'|'+m.kind]=first.id;}
 console.log(JSON.stringify(picks));
+"""
+# publicText in web/app.js, run on strings read from stdin; the static pages must print the same words.
+APP_WORDING = r"""
+const fs=require('fs'),vm=require('vm'),app=fs.readFileSync(process.argv[1],'utf8'),DATA=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+const start=app.indexOf('const PUBLIC_COPY_EDITS='),body=app.indexOf('function publicTextCompute('),end=app.indexOf('\n}\n',body);
+if(start<0||body<0||end<0)throw new Error('web/app.js changed: publicText not found');
+const context={DATA};vm.createContext(context);vm.runInContext(app.slice(start,end+3)+';this.publicText=publicText;',context);
+console.log(JSON.stringify(JSON.parse(fs.readFileSync(0,'utf8')).map(context.publicText)));
 """
 
 
@@ -148,6 +156,37 @@ class StaticPageTests(unittest.TestCase):
             rows = headline_metrics(self.data, cid)[0]
             self.assertEqual(len(rows), min(len(expected), METRIC_LIMIT), cid)
             for row in rows: self.assertEqual(row["id"], expected[kinds[row["id"]]], (cid, row["kind"]))
+
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    def test_printed_text_matches_the_app_wording(self):
+        """Research fields go through the Python port of publicText; sidecar copy must already be in final form."""
+        research = sorted({row[field] for table, fields in REWORDED_FIELDS.items() for row in self.data[table] for field in fields if isinstance(row.get(field), str)})
+        load = lambda name: json.loads((ROOT / "data" / name).read_text())
+        editorial, profiles, work = load("editorial.json")["entries"], load("profile-content.json")["entries"], load("work-routes.json")["routes"]
+        events = load("company-events.json")["events"] if (ROOT / "data/company-events.json").exists() else []
+        sidecar = {c["name"] for c in self.data["companies"]}
+        sidecar |= {e.get(field) for e in editorial for field in ("summary", "primary_offering", "precise_category")}
+        sidecar |= {p.get(field) for entry in profiles for p in entry.get("products", []) for field in ("name", "description")}
+        sidecar |= {r.get(field) for r in work for field in ("role", "pay_label")}
+        sidecar |= {e[field] for e in events for field in ("title", "detail", "status")} | {s["publisher"] for e in events for s in e["sources"]}
+        sidecar = sorted(text for text in sidecar if isinstance(text, str) and text)
+        strings = research + sidecar
+        shown = json.loads(subprocess.run(["node", "-e", APP_WORDING, str(ROOT / "web/app.js"), str(ROOT / "data/canonical.json")], input=json.dumps(strings), check=True, capture_output=True, text=True).stdout)
+        say = public_wording(self.data, load_copy_edits())
+        self.assertGreater(len(load_copy_edits()), 100)
+        for text, app in zip(research, shown): self.assertEqual(say(text), app, text)
+        for text, app in zip(sidecar, shown[len(research):]): self.assertEqual(text, app, "the app rewords this sidecar text; reword it at the source or pass it through public_wording")
+
+    def test_risk_statements_read_as_public_sentences(self):
+        self.assertIn("The evidence does not support comparing the $100M philanthropy pledge", self.pages["laude"])
+        self.assertNotIn("Do not compare the $100M", self.pages["laude"])
+        self.assertIn("The evidence does not support confusing pareto.ai with Pareto Securities", self.pages["pareto"])
+        say, changed = public_wording(self.data, load_copy_edits()), 0
+        for claim in self.data["claims"]:
+            if claim.get("subject") != "risks" or claim.get("status") != "supported": continue
+            self.assertIn(f"<tr><td>{html.escape(say(claim['statement']))}</td>", self.pages[claim["company_id"]], claim["id"])
+            changed += say(claim["statement"]) != claim["statement"]
+        self.assertGreater(changed, 10)
 
     def test_scale_leads_with_reported_revenue_not_the_unverified_run_rate(self):
         table, rest = self.pages["scale_ai"].split("<h3>Other reported figures, not used for comparison</h3>", 1)
