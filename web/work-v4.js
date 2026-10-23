@@ -390,7 +390,7 @@ const W4_SAFETY_SOURCES={
 };
 const W4_SAFETY_TIPS=[
   ['Never pay to get work or to get your earnings out. Real employers pay you.',['ftcJobs','ftcTasks','fbiHome']],
-  ['Ignore job offers you did not ask for that come by text or chat app. Find the job on the company’s own website and apply there.',['ftcTexts','fbiPosts','india']],
+  ['Ignore job offers you did not ask for that arrive by text or on apps such as WhatsApp or Telegram. Find the job on the company’s own website and apply there.',['ftcTexts','fbiPosts','india']],
   ['Share bank or tax details only after you are hired, and only on the company’s own site. Some platforms check your ID when you sign up. Do that on their site, never in a chat.',['fbiPosts','fbiData']],
   ['Never deposit a check from a new employer and send part of the money on. A bank can take weeks to spot a fake check, and then you must pay the money back.',['ftcJobs','ftcChecks']]
 ];
@@ -420,7 +420,7 @@ function w4NetworkSuggestions(shown){
 }
 function w4EmptyState(query,filters){
   if(!workRouteRows().length)return '<p class="w4-empty">No listings are available right now.</p>';
-  const queryAlone=query&&filters?workRouteRows().filter(route=>w4QueryMatcher(query).all(w4SearchText(route))).length:0;
+  const matcher=query&&filters?w4QueryMatcher(query):null,queryAlone=matcher?workRouteRows().filter(route=>matcher.all(w4SearchText(route))).length:0;
   const message=!query?'No listing matches these filters.':queryAlone?'No listing matches this search with these filters.':`No listing mentions “${w4Escape(query)}”. Try a broader word.`;
   return `<div class="w4-empty-state"><p class="w4-empty">${message}</p><p class="w4-empty-actions">${query?'<button type="button" data-work-clear="search">Clear search</button>':''}${filters?'<button type="button" data-work-clear="filters">Clear filters</button>':''}</p></div>`;
 }
