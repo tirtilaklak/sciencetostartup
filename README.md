@@ -27,6 +27,7 @@ internal reports, credentials, browser output and deployment configuration.
 - `scripts/build_public_snapshot.py`: build the approved public snapshot.
 - `dist/`: exact v31 HTML, assets, JSON/CSV exports and portable SQLite database.
 - `docs/research-id-crosswalk.json`: public profile aliases required by the builder.
+- `design-system/`, `scripts/design_system.py`: design system tokens and the build of its stylesheet; see `design-system/README.md`.
 
 ## View or reproduce
 
