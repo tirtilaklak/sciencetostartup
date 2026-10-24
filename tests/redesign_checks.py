@@ -143,7 +143,8 @@ def main():
     for route_id, labels in {
         'pareto.work.investment-analyst': ['Closed', 'Approx. $100 / approved hour'],
         'toloka.work.cad-simulation': ['Historical', 'Up to $69 / hour equivalent'],
-        'rws_trainai.work.polaris-asr': ['Availability unconfirmed', '$16 / hour'],
+        # The 19 Oct portal check closed this listing; its recorded rate must stay visible.
+        'rws_trainai.work.polaris-asr': ['Closed', '$16 / hour'],
         'afterquery.work.college-swe': ['Rate conflict'],
         'afterquery.work.technical-content-writer-contract': ['Initial commitment; may expand', 'Schedule conflict: header says full-time'],
         'abundant_ai.work.research-product-manager': ['Pay period not stated.'],
@@ -163,8 +164,10 @@ def main():
     assert next(m for m in scale_rows if m['company_id'] == 'surge_ai')['qualifier'] == 'greater_than'
     scale_tags = Elements(rendered['initial']['scale-visual']['html'])
     snapshots = scale_tags.with_attribute('data-snapshot-metric')
+    # The overview added micro1's headline pace (a company-stated figure, grade B).
     assert {attrs['data-snapshot-metric'] for _, attrs in snapshots} == {
-        'mercor.metric.oct14-major-financial-2', 'handshake_ai.metric.major-growth_metrics-0'}
+        'micro1.metric.oct14-q3-run-rate', 'mercor.metric.oct14-major-financial-2',
+        'handshake_ai.metric.major-growth_metrics-0'}
     assert len(scale_tags.with_attribute('data-story-metric')) == 2
     growth_expected = {
         'taskus': (135107000, 214218000, 'ai_data'),
@@ -213,7 +216,10 @@ def main():
     export = ROOT / 'dist/research.json'
     assert export.read_bytes() == canonical, 'Portable JSON changed'
     html = (ROOT / 'dist/index.html').read_text()
-    assert (ROOT / 'web/app.js').read_text() in html, 'Build is stale relative to dashboard JavaScript'
+    # The build moves the data and app scripts into content-hashed files under dist/js/.
+    bundles = json.loads(re.search(r'const files=(\[[^\]]*\])', html).group(1))
+    app_bundle = (ROOT / 'dist' / next(name for name in bundles if name.startswith('js/app.'))).read_text()
+    assert (ROOT / 'web/app.js').read_text() in app_bundle, 'Build is stale relative to dashboard JavaScript'
     assert (ROOT / 'web/style.css').read_text() in html, 'Build is stale relative to dashboard CSS'
     embedded = re.search(r'<script id="research-data" type="application/json">(.*?)</script>', html, re.S)
     assert embedded and json.loads(embedded.group(1)) == data

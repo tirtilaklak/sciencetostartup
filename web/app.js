@@ -277,7 +277,7 @@ const modelFor=id=>window.EDITORIAL?.entries.find(e=>e.company_id===id)?.summary
 // Navigation taxonomy is editorial grouping, not a maturity or quality score.
 const MODEL_GROUPS=Object.fromEntries(["Expert data & evaluation", "Managed AI & data services", "Frontier data & RL environments", "AI software & analytics", "AI evaluation & safety", "Compute & model research", "Nonprofit research"].map(name=>[name,(window.EDITORIAL?.entries||[]).filter(e=>e.primary_offering===name).map(e=>e.company_id)]));
 const modelGroup=id=>Object.entries(MODEL_GROUPS).find(([,ids])=>ids.includes(id))?.[0]||'Other';
-const WORK_TYPES={'Employment':'Employment roles','Expert & contractor projects':'Expert & contractor projects','Research fellowship':'Research fellowships','Contributor bounties':'Contributor bounties'};
+const WORK_TYPES={'Employment':'Jobs','Expert & contractor projects':'Contract and task work','Research fellowship':'Research fellowships','Contributor bounties':'Bounties for contributions'};
 const workClaims=id=>currentClaims(id).filter(c=>c.subject==='worker opportunities');
 function workRouteSummary(id){
  const rows=typeof workRoutesFor==='function'?workRoutesFor(id):[];
@@ -285,9 +285,9 @@ function workRouteSummary(id){
 }
 function workType(id){
  const {rows,primary,careers}=workRouteSummary(id);
- if(primary.length)return [...new Set(primary.map(r=>WORK_TYPES[r.group]||r.group||'Published work routes'))].join(' · ');
- if(careers.length)return 'Careers directory';
- return rows.length?'No current paid route verified':'Work route not reviewed';
+ if(primary.length)return [...new Set(primary.map(r=>WORK_TYPES[r.group]||r.group||'Paid work listings'))].join(' · ');
+ if(careers.length)return 'Career page only';
+ return rows.length?'No confirmed paid listing':'Paid work not reviewed yet';
 }
 const hasWorkRoute=id=>{const {primary,careers}=workRouteSummary(id);return Boolean(primary.length||careers.length);};
 const unknownFor=id=>currentClaims(id).filter(c=>c.subject==='unknowns').sort((a,b)=>Number(b.id.includes('audit'))-Number(a.id.includes('audit')))[0];
@@ -647,7 +647,7 @@ function repeatMainRoute(event){
  const sameView=['#companies','#compare'].includes(hash)&&'#'+String(routeParts()[0]||'').toLowerCase()===hash;
  if(!normalSelfLinkActivation(event,link)||(hash!==location.hash&&!sameView))return;
  const anchorId=viewAnchorId(hash);if(anchorId){event.preventDefault();showViewAnchor($(anchorId));return;}
- if(!['#market','#companies','#compare','#work','#outreach','#method'].includes(hash))return;
+ if(!['#market','#companies','#compare','#work','#method'].includes(hash))return;
  event.preventDefault();
  if(hash==='#companies')companyReturnFocus=null;
  if(hash==='#work'&&typeof workReturnFocus!=='undefined')workReturnFocus=null;

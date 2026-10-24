@@ -17,14 +17,21 @@ function snapshot(query,filters={}){
  const html=node('work-cards').innerHTML;
  return{ids:plain(run('filteredWork().map(route=>route.id)')),html:clean(html),
   beforeGroups:(html.split('<details class="work-route-archive-group w4-route-group"')[0].match(/data-work-route=/g)||[]).length,
-  more:html.includes('More listed routes'),
+  more:html.includes('More jobs and fellowships'),
   openGroups:(html.match(/<details class="work-route-archive-group w4-route-group"[^>]*\bopen\b/g)||[]).length,
+  groups:(html.match(/<details class="work-route-archive-group w4-route-group"/g)||[]).length,
   count:node('work-count').textContent,overview:node('work-overview').innerHTML};
 }
 const baseline=snapshot('');
 assert.equal(baseline.ids.length,135,'Review route-count coverage after a research update');
-assert.equal(baseline.beforeGroups,12,'Default work view must retain its compact preview');
-assert.equal(baseline.more,true,'Default work view lost its remaining-role disclosure');
+// The default view shows every contract listing, then six jobs (at most three per company).
+const preview=plain(run(`(()=>{const g=w4RouteGroups(filteredWork()),seen={};let jobs=0;
+ for(const route of g.jobs){const n=seen[route.company_id]||0;if(jobs<6&&n<3){jobs++;seen[route.company_id]=n+1;}}
+ return{contract:g.contract.length,jobs,allJobs:g.jobs.length};})()`));
+assert.ok(preview.contract>0&&preview.allJobs>6,'Fixture lost the contract or jobs listings the preview needs');
+assert.equal(preview.jobs,6,'Jobs preview should fill six cards from the current data');
+assert.equal(baseline.beforeGroups,preview.contract+preview.jobs,'Default work view must retain its compact preview');
+assert.equal(baseline.more,true,'Default work view lost its remaining-jobs disclosure');
 assert.equal(baseline.openGroups,0,'Default secondary groups should start collapsed');
 for(const query of whitespace)assert.deepEqual(snapshot(query),baseline,
  'Whitespace-only work search changed results or disclosure state: '+JSON.stringify(query));
@@ -34,6 +41,7 @@ for(const query of ['AfterQuery','Python','no-such-work-route-qqz']){
  const exact=snapshot(query),padded=snapshot(' \t'+query+'\n ');
  assert.deepEqual(padded,exact,'Padding changed a genuine search: '+query);
  assert.equal(exact.more,false,'An active search should reveal all matching primary roles');
+ assert.equal(exact.openGroups,exact.groups,'An active search should open every group that holds matches');
  if(query==='AfterQuery')assert.equal(exact.ids.length,45,'AfterQuery search coverage changed');
  if(query==='no-such-work-route-qqz')assert.equal(exact.ids.length,0,'Unknown query should remain empty');
  nonemptyCases++;
@@ -45,6 +53,7 @@ for(const filters of [{workGroup:'Employment'},{workPay:'numeric'},
  const filtered=snapshot('',filters);
  assert.ok(filtered.ids.length>0,'Filter intersection lost its fixture results');
  assert.equal(filtered.more,false,'A real filter should reveal matching primary roles');
+ assert.equal(filtered.openGroups,filtered.groups,'A real filter should open every group that holds matches');
  for(const query of whitespace)assert.deepEqual(snapshot(query,filters),filtered,
   'Whitespace bypassed or changed an active filter: '+JSON.stringify(filters));
  filterCases++;
