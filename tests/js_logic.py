@@ -23,13 +23,14 @@ const profileData=readJSON('data/profile-content.json'),afterqueryPath=path.join
 if(fs.existsSync(afterqueryPath))profileData.entries=profileData.entries.filter(entry=>entry.company_id!=='afterquery').concat(JSON.parse(fs.readFileSync(afterqueryPath,'utf8')));
 const window={scrollY:0,scrollTo(){},addEventListener(k,f){(windowCallbacks[k]??=[]).push(f)},EDITORIAL:readJSON('data/editorial.json'),LOGOS:readJSON('data/logo-provenance.json'),WORK_ROUTES:synthetic?{routes:[]}:readJSON('data/work-routes.json'),PROFILE_CONTENT:profileData,RESEARCH_ALIASES:readJSON('docs/research-id-crosswalk.json')};
 window.SOURCE_UPDATES=readJSON('data/source-updates.json');
+window.BUSINESS_HEALTH=synthetic?null:readJSON('data/business-health.json');
 const history={replaceState(state,title,hash){location.hash=hash;}};
 let downloadedBlob;
 class CaptureURL extends URL {static createObjectURL(blob){downloadedBlob=blob;return 'blob:test'}static revokeObjectURL(){}}
 const context=vm.createContext({document,window,history,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,Blob,queueMicrotask,setTimeout:()=>{},clearTimeout:()=>{},console});
 // The icon script runs first. This stub's window is separate from its global.
 // Combining the remaining modules matches declaration hoisting in the build.
-const modules=['web/icons.js','web/app.js','web/editorial.js','web/work-v3.js','web/work-v4.js','web/profiles-v2.js','web/source-updates.js'];
+const modules=['web/icons.js','web/app.js','web/editorial.js','web/work-v3.js','web/work-v4.js','web/profiles-v2.js','web/source-updates.js','web/business-health.js'];
 vm.runInContext(fs.readFileSync(path.join(root,modules[0]),'utf8'),context);
 context.iconHTML=window.iconHTML;
 assert.equal(typeof context.iconHTML,'function');

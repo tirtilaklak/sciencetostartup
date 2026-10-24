@@ -709,14 +709,17 @@ def build(data, destination):
     # Other datasets, including the pipeline fixtures, receive no replacements.
     source_updates = validate_source_updates(source_updates, data, profile_content) if data["dataset_version"] == SIDECAR_DATASET_VERSION else None
     injected = "window.EDITORIAL=" + json.dumps(editorial) + ";window.RESEARCH_ALIASES=" + (ROOT / "docs/research-id-crosswalk.json").read_text() + ";window.LOGOS=" + json.dumps(logo_data) + ";window.WORK_ROUTES=" + json.dumps(work_data) + ";window.PROFILE_CONTENT=" + json.dumps(profile_content) + ";window.LINK_HEALTH=" + json.dumps(link_health) + ";window.COMPANY_EVENTS=" + json.dumps(company_events) + ";"
-    injected += "window.SOURCE_UPDATES=" + json.dumps(source_updates) + ";"
+    from business_health import load_business_health
+    health_path = ROOT / "data/business-health.json"
+    health = load_business_health(health_path, data)
+    injected += "window.SOURCE_UPDATES=" + json.dumps(source_updates) + ";window.BUSINESS_HEALTH=" + json.dumps(health) + ";"
     html = html.replace("/* EDITORIAL_DATA */", injected.replace("<", "\\u003c").replace(">", "\\u003e"))
-    html = html.replace("/* REDESIGN_CSS */", (ROOT / "web/profiles-v2.css").read_text() + (ROOT / "web/work-v4.css").read_text() + (ROOT / "web/investor.css").read_text() + (ROOT / "web/edition.css").read_text())
+    html = html.replace("/* REDESIGN_CSS */", (ROOT / "web/profiles-v2.css").read_text() + (ROOT / "web/work-v4.css").read_text() + (ROOT / "web/investor.css").read_text() + (ROOT / "web/edition.css").read_text() + (ROOT / "web/business-health.css").read_text())
     html = html.replace("/* ICONS_CSS */", (ROOT / "web/icons.css").read_text())
     html = html.replace("/* ICONS_JS */", (ROOT / "web/icons.js").read_text())
     html = html.replace("/* EDITORIAL_JS */", (ROOT / "web/editorial.js").read_text())
     work_js = ROOT / "web/work-v3.js"
-    html = html.replace("/* WORK_V3_JS */", (work_js.read_text() if work_js.exists() else "") + (ROOT / "web/work-v4.js").read_text() + (ROOT / "web/profiles-v2.js").read_text() + (ROOT / "web/source-updates.js").read_text())
+    html = html.replace("/* WORK_V3_JS */", (work_js.read_text() if work_js.exists() else "") + (ROOT / "web/work-v4.js").read_text() + (ROOT / "web/profiles-v2.js").read_text() + (ROOT / "web/source-updates.js").read_text() + "\n" + (ROOT / "web/business-health.js").read_text())
     import shutil
     assets = ROOT / "web/assets"
     if assets.exists(): shutil.copytree(assets, destination / "assets", dirs_exist_ok=True)
@@ -724,6 +727,8 @@ def build(data, destination):
         shutil.copy2(ROOT / "web" / name, destination / name)
     for source in [ROOT / "data/editorial.json", ROOT / "data/portrait-provenance.json", ROOT / "data/investor-image-provenance.json", logo_path, work_path, link_health_path, events_path, source_updates_path]:
         if source.exists(): shutil.copy2(source, destination / source.name)
+    if health is not None:
+        (destination / "business-health.json").write_text(json.dumps(health, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
     (destination / "profile-content.json").write_text(json.dumps(profile_content, indent=2, ensure_ascii=False) + "\n")
     html = html.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{GROUP_COUNT}}", str(len({e["primary_offering"] for e in editorial["entries"]})))
     html = render_snapshot_metadata(html, data)

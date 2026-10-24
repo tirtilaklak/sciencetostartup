@@ -19,6 +19,7 @@ data/versions/*
 docs/*
 !docs/research-id-crosswalk.json
 !docs/pending-2.5.1-corrections.md
+!docs/business-health-dashboard.md
 *.tar
 *.tar.gz
 *.zip

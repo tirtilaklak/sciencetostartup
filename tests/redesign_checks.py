@@ -46,8 +46,7 @@ RUNTIME = r'''
  window.innerWidth=390;run('initialize()');
  const initial=Object.fromEntries(Object.entries(nodes).filter(([id])=>id!=='research-data').map(([id,n])=>[id,{html:n.innerHTML,text:n.textContent,hidden:n.hidden}]));
  const groups=run('MODEL_GROUPS');
- const scaleRows=typeof run('typeof storyScaleRows')==='string'&&run('typeof storyScaleRows')==='function'?run('storyScaleRows()'):null;
- const growth=run('STORY_GROWTH');
+ const healthObservations=plain(run('window.BusinessHealth.observations()'));
  const clearStates={initial:node('reset').hidden};
  for(const [key,value] of Object.entries({query:'Mercor',category:Object.keys(groups)[0],stage:'established_commercial_evidence',financial:true,work:true,sort:'name-desc'})){run(`reset();state[${JSON.stringify(key)}]=${JSON.stringify(value)};renderDirectory()`);clearStates[key]=node('reset').hidden;}run('reset()');clearStates.afterReset=node('reset').hidden;
  const workCards=Object.fromEntries(run('workRouteRows().map(r=>[r.id,workCard(r)])'));const workRoutes=plain(run('workRouteRows()'));
@@ -59,7 +58,7 @@ RUNTIME = r'''
  const lastPage={dataset:{mobileCompare:'2'},hasAttribute:()=>false};click(lastPage);const lastMobileComparison=node('compare-content').innerHTML;const preservedSelection=run('state.selected');run('setSelection([])');
  node('download-json').callbacks.click();const jsonDownload=JSON.parse(await downloadedBlob.text());const jsonFilename=node('created').download;
  run('exportCsv()');const csvDownload=await downloadedBlob.text();const csvFilename=node('created').download;
- console.log(JSON.stringify({initial,groups,scaleRows,growth,clearStates,workCards,workRoutes,search,resetCount,categoryCounts,reverseNames,selection,comparison,lastMobileComparison,preservedSelection,jsonDownloadMatches:JSON.stringify(jsonDownload)===JSON.stringify(data),jsonFilename,csvDownload,csvFilename}));
+ console.log(JSON.stringify({initial,groups,healthObservations,clearStates,workCards,workRoutes,search,resetCount,categoryCounts,reverseNames,selection,comparison,lastMobileComparison,preservedSelection,jsonDownloadMatches:JSON.stringify(jsonDownload)===JSON.stringify(data),jsonFilename,csvDownload,csvFilename}));
 })().catch(error=>{console.error(error);process.exitCode=1});
 '''
 
@@ -75,7 +74,8 @@ def main():
     template = (ROOT / 'web/index.html').read_text()
     tags = Elements(template)
     findings = tags.with_attribute('data-story-finding')
-    assert len(findings) == 3, f'Expected three story findings, saw {len(findings)}'
+    assert any(a.get('id') == 'business-health' for _, a in tags.elements), 'Business health dashboard missing'
+    assert {a['data-story-finding'] for _, a in findings} == {'products'}, 'Obsolete financial stories remain'
     assert any(a.get('id') == 'companies-view' for _, a in tags.elements), 'Separate directory route missing'
     assert len(re.findall(r'<h1\b', template.split('id="market-view"', 1)[1].split('id="companies-view"', 1)[0])) == 1, 'Overview must have one headline'
     assert 'company-cards' not in template.split('id="market-view"', 1)[1].split('id="companies-view"', 1)[0], 'Verbose directory must not be part of overview'
@@ -113,11 +113,10 @@ def main():
     assert all(not rendered['clearStates'][key] for key in ('query', 'category', 'stage', 'financial', 'work', 'sort')), 'Clear must appear for an active query, filter or descending sort'
     assert not any(x in directory for x in ['class="unknown"', 'class="evidence-markers"', 'class="card-context"']), 'Old verbose layers remain in directory'
     assert '[object Object]' not in initial_html
-    # The sole overview axis compares completed FY2024 USD revenue. Annualized
-    # snapshots have separate labels and no quantitative shared scale.
-    metric_index = {m['id']: m for m in data['metrics']}
+    # The business-health observations have independently tested provenance and
+    # comparison rules in test_business_health.py. Preserve the rest of the
+    # directory, source, work, comparison and portable-data regression checks.
     claim_index = {c['id']: c for c in data['claims']}
-    source_index = {s['id']: s for s in data['sources']}
     # v2.0.1 used one prose-derived card per company. The current reviewed
     # route bundle has 135 individually dated records, including closed routes.
     # Retain pay/source coverage checks against those records instead of the
@@ -143,6 +142,8 @@ def main():
     for route_id, labels in {
         'pareto.work.investment-analyst': ['Closed', 'Approx. $100 / approved hour'],
         'toloka.work.cad-simulation': ['Historical', 'Up to $69 / hour equivalent'],
+        # The existing 19 October route update marked the portal listing closed;
+        # the original 12 October pay observation remains visible as history.
         'rws_trainai.work.polaris-asr': ['Closed', '$16 / hour'],
         'afterquery.work.college-swe': ['Rate conflict'],
         'afterquery.work.technical-content-writer-contract': ['Initial commitment; may expand', 'Schedule conflict: header says full-time'],
@@ -151,50 +152,8 @@ def main():
         'toloka.work.mindrift-code': ['hour equivalent', 'Paid per completed task'],
     }.items():
         assert all(label in visible_work[route_id] for label in labels), route_id + ': visible pay/status qualifier lost'
-    scale_rows = rendered['scaleRows']
-    assert {m['company_id'] for m in scale_rows} == {'surge_ai', 'scale_ai'}
-    assert len(scale_rows) == 2
-    for metric in scale_rows:
-        assert metric == metric_index[metric['id']]
-        assert metric['kind'] == 'revenue' and metric['currency'] == 'USD'
-        assert metric['gross_vs_net'] == 'unspecified' and '2024' in metric['as_of']
-        assert metric.get('observation_status', 'reported') == 'reported'
-        assert claim_index[metric['claim_id']]['status'] == 'supported'
-    assert next(m for m in scale_rows if m['company_id'] == 'surge_ai')['qualifier'] == 'greater_than'
-    scale_tags = Elements(rendered['initial']['scale-visual']['html'])
-    snapshots = scale_tags.with_attribute('data-snapshot-metric')
-    assert {attrs['data-snapshot-metric'] for _, attrs in snapshots} == {
-        'mercor.metric.major-growth_metrics-0', 'handshake_ai.metric.major-growth_metrics-0'}
-    assert len(scale_tags.with_attribute('data-story-metric')) == 2
-    growth_expected = {
-        'taskus': (135107000, 214218000, 'ai_data'),
-        'appen': (234300000, 230800000, 'company'),
-    }
-    # October 14/15 source reconciliation rebound the FY2025 figures to
-    # supported primary-source claims graded B; FY2024 claims remain A.
-    # Pin those exact grades rather than upgrading the research to satisfy
-    # the old assertion. Filing support, amounts and scopes stay mandatory.
-    growth_confidence = {
-        'taskus.metric.expansion-3': 'A', 'taskus.metric.expansion-2': 'B',
-        'appen.metric.major-financial_metrics-1': 'A',
-        'appen.metric.major-financial_metrics-2': 'B',
-    }
-    assert {g['id'] for g in rendered['growth']} == set(growth_expected)
-    for group in rendered['growth']:
-        before, after = [metric_index[mid] for mid in group['ids']]
-        old, new, scope = growth_expected[group['id']]
-        assert (before['value'], after['value']) == (old, new)
-        assert before['segment_scope'] == after['segment_scope'] == scope
-        assert '2024' in before['as_of'] and '2025' in after['as_of']
-        rendered_growth = next(attrs for _, attrs in Elements(rendered['initial']['growth-visual']['html']).with_attribute('data-growth-company') if attrs['data-growth-company'] == group['id'])
-        assert abs(float(rendered_growth['data-growth-exact']) - (new / old - 1) * 100) < 0.0001
-        for metric in (before, after):
-            assert metric['kind'] == 'revenue' and metric['currency'] == 'USD'
-            assert metric['period_type'] == 'annual'
-            claim = claim_index[metric['claim_id']]
-            assert claim['confidence'] == growth_confidence[metric['id']] and claim['status'] == 'supported'
-            assert any(source_index[s]['source_type'] == 'filing' for s in claim['source_ids'])
-            assert f'data-claim="{metric["claim_id"]}"' in rendered['initial']['growth-visual']['html']
+    assert rendered['healthObservations'], 'Business-health research does not reach the delivered runtime'
+    assert not any(key in rendered['initial'] for key in ('scale-visual', 'growth-visual')), 'Removed story renderer still runs'
     assert rendered['search'] == ['mercor'] and rendered['resetCount'] == 39
     assert rendered['categoryCounts'] == rendered['groups'] or all(set(rendered['categoryCounts'][k]) == set(v) for k, v in rendered['groups'].items())
     assert rendered['reverseNames'][0] == sorted([c['name'] for c in data['companies']], key=str.casefold, reverse=True)[0]
@@ -224,7 +183,7 @@ def main():
     manifest = json.loads((ROOT / 'dist/manifest.json').read_text())
     for name, expected in manifest['sha256'].items():
         assert hashlib.sha256((ROOT / 'dist' / name).read_bytes()).hexdigest() == expected, name
-    print(json.dumps({'audited_dataset_version': PINNED_VERSION, 'canonical_sha256': PINNED_SHA256, 'html_sha256': hashlib.sha256((ROOT / 'dist/index.html').read_bytes()).hexdigest(), 'canonical_unchanged': True, 'story_findings': len(findings), 'model_groups': 7, 'categorized_companies': len(map_ids), 'company_cards': len(rows), 'conditional_clear': 'passed', 'visible_work_summaries': len(visible_work), 'same_year_scale_observations': len(scale_rows), 'audited_growth_series': len(rendered['growth']), 'search_filters_compare_download_handlers': 'passed', 'portable_data_integrity': 'passed', 'browser_rendering_verified': False}, indent=2))
+    print(json.dumps({'audited_dataset_version': PINNED_VERSION, 'canonical_sha256': PINNED_SHA256, 'html_sha256': hashlib.sha256((ROOT / 'dist/index.html').read_bytes()).hexdigest(), 'canonical_unchanged': True, 'business_health_observations': len(rendered['healthObservations']), 'model_groups': 7, 'categorized_companies': len(map_ids), 'company_cards': len(rows), 'conditional_clear': 'passed', 'visible_work_summaries': len(visible_work), 'search_filters_compare_download_handlers': 'passed', 'portable_data_integrity': 'passed', 'browser_rendering_verified': False}, indent=2))
 
 
 if __name__ == '__main__':
