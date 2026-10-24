@@ -25,6 +25,9 @@ WIRED = ("field", "field-border", "green-dark", "tray", "tray-border", "logo-dar
 # White also paints other things, so on-green replaces it only in rules that set text on a green fill.
 ON_GREEN_RULES = (".button-primary", "#compare-tray a", "#compare-tray .quiet")
 HEX = re.compile(r"#([0-9a-fA-F]{3,8})(?![0-9a-fA-F])")
+COMMENT = re.compile(r"/\*.*?\*/", re.S)
+DECLARATION = re.compile(r"(?<![\w-])--([\w-]+)\s*:")
+VAR_USE = re.compile(r"var\(\s*--([\w-]+)")
 
 
 def normal_hex(text):
@@ -50,28 +53,52 @@ def token_values(tokens):
     return values
 
 
+def blank_comments(css):
+    """Comments become spaces of the same length, so positions still match the source."""
+    return COMMENT.sub(lambda match: " " * len(match.group()), css)
+
+
 def lift_root(css, names):
-    """Remove top-level :root declarations of token names; return the CSS and what was lifted."""
-    lifted, out, depth, i = [], [], 0, 0
-    while i < len(css):
-        if depth == 0 and css.startswith(":root{", i):
-            end = css.index("}", i)
-            keep = []
-            for declaration in filter(str.strip, css[i + 6:end].split(";")):
-                name, _, value = declaration.partition(":")
-                name = name.strip()
-                if name.startswith("--") and name[2:] in names:
-                    lifted.append((name[2:], value.strip()))
-                else:
-                    keep.append(declaration.strip())
-            if keep:
-                out.append(":root{" + ";".join(keep) + "}")
-            i = end + 1
-            continue
-        depth += {"{": 1, "}": -1}.get(css[i], 0)
-        out.append(css[i])
+    """Lift token declarations out of top-level rules whose whole selector is :root.
+
+    Returns the remaining CSS, the lifted (name, value, position) triples and problems.
+    """
+    plain = blank_comments(css)
+    lifted, problems, out = [], [], []
+    depth, rule_start, copied, i = 0, 0, 0, 0
+    while i < len(plain):
+        char = plain[i]
+        if char == "{" and depth == 0:
+            selector = plain[rule_start:i].strip()
+            close = plain.find("}", i)
+            body = plain[i + 1:close]
+            declares = [m.group(1) for m in DECLARATION.finditer(body) if m.group(1) in names]
+            if selector == ":root" and close != -1 and "{" not in body:
+                keep = []
+                for part in re.finditer(r"[^;]+", body):
+                    name, sep, value = part.group().partition(":")
+                    if sep and name.strip().startswith("--") and name.strip()[2:] in names:
+                        at = i + 1 + part.start() + len(part.group()) - len(part.group().lstrip())
+                        lifted.append((name.strip()[2:], value.strip(), at))
+                    elif part.group().strip():
+                        keep.append(css[i + 1 + part.start():i + 1 + part.end()].strip())
+                begin = rule_start + len(plain[rule_start:i]) - len(plain[rule_start:i].lstrip())
+                out.append(css[copied:begin])
+                if keep:
+                    out.append(css[begin:i + 1] + ";".join(keep) + "}")
+                copied = rule_start = i = close + 1
+                continue
+            if declares and (":root" in selector or re.search(r"(?<![\w-])html(?![\w-])", selector)):
+                problems.append(f"'{selector}' declares --{declares[0]}; only a rule whose whole selector is :root can be lifted")
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+        if depth == 0 and char in "};":
+            rule_start = i + 1
         i += 1
-    return "".join(out), lifted
+    out.append(css[copied:])
+    return "".join(out), lifted, problems
 
 
 def build(tokens=None, web=ROOT / "web"):
@@ -79,21 +106,37 @@ def build(tokens=None, web=ROOT / "web"):
     tokens = tokens or json.loads(TOKENS.read_text())
     values = token_values(tokens)
     shadows = {entry["name"]: entry["value"] for entry in tokens.get("shadow", {}).get("tokens", [])}
-    problems, parts, lifted = [], [], []
-    for name in CASCADE:
-        css, found = lift_root((web / name).read_text(), set(values))
-        lifted += found
+    problems, parts, lifted, declared, used = [], [], [], [], set()
+    for index, name in enumerate(CASCADE):
+        source = (web / name).read_text()
+        css, found, issues = lift_root(source, set(values))
+        lifted += [(token, value, (index, at)) for token, value, at in found]
+        problems += [f"web/{name}: {issue}" for issue in issues]
+        plain = blank_comments(source)
+        declared += [(m.group(1), (index, m.start())) for m in DECLARATION.finditer(plain)]
+        used |= {m.group(1) for m in VAR_USE.finditer(plain)}
         parts.append(f"/* ---- web/{name} ---- */\n{css.strip()}\n")
     stripped = "\n".join(parts)
 
-    final = dict(lifted)  # the last declaration wins, as in the cascade
+    final = {token: value for token, value, _ in lifted}  # the last declaration wins, as in the cascade
     for name, value in final.items():
         if normal_hex(value.lower()) != normal_hex(values[name].lower()):
             problems.append(f"--{name}: tokens.json has {values[name]}, the stylesheet ends at {value}")
+    # tokens.css loads first, so a lifted value must stay the last word on its variable.
+    last = {}
+    for token, _, at in lifted:
+        last[token] = max(last.get(token, at), at)
+    lifted_at = {(token, at) for token, _, at in lifted}
+    for token, at in declared:
+        if token in last and (token, at) not in lifted_at and at < last[token]:
+            problems.append(f"--{token}: web/{CASCADE[at[0]]} declares it before its last top-level :root value; lifting would let that earlier declaration win")
+    # The site must declare every token it reads; tokens.css would supply a value the site lacks.
+    for token in sorted(used & set(values) - {token for token, _ in declared}):
+        problems.append(f"var(--{token}) is used in web/ but the site never declares --{token}")
 
     css = stripped
     for name in WIRED + tuple(shadows) + ("on-green",):
-        if f"var(--{name})" in css:
+        if re.search(r"var\(\s*--" + re.escape(name) + r"(?![\w-])", css):
             problems.append(f"var(--{name}) already appears in web/; wiring would be ambiguous")
     for name in WIRED:
         pattern = re.compile(re.escape(values[name]) + r"(?![0-9a-fA-F])", re.I)
@@ -101,9 +144,10 @@ def build(tokens=None, web=ROOT / "web"):
         if not count:
             problems.append(f"{name}: {values[name]} no longer appears in web/; update tokens.json")
     for name, value in shadows.items():
-        if value not in css:
+        pattern = re.compile(r"(?<![\w#.-])" + re.escape(value) + r"(?![0-9a-fA-F\w])")
+        css, count = pattern.subn(f"var(--{name})", css)
+        if not count:
             problems.append(f"{name}: '{value}' no longer appears in web/; update tokens.json")
-        css = css.replace(value, f"var(--{name})")
     for selector in ON_GREEN_RULES:
         rule = re.compile(r"((?:^|[}\n,])" + re.escape(selector) + r"\{[^}]*?(?<![-\w])color:)#fff(?![0-9a-fA-F])", re.I)
         css, count = rule.subn(r"\1var(--on-green)", css)
