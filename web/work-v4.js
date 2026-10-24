@@ -10,6 +10,8 @@ function w4SourcePublicationDate(source){
   const recorded=[source.published_on,source.source_publication_date,source.published_at].find(value=>value&&value!=='undated');
   return recorded||(typeof sources!=='undefined'?sources[source.id]?.published_on:null);
 }
+// Some check notes begin with the raw result code (public_page_live); the note reads on without it.
+function w4CheckNote(check){const note=String(check?.note||'');return check?.result&&note.startsWith(check.result+' ')?note.slice(check.result.length+1):note;}
 function w4Checked(route){return [route.availability_checked_on,route.last_route_check?.date].filter(Boolean).sort().at(-1)||null;}
 function w4CheckedLabel(route){const checked=w4Checked(route);return checked?w4Date(checked):'Not yet checked';}
 function w4Uncertain(route){
@@ -218,7 +220,7 @@ function w4Details(route){
       <p class="w4-source-dates"><span>Terms recorded: ${w4Escape(w4Date(route.as_of))}</span><span>Checked: ${w4Escape(w4CheckedLabel(route))}</span></p>
       ${sourceRows.length?`<ul>${sourceRows.map(s=>`<li>${w4SourceLink(s.url,s.title||s.publisher||'Source')}<small>Published ${w4Escape(w4Date(w4SourcePublicationDate(s)))}${s.accessed_on?` · Read ${w4Escape(w4Date(s.accessed_on))}`:''}</small></li>`).join('')}</ul>`:''}
       ${route.source_quote?`<blockquote>${w4Escape(route.source_quote)}</blockquote>`:''}
-      ${route.last_route_check?.note?`<details class="w4-source-notes"><summary>Availability check</summary><p>${w4Escape(route.last_route_check.note)}</p></details>`:''}
+      ${route.last_route_check?.note?`<details class="w4-source-notes"><summary>Availability check</summary><p>${w4Escape(w4CheckNote(route.last_route_check))}</p></details>`:''}
       ${route.claim_ids?.length?`<div class="w4-evidence-links">${w4ClaimAccess(route.claim_ids)}</div>`:''}
     </div>
     ${typeof compareCheck==='function'?`<div class="w4-compare">${compareCheck(route.company_id)}</div>`:''}
