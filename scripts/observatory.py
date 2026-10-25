@@ -18,6 +18,10 @@ from schema_def import SCHEMA, TABLES
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIDENCE = {"U": 0, "C": 1, "B": 2, "A": 3}
+# The dataset release that the reviewed sidecars (work routes, source updates, company events) were checked against.
+# Any other dataset, including the pipeline fixtures, gets structural checks only, no source updates and no events.
+# Change it once per release, together with the new dataset, after rechecking the sidecars.
+SIDECAR_DATASET_VERSION = "2.5.0"
 
 class ValidationError(ValueError): pass
 
@@ -49,6 +53,64 @@ def validate_link_health(data):
         require(entry["url"] not in seen, "link-health: duplicate public URL")
         seen.add(entry["url"])
     return data
+
+EVENT_FIELDS = {"id", "company_id", "related_company_ids", "kind", "date", "date_basis", "title", "detail", "status", "status_checked_on", "sources"}
+EVENT_SOURCE_FIELDS = {"url", "title", "publisher", "published_on", "source_type"}
+# Markup, C0 and C1 controls, line and paragraph separators, and bidirectional marks, embeddings, overrides and isolates.
+UNSAFE_EVENT_TEXT = re.compile(r"[<>\x00-\x1f\x7f-\x9f\u200e\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069]")
+
+def validate_company_events(events, data):
+    """Dated public events reviewed after the pinned dataset. Lawsuit rows describe allegations and filings, not findings."""
+    require(isinstance(events, dict) and set(events) == {"version", "reviewed_on", "note", "events"}, "company-events: root must hold exactly version, reviewed_on, note and events")
+    require(events["version"] == "1.0.0" and isinstance(events["events"], list), "company-events: unsupported version, or events is not a list")
+    def checked_date(value, label, month=False):
+        require(isinstance(value, str) and re.fullmatch(r"[0-9]{4}-[0-9]{2}" + (r"(?:-[0-9]{2})?" if month else r"-[0-9]{2}"), value), f"{label} must be YYYY-MM-DD" + (" or YYYY-MM" if month else ""))
+        try: date.fromisoformat(value if len(value) == 10 else value + "-01")
+        except ValueError: raise ValidationError(f"{label} is not a calendar date")
+        return value
+    def text(value, label, limit=None):
+        require(isinstance(value, str) and value.strip(), f"{label} must be non-empty text")
+        require(not UNSAFE_EVENT_TEXT.search(value), f"{label} must be plain text without < > or control characters")
+        require(limit is None or len(value) <= limit, f"{label} is longer than {limit} characters")
+    reviewed_on = checked_date(events["reviewed_on"], "company-events: reviewed_on")
+    text(events["note"], "company-events: note")
+    companies = {row["id"] for row in data["companies"]}
+    seen = set()
+    for event in events["events"]:
+        require(isinstance(event, dict) and set(event) == EVENT_FIELDS, "company-events: each event must hold exactly " + ", ".join(sorted(EVENT_FIELDS)))
+        require(isinstance(event["id"], str) and re.fullmatch(r"[a-z0-9_]+\.event\.[a-z0-9-]+", event["id"]), f"company-events: invalid event id {event['id']!r}")
+        require(event["id"] not in seen, f"company-events: duplicate event id {event['id']}")
+        seen.add(event["id"])
+        where = "company-events: " + event["id"]
+        require(isinstance(event["company_id"], str) and event["company_id"] in companies, f"{where}: unknown company_id {event['company_id']!r}")
+        require(event["id"].startswith(event["company_id"] + ".event."), f"{where}: event id must start with its company_id")
+        require(isinstance(event["related_company_ids"], list) and all(isinstance(value, str) and value in companies for value in event["related_company_ids"]), f"{where}: related_company_ids must list known company IDs")
+        require(event["company_id"] not in event["related_company_ids"] and len(set(event["related_company_ids"])) == len(event["related_company_ids"]), f"{where}: related_company_ids must not repeat the company or each other")
+        require(event["kind"] in ("lawsuit", "data_incident", "customer_change", "workforce_change", "filing"), f"{where}: unsupported kind {event['kind']!r}")
+        require(checked_date(event["date"], f"{where}: date", month=True) <= reviewed_on, f"{where}: date is after reviewed_on")
+        require(event["date_basis"] in ("filed", "reported", "published", "announced"), f"{where}: unsupported date_basis {event['date_basis']!r}")
+        text(event["title"], f"{where}: title", 110)
+        text(event["detail"], f"{where}: detail", 320)
+        text(event["status"], f"{where}: status", 40)
+        require(checked_date(event["status_checked_on"], f"{where}: status_checked_on") <= reviewed_on, f"{where}: status_checked_on is after reviewed_on")
+        require(isinstance(event["sources"], list) and event["sources"], f"{where}: sources must be a non-empty list")
+        for source in event["sources"]:
+            require(isinstance(source, dict) and set(source) == EVENT_SOURCE_FIELDS, f"{where}: each source must hold exactly " + ", ".join(sorted(EVENT_SOURCE_FIELDS)))
+            text(source["title"], f"{where}: source title")
+            text(source["publisher"], f"{where}: source publisher")
+            require(source["source_type"] in ("court_record", "filing", "company", "news"), f"{where}: unsupported source_type {source['source_type']!r}")
+            if source["published_on"] is not None: require(checked_date(source["published_on"], f"{where}: source published_on") <= reviewed_on, f"{where}: source published_on is after reviewed_on")
+            unsafe = f"{where}: source url must be https with a hostname and no credentials"
+            require(isinstance(source["url"], str) and not re.search(r"[\s\x00-\x1f\x7f]", source["url"]), unsafe)
+            try: url = urlsplit(source["url"]); url.port
+            except ValueError: raise ValidationError(unsafe)
+            require(url.scheme == "https" and url.hostname and url.username is None and url.password is None, unsafe)
+    return events
+
+def load_company_events(path, data):
+    """Events were reviewed against SIDECAR_DATASET_VERSION; other datasets, including the pipeline fixtures, receive none."""
+    if not path.exists() or data["dataset_version"] != SIDECAR_DATASET_VERSION: return {"version": "1.0.0", "events": []}
+    return validate_company_events(json.loads(path.read_text()), data)
 
 def validate_shape(value, spec, path="$",):
     """Small strict validator for the deliberately limited vocabulary in schema_def."""
@@ -290,7 +352,7 @@ def render_snapshot_metadata(html, data):
     return html.replace("{{SNAPSHOT_LABEL}}", label).replace("{{DATASET_VERSION}}", data["dataset_version"])
 
 STATIC_DOWNLOAD_FILES = {
-    "INVESTOR": ("assets/Investor_Snapshot_Human_Depth.png", "PNG"),
+    "INVESTOR": ("assets/Investor_Snapshot_Human_Depth_v2.png", "PNG"),
     "SQLITE": ("observatory.sqlite", "SQLite"),
     "WORK": ("work-routes.json", "JSON"),
     "PROFILES": ("profile-content.json", "JSON"),
@@ -557,7 +619,7 @@ def validate_work_routes(work, data):
     # This sidecar includes later reviewed overlays for the current snapshot.
     # Other selected versions and synthetic fixtures keep structural checks only.
     # The selected dataset, never sidecar metadata, controls reference checks.
-    current = data["dataset_version"] == "2.5.0"
+    current = data["dataset_version"] == SIDECAR_DATASET_VERSION
     rows = work.get("routes")
     require(isinstance(rows, list) and (rows or not current), "work-routes: reviewed routes missing")
     companies = {row["id"] for row in data["companies"]}
@@ -634,6 +696,8 @@ def build(data, destination):
     logo_data = json.loads(logo_path.read_text()) if logo_path.exists() else {"logos": []}
     link_health_path = ROOT / "data/link-health.json"
     link_health = validate_link_health(json.loads(link_health_path.read_text()) if link_health_path.exists() else {"version": "1.0.0", "entries": []})
+    events_path = ROOT / "data/company-events.json"
+    company_events = load_company_events(events_path, data)
     profile_content = json.loads((ROOT / "data/profile-content.json").read_text())
     afterquery_content = ROOT / "data/profile-afterquery.json"
     if afterquery_content.exists():
@@ -643,8 +707,8 @@ def build(data, destination):
     source_updates = json.loads(source_updates_path.read_text())
     # The actual dataset selects validation; sidecar metadata cannot disable it.
     # Other datasets, including the pipeline fixtures, receive no replacements.
-    source_updates = validate_source_updates(source_updates, data, profile_content) if data["dataset_version"] == "2.5.0" else None
-    injected = "window.EDITORIAL=" + json.dumps(editorial) + ";window.RESEARCH_ALIASES=" + (ROOT / "docs/research-id-crosswalk.json").read_text() + ";window.LOGOS=" + json.dumps(logo_data) + ";window.WORK_ROUTES=" + json.dumps(work_data) + ";window.PROFILE_CONTENT=" + json.dumps(profile_content) + ";window.LINK_HEALTH=" + json.dumps(link_health) + ";"
+    source_updates = validate_source_updates(source_updates, data, profile_content) if data["dataset_version"] == SIDECAR_DATASET_VERSION else None
+    injected = "window.EDITORIAL=" + json.dumps(editorial) + ";window.RESEARCH_ALIASES=" + (ROOT / "docs/research-id-crosswalk.json").read_text() + ";window.LOGOS=" + json.dumps(logo_data) + ";window.WORK_ROUTES=" + json.dumps(work_data) + ";window.PROFILE_CONTENT=" + json.dumps(profile_content) + ";window.LINK_HEALTH=" + json.dumps(link_health) + ";window.COMPANY_EVENTS=" + json.dumps(company_events) + ";"
     from business_health import load_business_health
     health_path = ROOT / "data/business-health.json"
     health = load_business_health(health_path, data)
@@ -659,9 +723,9 @@ def build(data, destination):
     import shutil
     assets = ROOT / "web/assets"
     if assets.exists(): shutil.copytree(assets, destination / "assets", dirs_exist_ok=True)
-    for name in ("robots.txt", "sitemap.xml", "404.html", "_headers", "_redirects"):
+    for name in ("robots.txt", "sitemap.xml", "404.html", "_headers", "_redirects", "favicon.ico"):
         shutil.copy2(ROOT / "web" / name, destination / name)
-    for source in [ROOT / "data/editorial.json", ROOT / "data/portrait-provenance.json", ROOT / "data/investor-image-provenance.json", logo_path, work_path, link_health_path, source_updates_path]:
+    for source in [ROOT / "data/editorial.json", ROOT / "data/portrait-provenance.json", ROOT / "data/investor-image-provenance.json", logo_path, work_path, link_health_path, events_path, source_updates_path]:
         if source.exists(): shutil.copy2(source, destination / source.name)
     if health is not None:
         (destination / "business-health.json").write_text(json.dumps(health, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
@@ -670,7 +734,7 @@ def build(data, destination):
     html = render_snapshot_metadata(html, data)
     html = render_static_file_metadata(html, destination)
     (destination / "index.html").write_text(html)
-    from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial)
+    from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, company_events, link_health)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}
     (destination / "manifest.json").write_text(json.dumps({"dataset_version": data["dataset_version"], "schema_version": data["schema_version"], "sha256": files}, indent=2) + "\n")
 

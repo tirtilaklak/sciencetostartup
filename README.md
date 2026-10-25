@@ -21,6 +21,7 @@ internal reports, credentials, browser output and deployment configuration.
 - `web/`: editable HTML, CSS, JavaScript and local assets.
 - `data/canonical.json`: authoritative research dataset 2.5.0.
 - `data/work-routes.json`: curated Work routes, including reviewed additions and availability checks.
+- `data/company-events.json`: dated lawsuits, incidents, customer and workforce changes and filings, reviewed after dataset 2.5.0.
 - Other `data/*.json`: public profiles, editorial context and source updates.
 - `schema/`: data and relational contracts.
 - `scripts/observatory.py`, `scripts/schema_def.py`: research and export builder.
@@ -31,8 +32,8 @@ internal reports, credentials, browser output and deployment configuration.
 
 ## View or reproduce
 
-Python's standard library is sufficient for the snapshot build. Node.js is used
-by some optional logic checks. No hosted database, API key or npm install is
+Python's standard library is sufficient for the snapshot build. Node.js runs
+the logic checks. No hosted database, API key or npm install is
 required to view or build the dashboard.
 
 ```sh
@@ -41,9 +42,11 @@ python3 scripts/build_public_snapshot.py --verify
 python3 scripts/build_public_snapshot.py --output build/public-snapshot
 ```
 
-`--verify` builds in a temporary directory and checks every payload against the
-checked-in public release manifest. Normal output must use an empty directory;
-the command preserves the reviewed `dist/` files.
+`--verify` builds in a temporary directory and requires it to match
+`dist/manifest.json` byte for byte. It then hashes every file in `dist/` against
+that manifest and fails on any changed, extra or missing file, so `dist/` holds
+exactly what the builder produces. Normal output must use an empty directory;
+the command never writes to `dist/`.
 
 The original `observatory.py build` command is a research-release operation. It
 requires the exact original raw research files, which are deliberately excluded
@@ -51,16 +54,28 @@ from this public repository. The public snapshot wrapper calls the same
 validated `build()` function without changing or weakening that release check.
 It reproduces an approved snapshot; it does not attest to a new research release.
 
-The included standalone Python unit modules can be run with:
+CI runs the same checks on pushes to `main` and on pull requests:
 
 ```sh
 python3 -m unittest discover -s tests -p 'test_*.py'
+python3 scripts/build_public_snapshot.py --verify
 python3 tests/js_logic.py
 python3 tests/company_search_prefix_logic.py
+python3 tests/redesign_checks.py
+python3 tests/revision_app_logic.py
+python3 tests/revision_work_logic.py
+python3 tests/work_route_summary_logic.py
+python3 tests/reliability_copy_context_logic.py
+python3 tests/reliability_failure_state_logic.py
+python3 tests/risk_section_logic.py
 ```
 
-The snapshot includes standalone unit tests and public logic checks. Historical
-comparison tests and local audit reports remain in the research repository.
+The 105 unit tests cover the pipeline, the build, static pages, company events,
+the business health data, Work routes, link health and a privacy scan of the
+published text files and database. The nine logic checks run the page scripts
+in Node against a DOM stub; they are not browser proof.
+Historical comparison tests and local audit reports remain in the research
+repository.
 
 ## Hosting
 
@@ -84,3 +99,26 @@ The recommended north star is gross profit from repeat paying customers.
 See [dashboard definitions and evidence limits](docs/business-health-dashboard.md).
 The underlying research remains dataset v2.5.0; the October 23 dashboard curation
 does not imply all source material was freshly verified.
+
+## Owner steps
+
+1. Analytics. Create a GoatCounter site with the code `sciencetostartup`. Set
+   the `sts-analytics` meta content in `web/index.html` to
+   `https://sciencetostartup.goatcounter.com/count`, then rebuild and deploy.
+   The static company pages pick up the same setting at build time. While
+   the content is empty, nothing loads and nothing is counted.
+2. Search. Verify the domain in Google Search Console and Bing Webmaster Tools,
+   and submit `https://sciencetostartup.com/sitemap.xml` in each.
+3. Dataset corrections. Corrections that need a new dataset version are listed
+   in `docs/pending-2.5.1-corrections.md`. Release them from the research
+   repository; this repository pins dataset 2.5.0.
+4. Deploying. Build into an empty directory, replace `dist/` with it, run the
+   checks above and commit. Then deploy `dist/` to the `sciencetostartup`
+   Worker, staging it without `_redirects` as described under Hosting.
+   Pushing to GitHub does not deploy.
+
+   ```sh
+   python3 scripts/build_public_snapshot.py --output build/release
+   rm -rf dist && mv build/release dist
+   python3 scripts/build_public_snapshot.py --verify
+   ```

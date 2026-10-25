@@ -2,12 +2,16 @@
 import json
 import math
 
+from observatory import SIDECAR_DATASET_VERSION
+
 SIGNALS = {'revenue', 'profit', 'customers', 'delivery', 'cash'}
 
 
 def load_business_health(path, data):
-    # Fixtures and future research versions must never inherit this curated layer.
-    if data['dataset_version'] != '2.5.0':
+    # Fixtures and other research versions must never inherit this curated layer. After a
+    # SIDECAR_DATASET_VERSION bump the source_dataset_version check below fails loudly until
+    # the dashboard is rebaselined, instead of the dashboard silently disappearing.
+    if data['dataset_version'] != SIDECAR_DATASET_VERSION:
         return None
     health = json.loads(path.read_text())
     if health.get('source_dataset_version') != data['dataset_version']:

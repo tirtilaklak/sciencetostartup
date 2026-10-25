@@ -16,9 +16,16 @@ jobs:
           node-version: "22"
       - name: Unit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py'
-      - name: Public snapshot reproduces the checked-in dist
+      - name: Checked-in dist matches a fresh build, file for file
         run: python3 scripts/build_public_snapshot.py --verify
-      - name: JS logic checks
+      - name: Logic checks
         run: |
           python3 tests/js_logic.py
           python3 tests/company_search_prefix_logic.py
+          python3 tests/redesign_checks.py
+          python3 tests/revision_app_logic.py
+          python3 tests/revision_work_logic.py
+          python3 tests/work_route_summary_logic.py
+          python3 tests/reliability_copy_context_logic.py
+          python3 tests/reliability_failure_state_logic.py
+          python3 tests/risk_section_logic.py
