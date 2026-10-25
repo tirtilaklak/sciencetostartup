@@ -35,6 +35,7 @@ internal reports, credentials, browser output and deployment configuration.
   `companies/`, `work/`, `method/`, `404.html`), assets, JSON/CSV exports and
   a portable SQLite database.
 - `docs/research-id-crosswalk.json`: public profile aliases required by the builder.
+- `design-system/`, `scripts/design_system.py`: design system tokens and the build of its stylesheet; see `design-system/README.md`.
 
 ## How the page is built
 
