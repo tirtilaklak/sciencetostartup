@@ -27,7 +27,7 @@ window.BUSINESS_HEALTH=synthetic?null:readJSON('data/business-health.json');
 const history={replaceState(state,title,hash){location.hash=hash;}};
 let downloadedBlob;
 class CaptureURL extends URL {static createObjectURL(blob){downloadedBlob=blob;return 'blob:test'}static revokeObjectURL(){}}
-const context=vm.createContext({document,window,history,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,Blob,queueMicrotask,setTimeout:()=>{},console});
+const context=vm.createContext({document,window,history,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,Blob,queueMicrotask,setTimeout:()=>{},clearTimeout:()=>{},console});
 // The icon script runs first. This stub's window is separate from its global.
 // Combining the remaining modules matches declaration hoisting in the build.
 const modules=['web/icons.js','web/app.js','web/editorial.js','web/work-v3.js','web/work-v4.js','web/profiles-v2.js','web/source-updates.js','web/business-health.js'];
@@ -176,6 +176,24 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  node('compare-preset').value='work';node('compare-preset').callbacks.change({target:node('compare-preset')});assert.deepEqual(plain(run('state.selected')),['surge_ai','toloka','labelbox']);assert.ok(boxes.filter(b=>b.dataset.compare==='surge_ai').every(b=>b.checked));
  run('setSelection([])');assert.equal((node('compare-content').innerHTML.match(/data-mobile-compare=/g)||[]).length,3);assert.ok(node('compare-content').innerHTML.includes('TaskUs + Appen'));assert.ok(node('compare-content').innerHTML.includes('data-mobile-compare="2"'));click(button({mobileCompare:'1'}));assert.equal(run('state.mobileCompare'),1,'Default example must reach final company');
  assert.ok(/data-comparison-company="scale_ai" class=""/.test(node('compare-content').innerHTML));run('setSelection([])');
+
+ // Routes ignore hash queries and letter case, land on in-page sections and carry the comparison.
+ for(const [hash,view] of [['#work?utm_source=x','work'],['#venture','market'],['#about','method']]){location.hash=hash;run('route()');assert.equal(node(view+'-view').hidden,false,hash);assert.equal(location.hash,hash,hash+' must stay linkable');}
+ location.hash='#market';run('route()');assert.equal(run('document.title'),'Overview · ScienceToStartup');
+ // A plain view link after #venture or #about starts at the top of that view, even though the view is unchanged.
+ const scrolls=[];window.scrollTo=options=>scrolls.push(options);
+ for(const [section,next] of [['#venture','#market'],['#about','#method']]){location.hash=section;run('route()');scrolls.length=0;location.hash=next;run('route()');assert.deepEqual(scrolls.map(options=>options.top),[0],section+' then '+next+' must scroll to the top');}
+ window.scrollTo=()=>{};location.hash='#market';run('route()');
+ location.hash='#company/Scale_AI/WORK';run('route()');assert.ok(node('profile-view').innerHTML.includes('data-profile-pane="work">'),'Section case must not hide the Paid work tab');
+ assert.equal(location.hash,'#company/scale_ai/work','Mixed-case company links are rewritten to their canonical form');run(`activateProfileTab('traction')`);assert.equal(location.hash,'#company/scale_ai/traction','Profile tabs work after a mixed-case link');
+ location.hash='#compare/mercor,Handshake_AI,unknown,mercor';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai']);assert.equal(location.hash,'#compare/mercor,handshake_ai');
+ run(`chooseCompare('appen',true)`);assert.equal(location.hash,'#compare/mercor,handshake_ai,appen');
+ location.hash='#compare/junk,nope';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai','appen'],'A compare link naming no known company keeps the selection');assert.equal(location.hash,'#compare/mercor,handshake_ai,appen');run('setSelection([])');assert.equal(location.hash,'#compare');location.hash='#market';run('route()');
+
+ // Curated profile headings render as text.
+ const headed=curated.find(entry=>entry.traction_heading),heading=headed.traction_heading;headed.traction_heading='<b>x</b>';
+ const tractionHeading=run(`profileHTML(${JSON.stringify(headed.company_id)})`).match(/data-profile-section="traction"><h2>([\s\S]*?)<\/h2>/)[1];headed.traction_heading=heading;
+ assert.equal(tractionHeading,'&lt;b&gt;x&lt;/b&gt;');assert.ok(!tractionHeading.includes('<'),'Profile heading h2 must have no element children');
 
  // Role routes, pay units and availability remain separate, with no company pay band.
  const routes=window.WORK_ROUTES.routes;assert.equal(run('filteredWork().length'),routes.length);

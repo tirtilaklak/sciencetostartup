@@ -4,57 +4,67 @@
     {
       "url": "https://blog.abundant.ai/",
       "status": "not_found",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
     },
     {
       "url": "https://blog.abundant.ai/frontier-models-caught-cheating",
       "status": "not_found",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
     },
     {
       "url": "https://bouncingcosmology.net/team.html",
       "status": "not_found",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
     },
     {
       "url": "https://docs.google.com/document/d/1H0tKd3zVlMQEp3965eMyNPA5z54ymF9l6zl1NMF30eA/edit?tab=t.z8d9spr0il0x",
       "status": "sign_in",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
     },
     {
       "url": "https://hello.datacurve.ai/derrick",
       "status": "not_found",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
+    },
+    {
+      "url": "https://help.labelbox.com/en/articles/13600616-alignerr-payment-faqs",
+      "status": "gone",
+      "checked_on": "2026-10-23"
     },
     {
       "url": "https://innovation.ox.ac.uk/wp-content/uploads/2017/03/170301-Prolific-PR-FINAL.pdf",
       "status": "not_found",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
+    },
+    {
+      "url": "https://jobs.ashbyhq.com/elorian-ai-inc/69acef27-d755-4b22-8257-94759edb0efb",
+      "status": "not_found",
+      "checked_on": "2026-10-23"
     },
     {
       "url": "https://math.bogazici.edu.tr/en/hakan-karakus",
       "status": "not_found",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
     },
     {
       "url": "https://math.bogazici.edu.tr/sites/math.boun.edu.tr/files/cv_4.pdf",
       "status": "not_found",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
     },
     {
       "url": "https://math.bogazici.edu.tr/sites/math.boun.edu.tr/files/muhammedulvi_26.12.2022_cv_0.pdf",
       "status": "not_found",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
     },
     {
       "url": "https://math.bogazici.edu.tr/tr/muhammed-ikbal-ulvi",
       "status": "not_found",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
     },
     {
       "url": "https://teeming.ai/c/refresh-ai/ba5945f8-e46e-4fe3-b8b3-ef91757ed7ec",
       "status": "gone",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
     },
     {
       "url": "https://users.cms.caltech.edu/~venkatc/alck_posetmarkovcapacity_preprint.pdf",
@@ -64,12 +74,22 @@
     {
       "url": "https://www.its.caltech.edu/~jlim/CV.pdf",
       "status": "not_found",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
+    },
+    {
+      "url": "https://www.leilajanahfoundation.org/about",
+      "status": "not_found",
+      "checked_on": "2026-10-23"
+    },
+    {
+      "url": "https://www.leilajanahfoundation.org/rememberingleila",
+      "status": "not_found",
+      "checked_on": "2026-10-23"
     },
     {
       "url": "https://www.math.ucla.edu/~oak/docs/teaching/170E_20F/170E_20F_W1_typed_discussion_notes.pdf",
       "status": "not_found",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-10-23"
     }
   ]
 }

@@ -170,8 +170,7 @@ dl.bh-fact dd{font-size:11px;margin:0}
  .bh-metric-tab strong{font-size:14px}
  .bh-metric-tab>.question,.bh-metric-tab>.bh-question{font-size:11px;line-height:1.5}
  .bh-controls{padding:15px;gap:12px}
- .bh-controls>label,.bh-subcontrols>label{flex:1 1 calc(50% - 8px);max-width:none;font-size:11px}
- .bh-controls select,.bh-controls input:not([type=checkbox]),.bh-subcontrols select{font-size:12px;min-height:42px}
+ .bh-controls>label,.bh-subcontrols>label{flex:1 1 100%;max-width:none;font-size:11px}
  .bh-controls label:has(input[type=checkbox]){min-height:42px;flex-basis:100%}
  .bh-chart-main{padding:20px 13px 17px}
  .bh-chart-header{gap:10px;margin-bottom:14px;padding-inline:2px}
@@ -212,11 +211,11 @@ dl.bh-fact dd{font-size:11px;margin:0}
  .bh-note,.bh-context,.bh-warning{font-size:12px}
  .bh-empty{padding:20px 5px;font-size:12px;min-height:130px}
 }
+@media(max-width:700px){#business-health select,#business-health input[type=search]{font-size:16px;min-height:44px}}
 @media(max-width:360px){
  .bh-row-name{font-size:11px}
  .bh-row-value{font-size:13px}
  .bh-plot-row{column-gap:7px;grid-template-columns:minmax(84px,1fr) minmax(25px,.7fr) minmax(60px,.65fr)}
- .bh-controls>label{flex-basis:100%}
 }
 @media(prefers-reduced-motion:reduce){.bh-metric-tab{transition:none}.bh-metric-tabs{scroll-behavior:auto}}
 @media(forced-colors:active){
@@ -239,7 +238,6 @@ dl.bh-fact dd{font-size:11px;margin:0}
 .bh-plot-group+.bh-plot-group,.bh-history-group+.bh-history-group{border-top:1px solid var(--bh-line);margin-top:20px;padding-top:8px}
 .bh-row-track{position:relative;overflow:visible}
 .bh-row-bar{position:absolute;top:0;min-width:2px}
-.bh-row-bar.is-bound:after{content:'›';position:absolute;right:-6px;top:-10px;font-size:22px;font-weight:500;color:var(--bh-green)}
 .bh-matrix small{display:block;color:var(--muted);font-size:10px;font-weight:400;line-height:1.6;margin-top:4px}
 .bh-matrix-cell{display:block;width:100%;text-align:left;border:0;background:transparent;padding:0;min-height:48px;border-radius:0}
 .bh-matrix-cell:hover{background:var(--bh-soft)}
@@ -251,7 +249,6 @@ dl.bh-fact dd{font-size:11px;margin:0}
 .bh-history-points{display:flex;flex-wrap:wrap;gap:4px 16px}
 .bh-history-points button{font-size:11px;min-height:36px}
 .bh-estimator .bh-controls{padding:0;border:0}
-#bh-panel{scroll-margin-top:90px}
 .bh-matrix-section .bh-heading>label{display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:6px;min-width:200px}
 @media(max-width:800px){.bh-northstar{grid-template-columns:1fr}.bh-northstar>.bh-note{grid-column:1}.bh-metric-tabs{scroll-snap-type:x mandatory}.bh-metric-tab{scroll-snap-align:start}#bh-question{padding:16px 14px 0}.bh-svg-axis{font-size:12px}.bh-svg-value{font-size:13px}}
 @media(max-width:600px){.bh-metric-tabs{grid-template-columns:repeat(5,minmax(154px,1fr))}.bh-metric-tab{min-height:146px}.bh-metric-tab>.coverage{font-size:10px;line-height:1.5}.bh-northstar>div>strong{font-size:22px}.bh-matrix-section .bh-heading>label{margin-top:16px}}

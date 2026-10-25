@@ -23,7 +23,7 @@ for(const row of workLabels){
   for(const group of new Set(row.primary.map(route=>route.group)))assert.ok(row.label.includes(run(`WORK_TYPES[${JSON.stringify(group)}]`)||group||'Published work routes'),row.id+' missing retained route type '+group);
  }else assert.equal(row.label,row.careers.length?'Careers directory':'No current paid route verified',row.id+' unsupported current route label');
 }
-assert.equal(run('workType("apto")'),'Employment roles');
+assert.equal(run('workType("apto")'),'Employment roles · Expert & contractor projects');
 assert.equal(run('workType("elorian")'),'No current paid route verified');
 assert.equal(run('hasWorkRoute("elorian")'),false);
 assert.equal(run('workType("taskus")'),'Careers directory');
