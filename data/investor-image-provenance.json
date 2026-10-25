@@ -4,8 +4,8 @@
   "mime_type": "image/png",
   "width": 1672,
   "height": 941,
-  "file_size_bytes": 2270776,
-  "sha256": "5d30e90b27c4e998fd92a906990c53caae010d39a12780773d31877855a7b72c",
+  "file_size_bytes": 2282337,
+  "sha256": "a09b433ebb2418c2791fe64de7f4348c9987da8c3fefda04bcce07645e71fd02",
   "source": {
     "type": "user_approved_library_asset",
     "library_file_id": "libfile_bd98e896bf4c8191a962d48a373396a5",
@@ -20,14 +20,28 @@
     "file_size_bytes": 2537604,
     "sha256": "c84869ef05fd9727d3e0d4705211126d102d7d101751364de394af7ad5130ab0"
   },
-  "edit": {
-    "edited_on": "2026-10-23",
-    "change": "Removed the bottom figure band: three figures with their captions, the two dividers and the gold rule above them.",
-    "method": "The cleared area was repainted with background texture sampled from the same image. Pixels outside the cleared area are unchanged.",
-    "reason": "The figures were superseded or had no source record.",
-    "crop": "none",
-    "resize": "none"
-  },
+  "edits": [
+    {
+      "edited_on": "2026-10-23",
+      "change": "Removed the bottom figure band: three figures with their captions, the two dividers and the gold rule above them.",
+      "method": "The cleared area was repainted with background texture sampled from the same image. Pixels outside the cleared area were unchanged.",
+      "reason": "The figures were superseded or had no source record.",
+      "result_file_size_bytes": 2270776,
+      "result_sha256": "5d30e90b27c4e998fd92a906990c53caae010d39a12780773d31877855a7b72c",
+      "crop": "none",
+      "resize": "none"
+    },
+    {
+      "edited_on": "2026-10-25",
+      "change": "Moved the left text block 100 px down: the headline, the gold rule under it, OUR ALPHA THESIS, the thesis lines and the medalists line. The block now sits centred between the header line and the bottom line.",
+      "method": "The block moved with its own background. The clean background it now covers moved up into the vacated rows, so the new area is real texture from the same image. The joins follow minimum-difference cuts with narrow blends and a smooth level match. No flat fills were used. The end of the headline, the letter y and the full stop, overlapped Jung's ear. Those glyphs were lifted out with their outline and moved with the line. The ear under them was filled from the surrounding ear tone and grain.",
+      "unchanged": "The header line, the bottom line and the portraits. On the portrait side, only the small area under the old and new position of the headline's last glyphs changed.",
+      "reason": "Removing the figure band left an empty band of about 259 px under the text, so the image was top-heavy.",
+      "input_sha256": "5d30e90b27c4e998fd92a906990c53caae010d39a12780773d31877855a7b72c",
+      "crop": "none",
+      "resize": "none"
+    }
+  ],
   "presentation": {
     "placement": "Homepage venture section (#venture)",
     "accessible_text": "Concise alternative text and a complete image transcript",
@@ -58,8 +72,8 @@
       "mime_type": "image/jpeg",
       "width": 1672,
       "height": 941,
-      "file_size_bytes": 270260,
-      "sha256": "cd4966bf03b68d804e720923097de40054e5272d365a4f464e94ca82096f7ad8",
+      "file_size_bytes": 269271,
+      "sha256": "5388c3e56f6228bef6d7948cc83e51184427d7cdcf2f7d9ea7f7625b12c6cff7",
       "encoding": "Progressive JPEG, quality 85, 4:2:0",
       "purpose": "Fallback for browsers without WebP."
     },
@@ -68,8 +82,8 @@
       "mime_type": "image/webp",
       "width": 1672,
       "height": 941,
-      "file_size_bytes": 166560,
-      "sha256": "88fca34424472d03f66c4422134b1380adf64de05f38afeb07bc4de169517f2f",
+      "file_size_bytes": 166952,
+      "sha256": "ee6d2d6f3382b98a239d0bd0e12dd250946e515d7b67c217762f2a0285d47669",
       "encoding": "Lossy WebP, quality 82",
       "purpose": "Inline display at full width."
     },
@@ -78,8 +92,8 @@
       "mime_type": "image/webp",
       "width": 1000,
       "height": 563,
-      "file_size_bytes": 72476,
-      "sha256": "0b2a43df4159bf4687be045b3aa7521f48c1371888e4d036bffa6a41a1e891d8",
+      "file_size_bytes": 72360,
+      "sha256": "aed2849fb56ca7cb20f5a34f9a76378d8d1e6c36bdb62b6dfdf2c95ada0dab53",
       "encoding": "Lossy WebP, quality 82, Lanczos downscale",
       "purpose": "Inline display on narrow screens."
     }
