@@ -24,10 +24,12 @@
 .bh-workbench{border:1px solid var(--bh-line);background:var(--bh-paper)}
 .bh-controls{display:flex;flex-wrap:wrap;align-items:end;gap:13px 18px;padding:18px 22px;border-bottom:1px solid var(--bh-line)}
 .bh-controls>label,.bh-subcontrols>label{display:flex;flex-direction:column;flex:1 1 150px;min-width:0;max-width:250px;gap:6px;color:var(--muted);font-size:11px;font-weight:500}
-.bh-controls select,.bh-controls input:not([type=checkbox]),.bh-subcontrols select,.bh-subcontrols input:not([type=checkbox]){width:100%;min-width:0;min-height:40px;font-size:12px;background:var(--bh-paper);border:1px solid #7d8b80;padding:8px 28px 8px 10px;border-radius:2px}
+.bh-controls select,.bh-controls input:not([type=checkbox]),.bh-subcontrols select,.bh-subcontrols input:not([type=checkbox]){width:100%;min-width:0;min-height:40px;font-size:12px;background:var(--bh-paper);border:1px solid #7d8b80;padding:8px 10px;border-radius:2px}
 .bh-controls label:has(input[type=checkbox]),.bh-subcontrols label:has(input[type=checkbox]){flex:0 1 auto;max-width:none;flex-direction:row;align-items:center;gap:8px;min-height:40px;font-size:12px}
 .bh-controls input[type=checkbox],.bh-subcontrols input[type=checkbox]{width:17px;height:17px;min-height:17px;accent-color:var(--bh-green);flex:0 0 17px}
 .bh-subcontrols{display:flex;flex-wrap:wrap;align-items:end;gap:10px 16px}
+/* Each control starts wide enough for every current option and never drops below its own longest one, so rows wrap instead of clipping and stay put as options change. At full width the first row fills, keeping the last control under the first. */
+@media(min-width:701px){.bh-workbench>.bh-controls>label{flex:1 0 282px;min-width:fit-content;max-width:100%}.bh-workbench>.bh-controls>label:last-child{flex-grow:0}#bh-cohort-label{flex-basis:584px}}
 .bh-chart-area{display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,.43fr);align-items:stretch;min-width:0}
 .bh-chart-main{min-width:0;padding:24px 22px 20px}
 .bh-chart-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:start;gap:10px 18px;margin-bottom:18px}
@@ -211,7 +213,7 @@ dl.bh-fact dd{font-size:11px;margin:0}
  .bh-note,.bh-context,.bh-warning{font-size:12px}
  .bh-empty{padding:20px 5px;font-size:12px;min-height:130px}
 }
-@media(max-width:700px){#business-health select,#business-health input[type=search]{font-size:16px;min-height:44px}}
+@media(max-width:700px){#business-health select,#business-health input[type=search]{font-size:16px;min-height:44px}.bh-workbench>.bh-controls>label{flex:1 1 100%;max-width:none}}
 @media(max-width:360px){
  .bh-row-name{font-size:11px}
  .bh-row-value{font-size:13px}
@@ -249,6 +251,8 @@ dl.bh-fact dd{font-size:11px;margin:0}
 .bh-history-points{display:flex;flex-wrap:wrap;gap:4px 16px}
 .bh-history-points button{font-size:11px;min-height:36px}
 .bh-estimator .bh-controls{padding:0;border:0}
-.bh-matrix-section .bh-heading>label{display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:6px;min-width:200px}
+.bh-estimator .bh-controls>label:has(#bh-estimate-company){flex-basis:100%;max-width:none}
+#bh-estimate-company{max-width:780px}
+.bh-matrix-section .bh-heading>label{display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:6px;min-width:min(100%,300px)}
 @media(max-width:800px){.bh-northstar{grid-template-columns:1fr}.bh-northstar>.bh-note{grid-column:1}.bh-metric-tabs{scroll-snap-type:x mandatory}.bh-metric-tab{scroll-snap-align:start}#bh-question{padding:16px 14px 0}.bh-svg-axis{font-size:12px}.bh-svg-value{font-size:13px}}
 @media(max-width:600px){.bh-metric-tabs{grid-template-columns:repeat(5,minmax(154px,1fr))}.bh-metric-tab{min-height:146px}.bh-metric-tab>.coverage{font-size:10px;line-height:1.5}.bh-northstar>div>strong{font-size:22px}.bh-matrix-section .bh-heading>label{margin-top:16px}}

@@ -245,6 +245,24 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  const labelboxMixed=data.funding_rounds.find(r=>r.id==='labelbox.round.oct14-equity');assert.equal(labelboxMixed.capital_type,'mixed');assert.equal(labelboxMixed.amount_basis,'undisclosed');assert.equal(labelboxMixed.qualifier,'greater_than');assert.equal(labelboxMixed.include_in_total,false);assert.equal(data.funding_rounds.find(r=>r.id==='labelbox.round.oct14-credit').parent_round_id,labelboxMixed.id);assert.ok(run(`profileCapital('labelbox')`).includes('Pre-money valuation'));const selectedLabelbox=data.funding_rounds.filter(r=>r.company_id==='labelbox'&&r.include_in_disclosed_primary_sum);assert.ok(selectedLabelbox.every(r=>r.qualifier==='exact'&&r.capital_type==='equity'));
  assert.ok(run(`disclosedPrimarySummary('labelbox')`).includes(run(`metricValue({value:${selectedLabelbox.reduce((n,r)=>n+r.amount,0)},unit:'currency',currency:'USD',qualifier:'exact'})`)));
 
+ // A closed revenue input reads company · value · period · a short scope; its title keeps the full period and scope.
+ const bh=window.BusinessHealth,health=window.BUSINESS_HEALTH.observations,observation=id=>health.find(o=>o.id===id),escaped=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const mercorHalf=observation('mercor.metric.major-growth_metrics-1'),mercorPace=observation('mercor.metric.oct14-major-financial-2');
+ assert.equal(bh.estimateLabel(mercorHalf),'Mercor · $614M · '+mercorHalf.period.label+' · AI business');
+ assert.equal(bh.estimateLabel(mercorPace),'Mercor · $2B annualized · '+mercorPace.period.label+' · Whole company');
+ assert.equal(bh.estimateLabel(mercorHalf,true),'Mercor · $614M · '+mercorHalf.period.label+' · '+mercorHalf.scope_label);
+ const rwsSegment=health.find(o=>o.company_id==='rws_trainai'&&o.scope==='other_segment'&&o.measure==='period_revenue');
+ assert.equal(bh.estimateLabel(rwsSegment),'RWS / TrainAI · '+bh.valueText(rwsSegment)+' · '+rwsSegment.period.label.split(' · ')[0]+' · Other segment','A fiscal period drops the month range that restates it');
+ const estimateOptions=[...node('bh-estimate-company').innerHTML.matchAll(/<option value="([^"]*)" title="([^"]*)">([^<]*)<\/option>/g)];
+ assert.ok(estimateOptions.length>2);assert.equal(new Set(estimateOptions.map(m=>m[3])).size,estimateOptions.length,'Every revenue input must read differently when closed');
+ for(const [,id,title,text] of estimateOptions){
+  const o=observation(id);assert.ok(o,'Unknown revenue input '+id);
+  assert.equal(text,escaped(bh.estimateLabel(o)));assert.equal(title,escaped(bh.estimateLabel(o,true)));
+  assert.ok(!/service line|mixed segment/.test(text),'Closed revenue input keeps the scope short: '+text);
+ }
+ const hostileInput=bh.estimateOption({...mercorHalf,id:'x"><b>',period:{...mercorHalf.period,label:'<i>"P"</i>'},scope:'unlisted',scope_label:"<s>'S'</s>"});
+ assert.ok(!/<(?:b|i|s)>/.test(hostileInput)&&hostileInput.includes('&lt;i&gt;&quot;P&quot;&lt;/i&gt;')&&hostileInput.includes('&lt;s&gt;&#39;S&#39;&lt;/s&gt;'),'Revenue input options escape every field');
+
  // Download handlers preserve the complete canonical object and numerical bounds.
  node('download-json').callbacks.click();assert.deepEqual(JSON.parse(await downloadedBlob.text()),data);
  run('exportCsv()');const csv=await downloadedBlob.text(),header=csv.split('\r\n')[0];
@@ -254,7 +272,7 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  assert.equal(csv.split('\r\n').filter(Boolean).length,40);
  checkSvgControls(node('company-cards').innerHTML,'company cards');checkSvgControls(node('compare-content').innerHTML,'comparison');
  assert.ok(svgControlsChecked>0,'No shared SVG controls rendered');
- console.log(JSON.stringify({status:presentationFailures.length?'failed':'passed',presentation_failures:presentationFailures,entities:39,modules_loaded:modules,curated_profiles_checked:curated.length,afterquery_overlay_and_source_links:true,afterquery_exact_leadership:true,afterquery_distinct_relationship_roles:true,afterquery_performance_attribution:true,curated_products_checked:curatedProducts,relationship_names_checked:relationshipsChecked,shared_svg_controls_checked:svgControlsChecked,visible_typed_records_checked:referenced,source_records_checked:data.sources.length,work_routes_checked:routes.length,unique_primary_groups:7,editorial_primary_alignment:39,frontier_primary_and_secondary_software_regressions:true,canonical_json_download:true,csv_bounds_and_scope:true,current_and_historical_financial_semantics:true,browser_rendering_verified:false}));
+ console.log(JSON.stringify({status:presentationFailures.length?'failed':'passed',presentation_failures:presentationFailures,entities:39,modules_loaded:modules,curated_profiles_checked:curated.length,afterquery_overlay_and_source_links:true,afterquery_exact_leadership:true,afterquery_distinct_relationship_roles:true,afterquery_performance_attribution:true,curated_products_checked:curatedProducts,relationship_names_checked:relationshipsChecked,shared_svg_controls_checked:svgControlsChecked,visible_typed_records_checked:referenced,source_records_checked:data.sources.length,work_routes_checked:routes.length,unique_primary_groups:7,editorial_primary_alignment:39,frontier_primary_and_secondary_software_regressions:true,canonical_json_download:true,csv_bounds_and_scope:true,current_and_historical_financial_semantics:true,estimator_option_text:true,browser_rendering_verified:false}));
  assert.equal(presentationFailures.length,0,'Presentation checks failed; see the JSON report above.');
 })().catch(error=>{console.error(error);process.exitCode=1});
 function readJSONFrom(file){return JSON.parse(fs.readFileSync(file,'utf8'));}
