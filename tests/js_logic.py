@@ -260,6 +260,10 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
   assert.equal(text,escaped(bh.estimateLabel(o)));assert.equal(title,escaped(bh.estimateLabel(o,true)));
   assert.ok(!/service line|mixed segment/.test(text),'Closed revenue input keeps the scope short: '+text);
  }
+ // A panel heading ends with the card's accounting label, or with the scope when no accounting basis applies (head counts, customer counts).
+ for(const o of health){const parts=o.cohort.split(' · '),basis=bh.basisLabel(o);assert.equal(parts.at(-1),basis||o.scope_label,o.id);if(basis)assert.equal(parts.at(-2),o.scope_label,o.id);assert.ok(/^[A-Z0-9]/.test(o.cohort)&&!/_/.test(basis),o.id);}
+ assert.equal(bh.basisLabel(observation('taskus.metric.expansion-14')),'Company-defined NRR');assert.equal(bh.basisLabel(mercorPace),'Gross before delivery payouts');
+ assert.equal(bh.basisLabel(health.find(o=>o.measure==='team_size')),'');assert.equal(bh.basisLabel(health.find(o=>o.measure==='revenue_growth_yoy'&&o.accounting_basis==='unspecified')),'Gross/net undisclosed');
  const hostileInput=bh.estimateOption({...mercorHalf,id:'x"><b>',period:{...mercorHalf.period,label:'<i>"P"</i>'},scope:'unlisted',scope_label:"<s>'S'</s>"});
  assert.ok(!/<(?:b|i|s)>/.test(hostileInput)&&hostileInput.includes('&lt;i&gt;&quot;P&quot;&lt;/i&gt;')&&hostileInput.includes('&lt;s&gt;&#39;S&#39;&lt;/s&gt;'),'Revenue input options escape every field');
 
