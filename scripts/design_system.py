@@ -17,7 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TOKENS = ROOT / "design-system/tokens.json"
 # The order scripts/observatory.py inlines these into index.html; later rules win.
-CASCADE = ("style.css", "profiles-v2.css", "work-v4.css", "investor.css", "edition.css", "icons.css")
+CASCADE = ("style.css", "profiles-v2.css", "work-v4.css", "investor.css", "edition.css", "business-health.css", "icons.css")
 # Literal colours wired to tokens. Every live use of each value shares the token's role.
 WIRED = ("field", "field-border", "green-dark", "tray", "tray-border", "logo-dark", "hover", "wash",
          "band", "band-group", "band-rule", "rule-strong", "track", "bar-compare", "figure-rule",

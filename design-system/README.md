@@ -30,7 +30,7 @@ The build writes three files:
 - `project/tokens.json`: the tokens, stamped with the current branch and commit.
 - `project/components/bundle.css`: the site's live stylesheet in build order
   (`style.css`, `profiles-v2.css`, `work-v4.css`, `investor.css`, `edition.css`,
-  `icons.css`). Root colour variables move into the tokens. 22 literal colours,
+  `business-health.css`, `icons.css`). Root colour variables move into the tokens. 22 literal colours,
   white text on green fills and 5 shadows read as `var(--name)`.
 - `tokens.css`: the tokens as CSS custom properties plus a class per type style,
   for pages outside the artifact. Load it before `bundle.css`.
