@@ -8,6 +8,7 @@ import copy
 import hashlib
 import json
 import math
+import re
 import subprocess
 import sys
 import tempfile
@@ -200,6 +201,43 @@ console.log(JSON.stringify({observations:observations.length,filtering:true,cont
             result = subprocess.run(["node", str(script), str(ROOT / "data/canonical.json"), str(ROOT)], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(result.stdout)["observations"], len(self.observations))
+
+    def test_reader_facing_wording_has_no_record_dumps_or_reviewer_notes(self):
+        # Cards already show scope, period and accounting basis as fields, and sources link
+        # through source_ids. Prose must not repeat record fields, raw identifiers, bare URLs
+        # or research-team instructions. Methodology names JSON fields on purpose and is exempt.
+        patterns = {
+            "bare URL": r"https?://|www\.",
+            "joined sentences": r"\.;",
+            "record-field tail": r"(?i)\b(?:segment scope|scope|original period/date|revenue/accounting basis|source type|original value|kind|label|id|value|qualifier|unit|currency|period start|period end|reported vs estimated|gross vs net|is arr|as of|observation status|remove fields|measurement date|employment type|countries(?: qualifier)?|research label):",
+            "raw identifier": r"\b[a-z0-9]+(?:_[a-z0-9]+)+\b",
+            "reviewer instruction": r"(?i)(?:^|[.;:]\s+)(?:do not|don't|never|keep|retain|exclude|avoid|remove|treat)\b|\b(?:should|must) not\b",
+            "space before punctuation": r" [.,;]",
+            "trailing whitespace": r"[ \t]+$",
+        }
+        texts = [(row["id"] + "." + field, row[field]) for row in self.observations
+                 for field in ("label", "basis", "limitations", "original_text", "normalization", "evidence_assurance") if row.get(field)]
+        texts += [("north_star." + key, self.health["north_star"][key]) for key in ("label", "definition", "why", "limitation")]
+        texts += [("signal." + row["id"] + "." + key, row[key]) for row in self.health["signals"] for key in ("label", "question", "ideal_measure", "interpretation", "limitations")]
+        texts += [("measure." + row["id"] + "." + key, row[key]) for row in self.health["measure_definitions"] for key in ("label", "note")]
+        texts.append(("source_checks.notes", self.health["source_checks"]["notes"]))
+        for where, text in texts:
+            for name, pattern in patterns.items():
+                with self.subTest(text=where, pattern=name):
+                    self.assertNotRegex(text, re.compile(pattern, re.M))
+        for row in self.observations:
+            with self.subTest(label=row["id"]):
+                name = self.companies[row["company_id"]]["name"]
+                self.assertTrue(not row["label"][:1].islower() or row["label"].startswith(name), "Labels are card headings, not identifiers")
+        mercor = next(row for row in self.observations if row["id"] == "mercor.metric.oct14-major-financial-2")
+        self.assertIn("Sacra estimates the gross basis", mercor["limitations"])
+
+    def test_calculated_records_quote_their_inputs_source_wording(self):
+        observations = {row["id"]: row for row in self.observations}
+        for row in self.observations:
+            if row["evidence_type"] == "calculated":
+                with self.subTest(observation=row["id"]):
+                    self.assertEqual(row["original_text"], "\n".join(observations[i]["original_text"] for i in row["calculation"]["input_observation_ids"]))
 
     def test_missing_information_has_no_zero_placeholder_records(self):
         # Zero may be an actual financial result; unknown observations instead
