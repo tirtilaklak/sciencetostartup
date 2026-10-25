@@ -5,8 +5,8 @@ The current public site is https://sciencetostartup.com.
 
 ## Where this source came from
 
-This repository began as the reviewed public source and distribution for Sites
-version 31. That snapshot comes from commit
+This repository began with the reviewed public source and distribution for Sites
+version 31. That source snapshot comes from commit
 `65e67210b80abc2b93d5f84a34a3975abbb03cc0`; `SOURCE_PROVENANCE.json` records
 the source-file hashes at that import. Later commits changed the pages and
 menus, so those hashes describe the starting point only. The GitHub history
@@ -23,6 +23,8 @@ internal reports, credentials, browser output and deployment configuration.
 - `web/`: editable HTML, CSS, JavaScript and local assets.
 - `data/canonical.json`: authoritative research dataset 2.5.0.
 - `data/work-routes.json`: curated Work routes, including reviewed additions and availability checks.
+- `data/company-events.json`: dated lawsuits, incidents, customer and workforce changes and filings, reviewed after dataset 2.5.0.
+- `data/business-health.json`: sourced business observations, reporting cohorts and calculations for the interactive dashboard.
 - Other `data/*.json`: public profiles, editorial context and source updates.
 - `schema/`: data and relational contracts.
 - `scripts/observatory.py`, `scripts/schema_def.py`: research and export builder.
@@ -44,8 +46,10 @@ internal reports, credentials, browser output and deployment configuration.
 - `icons.js` runs first in its own tag. The other scripts join into one
   classic script in this order: `link-health.js`, `app.js`, `editorial.js`,
   `work-v3.js`, then the files in `PRESENTATION_JS` (`work-v4.js`,
-  `profiles-v2.js`, `source-updates.js`, `site-nav.js`). When two files declare
-  a function with the same name, the later one is the one that runs.
+  `profiles-v2.js`, `source-updates.js`, `site-nav.js`, `business-health.js`).
+  When two files declare a function with the same name, the later one is the
+  one that runs. `business-health.js` sets up the dashboard as soon as it
+  loads, so it comes last, after everything it reads.
 - That script and the page data go to content-hashed files,
   `dist/js/app.<hash>.js` and `dist/js/data.<hash>.js` (the name changes when
   the content changes). They load after the first paint. The research dataset
@@ -54,8 +58,8 @@ internal reports, credentials, browser output and deployment configuration.
 
 ## View or reproduce
 
-Python's standard library is sufficient for the snapshot build. Node.js is used
-by some optional logic checks. No hosted database, API key or npm install is
+Python's standard library is sufficient for the snapshot build. Node.js runs
+the logic checks. No hosted database, API key or npm install is
 required to view or build the dashboard.
 
 ```sh
@@ -64,14 +68,17 @@ python3 scripts/build_public_snapshot.py --verify
 python3 scripts/build_public_snapshot.py --output build/public-snapshot
 ```
 
-`--verify` builds in a temporary directory and checks every payload against the
-checked-in public release manifest. Normal output must use an empty directory;
-the command preserves the reviewed `dist/` files. After you change `web/`,
+`--verify` builds in a temporary directory and requires it to match
+`dist/manifest.json` byte for byte. It then hashes every file in `dist/` against
+that manifest and fails on any changed, extra or missing file, so `dist/` holds
+exactly what the builder produces. Normal output must use an empty directory;
+the command never writes to `dist/`. After you change `web/` or `data/`,
 rebuild `dist/` and commit it with your change:
 
 ```sh
 rm -rf build/snap && python3 scripts/build_public_snapshot.py --output build/snap
 rm -rf dist && cp -r build/snap dist && rm -rf build
+python3 scripts/build_public_snapshot.py --verify
 ```
 
 The original `observatory.py build` command is a research-release operation. It
@@ -80,29 +87,70 @@ from this public repository. The public snapshot wrapper calls the same
 validated `build()` function without changing or weakening that release check.
 It reproduces an approved snapshot; it does not attest to a new research release.
 
-The included standalone Python unit modules can be run with:
+CI runs the same checks on pushes to `main` and on pull requests:
 
 ```sh
 python3 -m unittest discover -s tests -p 'test_*.py'
+python3 scripts/build_public_snapshot.py --verify
 python3 tests/js_logic.py
 python3 tests/company_search_prefix_logic.py
+python3 tests/redesign_checks.py
+python3 tests/revision_app_logic.py
+python3 tests/revision_work_logic.py
+python3 tests/work_route_summary_logic.py
+python3 tests/reliability_copy_context_logic.py
+python3 tests/reliability_failure_state_logic.py
+python3 tests/risk_section_logic.py
 ```
 
-CI runs those three commands and `--verify`. The suite has 82 unit tests. More
-Node logic checks run by hand: `tests/redesign_checks.py`,
-`tests/revision_work_logic.py`, `tests/work_route_summary_logic.py`,
-`tests/revision_app_logic.py`, `tests/reliability_copy_context_logic.py` and
-`tests/reliability_failure_state_logic.py`. Some of them pin counts from the
-current data, so a research update may need new expected values. Historical
-comparison tests and local audit reports remain in the research repository.
+The 124 unit tests cover the pipeline, the build, static pages, company events,
+the business health data, Work routes, the Paid work page, site search, link
+health and a privacy scan of the published text files, scripts and database. The nine logic checks run the page scripts
+in Node against a DOM stub; they are not browser proof. Some of them pin counts
+from the current data, so a research update may need new expected values.
+Historical comparison tests and local audit reports remain in the research
+repository.
 
 ## Hosting
 
-The live website remains on the existing ChatGPT Sites project through
-Cloudflare. GitHub is the source repository and reviewed backup. No deployment
-workflow or hosting migration was added; pushing this repository does not change
-our configured Sites deployment.
+The live website is served by the `sciencetostartup` Cloudflare Worker with Static
+Assets on the apex and www custom domains. Deployment publishes the reviewed
+`dist/` build; a GitHub push alone does not trigger deployment.
 
 A deploy must upload all of `dist/`, including `dist/js/`: the app page
-(`index.html`) loads its scripts from there. Those file names change with their content, so
-`web/_headers` and `vercel.json` let browsers cache them for a year.
+(`index.html`) loads its scripts from there. Those file names change with their
+content, so `web/_headers` and `vercel.json` let browsers cache them for a year.
+
+The Worker staging omits the domain-level `_redirects` file because Workers
+Static Assets accepts relative source paths. Equivalent zone redirects enforce
+HTTPS and the apex hostname while preserving paths and queries. `_headers` is
+deployed unchanged.
+
+## Business health dashboard
+
+The overview explores revenue growth, delivery margins, customer durability, paid
+expert activity and cash resilience. It covers all 39 organizations, with 98 dated
+observations linked to 65 sources, explicit missing values and a separate
+hypothetical margin calculator. Employee and registered-expert counts are context.
+The recommended north star is gross profit from repeat paying customers.
+
+See [dashboard definitions and evidence limits](docs/business-health-dashboard.md).
+The underlying research remains dataset v2.5.0; the October 23 dashboard curation
+does not imply all source material was freshly verified.
+
+## Owner steps
+
+1. Analytics. Create a GoatCounter site with the code `sciencetostartup`. Set
+   the `sts-analytics` meta content in `web/index.html` to
+   `https://sciencetostartup.goatcounter.com/count`, then rebuild and deploy.
+   The static company pages pick up the same setting at build time. While
+   the content is empty, nothing loads and nothing is counted.
+2. Search. Verify the domain in Google Search Console and Bing Webmaster Tools,
+   and submit `https://sciencetostartup.com/sitemap.xml` in each.
+3. Dataset corrections. Corrections that need a new dataset version are listed
+   in `docs/pending-2.5.1-corrections.md`. Release them from the research
+   repository; this repository pins dataset 2.5.0.
+4. Deploying. Rebuild `dist/` with the commands under "View or reproduce", run
+   the checks above and commit. Then deploy all of `dist/`, including
+   `dist/js/`, to the `sciencetostartup` Worker, staging it without
+   `_redirects` as described under Hosting. Pushing to GitHub does not deploy.

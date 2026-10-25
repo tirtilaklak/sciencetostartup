@@ -21,3 +21,5 @@
 
 .profile-v2 .profile-scale-observation .eyebrow{white-space:normal;overflow-wrap:anywhere;min-height:36px;letter-spacing:1px}
 @media(max-width:760px){.profile-v2 .profile-scale-observation .eyebrow{min-height:0}}
+.profile-risks>.eyebrow{margin:0 0 8px}.profile-risks>.profile-relationship-grid{margin:0 0 30px}.profile-risks .risk-date{font-size:15px;margin:0 0 4px}.profile-risks h4{font-size:16px;line-height:1.45;letter-spacing:-.2px;margin:0 0 6px}.profile-risks [data-profile-event] .relationship-account p{font-size:14px}.profile-risks [data-profile-risk] .relationship-account p{color:var(--ink)}.profile-risks .risk-meta{font-size:13px;line-height:1.85;color:var(--ink);margin-top:6px}.profile-risks>.sub{margin:0;max-width:70ch}
+@media(min-width:701px){.profile-risks .relationship-card{grid-template-columns:minmax(180px,.9fr) minmax(0,2fr) 48px}.profile-risks .profile-card-source{justify-self:end}}

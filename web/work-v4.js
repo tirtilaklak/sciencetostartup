@@ -205,13 +205,16 @@ function w4Action(route){
 function w4ClaimAccess(ids,topic=''){
   return [...new Set(ids||[])].filter(id=>claims[id]).map((id,i)=>`<span data-work-claim="${w4Escape(id)}">${claimButton(id,`Original evidence${ids.length>1?' '+(i+1):''}`,topic)}</span>`).join('');
 }
-// Route checks store a status code before the note; readers see plain words instead.
+// Route checks store their result before the note (a code such as public_page_live, or a short phrase).
+// Readers see plain words instead of the code, and the result ends with a period so the note reads on.
 const W4_CHECK_CODES={public_page_live:'Public page was live.',information_only_not_verified_paid_application:'Information page only. No paid application confirmed.'};
-function w4CheckNote(note){
-  const text=w4Text(note),match=text.match(/^([a-z]+(?:_[a-z]+)+)(?:\s+(.*))?$/);
-  if(!match)return text;
-  const lead=W4_CHECK_CODES[match[1]]||match[1].charAt(0).toUpperCase()+match[1].slice(1).replace(/_/g,' ')+'.';
-  return match[2]?`${lead} ${match[2]}`:lead;
+const W4_CHECK_CODE=/^[a-z]+(?:_[a-z]+)+$/;
+function w4CheckLead(result){return W4_CHECK_CODE.test(result)?W4_CHECK_CODES[result]||result.charAt(0).toUpperCase()+result.slice(1).replace(/_/g,' ')+'.':result.replace(/[\s.;:,]+$/,'')+'.';}
+function w4CheckNote(check){
+  const text=w4Text(check?.note),result=w4Text(check?.result);
+  if(result&&text.startsWith(result+' '))return `${w4CheckLead(result)} ${text.slice(result.length+1)}`;
+  const code=text.match(/^([a-z]+(?:_[a-z]+)+)(?:\s+(.*))?$/);
+  return code?(code[2]?`${w4CheckLead(code[1])} ${code[2]}`:w4CheckLead(code[1])):text;
 }
 function w4Details(route,level=4){
   const requirements=[...new Set((route.requirements||[]).map(w4Text).filter(Boolean))];
@@ -231,7 +234,7 @@ function w4Details(route,level=4){
       <p class="w4-source-dates"><span>Terms recorded: ${w4Escape(route.as_of&&route.as_of!=='undated'?w4Date(route.as_of):'date not stated')}</span><span>${w4Escape(w4FreshnessLabel(route))}</span></p>
       ${sourceRows.length?`<ul>${sourceRows.map(s=>`<li>${w4SourceLink(s.url,s.title||s.publisher||'Source')}<small>${w4Escape(published(s))}${s.accessed_on?` · Checked ${w4Escape(w4Date(s.accessed_on))}`:''}</small></li>`).join('')}</ul>`:''}
       ${route.source_quote?`<blockquote>${w4Escape(route.source_quote)}</blockquote>`:''}
-      ${route.last_route_check?.note?`<details class="w4-source-notes"><summary>Link check note</summary><p>${w4Escape(w4CheckNote(route.last_route_check.note))}</p></details>`:''}
+      ${route.last_route_check?.note?`<details class="w4-source-notes"><summary>Link check note</summary><p>${w4Escape(w4CheckNote(route.last_route_check))}</p></details>`:''}
       ${route.claim_ids?.length?`<div class="w4-evidence-links">${w4ClaimAccess(route.claim_ids,route.role)}</div>`:''}
     </div>
     ${typeof compareCheck==='function'?`<div class="w4-compare">${compareCheck(route.company_id)}</div>`:''}
@@ -340,15 +343,32 @@ function w4RouteGroups(rows,sort=''){
   return Object.assign(groups,{primary:[...groups.contract,...groups.jobs],careers:groups.boards,other:[...groups.outside,...groups.closed]});
 }
 const W4_GROUP_NOTES={boards:'Each link opens a company’s full list of openings. We did not record pay for these pages.',outside:'Open staff roles that are not AI training work.',closed:'Past or paused listings, and pages with no confirmed paid work. We keep them for the record.'};
+// A closed group carries only its listing ids. Its cards render on first open, which keeps the page light.
+// The trade-off: browser find-in-page cannot reach cards in a closed group. The Paid work search covers every listing.
 function w4GroupDisclosure(rows,label,open=false,key='',note=''){
-  return rows.length?`<details class="work-route-archive-group w4-route-group" ${key?`id="${w4Escape(key)}"`:""} ${open?'open':''}><summary>${w4Escape(label)} <span>(${rows.length})</span></summary>${note?`<p class="w4-group-note">${w4Escape(note)}</p>`:''}<div class="w4-secondary-list">${rows.map(route=>workCard(route,'compact')).join('')}</div></details>`:'';
+  return rows.length?`<details class="work-route-archive-group w4-route-group" ${key?`id="${w4Escape(key)}"`:""} ${open?'open':''}><summary>${w4Escape(label)} <span>(${rows.length})</span></summary>${note?`<p class="w4-group-note">${w4Escape(note)}</p>`:''}<div class="w4-secondary-list"${open?'':` data-w4-routes="${w4Escape(rows.map(route=>route.id).join(' '))}"`}>${open?rows.map(route=>workCard(route,'compact')).join(''):''}</div></details>`:'';
 }
+function w4FillGroup(group){
+  const list=group?.querySelector?.(':scope>.w4-secondary-list[data-w4-routes]');if(!list)return;
+  const routes=new Map(workRouteRows().map(route=>[route.id,route]));
+  list.innerHTML=list.dataset.w4Routes.split(' ').map(id=>routes.get(id)).filter(Boolean).map(route=>workCard(route,'compact')).join('');list.removeAttribute('data-w4-routes');
+}
+// Fills the closed group that holds one listing, so code that looks for its card (site search) finds it.
+function w4FillRouteGroup(scope,id){
+  const root=typeof scope==='string'?document.querySelector(scope):scope;
+  for(const list of root?.querySelectorAll?.('.w4-secondary-list[data-w4-routes]')||[])if(list.dataset.w4Routes.split(' ').includes(id))w4FillGroup(list.parentElement);
+}
+document.addEventListener('toggle',event=>{if(event.target.open)w4FillGroup(event.target);},true);
 function w4ProfilePrimary(rows,id){
   const preferred=id==='afterquery'?['research-fellow','research-engineer','research-scientist-post-training','technical-content-writer-contract'].map(role=>`afterquery.work.${role}`):[];
   const rank=route=>{const index=preferred.indexOf(route.id);return index<0?preferred.length:index;};
   return [...rows].sort((a,b)=>rank(a)-rank(b));
 }
 let workReturnFocus=null,workViewRendered=false;
+// Typing in the Paid work search draws the list once typing pauses for 180 ms, so each keystroke paints at
+// once (measured on a phone at 4x CPU slowdown). A direct render, such as a filter change, cancels a waiting one.
+let w4RenderTimer=0;
+function w4QueueRender(){if(w4RenderTimer)clearTimeout(w4RenderTimer);w4RenderTimer=setTimeout(renderWork,180);}
 function rememberWorkCompanyLink(event){
   if(event.defaultPrevented||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(event.button!==undefined&&event.button!==0))return;
   const link=event.target.closest?.('#work-view a[href^="#company/"]');
@@ -408,9 +428,17 @@ function w4JobsSection(shown,more){
   const total=shown.length+more.length;
   return total?`<section class="w4-section"><h2 id="work-jobs" class="work-list-heading">Jobs and fellowships <span>(${total})</span></h2><p class="w4-section-note">Staff jobs and paid fellowships at these companies.</p>${shown.map(route=>workCard(route)).join('')}${w4GroupDisclosure(more,'More jobs and fellowships')}</section>`:'';
 }
-function w4OtherSection(groups,open){
-  const total=groups.boards.length+groups.outside.length+groups.closed.length;
-  return total?`<section class="w4-section"><h2 id="work-more" class="work-list-heading">Other listings <span>(${total})</span></h2>${w4GroupDisclosure(groups.boards,'Career pages',open,'work-careers',W4_GROUP_NOTES.boards)}${w4GroupDisclosure(groups.outside,'Company jobs outside AI training',open,'work-outside',W4_GROUP_NOTES.outside)}${w4GroupDisclosure(groups.closed,'Closed or unpaid listings',open,'work-other',W4_GROUP_NOTES.closed)}</section>`:'';
+// Phone budget for searches and filters, measured at 4x CPU slowdown on a 390 px screen. A one-letter search
+// matches nearly every listing, and drawing all of them took twice as long as the default view. So a search
+// draws about as many full cards as the default view (W4_FULL_CARDS: 20 contract cards with an hourly or
+// per-task rate, plus six jobs). Contract work is never cut; jobs get the rest of the budget, at least six.
+// Groups under Other listings open only when they hold 12 or fewer matches. Every other match waits in a
+// closed group that shows its count and draws its cards on first open.
+const W4_FULL_CARDS=26,W4_SEARCH_JOBS=6,W4_SEARCH_OPEN_MAX=12;
+function w4SearchJobBudget(groups){return Math.max(W4_SEARCH_JOBS,W4_FULL_CARDS-groups.hourly.length-groups.task.length);}
+function w4OtherSection(groups,filtered){
+  const total=groups.boards.length+groups.outside.length+groups.closed.length,open=list=>filtered&&list.length<=W4_SEARCH_OPEN_MAX;
+  return total?`<section class="w4-section"><h2 id="work-more" class="work-list-heading">Other listings <span>(${total})</span></h2>${w4GroupDisclosure(groups.boards,'Career pages',open(groups.boards),'work-careers',W4_GROUP_NOTES.boards)}${w4GroupDisclosure(groups.outside,'Company jobs outside AI training',open(groups.outside),'work-outside',W4_GROUP_NOTES.outside)}${w4GroupDisclosure(groups.closed,'Closed or unpaid listings',open(groups.closed),'work-other',W4_GROUP_NOTES.closed)}</section>`:'';
 }
 // Networks whose location rules are set per project: a next step when a search finds little contract work.
 const W4_PROJECT_RULES=/project|role-specific|country varies|eligibility varies|geographic restrictions|global/i;
@@ -432,6 +460,7 @@ function w4SortNote(sort,open,filtered){
   return '';
 }
 function renderWork(){
+  if(w4RenderTimer){clearTimeout(w4RenderTimer);w4RenderTimer=0;}
   workViewRendered=true;
   workReturnFocus=null;
   if(state.workSort===undefined)state.workSort='';
@@ -448,8 +477,10 @@ function renderWork(){
   const note=$('work-sort-note');
   if(note){note.textContent=w4SortNote(sort,groups.primary,filtered);note.hidden=!note.textContent;}
   // Unfiltered, the jobs section opens with six cards and at most three per company.
+  // A search or filter shows matching jobs in full up to the phone budget; the rest wait in the closed More group.
   let jobs=groups.jobs,moreJobs=[];
   if(!filtered){const perCompany={};jobs=[];for(const route of groups.jobs){const n=perCompany[route.company_id]||0;if(jobs.length<6&&n<3){jobs.push(route);perCompany[route.company_id]=n+1;}else moreJobs.push(route);}}
+  else{const budget=w4SearchJobBudget(groups);if(jobs.length>budget+1){moreJobs=jobs.slice(budget);jobs=jobs.slice(0,budget);}}
   // A search that finds little contract work, and does not name a company, also lists the per-project networks.
   const thin=matcher&&!filters&&groups.contract.length<5&&!rows.some(route=>matcher.all([companies[route.company_id]?.name,...(companies[route.company_id]?.aliases||[])].join(' ').toLowerCase()));
   $('work-cards').innerHTML=w4ContractSection(groups)+w4JobsSection(jobs,moreJobs)+w4OtherSection(groups,filtered)+(rows.length?'':w4EmptyState(query,filters))+(thin?w4NetworkSuggestions(rows):'');
@@ -472,7 +503,7 @@ function workSummary(id){
   return `<div class="work-v4-profile">${open||groups.boards.length?workSafetyHTML(rows):''}${section('Contract and task work',groups.contract,4,'More contract and task listings')}${section('Jobs and fellowships',jobs,2,'More jobs and fellowships')}${open?'':`<p class="w4-empty">No open paid listing recorded for ${w4Escape(companies[id]?.name||'this company')}.</p>`}${w4GroupDisclosure(groups.boards,'Career pages',!open,'',W4_GROUP_NOTES.boards)}${w4GroupDisclosure(groups.outside,'Company jobs outside AI training',false,'',W4_GROUP_NOTES.outside)}${w4GroupDisclosure(groups.closed,'Closed or unpaid listings',!open&&!groups.boards.length,'',W4_GROUP_NOTES.closed)}${related.length?`<details class="w4-related"><summary>Related work evidence</summary><div class="w4-evidence-links">${w4ClaimAccess(related)}</div></details>`:''}</div>`;
 }
 
-document.addEventListener('click',event=>{const clear=event.target.closest?.('[data-work-clear]');if(clear){resetWorkFilters(clear.dataset.workClear);document.getElementById('work-search')?.focus();return;}const button=event.target.closest?.('[data-work-section]');if(!button)return;const target=document.getElementById(button.dataset.workSection);if(target){if(target.tagName==='DETAILS')target.open=true;const focus=target.tagName==='DETAILS'?target.querySelector('summary'):target;if(focus&&focus.tagName!=='SUMMARY')focus.setAttribute('tabindex','-1');focus?.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});}});
+document.addEventListener('click',event=>{const clear=event.target.closest?.('[data-work-clear]');if(clear){resetWorkFilters(clear.dataset.workClear);document.getElementById('work-search')?.focus();return;}const button=event.target.closest?.('[data-work-section]');if(!button)return;const target=document.getElementById(button.dataset.workSection);if(target){if(target.tagName==='DETAILS'){w4FillGroup(target);target.open=true;}const focus=target.tagName==='DETAILS'?target.querySelector('summary'):target;if(focus&&focus.tagName!=='SUMMARY')focus.setAttribute('tabindex','-1');focus?.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});}});
 
 let responsiveFiltersWide,responsiveFilterFocus;
 document.addEventListener('focusin',event=>{

@@ -114,7 +114,8 @@ function siteSearchSetActive(index){
 }
 // Land on the exact product or listing card once the profile has rendered.
 function siteSearchReveal(item){
- const product=item.type==='product',card=[...document.querySelectorAll(product?'#profile-view [data-profile-product]':'#profile-view [data-work-route]')].find(el=>product?el.dataset.profileProduct===item.product:el.dataset.workRoute===item.id);
+ const product=item.type==='product';if(!product&&typeof w4FillRouteGroup==='function')w4FillRouteGroup('#profile-view',item.id);
+ const card=[...document.querySelectorAll(product?'#profile-view [data-profile-product]':'#profile-view [data-work-route]')].find(el=>product?el.dataset.profileProduct===item.product:el.dataset.workRoute===item.id);
  if(!card)return;
  for(let el=card;el;el=el.parentElement)if(el.tagName==='DETAILS')el.open=true;
  const toggle=card.querySelector('.w4-compact-toggle');if(toggle)toggle.open=true;

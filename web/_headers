@@ -4,7 +4,7 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://gc.zgo.at; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://cloudflareinsights.com https://sciencetostartup.goatcounter.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
 /js/*
   Cache-Control: public, max-age=31536000, immutable
 /assets/*
@@ -15,3 +15,4 @@
   Cache-Control: public, max-age=3600
 /*.sqlite
   Cache-Control: public, max-age=3600
+  Content-Type: application/vnd.sqlite3

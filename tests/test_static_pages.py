@@ -1,4 +1,5 @@
-"""Crawlable static pages, the figure rules they share with the app, and the generated sitemap, built into a scratch directory."""
+"""Crawlable static pages, the figure rules and wording they share with the app, and the generated sitemap, built into a scratch directory."""
+import html
 import json
 import re
 import shutil
@@ -21,6 +22,9 @@ NAMESPACE = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
 EMAIL = re.compile(r"@[A-Za-z0-9-]+\.[A-Za-z]{2,}")
 PAGE_LIMIT = 120_000
 REVENUE_KINDS = ("revenue", "annualized_revenue_run_rate", "arr")
+ICONS = [("icon", "/assets/favicon.svg"), ("icon", "/assets/favicon-48.png"), ("apple-touch-icon", "/assets/apple-touch-icon.png")]
+# eligibleMetrics in web/app.js decides which figure the app compares; the static pages must agree with it.
+APP_RULE = "m.preferred_for_comparison!==false&&claims[m.claim_id].status==='supported'&&(!m.observation_status||m.observation_status==='reported')"
 
 # Runs the app's own modules in Node with a minimal DOM stub and prints the choices the static pages must repeat.
 APP_RULES = r"""
@@ -42,6 +46,14 @@ process.stdout.write(vm.runInContext(`JSON.stringify((()=>{
  for(const name of Object.keys(MODEL_GROUPS))r.slugs[name]=groupSlug(name);
  r.ids=DATA.metrics.map(m=>m.id).sort((a,b)=>a.localeCompare(b));r.names=DATA.companies.map(c=>c.name).concat(window.WORK_ROUTES.routes.map(w=>w.role)).sort((a,b)=>a.localeCompare(b));
  return r;})())`,context));
+"""
+# publicText in web/app.js, run on strings read from stdin; the static pages must print the same words.
+APP_WORDING = r"""
+const fs=require('fs'),vm=require('vm'),app=fs.readFileSync(process.argv[1],'utf8'),DATA=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+const start=app.indexOf('const PUBLIC_COPY_EDITS='),body=app.indexOf('function publicTextCompute('),end=app.indexOf('\n}\n',body);
+if(start<0||body<0||end<0)throw new Error('web/app.js changed: publicText not found');
+const context={DATA};vm.createContext(context);vm.runInContext(app.slice(start,end+3)+';this.publicText=publicText;',context);
+console.log(JSON.stringify(JSON.parse(fs.readFileSync(0,'utf8')).map(context.publicText)));
 """
 
 
@@ -87,6 +99,10 @@ def plain(fragment):
     return " ".join(re.sub(r"<[^>]+>", " ", fragment).replace("&amp;", "&").replace("&#x27;", "'").split())
 
 
+def png_size(data):
+    return struct.unpack(">II", data[16:24])
+
+
 class StaticPageTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -96,9 +112,12 @@ class StaticPageTests(unittest.TestCase):
         build(cls.data, cls.dist)
         cls.companies = {c["id"]: c for c in cls.data["companies"]}
         cls.pages = {cid: (cls.dist / "company" / cid / "index.html").read_text() for cid in cls.companies}
-        cls.research = sp.Research(cls.data, sp.read_js_object(ROOT / "web/app.js", "FINANCIAL_HEADLINES"), json.loads((ROOT / "data/source-updates.json").read_text()))
+        say = sp.public_wording(cls.data, sp.load_copy_edits())
+        cls.say = staticmethod(say)
+        cls.research = sp.Research(cls.data, sp.read_js_object(ROOT / "web/app.js", "FINANCIAL_HEADLINES"), json.loads((ROOT / "data/source-updates.json").read_text()), say=say)
         cls.metrics = {m["id"]: m for m in cls.data["metrics"]}
         cls.routes = json.loads((ROOT / "data/work-routes.json").read_text())["routes"]
+        cls.events = json.loads((ROOT / "data/company-events.json").read_text())
         cls.editorial = {e["company_id"]: e for e in json.loads((ROOT / "data/editorial.json").read_text())["entries"]}
         profiles = json.loads((ROOT / "data/profile-content.json").read_text())["entries"]
         overlay = ROOT / "data/profile-afterquery.json"
@@ -114,10 +133,18 @@ class StaticPageTests(unittest.TestCase):
     def html_files(self):
         return [path for path in self.public_files() if path.suffix == ".html"]
 
+    def indexable_files(self):
+        return [path for path in self.html_files() if path.name != "404.html"]
+
     def figures(self, cid):
-        """(metric id, row html) for each Key figures row, and (metric id, item html) for each Not confirmed item."""
+        """(metric id, html) for each Key figures row, each Not confirmed item and each Other reported figures item."""
         section = self.pages[cid].split('<h2 id="figures">', 1)[1].split('<h2 id="facts"', 1)[0]
-        return re.findall(r'<tr data-metric="([^"]+)">(.*?)</tr>', section, re.S), re.findall(r'<li data-metric="([^"]+)">(.*?)</li>', section, re.S)
+        rows = re.findall(r'<tr data-metric="([^"]+)">(.*?)</tr>', section, re.S)
+        lists = {key: re.findall(r'<li data-metric="([^"]+)">(.*?)</li>', section.split(f'<h3 id="{key}">', 1)[1].split("</ul>", 1)[0], re.S) if f'<h3 id="{key}">' in section else [] for key in ("unconfirmed", "other-figures")}
+        return rows, lists["unconfirmed"], lists["other-figures"]
+
+    def footer(self, path):
+        return re.search(r'<footer class="site-footer">.*?</footer>', path.read_text(), re.S).group(0)
 
     # Pages, links and metadata
 
@@ -159,11 +186,21 @@ class StaticPageTests(unittest.TestCase):
         locs = [u.find(NAMESPACE + "loc").text for u in urls]
         self.assertEqual(locs[:2] + locs[-2:], [ORIGIN + "/", ORIGIN + "/companies/", ORIGIN + "/work/", ORIGIN + "/method/"])
         self.assertEqual(sorted(locs[2:-2]), sorted(f"{ORIGIN}/company/{cid}/" for cid in self.companies))
+        reviewed = self.events["reviewed_on"]
+        newest = max(sp.SITE_REVISED, self.data["meta"]["as_of"], reviewed, *(e.get("reviewed_on") or "" for e in self.editorial.values()), *(d for r in self.routes for d in sp.route_dates(r) if d))
+        lastmods = {}
         for url in urls:
-            lastmod = url.find(NAMESPACE + "lastmod").text
+            loc, lastmod = url.find(NAMESPACE + "loc").text, url.find(NAMESPACE + "lastmod").text
+            lastmods[loc] = lastmod
             self.assertRegex(lastmod, r"^\d{4}-\d{2}-\d{2}$")
-            self.assertGreaterEqual(lastmod, self.data["meta"]["as_of"], url.find(NAMESPACE + "loc").text)
-            self.assertLessEqual(lastmod, max(sp.SITE_REVISED, self.data["meta"]["as_of"], *(d for r in self.routes for d in sp.route_dates(r) if d)))
+            self.assertGreaterEqual(lastmod, self.data["meta"]["as_of"], loc)
+            self.assertLessEqual(lastmod, newest, loc)
+        # Events reviewed after the dataset change the pages that show them, and dateModified agrees with lastmod.
+        for cid in {e["company_id"] for e in self.events["events"]} | {r for e in self.events["events"] for r in e["related_company_ids"]}:
+            self.assertGreaterEqual(lastmods[f"{ORIGIN}/company/{cid}/"], reviewed, cid)
+        for path in self.indexable_files():
+            canonical = PageFacts(path.read_text()).canonicals[0]
+            self.assertIn(f'"dateModified":"{lastmods[canonical]}"', path.read_text(), canonical)
 
     def test_index_page_groups_every_company_and_links_the_app(self):
         text = (self.dist / "companies/index.html").read_text()
@@ -179,6 +216,14 @@ class StaticPageTests(unittest.TestCase):
             self.assertIn(f'href="{ORIGIN}/#companies/{slug}"', text)
         nonprofits = sum(1 for e in self.editorial.values() if e["primary_offering"] == "Nonprofit research")
         self.assertIn(f"{sp.count_word(nonprofits)} of the {len(self.companies)} are nonprofit research groups.", text)
+
+    def test_index_states_coverage_limits(self):
+        text = (self.dist / "companies/index.html").read_text()
+        self.assertIn("The guide is a selected study of the market. It does not list every company.", text)
+        self.assertIn("The guide is a selected study of the market. It does not list every company.", (self.dist / "method/index.html").read_text())
+        missing = re.search(r"Firms not yet profiled include ([^<]+)", text).group(1)
+        self.assertEqual(missing, "Uber AI Solutions, TELUS Digital, CloudFactory, SuperAnnotate, Encord, Defined.ai, LXT and Welocalize.")
+        self.assertTrue(self.footer(self.dist / "companies/index.html").endswith("<p>Company names and logos belong to their owners and identify them here.</p></footer>"))
 
     def test_company_pages_link_breadcrumbs_group_and_every_peer(self):
         labels = sp.read_js_object(ROOT / "web/editorial.js", "GROUP_LABELS")
@@ -199,7 +244,9 @@ class StaticPageTests(unittest.TestCase):
             nav = re.search(r'<nav class="site-nav" aria-label="Site">(.*?)</nav>', text).group(1)
             self.assertEqual(re.findall(r'href="([^"]+)"', nav), expected_nav, label)
             self.assertIn("Site map", facts.navs, label)
-            self.assertEqual({(l.get("rel"), l.get("href")) for l in facts.links if "icon" in str(l.get("rel"))}, {("icon", "/favicon.ico"), ("icon", "/assets/icon-192.png"), ("apple-touch-icon", "/assets/icon-192.png")}, label)
+            icons = [l for l in facts.links if "icon" in str(l.get("rel"))]
+            self.assertEqual([(l.get("rel"), l.get("href")) for l in icons], ICONS, label)
+            self.assertEqual(icons[0].get("type"), "image/svg+xml", label)
             self.assertIn(f'href="{ORIGIN}/#corrections"', text, label)
             self.assertNotIn("—", text, label)
             for anchor in facts.anchors:
@@ -210,26 +257,68 @@ class StaticPageTests(unittest.TestCase):
         self.assertIn('aria-current="true">Companies<', self.pages["mercor"])
         self.assertIn('aria-current="page">Paid work<', (self.dist / "work/index.html").read_text())
 
-    def test_share_cards_on_indexable_pages(self):
-        for path in [p for p in self.html_files() if p.name != "404.html"] + [self.dist / "index.html"]:
+    def test_header_main_and_footer_share_one_column(self):
+        inset = re.search(r"\.site-header\{[^}]*padding:0 ([^;}]+)", sp.STYLE).group(1)
+        self.assertIn(f"main,.site-footer{{margin:0 {inset}}}", sp.STYLE)
+        self.assertIn("max(var(--gutter),calc((100% - var(--content))/2))", inset)
+
+    def test_footer_names_publisher_disclosure_and_corrections(self):
+        about = re.search(r'<article[^>]*\bid="about"[^>]*>.*?</article>', (ROOT / "web/index.html").read_text(), re.S).group(0)
+        disclosure = re.sub(r"<[^>]+>", "", re.search(r"<strong>Disclosure\.</strong>\s*(.*?)</p>", about, re.S).group(1)).strip()
+        publisher = re.search(r"ScienceToStartup is published by [^.]+\.", about).group(0)
+        self.assertEqual(sp.DISCLOSURE, html.unescape(disclosure))
+        for path in self.html_files():
+            footer = self.footer(path)
+            text = html.unescape(re.sub(r"<[^>]+>", "", footer))
+            self.assertIn(publisher, text, path)
+            self.assertIn(sp.DISCLOSURE, text, path)
+            self.assertIn(f'<a href="{ORIGIN}/#venture">overview page</a>', footer, path)
+            self.assertIn(f'<a href="{ORIGIN}/#corrections">Request a correction</a>', footer, path)
+
+    def test_head_tags_make_every_page_share_ready(self):
+        for path in self.indexable_files() + [self.dist / "404.html"]:
+            facts, label = PageFacts(path.read_text()), str(path.relative_to(self.dist))
+            meta = facts.meta
+            self.assertLessEqual(len(facts.title), sp.TITLE_LIMIT, label)
+            self.assertLess(len(facts.title), 60, label)
+            self.assertLessEqual(len(meta["description"]), sp.DESCRIPTION_LIMIT, label)
+            self.assertTrue(meta["description"].endswith("."), label)
+            self.assertNotIn("…", meta["description"], label)
+        for path in self.indexable_files() + [self.dist / "index.html"]:
             meta, label = PageFacts(path.read_text()).meta, str(path.relative_to(self.dist))
             self.assertEqual(meta["og:image"], sp.SHARE_IMAGE, label)
             self.assertEqual((meta["og:image:width"], meta["og:image:height"]), ("1200", "630"), label)
             self.assertEqual(meta["twitter:card"], "summary_large_image", label)
             self.assertTrue(meta["og:image:alt"] and meta["twitter:image:alt"] == meta["og:image:alt"], label)
+        for path in self.indexable_files():
+            facts, label = PageFacts(path.read_text()), str(path.relative_to(self.dist))
+            meta = facts.meta
+            self.assertEqual((meta["og:title"], meta["twitter:title"]), (facts.title, facts.title), label)
+            self.assertEqual((meta["og:description"], meta["twitter:description"]), (meta["description"], meta["description"]), label)
+            self.assertEqual(meta["og:image:alt"], sp.SHARE_ALT, label)
+
+    def test_share_image_and_icons_are_the_right_files(self):
         image = (self.dist / sp.SHARE_IMAGE.replace(ORIGIN + "/", "")).read_bytes()
         self.assertEqual(image[:8], b"\x89PNG\r\n\x1a\n")
-        self.assertEqual(struct.unpack(">II", image[16:24]), (1200, 630))
+        self.assertEqual(png_size(image), (1200, 630))
         self.assertLess(len(image), 100_000)
-        icon = (self.dist / "assets/icon-192.png").read_bytes()
-        self.assertEqual(struct.unpack(">II", icon[16:24]), (192, 192))
+        self.assertFalse((self.dist / "assets/og").exists(), "the older share card with a typed company count is gone")
+        self.assertFalse((self.dist / "assets/icon-192.png").exists())
+        self.assertTrue((self.dist / "assets/favicon.svg").read_text().lstrip().startswith("<svg"))
+        self.assertEqual(png_size((self.dist / "assets/favicon-48.png").read_bytes()), (48, 48))
+        touch = (self.dist / "assets/apple-touch-icon.png").read_bytes()
+        self.assertEqual(png_size(touch), (180, 180))
+        self.assertIn(touch[25], (0, 2), "the Apple touch icon is opaque")
         ico = (self.dist / "favicon.ico").read_bytes()
         reserved, kind, count = struct.unpack("<HHH", ico[:6])
         self.assertEqual((reserved, kind), (0, 1))
+        sizes = []
         for index in range(count):
             width, height, _, _, _, _, size, offset = struct.unpack("<BBBBHHII", ico[6 + 16 * index: 22 + 16 * index])
             self.assertEqual(ico[offset:offset + 8], b"\x89PNG\r\n\x1a\n")
-            self.assertEqual(struct.unpack(">II", ico[offset + 16: offset + 24]), (width or 256, height or 256))
+            self.assertEqual(png_size(ico[offset:]), (width or 256, height or 256))
+            sizes.append(width)
+        self.assertEqual(sorted(sizes), [16, 32, 48])
 
     def test_home_head_names_the_site_and_publisher(self):
         text = (self.dist / "index.html").read_text()
@@ -247,7 +336,7 @@ class StaticPageTests(unittest.TestCase):
 
     def test_manifest_covers_the_static_pages(self):
         manifest = json.loads((self.dist / "manifest.json").read_text())["sha256"]
-        for name in ("sitemap.xml", "companies/index.html", "company/mercor/index.html", "work/index.html", "method/index.html", "404.html", "favicon.ico", "assets/icon-192.png", "assets/share/sciencetostartup-1200x630.png"): self.assertIn(name, manifest)
+        for name in ("sitemap.xml", "companies/index.html", "company/mercor/index.html", "work/index.html", "method/index.html", "404.html", "favicon.ico", "assets/favicon.svg", "assets/favicon-48.png", "assets/apple-touch-icon.png", "assets/share/sciencetostartup-1200x630.png"): self.assertIn(name, manifest)
         self.assertEqual(sum(1 for n in manifest if n.startswith("company/") and n.endswith("/index.html")), 39)
 
     def test_static_pages_are_reproducible(self):
@@ -264,11 +353,41 @@ class StaticPageTests(unittest.TestCase):
         for path in self.html_files():
             for cell in re.findall(r"<td\b[^>]*>", path.read_text()): self.assertIn("data-label=", cell, str(path.relative_to(self.dist)))
 
+    def test_analytics_loader_follows_the_index_meta(self):
+        self.assertEqual(sp.analytics_endpoint((ROOT / "web/index.html").read_text()), "")
+        self.assertEqual(sp.analytics_endpoint('<meta name="sts-analytics" content="https://sciencetostartup.goatcounter.com/count">'), "https://sciencetostartup.goatcounter.com/count")
+        for other in ("https://example.com/count", "javascript:alert(1)", "https://x.goatcounter.com/count?x=1"):
+            self.assertEqual(sp.analytics_endpoint(f'<meta name="sts-analytics" content="{other}">'), "", other)
+        counting = sp.Research(self.data, analytics="https://sciencetostartup.goatcounter.com/count")
+        page = sp.document(counting, "T", "D.", ORIGIN + "/", "", {})
+        self.assertIn('<script async src="https://gc.zgo.at/count.js" data-goatcounter="https://sciencetostartup.goatcounter.com/count"></script>\n</head>', page)
+        self.assertNotIn("gc.zgo.at", sp.document(counting, "Page not found", "D.", "", "", robots="noindex"), "the 404 page does not count")
+        self.assertNotIn("gc.zgo.at", sp.document(sp.Research(self.data), "T", "D.", ORIGIN + "/", "", {}))
+        for path in self.html_files(): self.assertNotIn("gc.zgo.at", path.read_text(), "counting is off in web/index.html")
+
+    def test_both_hosts_send_the_same_headers(self):
+        """web/_headers (Cloudflare) and vercel.json carry one policy: GoatCounter allowed, hashed scripts cached for a year, SQLite typed."""
+        lines = (ROOT / "web/_headers").read_text().splitlines()
+        rules, path = {}, None
+        for line in lines:
+            if line and not line.startswith(" "): path = line.strip(); rules[path] = {}
+            elif line.strip(): key, value = line.strip().split(": ", 1); rules[path][key] = value
+        vercel = {rule["source"]: {h["key"]: h["value"] for h in rule["headers"]} for rule in json.loads((ROOT / "vercel.json").read_text())["headers"]}
+        policy = rules["/*"]["Content-Security-Policy"]
+        self.assertEqual(vercel["/(.*)"]["Content-Security-Policy"], policy)
+        for host in ("https://gc.zgo.at", "https://sciencetostartup.goatcounter.com", "https://static.cloudflareinsights.com"): self.assertIn(host, policy)
+        self.assertEqual(rules["/js/*"]["Cache-Control"], "public, max-age=31536000, immutable")
+        self.assertEqual(vercel["/js/(.*)"]["Cache-Control"], "public, max-age=31536000, immutable")
+        self.assertEqual(rules["/*.sqlite"]["Content-Type"], "application/vnd.sqlite3")
+        self.assertEqual(vercel["/(.*)\\.sqlite"]["Content-Type"], "application/vnd.sqlite3")
+        self.assertEqual((self.dist / "_headers").read_bytes(), (ROOT / "web/_headers").read_bytes())
+
     # Figures follow the app's rules (red-team RED-1, RED-2, RED-3, RED-10, RED-11, RED-13 and IA-11)
 
     def test_static_rules_match_the_app_code_in_node(self):
         node = shutil.which("node")
         if not node: self.skipTest("Node is not installed")
+        self.assertIn(APP_RULE, (ROOT / "web/app.js").read_text(), "eligibleMetrics changed in web/app.js; update Research.eligible and static_pages.exclusion")
         modules = ["web/app.js", "web/editorial.js", "web/work-v3.js"] + ["web/" + name for name in PRESENTATION_JS]
         result = subprocess.run([node, "-e", APP_RULES, str(ROOT), json.dumps(modules)], capture_output=True, text=True, timeout=120)
         self.assertEqual(result.returncode, 0, result.stderr[-2000:])
@@ -291,9 +410,27 @@ class StaticPageTests(unittest.TestCase):
             for field, key in (("display_basis", "basis"), ("display_label", "label")): self.assertEqual(self.research.correction(metric, field), expected[key], (mid, field))
             if expected["currentPeriod"]: self.assertEqual(self.research.correction(metric, "display_period"), expected["currentPeriod"], mid)
 
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    def test_printed_text_matches_the_app_wording(self):
+        """Research fields go through the Python port of publicText; sidecar copy must already be in final form."""
+        research = sorted({row[field] for table, fields in sp.REWORDED_FIELDS.items() for row in self.data[table] for field in fields if isinstance(row.get(field), str)})
+        load = lambda name: json.loads((ROOT / "data" / name).read_text())
+        editorial, profiles, work = load("editorial.json")["entries"], load("profile-content.json")["entries"], load("work-routes.json")["routes"]
+        sidecar = {c["name"] for c in self.data["companies"]}
+        sidecar |= {e.get(field) for e in editorial for field in ("summary", "primary_offering", "precise_category")}
+        sidecar |= {p.get(field) for entry in profiles for p in entry.get("products", []) for field in ("name", "description")}
+        sidecar |= {r.get(field) for r in work for field in ("role", "pay_label")}
+        sidecar |= {e[field] for e in self.events["events"] for field in ("title", "detail", "status")} | {s["publisher"] for e in self.events["events"] for s in e["sources"]}
+        sidecar = sorted(text for text in sidecar if isinstance(text, str) and text)
+        strings = research + sidecar
+        shown = json.loads(subprocess.run(["node", "-e", APP_WORDING, str(ROOT / "web/app.js"), str(ROOT / "data/canonical.json")], input=json.dumps(strings), check=True, capture_output=True, text=True).stdout)
+        self.assertGreater(len(sp.load_copy_edits()), 100)
+        for text, app in zip(research, shown): self.assertEqual(self.say(text), app, text)
+        for text, app in zip(sidecar, shown[len(research):]): self.assertEqual(text, app, "the app rewords this sidecar text; reword it at the source or pass it through public_wording")
+
     def test_key_figures_hold_only_eligible_figures_led_by_the_app_headline(self):
         for cid in self.companies:
-            rows, pending = self.figures(cid)
+            rows, pending, others = self.figures(cid)
             shown = [self.metrics[mid] for mid, _ in rows]
             for metric in shown:
                 claim = self.research.claims[metric["claim_id"]]
@@ -307,11 +444,31 @@ class StaticPageTests(unittest.TestCase):
                 self.assertLessEqual(len(same), 1, (cid, kind))
                 if headline and same and kind == headline["kind"]: self.assertEqual(same[0]["id"], headline["id"], cid)
             for mid, item in pending:
-                metric, text = self.metrics[mid], plain(item)
                 self.assertNotIn(mid, [m["id"] for m in shown], cid)
-                self.assertRegex(text, r"In reported talks|Unverified|Conflicting reports", mid)
+                self.assertRegex(plain(item), r"In reported talks|Unverified|Conflicting reports", mid)
+            for mid, item in others:
+                self.assertNotIn(mid, [m["id"] for m in shown] + [m for m, _ in pending], cid)
+                self.assertRegex(plain(item), r"\. (?:Forecast|Target|Older or partial figure)\.", mid)
+            # Forecasts and targets never count as key figures (RED-10): they appear only in the list of other reported figures.
+            listed = {mid for mid, _ in others}
             for mid in re.findall(r'data-metric="([^"]+)"', self.pages[cid]):
-                self.assertNotIn(self.metrics[mid].get("observation_status"), ("forecast", "target"), mid)
+                if self.metrics[mid].get("observation_status") in ("forecast", "target"): self.assertIn(mid, listed, mid)
+
+    def test_excluded_figures_are_listed_with_their_status(self):
+        """Nothing reported silently disappears: a newer figure the app excludes is listed with its status in words."""
+        eligible = lambda m: m.get("preferred_for_comparison") is not False and self.research.claims[m["claim_id"]]["status"] == "supported" and (not m.get("observation_status") or m["observation_status"] == "reported")
+        found, shown = set(), 0
+        for cid in self.companies:
+            rows, pending, others = self.figures(cid)
+            shown += len(rows)
+            for mid, item in pending + others:
+                self.assertFalse(eligible(self.metrics[mid]), (cid, mid))
+                value, status = re.match(r"[^:]+: (.*?)(?: Historical)? · .*?\. ((?:In reported talks|Unverified|Conflicting reports|Forecast|Target|Older or partial figure))\.", plain(item)).groups()
+                found.add((cid, value, status))
+        self.assertGreater(shown, 100)
+        self.assertLessEqual({("scale_ai", "$200M", "Unverified"), ("invisible", "more than $2B", "Unverified"), ("afterquery", "$3.2B", "In reported talks"), ("micro1", "$1B", "Target"), ("labelbox", "$189M", "Older or partial figure"), ("prolific", "$500M", "Forecast")}, found)
+        self.assertNotIn("Not preferred", "".join(self.pages.values()))
+        self.assertNotIn("DeepSWE pass@1, base", self.pages["afterquery"])
 
     def test_each_row_states_scope_date_grade_and_status(self):
         for cid in self.companies:
@@ -329,8 +486,23 @@ class StaticPageTests(unittest.TestCase):
                 self.assertNotRegex(text, r"\b[a-z]+_[a-z_]+\b", mid)
                 self.assertNotRegex(text, r"[$£€]-|\d{4}-\d{2}(?:-\d{2})?", mid)
 
+    def test_rows_name_their_scope_and_revenue_period(self):
+        taskus = dict(self.figures("taskus")[0])
+        self.assertIn("AI Services service line", plain(taskus["taskus.metric.expansion-2"]))
+        self.assertIn("FY2025", plain(taskus["taskus.metric.expansion-2"]))
+        self.assertIn("Revenue growth year over year AI Services service line", plain(taskus["taskus.metric.expansion-11"]))
+        prolific = dict(self.figures("prolific")[0])
+        self.assertIn("One week; exact week-end unspecified", plain(prolific["prolific.metric.audit-1"]))
+
+    def test_scale_leads_with_reported_revenue_not_the_unverified_run_rate(self):
+        rows, pending, _ = self.figures("scale_ai")
+        self.assertNotIn("$200M", "".join(plain(row) for _, row in rows))
+        self.assertRegex(plain(rows[0][1]), r"^Revenue .*\$870M")
+        self.assertIn(("scale_ai.claim.growth_metrics-3.metric-0"), dict(pending))
+        self.assertIn("Annualized pace: $200M", plain(dict(pending)["scale_ai.claim.growth_metrics-3.metric-0"]))
+
     def test_red_team_regressions_stay_fixed(self):
-        mercor_rows, mercor_pending = self.figures("mercor")
+        mercor_rows, mercor_pending, _ = self.figures("mercor")
         self.assertEqual(mercor_rows[0][0], "mercor.metric.oct14-major-financial-2")
         self.assertIn("gross (Sacra estimate)", plain(mercor_rows[0][1]))
         self.assertIn("mercor.metric.major-valuation_alternatives", [mid for mid, _ in mercor_pending])
@@ -368,6 +540,60 @@ class StaticPageTests(unittest.TestCase):
             script.write_text("const A={a:'1'};\nconst A={a:'2'};\n")
             with self.assertRaises(ValueError): sp.read_js_object(script, "A")
 
+    def test_company_descriptions_are_whole_sentences(self):
+        for cid, text in self.pages.items():
+            description, name = PageFacts(text).meta["description"], self.companies[cid]["name"]
+            self.assertTrue(description.startswith(name + " ") or description.startswith(name + ":"), (cid, description))
+            self.assertTrue(description.endswith("."), (cid, description))
+            self.assertNotIn("…", description, cid)
+            lede = html.unescape(re.search(r'<p class="lede">(.*?)</p>', text).group(1))
+            first = sp.sentences(lede)[0]
+            self.assertIn(first[1:], description, cid)
+
+    # Risks and disputes, link checks
+
+    def test_risk_statements_read_as_public_sentences(self):
+        for cid, sentence, instruction in (
+            ("laude", "The $100M philanthropy pledge, Institute grants, Laude Ventures capital and benchmark grant support are not comparable", "Do not compare the $100M"),
+            ("pareto", "pareto.ai is unrelated to Pareto Securities", "Do not confuse pareto.ai"),
+            ("micro1", "Latest financing was reported without company confirmation, and the participating labs are not named.", "fabricated"),
+            ("a-team", "Its full 11,000-builder network is not a count of AI-data contributors, and unnamed RL delivery cases are not named-customer validation.", "or interpret unnamed RL"),
+            ("scale_ai", "Meta’s 49% stake raised customer-independence concerns", "Meta ownership triggered"),
+        ):
+            self.assertIn(html.escape(sentence), self.pages[cid], cid)
+            self.assertNotIn(html.escape(instruction), self.pages[cid], cid)
+        changed = 0
+        for claim in self.data["claims"]:
+            if claim.get("subject") != "risks" or claim.get("status") != "supported": continue
+            self.assertIn(f'<tr data-risk="{claim["id"]}"><th scope="row">{html.escape(sp.clean(self.say(claim["statement"])))}</th>', self.pages[claim["company_id"]], claim["id"])
+            changed += self.say(claim["statement"]) != claim["statement"]
+        self.assertGreater(changed, 10)
+
+    def test_risk_section_lists_dated_events_then_risks_newest_first(self):
+        for cid, text in self.pages.items():
+            dated = sp.company_events(self.events, cid)
+            risks = sp.risk_claims(self.research, cid)
+            if not dated and not risks:
+                self.assertNotIn('id="risks"', text, cid)
+                continue
+            section = text.split('<h2 id="risks">', 1)[1].split('<h2 id="work">', 1)[0]
+            self.assertEqual(re.findall(r'<tr data-event="([^"]+)">', section), [e["id"] for e in dated], cid)
+            self.assertEqual(re.findall(r'<tr data-risk="([^"]+)">', section), [c["id"] for c in risks], cid)
+            self.assertEqual([e["date"] for e in dated], sorted((e["date"] for e in dated), reverse=True), cid)
+            self.assertEqual(sp.EVENTS_NOTE in section, bool(dated), cid)
+            self.assertIn(f'href="{ORIGIN}/#company/{cid}/risks"', section, cid)
+        mercor = self.pages["mercor"].split("<h3>Risks named in the evidence</h3>", 1)[1].split("</table>", 1)[0]
+        self.assertIn('<td class="date" data-label="As of">Jun 2026</td>', mercor)
+        self.assertIn('<td class="date" data-label="Date">Source date not stated</td>', mercor)
+        self.assertIn("Statuses were checked on 23 Oct 2026.", self.pages["mercor"])
+        self.assertIn("@media(min-width:701px){table.events td:last-child a{white-space:nowrap}}", sp.STYLE)
+
+    def test_dead_evidence_links_carry_the_link_check(self):
+        self.assertIn('href="https://jobs.ashbyhq.com/elorian-ai-inc/69acef27-d755-4b22-8257-94759edb0efb">', self.pages["elorian"])
+        self.assertIn("(page unavailable when checked 23 Oct 2026)", self.pages["elorian"])
+        self.assertIn("(page unavailable when checked 23 Oct 2026)", self.pages["labelbox"])
+        self.assertNotIn("when checked", self.pages["mercor"])
+
     # Paid work, method and 404 pages
 
     def test_work_page_lists_every_listing_once_in_worker_groups(self):
@@ -392,6 +618,7 @@ class StaticPageTests(unittest.TestCase):
 
     def test_company_pages_list_their_listings_in_worker_groups(self):
         labels = [label for _, label, _ in sp.WORK_BUCKETS]
+        closed_label = dict((key, label) for key, label, _ in sp.WORK_BUCKETS)["closed"]
         for cid, text in self.pages.items():
             own = [r for r in self.routes if r["company_id"] == cid]
             section = text.split('<h2 id="work">', 1)[1].split("<h2", 1)[0]
@@ -399,7 +626,7 @@ class StaticPageTests(unittest.TestCase):
             headings = re.findall(r"<h3>(.*?)</h3>", section)
             self.assertEqual(headings, sorted(headings, key=labels.index), cid)
             if own: self.assertIn("Never pay to get work.", section, cid)
-            closed = section.split("<h3>Closed or unpaid links</h3>", 1)[1] if "<h3>Closed or unpaid links</h3>" in section else ""
+            closed = section.split(f"<h3>{closed_label}</h3>", 1)[1] if f"<h3>{closed_label}</h3>" in section else ""
             self.assertNotIn("Pay: ", closed, cid)
 
     def test_method_page_describes_the_dataset_without_a_license(self):
@@ -416,6 +643,7 @@ class StaticPageTests(unittest.TestCase):
             name = download["contentUrl"].replace(ORIGIN + "/", "")
             self.assertTrue((self.dist / name).is_file(), name)
             self.assertIn(f'href="{download["contentUrl"]}"', text)
+        self.assertIn(f"{ORIGIN}/business-health.json", [d["contentUrl"] for d in dataset["distribution"]])
         self.assertIn("Musa Ozdem", text)
         self.assertIn(str(sum(1 for c in self.data["claims"] if c["status"] in ("unverified", "contested"))), text)
 
@@ -425,7 +653,10 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(facts.meta.get("robots"), "noindex")
         self.assertEqual(facts.canonicals, [])
         self.assertEqual(facts.headings, ["We could not find that page."])
-        for path in ("/", "/companies/", "/work/", "/method/"): self.assertIn(f'href="{ORIGIN}{path}"', text)
+        for path in ("/", "/companies/", "/work/", "/method/", "/#about", "/?search"): self.assertIn(f'href="{ORIGIN}{path}"', text)
+        self.assertEqual([(l.get("rel"), l.get("href")) for l in facts.links if "icon" in str(l.get("rel"))], ICONS)
+        self.assertIn("--bg:#f8f8f4;--ink:#18231f", sp.STYLE, "the edition palette")
+        self.assertFalse((ROOT / "web/404.html").exists(), "404.html is generated by scripts/static_pages.py")
 
     def test_research_text_cannot_break_out_of_static_pages(self):
         sys.path.insert(0, str(ROOT / "tests"))

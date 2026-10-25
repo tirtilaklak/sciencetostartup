@@ -17,9 +17,6 @@
 .investor-transcript>summary{display:list-item;width:fit-content;cursor:pointer;min-height:44px;padding:12px 0;line-height:20px}
 .investor-transcript>div{max-width:780px;padding:3px 0 4px}
 .investor-transcript p{margin:0 0 12px}
-.investor-transcript dl{display:grid;gap:12px;margin:0 0 16px}
-.investor-transcript dt{font-weight:600;color:var(--ink)}
-.investor-transcript dd{margin:3px 0 0}
 .investor-terms{font-size:11px}
 @media(max-width:600px){
   .investor-snapshot{margin-bottom:28px}

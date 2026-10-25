@@ -23,7 +23,9 @@ for(const id of g.closed)assert.ok(['historical','closed','contributions','pause
 for(const id of g.boards)assert.equal(byId[id].status,'careers');
 for(const id of g.outside)assert.equal(byId[id].ai_data_work,false);
 // Persona fits sit in open blocks, not in closed groups.
-for(const id of ['afterquery.work.world-models','surge_ai.work.swe-environments','elorian.work.model-safety','terac.work.ml-scenarios','toloka.work.mindrift-code','terac.work.rl-environment-creation','afterquery.work.fullstack-evaluation'])assert.ok(g.hourly.includes(id),'hourly fit '+id);
+for(const id of ['afterquery.work.world-models','surge_ai.work.swe-environments','terac.work.ml-scenarios','toloka.work.mindrift-code','terac.work.rl-environment-creation','afterquery.work.fullstack-evaluation'])assert.ok(g.hourly.includes(id),'hourly fit '+id);
+// The 23 Oct check found the Elorian safety listing removed, so it moves to the closed group.
+assert.ok(g.closed.includes('elorian.work.model-safety'),'closed listing elorian.work.model-safety');
 for(const id of ['micro1.work.everyday-tasks','rws_trainai.work.community','toloka.work.toloka-work-now-on-mindrift'])assert.ok(g.task.includes(id),'task fit '+id);
 assert.ok(g.project.includes('prolific.work.study-participant'));
 // Hourly ranges: only labels that state a rate per hour, never a conflict, all read as published.
@@ -38,7 +40,8 @@ const sorted=ids(`w4RouteGroups(workRouteRows(),'hourly').hourly.map(r=>r.id)`);
 const highs=sorted.map(id=>run(`w4HourlyRange(${JSON.stringify(byId[id])})`)?.high??-1);
 for(let i=1;i<highs.length;i++)if(highs[i]>=0)assert.ok(highs[i]<=highs[i-1],'rate order at '+sorted[i]);
 assert.equal(sorted.at(-1),'afterquery.work.college-swe');
-assert.deepEqual(sorted.slice(0,4),['afterquery.work.world-models','terac.work.finance-experts','surge_ai.work.swe-environments','scale_ai.work.outlier-statistics']);
+// The 23 Oct check relisted G2i's senior SWE training work at $100–200 / hour, so it ranks second.
+assert.deepEqual(sorted.slice(0,4),['afterquery.work.world-models','g2i.work.senior-swe-training','terac.work.finance-experts','surge_ai.work.swe-environments']);
 // A non-USD hourly rate never outranks a USD one and is never compared by amount.
 assert.ok(run(`w4RateOrder({...${JSON.stringify(byId['appen.work.sage-media'])}},{...${JSON.stringify(byId['appen.work.sage-media'])},pay_label:'£900 / hour'})`)<0);
 // Pay filter values, including the two the old tests use.

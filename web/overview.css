@@ -1,4 +1,4 @@
-/* Overview page (#market): hero, evidence stories, paid work, business groups, how we check and the publisher's proposed lab. */
+/* Overview page (#market): hero, paid work, business groups, how we check and the publisher's proposed lab. The business health dashboard has its own file. */
 /* Hero: what the guide is, who publishes it, and the two main paths. */
 #market-view .market-hero{grid-template-columns:minmax(0,740px) minmax(220px,1fr);align-items:center;padding:48px 0 20px}
 .hero-eyebrow{text-transform:uppercase}
@@ -21,7 +21,7 @@
 #market-view .hero-logo-grid>a>.hero-logo-name{display:block;max-width:100%;font-size:12px;line-height:1.4;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #market-view .hero-logo-grid>a:hover>.hero-logo-name{color:var(--green);text-decoration:underline;text-underline-offset:3px}
 /* Section headings and the grade key. */
-#market-view .editorial-heading .eyebrow,#market-view .product-story .story-number{display:block}
+#market-view .product-story .story-number{display:block}
 #market-view .section-heading>div>p:not(.eyebrow):not(.story-number){margin:10px 0 0;max-width:640px;font-size:15px;line-height:1.55;color:var(--muted)}
 .grade-key{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin:14px 0 0;font-size:13px;line-height:1.5;color:var(--muted)}
 .grade-key>p{margin:0;color:var(--ink)}
@@ -30,40 +30,6 @@
 .grade-key dd{margin:0}
 .grade-key dt,.story-grade{display:inline-flex;align-items:center;justify-content:center;min-width:20px;padding:2px 6px;border:1px solid #aab4ad;border-radius:999px;font-size:11px;font-weight:600;line-height:1.3;color:var(--ink);white-space:nowrap;background:var(--bg)}
 .story-grade[data-grade="U"],.grade-key dl>div:last-child dt{border-style:dashed}
-/* Revenue: dated annualized snapshots first, then the latest full year. */
-#scale-visual .scale-layout{display:block}
-#scale-visual .scale-annualized{border:0;padding:0;margin:0}
-#scale-visual .pace-snapshots{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0;margin:0;padding:0;border:0}
-#scale-visual .pace-snapshot{margin:0;padding:0 20px;border:0;border-left:1px solid var(--border)}
-#scale-visual .pace-snapshot:first-child{padding-left:0;border-left:0}
-.pace-figure{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
-#scale-visual .pace-snapshot p{font-size:13px;line-height:1.5;margin:6px 0 0;color:var(--muted)}
-#scale-visual .scale-completed{margin-top:28px;padding-top:22px;border-top:1px solid var(--border)}
-#scale-visual .scale-observation{grid-template-columns:110px minmax(0,1fr) 96px;gap:12px;margin:20px 0}
-#scale-visual .scale-value{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
-#scale-visual .chart-axis{margin:0 108px 0 122px}
-/* Revenue change: dumbbell rows on one shared axis from $0. Light dot = first year, dark dot = second year. */
-#growth-visual .growth-pairs{display:block}
-.growth-legend{display:flex;gap:20px;margin:0 0 2px;font-size:12px;line-height:1.5;color:var(--muted)}
-.growth-legend span{display:inline-flex;align-items:center;gap:7px}
-.growth-legend .growth-dot,.growth-legend .growth-dot.is-end{position:static;margin:0}
-#growth-visual .growth-pair{padding:14px 0 10px}
-#growth-visual .growth-pair+.growth-pair{border-top:1px solid var(--border)}
-#growth-visual .growth-label{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
-#growth-visual .growth-label strong{display:block;margin:0;color:var(--ink);font-size:26px;font-weight:600;letter-spacing:-.5px;font-variant-numeric:normal}
-.growth-track{position:relative;height:30px;margin:8px 0 2px}
-.growth-track:before{content:'';position:absolute;left:0;right:0;top:50%;border-top:1px solid var(--border)}
-.growth-grid span{position:absolute;top:6px;bottom:6px;border-left:1px solid var(--border)}
-.growth-span{position:absolute;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:#739281}
-.growth-dot{position:absolute;top:50%;display:inline-block;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#739281;box-shadow:0 0 0 2px var(--bg)}
-.growth-dot.is-end{width:14px;height:14px;margin:-7px 0 0 -7px;background:var(--green)}
-.growth-values{margin:2px 0 6px;font-size:14px;line-height:1.5;color:var(--ink)}
-#growth-visual .growth-sources{display:flex;flex-wrap:wrap;gap:4px 22px;max-width:none;margin:0}
-.growth-sources>span{display:inline-flex;align-items:center;gap:6px}
-.growth-axis{position:relative;height:20px;margin:2px 0 0;font-size:12px;line-height:20px;color:var(--muted)}
-.growth-axis span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
-.growth-axis .is-first{transform:none}
-.growth-axis .is-last{transform:translateX(-100%)}
 /* Paid work. */
 .overview-work{display:grid;grid-template-columns:minmax(180px,.8fr) minmax(0,2.3fr);gap:0 46px;margin:30px 0 0;padding:32px 0 36px;border-top:1px solid var(--border)}
 .overview-work>.section-heading{margin:0;align-items:start}
@@ -132,12 +98,6 @@
   .hero-logos{margin-top:20px}
   #market-view .hero-logo-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;overflow:visible}
   #market-view .hero-logo-grid .brand-asset{width:100%;max-width:108px}
-  #scale-visual .pace-snapshots{grid-template-columns:1fr}
-  #scale-visual .pace-snapshot,#scale-visual .pace-snapshot:first-child{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;column-gap:16px;padding:14px 0;border-left:0;border-top:1px solid var(--border)}
-  #scale-visual .pace-snapshot:first-child{border-top:0;padding-top:0}
-  #scale-visual .pace-snapshot>a{grid-column:1}
-  #scale-visual .pace-snapshot>.pace-figure{grid-column:2;grid-row:1/3;flex-direction:column;align-items:flex-end;gap:4px}
-  #scale-visual .pace-snapshot>p{grid-column:1;grid-row:2}
   .overview-work{display:block}
   .overview-work>.section-heading{margin-bottom:16px}
   #model-map .category-card{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 60px 20px}
@@ -154,9 +114,6 @@
   #market-view .hero-logo-grid .brand-asset{width:90px;max-width:100%;height:28px}
   .grade-key{margin:0;font-size:13px}
   .grade-key dl{display:grid;grid-template-columns:1fr;gap:6px}
-  #scale-visual .scale-observation{grid-template-columns:84px minmax(0,1fr) 84px;gap:10px;margin:20px 0}
-  #scale-visual .chart-axis{margin:0 94px 0 94px}
-  #scale-visual .pace-snapshot .number-button{font-size:26px}
   .overview-work{margin-top:20px;padding:24px 0 28px}
   .overview-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
   .overview-stats span{font-size:13px;line-height:1.35}
@@ -168,13 +125,9 @@
 }
 @media(max-width:380px){
   #market-view .hero-meta b{font-size:22px}
-  #scale-visual .scale-observation{grid-template-columns:78px minmax(0,1fr) 80px}
-  #scale-visual .chart-axis{margin:0 90px 0 88px}
   .venture-band{margin-left:-16px;margin-right:-16px;padding:24px 16px}
 }
 @media(forced-colors:active){
   .grade-bar{display:none}
   .grade-key dt,.story-grade{border-color:CanvasText}
-  .growth-span,.growth-dot,.growth-dot.is-end{forced-color-adjust:none;background:CanvasText}
-  .growth-dot.is-start{background:Canvas;box-shadow:inset 0 0 0 2px CanvasText}
 }

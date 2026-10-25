@@ -3,10 +3,10 @@
 The synthetic fixture checks every rubric combination. The real dataset run loads
 all presentation modules and JSON inputs in the build's order before initialize.
 """
-import itertools, json, subprocess, sys, tempfile
+import itertools, json, re, subprocess, sys, tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
-from observatory import classify, stage_confidence
+from observatory import PRESENTATION_JS, classify, stage_confidence
 from fixtures import fixture
 
 STUB=r'''
@@ -23,13 +23,14 @@ const profileData=readJSON('data/profile-content.json'),afterqueryPath=path.join
 if(fs.existsSync(afterqueryPath))profileData.entries=profileData.entries.filter(entry=>entry.company_id!=='afterquery').concat(JSON.parse(fs.readFileSync(afterqueryPath,'utf8')));
 const window={scrollY:0,scrollTo(){},addEventListener(k,f){(windowCallbacks[k]??=[]).push(f)},EDITORIAL:readJSON('data/editorial.json'),LOGOS:readJSON('data/logo-provenance.json'),WORK_ROUTES:synthetic?{routes:[]}:readJSON('data/work-routes.json'),PROFILE_CONTENT:profileData,RESEARCH_ALIASES:readJSON('docs/research-id-crosswalk.json')};
 window.SOURCE_UPDATES=readJSON('data/source-updates.json');
+window.BUSINESS_HEALTH=synthetic?null:readJSON('data/business-health.json');
 const history={replaceState(state,title,hash){location.hash=hash;}};
 let downloadedBlob;
 class CaptureURL extends URL {static createObjectURL(blob){downloadedBlob=blob;return 'blob:test'}static revokeObjectURL(){}}
-const context=vm.createContext({document,window,history,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,Blob,queueMicrotask,setTimeout:()=>{},console});
+const context=vm.createContext({document,window,history,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,Blob,queueMicrotask,setTimeout:()=>{},clearTimeout:()=>{},console});
 // The icon script runs first. This stub's window is separate from its global.
 // Combining the remaining modules matches declaration hoisting in the build.
-const modules=['web/icons.js','web/app.js','web/editorial.js','web/work-v3.js','web/work-v4.js','web/profiles-v2.js','web/source-updates.js','web/site-nav.js'];
+const modules=['web/icons.js','web/app.js','web/editorial.js','web/work-v3.js','web/work-v4.js','web/profiles-v2.js','web/source-updates.js','web/site-nav.js','web/business-health.js'];
 vm.runInContext(fs.readFileSync(path.join(root,modules[0]),'utf8'),context);
 context.iconHTML=window.iconHTML;
 assert.equal(typeof context.iconHTML,'function');
@@ -176,6 +177,28 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  run('setSelection([])');assert.equal((node('compare-content').innerHTML.match(/data-mobile-compare=/g)||[]).length,3);assert.ok(node('compare-content').innerHTML.includes('TaskUs + Appen'));assert.ok(node('compare-content').innerHTML.includes('data-mobile-compare="2"'));click(button({mobileCompare:'1'}));assert.equal(run('state.mobileCompare'),1,'Default example must reach final company');
  assert.ok(/data-comparison-company="scale_ai" class=""/.test(node('compare-content').innerHTML));run('setSelection([])');
 
+ // Routes ignore hash queries and letter case, land on in-page sections and carry the comparison.
+ for(const [hash,view] of [['#work?utm_source=x','work'],['#venture','market'],['#about','method'],['#labels','method'],['#corrections','method'],['#downloads','method']]){location.hash=hash;run('route()');assert.equal(node(view+'-view').hidden,false,hash);assert.equal(location.hash,hash,hash+' must stay linkable');}
+ // The overview's tab title names the site; the other views lead with their own name.
+ location.hash='#market';run('route()');assert.equal(run('document.title'),'ScienceToStartup · The AI data field guide');
+ // A plain view link after #venture or #about starts at the top of that view, even though the view is unchanged.
+ const scrolls=[];window.scrollTo=options=>scrolls.push(options);
+ for(const [section,next] of [['#venture','#market'],['#about','#method']]){location.hash=section;run('route()');scrolls.length=0;location.hash=next;run('route()');assert.deepEqual(scrolls.map(options=>options.top),[0],section+' then '+next+' must scroll to the top');}
+ window.scrollTo=()=>{};location.hash='#market';run('route()');
+ location.hash='#company/Scale_AI/WORK';run('route()');assert.ok(node('profile-view').innerHTML.includes('data-profile-pane="work">'),'Section case must not hide the Paid work tab');
+ assert.equal(location.hash,'#company/scale_ai/work','Mixed-case company links are rewritten to their canonical form');run(`activateProfileTab('traction')`);assert.equal(location.hash,'#company/scale_ai/traction','Profile tabs work after a mixed-case link');
+ // Compare links use #compare/<id>/<id>. The earlier comma form (#compare/a,b) still opens and is rewritten to it.
+ location.hash='#compare/mercor,Handshake_AI,unknown,mercor';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai']);assert.equal(location.hash,'#compare/mercor/handshake_ai');
+ run(`chooseCompare('appen',true)`);assert.equal(location.hash,'#compare/mercor/handshake_ai/appen');
+ location.hash='#compare/junk,nope';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai','appen'],'A compare link naming no known company keeps the selection');assert.equal(location.hash,'#compare/mercor/handshake_ai/appen');
+ location.hash='#compare/Appen/unknown/appen/Scale_AI';run('route()');assert.deepEqual(plain(run('state.selected')),['appen','scale_ai'],'Slash links ignore case, unknown and repeated companies');assert.equal(location.hash,'#compare/appen/scale_ai');
+ run('setSelection([])');assert.equal(location.hash,'#compare');location.hash='#market';run('route()');
+
+ // Curated profile headings render as text.
+ const headed=curated.find(entry=>entry.traction_heading),heading=headed.traction_heading;headed.traction_heading='<b>x</b>';
+ const tractionHeading=run(`profileHTML(${JSON.stringify(headed.company_id)})`).match(/data-profile-section="traction"><h2>([\s\S]*?)<\/h2>/)[1];headed.traction_heading=heading;
+ assert.equal(tractionHeading,'&lt;b&gt;x&lt;/b&gt;');assert.ok(!tractionHeading.includes('<'),'Profile heading h2 must have no element children');
+
  // Role routes, pay units and availability remain separate, with no company pay band.
  const routes=window.WORK_ROUTES.routes;assert.equal(run('filteredWork().length'),routes.length);
  assert.ok(routes.length>39);assert.equal(new Set(routes.map(r=>r.id)).size,routes.length);
@@ -240,6 +263,10 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
 })().catch(error=>{console.error(error);process.exitCode=1});
 function readJSONFrom(file){return JSON.parse(fs.readFileSync(file,'utf8'));}
 '''
+# The stub loads the page scripts in the build's order (PRESENTATION_JS in scripts/observatory.py).
+# link-health.js is left out on purpose: test_link_health.py loads it later to check the fallback without it.
+STUB_MODULES=re.search(r"const modules=\[([^\]]*)\];",STUB).group(1).replace("'","").split(',')
+assert STUB_MODULES==['web/icons.js','web/app.js','web/editorial.js','web/work-v3.js']+['web/'+name for name in PRESENTATION_JS],'The JS stub must load every presentation script in the build order'
 
 with tempfile.TemporaryDirectory(prefix='observatory-js-') as tmp:
  tmp=Path(tmp);(tmp/'test.cjs').write_text(STUB);data=fixture();expected=[]

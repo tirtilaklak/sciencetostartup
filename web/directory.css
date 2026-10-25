@@ -6,7 +6,7 @@
 .filters>.more-filters,.filters>.more-filters[open]{position:static;align-self:end;width:auto;max-width:none;margin:0;padding:0;border:0;background:none;box-shadow:none}
 .more-filters>summary{border-radius:3px}
 .more-filters[open]>summary{background:#eef1ea;color:var(--ink)}
-.more-filters-panel{position:absolute;right:0;top:calc(100% + 6px);z-index:35;width:290px;box-sizing:border-box;padding:4px 16px 14px;background:var(--bg);border:1px solid #cbd4c5;border-radius:3px;box-shadow:0 6px 20px #162a1822}
+.more-filters-panel{position:absolute;right:0;top:calc(100% + 6px);z-index:61;width:290px;box-sizing:border-box;padding:4px 16px 14px;background:var(--bg);border:1px solid #cbd4c5;border-radius:3px;box-shadow:0 6px 20px #162a1822}
 .more-filters-panel>label{margin:12px 0 0}
 .more-filters-panel select{width:100%}
 @media(max-width:700px){.filters>.more-filters,.filters>.more-filters[open]{grid-column:2;grid-row:2}.more-filters-panel{left:0;width:auto}}

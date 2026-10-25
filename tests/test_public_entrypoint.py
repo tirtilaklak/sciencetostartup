@@ -1,7 +1,12 @@
-"""Public crawler exports and lossless embedded data in the built dashboard."""
+"""Public crawler exports, lossless embedded data and the deployed-dist release check."""
+import contextlib
 import hashlib
+import io
 import json
 import re
+import shutil
+import sys
+import tempfile
 import unittest
 import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
@@ -9,6 +14,10 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from build_public_snapshot import verify
+from observatory import build
+
 ORIGIN = "https://sciencetostartup.com"
 
 
@@ -70,6 +79,50 @@ class PublicEntrypointTests(unittest.TestCase):
         for name in ("robots.txt", "sitemap.xml", "favicon.ico", "404.html"):
             self.assertEqual(hashlib.sha256((self.dist / name).read_bytes()).hexdigest(), manifest[name])
         self.assertEqual((self.dist / "favicon.ico").read_bytes(), (ROOT / "web/favicon.ico").read_bytes())
+
+
+class DeployedDistTests(unittest.TestCase):
+    """verify() must read the deployed files, not only the rebuilt manifest."""
+    @classmethod
+    def setUpClass(cls):
+        cls.temp = tempfile.TemporaryDirectory(prefix="verify-dist-")
+        cls.build = Path(cls.temp.name) / "build"
+        build(json.loads((ROOT / "data/canonical.json").read_text()), cls.build)
+
+    @classmethod
+    def tearDownClass(cls): cls.temp.cleanup()
+
+    def deployed(self):
+        dist = Path(self.temp.name) / self._testMethodName
+        shutil.copytree(self.build, dist)
+        return dist
+
+    def rejected(self, dist):
+        with self.assertRaises(SystemExit) as caught, contextlib.redirect_stdout(io.StringIO()):
+            verify(self.build, dist)
+        return str(caught.exception)
+
+    def test_faithful_copy_passes(self):
+        with contextlib.redirect_stdout(io.StringIO()) as output: verify(self.build, self.deployed())
+        result = json.loads(output.getvalue())
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(result["deployed_files"], result["payloads"] + 1)
+
+    def test_tampered_entrypoint_fails(self):
+        dist = self.deployed()
+        page = dist / "index.html"
+        page.write_text(page.read_text().replace("</body>", '<script src="https://example.com/x.js"></script></body>'))
+        self.assertEqual(self.rejected(dist), "Deployed file differs from the manifest: index.html")
+
+    def test_extra_file_fails(self):
+        dist = self.deployed()
+        (dist / "company/mercor/stray.html").write_text("stray")
+        self.assertIn("Extra: company/mercor/stray.html", self.rejected(dist))
+
+    def test_missing_file_fails(self):
+        dist = self.deployed()
+        (dist / "company/mercor/index.html").unlink()
+        self.assertIn("Missing: company/mercor/index.html", self.rejected(dist))
 
 
 if __name__ == "__main__":
