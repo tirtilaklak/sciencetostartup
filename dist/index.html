@@ -311,260 +311,190 @@ body:has(#compare-tray:not([hidden])) main{padding-bottom:144px}
 .availability-notice{margin:24px 0;padding:18px 20px;border:1px solid var(--border);background:var(--paper);font-size:15px;line-height:1.6}.availability-notice p{margin:0 0 10px}.availability-notice p:last-child{margin:0}.availability-notice a{display:inline-block;margin-right:18px;min-height:32px;overflow-wrap:anywhere}.brand-dark.brand-text{color:#f7f8f3}
 /* Section links move focus to #venture or #about for screen readers; the scroll already shows where it landed, as with headings. */
 #venture[tabindex="-1"]:focus,#about[tabindex="-1"]:focus{outline:none}
-/* Business-health workbench. All rules stay inside its own component classes. */
-#business-health{--bh-green:#285b46;--bh-dark:#193f2f;--bh-line:#d8ddd5;--bh-soft:#edf1e9;--bh-paper:#fcfcf8;--bh-amber:#745320;--bh-amber-bg:#f5efdf;margin:42px 0 40px;scroll-margin-top:calc(var(--header-height,72px) + 20px)}
-.bh-heading{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 32px;margin-bottom:22px}
-.bh-heading .eyebrow,.bh-heading>.eyebrow{font-size:11px;letter-spacing:1.15px;margin-bottom:9px;color:var(--muted)}
-.bh-heading h2{font-size:32px;line-height:1.16;letter-spacing:-1px;margin:0 0 10px}
-.bh-heading p{max-width:740px;margin:0;color:var(--muted);font-size:15px;line-height:1.6}
-.bh-heading>a{font-size:13px;flex:none;min-height:36px;display:inline-flex;align-items:center;gap:6px}
-.bh-northstar{display:grid;grid-template-columns:minmax(170px,.8fr) minmax(0,2.2fr);gap:8px 28px;border-block:1px solid var(--bh-line);padding:20px 0;margin-bottom:24px}
-.bh-northstar>span,.bh-northstar>label,.bh-northstar .bh-label{font-size:11px;font-weight:650;letter-spacing:.9px;text-transform:uppercase;color:var(--bh-green)}
-.bh-northstar>strong{font-size:19px;line-height:1.4;letter-spacing:-.3px;font-weight:600}
-.bh-northstar>p,.bh-northstar>details{grid-column:2;font-size:13px;line-height:1.6;color:var(--muted);margin:0}
-.bh-northstar details summary{font-size:12px;min-height:32px;padding:5px 0;color:var(--bh-green)}
-.bh-northstar details p{margin:6px 0 0}
-.bh-metric-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;border:1px solid var(--bh-line);border-bottom:0;background:var(--bh-paper)}
-.bh-metric-tab{position:relative;min-width:0;min-height:134px;display:flex;flex-direction:column;align-items:start;gap:5px;border:0;border-right:1px solid var(--bh-line);border-radius:0;padding:17px 17px 15px;text-align:left;line-height:1.4;background:transparent;transition:background .12s ease}
-.bh-metric-tab:last-child{border-right:0}
-.bh-metric-tab:hover{background:var(--bh-soft)}
-.bh-metric-tab[aria-selected=true]{background:var(--bh-soft);box-shadow:inset 0 3px 0 var(--bh-green)}
-.bh-metric-tab[aria-selected=true] strong{color:var(--bh-dark)}
-.bh-metric-tab>.number,.bh-metric-tab>.bh-number{font-size:11px;font-weight:500;letter-spacing:.5px;color:var(--muted)}
-.bh-metric-tab strong{font-size:16px;font-weight:650;letter-spacing:-.2px;line-height:1.25}
-.bh-metric-tab>.question,.bh-metric-tab>.bh-question{font-size:12px;font-weight:400;line-height:1.5;color:var(--muted)}
-.bh-metric-tab>.coverage,.bh-metric-tab>.bh-coverage{display:block;margin-top:auto;padding-top:6px;font-size:11px;color:var(--muted);font-weight:500}
-.bh-workbench{border:1px solid var(--bh-line);background:var(--bh-paper)}
-.bh-controls{display:flex;flex-wrap:wrap;align-items:end;gap:13px 18px;padding:18px 22px;border-bottom:1px solid var(--bh-line)}
-.bh-controls>label,.bh-subcontrols>label{display:flex;flex-direction:column;flex:1 1 150px;min-width:0;max-width:250px;gap:6px;color:var(--muted);font-size:11px;font-weight:500}
-.bh-controls select,.bh-controls input:not([type=checkbox]),.bh-subcontrols select,.bh-subcontrols input:not([type=checkbox]){width:100%;min-width:0;min-height:40px;font-size:12px;background:var(--bh-paper);border:1px solid #7d8b80;padding:8px 28px 8px 10px;border-radius:2px}
-.bh-controls label:has(input[type=checkbox]),.bh-subcontrols label:has(input[type=checkbox]){flex:0 1 auto;max-width:none;flex-direction:row;align-items:center;gap:8px;min-height:40px;font-size:12px}
-.bh-controls input[type=checkbox],.bh-subcontrols input[type=checkbox]{width:17px;height:17px;min-height:17px;accent-color:var(--bh-green);flex:0 0 17px}
-.bh-subcontrols{display:flex;flex-wrap:wrap;align-items:end;gap:10px 16px}
-.bh-chart-area{display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,.43fr);align-items:stretch;min-width:0}
-.bh-chart-main{min-width:0;padding:24px 22px 20px}
-.bh-chart-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:start;gap:10px 18px;margin-bottom:18px}
-.bh-chart-header h3{font-size:20px;letter-spacing:-.45px;line-height:1.35;margin:0 0 5px}
-.bh-chart-header p{font-size:12px;line-height:1.6;color:var(--muted);margin:0;max-width:590px}
-.bh-legend{display:flex;flex-wrap:wrap;align-items:center;gap:7px 15px;font-size:11px;line-height:1.5;color:var(--muted)}
-.bh-legend>span{display:inline-flex;align-items:center;gap:5px}
-.bh-legend i{display:inline-block;width:7px;height:7px;flex:0 0 7px;background:var(--bh-green);border:1px solid var(--bh-green);border-radius:50%}
-.bh-legend .is-estimate,.bh-legend .bh-estimated{background:var(--bh-amber-bg);border-color:var(--bh-amber)}
-#bh-plot{min-width:0}
-.bh-plot-row{display:grid;grid-template-columns:minmax(115px,1fr) minmax(65px,1.3fr) minmax(76px,.6fr);column-gap:14px;row-gap:3px;align-items:center;width:100%;min-height:67px;border:0;border-bottom:1px solid #e5e8e0;border-radius:0;padding:11px 8px;background:transparent;text-align:left;font-size:13px;line-height:1.4}
-.bh-plot-row:last-child{border-bottom:0}
-.bh-plot-row:hover{background:var(--bh-soft)}
-.bh-plot-row[aria-pressed=true],.bh-plot-row[aria-selected=true],.bh-plot-row.is-selected{background:var(--bh-soft);box-shadow:inset 3px 0 0 var(--bh-green)}
-.bh-row-name{display:block;min-width:0;color:var(--ink);font-size:13px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
-.bh-row-name small,.bh-row-name>span{display:block;font-size:10px;line-height:1.5;font-weight:400;color:var(--muted);margin-top:3px}
-.bh-row-track{display:block;position:relative;min-width:0;height:7px;background:#e1e7dc;border-radius:0;overflow:visible}
-.bh-row-bar{display:block;position:relative;height:100%;min-width:2px;max-width:100%;background:var(--bh-green)}
-.bh-row-bar.is-bound::after,.bh-plot-row.is-bound .bh-row-bar::after{content:"";position:absolute;right:-3px;top:0;width:7px;height:7px;transform:rotate(45deg);border-top:1.5px solid var(--bh-green);border-right:1.5px solid var(--bh-green)}
-.bh-row-bar.is-estimate,.bh-plot-row.is-estimate .bh-row-bar{background:repeating-linear-gradient(120deg,#9a7946 0 3px,#d4c19d 3px 6px)}
-.bh-row-value{display:block;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--bh-green);font-size:16px;font-weight:650;letter-spacing:-.3px}
-.bh-row-value small{display:block;font-size:10px;font-weight:400;line-height:1.5;letter-spacing:0;color:var(--muted)}
-.bh-row-meta{grid-column:1/-1;display:block;color:var(--muted);font-size:10px;font-weight:400;line-height:1.55;overflow-wrap:anywhere}
-.bh-row-delta{font-size:11px;font-weight:550;white-space:nowrap;color:var(--bh-green)}
-.bh-axis{display:flex;justify-content:space-between;gap:14px;margin:12px 0 0 8px;color:var(--muted);font-size:10px;font-variant-numeric:tabular-nums;line-height:1.5}
-.bh-detail{min-width:0;border-left:1px solid var(--bh-line);padding:24px 22px;background:#f2f4ed;overflow-wrap:anywhere}
-.bh-detail-kicker{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:0 0 8px}
-.bh-detail h4{font-size:19px;letter-spacing:-.35px;line-height:1.35;margin:0 0 12px}
-.bh-detail h4 a{color:var(--ink);text-decoration:none}
-.bh-detail h4 a:hover{text-decoration:underline}
-.bh-detail-value{font-size:33px;font-weight:600;letter-spacing:-1px;line-height:1.15;color:var(--bh-green);margin:0 0 6px;font-variant-numeric:tabular-nums}
-.bh-detail-value small{display:block;font-size:12px;line-height:1.55;letter-spacing:0;font-weight:400;margin-top:6px;color:var(--muted)}
-.bh-detail p{font-size:12px;line-height:1.65;margin:0 0 12px;color:var(--muted)}
-.bh-detail p strong{color:var(--ink);font-weight:600}
-.bh-detail .number-button{font-size:inherit;white-space:normal}
-.bh-detail .bh-pill{margin:3px 0 12px}
-.bh-fact{padding:13px 0;border-top:1px solid var(--bh-line);font-size:12px}
-.bh-fact:first-of-type{margin-top:16px}
-.bh-fact dl{display:grid;grid-template-columns:80px minmax(0,1fr);gap:7px 13px;font-size:11px;line-height:1.6;margin:0}
-.bh-fact dt{color:var(--muted);font-weight:400}
-.bh-fact dd{margin:0;color:var(--ink)}
-dl.bh-fact{display:grid;grid-template-columns:80px minmax(0,1fr);gap:7px 13px;margin:16px 0 0;line-height:1.6}
-dl.bh-fact dt{font-size:11px;color:var(--muted);font-weight:400}
-dl.bh-fact dd{font-size:11px;margin:0}
-.bh-evidence-links{display:flex;flex-wrap:wrap;gap:5px 13px;margin-top:12px;align-items:center}
-.bh-evidence-links a,.bh-evidence-links button{display:inline-flex;align-items:center;min-height:36px;font-size:11px;line-height:1.5;color:var(--bh-green);text-decoration:underline;text-underline-offset:3px;border:0;border-radius:0;padding:3px 0;background:none;max-width:100%;overflow-wrap:anywhere;text-align:left}
+/* Business-health dashboard: signal tiles, the evidence grid and its inspector. All rules stay inside its own component classes. */
+#business-health{--bh-green:#285b46;--bh-dark:#193f2f;--bh-line:#d8ddd5;--bh-soft:#edf1e9;--bh-paper:#fcfcf8;--bh-amber:#745320;--bh-amber-bg:#f5efdf;--bh-track:#e5eae2;--bh-neg:#7b5141;--bh-quiet:#9aa49c;margin:40px 0 36px;scroll-margin-top:calc(var(--header-height,72px) + 20px)}
+.bh-head{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(250px,1fr);gap:14px 36px;align-items:end;margin-bottom:16px}
+.bh-head .eyebrow{font-size:11px;letter-spacing:1.1px;margin-bottom:8px;color:var(--muted)}
+.bh-head h2{font-size:30px;line-height:1.15;letter-spacing:-.9px;margin:0 0 8px}
+.bh-head>div>p{margin:0;color:var(--muted);font-size:14px;line-height:1.55;max-width:560px}
+.bh-northstar{margin:0;padding:11px 14px;border:1px solid var(--bh-line);border-left:3px solid var(--bh-green);background:var(--bh-paper);font-size:12px;line-height:1.55;color:var(--muted)}
+.bh-northstar>span{display:block;font-size:10px;font-weight:650;letter-spacing:.9px;text-transform:uppercase;color:var(--bh-green);margin-bottom:3px}
+.bh-northstar>strong{display:block;font-size:15px;line-height:1.35;letter-spacing:-.2px;color:var(--ink);margin-bottom:3px}
+.bh-northstar>a{display:inline-block;margin-top:5px;font-size:11px}
+.bh-tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.bh-tile{display:flex;flex-direction:column;gap:3px;min-width:0;border:1px solid var(--bh-line);border-radius:3px;background:var(--bh-paper);padding:9px 12px 8px;text-align:left;line-height:1.3;color:var(--ink);transition:background .12s ease,border-color .12s ease}
+.bh-tile:hover{background:var(--bh-soft);border-color:#a6b2a1}
+.bh-tile[aria-selected=true]{background:var(--bh-soft);border-color:var(--bh-green);box-shadow:inset 0 0 0 1px var(--bh-green)}
+.bh-tile-top{display:flex;align-items:baseline;gap:7px;min-width:0}
+.bh-tile-n{font-size:10px;font-weight:500;letter-spacing:.4px;color:var(--muted)}
+.bh-tile strong{font-size:13px;font-weight:650;letter-spacing:-.15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bh-tile-q{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bh-tile-cov{display:block;height:4px;background:var(--bh-track);border-radius:2px;overflow:hidden;margin-top:4px}
+.bh-tile-cov i{display:block;height:100%;background:var(--bh-green);border-radius:2px}
+.bh-tile small{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bh-board{display:flex;align-items:stretch;max-height:max(560px,calc(100vh - var(--header-height,72px) - 24px));border:1px solid var(--bh-line);background:var(--bh-paper)}
+.bh-grid-side{flex:1 1 auto;min-width:0;min-height:0;display:flex;flex-direction:column}
+.bh-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 12px;border-bottom:1px solid var(--bh-line)}
+.bh-toolbar label{display:flex;flex-direction:row;align-items:center;gap:6px;flex:0 1 auto;font-size:11px;color:var(--muted);min-width:0}
+.bh-toolbar label:first-child{flex:1 1 170px}
+.bh-toolbar input[type=search],.bh-toolbar select{width:100%;min-height:34px;font-size:12px;padding:5px 9px;border:1px solid #7b8978;border-radius:3px;background:#fffefa;color:var(--ink)}
+.bh-toolbar select{padding-right:26px;max-width:200px}
+.bh-toolbar input[type=checkbox]{width:15px;height:15px;min-height:0;accent-color:var(--bh-green);flex:0 0 15px}
+.bh-count{margin:0;padding:6px 12px;font-size:11px;line-height:1.5;color:var(--muted);border-bottom:1px solid var(--bh-line)}
+.bh-grid-wrap{position:relative;flex:1 1 auto;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#a7b3a4 transparent}
+.bh-grid{border-collapse:separate;border-spacing:0;width:100%;min-width:640px;table-layout:fixed;font-size:12px;line-height:1.3;background:var(--bh-paper)}
+.bh-grid th,.bh-grid td{text-align:left;letter-spacing:0}
+.bh-grid thead th{position:sticky;top:0;z-index:2;background:var(--bh-soft);border-bottom:1px solid var(--bh-line);padding:0;text-align:left;vertical-align:bottom}
+.bh-grid thead th:first-child{width:19%;min-width:140px}
+.bh-colhead{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;min-height:40px;padding:6px 10px;border:0;border-radius:0;background:transparent;text-align:left;font-size:11px;font-weight:650;line-height:1.3;color:var(--ink)}
+.bh-colhead small{font-size:10px;font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+.bh-colhead:hover{background:#e3e9df;border:0}
+.bh-colhead.is-active{color:var(--bh-dark)}
+.bh-grid thead th[aria-sort=descending] .bh-colhead,.bh-grid thead th[aria-sort=other] .bh-colhead{box-shadow:inset 0 -2px 0 var(--bh-green)}
+.bh-grid tbody th{padding:4px 10px;border-bottom:1px solid #e5e8e0;font-weight:600;font-size:12px;vertical-align:middle;background:var(--bh-paper)}
+.bh-grid tbody th a{display:block;color:var(--ink);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:0}
+.bh-grid tbody th a:hover{color:var(--bh-green);text-decoration:underline}
+.bh-grid tbody th small{display:block;margin-top:1px;font-size:9.5px;font-weight:400;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bh-grid tbody tr:hover>th,.bh-grid tbody tr:hover>td,.bh-grid tbody tr.is-selected>th{background:#f1f4ec}
+.bh-cell{padding:3px 2px;border-bottom:1px solid #e5e8e0;vertical-align:middle}
+.bh-cell>button,.bh-cell>span{display:flex;flex-direction:column;justify-content:center;gap:1px;width:100%;min-height:34px;padding:3px 7px;border:0;border-radius:3px;background:transparent;text-align:left;font-size:12px;line-height:1.3;color:var(--muted);cursor:default}
+.bh-cell>button{cursor:pointer;transition:box-shadow .12s ease}
+.bh-cell b{font-weight:650;letter-spacing:-.15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.bh-cell small{font-size:9.5px;line-height:1.3;letter-spacing:-.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.bh-scope{display:inline-block;vertical-align:1px;margin-left:5px;padding:0 4px;border:1px solid currentColor;border-radius:2px;font-size:8.5px;font-style:normal;font-weight:600;letter-spacing:.3px;line-height:1.5;text-transform:uppercase;opacity:.8}
+.bh-cell[data-state=observed]>button{background:var(--bh-soft);color:var(--bh-dark)}
+.bh-cell[data-state=proxy]>button{background:var(--bh-amber-bg);color:var(--bh-amber)}
+.bh-cell[data-state=proxy] small{color:var(--bh-amber)}
+.bh-cell[data-state=missing]>span{color:var(--bh-quiet);font-weight:500}
+.bh-cell[data-state=n-a]>span{color:var(--bh-quiet);font-size:11px;background:repeating-linear-gradient(135deg,transparent 0 5px,#eef0ea 5px 6px)}
+.bh-cell>button:hover{box-shadow:inset 0 0 0 1px var(--bh-green)}
+.bh-cell>button[aria-pressed=true]{box-shadow:inset 0 0 0 2px var(--bh-green)}
+.bh-grid td.bh-empty{padding:28px 12px;font-size:12px;color:var(--muted)}
+.bh-legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0;padding:8px 12px;border-top:1px solid var(--bh-line);font-size:10.5px;line-height:1.5;color:var(--muted)}
+.bh-legend span{display:inline-flex;align-items:center;gap:5px}
+.bh-legend i{width:12px;height:12px;border-radius:2px;background:var(--bh-soft);border:1px solid #c5d0c2;flex:0 0 12px}
+.bh-legend i.is-proxy{background:var(--bh-amber-bg);border-color:#cbb995}
+.bh-legend i.is-missing{background:transparent;border-color:var(--bh-line)}
+.bh-legend i.is-na{background:repeating-linear-gradient(135deg,transparent 0 3px,#dfe3da 3px 4px);border-color:var(--bh-line)}
+.bh-inspector{flex:0 0 340px;min-width:0;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#a7b3a4 transparent;border-left:1px solid var(--bh-line);background:#f2f4ed;padding:14px 16px 16px;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.bh-kicker{font-size:10px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.bh-inspector h3{font-size:15px;line-height:1.35;letter-spacing:-.2px;margin:0 0 8px}
+.bh-inspector h4{font-size:10.5px;font-weight:650;letter-spacing:.6px;text-transform:uppercase;color:var(--ink);margin:0 0 6px}
+.bh-lede{margin:0 0 8px;color:var(--ink)}
+.bh-value{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 0 10px;font-size:28px;font-weight:600;letter-spacing:-.9px;line-height:1.1;color:var(--bh-green)}
+.bh-pill{display:inline-flex;align-items:center;border:1px solid #bcc9b6;padding:1px 6px;color:var(--bh-green);background:#f3f6ed;font-size:10px;font-weight:550;line-height:1.5;letter-spacing:0;border-radius:2px;white-space:nowrap}
+.bh-pill.is-context,.bh-pill.is-estimate{color:var(--bh-amber);background:var(--bh-amber-bg);border-color:#cbb995}
+.bh-facts{display:grid;grid-template-columns:48px minmax(0,1fr);gap:4px 10px;margin:0 0 10px;font-size:11px;line-height:1.5}
+.bh-facts dt{color:var(--muted)}
+.bh-facts dd{margin:0;color:var(--ink)}
+.bh-evidence-links{display:inline-flex;flex-wrap:wrap;gap:2px 10px;align-items:center}
+.bh-evidence-links a,.bh-evidence-links button{display:inline-flex;align-items:center;min-height:24px;font-size:11px;line-height:1.4;color:var(--bh-green);text-decoration:underline;text-underline-offset:3px;border:0;border-radius:0;padding:0;background:none;max-width:100%;text-align:left;font-weight:500}
 .bh-evidence-links a:hover,.bh-evidence-links button:hover{background:none;text-decoration-thickness:2px}
-.bh-detail-nav{display:flex;flex-wrap:wrap;gap:6px 14px;border-top:1px solid var(--bh-line);padding-top:12px;margin-top:15px}
-.bh-detail-nav a,.bh-detail-nav button{font-size:11px;line-height:1.5;min-height:36px;display:inline-flex;align-items:center}
-.bh-note,.bh-context{color:var(--muted);font-size:12px;line-height:1.65;margin:13px 0 0}
-.bh-context{border-top:1px solid var(--bh-line);padding-top:13px}
-.bh-warning{color:var(--bh-amber);background:var(--bh-amber-bg);border-left:2px solid #a88954;padding:10px 12px;font-size:12px;line-height:1.65;margin:13px 0}
-.bh-empty{font-size:13px;line-height:1.75;color:var(--muted);padding:25px 8px;max-width:600px;min-height:150px}
-.bh-empty strong{display:block;font-size:16px;line-height:1.45;color:var(--ink);margin-bottom:7px}
-.bh-pill{display:inline-flex;align-items:center;gap:5px;border:1px solid #bcc9b6;padding:2px 7px;color:var(--bh-green);background:#f3f6ed;font-size:10px;font-weight:550;line-height:1.5;border-radius:2px;white-space:normal}
-.bh-pill.is-estimate,.bh-pill[data-status=proxy],.bh-pill.bh-proxy{color:var(--bh-amber);background:var(--bh-amber-bg);border-color:#cbb995}
-.bh-pill[data-status=missing],.bh-pill[data-status=n-a]{color:var(--muted);background:transparent;border-color:var(--bh-line)}
-.bh-estimator{border-top:1px solid var(--bh-line);padding:0 22px;margin:0;background:#f7f6ef}
-.bh-estimator>summary{min-height:48px;display:list-item;padding:14px 0;font-size:12px;line-height:1.5;color:var(--bh-amber);font-weight:600}
-.bh-estimator[open]{padding-bottom:19px}
-.bh-estimator>p{font-size:12px;line-height:1.65;color:var(--muted);max-width:780px;margin:0 0 14px}
-.bh-estimator .bh-subcontrols{gap:14px 24px}
-.bh-estimator label{font-size:11px;line-height:1.6;color:var(--muted);min-width:0}
-.bh-estimator input[type=range]{width:100%;min-width:0;min-height:28px;padding:0;border:0;accent-color:var(--bh-green)}
+.bh-note{color:var(--muted);font-size:11px;line-height:1.55;margin:0 0 8px}
+.bh-note strong{color:var(--ink);font-weight:600}
+.bh-caveats{margin:0 0 8px;font-size:11px}
+#business-health .bh-caveats>summary{font-size:11px;min-height:28px;padding:4px 0;color:var(--bh-green);font-weight:500}
+.bh-caveats p{margin:6px 0 0;color:var(--muted);line-height:1.55}
+.bh-warning{color:var(--bh-amber);background:var(--bh-amber-bg);border-left:2px solid #a88954;padding:7px 9px}
+.bh-quote{font-style:italic}
+.bh-related{margin:0 0 8px;font-size:11px}
+.bh-related p{margin:0 0 4px;color:var(--muted);line-height:1.6}
+.bh-related strong{color:var(--ink);font-weight:600;margin-right:4px}
+.bh-related .text-link{font-size:11px;min-height:24px;line-height:1.4;white-space:normal;text-align:left}
+.bh-profile{display:inline-flex;align-items:center;gap:4px;font-size:11px;min-height:28px;margin-top:2px}
+.bh-compare,.bh-history{border-top:1px solid var(--bh-line);padding-top:10px;margin-top:10px}
+.bh-compare-head{display:flex;flex-wrap:wrap;gap:6px 8px;margin-bottom:4px}
+.bh-compare-head h4{flex:1 1 100%}
+.bh-compare-head label{flex:1 1 130px;min-width:0;font-size:10px;color:var(--muted);gap:2px}
+.bh-compare-head select{width:100%;min-height:30px;font-size:11px;padding:3px 22px 3px 7px;border:1px solid #7b8978;border-radius:3px;background:#fffefa;color:var(--ink)}
+.bh-cohort-heading{font-size:10px;font-weight:400;color:var(--muted);margin:8px 0 3px;line-height:1.4}
+.bh-plot-group+.bh-plot-group{border-top:1px solid #e5e8e0;margin-top:6px;padding-top:2px}
+.bh-bar{display:grid;grid-template-columns:minmax(64px,.9fr) minmax(36px,1.4fr) minmax(50px,auto);gap:8px;align-items:center;width:100%;min-height:24px;padding:2px 4px;border:0;border-radius:2px;background:transparent;text-align:left;font-size:11px;line-height:1.3;color:var(--ink)}
+.bh-bar:hover{background:var(--bh-soft)}
+.bh-bar[aria-pressed=true]{background:var(--bh-soft);box-shadow:inset 2px 0 0 var(--bh-green)}
+.bh-bar-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bh-bar-track{position:relative;display:block;height:6px;background:var(--bh-track);border-radius:3px}
+.bh-bar-fill{position:absolute;top:0;height:100%;min-width:2px;background:var(--bh-green);border-radius:3px}
+.bh-bar-fill.is-bound{background:linear-gradient(90deg,var(--bh-green) calc(100% - 12px),transparent);border-radius:3px 0 0 3px}
+.bh-bar-fill.is-negative{background:var(--bh-neg)}
+.bh-bar-fill.is-estimate{background:repeating-linear-gradient(120deg,#9a7946 0 3px,#d4c19d 3px 6px)}
+.bh-bar-value{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600;color:var(--bh-dark)}
+.bh-axis{display:flex;justify-content:space-between;gap:10px;margin:1px 4px 0;font-size:9.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bh-chart-note{font-size:10.5px;line-height:1.5;color:var(--muted);margin:8px 0 0}
+.bh-empty{font-size:11px;line-height:1.6;color:var(--muted);margin:0;padding:8px 0}
+.bh-history svg{width:100%;height:auto;display:block;overflow:visible;margin-top:2px}
+.bh-svg-axis{font:10px system-ui,sans-serif;fill:#59665c}
+.bh-svg-value{font:600 11px system-ui,sans-serif;fill:#193f2f}
+.bh-history-points{display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:2px}
+.bh-history-points button{font-size:10.5px;min-height:26px;border:0;border-radius:0;background:none;padding:0;color:var(--bh-green);text-decoration:underline;text-underline-offset:3px}
+.bh-history-points button:hover{background:none;text-decoration-thickness:2px}
+.bh-history-points button[aria-pressed=true]{font-weight:650;text-decoration:none;color:var(--bh-dark)}
+.bh-estimator{border:1px solid var(--bh-line);border-top:0;padding:0 14px;margin:0;background:#f7f6ef}
+.bh-estimator>summary{min-height:40px;display:list-item;padding:10px 0;font-size:12px;line-height:1.5;color:var(--bh-amber);font-weight:600}
+.bh-estimator[open]{padding-bottom:14px}
+.bh-estimator>p{font-size:11px;line-height:1.55;color:var(--muted);max-width:720px;margin:0 0 10px}
+.bh-estimator .bh-controls{display:flex;flex-wrap:wrap;align-items:end;gap:10px 18px}
+.bh-estimator .bh-controls>label{display:flex;flex-direction:column;flex:1 1 150px;min-width:0;max-width:300px;gap:4px;font-size:11px;line-height:1.5;color:var(--muted)}
+.bh-estimator select{width:100%;min-height:34px;font-size:12px;padding:5px 24px 5px 9px;border:1px solid #7b8978;border-radius:3px;background:#fffefa;color:var(--ink)}
+.bh-estimator input[type=range]{width:100%;min-width:0;min-height:26px;padding:0;border:0;accent-color:var(--bh-green)}
 .bh-estimator output{color:var(--ink);font-variant-numeric:tabular-nums;font-weight:600}
-.bh-estimate-result{border-top:1px solid #ded9c7;margin-top:15px;padding-top:14px;font-size:13px;line-height:1.6;color:var(--bh-amber)}
-.bh-estimate-result strong{font-size:22px;line-height:1.4;font-weight:600;letter-spacing:-.4px;font-variant-numeric:tabular-nums;margin-right:7px}
-.bh-estimate-result p{font-size:11px;line-height:1.65;margin:5px 0 0;color:var(--muted)}
-.bh-matrix-section{margin-top:30px}
-.bh-matrix-section>.bh-heading{align-items:center;margin-bottom:15px}
-.bh-matrix-section h3{font-size:22px;line-height:1.35;letter-spacing:-.5px;margin:0 0 5px}
-.bh-matrix-section .bh-heading p{font-size:12px;line-height:1.6;max-width:690px}
-.bh-matrix-section .bh-subcontrols{margin-bottom:13px}
-.bh-matrix-section input[type=search]{font-size:12px;width:100%;min-height:40px;border:1px solid #7d8b80;background:var(--bh-paper);border-radius:2px}
-.bh-matrix-wrap{position:relative;max-width:100%;overflow-x:auto;border:1px solid var(--bh-line);scrollbar-width:thin;scrollbar-color:#a7b3a4 transparent}
-.bh-matrix{border-collapse:separate;border-spacing:0;width:100%;min-width:840px;table-layout:fixed;font-size:12px;line-height:1.5;background:var(--bh-paper)}
-.bh-matrix th,.bh-matrix td{text-align:left;vertical-align:top;padding:12px 13px;border-bottom:1px solid var(--bh-line);overflow-wrap:anywhere}
-.bh-matrix thead th{background:var(--bh-soft);font-size:11px;line-height:1.5;font-weight:600;color:var(--ink);padding-block:12px}
-.bh-matrix th:first-child{width:20%;min-width:165px}
-.bh-matrix tbody th{font-weight:600;font-size:12px}
-.bh-matrix tbody th>a{display:inline-block;min-height:28px;color:var(--ink);text-decoration:none}
-.bh-matrix tbody th>a:hover{text-decoration:underline;color:var(--bh-green)}
-.bh-matrix tbody th small,.bh-matrix tbody th>span{display:block;font-weight:400;font-size:10px;line-height:1.5;color:var(--muted);margin-top:3px}
-.bh-matrix tbody tr:last-child th,.bh-matrix tbody tr:last-child td{border-bottom:0}
-.bh-matrix tbody tr:hover th,.bh-matrix tbody tr:hover td{background:#f1f4ec}
-.bh-matrix td>button{display:block;width:100%;text-align:left;min-height:44px;padding:0;border:0;background:none;border-radius:0;font-size:12px;line-height:1.5;color:var(--bh-green);font-weight:600}
-.bh-matrix td>button:hover{background:none;text-decoration:underline;text-underline-offset:3px}
-.bh-matrix td>button small,.bh-matrix td>small,.bh-matrix td>span{display:block;font-size:10px;line-height:1.6;font-weight:400;color:var(--muted);margin-top:3px}
-.bh-matrix .bh-pill{display:inline-flex;width:max-content;max-width:100%;margin-top:5px}
-.bh-matrix [data-status=proxy]{color:var(--bh-amber)}
-.bh-matrix [data-status=missing],.bh-matrix [data-status=n-a]{color:var(--muted);font-weight:400}
-.bh-method{border-top:1px solid var(--bh-line);margin:18px 0 0;font-size:12px;color:var(--muted)}
-.bh-method>summary{padding:13px 0;min-height:46px;font-size:12px;color:var(--bh-green)}
-.bh-method p{font-size:12px;line-height:1.75;max-width:930px;margin:0 0 12px}
-.bh-method ul,.bh-method ol{font-size:12px;line-height:1.75;padding-left:20px;max-width:930px;margin:10px 0 16px}
-.bh-method li{margin:0 0 7px;padding-left:2px}
+.bh-estimate-result{border-top:1px solid #ded9c7;margin-top:10px;padding-top:10px;font-size:12px;line-height:1.55;color:var(--bh-amber)}
+.bh-estimate-result strong{font-size:18px;line-height:1.4;font-weight:600;letter-spacing:-.3px;font-variant-numeric:tabular-nums;margin:0 4px}
+.bh-estimate-result p{margin:0 0 5px;color:var(--muted);font-size:11px}
+.bh-estimate-result p:first-child{color:var(--bh-amber);font-size:12px}
+.bh-method{border-top:1px solid var(--bh-line);margin:14px 0 0;font-size:12px;color:var(--muted)}
+.bh-method>summary{padding:10px 0;min-height:40px;font-size:12px;color:var(--bh-green)}
+.bh-method p{font-size:12px;line-height:1.65;max-width:860px;margin:0 0 10px}
 .bh-method strong{color:var(--ink);font-weight:600}
-#business-health button:focus-visible,#business-health a:focus-visible,#business-health input:focus-visible,#business-health select:focus-visible,#business-health summary:focus-visible{outline:3px solid var(--bh-green);outline-offset:3px;z-index:2;position:relative}
+#business-health button:focus-visible,#business-health a:focus-visible,#business-health input:focus-visible,#business-health select:focus-visible,#business-health summary:focus-visible{outline:3px solid var(--bh-green);outline-offset:2px;z-index:3;position:relative}
+#business-health .bh-inspector:focus-visible{outline-offset:-3px}
 #business-health [hidden]{display:none!important}
-@media(min-width:1200px){
- .bh-plot-row{grid-template-columns:minmax(135px,1fr) minmax(90px,1.35fr) minmax(82px,.6fr)}
- .bh-controls>label{max-width:230px}
-}
-@media(max-width:1050px){
- .bh-metric-tab{padding:15px 12px;min-height:143px}
- .bh-metric-tab strong{font-size:14px}
- .bh-metric-tab>.question,.bh-metric-tab>.bh-question{font-size:11px}
- .bh-chart-area{grid-template-columns:minmax(0,1fr) 250px}
- .bh-chart-main,.bh-detail{padding:21px 16px}
- .bh-plot-row{grid-template-columns:minmax(95px,1fr) minmax(46px,1fr) minmax(65px,.6fr);column-gap:10px}
- .bh-row-name{font-size:12px}
- .bh-row-value{font-size:15px}
+@media(max-width:1100px){
+ .bh-inspector{flex-basis:300px}
+ .bh-tile strong{font-size:12px}
+ .bh-tile-q{font-size:10.5px}
+ .bh-inspector{padding:12px 14px 14px}
 }
 @media(max-width:800px){
- .bh-heading h2{font-size:29px}
- .bh-metric-tab{min-height:140px;padding:14px 10px;gap:5px}
- .bh-metric-tab>.coverage,.bh-metric-tab>.bh-coverage{font-size:10px}
- .bh-chart-area{grid-template-columns:minmax(0,1fr)}
- .bh-chart-main{padding:22px 20px 18px}
- .bh-detail{border-left:0;border-top:1px solid var(--bh-line);padding:22px 20px}
- .bh-detail-value{font-size:29px}
- .bh-detail p{max-width:660px}
- .bh-fact dl,dl.bh-fact{grid-template-columns:110px minmax(0,1fr)}
- .bh-plot-row{grid-template-columns:minmax(125px,1fr) minmax(85px,1.6fr) minmax(78px,.7fr)}
- .bh-row-value{font-size:16px}
- .bh-matrix th:first-child{position:sticky;left:0;z-index:1;background:var(--bh-paper);box-shadow:1px 0 0 var(--bh-line)}
- .bh-matrix thead th:first-child{background:var(--bh-soft);z-index:2}
+ .bh-head{grid-template-columns:minmax(0,1fr);gap:12px;align-items:start}
+ .bh-tiles{display:flex;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#a7b3a4 transparent;padding-bottom:4px}
+ .bh-tile{flex:0 0 164px;scroll-snap-align:start}
+ .bh-board{flex-direction:column;max-height:none}
+ .bh-grid-side{flex:0 0 auto}
+ .bh-grid-wrap{max-height:max(420px,70vh)}
+ .bh-grid{min-width:600px}
+ .bh-grid thead th:first-child,.bh-grid tbody th{position:sticky;left:0;z-index:1;box-shadow:1px 0 0 var(--bh-line)}
+ .bh-grid thead th:first-child{z-index:3;width:140px;min-width:140px}
+ .bh-inspector{flex:0 0 auto;overflow:visible;border-left:0;border-top:1px solid var(--bh-line);scroll-margin-top:calc(var(--header-height,72px) + 8px)}
 }
 @media(max-width:600px){
- #business-health{margin-top:32px;margin-bottom:30px}
- .bh-heading{display:block;margin-bottom:18px}
- .bh-heading h2{font-size:28px;letter-spacing:-.8px;line-height:1.2}
- .bh-heading p{font-size:14px;line-height:1.65}
- .bh-heading>a{margin-top:8px;font-size:12px}
- .bh-northstar{grid-template-columns:minmax(0,1fr);gap:6px;padding:17px 0;margin-bottom:20px}
- .bh-northstar>strong{font-size:18px;line-height:1.4}
- .bh-northstar>p,.bh-northstar>details{grid-column:auto;font-size:12px;line-height:1.7}
- .bh-metric-tabs{grid-template-columns:repeat(5,minmax(100px,1fr));overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#a7b3a4 transparent}
- .bh-metric-tab{min-height:142px;padding:13px 11px;scroll-snap-align:start}
- .bh-metric-tab strong{font-size:14px}
- .bh-metric-tab>.question,.bh-metric-tab>.bh-question{font-size:11px;line-height:1.5}
- .bh-controls{padding:15px;gap:12px}
- .bh-controls>label,.bh-subcontrols>label{flex:1 1 100%;max-width:none;font-size:11px}
- .bh-controls label:has(input[type=checkbox]){min-height:42px;flex-basis:100%}
- .bh-chart-main{padding:20px 13px 17px}
- .bh-chart-header{gap:10px;margin-bottom:14px;padding-inline:2px}
- .bh-chart-header h3{font-size:18px;letter-spacing:-.35px}
- .bh-chart-header p{font-size:11px;line-height:1.65}
- .bh-legend{gap:7px 12px;font-size:10px}
- .bh-plot-row{grid-template-columns:minmax(92px,.95fr) minmax(40px,1fr) minmax(65px,.65fr);column-gap:9px;row-gap:4px;padding:11px 5px;min-height:69px}
- .bh-row-name{font-size:12px;line-height:1.4}
- .bh-row-value{font-size:14px;letter-spacing:-.25px}
- .bh-row-track{height:6px}
- .bh-row-bar.is-bound::after,.bh-plot-row.is-bound .bh-row-bar::after{width:6px;height:6px;right:-2px}
- .bh-row-meta{font-size:10px;line-height:1.6}
- .bh-axis{font-size:10px;margin:11px 4px 0}
- .bh-detail{padding:21px 17px}
- .bh-detail h4{font-size:19px;margin-bottom:10px}
- .bh-detail-value{font-size:30px}
- .bh-detail p{font-size:12px;line-height:1.7}
- .bh-fact dl,dl.bh-fact{grid-template-columns:80px minmax(0,1fr);gap:6px 12px}
- .bh-evidence-links a,.bh-evidence-links button,.bh-detail-nav a,.bh-detail-nav button{min-height:44px;font-size:12px}
- .bh-estimator{padding-inline:16px}
- .bh-estimator>summary{padding-block:14px;font-size:12px;line-height:1.65;min-height:48px}
- .bh-estimator .bh-subcontrols{display:grid;grid-template-columns:minmax(0,1fr);gap:13px}
- .bh-estimator label{font-size:12px}
- .bh-estimator input[type=range]{min-height:40px}
- .bh-estimate-result strong{display:block;font-size:24px;margin:0 0 3px}
- .bh-matrix-section{margin-top:25px}
- .bh-matrix-section h3{font-size:21px}
- .bh-matrix-section .bh-heading p{font-size:12px;line-height:1.65}
- .bh-matrix-section .bh-subcontrols{gap:10px}
- .bh-matrix-section .bh-subcontrols>label:has(input[type=search]){flex-basis:100%}
- .bh-matrix{min-width:790px}
- .bh-matrix th:first-child{width:155px}
- .bh-matrix th,.bh-matrix td{padding:11px 12px}
- .bh-matrix td>button{min-height:48px;font-size:12px}
- .bh-matrix tbody th>a{min-height:36px;display:flex;align-items:center}
- .bh-method>summary{min-height:48px;font-size:12px}
- .bh-method p,.bh-method li{font-size:12px;line-height:1.75}
- .bh-note,.bh-context,.bh-warning{font-size:12px}
- .bh-empty{padding:20px 5px;font-size:12px;min-height:130px}
+ #business-health{margin-top:32px;margin-bottom:28px}
+ .bh-head h2{font-size:27px;letter-spacing:-.8px}
+ .bh-head>div>p{font-size:13px}
+ .bh-toolbar{padding:10px}
+ .bh-toolbar label{flex:1 1 100%}
+ .bh-toolbar select{max-width:none}
+ .bh-toolbar label:has(input[type=checkbox]){flex-basis:100%}
+ .bh-grid thead th:first-child{width:120px;min-width:120px}
+ .bh-grid tbody th{padding:4px 8px}
+ .bh-cell>button,.bh-cell>span{padding:3px 6px;min-height:36px}
+ .bh-cell b{font-size:11.5px}
+ .bh-value{font-size:26px}
+ .bh-compare-head label{flex-basis:100%}
+ .bh-estimator{padding-inline:12px}
+ .bh-estimator .bh-controls>label{flex-basis:100%;max-width:none}
 }
 @media(max-width:700px){#business-health select,#business-health input[type=search]{font-size:16px;min-height:44px}}
-@media(max-width:360px){
- .bh-row-name{font-size:11px}
- .bh-row-value{font-size:13px}
- .bh-plot-row{column-gap:7px;grid-template-columns:minmax(84px,1fr) minmax(25px,.7fr) minmax(60px,.65fr)}
-}
-@media(prefers-reduced-motion:reduce){.bh-metric-tab{transition:none}.bh-metric-tabs{scroll-behavior:auto}}
+@media(prefers-reduced-motion:reduce){.bh-tile,.bh-cell>button{transition:none}.bh-tiles{scroll-behavior:auto}}
 @media(forced-colors:active){
- .bh-metric-tab[aria-selected=true]{outline:2px solid Highlight;outline-offset:-3px;box-shadow:none}
- .bh-plot-row[aria-pressed=true],.bh-plot-row[aria-selected=true],.bh-plot-row.is-selected{outline:2px solid Highlight;outline-offset:-2px;box-shadow:none}
- .bh-row-track{border:1px solid CanvasText;background:Canvas}
- .bh-row-bar,.bh-row-bar.is-estimate,.bh-plot-row.is-estimate .bh-row-bar{background:CanvasText}
- .bh-row-bar.is-bound::after,.bh-plot-row.is-bound .bh-row-bar::after{border-color:CanvasText}
- .bh-matrix th:first-child{box-shadow:none;border-right:1px solid CanvasText}
- .bh-pill{border-color:CanvasText}
+ .bh-tile[aria-selected=true]{outline:2px solid Highlight;outline-offset:-3px;box-shadow:none}
+ .bh-cell>button[aria-pressed=true],.bh-bar[aria-pressed=true]{outline:2px solid Highlight;outline-offset:-2px;box-shadow:none}
+ .bh-cell[data-state=observed]>button,.bh-cell[data-state=proxy]>button{border:1px solid CanvasText}
+ .bh-bar-track{border:1px solid CanvasText;background:Canvas}
+ .bh-bar-fill,.bh-bar-fill.is-bound,.bh-bar-fill.is-negative,.bh-bar-fill.is-estimate{background:CanvasText}
+ .bh-grid thead th:first-child,.bh-grid tbody th{box-shadow:none;border-right:1px solid CanvasText}
+ .bh-pill,.bh-legend i{border-color:CanvasText}
 }
-/* Chart annotations and the revenue-history view. */
-.bh-northstar{grid-template-columns:minmax(0,2fr) minmax(180px,1fr)}
-.bh-northstar>div>strong{display:block;font-size:23px;line-height:1.35;letter-spacing:-.5px;margin:7px 0}
-.bh-northstar>div>p{font-size:13px;line-height:1.7;color:var(--muted);margin:0;max-width:700px}
-.bh-northstar>.bh-note{grid-column:auto;align-self:center}
-#bh-question{padding:17px 22px 0;border-top:0;margin-top:0}
-#bh-question>p{margin:5px 0 0;font-size:12px}
-.bh-cohort-heading{font-size:11px;font-weight:500;line-height:1.7;color:var(--muted);margin:15px 0 8px}
-.bh-plot-group+.bh-plot-group,.bh-history-group+.bh-history-group{border-top:1px solid var(--bh-line);margin-top:20px;padding-top:8px}
-.bh-row-track{position:relative;overflow:visible}
-.bh-row-bar{position:absolute;top:0;min-width:2px}
-.bh-matrix small{display:block;color:var(--muted);font-size:10px;font-weight:400;line-height:1.6;margin-top:4px}
-.bh-matrix-cell{display:block;width:100%;text-align:left;border:0;background:transparent;padding:0;min-height:48px;border-radius:0}
-.bh-matrix-cell:hover{background:var(--bh-soft)}
-.bh-history-group svg{width:100%;height:auto;display:block;margin-top:16px;overflow:visible}
-.bh-svg-axis{font:11px system-ui,sans-serif;fill:#59665c}
-.bh-svg-value{font:600 12px system-ui,sans-serif;fill:#193f2f}
-.bh-history-change{font-size:17px;color:var(--bh-green);margin:0}
-.bh-history-change small{font-size:10px;color:var(--muted);font-weight:400}
-.bh-history-points{display:flex;flex-wrap:wrap;gap:4px 16px}
-.bh-history-points button{font-size:11px;min-height:36px}
-.bh-estimator .bh-controls{padding:0;border:0}
-.bh-matrix-section .bh-heading>label{display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:6px;min-width:200px}
-@media(max-width:800px){.bh-northstar{grid-template-columns:1fr}.bh-northstar>.bh-note{grid-column:1}.bh-metric-tabs{scroll-snap-type:x mandatory}.bh-metric-tab{scroll-snap-align:start}#bh-question{padding:16px 14px 0}.bh-svg-axis{font-size:12px}.bh-svg-value{font-size:13px}}
-@media(max-width:600px){.bh-metric-tabs{grid-template-columns:repeat(5,minmax(154px,1fr))}.bh-metric-tab{min-height:146px}.bh-metric-tab>.coverage{font-size:10px;line-height:1.5}.bh-northstar>div>strong{font-size:22px}.bh-matrix-section .bh-heading>label{margin-top:16px}}
 
 /* Fixed geometry keeps icons consistent across devices and font families. */
 .ui-icon.ui-icon{display:inline-block;width:16px;height:16px;min-height:0;max-width:none;max-height:none;margin:0;flex:none;vertical-align:-3px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
@@ -581,16 +511,13 @@ dl.bh-fact dd{font-size:11px;margin:0}
 <section id="market-view" class="view">
 <header class="market-hero"><div class="hero-copy"><p class="eyebrow">AI DATA / OCTOBER 2026</p><h1>The businesses<br> behind AI data.</h1><p class="intro">People teach AI how to do useful work. Explore the organizations behind that effort, with sources for their claims.</p><div class="hero-actions"><a class="button-primary" href="#companies">Explore 39 organizations <span aria-hidden="true"><svg class="ui-icon" aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a><a class="text-link" href="#work">Find paid work</a><a class="text-link" href="#venture">About our proposed lab</a></div></div><div class="hero-research"><p>Public-source research</p><div class="hero-meta"><span><b id="organization-count">39</b> organizations</span><span><b id="group-count">7</b> business groups</span><span><b id="source-count">880</b> source records</span></div><a href="#method">Sources and method</a></div><div id="hero-logo-grid" class="hero-logo-grid" aria-label="Selected organizations"></div></header>
 <section id="business-health" aria-labelledby="business-health-heading">
-<header class="bh-heading"><div><p class="eyebrow">THE BUSINESS HEALTH DASHBOARD</p><h2 id="business-health-heading">Who is growing well?</h2><p>Follow demand, delivery economics and staying power. Explore five signals across all 39 organizations.</p></div><a href="business-health.json" download>Download the evidence</a></header>
-<div class="bh-northstar"><div><span class="bh-detail-kicker">THE NORTH STAR · RECOMMENDED MEASURE</span><strong>Gross profit from repeat customers.</strong><p>Revenue from returning customers, less the direct cost of delivering their work. Growth matters more when customers return and each project leaves money to reinvest.</p></div><p class="bh-note">Usually private. The five signals below help assess it. Public disclosure varies; an empty cell is an open question.</p></div>
-<div id="bh-tabs" class="bh-metric-tabs" role="tablist" aria-label="Business health signals"></div>
-<section id="bh-panel" class="bh-workbench" role="tabpanel" tabindex="0" aria-labelledby="bh-tab-revenue">
-<div id="bh-question" class="bh-context"></div>
-<div class="bh-controls"><label>View<select id="bh-chart-view"><option value="snapshots">Compare observations</option><option value="history">Company revenue history</option></select></label><label id="bh-trend-company-label" hidden>Company<select id="bh-trend-company"></select></label><label>Measure<select id="bh-measure"></select></label><label id="bh-cohort-label">Comparable basis<select id="bh-cohort"></select></label><label>Business group<select id="bh-group"><option value="">All business groups</option></select></label></div>
-<div class="bh-chart-area"><div class="bh-chart-main"><div id="bh-chart-header" class="bh-chart-header"></div><div id="bh-plot"></div><p id="bh-chart-note" class="bh-note"></p></div><aside id="bh-detail" class="bh-detail" aria-label="Selected observation"></aside></div>
-<details id="bh-estimator" class="bh-estimator"><summary>What could the economics look like? Model a margin range</summary><p>A scenario for undisclosed delivery margins. Choose a sourced revenue observation and your own assumptions. These outputs are hypothetical, not company estimates.</p><div class="bh-controls"><label>Revenue input<select id="bh-estimate-company"></select></label><label>Lower margin <output id="bh-margin-low-label">10%</output><input id="bh-margin-low" type="range" min="0" max="80" step="5" value="10"></label><label>Upper margin <output id="bh-margin-high-label">30%</output><input id="bh-margin-high" type="range" min="0" max="80" step="5" value="30"></label></div><div id="bh-estimate-result" class="bh-estimate-result" aria-live="polite"></div></details>
-</section>
-<section class="bh-matrix-section" aria-labelledby="bh-matrix-heading"><div class="bh-heading"><div><p class="eyebrow">THE WHOLE FIELD</p><h3 id="bh-matrix-heading">What can we actually know?</h3><p>Click a signal to inspect the evidence. Counts of employees, customers served and registered experts appear as context.</p></div><label>Find a company<input type="search" id="bh-search" placeholder="Company name" autocomplete="off"></label></div><p id="bh-matrix-count" class="bh-note" role="status" aria-live="polite"></p><div class="bh-matrix-wrap" tabindex="0" role="region" aria-label="Company evidence, scroll horizontally for all five signals"><table class="bh-matrix"><caption class="sr-only">Public business health evidence for all organizations. Missing is not zero.</caption><thead><tr><th scope="col">Organization</th><th scope="col">Revenue</th><th scope="col">Margin</th><th scope="col">Customers</th><th scope="col">Paid delivery</th><th scope="col">Cash</th></tr></thead><tbody id="bh-matrix-body"></tbody></table></div><button id="bh-show-all" class="quiet" aria-expanded="false">Show all 39 organizations</button></section>
+<header class="bh-head"><div><p class="eyebrow">THE BUSINESS HEALTH DASHBOARD</p><h2 id="business-health-heading">Who is growing well?</h2><p>Five public signals for all 39 organizations in one grid. Click any cell to read its source, date and scope.</p></div><p class="bh-northstar"><span>North star · recommended measure</span><strong>Gross profit from repeat customers</strong>Usually private. The five signals below are the public clues. An empty cell is an open question, not a zero. <a href="business-health.json" download>Download the evidence · JSON</a></p></header>
+<div id="bh-tabs" class="bh-tiles" role="tablist" aria-label="Business health signals"></div>
+<div class="bh-board">
+<div class="bh-grid-side"><div class="bh-toolbar"><label><span class="sr-only">Find a company</span><input type="search" id="bh-search" placeholder="Find a company" autocomplete="off"></label><label><span class="sr-only">Business group</span><select id="bh-group"><option value="">All business groups</option></select></label><label><span class="sr-only">Order</span><select id="bh-sort"><option value="coverage">Most evidence first</option><option value="signal">By selected signal</option><option value="name">Name A to Z</option></select></label><label><input type="checkbox" id="bh-evidence-only"> Hide rows without evidence</label></div><p id="bh-matrix-count" class="bh-count" role="status" aria-live="polite"></p><div class="bh-grid-wrap" tabindex="0" role="region" aria-label="Company evidence grid, scrolls"><table class="bh-grid"><caption class="sr-only">Public business health evidence for all organizations. Missing is not zero.</caption><thead><tr id="bh-grid-head"></tr></thead><tbody id="bh-matrix-body"></tbody></table></div><p class="bh-legend"><span><i></i> Reported or calculated figure</span><span><i class="is-proxy"></i> Context only: reach, headcount, claims</span><span><i class="is-missing"></i> — No public disclosure found</span><span><i class="is-na"></i> n/a Nonprofit research</span></p></div>
+<section id="bh-inspector" class="bh-inspector" role="tabpanel" tabindex="-1" aria-labelledby="bh-tab-revenue"><div id="bh-detail"></div><div id="bh-history" class="bh-history" hidden></div><div class="bh-compare"><div class="bh-compare-head"><h4>Same measure, other companies</h4><label>Measure<select id="bh-measure"></select></label><label>Comparable basis<select id="bh-cohort"></select></label></div><div id="bh-plot"></div><p id="bh-chart-note" class="bh-chart-note"></p></div></section>
+</div>
+<details id="bh-estimator" class="bh-estimator"><summary>Model a margin range (hypothetical)</summary><p>Pick a sourced revenue figure and your own gross margin assumptions. The result is a scenario, not a company estimate, and never enters the grid.</p><div class="bh-controls"><label>Revenue input<select id="bh-estimate-company"></select></label><label>Lower margin <output id="bh-margin-low-label">10%</output><input id="bh-margin-low" type="range" min="0" max="80" step="5" value="10"></label><label>Upper margin <output id="bh-margin-high-label">30%</output><input id="bh-margin-high" type="range" min="0" max="80" step="5" value="30"></label></div><div id="bh-estimate-result" class="bh-estimate-result" aria-live="polite"></div></details>
 <details class="bh-method"><summary>Definitions, estimates and evidence limits</summary><div id="bh-method-content"></div><p><a href="business-health.json" download>Download all dashboard observations and calculations · JSON</a> · <a href="#method">Full research method</a></p></details>
 </section>
 <section class="product-story" data-story-finding="products" aria-labelledby="products-heading"><div class="section-heading"><div><p class="story-number">WHAT THEY DO</p><h2 id="products-heading">What these organizations sell and build.</h2></div><p>We group each organization by its main offering.<br>Many work across several categories.</p></div><div id="model-map" class="model-map"></div></section>
@@ -2368,14 +2295,20 @@ function evidenceContextArchiveHTML(id){
  return evidenceContextCorrections().filter(update=>update.company_id===id).map(update=>evidenceContextUpdateHTML(update)).join('');
 }
 
-/* Business health: evidence, arithmetic and scenarios stay separate. */
+/* Business health: one evidence grid for every organization and an inspector for the selected cell.
+   Evidence, arithmetic and scenarios stay separate. */
 (() => {
 'use strict';
 const bundle=window.BUSINESS_HEALTH;
 const signals=['revenue','profit','customers','delivery','cash'];
 const labels={revenue:'Revenue & growth',profit:'Delivery margin',customers:'Customer durability',delivery:'Paid expert activity',cash:'Cash resilience'};
+const columns={revenue:'Revenue',profit:'Margin',customers:'Customers',delivery:'Paid delivery',cash:'Cash'};
 const questions={revenue:'Is demand expanding?',profit:'What stays after delivery?',customers:'Will customers come back?',delivery:'Is expertise turning into paid work?',cash:'Can the business sustain growth?'};
-const bhState={view:'snapshots',trendCompany:'taskus',signal:'revenue',measure:'',cohort:'',group:'',company:'',observation:'',query:'',expanded:false};
+// Short cell tags. The inspector and the measure select keep the full measure labels.
+const measureShort={period_revenue:'revenue',annualized_revenue:'run rate',revenue_growth_yoy:'growth YoY',net_income:'net income',net_margin:'net margin',adjusted_ebitda:'adj. EBITDA',adjusted_ebitda_margin:'adj. EBITDA margin',gross_margin:'gross margin',pretax_income:'pre-tax',profitability_statement:'profit claim',net_revenue_retention:'net retention',top_five_customer_share:'top-5 share',customer_count:'customers',daily_expert_payouts:'paid per day',cumulative_expert_payouts:'paid to date',payouts_period_unclear:'paid · basis unclear',cumulative_work_hours:'hours to date',network_reach:'experts',cash_balance:'cash',net_debt:'net debt',team_size:'staff'};
+const stateRank={observed:0,proxy:1,missing:2,'n-a':3};
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const bhState={signal:'revenue',measure:'',cohort:'',group:'',query:'',sort:'coverage',evidenceOnly:false,company:'',observation:''};
 const all=()=>bundle?.observations||[];
 const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const scopeLabel=o=>o.scope_label||scopeText(o.scope,o.company_id);
@@ -2385,7 +2318,8 @@ const numeric=o=>typeof o.value==='number'&&Number.isFinite(o.value);
 const definition=id=>(bundle?.signals||[]).find(s=>s.id===id)||{};
 const human=s=>String(s||'').replaceAll('_',' ').replace(/^./,c=>c.toUpperCase());
 const plural=(n,word)=>n+' '+word+(n===1?'':'s');
-// Research notes end with record fields (scope, period, source type) that the card already shows.
+const narrow=()=>typeof window.matchMedia==='function'&&window.matchMedia('(max-width:800px)').matches;
+// Research notes end with record fields (scope, period, source type) that the inspector already shows.
 const basisText=o=>String(o.basis||'').split(/;\s*(?:Scope|Source type):/)[0];
 const limitationsText=o=>o.basis&&o.limitations.startsWith(o.basis)?(basisText(o)+' '+o.limitations.slice(o.basis.length)).trim():o.limitations;
 function cohort(o){return o.cohort||[o.period?.label,o.currency,o.scope,o.accounting_basis].filter(Boolean).join(' · ');}
@@ -2422,6 +2356,27 @@ function valueText(o,amount=o.value,qualify=true){
  const q=qualify?({greater_than:'> ',at_least:'≥ ',at_most:'≤ ',less_than:'< ',approximately:'≈ ',approximate:'≈ ',nearly:'Nearly '}[o.qualifier]||''):'';
  return q+val;
 }
+function shortDate(text,day=true){
+ const s=String(text||'').trim(),m=s.match(/(\d{4})-(\d{2})(?:-(\d{2}))?/);
+ if(!m)return s.replace(/^as of /i,'');
+ return (/inferred/i.test(s)?'≈ ':'')+(day&&m[3]?Number(m[3])+' ':'')+MONTHS[Number(m[2])-1]+' '+m[1];
+}
+// Cell tags keep month precision; the inspector shows the full period and date.
+function periodShort(o,day=false){
+ const p=o.period||{},label=String(p.label||''),named=label.match(/^H[12](?: FY)?\d{4}/);
+ switch(p.type){
+  case 'annual':return p.end&&!/-12-31$/.test(p.end)?'FY to '+shortDate(p.end,day):p.year?'FY'+p.year:label;
+  case 'half_year':{if(named)return named[0];const month=String(p.start||'').slice(5,7);return month==='01'&&p.year?'H1 '+p.year:month==='07'&&p.year?'H2 '+p.year:'6 months to '+shortDate(p.end||o.as_of,day);}
+  case 'trailing_year':return 'TTM '+shortDate(p.end||o.as_of,day);
+  case 'cumulative':return /\d{4}/.test(o.as_of)?shortDate(o.as_of,day):'';
+  case 'undated':return day?'undated':'';
+  default:{const d=shortDate(o.as_of,day);return /^undated$/i.test(d)&&!day?'':d||label;}
+ }
+}
+const dateKey=o=>o.period?.end||(String(o.as_of||'').match(/\d{4}(?:-\d{2}){0,2}/)||[''])[0];
+function cellTag(o){return [measureShort[o.measure]||measureLabel(o.measure).toLowerCase(),periodShort(o)].filter(Boolean).join(' · ');}
+// A small badge marks figures that cover one line of business or another segment rather than the whole company.
+function scopeBadge(o){const text=o.scope==='ai_data'?'AI line':o.scope==='other_segment'?'segment':'';return text?`<i class="bh-scope" title="${safe(scopeLabel(o))}">${text}</i>`:'';}
 function measureDefinition(id){const d=bundle?.measure_definitions;if(Array.isArray(d))return d.find(m=>m.id===id)||{};return d?.[id]||{};}
 function measureLabel(id){return measureDefinition(id).label||all().find(o=>o.measure===id)?.measure_label||human(id);}
 function measures(signal){return [...new Set(all().filter(o=>o.signal===signal&&numeric(o)).map(o=>o.measure))];}
@@ -2431,112 +2386,119 @@ function pickCompanyObservation(company,signal){
  const preferred=bestMeasure(signal);
  return list.sort((a,b)=>Number(numeric(b))-Number(numeric(a))||Number(b.measure===preferred)-Number(a.measure===preferred)||Number(!!a.is_context)-Number(!!b.is_context)||b.as_of.localeCompare(a.as_of))[0];
 }
-function evidenceLinks(o){return `<div class="bh-evidence-links">${o.claim_ids.map((id,i)=>claimButton(id,o.claim_ids.length>1?'Evidence '+(i+1):'Inspect original claim')).join('')}${o.source_ids.slice(0,3).map(id=>external(sources[id].url,sources[id].publisher||'Original source')).join('')}</div>`;}
+function evidenceLinks(o){return `<span class="bh-evidence-links">${o.claim_ids.map((id,i)=>claimButton(id,o.claim_ids.length>1?'Claim '+(i+1):'Inspect claim')).join('')}${o.source_ids.slice(0,3).map(id=>external(sources[id].url,sources[id].publisher||'Original source')).join('')}</span>`;}
+function statusText(o){return o.evidence_type==='estimate'?'Third-party estimate':o.evidence_type==='calculated'?'Calculated':o.is_context?'Context only':'Reported';}
+function pillClass(o){return o.evidence_type==='estimate'?'is-estimate':o.is_context?'is-context':'';}
 function renderDetail(){
- const o=byId(bhState.observation),id=bhState.company||(o?.company_id),name=companies[id]?.name;
+ const o=byId(bhState.observation),id=bhState.company||(o?.company_id),name=companies[id]?.name,group=id?groupLabel(modelGroup(id)):'';
  if(!o||o.company_id!==id||o.signal!==bhState.signal){
   const context=all().filter(r=>r.company_id===id&&r.signal===bhState.signal);
-  $('bh-detail').innerHTML=`<span class="bh-detail-kicker">${safe(name||'READ THE EVIDENCE')}</span><h4>${name?'A question to investigate':'Select a company or chart mark'}</h4><p>${name?'The reviewed evidence does not establish this measure for '+safe(name)+'.':'Every mark opens its source, date, scope and calculation here.'}</p><p class="bh-note">${esc(definition(bhState.signal).ideal_measure||questions[bhState.signal])}</p>${context.length?`<div class="bh-fact"><strong>Available context</strong>${context.map(r=>`<p>${esc(r.label)}: ${numeric(r)?safe(valueText(r)):esc(r.original_text)}</p>${evidenceLinks(r)}`).join('')}</div>`:''}${id?`<a href="#company/${safe(id)}/traction">Open the full company profile</a>`:''}`;
+  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name?name+' · '+group:'Read the evidence')}</p><h3>${name?'No reviewed public figure':'Select a cell'}</h3><p class="bh-lede">${name?'The reviewed sources do not establish '+labels[bhState.signal].toLowerCase()+' for '+safe(name)+'. Missing is not zero.':'Every cell opens its source, date, scope and calculation here.'}</p><p class="bh-note">${esc(definition(bhState.signal).ideal_measure||questions[bhState.signal])}</p>${context.length?`<div class="bh-related"><p><strong>Available context</strong></p>${context.map(r=>`<p>${esc(r.label)}: ${numeric(r)?safe(valueText(r)):esc(r.original_text)} ${evidenceLinks(r)}</p>`).join('')}</div>`:''}${id?`<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`:''}`;
   return;
  }
- const status=o.evidence_type==='estimate'?'Third-party estimate':o.evidence_type==='calculated'?'Calculated from reported inputs':'Reported observation';
  const history=all().filter(r=>r.company_id===id&&r.signal===o.signal&&r.measure===o.measure&&r.id!==o.id).sort((a,b)=>b.as_of.localeCompare(a.as_of));
  const related=all().filter(r=>r.company_id===id&&r.signal===o.signal&&r.measure!==o.measure);
- $('bh-detail').innerHTML=`<span class="bh-detail-kicker">${safe(name)}</span><h4>${esc(o.label)}</h4><div class="bh-detail-value">${safe(numeric(o)?valueText(o):'Amount not disclosed')}</div><span class="bh-pill ${o.evidence_type==='estimate'?'is-estimate':''}">${status}${o.is_context?' · context only':''}</span><p class="bh-note">${esc(o.evidence_assurance||evidenceLabel(claims[o.claim_ids[0]]))}</p><dl class="bh-fact"><dt>Period / date</dt><dd>${safe(o.period.label)}${o.as_of!==o.period.label?' · '+safe(o.as_of):''}</dd><dt>Business scope</dt><dd>${safe(scopeLabel(o))}</dd><dt>Accounting</dt><dd>${safe(basisLabel(o))}</dd></dl>${!o.limitations.includes(o.basis)?`<p>${esc(basisText(o))}</p>`:''}${o.normalization?`<p class="bh-note">${esc(o.normalization)}</p>`:''}${o.calculation?`<div class="bh-fact"><strong>How it is calculated</strong><p>${esc(o.calculation.formula||o.calculation)}</p></div>`:''}<p class="bh-warning">${esc(limitationsText(o))}</p><details class="bh-fact"><summary>Source wording &amp; attribution</summary><p>${esc(o.original_text)}</p></details>${evidenceLinks(o)}${history.length?`<details class="bh-fact"><summary>Other dated observations (${history.length})</summary>${history.map(r=>`<p><button class="text-link" data-bh-observation="${safe(r.id)}">${safe(r.period.label)} · ${safe(valueText(r))}</button><br>${safe(scopeLabel(r))}</p>`).join('')}</details>`:''}${related.length?`<details class="bh-fact"><summary>Other measures for this signal (${related.length})</summary>${related.map(r=>`<p><button class="text-link" data-bh-context="${safe(r.id)}">${esc(r.label)} · ${safe(valueText(r))}</button></p>`).join('')}</details>`:''}<div class="bh-detail-nav"><a href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a></div>`;
+ const sparkline=historySeries(id,o.measure).some(list=>list.length>1&&list.some(r=>r.id===o.id));
+ const dated=o.as_of!==o.period.label&&!o.period.label.includes(o.as_of)?o.period.label+' · '+o.as_of:o.period.label;
+ $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name)} · ${safe(group)}</p><h3>${esc(o.label)}</h3><p class="bh-value">${safe(numeric(o)?valueText(o):'Not quantified')}<span class="bh-pill ${pillClass(o)}">${statusText(o)}</span></p><dl class="bh-facts"><dt>Date</dt><dd>${safe(dated)}</dd><dt>Scope</dt><dd>${safe(scopeLabel(o))}</dd><dt>Basis</dt><dd>${safe(basisLabel(o))}</dd><dt>Source</dt><dd>${esc(o.evidence_assurance||evidenceLabel(claims[o.claim_ids[0]]))} ${evidenceLinks(o)}</dd></dl>${o.calculation?`<p class="bh-note"><strong>Calculated:</strong> ${esc(o.calculation.formula||o.calculation)}</p>`:''}${o.normalization?`<p class="bh-note">${esc(o.normalization)}</p>`:''}<details class="bh-caveats"><summary>Caveats and source wording</summary>${!o.limitations.includes(o.basis)?`<p>${esc(basisText(o))}</p>`:''}<p class="bh-warning">${esc(limitationsText(o))}</p><p class="bh-quote">“${esc(o.original_text)}”</p></details>${history.length&&!sparkline?`<div class="bh-related"><p><strong>Other dates</strong> ${history.map(r=>`<button type="button" class="text-link" data-bh-observation="${safe(r.id)}">${safe(periodShort(r,true))} · ${safe(valueText(r))}</button>`).join(' ')}</p></div>`:''}${related.length?`<div class="bh-related"><p><strong>Other measures</strong> ${related.map(r=>`<button type="button" class="text-link" data-bh-context="${safe(r.id)}">${esc(measureShort[r.measure]||measureLabel(r.measure))} · ${numeric(r)?safe(valueText(r)):'claim'}</button>`).join(' ')}</p></div>`:''}<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`;
 }
 function historyMeasures(company){return [...new Set(all().filter(o=>o.company_id===company&&o.signal==='revenue'&&numeric(o)).map(o=>o.measure))];}
-function historyMeasure(company,current){const ids=historyMeasures(company);return ids.includes(current)?current:['period_revenue','annualized_revenue'].find(id=>ids.includes(id))||ids[0]||current;}
 function historySeries(company,measure){
  const grouped=new Map();
- for(const o of all().filter(o=>o.company_id===company&&o.signal==='revenue'&&o.measure===measure&&numeric(o))){
+ for(const o of all().filter(o=>o.company_id===company&&o.measure===measure&&numeric(o))){
   const key=[o.period.type,o.currency,scopeLabel(o),o.accounting_basis].join('|');
   if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(o);
  }
  return [...grouped.values()].map(list=>list.sort((a,b)=>(a.period.end||a.as_of).localeCompare(b.period.end||b.as_of)));
 }
 function renderHistory(){
- const company=bhState.trendCompany,series=historySeries(company,bhState.measure),total=series.flat().length;
- $('bh-chart-header').innerHTML=`<div><h3>${safe(companies[company].name)} · ${esc(measureLabel(bhState.measure))}</h3><p>Follow the same business through time. Each line keeps one period type, currency, business scope and accounting basis.</p></div>`;
- $('bh-plot').innerHTML=series.length?series.map(list=>{
-  const max=Math.max(1,...list.map(o=>o.value)),min=Math.min(0,...list.map(o=>o.value)),span=max-min||1;
-  const positions=list.map((o,i)=>({o,x:list.length===1?300:65+i/(list.length-1)*470,y:170-(o.value-min)/span*130}));
-  const first=list[0],last=list.at(-1),exact=list.length>1&&first.value>0&&list.every(o=>['exact','calculated'].includes(o.qualifier)&&o.evidence_type!=='estimate');
-  return `<section class="bh-history-group"><h4 class="bh-cohort-heading">${safe(first.period.type==='annual'?'Full years':first.period.type==='half_year'?'Half years':human(first.period.type))} · ${safe(first.currency||'percent')} · ${safe(scopeLabel(first))} · ${safe(basisLabel(first))}</h4>${exact?`<p class="bh-history-change">${((last.value/first.value-1)*100).toFixed(1)}% change across the displayed span <small>· calculated from endpoints; not an annualized growth rate</small></p>`:''}<svg viewBox="0 0 600 225" role="img" aria-label="${esc(companies[company].name+' '+first.label+', '+list.map(o=>o.period.label+': '+valueText(o)).join('; '))}"><line x1="65" y1="170" x2="535" y2="170" stroke="#cbd1ce"/><line x1="65" y1="40" x2="535" y2="40" stroke="#d8ddd5" stroke-dasharray="3 5"/><text x="4" y="44" class="bh-svg-axis">${safe(valueText(first,max,false))}</text><text x="30" y="174" class="bh-svg-axis">0</text>${positions.length>1?`<polyline points="${positions.map(p=>p.x+','+p.y).join(' ')}" fill="none" stroke="#285b46" stroke-width="3"/>`:''}${positions.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="5" fill="#285b46"/><text x="${p.x}" y="${p.y-13}" text-anchor="middle" class="bh-svg-value">${safe(valueText(p.o))}</text><text x="${p.x}" y="196" text-anchor="middle" class="bh-svg-axis">${safe(p.o.period.label.replace(' · Oct 2025–Mar 2026',''))}</text>`).join('')}</svg><div class="bh-history-points">${list.map(o=>`<button class="text-link" data-bh-observation="${safe(o.id)}" aria-pressed="${bhState.observation===o.id}">${safe(o.period.label)} · ${safe(valueText(o))}</button>`).join('')}</div></section>`;
- }).join(''):`<div class="bh-empty"><strong>No history for this measure.</strong>${historyMeasures(company).length?safe(companies[company].name)+' has '+historyMeasures(company).map(id=>esc(measureLabel(id)).toLowerCase()).join(' and ')+'.':'Select another company.'}</div>`;
- $('bh-chart-note').textContent=`${plural(total,'dated observation')}. Lines connect disclosed observations; unreported periods remain unknown. Annualized snapshots are estimates of pace. Select a dated value to inspect its evidence.`;
- if(!bhState.observation&&series.length){const o=series[0].at(-1);bhState.observation=o.id;bhState.company=company;}
- renderDetail();
+ const o=byId(bhState.observation),company=o?.company_id;
+ const list=o?historySeries(company,o.measure).find(list=>list.length>1&&list.some(r=>r.id===o.id)):null;
+ $('bh-history').hidden=!list;
+ if(!list){$('bh-history').innerHTML='';return;}
+ const max=Math.max(1,...list.map(r=>r.value)),min=Math.min(0,...list.map(r=>r.value)),span=max-min||1;
+ const positions=list.map((r,i)=>({r,x:list.length===1?150:28+i/(list.length-1)*244,y:62-(r.value-min)/span*48}));
+ const first=list[0],last=list.at(-1),exact=first.value>0&&list.every(r=>['exact','calculated'].includes(r.qualifier)&&r.evidence_type!=='estimate');
+ const basis=[first.period.type==='annual'?'Full years':first.period.type==='half_year'?'Half years':human(first.period.type),first.currency||'percent',scopeLabel(first),basisLabel(first)].join(' · ');
+ $('bh-history').innerHTML=`<h4>${safe(companies[company].name)} over time</h4><p class="bh-cohort-heading">${safe(basis)}${exact&&list.length>1?` · ${((last.value/first.value-1)*100).toFixed(1)}% change, first to last`:''}</p><svg viewBox="0 0 300 84" role="img" aria-label="${esc(companies[company].name+' '+first.label+', '+list.map(r=>r.period.label+': '+valueText(r)).join('; '))}"><line x1="28" y1="62" x2="272" y2="62" stroke="#d8ddd5"/>${positions.length>1?`<polyline points="${positions.map(p=>p.x+','+p.y).join(' ')}" fill="none" stroke="#285b46" stroke-width="2" stroke-linejoin="round"/>`:''}${positions.map((p,i)=>`<circle cx="${p.x}" cy="${p.y}" r="${p.r.id===o.id?5:3.5}" fill="${p.r.id===o.id?'#193f2f':'#285b46'}" stroke="#fcfcf8" stroke-width="2"/>${i===0||i===positions.length-1||p.r.id===o.id?`<text x="${p.x}" y="${p.y-9}" text-anchor="${i===0?'start':i===positions.length-1?'end':'middle'}" class="bh-svg-value">${safe(valueText(p.r))}</text>`:''}<text x="${p.x}" y="78" text-anchor="${i===0?'start':i===positions.length-1?'end':'middle'}" class="bh-svg-axis">${safe(periodShort(p.r))}</text>`).join('')}</svg><div class="bh-history-points">${list.map(r=>`<button type="button" data-bh-observation="${safe(r.id)}" aria-pressed="${bhState.observation===r.id}">${safe(periodShort(r,true))} · ${safe(valueText(r))}</button>`).join('')}</div>`;
 }
-
-function renderPlot(){
- if(bhState.view==='history'&&bhState.signal==='revenue'){renderHistory();return;}
+function renderCompare(){
  const selected=rows(bhState.signal,bhState.measure,{group:bhState.group,cohort:bhState.cohort}),groups=new Map();
  if(!bhState.observation&&!bhState.company&&selected.length){bhState.observation=selected[0].id;bhState.company=selected[0].company_id;}
  for(const o of selected){const key=cohort(o);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(o);}
  const md=measureDefinition(bhState.measure);
- $('bh-chart-header').innerHTML=`<div><h3>${esc(measureLabel(bhState.measure))}</h3><p>${esc(md.note||md.description||'Dated observations from the reviewed public evidence.')}</p></div><div class="bh-legend"><span><i></i> Reported / calculated</span><span><i class="is-estimate"></i> Estimate</span></div>`;
- if(!selected.length)$('bh-plot').innerHTML=`<div class="bh-empty"><strong>No comparable observations in this selection.</strong>Try another measure or business group. Missing values stay unknown.</div>`;
+ if(!selected.length)$('bh-plot').innerHTML=`<p class="bh-empty">No comparable observations in this selection. Missing values stay unknown.</p>`;
  else $('bh-plot').innerHTML=[...groups].map(([key,list])=>{
   const min=Math.min(0,...list.map(o=>o.value)),max=Math.max(0,...list.map(o=>o.value)),span=max-min||1,zero=(0-min)/span*100;
-  return `<section class="bh-plot-group" aria-label="${safe(key)}"><h4 class="bh-cohort-heading">${safe(key)}</h4><div class="bh-axis"><span>${safe(valueText(list[0],min,false))}</span><span>${safe(valueText(list[0],max,false))}</span></div>${list.map(o=>{const end=(o.value-min)/span*100;const left=Math.min(zero,end),width=Math.abs(end-zero);return `<button class="bh-plot-row ${o.evidence_type==='estimate'?'is-estimate':''}" data-bh-observation="${safe(o.id)}" aria-pressed="${bhState.observation===o.id}" aria-label="${esc(companies[o.company_id].name+': '+valueText(o)+', '+o.label+', '+o.period.label+', '+scopeLabel(o))}"><span class="bh-row-name">${safe(companies[o.company_id].name)}</span><span class="bh-row-track" aria-hidden="true"><span class="bh-row-bar ${['greater_than','at_least','less_than','at_most'].includes(o.qualifier)?'is-bound':''}" style="left:${left}%;width:${width}%;${o.value<0?'background:#7b5141':''}"></span></span><span class="bh-row-value">${safe(valueText(o))}</span><span class="bh-row-meta">${safe(o.as_of)} · ${safe(scopeLabel(o))}${o.is_context?' · context only':''}${o.evidence_type==='estimate'?' · estimate':o.evidence_type==='calculated'?' · calculated':''}</span></button>`;}).join('')}</section>`;
+  return `<section class="bh-plot-group" aria-label="${safe(key)}"><h5 class="bh-cohort-heading">${safe(key)}</h5>${list.map(o=>{const end=(o.value-min)/span*100;const left=Math.min(zero,end),width=Math.abs(end-zero);return `<button type="button" class="bh-bar" data-bh-observation="${safe(o.id)}" aria-pressed="${bhState.observation===o.id}" aria-label="${esc(companies[o.company_id].name+': '+valueText(o)+', '+o.label+', '+o.period.label+', '+scopeLabel(o))}"><span class="bh-bar-name">${safe(companies[o.company_id].name)}</span><span class="bh-bar-track" aria-hidden="true"><i class="bh-bar-fill${['greater_than','at_least','less_than','at_most'].includes(o.qualifier)?' is-bound':''}${o.value<0?' is-negative':''}${o.evidence_type==='estimate'?' is-estimate':''}" style="left:${left}%;width:${width}%"></i></span><span class="bh-bar-value">${safe(valueText(o))}</span></button>`;}).join('')}<div class="bh-axis"><span>${safe(valueText(list[0],min,false))}</span><span>${safe(valueText(list[0],max,false))}</span></div></section>`;
  }).join('');
- $('bh-chart-note').textContent=`${plural(new Set(selected.map(o=>o.company_id)).size,'organization')} · ${plural(selected.length,'observation')}. Each panel has its own scale and reporting basis. Snapshots have different dates; annualized pace is not completed-year revenue. Bounds retain > / ≥ / ≤; none of these views is a company health ranking.`;
- if(!bhState.observation&&!bhState.company&&selected.length){bhState.observation=selected[0].id;bhState.company=selected[0].company_id;}
- renderDetail();
+ $('bh-chart-note').textContent=`${md.note||md.description||'Dated observations from the reviewed public evidence.'} ${plural(new Set(selected.map(o=>o.company_id)).size,'organization')}; each panel keeps its own scale and basis. Not a ranking.`;
 }
-function renderMatrix(){
- const pool=DATA.companies.filter(c=>!bhState.group||modelGroup(c.id)===bhState.group),query=bhState.query.trim();
- const list=pool.filter(c=>c.name.toLowerCase().includes(query.toLowerCase())).sort((a,b)=>a.name.localeCompare(b.name));
- // Start with the most inspectable businesses; this orders evidence, not health.
- const ordered=[...list].sort((a,b)=>signals.filter(s=>evidenceState(b.id,s)==='observed').length-signals.filter(s=>evidenceState(a.id,s)==='observed').length||a.name.localeCompare(b.name));
- const shown=bhState.expanded||query?ordered:ordered.slice(0,8);
- $('bh-matrix-count').textContent=`${query?`${list.length} of ${plural(pool.length,'organization')} match “${query}”.`:`Showing ${shown.length} of ${plural(list.length,'organization')}.`} Ordered by evidence coverage, not business health. “Context” is a proxy; “Missing” is unknown.`;
- $('bh-matrix-body').innerHTML=shown.map(c=>`<tr><th scope="row"><a href="#company/${safe(c.id)}">${safe(c.name)}</a><small>${safe(groupLabel(modelGroup(c.id)))}</small></th>${signals.map(signal=>{const status=evidenceState(c.id,signal),o=pickCompanyObservation(c.id,signal),text=status==='n-a'?'Research':o?(numeric(o)?valueText(o):'Attributed claim'):'Missing';return `<td><button data-bh-company="${safe(c.id)}" data-bh-signal="${signal}" class="bh-matrix-cell" aria-label="${safe(c.name+' · '+labels[signal]+': '+text)}"><span class="bh-pill" data-status="${status}">${safe(text)}</span><small>${status==='n-a'?'Commercial metrics N/A':o?(o.is_context?'Context · ':'')+esc(measureLabel(o.measure)):'No reviewed disclosure'}</small>${o?`<small>${safe(o.as_of)}</small>`:''}</button></td>`;}).join('')}</tr>`).join('');
- $('bh-show-all').hidden=!!query||list.length<=8;
- $('bh-show-all').textContent=bhState.expanded?'Show fewer organizations':`Show all ${list.length} organizations`;
- $('bh-show-all').setAttribute('aria-expanded',String(bhState.expanded));
+function companyRows(){
+ const pool=DATA.companies.filter(c=>!bhState.group||modelGroup(c.id)===bhState.group),query=bhState.query.trim().toLowerCase();
+ const states=new Map(pool.map(c=>[c.id,Object.fromEntries(signals.map(s=>[s,evidenceState(c.id,s)]))]));
+ let list=pool.filter(c=>c.name.toLowerCase().includes(query));
+ if(bhState.evidenceOnly)list=list.filter(c=>signals.some(s=>['observed','proxy'].includes(states.get(c.id)[s])));
+ const coverage=id=>signals.filter(s=>states.get(id)[s]==='observed').length*2+signals.filter(s=>states.get(id)[s]==='proxy').length;
+ const unitRank=o=>!o||!numeric(o)?3:o.currency?0:o.unit==='percent'?1:2;
+ const bySignal=(a,b)=>{const sa=states.get(a.id)[bhState.signal],sb=states.get(b.id)[bhState.signal];if(stateRank[sa]!==stateRank[sb])return stateRank[sa]-stateRank[sb];const oa=pickCompanyObservation(a.id,bhState.signal),ob=pickCompanyObservation(b.id,bhState.signal);return unitRank(oa)-unitRank(ob)||(numeric(ob||{})?ob.value:0)-(numeric(oa||{})?oa.value:0)||a.name.localeCompare(b.name);};
+ const sorted=[...list].sort(bhState.sort==='name'?(a,b)=>a.name.localeCompare(b.name):bhState.sort==='signal'?bySignal:(a,b)=>coverage(b.id)-coverage(a.id)||a.name.localeCompare(b.name));
+ return {pool,sorted,states};
+}
+function cellHTML(c,signal,state){
+ if(state==='n-a')return `<td class="bh-cell" data-state="n-a" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><span title="Nonprofit research: commercial measures are not applied">n/a</span></td>`;
+ const o=pickCompanyObservation(c.id,signal),selected=bhState.company===c.id&&bhState.signal===signal;
+ if(!o)return `<td class="bh-cell" data-state="missing" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><span title="${safe(c.name+' · '+labels[signal]+': no reviewed public disclosure. Missing is not zero.')}" aria-label="${safe(labels[signal]+': not disclosed')}">—</span></td>`;
+ const value=numeric(o)?valueText(o):'Claim',tag=cellTag(o);
+ return `<td class="bh-cell" data-state="${state}" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><button type="button" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}" aria-pressed="${selected}" title="${esc(c.name+' · '+o.label+' · '+o.period.label+' · '+scopeLabel(o)+(o.is_context?' · context only':''))}"><b>${safe(value)}${scopeBadge(o)}</b><small>${safe(tag)}</small></button></td>`;
+}
+function renderGrid(){
+ const {pool,sorted,states}=companyRows(),query=bhState.query.trim();
+ const figures=sorted.filter(c=>signals.some(s=>states.get(c.id)[s]==='observed')).length;
+ const order={coverage:'ordered by evidence coverage',signal:'ordered by '+labels[bhState.signal].toLowerCase()+' evidence',name:'A to Z'}[bhState.sort];
+ $('bh-matrix-count').textContent=`${query||bhState.evidenceOnly||bhState.group?`${sorted.length} of ${plural(pool.length,'organization')}`:plural(sorted.length,'organization')} · ${figures} with a reported figure · ${order}, not by health.`;
+ $('bh-grid-head').innerHTML=`<th scope="col"${bhState.sort!=='signal'?' aria-sort="other"':''}><button type="button" class="bh-colhead" data-bh-sort="${bhState.sort==='name'?'coverage':'name'}">Organization<small>${bhState.sort==='name'?'A to Z':bhState.sort==='coverage'?'most evidence first':'sort A to Z'}</small></button></th>`+signals.map(s=>{const n=new Set(all().filter(o=>o.signal===s&&numeric(o)&&!o.is_context).map(o=>o.company_id)).size;return `<th scope="col"${bhState.sort==='signal'&&bhState.signal===s?' aria-sort="descending"':''}><button type="button" class="bh-colhead${bhState.signal===s?' is-active':''}" data-bh-tab="${s}" title="${esc(questions[s])}">${columns[s]}<small>${n} of ${DATA.companies.length}</small></button></th>`;}).join('');
+ $('bh-matrix-body').innerHTML=sorted.length?sorted.map(c=>`<tr${bhState.company===c.id?' class="is-selected"':''}><th scope="row"><a href="#company/${safe(c.id)}" title="${safe(c.name)}">${safe(c.name)}</a><small>${safe(groupLabel(modelGroup(c.id)))}</small></th>${signals.map(s=>cellHTML(c,s,states.get(c.id)[s])).join('')}</tr>`).join(''):`<tr><td colspan="6" class="bh-empty">No organization matches. Clear the search or the group filter.</td></tr>`;
 }
 function renderEstimator(){
  const o=byId($('bh-estimate-company').value);if(!o)return;
  const low=Number($('bh-margin-low').value),high=Number($('bh-margin-high').value);$('bh-margin-low-label').textContent=low+'%';$('bh-margin-high-label').textContent=high+'%';
  const result=estimate(o.value,low,high);
- $('bh-estimate-result').innerHTML=result?`<span class="bh-pill is-estimate">HYPOTHETICAL SCENARIO</span><p><strong>${safe(valueText(o,result.low,false))} – ${safe(valueText(o,result.high,false))}</strong> gross profit${/run.?rate|annualized/.test(o.measure)?' at an annualized pace':''}</p><p>${safe(companies[o.company_id].name)} · ${safe(valueText(o))} × ${low}–${high}% assumed gross margin · ${safe(o.period.label)} · ${safe(scopeLabel(o))}. Revenue basis: ${safe(basisLabel(o))}.</p><p>Assumes the revenue input represents sales before direct delivery costs. If it is net platform revenue, this model does not apply. A lower-bound input yields a scenario at that threshold, not an upper forecast. No retention rate is known, so this is not the repeat-customer north star.</p>${evidenceLinks(o)}`:'<p>Lower margin must be at or below upper margin.</p>';
+ $('bh-estimate-result').innerHTML=result?`<p><span class="bh-pill is-estimate">Hypothetical</span> <strong>${safe(valueText(o,result.low,false))} – ${safe(valueText(o,result.high,false))}</strong> gross profit${/run.?rate|annualized/.test(o.measure)?' at an annualized pace':''}</p><p>${safe(companies[o.company_id].name)} · ${safe(valueText(o))} × ${low}–${high}% assumed gross margin · ${safe(o.period.label)} · ${safe(scopeLabel(o))} · ${safe(basisLabel(o))}. Assumes revenue before direct delivery costs; a lower-bound input gives a threshold, not a forecast. No retention rate is known, so this is not the repeat-customer north star. ${evidenceLinks(o)}</p>`:'<p>Lower margin must be at or below upper margin.</p>';
 }
 function render(){
  if(!bundle||!DATA.companies.some(c=>c.id==='mercor'))return;
  const ids=measures(bhState.signal);if(!ids.includes(bhState.measure))bhState.measure=bestMeasure(bhState.signal);
- $('bh-tabs').innerHTML=signals.map((id,i)=>{const coverage=new Set(all().filter(o=>o.signal===id&&numeric(o)&&!o.is_context).map(o=>o.company_id)).size;return `<button class="bh-metric-tab" id="bh-tab-${id}" role="tab" aria-controls="bh-panel" aria-selected="${id===bhState.signal}" tabindex="${id===bhState.signal?0:-1}" data-bh-tab="${id}"><span class="number">0${i+1}</span><strong>${labels[id]}</strong><span class="question">${questions[id]}</span><small class="coverage">${coverage} / ${DATA.companies.length} with direct observations</small></button>`;}).join('');
- $('bh-panel').setAttribute('aria-labelledby','bh-tab-'+bhState.signal);
- $('bh-question').innerHTML=`<strong>${esc(definition(bhState.signal).ideal_measure||questions[bhState.signal])}</strong><p>${esc(definition(bhState.signal).interpretation||'Use public observations as clues to the underlying business economics.')}</p>`;
+ $('bh-tabs').innerHTML=signals.map((id,i)=>{const coverage=new Set(all().filter(o=>o.signal===id&&numeric(o)&&!o.is_context).map(o=>o.company_id)).size,pct=Math.round(coverage/DATA.companies.length*100);return `<button type="button" class="bh-tile" id="bh-tab-${id}" role="tab" aria-controls="bh-inspector" aria-selected="${id===bhState.signal}" tabindex="${id===bhState.signal?0:-1}" data-bh-tab="${id}" title="${esc(definition(id).ideal_measure||'')}"><span class="bh-tile-top"><span class="bh-tile-n">0${i+1}</span><strong>${labels[id]}</strong></span><span class="bh-tile-q">${questions[id]}</span><span class="bh-tile-cov" aria-hidden="true"><i style="width:${pct}%"></i></span><small>${coverage} of ${DATA.companies.length} report a figure</small></button>`;}).join('');
+ $('bh-inspector').setAttribute('aria-labelledby','bh-tab-'+bhState.signal);
  $('bh-measure').innerHTML=ids.map(id=>`<option value="${safe(id)}">${esc(measureLabel(id))}</option>`).join('');$('bh-measure').value=bhState.measure;
  const cohorts=[...new Set(rows(bhState.signal,bhState.measure,{group:bhState.group,history:true}).map(cohort))];
  if(!cohorts.includes(bhState.cohort))bhState.cohort='';
  $('bh-cohort').innerHTML='<option value="">All bases · separate panels</option>'+cohorts.map(c=>`<option value="${safe(c)}">${safe(c)}</option>`).join('');$('bh-cohort').value=bhState.cohort;
  $('bh-group').innerHTML='<option value="">All business groups</option>'+Object.keys(MODEL_GROUPS).map(g=>`<option value="${safe(g)}">${safe(groupLabel(g))}</option>`).join('');$('bh-group').value=bhState.group;
- $('bh-chart-view').value=bhState.view;$('bh-chart-view').disabled=bhState.signal!=='revenue';
- $('bh-trend-company-label').hidden=bhState.view!=='history';$('bh-cohort-label').hidden=bhState.view==='history';
- $('bh-trend-company').innerHTML=DATA.companies.filter(c=>all().some(o=>o.company_id===c.id&&o.signal==='revenue'&&numeric(o))).map(c=>`<option value="${safe(c.id)}">${safe(c.name)}</option>`).join('');$('bh-trend-company').value=bhState.trendCompany;
- renderPlot();renderMatrix();
+ $('bh-sort').value=bhState.sort;
+ renderCompare();renderDetail();renderHistory();renderGrid();
 }
 function selectSignal(signal,company=''){
- bhState.signal=signal;bhState.view='snapshots';bhState.measure=bestMeasure(signal);bhState.cohort='';bhState.company=company;bhState.observation='';
+ if(!company)bhState.sort='signal';
+ bhState.signal=signal;bhState.measure=bestMeasure(signal);bhState.cohort='';bhState.company=company;bhState.observation='';
  if(company){const o=pickCompanyObservation(company,signal);if(o){bhState.measure=o.measure;bhState.observation=o.id;}}
  render();
 }
 window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries};
 if(!bundle)return;
-$('bh-chart-view').addEventListener('change',e=>{bhState.view=e.target.value;bhState.cohort='';if(bhState.view==='history'){bhState.measure=historyMeasure(bhState.trendCompany,'period_revenue');bhState.company=bhState.trendCompany;bhState.observation='';}render();});
-$('bh-trend-company').addEventListener('change',e=>{bhState.trendCompany=e.target.value;bhState.company=e.target.value;bhState.measure=historyMeasure(e.target.value,bhState.measure);bhState.observation='';render();});
 $('bh-measure').addEventListener('change',e=>{bhState.measure=e.target.value;bhState.cohort='';bhState.company='';bhState.observation='';render();});
 $('bh-cohort').addEventListener('change',e=>{bhState.cohort=e.target.value;bhState.company='';bhState.observation='';render();});
-$('bh-group').addEventListener('change',e=>{bhState.group=e.target.value;bhState.view='snapshots';bhState.cohort='';bhState.company='';bhState.observation='';render();});
-$('bh-search').addEventListener('input',e=>{bhState.query=e.target.value;renderMatrix();});
-$('bh-show-all').addEventListener('click',()=>{bhState.expanded=!bhState.expanded;renderMatrix();});
+$('bh-group').addEventListener('change',e=>{bhState.group=e.target.value;bhState.cohort='';bhState.company='';bhState.observation='';render();});
+$('bh-sort').addEventListener('change',e=>{bhState.sort=e.target.value;renderGrid();});
+$('bh-search').addEventListener('input',e=>{bhState.query=e.target.value;renderGrid();});
+$('bh-evidence-only').addEventListener('change',e=>{bhState.evidenceOnly=!!e.target.checked;renderGrid();});
 for(const id of ['bh-margin-low','bh-margin-high'])$(id).addEventListener('input',renderEstimator);
 $('bh-estimate-company').addEventListener('change',renderEstimator);
 document.addEventListener('click',e=>{
+ const sort=e.target.closest('[data-bh-sort]');if(sort){bhState.sort=sort.dataset.bhSort;$('bh-sort').value=bhState.sort;renderGrid();return;}
  const tab=e.target.closest('[data-bh-tab]');if(tab){selectSignal(tab.dataset.bhTab);$('bh-tab-'+tab.dataset.bhTab).focus({preventScroll:true});return;}
- const cell=e.target.closest('[data-bh-company]');if(cell){selectSignal(cell.dataset.bhSignal,cell.dataset.bhCompany);const strip=$('bh-tabs'),tab=$('bh-tab-'+cell.dataset.bhSignal);strip.scrollTo({left:strip.scrollLeft+tab.getBoundingClientRect().left-strip.getBoundingClientRect().left});strip.scrollIntoView({behavior:'auto',block:'start'});$('bh-panel').focus({preventScroll:true});return;}
+ const cell=e.target.closest('[data-bh-company]');if(cell){selectSignal(cell.dataset.bhSignal,cell.dataset.bhCompany);const inspector=$('bh-inspector');if(narrow())inspector.scrollIntoView({behavior:'smooth',block:'start'});inspector.focus({preventScroll:true});return;}
  const mark=e.target.closest('[data-bh-observation], [data-bh-context]');if(mark){const o=byId(mark.dataset.bhObservation||mark.dataset.bhContext);if(!o)return;bhState.company=o.company_id;bhState.observation=o.id;bhState.measure=o.measure;bhState.cohort='';render();const updated=[...document.querySelectorAll('[data-bh-observation]')].find(el=>el.dataset.bhObservation===o.id);updated?.focus({preventScroll:true});}
 });
 $('bh-tabs').addEventListener('keydown',e=>{
@@ -2546,7 +2508,7 @@ const inputs=all().filter(o=>o.signal==='revenue'&&numeric(o)&&o.currency&&/reve
 $('bh-estimate-company').innerHTML=inputs.map(o=>`<option value="${safe(o.id)}">${safe(companies[o.company_id]?.name)} · ${safe(valueText(o))} · ${safe(o.period.label)} · ${safe(scopeLabel(o))}</option>`).join('');
 if(inputs.length)$('bh-estimate-company').value=inputs.find(o=>o.company_id==='mercor')?.id||inputs[0].id;
 renderEstimator();
-$('bh-method-content').innerHTML=`<p>Dashboard curated ${safe(bundle.dashboard_curated_on||'23 October 2026')} from research dataset ${safe(DATA.dataset_version)}. Source review dates remain attached to each original claim; curation does not imply a fresh audit. This is a selected field guide, not a market census.</p><p>Reported means the source states the number. Calculated means arithmetic using cited inputs. Estimates are attributed to their source. The margin model uses your assumptions and stays outside the evidence table.</p><p>Revenue after contractor payouts, gross billings, software ARR and annualized pace have different meanings. Completed periods and business scopes are separated. Employee headcount and registered expert networks are context; neither measures paid utilization. Customer logos and cumulative clients do not establish retention.</p><p>Cash balance alone cannot establish runway without a dated burn rate. Net income, adjusted EBITDA and gross margin are separate measures. Missing disclosure is not evidence of a weak business. Commercial health measures are not applied to nonprofit research organizations.</p><p>Original research reviewed ${safe(bundle.source_dataset_reviewed_on)}. Dashboard curation does not refresh every source. Follow original source links before making a decision.</p>`;
+$('bh-method-content').innerHTML=`<p><strong>Reported</strong> means the source states the number. <strong>Calculated</strong> means arithmetic from cited inputs, shown with its formula. <strong>Context</strong> covers customer counts, expert networks, headcount and profitability claims: proxies, never a measured margin, retention rate or cash figure.</p><p>Run rate (annualized pace), completed-period revenue, gross billings and net revenue mean different things, so each keeps its own panel and scale. Missing disclosure is not zero and not a sign of weakness. Nonprofit research organizations are not scored on commercial measures.</p><p>Curated ${safe(bundle.dashboard_curated_on||'23 October 2026')} from research dataset ${safe(DATA.dataset_version)}, reviewed ${safe(bundle.source_dataset_reviewed_on)}; review dates stay attached to each claim. The margin model uses your assumptions and never enters the evidence grid. Follow the original source before acting on a figure.</p>`;
 })();
 
 initialize();</script></body></html>

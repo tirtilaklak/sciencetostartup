@@ -2,6 +2,12 @@
 
 The overview answers five business questions: is paid demand growing, does delivery leave a margin, do customers return, is expert supply doing paid work, and can the business sustain growth?
 
+## Layout
+
+The dashboard is one board. Five signal tiles sit above it, each with its question and how many of the 39 organizations report a figure for it. The board's left side is an evidence grid with every organization as a row and the five signals as columns; the grid scrolls inside the board, so the whole field stays within one screen on a desktop. A cell shows the best available figure with a short tag (measure and period), tinted green for a reported or calculated figure and amber for context such as reach or headcount. A dash marks no public disclosure and `n/a` marks nonprofit research. A badge marks figures that cover one line of business or a segment rather than the whole company. The toolbar searches, filters by business group, orders rows by evidence coverage, by the selected signal or by name, and can hide rows without evidence.
+
+The right side is an inspector for the selected cell: value, evidence type, date, scope, accounting basis, source links, a collapsed caveats block with the source wording, the same measure across other companies in separate same-basis panels, and a line of the company's own dated observations when the same series has more than one point. Selecting a tile sorts the grid by that signal and opens its leading observation. On phones the board stacks: tiles scroll sideways, the grid scrolls both ways with the company column pinned, and tapping a cell brings the inspector into view.
+
 The recommended north star for the commercial AI data businesses is **gross profit from repeat paying customers**: recognized revenue from returning customers less direct delivery costs attributable to that work. It combines durable demand and delivery economics. It is an analytical recommendation, not a number publicly established for this universe. Compute businesses, software vendors and nonprofit research need their own operating context.
 
 ## Evidence and calculations
@@ -20,4 +26,4 @@ The margin-range calculator multiplies one cited revenue input by user-selected 
 
 Dashboard curation is dated October 23, 2026. Underlying research retains its October 12–15 review dates. Attempts to refresh three primary filings returned HTTP 403, so this release claims no fresh source-content verification. Original source links and dates are available in the evidence dialog and JSON export.
 
-The build validates supported same-company claim/metric/source bindings and finite numbers. Focused tests independently reconstruct derived ratios, reject broken provenance, check bounds and missing-value semantics, and exercise filters and scenario arithmetic. Chromium checks cover all numeric measure choices, keyboard tabs, source dialogs, company history, filtering, and mobile overflow. The canonical audit and public snapshot reproducibility checks remain in place.
+The build validates supported same-company claim/metric/source bindings and finite numbers. Focused tests independently reconstruct derived ratios, reject broken provenance, check bounds and missing-value semantics, and exercise filters and scenario arithmetic. Chromium checks on this layout drove search, the group filter, the evidence-only toggle, the three row orders, cell selection including a missing cell, the company history line, measure switching, bar selection and arrow-key tabs at desktop and phone widths, with no console errors. The canonical audit and public snapshot reproducibility checks remain in place.
