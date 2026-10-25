@@ -199,8 +199,9 @@ $('bh-evidence-only').addEventListener('change',e=>{bhState.evidenceOnly=!!e.tar
 for(const id of ['bh-margin-low','bh-margin-high'])$(id).addEventListener('input',renderEstimator);
 $('bh-estimate-company').addEventListener('change',renderEstimator);
 document.addEventListener('click',e=>{
- const sort=e.target.closest('[data-bh-sort]');if(sort){bhState.sort=sort.dataset.bhSort;$('bh-sort').value=bhState.sort;renderGrid();return;}
- const tab=e.target.closest('[data-bh-tab]');if(tab){selectSignal(tab.dataset.bhTab);$('bh-tab-'+tab.dataset.bhTab).focus({preventScroll:true});return;}
+ // Header buttons are rebuilt with the grid, so focus returns to the new button in the same place.
+ const sort=e.target.closest('[data-bh-sort]');if(sort){bhState.sort=sort.dataset.bhSort;$('bh-sort').value=bhState.sort;renderGrid();$('bh-grid-head').querySelector?.('[data-bh-sort]')?.focus({preventScroll:true});return;}
+ const tab=e.target.closest('[data-bh-tab]');if(tab){const inGrid=!!tab.closest('thead');selectSignal(tab.dataset.bhTab);(inGrid?$('bh-grid-head').querySelector?.(`[data-bh-tab="${tab.dataset.bhTab}"]`):$('bh-tab-'+tab.dataset.bhTab))?.focus({preventScroll:true});return;}
  const cell=e.target.closest('[data-bh-company]');if(cell){selectSignal(cell.dataset.bhSignal,cell.dataset.bhCompany);const inspector=$('bh-inspector');if(narrow())inspector.scrollIntoView({behavior:'smooth',block:'start'});inspector.focus({preventScroll:true});return;}
  const mark=e.target.closest('[data-bh-observation], [data-bh-context]');if(mark){const o=byId(mark.dataset.bhObservation||mark.dataset.bhContext);if(!o)return;bhState.company=o.company_id;bhState.observation=o.id;bhState.measure=o.measure;bhState.cohort='';render();const updated=[...document.querySelectorAll('[data-bh-observation]')].find(el=>el.dataset.bhObservation===o.id);updated?.focus({preventScroll:true});}
 });
