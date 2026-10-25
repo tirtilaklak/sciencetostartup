@@ -29,6 +29,7 @@ internal reports, credentials, browser output and deployment configuration.
 - `data/business-health.json`: sourced business observations, reporting cohorts and calculations for the interactive dashboard.
 - `dist/`: generated current HTML, assets, JSON/CSV exports and portable SQLite database.
 - `docs/research-id-crosswalk.json`: public profile aliases required by the builder.
+- `design-system/`, `scripts/design_system.py`: design system tokens and the build of its stylesheet; see `design-system/README.md`.
 
 ## View or reproduce
 
