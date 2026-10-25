@@ -132,11 +132,14 @@ function renderMatrix(){
 // A closed select shows company · value · period · scope in a few words; the option title keeps the full wording.
 function estimateLabel(o,full=false){return [companies[o.company_id]?.name,valueText(o)+(annualized(o)?' annualized':''),full?o.period.label:periodName(o),full?scopeLabel(o):scopeShort(o)].join(' · ');}
 function estimateOption(o){return `<option value="${safe(o.id)}" title="${safe(estimateLabel(o,true))}">${safe(estimateLabel(o))}</option>`;}
+// A wrapped value breaks between its · parts where it can.
+function faces(){for(const face of document.querySelectorAll('#business-health .bh-face'))face.innerHTML='<span>'+(face.previousElementSibling.selectedOptions[0]?.text||'').split(' · ').map(safe).join(' ·</span> <span>')+'</span>';}
 function renderEstimator(){
  const o=byId($('bh-estimate-company').value);if(!o)return;
  const low=Number($('bh-margin-low').value),high=Number($('bh-margin-high').value);$('bh-margin-low-label').textContent=low+'%';$('bh-margin-high-label').textContent=high+'%';
  const result=estimate(o.value,low,high);
  $('bh-estimate-result').innerHTML=result?`<span class="bh-pill is-estimate">HYPOTHETICAL SCENARIO</span><p><strong>${safe(valueText(o,result.low,false))} – ${safe(valueText(o,result.high,false))}</strong> gross profit${annualized(o)?' at an annualized pace':''}</p><p>${safe(companies[o.company_id].name)} · ${safe(valueText(o))} × ${low}–${high}% assumed gross margin · ${safe(o.period.label)} · ${safe(scopeLabel(o))}. Revenue basis: ${safe(basisLabel(o))}.</p><p>Assumes the revenue input represents sales before direct delivery costs. If it is net platform revenue, this model does not apply. A lower-bound input yields a scenario at that threshold, not an upper forecast. No retention rate is known, so this is not the repeat-customer north star.</p>${evidenceLinks(o)}`:'<p>Lower margin must be at or below upper margin.</p>';
+ faces();
 }
 function render(){
  if(!bundle||!DATA.companies.some(c=>c.id==='mercor'))return;
@@ -152,7 +155,7 @@ function render(){
  $('bh-chart-view').value=bhState.view;$('bh-chart-view').disabled=bhState.signal!=='revenue';
  $('bh-trend-company-label').hidden=bhState.view!=='history';$('bh-cohort-label').hidden=bhState.view==='history';
  $('bh-trend-company').innerHTML=DATA.companies.filter(c=>all().some(o=>o.company_id===c.id&&o.signal==='revenue'&&numeric(o))).map(c=>`<option value="${safe(c.id)}">${safe(c.name)}</option>`).join('');$('bh-trend-company').value=bhState.trendCompany;
- renderPlot();renderMatrix();
+ renderPlot();renderMatrix();faces();
 }
 function selectSignal(signal,company=''){
  bhState.signal=signal;bhState.view='snapshots';bhState.measure=bestMeasure(signal);bhState.cohort='';bhState.company=company;bhState.observation='';
@@ -161,6 +164,7 @@ function selectSignal(signal,company=''){
 }
 window.BusinessHealth={observations,rows,evidenceState,estimate,estimateLabel,estimateOption,render,valueText,cohort,basisLabel,historySeries};
 if(!bundle)return;
+for(const select of document.querySelectorAll('#business-health select')){const pick=document.createElement('span'),face=document.createElement('span');pick.className='bh-pick';face.className='bh-face';face.setAttribute('aria-hidden','true');select.replaceWith(pick);pick.append(select,face);}
 $('bh-chart-view').addEventListener('change',e=>{bhState.view=e.target.value;bhState.cohort='';if(bhState.view==='history'){bhState.measure=historyMeasure(bhState.trendCompany,'period_revenue');bhState.company=bhState.trendCompany;bhState.observation='';}render();});
 $('bh-trend-company').addEventListener('change',e=>{bhState.trendCompany=e.target.value;bhState.company=e.target.value;bhState.measure=historyMeasure(e.target.value,bhState.measure);bhState.observation='';render();});
 $('bh-measure').addEventListener('change',e=>{bhState.measure=e.target.value;bhState.cohort='';bhState.company='';bhState.observation='';render();});
