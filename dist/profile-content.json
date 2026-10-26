@@ -4802,7 +4802,12 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "metric_ids": [
+        "toloka.metric.major-financial_metrics-2",
+        "toloka.metric.major-growth_metrics-1",
+        "toloka.metric.oct14-0-expert-and-annotator-pool"
+      ]
     },
     {
       "company_id": "afterquery",

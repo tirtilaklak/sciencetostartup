@@ -821,7 +821,7 @@
       "numeric_pay": true,
       "as_of": "undated",
       "reviewed_on": "2026-10-12",
-      "status": "listed",
+      "status": "unverified",
       "geography": "San Francisco / remote US",
       "eligibility": "US listing evidence",
       "url": "https://www.ycombinator.com/companies/abundant",
@@ -854,7 +854,8 @@
           "retrieval_status": "checked"
         }
       ],
-      "availability_note": "The reviewed source labels this a salary; no hourly conversion is made. Listing URL points to the YC company page; a direct listing was not found on 2026-10-19."
+      "availability_note": "The reviewed source labels this a salary; no hourly conversion is made. Listing URL points to the YC company page; a direct listing was not found on 2026-10-19.",
+      "availability_checked_on": "2026-10-19"
     },
     {
       "id": "afterquery.work.world-models",
@@ -1238,7 +1239,7 @@
         }
       ],
       "availability_note": "The official listing showed “Job not found” on 17 October 2026. Original terms are retained as historical evidence. Original posting returns 'Job not found'; link goes to the employer's job board (checked 2026-10-19).",
-      "availability_checked_on": "2026-10-17",
+      "availability_checked_on": "2026-10-19",
       "last_route_check": {
         "date": "2026-10-17",
         "checked_at": "2026-10-17T21:34:44.603Z",
@@ -1297,7 +1298,7 @@
       "hours": "35–40 hours/week",
       "duration": "1–2 months; possible extension",
       "availability_note": "The official listing showed “Job not found” on 17 October 2026. Original terms are retained as historical evidence. Original posting returns 'Job not found'; link goes to the employer's job board (checked 2026-10-19).",
-      "availability_checked_on": "2026-10-17",
+      "availability_checked_on": "2026-10-19",
       "last_route_check": {
         "date": "2026-10-17",
         "checked_at": "2026-10-17T21:34:45.436Z",
@@ -1450,7 +1451,7 @@
       ],
       "hours": "Full- or part-time",
       "availability_note": "The official listing showed “Job not found” on 17 October 2026. Original terms are retained as historical evidence. Original posting returns 'Job not found'; link goes to the employer's job board (checked 2026-10-19).",
-      "availability_checked_on": "2026-10-17",
+      "availability_checked_on": "2026-10-19",
       "last_route_check": {
         "date": "2026-10-17",
         "checked_at": "2026-10-17T21:34:46.099Z",
@@ -4799,6 +4800,7 @@
         }
       ],
       "availability_note": "The opportunities portal showed zero listings in the 15 October review. Polaris and its $16/hour rate were recorded on 12 October 2026. Current availability is unconfirmed. Portal showed 0 open roles on 2026-10-19; route marked closed.",
+      "availability_checked_on": "2026-10-19",
       "last_route_check": {
         "date": "2026-10-15",
         "result": "public_portal_zero_listings",
@@ -5633,7 +5635,7 @@
       "source_publication_date": "undated",
       "hours": "Full-time",
       "availability_note": "The exact official role URL now renders “Job not found”. Historical pay and requirements are retained; a separate Inference Infrastructure Engineer, Serving role is not merged into this record. Original posting returns 'Job not found'; link goes to the employer's job board (checked 2026-10-19).",
-      "availability_checked_on": "2026-10-14"
+      "availability_checked_on": "2026-10-19"
     },
     {
       "id": "aixi.work.machine-learning-research-scientist",

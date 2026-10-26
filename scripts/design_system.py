@@ -17,11 +17,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TOKENS = ROOT / "design-system/tokens.json"
 # The order scripts/observatory.py inlines these into index.html; later rules win.
-CASCADE = ("style.css", "profiles-v2.css", "work-v4.css", "investor.css", "edition.css", "business-health.css", "icons.css")
+# Read from the build's own list so the two cannot drift apart.
+from observatory import REDESIGN_CSS  # noqa: E402
+CASCADE = ("style.css", *REDESIGN_CSS, "icons.css")
 # Literal colours wired to tokens. Every live use of each value shares the token's role.
 WIRED = ("field", "field-border", "green-dark", "tray", "tray-border", "logo-dark", "hover", "wash",
          "band", "band-group", "band-rule", "rule-strong", "track", "bar-compare", "figure-rule",
-         "mark-frame", "dialog-border", "scrim", "status", "status-rule", "link-status", "focus-work")
+         "mark-frame", "dialog-border", "scrim", "status", "status-rule", "link-status")
 # White also paints other things, so on-green replaces it only in rules that set text on a green fill.
 ON_GREEN_RULES = (".button-primary", "#compare-tray a", "#compare-tray .quiet")
 HEX = re.compile(r"#([0-9a-fA-F]{3,8})(?![0-9a-fA-F])")

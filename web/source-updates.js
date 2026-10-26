@@ -26,7 +26,7 @@ function sourceUpdatesArchiveHTML(id){
 }
 function sourceUpdateClaimHTML(id){
  const updates=(window.SOURCE_UPDATES?.updates||[]).filter(update=>update.affected_claim_ids.includes(id));if(!updates.length)return '';
- return `<aside class="source-update-note" data-source-update-claim="${attr(id)}"><p><strong>Later product source update</strong></p>${updates.map(update=>`<p>${esc(update.replacement_fields.description)}${update.replacement_fields.status?' '+esc(update.replacement_fields.status)+'.':''}</p>${sourceUpdateReferenceHTML(update)}<p class="sub">${esc(update.qualification)}</p>`).join('')}<p class="sub">The original dataset ${esc(window.SOURCE_UPDATES.baseline_dataset_version)} statement and evidence remain below.</p></aside>`;
+ return `<aside class="source-update-note" role="note" data-source-update-claim="${attr(id)}"><p><strong>Later product source update</strong></p>${updates.map(update=>`<p>${esc(update.replacement_fields.description)}${update.replacement_fields.status?' '+esc(update.replacement_fields.status)+'.':''}</p>${sourceUpdateReferenceHTML(update)}<p class="sub">${esc(update.qualification)}</p>`).join('')}<p class="sub">The original dataset ${esc(window.SOURCE_UPDATES.baseline_dataset_version)} statement and evidence remain below.</p></aside>`;
 }
 
 // Context corrections never replace canonical metrics, claims or source lists.
@@ -151,7 +151,7 @@ function evidenceContextStatementHeading(claim){return historicalOfferContextFor
 function originalProductContextHTML(product){const update=evidenceContextCorrections().find(row=>row.kind==='historical-offer-source-context'&&row.target.product_id===product?.id&&evidenceContextSnapshotMatches(product,row.historical_snapshot.products[0]));return update?evidenceContextUpdateHTML(update)+evidenceContextStatementHeadingHTML(claims[product.claim_id]):'';}
 function evidenceContextStatementHeadingHTML(claim){const heading=evidenceContextStatementHeading(claim);return heading?`<p class="sub"><strong>${esc(heading)}</strong></p>`:'';}
 function evidenceContextOriginalScope(claim,fallback){return evidenceContextScopeLabel(claim,fallback)!==fallback?'Original dataset scope: '+fallback:fallback;}
-function evidenceContextScopeHTML(claim,fallback){const current=evidenceContextScopeLabel(claim,fallback);return current!==fallback?`<div><strong>Reviewed engagement scope</strong>${esc(current)}</div><div><strong>Original dataset scope</strong>${esc(fallback)}</div>`:`<div><strong>Entity scope</strong>${esc(fallback)}</div>`;}
+function evidenceContextScopeHTML(claim,fallback){const current=evidenceContextScopeLabel(claim,fallback);return current!==fallback?`<div><strong>Reviewed engagement scope</strong>${esc(current)}</div><div><strong>Original dataset scope</strong>${esc(fallback)}</div>`:`<div><strong>Business covered</strong>${esc(fallback)}</div>`;}
 function relationshipAssessmentContextForAssessment(assessment){return evidenceContextCorrections().find(update=>update.kind==='relationship-assessment-scope-context'&&update.target.assessment_id===assessment?.id&&evidenceContextSnapshotMatches(assessment,update.historical_snapshot.assessments[0]));}
 function evidenceContextAssessmentHTML(assessment){const update=relationshipAssessmentContextForAssessment(assessment);return update?evidenceContextUpdateHTML(update)+`<p class="sub"><strong>Original assessment rationale</strong></p>`:'';}
 function evidenceContextCriterionHTML(assessment,key){const update=relationshipAssessmentContextForAssessment(assessment);return update&&Object.hasOwn(update.criterion_context,key)?`<p class="sub">${esc(update.criterion_context[key])}</p><p class="sub"><strong>Original criterion rationale</strong></p>`:'';}
@@ -165,7 +165,7 @@ function evidenceContextClaimPeriod(claim,fallback){
 }
 function evidenceContextDateHeading(claim){
  if(historicalOfferContextForClaim(claim))return 'Original dataset date field';
- return evidenceContextForClaim(claim).some(update=>update.kind==='metric_reporting_context')?'Original dataset reporting date':'Evidence / reporting date';
+ return evidenceContextForClaim(claim).some(update=>update.kind==='metric_reporting_context')?'Original dataset reporting date':'Date of the evidence';
 }
 function evidenceContextArchiveDate(claim,fallback){
  if(historicalOfferContextForClaim(claim))return 'Original dataset date field: '+fallback;
@@ -183,7 +183,7 @@ function evidenceContextUpdateHTML(update,claimId){
   const source=sources[ref.source_id],role={bound_gross_observation:'Database report',separate_investor_corroboration:'Separate investor corroboration',direct_financial_support:'CEO post',bound_investor_run_rate:'Felicis · investor-published company statement',secondary_gross_basis_estimate:'Sacra · separate secondary gross estimate',market_research_engagement:'Dialogue market-research case',separate_annotation_testimony:'Spade annotation testimony',dated_ai_workflow:'Dated AI workflow',expert_payout_forecast:'Expert-payout forecast',retained_issuer_offer:'Ooak partner page · retained read 16 Oct 2026 · publication date not stated'}[ref.role];
   return `<li>${external(source.url,role)}${ref.publication_date?' · Published '+esc(profileDate(ref.publication_date)):''}${ref.role==='direct_financial_support'?' · '+claimButton(ref.claim_id,'Retained financial evidence'):''}</li>`;
  }).join('');
- return `<aside class="source-update-note" data-evidence-context="${attr(update.id)}"><p><strong>${esc(label)} · ${esc(profileDate(update.reviewed_on))}</strong></p><p>${esc(context)}</p>${update.access_note?`<p class="sub">${esc(update.access_note)}</p>`:''}<ul>${links}</ul><p class="sub">${scope?`Based on retained research. This clarification is not a new source check. Original dataset ${esc(DATA.dataset_version)} statements, assessment values and source lists are retained.`:`Based on retained research. This correction is not a new source check. The original dataset ${esc(DATA.dataset_version)} record and sources are retained.`}</p><p><a href="source-updates.json" download>Source updates and original records · JSON</a></p></aside>`;
+ return `<aside class="source-update-note" role="note" data-evidence-context="${attr(update.id)}"><p><strong>${esc(label)} · ${esc(profileDate(update.reviewed_on))}</strong></p><p>${esc(context)}</p>${update.access_note?`<p class="sub">${esc(update.access_note)}</p>`:''}<ul>${links}</ul><p class="sub">${scope?`Based on retained research. This clarification is not a new source check. Original dataset ${esc(DATA.dataset_version)} statements, assessment values and source lists are retained.`:`Based on retained research. This correction is not a new source check. The original dataset ${esc(DATA.dataset_version)} record and sources are retained.`}</p><p><a href="source-updates.json" download>Source updates and original records · JSON</a></p></aside>`;
 }
 function evidenceContextClaimHTML(id){
  const claim=claims[id];return claim?evidenceContextForClaim(claim).map(update=>evidenceContextUpdateHTML(update,id)).join(''):'';

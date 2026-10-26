@@ -1,0 +1,133 @@
+/* Overview page (#market): hero, paid work, business groups, how we check and the publisher's proposed lab. The business health dashboard has its own file. */
+/* Hero: what the guide is, who publishes it, and the two main paths. */
+#market-view .market-hero{grid-template-columns:minmax(0,740px) minmax(220px,1fr);align-items:center;padding:48px 0 20px}
+.hero-eyebrow{text-transform:uppercase}
+#market-view .market-hero h1{max-width:640px}
+#market-view .hero-actions{gap:12px;flex-wrap:wrap}
+#market-view .button-primary{gap:14px}
+#market-view .button-secondary{display:inline-flex;align-items:center;gap:14px;min-height:44px;padding:10px 16px;border:1px solid var(--green);border-radius:3px;background:transparent;color:var(--green);text-decoration:none;font-size:14px;font-weight:550}
+#market-view .button-secondary:hover{background:#eef1eb}
+.hero-byline{margin:18px 0 0;max-width:600px;font-size:14px;line-height:1.55;color:var(--muted)}
+#market-view .hero-research{display:block;align-self:center;font-size:14px;color:var(--ink)}
+#market-view .hero-research>p{font-size:14px;margin:0 0 10px}
+#market-view .hero-meta{gap:6px;font-size:14px;margin:0 0 12px}
+#market-view .hero-meta b{min-width:36px}
+#hero-work-stat[data-pending]{visibility:hidden}
+#market-view .hero-research>a{font-size:14px}
+.hero-logos{grid-column:1/-1;margin-top:28px;padding-top:16px;border-top:1px solid var(--border)}
+.hero-logo-label{margin:0 0 6px;font-size:12px;line-height:1.5;color:var(--muted)}
+#market-view .hero-logo-grid{margin:0;padding:6px 0 0;border:0;gap:24px}
+#market-view .hero-logo-grid>a{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+#market-view .hero-logo-grid>a>.hero-logo-name{display:block;max-width:100%;font-size:12px;line-height:1.4;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#market-view .hero-logo-grid>a:hover>.hero-logo-name{color:var(--green);text-decoration:underline;text-underline-offset:3px}
+/* Section headings and the grade key. */
+#market-view .product-story .story-number{display:block}
+#market-view .section-heading>div>p:not(.eyebrow):not(.story-number){margin:10px 0 0;max-width:640px;font-size:15px;line-height:1.55;color:var(--muted)}
+.grade-key{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin:14px 0 0;font-size:13px;line-height:1.5;color:var(--muted)}
+.grade-key>p{margin:0;color:var(--ink)}
+.grade-key dl{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0}
+.grade-key dl>div{display:flex;align-items:baseline;gap:6px}
+.grade-key dd{margin:0}
+.grade-key dt,.story-grade{display:inline-flex;align-items:center;justify-content:center;min-width:20px;padding:2px 6px;border:1px solid #aab4ad;border-radius:999px;font-size:11px;font-weight:600;line-height:1.3;color:var(--ink);white-space:nowrap;background:var(--bg)}
+.story-grade[data-grade="U"],.grade-key dl>div:last-child dt{border-style:dashed}
+/* Paid work. */
+.overview-work{display:grid;grid-template-columns:minmax(180px,.8fr) minmax(0,2.3fr);gap:0 46px;margin:30px 0 0;padding:32px 0 36px;border-top:1px solid var(--border)}
+.overview-work>.section-heading{margin:0;align-items:start}
+.overview-work-body,.overview-work-action{grid-column:2}
+.overview-stats{display:flex;flex-wrap:wrap;gap:12px 40px;margin:0 0 14px}
+.overview-stats span{font-size:14px;color:var(--muted)}
+.overview-stats b{display:block;font-size:30px;font-weight:600;line-height:1.2;letter-spacing:-.6px;color:var(--ink)}
+.overview-work-body>p:not(.overview-stats){max-width:640px;margin:0 0 12px;font-size:15px;line-height:1.55;color:var(--muted)}
+#market-view .overview-safety{padding:10px 14px;border-left:3px solid var(--green);background:var(--pale);color:var(--ink);font-size:14px}
+.overview-work-action{margin:8px 0 0}
+/* Business groups: each row is a link to the filtered company list. */
+#model-map .category-card{grid-template-columns:minmax(220px,1.1fr) minmax(220px,1.4fr) 120px 24px;grid-template-areas:"name desc count icon" "members desc count icon";gap:4px 28px;text-decoration:none;color:var(--ink)}
+#model-map .category-name{grid-area:name}
+#model-map .category-members{grid-area:members;font-size:13px;line-height:1.5;color:var(--muted)}
+#model-map .category-description{grid-area:desc}
+#model-map .category-count{grid-area:count}
+#model-map .category-card>.ui-icon{grid-area:icon}
+#model-map .category-card:hover .category-name{color:var(--green);text-decoration:underline;text-underline-offset:3px}
+/* How we check. */
+.overview-check{margin:44px 0 0;padding-top:8px;border-top:1px solid var(--border)}
+.overview-check-body{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px;margin-top:6px}
+.check-item h3{font-size:16px;margin:0 0 8px}
+.check-item p{font-size:14px;line-height:1.55;color:var(--muted);margin:0 0 10px}
+.check-item p b{color:var(--ink);font-weight:600}
+.check-item p a{font-size:14px}
+/* One-hue ordinal ramp (A darkest), validated against the page surface; 2px surface gaps between segments. */
+.grade-bar{display:flex;gap:2px;height:10px;margin:10px 0}
+.grade-bar span{min-width:3px}
+.grade-bar span:first-child{border-radius:2px 0 0 2px}
+.grade-bar span:last-child{border-radius:0 2px 2px 0}
+.grade-bar [data-grade="A"]{background:#1f4a38}
+.grade-bar [data-grade="B"]{background:#46705b}
+.grade-bar [data-grade="C"]{background:#6e8e7b}
+.grade-bar [data-grade="U"]{background:#9db4a5}
+.grade-counts{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 10px;padding:0;list-style:none;font-size:14px;color:var(--ink)}
+.grade-counts li{display:flex;align-items:center;gap:6px}
+.check-item .sub{font-size:13px}
+/* From the publisher: the proposed lab, kept apart from the research in a tinted band. */
+.venture-band{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);gap:40px;align-items:start;margin:60px 0 0;padding:32px;background:var(--pale);border-top:2px solid var(--green)}
+.venture-copy h2{font-size:26px;margin:0 0 14px}
+.venture-copy>p{font-size:15px;line-height:1.6;color:var(--ink);margin:0 0 14px;max-width:560px}
+#market-view .venture-copy .investor-status,#market-view .venture-copy .investor-lab-positioning{font-size:14px;line-height:1.55;color:var(--muted);margin:0 0 12px}
+#market-view .venture-band .investor-snapshot{display:block;margin:0;padding:0;border:0}
+#market-view .venture-band figcaption{padding:0}
+.investor-caption-title{margin:14px 0 0;font-size:14px;line-height:1.5;font-weight:600;color:var(--ink)}
+#market-view .venture-band .investor-qualifications{margin:8px 0 0}
+#market-view .venture-band .investor-qualifications>div{padding:10px 0;border-top:1px solid #cdd4cb}
+#market-view .venture-band .investor-qualifications dt{font-size:13px;line-height:1.45}
+#market-view .venture-band .investor-qualifications dd{margin:4px 0 0;font-size:13px;line-height:1.55;color:var(--muted)}
+.investor-image-actions{margin:6px 0 0}
+#market-view .venture-band .investor-full-image{display:inline-flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:2px 6px;min-height:44px;margin:0;font-size:14px}
+#market-view .venture-band .investor-link-note{font-size:12px;color:var(--muted)}
+#market-view .venture-band .investor-transcript>summary{min-height:44px;font-size:13px}
+.investor-terms{font-size:12px}
+@media(max-width:1100px){
+  #market-view .market-hero{grid-template-columns:minmax(0,1fr) 230px;column-gap:40px}
+  #model-map .category-card{grid-template-columns:minmax(200px,1.1fr) minmax(180px,1.3fr) 100px 20px;gap:4px 20px}
+  .venture-band{grid-template-columns:minmax(0,1fr) minmax(0,460px);gap:32px}
+}
+@media(max-width:900px){
+  #market-view .market-hero{grid-template-columns:minmax(0,1fr)}
+  #market-view .hero-research{display:block;margin-top:24px;padding:14px 0 0;border-left:0;border-top:1px solid var(--border);min-width:0;justify-self:stretch}
+  #market-view .hero-research>p{font-size:13px;margin-bottom:8px}
+  #market-view .hero-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 10px;font-size:13px;line-height:1.35;color:var(--muted)}
+  #market-view .hero-meta b{display:block;min-width:0;font-size:24px;font-weight:600;line-height:1.2;color:var(--ink)}
+  .hero-logos{margin-top:20px}
+  #market-view .hero-logo-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;overflow:visible}
+  #market-view .hero-logo-grid .brand-asset{width:100%;max-width:108px}
+  .overview-work{display:block}
+  .overview-work>.section-heading{margin-bottom:16px}
+  #model-map .category-card{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 60px 20px}
+  .overview-check-body{grid-template-columns:1fr;gap:22px}
+  .venture-band{display:block}
+  #market-view .venture-band .investor-snapshot{margin-top:20px}
+}
+@media(max-width:700px){
+  #market-view .market-hero{padding:28px 0 8px}
+  #market-view .hero-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:22px}
+  #market-view .hero-actions a{justify-content:space-between}
+  .hero-byline{font-size:14px;margin-top:16px}
+  #market-view .hero-logo-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 12px}
+  #market-view .hero-logo-grid .brand-asset{width:90px;max-width:100%;height:28px}
+  .grade-key{margin:0;font-size:13px}
+  .grade-key dl{display:grid;grid-template-columns:1fr;gap:6px}
+  .overview-work{margin-top:20px;padding:24px 0 28px}
+  .overview-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .overview-stats span{font-size:13px;line-height:1.35}
+  .overview-stats b{font-size:24px}
+  #model-map .category-card{grid-template-columns:minmax(0,1fr) 44px 18px;grid-template-areas:"name count icon" "desc count icon" "members count icon";gap:4px 14px}
+  .overview-check{margin-top:32px}
+  .venture-band{margin:40px -20px 0;padding:24px 20px}
+  .venture-copy h2{font-size:24px}
+}
+@media(max-width:380px){
+  #market-view .hero-meta b{font-size:22px}
+  .venture-band{margin-left:-16px;margin-right:-16px;padding:24px 16px}
+}
+@media(forced-colors:active){
+  .grade-bar{display:none}
+  .grade-key dt,.story-grade{border-color:CanvasText}
+}
