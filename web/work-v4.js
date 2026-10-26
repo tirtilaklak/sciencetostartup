@@ -309,6 +309,14 @@ function w4Bucket(route){
   if(route.ai_data_work===false)return 'outside';
   return W4_CONTRACT_GROUPS.has(route.group)||(route.group==='Employment'&&W4_CONTRACT_PAY.has(route.pay_basis))?'contract':'jobs';
 }
+// The "Contract and task work" and "Jobs" filter options follow the same rule as the sections,
+// so an Employment listing paid by the hour shows under contract work in both places.
+function w4GroupMatches(route,group){
+  const contractPay=route.group==='Employment'&&W4_CONTRACT_PAY.has(route.pay_basis);
+  if(group==='Expert & contractor projects')return route.group===group||contractPay;
+  if(group==='Employment')return route.group===group&&!contractPay;
+  return route.group===group;
+}
 // A published hourly range, read only from labels that state a rate per hour. "Up to" has no low end.
 function w4HourlyRange(route){
   if(!route?.numeric_pay||route.status==='pay_conflict'||route.pay_basis==='conflicting_hourly')return null;

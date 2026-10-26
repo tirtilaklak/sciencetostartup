@@ -112,6 +112,20 @@ for(const query of ['a','e']){
  run('renderWork()');assert.deepEqual(view(),sorted,query+': a repeat render changed the view');
  run(`state.workQuery=${JSON.stringify(query+' ')};renderWork()`);assertTypedView(view(),query+' typed after a sort change');
 }
+// The type filter follows the section rule: an Employment listing paid by the hour or by a
+// one-time award is contract work in the sections and in the "Contract and task work" filter.
+{
+ const ids=group=>plain(run(`(()=>{Object.assign(state,{workQuery:'',workGroup:${JSON.stringify(group)},workPay:'',workEligibility:''});return filteredWork().map(r=>r.id);})()`));
+ const contract=ids('Expert & contractor projects'),jobs=ids('Employment');
+ const moved=plain(run(`workRouteRows().filter(r=>r.group==='Employment'&&W4_CONTRACT_PAY.has(r.pay_basis)).map(r=>r.id)`));
+ assert.ok(moved.length>0,'Fixture lost the Employment listings paid by the hour or one-time award');
+ for(const id of moved){
+  assert.ok(contract.includes(id),'Contract filter hides a listing the contract section shows: '+id);
+  assert.ok(!jobs.includes(id),'Jobs filter shows a listing the contract section owns: '+id);
+ }
+ assert.deepEqual(contract.filter(id=>jobs.includes(id)),[],'A listing matched both the contract and the jobs filter');
+ run(`Object.assign(state,{workGroup:''})`);
+}
 let filterCases=0;
 for(const filters of [{workGroup:'Employment'},{workPay:'numeric'},
  {workEligibility:'US listing evidence'},

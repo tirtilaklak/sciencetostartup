@@ -1017,7 +1017,7 @@ function workTerms(id){
 // A whole-phrase match wins; otherwise every word must match, with worker synonyms.
 function filteredWork(){
   const matcher=w4QueryMatcher(state.workQuery);
-  let rows=workRouteRows().filter(route=>(!state.workGroup||route.group===state.workGroup)&&w4PayMatches(route,state.workPay)&&w4WhereMatches(route,state.workEligibility));
+  let rows=workRouteRows().filter(route=>(!state.workGroup||w4GroupMatches(route,state.workGroup))&&w4PayMatches(route,state.workPay)&&w4WhereMatches(route,state.workEligibility));
   if(matcher){const text=new Map(rows.map(route=>[route,w4SearchText(route)])),phrase=rows.filter(route=>matcher.phrase(text.get(route)));rows=phrase.length?phrase:rows.filter(route=>matcher.all(text.get(route)));}
   return rows.sort((a,b)=>(WORK_ROUTE_ORDER[a.status]??10)-(WORK_ROUTE_ORDER[b.status]??10)||Number(b.numeric_pay)-Number(a.numeric_pay)||companies[a.company_id].name.localeCompare(companies[b.company_id].name)||a.role.localeCompare(b.role));
 }
@@ -1332,6 +1332,14 @@ function w4Bucket(route){
   if(WORK_ROUTE_ARCHIVE.has(route.status))return 'closed';
   if(route.ai_data_work===false)return 'outside';
   return W4_CONTRACT_GROUPS.has(route.group)||(route.group==='Employment'&&W4_CONTRACT_PAY.has(route.pay_basis))?'contract':'jobs';
+}
+// The "Contract and task work" and "Jobs" filter options follow the same rule as the sections,
+// so an Employment listing paid by the hour shows under contract work in both places.
+function w4GroupMatches(route,group){
+  const contractPay=route.group==='Employment'&&W4_CONTRACT_PAY.has(route.pay_basis);
+  if(group==='Expert & contractor projects')return route.group===group||contractPay;
+  if(group==='Employment')return route.group===group&&!contractPay;
+  return route.group===group;
 }
 // A published hourly range, read only from labels that state a rate per hour. "Up to" has no low end.
 function w4HourlyRange(route){

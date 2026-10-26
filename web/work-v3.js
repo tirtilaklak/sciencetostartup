@@ -30,7 +30,7 @@ function workTerms(id){
 // A whole-phrase match wins; otherwise every word must match, with worker synonyms.
 function filteredWork(){
   const matcher=w4QueryMatcher(state.workQuery);
-  let rows=workRouteRows().filter(route=>(!state.workGroup||route.group===state.workGroup)&&w4PayMatches(route,state.workPay)&&w4WhereMatches(route,state.workEligibility));
+  let rows=workRouteRows().filter(route=>(!state.workGroup||w4GroupMatches(route,state.workGroup))&&w4PayMatches(route,state.workPay)&&w4WhereMatches(route,state.workEligibility));
   if(matcher){const text=new Map(rows.map(route=>[route,w4SearchText(route)])),phrase=rows.filter(route=>matcher.phrase(text.get(route)));rows=phrase.length?phrase:rows.filter(route=>matcher.all(text.get(route)));}
   return rows.sort((a,b)=>(WORK_ROUTE_ORDER[a.status]??10)-(WORK_ROUTE_ORDER[b.status]??10)||Number(b.numeric_pay)-Number(a.numeric_pay)||companies[a.company_id].name.localeCompare(companies[b.company_id].name)||a.role.localeCompare(b.role));
 }
