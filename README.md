@@ -104,7 +104,7 @@ python3 tests/reliability_failure_state_logic.py
 python3 tests/risk_section_logic.py
 ```
 
-The 145 unit tests cover the pipeline, the build, the design system tokens
+The 149 unit tests cover the pipeline, the build, the design system tokens
 (the same check as `python3 scripts/design_system.py --check`), download sizes,
 static pages, company events, the business health data, Work routes, the Paid
 work page, site search, link health and a privacy scan of every file in `dist/`.
@@ -129,6 +129,8 @@ Static Assets accepts relative source paths. Equivalent zone redirects enforce
 HTTPS and the apex hostname while preserving paths and queries. `_headers` is
 deployed unchanged.
 
+Cloudflare Web Analytics is injected at the edge and sets no cookies.
+
 ## Business health dashboard
 
 The overview explores revenue growth, delivery margins, customer durability, paid
@@ -143,17 +145,12 @@ does not imply all source material was freshly verified.
 
 ## Owner steps
 
-1. Analytics. Create a GoatCounter site with the code `sciencetostartup`. Set
-   the `sts-analytics` meta content in `web/index.html` to
-   `https://sciencetostartup.goatcounter.com/count`, then rebuild and deploy.
-   The static company pages pick up the same setting at build time. While
-   the content is empty, nothing loads and nothing is counted.
-2. Search. Verify the domain in Google Search Console and Bing Webmaster Tools,
+1. Search. Verify the domain in Google Search Console and Bing Webmaster Tools,
    and submit `https://sciencetostartup.com/sitemap.xml` in each.
-3. Dataset corrections. Corrections that need a new dataset version are listed
+2. Dataset corrections. Corrections that need a new dataset version are listed
    in `docs/pending-2.5.1-corrections.md`. Release them from the research
    repository; this repository pins dataset 2.5.0.
-4. Deploying. Rebuild `dist/` with the commands under "View or reproduce", run
+3. Deploying. Rebuild `dist/` with the commands under "View or reproduce", run
    the checks above and commit. Then deploy all of `dist/`, including
    `dist/js/`, to the `sciencetostartup` Worker, staging it without
    `_redirects` as described under Hosting. Pushing to GitHub does not deploy.

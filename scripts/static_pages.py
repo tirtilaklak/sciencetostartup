@@ -5,9 +5,8 @@ The interactive guide is one large HTML document routed by URL fragments, so
 search engines see a single URL. This module writes small static pages: one per
 company at /company/<id>/, the company list at /companies/, the paid work
 listings at /work/, the method at /method/, the 404 page and the sitemap. Pages
-embed no dataset and no application script (only GoatCounter's counter when
-web/index.html turns analytics on). Every string is escaped and the output is
-deterministic, so rebuilds stay byte-identical.
+embed no dataset and no application script. Every string is escaped and the
+output is deterministic, so rebuilds stay byte-identical.
 
 Figures follow the app's own rules in web/app.js: eligibleMetrics() decides
 which figures may be key figures, preferredFinancial() picks the revenue
@@ -61,12 +60,11 @@ SCAM_GUIDE = "https://consumer.ftc.gov/articles/job-scams"
 DISCLOSURE = "The publisher is also proposing an AI research lab, described on the overview page. That proposal is separate from this research, which applies the same rules to every company."
 # The owner's one-line disclosure about paid work. It belongs to the About text only (the app's About panel and /method/), not every footer.
 WORK_DISCLOSURE = "The publisher has applied for paid work at some profiled companies and is a member of A.Team's talent network."
+# Cloudflare Web Analytics is injected at the edge. Both About texts (web/index.html and /method/) say so in these words.
+VISITS_NOTE = "Visits are counted by Cloudflare Web Analytics, which sets no cookies."
 COVERAGE = "The guide is a selected study of the market. It does not list every company."
 LOGO_NOTE = "Company names and logos belong to their owners and identify them here."
 NOT_YET_PROFILED = ("Uber AI Solutions", "TELUS Digital", "CloudFactory", "SuperAnnotate", "Encord", "Defined.ai", "LXT", "Welocalize")
-# Only a GoatCounter endpoint switches counting on, as in web/app.js; the meta tag lives in web/index.html.
-ANALYTICS_META = re.compile(r'<meta name="sts-analytics" content="([^"]*)">')
-ANALYTICS_URL = re.compile(r"https://[a-z0-9-]+\.goatcounter\.com/count")
 LINK_STATES = {"not_found": "page unavailable", "gone": "page unavailable", "sign_in": "sign-in required"}
 
 # ---------------------------------------------------------------------------
@@ -213,7 +211,7 @@ def public_wording(data, edits):
     return say
 
 # ---------------------------------------------------------------------------
-# Link checks (web/link-health.js) and the analytics switch (web/index.html)
+# Link checks (web/link-health.js)
 
 def health_key(url):
     """The URL as web/link-health.js compares it: scheme and host in lower case, no fragment, a path of at least /."""
@@ -237,13 +235,6 @@ def availability(url, health):
     """After a link the app marks as unavailable, the same observation in muted type."""
     entry = (health or {}).get(health_key(url))
     return f' <span class="muted">({LINK_STATES[entry["status"]]} when checked {escape(format_date(entry["checked_on"]))})</span>' if entry else ""
-
-
-def analytics_endpoint(index_html):
-    """The GoatCounter endpoint named in web/index.html, or empty while counting is off."""
-    match = ANALYTICS_META.search(index_html or "")
-    url = match.group(1).strip() if match else ""
-    return url if ANALYTICS_URL.fullmatch(url) else ""
 
 # ---------------------------------------------------------------------------
 # The app's rules, ported from web/app.js and web/source-updates.js
@@ -332,12 +323,12 @@ def snapshot_matches(actual, expected):
 class Research:
     """The dataset indexed once, answering the questions the app asks of it.
     The rules read the records as stored, like the app. `say` (public_wording) only changes the words the pages print.
-    `health` (link_health_index) and `analytics` (analytics_endpoint) carry the link checks and the counter switch."""
+    `health` (link_health_index) carries the link checks."""
 
-    def __init__(self, data, headlines=None, updates=None, say=None, health=None, analytics=""):
+    def __init__(self, data, headlines=None, updates=None, say=None, health=None):
         self.data = data
         self.say = say or (lambda value: "" if value is None else str(value))
-        self.health, self.analytics = health or {}, analytics
+        self.health = health or {}
         self.claims = {row["id"]: row for row in data.get("claims", [])}
         self.sources = {row["id"]: row for row in data.get("sources", [])}
         self.companies = {row["id"]: row for row in data.get("companies", [])}
@@ -812,8 +803,7 @@ def page_node(page_type, title, description, canonical, modified, crumbs, **extr
 
 
 def document(research, title, description, canonical, body, structured=None, current=None, state="page", robots="", note=""):
-    """One static page. GoatCounter's counter loads only on indexable pages, and only when web/index.html names an endpoint;
-    static pages have no hash routes, so its own page-load count is the right one here."""
+    """One static page: its head tags, the site header, the body and the footer."""
     head = ['<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<meta name="color-scheme" content="light">\n',
             f"<title>{escape(title)}</title>\n<meta name=\"description\" content=\"{escape(description)}\">\n"]
     if robots: head.append(f'<meta name="robots" content="{escape(robots)}">\n')
@@ -825,7 +815,6 @@ def document(research, title, description, canonical, body, structured=None, cur
                     f'<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:title" content="{escape(title)}">\n<meta name="twitter:description" content="{escape(description)}">\n<meta name="twitter:image:alt" content="{escape(SHARE_ALT)}">\n')
     head.append(f"<style>{STYLE}</style>\n")
     if structured: head.append(f'<script type="application/ld+json">{json_ld(structured)}</script>\n')
-    if canonical and research.analytics: head.append(f'<script async src="https://gc.zgo.at/count.js" data-goatcounter="{escape(research.analytics)}"></script>\n')
     return "".join(head) + "</head>\n<body>\n" + site_header(current, state) + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + "</body>\n</html>\n"
 
 # ---------------------------------------------------------------------------
@@ -1156,7 +1145,8 @@ def render_method(research, sizes, modified):
             f"<p>{SITE_NAME} is published by {PUBLISHER_NAME}. It is a public-source research guide to the companies that produce AI training data. No profiled company has paid for coverage, and none is a customer, investor or affiliate of the publisher. {escape(WORK_DISCLOSURE)}</p>\n"
             f"<p><strong>Disclosure.</strong> {disclosure_html()}</p>\n"
             f'<p><strong>Corrections.</strong> If a figure or a listing is wrong, <a href="{ORIGIN}/#corrections">request a correction</a> with the company name and the source. We review each request within seven days.</p>\n'
-            "<p><strong>Personal data and removal.</strong> Company profiles name founders and executives from public company sources only. Profiles do not show personal contact details. If you are named here and want a record corrected or removed, send a correction request.</p>\n",
+            "<p><strong>Personal data and removal.</strong> Company profiles name founders and executives from public company sources only. Profiles do not show personal contact details. If you are named here and want a record corrected or removed, send a correction request. "
+            f"{VISITS_NOTE}</p>\n",
             '<h2 id="figures">How figures are shown</h2>\n<ul>'
             "<li>Each figure keeps its own date and the part of the business it covers, such as the whole company or one business segment.</li>"
             "<li>Key figures come only from supported claims about reported results. The interactive guide uses the same rule.</li>"
@@ -1230,10 +1220,8 @@ def write_static_pages(data, destination, work_data=None, profile_content=None, 
     """Write /company/<id>/, /companies/, /work/, /method/, 404.html and sitemap.xml.
     `events` is the company events sidecar and `link_health` the link checks, both as the build validated them."""
     destination, root = Path(destination), Path(root)
-    index_page = root / "web/index.html"
     research = Research(data, read_js_object(root / "web/app.js", "FINANCIAL_HEADLINES"), read_json(root / "data/source-updates.json"),
-                        say=public_wording(data, load_copy_edits(root / "web/app.js")), health=link_health_index(link_health),
-                        analytics=analytics_endpoint(index_page.read_text(encoding="utf-8") if index_page.is_file() else ""))
+                        say=public_wording(data, load_copy_edits(root / "web/app.js")), health=link_health_index(link_health))
     # A company page with dated events changes when the events are reviewed, so its lastmod follows that review too.
     events_reviewed = str((events or {}).get("reviewed_on") or "")
     labels = read_js_object(root / "web/editorial.js", "GROUP_LABELS")
