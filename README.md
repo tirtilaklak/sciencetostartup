@@ -71,7 +71,7 @@ python3 tests/reliability_failure_state_logic.py
 python3 tests/risk_section_logic.py
 ```
 
-The 119 unit tests cover the pipeline, the build, static pages, company events,
+The 121 unit tests cover the pipeline, the build, static pages, company events,
 the business health data, Work routes, link health and a privacy scan of the
 published text files and database. The nine logic checks run the page scripts
 in Node against a DOM stub; they are not browser proof.
