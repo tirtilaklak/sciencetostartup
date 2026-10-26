@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from observatory import build
-from static_pages import METRIC_LIMIT, REWORDED_FIELDS, STYLE, analytics_endpoint, document, headline_metrics, load_copy_edits, public_wording
+from static_pages import METRIC_LIMIT, REWORDED_FIELDS, STYLE, headline_metrics, load_copy_edits, public_wording
 
 ORIGIN = "https://sciencetostartup.com"
 NAMESPACE = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
@@ -219,14 +219,10 @@ class StaticPageTests(unittest.TestCase):
         self.assertIn('<td class="date">Source date not stated</td>', mercor)
         self.assertIn("td.asof::before{content:'As of '", STYLE)
 
-    def test_analytics_loader_follows_the_index_meta(self):
-        self.assertEqual(analytics_endpoint((ROOT / "web/index.html").read_text()), "")
-        self.assertEqual(analytics_endpoint('<meta name="sts-analytics" content="https://sciencetostartup.goatcounter.com/count">'), "https://sciencetostartup.goatcounter.com/count")
-        for other in ("https://example.com/count", "javascript:alert(1)", "https://x.goatcounter.com/count?x=1"):
-            self.assertEqual(analytics_endpoint(f'<meta name="sts-analytics" content="{other}">'), "", other)
-        page = document("T", "D.", ORIGIN + "/", "", {}, analytics="https://sciencetostartup.goatcounter.com/count")
-        self.assertIn('<script async src="https://gc.zgo.at/count.js" data-goatcounter="https://sciencetostartup.goatcounter.com/count"></script>\n</head>', page)
-        self.assertNotIn("gc.zgo.at", document("T", "D.", ORIGIN + "/", "", {}))
+    def test_no_built_page_mentions_goatcounter(self):
+        # Visits are counted by Cloudflare Web Analytics at the edge; the pages and headers carry no counter of their own.
+        built = sorted(self.dist.rglob("*.html")) + [self.dist / "_headers"]
+        self.assertEqual([str(p.relative_to(self.dist)) for p in built if re.search(r"goatcounter|gc\.zgo\.at", p.read_text(), re.I)], [])
 
     def test_scale_leads_with_reported_revenue_not_the_unverified_run_rate(self):
         table, rest = self.pages["scale_ai"].split("<h3>Other reported figures, not used for comparison</h3>", 1)

@@ -4,8 +4,7 @@
 The interactive dashboard is one large HTML document routed by URL fragments,
 so search engines see a single URL. This module writes a small static page per
 company at /company/<id>/, an index at /companies/, and a sitemap listing them.
-Pages embed no dataset and no application script (only GoatCounter's counter when
-web/index.html turns analytics on); every string is escaped and
+Pages embed no dataset and no application script; every string is escaped and
 the output is deterministic so rebuilds stay byte-identical.
 """
 import html
@@ -29,9 +28,6 @@ DISCLOSURE = "The publisher is also proposing an AI research lab, described on t
 NOT_YET_PROFILED = ("Uber AI Solutions", "TELUS Digital", "CloudFactory", "SuperAnnotate", "Encord", "Defined.ai", "LXT", "Welocalize")
 EVENTS_NOTE = "Lawsuit entries describe allegations and court filings, not findings. Dates show when a case was filed or an event was reported."
 EVENT_KINDS = {"lawsuit": "Lawsuit", "data_incident": "Data incident", "customer_change": "Customer change", "workforce_change": "Workforce change", "filing": "Filing"}
-# Only a GoatCounter endpoint switches counting on, as in web/app.js; the meta tag lives in web/index.html.
-ANALYTICS_META = re.compile(r'<meta name="sts-analytics" content="([^"]*)">')
-ANALYTICS_URL = re.compile(r"https://[a-z0-9-]+\.goatcounter\.com/count")
 STATUS_LABELS = {"not preferred": "Older or partial figure"}
 LINK_STATES = {"not_found": "page unavailable", "gone": "page unavailable", "sign_in": "sign-in required"}
 MONTHS = ("january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december")
@@ -68,7 +64,6 @@ def escape(value):
 # publicText in web/app.js; the port below lets the static pages print the same words. The copy table itself is
 # read from web/app.js so it lives in one place, and tests/test_static_pages.py runs both versions to keep them equal.
 APP_SCRIPT = Path(__file__).resolve().parents[1] / "web" / "app.js"
-INDEX_PAGE = APP_SCRIPT.with_name("index.html")
 COPY_EDIT_BLOCK = re.compile(r"(?:const PUBLIC_COPY_EDITS=|Object\.assign\(PUBLIC_COPY_EDITS,)(\{.*?\n\})", re.S)
 JS_SPACE = "\t\n\v\f\r \u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000\ufeff"
 SPACE = f"[{JS_SPACE}]"  # JavaScript's \s, which also sets what trim() removes
@@ -237,13 +232,6 @@ def availability(url, health):
     return f' <span class="muted">({LINK_STATES[entry["status"]]} when checked {escape(day_label(entry["checked_on"]))})</span>' if entry else ""
 
 
-def analytics_endpoint(index_html):
-    """The GoatCounter endpoint named in web/index.html, or empty while counting is off."""
-    match = ANALYTICS_META.search(index_html or "")
-    url = match.group(1).strip() if match else ""
-    return url if ANALYTICS_URL.fullmatch(url) else ""
-
-
 def compact_number(value):
     for divisor, suffix in ((1e9, "B"), (1e6, "M"), (1e3, "K")):
         if abs(value) >= divisor:
@@ -330,7 +318,7 @@ def first_source(claim, sources):
     return next((sources[sid] for sid in claim.get("source_ids", []) if sid in sources), {})
 
 
-def document(title, description, canonical, body, structured, note="", analytics=""):
+def document(title, description, canonical, body, structured, note=""):
     meta = {"og:type": "website", "og:title": title, "og:description": description, "og:url": canonical, "og:site_name": SITE_NAME, "og:image": OG_IMAGE, "og:image:width": "1200", "og:image:height": "630", "og:image:alt": OG_IMAGE_ALT}
     head = (
         '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<meta name="color-scheme" content="light">\n'
@@ -339,9 +327,7 @@ def document(title, description, canonical, body, structured, note="", analytics
         + f'<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:title" content="{escape(title)}">\n<meta name="twitter:description" content="{escape(description)}">\n'
         '<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">\n<link rel="icon" href="/assets/favicon-48.png" sizes="48x48" type="image/png">\n<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">\n'
         f"<style>{STYLE}</style>\n<script type=\"application/ld+json\">{json_ld(structured)}</script>\n"
-        # Static pages have no hash routes, so GoatCounter's own page-load count is the right one here.
-        + (f'<script async src="https://gc.zgo.at/count.js" data-goatcounter="{escape(analytics)}"></script>\n' if analytics else "")
-        + "</head>\n"
+        "</head>\n"
     )
     header = f'<header><a href="{ORIGIN}/">{SITE_NAME}</a> · <a href="{ORIGIN}/companies/">All companies</a> · <a href="{ORIGIN}/#work">Paid work</a> · <a href="{ORIGIN}/#method">Method</a></header>\n'
     disclosure = escape(DISCLOSURE).replace("overview page", f'<a href="{ORIGIN}/#venture">overview page</a>', 1)
@@ -374,7 +360,7 @@ def risks_section(data, company_id, events, health=None):
     return "".join(parts)
 
 
-def render_company(data, company, editorial_entry, profile_entry, routes, events, as_of, modified, health=None, analytics=""):
+def render_company(data, company, editorial_entry, profile_entry, routes, events, as_of, modified, health=None):
     cid, name = company["id"], company["name"]
     canonical = f"{ORIGIN}/company/{cid}/"
     app_url = f"{ORIGIN}/#company/{cid}"
@@ -422,10 +408,10 @@ def render_company(data, company, editorial_entry, profile_entry, routes, events
     website = {"@type": "WebSite", "@id": f"{ORIGIN}/", "name": SITE_NAME, "url": f"{ORIGIN}/"}
     publisher = {"@type": "Organization", "name": SITE_NAME, "url": f"{ORIGIN}/"}
     structured = {"@context": "https://schema.org", "@type": "WebPage", "@id": canonical, "url": canonical, "name": title, "description": meta_description, "isPartOf": website, "publisher": publisher, "dateModified": modified, "about": organization, "mainEntity": organization}
-    return document(title, meta_description, canonical, "".join(body), structured, analytics=analytics)
+    return document(title, meta_description, canonical, "".join(body), structured)
 
 
-def render_index(data, companies, editorial_by_id, as_of, modified, analytics=""):
+def render_index(data, companies, editorial_by_id, as_of, modified):
     canonical = f"{ORIGIN}/companies/"
     count = len(companies)
     title = f"AI data companies: {count} sourced profiles · {SITE_NAME}"
@@ -435,7 +421,7 @@ def render_index(data, companies, editorial_by_id, as_of, modified, analytics=""
     body = (f'<p class="eyebrow">Company index · data as of {escape(as_of)}</p>\n<h1>AI data companies</h1>\n<p class="lede">{escape(description)}</p>\n<p class="muted">{escape(coverage)}</p>\n<p><a class="cta" href="{ORIGIN}/#companies">Open the interactive index</a></p>\n<ul>{items}</ul>\n')
     website = {"@type": "WebSite", "@id": f"{ORIGIN}/", "name": SITE_NAME, "url": f"{ORIGIN}/"}
     structured = {"@context": "https://schema.org", "@type": "CollectionPage", "@id": canonical, "url": canonical, "name": title, "description": description, "isPartOf": website, "publisher": {"@type": "Organization", "name": SITE_NAME, "url": f"{ORIGIN}/"}, "dateModified": modified, "mainEntity": {"@type": "ItemList", "numberOfItems": count, "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": c["name"], "url": f"{ORIGIN}/company/{c['id']}/"} for i, c in enumerate(companies)]}}
-    return document(title, description, canonical, body, structured, "<p>Company names and logos belong to their owners and identify them here.</p>\n", analytics)
+    return document(title, description, canonical, body, structured, "<p>Company names and logos belong to their owners and identify them here.</p>\n")
 
 
 def render_sitemap(company_ids, lastmod):
@@ -452,7 +438,6 @@ def write_static_pages(data, destination, work_data=None, profile_content=None, 
     # Pages change when the dataset or the reviewed events change; lastmod and dateModified follow the later date.
     modified = max(as_of, str((events or {}).get("reviewed_on") or ""))
     health = link_health_index(link_health)
-    analytics = analytics_endpoint(INDEX_PAGE.read_text(encoding="utf-8") if INDEX_PAGE.exists() else "")
     editorial_by_id = {e["company_id"]: e for e in (editorial or {}).get("entries", []) if isinstance(e, dict) and e.get("company_id")}
     profile_by_id = {e["company_id"]: e for e in (profile_content or {}).get("entries", []) if isinstance(e, dict) and e.get("company_id")}
     companies = sorted(data.get("companies", []), key=lambda c: c["id"])
@@ -462,12 +447,12 @@ def write_static_pages(data, destination, work_data=None, profile_content=None, 
         if not COMPANY_ID.match(cid): raise ValueError(f"static pages: company id is not URL-safe: {cid!r}")
         folder = destination / "company" / cid
         folder.mkdir(parents=True, exist_ok=True)
-        page = render_company(data, company, editorial_by_id.get(cid), profile_by_id.get(cid), company_routes(work_data, cid), events, as_of, modified, health, analytics)
+        page = render_company(data, company, editorial_by_id.get(cid), profile_by_id.get(cid), company_routes(work_data, cid), events, as_of, modified, health)
         (folder / "index.html").write_text(page, encoding="utf-8")
         written.append(folder / "index.html")
     index_folder = destination / "companies"
     index_folder.mkdir(parents=True, exist_ok=True)
-    (index_folder / "index.html").write_text(render_index(data, sorted(companies, key=lambda c: (c["name"].lower(), c["id"])), editorial_by_id, as_of, modified, analytics), encoding="utf-8")
+    (index_folder / "index.html").write_text(render_index(data, sorted(companies, key=lambda c: (c["name"].lower(), c["id"])), editorial_by_id, as_of, modified), encoding="utf-8")
     written.append(index_folder / "index.html")
     (destination / "sitemap.xml").write_text(render_sitemap([c["id"] for c in companies], modified), encoding="utf-8")
     written.append(destination / "sitemap.xml")
