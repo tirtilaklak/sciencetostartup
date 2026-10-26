@@ -165,5 +165,5 @@ does not imply all source material was freshly verified.
   list, including `scripts/`, `tests/`, `schema/`, `design-system/`, `docs/`
   and the HTML, CSS and JavaScript in `web/`.
 - Neither license covers third-party material such as company names and logos,
-  product images, photos of people, the proposed venture image and text quoted
-  from sources. `LICENSE-DATA.md` lists them.
+  product images, photos of people and text quoted from sources.
+  `LICENSE-DATA.md` lists them.
