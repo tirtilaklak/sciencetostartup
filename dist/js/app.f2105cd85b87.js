@@ -1,0 +1,2598 @@
+/* Negative observations from public link checks. No requests or contact changes. */
+(() => {
+  'use strict';
+  const labels={not_found:'Page unavailable',gone:'Page unavailable',sign_in:'Asks for sign-in'};
+  const publicURL=value=>{
+    if(typeof value!=='string')return '';
+    try{
+      const url=new URL(value),host=url.hostname.toLowerCase().replace(/\.$/,'');
+      if(!['https:','http:'].includes(url.protocol)||url.username||url.password||!host.includes('.')||host.includes(':')||/(?:^|\.)(?:localhost|local|internal|test|invalid)$/.test(host))return '';
+      if([...url.searchParams.keys()].some(key=>/(?:^|[-_])(?:token|api[-_]?key|password|passwd|secret|credential|signature)(?:$|[-_])/i.test(key)))return '';
+      const octets=/^\d+\.\d+\.\d+\.\d+$/.test(host)?host.split('.').map(Number):null;
+      if(octets&&(octets[0]===0||octets[0]===10||octets[0]===127||octets[0]>=224||octets[0]===169&&octets[1]===254||octets[0]===172&&octets[1]>=16&&octets[1]<=31||octets[0]===192&&octets[1]===168||octets[0]===100&&octets[1]>=64&&octets[1]<=127||octets[0]===198&&[18,19].includes(octets[1])))return '';
+      url.hash='';return url.href;
+    }catch{return '';}
+  };
+  const checkedDate=value=>{
+    if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return '';
+    const date=new Date(value+'T12:00:00Z');
+    return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===value?value:'';
+  };
+  const entries=new Map();
+  for(const entry of Array.isArray(window.LINK_HEALTH?.entries)?window.LINK_HEALTH.entries:[]){
+    if(!entry||!Object.hasOwn(labels,entry.status))continue;
+    const url=publicURL(entry.url),date=checkedDate(entry.checked_on);
+    if(url&&date&&(!entries.has(url)||date>=entries.get(url).checked_on))entries.set(url,{status:entry.status,checked_on:date});
+  }
+  // One formatter and one cached badge per link: building them per call was a startup hot spot.
+  const dayFormat=new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}),badges=new Map();
+  const availabilityHTML=url=>{
+    const entry=entries.get(publicURL(url));if(!entry)return '';
+    const display=dayFormat.format(new Date(entry.checked_on+'T12:00:00Z')).replace('Sept','Sep');
+    const observation=entry.status==='sign_in'?`When we checked on ${display} without an account, the page asked us to sign in.`:`Page unavailable when checked ${display}.`;
+    return `<span class="source-link-status" data-link-status="${entry.status}" title="${observation}"><span aria-hidden="true">${labels[entry.status]} · <time datetime="${entry.checked_on}">${display}</time></span><span class="sr-only">${observation}</span></span>`;
+  };
+  window.linkAvailabilityHTML=url=>{if(!badges.has(url))badges.set(url,availabilityHTML(url));return badges.get(url);};
+})();
+
+/* Portable, dependency-free public research. No network calls or local storage. */
+'use strict';
+const DATA=JSON.parse(document.getElementById('research-data').textContent);
+const $=id=>document.getElementById(id), index=rows=>{const map={};for(const row of rows)map[row.id]=row;return map;};
+const claims=index(DATA.claims),sources=index(DATA.sources),companies=index(DATA.companies),people=index(DATA.people),investors=index(DATA.investors);
+const state={query:'',category:'',stage:'',financial:false,work:false,sort:'name',workQuery:'',workGroup:'',workPay:'',workEligibility:'',selected:[],mobileCompare:0,revenuePeriod:'annual',revenueCurrency:'USD',runratesExpanded:false,lastView:'market'};
+// Presentation-only wording: original research and provenance remain in DATA and exports.
+const PUBLIC_COPY_EDITS={
+  "C1 blocks demonstrated/repeatable/established rubric stages despite strong financial scale; O2 is also not established by the inspected detail. Low disclosure is not low business scale.": "The reviewed sources do not identify a named AI Services customer or give enough detail on how AI-data work is checked and accepted. These disclosure gaps limit the assessment despite the division’s financial scale.",
+  "A useful comparison should show both the rapid expansion and the absence of audited economics.": "Rapid expansion is reported, while audited economics remain unavailable.",
+  "Announcement date must not be substituted for exact close date.": "Announcement and exact closing dates are distinct.",
+  "Appen is the most financially transparent of these four and should be assessed as a listed operating-business turnaround.": "Appen has comparatively detailed financial disclosure as a listed operating business undergoing a turnaround.",
+  "Broad company historical-commercial evidence only; display dates and ended-client status prominently": "Broad-company historical commercial evidence; customer relationships retain their dates and ended status.",
+  "Classify each as open-data use or citation, never automatically as a paid customer.": "Open-data use and citations do not by themselves establish paid customer relationships.",
+  "Company retrospective; distinguish parent founding from product brand launch.": "Company retrospective; parent founding and product launch are separate milestones.",
+  "Compare its disclosed service revenue with other companies on a like-for-like basis; fundraising, ARR estimates and annualized monthly run rates are poor substitutes for Appen’s actual reported sales.": "Its disclosed service revenue has a different basis from fundraising, ARR estimates and annualized monthly run rates.",
+  "Completed primary financing evidenced in the audited source register and final QA.": "Completed primary financing supported by the cited sources.",
+  "Credit dated investor-reported contracts, while preserving revenue recognition, retention and named-buyer gaps.": "Dated investor-reported contracts are available; revenue recognition, retention and named-buyer evidence remain unresolved.",
+  "Current about-page retrospective instead says $7.8m and conflates Series B chronology; retain conflicting alternative and exclude from strict exact observed sum pending reconciliation.": "The current about-page retrospective instead says $7.8m and conflates the Series B chronology. The conflicting amount is excluded from the strict disclosed-round sum pending reconciliation.",
+  "Current canonical uses Andrey; keep Andrei as a source spelling/alias rather than creating another person.": "Andrey and Andrei are source spelling variants for the same person.",
+  "Current search index exposes the company biography; preserve the co-founder title with historical qualification.": "The indexed company biography describes a co-founder title; this is historical evidence.",
+  "Display: $23.5m announced rounds + $12.8m later BII commitment": "$23.5m announced rounds + $12.8m later BII commitment",
+  "Distinguish business origin from platform/product launch; do not flatten the three milestones into one founding date.": "Business origin and platform/product launches are three separate milestones, not a single founding date.",
+  "Do not badge as freshly verified.": "This evidence has not been freshly verified.",
+  "Do not imply ongoing 2026 contract or SaaS production.": "An ongoing 2026 contract or SaaS production deployment is not established.",
+  "Do not imply this 2022 year was newly verified from a primary source.": "The 2022 founding year has not been newly verified from a primary source.",
+  "Do not infer capitalization from the standard YC deal.": "The standard YC deal does not establish this company’s capitalization.",
+  "Do not invent investor check sizes.": "Individual investor check sizes are not disclosed.",
+  "Do not mark acquired/private.": "The evidence does not establish acquired/private status.",
+  "Do not set whole profile financials to unknown because standalone TrainAI revenue is undisclosed; no newer official financial disclosure found in targeted search.": "Standalone TrainAI revenue is undisclosed; parent financial figures remain available. No newer official financial disclosure was found.",
+  "Do not store unnecessary tax identifiers.": "",
+  "Do not use Meta as a current logo without new evidence.": "Meta is not established as a current customer.",
+  "Earlier FY2024 report showed $26.4M as segment revenue; keep both with basis labels.": "The earlier FY2024 report showed $26.4M as segment revenue; both observations retain their different accounting bases.",
+  "Exact close date remains unresolved; do not invent it.": "Exact closing date remains unresolved.",
+  "Exact latest round size, closing date and investors": "Size, closing date and investors for the reported September 2026 financing",
+  "Existing raw silently labels USD; retain the text and flag currency unspecified rather than treating $50m as verified revenue.": "Currency is unspecified in the source; $50m is not a verified USD revenue figure.",
+  "Founder narrative; distinguish co-founders, founding advisers, board members and project contributors.": "Founder narrative; co-founders, founding advisers, board members and project contributors have different roles.",
+  "Funding databases and founder/HQ aggregators conflict; primary YC/legal identities should control.": "Funding databases and founder/HQ aggregators conflict; identities here follow primary YC and legal sources.",
+  "Google is a documented historical customer, terminated in early 2024; it must not be shown as a current customer.": "Google is a documented historical customer whose relationship terminated in early 2024.",
+  "Historical parent funding and valuation should remain visible without being attributed to the AI division.": "Historical parent funding and valuation are distinct from the AI division’s finances.",
+  "Image counts are rounded inconsistently within the source (1m+ heading versus nearly 1m text); retain approximately, not a precise floor.": "Image counts are rounded inconsistently within the source (1m+ heading versus nearly 1m text); the observation is approximate.",
+  "Individual biographies do not map each named employer to every founder; retain team-level attribution.": "Individual biographies do not map each named employer to every founder; attribution is at team level.",
+  "Investor job board now explicitly says no longer accepting applications; use as historical pay evidence only.": "The investor job board explicitly says it is no longer accepting applications; the advertised pay is historical.",
+  "Investor list should not be lost just because no dollar total exists.": "Named investors are disclosed even though the funding total is not.",
+  "Its disclosure-based gate result is constrained by unnamed AI buyers and must not be presented as an early-stage business classification.": "Its disclosure-based gate result is constrained by unnamed AI buyers; this is not an early-stage business classification.",
+  "Its historical Google relationship must not be shown as current.": "Its Google relationship is historical, not current.",
+  "Keep $55M reported funding aggregate visible independently.": "The $55M reported funding aggregate is a separate observation.",
+  "Keep as attributed undated claim.": "Attributed undated claim.",
+  "Keep as entity/funding-status prose.": "Entity and funding-status context; no numeric financing amount established.",
+  "Keep excluded from closed venture-equity sums; no funding_unknown card should hide the pledge.": "The pledge is separate from closed venture-equity financing.",
+  "Keep existing $65m reported-total metric and historical $42m May-2022 revenue run rate; do not replace with funding_unknown.": "The $65m reported funding total and $42m May-2022 revenue run rate are separate historical observations.",
+  "Keep existing supporting claim/source; change normalized relationship only.": "",
+  "Keep its independent-verification limit.": "Independent verification remains limited.",
+  "Keep outside dated charts and do not equate to August gross figure.": "Undated claim, excluded from dated charts; not equivalent to the August gross figure.",
+  "Keep outside realized/latest-reported numeric ranking.": "Excluded from reported actual-value comparisons.",
+  "Keep project, fiscal sponsor and the mathematical AIXI model distinct.": "The project, fiscal sponsor and mathematical AIXI model are separate entities.",
+  "Keep the separate $150.5m calculated disclosed-round sum; date that sum to the last included announcement, July 8, 2026.": "The $150.5m calculated disclosed-round sum is dated to the last included announcement, July 8, 2026.",
+  "Keep this closing-month observation alongside the July 12, 2023 financing announcement, rather than changing announcement date.": "The closing-month observation is separate from the July 12, 2023 financing announcement.",
+  "Later company retrospective additionally names Salesforce Ventures; keep that separately rather than silently changing the contemporaneous syndicate list.": "A later company retrospective additionally names Salesforce Ventures; the contemporaneous syndicate list differs.",
+  "Linked Ramp X post returned 403, so do not upgrade to buyer-confirmed A evidence.": "The linked Ramp X post returned 403; buyer-confirmed A evidence is not established.",
+  "Listed event amounts sum to $434M, leaving $1.5M unexplained; show both basis and discrepancy, do not force reconciliation.": "Listed event amounts sum to $434M, leaving an unexplained $1.5M difference from the derived reported cumulative total.",
+  "Markets 100,000+ active vetted AI-data specialists; distinguish this from RWS’s broader 250,000-person cultural/language/domain network.": "The marketed 100,000+ active vetted AI-data specialists are distinct from RWS’s broader 250,000-person cultural/language/domain network.",
+  "Motif 3 was publicly released; the inspected Motif technical report does not mention AfterQuery, so retain this as a named supplier claim rather than buyer-confirmed paid customer.": "Motif 3 was publicly released. Its inspected technical report does not mention AfterQuery; the relationship is supplier-reported, without buyer-confirmed payment.",
+  "Never substitute funding_unknown because source amounts are strings.": "Financing amounts are disclosed.",
+  "Never use as iMerit revenue or training-data market revenue.": "This is not iMerit revenue or training-data market revenue.",
+  "No commercial maturity score should be created.": "Commercial maturity scoring is not applicable.",
+  "No separate Astra corporate valuation or funding should be created.": "Astra does not have a separately established corporate valuation or funding total.",
+  "Official retrospective funding chronology conflicts with contemporary Series B reporting; retain provenance rather than quietly rewrite the history.": "Official retrospective funding chronology conflicts with contemporary Series B reporting; the discrepancy remains unresolved.",
+  "Operational hiring is primarily Paris; distinguish registry address from operating HQ.": "Operational hiring is primarily in Paris; registry address and operating headquarters are distinct.",
+  "Percent versus percentage-point basis is not fully specified; preserve wording and avoid generalized performance claims.": "Percent versus percentage-point basis is not fully specified; the stated performance measure has limited comparability.",
+  "Preserve $55M funding and named founding team; do not call financing unknown.": "$55M in funding and the named founding team are disclosed.",
+  "Preserve Andy Konwinski’s $100m personal pledge separately from institutional research outlays and any Laude Ventures funds.": "Andy Konwinski’s $100m personal pledge is separate from institutional research outlays and Laude Ventures funds.",
+  "Preserve a16z Scout Fund distinction from flagship institutional investing or accelerator admission.": "a16z Scout Fund participation is distinct from flagship institutional investment or accelerator admission.",
+  "Preserve the $30M company Series A versus $32M later press discrepancy.": "The company’s $30M Series A figure differs from the later $32M press report.",
+  "Preserve ~$59m standalone revenue, dated transfer-scope headcount, and the separate historical-funding, BII-commitment and acquisition categories.": "Approximately $59m in standalone revenue and dated transfer-scope headcount are separate from historical funding, the BII commitment and acquisition figures.",
+  "R3 remains unsupported": "Public evidence of commercial activity across multiple years remains incomplete",
+  "Retain $55M issuer/counsel figure and reported $300M separately; do not promote uncorroborated $500M estimates.": "The $55M issuer/counsel figure and reported $300M figure are separate observations. The $500M estimates are uncorroborated.",
+  "Retain $60m Series D and >$115m company total; additional existing backers are not all confirmed new-money participants.": "The $60m Series D is separate from the >$115m company total; additional existing backers are not all confirmed new-money participants.",
+  "Retain H1 FY2026 group revenue £360.3m and Generate revenue £99.4m as actual six-month figures; Generate includes both TrainAI and Content Technology.": "H1 FY2026 group revenue of £360.3m and Generate revenue of £99.4m are actual six-month figures; Generate includes both TrainAI and Content Technology.",
+  "Retain both amounts and the discrepancy; no separate extra round is established.": "The amounts differ; no separate extra round is established.",
+  "Retain claim: Yes": "",
+  "Revised audit follow-up: Distinguish a named commissioned engagement from generic external-testing participation; commercial scale and payment remain undisclosed.": "A named commissioned engagement is documented; commercial scale and payment remain undisclosed.",
+  "Revised audit follow-up: Existing R unknown rationale says no dated contract evidence exists; that is now factually obsolete.": "Dated investor-reported contract evidence is available, while the formal gate assessment remains historical.",
+  "Revised audit follow-up: Raise confidence in demonstrated technical delivery because Snowflake independently confirms joint work; do not label all research collaborators paying customers.": "Snowflake independently confirms joint technical work; research collaboration does not by itself establish a paying customer.",
+  "SkillsBench’s separately described 1.0 release has 100+ tasks, so retain version labels.": "SkillsBench’s separately described 1.0 release has 100+ tasks; counts refer to different versions.",
+  "The prior profile materially understated commercial scale by omitting them.": "",
+  "These should be prominently visible sourced text cards.": "",
+  "This is an audit warning, not a dashboard headline revenue metric.": "This amount is not an established revenue observation.",
+  "Treat Labelbox as an established platform supplier with a newer expert-data and RL push, not as a company with a verified current ARR figure.": "Labelbox is an established platform supplier with a newer expert-data and RL offering; current ARR is not verified.",
+  "Treat as a Japan-focused lead rather than a confirmed US opportunity.": "Japan-focused route; a US opportunity is not confirmed.",
+  "Treat it as rapidly scaled but financially opaque; missing named buyers, concentration and revenue-recognition details limit valuation comparisons.": "Reported scale has grown rapidly, while missing named buyers, concentration and revenue-recognition details limit valuation comparisons.",
+  "Treat that scope as unresolved; SOC 2 report existence was visible but report scope/date not inspected.": "SOC 2 report existence was visible, but its scope and date were not inspected.",
+  "Use HackerRank / Astra (HackerRank Bench) as aliases; this is not a separately funded entity.": "HackerRank / Astra (HackerRank Bench) are aliases, not separately funded entities.",
+  "Use actual CEO statements; article has a chronology typo saying Series A followed Series B.": "The article’s chronology incorrectly places Series A after Series B; the quoted CEO statements provide separate evidence.",
+  "Use company aggregate, retain discrepancy": "Company-reported aggregate; discrepancy remains unresolved.",
+  "Use date-stamped ASX equity market capitalization if needed; no live price/market cap was independently checked in this pass.": "No current ASX share price or equity market capitalization was independently checked.",
+  "Use dated transfer-scope figure for the main FTE card.": "Headcount refers to the dated transfer scope.",
+  "Details-only disclosure minimum; never primary market-overview classification": "This disclosure minimum does not describe the company’s business scale.",
+  "Gate assessment retained from the original reviewed snapshot; the revised narrative and new metrics do not automatically upgrade it.": "The assessment reflects the earlier dated evidence; newer financial observations do not establish every delivery criterion.",
+  "Some supporting source checks were inherited rather than refreshed in the final audit; this remains a historical scoped assessment.": "Some supporting sources have not been rechecked; this remains a historical scoped assessment.",
+  "financing talks and wealth-based valuations must not appear as closed funding": "financing talks and wealth-based valuations are not closed funding",
+  "founding year: 2,023": "founding year: 2023",
+  "closed_company_announced_round": "Company-announced financing round",
+  "reported_cumulative_funding": "Reported cumulative funding",
+  "funding_unknown": "funding not established"
+};
+Object.assign(PUBLIC_COPY_EDITS,{
+  "$2.5M company-reported; retain $2.3M initial announcement as historical, do not sum": "$2.5M company-reported total; the historical $2.3M announcement is included, not additive.",
+  "The products page still says 70+ languages; retain the different page snapshots rather than implying an audited growth series.": "The products page still says 70+ languages; different page snapshots do not establish an audited growth series.",
+  "Current canonical third_party/C is wrong: this is a primary supplier case.": "Primary supplier case study; independent buyer confirmation was not reviewed.",
+  "Canonical company_named is wrong when no lab is named.": "The claimed lab customers are unnamed.",
+  "Existing prose says research collaboration, not four paying customers; normalization currently marks claimed_customer.": "Research collaboration is described; four paying customer relationships are not established.",
+  "Later homepage metrics appear larger, but the forecast must not be mistaken for actual payout at that date.": "Later homepage metrics appear larger; the earlier forecast is not actual payout at that date.",
+  "Private revenue databases mix year-end run-rate, revenue estimates, forecasts and bookings; none should be substituted for audited financials.": "Private revenue databases mix year-end run-rate, revenue estimates, forecasts and bookings; these are not audited financials.",
+  "Subsequent revenue is not publicly comparable after deconsolidation, so neither a 2025 stub nor a financing amount should be used to imply today’s commercial scale.": "Subsequent revenue is not publicly comparable after deconsolidation; the 2025 stub and financing amounts do not establish current commercial scale.",
+  "Supplier case describes image-labeling work and includes attributed buyer testimony; scope should remain the described pilot/project rather than assumed enterprise-wide deployment.": "Supplier case describes image-labeling work and includes attributed buyer testimony for a pilot/project; enterprise-wide deployment is not established.",
+  "Work is project-matched and can end early; accepted-task approval matters to payment and no hours should be annualized into a salary.": "Work is project-matched and can end early; payment depends on accepted tasks, with no guaranteed annual salary.",
+  "Toronto organization’s grants/metrics also do not belong here": "Grants and metrics for the separate Toronto organization are excluded.",
+  "no O3 credit from marketing claims alone": "marketing claims alone do not establish the highest operating-controls criterion",
+  "not fully re-audited": "not fully rechecked"
+});
+Object.assign(PUBLIC_COPY_EDITS,{
+  "Compute/services run-rate should not be compared directly with net SaaS ARR or contractor-marketplace revenue.": "Compute and services run-rate figures have a different basis from net yearly recurring subscription revenue or contractor-marketplace revenue.",
+  "aggregate growth should not conceal US/global weakness or project concentration.": "US/global weakness and project concentration remain relevant to group growth.",
+  "DataAnnotation should not be counted as a separately funded competitor.": "DataAnnotation is Surge’s operating platform; separate financing is not established.",
+  "Leave unknown financing while retaining commercial revenue/contract claims.": "Financing is undisclosed; commercial revenue and contract claims are disclosed separately.",
+  "Funding event must read philanthropic pledge.": "This financing record describes a philanthropic pledge.",
+  "do not blanket-erase funding because revenue is unknown.": "funding disclosures remain available while revenue is undisclosed.",
+  "do not claim this is an independently reconstructed all-equity total or add it to the latest round.": "an independently reconstructed all-equity total is unavailable. The latest round is included in this reported total.",
+  "Derived from rounded latest discontinued-operations comparatives; do not mix with original 138% segment headline.": "Derived from rounded latest discontinued-operations comparatives; the original 138% segment headline has a different accounting basis.",
+  "Weak evidence for scope and recency; do not classify all logos as frontier-model customers or verified current contracts.": "Displayed logos provide limited evidence about scope and recency. They do not establish current frontier-model customers or verified contracts.",
+  "do not mechanically subtract notices from old headcount.": "an updated payroll total cannot be derived by subtracting the redundancy notice from older headcount.",
+  "Website claim of all top labs and older YC numerical claim should not be collapsed into a verified customer list.": "The website’s unnamed top-lab claim and older YC count do not establish a verified customer list.",
+  "Do not interpret data-licensing payouts as individual hourly earnings.": "Data-licensing payouts describe company data sales; individual hourly earnings are not established.",
+  "The old /solutions page returns 404; do not link it.": "The older /solutions page returned HTTP 404 (the page was not found) at the recorded check.",
+  "Funding disclosure lists differ between homepage and careers; preserve source attribution.": "The homepage and careers page give different funding lists.",
+  "Company-reported annualized figure; do not relabel audited revenue or ARR.": "Company-reported annualized figure; audited annual revenue and yearly recurring subscription revenue remain unverified.",
+  "Current positioning has changed; do not show Quesma primarily as an RL-environment supplier.": "Quesma’s current main offer analyzes coding-agent activity.",
+  "Founding engineers must not automatically be relabeled co-founders.": "Founding-engineer roles alone do not establish co-founder status.",
+  "do not silently merge versions.": "these figures refer to different versions.",
+  "Do not show prior OpenAI/Google customer relationships as current without fresh evidence.": "Current OpenAI and Google customer relationships are unverified.",
+  "Keep Handshake AI and parent Handshake scopes separate.": "Handshake AI figures describe the AI business; Handshake figures may describe the parent company.",
+  "Do not repeat the Reuters annual-revenue wording; the primary company release explicitly says annual revenue runrate.": "The primary company release calls this an annual revenue run rate; Reuters described it as annual revenue.",
+  "Keep version 2 separate from the 912-task original benchmark.": "The original benchmark is a separate, 912-task version.",
+  "No exact amount is established; do not synthesize a numeric revenue or profitability metric.": "No numeric revenue or profitability figure is established.",
+  "Named accountable founders, screening/verification and payout process. Inconsistent headcount does not erase team identity, but current operational controls lack independent scope.": "Named founders are identified. The company describes screening and verification, alongside its payout process. Headcount reports conflict. Independent evidence about current operational controls is limited."
+});
+// Risk statements shown under Risks and disputes, written as public sentences rather than reviewer instructions.
+Object.assign(PUBLIC_COPY_EDITS,{
+  "Latest financing reported without company confirmation; unnamed lab participants should not be fabricated.": "Latest financing was reported without company confirmation, and the participating labs are not named.",
+  "Do not label its full 11,000-builder network as AI-data contributors or interpret unnamed RL delivery cases as named customer validation.": "Its full 11,000-builder network is not a count of AI-data contributors, and unnamed RL delivery cases are not named-customer validation.",
+  "Prefer official founders and record headcount as unresolved.": "Headcount is unresolved; the founders listed here follow official pages.",
+  "High margins, run rate and $150M valuation originate in recruiting copy; require diligence before using as current financial facts": "High margins, the run rate and the $150M valuation come from recruiting copy and are not verified current financial figures.",
+  "Press release contrasts its team with contractor-heavy competitors, but official listings explicitly recruit contractors; interpret as positioning, not absence of contract work": "A press release contrasts its team with contractor-heavy competitors, but official listings recruit contractors. The contrast is positioning and does not mean the company uses no contract work.",
+  "Do not silently normalize into an incorporation year.": "None of these dates is an established incorporation year.",
+  "Largest verified revenue scale in this batch, but old financial snapshot. Financing targets, secondary-market estimates and run-rate figures are widely conflated": "Its verified revenue is among the largest profiled here, but the financial snapshot is old. Financing targets, secondary-market estimates and run-rate figures are often conflated.",
+  "Do not confuse pareto.ai with Pareto Securities, Pareto Holdings, trypareto.ai, Brazilian Pareto/Tess or other unrelated businesses.": "pareto.ai is unrelated to Pareto Securities, Pareto Holdings, trypareto.ai, Brazilian Pareto/Tess and other businesses with similar names.",
+  "Meta ownership triggered customer-independence concerns and reported Google withdrawal plans.": "Meta’s 49% stake raised customer-independence concerns, and Google reportedly planned to cut ties with Scale.",
+  "Do not count CEO’s historical $100M raised for a hedge fund as Trajectory funding.": "The $100M the CEO earlier raised for a hedge fund is not Trajectory funding.",
+  "Do not compare the $100M philanthropy pledge, Institute grants, Laude Ventures capital or benchmark grant support with a commercial vendor’s revenue/venture funding.": "The $100M philanthropy pledge, Institute grants, Laude Ventures capital and benchmark grant support are not comparable with a commercial vendor’s revenue or venture funding.",
+  "Job-board compensation/location mirrors conflict, so current employer pages take precedence": "Job-board copies of its listings give conflicting pay and locations; this profile follows the current employer pages."
+});
+// Interim plain wording for Scale AI until dataset 2.5.1 rewords these records (docs/pending-2.5.1-corrections.md).
+// It rewrites five fields on four records: scale_ai.claim.oct14-major-financial-0 (statement, caveat),
+// scale_ai.metric.oct14-major-financial-0 (basis), scale_ai.claim.audit-readout (statement) and scale_ai.editorial (readout).
+// Remove this block after 2.5.1.
+Object.assign(PUBLIC_COPY_EDITS,{
+  "Includes shareholder liquidity; not equivalent to new primary venture funding.": "Part of the money went to existing shareholders. The total is not all new company funding.",
+  "and included substantial shareholder liquidity.": "and included large payouts to existing shareholders."
+});
+// Turing has two run-rate figures from two releases, both kept. The $167M one has no exact date, so it lists
+// above the $300M figure for 2024. Its note says why.
+Object.assign(PUBLIC_COPY_EDITS,{
+  "Release explicitly expands ARR as annualized revenue run rate.": "The Series E release says the round was priced when the run rate (recent revenue projected across a full year) reached $167M. It does not give that date. In January 2025, Turing reported a $300M run rate for 2024."
+});
+const PUBLIC_RECORD_IDS=new Set(Object.values(DATA).filter(Array.isArray).flatMap(rows=>rows.map(r=>r?.id).filter(Boolean)).concat(DATA.rubric.stages.map(s=>s.id),['not_applicable','pending']));
+const PUBLIC_TEXT_CACHE=new Map();
+// One scan finds the texts that contain an edited phrase; only those run the ordered edits below.
+// No phrase is empty and no replacement contains a phrase, so other texts would come out unchanged.
+const PUBLIC_COPY_PATTERN=new RegExp(Object.keys(PUBLIC_COPY_EDITS).map(phrase=>phrase.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'));
+// Every rewrite in publicTextCompute needs one of these fragments, so a text without any passes through unchanged.
+const PUBLIC_REWRITE_PATTERN=/Superseded by the final|Retained as historical provenance|Final audit source |Earlier registry status: |Review status: |Retain claim: Yes|Source support was inherited|Historical statements are preserved|[12],\d\d\d|o not |must not be |should not be |id: |_|\s\s| \.|^\s|\s$/i;
+const PUBLIC_COMMAND_VERBS={add:'adding',assume:'assuming',attribute:'attributing',call:'calling',characterize:'characterizing',choose:'choosing',compare:'comparing',confuse:'confusing',convert:'converting',count:'counting',directly:'directly',display:'displaying',equate:'equating',force:'forcing',imply:'implying',import:'importing',infer:'inferring',invent:'inventing',label:'labelling',mark:'marking',mechanically:'mechanically',mislabel:'mislabelling',normalize:'normalizing',present:'presenting',promote:'promoting',replace:'replacing',set:'setting',silently:'silently',substitute:'substituting',transfer:'transferring',treat:'treating',turn:'turning',upgrade:'upgrading',use:'using',guess:'guessing',fabricate:'fabricating',annualize:'annualizing',erase:'erasing'};
+function publicText(value){
+ const key=String(value??'');
+ if(PUBLIC_TEXT_CACHE.has(key))return PUBLIC_TEXT_CACHE.get(key);
+ const result=publicTextCompute(key);PUBLIC_TEXT_CACHE.set(key,result);return result;
+}
+function publicTextCompute(value){
+ let text=String(value??'');
+ if(PUBLIC_RECORD_IDS.has(text)||/^https?:\/\//i.test(text))return text;
+ if(PUBLIC_COPY_PATTERN.test(text))for(const [original,copy] of Object.entries(PUBLIC_COPY_EDITS))text=text.split(original).join(copy);
+ // Research notes can quote a person's address from a source page; say how contact works instead of repeating it.
+ if(text.includes('contact at '))text=text.replace(/\bcontact at [A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,'contact by email');
+ if(!PUBLIC_REWRITE_PATTERN.test(text))return text;
+ text=text.replace(/Superseded by the final [^.]+\./g,'Replaced by later research.').replace(/Retained as historical provenance; excluded from active fact selectors\./g,'Historical observation; excluded from current comparisons.');
+ text=text.replace(/Final audit source [\w.-]+: /g,'').replace(/Earlier registry status: /g,'Earlier source check: ').replace(/Review status: /g,'Source check: ').replace(/Retain claim: Yes\.?/g,'');
+ text=text.replace(/Source support was inherited[^.]*\./g,'Source support has not been rechecked.').replace(/Historical statements are preserved[^.]*\./g,'Historical statements are dated and may not describe current conditions.');
+ text=text.replace(/\b([Ff]ound(?:ed|ing)(?: year)?[^.\d]{0,12})([12]),(\d{3})\b/g,'$1$2$3');
+ // Convert evidentiary cautions phrased as editing commands to declarative caveats.
+ text=text.replace(/\b([Dd])o not (silently |mechanically |directly )?([a-z]+)\b/g,(all,cap,adverb,verb)=>Object.hasOwn(PUBLIC_COMMAND_VERBS,verb)?(cap==='D'?'The':'the')+' evidence does not support '+(adverb||'')+PUBLIC_COMMAND_VERBS[verb]:all);
+ text=text.replace(/\bmust not be (shown|presented|represented|treated|counted|reported|label(?:l)?ed|equated|added|summed|merged|transferred)\b/g,'cannot be $1').replace(/\bshould not be (treated|mistaken|equated|relabeled|fabricated|read|combined|reported|substituted)\b/g,'cannot be $1');
+ text=text.replace(/\b(?:Round id|Id): [a-z0-9_.-]+\.(?:\s|$)/gi,'').replace(/\b[a-zA-Z][a-zA-Z0-9]*(?:_[a-zA-Z0-9]+)+\b/g,word=>word.replaceAll('_',' '));
+ return text.replace(/\s{2,}/g,' ').replace(/ \./g,'.').trim();
+}
+const esc=v=>publicText(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const title=v=>String(v||'').replaceAll('_',' ').replace(/^./,x=>x.toUpperCase());
+const external=(url,label)=>/^https?:\/\//i.test(url||'')?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(label)} ${iconHTML('external')}<span class="sr-only"> (opens in a new tab)</span></a>${typeof window.linkAvailabilityHTML==='function'?window.linkAvailabilityHTML(url):''}`:esc(label);
+const pill=(label,known=false)=>`<span class="marker ${known?'known':''}">${esc(label)}</span>`;
+const currentClaims=id=>DATA.claims.filter(c=>c.company_id===id&&c.status!=='superseded');
+const companyClaims=id=>DATA.claims.filter(c=>c.company_id===id);
+const companySources=id=>DATA.sources.filter(s=>s.company_id===id||s.id.startsWith(id+'.source.'));
+const brief=text=>String(text||'').split(/(?<=[.!?])\s+(?=[A-Z“])/).slice(0,2).join(' ').trim();
+const editorialFor=id=>DATA.editorial_readouts.find(e=>e.company_id===id);
+const scopeText=(scope,id)=>({company:['handshake_ai','hackerrank','rws_trainai'].includes(id)?'Parent company':'Whole company',ai_data:'AI business',research:companies[id]?.entity_type==='adjacent_research'?'Research organization':'Research activity',other_segment:id==='rws_trainai'?'Generate segment (includes TrainAI)':'Other business segment'}[scope]||title(scope));
+const dateText=s=>s==='undated'?'Source date not stated':s;
+function sourceReviewText(source){
+ const date=source.accessed_on;
+ if(source.retrieval_status==='checked')return 'Reviewed '+date;
+ if(source.retrieval_status==='summary_only')return 'Recorded '+date+' · Summary only';
+ if(source.retrieval_status==='unverified')return 'Recorded '+date+' · Not reverified';
+ return 'Recorded '+date;
+}
+const compiledSnapshotLabel=asOf=>'Public research · compiled '+new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(asOf+'T00:00:00Z'));
+function dateRank(s){const text=String(s),year=text.match(/(?:19|20)\d{2}/)?.[0];if(!year)return '0000';const iso=text.match(/(?:19|20)\d{2}-\d{2}(?:-\d{2})?/);if(iso)return iso[0];if(/H1|half.year|six.month/i.test(text))return year+'-06';if(/H2|end of|year.end/i.test(text))return year+'-12';const names=['january','february','march','april','may','june','july','august','september','october','november','december'];const month=names.findIndex(m=>text.toLowerCase().includes(m));return year+(month>=0?'-'+String(month+1).padStart(2,'0'):'');}
+const byRecent=(a,b)=>dateRank(b.as_of||b.announced_on).localeCompare(dateRank(a.as_of||a.announced_on))||Number(b.preferred_for_comparison===true)-Number(a.preferred_for_comparison===true)||Number(b.id.includes('major-'))-Number(a.id.includes('major-'))||a.id.localeCompare(b.id);
+const metricLabels={funding_total_reported:'Reported lifetime financing',funding_total_calculated:'Sum of disclosed rounds',valuation:'Valuation',arr:'Yearly recurring subscription revenue',annualized_revenue_run_rate:'Annualized revenue pace',revenue:'Period revenue',gmv:'Gross merchandise value',headcount:'Company team size',expert_network:'Expert / contributor network',active_paid_experts:'Active paid experts',customer_count:'Customer count',growth_rate:'Growth measure',other:'Other operating measure'};
+const COMPACT_FORMATS={compact:new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:2}),standard:new Intl.NumberFormat('en',{notation:'standard',maximumFractionDigits:2})};
+const compact=v=>COMPACT_FORMATS[Math.abs(v)>=100000?'compact':'standard'].format(v);
+function metricValue(m){return ({at_least:'≥ ',greater_than:'> ',less_than:'< ',nearly:'Nearly ',at_most:'≤ ',approximate:'≈ ',range:'',exact:''}[m.qualifier]||'')+(m.unit==='currency'?({USD:'$',GBP:'£',EUR:'€'}[m.currency]||m.currency+' '):'')+compact(m.value)+(m.qualifier==='range'?'–'+compact(m.upper_value):'')+(m.unit==='percent'?'%':m.unit==='multiple'?'×':'');}
+function financialPeriod(m){if(m.period_type)return ['week','quarter','partial'].includes(m.period_type)?'short':m.period_type;const s=(m.period_label||m.label||'')+' '+m.as_of;return /half|H1|H2|six.month/i.test(s)?'half':/week|quarter|Q[1-4]|month/i.test(s)?'short':/FY\d{4}|annual|full.year|^20\d{2}$/i.test(s.trim())?'annual':/^20\d{2}$/.test(m.period_label||'')?'annual':'other';}
+function evidenceLabel(cl){
+ const types=cl.source_ids.map(id=>sources[id].source_type);
+ if(cl.source_ids.length&&cl.source_ids.every(id=>sources[id].retrieval_status==='unverified'))return 'Inherited evidence · not reverified';
+ if(cl.source_ids.length&&cl.source_ids.every(id=>sources[id].retrieval_status==='summary_only'))return 'Summary-only evidence · page not reviewed';
+ if(cl.evidence_label==='Attributed primary-source evidence'&&types.length&&types.every(type=>type==='database'))return 'Database summary';
+ if(cl.evidence_label){const label=title(cl.evidence_label);return ['taskus','appen'].includes(cl.company_id)&&{'Audited filing':'Annual report filing','Audited public company':'Public company annual report'}[label]||label;}
+ if(cl.status==='unverified')return 'Not established';
+ if(cl.status==='contested')return 'Conflicting reports';
+ if(!types.length)return 'No current cited source';
+ const reviewedAttributions={
+  'trajectory_labs_pbc.claim.customers-0':['trajectory_labs_pbc.source.b_tl3','https://ai.meta.com/static-resource/muse-spark-safety-and-preparedness-report/','Buyer / counterparty evidence'],
+  'quesma.claim.customers-0':['quesma.source.b_q7','https://www.prnewswire.com/news-releases/hydrolix-adds-quesma-gateway-proxy-ip-to-its-portfolio-assuring-continued-kibana-support-302559127.html','Buyer / counterparty evidence'],
+  'elorian.claim.headquarters':['elorian.source.elorian-4','https://www.wsgr.com/en/insights/wilson-sonsini-advises-elorian-on-dollar55-million-seed-financing-as-company-emerges-from-stealth.html','Transaction counsel statement'],
+  'prolific.claim.founders':['prolific.source.d_pro1','https://innovation.ox.ac.uk/wp-content/uploads/2017/03/170301-Prolific-PR-FINAL.pdf','University incubator statement'],
+  'rws_trainai.claim.founders':['rws_trainai.source.d_rws8','https://www.rws.com/media/images/Admission_Document-11_November_2003_tcm228-184244.pdf','Company admission document'],
+ };
+ const reviewed=Object.hasOwn(reviewedAttributions,cl.id)?reviewedAttributions[cl.id]:null;
+ if(reviewed&&cl.status==='supported'&&cl.confidence==='A'&&cl.source_ids.length===1&&cl.source_ids[0]===reviewed[0]&&types[0]==='other'&&sources[reviewed[0]].url===reviewed[1])return reviewed[2];
+ if(cl.confidence==='A'&&types.includes('customer'))return 'Buyer / counterparty evidence';
+ if(cl.confidence==='A'&&types.includes('filing'))return 'Filed disclosure';
+ if(cl.confidence==='C')return 'Indirect or secondary reporting';
+ if(types.every(type=>type==='investor'))return 'Investor-reported';
+ if(cl.confidence==='A'&&types.every(type=>type==='company'))return 'Company-reported';
+ return cl.confidence==='B'?'Attributed primary statement':'Independent reporting';
+}
+let evidenceDescriptionSequence=0;
+// Evidence dates read as "14 Oct 2026" when the profile date helper is loaded; dates repeat, so each is formatted once.
+const EVIDENCE_DATES=new Map();
+const evidenceDate=value=>{if(typeof profileDate!=='function')return value;if(!EVIDENCE_DATES.has(value))EVIDENCE_DATES.set(value,profileDate(value));return EVIDENCE_DATES.get(value);};
+const evidenceRecordTopics=new Map();
+const evidenceMetricScopes=new Map();
+for(const metric of DATA.metrics){
+ const detail=publicText(metric.scope_detail);
+ if(detail&&!['company','ai_data','research','other_segment'].includes(metric.scope_detail)){if(!evidenceMetricScopes.has(metric.claim_id))evidenceMetricScopes.set(metric.claim_id,new Set());evidenceMetricScopes.get(metric.claim_id).add(detail);}
+}
+for(const [rows,topic]of[[DATA.metrics,row=>row.label||metricLabels[row.kind]],[DATA.products,row=>row.name],[DATA.customer_evidence,row=>row.organization],[DATA.funding_rounds,row=>row.round_name],[DATA.company_people,row=>people[row.person_id]?.name],[DATA.company_investors||[],row=>investors[row.investor_id]?.name]]){
+ for(const row of rows||[]){const text=publicText(topic(row));if(row.claim_id&&text&&text.length<=100&&!evidenceRecordTopics.has(row.claim_id))evidenceRecordTopics.set(row.claim_id,text);}
+}
+function evidenceAccess(ids,label,topicHint=''){
+ const selected=[...new Set(ids||[])].map(id=>claims[id]).filter(Boolean);
+ if(!selected.length)return{attributes:'',description:''};
+ const subjects={'financial metrics':'Financial figure','growth metrics':'Growth measure','worker opportunities':'Work opportunity','operating metric':'Operating figure','public application availability':'Application availability','customers':'Relationship evidence','funding rounds':'Financing event','total funding':'Financing total','founders':'Founders and leadership'};
+ const gate=selected[0].subject.match(/^ai data gate ([PCRO])$/i),criterion=gate?DATA.rubric.dimensions.find(d=>d.id===gate[1].toUpperCase())?.label:'';
+ const topic=publicText(topicHint)||evidenceRecordTopics.get(selected[0].id)||criterion||subjects[selected[0].subject]||title(selected[0].subject.replace(/\s+\d+$/,''));
+ const companyNames=[...new Set(selected.map(cl=>companies[cl.company_id]?.name).filter(Boolean))];
+ const dates=[...new Set(selected.map(cl=>evidenceContextClaimPeriod(cl,cl.as_of&&cl.as_of!=='undated'?cl.as_of:'not stated')))];
+ const name=label+' for '+companyNames.join(' and ')+': '+topic+'. Date'+(dates.length>1?'s':'')+' of the evidence: '+dates.map(evidenceDate).join('; ')+'.';
+ const description=selected.map(cl=>{
+  const statement=publicText(cl.statement),caveat=publicText(cl.caveat);
+  const details=[...(evidenceMetricScopes.get(cl.id)||[])];
+  const originalScope=scopeText(cl.segment_scope,cl.company_id),scope=evidenceContextScopeLabel(cl,originalScope),context=evidenceContextClaimDescription(cl);
+  return[cl.status!=='supported'?'Status: '+title(cl.status)+'.':'','Evidence label: '+evidenceLabel(cl)+'.','Business covered: '+scope+'.',scope!==originalScope?'Original dataset scope: '+originalScope+'.':'',details.length?'Metric scope detail: '+details.join('; ')+'.':'',context,context?'Original dataset statement: '+statement:statement,caveat&&!statement.includes(caveat)?caveat:''].filter(Boolean).join(' ');
+ }).join(' ');
+ const descriptionId='evidence-description-'+(++evidenceDescriptionSequence);
+ return{attributes:`aria-label="${esc(name)}" aria-describedby="${descriptionId}" aria-haspopup="dialog" aria-controls="evidence-dialog"`,description:`<span id="${descriptionId}" data-evidence-description hidden style="display:none">${esc(description)}</span>`};
+}
+const claimButton=(id,label='Evidence',topic='')=>{const access=evidenceAccess([id],label,topic);return `<button class="evidence-action" data-claim="${esc(id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;};
+const numberButton=m=>{const label=metricValue(m),access=evidenceAccess([m.claim_id],label,metricEvidenceTopic(m,m.label||metricLabels[m.kind]));return `<button class="number-button" data-claim="${esc(m.claim_id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;};
+const sourceLinks=cl=>cl.source_ids.map(id=>external(sources[id].url,sources[id].publisher)).join(' ');
+const provenance=cl=>`<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(evidenceContextArchiveDate(cl,dateText(cl.as_of)))}</span><span>· ${esc(evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id)))}</span><span>· ${esc(evidenceLabel(cl))}</span>${claimButton(cl.id)}</div>`;
+function metricMeta(m){const accounting=metricCurrentBasis(m,['revenue','annualized_revenue_run_rate','arr'].includes(m.kind)?m.gross_vs_net==='unspecified'?'Gross or net revenue not stated':title(m.gross_vs_net)+' basis':'');return `${m.currency?m.currency+' · ':''}${metricContextMetaPeriod(m,m.kind==='revenue'?m.period_label||m.as_of:dateText(m.as_of))} · ${m.scope_detail&&m.scope_detail!=='company'&&m.scope_detail!=='ai_data'?m.scope_detail:scopeText(m.segment_scope,m.company_id)}${accounting?' · '+accounting:''}`;}
+function eligibleMetrics(id,kind){return DATA.metrics.filter(m=>(!id||m.company_id===id)&&(!kind||m.kind===kind)&&m.preferred_for_comparison!==false&&claims[m.claim_id].status==='supported'&&(!m.observation_status||m.observation_status==='reported')).sort(byRecent);}
+function metricFor(id,kind){return eligibleMetrics(id,kind)[0];}
+// Keep headline views on the same reviewed records; earlier observations remain in the archive.
+const FINANCIAL_HEADLINES={mercor:'mercor.metric.oct14-major-financial-2',surge_ai:'surge_ai.metric.oct14-major-financial-0',handshake_ai:'handshake_ai.metric.major-growth_metrics-0',turing:'turing.metric.major-growth_metrics-1'};
+function preferredFinancial(id){const reviewed=FINANCIAL_HEADLINES[id];if(reviewed){const metric=eligibleMetrics(id).find(m=>m.id===reviewed);if(metric)return metric;}const explicit=assessmentFor(id)?.headline_metric_id;if(explicit){const metric=eligibleMetrics(id).find(m=>m.id===explicit);if(metric)return metric;}const all=eligibleMetrics(id),scope=['handshake_ai','taskus'].includes(id)?'ai_data':all.some(m=>['revenue','arr','annualized_revenue_run_rate'].includes(m.kind)&&m.segment_scope==='company')?'company':all.some(m=>['revenue','arr','annualized_revenue_run_rate'].includes(m.kind)&&m.segment_scope==='ai_data')?'ai_data':null;const scoped=all.filter(m=>!scope||m.segment_scope===scope),kind=k=>scoped.filter(m=>m.kind===k),actual=kind('revenue').filter(m=>['annual','half','ttm'].includes(financialPeriod(m))).sort((a,b)=>dateRank(b.as_of).localeCompare(dateRank(a.as_of))||({ttm:3,annual:2,half:1}[financialPeriod(b)]||0)-({ttm:3,annual:2,half:1}[financialPeriod(a)]||0)||byRecent(a,b));return actual[0]||kind('annualized_revenue_run_rate')[0]||kind('arr').find(m=>dateRank(m.as_of)>='2025')||kind('revenue')[0];}
+function assessmentFor(id,scope){return DATA.assessments.find(a=>a.company_id===id&&a.segment_scope===(scope||'ai_data'))||(!scope?DATA.assessments.find(a=>a.company_id===id):undefined);}
+function stageFor(id,scope){if(companies[id].entity_type==='adjacent_research')return 'not_applicable';if(DATA.rubric.status!=='final')return 'pending';const a=assessmentFor(id,scope);if(!a)return 'pending';return DATA.rubric.stages.find(s=>Object.entries(s.minimums).every(([d,n])=>a.gates[d].level!=='U'&&Number(a.gates[d].level)>=Number(n)))?.id||'insufficient_public_evidence';}
+const stageLabels={established_commercial_evidence:'Established',repeatable_commercial_evidence:'Repeat business',demonstrated_delivery:'Demonstrated delivery',visible_operating_offer:'Offer visible',insufficient_public_evidence:'Evidence incomplete',not_applicable:'Research organization',pending:'Assessment pending'};
+const stageLabel=id=>stageLabels[id]||id;
+const businessHeadline=id=>assessmentFor(id)?.business_headline||'';
+const publicAssessmentLabel=id=>businessHeadline(id)||stageLabel(stageFor(id));
+function stageConfidence(id,scope){const a=assessmentFor(id,scope),s=DATA.rubric.stages.find(s=>s.id===stageFor(id,scope));if(!s||!Object.keys(s.minimums).length)return 'unclassified';const relevant=Object.keys(s.minimums).flatMap(k=>a.gates[k].claim_ids.map(id=>claims[id]));if(a.material_conflict||relevant.some(c=>['C','U'].includes(c.confidence)))return 'low_provisional';if(a.stale_source_caveat)return 'medium';const direct=['C','R'].filter(k=>k in s.minimums).flatMap(k=>a.gates[k].claim_ids.map(id=>claims[id])).some(c=>c.confidence==='A'&&c.source_ids.some(s=>['customer','filing'].includes(sources[s].source_type)));return direct?'high':'medium';}
+const modelFor=id=>window.EDITORIAL?.entries.find(e=>e.company_id===id)?.summary||editorialFor(id)?.segment||companies[id].description;
+// Navigation taxonomy is editorial grouping, not a maturity or quality score.
+const MODEL_GROUPS=Object.fromEntries(["Expert data & evaluation", "Managed AI & data services", "Frontier data & RL environments", "AI software & analytics", "AI evaluation & safety", "Compute & model research", "Nonprofit research"].map(name=>[name,(window.EDITORIAL?.entries||[]).filter(e=>e.primary_offering===name).map(e=>e.company_id)]));
+const modelGroup=id=>Object.entries(MODEL_GROUPS).find(([,ids])=>ids.includes(id))?.[0]||'Other';
+const WORK_TYPES={'Employment':'Jobs','Expert & contractor projects':'Contract and task work','Research fellowship':'Research fellowships','Contributor bounties':'Bounties for contributions'};
+const workClaims=id=>currentClaims(id).filter(c=>c.subject==='worker opportunities');
+function workRouteSummary(id){
+ const rows=typeof workRoutesFor==='function'?workRoutesFor(id):[];
+ return {rows,...(typeof w4RouteGroups==='function'?w4RouteGroups(rows):{primary:[],careers:[],other:rows})};
+}
+function workType(id){
+ const {rows,primary,careers}=workRouteSummary(id);
+ if(primary.length)return [...new Set(primary.map(r=>WORK_TYPES[r.group]||r.group||'Paid work listings'))].join(' · ');
+ if(careers.length)return 'Career page only';
+ return rows.length?'No confirmed paid listing':'Paid work not reviewed yet';
+}
+const hasWorkRoute=id=>{const {primary,careers}=workRouteSummary(id);return Boolean(primary.length||careers.length);};
+const unknownFor=id=>currentClaims(id).filter(c=>c.subject==='unknowns').sort((a,b)=>Number(b.id.includes('audit'))-Number(a.id.includes('audit')))[0];
+
+function financialSignal(id){const m=preferredFinancial(id);return m?`${numberButton(m)}<span class="sub">${esc(metricLabels[m.kind])}${m.gross_vs_net==='gross'?' · '+esc(metricCurrentBasis(m,'gross basis')):''}</span><span class="sub">${esc(m.currency||'')} · ${esc(metricCurrentPeriod(m,dateText(m.as_of)))} · ${esc(scopeText(m.segment_scope,id))}</span><span class="sub">${esc(metricCurrentAttribution(m,evidenceLabel(claims[m.claim_id])))}</span>`:`<strong style="font-size:15px">${companies[id].entity_type==='adjacent_research'?'Commercial revenue not applicable':'Revenue not publicly established'}</strong><span class="sub">${claimButton((currentClaims(id).find(c=>c.subject==='growth metrics')||claims[companies[id].identity_claim_id]).id,'See reviewed evidence')}</span>`;}
+function compareCheck(id){return `<label class="compare-check"><input type="checkbox" data-compare="${esc(id)}" aria-label="Compare ${attr(companies[id]?.name||id)}" ${state.selected.includes(id)?'checked':''}> Compare</label>`;}
+function filtered(){
+ const tokens=state.query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+ // Match literal term prefixes at word starts; keep letters, numbers and combining marks together.
+ const prefixes=tokens.map(token=>new RegExp('(?:^|[^\\p{L}\\p{N}\\p{M}])'+token.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'u'));
+ return DATA.companies.filter(c=>{
+  const products=DATA.products.filter(p=>p.company_id===c.id).flatMap(p=>[p.name,p.work_performed]);
+  const offerings=typeof profileProducts==='function'?profileProducts(c.id).flatMap(p=>[p.name,p.description,...(p.aliases||[])]):[];
+  const searchable=[c.name,...(c.aliases||[]),c.description,modelFor(c.id),...products,...offerings].filter(Boolean).join(' ').toLowerCase();
+  return prefixes.every(prefix=>prefix.test(searchable))&&(!state.category||modelGroup(c.id)===state.category)&&(!state.stage||stageFor(c.id)===state.stage)&&(!state.financial||preferredFinancial(c.id))&&(!state.work||hasWorkRoute(c.id));
+ }).sort((a,b)=>(state.sort==='name-desc'?-1:1)*a.name.localeCompare(b.name));
+}
+
+function latestByScope(rows){const seen=new Set();return rows.sort(byRecent).filter(m=>{const key=m.company_id+'|'+m.segment_scope+'|'+(['company','ai_data','research','other_segment'].includes(m.scope_detail)?'':m.scope_detail||'');if(seen.has(key))return false;seen.add(key);return true;});}
+function chartRows(rows,dots=false){if(!rows.length)return '<p class="empty-chart">No eligible observations for this period and currency. Missing values are not zero.</p>';const max=Math.max(...rows.map(m=>m.value));return rows.sort((a,b)=>b.value-a.value).map(m=>`<div class="chart-row" data-chart-metric="${esc(m.id)}"><div class="chart-line"><a href="#company/${esc(m.company_id)}">${esc(companies[m.company_id].name)}</a>${numberButton(m)}</div><p class="chart-meta">${esc(metricMeta(m))}<br>${esc(metricCurrentAttribution(m,evidenceLabel(claims[m.claim_id])))}</p>${dots?`<div class="dot-track" aria-hidden="true"><span class="dot" style="left:${Math.max(0,Math.min(100,m.value/max*100))}%"></span></div>`:`<div class="bar-track" aria-hidden="true"><span class="bar ${['at_least','greater_than'].includes(m.qualifier)?'bound':''}" style="width:${m.value/max*100}%"></span></div>`}</div>`).join('')+`<div class="axis" aria-hidden="true"><span>0</span><span>${rows[0].currency} ${compact(max)}${rows.some(r=>['at_least','greater_than'].includes(r.qualifier))?' (bound)':''}</span></div>`;}
+function renderCharts(){const actual=latestByScope(eligibleMetrics(null,'revenue').filter(m=>m.currency===state.revenueCurrency&&financialPeriod(m)===state.revenuePeriod));const groups=[...new Set(actual.map(m=>m.gross_vs_net))];$('revenue-chart').innerHTML=groups.length?groups.map(b=>`<section class="chart-group"><h4 class="chart-group-title">${b==='unspecified'?'Gross or net revenue not stated':title(b)+' basis'}</h4>${chartRows(actual.filter(m=>m.gross_vs_net===b))}</section>`).join(''):chartRows([]);const run=latestByScope(eligibleMetrics(null,'annualized_revenue_run_rate').filter(m=>m.currency==='USD'&&dateRank(m.as_of)!=='0000'&&m.as_of!=='undated'));$('runrate-chart').innerHTML=['gross','unspecified','net'].map(b=>{let rows=run.filter(m=>m.gross_vs_net===b).sort((a,b)=>b.value-a.value);if(!rows.length)return '';const count=rows.length;if(!state.runratesExpanded)rows=rows.slice(0,b==='gross'?3:5);return `<section class="chart-group"><h4 class="chart-group-title">${b==='unspecified'?'Gross or net revenue not stated':title(b)+' billings / revenue'}</h4>${chartRows(rows,true)}${count>rows.length?`<p class="chart-more">${count-rows.length} more observations available</p>`:''}</section>`;}).join('')+`<button class="quiet chart-more" data-runrates>${state.runratesExpanded?'Show fewer':'Show all run-rate observations'}</button>`;}
+
+function historicalSourceHTML(cl){const ids=cl.historical_source_ids||[];return ids.length?`<details class="historical-citations"><summary>Previous citations</summary><p class="sub">Retained for provenance. Their current content does not support this claim.</p><ul>${ids.map(id=>`<li>${external(sources[id].url,sources[id].title)}<p class="sub">${esc(sources[id].notes||'Historical citation')}</p></li>`).join('')}</ul></details>`:'';}
+function claimRecord(c){const clarified=Boolean(evidenceContextStatementHeading(c));return `<article class="record" data-claim-record="${esc(c.id)}">${clarified?evidenceContextClaimHTML(c.id)+evidenceContextStatementHeadingHTML(c):''}<p>${esc(c.statement)}</p>${clarified?'':evidenceContextClaimHTML(c.id)}${profileProvenance(c)}${c.caveat&&!publicText(c.statement).includes(publicText(c.caveat))?`<p class="sub">${esc(c.caveat)}</p>`:''}<div class="source-links">${sourceLinks(c)}</div>${historicalSourceHTML(c)}</article>`;}
+
+// These filters describe the reviewed public route, never individual eligibility.
+const US_LISTING_IDS=new Set(['scale_ai','g2i','elorian','terac','appen','rws_trainai','prolific','abundant_ai','toloka']);
+// Additional routes are tied to specific reviewed claims, not inferred from company size.
+const ADDITIONAL_WORK_TYPES={
+ 'Research fellowship':['surge_ai.claim.worker_opportunities-1'],
+ 'Employment':['afterquery.claim.worker_opportunities-2','bespoke_labs.claim.worker_opportunities-2','proximal.claim.worker_opportunities-1','trajectory_labs_pbc.claim.worker_opportunities-1','datacurve.claim.worker_opportunities-1','surge_ai.claim.worker_opportunities-2']
+};
+function workTerms(id){
+ const cs=workClaims(id),text=cs.map(c=>c.statement).join(' '),sentences=cs.flatMap(c=>c.statement.split(/(?<=[.!?])\s+/).map(text=>({text,claim_id:c.id}))),pay=sentences.filter(s=>/[$£€]\s?[\d]/.test(s.text));
+ const group=/No .*verified|No current paid/.test(workType(id))?'Unverified route':/fellowship/i.test(workType(id))?'Research fellowship':/employment|careers/i.test(workType(id))?'Employment':/bounties/i.test(workType(id))?'Contributor bounties':'Expert & contractor projects';
+ const groups=[...new Set([group,...Object.entries(ADDITIONAL_WORK_TYPES).filter(([,ids])=>cs.some(c=>ids.includes(c.id))).map(([name])=>name)])];
+ return {cs,groups,pay,eligibility:US_LISTING_IDS.has(id)?'US listing evidence':id==='aixi'?'Worldwide wording':'Check project / unverified',requirements:sentences.filter(s=>/eligib|requir|degree|PhD|geograph|residen|remote|on.site|hybrid|experience|US |US-|worldwide|anywhere/i.test(s.text))};
+}
+function workAction(s){const u=s.url.toLowerCase();if(/fellowship|frontierswe.com\/contribute/.test(u))return 'View fellowship';if(/\/careers|workatastartup|ycombinator.com/.test(u))return 'View careers';if(/ashbyhq|greenhouse|workable|lever.co|alignerr.com\/jobs/.test(u))return 'View role listing';if(/worker_signup|\/apply\/|harbest|\/join|become-an-expert/.test(u))return 'View application route';if(/terms|privacy|payment|help\.|participant-help/.test(u))return 'Read terms / eligibility';if(/software-engineering/.test(u))return 'Read program background';if(/expert|fellowship|surgehq.ai\/swe|mindrift.ai\/project|crowdgen|trainai-community|tai.rws.com/.test(u))return 'View contributor program';return 'Read route evidence';}
+function workLinks(id){const unique=new Map();for(const c of workClaims(id))for(const sid of c.source_ids){const src=sources[sid];if(!unique.has(src.url))unique.set(src.url,src);}return `<div class="work-actions">${[...unique.values()].map(s=>external(s.url,workAction(s))).join('')}</div>`;}
+function workSummary(id){const t=workTerms(id);return `${t.cs.some(c=>c.status!=='supported')?'<p class="audit-note">Some route evidence is historical or has not been rechecked. Current intake and terms may differ.</p>':''}<dl class="work-terms"><div><dt>Work type</dt><dd>${esc([...new Set([...t.groups,workType(id)])].join(' · '))}</dd></div><div><dt>Advertised pay</dt><dd>${t.pay.length?t.pay.map(p=>`<p>${esc(p.text)} ${claimButton(p.claim_id,'Pay source')}</p>`).join(''):'No numeric rate established in the reviewed route.'}</dd></div><div><dt>Geographic evidence & requirements</dt><dd><b>${esc(t.eligibility)}</b>${id==='toloka'?'<p class="audit-note">Texas US-remote listing checked October 12, 2026. Current intake is not verified open.</p>':''}${t.requirements.slice(0,2).map(p=>`<p>${esc(p.text)} ${claimButton(p.claim_id,'Requirements source')}</p>`).join('')||'<p>Check the source for current project requirements.</p>'}</dd></div></dl>${workLinks(id)}`;}
+function workPaySummary(t){
+ const rate=/(?:average pay (?:over )?|up to |approximately |top experts earn |over )?[$£€][\d,]+[Kk]?(?:[–-]\s*[$£€]?[\d,]+[Kk]?)?\+?(?:\/(?:hour|week|month)|\s+(?:per approved hour|per hour(?: equivalent)?|hourly rates|salary|base))/gi;
+ const seen=new Set(),items=[];
+ for(const p of t.pay){const matches=p.text.match(rate)||[];for(const match of matches){let label=match.trim();const statement=claims[p.claim_id].statement;if(/historical|no longer accepting/i.test(statement))label='Historical: '+label;if(/per completed task/i.test(statement))label+=' · paid per task';if(/equivalent/i.test(statement)&&!label.includes('equivalent'))label+=' equivalent';if(/pay-range inconsistency/i.test(statement))label+=' · conflicting listing rates';if(!seen.has(label)){seen.add(label);items.push(claimButton(p.claim_id,label));}}}
+ return items.length?items.join('<span class="pay-separator"> / </span>'):'No numeric rate established';
+}
+function primaryWorkSource(id){const unique=new Map();for(const cl of workClaims(id))for(const sid of cl.source_ids){const source=sources[sid];if(!unique.has(source.url))unique.set(source.url,source);}const rank=source=>{const action=workAction(source);return action==='View role listing'?0:action==='View application route'?1:action==='View fellowship'?2:action==='View contributor program'?3:action==='View careers'?4:action==='Read route evidence'?5:6;};return [...unique.values()].sort((a,b)=>rank(a)-rank(b))[0];}
+function workCard(c){const t=workTerms(c.id),primary=primaryWorkSource(c.id);return `<article class="work-card" data-work-company="${esc(c.id)}"><div class="card-head"><div><h3><a href="#company/${esc(c.id)}/work">${esc(c.name)}</a></h3><span class="sub">${esc([...new Set(t.groups)].join(' · '))} · ${esc(t.eligibility)}</span></div>${compareCheck(c.id)}</div><div class="work-overview"><div class="work-pay-summary"><span class="sub">Advertised pay</span>${workPaySummary(t)}</div><div class="work-primary-route">${primary?external(primary.url,workAction(primary)):`<a href="#company/${esc(c.id)}/work">View route evidence</a>`}<span class="sub">Checked ${esc(DATA.meta.as_of)}</span></div></div><details class="work-requirements"><summary>Requirements & full terms</summary>${t.requirements.length?t.requirements.map(p=>`<p>${esc(p.text)} ${claimButton(p.claim_id,'Source')}</p>`).join(''):'<p>Check current requirements with the provider.</p>'}${workLinks(c.id)}<details><summary>Full route evidence</summary>${workClaims(c.id).map(claimRecord).join('')}</details><p class="sub">Current intake must be confirmed with the provider.</p></details></article>`;}
+function filteredWork(){return DATA.companies.filter(c=>{const t=workTerms(c.id);return t.cs.length&&`${c.name} ${workType(c.id)} ${t.cs.map(c=>c.statement).join(' ')}`.toLowerCase().includes(state.workQuery.toLowerCase())&&(!state.workGroup||t.groups.includes(state.workGroup))&&(!state.workPay||(state.workPay==='numeric')===Boolean(t.pay.length))&&(!state.workEligibility||t.eligibility===state.workEligibility);}).sort((a,b)=>a.name.localeCompare(b.name));}
+function renderWork(){const rows=filteredWork();$('work-count').textContent=`${rows.length} ${rows.length===1?'organization':'organizations'} with reviewed route evidence`;$('work-cards').innerHTML=rows.map(workCard).join('')||'<p>No routes match these filters. Clear a filter to widen the selection.</p>';syncSelection();}
+
+function unconfirmedValuation(m){return m.kind==='valuation'&&(claims[m.claim_id].status!=='supported'||(m.observation_status&&m.observation_status!=='reported'));}
+// Estimates never read "Reported".
+function metricStatusLabel(m){const status=m.observation_status||'reported';if(m.reported_vs_estimated==='estimated')return status==='reported'?'Estimate':'Estimate · '+title(status);return status==='reported'?'Reported':title(status);}
+function metricTile(m){return `<article class="metric-tile ${unconfirmedValuation(m)?'unconfirmed-metric':''}" data-metric="${esc(m.id)}"><h3>${unconfirmedValuation(m)?'Unconfirmed valuation · '+esc(title(m.observation_status||claims[m.claim_id].status)):esc(metricLabels[m.kind])}</h3>${profileNumberButton(m)}<span class="sub">${esc(profileSentenceCase(metricPresentationLabel(m,m.label)))}</span><span class="sub">${esc(readableDate(metricMeta(m)))}</span><span class="sub">${esc([metricStatusLabel(m),profileMetricHistory(m),metricCurrentAttribution(m,profileEvidenceLabel(claims[m.claim_id]))].filter(Boolean).join(' · '))}</span><div class="source-links">${sourceLinks(claims[m.claim_id])}</div>${m.duplicate_records?.length?`<details><summary>More sources for this figure</summary>${m.duplicate_records.map(d=>`<div data-metric="${esc(d.id)}">${claimButton(d.claim_id,'Source')} ${sourceLinks(claims[d.claim_id])}</div>`).join('')}</details>`:''}</article>`;}
+function fundingRows(id){return DATA.funding_rounds.filter(r=>r.company_id===id).sort(byRecent);}
+function fundingSummary(id){const ms=['funding_total_reported','funding_total_calculated'].map(k=>metricFor(id,k)).filter(Boolean);if(ms.length)return ms.map(m=>`<p>${numberButton(m)}<span class="sub">${esc(id==='handshake_ai'&&m.kind==='funding_total_reported'?'Derived reported cumulative total':metricLabels[m.kind])} · ${esc(profileDate(m.as_of))} · ${esc(scopeText(m.segment_scope,id))}</span>${claimButton(m.claim_id,'Funding basis')}${id==='handshake_ai'?'<span class="sub">$235.5M previously reported cumulative + $200M Series F. Listed event amounts total $434M.</span>':''}</p>`).join('');const r=fundingRows(id).find(r=>'amount'in r&&['closed','announced'].includes(r.status));return r?`<p><strong>${esc(metricValue({value:r.amount,qualifier:r.qualifier,currency:r.currency,unit:'currency'}))}</strong><span class="sub">${esc(r.round_name)} · ${esc(r.status)} · ${esc(profileCapitalContext(r).dateLabel||'Announced')} ${esc(profileDate(r.announced_on))} · ${esc(scopeText(r.segment_scope,id))}</span>${claimButton(r.claim_id,'Source')}</p><p class="sub">Complete lifetime financing is not established.</p>`:`<p class="sub">${companies[id].entity_type==='adjacent_research'?'Commercial financing is not applicable.':['appen','rws_trainai'].includes(id)?'Public-company financing; no comparable private-round total reconstructed.':'Complete financing total not established in reviewed sources.'}</p>`;}
+function disclosedPrimarySummary(id){const groups=new Map();for(const r of fundingRows(id).filter(r=>r.include_in_disclosed_primary_sum&&claims[r.claim_id].status==='supported')){if(!groups.has(r.currency))groups.set(r.currency,[]);groups.get(r.currency).push(r);}return [...groups.entries()].map(([currency,rows])=>`<p class="disclosed-sum"><b>${esc(metricValue({value:rows.reduce((n,r)=>n+r.amount,0),currency,unit:'currency',qualifier:'exact'}))}</b><span class="sub">Sum of new money from ${rows.length} disclosed ${rows.length===1?'round':'rounds'}, in ${esc(currency)}. It includes announced rounds that may not have closed. It may not cover every round.</span>${rows.map(r=>claimButton(r.claim_id,r.round_name)).join(' · ')}</p>`).join('');}
+function financingDetails(r){const fields=[['first_sale_on','First sale'],['filing_on','Filing date'],['offering_ceiling','Offering ceiling'],['remaining_unsold_at_filing','Unsold at filing'],['primary_component','New company funding'],['secondary_component','Existing shares sold']];return fields.filter(([key])=>r[key]!==undefined).map(([key,label])=>`<span class="sub">${label}: ${esc(typeof r[key]==='number'?metricValue({value:r[key],unit:'currency',currency:r.currency,qualifier:'exact'}):r[key])}</span>`).join('');}
+function financingEvent(r){return `<article class="record" data-funding="${esc(r.id)}"><h3>${esc(r.round_name)} · ${'amount'in r?esc(metricValue({value:r.amount,unit:'currency',currency:r.currency,qualifier:r.qualifier})):'Amount not disclosed'}</h3><p class="sub">${esc(profileDate(r.announced_on))} · ${esc(title(r.status))} · ${esc(title(r.capital_type))} · ${esc(scopeText(r.segment_scope,r.company_id))}</p><p>${esc(claims[r.claim_id].statement)}</p><p class="sub">Investors: ${DATA.round_investors.filter(x=>x.round_id===r.id).map(x=>`${esc(investors[x.investor_id].name)} (${esc(x.role)})`).join(', ')||'See the financing statement above; names are not separately structured.'}</p>${profileProvenance(claims[r.claim_id])}${financingDetails(r)}<details><summary>How this amount is counted</summary><p class="sub">${esc(title(r.amount_basis))} · ${esc(r.inclusion_reason)}${r.closed_on?` Closed ${esc(profileDate(r.closed_on))}.`:''}</p></details></article>`;}
+function customerRecord(r){const cl=claims[r.claim_id];return `<article class="record" data-customer="${esc(r.id)}">${evidenceContextStatementHeading(cl)?evidenceContextClaimHTML(cl.id)+evidenceContextStatementHeadingHTML(cl):''}<h3>${esc(r.organization)}</h3><p class="sub">${esc(r.relationship_detail||title(r.relationship))} · ${r.disclosure==='customer_confirmed'?'Counterparty-confirmed':esc(title(r.disclosure))} · ${r.paid_status==='unknown'?'Payment not publicly established':esc(title(r.paid_status))}</p><p>${esc(r.use_case||cl.statement)}</p>${profileProvenance(cl)}<div class="source-links">${sourceLinks(cl)}</div></article>`;}
+function narrativeSection(cl){const s=cl.subject.toLowerCase();if(/worker opportun/.test(s))return 'work';if(/founder|leadership|founding year|headquarters|legal identity|company profile/.test(s))return 'people';if(/funding|financing|valuation|investor|financial disclosure/.test(s))return 'finance';if(/growth|operating signal|financial scope|financial metrics|financial interpretation|metric|revenue/.test(s))return 'traction';if(/customer|commercial proof/.test(s))return 'customers';if(/product|operating process|business model/.test(s))return 'products';if(/gate|commercial maturity|editorial readout|category/.test(s))return 'method';return 'questions';}
+// Dataset 2.5.0 holds some figures twice: a later research pass re-read a page that an
+// earlier record already cites. Each key is listed under the figure it repeats, as another
+// source. Drop an entry once the research release retires that record.
+const SAME_OBSERVATION={
+ 'abundant_ai.metric.oct14-2-expert-network':'abundant_ai.metric.audit-abundant-network',
+ 'afterquery.claim.growth_metrics-0.metric-0':'afterquery.metric.round2-financial-2',
+ 'afterquery.metric.oct14-1-expert-network':'afterquery.claim.growth_metrics-0.metric-1',
+ 'afterquery.metric.oct14-5-benchmark-domain-coverage':'afterquery.metric.round2-legora-areas',
+ 'bespoke_labs.metric.oct14-0-open-source-adoption':'bespoke_labs.metric.specialist-1',
+ 'mercor.metric.major-growth_metrics-0':'mercor.metric.oct14-major-financial-2',
+ 'proximal.metric.specialist-3':'proximal.metric.oct14-0-revenue-run-rate',
+ 'surge_ai.claim.growth_metrics-0.metric-0':'surge_ai.metric.oct14-major-financial-0',
+ 'terac.metric.oct14-0-registered-expert-pool':'terac.claim.growth_metrics-0.metric-0',
+ 'terac.metric.oct14-1-worker-payout':'terac.metric.audit-terac-payout',
+ 'toloka.metric.major-growth_metrics-3':'toloka.metric.oct14-0-expert-and-annotator-pool'
+};
+function uniqueMetrics(id){
+ const groups=new Map(),key=m=>[m.kind,m.segment_scope,m.scope_detail||'',m.as_of,m.value,m.qualifier,m.observation_status,m.currency].join('|');
+ const rows=DATA.metrics.filter(m=>m.company_id===id&&claims[m.claim_id].status!=='superseded').sort((a,b)=>a.kind.localeCompare(b.kind)||byRecent(a,b));
+ // A repeat folds into its figure only while that figure is shown and is not itself a repeat.
+ const shown=new Set(rows.map(m=>m.id)),target=m=>{const t=SAME_OBSERVATION[m.id];return t&&shown.has(t)&&!SAME_OBSERVATION[t]?t:null;};
+ for(const m of rows.filter(m=>!target(m))){const k=key(m);if(groups.has(k))groups.get(k).duplicate_records.push(m);else groups.set(k,{...m,duplicate_records:[]});}
+ const owner=new Map([...groups.values()].flatMap(g=>[[g.id,g],...g.duplicate_records.map(d=>[d.id,g])]));
+ for(const m of rows.filter(target)){const g=owner.get(target(m));if(g)g.duplicate_records.push(m);else groups.set('repeat|'+m.id,{...m,duplicate_records:[]});}
+ return [...groups.values()];
+}
+const REVIEWED_TRENDS={
+ appen:{ids:['appen.metric.major-financial_metrics-0','appen.metric.major-financial_metrics-1','appen.metric.major-financial_metrics-2'],note:'Whole-company revenue in US dollars for full financial years. These are reported totals. They include the effect of losing the Google business.'},
+ taskus:{ids:['taskus.metric.expansion-4','taskus.metric.expansion-3','taskus.metric.expansion-2'],note:'Revenue of the AI Services line of TaskUs, in US dollars, for full financial years. Whole-company, half-year and trailing 12-month figures are left out.'}
+};
+function growthHTML(id){const config=REVIEWED_TRENDS[id],rows=config?config.ids.map(mid=>DATA.metrics.find(m=>m.id===mid)).filter(Boolean):[],changes=eligibleMetrics(id,'growth_rate'),max=Math.max(1,...rows.map(m=>m.value));return (rows.length>1?`<div class="growth-trend" data-growth-trend="${esc(id)}"><h3>Comparable annual revenue</h3><p class="sub">${esc(config.note)}</p>${rows.map(m=>`<div class="chart-row"><div class="chart-line"><span>${esc(m.period_label)}</span>${numberButton(m)}</div><div class="bar-track" aria-hidden="true"><span class="bar" style="width:${m.value/max*100}%"></span></div><span class="sub">${esc(evidenceLabel(claims[m.claim_id]))}</span></div>`).join('')}<p class="sub">Linear bars start at zero. Missing periods are not filled.</p></div>`:'<p class="muted">No reviewed like-for-like time series is charted. Dated observations retain their own periods and bases below.</p>')+changes.map(m=>`<article class="record" data-growth="${esc(m.id)}"><h3>${esc(m.label)} · ${numberButton(m)}</h3>${provenance(claims[m.claim_id])}<p>${esc(m.basis)}</p>${claims[m.claim_id].caveat?`<p class="sub">${esc(claims[m.claim_id].caveat)}</p>`:''}</article>`).join('');}
+/* Presentation-only profile replacement. Canonical data is never changed. */
+function profileSection(name,label,html){
+  return `<section class="profile-section" id="profile-${name}" data-profile-section="${name}"><h2>${esc(label)}</h2>${html||'<p class="muted">Not established in the reviewed sources.</p>'}</section>`;
+}
+
+// Ignore hash queries and letter case; decode company and compare parts once. Malformed escapes stay unknown.
+function routeParts(hash=location.hash){
+  const parts=String(hash||'').replace(/^#/,'').split('?')[0].split('/');parts[0]=parts[0].toLowerCase();return parts.map((part,index)=>{
+    try{part=index&&['company','compare'].includes(parts[0])?decodeURIComponent(part):part;}catch{}
+    return parts[0]==='company'&&index===2?part.toLowerCase():part;
+  });
+}
+function isCompanyId(id){return typeof id==='string'&&Object.hasOwn(companies,id);}
+
+const PROFILE_ROUTE_SECTIONS=new Set(['business','products','customers','risks','traction','growth','people','finance','capital','work','method','questions','sources','observations','financing']);
+function profileRouteSection(value){return PROFILE_ROUTE_SECTIONS.has(value)?value==='capital'?'finance':value:'';}
+function profileRouteDestination(value){
+  const section=profileRouteSection(value);if(!section)return null;
+  const primary=['business','traction','people','work'].includes(section);
+  return document.querySelector(primary?'[data-profile-pane="'+section+'"]':'[data-profile-section="'+section+'"]');
+}
+
+function profileTabFor(section){
+  if(['traction','growth'].includes(section))return 'traction';
+  if(['people','finance','capital'].includes(section))return 'people';
+  if(section==='work')return 'work';
+  return 'business';
+}
+// Tabs switch in place; replaceState keeps Back history clean. The rendered id covers case-variant links.
+function activateProfileTab(tab){
+  const id=profileRouteCompany(document.querySelector('#profile-view .profile-v2')?.dataset?.profileCompany||routeParts()[1]);
+  if(!id||!['business','traction','people','work'].includes(tab))return;
+  history.replaceState(history.state??null,'','#company/'+id+'/'+tab);
+  renderCompanyProfile(id);
+  const bar=document.querySelector('.profile-tabs');
+  if(bar&&typeof getComputedStyle==='function'&&bar.getBoundingClientRect().top<=parseFloat(getComputedStyle(bar).top)+1)bar.scrollIntoView({block:'start',behavior:'instant'});
+}
+function profileDisclosure(label,html,open=false){return `<details class="profile-disclosure"${open?' open':''}><summary>${label}</summary>${html}</details>`;}
+function profileGrowth(id){
+  const config=REVIEWED_TRENDS[id];if(!config)return '';
+  const rows=config.ids.map(mid=>DATA.metrics.find(m=>m.id===mid)).filter(Boolean),max=Math.max(1,...rows.map(m=>m.value));
+  return `<section id="profile-growth" class="profile-growth" data-profile-section="growth"><h2>Revenue over time</h2><p class="sub">${esc(config.note)}</p><div data-growth-trend="${esc(id)}">${rows.map(m=>`<div class="chart-row"><div class="chart-line"><span>${esc(readableDate(metricCurrentPeriod(m,m.period_label||m.as_of)))}</span>${numberButton(m)}</div><div class="bar-track" aria-hidden="true"><span class="bar" style="width:${m.value/max*100}%"></span></div></div>`).join('')}</div></section>`;
+}
+
+function renderAssessment(a){
+  return `<details data-formal-minimum="${esc(a.company_id)}"><summary>Assessment rules · ${esc(a.scope_label||scopeText(a.segment_scope,a.company_id))}</summary><article class="record"><h3>Evidence level supported: ${esc(stageLabel(stageFor(a.company_id,a.segment_scope)))}</h3><p class="sub">Assessed ${esc(profileDate(a.as_of))} · ${esc(title(stageConfidence(a.company_id,a.segment_scope)))} evidence confidence</p>${evidenceContextAssessmentHTML(a)}<p>${esc(a.stage_limitations)}</p>${a.stage_use?`<p class="sub">${esc(a.stage_use)}</p>`:''}${a.scope_exclusions?.length?`<ul>${a.scope_exclusions.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}${Object.entries(a.gates).map(([key,g])=>`<div class="record"><h4>${esc(DATA.rubric.dimensions.find(d=>d.id===key).label)} · ${g.level==='U'?'Unknown':esc(g.level)}</h4>${evidenceContextCriterionHTML(a,key)}<p>${esc(g.rationale)}</p>${g.claim_ids.map(id=>claimButton(id,'Criterion source')).join(' ')}</div>`).join('')}</article></details>`;
+}
+
+// The live profile template is profileHTML() in profiles-v2.js.
+
+function compactCapitalQualification(record){
+ if(!record)return '';
+ const context=[record.basis,record.round_name,claims[record.claim_id]?.statement,claims[record.claim_id]?.caveat].filter(Boolean).join(' ');
+ if(record.amount_basis==='mixed_transaction')return 'Includes existing shares sold by shareholders. The total is not all new company funding.';
+ if(record.capital_type==='secondary')return 'Existing shareholders sold shares. The company raised no new money in this deal.';
+ if(record.capital_type==='mixed'&&/credit/i.test(context))return 'Includes equity and credit. Component amounts and credit drawdown are undisclosed.';
+ if(/mixed primary[\s/]+secondary|primary and secondary/i.test(context))return 'Includes primary financing and sales of existing shares; this is not a pure new-capital total.';
+ return '';
+}
+// Rounds announced as one raise. They are summed only when a round record states the combined total.
+const COMPARE_RAISES={appen:{rounds:['appen.round.major-8','appen.round.major-9'],label:'Placement and share purchase plan'}};
+function compareRaise(id){const plan=Object.hasOwn(COMPARE_RAISES,id)?COMPARE_RAISES[id]:null,rows=(plan?.rounds||[]).map(rid=>DATA.funding_rounds.find(r=>r.id===rid));if(!rows.length||rows.some(r=>!r||r.company_id!==id||r.status!=='closed'||r.amount_basis!=='new_capital'||!(r.amount>0)||r.currency!==rows[0].currency||claims[r.claim_id]?.status!=='supported'))return null;const total=rows.reduce((n,r)=>n+r.amount,0),stated=rows.find(r=>/combined[^.]*?raise\s+\D{0,3}[\d.]+\s?M\b/i.test(claims[r.claim_id].caveat||''));const value=Number((claims[stated?.claim_id]?.caveat||'').match(/combined[^.]*?raise\s+\D{0,3}([\d.]+)\s?M\b/i)?.[1]);return stated&&value*1e6===total?{rows,total,label:plan.label,claim:stated.claim_id}:null;}
+function compactFundingSummary(id){const m=metricFor(id,'funding_total_reported')||metricFor(id,'funding_total_calculated');if(id==='handshake_ai'&&m?.id==='handshake_ai.metric.major-total_funding')return `<p>${numberButton(m)}<span class="sub">Derived parent financing total · ${esc(readableDates(m.as_of))}</span></p><p class="sub">$235.5M prior total + $200M Series F. Listed rounds sum to $434M; the $1.5M difference is unexplained.</p>`;const raise=!m&&compareRaise(id);if(raise){const label=metricValue({value:raise.total,unit:'currency',currency:raise.rows[0].currency,qualifier:'exact'}),access=evidenceAccess([raise.claim],label,raise.label);return `<p><button class="number-button" data-claim="${esc(raise.claim)}" ${access.attributes}>${esc(label)}</button>${access.description}<span class="sub">Raised ${esc(monthSpan(raise.rows.map(r=>r.announced_on)))} · ${esc(raise.label)} · ${esc(scopeText(raise.rows[0].segment_scope,id))}</span></p><p class="sub">Complete lifetime financing is not established.</p>`;}const r=m||fundingRows(id).find(r=>'amount'in r&&['closed','announced'].includes(r.status)),qualification=compactCapitalQualification(r);
+ // A total reported before a later transformative deal says so, with the deal's month from its round record.
+ const before=m&&/\bpre-Meta\b/i.test(m.basis||'')?fundingRows(id).find(x=>/\bMeta\b/.test(x.round_name||'')&&dateRank(x.announced_on)>=dateRank(m.as_of)):null,label=before?`Reported financing before Meta’s ${readableDates(String(before.announced_on).slice(0,7))} deal`:m&&metricLabels[m.kind];
+ return (m?`<p>${numberButton(m)}<span class="sub">${esc(label)} · ${esc(readableDates(dateText(m.as_of)))} · ${esc(scopeText(m.segment_scope,id))}</span></p>`:fundingSummary(id))+(qualification?`<p class="sub capital-scope">${esc(qualification)}</p>`:'');}
+
+function comparisonRows(){return [
+ ['Main offering',id=>`<span class="category-label">${esc(groupLabel(modelGroup(id)))}</span><p>${esc(modelFor(id))}</p>`],
+ ['Products',id=>`<p>${DATA.products.filter(p=>p.company_id===id&&p.id.includes('oct14')).slice(0,3).map(p=>esc(p.name)).join('<br>')||esc(brief(DATA.products.find(p=>p.company_id===id)?.work_performed||companies[id].description))}</p><a href="#company/${esc(id)}/products">Product evidence ${iconHTML('right')}</a>`],
+ ['Customer evidence',id=>{const rows=DATA.customer_evidence.filter(r=>r.company_id===id);return rows.slice(0,2).map(r=>`<p>${esc(r.organization)} <span class="sub">${esc(title(r.relationship))} · ${claimButton(r.claim_id,'Source')}</span></p>`).join('')+`<a href="#company/${esc(id)}/customers">All relationship evidence ${iconHTML('right')}</a>`;}],
+ ['Published revenue figure',comparisonRevenue],
+ ['Growth',id=>{const g=STORY_GROWTH.find(g=>g.id===id);if(!g)return '<p class="sub">No reviewed full-year growth series for this company.</p>';const [a,b]=g.ids.map(id=>DATA.metrics.find(m=>m.id===id)),pct=(b.value/a.value-1)*100;return `<p>≈ ${pct>0?'+':'−'}${Math.abs(pct).toFixed(1)}% · FY2024 to FY2025</p><p class="sub">${g.scope} · USD actual revenue</p><a href="#company/${id}/growth">See yearly figures ${iconHTML('right')}</a>`;}],
+ ['People',id=>{const rows=DATA.company_people.filter(p=>p.company_id===id);return `<p>${rows.slice(0,3).map(p=>`${esc(people[p.person_id].name)} <span class="sub">${esc(title(p.role))}</span>`).join('<br>')||'Not established'}</p><a href="#company/${id}/people">People & roles ${iconHTML('right')}</a>`;}],
+ ['Funding & investors',id=>compactFundingSummary(id)+`<a href="#company/${id}/finance">${companies[id].entity_type==='adjacent_research'?'Research support':'Rounds & investors'} ${iconHTML('right')}</a>`],
+ ['Paid work',id=>`<p>${esc(workType(id))}</p><a href="#company/${id}/work">Pay & requirements ${iconHTML('right')}</a>`],
+ ['Explore',id=>`<a href="#company/${id}">Full profile & sources ${iconHTML('right')}</a>`]
+ ];}
+// Like with like: when another column shows a 12-month figure, a half-year or quarter
+// headline gives way to the same scope's latest full year and moves to a second line.
+function comparisonRevenue(id){const m=preferredFinancial(id),period=m&&financialPeriod(m);if(!m||m.kind!=='revenue'||!['half','short'].includes(period))return compactSignal(id);const months=period==='half'?6:m.period_type==='quarter'||/quarter|three months|\bQ[1-4]\b/i.test(m.period_label||'')?3:0,span=months?months+' months':'',peers=compareIds().filter(x=>x!==id).map(x=>preferredFinancial(x)).filter(Boolean),twelve=peers.some(o=>['annualized_revenue_run_rate','arr'].includes(o.kind)||(o.kind==='revenue'&&['annual','ttm'].includes(financialPeriod(o))));const year=twelve?eligibleMetrics(id,'revenue').filter(x=>financialPeriod(x)==='annual'&&x.segment_scope===m.segment_scope&&(x.scope_detail||'')===(m.scope_detail||'')&&x.currency===m.currency).sort((a,b)=>dateRank(b.as_of).localeCompare(dateRank(a.as_of)))[0]:null;return year?signalFor(id,year)+`<p class="comparison-later"><span class="comparison-later-label">Latest ${esc(span||'shorter period')}</span>${numberButton(m)}<span class="row-period">${esc(readableDates(shortPeriod(m)))} · ${esc(compactMetricScope(m))}</span></p>`:signalFor(id,m,span);}
+const MOBILE_COMPARE_PAIRS=[[0,1],[0,2],[1,2]];
+function comparePairOptions(ids){return MOBILE_COMPARE_PAIRS.filter(pair=>pair.every(i=>i<ids.length));}
+let comparisonFocus=null,evidenceReturnFocus=null,pendingComparisonResize=false;
+document.addEventListener('focusin',event=>{comparisonFocus=$('compare-content').contains(event.target)?event.target:null;});
+document.addEventListener('pointerdown',event=>{if(!$('compare-content').contains(event.target))comparisonFocus=null;});
+function resizeComparison(returnFocus=null){
+ const container=$('compare-content');
+ // Keep the citation's opener connected until the modal closes. Its column may
+ // become hidden at the new width, so restore the matching replacement then.
+ if($('evidence-dialog').open&&evidenceReturnFocus?.isConnected&&container.contains(evidenceReturnFocus)){pendingComparisonResize=true;return;}
+ const active=returnFocus?.isConnected?returnFocus:document.activeElement===document.body&&comparisonFocus?.isConnected?comparisonFocus:document.activeElement;
+ if(!container.contains(active)){renderCompare();return;}
+ const cell=active.closest('[data-comparison-company]'),row=active.closest('[data-comparison-row]'),header=active.closest('thead th'),company=cell?.dataset.comparisonCompany||active.dataset.remove||header?.querySelector('a[href^="#company/"]')?.getAttribute('href').split('/')[1];
+ const identity={tag:active.tagName,claim:active.dataset.claim,remove:active.dataset.remove,href:active.getAttribute('href'),pair:active.dataset.mobileCompare,summary:active.tagName==='SUMMARY',company,row:row?.dataset.comparisonRow};
+ const ids=state.selected.length?state.selected:['taskus','appen','scale_ai'],index=ids.indexOf(company),pairs=comparePairOptions(ids);
+ if(window.innerWidth<=700&&index>=0&&!pairs[state.mobileCompare]?.includes(index))state.mobileCompare=pairs.findIndex(pair=>pair.includes(index));
+ renderCompare();
+ const scope=identity.row?[...container.querySelectorAll('[data-comparison-row]')].find(n=>n.dataset.comparisonRow===identity.row):container.querySelector('thead');
+ const candidates=[...(scope||container).querySelectorAll('a,button,summary')];
+ const restored=candidates.find(n=>n.getClientRects().length&&n.tagName===identity.tag&&(identity.claim?n.dataset.claim===identity.claim:identity.remove?n.dataset.remove===identity.remove:identity.href?n.getAttribute('href')===identity.href:identity.pair!==undefined?n.dataset.mobileCompare===identity.pair:identity.summary&&n.tagName==='SUMMARY'));
+ const pairSummary=container.querySelector('.mobile-column-options summary');(restored||(pairSummary?.getClientRects().length?pairSummary:null)||$('compare-preset')).focus({preventScroll:true});
+ const focused=document.activeElement,box=focused.getBoundingClientRect();if(box.top<0||box.bottom>window.innerHeight)focused.scrollIntoView({block:'nearest',behavior:'instant'});
+}
+function syncComparisonPreset(){const presets={scale:['taskus','appen','scale_ai'],work:['surge_ai','toloka','labelbox']},match=Object.keys(presets).find(key=>presets[key].join('|')===state.selected.join('|'));$('compare-preset').value=match||'';const placeholder=$('compare-preset').querySelector?.('option[value=""]');if(placeholder)placeholder.textContent=state.selected.length&&!match?'Custom selection':'Choose an example';}
+// The example shows until a visitor picks companies. #compare/<id>/<id>/<id> names a selection,
+// so a comparison survives reloads, Back and Forward, and can be shared.
+const COMPARE_EXAMPLE=['taskus','appen','scale_ai'];
+function compareIds(){return (state.selected.length?state.selected:COMPARE_EXAMPLE).filter(id=>companies[id]);}
+function onCompareRoute(){return String(routeParts()[0]||'').toLowerCase()==='compare';}
+function compareHash(){return '#compare'+state.selected.map(id=>'/'+id).join('');}
+function compareRouteId(value){let id=String(value||'');try{id=decodeURIComponent(id);}catch{}id=id.trim().toLowerCase();const aliases=window.RESEARCH_ALIASES;return isCompanyId(id)?id:aliases&&Object.hasOwn(aliases,id)&&isCompanyId(aliases[id])?aliases[id]:'';}
+// Also reads the comma form (#compare/a,b) and rewrites it to the slash form.
+function syncCompareRoute(){if(!onCompareRoute())return;const parts=routeParts().slice(1).flatMap(part=>String(part).split(',')).filter(Boolean);if(parts.length){const ids=[...new Set(parts.map(compareRouteId).filter(Boolean))].slice(0,3);if(ids.length&&ids.join('|')!==state.selected.join('|')){state.selected=ids;state.mobileCompare=0;syncSelection();renderTray();}}if(location.hash!==compareHash())history.replaceState(history.state,'',compareHash());document.title=(state.selected.length?listText(state.selected.map(id=>companies[id].name))+' · ':'')+VIEW_TITLES.compare;}
+function syncCompareAdd(){const select=$('compare-add'),full=state.selected.length>=3;if(!select)return;select.innerHTML=`<option value="">${full?'Remove one to add another':'Choose a company'}</option>`+[...DATA.companies].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option value="${esc(c.id)}"${full||state.selected.includes(c.id)?' disabled':''}>${esc(c.name)}</option>`).join('');select.value='';const add=$('compare-add-button');if(add)add.hidden=true;}
+function renderCompare(){syncCompareRoute();syncComparisonPreset();syncCompareAdd();const example=!state.selected.length,ids=compareIds(),names=listText(ids.map(id=>companies[id].name));
+ const pairs=comparePairOptions(ids);state.mobileCompare=Math.min(state.mobileCompare,Math.max(0,pairs.length-1));const visiblePair=pairs[state.mobileCompare]||[0];
+ const narrow=window.innerWidth<=700,colspan=1+(narrow?Math.min(2,ids.length):ids.length),groups={'Main offering':['Business',''],'Published revenue figure':['Financial figures','Full-year figures come first. A shorter period shows as a second line. Dates and business scopes differ. Annualized pace (recent revenue projected across a full year) is an estimate. Gross revenue is customer spending before costs such as contractor pay.'],'Products':['Products & relationships',''],'People':['People',''],'Paid work':['Work & sources','']},labels={'Main offering':'Business group','Growth':'Revenue change'};
+ const order=['Main offering','Published revenue figure','Growth','Funding & investors','Products','Relationships','People','Paid work','Explore'];const rows=comparisonRows().sort((a,b)=>order.indexOf(a[0])-order.indexOf(b[0])).map(([label,render])=>`${groups[label]?`<tr class="comparison-group"><th colspan="${colspan}" scope="colgroup">${groups[label][0]}${groups[label][1]?`<p>${groups[label][1]}</p>`:''}</th></tr>`:''}<tr data-comparison-row="${esc(label)}"><th scope="row">${esc(labels[label]||label)}</th>${ids.map((id,i)=>`<td data-comparison-company="${esc(id)}" class="${!visiblePair.includes(i)?'mobile-hidden':''}">${render(id)}</td>`).join('')}</tr>`).join('');
+ $('compare-content').innerHTML=`<div class="comparison-mode"><p>${example?'This is an example. To build your own, add up to three companies above or tick Compare on the <a href="#companies">company cards</a>.':`${state.selected.length} of 3 companies selected. This page’s link opens the same comparison.`}</p>${example?'':'<button type="button" class="text-link" data-copy-compare>Copy link</button>'}</div>${ids.length>2?'<p class="comparison-swipe">Small screens show two companies at a time. Use Change pair to switch.</p>':''}<div class="comparison-scroll"><table class="comparison-table" data-company-count="${ids.length}"><caption class="sr-only">${example?'Example comparison':'Comparison'} of ${esc(names)}</caption><thead><tr><th scope="col">Comparison</th>${ids.map((id,i)=>`<th scope="col" class="${!visiblePair.includes(i)?'mobile-hidden':''}"><div class="card-head"><a href="#company/${esc(id)}">${esc(companies[id].name)}</a><button type="button" ${example?'hidden':''} data-remove="${esc(id)}" aria-label="Remove ${esc(companies[id].name)}">${iconHTML('close')}</button></div>${i===visiblePair.at(-1)&&ids.length>2?`<details class="mobile-column-options"><summary>Change pair</summary><div class="mobile-compare-pager" role="group" aria-label="Choose companies to compare">${pairs.map((pair,i)=>`<button type="button" data-mobile-compare="${i}" aria-pressed="${i===state.mobileCompare}">${esc(companies[ids[pair[0]]].name)} + ${esc(companies[ids[pair[1]]].name)}</button>`).join('')}</div></details>`:''}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
+ $('compare-status').textContent=example?`Showing an example: ${names}.`:`Comparing ${names}.`;comparisonScrollRegion();}
+// The table box becomes a focusable, named region only while it really scrolls sideways.
+// The stylesheet lets the table wrap, so today it never does and keyboard users skip it.
+function comparisonScrollRegion(){const box=document.querySelector('#compare-content .comparison-scroll');if(!box)return;const scrolls=typeof getComputedStyle==='function'&&/auto|scroll/.test(getComputedStyle(box).overflowX)&&box.scrollWidth>box.clientWidth+1;if(scrolls){box.setAttribute('tabindex','0');box.setAttribute('role','region');box.setAttribute('aria-label','Comparison table, scroll for more fields');}else for(const name of ['tabindex','role','aria-label'])box.removeAttribute(name);}
+function copyCompareLink(button){const done=copied=>{$('compare-status').textContent=copied?'Link copied.':'Copy the address from your browser bar.';button.textContent=copied?'Link copied':'Copy link';},clip=typeof navigator==='undefined'?null:navigator.clipboard;if(!clip?.writeText)return done(false);clip.writeText(location.href).then(()=>done(true),()=>done(false));}
+
+function evidenceMetricStatus(m){
+ const estimated=m.reported_vs_estimated==='estimated',status=m.observation_status||'reported';
+ if(status==='reported')return estimated?'Estimate':'Reported figure';
+ if(status==='talks')return(estimated?'Estimated ':'Reported ')+(m.kind==='valuation'?'valuation talks':'talks');
+ return(estimated?'Estimated ':'Reported ')+status;
+}
+function evidenceMetricContextHTML(m){
+ const kind=m.kind==='revenue'?'Period revenue':m.kind==='other'?'':metricLabels[m.kind];
+ const accounting=metricCurrentBasis(m,['revenue','annualized_revenue_run_rate','arr'].includes(m.kind)?m.gross_vs_net==='unspecified'?'Gross or net revenue not stated':title(m.gross_vs_net)+' revenue basis':'');
+ const value=profileMetricValue(m)+(m.unit==='currency'&&m.currency?' '+m.currency:m.unit==='people'?' people':'');
+ const scope=m.scope_detail&&!['company','ai_data','research','other_segment'].includes(m.scope_detail)?m.scope_detail:scopeText(m.segment_scope,m.company_id);
+ return `<div class="evidence-metric-context" data-evidence-metric="${esc(m.id)}"><div class="evidence-metric-heading"><strong>${esc(profileSentenceCase(metricPresentationLabel(m,m.label||metricLabels[m.kind])))}</strong><span class="evidence-metric-value">${esc(value)}</span></div><p>${[kind,evidenceMetricStatus(m),profileMetricHistory(m),scope,profileMetricDate(m),accounting].filter(Boolean).map(esc).join(' · ')}</p></div>`;
+}
+// Grade meanings, as the Method page states them.
+const CONFIDENCE_GRADES={A:'Independent or buyer-side evidence, such as a filing or a customer who confirms the work.',B:'The company, an investor or another named first-hand source says it.',C:'Reporting by others, an estimate, or indirect evidence.',U:'Not confirmed. The fact may be undisclosed or still unresolved.'};
+function claimConfidenceHTML(cl){
+ const inheritedIndependentReason='Independent or buyer-side evidence. Research label: researcher-assigned evidence grade.';
+ const attribution=evidenceLabel(cl);
+ let reason=cl.confidence_reason;
+ if(cl.confidence==='A'&&reason===inheritedIndependentReason){
+  if(['Company-reported','Investor-reported'].includes(attribution))reason=attribution+' evidence. The research confidence grade is retained from the compiled snapshot.';
+  else if(!cl.evidence_label&&['Transaction counsel statement','University incubator statement','Company admission document'].includes(attribution))reason=attribution+'. The research confidence grade is retained from the compiled snapshot.';
+ }
+ // Drop the researcher-only "Research label" note; show the reason only when it adds to the grade.
+ reason=String(reason||'').replace(/\s*Research label:[^.]*\.?\s*$/,'').trim();
+ const meaning=CONFIDENCE_GRADES[cl.confidence]||'',plain=text=>publicText(text).replace(/[.\s]+$/,'').toLowerCase();
+ return `<div class="claim-confidence"><strong>Confidence grade</strong>${esc(cl.confidence)}${meaning?`<span class="sub">${esc(meaning)}</span>`:''}${reason&&!plain(meaning).startsWith(plain(reason))?`<details><summary>Why this grade</summary><p class="sub">${esc(reason)}</p></details>`:''}</div>`;
+}
+// Display wording for common research date notes (records unchanged).
+const EVIDENCE_DATE_NOTES={
+ 'Date label preserved from research; access dates are not substituted.':'This date comes from the source. We did not swap in the date we checked it.',
+ 'The observation date is October 14. An undated page is not assigned a synthetic publication date.':'We read this source on 14 Oct 2026. When a page shows no date, we do not make one up.',
+ 'Review date is not substituted for an unknown publication, closing or milestone date.':'When a publication, closing or milestone date is unknown, we leave it unknown. We do not use the date we checked the source.'
+};
+let evidenceRecordHash='',evidenceReturnHash='';
+// Record links: #company/<id>/claim/<claim-id> opens the profile with this dialog.
+function evidenceRecordLink(cl){return '#company/'+encodeURIComponent(cl.company_id)+'/claim/'+encodeURIComponent(cl.id);}
+function showEvidence(id,group=[]){
+ const cl=claims[id];if(!cl)return;
+ const dialog=$('evidence-dialog');if(!dialog.open){evidenceReturnFocus=document.activeElement;evidenceReturnHash='';evidenceRecordHash='';}
+ const ms=DATA.metrics.filter(m=>m.claim_id===id),scope=[...new Set([scopeText(cl.segment_scope,cl.company_id),...(evidenceMetricScopes.get(id)||[])])].join(' · '),link=evidenceRecordLink(cl),others=group.filter(other=>other!==id&&claims[other]);
+ $('evidence-content').innerHTML=`${ms.map(evidenceMetricContextHTML).join('')}${typeof sourceUpdateClaimHTML==='function'?sourceUpdateClaimHTML(id):''}${evidenceContextClaimHTML(id)}${evidenceContextStatementHeadingHTML(cl)}<p class="evidence-statement" id="evidence-statement">${esc(cl.statement)}</p><h3>Sources</h3><ol class="sources-list">${cl.source_ids.map(sid=>{const s=sources[sid];return `<li>${external(s.url,s.title)}<p class="sub">${esc(profileSourceMeta(s))}</p>${s.notes?`<p class="sub">${esc(readableDate(publicText(s.notes.replaceAll('_',' '))))}</p>`:''}</li>`;}).join('')}</ol>${!cl.source_ids.length?'<p>No current source is linked to this claim.</p>':''}${historicalSourceHTML(cl)}<div class="evidence-data"><div><strong>${esc(evidenceContextDateHeading(cl))}</strong>${esc(profileDate(cl.as_of))}</div><div><strong>Checked</strong>${esc(profileDate(cl.observed_on))}</div>${evidenceContextScopeHTML(cl,scope)}<div><strong>Evidence label</strong>${esc(profileEvidenceLabel(cl))}</div><div><strong>Status</strong>${esc(title(cl.status))}</div>${claimConfidenceHTML(cl)}</div>${cl.date_note?`<p class="sub">${esc(EVIDENCE_DATE_NOTES[cl.date_note]||cl.date_note)}</p>`:''}${[...new Set([cl.caveat,...ms.map(m=>m.basis)].map(publicText))].filter(t=>t&&!publicText(cl.statement).includes(t)).map(t=>`<p class="sub">${esc(t)}</p>`).join('')}${others.length?`<h3>Other claims for this item</h3><ul class="evidence-related">${others.map(other=>`<li><button type="button" class="evidence-action" data-profile-evidence="${attr([other,...group.filter(x=>x!==other)].join('|'))}">Claim ${group.indexOf(other)+1} of ${group.length}: ${esc(profileEvidenceLabel(claims[other]))}</button></li>`).join('')}</ul>`:''}<div class="evidence-actions"><button type="button" class="evidence-copy" data-copy-record="${attr(link)}">${iconHTML('link')} Copy link to this record</button><p class="sub" id="evidence-copy-status" role="status"></p><p class="evidence-correction">Something wrong here? <a href="#corrections">Request a correction ${iconHTML('right')}</a></p></div>`;
+ // On the claim's profile the address bar shows the record link while open.
+ const parts=routeParts(),company=String(parts[0]).toLowerCase()==='company'?profileRouteCompany(parts[1]):'';
+ if(company&&company===cl.company_id&&!$('profile-view').hidden){if(!evidenceReturnHash)evidenceReturnHash=parts[2]==='claim'?profileTabHash(company):location.hash;if(location.hash!==link)history.replaceState(history.state??null,'',link);evidenceRecordHash=link;}
+ if(!dialog.open)dialog.showModal();dialog.scrollTop=0;$('close-evidence').focus({preventScroll:true});
+}
+$('evidence-dialog').addEventListener('close',()=>{
+ const opener=evidenceReturnFocus,resize=pendingComparisonResize,record=evidenceRecordHash,back=evidenceReturnHash;
+ evidenceReturnFocus=null;pendingComparisonResize=false;evidenceRecordHash='';evidenceReturnHash='';
+ // Restore the profile address unless navigation closed the dialog.
+ if(record&&location.hash===record){history.replaceState(history.state??null,'',back);if(!opener?.isConnected||opener===document.body){const heading=document.querySelector('#profile-view:not([hidden]) h1');heading?.setAttribute('tabindex','-1');heading?.focus({preventScroll:true});}}
+ if(resize&&onCompareRoute()&&!$('compare-view').hidden)resizeComparison(opener);
+});
+
+function storyUnknown(id){const original=unknownFor(id)?.statement||assessmentFor(id)?.stage_limitations||'Current commercial economics are not publicly established.',current=typeof sourceUpdateUnknownText==='function'?sourceUpdateUnknownText(id,original):original,text=publicText(current).split(/[.;]/)[0];const words=text.split(/\s+/);return words.slice(0,18).join(' ')+(words.length>18?'…':'.');}
+const SELECTION_OFFERING_COPY={
+ datacurve:{name:'RL environments',record:'datacurve.product.oct14-0',claim:'datacurve.claim.oct14-product-0',source:'datacurve.source.oct14-a5da84956a24',url:'https://datacurve.ai/products'},
+ abundant_ai:{name:'Custom RL environments and datasets',record:'abundant_ai.product.oct14-0',claim:'abundant_ai.claim.oct14-product-0',source:'abundant_ai.source.oct14-8fcc746dfc96',url:'https://www.abundant.ai/'}
+};
+function selectionOfferingName(id,product){
+ const expected=Object.hasOwn(SELECTION_OFFERING_COPY,id)?SELECTION_OFFERING_COPY[id]:null;
+ if(!expected||product.name!==expected.name||product.record_ids?.length!==1||product.record_ids[0]!==expected.record||product.claim_ids?.length!==1||product.claim_ids[0]!==expected.claim)return product.name;
+ const record=DATA.products.find(row=>row.id===expected.record),claim=claims[expected.claim],source=sources[expected.source];
+ if(record?.company_id!==id||record.name!==expected.name||record.claim_id!==expected.claim||claim?.company_id!==id||claim.status!=='supported'||claim.source_ids?.length!==1||claim.source_ids[0]!==expected.source||source?.company_id!==id||source.url!==expected.url)return product.name;
+ return publicOfferingName(product.name);
+}
+function selectionFact(id){
+ if(preferredFinancial(id))return compactSignal(id);
+ const supported=ids=>(ids||[]).filter(cid=>claims[cid]?.status==='supported');
+ const reference=(ids,label)=>typeof profileReferences==='function'?profileReferences(ids,label,label):claimButton(ids[0],label,label);
+ const rows=typeof profileRelationships==='function'?profileRelationships(id):DATA.customer_evidence.filter(r=>r.company_id===id).map(r=>({name:r.organization,relationship:r.relationship,claim_ids:[r.claim_id]}));
+ const relationship=rows.find(r=>r.name&&r.name.length<=75&&!/[:;]|unnamed|undisclosed|anonymous|no named|not (?:named|disclosed|established)|no verified|unverified customer/i.test(r.name)&&supported(r.claim_ids).length);
+ if(relationship){const ids=supported(relationship.claim_ids),cl=claims[ids[0]],label=typeof profileRelationshipLabel==='function'?profileRelationshipLabel(id,relationship):typeof relationshipLabel==='function'?relationshipLabel(relationship.relationship):title(relationship.relationship);return `<div class="row-number">${reference(ids,relationship.name)}</div><span class="row-period">${esc(label)} · ${esc(dateText(cl.as_of))} · ${esc(evidenceContextScopeLabel(cl,scopeText(cl.segment_scope,id)))}</span>`;}
+ const products=typeof profileProducts==='function'?profileProducts(id):DATA.products.filter(p=>p.company_id===id).map(p=>({name:p.name,claim_ids:[p.claim_id]}));
+ const product=products.find(p=>p.name&&supported(p.claim_ids).length);
+ if(product){
+  const label=companies[id].entity_type==='adjacent_research'?'Research offering':'Offering';
+  if(product.source_updates?.length)return `<div class="row-number">${productSourceHTML(product,product.name)}</div><span class="row-period">${label}${product.status?' · '+esc(title(product.status)):''}</span>`;
+  const ids=supported(product.claim_ids),cl=claims[ids[0]];return `<div class="row-number">${reference(ids,selectionOfferingName(id,product))}</div><span class="row-period">${label}${product.status?' · '+esc(title(product.status)):''} · ${esc(dateText(cl.as_of))} · ${esc(scopeText(cl.segment_scope,id))}</span>`;
+ }
+ return compactSignal(id);
+}
+function openCompanyStory(id){if(!isCompanyId(id))return;const c=companies[id];const ed=editorialFor(id);$('company-story').innerHTML=`<p class="eyebrow">${esc(groupLabel(modelGroup(id)))}</p><h2 id="company-story-title">${esc(c.name)}</h2><p class="selection-description">${esc(modelFor(id))}</p><div class="selection-metric">${selectionFact(id)}</div><p class="selection-unknown"><span>Still unclear</span>${esc(storyUnknown(id))}</p><div class="selection-actions">${claimButton(ed?.claim_id||c.identity_claim_id,'Sources')}<a class="full-profile-link" href="#company/${esc(id)}" data-full-profile>Full profile ${iconHTML('right')}</a></div>`;$('company-dialog').showModal();}
+
+function renderTray(){const n=state.selected.length;$('compare-tray').hidden=!n||onCompareRoute();$('tray-text').textContent=n?`${n} of 3 selected: ${listText(state.selected.map(id=>companies[id].name))}`:'';$('nav-count').textContent=n?`(${n})`:'';document.querySelectorAll('[data-nav="compare"],#compare-tray a[href^="#compare"]').forEach(a=>a.setAttribute('href',compareHash()));}
+function syncSelection(){document.querySelectorAll('[data-compare]').forEach(el=>el.checked=state.selected.includes(el.dataset.compare));}
+// On the compare page the URL follows the selection; replaceState keeps Back history short.
+function setSelection(ids){state.selected=[...new Set(ids)].filter(isCompanyId).slice(0,3);state.mobileCompare=Math.min(state.mobileCompare,Math.max(0,comparePairOptions(state.selected).length-1));syncSelection();renderTray();if(onCompareRoute()&&location.hash!==compareHash())history.replaceState(history.state,'',compareHash());renderCompare();}
+function chooseCompare(id,on){if(on&&!state.selected.includes(id)&&state.selected.length>=3){syncSelection();$('tray-text').textContent='Three selected. Remove one to add another.';return;}setSelection(on?[...state.selected,id]:state.selected.filter(x=>x!==id));}
+function reset(){Object.assign(state,{query:'',category:'',stage:'',financial:false,work:false,sort:'name'});$('search').value='';$('category').value='';$('stage').value='';$('financial-only').checked=false;$('work-only').checked=false;$('sort').value='name';renderDirectory();writeDirectoryRoute();$('search').focus({preventScroll:true});}
+
+// previousSection is set after a section link such as #venture, so the next plain view link starts at the top.
+let previousRoute='',previousSection='';const viewScroll={};
+let companyReturnFocus=null;
+// Hashes that name a place inside a page. route() shows that page, then brings the element to the top with focus.
+const VIEW_ANCHORS={venture:'market',about:'method',labels:'method',corrections:'method',coverage:'method',downloads:'method'};
+function viewAnchorId(hash=location.hash){const id=String(routeParts(hash)[0]||'').toLowerCase();return Object.hasOwn(VIEW_ANCHORS,id)?id:'';}
+function showViewAnchor(target){
+ if(!target)return;
+ for(let node=target;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;
+ if(!target.matches?.('a[href],button,input,select,textarea,summary'))target.setAttribute('tabindex','-1');
+ target.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});
+}
+// Back and Forward return each history entry to where the reader left it. The Navigation API
+// says which entry is which and when a move is a traversal; other browsers keep the old behavior.
+const entryScroll=new Map();let routeTraversal=false;
+const historyKey=()=>window.navigation?.currentEntry?.key;
+if(window.navigation&&'scrollRestoration' in history)history.scrollRestoration='manual';
+// A reload, or Back to this page from another site, also returns to the same place: the entry keeps
+// its scroll position as Navigation API state, which route() reads on its first run.
+let entryScrollTimer=0;
+const keepEntryScroll=()=>{clearTimeout(entryScrollTimer);try{window.navigation.updateCurrentEntry({state:{scrollY:window.scrollY}});}catch{}};
+if(window.navigation)window.addEventListener('scroll',()=>{clearTimeout(entryScrollTimer);entryScrollTimer=setTimeout(keepEntryScroll,300);},{passive:true});
+// Without the Navigation API, history.state carries the same scroll position so a reload can restore it.
+if(!window.navigation)window.addEventListener('scroll',()=>{clearTimeout(entryScrollTimer);entryScrollTimer=setTimeout(()=>{try{history.replaceState({...(history.state||{}),scrollY:window.scrollY},'');}catch{}},300);},{passive:true});
+// An in-page link saves the position at once, before the new entry exists. So an entry the reader left by a link
+// always has one, and a new entry has none until the reader scrolls it (profiles-v2.js reads that).
+if(!window.navigation)document.addEventListener('click',e=>{if(!e.target?.closest?.('a[href^="#"]'))return;clearTimeout(entryScrollTimer);try{history.replaceState({...(history.state||{}),scrollY:window.scrollY},'');}catch{}},true);
+// history.replaceState() from any page script clears that state, so keep the position again afterwards.
+window.navigation?.addEventListener('currententrychange',event=>{if(event.navigationType==='replace')keepEntryScroll();});
+window.navigation?.addEventListener('navigate',event=>{if(event.navigationType==='replace')return;keepEntryScroll();const key=historyKey();if(key)entryScroll.set(key,window.scrollY);routeTraversal=event.destination.sameDocument&&event.navigationType==='traverse';});
+// Hidden pages are set up the first time they open; idle time fills in their filters and method
+// text. The overview and the company cards render on first visit only. The Node test stub has no
+// requestIdleCallback or requestAnimationFrame, so there initialize() sets everything up at once,
+// in the original order.
+const PAGE_SETUP={};let directoryShown=false;
+function preparePage(view){const steps=PAGE_SETUP[view];while(steps?.length)steps.shift()();}
+function showDirectory(){if(!directoryShown)renderDirectory();}
+function normalSelfLinkActivation(event,link){
+ return Boolean(link&&!event.defaultPrevented&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&(event.button===undefined||event.button===0)&&!link.hasAttribute('download')&&(!link.getAttribute('target')||link.getAttribute('target')==='_self'));
+}
+function rememberCompanyOrigin(event){
+ if(event.defaultPrevented||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(event.button!==undefined&&event.button!==0))return;
+ const origin=event.target.closest?.('#company-cards a[href^="#company/"],#company-cards [data-open-company]');
+ if(!origin||(origin.tagName==='A'&&!normalSelfLinkActivation(event,origin)))return;
+ // The logo link is out of the tab order, so Back returns focus to the card's name link instead.
+ companyReturnFocus=origin.matches('.company-brand')?origin.closest('[data-company-card]')?.querySelector('h3 a')||origin:origin;
+}
+function companyReturnFocusTarget(){
+ const origin=companyReturnFocus;
+ if(!origin?.isConnected||origin.closest('[hidden]')||!origin.getClientRects().length){companyReturnFocus=null;return null;}
+ const box=origin.getBoundingClientRect();
+ if(box.bottom<=0||box.top>=window.innerHeight||box.right<=0||box.left>=window.innerWidth){companyReturnFocus=null;return null;}
+ return origin;
+}
+function focusRouteDestination(hash){
+ const anchorId=viewAnchorId(hash);if(anchorId){showViewAnchor($(anchorId));return;}
+ const parts=routeParts(hash),section=profileRouteSection(parts[2]),primary=['business','traction','people','work'].includes(section);
+ const companyOrigin=String(parts[0]||'').toLowerCase()==='companies'?companyReturnFocusTarget():null;
+ if(companyOrigin){companyOrigin.focus({preventScroll:true});return;}
+ const workLink=parts[0]==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():null;
+ if(workLink){workLink.focus({preventScroll:true});return;}
+ const destination=parts[0]==='company'&&isCompanyId(parts[1])?profileRouteDestination(section):null;
+ const target=destination?.tagName==='DETAILS'?destination.querySelector('summary'):destination||document.querySelector('.view:not([hidden]) h1');
+ for(let node=destination;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;
+ if(target&&target.tagName!=='SUMMARY')target.setAttribute('tabindex','-1');
+ target?.focus({preventScroll:true});
+ (destination&&primary?document.querySelector('.profile-tabs'):destination||target)?.scrollIntoView({block:'start',behavior:'instant'});
+}
+function repeatCompanyRoute(event){
+ if(event.defaultPrevented||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(event.button!==undefined&&event.button!==0))return;
+ const link=event.target.closest?.('a[href]'),hash=link?.getAttribute('href');
+ if(!hash?.startsWith('#company/')||hash!==location.hash||link.hasAttribute('download')||(link.getAttribute('target')&&link.getAttribute('target')!=='_self'))return;
+ if(link.hasAttribute('data-full-profile'))$('company-dialog').close();
+ event.preventDefault();route({type:'hashchange'});
+}
+function repeatMainRoute(event){
+ const link=event.target.closest?.('a[href]'),hash=link?.getAttribute('href');
+ const sameView=['#companies','#compare'].includes(hash)&&'#'+String(routeParts()[0]||'').toLowerCase()===hash;
+ if(!normalSelfLinkActivation(event,link)||(hash!==location.hash&&!sameView))return;
+ const anchorId=viewAnchorId(hash);if(anchorId){event.preventDefault();showViewAnchor($(anchorId));return;}
+ if(!['market','companies','compare','work','method'].includes(routeParts(hash)[0]))return;
+ event.preventDefault();
+ if(hash==='#companies')companyReturnFocus=null;
+ if(hash==='#work'&&typeof workReturnFocus!=='undefined')workReturnFocus=null;
+ const heading=document.querySelector('.view:not([hidden]) h1');
+ if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});heading.scrollIntoView({block:'start',behavior:'instant'});}
+}
+document.addEventListener('click',rememberCompanyOrigin);
+document.addEventListener('click',repeatCompanyRoute);
+document.addEventListener('click',repeatMainRoute);
+// Grouped profile citations can also appear in a quick summary. Close that
+// modal before the profile module opens its evidence dialog.
+document.addEventListener('click',event=>{if(event.target.closest?.('[data-profile-evidence]')&&$('company-dialog').open)$('company-dialog').close();});
+// Analytics stay off until index.html names a GoatCounter endpoint. No failure here reaches the app.
+const ANALYTICS_URL=(()=>{try{const url=document.querySelector('meta[name="sts-analytics"]')?.getAttribute('content')?.trim()||'';return /^https:\/\/[a-z0-9-]+\.goatcounter\.com\/count$/.test(url)?url:'';}catch{return '';}})();
+const analyticsQueue=[];let lastPageview='';
+function track(hit){if(!ANALYTICS_URL)return;try{if(typeof window.goatcounter?.count==='function')window.goatcounter.count(hit);else if(analyticsQueue.length<50)analyticsQueue.push(hit);}catch{}}
+function trackPageview(path){if(path===lastPageview)return;lastPageview=path;track({path,title:document.title});}
+if(ANALYTICS_URL)try{document.getElementById('analytics-note')?.removeAttribute('hidden');const script=document.createElement('script');script.async=true;script.src='https://gc.zgo.at/count.js';script.dataset.goatcounter=ANALYTICS_URL;script.dataset.goatcounterSettings='{"no_onload":true}';script.addEventListener('load',()=>analyticsQueue.splice(0).forEach(track));document.head.appendChild(script);}catch{}
+document.addEventListener('click',event=>{if(!ANALYTICS_URL)return;try{const el=event.target.closest?.('a,button'),card=el?.closest('.work-card');
+ if(!el)return;if(el.matches('a[href^="mailto:"][href*="ScienceToStartup%20lab"]'))track({path:'lab-inquiry',title:'Lab inquiry',event:true});
+ else if(el.matches('#venture a[href="#about"]'))track({path:'lab-cta',title:'Lab call to action',event:true});
+ else if(el.matches('#download-json,#download-csv,a[download]'))track({path:'download/'+({'download-json':'observatory-research.json','download-csv':'observatory-company-comparison.csv'}[el.id]||el.getAttribute('href')),title:'Dataset download',event:true});
+ else if(card&&/^https?:/i.test(el.getAttribute('href')||''))track({path:'work-route/'+(card.dataset.workRoute||card.dataset.workCompany),title:new URL(el.href).hostname,event:true});
+}catch{}});
+function route(event){document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=typeof kept==='number'?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeTraversal=false;const closingDialog=event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';if(parts[0]&&parts[0]!=='market'&&view==='market'&&!anchorId)history.replaceState(null,'','#market');if(view!=='company')preparePage(view);if(previousRoute&&view!==previousRoute)viewScroll[previousRoute]=window.scrollY;for(const name of ['market','companies','work','compare','method','profile'])$(name+'-view').hidden=(name!==(view==='company'?'profile':view));document.querySelectorAll('[data-nav]').forEach(a=>{if(a.dataset.nav===(view==='company'?'companies':view))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});if(view==='company'){if(isCompanyId(parts[1])){renderCompanyProfile(parts[1]);document.title=companies[parts[1]].name+' · ScienceToStartup';}else{document.title='Profile not found · ScienceToStartup';$('profile-view').innerHTML='<div class="page-heading"><h1>Profile not found</h1><p>No company in this guide uses that address.</p><a href="#companies">Browse the companies</a></div>';}}
+ else{document.title=VIEW_TITLES[view];if(view==='companies'){if(typeof syncDirectoryRoute==='function')syncDirectoryRoute(parts.slice(1));showDirectory();}if(view==='method')showDirectory();if(view==='work'&&!workViewRendered)renderWork();if(view==='compare')renderCompare();}
+ renderTray();const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const back=()=>window.scrollTo({left:0,top:restore,behavior:'instant'});back();queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}trackPageview(view==='market'&&!anchorId?'/':'/'+(view==='compare'?compareHash().slice(1):parts.filter(Boolean).join('/')));previousRoute=view;previousSection=anchorId;if(closingDialog){const hash=location.hash;requestAnimationFrame(()=>{if(location.hash!==hash)return;focusRouteDestination(hash);});}}
+function download(name,body,type){const url=URL.createObjectURL(new Blob([body],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function csvCell(v){let s=String(v??'');if(/^[\t\r\n]/.test(s)||/^\s*[=+@-]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';}
+// The CSV starts with a byte order mark, so spreadsheet software such as Excel reads it as UTF-8.
+function exportCsv(){const head=['company_id','company','business_model','delivery_evidence','assessment_scope','financial_metric','financial_value','financial_qualifier','financial_display','upper_value','observation_status','currency','metric_date','metric_period','metric_scope','scope_detail','accounting_basis','financial_source_urls','work_route','readout','snapshot_as_of'];const rows=filtered().map(c=>{const m=preferredFinancial(c.id);return[c.id,c.name,modelFor(c.id),stageLabel(stageFor(c.id)),assessmentFor(c.id)?.segment_scope||'',m?.kind||'',m?.value??'',m?.qualifier||'',m?metricValue(m):'',m?.upper_value??'',m?.observation_status||'',m?.currency||'',m?.as_of||'',m?.period_label||'',m?.segment_scope||'',m?.scope_detail||'',m?.gross_vs_net||'',m?claims[m.claim_id].source_ids.map(id=>sources[id].url).join(' | '):'',workType(c.id),publicText(editorialFor(c.id)?.readout||''),DATA.meta.as_of];});download('observatory-company-comparison.csv','﻿'+[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n')+'\r\n','text/csv;charset=utf-8');}
+
+// Editorial views of existing reviewed records; no research data is modified.
+const STORY_GROWTH=[
+ {id:'taskus',name:'TaskUs',scope:'AI Services',ids:['taskus.metric.expansion-3','taskus.metric.expansion-2'],color:'var(--green)'},
+ {id:'appen',name:'Appen',scope:'Whole company',ids:['appen.metric.major-financial_metrics-1','appen.metric.major-financial_metrics-2'],color:'var(--muted)'}
+];
+const STORY_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],STORY_NUMBER_WORDS=['No','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'];
+// Reader-facing dates: 2026-06 becomes Jun 2026 and 2026-10-12 becomes 12 Oct 2026.
+function storyDate(value){return String(value??'').replace(/\b(\d{4})-(\d{2})(?:-(\d{2}))?\b/g,(all,y,m,d)=>STORY_MONTHS[m-1]?`${d?Number(d)+' ':''}${STORY_MONTHS[m-1]} ${y}`:all);}
+// "on 15 Oct 2026", "on 16 and 17 Oct 2026" or "between 12 and 15 Oct 2026", from ISO dates.
+function storyDateRange(values){const dates=[...new Set(values.filter(Boolean))].sort(),first=dates[0],last=dates.at(-1);if(!first)return '';const a=storyDate(first),b=storyDate(last);if(first===last)return 'on '+b;const word=dates.length===2?'on':'between';return a.split(' ').slice(1).join(' ')===b.split(' ').slice(1).join(' ')?`${word} ${a.split(' ')[0]} and ${b}`:`${word} ${a} and ${b}`;}
+function shortPeriod(m){const corrected=metricCurrentPeriod(m);if(corrected)return corrected;const s=m.period_label||m.as_of;return /FY ended (\d{4})/.test(s)?'FY'+s.match(/FY ended (\d{4})/)[1]:storyDate(s);}
+// Paid work on the overview: counts, freshness and a safety line. It names no single listing.
+// The paid work listings follow the Paid work page: its contract and job buckets when they exist, otherwise its main group.
+// Cards keep their own availability labels, so the count does not call these listings open.
+function storyWorkRows(){const rows=typeof workRouteRows==='function'?workRouteRows():[];if(typeof w4Bucket==='function'){const paid=rows.filter(r=>['contract','jobs'].includes(w4Bucket(r)));if(paid.length)return paid;}return typeof w4RouteGroups==='function'?w4RouteGroups(rows).primary:[];}
+function renderStoryWork(){const rows=storyWorkRows(),box=$('overview-work');if(!box||!rows.length)return;const count=new Set(rows.map(r=>r.company_id)).size,paid=rows.filter(r=>r.numeric_pay).length,contract=rows.filter(r=>typeof w4Bucket==='function'?w4Bucket(r)==='contract':['Expert & contractor projects','Contributor bounties'].includes(r.group)).length,jobs=rows.filter(r=>typeof w4Bucket==='function'?w4Bucket(r)==='jobs':['Employment','Research fellowship'].includes(r.group)).length,range=storyDateRange(rows.map(r=>[r.reviewed_on,typeof w4Checked==='function'?w4Checked(r):null].filter(Boolean).sort().at(-1)));
+ $('hero-work-count').textContent=rows.length;$('hero-work-stat')?.removeAttribute('data-pending');
+ box.innerHTML=`<p class="overview-stats"><span><b>${rows.length}</b> paid work listings</span><span><b>${count}</b> companies</span><span><b>${paid}</b> show a pay amount</span></p><p>${contract+jobs===rows.length?`Of these, ${contract} are contract or task work and ${jobs} are jobs or fellowships. `:''}${range?`We reviewed every listing ${range}.`:''}</p><p class="overview-safety"><strong>Before you apply:</strong> never pay to get work, and be careful with job offers that come out of the blue from a stranger. <a href="https://consumer.ftc.gov/articles/job-scams" target="_blank" rel="noopener noreferrer">How to spot a job scam ${iconHTML('external')}<span class="sr-only"> (opens in a new tab)</span></a></p>`;
+}
+// How we check: grade mix, source mix and later corrections, all counted from the loaded data.
+function renderStoryCheck(){const box=$('overview-check');if(!box)return;const current=DATA.claims.filter(c=>c.status!=='superseded'),grades=['A','B','C','U'].map(g=>[g,current.filter(c=>c.confidence===g).length]),open=current.filter(c=>c.subject==='unknowns'&&c.confidence==='U').length,own=DATA.sources.filter(s=>s.source_type==='company').length,pages=new Set(DATA.sources.map(s=>s.url)).size,updates=window.SOURCE_UPDATES||{},fixes=[...(updates.updates||[]).map(u=>[u.company_id,u.source?.observed_on]),...(updates.evidence_context?.corrections||[]).map(u=>[u.company_id,u.reviewed_on])],when=storyDateRange(fixes.map(f=>f[1])),n=v=>v.toLocaleString('en-US');
+ box.innerHTML=`<div class="check-item"><h3>Confidence grades</h3><p><b>${n(current.length)}</b> current claims, by grade</p><div class="grade-bar" aria-hidden="true">${grades.map(([g,c])=>`<span data-grade="${g}" style="flex-grow:${c}"></span>`).join('')}</div><ul class="grade-counts">${grades.map(([g,c])=>`<li><span class="story-grade" data-grade="${g}"><span class="sr-only">Grade </span>${g}</span> ${n(c)}<span class="sr-only"> claims</span></li>`).join('')}</ul><p class="sub">U includes ${n(open)} open questions, such as figures a company has not disclosed. ${n(DATA.claims.length-current.length)} earlier versions stay on file.</p></div><div class="check-item"><h3>Sources</h3><p><b>${n(DATA.sources.length)}</b> source records point to <b>${n(pages)}</b> distinct web pages. <b>${n(own)}</b> of the records come from the companies themselves.</p><p><a href="#downloads">Download the data ${iconHTML('right')}</a></p></div><div class="check-item"><h3>Corrections</h3><p>${fixes.length?`<b>${n((updates.updates||[]).length)}</b> corrections from later sources${(updates.evidence_context?.corrections||[]).length?` and <b>${n(updates.evidence_context.corrections.length)}</b> clarifications of existing records`:''} ${when}, for <b>${n(new Set(fixes.map(f=>f[0])).size)}</b> companies. `:''}We review reported errors within seven days.</p><p><a href="#corrections">Request a correction ${iconHTML('right')}</a></p></div>`;
+}
+function renderStory(){$('organization-count').textContent=DATA.companies.length;$('group-count').textContent=Object.keys(MODEL_GROUPS).length;document.querySelectorAll('[data-company-count]').forEach(node=>{node.textContent=DATA.companies.length;});const nonprofit=(MODEL_GROUPS['Nonprofit research']||[]).length;$('nonprofit-count').textContent=STORY_NUMBER_WORDS[nonprofit]||nonprofit;$('hero-snapshot').textContent=compiledSnapshotLabel(DATA.meta.as_of);if(!DATA.companies.some(c=>Object.values(MODEL_GROUPS).flat().includes(c.id)))return;const mercor=preferredFinancial('mercor'),sentence=s=>s&&!/[.!?]$/.test(s)?s+'.':s;if(mercor)$('venture-mercor').textContent=[`The latest is ${metricValue(mercor)} for ${metricCurrentPeriod(mercor,storyDate(dateText(mercor.as_of)))}.`,sentence(metricCurrentAttribution(mercor,evidenceLabel(claims[mercor.claim_id]))),metricCurrentBasisDescription(mercor,'')].filter(Boolean).join(' ');if(window.BusinessHealth)window.BusinessHealth.render();renderModelMap();renderStoryWork();renderStoryCheck();}
+
+function compactMetricScope(m){
+ if(m.company_id==='imerit'&&m.scope_detail==='iMerit standalone acquired business')return 'iMerit standalone business';
+ return m.company_id==='taskus'?'AI Services':scopeText(m.segment_scope,m.company_id);
+}
+const SHORT_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+// Dates in running text read "17 May 2022" or "Jun 2026". Other text is left as it is.
+function readableDates(text){return String(text??'').replace(/\b((?:19|20)\d{2})-(0[1-9]|1[0-2])(?:-(0[1-9]|[12]\d|3[01]))?\b(?![-\d])/g,(all,year,month,day)=>(day?Number(day)+' ':'')+SHORT_MONTHS[month-1]+' '+year);}
+function monthSpan(dates){const months=[...new Set(dates.map(d=>String(d).slice(0,7)))].sort(),first=months[0],last=months.at(-1);return first===last?readableDates(first):first.slice(0,4)===last.slice(0,4)?SHORT_MONTHS[first.slice(5)-1]+'–'+SHORT_MONTHS[last.slice(5)-1]+' '+first.slice(0,4):readableDates(first)+' to '+readableDates(last);}
+function listText(names){return names.length<3?names.join(' and '):names.slice(0,-1).join(', ')+' and '+names.at(-1);}
+function compactSignal(id){return signalFor(id,preferredFinancial(id));}
+function signalFor(id,m,span=''){if(!m)return `<span class="unavailable">${companies[id].entity_type==='adjacent_research'?'Research organization':'Not disclosed'}</span>`;const kind={revenue:'Revenue',annualized_revenue_run_rate:'Annualized pace',arr:'Yearly recurring subscription revenue'}[m.kind]||metricLabels[m.kind];const rank=dateRank(m.as_of),year=rank==='0000'?null:Number(rank.slice(0,4)),historical=year&&year<Number(DATA.meta.as_of.slice(0,4))-1;return `${historical?`<span class="signal-history">Historical · ${year}</span>`:''}<div class="row-number ${historical?'is-historical':''}">${numberButton(m)}<span>${esc(kind)}${m.gross_vs_net==='gross'?' · '+esc(metricCurrentBasis(m,'gross')):''}</span></div><span class="row-period">${esc(readableDates(shortPeriod(m)))}${span?' · '+esc(span):''} · ${esc(m.currency||'')} · ${esc(compactMetricScope(m))}${m.gross_vs_net==='net'?' · net':m.gross_vs_net!=='gross'?' · gross or net not stated':''}</span>`;}
+function renderDirectory(){
+ companyReturnFocus=null;
+ const rows=filtered(),query=state.query.trim(),secondaryCount=[state.stage,state.financial,state.work,state.sort!=='name'].filter(Boolean).length;
+ const summary=document.querySelector('.more-filters>summary');if(summary)summary.textContent=secondaryCount?`More filters (${secondaryCount})`:'More filters';
+ $('download-csv').textContent=`Current company results · ${rows.length} ${rows.length===1?'row':'rows'} · CSV (a table format for spreadsheet software)`;$('reset').hidden=!(query||state.category||secondaryCount);$('company-cards').innerHTML=rows.map(card).join('');$('result-count').textContent=`Showing ${rows.length} of ${DATA.companies.length} companies`;$('empty-state').hidden=rows.length>0;
+ $('active-filters').innerHTML=[query&&`Search: ${query}`,state.category&&groupLabel(state.category),state.stage&&`Delivery evidence: ${stageLabel(state.stage)}`,state.financial&&'Revenue figures',state.work&&'Has paid work listings',state.sort==='name-desc'&&'Name Z–A'].filter(Boolean).map(x=>`<span class="active-filter">${esc(x)}</span>`).join('');syncSelection();
+}
+
+// Shared <select> option helper for page filters.
+function addOptions(id,rows){$(id).innerHTML+=[...rows].map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('');}
+
+// Company index: apply a #companies/<group-slug> route to the filters.
+// A new group shows the whole group; a bare #companies keeps the visitor's filters.
+// Either way the URL then names the selected group, so it can be shared.
+// An address that names no group (#companies/no-such-group) clears the filters, shows the full list and becomes #companies.
+function syncDirectoryRoute(rest){const slug=String(rest?.[0]||'').toLowerCase(),key=slug?Object.keys(MODEL_GROUPS).find(k=>groupSlug(k)===slug)||'':state.category,narrowed=state.query||state.stage||state.financial||state.work;if(key!==state.category||(slug&&!key&&narrowed)){Object.assign(state,{query:'',category:key,stage:'',financial:false,work:false});$('search').value='';$('category').value=key;$('stage').value='';$('financial-only').checked=false;$('work-only').checked=false;renderDirectory();viewScroll.companies=0;}writeDirectoryRoute();}
+function writeDirectoryRoute(){if(String(routeParts()[0]||'').toLowerCase()!=='companies')return;const hash='#companies'+(state.category?'/'+groupSlug(state.category):'');if(location.hash!==hash)history.replaceState(history.state,'',hash);document.title=(state.category?groupLabel(state.category)+' · ':'')+VIEW_TITLES.companies;}
+
+// Company index: filter options and controls.
+function initDirectory(){addOptions('category',Object.keys(MODEL_GROUPS).map(x=>[x,groupLabel(x)]));const presentStages=new Set(Object.keys(companies).map(id=>stageFor(id)));addOptions('stage',[...DATA.rubric.stages.map(s=>[s.id,stageLabel(s.id)]),['not_applicable','Research organizations'],['pending','Assessment pending']].filter(([id])=>presentStages.has(id)));const nonprofits=(MODEL_GROUPS['Nonprofit research']||[]).length;$('directory-nonprofits').textContent=nonprofits?` ${['One','Two','Three','Four','Five'][nonprofits-1]||nonprofits} of the ${DATA.companies.length} ${nonprofits===1?'is a nonprofit research group':'are nonprofit research groups'}.`:'';$('search').addEventListener('input',e=>{state.query=e.target.value;renderDirectory();});$('category').addEventListener('change',e=>{state.category=e.target.value;renderDirectory();writeDirectoryRoute();});$('stage').addEventListener('change',e=>{state.stage=e.target.value;renderDirectory();});$('sort').addEventListener('change',e=>{state.sort=e.target.value;renderDirectory();});$('financial-only').addEventListener('change',e=>{state.financial=e.target.checked;renderDirectory();});$('work-only').addEventListener('change',e=>{state.work=e.target.checked;renderDirectory();});$('reset').addEventListener('click',reset);}
+
+// Work page: filter options and controls. Typing redraws the list after a 180 ms pause, so each keystroke
+// paints at once on slow phones; input sent by the site search (not typed) redraws at once.
+function initWork(){state.workSort=state.workSort||'';const groups=new Set(DATA.companies.filter(c=>workClaims(c.id).length).flatMap(c=>workTerms(c.id).groups));addOptions('work-group',[...Object.keys(W4_TYPE_LABELS).filter(x=>groups.has(x)),...[...groups].filter(x=>!(x in W4_TYPE_LABELS)).sort()].map(x=>[x,W4_TYPE_LABELS[x]||x]));$('work-safety').innerHTML=workSafetyHTML(workRouteRows());$('work-search').addEventListener('input',e=>{state.workQuery=e.target.value;if(e.isTrusted)w4QueueRender();else renderWork();});for(const [id,key] of [['work-group','workGroup'],['work-pay','workPay'],['work-eligibility','workEligibility'],['work-sort','workSort']])$(id).addEventListener('change',e=>{state[key]=e.target.value;renderWork();});$('work-reset').addEventListener('click',()=>{resetWorkFilters();});}
+
+// Compare page: selection controls and the narrow-screen layout switch.
+function initCompare(){$('clear-compare').addEventListener('click',()=>{setSelection([]);$('compare-preset').value='';});$('compare-preset').addEventListener('change',event=>{if(!event.target.value){syncComparisonPreset();return;}state.mobileCompare=0;setSelection(event.target.value==='scale'?['taskus','appen','scale_ai']:['surge_ai','toloka','labelbox']);});
+ // Add a company: a pick with a pointer adds it at once. With the keyboard, arrow keys only
+ // browse the list; Enter or the Add button adds the company that is showing.
+ const add=$('compare-add'),addButton=$('compare-add-button');let picked=false;const addChosen=()=>{const id=add.value;if(!isCompanyId(id)||state.selected.includes(id))return;add.focus?.({preventScroll:true});state.mobileCompare=Math.max(0,comparePairOptions([...state.selected,id]).findIndex(pair=>pair.includes(state.selected.length)));chooseCompare(id,true);};
+ add.addEventListener('pointerdown',()=>{picked=true;});add.addEventListener('keydown',event=>{if(event.key!=='Enter'){picked=false;return;}if(add.value){event.preventDefault();addChosen();}});add.addEventListener('change',()=>{if(picked){picked=false;addChosen();}else addButton.hidden=!add.value;});addButton.addEventListener('click',addChosen);
+ document.addEventListener('click',event=>{const button=event.target.closest?.('[data-copy-compare]');if(button)copyCompareLink(button);});
+ let compareNarrow=window.innerWidth<=700;window.addEventListener('resize',()=>{const next=window.innerWidth<=700;if(next!==compareNarrow){compareNarrow=next;resizeComparison();}comparisonScrollRegion();});}
+
+// Method page: evidence labels, research coverage and downloads.
+function initMethod(){
+ document.querySelectorAll('.download-list>li').forEach(item=>item.insertAdjacentHTML('afterbegin',iconHTML('download')));
+ // Every count is computed from the data. Hand-written copy is inserted as is; data strings go through esc().
+ const count=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,','),plural=(n,one,many)=>`${count(n)} ${n===1?one:many}`,numberWord=n=>['No','One','Two','Three','Four','Five','Six','Seven','Eight','Nine'][n]||count(n);
+ const grades={},levels={},research=DATA.companies.filter(c=>c.entity_type==='adjacent_research').length,dims=DATA.rubric.dimensions;let current=0,open=0;
+ for(const c of DATA.claims){if(c.status==='superseded')continue;current++;grades[c.confidence]=(grades[c.confidence]||0)+1;if(c.status==='unverified'||c.status==='contested')open++;}for(const c of DATA.companies){const s=stageFor(c.id);levels[s]=(levels[s]||0)+1;}
+ document.querySelectorAll('.grade-list>div').forEach(row=>row.insertAdjacentHTML('beforeend',`<dd class="grade-count">${plural(grades[row.querySelector('dt')?.textContent.trim()]||0,'claim','claims')}</dd>`));
+ $('grade-note').textContent=`Counts cover all ${count(current)} current claims. Tap or click a figure on a company page or in Compare to see its sources and grade.`;
+ const meanings={established_commercial_evidence:'A buyer, a filing or another independent record confirms a named project, and sales have lasted at least two years. The offer and how it is delivered are documented.',repeatable_commercial_evidence:'A named customer project, plus signs of repeat business such as a renewal. The offer and how it is delivered are documented.',demonstrated_delivery:'A documented offer and at least one named customer project, described in detail.',visible_operating_offer:'A clear current offer, run by a named team with a documented delivery process.',insufficient_public_evidence:'The public evidence we reviewed does not reach a higher level.'};
+ const areas={P:'product (an offer someone can buy or use)',C:'customer evidence (signs that buyers use the offer)',R:'commercial continuity (sales that repeat over time)',O:'operating readiness (the team and process that deliver the work)'};
+ $('rubric-content').innerHTML=`<dl class="level-list">${DATA.rubric.stages.map(s=>`<div><dt>${esc(stageLabel(s.id))}</dt><dd>${meanings[s.id]||esc(s.definition)}</dd><dd class="level-count">${plural(levels[s.id]||0,'company','companies')}</dd></div>`).join('')}</dl><details class="rubric-exact-rules"><summary>Exact assessment rules</summary><p>${dims.map(d=>`${esc(d.id)}: ${areas[d.id]||esc(d.label)}.`).join(' ')}</p><table class="rubric-table"><caption>Lowest level needed in each area</caption><thead><tr><th scope="col">Level</th>${dims.map(d=>`<th scope="col"><span aria-hidden="true">${esc(d.id)}</span><span class="sr-only">${esc(d.label)}</span></th>`).join('')}</tr></thead><tbody>${DATA.rubric.stages.map(s=>`<tr><th scope="row">${esc(stageLabel(s.id))}</th>${Object.keys(s.minimums).length?dims.map(d=>s.minimums[d.id]?`<td>${esc(s.minimums[d.id])}</td>`:'<td class="rubric-any">Any</td>').join(''):`<td colspan="${dims.length}" class="rubric-any">No rule above is met</td>`}</tr>`).join('')}</tbody></table>${dims.map(d=>`<details><summary>${esc(d.id)} · ${esc(d.label)}</summary>${Object.entries(d.levels).map(([n,desc])=>`<p>Level ${esc(n)}: ${esc(desc)}</p>`).join('')}</details>`).join('')}</details><p>Each company gets the highest level its evidence supports. Missing evidence stays marked as unknown, and funding or valuation never counts.${research?` The ${numberWord(research).toLowerCase()} nonprofit research ${research===1?'group gets no level and shows':'groups get no level and show'} ${esc(stageLabel('not_applicable'))} instead.`:''}</p><p class="method-note">Levels reflect public proof only. They are not guarantees or judgments of honesty. Private companies publish less, so their level can understate them. Proof about a whole company does not prove the same for its AI data work.</p>`;
+ $('coverage-notes').innerHTML=`<ul class="coverage-stats"><li><strong>${count(DATA.companies.length)}</strong> companies profiled.${research?` ${numberWord(research)} ${research===1?'is a nonprofit research group':'are nonprofit research groups'}.`:''}</li><li><strong>${count(DATA.sources.length)}</strong> source records, pointing to ${count(new Set(DATA.sources.map(s=>s.url)).size)} distinct web pages.</li><li><strong>${count(current)}</strong> current claims. ${count(DATA.claims.length-current)} earlier versions stay on file.</li><li><strong>${count(open)}</strong> claims are unverified or disputed. Each one is labeled.</li></ul><p>We chose these companies, so the guide does not cover the whole market. On 14 Oct 2026 we rechecked what each company offers. Older claims keep their original dates and grades, and we have not rechecked every older source.</p>`;
+ const [year,month,day]=String(DATA.meta.as_of).split('-').map(Number);$('download-version').textContent=`Dataset v${DATA.dataset_version} · research compiled ${day} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][month-1]} ${year}`;
+ $('download-json').addEventListener('click',()=>download('observatory-research.json',JSON.stringify(DATA,null,2)+'\n','application/json'));$('download-csv').addEventListener('click',exportCsv);
+}
+
+function initialize(){$('snapshot').textContent=compiledSnapshotLabel(DATA.meta.as_of);$('footer-version').textContent=`Dataset v${DATA.dataset_version}`;
+ const renderCards=renderDirectory;renderDirectory=function(){directoryShown=true;return renderCards.apply(this,arguments);};
+ Object.assign(PAGE_SETUP,{companies:[initDirectory],method:[initMethod],work:[initWork],market:[renderStory]});
+ const later=typeof requestIdleCallback==='function'?task=>requestIdleCallback(task,{timeout:1000}):typeof requestAnimationFrame==='function'?task=>setTimeout(task,50):null;
+ if(!later){for(const view of ['companies','method','work'])preparePage(view);renderDirectory();preparePage('market');}
+ route();initCompare();if(typeof initSiteNav==='function')initSiteNav();
+ $('close-company').addEventListener('click',()=>$('company-dialog').close());$('close-evidence').addEventListener('click',()=>$('evidence-dialog').close());
+ document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||$('clear-compare');next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.dataset.preset){state.mobileCompare=0;setSelection(b.dataset.preset==='scale'?['taskus','appen','scale_ai']:['surge_ai','toloka','labelbox']);}if(b.dataset.mobileCompare!==undefined){state.mobileCompare=Math.min(Number(b.dataset.mobileCompare),Math.max(0,comparePairOptions(state.selected.length?state.selected:['taskus','appen','scale_ai']).length-1));renderCompare();document.querySelector('.mobile-column-options summary')?.focus();}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});window.addEventListener('hashchange',route);
+ // On small screens the Filters fields open as a panel under the button. A short screen can leave the whole panel
+ // below the fold, so bring it into view when it opens. toggle does not bubble, so listen in the capture phase.
+ document.addEventListener('toggle',e=>{const panel=e.target;if(!panel?.open||!panel.matches?.('.responsive-filter-panel,.more-filters'))return;const fields=panel.querySelector('.responsive-filter-fields,.more-filters-panel'),box=fields?.getBoundingClientRect();if(box?.height&&box.bottom>window.innerHeight)fields.scrollIntoView({block:'nearest'});},true);
+ if(later)for(const view of ['companies','work','method'])later(()=>preparePage(view));
+}
+
+// Native disclosures used as overlays retain predictable dismissal and focus.
+// A press of the mouse or a tap moves focus before its click lands. Collapsing the panel then
+// would shift the page under the pointer and lose the click, so pointer presses leave closing
+// to the outside-click listener; Tab and Escape still close the panel.
+const OVERLAY_DETAILS='.responsive-filter-panel,.more-filters,.mobile-column-options';
+let overlayPointerFocus=false;
+function dismissDisclosure(panel,restoreFocus){
+ if(!panel?.open)return;
+ panel.open=false;
+ const target=restoreFocus?panel.querySelector('summary'):document.activeElement;
+ if(restoreFocus)target?.focus({preventScroll:true});
+ if(!target||target===document.body||!target.getClientRects().length||target.closest('dialog'))return;
+ const header=document.querySelector('.topbar');
+ if(header?.contains(target))return;
+ const box=target.getBoundingClientRect(),top=(header?.getBoundingClientRect().bottom||0)+8,bottom=window.innerHeight-8;
+ if(box.top<top)window.scrollBy({top:box.top-top,behavior:'instant'});
+ else if(box.bottom>bottom)window.scrollBy({top:box.bottom-bottom,behavior:'instant'});
+}
+document.addEventListener('keydown',event=>{overlayPointerFocus=false;if(event.key!=='Escape')return;const panel=event.target.closest?.(OVERLAY_DETAILS);if(panel?.open&&panel.querySelector('summary')?.getClientRects().length){event.preventDefault();dismissDisclosure(panel,true);}});
+document.addEventListener('pointerdown',()=>{overlayPointerFocus=true;},true);
+document.addEventListener('click',event=>{document.querySelectorAll(OVERLAY_DETAILS).forEach(panel=>{if(panel.open&&!panel.contains(event.target)&&panel.querySelector('summary')?.getClientRects().length)dismissDisclosure(panel,panel.contains(document.activeElement));});});
+document.addEventListener('focusin',event=>{if(overlayPointerFocus)return;document.querySelectorAll(OVERLAY_DETAILS).forEach(panel=>{if(panel.open&&!panel.contains(event.target)&&panel.querySelector('summary')?.getClientRects().length)dismissDisclosure(panel,false);});});
+
+// Page titles for each main view.
+const VIEW_TITLES={market:'ScienceToStartup · The AI data field guide',companies:'Companies · ScienceToStartup',compare:'Compare · ScienceToStartup',work:'Paid work · ScienceToStartup',method:'Method · ScienceToStartup'};
+
+/* Editorial presentation layer. Canonical claims and measures remain inspectable. */
+const attr=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const entryFor=id=>window.EDITORIAL.entries.find(e=>e.company_id===id);
+const logoFor=id=>(window.LOGOS?.logos||[]).find(l=>l.company_id===id&&l.local_path);
+const GROUP_LABELS={
+  'Expert data & evaluation':'Expert data & AI testing',
+  'Managed AI & data services':'AI & data services',
+  'Frontier data & RL environments':'AI training data & practice environments',
+  'AI software & analytics':'AI software & analysis',
+  'AI evaluation & safety':'AI testing & safety',
+  'Compute & model research':'Computing & AI model research'
+};
+function groupLabel(name){return GROUP_LABELS[name]||name;}
+// Stable URL slug for a business group key, shared by #companies/<slug> and /companies/#<slug>.
+function groupSlug(name){return String(name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+// Every logo sits in a tile. Without an image the tile shows initials. Pass decorative=true
+// where the company name is printed next to the logo, so screen readers hear the name once.
+function logoInitials(id){return String(companies[id]?.name||id).split(/[\s/]+/).filter(word=>/^[\p{L}\p{N}]/u.test(word)).slice(0,2).map(word=>[...word][0]).join('').toUpperCase();}
+function logoHTML(id,extra='',decorative=false) { const a=logoFor(id);return a?`<span class="brand-asset ${extra} ${a.background==='dark'?'brand-dark':''}"><img src="${attr(a.local_path)}" alt="${decorative?'':esc(companies[id]?.name||id)+' logo'}" data-initials="${attr(logoInitials(id))}" loading="lazy" decoding="async"></span>`:`<span class="brand-asset brand-text ${extra}" aria-hidden="true">${esc(logoInitials(id))}</span>`; }
+function card(c){const e=entryFor(c.id),financial=preferredFinancial(c.id),product=typeof profileProducts==='function'?profileProducts(c.id)[0]:null;return `<article class="company-card" data-company-card="${esc(c.id)}"><a class="company-brand" href="#company/${esc(c.id)}" tabindex="-1" aria-hidden="true">${logoHTML(c.id)}</a><div class="company-card-content"><span class="category-label sr-only">${esc(groupLabel(modelGroup(c.id)))}</span><h3><a href="#company/${esc(c.id)}">${esc(c.name)}</a></h3><p class="company-description">${esc(modelFor(c.id))}</p><div class="capability-tags sr-only">${(e?.capability_tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div></div><div class="company-signal">${financial?compactSignal(c.id):product?`<span class="signal-label">${companies[c.id].entity_type==='adjacent_research'?'Research':'Offering'}</span><p class="product-distinction">${esc(publicOfferingName(product.name))} ${typeof productSourceHTML==='function'?productSourceHTML(product):profileReferences(product.claim_ids,'Source')}</p>${product.status?`<p class="sub offering-status">${esc(title(product.status))}</p>`:''}`:'<span class="signal-label">See the research</span>'}</div><div class="company-card-footer">${compareCheck(c.id)}<button class="text-link" data-open-company="${esc(c.id)}" aria-label="Quick summary of ${esc(c.name)}">Quick summary</button></div></article>`;}
+
+// Overview business groups: each row links to the company list filtered to that group (#companies/<slug>).
+function renderModelMap(){const captions={'Expert data & evaluation':'Experts create examples and test AI','Managed AI & data services':'Teams prepare data and run AI projects','Frontier data & RL environments':'Tasks and simulations that help AI learn','AI software & analytics':'Tools for building and measuring AI','AI evaluation & safety':'Tests for reliability and security','Compute & model research':'Computing resources and research on AI models','Nonprofit research':'Public research and shared tests'},list=names=>names.length>2?names.slice(0,-1).join(', ')+' and '+names.at(-1):names.join(' and ');$('model-map').innerHTML=Object.entries(MODEL_GROUPS).map(([name,ids])=>{const names=ids.map(id=>companies[id]?.name).filter(Boolean).sort((a,b)=>a.localeCompare(b,'en',{sensitivity:'base'})),rest=names.length-3;return `<a class="category-card" href="#companies/${attr(groupSlug(name))}" data-category-jump="${attr(name)}"><span class="category-name">${esc(groupLabel(name))}</span><span class="category-description">${esc(captions[name])}</span><span class="category-members">${esc(rest>0?names.slice(0,3).join(', ')+' and '+rest+' more':list(names))}</span><span class="category-count">${ids.length}<small>${ids.length===1?'company':'companies'}</small></span>${iconHTML('right')}</a>`;}).join('');}
+
+const originalRenderStory=renderStory;
+renderStory=function(){originalRenderStory();$('source-count').textContent=DATA.sources.length;$('hero-logo-grid').innerHTML=['scale_ai','mercor','surge_ai','snorkel_ai','labelbox','prime_intellect'].filter(id=>companies[id]).map(id=>`<a href="#company/${attr(id)}">${logoHTML(id,'',true)}<span class="hero-logo-name">${esc(companies[id].name)}</span></a>`).join('');};
+
+const originalRenderCompare=renderCompare;
+renderCompare=function(){originalRenderCompare();document.querySelectorAll('.comparison-table thead th:not(:first-child)').forEach((th,i)=>{const id=compareIds()[i];if(id)th.insertAdjacentHTML('afterbegin',logoHTML(id,'compare-logo',true));});};
+
+// Profiles render in profiles-v2.js (profileHTML).
+
+const originalOpenCompanyStory=openCompanyStory;
+openCompanyStory=function(id){originalOpenCompanyStory(id);$('company-story').insertAdjacentHTML('afterbegin',logoHTML(id,'dialog-logo',true));const e=entryFor(id);$('company-story').insertAdjacentHTML('beforeend',`<div class="capability-tags">${(e?.capability_tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div>`);};
+
+document.addEventListener('click',e=>{
+ const b=e.target.closest?.('[data-category-jump]'),category=b?.dataset.categoryJump;
+ if(!category||!Object.hasOwn(MODEL_GROUPS,category))return;
+ // A modified click opens the group link in a new tab; that page reads the group from its URL.
+ if(b.tagName==='A'&&(e.defaultPrevented||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||(e.button!==undefined&&e.button!==0)))return;
+ // Overview groups show the complete group, independent of earlier searches. Set up the list first,
+ // so the group field has its options before it is set.
+ preparePage('companies');
+ Object.assign(state,{query:'',category,stage:'',financial:false,work:false});
+ $('search').value='';$('category').value=category;$('stage').value='';
+ $('financial-only').checked=false;$('work-only').checked=false;
+ renderDirectory();viewScroll.companies=0;
+ // Links follow their own #companies/<slug> href; any older button form still jumps to the list.
+ if(b.tagName!=='A'){location.hash='#companies';window.scrollTo(0,0);}
+});
+
+// Route first, then focus the newly visible heading for hash navigation only.
+// initialize() registers this wrapper and calls it without an event on first load.
+// In-page anchors such as #about keep the focus that route() gave their element.
+const originalRoute=route;
+route=function(event){
+  const returningToWork=event?.type==='hashchange'&&location.hash.slice(1).split('/')[0]==='work'&&previousRoute==='company';
+  const returningToCompanies=event?.type==='hashchange'&&location.hash.slice(1).split('/')[0].toLowerCase()==='companies'&&previousRoute==='company';
+  const result=originalRoute.apply(this,arguments);
+  if(event?.type==='hashchange'&&location.hash!=='#main'&&!viewAnchorId()){
+    const workLink=returningToWork&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():null;
+    const companyOrigin=returningToCompanies?companyReturnFocusTarget():null;
+    if(companyOrigin)companyOrigin.focus({preventScroll:true});
+    else if(workLink)workLink.focus({preventScroll:true});
+    else{
+      const heading=document.querySelector('.view:not([hidden]) h1');
+      if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}
+    }
+  }
+  return result;
+};
+
+document.addEventListener('error',e=>{if(e.target.matches?.('.brand-asset img')){const img=e.target,tile=img.parentElement,label=img.alt;tile.textContent=img.dataset.initials||label.replace(/ logo$/,'');tile.classList.add('brand-text');if(label){tile.setAttribute('role','img');tile.setAttribute('aria-label',label);}else tile.setAttribute('aria-hidden','true');}},true);
+
+const PRODUCT_MEDIA_DIMENSIONS={labelbox:[1200,627],imerit:[1024,576],sama:[2180,1117]};
+function productMediaHTML(id){const e=entryFor(id),m=e?.product_media,dimensions=PRODUCT_MEDIA_DIMENSIONS[id];return m?`<figure class="product-media"><img src="${attr(m.local_path)}" alt="${attr(m.title)}"${dimensions?` width="${dimensions[0]}" height="${dimensions[1]}"`:''} loading="lazy" decoding="async"><figcaption>${esc(m.caption)} ${external(m.source_page,'Source')}</figcaption></figure>`:'';}
+
+function publicOfferingName(name){return String(name).replace(/\bRL\b/g,'AI practice').replace(/\bSFT\b/g,'training from examples');}
+
+/* Paid work data helpers: listing rows, dates, the archive statuses and the filter. Loaded after app.js
+   declarations and before work-v4.js, which draws the page. */
+function workRouteBundle(){
+  return typeof WORK_ROUTES !== 'undefined' ? WORK_ROUTES : (typeof window !== 'undefined' ? window.WORK_ROUTES : null);
+}
+function workRouteRows(){
+  const bundle=workRouteBundle();
+  return Array.isArray(bundle)?bundle:(bundle?.routes||[]);
+}
+function workRoutesFor(id){return workRouteRows().filter(r=>r.company_id===id);}
+// Attribute identifiers must not pass through the prose-normalizing esc().
+function workRouteAttr(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+// One formatter for every work date: building a new one per label made the first #work render slow.
+const WORK_DAY_FORMAT=new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}),WORK_MONTH_FORMAT=new Intl.DateTimeFormat('en-GB',{month:'short',year:'numeric',timeZone:'UTC'});
+function workDayLabel(value){return WORK_DAY_FORMAT.format(new Date(value+'T12:00:00Z')).replace('Sept','Sep');}
+function workMonthLabel(value){return WORK_MONTH_FORMAT.format(new Date(value+'-15T12:00:00Z')).replace('Sept','Sep');}
+const WORK_ROUTE_ARCHIVE=new Set(['historical','closed','contributions','paused','no_route','inquiry','information']);
+const WORK_ROUTE_ORDER={listed:0,pay_conflict:2,program:3,intake_unverified:4,careers:5,unverified:6,closed:7,historical:8,paused:9,contributions:10,inquiry:10,information:10,no_route:11};
+
+// Keep the original filter option values and the profile API, using explicit
+// route data rather than extracting rates from a company's combined prose.
+function workTerms(id){
+  const rows=workRoutesFor(id),cs=workClaims(id);
+  return {cs,groups:[...new Set(rows.map(r=>r.group))],
+    pay:rows.filter(r=>r.numeric_pay).map(r=>({text:r.role+': '+r.pay_label,claim_id:r.claim_ids[0]})),
+    eligibility:rows.length===1?rows[0].eligibility:'Check project / unverified',
+    requirements:rows.flatMap(r=>(r.requirements||[]).map(text=>({text,claim_id:r.claim_ids[0]})))};
+}
+// Search, pay and place helpers (w4QueryMatcher, w4PayMatches, w4WhereMatches) live in work-v4.js.
+// A whole-phrase match wins; otherwise every word must match, with worker synonyms.
+function filteredWork(){
+  const matcher=w4QueryMatcher(state.workQuery);
+  let rows=workRouteRows().filter(route=>(!state.workGroup||w4GroupMatches(route,state.workGroup))&&w4PayMatches(route,state.workPay)&&w4WhereMatches(route,state.workEligibility));
+  if(matcher){const text=new Map(rows.map(route=>[route,w4SearchText(route)])),phrase=rows.filter(route=>matcher.phrase(text.get(route)));rows=phrase.length?phrase:rows.filter(route=>matcher.all(text.get(route)));}
+  return rows.sort((a,b)=>(WORK_ROUTE_ORDER[a.status]??10)-(WORK_ROUTE_ORDER[b.status]??10)||Number(b.numeric_pay)-Number(a.numeric_pay)||companies[a.company_id].name.localeCompare(companies[b.company_id].name)||a.role.localeCompare(b.role));
+}
+// The page renderers (workCard, renderWork, workSummary) live in work-v4.js, which loads after this file.
+/* Compact role presentation. Load after work-v3.js and before initialize().
+   This module reads WORK_ROUTES; it does not change research or filter state. */
+function w4Escape(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function w4Text(value){return String(value??'').replace(/\s+/g,' ').trim();}
+function w4Date(value){
+  if(!value||value==='undated')return 'Undated';
+  return /^\d{4}-\d{2}-\d{2}$/.test(value)?workDayLabel(value):/^\d{4}-\d{2}$/.test(value)?workMonthLabel(value):value;
+}
+function w4SourcePublicationDate(source){
+  const recorded=[source.published_on,source.source_publication_date,source.published_at].find(value=>value&&value!=='undated');
+  return recorded||(typeof sources!=='undefined'?sources[source.id]?.published_on:null);
+}
+function w4Checked(route){return [route.availability_checked_on,route.last_route_check?.date].filter(Boolean).sort().at(-1)||null;}
+function w4CheckedLabel(route){const checked=w4Checked(route);return checked?w4Date(checked):'Not rechecked';}
+// One date per listing: the latest link check, or the research review when the link was never rechecked.
+function w4FreshnessLabel(route){const checked=w4Checked(route);return checked?`Checked ${w4Date(checked)}`:`${route.reviewed_on?`Reviewed ${w4Date(route.reviewed_on)} · `:''}Link not rechecked`;}
+function w4Uncertain(route){
+  if(['unverified','intake_unverified','pay_conflict'].includes(route.status))return true;
+  const check=[route.last_route_check?.result,route.last_route_check?.note].filter(Boolean).join(' ');
+  return route.research_record?.route?.live_application_verified===false||/HTTP 403|blocked.fetch|JavaScript.only|requires JavaScript|JavaScript shell|not verified open|could not be loaded/i.test(check);
+}
+function w4Status(route){
+  if(route.status==='program'&&/waitlist/i.test(route.availability_note||''))return 'Waitlist may apply';
+  const labels={intake_unverified:'Availability unconfirmed',unverified:'Availability unconfirmed',pay_conflict:'Pay conflict',historical:'Historical',closed:'Closed',paused:'Training paused',contributions:'Research contribution',no_route:'No confirmed paid listing',inquiry:'Inquiry only',information:'Information only'};
+  if(route.status==='historical'&&['official_role_not_found_redirect','official_role_not_found'].includes(route.last_route_check?.result))return 'Historical · listing unavailable';
+  return labels[route.status]||(w4Uncertain(route)?'Availability unconfirmed':'');
+}
+function w4SplitPay(route){
+  if(route.pay_basis!=='salary_period_unspecified')return null;
+  return w4Text(route.pay_label).match(/^(\$[\d,.]+K?\s*[–-]\s*\$[\d,.]+K?) salary band \+ equity;\s*(\$[\d,.]+K?\s*[–-]\s*\$[\d,.]+K?) separate bonus band$/i);
+}
+function w4Pay(route){
+  if(route.status==='pay_conflict'||route.pay_basis==='conflicting_hourly')return 'Rate conflict';
+  if(!route.pay_label||route.pay_label==='Not published')return 'Pay not listed';
+  const split=w4SplitPay(route);
+  if(split)return `${split[1]} salary band`;
+  const concise={'Paid route not established':'Pay unconfirmed','Paid opening unconfirmed':'Pay unconfirmed','Compensation not promised':'Pay not promised','No published offer':'Pay not listed','Hourly; rate not published':'Hourly · rate unlisted'};
+  return concise[route.pay_label]||route.pay_label;
+}
+function w4PayNote(route){
+  const split=w4SplitPay(route);
+  if(split)return `Equity offered. Separate bonus band: ${split[2]}.`;
+  if(route.pay_observations?.length)return route.pay_observations.map(p=>`${p.value.replace(/\/hour\b/g,'/h')} ${p.label.toLowerCase().replace(/^listing /,'')}`).join(' · ');
+  const labels={per_completed_task:'Paid per completed task',hour_equivalent:'Hourly equivalent',approved_deliverables:'Approved deliverables · advertised range',hour_or_accepted_task:'Hourly or accepted tasks; rejected tasks may be unpaid',month_stipend:'Monthly stipend',approved_recording:'Payment requires approval',approved_submission:'Payment requires approval',accepted_project:'Payment requires acceptance',accepted_task:'Payment requires acceptance'};
+  return labels[route.pay_basis]||'';
+}
+function w4PayQualification(route){
+  if(route.pay_basis==='advertised_maximum_hourly')return 'Rates vary by expertise, assessment, location and project. Non-core work can pay less.';
+  if(!route.pay_basis?.endsWith('salary_period_unspecified'))return '';
+  return 'Pay period not stated.'+(/Bonus eligibility and payout terms are undisclosed/i.test(route.availability_note||'')?' Bonus terms not stated.':'');
+}
+function w4Hours(route){
+  const hours=w4Text(route.hours),duration=w4Text(route.duration);
+  let commitment='';
+  if(hours){
+    // Keep estimated, minimum and demand-dependent qualifiers with the number.
+    if(/\d.*(?:hours?\/week|hours? per week)/i.test(hours))commitment=hours.replace(/hours?\/week/gi,'h/week').replace(/hours? per week/gi,'h/week');
+    else if(/^(?:full[- ]time|full- or part-time|part-time to full-time)/i.test(hours))commitment=hours.split(';')[0];
+    else if(/^flexible/i.test(hours))commitment='Flexible schedule';
+    else if(/^remote, part-time/i.test(hours))commitment='Part-time · flexible';
+    else if(/^opt-in studies/i.test(hours))commitment='Opt-in studies';
+  }
+  if(commitment&&/no guaranteed volume/i.test(hours)&&!/no guaranteed volume/i.test(commitment))commitment+=' · No guaranteed volume';
+  const hoursDetail=w4Text(route.research_record?.route?.hours?.detail);
+  if(commitment&&hoursDetail&&!commitment.toLowerCase().includes(hoursDetail.toLowerCase()))commitment+=` · ${hoursDetail}`;
+  if(duration&&duration.length<=72){
+    if(!commitment)return duration;
+    if(commitment.toLowerCase().includes(duration.toLowerCase()))return commitment;
+    if(duration.toLowerCase().includes(commitment.toLowerCase()))return duration;
+    return `${commitment} · ${duration}`;
+  }
+  return commitment;
+}
+function w4ScheduleNote(route){
+  const note=w4Text(route.availability_note);
+  if(route.id==='afterquery.work.research-fellow'&&/^full-time$/i.test(w4Text(route.hours))&&/20\+ hours\/week and in-person preferred/i.test(note))return 'Schedule conflict: full-time on-site required. Another line lists 20+ h/week and says in-person work is preferred.';
+  if(route.id==='afterquery.work.technical-content-writer-contract'&&/Header employment type says full-time; role body specifies a part-time contract/i.test(note))return 'Schedule conflict: header says full-time; role body specifies a part-time contract.';
+  return '';
+}
+function w4Location(route){
+  const value=w4Text(route.geography);
+  const aliases={
+    'Project-specific':'Location set per project','Role-specific':'Location set per role','Location not published':'Location not listed',
+    'Remote · eligibility unverified':'Remote · country rules not confirmed','At home · eligibility unverified':'At home · country rules not confirmed',
+    'Remote · project-specific':'Remote · country rules vary by project','Remote · restricted by project':'Remote · country rules vary by project',
+    'Remote · eligibility varies':'Remote · country rules vary','Remote · country varies':'Remote · country rules vary',
+    'Global community advertised; specific geographic eligibility not exhaustively verified':'Global network · country rules vary',
+    'Supported countries · US residents included':'Supported countries, including US',
+    'Japan-focused · US eligibility unverified':'Japan-focused · US eligibility not confirmed',
+    'Palo Alto · on-site / hybrid wording':'Palo Alto · on-site or hybrid',
+    'Remote US listing':'Remote US'
+  };
+  return aliases[value]||value||'Location not listed';
+}
+
+// Concise, source-backed previews for dense requirement strings. Each preview
+// is conditional on the current route text so future data corrections can
+// remove it. Unmatched routes use short original clauses, never title inference.
+function w4Requirements(route){
+  if(route.id==='ooak.work.data-quality-specialist'&&/conflict/i.test((route.requirements||[]).join(' ')))return ['Experience conflict: 6+ years in header; 4+ in body','Python/SQL, data quality and fluent English'];
+  if(route.id==='scale_ai.work.outlier-statistics'&&/Degree conflict/i.test((route.requirements||[]).join(' ')))return ["Degree conflict: master's badge; doctorate in ideal qualifications",'Authorization to work in the country of residence'];
+  const originals=(route.requirements||[]).map(w4Text).filter(Boolean),text=originals.join(' ');
+  if(!text)return [];
+  const age=text.match(/\b(?:aged?\s*)?18\+|\bover\s+18\b|\bat\s+least\s+18\b/i)?.[0];
+  const preserveAge=rows=>age&&!rows.some(row=>/\b18(?:\+|\b)/.test(row))?(rows.length?[age+' · '+rows[0],...rows.slice(1)]:[age]):rows;
+  const tailored={
+    'g2i.work.senior-swe-training':[
+      [/Senior\/staff\/principal.*TypeScript\/JavaScript or Python/i,'Senior engineering · JS/TS or Python'],
+      [/take-home evaluation.*recorded walkthrough/i,'Take-home evaluation + recorded walkthrough']],
+    'elorian.work.model-safety':[
+      [/LLM safety.*red.team.*data.annotation/i,'Language-model safety, attack testing or safety data labeling'],
+      [/harm taxonomies and clear writing/i,'Harm categories + clear writing']],
+    'toloka.work.cad-simulation':[
+      [/5\+ years/i,'5+ years’ experience'],[/own professional CAD license/i,'Own professional CAD license']],
+    'appen.work.sage-media':[
+      [/US residence/i,'US residence'],[/MacBook Pro/i,'MacBook Pro']],
+    'terac.work.ml-scenarios':[
+      [/ML\/research and simulation or reinforcement.learning/i,'AI research + simulation or RL (training AI through rewards for completing tasks) experience'],
+      [/No H1-B or STEM OPT support/i,'H1-B / STEM OPT unsupported']],
+    'terac.work.rl-environment-creation':[
+      [/Experienced domain professionals/i,'Professional domain experience'],
+      [/H1-B and STEM OPT unsupported/i,'H1-B / STEM OPT unsupported']],
+    'terac.work.ai-evaluator-shopping-assistant':[
+      [/AI evaluation, QA or data training experience plus ecommerce familiarity/i,'AI evaluation, QA or data training + ecommerce'],
+      [/H1-B and STEM OPT unsupported/i,'H1-B / STEM OPT unsupported']],
+    'ooak.work.data-quality-specialist':[
+      [/6\+ years.*Python\/SQL.*data.quality/i,'6+ years · Python/SQL + data quality'],
+      [/fluent English/i,'Fluent English']],
+    'aixi.work.research-fellowship':[
+      [/PhD.level research, or relevant master.s plus substantial applied research/i,'PhD-level research, or relevant master’s + substantial applied research']],
+    'abundant_ai.work.research-fellow':[
+      [/Research depth in CS\/ML\/NLP/i,'Research in computing, machine learning or language processing'],
+      [/requires AI safety\/governance policy experience/i,'AI safety / governance policy experience']],
+    'bespoke_labs.work.fulfillment-operations-associate':[
+      [/scaled expert\/contractor fulfillment/i,'Expert / contractor fulfillment experience']],
+    'a-team.work.expert-network':[
+      [/Senior production experience/i,'Senior production experience'],
+      [/portfolio review, interview, and additional AI evaluation/i,'Portfolio review + interview; AI-role evaluation']],
+    'prolific.work.study-participant':[
+      [/verified account|identity verification/i,'Identity verification'],
+      [/supported country of residence|supported residence/i,'Supported country of residence']],
+    'datacurve.work.shipd-bounties':[
+      [/At least 18, legal capacity to contract/i,'18+ and legal capacity to contract'],
+      [/project access depends on skills and invitation/i,'Skills-based project access + invitation']],
+    'polymath_ai_labs.work.member-of-technical-staff-engineering':[
+      [/US citizen\/visa only/i,'US citizen / visa requirement'],
+      [/strong engineering\/full-stack\/infrastructure experience/i,'Full-stack / infrastructure engineering']],
+    'polymath_ai_labs.work.member-of-technical-staff-research':[
+      [/US citizen\/visa only/i,'US citizen / visa requirement'],
+      [/post-training and publication experience/i,'AI model improvement and published research']],
+    'elorian.work.rl-infrastructure-engineer':[
+      [/3\+ years distributed systems including RL pipelines/i,'3+ years in distributed systems, including reward-based AI training'],
+      [/Python and PyTorch\/JAX/i,'Python + PyTorch/JAX']],
+    'apto.work.ai-data-research-engineer':[
+      [/ML\/deep learning, Python and PyTorch\/TensorFlow/i,'Machine learning and deep learning · Python + PyTorch/TensorFlow']]
+  };
+  const custom=(tailored[route.id]||[]).filter(([pattern])=>pattern.test(text)).map(([,label])=>label);
+  if(custom.length)return preserveAge(custom.slice(0,2));
+  // Boards list departments, not applicant requirements.
+  if(route.status==='careers'||route.status==='no_route'||route.status==='information')return [];
+  const clauses=originals.flatMap(s=>s.split(/\s*;\s*/)).map(s=>s.replace(/[.;]$/,'').trim()).filter(s=>s.length>=5&&s.length<=100);
+  const locations=/^(?:Remote|Remote or Palo Alto|San Francisco|San Francisco and Bangalore roles|Berkeley or remote|London or Berkeley|Worldwide remote or London|Palo Alto|Tokyo|Paris)(?:[.,])?$/i;
+  const generic=/^(?:requirements vary|role-specific|current intake|check |project allocation|joining is free|no public|weekly hours)/i;
+  const selected=[];
+  for(const clause of clauses.filter(s=>!locations.test(s)&&!generic.test(s))){
+    const signature=clause.toLowerCase().replace(/[^a-z0-9]+/g,' ');
+    if(selected.some(s=>s.signature.includes(signature)||signature.includes(s.signature)))continue;
+    selected.push({text:clause,signature});
+    if(selected.length===2)break;
+  }
+  return preserveAge(selected.map(s=>s.text));
+}
+// Hidden context tells repeated "View role" links apart; the new-tab note warns before the tab opens.
+function w4SourceLink(url,label,extra='',context=''){
+  if(!/^https?:\/\//i.test(url||''))return w4Escape(label);
+  return `<a href="${w4Escape(url)}" target="_blank" rel="noopener noreferrer" ${extra}>${w4Escape(label)}${context?`<span class="sr-only">: ${w4Escape(context)}</span>`:''} ${iconHTML('external')}<span class="sr-only"> (opens in a new tab)</span></a>${typeof window.linkAvailabilityHTML==='function'?window.linkAvailabilityHTML(url):''}`;
+}
+function w4BoundDestinationAction(route){
+  const binding={
+    'rws_trainai.work.polaris-asr':{company:'rws_trainai',status:'intake_unverified',url:'https://app.tai.rws.com/opportunities',claim:'rws_trainai.claim.oct15-work-polaris-asr',source:'rws_trainai.source.oct15-work-polaris-asr',label:'View opportunities'},
+    'apto.work.harbest-experts':{company:'apto',status:'unverified',url:'https://expert.harbest.io/',claim:'apto.claim.worker_opportunities-0',source:'apto.source.d_apt5',label:'View program'}
+  }[route.id];
+  if(!binding||route.company_id!==binding.company||route.status!==binding.status||route.url!==binding.url)return '';
+  const claim=typeof claims==='undefined'?null:claims[binding.claim],source=typeof sources==='undefined'?null:sources[binding.source];
+  if(claim?.company_id!==binding.company||claim.status!=='supported'||!claim.source_ids?.includes(binding.source))return '';
+  if(source?.company_id!==binding.company||source.url!==binding.url||source.source_type!=='company')return '';
+  if(!route.claim_ids?.includes(binding.claim)||!route.source_ids?.includes(binding.source)||!route.sources?.some(item=>item.id===binding.source&&item.url===binding.url))return '';
+  return binding.label;
+}
+function w4Action(route){
+  if(route.status==='closed'||route.status==='historical'||route.status==='no_route')return 'View source';
+  if(route.status==='paused'||route.status==='contributions')return 'View research';
+  if(route.status==='information')return 'Program details';
+  if(route.status==='inquiry')return 'Contact page';
+  if(route.status==='careers')return 'View career page';
+  if(route.status==='program')return 'View program';
+  const destinationAction=w4BoundDestinationAction(route);if(destinationAction)return destinationAction;
+  if(['unverified','intake_unverified'].includes(route.status)){
+    if(route.id==='scale_ai.work.remotasks'&&route.url==='https://www.remotasks.com/en/migration')return 'Migration information';
+    const entry=route.entry_point_research?.entry;
+    if(entry?.url===route.url&&['expert community','expert fellowship','experts'].includes(entry.type))return 'View program';
+  }
+  return 'View role';
+}
+function w4ClaimAccess(ids,topic=''){
+  return [...new Set(ids||[])].filter(id=>claims[id]).map((id,i)=>`<span data-work-claim="${w4Escape(id)}">${claimButton(id,`Original evidence${ids.length>1?' '+(i+1):''}`,topic)}</span>`).join('');
+}
+// Route checks store their result before the note (a code such as public_page_live, or a short phrase).
+// Readers see plain words instead of the code, and the result ends with a period so the note reads on.
+const W4_CHECK_CODES={public_page_live:'Public page was live.',information_only_not_verified_paid_application:'Information page only. No paid application confirmed.'};
+const W4_CHECK_CODE=/^[a-z]+(?:_[a-z]+)+$/;
+function w4CheckLead(result){return W4_CHECK_CODE.test(result)?W4_CHECK_CODES[result]||result.charAt(0).toUpperCase()+result.slice(1).replace(/_/g,' ')+'.':result.replace(/[\s.;:,]+$/,'')+'.';}
+function w4CheckNote(check){
+  const text=w4Text(check?.note),result=w4Text(check?.result);
+  if(result&&text.startsWith(result+' '))return `${w4CheckLead(result)} ${text.slice(result.length+1)}`;
+  const code=text.match(/^([a-z]+(?:_[a-z]+)+)(?:\s+(.*))?$/);
+  return code?(code[2]?`${w4CheckLead(code[1])} ${code[2]}`:w4CheckLead(code[1])):text;
+}
+function w4Details(route,level=4){
+  const requirements=[...new Set((route.requirements||[]).map(w4Text).filter(Boolean))];
+  const sourceRows=[...new Map((route.sources||[]).map(s=>[s.url,s])).values()];
+  const commitment=[...new Set([route.hours,route.research_record?.route?.hours?.detail].map(w4Text).filter(Boolean))].join(' · ');
+  const rows=[['Payment',route.pay_label],['Commitment',commitment],['Duration',route.duration],['Location',route.geography]].filter(([,v])=>v);
+  const h=`h${Math.min(Math.max(level,2),6)}`,published=s=>{const date=w4SourcePublicationDate(s);return date&&date!=='undated'?`Published ${w4Date(date)}`:'Publication date not stated';};
+  return `<div class="w4-detail-content">
+    ${route.summary?`<p class="w4-role-summary">${w4Escape(route.summary)}</p>`:''}
+    <dl class="w4-term-table">${rows.map(([label,value])=>`<div><dt>${w4Escape(label)}</dt><dd>${w4Escape(value)}</dd></div>`).join('')}</dl>
+    ${requirements.length?`<div class="w4-detail-block"><${h}>Requirements</${h}><ul>${requirements.map(t=>`<li>${w4Escape(t)}</li>`).join('')}</ul></div>`:''}
+    ${route.pay_observations?.length?`<div class="w4-detail-block"><${h}>Published pay terms</${h}><dl class="w4-term-table">${route.pay_observations.map(p=>`<div><dt>${w4Escape(p.label)}</dt><dd>${w4Escape(p.value)}</dd></div>`).join('')}</dl></div>`:''}
+    ${route.availability_note?`<p class="w4-availability-note">${w4Escape(route.availability_note)}</p>`:''}
+    ${route.pay_context?`<p>${w4Escape(route.pay_context)}${route.pay_policy?.source_url?` ${w4SourceLink(route.pay_policy.source_url,'Payment policy')}`:''}</p>`:''}
+    ${route.historical_pay_context?`<details class="w4-source-notes"><summary>Past payment offer</summary><p>${w4Escape(route.historical_pay_context.label)}: ${w4Escape(route.historical_pay_context.amount)}.</p><p>${w4Escape(route.historical_pay_context.note)}</p>${w4SourceLink(route.historical_pay_context.url,'Historical source')}</details>`:''}
+    <div class="w4-detail-block w4-sources"><${h}>Sources</${h}>
+      <p class="w4-source-dates"><span>Terms recorded: ${w4Escape(route.as_of&&route.as_of!=='undated'?w4Date(route.as_of):'date not stated')}</span><span>${w4Escape(w4FreshnessLabel(route))}</span></p>
+      ${sourceRows.length?`<ul>${sourceRows.map(s=>`<li>${w4SourceLink(s.url,s.title||s.publisher||'Source')}<small>${w4Escape(published(s))}${s.accessed_on?` · Checked ${w4Escape(w4Date(s.accessed_on))}`:''}</small></li>`).join('')}</ul>`:''}
+      ${route.source_quote?`<blockquote>${w4Escape(route.source_quote)}</blockquote>`:''}
+      ${route.last_route_check?.note?`<details class="w4-source-notes"><summary>Link check note</summary><p>${w4Escape(w4CheckNote(route.last_route_check))}</p></details>`:''}
+      ${route.claim_ids?.length?`<div class="w4-evidence-links">${w4ClaimAccess(route.claim_ids,route.role)}</div>`:''}
+    </div>
+    ${typeof compareCheck==='function'?`<div class="w4-compare">${compareCheck(route.company_id)}</div>`:''}
+  </div>`;
+}
+function w4PayNotes(route){
+  const payNote=w4PayNote(route),payQualification=w4PayQualification(route);
+  return `${route.pay_indicator?`<span class="w4-pay-note w4-pay-indicator">${w4Escape(route.pay_indicator)}</span>`:''}${payNote?`<span class="w4-pay-note">${w4Escape(payNote)}</span>`:''}${payQualification?`<span class="w4-pay-note w4-pay-qualification">${w4Escape(payQualification)}</span>`:''}`;
+}
+function w4StatusBadge(route){const status=w4Status(route);return status?`<span class="w4-status w4-status-${w4Escape(route.status)}">${w4Escape(status)}</span>`:'';}
+// Pieces of a card. A compact card shows its pay in the summary, so its offer leaves the pay out.
+function w4CardParts(route,compact){
+  const company=companies[route.company_id],commitment=w4Hours(route),scheduleNote=w4ScheduleNote(route),requirements=w4Requirements(route);
+  const logo=typeof logoHTML==='function'&&(typeof logoFor!=='function'||logoFor(company.id))?logoHTML(company.id,'w4-company-logo',true):'';
+  return {context:`${route.role}, ${company.name}`,
+    identity:`<a class="w4-company" href="#company/${w4Escape(company.id)}/work">${logo?`<span class="w4-logo" aria-hidden="true">${logo}</span>`:''}<span>${w4Escape(company.name)}</span></a>`,
+    offer:`<div class="w4-offer">${compact?'':`<p class="w4-pay ${route.numeric_pay?'':'w4-pay-unspecified'}"><strong>${w4Escape(w4Pay(route))}</strong>${w4PayNotes(route)}</p>`}${commitment?`<p class="w4-commitment">${w4Escape(commitment)}</p>`:''}${scheduleNote?`<p class="w4-schedule-note">${w4Escape(scheduleNote)}</p>`:''}</div>`,
+    conditions:`<p class="w4-location">${w4Escape(w4Location(route))}</p>${requirements.length?`<ul class="w4-requirements" aria-label="Requirements">${requirements.map(text=>`<li>${w4Escape(text)}</li>`).join('')}</ul>`:''}`,
+    dates:`<p class="w4-dates"><span>${w4Escape(w4FreshnessLabel(route))}</span></p>`};
+}
+// "Terms & sources". Lazy disclosures carry only their summary and draw the rest on first open (w4FillCard).
+function w4DetailsDisclosure(route,level,context,lazy){
+  const summary=`<summary>Terms & sources<span class="sr-only">: ${w4Escape(context)}</span><span aria-hidden="true">+</span></summary>`;
+  return lazy?`<details class="w4-details" data-w4-detail="${w4Escape(route.id)}" data-w4-level="${level}">${summary}</details>`:`<details class="w4-details">${summary}${w4Details(route,level)}</details>`;
+}
+// What an open compact card shows under its summary. level is the heading level its details sit under.
+function w4CompactBody(route,level,lazy){
+  const part=w4CardParts(route,true);
+  return `<div class="w4-card-front"><div class="w4-compact-company">${part.identity}</div>${part.offer}${part.conditions}<div class="w4-card-bottom">${part.dates}${w4SourceLink(route.url,w4Action(route),'class="w4-open"',part.context)}</div></div>${w4DetailsDisclosure(route,level+1,part.context,lazy)}`;
+}
+// level: for a full card, its role heading (3 under a section h2, 4 under a pay block h3); its details use the
+// next level. A compact card has no role heading, so level is the heading it sits under (2 under a section h2).
+// lazy: the page draws closed parts on first open, so a long list costs little until a reader opens a card.
+// workCard(route) with no lazy flag returns every part, which the tests read.
+function workCard(route,mode,level=3,lazy=false){
+  if(!route.company_id)route=workRoutesFor(route.id)[0];
+  if(!route)return '';
+  const company=companies[route.company_id];
+  if(!company)return '';
+  const compact=mode==='compact',heading=Math.min(Math.max(Number(level)||3,2),5);
+  const open=`<article class="work-card work-card-v4 ${compact?'w4-compact-card':''}" data-work-route="${w4Escape(route.id)}" data-work-company="${w4Escape(company.id)}" aria-label="${w4Escape(company.name+': '+route.role)}">`;
+  if(compact){
+    const title=`<summary><span class="w4-compact-title"><small>${w4Escape(company.name)}</small><strong>${w4Escape(route.role)}</strong></span><span class="w4-compact-pay"><strong>${w4Escape(w4Pay(route))}</strong>${w4PayNotes(route)}${w4StatusBadge(route)}</span><span class="w4-toggle-icon" aria-hidden="true">+</span></summary>`;
+    return `${open}<details class="w4-compact-toggle"${lazy?` data-w4-card="${w4Escape(route.id)}" data-w4-level="${heading}"`:''}>${title}${lazy?'':w4CompactBody(route,heading,false)}</details></article>`;
+  }
+  const part=w4CardParts(route,false),action=w4SourceLink(route.url,w4Action(route),'class="w4-open"',part.context);
+  return `${open}<div class="w4-card-front"><div class="w4-role-column"><header class="w4-card-heading">${part.identity}${w4StatusBadge(route)}</header><h${heading} class="w4-role">${w4Escape(route.role)}</h${heading}>${part.dates}</div><div class="w4-offer-column">${part.offer}</div><div class="w4-conditions-column">${part.conditions}</div><div class="w4-action-column">${action}</div></div>${w4DetailsDisclosure(route,heading+1,part.context,lazy)}</article>`;
+}
+let w4RouteIndex=null,w4RouteIndexRows=null;
+function w4RouteById(id){const rows=workRouteRows();if(rows!==w4RouteIndexRows){w4RouteIndexRows=rows;w4RouteIndex=new Map(rows.map(route=>[route.id,route]));}return w4RouteIndex.get(id);}
+// Draws a lazy card part (a compact card's body or a card's Terms & sources) the first time it opens.
+function w4FillCard(box){
+  const data=box?.dataset;if(!data||!(data.w4Card||data.w4Detail))return;
+  const route=w4RouteById(data.w4Card||data.w4Detail),level=Number(data.w4Level)||3;
+  if(data.w4Card){box.removeAttribute('data-w4-card');if(route)box.insertAdjacentHTML('beforeend',w4CompactBody(route,level,true));}
+  else{box.removeAttribute('data-w4-detail');if(route)box.insertAdjacentHTML('beforeend',w4Details(route,level));}
+}
+// Work type options keep the research group values (tests and links use them); labels use plain words.
+const W4_TYPE_LABELS={'Expert & contractor projects':'Contract and task work','Employment':'Jobs','Research fellowship':'Research fellowships','Contributor bounties':'Bounties for contributions','Unverified route':'Type not confirmed'};
+// Pay and place come from each listing's own fields. Nothing is converted between currencies or pay periods.
+const W4_CONTRACT_GROUPS=new Set(['Expert & contractor projects','Contributor bounties']);
+const W4_TASK_PAY=new Set(['per_completed_task','task','accepted_task','approved_recording','approved_submission']);
+const W4_REMOTE=/remote|at home|worldwide|global/i,W4_ONSITE=/San Francisco|Palo Alto|Berkeley|London|Paris|Tokyo|Bangalore|on-?site|hybrid|in.person|office/i;
+// An Employment listing paid by the hour or by a one-time award is contract and task work, not a staff job.
+// scripts/static_pages.py work_bucket() uses the same rule (CONTRACT_PAY).
+const W4_CONTRACT_PAY=new Set(['hour','one_time']);
+// What a worker can do with a listing: contract or task work, a job or fellowship, a career page,
+// a company job outside AI training, or a closed or unpaid record.
+function w4Bucket(route){
+  if(route.status==='careers')return 'boards';
+  if(WORK_ROUTE_ARCHIVE.has(route.status))return 'closed';
+  if(route.ai_data_work===false)return 'outside';
+  return W4_CONTRACT_GROUPS.has(route.group)||(route.group==='Employment'&&W4_CONTRACT_PAY.has(route.pay_basis))?'contract':'jobs';
+}
+// The "Contract and task work" and "Jobs" filter options follow the same rule as the sections,
+// so an Employment listing paid by the hour shows under contract work in both places.
+function w4GroupMatches(route,group){
+  const contractPay=route.group==='Employment'&&W4_CONTRACT_PAY.has(route.pay_basis);
+  if(group==='Expert & contractor projects')return route.group===group||contractPay;
+  if(group==='Employment')return route.group===group&&!contractPay;
+  return route.group===group;
+}
+// A published hourly range, read only from labels that state a rate per hour. "Up to" has no low end.
+function w4HourlyRange(route){
+  if(!route?.numeric_pay||route.status==='pay_conflict'||route.pay_basis==='conflicting_hourly')return null;
+  const label=w4Text(route.pay_label);
+  if(!/\/\s*(?:approved\s+)?hour/i.test(label))return null;
+  const match=label.match(/([$€£¥])\s*([\d,]+(?:\.\d+)?)(?:\s*[–-]\s*[$€£¥]?\s*([\d,]+(?:\.\d+)?))?(\+)?/);
+  if(!match)return null;
+  const number=value=>Number(value.replace(/,/g,''));
+  return {currency:match[1],low:/^up to\b/i.test(label)?null:number(match[2]),high:number(match[3]||match[2]),open:Boolean(match[4])};
+}
+function w4PayBlock(route){return w4HourlyRange(route)||route.pay_basis==='conflicting_hourly'?'hourly':W4_TASK_PAY.has(route.pay_basis)?'task':'project';}
+function w4PayMatches(route,value){
+  if(!value)return true;
+  if(value==='numeric'||value==='undisclosed')return (value==='numeric')===Boolean(route.numeric_pay);
+  if(value==='hourly')return Boolean(w4HourlyRange(route));
+  if(value==='task')return W4_TASK_PAY.has(route.pay_basis);
+  if(value==='monthly')return ['month_stipend','undisclosed_stipend'].includes(route.pay_basis);
+  if(value==='yearly')return /^(?:annual_salary|annual_target_cash)$|salary_period_unspecified$/.test(route.pay_basis||'');
+  return false;
+}
+function w4Where(route){const place=route.geography||'';return W4_REMOTE.test(place)?'remote':W4_ONSITE.test(place)?'onsite':'varies';}
+// Older eligibility values (such as "US listing evidence") still filter on the research field itself.
+function w4WhereMatches(route,value){return !value||(['remote','onsite','varies'].includes(value)?w4Where(route)===value:route.eligibility===value);}
+
+// Worker words map to the words listings use. Each term must start a word, so "doctor" skips "doctorate".
+const W4_WORD_START='(?:^|[^\\p{L}\\p{N}])',W4_WORD_END='(?![\\p{L}\\p{N}])';
+const W4_SEARCH_GROUPS=[
+  {words:['medical','medicine','doctor','doctors','physician','physicians','clinical','clinician','clinicians','health','healthcare','nurse','nurses','nursing'],terms:['medic','clinic','physician','doctors?'+W4_WORD_END,'health','nurs(?:e|es|ing)'+W4_WORD_END]},
+  {words:['code','coding','coder','coders','developer','developers','programmer','programmers','programming','swe','software'],terms:['cod(?:e|es|ing|er|ers)'+W4_WORD_END,'software','swe'+W4_WORD_END,'developers?'+W4_WORD_END,'programm']},
+  {words:['label','labels','labeling','labelling','labeler','labelers','annotation','annotations','annotate','annotator','annotators'],terms:['label(?:s|ed|er|ers|ing|ling)?'+W4_WORD_END,'annotat']},
+  {words:['beginner','beginners','entry','entry-level','novice','junior'],phrases:['no experience','entry level'],terms:['no experience','generalists','general tasks?','general ai','entry[- ]level','beginner']},
+  {words:['student','students','college','intern','interns','internship','internships','graduate','graduates','university'],terms:['student','college','intern(?:s|ship|ships)?'+W4_WORD_END,'graduate','universit','no experience','generalists','general tasks?','entry[- ]level']},
+  {words:['part-time','parttime','flexible'],phrases:['part time'],terms:['part[- ]?time','flexible','opt-in']},
+  {words:['worldwide','global','anywhere','international'],terms:['worldwide','global','anywhere','international']}
+];
+function w4RegExpEscape(value){return value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function w4SearchText(route){const c=companies[route.company_id];return [c?.name,...(c?.aliases||[]),route.role,route.summary,route.group,route.geography,w4Location(route),route.pay_label,route.hours,route.duration,...(route.requirements||[])].filter(Boolean).join(' ').toLowerCase();}
+function w4QueryMatcher(query){
+  let text=w4Text(query).toLowerCase();
+  if(!text)return null;
+  for(const group of W4_SEARCH_GROUPS)for(const phrase of group.phrases||[])text=text.split(phrase).join(group.words[0]);
+  const tokens=text.split(' ').filter(Boolean);
+  const tests=tokens.map(token=>{const group=W4_SEARCH_GROUPS.find(g=>g.words.includes(token));return new RegExp(W4_WORD_START+'(?:'+(group?group.terms.join('|'):w4RegExpEscape(token))+')','u');});
+  const phrase=tokens.length>1?new RegExp(W4_WORD_START+w4RegExpEscape(tokens.join(' ')),'u'):null;
+  return {all:value=>tests.every(test=>test.test(value)),phrase:value=>Boolean(phrase?.test(value))};
+}
+
+// Best match: remote listings with an hourly rate first, then the strongest link check, then the latest
+// check, then the higher top rate (same currency only), then company and role names.
+function w4BestRank(route){return (w4HourlyRange(route)&&W4_REMOTE.test(route.geography||'')?0:10)+(route.research_record?.route?.live_application_verified===true?0:route.last_route_check?.result==='public_page_live'?1:route.status==='listed'?2:3);}
+function w4RateTie(a,b){const x=w4HourlyRange(a),y=w4HourlyRange(b);return x&&y&&x.currency===y.currency?y.high-x.high:0;}
+function w4BestOrder(a,b){return w4BestRank(a)-w4BestRank(b)||(w4Checked(b)||'').localeCompare(w4Checked(a)||'')||w4RateTie(a,b)||companies[a.company_id].name.localeCompare(companies[b.company_id].name)||a.role.localeCompare(b.role);}
+// Highest hourly rate: top of the published range, then its low end ("up to" last), then open-ended
+// ranges. Listings without a rate keep best-match order after them. US dollar rates come before other
+// currencies, and amounts in different currencies are never compared.
+function w4RateOrder(a,b){
+  const x=w4HourlyRange(a),y=w4HourlyRange(b);
+  if(!x||!y)return Number(Boolean(y))-Number(Boolean(x))||w4BestOrder(a,b);
+  if(x.currency!==y.currency)return Number(y.currency==='$')-Number(x.currency==='$')||x.currency.localeCompare(y.currency);
+  return y.high-x.high||(y.low??-1)-(x.low??-1)||Number(y.open)-Number(x.open)||w4BestOrder(a,b);
+}
+function w4CheckedOrder(a,b){return (w4Checked(b)||'').localeCompare(w4Checked(a)||'')||(b.reviewed_on||'').localeCompare(a.reviewed_on||'')||w4BestOrder(a,b);}
+// primary, careers and other keep their old meaning for callers in app.js (workType, hasWorkRoute).
+function w4RouteGroups(rows,sort=''){
+  const groups={contract:[],jobs:[],boards:[],outside:[],closed:[]},order=sort==='hourly'?w4RateOrder:sort==='checked'?w4CheckedOrder:w4BestOrder;
+  for(const route of rows)groups[w4Bucket(route)].push(route);
+  for(const list of Object.values(groups))list.sort(order);
+  for(const block of ['hourly','task','project'])groups[block]=groups.contract.filter(route=>w4PayBlock(route)===block);
+  return Object.assign(groups,{primary:[...groups.contract,...groups.jobs],careers:groups.boards,other:[...groups.outside,...groups.closed]});
+}
+const W4_GROUP_NOTES={boards:'Each link opens a company’s full list of openings. We did not record pay for these pages.',outside:'Open staff roles that are not AI training work.',closed:'Past or paused listings, and pages with no confirmed paid work. We keep them for the record.'};
+// A closed group carries only its listing ids. Its cards render on first open, which keeps the page light.
+// The trade-off: browser find-in-page cannot reach cards in a closed group, or the closed parts of a card.
+// The Paid work search covers every listing. level is the heading the group sits under (2 under a section h2),
+// so the compact cards' detail headings follow it (axe heading-order).
+function w4GroupDisclosure(rows,label,open=false,key='',note='',level=2){
+  return rows.length?`<details class="work-route-archive-group w4-route-group" ${key?`id="${w4Escape(key)}"`:""} ${open?'open':''}><summary>${w4Escape(label)} <span>(${rows.length})</span></summary>${note?`<p class="w4-group-note">${w4Escape(note)}</p>`:''}<div class="w4-secondary-list" data-w4-level="${level}"${open?'':` data-w4-routes="${w4Escape(rows.map(route=>route.id).join(' '))}"`}>${open?w4CompactCards(rows,level):''}</div></details>`:'';
+}
+function w4CompactCards(rows,level){return rows.map(route=>workCard(route,'compact',level,true)).join('');}
+function w4FillGroup(group){
+  const list=group?.querySelector?.(':scope>.w4-secondary-list[data-w4-routes]');if(!list)return;
+  list.innerHTML=w4CompactCards(list.dataset.w4Routes.split(' ').map(w4RouteById).filter(Boolean),Number(list.dataset.w4Level)||2);list.removeAttribute('data-w4-routes');
+}
+// Lazy parts fill as they open: on the click, before the browser shows the disclosure, and on toggle for
+// disclosures opened by code or by find-in-page.
+function w4FillLazy(box){if(box?.tagName==='DETAILS'){w4FillGroup(box);w4FillCard(box);}}
+// Fills the closed group that holds one listing, so code that looks for its card (site search) finds it.
+function w4FillRouteGroup(scope,id){
+  const root=typeof scope==='string'?document.querySelector(scope):scope;
+  for(const list of root?.querySelectorAll?.('.w4-secondary-list[data-w4-routes]')||[])if(list.dataset.w4Routes.split(' ').includes(id))w4FillGroup(list.parentElement);
+}
+document.addEventListener('toggle',event=>{if(event.target.open)w4FillLazy(event.target);},true);
+function w4ProfilePrimary(rows,id){
+  const preferred=id==='afterquery'?['research-fellow','research-engineer','research-scientist-post-training','technical-content-writer-contract'].map(role=>`afterquery.work.${role}`):[];
+  const rank=route=>{const index=preferred.indexOf(route.id);return index<0?preferred.length:index;};
+  return [...rows].sort((a,b)=>rank(a)-rank(b));
+}
+let workReturnFocus=null,workViewRendered=false;
+// Typing in the Paid work search draws the list once typing pauses for 180 ms, so each keystroke paints at
+// once (measured on a phone at 4x CPU slowdown). A direct render, such as a filter change, cancels a waiting one.
+let w4RenderTimer=0;
+function w4QueueRender(){if(w4RenderTimer)clearTimeout(w4RenderTimer);w4RenderTimer=setTimeout(renderWork,180);}
+function rememberWorkCompanyLink(event){
+  if(event.defaultPrevented||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(event.button!==undefined&&event.button!==0))return;
+  const link=event.target.closest?.('#work-view a[href^="#company/"]');
+  if(!link||link.hasAttribute('download')||(link.getAttribute('target')&&link.getAttribute('target')!=='_self'))return;
+  workReturnFocus=link;
+}
+function workReturnFocusTarget(){
+  const link=workReturnFocus;
+  if(!link?.isConnected||link.closest('[hidden]')||!link.getClientRects().length){workReturnFocus=null;return null;}
+  const box=link.getBoundingClientRect();
+  if(box.bottom<=0||box.top>=window.innerHeight||box.right<=0||box.left>=window.innerWidth){workReturnFocus=null;return null;}
+  return link;
+}
+document.addEventListener('click',rememberWorkCompanyLink);
+function w4Count(n,one,many){return `${n} ${n===1?one:many}`;}
+// Dates such as "14 and 15 Oct 2026"; more dates read "between 14 and 23 Oct 2026", and dates across
+// months read "between 30 Sep 2026 and 2 Oct 2026".
+function w4DateList(dates){
+  const parts=dates.map(date=>w4Date(date).split(' '));
+  if(parts.length===1)return parts[0].join(' ');
+  const sameMonth=parts.every(p=>p.length===3&&p[1]===parts[0][1]&&p[2]===parts[0][2]);
+  if(parts.length<=3&&sameMonth)return `${parts.slice(0,-1).map(p=>p[0]).join(', ')} and ${parts.at(-1).join(' ')}`;
+  return `between ${sameMonth?parts[0][0]:parts[0].join(' ')} and ${parts.at(-1).join(' ')}`;
+}
+function w4FreshnessSentence(rows){
+  const open=rows.filter(route=>['contract','jobs'].includes(w4Bucket(route))),checked=open.filter(w4Checked);
+  if(!checked.length)return '';
+  const which=open.length===1?'this link':checked.length===open.length?'these links':checked.length*2>=open.length?'most links':'some links',dates=w4DateList([...new Set(checked.map(w4Checked))].sort());
+  return `We checked ${which} ${dates.startsWith('between')?'':'on '}${dates}.`;
+}
+// Scam advice, each tip tied to the public agencies that give it (US FTC and FBI, India's Home Ministry).
+const W4_SAFETY_SOURCES={
+  ftcJobs:['https://consumer.ftc.gov/articles/job-scams','FTC: Job scams'],
+  ftcTasks:['https://consumer.ftc.gov/consumer-alerts/2024/11/task-scams-create-illusion-making-money','FTC: Task scams'],
+  fbiHome:['https://www.ic3.gov/PSA/2024/PSA240604','FBI: Work-from-home scams'],
+  ftcTexts:['https://consumer.ftc.gov/consumer-alerts/2026/04/job-offer-text-probably-scam','FTC: Job offer texts'],
+  fbiPosts:['https://www.ic3.gov/PSA/2022/PSA220201','FBI: Fake job posts'],
+  india:['https://pib.gov.in/PressReleaseIframePage.aspx?PRID=1982936','India Home Ministry: Part-time job fraud'],
+  fbiData:['https://www.ic3.gov/PSA/2020/PSA200121','FBI: Fake listings that collect data'],
+  ftcChecks:['https://consumer.ftc.gov/articles/how-spot-avoid-and-report-fake-check-scams','FTC: Fake checks']
+};
+const W4_SAFETY_TIPS=[
+  ['Never pay to get work or to get your earnings out. Real employers pay you.',['ftcJobs','ftcTasks','fbiHome']],
+  ['Ignore job offers you did not ask for that arrive by text or on apps such as WhatsApp or Telegram. Find the job on the company’s own website and apply there.',['ftcTexts','fbiPosts','india']],
+  ['Share bank or tax details only after you are hired. First confirm who the employer is, in person or on a video call.',['fbiPosts','fbiData']],
+  ['Never deposit a check from a new employer and send part of the money on. A bank can take weeks to spot a fake check, and then you must pay the money back.',['ftcJobs','ftcChecks']]
+];
+function workSafetyHTML(rows=[]){
+  const fresh=w4FreshnessSentence(rows);
+  return `<div class="w4-safety"><p><strong>Before you apply.</strong> Never pay to get work. Apply only on the company’s own website, and confirm the pay there.${fresh?' '+w4Escape(fresh):''}</p><details class="w4-safety-tips"><summary>How to spot a job scam</summary><ul>${W4_SAFETY_TIPS.map(([tip,keys])=>`<li><p>${w4Escape(tip)}</p><p class="w4-safety-sources">Sources: ${keys.map(key=>w4SourceLink(...W4_SAFETY_SOURCES[key])).join(' · ')}</p></li>`).join('')}</ul><p class="w4-safety-report">Report a scam: ${w4SourceLink('https://reportfraud.ftc.gov/','ReportFraud.ftc.gov')} in the US. In India, ${w4SourceLink('https://cybercrime.gov.in/','cybercrime.gov.in')} or call 1930.</p></details></div>`;
+}
+function w4Jump(id,label,n){return `<button type="button" data-work-section="${id}" ${n?'':'disabled'}>${label} <span>(${n})</span></button>`;}
+function w4ContractSection(groups){
+  if(!groups.contract.length)return '';
+  const blocks=[['work-hourly','Hourly pay','Hourly',groups.hourly,true],['work-task','Paid per task','Per task',groups.task,true],['work-project','Pay set per project or not published','Pay set per project',groups.project,false]].filter(block=>block[3].length);
+  return `<section class="w4-section"><h2 id="work-listed" class="work-list-heading">Contract and task work <span>(${groups.contract.length})</span></h2><div class="w4-section-intro"><p class="w4-section-note">Freelance and project work for AI training.</p>${blocks.length>1?`<p class="w4-jumps">${blocks.map(([id,,short,list])=>w4Jump(id,short,list.length)).join('')}</p>`:''}</div>${blocks.map(([id,label,,list,full])=>`<h3 id="${id}" class="w4-block-heading">${label} <span>(${list.length})</span></h3>${full?list.map(route=>workCard(route,'',4,true)).join(''):`<div class="w4-secondary-list">${w4CompactCards(list,3)}</div>`}`).join('')}</section>`;
+}
+function w4JobsSection(shown,more){
+  const total=shown.length+more.length;
+  return total?`<section class="w4-section"><h2 id="work-jobs" class="work-list-heading">Jobs and fellowships <span>(${total})</span></h2><p class="w4-section-note">Staff jobs and paid fellowships at these companies.</p>${shown.map(route=>workCard(route,'',3,true)).join('')}${w4GroupDisclosure(more,'More jobs and fellowships')}</section>`:'';
+}
+// Phone budget for typed searches. A one-letter search matches nearly every listing, so typing draws about as
+// many full cards as the default view (W4_FULL_CARDS: the contract cards with an hourly or per-task rate, plus
+// at least six jobs). Contract work is never cut; jobs get the rest of the budget. Groups under Other listings
+// open only when they hold 12 or fewer matches. Every other match waits in a closed group that shows its count
+// and draws its cards on first open. A filter change (a select field or Clear) skips the budget: it draws every
+// match and opens every group that holds one. Cards draw their closed parts on first open (workCard lazy), and
+// work-v5.css lets the browser skip cards far from the screen (content-visibility).
+// Measured 26 Oct 2026 on a 390x844 phone at 4x CPU slowdown, interleaved with main's build, median of 7 runs,
+// longest task in ms: opening #work main 339, before 413, now 188; typing "a" main 199, before 237, now 110;
+// "e" main 270, before 773, now 111; "s" main 199, before 806, now 118. The page draws 1,258 elements (main
+// 1,533, before 3,770). Most of the old cost was layout of card text hidden in closed disclosures.
+const W4_FULL_CARDS=26,W4_SEARCH_JOBS=6,W4_SEARCH_OPEN_MAX=12;
+function w4SearchJobBudget(groups){return Math.max(W4_SEARCH_JOBS,W4_FULL_CARDS-groups.hourly.length-groups.task.length);}
+function w4OtherSection(groups,filtered,typed){
+  const total=groups.boards.length+groups.outside.length+groups.closed.length,open=list=>filtered&&(!typed||list.length<=W4_SEARCH_OPEN_MAX);
+  return total?`<section class="w4-section"><h2 id="work-more" class="work-list-heading">Other listings <span>(${total})</span></h2>${w4GroupDisclosure(groups.boards,'Career pages',open(groups.boards),'work-careers',W4_GROUP_NOTES.boards)}${w4GroupDisclosure(groups.outside,'Company jobs outside AI training',open(groups.outside),'work-outside',W4_GROUP_NOTES.outside)}${w4GroupDisclosure(groups.closed,'Closed or unpaid listings',open(groups.closed),'work-other',W4_GROUP_NOTES.closed)}</section>`:'';
+}
+// Networks whose location rules are set per project: a next step when a search finds little contract work.
+const W4_PROJECT_RULES=/project|role-specific|country varies|eligibility varies|geographic restrictions|global/i;
+function w4NetworkSuggestions(shown){
+  const seen=new Set(shown.map(route=>route.id)),rows=workRouteRows().filter(route=>w4Bucket(route)==='contract'&&W4_PROJECT_RULES.test(route.geography||'')&&!seen.has(route.id)).sort(w4BestOrder);
+  return rows.length?`<section class="w4-section w4-suggestions"><h2 id="work-suggested" class="work-list-heading">Expert networks worth checking <span>(${rows.length})</span></h2><p class="w4-section-note">These networks pick people for each project by skill and country. They may have work that your search words did not match.</p><div class="w4-secondary-list">${w4CompactCards(rows,2)}</div></section>`:'';
+}
+function w4EmptyState(query,filters){
+  if(!workRouteRows().length)return '<p class="w4-empty">No listings are available right now.</p>';
+  const matcher=query&&filters?w4QueryMatcher(query):null,queryAlone=matcher?workRouteRows().filter(route=>matcher.all(w4SearchText(route))).length:0;
+  const message=!query?'No listing matches these filters.':queryAlone?'No listing matches this search with these filters.':`No listing mentions “${w4Escape(query)}”. Try a broader word.`;
+  return `<div class="w4-empty-state"><p class="w4-empty">${message}</p><p class="w4-empty-actions">${query?'<button type="button" data-work-clear="search">Clear search</button>':''}${filters?'<button type="button" data-work-clear="filters">Clear filters</button>':''}</p></div>`;
+}
+// Each sort says how many paid work listings (contract and task work plus jobs) it can actually order.
+function w4SortNote(sort,open,filtered){
+  const of=`of ${w4Count(open.length,filtered?'matching paid work listing':'paid work listing',filtered?'matching paid work listings':'paid work listings')}`;
+  if(sort==='hourly'){const rated=open.filter(w4HourlyRange);return `Sorted by the top of each published hourly range. ${rated.length} ${of} ${rated.length===1?'publishes':'publish'} one.${rated.some(route=>w4HourlyRange(route).currency!=='$')?' Rates in other currencies follow the US dollar rates.':''}`;}
+  if(sort==='checked'){const dated=open.filter(w4Checked);return `Sorted by the date we last checked each link. ${dated.length} ${of} ${dated.length===1?'has':'have'} a check date.`;}
+  return '';
+}
+// What the last render drew from: the raw search text, the select fields (filters and sort), and whether it
+// kept the typing budget. A render whose only change is new search text is typing; one that changes a select
+// field or a Clear button is a filter change. Nothing changed (a repeat render) keeps the last choice.
+let w4LastSearch='',w4LastSelects='\n\n\n',w4LastTyped=false;
+function w4TypedRender(query){
+  const raw=String(state.workQuery??''),selects=[state.workGroup,state.workPay,state.workEligibility,state.workSort].map(value=>value||'').join('\n');
+  const typed=Boolean(query)&&(selects!==w4LastSelects?false:raw!==w4LastSearch?true:w4LastTyped);
+  w4LastSearch=raw;w4LastSelects=selects;w4LastTyped=typed;
+  return typed;
+}
+function renderWork(){
+  if(w4RenderTimer){clearTimeout(w4RenderTimer);w4RenderTimer=0;}
+  workViewRendered=true;
+  workReturnFocus=null;
+  if(state.workSort===undefined)state.workSort='';
+  const rows=filteredWork(),query=w4Text(state.workQuery),matcher=w4QueryMatcher(query),sort=state.workSort;
+  const filters=[state.workGroup,state.workPay,state.workEligibility].filter(Boolean).length,filtered=Boolean(query||filters),typed=w4TypedRender(query);
+  const groups=w4RouteGroups(rows,sort),orgs=new Set(rows.map(r=>r.company_id));
+  // With a search and no chosen sort, listings whose role or company matches come first in each block.
+  if(matcher&&!sort){const score=route=>matcher.all(`${companies[route.company_id]?.name} ${route.role}`.toLowerCase())?0:1;for(const key of ['hourly','task','project','jobs'])groups[key].sort((a,b)=>score(a)-score(b));}
+  const summary=document.querySelector('.work-filters .responsive-filter-panel>summary');
+  if(summary)summary.textContent=filters?`Filters (${filters})`:'Filters';
+  // Every record counts here, including career pages and closed listings, so the line says "we reviewed".
+  $('work-count').textContent=`${w4Count(rows.length,'listing','listings')} we reviewed at ${w4Count(orgs.size,'company','companies')}.`;
+  const other=groups.boards.length+groups.outside.length+groups.closed.length;
+  if($('work-overview'))$('work-overview').innerHTML=[['work-listed',groups.contract.length,'contract and task listing','contract and task listings'],['work-jobs',groups.jobs.length,'job or fellowship','jobs and fellowships'],['work-more',other,'other listing','other listings']].map(([id,n,one,many])=>`<button type="button" data-work-section="${id}" ${n?'':'disabled'}><strong>${n}</strong> ${n===1?one:many}</button>`).join('');
+  const note=$('work-sort-note');
+  if(note){note.textContent=w4SortNote(sort,groups.primary,filtered);note.hidden=!note.textContent;}
+  // Unfiltered, the jobs section opens with six cards and at most three per company. Typing shows matching
+  // jobs in full up to the phone budget, and the rest wait in the closed More group. A filter change draws
+  // every match and opens every group that holds one.
+  let jobs=groups.jobs,moreJobs=[];
+  if(!filtered){const perCompany={};jobs=[];for(const route of groups.jobs){const n=perCompany[route.company_id]||0;if(jobs.length<6&&n<3){jobs.push(route);perCompany[route.company_id]=n+1;}else moreJobs.push(route);}}
+  else if(typed){const budget=w4SearchJobBudget(groups);if(jobs.length>budget+1){moreJobs=jobs.slice(budget);jobs=jobs.slice(0,budget);}}
+  // A search that finds little contract work, and does not name a company, also lists the per-project networks.
+  const thin=matcher&&!filters&&groups.contract.length<5&&!rows.some(route=>matcher.all([companies[route.company_id]?.name,...(companies[route.company_id]?.aliases||[])].join(' ').toLowerCase()));
+  $('work-cards').innerHTML=w4ContractSection(groups)+w4JobsSection(jobs,moreJobs)+w4OtherSection(groups,filtered,typed)+(rows.length?'':w4EmptyState(query,filters))+(thin?w4NetworkSuggestions(rows):'');
+  syncSelection();
+}
+// Clears the search, the filters, or everything (the Clear filters button in the panel).
+function resetWorkFilters(scope='all'){
+  const fields={search:[['work-search','workQuery']],filters:[['work-group','workGroup'],['work-pay','workPay'],['work-eligibility','workEligibility']]};
+  for(const [id,key] of scope==='all'?[...fields.search,...fields.filters,['work-sort','workSort']]:fields[scope]||[]){state[key]='';$(id).value='';}
+  renderWork();
+}
+function workSummary(id){
+  const rows=workRoutesFor(id);
+  if(!rows.length)return '<p class="w4-empty">No paid work listing recorded for this company.</p>';
+  const groups=w4RouteGroups(rows),jobs=w4ProfilePrimary(groups.jobs,id),open=groups.primary.length;
+  const covered=new Set(rows.flatMap(r=>r.claim_ids||[]));
+  const related=typeof workClaims==='function'?workClaims(id).filter(c=>!covered.has(c.id)).map(c=>c.id):[];
+  // A "More" group never holds a single listing: that one is shown in full instead.
+  const section=(label,list,full,more)=>{const shown=list.length<=full+1?list.length:full;return list.length?`<h3 class="w4-profile-heading">${label} <span>(${list.length})</span></h3><div class="work-v4-profile-grid">${list.slice(0,shown).map(route=>workCard(route,'',4,true)).join('')}</div>${w4GroupDisclosure(list.slice(shown),more,false,'','',3)}`:'';};
+  return `<div class="work-v4-profile">${open||groups.boards.length?workSafetyHTML(rows):''}${section('Contract and task work',groups.contract,4,'More contract and task listings')}${section('Jobs and fellowships',jobs,2,'More jobs and fellowships')}${open?'':`<p class="w4-empty">No confirmed paid listing for ${w4Escape(companies[id]?.name||'this company')}.</p>`}${w4GroupDisclosure(groups.boards,'Career pages',!open,'',W4_GROUP_NOTES.boards)}${w4GroupDisclosure(groups.outside,'Company jobs outside AI training',false,'',W4_GROUP_NOTES.outside)}${w4GroupDisclosure(groups.closed,'Closed or unpaid listings',!open&&!groups.boards.length,'',W4_GROUP_NOTES.closed)}${related.length?`<details class="w4-related"><summary>Related work evidence</summary><div class="w4-evidence-links">${w4ClaimAccess(related)}</div></details>`:''}</div>`;
+}
+
+document.addEventListener('click',event=>{const summary=event.target.closest?.('summary');if(summary&&!summary.parentElement?.open)w4FillLazy(summary.parentElement);const clear=event.target.closest?.('[data-work-clear]');if(clear){resetWorkFilters(clear.dataset.workClear);document.getElementById('work-search')?.focus();return;}const button=event.target.closest?.('[data-work-section]');if(!button)return;const target=document.getElementById(button.dataset.workSection);if(target){if(target.tagName==='DETAILS'){w4FillGroup(target);target.open=true;}const focus=target.tagName==='DETAILS'?target.querySelector('summary'):target;if(focus&&focus.tagName!=='SUMMARY')focus.setAttribute('tabindex','-1');focus?.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});}});
+
+let responsiveFiltersWide,responsiveFilterFocus;
+document.addEventListener('focusin',event=>{
+  const panel=event.target.closest?.('.responsive-filter-panel');
+  responsiveFilterFocus=panel?{panel,target:event.target}:null;
+});
+document.addEventListener('pointerdown',event=>{
+  if(responsiveFilterFocus&&!responsiveFilterFocus.panel.contains(event.target))responsiveFilterFocus=null;
+});
+function syncResponsiveFilterMode(){
+  const wide=window.innerWidth>900;
+  if(wide===responsiveFiltersWide)return;
+  // Snapshot before changing any panel: an earlier DOM mutation can blur a
+  // summary that the new desktop styles hide in a later panel.
+  let active=document.activeElement;
+  const remembered=responsiveFilterFocus;
+  // CSS may blur the summary before resize runs. Recover only that transition;
+  // focus on another control or an outside pointer action cancels the memory.
+  if(wide&&responsiveFiltersWide===false&&active===document.body&&remembered?.target.isConnected&&!remembered.panel.closest('[hidden]')&&remembered.panel.querySelector('summary')?.contains(remembered.target))active=remembered.target;
+  responsiveFiltersWide=wide;
+  document.querySelectorAll('.responsive-filter-panel').forEach(panel=>{
+    const fields=panel.querySelector('.responsive-filter-fields'),summary=panel.querySelector('summary');
+    // Keep a focused field visible when the filters become collapsible.
+    panel.open=wide||Boolean(fields?.contains(active));
+    // Desktop hides the summary, so transfer its focus into the visible fields.
+    if(wide&&summary?.contains(active))fields?.querySelector('input:not([disabled]), select:not([disabled]), button:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])')?.focus({preventScroll:true});
+  });
+}
+queueMicrotask(syncResponsiveFilterMode);window.addEventListener('resize',syncResponsiveFilterMode);
+/* Public, source-linked profile presentation. Raw records remain in the archive. */
+function profileContent(id){return (window.PROFILE_CONTENT?.entries||[]).find(e=>e.company_id===id)||{};}
+// Formatters built once; output matches toLocaleDateString('en-GB').
+const PROFILE_DAY_FORMAT=new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}),PROFILE_MONTH_FORMAT=new Intl.DateTimeFormat('en-GB',{month:'short',year:'numeric',timeZone:'UTC'});
+// 2026-06-30 -> 30 Jun 2026, 2026-06 -> Jun 2026, FY ended 2025-12-31 -> FY2025.
+function readableDate(text){
+ const valid=(y,m,d=1)=>{const date=new Date(Date.UTC(+y,+m-1,+d,12));return date.getUTCMonth()===+m-1&&date.getUTCDate()===+d?date:null;};
+ return String(text??'').replace(/\bFY ended (\d{4})-12-31\b/g,'FY$1').replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g,(all,y,m,d)=>{const date=valid(y,m,d);return date?PROFILE_DAY_FORMAT.format(date).replace('Sept','Sep'):all;}).replace(/\b(\d{4})-(\d{2})\b(?!-\d)/g,(all,y,m)=>{const date=valid(y,m);return date?PROFILE_MONTH_FORMAT.format(date).replace('Sept','Sep'):all;});
+}
+function profileDate(value){return readableDate(dateText(value));}
+function profileSourceMeta(s){const added=profileDate(s.accessed_on);return [s.publisher,s.published_on?'Published '+profileDate(s.published_on):'Publication date not stated',s.retrieval_status==='checked'?'Checked '+added:s.retrieval_status==='summary_only'?'Summary only, page not reviewed · recorded '+added:s.retrieval_status==='unverified'?'Not checked again · recorded '+added:'Recorded '+added].filter(Boolean).join(' · ');}
+function profileProvenance(cl){return `<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(evidenceContextArchiveDate(cl,profileDate(cl.as_of)))}</span><span>· ${esc(evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id)))}</span><span>· ${esc(profileEvidenceLabel(cl))}</span>${claimButton(cl.id,'Source')}</div>`;}
+// Canonical company id for a route value (case and alias fixes).
+function profileRouteCompany(value=routeParts()[1]){const raw=String(value??''),lower=raw.toLowerCase(),aliases=window.RESEARCH_ALIASES;return isCompanyId(raw)?raw:isCompanyId(lower)?lower:aliases&&Object.hasOwn(aliases,lower)&&isCompanyId(aliases[lower])?aliases[lower]:'';}
+function profileReferences(ids,label='Source',topic=''){
+  const unique=[...new Set(ids||[])].filter(id=>claims[id]);
+  if(unique.length<2)return unique.map(id=>claimButton(id,label,topic)).join('');
+  const visibleLabel=label==='Source'?'Sources':label,access=evidenceAccess(unique,visibleLabel,topic);
+  return `<button type="button" class="evidence-link" data-profile-evidence="${attr(unique.join('|'))}" ${access.attributes}>${esc(visibleLabel)}</button>${access.description}`;
+}
+// Grouped sources: the dialog lists the other claims.
+document.addEventListener('click',event=>{const button=event.target.closest?.('[data-profile-evidence]');if(!button)return;const ids=button.dataset.profileEvidence.split('|').filter(id=>claims[id]);if(!ids.length)return;showEvidence(ids[0],ids);});
+// Copy the record link; without clipboard access, show it.
+document.addEventListener('click',event=>{const button=event.target.closest?.('[data-copy-record]');if(!button)return;const url=new URL(button.dataset.copyRecord,location.href).href,status=$('evidence-copy-status'),say=text=>{if(status)status.textContent=text;};const copy=navigator.clipboard?.writeText?navigator.clipboard.writeText(url):Promise.reject();copy.then(()=>say('Link copied.'),()=>say('Copy this link: '+url));});
+function profileProducts(id){
+  const curated=profileContent(id).products;if(curated?.length)return typeof applyProductSourceUpdates==='function'?applyProductSourceUpdates(id,curated):curated;
+  const all=DATA.products.filter(p=>p.company_id===id&&claims[p.claim_id]?.status!=='superseded');
+  const named=all.filter(p=>!/^Offer \/ product evidence|^Product evidence/i.test(p.name));
+  const rows=named.length?named:all,seen=new Set();
+  const products=rows.filter(p=>{const key=p.name.toLowerCase().replace(/[^a-z0-9]/g,'');if(seen.has(key))return false;seen.add(key);return true;}).map(p=>({name:p.name,description:p.work_performed,kind:p.delivery_model,record_ids:[p.id],claim_ids:[p.claim_id]}));
+  return typeof applyProductSourceUpdates==='function'?applyProductSourceUpdates(id,products):products;
+}
+function profileRelationships(id){
+  const curated=profileContent(id).relationships;if(curated)return curated;
+  const seen=new Set();
+  return DATA.customer_evidence.filter(r=>r.company_id===id&&claims[r.claim_id]?.status!=='superseded').filter(r=>{
+    if(r.organization.length>75||/unnamed|undisclosed|anonymous|not (?:named|disclosed|established)|every leading|no named|not a |no verified|unverified customer/i.test(r.organization))return false;
+    const key=r.organization.toLowerCase().replace(/[^a-z0-9]/g,'');if(seen.has(key))return false;seen.add(key);return true;
+  }).map(r=>({name:r.organization,relationship:r.relationship_detail||title(r.relationship),description:r.use_case,record_ids:[r.id],claim_ids:[r.claim_id]}));
+}
+function relationshipLabel(value){return ({dataset_use:'Dataset used in training',dataset_user:'Dataset use',implementation_partner:'Business implementation',research_collaboration:'Research collaboration',research_collaborator:'Research collaboration',company_reported_customer:'Company-reported customer',company_reported_data_partner:'Company-reported data partner',customer:'Customer evidence',claimed_customer:'Reported customer relationship',technology_vendor:'Technology supplier',research_citation:'Research citation',benchmark_adopter:'Use of an AI test',benchmark_contributor:'Contribution to an AI test',acquirer:'Acquirer',reseller:'Reseller'})[value]||title(value);}
+function profileRelationshipLabel(id,row){
+ const claimId='quesma.claim.audit-historical-delivery',sourceId='quesma.source.audit-q-hydrolix',claim=claims[claimId],source=sources[sourceId];
+ if(id==='quesma'&&row.name==='Hydrolix'&&row.relationship==='former_customer'&&row.claim_ids?.length===1&&row.claim_ids[0]===claimId&&claim?.company_id===id&&claim.status==='supported'&&claim.source_ids?.length===1&&claim.source_ids[0]===sourceId&&source?.company_id===id&&source.url==='https://www.prnewswire.com/news-releases/hydrolix-adds-quesma-gateway-proxy-ip-to-its-portfolio-assuring-continued-kibana-support-302559127.html')return 'Gateway IP buyer';
+ return typeof relationshipLabel==='function'?relationshipLabel(row.relationship):title(row.relationship);
+}
+function profileProductGrid(id){const rows=[...profileProducts(id)].sort((a,b)=>Number(Boolean(b.description))-Number(Boolean(a.description)));const render=items=>`<div class="profile-product-grid">${items.map(p=>`<article class="offering-card" data-profile-product="${attr(p.name)}"><div class="offering-title"><h3>${esc(p.name)}</h3>${p.kind?`<p class="offering-kind">${esc(p.kind)}</p>`:''}</div><div class="offering-description">${p.description?`<p>${esc(p.description)}</p>`:''}${p.status?`<p class="offering-status">${esc(title(p.status))}</p>`:''}${p.aliases?.length?`<details class="offering-aliases"><summary>Other names in the source</summary><p>${esc(p.aliases.join(' · '))}</p></details>`:''}</div><div class="profile-card-source">${typeof productSourceHTML==='function'?productSourceHTML(p,'Source',p.name):profileReferences(p.claim_ids,'Source',p.name)}${typeof productSourceContextHTML==='function'?productSourceContextHTML(p):''}</div></article>`).join('')}</div>`;return render(rows.slice(0,4))+(rows.length>4?profileDisclosure(`More offerings (${rows.length-4})`,render(rows.slice(4))):'');}
+function profileCase(id){const c=profileContent(id).featured_case;if(!c)return '';return `<section class="featured-case"><p class="eyebrow">${esc(c.eyebrow||'A closer look')}</p><h3>${esc(c.title)}</h3><p>${esc(c.description)}</p>${c.qualifier?`<p class="case-qualifier">${esc(c.qualifier)}</p>`:''}${profileReferences(c.claim_ids,'Case source',c.title)}</section>`;}
+function profileContextDescription(text,claimIds=[]){
+ if(!claimIds.some(id=>['afterquery.claim.round2-relationship-3','afterquery.claim.round2-research-legora-bar'].includes(id)))return text;
+ return String(text||'').replace('synthetic BAR case','synthetic case for BAR (an evaluation of AI on legal work)').replace('BAR uses','BAR (an evaluation of AI on legal work) uses');
+}
+function profileRelationshipGrid(id){const rows=profileRelationships(id),featured=profileContent(id).featured_case;const render=items=>`<div class="profile-relationship-grid">${items.map(r=>`<article class="relationship-card" data-profile-relationship="${attr(r.name)}"><div><h3>${esc(r.name)}</h3><p class="relationship-kind">${esc(profileRelationshipLabel(id,r))}</p></div><div class="relationship-account">${r.description&&r.description!==featured?.description?`<p>${esc(profileContextDescription(r.description,r.claim_ids))}</p>`:''}${profileRelationshipScopeContext(id,r)?`<p class="sub">${esc(profileRelationshipScopeContext(id,r))}</p>`:''}</div><div class="profile-card-source">${profileReferences(r.claim_ids,'Source',r.name)}</div></article>`).join('')}</div>`;return rows.length?render(rows.slice(0,4))+(rows.length>4?profileDisclosure(`More relationships (${rows.length-4})`,render(rows.slice(4))):''):'<p class="profile-empty">Named relationships are not established in the reviewed sources.</p>';}
+const PROFILE_EVENT_KINDS={lawsuit:'Lawsuit',data_incident:'Data incident',customer_change:'Customer change',workforce_change:'Workforce change',filing:'Filing'};
+function profileMonthHTML(value,prefix=''){return /^\d{4}-\d{2}(-\d{2})?$/.test(value)?`${prefix}<time datetime="${attr(value)}">${esc(new Date(value.slice(0,7)+'-01T12:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'}))}</time>`:esc(dateText(value));}
+function profileEvents(id){return (window.COMPANY_EVENTS?.events||[]).filter(e=>e.company_id===id||e.related_company_ids.includes(id)).sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id));}
+// Event statuses carry the date they were checked, since a pending case can change after review.
+function profileStatusesChecked(events){
+ const days=[...new Set(events.map(e=>e.status_checked_on).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)))].sort(),label=d=>`${Number(d.slice(8))} ${new Date(d+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',timeZone:'UTC'})} ${d.slice(0,4)}`;
+ return !days.length?'':days.length===1?`Statuses were checked on ${label(days[0])}.`:`Statuses were checked between ${label(days[0])} and ${label(days.at(-1))}.`;
+}
+function profileRiskClaims(id){return currentClaims(id).filter(c=>c.subject==='risks'&&c.status==='supported').sort(byRecent);}
+function profileRisks(id){
+ const events=profileEvents(id),risks=profileRiskClaims(id);if(!events.length&&!risks.length)return '';
+ const eventRows=events.map(e=>`<article class="relationship-card" data-profile-event="${attr(e.id)}"><div><p class="risk-date">${profileMonthHTML(e.date)}</p><p class="relationship-kind">${esc(PROFILE_EVENT_KINDS[e.kind]||title(e.kind))}</p></div><div class="relationship-account"><h4>${esc(e.title)}</h4><p>${esc(e.detail)}</p><p class="risk-meta">${esc(e.status)}${e.sources.map(s=>' · '+external(s.url,s.publisher)).join('')}</p></div></article>`).join('');
+ const riskRows=risks.map(c=>`<article class="relationship-card" data-profile-risk="${attr(c.id)}"><div><p class="risk-date">${profileMonthHTML(c.as_of,'As of ')}</p></div><div class="relationship-account"><p>${esc(c.statement)}</p></div><div class="profile-card-source">${profileReferences([c.id])}</div></article>`).join('');
+ return profileSection('risks','Risks and disputes',`<div class="profile-risks">${events.length?`<h3 class="eyebrow">Dated events</h3><div class="profile-relationship-grid">${eventRows}</div>`:''}${risks.length?`<h3 class="eyebrow">Risks named in the evidence</h3><div class="profile-relationship-grid">${riskRows}</div>`:''}${events.length?`<p class="sub">Lawsuit entries describe allegations and court filings, not findings. Dates show when a case was filed or an event was reported. ${esc(profileStatusesChecked(events))}</p>`:''}</div>`);
+}
+function profilePeopleRows(id){
+  const curated=profileContent(id).people;
+  const all=curated?.length?curated:DATA.company_people.filter(p=>p.company_id===id).map(p=>({person_id:p.person_id,role:title(p.role),bio:'',claim_ids:[p.claim_id]}));
+  return all.filter(p=>!p.historical&&!/early founding|historical/i.test(p.role)&&(!/\bformer\b/i.test(p.role)||/\badvisor\b/i.test(p.role)));
+}
+function profilePeople(id){
+  const rows=profilePeopleRows(id);
+  return rows.length?`<div class="leadership-grid">${rows.map(p=>`<article class="leadership-card">${p.portrait?`<span class="leadership-photo ${p.portrait.includes('carlos')?'photo-tighter':''}"><img class="leadership-portrait" src="${attr(p.portrait)}" alt="" width="80" height="80" loading="lazy"></span>`:''}<div><h3>${esc(people[p.person_id]?.name||p.name)}</h3><p class="leadership-role">${esc(p.role)}</p>${p.bio?`<p>${esc(p.bio)}</p>`:''}${profileReferences(p.claim_ids,'Source',people[p.person_id]?.name||p.name)}</div></article>`).join('')}</div>`:'<p class="profile-empty">Leadership is not established in the reviewed sources.</p>';
+}
+const PROFILE_CAPITAL_CONTEXT={
+ 'bespoke_labs.round.1':{qualification:'Series A amount differs by source: Wing reports $31.3M; SiliconANGLE reports $31.75M.'},
+ 'giskard.round.1':{label:'Public grants · 2023',dateLabel:'Reported',qualification:'Includes the €500K i-Lab award.'},
+ 'giskard.round.2':{label:'Consortium grant',dateLabel:'Project announced',qualification:'Company-reported €3M Bpifrance grant linked to ArGiMi. Amount drawn and allocation details are undisclosed.'},
+ 'apto.round.0':{label:'Investment history',dateLabel:'Interview published',qualification:'Mitsui Sumitomo Insurance Venture Capital first invested in December 2020 and led four later investments. Amounts are undisclosed.'},
+ 'appen.round.major-8':{dateLabel:'Completed'},
+ 'appen.round.major-9':{dateLabel:'Completed'},
+ 'hackerrank.round.recruit-2015':{qualification:'The 2015 announcement reports $7.5M; the company timeline later gives $7.8M.'},
+ 'invisible.round.major-1':{dateLabel:'Database date',qualification:'Funding database reports the amount and date; an original financing announcement was not verified.'},
+ 'sama.round.sama-2017':{label:'BESTSELLER Foundation investment · 2017',qualification:'Sama Kenya subsidiary. Amount undisclosed.'},
+ 'refresh.round.0':{label:'Y Combinator · Spring 2025 cohort'},
+ 'taskus.round.2':{label:'Initial public share offering',qualification:'Gross base value: 13.2M shares × $23. Excludes the banks’ option to buy extra shares.'},
+ 'taskus.round.3':{outcome:'The take-private proposal failed its shareholder vote on 8 Oct 2025.',outcomeSourceLabel:'Vote source'}
+};
+function profileCapitalContext(r){return Object.prototype.hasOwnProperty.call(PROFILE_CAPITAL_CONTEXT,r.id)?PROFILE_CAPITAL_CONTEXT[r.id]:{};}
+function capitalLabel(r){
+ const context=profileCapitalContext(r);if(context.label)return context.label;
+ if(/philanthropic|pledge/i.test(r.round_name+' '+claims[r.claim_id]?.statement))return 'Philanthropic pledge';
+ return ({secondary:'Sale of existing shares',debt:'Debt financing',acquisition:'Acquisition',grant:'Grant'})[r.capital_type]||title(r.round_name);
+}
+function profileCapital(id){
+ const config=profileContent(id),rounds=fundingRows(id).filter(r=>claims[r.claim_id]?.status!=='superseded'),uncertainStatus=['talks','rumor','rumoured','proposed','cancelled'];
+ const current=rounds.filter(r=>claims[r.claim_id]?.status==='supported'&&!r.parent_round_id&&!uncertainStatus.includes(r.status));
+ const valuations=uniqueMetrics(id).filter(m=>m.kind==='valuation'&&!unconfirmedValuation(m)),combined=config.combine_round_and_valuation&&current.length===1?valuations.find(m=>m.as_of===current[0].announced_on):null;
+ const outcomes=rounds.filter(r=>r.status==='cancelled'&&claims[r.claim_id]?.status==='supported'&&profileCapitalContext(r).outcome);
+ const outcomeHTML=outcomes.map(r=>{const context=profileCapitalContext(r);return `<div class="capital-outcome"><p class="sub">${esc(context.outcome)}</p>${profileReferences([r.claim_id],context.outcomeSourceLabel||'Outcome source')}</div>`;}).join('');
+ const unconfirmed=rounds.some(r=>claims[r.claim_id]?.status!=='supported'||uncertainStatus.slice(0,4).includes(r.status))||uniqueMetrics(id).some(unconfirmedValuation),more=unconfirmed||rounds.some(r=>r.status==='cancelled')||current.length>3||valuations.filter(m=>m!==combined).length>1;
+ return `<div class="capital-grid">${current.slice(0,3).map(r=>{
+  const context=profileCapitalContext(r),leads=DATA.round_investors.filter(x=>x.round_id===r.id&&claims[x.claim_id||r.claim_id]?.status==='supported'&&/lead/i.test(x.role)).map(x=>investors[x.investor_id].name);
+  return `<article class="capital-event" data-capital-round="${attr(r.id)}"><div class="capital-time"><p class="capital-date">${esc(context.dateLabel||'Announced')}<span>${esc(profileDate(r.announced_on))}</span></p>${r.closed_on?`<p class="sub">Closed ${esc(profileDate(r.closed_on))}</p>`:''}</div><div class="capital-data"><p class="capital-label">${esc(capitalLabel(r))}</p><h3><span class="sr-only">${esc(capitalLabel(r))}: </span>${'amount'in r?esc(metricValue({value:r.amount,unit:'currency',currency:r.currency,qualifier:r.qualifier})):'Amount undisclosed'}</h3>${r.capital_type==='mixed'&&r.amount_basis==='undisclosed'?'<p class="sub capital-scope">Company-reported financing includes equity and credit. Component amounts and credit drawdown are undisclosed.</p>':''}${r.amount_basis==='mixed_transaction'?'<p class="sub capital-scope">Includes existing shares sold by shareholders. The total is not all new company funding.</p>':''}${context.qualification?`<p class="sub capital-scope">${esc(context.qualification)}</p>`:''}${leads.length?`<p class="sub">Led by ${esc(leads.join(', '))}</p>`:''}${combined?`<div class="capital-valuation">${numberButton(combined)}<span>Valuation at the round</span></div>`:''}<p class="sub">${config.capital_note?esc(config.capital_note):r.status==='announced'?'':esc(title(r.status))}${r.capital_type==='secondary'?' · Existing shares':''}</p>${profileReferences([r.claim_id],'Source')}</div></article>`;
+ }).join('')}${valuations.filter(m=>m!==combined).slice(0,1).map(m=>`<article class="capital-event valuation-event"><div class="capital-time"><p class="capital-date">As of<span>${esc(profileDate(m.as_of))}</span></p></div><div class="capital-data"><p class="capital-label">${esc(/pre.money/i.test(m.label)?'Pre-money valuation':/post.money/i.test(m.label)?'Post-money valuation':'Valuation')}</p><h3>${numberButton(m)}</h3><p class="sub">${esc(scopeText(m.segment_scope,id))}</p>${/pre.money/i.test(m.label)?'<p class="sub">Company value before the new investment is added.</p>':''}<p class="sub">${esc(evidenceLabel(claims[m.claim_id]))}</p></div></article>`).join('')}</div>${!current.length&&!valuations.length?'<p class="profile-empty">No quantified financing is established in the reviewed sources.</p>':''}${outcomeHTML}${more?`<p class="sub profile-more-records">More funding records${unconfirmed?', including unconfirmed reports,':''} are in <a href="#company/${attr(id)}/financing">Sources and review</a>.</p>`:''}`;
+}
+function profileSentenceCase(text){const value=String(text??'');return value.charAt(0).toUpperCase()+value.slice(1);}
+function profileMetricLabel(m){
+  if(m.id==='ooak.metric.audit-ooak-headcount-scope'&&m.company_id==='ooak'&&m.kind==='headcount'&&m.label==='directory_team_size')return 'Team size listed by Y Combinator (a startup investor)';
+  if(m.kind==='annualized_revenue_run_rate')return 'Annualized revenue pace';
+  if(['expert_network','headcount','active_paid_experts','other'].includes(m.kind))return profileSentenceCase(m.label);
+  return metricLabels[m.kind]||profileSentenceCase(m.label);
+}
+function profileMetricDate(m){
+ const corrected=metricCurrentPeriod(m);if(corrected)return corrected;
+ if(m.kind==='revenue')return readableDate(m.period_label||financialPeriod(m));
+ if(m.as_of==='undated')return 'Undated · checked '+profileDate(claims[m.claim_id].observed_on);
+ const date=profileDate(String(m.as_of).replace(/^as of\s+/i,''));return /^(\d|[A-Z][a-z]{2,3} \d{4})/.test(date)?'As of '+date:date.charAt(0).toUpperCase()+date.slice(1);
+}
+function profileMetricYear(m){const rank=dateRank(m.as_of);return rank==='0000'?null:Number(rank.slice(0,4));}
+// Same Historical rule as compactSignal() on the cards.
+function profileMetricHistory(m){const year=profileMetricYear(m);return year&&year<Number(DATA.meta.as_of.slice(0,4))-1?'Historical · '+year:'';}
+function profileMetricTags(m){const tags=[metricStatusLabel(m),profileMetricHistory(m)].filter(tag=>tag&&tag!=='Reported');return tags.length?`<p class="observation-tags">${tags.map(tag=>`<span>${esc(tag)}</span>`).join('')}</p>`:'';}
+// Signed growth: +58.6%, −1.5%.
+function profileMetricValue(m){const value=metricValue(m);return m.kind!=='growth_rate'||m.unit!=='percent'?value:m.value>0?value.replace(/\d/,'+$&'):value.replace('-','−');}
+function profileNumberButton(m){const label=profileMetricValue(m);if(label===metricValue(m))return numberButton(m);const access=evidenceAccess([m.claim_id],label,metricEvidenceTopic(m,m.label||metricLabels[m.kind]));return `<button class="number-button" data-claim="${esc(m.claim_id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;}
+const PROFILE_METRIC_ATTRIBUTIONS={
+ 'elorian.claim.core-elorian.claim.growth_metrics-0.metric-0-metric':'Employer job listing',
+ 'abundant_ai.claim.audit-abundant-network-metric':'Company-authored Y Combinator profile',
+ 'ooak.claim.audit-ooak-headcount-scope-metric':'Y Combinator profile snapshot',
+ 'laude.claim.audit-laude-deployed-grants-metric':'Institute-reported grantmaking'
+};
+// Lead decision: TaskUs and Appen figures are annual-report figures, never "audited".
+const PROFILE_EVIDENCE_LABELS={'Audited filing':'Annual report filing','Audited public company':'Public company annual report'};
+function profileEvidenceLabel(cl){const label=evidenceLabel(cl);return ['taskus','appen'].includes(cl.company_id)&&PROFILE_EVIDENCE_LABELS[label]||label;}
+function profileMetricAttribution(m){
+ const claim=claims[m.claim_id];
+ if(claim.status!=='supported'||claim.source_ids.length&&claim.source_ids.every(id=>sources[id].retrieval_status==='unverified'))return profileEvidenceLabel(claim);
+ return metricCurrentAttribution(m,PROFILE_METRIC_ATTRIBUTIONS[claim.id]||profileEvidenceLabel(claim));
+}
+function profilePerformance(id){
+  const config=profileContent(id),chart=config.performance_chart,related=config.operating_case;const chartTitle=chart&&/GDPval/i.test(chart.title)?'Initial training comparison':chart?.title,seriesLabel=value=>String(value).replace(/warmup/gi,'initial training');
+  const visual=chart?`<section class="profile-performance"><p class="eyebrow">Performance experiment</p><h2>${esc(chartTitle)}</h2>${/GDPval/i.test(chart.title)?'<p class="sub">GDPval tests AI on professional work tasks. This experiment compares training with and without an initial preparation stage.</p>':''}<p class="sub">${esc(chart.subtitle)}</p><div class="performance-bars" role="img" aria-label="${attr(chart.title+': '+chart.series.map(s=>s.label+' '+s.value).join('; ')+'. Scale zero to 100.')}">${chart.series.map(s=>`<div class="performance-row"><div><span>${esc(seriesLabel(s.label))}</span><strong>${esc(s.value)}</strong></div><div class="performance-track"><span style="width:${Math.max(0,Math.min(100,Number(s.value)))}%"></span></div></div>`).join('')}<div class="performance-axis"><span>0</span><span>GDPval score</span><span>100</span></div></div><p class="performance-note">${esc(chart.qualification)}</p>${profileReferences(chart.claim_ids,'Experiment source')}</section>`:'';
+  const context=related?`<section class="operating-case"><p class="eyebrow">Research collaboration</p><h3>${esc(related.title)}</h3><p>${esc(profileContextDescription(related.description,related.claim_ids))}</p>${profileReferences(related.claim_ids)}</section>`:'';
+  return visual||context?`<div class="profile-performance-layout">${visual}${context}</div>`:'';
+}
+function profileOperatingMetrics(id,metrics=uniqueMetrics(id)){return metrics.filter(m=>!['valuation','funding_total_reported','funding_total_calculated'].includes(m.kind));}
+function profileHeadlineMetrics(id,all=uniqueMetrics(id)){
+ const config=profileContent(id),primary=preferredFinancial(id),extras=all.filter(m=>['expert_network','headcount','active_paid_experts'].includes(m.kind)&&m.segment_scope!=='other_segment');
+ const selected=config.metric_ids?config.metric_ids.map(mid=>all.find(m=>m.id===mid)).filter(Boolean):primary?[primary]:[];if(!config.metric_ids)for(const m of extras)if(!selected.some(x=>x.kind===m.kind)&&selected.length<3)selected.push(m);
+ return selected;
+}
+function profileFiguresHeading(id){return profileContent(id).traction_heading||(profileHeadlineMetrics(id).every(m=>metricStatusLabel(m)==='Reported')?'Reported figures':'Key figures');}
+function profileTraction(id){
+ const config=profileContent(id),all=uniqueMetrics(id),selected=profileHeadlineMetrics(id,all);
+ const metrics=selected.map(m=>{const context=config.metric_context?.[m.id],scope=context?.scope||(m.scope_detail&&!['company','ai_data','other_segment'].includes(m.scope_detail)?m.scope_detail:scopeText(m.segment_scope,id));return `<article class="profile-scale-observation">${profileMetricTags(m)}<div class="scale-number">${profileNumberButton(m)}</div><h3 class="observation-label">${esc(profileMetricLabel(m))}</h3><p class="observation-scope">${esc(scope)}${m.currency?' · '+esc(m.currency):''}</p><p class="observation-date">${esc(profileMetricDate(m))}</p><p class="observation-note">${esc(profileMetricAttribution(m))}</p>${context?.note&&!/^Undated company claim$/i.test(context.note)?`<p class="observation-note">${esc(context.note)}</p>`:''}${m.kind==='revenue'&&m.gross_vs_net==='unspecified'?'<p class="observation-note">Gross or net revenue not stated</p>':''}${m.kind==='annualized_revenue_run_rate'?`<p class="metric-definition">Annualized pace (recent revenue projected across a full year).</p><p class="observation-note">${esc(metricCurrentBasisDescription(m,m.gross_vs_net==='unspecified'?'The source does not say whether revenue is gross or net.':m.gross_vs_net==='gross'?'Gross revenue (revenue before deductions described by its source).':'Net revenue (revenue after deductions described by its source).'))}</p>`:''}</article>`;}).join('');
+ const observations=profileOperatingMetrics(id,all);
+ return `${metrics?`<div class="profile-scale-grid">${metrics}</div>`:(config.activity?'':'<p class="profile-empty">Revenue is not publicly established.</p>')}${profileGrowth(id)}${profilePerformance(id)}${observations.length?`<p class="profile-archive-link"><a href="#company/${attr(id)}/observations">All dated figures (${observations.length}) ${iconHTML('right')}</a></p>`:''}`;
+}
+function profileArchive(id){
+  const rows=table=>DATA[table].filter(r=>r.company_id===id),c=companies[id],registry=companySources(id);
+  const products=rows('products').map(p=>`<article class="record" data-product="${attr(p.id)}"><h3>${esc(p.name)}</h3>${originalProductContextHTML(p)}<p>${esc(p.work_performed)}</p>${profileProvenance(claims[p.claim_id])}</article>`).join('');
+  const peopleRows=rows('company_people').map(p=>`<article class="record" data-person="${attr(p.id)}"><h3>${esc(people[p.person_id].name)}</h3><p>${esc(title(p.role))}</p>${profileProvenance(claims[p.claim_id])}${(p.background_claim_ids||[]).map(id=>claimButton(id,'Background source')).join(' ')}</article>`).join('');
+  const relationships=rows('customer_evidence').map(customerRecord).join('');
+  const backers=(DATA.company_investors||[]).filter(r=>r.company_id===id).map(r=>`<article class="record" data-backer="${attr(r.id)}"><h3>${esc(investors[r.investor_id].name)}</h3><p>${esc(r.allocation)}</p>${profileProvenance(claims[r.claim_id])}</article>`).join('');
+  const finance=rows('funding_rounds').map(r=>financingEvent(r).replace(' · Equity · ',' · '+esc(capitalLabel(r))+' · ')).join('')+disclosedPrimarySummary(id)+backers;
+  const metricRows=uniqueMetrics(id),financeMetrics=metricRows.filter(m=>['valuation','funding_total_reported','funding_total_calculated'].includes(m.kind));
+  const operatingMetrics=profileOperatingMetrics(id,metricRows),financeHTML=finance+(financeMetrics.length?`<div class="metric-grid">${financeMetrics.map(metricTile).join('')}</div>`:'');
+  const method=DATA.assessments.filter(a=>a.company_id===id).map(renderAssessment).join('')+rows('company_relationships').map(r=>`<p>${esc(title(r.relationship))} ${esc(r.related_entity_name)} · ${claimButton(r.claim_id,'Source')}</p>`).join('');
+  const scope=method||(c.entity_type==='adjacent_research'?'<p>Research organizations are outside the commercial assessment rules.</p>':'');
+  const observations=operatingMetrics.length?`<details id="profile-observations" data-profile-section="observations"><summary>All dated figures</summary><div class="metric-grid">${operatingMetrics.map(metricTile).join('')}</div></details>`:profileRouteSection(routeParts()[2])==='observations'?'<section id="profile-observations" data-profile-section="observations"><h2>All dated figures</h2><p class="profile-empty">No dated figures are established in the reviewed sources.</p></section>':'';
+  const sourceHTML=`<section id="profile-sources" data-profile-section="sources"><h2>All sources</h2><ol class="sources-list">${registry.map(s=>`<li data-source="${attr(s.id)}">${external(s.url,s.title)}<p class="sub">${esc(profileSourceMeta(s))}</p></li>`).join('')}</ol></section>`;
+  const logo=logoFor(id),brand=logo?`<details><summary>Logo source</summary><p>${external(logo.source_page||logo.source_url,'Original source')} · Checked ${esc(profileDate(logo.verified_on||logo.accessed_on||'2026-10-14'))}</p></details>`:'';
+  const finances=financeHTML?`<details class="profile-disclosure" id="profile-financing" data-profile-section="financing"><summary>Funding records</summary>${financeHTML}</details>`:'';
+  return `<div class="profile-archive"><div class="archive-intro">${typeof sourceUpdatesArchiveHTML==='function'?sourceUpdatesArchiveHTML(id):''}${evidenceContextArchiveHTML(id)}<p>${companyClaims(id).length} claims and ${registry.length} sources</p><nav aria-label="Evidence sections">${operatingMetrics.length?`<a href="#company/${attr(id)}/observations">All dated figures</a>`:''}${finances?`<a href="#company/${attr(id)}/financing">Funding records</a>`:''}<a href="#company/${attr(id)}/questions">All claims</a><a href="#company/${attr(id)}/sources">All sources</a></nav></div>${products?profileDisclosure('Product records',products):''}${relationships?profileDisclosure('Relationship records',relationships):''}${peopleRows?profileDisclosure('Leadership records',peopleRows):''}${finances}${observations}${scope?`<section id="profile-method" data-profile-section="method"><h2>Assessment and scope</h2>${scope}</section>`:''}${profileDisclosure('All claims and historical evidence',`<div id="profile-questions" data-profile-section="questions">${companyClaims(id).map(claimRecord).join('')}</div>`)}${brand}${sourceHTML}</div>`;
+}
+const PROFILE_ARCHIVE_SECTIONS=['method','questions','sources','observations','financing'];
+// A record link opens the tab that holds the record.
+function profileTarget(id,parts=routeParts()){
+ const claim=parts[2]==='claim'?claims[parts[3]]:null;
+ if(claim?.company_id===id){const section=narrativeSection(claim);return ['products','customers','traction','people','finance','work'].includes(section)?section:'business';}
+ return profileRouteSection(parts[2])||'business';
+}
+// Logos beside a visible name are decorative.
+function profileLogoHTML(id,extra){return logoHTML(id,extra,true).replace(/ alt="[^"]*"/,' alt=""');}
+function profilePeersHTML(id){
+ const group=modelGroup(id),members=(MODEL_GROUPS[group]||[]).filter(peer=>companies[peer]),peers=members.filter(peer=>peer!==id).sort((a,b)=>companies[a].name.localeCompare(companies[b].name));
+ if(!peers.length)return '';
+ return `<section class="profile-peers" aria-labelledby="profile-peers-title"><h2 id="profile-peers-title">More in ${esc(groupLabel(group))}</h2><ul>${peers.map(peer=>`<li><a href="#company/${attr(peer)}">${logoFor(peer)?profileLogoHTML(peer,'peer-logo'):''}<span>${esc(companies[peer].name)}</span></a></li>`).join('')}</ul><p><a class="profile-peers-all" href="#companies/${attr(groupSlug(group))}" data-category-jump="${attr(group)}">${members.length===2?'Both companies':'All '+members.length+' companies'} in this group ${iconHTML('right')}</a></p></section>`;
+}
+function profileHTML(id,{deferArchive=false}={}){
+ const c=companies[id],config=profileContent(id),target=profileTarget(id),active=target==='observations'?'traction':profileTabFor(target),archiveOpen=PROFILE_ARCHIVE_SECTIONS.includes(target);
+ const notes=(config.notes||[]).map(n=>typeof n==='string'?`<p>${esc(n)}</p>`:`<p>${esc(n.text)} ${profileReferences(n.claim_ids)}</p>`).join('');
+ const group=modelGroup(id),category=`<p class="profile-category">${esc(groupLabel(group))}</p>`;
+ const panes={business:`<div class="profile-business-intro">${MODEL_GROUPS[group]?`<a class="profile-category-link" href="#companies/${attr(groupSlug(group))}" data-category-jump="${attr(group)}">${category}${iconHTML('right')}<span class="sr-only">: all companies in this business group</span></a>`:category}<p>${esc(config.summary||modelFor(id))}</p></div><div class="profile-business-layout ${config.featured_case?'has-case':''}">${profileSection('products',config.product_heading||'Products and services',profileProductGrid(id))}${profileCase(id)}</div>${typeof productMediaHTML==='function'?productMediaHTML(id):''}${profileSection('customers','Who it works with',profileRelationshipGrid(id))}${profileRisks(id)}`,
+ traction:profileSection('traction',profileFiguresHeading(id),`${config.activity?`<div class="profile-activity"><h3>${esc(config.activity.title)}</h3><p>${esc(config.activity.description)}</p>${profileReferences(config.activity.claim_ids)}</div>`:''}${profileTraction(id)}`),
+ people:`<div class="profile-people-layout">${profileSection('finance',c.entity_type==='adjacent_research'?'Research support':'Funding and valuation',profileCapital(id))}${profileSection('people','Founders and leadership',profilePeople(id))}</div>`+(notes?profileDisclosure('Further context',notes):''),
+ work:profileSection('work','Paid work at '+c.name,workSummary(id))};
+ const tabs=[['business','Business'],['traction','Figures'],['people','Funding & people'],['work','Paid work']];
+ return `<div class="profile-v2" data-profile-company="${attr(id)}"><a class="profile-back" href="#companies">${iconHTML('left')} Companies</a><header class="profile-top profile-hero"><div class="profile-title-row">${profileLogoHTML(id,'profile-brand')}<h1>${esc(c.name)}</h1></div><div class="profile-links">${external(c.website,'Website')}${c.founded_year?`<span>Founded ${c.founded_year}</span>`:''}${compareCheck(id)}<a href="#company/${attr(id)}/sources">Sources ${iconHTML('right')}</a><a href="/company/${attr(id)}/">Plain page to share ${iconHTML('right')}</a></div></header><nav class="profile-tabs" role="tablist" aria-label="${attr(c.name)} details">${tabs.map(([key,label])=>`<button type="button" role="tab" id="profile-tab-${key}" data-profile-tab="${key}" aria-controls="profile-pane-${key}" aria-selected="${active===key}" tabindex="${active===key?0:-1}">${esc(label)}</button>`).join('')}</nav><div class="profile-panes">${tabs.map(([key])=>`<section id="profile-pane-${key}" role="tabpanel" aria-labelledby="profile-tab-${key}" tabindex="-1" data-profile-pane="${key}"${active===key?'':' hidden'}>${panes[key]}</section>`).join('')}</div><details class="profile-evidence"${archiveOpen?' open':''}><summary><span class="archive-summary-label">Sources and review <i aria-hidden="true">+</i></span><span>${companyClaims(id).length} claims · ${companySources(id).length} sources</span></summary>${deferArchive&&!archiveOpen?'':profileArchive(id)}</details><p class="profile-correction">Something wrong here? <a href="#corrections">Request a correction ${iconHTML('right')}</a></p>${profilePeersHTML(id)}</div>`;
+}
+
+function ensureProfileArchive(root){
+ const container=$('profile-view'),id=root?.dataset?.profileCompany;
+ // Queued disclosure events from a replaced profile must not populate stale DOM.
+ if(!isCompanyId(id)||container.querySelector?.('.profile-v2')!==root)return null;
+ const evidence=root.querySelector('.profile-evidence');if(!evidence)return null;
+ const existing=evidence.querySelector('.profile-archive');if(existing)return existing;
+ evidence.insertAdjacentHTML('beforeend',profileArchive(id));
+ return evidence.querySelector('.profile-archive');
+}
+
+function renderCompanyProfile(id){
+ const container=$('profile-view'),existing=container.querySelector?.('.profile-v2');
+ const render=()=>{container.innerHTML=profileHTML(id,{deferArchive:typeof container.querySelector==='function'});};
+ if(!existing||existing.dataset.profileCompany!==id){render();return;}
+ const target=profileTarget(id);
+ // With no operating figures, the archive has a placeholder only on the
+ // observations route. Preserve that existing conditional presentation.
+ const emptyObservation=existing.querySelector('#profile-observations')?.tagName==='SECTION';
+ if(emptyObservation!==(target==='observations'&&!profileOperatingMetrics(id).length)){
+  render();return;
+ }
+ if(PROFILE_ARCHIVE_SECTIONS.includes(target)||existing.querySelector('.profile-evidence')?.open)ensureProfileArchive(existing);
+ const active=target==='observations'?'traction':profileTabFor(target);
+ existing.querySelectorAll('[data-profile-pane]').forEach(pane=>{pane.hidden=pane.dataset.profilePane!==active;});
+ existing.querySelectorAll('[data-profile-tab]').forEach(tab=>{
+  const selected=tab.dataset.profileTab===active;
+  tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1;
+ });
+}
+
+// Click precedes the native summary action, including Enter/Space activation.
+// Toggle does not bubble, so capture also covers programmatic disclosure opens.
+document.addEventListener('click',event=>{
+ const summary=event.target.closest?.('summary'),evidence=summary?.parentElement;
+ if(evidence?.classList.contains('profile-evidence')&&!evidence.open)ensureProfileArchive(evidence.closest('.profile-v2'));
+});
+document.addEventListener('toggle',event=>{
+ const evidence=event.target;
+ if(evidence?.open&&evidence.classList?.contains('profile-evidence'))ensureProfileArchive(evidence.closest('.profile-v2'));
+},true);
+
+// Keep comparison content aligned with the visible profiles.
+const profileComparisonRows=comparisonRows;
+comparisonRows=function(){return profileComparisonRows().map(([label,render])=>{
+  if(label==='Products')return [label,id=>`<p>${profileProducts(id).slice(0,4).map(p=>esc(p.name)+(p.status?`<span class="sub">${esc(title(p.status))}</span>`:'')+(p.source_updates?.length?`<span class="sub">${esc(p.description)}</span>${productSourceHTML(p)}`:'')).join('<br>')}</p><a href="#company/${attr(id)}/products">Explore products ${iconHTML('right')}</a>`];
+  if(label==='Customer evidence')return ['Relationships',id=>`${profileRelationships(id).slice(0,2).map(r=>`<p><b>${esc(r.name)}</b><span class="sub">${esc(profileRelationshipLabel(id,r))}</span>${profileRelationshipScopeContext(id,r)?`<span class="sub">${esc(profileRelationshipScopeContext(id,r))}</span>`:''}</p>`).join('')||'<p class="sub">No named relationship established.</p>'}<a href="#company/${attr(id)}/customers">Who it works with ${iconHTML('right')}</a>`];
+  if(label==='People')return [label,id=>{
+    const rows=profilePeopleRows(id);
+    return `<p>${rows.slice(0,3).map(p=>`${esc(people[p.person_id]?.name||p.name)} <span class="sub">${esc(p.role)}</span>`).join('<br>')||'Not established'}</p><a href="#company/${attr(id)}/people">Funding &amp; people ${iconHTML('right')}</a>`;
+  }];
+  return [label,render];
+});};
+
+// Direct links can scroll before a lazy product image above the archive has its
+// height. Correct that initial position after the visible images and page settle.
+let profileHasRouted=false,profileInitialAnchorCleanup=null;
+function settleInitialProfileAnchor(hash,destination){
+  let cancelled=false;
+  const events=['wheel','touchstart','pointerdown','keydown'];
+  const cancel=()=>{cancelled=true;for(const name of events)window.removeEventListener(name,cancel);};
+  profileInitialAnchorCleanup=cancel;
+  for(const name of events)window.addEventListener(name,cancel,{passive:true});
+  const top=destination.getBoundingClientRect().top;
+  const images=[...document.querySelectorAll('.profile-v2 img')].filter(img=>img.getClientRects().length&&img.getBoundingClientRect().top<top&&!img.complete);
+  const pending=images.map(img=>new Promise(resolve=>{
+    const ready=()=>{img.removeEventListener('load',ready);img.removeEventListener('error',ready);resolve();};
+    img.addEventListener('load',ready);img.addEventListener('error',ready);
+    img.loading='eager';
+  }));
+  if(document.readyState!=='complete')pending.push(new Promise(resolve=>window.addEventListener('load',resolve,{once:true})));
+  const frame=callback=>typeof requestAnimationFrame==='function'?requestAnimationFrame(callback):setTimeout(callback,0);
+  Promise.all(pending).then(()=>frame(()=>frame(()=>{
+    if(!cancelled&&location.hash===hash&&destination.isConnected)destination.scrollIntoView({block:'start',behavior:'instant'});
+    cancel();if(profileInitialAnchorCleanup===cancel)profileInitialAnchorCleanup=null;
+  })));
+}
+// The Navigation API distinguishes a new fragment from history traversal.
+// Without it, an entry the reader has not scrolled yet has no saved position in history.state
+// (app.js writes one while they scroll), so that entry is new. Back and Forward keep the browser's restore.
+let profileFragmentNavigation=null;
+window.navigation?.addEventListener('navigate',event=>{
+  profileFragmentNavigation=event.hashChange&&event.destination.sameDocument?{url:event.destination.url,type:event.navigationType}:null;
+});
+const profileRoute=route;
+route=function(event){
+  const initial=!profileHasRouted;profileHasRouted=true;
+  profileInitialAnchorCleanup?.();profileInitialAnchorCleanup=null;
+  const previousCompany=previousRoute==='company'?document.querySelector('.profile-v2')?.dataset.profileCompany:null;
+  const fragmentNavigation=profileFragmentNavigation;
+  if(event?.type==='hashchange')profileFragmentNavigation=null;
+  const result=profileRoute.apply(this,arguments);let parts=routeParts();
+  // Rewrite case-variant addresses (#company/MERCOR) to the canonical id.
+  const company=String(parts[0]).toLowerCase()==='company'?profileRouteCompany(parts[1]):'';
+  if(company&&(company!==parts[1]||parts[0]!=='company')){parts[0]='company';parts[1]=company;history.replaceState(history.state??null,'','#'+parts.map(encodeURIComponent).join('/'));parts=routeParts();}
+  const freshEntry=!window.navigation&&typeof history.state?.scrollY!=='number';
+  const newFragment=event?.type==='hashchange'&&(fragmentNavigation?fragmentNavigation.url===event.newURL&&['push','replace'].includes(fragmentNavigation.type):freshEntry);
+  if(newFragment&&previousCompany&&parts[0]==='company'&&isCompanyId(parts[1])&&parts[1]!==previousCompany&&!parts[2])window.scrollTo({left:0,top:0,behavior:'instant'});
+  if(parts[0]==='company'&&isCompanyId(parts[1])&&parts[2]){
+    const section=profileRouteSection(parts[2]);
+    const primary=['business','traction','people','work'].includes(section);
+    const destination=profileRouteDestination(section);
+    if(destination){
+      for(let node=destination;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;
+      const focusTarget=destination.tagName==='DETAILS'?destination.querySelector('summary'):destination;
+      if(focusTarget&&focusTarget.tagName!=='SUMMARY')focusTarget.setAttribute('tabindex','-1');
+      if(event?.type==='hashchange')focusTarget?.focus({preventScroll:true});
+      (primary?document.querySelector('.profile-tabs'):destination)?.scrollIntoView({block:'start',behavior:'instant'});
+      if(initial&&!primary)settleInitialProfileAnchor(location.hash,destination);
+    }
+  }
+  if(company&&parts[2]==='claim'&&claims[parts[3]]?.company_id===company)showEvidence(parts[3]);
+  return result;
+};
+function profileTabHash(id){const tab=document.querySelector('#profile-view .profile-tabs [aria-selected="true"]')?.dataset?.profileTab;return '#company/'+id+(tab&&tab!=='business'?'/'+tab:'');}
+document.addEventListener('keydown',event=>{
+  const tab=event.target.closest?.('[data-profile-tab]');if(!tab||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+  const ids=['business','traction','people','work'],index=ids.indexOf(tab.dataset.profileTab),next=event.key==='Home'?0:event.key==='End'?3:(index+(event.key==='ArrowRight'?1:3))%4;
+  event.preventDefault();activateProfileTab(ids[next]);
+  document.getElementById('profile-tab-'+ids[next])?.focus({preventScroll:true});
+});
+
+document.addEventListener('click',event=>{if(event.target.closest?.('.skip')){event.preventDefault();$('main').focus({preventScroll:true});$('main').scrollIntoView({behavior:'instant'});}});
+/* Later official-source corrections. The original research datasets stay intact. */
+function sourceUpdatesFor(id){return (window.SOURCE_UPDATES?.updates||[]).filter(update=>update.company_id===id);}
+function sourceUpdateUnknownText(id,original){
+ return id==='elorian'&&sourceUpdatesFor(id).some(update=>update.id==='elorian-platform-availability-2026-10-16')?'Private pilot traction, revenue, commercial customers and availability beyond the research preview.':original;
+}
+function applyProductSourceUpdates(id,rows){
+ const updates=sourceUpdatesFor(id);if(!updates.length)return rows;
+ return rows.map(product=>{
+  const matched=updates.filter(update=>update.target.product_name===product.name&&update.target.record_ids.every(record=>product.record_ids?.includes(record))&&update.target.claim_ids.every(claim=>product.claim_ids?.includes(claim)));
+  return matched.length?Object.assign({},product,...matched.map(update=>update.replacement_fields),{source_updates:matched}):product;
+ });
+}
+function sourceUpdateReferenceHTML(update,label='Company source'){
+ return `<span class="source-update-reference" data-source-update="${attr(update.id)}">${external(update.source.url,label)}<span class="sub">Checked ${esc(profileDate(update.source.observed_on))}</span></span>`;
+}
+function productSourceHTML(product,label='Source',topic=''){
+ return product.source_updates?.length?product.source_updates.map(update=>sourceUpdateReferenceHTML(update,label==='Source'?'Company source':label)).join(' '):profileReferences(product.claim_ids,label,topic);
+}
+function productSourceContextHTML(product){
+ if(!product.source_updates?.length)return '';
+ return `<details class="offering-aliases source-update-context"><summary>Source update context</summary>${product.source_updates.map(update=>`<p>${esc(update.qualification)}</p>${update.supporting_sources.map(source=>`<p>${external(source.url,source.title)} · Checked ${esc(profileDate(source.observed_on))}</p>`).join('')}`).join('')}<p><a href="source-updates.json" download>Source updates · JSON</a></p></details>`;
+}
+function sourceUpdatesArchiveHTML(id){
+ const updates=sourceUpdatesFor(id);if(!updates.length)return '';
+ return `<div class="source-update-note" data-source-updates-company="${attr(id)}"><p>Records below retain the original dataset ${esc(window.SOURCE_UPDATES.baseline_dataset_version)} context. Current product descriptions include later source corrections.</p><p>${updates.map(update=>sourceUpdateReferenceHTML(update,update.target.product_name)).join(' ')}</p><p><a href="source-updates.json" download>Source updates and prior values · JSON</a></p></div>`;
+}
+function sourceUpdateClaimHTML(id){
+ const updates=(window.SOURCE_UPDATES?.updates||[]).filter(update=>update.affected_claim_ids.includes(id));if(!updates.length)return '';
+ return `<aside class="source-update-note" role="note" data-source-update-claim="${attr(id)}"><p><strong>Later product source update</strong></p>${updates.map(update=>`<p>${esc(update.replacement_fields.description)}${update.replacement_fields.status?' '+esc(update.replacement_fields.status)+'.':''}</p>${sourceUpdateReferenceHTML(update)}<p class="sub">${esc(update.qualification)}</p>`).join('')}<p class="sub">The original dataset ${esc(window.SOURCE_UPDATES.baseline_dataset_version)} statement and evidence remain below.</p></aside>`;
+}
+
+// Context corrections never replace canonical metrics, claims or source lists.
+function evidenceContextSnapshotMatches(actual,expected){
+ return Boolean(actual&&expected&&Object.keys(expected).every(key=>JSON.stringify(actual[key])===JSON.stringify(expected[key])));
+}
+function relationshipAssessmentContextValid(update){
+ const keys=(value,expected)=>Boolean(value&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).length===expected.length&&expected.every(key=>Object.hasOwn(value,key)));
+ const exact=(actual,expected)=>Boolean(actual&&expected&&typeof expected==='object'&&!Array.isArray(expected)&&Object.keys(actual).length===Object.keys(expected).length&&evidenceContextSnapshotMatches(actual,expected));
+ const fields=['id','kind','company_id','reviewed_on','checked_at','review_basis','target','affected_claim_ids','display_scope','context','relationship_context','assessment_context','criterion_context','sources','historical_snapshot'];
+ if(!keys(update,fields)||update.id!=='terac-dialogue-assessment-scope-2026-10-17'||update.company_id!=='terac'||update.kind!=='relationship-assessment-scope-context')return false;
+ if(update.reviewed_on!=='2026-10-17'||update.reviewed_on>new Date().toISOString().slice(0,10)||update.checked_at!==null||update.review_basis!=='retained_public_evidence'||update.display_scope!=='Market research')return false;
+ const claimIds=['terac.claim.customers-0',...['p','c','r'].map(key=>'terac.claim.assessment-evidence-'+key)],sourceIds=['terac.source.terac-4','terac.source.terac-1','terac.source.terac-2','terac.source.terac-7'];
+ if(!exact(update.target,{claim_id:claimIds[0],customer_record_id:'terac.customer.0',assessment_id:'terac.assessment.ai_data'})||JSON.stringify(update.affected_claim_ids)!==JSON.stringify(claimIds)||!keys(update.criterion_context,['P','C','R']))return false;
+ if(![update.context,update.relationship_context,update.assessment_context,...Object.values(update.criterion_context)].every(value=>typeof value==='string'&&value.trim()&&!/[<>\x00-\x1f]/.test(value)))return false;
+ const snapshot=update.historical_snapshot;
+ if(!keys(snapshot,['dataset_version','metrics','claims','sources','assessments','customer_evidence','profile_relationships'])||snapshot.dataset_version!=='2.5.0'||snapshot.dataset_version!==DATA.dataset_version||!Array.isArray(snapshot.metrics)||snapshot.metrics.length)return false;
+ for(const [table,ids]of [['claims',claimIds],['sources',sourceIds],['assessments',['terac.assessment.ai_data']],['customer_evidence',['terac.customer.0']]]){
+  if(!Array.isArray(snapshot[table])||snapshot[table].length!==ids.length||!snapshot[table].every((row,index)=>row?.id===ids[index]&&exact(DATA[table].find(item=>item.id===row.id),row)))return false;
+ }
+ const relationship={name:'Dialogue',relationship:'claimed_customer',description:'Terac’s case study describes recruiting 25 startup founders in under four days. Contract value is undisclosed.',record_ids:['terac.customer.0'],claim_ids:[claimIds[0]]};
+ const rows=(window.PROFILE_CONTENT?.entries||[]).find(entry=>entry.company_id==='terac')?.relationships?.filter(row=>row.name==='Dialogue');
+ if(rows?.length!==1||!exact(rows[0],relationship)||!Array.isArray(snapshot.profile_relationships)||snapshot.profile_relationships.length!==1||!keys(snapshot.profile_relationships[0],['company_id','relationship'])||snapshot.profile_relationships[0].company_id!=='terac'||!exact(snapshot.profile_relationships[0].relationship,relationship))return false;
+ const bindings=[[sourceIds[0]],[sourceIds[2],sourceIds[0]],[sourceIds[0],sourceIds[1]],[sourceIds[0],sourceIds[3]]];
+ if(!claimIds.every((id,index)=>{const cl=claims[id];return cl?.company_id==='terac'&&cl.status==='supported'&&cl.confidence==='B'&&cl.segment_scope==='ai_data'&&cl.observed_on==='2026-10-12'&&cl.as_of===(index===0?'2026-05-31':'2026-10-12')&&JSON.stringify(cl.source_ids)===JSON.stringify(bindings[index]);}))return false;
+ const assessment=snapshot.assessments[0],customer=snapshot.customer_evidence[0];
+ if(assessment.company_id!=='terac'||assessment.segment_scope!=='ai_data'||assessment.as_of!=='2026-10-12'||assessment.rubric_version!=='1.0.0'||assessment.material_conflict!==false||!keys(assessment.gates,['P','C','R','O']))return false;
+ if(!Object.entries({P:'2',C:'2',R:'1',O:'1'}).every(([key,level])=>{const gate=assessment.gates[key],id='terac.claim.assessment-evidence-'+key.toLowerCase();return gate.level===level&&JSON.stringify(gate.claim_ids)===JSON.stringify([id])&&(key==='O'||gate.rationale===claims[id].statement);}))return false;
+ if(customer.company_id!=='terac'||customer.claim_id!==claimIds[0]||customer.segment_scope!=='ai_data'||customer.relationship!=='claimed_customer'||customer.disclosure!=='company_named'||customer.paid_status!=='unknown')return false;
+ const expected=[[sourceIds[0],claimIds[0],'https://terac.com/customers/dialogue-startup-founders','2026-05-31','market_research_engagement'],[sourceIds[1],claimIds[2],'https://terac.com/about',null,'separate_annotation_testimony'],[sourceIds[2],claimIds[1],'https://terac.com/blog/terac-x-berkeley-ai-hackathon','2026-06-18','dated_ai_workflow'],[sourceIds[3],claimIds[3],'https://terac.com/blog/zero-human-company-hackathon','2026-08-12','expert_payout_forecast']];
+ return Array.isArray(update.sources)&&update.sources.length===4&&update.sources.every((ref,index)=>{
+  const [sid,cid,url,published,role]=expected[index],source=sources[sid];
+  return exact(ref,{source_id:sid,claim_id:cid,publication_date:published,publication_date_basis:published?'retained_page_text':'not_established',role,access_status:'retained_readable_page'})&&source.company_id==='terac'&&source.source_type==='company'&&source.retrieval_status==='checked'&&source.url===url&&(source.published_on||null)===published;
+ });
+}
+function financialBasisContextValid(update){
+ const metricId='mercor.metric.oct14-major-financial-2',claimId='mercor.claim.oct14-major-financial-2',snapshot=update.historical_snapshot;
+ const fields=['id','kind','company_id','reviewed_on','checked_at','review_basis','target','display_basis','display_attribution','context','sources','historical_snapshot'];
+ if(Object.keys(update).length!==fields.length||!fields.every(key=>Object.hasOwn(update,key))||update.company_id!=='mercor'||update.target?.metric_id!==metricId||update.target?.claim_id!==claimId||Object.keys(update.target).length!==2)return false;
+ if(update.checked_at!==null||update.review_basis!=='retained_public_evidence'||!/^\d{4}-\d{2}-\d{2}$/.test(update.reviewed_on)||!Number.isFinite(Date.parse(update.reviewed_on))||new Date(update.reviewed_on).toISOString().slice(0,10)!==update.reviewed_on||update.reviewed_on>new Date().toISOString().slice(0,10))return false;
+ if(typeof update.id!=='string'||!update.id.trim()||typeof update.context!=='string'||!update.context.trim()||/[<>\x00-\x1f]/.test(update.id+update.context))return false;
+ if(update.display_basis!=='gross (Sacra estimate)'||update.display_attribution!=='Felicis reports the pace; Sacra estimates the gross basis.')return false;
+ if(!snapshot||Object.keys(snapshot).length!==4||snapshot.dataset_version!==DATA.dataset_version||!Array.isArray(snapshot.metrics)||snapshot.metrics.length!==1||!Array.isArray(snapshot.claims)||snapshot.claims.length!==2||!Array.isArray(snapshot.sources)||snapshot.sources.length!==2)return false;
+ for(const table of ['metrics','claims','sources'])if(!snapshot[table].every(row=>{const actual=DATA[table].find(item=>item.id===row?.id);return actual&&Object.keys(actual).length===Object.keys(row).length&&evidenceContextSnapshotMatches(actual,row);}))return false;
+ const metric=snapshot.metrics[0],claim=claims[claimId];
+ if(metric.id!==metricId||metric.company_id!=='mercor'||metric.claim_id!==claimId||metric.kind!=='annualized_revenue_run_rate'||metric.value!==2000000000||metric.currency!=='USD'||metric.unit!=='currency'||metric.qualifier!=='exact'||metric.as_of!=='2026-06'||metric.segment_scope!=='company'||metric.gross_vs_net!=='gross'||metric.reported_vs_estimated!=='reported'||metric.observation_status!=='reported')return false;
+ if(!claim||claim.as_of!=='2026-06'||claim.segment_scope!=='company'||JSON.stringify(claim.source_ids)!=='["mercor.source.oct14-88dab2271689"]')return false;
+ const expected=[['mercor.source.oct14-88dab2271689',claimId,'investor','https://www.felicis.com/blog/mercor-profile-organizing-human-intelligence-to-power-the-ai-economy','2026-07-21','retained_page_text','bound_investor_run_rate'],['mercor.source.audit-m6','mercor.claim.major-growth_metrics-0','independent_reporting','https://sacra.com/c/mercor/',null,'not_established','secondary_gross_basis_estimate']];
+ return Array.isArray(update.sources)&&update.sources.length===2&&update.sources.every((ref,index)=>{
+  if(!ref||Object.keys(ref).length!==6)return false;
+  const [sourceId,supportId,type,url,published,dateBasis,role]=expected[index],source=sources[sourceId],support=claims[supportId];
+  return source?.source_type===type&&source.url===url&&source.company_id==='mercor'&&support?.company_id==='mercor'&&support.status==='supported'&&support.source_ids.includes(sourceId)&&snapshot.sources.some(row=>row.id===sourceId)&&snapshot.claims.some(row=>row.id===supportId)&&ref.source_id===sourceId&&ref.claim_id===supportId&&ref.role===role&&ref.publication_date===published&&ref.publication_date_basis===dateBasis&&ref.access_status==='retained_readable_page'&&(!published||published<=update.reviewed_on)&&(!source.published_on||source.published_on===published);
+ });
+}
+function historicalOfferContextValid(update){
+ const keys=(value,expected)=>Boolean(value&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).length===expected.length&&expected.every(key=>Object.hasOwn(value,key)));
+ const exact=(actual,expected)=>keys(actual,Object.keys(expected))&&evidenceContextSnapshotMatches(actual,expected);
+ const fields=['id','kind','company_id','reviewed_on','checked_at','review_basis','target','affected_claim_ids','display_label','display_period','context','sources','retained_read','historical_snapshot'];
+ if(!keys(update,fields)||update.id!=='ooak-data-partner-offer-context-2026-10-17'||update.kind!=='historical-offer-source-context'||update.company_id!=='ooak')return false;
+ if(update.reviewed_on!=='2026-10-17'||update.reviewed_on>new Date().toISOString().slice(0,10)||update.checked_at!==null||update.review_basis!=='retained_public_evidence')return false;
+ const metricId='ooak.metric.oct14-4-data-partner-payout-cap',claimIds=['ooak.claim.oct14-metric-4-data-partner-payout-cap','ooak.claim.products-1'],sourceIds=['ooak.source.oct14-5bc8f134e0b5','ooak.source.ooak-5'],productId='ooak.product.1';
+ if(!exact(update.target,{metric_id:metricId,claim_id:claimIds[0],product_id:productId})||JSON.stringify(update.affected_claim_ids)!==JSON.stringify(claimIds))return false;
+ if(update.display_label!=='Original data-partner offer cap'||update.display_period!=='Original snapshot recorded 14 Oct 2026 · Source date not stated'||typeof update.context!=='string'||!update.context.trim()||/[<>\x00-\x1f]/.test(update.context))return false;
+ if(update.context!=='Original research records from 12 and 14 October 2026 list up to $300K for company-data licensing. In a retained read from 16 October, the official partner page advertises up to $1M for the same offer. These are marketing ceilings for payment to the company, subject to a data audit; they are not individual pay rates or guaranteed payments. The change date is not established.')return false;
+ const retained={started_at:'2026-10-16 23:56:42 UTC',completed_at:'2026-10-16 23:56:43 UTC',raw_evidence_file:'output/reliability-20261016-2247/link-reader-1/batch-166-166-raw.json',sha256:'1cb6464c6c50bef5794381345afefd2436cf5b87a501b9c6339ad86186b3da77',source_publication_date:null,change_date:null};
+ if(!exact(update.retained_read,retained))return false;
+ const snapshot=update.historical_snapshot;
+ if(!keys(snapshot,['dataset_version','metrics','claims','sources','products'])||snapshot.dataset_version!=='2.5.0'||snapshot.dataset_version!==DATA.dataset_version)return false;
+ for(const [table,ids]of [['metrics',[metricId]],['claims',claimIds],['sources',sourceIds],['products',[productId]]])if(!Array.isArray(snapshot[table])||snapshot[table].length!==ids.length||!snapshot[table].every((row,index)=>row?.id===ids[index]&&exact(DATA[table].find(item=>item.id===row.id),row)))return false;
+ const metric=snapshot.metrics[0],expectedMetric={company_id:'ooak',claim_id:claimIds[0],kind:'other',value:300000,qualifier:'at_most',currency:'USD',unit:'currency',as_of:'undated',segment_scope:'company',gross_vs_net:'unspecified',reported_vs_estimated:'reported',observation_status:'reported',label:'Data partner payout cap'};
+ if(!evidenceContextSnapshotMatches(metric,expectedMetric))return false;
+ if(!claimIds.every((id,index)=>{const cl=claims[id],src=sources[sourceIds[index]];return cl.company_id==='ooak'&&cl.status==='supported'&&cl.confidence==='B'&&cl.as_of===(index===0?'undated':'2026-10-12')&&cl.observed_on===(index===0?'2026-10-14':'2026-10-12')&&cl.segment_scope===(index===0?'company':'ai_data')&&JSON.stringify(cl.source_ids)===JSON.stringify([sourceIds[index]])&&src.company_id==='ooak'&&src.source_type==='company'&&src.retrieval_status==='checked'&&src.url==='https://ooakdata.com/partner'&&!src.published_on&&src.accessed_on===cl.observed_on;}))return false;
+ const product=snapshot.products[0];if(product.company_id!=='ooak'||product.claim_id!==claimIds[1]||product.segment_scope!=='ai_data'||product.work_performed!==claims[claimIds[1]].statement)return false;
+ return Array.isArray(update.sources)&&update.sources.length===1&&exact(update.sources[0],{source_id:sourceIds[0],claim_id:claimIds[0],publication_date:null,publication_date_basis:'not_established',role:'retained_issuer_offer',access_status:'retained_readable_page'});
+}
+let evidenceContextCache=null,evidenceContextCacheSource;
+function evidenceContextCorrections(){
+ if(evidenceContextCache&&evidenceContextCacheSource===window.SOURCE_UPDATES)return evidenceContextCache;
+ evidenceContextCacheSource=window.SOURCE_UPDATES;
+ return evidenceContextCache=evidenceContextCorrectionsCompute();
+}
+function evidenceContextCorrectionsCompute(){
+ const document=window.SOURCE_UPDATES,section=document?.evidence_context;
+ if(document?.baseline_dataset_version!==DATA.dataset_version||section?.version!=='1.0.0'||!Array.isArray(section.corrections))return [];
+ return section.corrections.filter(update=>{
+  if(update?.kind==='historical-offer-source-context')return section.corrections.filter(row=>row?.id===update.id||row?.kind===update.kind).length===1&&!(document.updates||[]).some(row=>row.id===update.id)&&historicalOfferContextValid(update);
+  if(update?.kind==='relationship-assessment-scope-context')return section.corrections.filter(row=>row?.id===update.id||row?.kind===update.kind).length===1&&!(document.updates||[]).some(row=>row.id===update.id)&&relationshipAssessmentContextValid(update);
+  if(!['metric_reporting_context','claim_source_supplement','financial-basis-source-supplement'].includes(update?.kind))return false;
+  if(update.kind==='financial-basis-source-supplement'&&!financialBasisContextValid(update))return false;
+  const snapshot=update?.historical_snapshot;
+  if(snapshot?.dataset_version!==DATA.dataset_version||!update.target||!Array.isArray(update.sources))return false;
+  if(!['metrics','claims','sources'].every(table=>Array.isArray(snapshot[table])))return false;
+  if(!snapshot.claims.length||!snapshot.sources.length)return false;
+  if(!snapshot.claims.every(row=>row&&evidenceContextSnapshotMatches(claims[row.id],row)))return false;
+  if(!snapshot.sources.every(row=>row&&evidenceContextSnapshotMatches(sources[row.id],row)))return false;
+  if(!snapshot.metrics.every(row=>row&&evidenceContextSnapshotMatches(DATA.metrics.find(metric=>metric.id===row.id),row)))return false;
+  return snapshot.claims.some(row=>row.id===update.target.claim_id&&row.company_id===update.company_id)&&update.sources.every(ref=>ref&&snapshot.sources.some(row=>row.id===ref.source_id));
+ });
+}
+function evidenceContextForMetric(metric){
+ return evidenceContextCorrections().find(update=>update.kind==='metric_reporting_context'&&update.company_id===metric.company_id&&update.target.metric_id===metric.id&&update.target.claim_id===metric.claim_id&&evidenceContextSnapshotMatches(metric,update.historical_snapshot.metrics[0]));
+}
+function financialBasisContextForMetric(metric){
+ return evidenceContextCorrections().find(update=>update.kind==='financial-basis-source-supplement'&&update.target.metric_id===metric.id&&update.target.claim_id===metric.claim_id&&evidenceContextSnapshotMatches(metric,update.historical_snapshot.metrics[0]));
+}
+function metricCurrentBasis(metric,fallback){return financialBasisContextForMetric(metric)?.display_basis||fallback;}
+function metricCurrentAttribution(metric,fallback){return financialBasisContextForMetric(metric)?.display_attribution||fallback;}
+function metricCurrentBasisDescription(metric,fallback){return financialBasisContextForMetric(metric)?'Gross is customer spend before contractor payouts, per Sacra’s estimate.':fallback;}
+function historicalOfferContextForMetric(metric){return evidenceContextCorrections().find(update=>update.kind==='historical-offer-source-context'&&update.target.metric_id===metric?.id&&update.target.claim_id===metric.claim_id&&evidenceContextSnapshotMatches(metric,update.historical_snapshot.metrics[0]));}
+function metricPresentationLabel(metric,fallback){return historicalOfferContextForMetric(metric)?.display_label||fallback;}
+function metricEvidenceTopic(metric,fallback){return historicalOfferContextForMetric(metric)?'Original data-partner offer cap; snapshot recorded 14 October 2026':financialBasisContextForMetric(metric)?fallback+'; gross basis from Sacra estimate':fallback;}
+function evidenceContextForClaim(claim){
+ return evidenceContextCorrections().filter(update=>update.company_id===claim.company_id&&(update.target.claim_id===claim.id||['relationship-assessment-scope-context','historical-offer-source-context'].includes(update.kind)&&update.affected_claim_ids.includes(claim.id)));
+}
+function relationshipAssessmentContextForClaim(claim){
+ return claim&&evidenceContextForClaim(claim).find(update=>update.kind==='relationship-assessment-scope-context'&&evidenceContextSnapshotMatches(claim,update.historical_snapshot.claims.find(row=>row.id===claim.id)));
+}
+function evidenceContextScopeLabel(claim,fallback){const update=relationshipAssessmentContextForClaim(claim);return update&&update.target.claim_id===claim?.id?update.display_scope:fallback;}
+function evidenceContextClaimDescription(claim){const offer=historicalOfferContextForClaim(claim);if(offer)return offer.context;const update=relationshipAssessmentContextForClaim(claim);return update?(claim.id===update.target.claim_id?update.context:update.criterion_context[claim.id.slice(-1).toUpperCase()]||''):'';}
+function historicalOfferContextForClaim(claim){return claim&&evidenceContextForClaim(claim).find(update=>update.kind==='historical-offer-source-context');}
+function evidenceContextStatementHeading(claim){return historicalOfferContextForClaim(claim)?'Original dataset statement · recorded '+profileDate(claim.observed_on):relationshipAssessmentContextForClaim(claim)?'Original dataset statement':'';}
+function originalProductContextHTML(product){const update=evidenceContextCorrections().find(row=>row.kind==='historical-offer-source-context'&&row.target.product_id===product?.id&&evidenceContextSnapshotMatches(product,row.historical_snapshot.products[0]));return update?evidenceContextUpdateHTML(update)+evidenceContextStatementHeadingHTML(claims[product.claim_id]):'';}
+function evidenceContextStatementHeadingHTML(claim){const heading=evidenceContextStatementHeading(claim);return heading?`<p class="sub"><strong>${esc(heading)}</strong></p>`:'';}
+function evidenceContextOriginalScope(claim,fallback){return evidenceContextScopeLabel(claim,fallback)!==fallback?'Original dataset scope: '+fallback:fallback;}
+function evidenceContextScopeHTML(claim,fallback){const current=evidenceContextScopeLabel(claim,fallback);return current!==fallback?`<div><strong>Reviewed engagement scope</strong>${esc(current)}</div><div><strong>Original dataset scope</strong>${esc(fallback)}</div>`:`<div><strong>Business covered</strong>${esc(fallback)}</div>`;}
+function relationshipAssessmentContextForAssessment(assessment){return evidenceContextCorrections().find(update=>update.kind==='relationship-assessment-scope-context'&&update.target.assessment_id===assessment?.id&&evidenceContextSnapshotMatches(assessment,update.historical_snapshot.assessments[0]));}
+function evidenceContextAssessmentHTML(assessment){const update=relationshipAssessmentContextForAssessment(assessment);return update?evidenceContextUpdateHTML(update)+`<p class="sub"><strong>Original assessment rationale</strong></p>`:'';}
+function evidenceContextCriterionHTML(assessment,key){const update=relationshipAssessmentContextForAssessment(assessment);return update&&Object.hasOwn(update.criterion_context,key)?`<p class="sub">${esc(update.criterion_context[key])}</p><p class="sub"><strong>Original criterion rationale</strong></p>`:'';}
+function profileRelationshipScopeContext(id,row){const update=evidenceContextCorrections().find(update=>update.kind==='relationship-assessment-scope-context'&&update.company_id===id);return update&&evidenceContextSnapshotMatches(row,update.historical_snapshot.profile_relationships[0].relationship)?update.relationship_context:'';}
+function metricCurrentPeriod(metric,fallback=''){
+ return evidenceContextForMetric(metric)?.display_period||fallback;
+}
+function evidenceContextClaimPeriod(claim,fallback){
+ if(historicalOfferContextForClaim(claim))return 'Original dataset date field: '+fallback;
+ return evidenceContextForClaim(claim).find(update=>update.kind==='metric_reporting_context')?.display_period||fallback;
+}
+function evidenceContextDateHeading(claim){
+ if(historicalOfferContextForClaim(claim))return 'Original dataset date field';
+ return evidenceContextForClaim(claim).some(update=>update.kind==='metric_reporting_context')?'Original dataset reporting date':'Date of the evidence';
+}
+function evidenceContextArchiveDate(claim,fallback){
+ if(historicalOfferContextForClaim(claim))return 'Original dataset date field: '+fallback;
+ return evidenceContextForClaim(claim).some(update=>update.kind==='metric_reporting_context')?'Original dataset reporting date: '+fallback:fallback;
+}
+function metricContextMetaPeriod(metric,fallback){
+ const offer=historicalOfferContextForMetric(metric);if(offer)return offer.display_period;
+ const update=evidenceContextForMetric(metric);
+ return update?update.display_period+' · Original dataset reporting date: '+fallback:fallback;
+}
+function evidenceContextUpdateHTML(update,claimId){
+ const scope=update.kind==='relationship-assessment-scope-context',label=scope?'Engagement and assessment scope clarification':update.kind==='historical-offer-source-context'?'Company-data licensing offer · source context reviewed':update.kind==='metric_reporting_context'?'Reporting-date clarification':update.kind==='financial-basis-source-supplement'?'Gross-basis source clarification':'Source-link supplement';
+ const context=scope?(claimId?evidenceContextClaimDescription(claims[claimId]):update.assessment_context):update.context;
+ const links=update.sources.map(ref=>{
+  const source=sources[ref.source_id],role={bound_gross_observation:'Database report',separate_investor_corroboration:'Separate investor corroboration',direct_financial_support:'CEO post',bound_investor_run_rate:'Felicis · investor-published company statement',secondary_gross_basis_estimate:'Sacra · separate secondary gross estimate',market_research_engagement:'Dialogue market-research case',separate_annotation_testimony:'Spade annotation testimony',dated_ai_workflow:'Dated AI workflow',expert_payout_forecast:'Expert-payout forecast',retained_issuer_offer:'Ooak partner page · retained read 16 Oct 2026 · publication date not stated'}[ref.role];
+  return `<li>${external(source.url,role)}${ref.publication_date?' · Published '+esc(profileDate(ref.publication_date)):''}${ref.role==='direct_financial_support'?' · '+claimButton(ref.claim_id,'Retained financial evidence'):''}</li>`;
+ }).join('');
+ return `<aside class="source-update-note" role="note" data-evidence-context="${attr(update.id)}"><p><strong>${esc(label)} · ${esc(profileDate(update.reviewed_on))}</strong></p><p>${esc(context)}</p>${update.access_note?`<p class="sub">${esc(update.access_note)}</p>`:''}<ul>${links}</ul><p class="sub">${scope?`Based on retained research. This clarification is not a new source check. Original dataset ${esc(DATA.dataset_version)} statements, assessment values and source lists are retained.`:`Based on retained research. This correction is not a new source check. The original dataset ${esc(DATA.dataset_version)} record and sources are retained.`}</p><p><a href="source-updates.json" download>Source updates and original records · JSON</a></p></aside>`;
+}
+function evidenceContextClaimHTML(id){
+ const claim=claims[id];return claim?evidenceContextForClaim(claim).map(update=>evidenceContextUpdateHTML(update,id)).join(''):'';
+}
+function evidenceContextArchiveHTML(id){
+ return evidenceContextCorrections().filter(update=>update.company_id===id).map(update=>evidenceContextUpdateHTML(update)).join('');
+}
+/* Site menus, global search and footer. Loaded after source-updates.js and before initialize(). */
+
+// Global search over companies, business groups, products, paid work listings and pages.
+// The index is built from data already in the page on first use, never at load.
+const SITE_SEARCH_GROUPS={company:['Companies',5],group:['Business groups',2],work:['Paid work',5],product:['Products',3],page:['Pages',3]};
+const SITE_SEARCH_SUGGESTED=['scale_ai','mercor','surge_ai','labelbox'];
+let siteSearchEntries=null,siteSearchItems=[],siteSearchActive=-1,siteSearchStatusTimer=0;
+const siteSearchFold=v=>String(v??'').normalize('NFKD').replace(/\p{M}+/gu,'').toLowerCase();
+const siteSearchWords=v=>siteSearchFold(Array.isArray(v)?v.join(' '):v).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+// "Outlier (contributor brand)" is matched as "Outlier"; the note stays with it in the result.
+function siteSearchAlias(value){const m=String(value).match(/^(.+?)\s*\((.+)\)$/);return m?{name:m[1],note:m[2]}:{name:String(value),note:''};}
+function siteSearchTopRate(label){const m=String(label||'').match(/\$\s?([\d,.]+)(?:\s*[–-]\s*\$?([\d,.]+))?\+?\s*\/\s*(?:approved\s+)?hour/i);return m?Number((m[2]||m[1]).replace(/,/g,''))||0:0;}
+function siteSearchPages(){
+ const listings=typeof workRouteRows==='function'?workRouteRows().filter(route=>typeof w4Bucket!=='function'||['contract','jobs'].includes(w4Bucket(route))).length:0;
+ return [
+  ['market','Overview','The front page, with the main figures and business groups','home start charts market'],
+  ['companies','Companies',`All ${DATA.companies.length} companies, with search and filters`,'index directory list organizations organisations firms startups'],
+  ['work','Paid work',`${listings} paid work listings, with pay and location`,'jobs gigs hiring careers contract contractor freelance hourly pay earn'],
+  ['compare','Compare','Put up to three companies side by side','versus vs comparison'],
+  ['method','Method','How each figure is checked and graded','methodology sources evidence research'],
+  ['labels','What the labels mean','Evidence labels and confidence grades','grades confidence rubric'],
+  ['about','About the publisher','Who publishes this guide, and the disclosure','contact publisher musa ozdem email disclosure removal privacy'],
+  ['corrections','Request a correction','Tell us when a figure or listing is wrong','corrections error mistake wrong fix report'],
+  ['downloads','Download the data','JSON, CSV and SQLite files','downloads csv json sqlite dataset export license reuse'],
+  ['venture','The publisher’s proposed AI lab','The publisher’s proposal, separate from the research','venture neolab investor pitch proposal']
+ ].map(([id,name,meta,keys])=>({type:'page',id,name,meta,keys:keys.split(' '),href:'#'+id}));
+}
+function siteSearchIndex(){
+ if(siteSearchEntries)return siteSearchEntries;
+ const rows=[],aliasesOf=c=>(c.aliases||[]).map(siteSearchAlias);
+ for(const c of DATA.companies){const key=modelGroup(c.id);rows.push({type:'company',id:c.id,company:c.id,name:c.name,aliases:aliasesOf(c),ctx:[groupLabel(key),key],text:[c.description,modelFor(c.id),...(c.categories||[])],meta:groupLabel(key),href:'#company/'+c.id});}
+ for(const [key,ids] of Object.entries(MODEL_GROUPS))rows.push({type:'group',id:groupSlug(key),name:groupLabel(key),aliases:[{name:key,note:''}],meta:`${ids.length} ${ids.length===1?'company':'companies'}`,href:'#companies/'+groupSlug(key)});
+ for(const c of DATA.companies)for(const p of typeof profileProducts==='function'?profileProducts(c.id):[])rows.push({type:'product',id:c.id+'/'+p.name,company:c.id,product:p.name,name:p.name,aliases:[...(p.aliases||[]),typeof publicOfferingName==='function'?publicOfferingName(p.name):''].filter(Boolean).map(siteSearchAlias),ctx:[c.name],text:[p.description,p.kind],meta:'From '+c.name,href:`#company/${c.id}/products`});
+ for(const r of typeof workRouteRows==='function'?workRouteRows():[]){const c=companies[r.company_id];if(!c)continue;
+  const pay=typeof w4Pay==='function'?w4Pay(r):r.pay_label,place=typeof w4Location==='function'?w4Location(r):r.geography,status=typeof w4Status==='function'?w4Status(r):'';
+  rows.push({type:'work',id:r.id,company:c.id,name:r.role,ctx:[c.name,...aliasesOf(c).map(a=>a.name),r.group,r.geography,r.pay_label],text:[r.summary,r.hours,...(r.requirements||[])],meta:[c.name,pay,place].filter(Boolean).join(' · '),badge:status,order:WORK_ROUTE_ORDER[r.status]??10,rate:siteSearchTopRate(r.pay_label),href:`#company/${c.id}/work`});}
+ rows.push(...siteSearchPages());
+ return siteSearchEntries=rows.map(row=>{
+  const name=siteSearchWords(row.name),aliases=(row.aliases||[]).map(a=>siteSearchWords(a.name)).filter(w=>w.length),keys=siteSearchWords(row.keys||[]),core=[...name,...aliases.flat(),...keys,...siteSearchWords(row.ctx||[])];
+  return Object.assign(row,{nameKey:name.join(' '),nameWords:name,aliasKeys:aliases.map(w=>w.join(' ')),labelWords:[...name,...aliases.flat(),...keys],keyWords:keys,coreWords:core,allWords:[...core,...siteSearchWords(row.text||[])]});
+ });
+}
+// Lower is better: 0 exact name or alias, 1 name starts with the query, 2 an alias or page keyword starts with it,
+// 3 every word starts a word of the name, 4 of the name, aliases or context, 5 of anything in the entry.
+function siteSearchRank(e,tokens,key){
+ const has=words=>tokens.every(t=>words.some(w=>w.startsWith(t)));
+ if(e.nameKey===key||e.aliasKeys.includes(key))return 0;
+ if(e.nameKey.startsWith(key))return 1;
+ if(e.aliasKeys.some(k=>k.startsWith(key))||(e.keyWords.length&&has(e.keyWords)))return 2;
+ if(has(e.nameWords))return 3;
+ if(has(e.coreWords))return 4;
+ return has(e.allWords)?5:-1;
+}
+const siteSearchStem=t=>t.length>3&&t.endsWith('s')?t.replace(/ies$/,'y').replace(/s$/,''):t;
+function siteSearchDistance(a,b){const d=[...Array(a.length+1)].map((_,i)=>[i]);for(let j=1;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++){d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1])d[i][j]=Math.min(d[i][j],d[i-2][j-2]+1);}return d[a.length][b.length];}
+// Typo tolerance, used only when nothing matches exactly: names and aliases, same first letter,
+// one slip in a short word and two in a long one.
+function siteSearchNear(t,words){if(t.length<3)return words.some(w=>w.startsWith(t));const max=t.length>6?2:1;return words.some(w=>w[0]===t[0]&&[t.length-1,t.length,t.length+1].some(n=>siteSearchDistance(t,w.slice(0,n))<=max));}
+// siteSearch('outlier') -> [{type:'company',id:'scale_ai',...}, ...]: results in display order, grouped by type.
+function siteSearch(query,opts={}){
+ const o=typeof opts==='number'?{limit:opts}:opts||{},tokens=siteSearchWords(query);
+ if(!tokens.length)return [];
+ const key=tokens.join(' '),stems=tokens.map(siteSearchStem),entries=siteSearchIndex().filter(e=>!o.types||o.types.includes(e.type));
+ // One or two letters match names, aliases and context only; descriptions join from three letters.
+ const most=key.length<3?4:5;
+ let hits=entries.map(e=>{let rank=siteSearchRank(e,tokens,key);if(rank<0&&stems.join(' ')!==key&&siteSearchRank(e,stems,stems.join(' '))>=0)rank=5;return [rank,e];}).filter(([rank])=>rank>=0&&rank<=most);
+ if(!hits.length)hits=entries.filter(e=>tokens.every(t=>siteSearchNear(t,e.labelWords))).map(e=>[6,e]);
+ // Groups follow their best match. On a tie the default order holds, except that listings lead
+ // when only descriptions match (skill words such as "python" are usually a worker's search).
+ const groups=Object.keys(SITE_SEARCH_GROUPS).map((type,order)=>{
+  const rows=hits.filter(([,e])=>e.type===type).sort(([ra,a],[rb,b])=>ra-rb||(type==='work'?a.order-b.order||b.rate-a.rate||companies[a.company].name.localeCompare(companies[b.company].name)||a.name.localeCompare(b.name):a.name.length-b.name.length||a.name.localeCompare(b.name)));
+  return {type,order,best:rows[0]?.[0],total:rows.length,rows:rows.slice(0,o.limit||SITE_SEARCH_GROUPS[type][1])};
+ }).filter(g=>g.total).sort((a,b)=>a.best-b.best||(a.best===5?(b.type==='work')-(a.type==='work'):0)||a.order-b.order);
+ return groups.flatMap(g=>g.rows.map(([rank,e])=>{
+  const has=words=>tokens.every(t=>words.some(w=>w.startsWith(t))),alias=e.type==='company'&&!has(e.nameWords)?(e.aliases||[]).find(a=>has(siteSearchWords(a.name))):null;
+  return {type:e.type,id:e.id,name:e.name,meta:alias?`Also known as ${alias.name}${alias.note?' ('+alias.note+')':''}`:e.meta,badge:e.badge||'',href:e.href,company:e.company||'',product:e.product||'',rank,group:SITE_SEARCH_GROUPS[e.type][0],total:g.total};
+ }));
+}
+// Listing count as the Paid work page will show it after the query is applied to its own search.
+function siteSearchWorkCount(query){if(typeof filteredWork!=='function')return 0;const saved=state.workQuery;try{state.workQuery=query;return filteredWork().length;}catch{return 0;}finally{state.workQuery=saved;}}
+function siteSearchView(query){
+ const tokens=siteSearchWords(query);
+ if(!tokens.length){const pages=siteSearchPages();return [{label:'Suggested',items:[...SITE_SEARCH_SUGGESTED.filter(isCompanyId).map(id=>({type:'company',name:companies[id].name,meta:groupLabel(modelGroup(id)),href:'#company/'+id})),...['work','compare','method'].map(id=>pages.find(p=>p.id===id))]}];}
+ const results=siteSearch(query),groups=[];
+ for(const item of results){if(groups.at(-1)?.type!==item.type)groups.push({type:item.type,label:item.group,items:[]});groups.at(-1).items.push(item);}
+ const work=groups.find(g=>g.type==='work'),text=tokens.join(' '),count=work?siteSearchWorkCount(text):0;
+ if(work&&count){const all={type:'action',action:'work',query:text,name:`See all ${count} ${count===1?'listing':'listings'} for “${query.trim()}”`,meta:'Opens Paid work with this search',href:'#work'};if(work.items[0].rank>=4)work.items.unshift(all);else work.items.push(all);}
+ if(!groups.length)groups.push({label:'Try instead',items:[{type:'page',name:`Browse all ${DATA.companies.length} companies`,meta:'The full company list',href:'#companies'},{type:'page',name:'See all paid work',meta:'Every listing, with filters',href:'#work'}]});
+ return groups;
+}
+function siteSearchMark(text,tokens){
+ const value=publicText(String(text??''));let html='',last=0;
+ if(tokens.length)for(const m of value.matchAll(/[\p{L}\p{N}\p{M}]+/gu)){
+  const word=m[0],folded=siteSearchFold(word),token=tokens.filter(t=>folded.startsWith(t)).sort((a,b)=>b.length-a.length)[0];if(!token)continue;
+  let end=0,length=0;for(const ch of word){if(length>=token.length)break;length+=siteSearchFold(ch).length;end+=ch.length;}
+  html+=attr(value.slice(last,m.index))+'<mark>'+attr(word.slice(0,end))+'</mark>';last=m.index+end;
+ }
+ return html+attr(value.slice(last));
+}
+function siteSearchAnnounce(text){clearTimeout(siteSearchStatusTimer);siteSearchStatusTimer=setTimeout(()=>{$('site-search-status').textContent=text;},450);}
+function siteSearchRender(){
+ const input=$('site-search-input'),list=$('site-search-results'),query=input.value.trim(),tokens=siteSearchWords(query),groups=siteSearchView(query);
+ siteSearchItems=groups.flatMap(g=>g.items);siteSearchActive=-1;let index=0;
+ list.innerHTML=groups.map(g=>`<div class="site-search-group" role="group" aria-label="${attr(g.label)}"><div class="site-search-group-label" aria-hidden="true">${esc(g.label)}</div>${g.items.map(item=>{const i=index++;return `<div class="site-search-option${i||!tokens.length?'':' is-first'}" id="site-search-option-${i}" role="option" aria-selected="false" data-site-search-index="${i}"><span class="site-search-name">${siteSearchMark(item.name,item.type==='action'?[]:tokens)}${item.badge?` <span class="site-search-badge">${esc(item.badge)}</span>`:''}</span>${item.meta?`<span class="site-search-meta">${siteSearchMark(item.meta,item.type==='action'?[]:tokens)}</span>`:''}<kbd class="site-search-enter" aria-hidden="true">Enter</kbd></div>`;}).join('')}</div>`).join('');
+ list.hidden=!siteSearchItems.length;input.setAttribute('aria-expanded',String(siteSearchItems.length>0));input.removeAttribute('aria-activedescendant');
+ const results=siteSearchItems.filter(i=>i.rank!==undefined).length,exact=siteSearchItems.some(i=>i.rank<6);
+ $('site-search-message').textContent=!tokens.length?'Type a name or a role. Press Enter to open the first result.':!results?`No match for “${query}”.`:exact?'':`No exact match for “${query}”. Showing close matches.`;
+ if(tokens.length)siteSearchAnnounce(results?`${results} ${results===1?'result':'results'}. Top result: ${siteSearchItems[0].name}.`:'No results.');
+}
+function siteSearchSetActive(index){
+ siteSearchActive=index;
+ document.querySelectorAll('#site-search-results [role=option]').forEach((option,i)=>{const on=i===index;option.setAttribute('aria-selected',String(on));option.classList.toggle('is-active',on);option.classList.remove('is-first');if(on)option.scrollIntoView({block:'nearest'});});
+ $('site-search-input').setAttribute('aria-activedescendant','site-search-option-'+index);
+}
+// Land on the exact product or listing card once the profile has rendered.
+function siteSearchReveal(item){
+ const product=item.type==='product';if(!product&&typeof w4FillRouteGroup==='function')w4FillRouteGroup('#profile-view',item.id);
+ const card=[...document.querySelectorAll(product?'#profile-view [data-profile-product]':'#profile-view [data-work-route]')].find(el=>product?el.dataset.profileProduct===item.product:el.dataset.workRoute===item.id);
+ if(!card)return;
+ for(let el=card;el;el=el.parentElement)if(el.tagName==='DETAILS')el.open=true;
+ const toggle=card.querySelector('.w4-compact-toggle');if(toggle)toggle.open=true;
+ const target=card.querySelector('h3')||toggle?.querySelector('summary')||card;
+ if(target.tagName!=='SUMMARY')target.setAttribute('tabindex','-1');
+ target.focus({preventScroll:true});card.scrollIntoView({block:'start',behavior:'instant'});
+ // Keep the card clear of the sticky header and profile tabs.
+ const covered=Math.max(0,...['.topbar','#profile-view .profile-tabs'].map(s=>document.querySelector(s)?.getBoundingClientRect().bottom||0)),gap=card.getBoundingClientRect().top-covered-16;
+ if(gap<0)window.scrollBy({top:gap,behavior:'instant'});
+ card.classList.add('site-search-target');target.addEventListener('blur',()=>card.classList.remove('site-search-target'),{once:true});
+}
+function siteSearchChoose(item){
+ if(!item)return;
+ // Set up the Paid work page first, so its search field listens before it receives the query.
+ if(item.action==='work'){preparePage('work');const field=$('work-search');field.value=item.query;field.dispatchEvent(new Event('input',{bubbles:true}));}
+ $('site-search').close();
+ const reveal=item.type==='product'||item.type==='work'?()=>siteSearchReveal(item):null;
+ if(location.hash===item.href){route({type:'hashchange'});reveal?.();return;}
+ if(reveal)window.addEventListener('hashchange',reveal,{once:true});
+ location.hash=item.href;
+}
+function siteSearchKey(event){
+ if(event.isComposing)return;
+ const n=siteSearchItems.length,down=event.key==='ArrowDown';
+ if(down||event.key==='ArrowUp'){if(!n)return;event.preventDefault();siteSearchSetActive(siteSearchActive<0?(down?0:n-1):(siteSearchActive+(down?1:n-1))%n);}
+ else if(event.key==='Enter'){event.preventDefault();siteSearchChoose(siteSearchItems[siteSearchActive]||(siteSearchWords(event.target.value).length?siteSearchItems[0]:null));}
+ else if(event.key==='Escape'&&event.target.value){event.preventDefault();event.target.value='';siteSearchRender();}
+}
+function siteSearchOpen(text){
+ const dialog=$('site-search'),input=$('site-search-input');
+ if(dialog.open)return;
+ if(typeof text==='string')input.value=text;
+ dialog.showModal();$('site-search-open').setAttribute('aria-expanded','true');
+ siteSearchRender();input.focus();input.select();
+}
+// "/" and Ctrl or Cmd+K open search, except while typing in a field or while another dialog is open.
+function siteSearchTyping(el){return Boolean(el?.isContentEditable||el?.closest?.('textarea,select')||(el?.matches?.('input')&&!/^(?:checkbox|radio|button|submit|reset|range|color|file|image)$/.test(el.type)));}
+function siteSearchShortcut(event){
+ if(event.defaultPrevented||event.isComposing||event.altKey)return;
+ const command=(event.ctrlKey||event.metaKey)&&!event.shiftKey&&(String(event.key).toLowerCase()==='k'||event.code==='KeyK');
+ if(!command&&!(event.key==='/'&&!event.ctrlKey&&!event.metaKey))return;
+ if(siteSearchTyping(event.target)||document.querySelector('dialog[open]'))return;
+ event.preventDefault();siteSearchOpen();
+}
+
+function initSiteNav(){
+ const button=$('site-search-open'),dialog=$('site-search'),input=$('site-search-input'),list=$('site-search-results');
+ button.addEventListener('click',()=>siteSearchOpen());
+ $('site-search-close').addEventListener('click',()=>dialog.close());
+ input.addEventListener('input',siteSearchRender);
+ input.addEventListener('keydown',siteSearchKey);
+ // Options keep focus in the field; a click chooses one.
+ list.addEventListener('mousedown',event=>event.preventDefault());
+ list.addEventListener('click',event=>{const option=event.target.closest?.('[role=option]');if(option)siteSearchChoose(siteSearchItems[Number(option.dataset.siteSearchIndex)]);});
+ dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});
+ // Focus returns to the opener. When search opened with nothing focused (on load, or "/" on the page), it goes to the button.
+ dialog.addEventListener('close',()=>{button.setAttribute('aria-expanded','false');$('site-search-status').textContent='';const active=document.activeElement;if(!active||active===document.body||dialog.contains(active))button.focus();});
+ document.addEventListener('keydown',siteSearchShortcut);
+ window.addEventListener('hashchange',()=>{if(dialog.open)dialog.close();});
+ // Static pages link to /?search (or /?q=text): open search once, then drop the query from the address.
+ const params=String(location.search||'');
+ if(/[?&](?:search|q)(?:[=&]|$)/.test(params)){
+  const match=params.match(/[?&](?:q|search)=([^&]*)/);let text='';try{text=match?decodeURIComponent(match[1].replace(/\+/g,' ')):'';}catch{}
+  history.replaceState(history.state,'',location.pathname.replace(/^\/{2,}/,'/')+location.hash);siteSearchOpen(text);
+ }
+}
+/* Business health: one evidence grid for every organization and an inspector for the selected cell.
+   Evidence, arithmetic and scenarios stay separate. */
+(() => {
+'use strict';
+const bundle=window.BUSINESS_HEALTH;
+const signals=['revenue','profit','customers','delivery','cash'];
+const labels={revenue:'Revenue & growth',profit:'Profit & margins',customers:'Customer durability',delivery:'Paid expert activity',cash:'Cash resilience'};
+const columns={revenue:'Revenue',profit:'Profit',customers:'Customers',delivery:'Paid delivery',cash:'Cash'};
+const questions={revenue:'Is demand expanding?',profit:'What stays after delivery?',customers:'Will customers come back?',delivery:'Is expertise turning into paid work?',cash:'Can the business sustain growth?'};
+// Short cell tags. The inspector and the measure select keep the full measure labels.
+const measureShort={period_revenue:'revenue',annualized_revenue:'run rate',revenue_growth_yoy:'growth YoY',net_income:'net income',net_margin:'net margin',adjusted_ebitda:'adj. EBITDA',adjusted_ebitda_margin:'adj. EBITDA margin',gross_margin:'gross margin',pretax_income:'pre-tax',profitability_statement:'profit claim',net_revenue_retention:'net retention',top_five_customer_share:'top-5 share',customer_count:'customers',daily_expert_payouts:'paid in one day',cumulative_expert_payouts:'paid to date',payouts_period_unclear:'paid · basis unclear',cumulative_work_hours:'hours to date',network_reach:'registered experts',cash_balance:'cash',net_debt:'net debt',team_size:'staff'};
+// The column header already names the plain measure of these signals, so that word is left out of the tag.
+const columnDefault={revenue:'period_revenue',cash:'cash_balance'};
+const preferredMeasures={revenue:['annualized_revenue','revenue_growth_yoy','period_revenue'],profit:['gross_margin','net_margin','net_profit_margin'],customers:['net_revenue_retention','nrr','customer_concentration'],delivery:['daily_expert_payouts','daily_payouts','expert_payouts_daily','cumulative_expert_payouts'],cash:['cash_balance','cash','operating_cash_flow']};
+const stateRank={observed:0,proxy:1,missing:2,'n-a':3};
+const periodRank={annual:0,trailing_year:0,run_rate:0,half_year:1,snapshot:1,daily:1,cumulative:1,undated:2,unclear:2};
+const ACRONYMS={us:'US',gaap:'GAAP',ebitda:'EBITDA',fx:'FX',nrr:'NRR (net revenue retention)',ifrs:'IFRS'};
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const bhState={signal:'revenue',measure:'',cohort:'',group:'',query:'',sort:'coverage',evidenceOnly:false,company:'',observation:''};
+const all=()=>bundle?.observations||[];
+const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const scopeLabel=o=>o.scope_label||scopeText(o.scope,o.company_id);
+const scopeWord=o=>o.scope==='ai_data'?'AI line':o.scope==='other_segment'?'segment':'';
+const byId=id=>all().find(o=>o.id===id);
+const numeric=o=>typeof o.value==='number'&&Number.isFinite(o.value);
+const definition=id=>(bundle?.signals||[]).find(s=>s.id===id)||{};
+const human=s=>String(s||'').replaceAll('_',' ').replace(/^./,c=>c.toUpperCase()).replace(/\b([a-z]+)\b/gi,w=>ACRONYMS[w.toLowerCase()]||w);
+const plural=(n,word)=>n+' '+word+(n===1?'':'s');
+const media=q=>typeof window.matchMedia==='function'&&window.matchMedia(q).matches;
+const narrow=()=>media('(max-width:1000px)');
+// A gross/net question only exists for money measures; other bases are simply not stated.
+const basisLabel=o=>o.accounting_basis==='unspecified'?(o.unit==='currency'&&/revenue|run_rate|payout/.test(o.measure)?'Gross/net undisclosed':'Not stated'):o.accounting_basis==='not_applicable'?'Not applicable':human(o.accounting_basis);
+// Research notes end with record fields (scope, period, source type) that the inspector already shows.
+const basisText=o=>String(o.basis||'').split(/(?:^|;\s*)(?:Scope|Source type|Original period\/date|Revenue\/accounting basis):/)[0].trim();
+const limitationsText=o=>o.basis&&o.limitations.startsWith(o.basis)?(basisText(o)+' '+o.limitations.slice(o.basis.length)).trim():o.limitations;
+function cohort(o){return o.cohort||[o.period?.label,o.currency,o.scope,o.accounting_basis].filter(Boolean).join(' · ');}
+// The cohort key stays as the data wrote it; only the display drops a money phrase from a people or percent basis.
+function cohortDisplay(key,o){return o&&basisLabel(o)==='Not stated'?human(key.replace(/\s·\sGross\/net undisclosed$/,'')):human(key);}
+function observations(){return all().map(o=>({...o}));}
+function rows(signal,measure,filters={}){
+ let result=all().filter(o=>o.signal===signal&&(!measure||o.measure===measure)&&numeric(o));
+ if(filters.group)result=result.filter(o=>modelGroup(o.company_id)===filters.group);
+ if(filters.company)result=result.filter(o=>o.company_id===filters.company);
+ if(filters.cohort)result=result.filter(o=>cohort(o)===filters.cohort);
+ if(filters.reportedOnly)result=result.filter(o=>o.evidence_type==='reported');
+ // Annualized snapshots: one dated figure per company on each reporting basis.
+ if(measure==='annualized_revenue'&&!filters.cohort&&!filters.history){const recent=new Map();for(const o of result){const key=o.company_id+'|'+cohort(o),before=recent.get(key);if(!before||dateKey(o).localeCompare(dateKey(before))>0)recent.set(key,o);}result=[...recent.values()];}
+ // Preserve distinct reporting bases; only deduplicate within the exact cohort.
+ const latest=new Map();
+ for(const o of result){const key=[o.company_id,o.measure,cohort(o)].join('|'),before=latest.get(key);if(!before||dateKey(o).localeCompare(dateKey(before))>0)latest.set(key,o);}
+ return [...latest.values()].sort((a,b)=>b.value-a.value||companies[a.company_id].name.localeCompare(companies[b.company_id].name));
+}
+function estimate(revenue,lowMargin,highMargin){
+ if(![revenue,lowMargin,highMargin].every(v=>typeof v==='number'&&Number.isFinite(v))||revenue<0||lowMargin<0||highMargin>100||lowMargin>highMargin)return null;
+ return {low:revenue*lowMargin/100,high:revenue*highMargin/100,lowMargin,highMargin};
+}
+function evidenceState(company,signal){
+ if(companies[company]?.entity_type==='adjacent_research')return 'n-a';
+ const list=all().filter(o=>o.company_id===company&&o.signal===signal);
+ if(list.some(o=>numeric(o)&&!o.is_context&&o.evidence_type!=='estimate'))return 'observed';
+ if(list.length)return 'proxy';
+ return 'missing';
+}
+function valueText(o,amount=o.value,qualify=true){
+ if(!numeric({...o,value:amount}))return 'Not disclosed';
+ let val;
+ if(o.unit==='percent'||o.unit==='%')val=new Intl.NumberFormat('en-US',{maximumFractionDigits:1}).format(amount)+'%';
+ else if(o.currency){const symbol={USD:'$',GBP:'£',EUR:'€'}[o.currency]||o.currency+' ';const abs=Math.abs(amount);val=(amount<0?'−':'')+symbol+new Intl.NumberFormat('en-US',{maximumFractionDigits:abs>=1e6?2:0}).format(abs/(abs>=1e9?1e9:abs>=1e6?1e6:1))+(abs>=1e9?'B':abs>=1e6?'M':'');}
+ else val=new Intl.NumberFormat('en-US',{notation:Math.abs(amount)>=1e6?'compact':'standard',maximumFractionDigits:1}).format(amount);
+ const q=qualify?({greater_than:'> ',at_least:'≥ ',at_most:'≤ ',less_than:'< ',approximately:'≈ ',approximate:'≈ ',nearly:'Nearly '}[o.qualifier]||''):'';
+ return q+val;
+}
+const boundWord=o=>({greater_than:'More than ',at_least:'At least ',at_most:'At most ',less_than:'Less than ',approximately:'About ',approximate:'About ',nearly:'Nearly '}[o.qualifier]||'');
+function shortDate(text,day=true){
+ const s=String(text||'').trim(),m=s.match(/(\d{4})-(\d{2})(?:-(\d{2}))?/);
+ if(!m)return s.replace(/^as of /i,'');
+ return (/inferred/i.test(s)?'≈ ':'')+(day&&m[3]?Number(m[3])+' ':'')+MONTHS[Number(m[2])-1]+' '+m[1];
+}
+// Cell tags keep month precision; the inspector shows the full period and date.
+function periodShort(o,day=false){
+ const p=o.period||{},label=String(p.label||''),named=label.match(/^H[12](?: FY)?\d{4}/);
+ switch(p.type){
+  case 'annual':return p.end&&!/-12-31$/.test(p.end)?'FY to '+shortDate(p.end,day):p.year?'FY'+p.year:label;
+  case 'half_year':{if(named)return named[0];const month=String(p.start||'').slice(5,7);return month==='01'&&p.year?'H1 '+p.year:month==='07'&&p.year?'H2 '+p.year:'6 months to '+shortDate(p.end||o.as_of,day);}
+  case 'trailing_year':return '12 months to '+shortDate(p.end||o.as_of,day);
+  case 'cumulative':return /\d{4}/.test(o.as_of)?shortDate(o.as_of,day):'';
+  case 'undated':return day?'undated':'';
+  default:{const d=shortDate(o.as_of,day);return /^undated$/i.test(d)&&!day?'':d||label;}
+ }
+}
+const dateKey=o=>o.period?.end||(String(o.as_of||'').match(/\d{4}(?:-\d{2}){0,2}/)||[''])[0];
+// Same rule as the company cards: a figure more than a year older than the dataset is historical.
+const asOfYear=Number(String(DATA.meta?.as_of||'').slice(0,4))||0;
+const yearOf=o=>Number(dateKey(o).slice(0,4))||0;
+const isHistorical=o=>!!asOfYear&&!!yearOf(o)&&yearOf(o)<asOfYear-1;
+// The research grade of the weakest cited claim: A strongest, U unverified.
+const gradeText={A:'independent or buyer-side evidence',B:'attributed company, investor or named primary statement',C:'secondary reporting, an estimate or indirect evidence',U:'unverified, undisclosed or unresolved'};
+const grade=o=>o.claim_ids.map(id=>claims[id]?.confidence).filter(g=>gradeText[g]).sort().at(-1)||'';
+const gradeChip=o=>{const g=grade(o);return g?`<i class="bh-grade" title="Research grade ${g}: ${safe(gradeText[g])}"><span class="sr-only">grade </span>${g}</i>`:'';};
+// The tag names the scope and a gross basis when they matter, and marks old figures.
+function cellTag(o){return [columnDefault[o.signal]===o.measure?'':measureShort[o.measure]||measureLabel(o.measure).toLowerCase(),scopeWord(o),o.accounting_basis==='gross'?'gross':'',periodShort(o),isHistorical(o)?'historical':''].filter(Boolean).join(' · ');}
+// Labels for the inspector's lists of a company's other figures: measure, scope, period and value.
+function otherLabel(r,withMeasure){return [withMeasure?measureShort[r.measure]||measureLabel(r.measure):'',scopeWord(r),r.accounting_basis==='gross'?'gross':'',periodShort(r,true),numeric(r)?valueText(r):'claim'].filter(Boolean).join(' · ');}
+function measureDefinition(id){const d=bundle?.measure_definitions;if(Array.isArray(d))return d.find(m=>m.id===id)||{};return d?.[id]||{};}
+function measureLabel(id){return measureDefinition(id).label||all().find(o=>o.measure===id)?.measure_label||human(id);}
+function measures(signal){return [...new Set(all().filter(o=>o.signal===signal&&numeric(o)).map(o=>o.measure))];}
+// The default measure for a signal; under a group filter, the measure that group reports most.
+function bestMeasure(signal,group=''){
+ const ids=measures(signal),preferred=preferredMeasures[signal]||[],rank=id=>{const i=preferred.indexOf(id);return i<0?preferred.length:i;};
+ if(!group)return preferred.find(id=>ids.includes(id))||ids[0]||'';
+ const counted=ids.map(id=>({id,n:rows(signal,id,{group}).length})).filter(m=>m.n).sort((a,b)=>b.n-a.n||rank(a.id)-rank(b.id));
+ return counted[0]?.id||bestMeasure(signal);
+}
+function pickCompanyObservation(company,signal){
+ const list=all().filter(o=>o.company_id===company&&o.signal===signal),preferred=bestMeasure(signal);
+ return list.sort((a,b)=>Number(numeric(b))-Number(numeric(a))||Number(!!a.is_context)-Number(!!b.is_context)||Number(b.measure===preferred)-Number(a.measure===preferred)||dateKey(b).slice(0,7).localeCompare(dateKey(a).slice(0,7))||Number(a.scope!=='company')-Number(b.scope!=='company')||(periodRank[a.period?.type]??2)-(periodRank[b.period?.type]??2))[0];
+}
+function evidenceLinks(o){return `<span class="bh-evidence-links">${o.claim_ids.map((id,i)=>claimButton(id,o.claim_ids.length>1?'Claim '+(i+1):'Inspect claim')).join('')}${o.source_ids.slice(0,3).map(id=>external(sources[id].url,sources[id].publisher||'Original source')).join('')}</span>`;}
+function statusText(o){return o.evidence_type==='estimate'?'Third-party estimate':o.evidence_type==='calculated'?'Calculated':o.is_context?'Context only':'Reported';}
+function pillClass(o){return o.evidence_type==='estimate'?'is-estimate':o.is_context?'is-context':'';}
+function assuranceText(o){const text=String(o.evidence_assurance||'');return text&&!/Research label:/i.test(text)?text:evidenceLabel(claims[o.claim_ids[0]]);}
+function dateRow(o){
+ const label=o.period.label,extra=shortDate(o.as_of,true),month=shortDate(o.as_of,false);
+ if(!/\d{4}-\d{2}/.test(o.as_of)||label.includes(o.as_of)||label.includes(month)||label.includes(dateKey(o).slice(0,7)))return label;
+ return label+' · stated '+extra;
+}
+function renderDetail(){
+ const o=byId(bhState.observation),id=bhState.company||(o?.company_id),name=companies[id]?.name,group=id?groupLabel(modelGroup(id)):'';
+ if(id&&evidenceState(id,bhState.signal)==='n-a'){
+  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name)} · ${safe(group)}</p><h3>Not applied</h3><p class="bh-lede">${safe(name)} is a nonprofit research organization. Commercial measures are not applied to it.</p><a class="bh-profile" href="#company/${safe(id)}">Full company profile ${iconHTML('external')}</a>`;
+  return;
+ }
+ if(!o||o.company_id!==id||o.signal!==bhState.signal){
+  const context=all().filter(r=>r.company_id===id&&r.signal===bhState.signal);
+  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name?name+' · '+group:'Read the evidence')}</p><h3>${name?'No reviewed public figure':'Select a cell'}</h3><p class="bh-lede">${name?'The reviewed sources do not establish '+labels[bhState.signal].toLowerCase()+' for '+safe(name)+'. Missing is not zero.':'Every cell opens its source, date, scope and calculation here.'}</p><p class="bh-note">${esc(definition(bhState.signal).ideal_measure||questions[bhState.signal])}</p>${context.length?`<div class="bh-related"><p><strong>Available context</strong></p>${context.map(r=>`<p>${esc(r.label)}: ${numeric(r)?safe(valueText(r)):esc(r.original_text)} ${evidenceLinks(r)}</p>`).join('')}</div>`:''}${id?`<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`:''}`;
+  return;
+ }
+ const history=all().filter(r=>r.company_id===id&&r.signal===o.signal&&r.measure===o.measure&&r.id!==o.id).sort((a,b)=>dateKey(b).localeCompare(dateKey(a)));
+ const related=all().filter(r=>r.company_id===id&&r.signal===o.signal&&r.measure!==o.measure);
+ const sparkline=historySeries(id,o.measure).some(list=>list.length>1&&list.some(r=>r.id===o.id));
+ const g=grade(o);
+ $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name)} · ${safe(group)}</p><h3>${esc(o.label)}</h3>${isHistorical(o)?`<span class="bh-historical">Historical · ${yearOf(o)}</span>`:''}<p class="bh-value${isHistorical(o)?' is-historical':''}">${safe(numeric(o)?valueText(o):'Not quantified')}<span class="bh-pill ${pillClass(o)}">${statusText(o)}</span></p><dl class="bh-facts"><dt>Date</dt><dd>${safe(dateRow(o))}</dd><dt>Scope</dt><dd>${safe(scopeLabel(o))}</dd><dt>Basis</dt><dd>${safe(basisLabel(o))}</dd><dt>Source</dt><dd>${g?`<span class="bh-grade-line">Research grade ${g}</span>, ${safe(gradeText[g])} · `:''}${esc(assuranceText(o))} ${evidenceLinks(o)}</dd></dl>${o.calculation?`<p class="bh-note"><strong>Calculated:</strong> ${esc(o.calculation.formula||o.calculation)}</p>`:''}${o.normalization?`<p class="bh-note">${esc(o.normalization)}</p>`:''}<details class="bh-caveats"><summary>Caveats and source wording</summary>${basisText(o)&&!o.limitations.includes(o.basis)?`<p>${esc(basisText(o))}</p>`:''}<p class="bh-warning">${esc(limitationsText(o))}</p><p class="bh-quote">“${esc(o.original_text)}”</p></details>${history.length&&!sparkline?`<div class="bh-related"><p><strong>Other dates</strong> ${history.map(r=>`<button type="button" class="text-link" data-bh-observation="${safe(r.id)}">${safe(otherLabel(r,false))}</button>`).join(' ')}</p></div>`:''}${related.length?`<div class="bh-related"><p><strong>Other measures</strong> ${related.map(r=>`<button type="button" class="text-link" data-bh-context="${safe(r.id)}">${esc(otherLabel(r,true))}</button>`).join(' ')}</p></div>`:''}<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`;
+}
+function historySeries(company,measure){
+ const grouped=new Map();
+ for(const o of all().filter(o=>o.company_id===company&&o.measure===measure&&numeric(o))){
+  const key=[o.period.type,o.currency,scopeLabel(o),o.accounting_basis].join('|');
+  if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(o);
+ }
+ return [...grouped.values()].map(list=>list.sort((a,b)=>dateKey(a).localeCompare(dateKey(b))));
+}
+function renderHistory(){
+ const o=byId(bhState.observation),company=o?.company_id;
+ const list=o?historySeries(company,o.measure).find(list=>list.length>1&&list.some(r=>r.id===o.id)):null;
+ $('bh-history').hidden=!list;
+ if(!list){$('bh-history').innerHTML='';return;}
+ const max=Math.max(1,...list.map(r=>r.value)),min=Math.min(0,...list.map(r=>r.value)),span=max-min||1;
+ const positions=list.map((r,i)=>({r,x:list.length===1?150:28+i/(list.length-1)*244,y:66-(r.value-min)/span*40}));
+ const first=list[0],last=list.at(-1),exact=first.value>0&&list.every(r=>['exact','calculated'].includes(r.qualifier)&&r.evidence_type!=='estimate');
+ const basis=[first.period.type==='annual'?'Full years':first.period.type==='half_year'?'Half years':human(first.period.type),first.currency||'percent',scopeLabel(first),basisLabel(first)].join(' · ');
+ $('bh-history').innerHTML=`<h4>${safe(companies[company].name)} over time</h4><p class="bh-cohort-heading">${safe(basis)}${exact&&list.length>1?` · ${((last.value/first.value-1)*100).toFixed(1)}% change, first to last`:''}</p><svg viewBox="0 0 300 88" role="img" aria-label="${esc(companies[company].name+' '+first.label+', '+list.map(r=>r.period.label+': '+valueText(r)).join('; '))}"><line class="bh-svg-base" x1="28" y1="66" x2="272" y2="66"/>${positions.length>1?`<polyline class="bh-svg-line" points="${positions.map(p=>p.x+','+p.y).join(' ')}" fill="none" stroke-width="2" stroke-linejoin="round"/>`:''}${positions.map((p,i)=>`<circle class="bh-svg-point${p.r.id===o.id?' is-selected':''}" cx="${p.x}" cy="${p.y}" r="${p.r.id===o.id?5:3.5}" stroke-width="2"/>${i===0||i===positions.length-1||p.r.id===o.id?`<text x="${p.x}" y="${p.y-9}" text-anchor="${i===0?'start':i===positions.length-1?'end':'middle'}" class="bh-svg-value">${safe(valueText(p.r))}</text>`:''}<text x="${p.x}" y="82" text-anchor="${i===0?'start':i===positions.length-1?'end':'middle'}" class="bh-svg-axis">${safe(periodShort(p.r))}</text>`).join('')}</svg><div class="bh-history-points">${list.map(r=>`<button type="button" data-bh-observation="${safe(r.id)}"${bhState.observation===r.id?' aria-current="true"':''}>${safe(periodShort(r,true))} · ${safe(valueText(r))}</button>`).join('')}</div>`;
+}
+function renderCompare(){
+ const selected=rows(bhState.signal,bhState.measure,{group:bhState.group,cohort:bhState.cohort}),groups=new Map(),current=byId(bhState.observation);
+ if(!bhState.observation&&!bhState.company&&selected.length){bhState.observation=selected[0].id;bhState.company=selected[0].company_id;}
+ // A figure chosen from the inspector stays visible in its own panel even when a later snapshot replaced it.
+ if(current&&current.signal===bhState.signal&&current.measure===bhState.measure&&numeric(current)&&!selected.some(r=>r.id===current.id)&&(!bhState.cohort||cohort(current)===bhState.cohort)&&(!bhState.group||modelGroup(current.company_id)===bhState.group))selected.push(current);
+ for(const o of selected){const key=cohort(o);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(o);}
+ const md=measureDefinition(bhState.measure);
+ if(!selected.length)$('bh-plot').innerHTML=`<p class="bh-empty">No comparable observations in this selection. Missing values stay unknown.</p>`;
+ else $('bh-plot').innerHTML=[...groups].map(([key,list])=>{
+  list.sort((a,b)=>b.value-a.value||companies[a.company_id].name.localeCompare(companies[b.company_id].name));
+  const min=Math.min(0,...list.map(o=>o.value)),max=Math.max(0,...list.map(o=>o.value)),span=max-min||1,zero=(0-min)/span*100;
+  return `<div class="bh-plot-group" role="group" aria-label="${safe(cohortDisplay(key,list[0]))}"><h5 class="bh-cohort-heading">${safe(cohortDisplay(key,list[0]))}</h5>${list.map(o=>{const end=(o.value-min)/span*100;const left=Math.min(zero,end),width=Math.abs(end-zero);return `<button type="button" class="bh-bar" data-bh-observation="${safe(o.id)}"${bhState.observation===o.id?' aria-current="true"':''} aria-label="${esc(companies[o.company_id].name+': '+valueText(o)+', '+o.label+', '+o.period.label+', '+scopeLabel(o)+(isHistorical(o)?', historical':''))}"><span class="bh-bar-name">${safe(companies[o.company_id].name)}</span><span class="bh-bar-track" aria-hidden="true"><i class="bh-bar-fill${['greater_than','at_least','less_than','at_most'].includes(o.qualifier)?' is-bound':''}${o.value<0?' is-negative':''}${o.evidence_type==='estimate'?' is-estimate':''}" style="left:${left}%;width:${width}%"></i>${min<0?`<i class="bh-bar-zero" style="left:${zero}%"></i>`:''}</span><span class="bh-bar-value${isHistorical(o)?' is-historical':''}">${safe(valueText(o))}</span></button>`;}).join('')}<div class="bh-axis"><span>${safe(valueText(list[0],min,false))}</span><span>${safe(valueText(list[0],max,false))}</span></div></div>`;
+ }).join('');
+ $('bh-chart-note').textContent=`${md.note||md.description||'Dated observations from the reviewed public evidence.'} ${plural(new Set(selected.map(o=>o.company_id)).size,'organization')}; each panel keeps its own scale and basis. Not a ranking.`;
+}
+function companyRows(){
+ const pool=DATA.companies.filter(c=>!bhState.group||modelGroup(c.id)===bhState.group),query=bhState.query.trim().toLowerCase();
+ const states=new Map(pool.map(c=>[c.id,Object.fromEntries(signals.map(s=>[s,evidenceState(c.id,s)]))]));
+ let list=pool.filter(c=>c.name.toLowerCase().includes(query));
+ if(bhState.evidenceOnly)list=list.filter(c=>signals.some(s=>['observed','proxy'].includes(states.get(c.id)[s])));
+ const coverage=id=>signals.filter(s=>states.get(id)[s]==='observed').length*2+signals.filter(s=>states.get(id)[s]==='proxy').length;
+ const unitRank=o=>!o||!numeric(o)?3:o.currency?0:o.unit==='percent'?1:2;
+ // Figures are ordered by size within one measure and reporting basis only; across bases the order is by evidence, never by size.
+ const bySignal=(a,b)=>{const sa=states.get(a.id)[bhState.signal],sb=states.get(b.id)[bhState.signal];if(stateRank[sa]!==stateRank[sb])return stateRank[sa]-stateRank[sb];const oa=pickCompanyObservation(a.id,bhState.signal),ob=pickCompanyObservation(b.id,bhState.signal);if(!oa||!ob)return a.name.localeCompare(b.name);const preferred=bestMeasure(bhState.signal);return Number(ob.measure===preferred)-Number(oa.measure===preferred)||unitRank(oa)-unitRank(ob)||Number(oa.scope!=='company')-Number(ob.scope!=='company')||cohort(oa).localeCompare(cohort(ob))||(numeric(ob)?ob.value:0)-(numeric(oa)?oa.value:0)||a.name.localeCompare(b.name);};
+ const sorted=[...list].sort(bhState.sort==='name'?(a,b)=>a.name.localeCompare(b.name):bhState.sort==='signal'?bySignal:(a,b)=>coverage(b.id)-coverage(a.id)||a.name.localeCompare(b.name));
+ return {pool,sorted,states};
+}
+function cellHTML(c,signal,state){
+ if(state==='n-a')return `<td class="bh-cell" data-state="n-a" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><span title="Nonprofit research: commercial measures are not applied">n/a<span class="sr-only"> ${labels[signal]}: not applied</span></span></td>`;
+ const o=pickCompanyObservation(c.id,signal),selected=bhState.company===c.id&&bhState.signal===signal;
+ if(!o)return `<td class="bh-cell" data-state="missing" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><span title="${safe(c.name+' · '+labels[signal]+': no reviewed public disclosure. Missing is not zero.')}">—<span class="sr-only"> ${labels[signal]}: not disclosed</span></span></td>`;
+ const value=numeric(o)?valueText(o):'Claim',tag=cellTag(o);
+ return `<td class="bh-cell" data-state="${state}"${isHistorical(o)?' data-historical="true"':''} data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><button type="button" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"${selected?' aria-current="true"':''} title="${esc(c.name+' · '+o.label+' · '+o.period.label+' · '+scopeLabel(o)+(o.is_context?' · context only':'')+(isHistorical(o)?' · historical':'')+(grade(o)?' · research grade '+grade(o):''))}"><b>${safe(value)}${gradeChip(o)}</b><small>${safe(tag)}${o.is_context?'<span class="sr-only"> (context only)</span>':''}</small></button></td>`;
+}
+function renderGrid(){
+ const {pool,sorted,states}=companyRows(),query=bhState.query.trim();
+ const figures=sorted.filter(c=>signals.some(s=>states.get(c.id)[s]==='observed')).length;
+ const order={coverage:'ordered by evidence coverage',signal:'ordered by '+labels[bhState.signal].toLowerCase()+' evidence, same basis together',name:'A to Z'}[bhState.sort];
+ $('bh-matrix-count').textContent=`${query||bhState.evidenceOnly||bhState.group?`${sorted.length} of ${plural(DATA.companies.length,'organization')}`:plural(sorted.length,'organization')} · ${figures} with a reported figure · ${order}, not by health.`;
+ const nextSort=bhState.sort==='name'?'coverage':'name';
+ $('bh-grid-head').innerHTML=`<th scope="col"${bhState.sort==='name'?' aria-sort="ascending"':bhState.sort==='coverage'?' aria-sort="other"':''}><button type="button" class="bh-colhead" data-bh-sort="${nextSort}">Organization<small>${nextSort==='name'?'sort A to Z':'sort by most evidence'}</small></button></th>`+signals.map(s=>{const n=new Set(all().filter(o=>o.signal===s&&numeric(o)&&!o.is_context).map(o=>o.company_id)).size;return `<th scope="col"${bhState.sort==='signal'&&bhState.signal===s?' aria-sort="descending"':''}><button type="button" class="bh-colhead${bhState.signal===s?' is-active':''}" data-bh-tab="${s}" title="${esc(questions[s])}">${columns[s]}<small>${n} of ${DATA.companies.length}</small></button></th>`;}).join('');
+ $('bh-matrix-body').innerHTML=sorted.length?sorted.map(c=>`<tr${bhState.company===c.id?' class="is-selected"':''}><th scope="row"><a href="#company/${safe(c.id)}"><span>${safe(c.name)}</span></a><small>${safe(groupLabel(modelGroup(c.id)))}</small></th>${signals.map(s=>cellHTML(c,s,states.get(c.id)[s])).join('')}</tr>`).join(''):`<tr><td colspan="6" class="bh-empty">No organization matches. Clear the search or the group filter.</td></tr>`;
+}
+// After the grid is re-sorted, show the selected cell, or the top of the grid.
+function revealSelection(){
+ const wrap=$('bh-grid-wrap');if(!wrap||typeof wrap.querySelector!=='function')return;
+ const pressed=wrap.querySelector('button[aria-current]');
+ if(pressed)pressed.scrollIntoView({block:'nearest',inline:'nearest'});else wrap.scrollTop=0;
+}
+function renderEstimator(){
+ const o=byId($('bh-estimate-company').value);if(!o)return;
+ const low=Number($('bh-margin-low').value),high=Number($('bh-margin-high').value);$('bh-margin-low-label').textContent=low+'%';$('bh-margin-high-label').textContent=high+'%';
+ const result=estimate(o.value,low,high);
+ $('bh-estimate-headline').innerHTML=result?`<span class="bh-pill is-estimate">Hypothetical</span> <strong>${safe(boundWord(o))}${safe(valueText(o,result.low,false))} – ${safe(valueText(o,result.high,false))}</strong> gross profit${/run.?rate|annualized/.test(o.measure)?' at an annualized pace':''}${isHistorical(o)?' from a historical figure':''}`:'Lower margin must be at or below upper margin.';
+ $('bh-estimate-detail').innerHTML=result?`<p>${safe(companies[o.company_id].name)} · ${safe(valueText(o))} × ${low}–${high}% assumed gross margin · ${safe(periodShort(o,true))} · ${safe(scopeLabel(o))} · ${safe(basisLabel(o))}. Assumes revenue before direct delivery costs; a lower-bound input gives a threshold, not a forecast. No retention rate is known, so this is not the repeat-customer north star. ${evidenceLinks(o)}</p>`:'';
+}
+function render(){
+ if(!bundle||!DATA.companies.some(c=>c.id==='mercor'))return;
+ const ids=measures(bhState.signal);if(!ids.includes(bhState.measure))bhState.measure=bestMeasure(bhState.signal,bhState.group);
+ $('bh-tabs').innerHTML=signals.map((id,i)=>{const coverage=new Set(all().filter(o=>o.signal===id&&numeric(o)&&!o.is_context).map(o=>o.company_id)).size,pct=Math.round(coverage/DATA.companies.length*100);return `<button type="button" class="bh-tile" id="bh-tab-${id}" role="tab" aria-controls="bh-inspector" aria-selected="${id===bhState.signal}" tabindex="${id===bhState.signal?0:-1}" data-bh-tab="${id}" title="${esc(definition(id).ideal_measure||'')}"><span class="bh-tile-top"><span class="bh-tile-n">0${i+1}</span><strong>${labels[id]}</strong></span><span class="bh-tile-q">${questions[id]}</span><span class="bh-tile-cov" aria-hidden="true"><i style="width:${pct}%"></i></span><small>${coverage} of ${DATA.companies.length} report a figure</small></button>`;}).join('');
+ $('bh-inspector').setAttribute('aria-labelledby','bh-tab-'+bhState.signal);
+ $('bh-measure').innerHTML=ids.map(id=>`<option value="${safe(id)}">${esc(measureLabel(id))}</option>`).join('');$('bh-measure').value=bhState.measure;
+ const cohortRows=rows(bhState.signal,bhState.measure,{group:bhState.group,history:true}),cohorts=[...new Set(cohortRows.map(cohort))];
+ if(!cohorts.includes(bhState.cohort))bhState.cohort='';
+ $('bh-cohort').innerHTML='<option value="">All bases · separate panels</option>'+cohorts.map(c=>`<option value="${safe(c)}">${safe(cohortDisplay(c,cohortRows.find(o=>cohort(o)===c)))}</option>`).join('');$('bh-cohort').value=bhState.cohort;
+ $('bh-group').innerHTML='<option value="">All business groups</option>'+Object.keys(MODEL_GROUPS).map(g=>`<option value="${safe(g)}">${safe(groupLabel(g))}</option>`).join('');$('bh-group').value=bhState.group;
+ $('bh-sort').value=bhState.sort;
+ renderCompare();renderDetail();renderHistory();renderGrid();
+}
+function selectSignal(signal,company=''){
+ if(!company){bhState.sort='signal';bhState.measure=bestMeasure(signal,bhState.group);}
+ else if(signal!==bhState.signal)bhState.measure=bestMeasure(signal);
+ bhState.signal=signal;bhState.cohort='';bhState.company=company;bhState.observation='';
+ if(company){const o=pickCompanyObservation(company,signal);if(o){bhState.measure=o.measure;bhState.observation=o.id;}}
+ render();
+}
+window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries};
+if(!bundle)return;
+$('bh-measure').addEventListener('change',e=>{bhState.measure=e.target.value;bhState.cohort='';bhState.company='';bhState.observation='';render();});
+$('bh-cohort').addEventListener('change',e=>{bhState.cohort=e.target.value;bhState.company='';bhState.observation='';render();});
+$('bh-group').addEventListener('change',e=>{bhState.group=e.target.value;bhState.cohort='';bhState.company='';bhState.observation='';bhState.measure=bestMeasure(bhState.signal,bhState.group);render();revealSelection();});
+$('bh-sort').addEventListener('change',e=>{bhState.sort=e.target.value;renderGrid();revealSelection();});
+$('bh-search').addEventListener('input',e=>{bhState.query=e.target.value;renderGrid();});
+$('bh-evidence-only').addEventListener('change',e=>{bhState.evidenceOnly=!!e.target.checked;renderGrid();});
+for(const id of ['bh-margin-low','bh-margin-high'])$(id).addEventListener('input',renderEstimator);
+$('bh-estimate-company').addEventListener('change',renderEstimator);
+document.addEventListener('click',e=>{
+ // Header buttons are rebuilt with the grid, so focus returns to the new button in the same place.
+ const sort=e.target.closest('[data-bh-sort]');if(sort){bhState.sort=sort.dataset.bhSort;$('bh-sort').value=bhState.sort;renderGrid();revealSelection();$('bh-grid-head').querySelector?.('[data-bh-sort]')?.focus({preventScroll:true});return;}
+ const tab=e.target.closest('[data-bh-tab]');if(tab){const inGrid=!!tab.closest('thead');selectSignal(tab.dataset.bhTab);revealSelection();(inGrid?$('bh-grid-head').querySelector?.(`[data-bh-tab="${tab.dataset.bhTab}"]`):$('bh-tab-'+tab.dataset.bhTab))?.focus({preventScroll:true});return;}
+ const cell=e.target.closest('[data-bh-company]');if(cell){selectSignal(cell.dataset.bhSignal,cell.dataset.bhCompany);const inspector=$('bh-inspector');inspector.scrollTop=0;if(narrow())inspector.scrollIntoView({behavior:media('(prefers-reduced-motion: reduce)')?'auto':'smooth',block:'start'});inspector.focus({preventScroll:true});return;}
+ const mark=e.target.closest('[data-bh-observation], [data-bh-context]');if(mark){const o=byId(mark.dataset.bhObservation||mark.dataset.bhContext);if(!o)return;const panel=mark.closest('#bh-plot, #bh-history, #bh-detail');bhState.company=o.company_id;bhState.observation=o.id;bhState.measure=o.measure;bhState.cohort='';render();const home=panel&&document.getElementById(panel.id),find=root=>[...root.querySelectorAll('[data-bh-observation]')].find(el=>el.dataset.bhObservation===o.id);(home&&find(home)||find(document))?.focus({preventScroll:true});}
+});
+$('bh-tabs').addEventListener('keydown',e=>{
+ if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;e.preventDefault();let i=signals.indexOf(bhState.signal);i=e.key==='Home'?0:e.key==='End'?4:(i+(e.key==='ArrowRight'?1:-1)+5)%5;selectSignal(signals[i]);revealSelection();const active=$('bh-tab-'+signals[i]);active.focus({preventScroll:true});active.scrollIntoView({block:'nearest',inline:'nearest'});
+});
+const inputs=all().filter(o=>o.signal==='revenue'&&numeric(o)&&o.currency&&/revenue|run_rate/.test(o.measure)&&!/growth|margin/.test(o.measure));
+$('bh-estimate-company').innerHTML=inputs.map(o=>`<option value="${safe(o.id)}">${safe(companies[o.company_id]?.name)} · ${safe(valueText(o))} · ${safe(periodShort(o,true))}${isHistorical(o)?' · historical':''} · ${safe(scopeLabel(o))}</option>`).join('');
+if(inputs.length)$('bh-estimate-company').value=inputs.find(o=>o.company_id==='mercor')?.id||inputs[0].id;
+renderEstimator();
+$('bh-method-content').innerHTML=`<p><strong>Reported</strong> means the source states the number. <strong>Calculated</strong> means arithmetic from cited inputs, shown with its formula. <strong>Context</strong> covers customer counts, registered expert networks, headcount and profitability claims: proxies, never a measured margin, retention rate or cash figure. The letter on each figure is the research grade of its claim: A independent or buyer-side evidence, B an attributed primary statement, C secondary reporting or an estimate.</p><p>Run rate (annualized pace), completed-period revenue, gross billings and net revenue mean different things, so each keeps its own panel and scale. Missing disclosure is not zero and not a sign of weakness. Nonprofit research organizations are not scored on commercial measures.</p><p>Curated ${safe(bundle.dashboard_curated_on||'23 October 2026')} from research dataset ${safe(DATA.dataset_version)}, reviewed ${safe(bundle.source_dataset_reviewed_on)}; review dates stay attached to each claim. The margin model uses your assumptions and never enters the evidence grid. Follow the original source before acting on a figure.</p>`;
+})();
+
+initialize();

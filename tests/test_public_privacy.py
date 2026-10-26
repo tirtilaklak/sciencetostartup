@@ -1,4 +1,6 @@
-"""No email address or phone number ships in the public build beyond an explicit allowlist."""
+"""No email address or phone number ships in the public build beyond an explicit allowlist.
+Every file in dist/ is read: text files whole, the SQLite database cell by cell, and images and icons as the
+printable text inside them (metadata such as EXIF, XMP or PNG text chunks can carry an address)."""
 import contextlib
 import json
 import re
@@ -8,7 +10,13 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TEXT = {".html", ".json", ".csv", ".xml", ".txt"}
+TEXT = {".html", ".json", ".csv", ".xml", ".txt", ".js", ".svg", ".css", ".md"}
+# Host config files such as _headers and _redirects have no suffix and are text.
+BINARY = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".ico", ".avif", ".pdf", ".woff", ".woff2"}
+PRINTABLE = re.compile(rb"[\x20-\x7e]{6,}")
+# The build moves the app code and the sidecar data out of index.html into content-hashed files in js/.
+# They are scanned under a stable name, so the allowlist does not change with every build.
+BUNDLE = re.compile(r"^js/([a-z]+)\.[0-9a-f]{12}\.js$")
 EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
 PHONE = re.compile(r"""tel:
     | (?<![\w.$£€+-]) (?:\+1[ .-]?)? (?:\(\d{3}\)\ ?|\d{3}[ .-]) \d{3}[ .-]\d{4} (?![\w%-]|\.\d)
@@ -22,8 +30,8 @@ ALLOWED = {
     # The publisher's own correction and contact address, shown in the About panel.
     "musaeminozdem@gmail.com": {"index.html#about"},
     # Role address Bespoke Labs publishes for domain experts on https://bespokelabs.ai/contact
-    # (checked 2026-10-23); the reviewed Work route cites that page.
-    "experts@bespokelabs.ai": {"work-routes.json", "index.html"},
+    # (checked 2026-10-23); the reviewed Work route cites that page. The app reads the routes from the data bundle.
+    "experts@bespokelabs.ai": {"work-routes.json", "js/data.js"},
     # A named person's address quoted in canonical claim benchflow.claim.worker_opportunities-0.
     # Dataset 2.5.0 is pinned, so it stays in canonical-derived files until the pending 2.5.1
     # release removes it. It must never appear in Work routes or a static page.
@@ -38,12 +46,19 @@ def sqlite_text(path):
                 yield from (value for value in row if isinstance(value, str))
 
 
+def printable_text(path):
+    """The runs of printable ASCII inside a binary file, as the strings tool shows them."""
+    return "\n".join(run.decode("ascii") for run in PRINTABLE.findall(path.read_bytes()))
+
+
 def places(dist):
     for path in sorted(p for p in dist.rglob("*") if p.is_file()):
-        name = path.relative_to(dist).as_posix()
+        name = BUNDLE.sub(r"js/\1.js", path.relative_to(dist).as_posix())
         if path.suffix == ".sqlite":
             yield name, "\n".join(sqlite_text(path))
-        elif path.suffix in TEXT:
+        elif path.suffix in BINARY:
+            yield name, printable_text(path)
+        elif path.suffix in TEXT or not path.suffix:
             text = path.read_text()
             if name == "index.html":
                 for section, pattern in SECTIONS.items():
@@ -57,9 +72,19 @@ class PublicPrivacyTests(unittest.TestCase):
     def setUpClass(cls):
         cls.places = dict(places(ROOT / "dist"))
 
+    def test_scan_covers_every_dist_file(self):
+        """No export escapes the scan: every file in dist/ is text, SQLite or a known binary type (coordinator A4)."""
+        dist = ROOT / "dist"
+        files = {BUNDLE.sub(r"js/\1.js", p.relative_to(dist).as_posix()) for p in dist.rglob("*") if p.is_file()}
+        self.assertEqual(files, {place.split("#", 1)[0] for place in self.places})
+        for place in ("_headers", "_redirects", "assets/favicon.svg", "assets/logos/mercor.svg", "favicon.ico", "assets/share/sciencetostartup-1200x630.png"):
+            self.assertIn(place, self.places)
+
     def test_scan_reads_every_public_text(self):
-        for place in ("index.html", "index.html#about", "index.html#research-data", "observatory.sqlite",
-                      "research.json", "claims.csv", "work-routes.json", "sitemap.xml", "companies/index.html"):
+        for place in ("index.html", "index.html#about", "index.html#research-data", "observatory.sqlite", "js/app.js", "js/data.js",
+                      "research.json", "claims.csv", "work-routes.json", "sitemap.xml", "companies/index.html",
+                      "work/index.html", "method/index.html", "404.html", "business-health.json", "company-events.json",
+                      "source-updates.json", "link-health.json", "manifest.json", "robots.txt", "_headers"):
             self.assertTrue(self.places.get(place), place)
         companies = json.loads((ROOT / "data/canonical.json").read_text())["companies"]
         self.assertEqual({p for p in self.places if p.startswith("company/")},
@@ -69,6 +94,11 @@ class PublicPrivacyTests(unittest.TestCase):
         found = {(address.lower(), place) for place, text in self.places.items() for address in EMAIL.findall(text)}
         self.assertEqual(sorted(f"{address} in {place}" for address, place in found
                                 if place not in ALLOWED.get(address, ())), [])
+
+    def test_benchflow_address_stays_out_of_work_data_and_bundles(self):
+        """Main removed this address from Work routes on 23 Oct; only the pinned 2.5.0 dataset files still carry it (coordinator E1)."""
+        for place in ("work-routes.json", "js/data.js", "js/app.js"):
+            self.assertNotIn("@benchflow.ai", self.places[place], place)
 
     def test_no_phone_numbers_ship(self):
         self.assertEqual(sorted(f"{match.group(0)!r} in {place}" for place, text in self.places.items()

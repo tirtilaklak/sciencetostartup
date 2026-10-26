@@ -8,6 +8,7 @@ import copy
 import hashlib
 import json
 import math
+import re
 import subprocess
 import sys
 import tempfile
@@ -213,7 +214,9 @@ console.log(JSON.stringify({observations:observations.length,filtering:true,cont
         self.assertEqual((ROOT / "dist/research.json").read_bytes(), (ROOT / "data/canonical.json").read_bytes())
         self.assertEqual(json.loads((ROOT / "dist/business-health.json").read_text()), self.health)
         html = (ROOT / "dist/index.html").read_text()
-        self.assertIn((ROOT / "web/business-health.js").read_text(), html)
+        # The page scripts load from content-hashed files in dist/js/; the CSS stays inline.
+        scripts = "".join((ROOT / "dist" / src).read_text() for src in dict.fromkeys(re.findall(r'"(js/[^"]+[.]js)"', html)))
+        self.assertIn((ROOT / "web/business-health.js").read_text(), scripts)
         self.assertIn((ROOT / "web/business-health.css").read_text(), html)
         self.assertIn('id="business-health"', html)
         manifest = json.loads((ROOT / "dist/manifest.json").read_text())["sha256"]
