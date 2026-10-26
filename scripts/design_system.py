@@ -23,7 +23,8 @@ CASCADE = ("style.css", *REDESIGN_CSS, "icons.css")
 # Literal colours wired to tokens. Every live use of each value shares the token's role.
 WIRED = ("field", "field-border", "green-dark", "tray", "tray-border", "logo-dark", "hover", "wash",
          "band", "band-group", "band-rule", "rule-strong", "track", "bar-compare", "figure-rule",
-         "mark-frame", "dialog-border", "scrim", "status", "status-rule", "link-status")
+         "mark-frame", "dialog-border", "scrim", "status", "status-rule", "link-status",
+         "grade-a", "grade-b", "grade-c", "grade-u")
 # White also paints other things, so on-green replaces it only in rules that set text on a green fill.
 ON_GREEN_RULES = (".button-primary", "#compare-tray a", "#compare-tray .quiet")
 HEX = re.compile(r"#([0-9a-fA-F]{3,8})(?![0-9a-fA-F])")
