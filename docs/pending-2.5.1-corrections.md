@@ -1,5 +1,7 @@
 # Pending 2.5.1 corrections
 
+Status, checked 25 Oct 2026: the release is blocked until the research repository with the 29 raw input files is attached to a session. No repository in the owner's GitHub holds them. The checksum checks in scripts/observatory.py stay as they are.
+
 Prepared 23 October 2026. Every source below was rechecked live on that date.
 
 Dataset 2.5.0 is pinned by hash in `tests/redesign_checks.py`, and `observatory.py import` requires the 29 raw files listed in `raw_inputs` (`data/raw/...`). Those files live only in the research repository, so these corrections must be released there. The public repository already carries the sidecar fixes noted at the end.
