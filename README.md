@@ -89,6 +89,8 @@ Static Assets accepts relative source paths. Equivalent zone redirects enforce
 HTTPS and the apex hostname while preserving paths and queries. `_headers` is
 deployed unchanged.
 
+Cloudflare Web Analytics is injected at the edge and sets no cookies.
+
 ## Business health dashboard
 
 The overview explores revenue growth, delivery margins, customer durability, paid
@@ -102,8 +104,6 @@ The underlying research remains dataset v2.5.0; the October 23 dashboard curatio
 does not imply all source material was freshly verified.
 
 ## Owner steps
-
-Analytics is Cloudflare Web Analytics, injected at the edge and cookieless.
 
 1. Search. Verify the domain in Google Search Console and Bing Webmaster Tools,
    and submit `https://sciencetostartup.com/sitemap.xml` in each.
