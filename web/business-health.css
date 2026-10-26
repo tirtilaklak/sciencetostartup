@@ -22,11 +22,11 @@
 .bh-board{display:flex;align-items:stretch;max-height:max(560px,calc(100vh - var(--header-height,72px) - 24px));border:1px solid var(--bh-line);background:var(--bh-paper)}
 .bh-grid-side{flex:1 1 auto;min-width:0;min-height:0;display:flex;flex-direction:column}
 .bh-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 12px;border-bottom:1px solid var(--bh-line)}
-.bh-toolbar label{display:flex;flex-direction:row;align-items:center;gap:6px;flex:0 1 auto;font-size:11px;color:var(--muted);min-width:0}
+.bh-toolbar label{display:flex;flex-direction:row;align-items:center;gap:6px;flex:0 1 auto;min-height:24px;font-size:11px;color:var(--muted);min-width:0}
 .bh-toolbar label:first-child{flex:1 1 170px}
 .bh-toolbar input[type=search],.bh-toolbar select{width:100%;min-height:34px;font-size:12px;padding:5px 9px;border:1px solid #7b8978;border-radius:3px;background:#fffefa;color:var(--ink)}
 .bh-toolbar select{padding-right:26px;max-width:200px}
-.bh-toolbar input[type=checkbox]{width:15px;height:15px;min-height:0;accent-color:var(--bh-green);flex:0 0 15px}
+.bh-toolbar input[type=checkbox]{width:18px;height:18px;min-height:0;margin:0;accent-color:var(--bh-green);flex:0 0 18px}
 .bh-count{margin:0;padding:6px 12px;font-size:11px;line-height:1.5;color:var(--muted);border-bottom:1px solid var(--bh-line)}
 .bh-grid-wrap{position:relative;flex:1 1 auto;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#a7b3a4 transparent}
 .bh-grid{border-collapse:separate;border-spacing:0;width:100%;min-width:640px;table-layout:fixed;font-size:12px;line-height:1.3;background:var(--bh-paper)}
@@ -39,7 +39,8 @@
 .bh-colhead.is-active{color:var(--bh-dark)}
 .bh-grid thead th[aria-sort=descending] .bh-colhead,.bh-grid thead th[aria-sort=other] .bh-colhead{box-shadow:inset 0 -2px 0 var(--bh-green)}
 .bh-grid tbody th{padding:4px 10px;border-bottom:1px solid #e5e8e0;font-weight:600;font-size:12px;vertical-align:middle;background:var(--bh-paper)}
-.bh-grid tbody th a{display:block;color:var(--ink);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:0}
+.bh-grid tbody th a{display:flex;align-items:center;min-height:24px;color:var(--ink);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bh-grid tbody th a>span{overflow:hidden;text-overflow:ellipsis}
 .bh-grid tbody th a:hover{color:var(--bh-green);text-decoration:underline}
 .bh-grid tbody th small{display:block;margin-top:1px;font-size:9.5px;font-weight:400;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bh-grid tbody tr:hover>th,.bh-grid tbody tr:hover>td,.bh-grid tbody tr.is-selected>th{background:#f1f4ec}
@@ -47,8 +48,9 @@
 .bh-cell>button,.bh-cell>span{display:flex;flex-direction:column;justify-content:center;gap:1px;width:100%;min-height:34px;padding:3px 7px;border:0;border-radius:3px;background:transparent;text-align:left;font-size:12px;line-height:1.3;color:var(--muted);cursor:default}
 .bh-cell>button{cursor:pointer;transition:box-shadow .12s ease}
 .bh-cell b{font-weight:650;letter-spacing:-.15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
-.bh-cell small{font-size:9.5px;line-height:1.3;letter-spacing:-.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
-.bh-scope{display:inline-block;vertical-align:1px;margin-left:5px;padding:0 4px;border:1px solid currentColor;border-radius:2px;font-size:8.5px;font-style:normal;font-weight:600;letter-spacing:.3px;line-height:1.5;text-transform:uppercase}
+.bh-cell small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;font-size:9.5px;line-height:1.3;letter-spacing:-.1px;overflow:hidden;overflow-wrap:anywhere;color:var(--muted)}
+.bh-grade{display:inline-block;vertical-align:1px;margin-left:5px;padding:0 3px;border:1px solid #c5d0c2;border-radius:2px;background:var(--bh-paper);font-size:8.5px;font-style:normal;font-weight:650;line-height:1.3;color:var(--muted)}
+.bh-cell[data-historical=true]>button{color:var(--muted)}
 .bh-cell[data-state=observed]>button{background:var(--bh-soft);color:var(--bh-dark)}
 .bh-cell[data-state=proxy]>button{background:var(--bh-amber-bg);color:var(--bh-amber)}
 .bh-cell[data-state=proxy] small{color:var(--bh-amber)}
@@ -62,12 +64,16 @@
 .bh-legend i{width:12px;height:12px;border-radius:2px;background:var(--bh-soft);border:1px solid #c5d0c2;flex:0 0 12px}
 .bh-legend i.is-proxy{background:var(--bh-amber-bg);border-color:#cbb995}
 .bh-legend i.is-missing{background:transparent;border-color:var(--bh-line)}
+.bh-legend .bh-grade{margin:0 2px 0 0;vertical-align:0}
 .bh-legend i.is-na{background:repeating-linear-gradient(135deg,transparent 0 3px,#dfe3da 3px 4px);border-color:var(--bh-line)}
 .bh-inspector{flex:0 0 340px;min-width:0;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#a7b3a4 transparent;border-left:1px solid var(--bh-line);background:#f2f4ed;padding:14px 16px 16px;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
 .bh-kicker{font-size:10px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
 .bh-inspector h3{font-size:15px;line-height:1.35;letter-spacing:-.2px;margin:0 0 8px}
 .bh-inspector h4{font-size:10.5px;font-weight:650;letter-spacing:.6px;text-transform:uppercase;color:var(--ink);margin:0 0 6px}
 .bh-lede{margin:0 0 8px;color:var(--ink)}
+.bh-historical{display:block;font-size:11px;color:var(--muted);margin:0 0 2px}
+.bh-value.is-historical,.bh-bar-value.is-historical{color:var(--muted)}
+.bh-grade-line{font-weight:600;color:var(--ink)}
 .bh-value{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 0 10px;font-size:28px;font-weight:600;letter-spacing:-.9px;line-height:1.1;color:var(--bh-green)}
 .bh-pill{display:inline-flex;align-items:center;border:1px solid #bcc9b6;padding:1px 6px;color:var(--bh-green);background:#f3f6ed;font-size:10px;font-weight:550;line-height:1.5;letter-spacing:0;border-radius:2px;white-space:nowrap}
 .bh-pill.is-context,.bh-pill.is-estimate{color:var(--bh-amber);background:var(--bh-amber-bg);border-color:#cbb995}
@@ -165,6 +171,7 @@
  .bh-grid thead th:first-child{width:120px;min-width:120px}
  .bh-grid tbody th{padding:4px 8px}
  .bh-cell>button,.bh-cell>span{padding:3px 6px;min-height:36px}
+ .bh-cell small{-webkit-line-clamp:3}
  .bh-cell b{font-size:11.5px}
  .bh-value{font-size:26px}
  .bh-compare-head label{flex-basis:100%}
