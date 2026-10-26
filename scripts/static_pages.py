@@ -1110,7 +1110,7 @@ def render_work(research, routes, names, modified):
     open_rows = [r for r in rows if work_bucket(r) in PAID_OPEN_BUCKETS]
     open_count, open_companies = len(open_rows), len({r["company_id"] for r in open_rows})
     title = f"{plural(open_count, 'paid work listing')} in AI training{SUFFIX}"
-    description = truncate(f"{plural(open_count, 'paid work listing')} in AI training at {plural(open_companies, 'AI data company', 'AI data companies')}, with pay as published and the date we last checked each one.")
+    description = truncate(f"{plural(open_count, 'paid work listing')} in AI training at {plural(open_companies, 'AI data company', 'AI data companies')}, with pay as published and when we last checked or reviewed each one.")
     crumbs = [("Overview", f"{ORIGIN}/"), ("Paid work", canonical)]
     buckets = {key: sort_routes([r for r in rows if work_bucket(r) == key], names) for key, _, _ in WORK_BUCKETS}
     body = [crumb_nav(crumbs), f'<p class="eyebrow">Paid work' + (f" · links checked up to {escape(format_date(checked))}" if checked else "") + "</p>\n<h1>Paid AI training work</h1>\n",
@@ -1173,14 +1173,14 @@ def render_method(research, sizes, modified):
         rows = "".join(f'<tr><th scope="row"><a href="{ORIGIN}/{escape(name)}" download>{escape(name)}</a></th><td data-label="Format">{kind}</td><td data-label="Size">{escape(sizes[name])}</td><td data-label="Contents">{escape(text)}</td></tr>' for name, kind, mime, text in files)
         version = data.get("dataset_version", "")
         body.append(f'<h2 id="downloads">Download the data</h2>\n<p>Dataset version {escape(version)}{escape(compiled.replace(" · research", ", research"))}. The research data files keep every claim that later research replaced.</p>\n'
-                    f'<p>{SITE_NAME} licenses this data under the <a class="ext" rel="license" href="{DATA_LICENSE}">CC BY 4.0 license</a> (any use is allowed if you credit us). Cite {SITE_NAME} and the original sources. Company names and logos belong to their owners. The license does not cover them, or product images, photos of people and text quoted from sources.</p>\n'
+                    f'<p>{SITE_NAME} licenses this data under the <a class="ext" rel="license" href="{DATA_LICENSE}">CC BY 4.0 license</a> (any use is allowed if you credit us). Cite {SITE_NAME} and the original sources. Company names and logos belong to their owners. The license does not cover them. It also leaves out product images, photos of people, text quoted from sources and personal contact details.</p>\n'
                     f'<table class="wide"><thead><tr><th scope="col">File</th><th scope="col">Format</th><th scope="col">Size</th><th scope="col">Contents</th></tr></thead><tbody>{rows}</tbody></table>\n')
     counts = {key: len(data.get(key, [])) for key in ("companies", "claims", "sources", "metrics", "funding_rounds", "products")}
     counts["current_claims"] = sum(1 for claim in data.get("claims", []) if claim.get("status") != "superseded")
     measured = sorted({KIND_LABELS.get(m.get("kind"), "") for m in data.get("metrics", [])} - {"", KIND_LABELS["other"]})
     # The home page's Dataset node, described in full where its files are listed. Publisher and creator link to the one Person by @id.
     dataset = {"@context": "https://schema.org", "@type": "Dataset", "@id": DATASET_ID, "name": DATASET_NAME, "alternateName": clean((data.get("meta") or {}).get("title")) or SITE_NAME,
-               "description": f"Public-source research on {counts['companies']} AI data companies: {counts['current_claims']:,} current claims ({counts['claims']:,} including earlier versions) from {counts['sources']:,} sources, with {counts['metrics']} figures, {counts['funding_rounds']} funding rounds and {counts['products']} products. Each claim keeps its sources, business scope and confidence grade.",
+               "description": f"Public-source research on {counts['companies']} AI data companies: {counts['current_claims']:,} current claims ({counts['claims']:,} including earlier versions) from {counts['sources']:,} sources, with {counts['metrics']} figures, {counts['funding_rounds']} funding rounds and {counts['products']} products. Each claim keeps its business scope and confidence grade, and each figure links to its sources.",
                "url": canonical, "version": data.get("dataset_version", ""), "dateModified": research.as_of, "isAccessibleForFree": True, "license": DATA_LICENSE,
                "creator": {"@id": PUBLISHER["@id"]}, "publisher": {"@id": PUBLISHER["@id"]},
                "measurementTechnique": "Public-source research. Each claim is graded A, B, C or U by the strength of its sources.", "variableMeasured": measured,
