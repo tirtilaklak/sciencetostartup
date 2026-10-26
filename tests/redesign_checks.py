@@ -47,6 +47,7 @@ RUNTIME = r'''
  const initial=Object.fromEntries(Object.entries(nodes).filter(([id])=>id!=='research-data').map(([id,n])=>[id,{html:n.innerHTML,text:n.textContent,hidden:n.hidden}]));
  const groups=run('MODEL_GROUPS');
  const healthObservations=plain(run('window.BusinessHealth.observations()'));
+ const headlines=plain(run(`Object.fromEntries(['micro1','mercor','handshake_ai'].map(id=>[id,preferredFinancial(id)?.id||null]))`));
  const clearStates={initial:node('reset').hidden};
  for(const [key,value] of Object.entries({query:'Mercor',category:Object.keys(groups)[0],stage:'established_commercial_evidence',financial:true,work:true,sort:'name-desc'})){run(`reset();state[${JSON.stringify(key)}]=${JSON.stringify(value)};renderDirectory()`);clearStates[key]=node('reset').hidden;}run('reset()');clearStates.afterReset=node('reset').hidden;
  const workCards=Object.fromEntries(run('workRouteRows().map(r=>[r.id,workCard(r)])'));const workRoutes=plain(run('workRouteRows()'));
@@ -58,7 +59,7 @@ RUNTIME = r'''
  const lastPage={dataset:{mobileCompare:'2'},hasAttribute:()=>false};click(lastPage);const lastMobileComparison=node('compare-content').innerHTML;const preservedSelection=run('state.selected');run('setSelection([])');
  node('download-json').callbacks.click();const jsonDownload=JSON.parse(await downloadedBlob.text());const jsonFilename=node('created').download;
  run('exportCsv()');const csvDownload=await downloadedBlob.text();const csvFilename=node('created').download;
- console.log(JSON.stringify({initial,groups,healthObservations,clearStates,workCards,workRoutes,search,resetCount,categoryCounts,reverseNames,selection,comparison,lastMobileComparison,preservedSelection,jsonDownloadMatches:JSON.stringify(jsonDownload)===JSON.stringify(data),jsonFilename,csvDownload,csvFilename}));
+ console.log(JSON.stringify({initial,groups,healthObservations,headlines,clearStates,workCards,workRoutes,search,resetCount,categoryCounts,reverseNames,selection,comparison,lastMobileComparison,preservedSelection,jsonDownloadMatches:JSON.stringify(jsonDownload)===JSON.stringify(data),jsonFilename,csvDownload,csvFilename}));
 })().catch(error=>{console.error(error);process.exitCode=1});
 '''
 
@@ -132,7 +133,7 @@ def main():
         assert 'Terms & sources' in details
         assert f'data-work-route="{route_id}"' in before_details
         assert f'data-work-company="{route["company_id"]}"' in before_details
-        assert 'Checked ' in before_details and 'Terms recorded:' in details
+        assert ('Checked ' in before_details or 'Reviewed ' in before_details) and 'Terms recorded:' in details
         links = [a['href'] for tag, a in Elements(before_details).elements if tag == 'a' and 'w4-open' in a.get('class', '')]
         assert links == [route['url']], route_id + ': exact route target changed'
         for claim_id in route.get('claim_ids', []):
@@ -142,18 +143,23 @@ def main():
     for route_id, labels in {
         'pareto.work.investment-analyst': ['Closed', 'Approx. $100 / approved hour'],
         'toloka.work.cad-simulation': ['Historical', 'Up to $69 / hour equivalent'],
-        # The existing 19 October route update marked the portal listing closed;
-        # the original 12 October pay observation remains visible as history.
+        # The 19 Oct portal check closed this listing. Its 12 Oct pay observation stays visible as history.
         'rws_trainai.work.polaris-asr': ['Closed', '$16 / hour'],
         'afterquery.work.college-swe': ['Rate conflict'],
         'afterquery.work.technical-content-writer-contract': ['Initial commitment; may expand', 'Schedule conflict: header says full-time'],
-        'abundant_ai.work.research-product-manager': ['Pay periods unspecified.'],
-        'bespoke_labs.work.mts-post-training': ['Pay periods unspecified.'],
+        'abundant_ai.work.research-product-manager': ['Pay period not stated.'],
+        'bespoke_labs.work.mts-post-training': ['Pay period not stated.'],
         'toloka.work.mindrift-code': ['hour equivalent', 'Paid per completed task'],
     }.items():
         assert all(label in visible_work[route_id] for label in labels), route_id + ': visible pay/status qualifier lost'
     assert rendered['healthObservations'], 'Business-health research does not reach the delivered runtime'
     assert not any(key in rendered['initial'] for key in ('scale-visual', 'growth-visual')), 'Removed story renderer still runs'
+    # The dashboard replaced the overview's annualized pace chart, which showed each company's headline record
+    # (micro1's is a company-stated figure, grade B). The dashboard must still carry those same headline records.
+    headline_paces = {'micro1': 'micro1.metric.oct14-q3-run-rate', 'mercor': 'mercor.metric.oct14-major-financial-2', 'handshake_ai': 'handshake_ai.metric.major-growth_metrics-0'}
+    assert rendered['headlines'] == headline_paces, 'Headline records changed'
+    dashboard_metrics = {mid for row in rendered['healthObservations'] for mid in row.get('metric_ids', [])}
+    assert set(headline_paces.values()) <= dashboard_metrics, 'Dashboard lost a headline annualized pace'
     assert rendered['search'] == ['mercor'] and rendered['resetCount'] == 39
     assert rendered['categoryCounts'] == rendered['groups'] or all(set(rendered['categoryCounts'][k]) == set(v) for k, v in rendered['groups'].items())
     assert rendered['reverseNames'][0] == sorted([c['name'] for c in data['companies']], key=str.casefold, reverse=True)[0]
@@ -172,7 +178,10 @@ def main():
     export = ROOT / 'dist/research.json'
     assert export.read_bytes() == canonical, 'Portable JSON changed'
     html = (ROOT / 'dist/index.html').read_text()
-    assert (ROOT / 'web/app.js').read_text() in html, 'Build is stale relative to dashboard JavaScript'
+    # The build moves the data and app scripts into content-hashed files under dist/js/.
+    bundles = json.loads(re.search(r'const files=(\[[^\]]*\])', html).group(1))
+    app_bundle = (ROOT / 'dist' / next(name for name in bundles if name.startswith('js/app.'))).read_text()
+    assert (ROOT / 'web/app.js').read_text() in app_bundle, 'Build is stale relative to dashboard JavaScript'
     assert (ROOT / 'web/style.css').read_text() in html, 'Build is stale relative to dashboard CSS'
     embedded = re.search(r'<script id="research-data" type="application/json">(.*?)</script>', html, re.S)
     assert embedded and json.loads(embedded.group(1)) == data
@@ -183,7 +192,7 @@ def main():
     manifest = json.loads((ROOT / 'dist/manifest.json').read_text())
     for name, expected in manifest['sha256'].items():
         assert hashlib.sha256((ROOT / 'dist' / name).read_bytes()).hexdigest() == expected, name
-    print(json.dumps({'audited_dataset_version': PINNED_VERSION, 'canonical_sha256': PINNED_SHA256, 'html_sha256': hashlib.sha256((ROOT / 'dist/index.html').read_bytes()).hexdigest(), 'canonical_unchanged': True, 'business_health_observations': len(rendered['healthObservations']), 'model_groups': 7, 'categorized_companies': len(map_ids), 'company_cards': len(rows), 'conditional_clear': 'passed', 'visible_work_summaries': len(visible_work), 'search_filters_compare_download_handlers': 'passed', 'portable_data_integrity': 'passed', 'browser_rendering_verified': False}, indent=2))
+    print(json.dumps({'audited_dataset_version': PINNED_VERSION, 'canonical_sha256': PINNED_SHA256, 'html_sha256': hashlib.sha256((ROOT / 'dist/index.html').read_bytes()).hexdigest(), 'canonical_unchanged': True, 'business_health_observations': len(rendered['healthObservations']), 'dashboard_headline_paces': len(headline_paces), 'model_groups': 7, 'categorized_companies': len(map_ids), 'company_cards': len(rows), 'conditional_clear': 'passed', 'visible_work_summaries': len(visible_work), 'search_filters_compare_download_handlers': 'passed', 'portable_data_integrity': 'passed', 'browser_rendering_verified': False}, indent=2))
 
 
 if __name__ == '__main__':

@@ -360,7 +360,11 @@ STATIC_DOWNLOAD_FILES = {
     "LOGOS": ("logo-provenance.json", "JSON"),
     "LINK_HEALTH": ("link-health.json", "JSON"),
     "SOURCE_UPDATES": ("source-updates.json", "JSON"),
+    "HEALTH": ("business-health.json", "JSON"),
 }
+# build() writes business-health.json only for SIDECAR_DATASET_VERSION, so fixture
+# builds have no file to measure and show the type alone. Every other file must exist.
+OPTIONAL_DOWNLOAD_FILES = {"HEALTH"}
 
 def validate_source_updates(updates, data, profile_content):
     """Validate later product presentation facts without rewriting their snapshots."""
@@ -608,6 +612,9 @@ def format_file_size(size):
 
 def render_static_file_metadata(html, destination):
     for key, (filename, file_type) in STATIC_DOWNLOAD_FILES.items():
+        if key in OPTIONAL_DOWNLOAD_FILES and not (destination / filename).exists():
+            html = html.replace("{{FILE_META_" + key + "}}", file_type).replace("{{FILE_SIZE_" + key + "}}", "")
+            continue
         size = format_file_size((destination / filename).stat().st_size)
         html = html.replace("{{FILE_META_" + key + "}}", file_type + " · " + size).replace("{{FILE_SIZE_" + key + "}}", size)
     return html
@@ -677,6 +684,43 @@ def load_work_routes(path, data):
     return validate_work_routes(work, data)
 
 
+# Presentation layers in cascade order. Each page area owns one file loaded after edition.css.
+# business-health.css styles only the overview dashboard; the page area files after it may refine it.
+REDESIGN_CSS = ("profiles-v2.css", "work-v4.css", "investor.css", "edition.css", "business-health.css", "site-nav.css", "overview.css", "directory.css", "profiles-v3.css", "work-v5.css", "method.css")
+# Scripts concatenated after work-v3.js and before initialize(); later declarations replace earlier ones.
+# business-health.js runs as soon as it loads and reads app.js constants, so it comes last, after every declaration.
+PRESENTATION_JS = ("work-v4.js", "profiles-v2.js", "source-updates.js", "site-nav.js", "business-health.js")
+# Presentation data ships as JSON text that is parsed on first read. JSON parses much faster than the
+# same data compiled as a JavaScript object, and a page that never reads a dataset never parses it.
+LAZY_DATA = "(()=>{const lazy=(name,text)=>{let value,ready=false;Object.defineProperty(window,name,{configurable:true,enumerable:true,get(){if(!ready){ready=true;value=JSON.parse(text);text=null;}return value;},set(next){ready=true;value=next;text=null;}});};"
+
+
+def script_safe(text):
+    return text.replace("<", "\\u003c").replace(">", "\\u003e")
+
+
+def lazy_data(name, value):
+    text = json.dumps(value, separators=(",", ":")).replace("\\", "\\\\").replace("'", "\\'")
+    return "lazy(" + json.dumps(name) + ",'" + script_safe(text) + "');"
+
+
+def externalize_scripts(html, destination):
+    """Move the data and app bundles to content-hashed files. The page paints first. The loader in
+    web/index.html requests both files (at once on deep links, after the first frame on the overview)
+    and runs them in order after the first paint."""
+    files = []
+    for name in ("data", "app"):
+        match = re.search(r'<script data-bundle="' + name + r'">(.*?)</script>', html, re.S)
+        require(match is not None, "build: missing " + name + " script bundle")
+        code = match.group(1)
+        path = "js/" + name + "." + hashlib.sha256(code.encode("utf-8")).hexdigest()[:12] + ".js"
+        (destination / "js").mkdir(parents=True, exist_ok=True)
+        (destination / path).write_text(code, encoding="utf-8")
+        files.append(path)
+        html = html[:match.start()] + html[match.end():]
+    require(html.count("/* BUNDLES */[]") == 2, "build: script loader placeholders missing")
+    return html.replace("/* BUNDLES */[]", json.dumps(files, separators=(",", ":")))
+
 def build(data, destination):
     validate(data)
     work_path = ROOT / "data/work-routes.json"
@@ -708,22 +752,25 @@ def build(data, destination):
     # The actual dataset selects validation; sidecar metadata cannot disable it.
     # Other datasets, including the pipeline fixtures, receive no replacements.
     source_updates = validate_source_updates(source_updates, data, profile_content) if data["dataset_version"] == SIDECAR_DATASET_VERSION else None
-    injected = "window.EDITORIAL=" + json.dumps(editorial) + ";window.RESEARCH_ALIASES=" + (ROOT / "docs/research-id-crosswalk.json").read_text() + ";window.LOGOS=" + json.dumps(logo_data) + ";window.WORK_ROUTES=" + json.dumps(work_data) + ";window.PROFILE_CONTENT=" + json.dumps(profile_content) + ";window.LINK_HEALTH=" + json.dumps(link_health) + ";window.COMPANY_EVENTS=" + json.dumps(company_events) + ";"
+    aliases = json.loads((ROOT / "docs/research-id-crosswalk.json").read_text())
     from business_health import load_business_health
     health_path = ROOT / "data/business-health.json"
     health = load_business_health(health_path, data)
-    injected += "window.SOURCE_UPDATES=" + json.dumps(source_updates) + ";window.BUSINESS_HEALTH=" + json.dumps(health) + ";"
-    html = html.replace("/* EDITORIAL_DATA */", injected.replace("<", "\\u003c").replace(">", "\\u003e"))
-    html = html.replace("/* REDESIGN_CSS */", (ROOT / "web/profiles-v2.css").read_text() + (ROOT / "web/work-v4.css").read_text() + (ROOT / "web/investor.css").read_text() + (ROOT / "web/edition.css").read_text() + (ROOT / "web/business-health.css").read_text())
+    injected = LAZY_DATA + "".join(lazy_data(name, value) for name, value in (("EDITORIAL", editorial), ("RESEARCH_ALIASES", aliases), ("LOGOS", logo_data), ("WORK_ROUTES", work_data), ("PROFILE_CONTENT", profile_content), ("COMPANY_EVENTS", company_events), ("SOURCE_UPDATES", source_updates), ("BUSINESS_HEALTH", health))) + "})();"
+    # link-health.js reads this one while it loads, so it stays a plain assignment.
+    injected += "window.LINK_HEALTH=" + script_safe(json.dumps(link_health)) + ";"
+    html = html.replace("/* EDITORIAL_DATA */", injected)
+    html = html.replace("/* REDESIGN_CSS */", "".join((ROOT / "web" / name).read_text() for name in REDESIGN_CSS))
     html = html.replace("/* ICONS_CSS */", (ROOT / "web/icons.css").read_text())
     html = html.replace("/* ICONS_JS */", (ROOT / "web/icons.js").read_text())
     html = html.replace("/* EDITORIAL_JS */", (ROOT / "web/editorial.js").read_text())
     work_js = ROOT / "web/work-v3.js"
-    html = html.replace("/* WORK_V3_JS */", (work_js.read_text() if work_js.exists() else "") + (ROOT / "web/work-v4.js").read_text() + (ROOT / "web/profiles-v2.js").read_text() + (ROOT / "web/source-updates.js").read_text() + "\n" + (ROOT / "web/business-health.js").read_text())
+    html = html.replace("/* WORK_V3_JS */", (work_js.read_text() if work_js.exists() else "") + "".join((ROOT / "web" / name).read_text() for name in PRESENTATION_JS))
     import shutil
     assets = ROOT / "web/assets"
     if assets.exists(): shutil.copytree(assets, destination / "assets", dirs_exist_ok=True)
-    for name in ("robots.txt", "sitemap.xml", "404.html", "_headers", "_redirects", "favicon.ico"):
+    # 404.html is generated by static_pages.py, so it is not copied from web/.
+    for name in ("robots.txt", "sitemap.xml", "_headers", "_redirects", "favicon.ico"):
         shutil.copy2(ROOT / "web" / name, destination / name)
     for source in [ROOT / "data/editorial.json", ROOT / "data/portrait-provenance.json", ROOT / "data/investor-image-provenance.json", logo_path, work_path, link_health_path, events_path, source_updates_path]:
         if source.exists(): shutil.copy2(source, destination / source.name)
@@ -733,8 +780,9 @@ def build(data, destination):
     html = html.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{GROUP_COUNT}}", str(len({e["primary_offering"] for e in editorial["entries"]})))
     html = render_snapshot_metadata(html, data)
     html = render_static_file_metadata(html, destination)
+    html = externalize_scripts(html, destination)
     (destination / "index.html").write_text(html)
-    from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, company_events, link_health)
+    from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}
     (destination / "manifest.json").write_text(json.dumps({"dataset_version": data["dataset_version"], "schema_version": data["schema_version"], "sha256": files}, indent=2) + "\n")
 

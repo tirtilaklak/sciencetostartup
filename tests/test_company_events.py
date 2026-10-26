@@ -2,6 +2,7 @@
 import html
 import json
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -13,9 +14,16 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import observatory
 from observatory import ValidationError, build, load_company_events, validate_company_events
 from fixtures import fixture
-from static_pages import EVENTS_NOTE, date_rank, load_copy_edits, public_wording
+from static_pages import EVENTS_NOTE, clean, date_rank, load_copy_edits, public_wording
 
 EMPTY = {"version": "1.0.0", "events": []}
+
+
+def embedded(dist, name):
+    """Run the built data bundle (dist/js/data.<hash>.js) as the page does and return one window value."""
+    bundle = dist / re.search(r'"(js/data[.][0-9a-f]+[.]js)"', (dist / "index.html").read_text()).group(1)
+    script = "const fs=require('fs'),vm=require('vm'),window={};vm.runInNewContext(fs.readFileSync(process.argv[1],'utf8'),{window,JSON});process.stdout.write(JSON.stringify(window[process.argv[2]]??null));"
+    return json.loads(subprocess.run(["node", "-e", script, str(bundle), name], capture_output=True, text=True, check=True).stdout)
 
 
 def sample():
@@ -148,24 +156,24 @@ class CompanyEventsBuildTests(unittest.TestCase):
     def page(self, cid): return (self.dist / "company" / cid / "index.html").read_text()
 
     def test_build_embeds_and_copies_the_sidecar(self):
-        html = (self.dist / "index.html").read_text()
-        self.assertLess(html.index("window.LINK_HEALTH="), html.index("window.COMPANY_EVENTS="))
-        embedded = re.search(r"window\.COMPANY_EVENTS=(.*?);window\.SOURCE_UPDATES=", html).group(1)
-        self.assertEqual(json.loads(embedded), sample())
+        # The sidecar ships in the data bundle, which the page runs before the app bundle that reads it.
+        files = json.loads(re.search(r"const files=(\[[^\]]*\])", (self.dist / "index.html").read_text()).group(1))
+        self.assertEqual([name.split(".")[0] for name in files], ["js/data", "js/app"])
+        self.assertEqual(embedded(self.dist, "COMPANY_EVENTS"), sample())
         self.assertEqual(json.loads((self.dist / "company-events.json").read_text()), sample())
         self.assertIn("company-events.json", json.loads((self.dist / "manifest.json").read_text())["sha256"])
 
     def test_fixture_build_embeds_the_empty_default(self):
         with tempfile.TemporaryDirectory() as folder:
             build(fixture(), Path(folder))
-            self.assertIn("window.COMPANY_EVENTS=" + json.dumps(EMPTY) + ";", (Path(folder) / "index.html").read_text())
+            self.assertEqual(embedded(Path(folder), "COMPANY_EVENTS"), EMPTY)
 
     def test_dated_events_render_newest_first_with_publisher_links(self):
         text = self.page("scale_ai")
-        self.assertLess(text.index("<h2>Headline metrics</h2>"), text.index("<h2>Risks and disputes</h2>"))
-        self.assertLess(text.index("<h2>Risks and disputes</h2>"), text.index("<h2>Paid work and open routes</h2>"))
+        self.assertLess(text.index('<h2 id="figures">Key figures</h2>'), text.index('<h2 id="risks">Risks and disputes</h2>'))
+        self.assertLess(text.index('<h2 id="risks">Risks and disputes</h2>'), text.index('<h2 id="work">'))
         self.assertLess(text.index("Test complaint &amp; reply"), text.index("Test customer pause"))
-        for fragment in ["<h3>Dated events</h3>", ">Sep 2025<br>", ">Lawsuit<", ">Jun 2025<br>", ">Customer change<", '<td class="status">Pending</td>', '<a href="https://example.org/docket" rel="noopener">Test Court</a>', '<a href="https://example.org/report" rel="noopener">Test Wire</a>', f'<p class="muted">{EVENTS_NOTE} Statuses were checked on 23 Oct 2026.</p>']:
+        for fragment in ["<h3>Dated events</h3>", '<td class="date" data-label="Date">Sep 2025<span class="sub">Lawsuit</span></td>', '<td class="date" data-label="Date">Jun 2025<span class="sub">Customer change</span></td>', '<td data-label="Status">Pending</td>', '<a class="ext" href="https://example.org/docket">Test Court</a>', '<a class="ext" href="https://example.org/report">Test Wire</a>', f'<p class="muted">{EVENTS_NOTE} Statuses were checked on 23 Oct 2026.</p>']:
             self.assertIn(fragment, text)
         related = self.page("mercor")
         self.assertIn("Test complaint &amp; reply", related)
@@ -177,7 +185,7 @@ class CompanyEventsBuildTests(unittest.TestCase):
     def test_supported_risk_claims_render_newest_first(self):
         risks = [c for c in self.data["claims"] if c["subject"] == "risks"]
         say = public_wording(self.data, load_copy_edits())
-        shown = lambda claim: html.escape(say(claim["statement"]))  # static pages print the app's public wording
+        shown = lambda claim: html.escape(clean(say(claim["statement"])))  # static pages print the app's public wording
         for company in self.data["companies"]:
             text, cid = self.page(company["id"]), company["id"]
             own = [c for c in risks if c["company_id"] == cid]

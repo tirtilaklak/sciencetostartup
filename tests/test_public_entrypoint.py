@@ -67,8 +67,8 @@ class PublicEntrypointTests(unittest.TestCase):
         locs = [node.text for node in root.iter(namespace + "loc")]
         companies = json.loads((ROOT / "data/canonical.json").read_text())["companies"]
         self.assertEqual(locs[0], ORIGIN + "/", "The app document stays first")
-        self.assertIn(ORIGIN + "/companies/", locs)
-        self.assertEqual(len(locs), 2 + len(companies), "One static page per company")
+        for page in ("/companies/", "/work/", "/method/"): self.assertIn(ORIGIN + page, locs)
+        self.assertEqual(len(locs), 4 + len(companies), "One static page per company plus the company list, paid work and method pages")
         for company in companies:
             self.assertIn(ORIGIN + "/company/" + company["id"] + "/", locs)
             self.assertTrue((self.dist / "company" / company["id"] / "index.html").is_file(), company["id"])
@@ -76,8 +76,9 @@ class PublicEntrypointTests(unittest.TestCase):
         manifest = json.loads((self.dist / "manifest.json").read_text())["sha256"]
         robots_raw = (self.dist / "robots.txt").read_bytes()
         self.assertEqual(robots_raw, (ROOT / "web/robots.txt").read_bytes())
-        for name in ("robots.txt", "sitemap.xml"):
+        for name in ("robots.txt", "sitemap.xml", "favicon.ico", "404.html"):
             self.assertEqual(hashlib.sha256((self.dist / name).read_bytes()).hexdigest(), manifest[name])
+        self.assertEqual((self.dist / "favicon.ico").read_bytes(), (ROOT / "web/favicon.ico").read_bytes())
 
 
 class DeployedDistTests(unittest.TestCase):

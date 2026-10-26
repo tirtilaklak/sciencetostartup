@@ -62,7 +62,7 @@ class StaticFileMetadataTests(unittest.TestCase):
                     self.assertIn(format_file_size((target / filename).stat().st_size), match["text"])
                     self.assertRegex(match["text"], r"\d(?:\.\d)? (?:kB|MB|B)")
                     if key == "INVESTOR":
-                        self.assertIn("(opens a new tab)", match["text"])
+                        self.assertIn("(opens in a new tab)", match["text"])
             for button in ["download-json", "download-csv"]:
                 pattern = r'<button id="' + button + r'">[\s\S]*?</button>'
                 self.assertEqual(re.search(pattern, rendered).group(), re.search(pattern, self.template).group(), "Generated download received a false static size")
@@ -87,6 +87,23 @@ class StaticFileMetadataTests(unittest.TestCase):
         self.assertTrue(all(node.lineno < metadata.lineno for node in copy_calls), "Metadata precedes asset or JSON copy")
         index_write = next(node for node in calls if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "write_text" and isinstance(node.func.value, ast.BinOp) and isinstance(node.func.value.right, ast.Constant) and node.func.value.right.value == "index.html")
         self.assertLess(metadata.lineno, index_write.lineno)
+
+    def test_a_build_without_the_dashboard_file_shows_the_type_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            for filename, _ in STATIC_DOWNLOAD_FILES.values():
+                if filename == "business-health.json":
+                    continue
+                file = target / filename
+                file.parent.mkdir(parents=True, exist_ok=True)
+                file.write_bytes(b"x" * 1500)
+            rendered = render_static_file_metadata(self.template, target)
+            self.assertNotRegex(rendered, r"\{\{FILE_(?:META|SIZE)_")
+            rows = [row for row in Anchors(rendered).rows if row["attrs"].get("href") == "business-health.json"]
+            self.assertTrue(rows)
+            for row in rows:
+                self.assertIn("JSON", row["text"])
+                self.assertNotRegex(row["text"], r"\d(?:\.\d)? (?:kB|MB|B)")
 
 
 if __name__ == "__main__":
