@@ -2,14 +2,16 @@
 
 The ScienceToStartup design system lives in a Design System artifact:
 https://claude.ai/artifact/R9W9tG9MnXBzBhXSJ4Qxqx (private to its owner until shared).
-It holds the brand book, 44 component guidelines and previews, the icons and the
+It holds the brand book, the component guidelines and previews, the icons and the
 favicon. This folder keeps the part that comes from code.
 
 - `tokens.json`: the colours, type styles, spacing steps, radii, shadows, layout
-  lengths and layers of the dashboard (`web/index.html`), each with its value and a
-  usage note. It is the source for the artifact's `project/tokens.json`. The static
-  company pages (`scripts/static_pages.py`) and `web/404.html` still use the first
-  palette and are outside it.
+  lengths and layers of the site app (`web/index.html`), each with its value and a
+  usage note. It is the source for the artifact's `project/tokens.json`. The plain
+  pages that `scripts/static_pages.py` writes (companies, company, work, method and
+  the 404) carry their own small stylesheet. It uses the same palette values under
+  local names (`--soft` is `pale`, `--mark` is `mark-frame`), and the build does not
+  read or check it.
 - `../scripts/design_system.py`: builds the artifact's code-derived files from
   `web/` and this token file, using only the Python standard library.
 
@@ -29,9 +31,9 @@ The build writes three files:
 
 - `project/tokens.json`: the tokens, stamped with the current branch and commit.
 - `project/components/bundle.css`: the site's live stylesheet in build order
-  (`style.css`, `profiles-v2.css`, `work-v4.css`, `investor.css`, `edition.css`,
-  `business-health.css`, `icons.css`). Root colour variables move into the tokens. 22 literal colours,
-  white text on green fills and 5 shadows read as `var(--name)`.
+  (`style.css`, then `REDESIGN_CSS` from `scripts/observatory.py`, then `icons.css`).
+  Root colour variables move into the tokens. 25 literal colours, white text on green
+  fills and 6 shadows read as `var(--name)`.
 - `tokens.css`: the tokens as CSS custom properties plus a class per type style,
   for pages outside the artifact. Load it before `bundle.css`.
 
