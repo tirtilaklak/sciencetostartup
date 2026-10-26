@@ -54,15 +54,13 @@ class StaticFileMetadataTests(unittest.TestCase):
             self.assertNotRegex(rendered, r"\{\{FILE_(?:META|SIZE)_")
             after = Anchors(rendered).rows
             self.assertEqual([row["attrs"] for row in before], [row["attrs"] for row in after], "A link destination, download attribute or new-tab behavior changed")
-            for key, (filename, file_type) in STATIC_DOWNLOAD_FILES.items():
-                matches = [row for row in after if row["attrs"].get("href") == filename and ("download" in row["attrs"] or row["attrs"].get("class") == "investor-full-image")]
+            for filename, file_type in STATIC_DOWNLOAD_FILES.values():
+                matches = [row for row in after if row["attrs"].get("href") == filename and "download" in row["attrs"]]
                 self.assertGreaterEqual(len(matches), 1, filename)
                 for match in matches:
                     self.assertIn(file_type, match["text"])
                     self.assertIn(format_file_size((target / filename).stat().st_size), match["text"])
                     self.assertRegex(match["text"], r"\d(?:\.\d)? (?:kB|MB|B)")
-                    if key == "INVESTOR":
-                        self.assertIn("(opens in a new tab)", match["text"])
             for button in ["download-json", "download-csv"]:
                 pattern = r'<button id="' + button + r'">[\s\S]*?</button>'
                 self.assertEqual(re.search(pattern, rendered).group(), re.search(pattern, self.template).group(), "Generated download received a false static size")

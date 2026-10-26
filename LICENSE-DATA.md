@@ -45,7 +45,6 @@ These belong to their owners. Neither this license nor the MIT license in
   `data/editorial.json` under `product_media`.
 - Photos of people in `web/assets/people/`. Their sources are in
   `data/portrait-provenance.json`.
-- The proposed venture image (`web/assets/Investor_Snapshot_Human_Depth_v2*`).
 - Text quoted from sources, such as `source_quote` fields and pay details
   copied from job listings, and the titles of source articles. These stay with
   their authors.

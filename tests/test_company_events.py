@@ -118,6 +118,14 @@ class CompanyEventsValidationTests(unittest.TestCase):
         for value in ["http://example.org/case", "https://user:secret@example.org/case", "https://user@example.org/case", "https:///case", "javascript:alert(1)", "https://example.org/a b", "https://example.org:99999/case", "ftp://example.org/case", 42]:
             self.rejects("source url must be https with a hostname and no credentials", self.source("url", value))
 
+    def test_reviewed_events_name_filings_without_calling_them_audited(self):
+        # The site has audited nothing; a filing is named as the document it is. "Unaudited" may stay.
+        events = json.loads((ROOT / "data/company-events.json").read_text())
+        texts = [events["note"]] + [e[f] for e in events["events"] for f in ("title", "detail", "status")] + [s[f] for e in events["events"] for s in e["sources"] for f in ("title", "publisher")]
+        self.assertEqual([w for t in texts for w in re.findall(r"(?i)[\w-]*audited[\w-]*", t) if w.lower() != "unaudited"], [])
+        filing = next(e for e in events["events"] if e["id"] == "prolific.event.2025-audited-accounts")
+        self.assertEqual(filing["title"], "Prolific Academic Ltd filed its 2025 annual accounts at Companies House")
+
     def test_loader_defaults_when_missing_or_for_other_datasets(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "company-events.json"

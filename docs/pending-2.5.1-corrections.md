@@ -1,5 +1,7 @@
 # Pending 2.5.1 corrections
 
+Status, checked 25 Oct 2026: the release is blocked until the research repository with the 29 raw input files is attached to a session. No repository in the owner's GitHub holds them. The checksum checks in scripts/observatory.py stay as they are.
+
 Prepared 23 October 2026. Every source in items 1 to 5 and in the sidecar notes at the end was rechecked live on that date.
 
 Items 6 to 10 were added on 25 October 2026, and their 2.5.0 values were rechecked against the dataset that day. The sources quoted in items 6, 8 and 9 were also read live that day. Item 7 rests on figures already stored in the records. Item 10 changes wording only.

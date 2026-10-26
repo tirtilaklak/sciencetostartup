@@ -422,29 +422,35 @@ class StaticPageTests(unittest.TestCase):
         for path in self.html_files():
             for cell in re.findall(r"<td\b[^>]*>", path.read_text()): self.assertIn("data-label=", cell, str(path.relative_to(self.dist)))
 
-    def test_analytics_loader_follows_the_index_meta(self):
-        self.assertEqual(sp.analytics_endpoint((ROOT / "web/index.html").read_text()), "")
-        self.assertEqual(sp.analytics_endpoint('<meta name="sts-analytics" content="https://sciencetostartup.goatcounter.com/count">'), "https://sciencetostartup.goatcounter.com/count")
-        for other in ("https://example.com/count", "javascript:alert(1)", "https://x.goatcounter.com/count?x=1"):
-            self.assertEqual(sp.analytics_endpoint(f'<meta name="sts-analytics" content="{other}">'), "", other)
-        counting = sp.Research(self.data, analytics="https://sciencetostartup.goatcounter.com/count")
-        page = sp.document(counting, "T", "D.", ORIGIN + "/", "", {})
-        self.assertIn('<script async src="https://gc.zgo.at/count.js" data-goatcounter="https://sciencetostartup.goatcounter.com/count"></script>\n</head>', page)
-        self.assertNotIn("gc.zgo.at", sp.document(counting, "Page not found", "D.", "", "", robots="noindex"), "the 404 page does not count")
-        self.assertNotIn("gc.zgo.at", sp.document(sp.Research(self.data), "T", "D.", ORIGIN + "/", "", {}))
-        for path in self.html_files(): self.assertNotIn("gc.zgo.at", path.read_text(), "counting is off in web/index.html")
+    def test_visits_are_counted_only_by_cloudflare(self):
+        """Cloudflare Web Analytics counts visits at the edge. Both About texts say so in a visible sentence,
+        and no built file carries the GoatCounter seam it replaced."""
+        about = re.search(r'<article[^>]*\bid="about"[^>]*>.*?</article>', (ROOT / "web/index.html").read_text(), re.S).group(0)
+        method_about = (self.dist / "method/index.html").read_text().split('<h2 id="about">', 1)[1].split("<h2", 1)[0]
+        self.assertEqual(sp.VISITS_NOTE, "Visits are counted by Cloudflare Web Analytics, which sets no cookies.")
+        for label, text in (("web/index.html#about", about), ("method/index.html#about", method_about)):
+            personal = re.search(r"<p><strong>Personal data and removal\.</strong>(.*?)</p>", text, re.S).group(1)
+            self.assertEqual(plain(personal).count(sp.VISITS_NOTE), 1, label)
+            self.assertNotIn("hidden", personal, label)
+        seam = ("goatcounter", "gc.zgo.at", "sts-analytics", "analytics_url", "analytics_endpoint", "analytics-note", "lab-inquiry", "lab-cta", "trackpageview")
+        for path in sorted(p for p in self.dist.rglob("*") if p.is_file() and p.suffix in ("", ".html", ".js", ".css", ".json", ".csv", ".xml", ".txt")):
+            text = path.read_text().lower()
+            for name in seam: self.assertNotIn(name, text, str(path.relative_to(self.dist)))
 
     def test_both_hosts_send_the_same_headers(self):
-        """web/_headers (Cloudflare) and vercel.json carry one policy: GoatCounter allowed, hashed scripts cached for a year, SQLite typed."""
+        """web/_headers (Cloudflare) and vercel.json carry one policy: Cloudflare Web Analytics allowed, hashed scripts cached for a year, SQLite typed."""
         lines = (ROOT / "web/_headers").read_text().splitlines()
         rules, path = {}, None
         for line in lines:
             if line and not line.startswith(" "): path = line.strip(); rules[path] = {}
             elif line.strip(): key, value = line.strip().split(": ", 1); rules[path][key] = value
         vercel = {rule["source"]: {h["key"]: h["value"] for h in rule["headers"]} for rule in json.loads((ROOT / "vercel.json").read_text())["headers"]}
+        self.assertEqual(vercel["/(.*)"], rules["/*"])
         policy = rules["/*"]["Content-Security-Policy"]
-        self.assertEqual(vercel["/(.*)"]["Content-Security-Policy"], policy)
-        for host in ("https://gc.zgo.at", "https://sciencetostartup.goatcounter.com", "https://static.cloudflareinsights.com"): self.assertIn(host, policy)
+        directives = {name: values for name, *values in (part.split() for part in policy.split(";"))}
+        self.assertIn("https://static.cloudflareinsights.com", directives["script-src"])
+        self.assertIn("https://cloudflareinsights.com", directives["connect-src"])
+        for host in ("gc.zgo.at", "goatcounter"): self.assertNotIn(host, policy.lower())
         self.assertEqual(rules["/js/*"]["Cache-Control"], "public, max-age=31536000, immutable")
         self.assertEqual(vercel["/js/(.*)"]["Cache-Control"], "public, max-age=31536000, immutable")
         self.assertEqual(rules["/*.sqlite"]["Content-Type"], "application/vnd.sqlite3")

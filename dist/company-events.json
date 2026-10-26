@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "reviewed_on": "2026-10-23",
+  "reviewed_on": "2026-10-26",
   "note": "Dated public events reviewed after dataset 2.5.0. Lawsuit entries describe allegations and filings, not findings.",
   "events": [
     {
@@ -10,7 +10,7 @@
       "kind": "filing",
       "date": "2026-09-29",
       "date_basis": "published",
-      "title": "Prolific Academic Ltd filed audited 2025 accounts at Companies House",
+      "title": "Prolific Academic Ltd filed its 2025 annual accounts at Companies House",
       "detail": "Revenue was £28.6 million (2024: £19.4 million) with an operating loss of £2.9 million. The accounts cover one UK company. Its revenue is £19.3 million of commissions plus £9.3 million recharged to another group company, so it is not comparable with the CEO's run-rate figures, whose basis is not stated.",
       "status": "Filed accounts",
       "status_checked_on": "2026-10-23",
@@ -230,7 +230,7 @@
       "title": "A former annotator sued Surge AI alleging annotators are misclassified as contractors",
       "detail": "The proposed class action in San Francisco Superior Court alleges that Surge Labs, which runs DataAnnotation, failed to pay annotators minimum wage, provide breaks or reimburse expenses under California law.",
       "status": "Filed, outcome not confirmed",
-      "status_checked_on": "2026-10-23",
+      "status_checked_on": "2026-10-26",
       "sources": [
         {
           "url": "https://clarksonlawfirm.com/wp-content/uploads/2025/05/2025.05.20-Surge-Labs.pdf",

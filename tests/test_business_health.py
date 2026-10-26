@@ -202,6 +202,65 @@ console.log(JSON.stringify({observations:observations.length,filtering:true,cont
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(result.stdout)["observations"], len(self.observations))
 
+    def test_reader_facing_wording_has_no_record_dumps_or_reviewer_notes(self):
+        # Cards already show scope, period and accounting basis as fields, and sources link
+        # through source_ids. Prose must not repeat record fields, raw identifiers, bare URLs
+        # or research-team instructions. Methodology names JSON fields on purpose and is exempt.
+        patterns = {
+            "bare URL": r"https?://|www\.",
+            "joined sentences": r"\.;",
+            "record-field tail": r"(?i)\b(?:segment scope|scope|original period/date|revenue/accounting basis|source type|original value|kind|label|id|value|qualifier|unit|currency|period start|period end|reported vs estimated|gross vs net|is arr|as of|observation status|remove fields|measurement date|employment type|countries(?: qualifier)?|research label):",
+            "raw identifier": r"\b[a-z0-9]+(?:_[a-z0-9]+)+\b",
+            "reviewer instruction": r"(?i)(?:^|[.;:]\s+)(?:do not|don't|never|keep|retain|exclude|avoid|remove|treat)\b|\b(?:should|must) not\b",
+            "space before punctuation": r" [.,;]",
+            "trailing whitespace": r"[ \t]+$",
+        }
+        texts = [(row["id"] + "." + field, row[field]) for row in self.observations
+                 for field in ("label", "basis", "limitations", "original_text", "normalization", "evidence_assurance") if row.get(field)]
+        texts += [("north_star." + key, self.health["north_star"][key]) for key in ("label", "definition", "why", "limitation")]
+        texts += [("signal." + row["id"] + "." + key, row[key]) for row in self.health["signals"] for key in ("label", "question", "ideal_measure", "interpretation", "limitations")]
+        texts += [("measure." + row["id"] + "." + key, row[key]) for row in self.health["measure_definitions"] for key in ("label", "note")]
+        texts.append(("source_checks.notes", self.health["source_checks"]["notes"]))
+        for where, text in texts:
+            for name, pattern in patterns.items():
+                with self.subTest(text=where, pattern=name):
+                    self.assertNotRegex(text, re.compile(pattern, re.M))
+        # Sentence case: every sentence starts with a capital, unless it starts with a company name written in lower case, such as micro1.
+        names = tuple({part for company in self.companies.values() for part in company["name"].split(" / ")})
+        for row in self.observations:
+            for field in ("label", "basis", "limitations", "original_text", "evidence_assurance"):
+                with self.subTest(observation=row["id"], field=field):
+                    sentences = re.split(r"(?<=[.!?])\s+|\n", row.get(field) or "")
+                    self.assertEqual([s for s in sentences if s[:1].islower() and not s.startswith(names)], [], "Sentences start with a capital letter")
+        mercor = next(row for row in self.observations if row["id"] == "mercor.metric.oct14-major-financial-2")
+        self.assertIn("Sacra estimates the gross basis", mercor["limitations"])
+
+    def test_no_reader_facing_text_calls_a_figure_audited(self):
+        # The site has audited nothing, and a filing is not an audit readers can rely on, so notes name the
+        # document type instead. "Unaudited" states a negative fact and may stay. Identifiers are not prose,
+        # and sources mirror canonical source records, which this layer does not reword.
+        audited = lambda text: [word for word in re.findall(r"(?i)[\w-]*audited[\w-]*", text) if word.lower() != "unaudited"]
+        self.assertEqual(audited("Audited filing; unaudited notes; re-audited"), ["Audited", "re-audited"])
+        def prose(value):
+            if isinstance(value, dict): return [text for key, item in value.items() if key != "sources" and not re.search(r"(?:^|_)(?:ids?|key)$", key) for text in prose(item)]
+            if isinstance(value, list): return [text for item in value for text in prose(item)]
+            return [value] if isinstance(value, str) else []
+        texts = prose(self.health)
+        # Without its own note a card shows the canonical claim's evidence label.
+        texts += [self.claims[row["claim_ids"][0]]["evidence_label"] for row in self.observations if not row.get("evidence_assurance")]
+        self.assertGreater(len(texts), 1000)
+        self.assertEqual([text for text in texts if audited(text)], [])
+        by_id = {row["id"]: row for row in self.observations}
+        self.assertEqual(by_id["taskus.metric.expansion-6"]["evidence_assurance"], "Annual report (Form 10-K)")
+        self.assertEqual(by_id["appen.metric.major-financial_metrics-0"]["evidence_assurance"], "Annual report (ASX)")
+
+    def test_calculated_records_quote_their_inputs_source_wording(self):
+        observations = {row["id"]: row for row in self.observations}
+        for row in self.observations:
+            if row["evidence_type"] == "calculated":
+                with self.subTest(observation=row["id"]):
+                    self.assertEqual(row["original_text"], "\n".join(observations[i]["original_text"] for i in row["calculation"]["input_observation_ids"]))
+
     def test_missing_information_has_no_zero_placeholder_records(self):
         # Zero may be an actual financial result; unknown observations instead
         # have no record and are represented by the runtime's missing state.

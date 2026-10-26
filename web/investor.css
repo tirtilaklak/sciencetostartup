@@ -1,28 +1,11 @@
-.investor-snapshot{margin:0 0 38px;min-width:0}
-.investor-image-link{display:block;background:#111;line-height:0}
-.investor-image-link img{display:block;width:100%;max-width:100%;height:auto;object-fit:contain}
-.investor-snapshot figcaption{padding:20px 0 0}
-.investor-caption-heading{display:flex;align-items:start;justify-content:space-between;gap:20px}
-.investor-caption-heading .eyebrow{margin:0 0 6px;font-size:10px}
 .investor-status{font-size:12px;line-height:1.6;color:var(--muted);margin:0;max-width:650px}
 .investor-lab-positioning{max-width:760px;margin:14px 0 0;font-size:14px;line-height:1.65;color:var(--muted)}
 .investor-lab-positioning strong{color:var(--ink)}
-.investor-full-image{flex-shrink:0;display:inline-flex;flex-direction:column;justify-content:center;min-height:44px;font-size:12px;text-underline-offset:3px}
-.investor-link-note{font-size:10px;color:var(--muted);text-decoration:none}
 .investor-qualifications{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:16px 0 0;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .investor-qualifications>div{min-width:0}
 .investor-qualifications dt{font-size:12px;font-weight:600;color:var(--ink);line-height:1.5}
 .investor-qualifications dd{margin:5px 0 0;font-size:11px;line-height:1.6;color:var(--muted)}
-.investor-transcript{margin-top:4px;font-size:12px;color:var(--muted)}
-.investor-transcript>summary{display:list-item;width:fit-content;cursor:pointer;min-height:44px;padding:12px 0;line-height:20px}
-.investor-transcript>div{max-width:780px;padding:3px 0 4px}
-.investor-transcript p{margin:0 0 12px}
-.investor-terms{font-size:11px}
 @media(max-width:600px){
-  .investor-snapshot{margin-bottom:28px}
-  .investor-snapshot figcaption{padding-top:14px}
-  .investor-caption-heading{display:block}
-  .investor-full-image{margin-top:7px;flex-direction:row;gap:5px;align-items:center;justify-content:start;flex-wrap:wrap}
   .investor-qualifications{grid-template-columns:1fr;gap:14px;margin-top:10px;padding:14px 0}
   .investor-qualifications dt,.investor-qualifications dd{font-size:12px}
   .investor-qualifications dd{margin-top:3px}
