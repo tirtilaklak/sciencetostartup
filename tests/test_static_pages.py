@@ -219,10 +219,17 @@ class StaticPageTests(unittest.TestCase):
         self.assertIn('<td class="date">Source date not stated</td>', mercor)
         self.assertIn("td.asof::before{content:'As of '", STYLE)
 
-    def test_no_built_page_mentions_goatcounter(self):
-        # Visits are counted by Cloudflare Web Analytics at the edge; the pages and headers carry no counter of their own.
-        built = sorted(self.dist.rglob("*.html")) + [self.dist / "_headers"]
-        self.assertEqual([str(p.relative_to(self.dist)) for p in built if re.search(r"goatcounter|gc\.zgo\.at", p.read_text(), re.I)], [])
+    def test_both_hosts_send_one_policy_that_allows_only_cloudflare_web_analytics(self):
+        # _headers (copied from web/) and vercel.json each hold the site-wide headers. Cloudflare Web Analytics, injected at the edge, is the only third-party script.
+        block = (self.dist / "_headers").read_text().split("\n/", 1)[0].splitlines()
+        self.assertEqual(block[0], "/*")
+        static = dict(line.strip().split(": ", 1) for line in block[1:])
+        vercel = json.loads((ROOT / "vercel.json").read_text())["headers"][0]
+        self.assertEqual(vercel["source"], "/(.*)")
+        self.assertEqual({h["key"]: h["value"] for h in vercel["headers"]}, static)
+        csp = dict(directive.split(" ", 1) for directive in static["Content-Security-Policy"].split("; "))
+        self.assertEqual(csp["script-src"], "'self' 'unsafe-inline' https://static.cloudflareinsights.com")
+        self.assertEqual(csp["connect-src"], "'self' https://cloudflareinsights.com")
 
     def test_scale_leads_with_reported_revenue_not_the_unverified_run_rate(self):
         table, rest = self.pages["scale_ai"].split("<h3>Other reported figures, not used for comparison</h3>", 1)
