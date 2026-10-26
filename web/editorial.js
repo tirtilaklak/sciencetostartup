@@ -38,7 +38,9 @@ document.addEventListener('click',e=>{
  if(!category||!Object.hasOwn(MODEL_GROUPS,category))return;
  // A modified click opens the group link in a new tab; that page reads the group from its URL.
  if(b.tagName==='A'&&(e.defaultPrevented||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||(e.button!==undefined&&e.button!==0)))return;
- // Overview groups show the complete group, independent of earlier searches.
+ // Overview groups show the complete group, independent of earlier searches. Set up the list first,
+ // so the group field has its options before it is set.
+ preparePage('companies');
  Object.assign(state,{query:'',category,stage:'',financial:false,work:false});
  $('search').value='';$('category').value=category;$('stage').value='';
  $('financial-only').checked=false;$('work-only').checked=false;

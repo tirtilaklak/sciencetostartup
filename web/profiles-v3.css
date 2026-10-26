@@ -58,4 +58,6 @@
 .profile-peers ul{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0 16px}
 .profile-v2 .profile-correction{font-size:13px}
 #evidence-content>.evidence-metric-context .evidence-metric-value{font-size:22px}
+/* Phone tap targets: the back link, the header links and the small links under each profile are 44px tall. */
+.profile-v2 .profile-back,.profile-v2 .profile-links a,.profile-category-link,.profile-correction a,.profile-peers-all,.evidence-correction a{min-height:44px}
 }

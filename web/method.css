@@ -73,6 +73,7 @@
 
 /* Downloads: buttons and links look alike. */
 .download-version{margin:0;font-size:14px;color:var(--muted)}
+#downloads .download-license{margin:10px 0 0;font-size:14px;line-height:1.55;color:var(--muted)}
 #downloads h3{margin:24px 0 2px;font-size:16px}
 .download-list{display:grid;grid-template-columns:minmax(0,1fr);gap:0 40px;margin:0;padding:0;list-style:none}
 @media(min-width:701px){.download-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -83,8 +84,6 @@
 .download-list button:hover,.download-list a:hover{background:none;text-decoration-thickness:2px}
 .download-file-meta{color:var(--muted);font-weight:400;white-space:nowrap}
 .download-list li>p{margin:4px 0 0;font-size:13px;line-height:1.5;color:var(--muted)}
-#downloads .download-doc{max-width:none;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--border);font-size:14px;color:var(--muted)}
-#downloads .source-link-status{display:block;margin:2px 0 0;font-size:12px}
 
 @media(max-width:520px){
 .grade-list>div{grid-template-columns:30px minmax(0,1fr)}

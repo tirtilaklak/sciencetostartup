@@ -360,7 +360,11 @@ STATIC_DOWNLOAD_FILES = {
     "LOGOS": ("logo-provenance.json", "JSON"),
     "LINK_HEALTH": ("link-health.json", "JSON"),
     "SOURCE_UPDATES": ("source-updates.json", "JSON"),
+    "HEALTH": ("business-health.json", "JSON"),
 }
+# build() writes business-health.json only for SIDECAR_DATASET_VERSION, so fixture
+# builds have no file to measure and show the type alone. Every other file must exist.
+OPTIONAL_DOWNLOAD_FILES = {"HEALTH"}
 
 def validate_source_updates(updates, data, profile_content):
     """Validate later product presentation facts without rewriting their snapshots."""
@@ -608,6 +612,9 @@ def format_file_size(size):
 
 def render_static_file_metadata(html, destination):
     for key, (filename, file_type) in STATIC_DOWNLOAD_FILES.items():
+        if key in OPTIONAL_DOWNLOAD_FILES and not (destination / filename).exists():
+            html = html.replace("{{FILE_META_" + key + "}}", file_type).replace("{{FILE_SIZE_" + key + "}}", "")
+            continue
         size = format_file_size((destination / filename).stat().st_size)
         html = html.replace("{{FILE_META_" + key + "}}", file_type + " · " + size).replace("{{FILE_SIZE_" + key + "}}", size)
     return html

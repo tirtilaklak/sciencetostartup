@@ -50,6 +50,17 @@ html:has(#compare-tray:not([hidden])){scroll-padding-bottom:96px}
 .comparison-mode p{margin:0}
 .comparison-mode .text-link{min-height:32px;font-size:13px}
 @media(max-width:700px){.comparison-swipe{display:block}}
+/* Phones. iOS Safari zooms the page when a field under 16px gets focus, so every field in the
+   index, work and compare views is 16px. Compare controls get a 44px tap area. */
+@media(max-width:700px){
+ #companies-view :is(input,select,textarea),#work-view :is(input,select,textarea),#compare-view :is(input,select,textarea){font-size:16px}
+ .comparison-table .card-head>a{display:inline-flex;align-items:center;min-height:44px}
+ .comparison-table .card-head button{min-width:44px;min-height:44px}
+ .mobile-column-options{margin-top:0}
+ .mobile-column-options>summary{min-height:44px;line-height:44px}
+ .mobile-column-options>.mobile-compare-pager{top:48px}
+ .comparison-mode .text-link{min-height:44px}
+}
 
 /* A shorter period shown under the full-year figure (RED-8). */
 .comparison-table .comparison-later{margin:12px 0 0;padding-top:10px;border-top:1px dashed #cbd4c5;font-size:13px;line-height:1.5}

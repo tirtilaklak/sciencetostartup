@@ -13,9 +13,9 @@ menus, so those hashes describe the starting point only. The GitHub history
 starts with this repository's existing initial commit. Earlier Sites Git
 history was not imported.
 
-The existing MIT license is preserved. The snapshot includes the already-public
-research data, official assets and their provenance. The alumni outreach
-directory is no longer published or tracked here. It excludes raw research archives, unpublished personal records,
+The snapshot includes the already-public research data, official assets and
+their provenance. See License below for what each license covers. The alumni
+outreach directory is no longer published or tracked here. It excludes raw research archives, unpublished personal records,
 internal reports, credentials, browser output and deployment configuration.
 
 ## Files
@@ -104,10 +104,12 @@ python3 tests/reliability_failure_state_logic.py
 python3 tests/risk_section_logic.py
 ```
 
-The 124 unit tests cover the pipeline, the build, static pages, company events,
-the business health data, Work routes, the Paid work page, site search, link
-health and a privacy scan of the published text files, scripts and database. The nine logic checks run the page scripts
-in Node against a DOM stub; they are not browser proof. Some of them pin counts
+The 145 unit tests cover the pipeline, the build, the design system tokens
+(the same check as `python3 scripts/design_system.py --check`), download sizes,
+static pages, company events, the business health data, Work routes, the Paid
+work page, site search, link health and a privacy scan of every file in `dist/`.
+The nine logic checks run the page scripts in Node against a DOM stub; they are
+not browser proof. Some of them pin counts
 from the current data, so a research update may need new expected values.
 Historical comparison tests and local audit reports remain in the research
 repository.
@@ -155,3 +157,16 @@ does not imply all source material was freshly verified.
    the checks above and commit. Then deploy all of `dist/`, including
    `dist/js/`, to the `sciencetostartup` Worker, staging it without
    `_redirects` as described under Hosting. Pushing to GitHub does not deploy.
+
+## License
+
+- Research data and the site's own text: CC BY 4.0, licensed by
+  ScienceToStartup. See `LICENSE-DATA.md`. This covers the files in `data/`,
+  the JSON, CSV and SQLite files built from them, and the text written for the
+  site.
+- Code: MIT, see `LICENSE`. This covers everything `LICENSE-DATA.md` does not
+  list, including `scripts/`, `tests/`, `schema/`, `design-system/`, `docs/`
+  and the HTML, CSS and JavaScript in `web/`.
+- Neither license covers third-party material such as company names and logos,
+  product images, photos of people, the proposed venture image and text quoted
+  from sources. `LICENSE-DATA.md` lists them.

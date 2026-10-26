@@ -193,6 +193,22 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  location.hash='#compare/junk,nope';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai','appen'],'A compare link naming no known company keeps the selection');assert.equal(location.hash,'#compare/mercor/handshake_ai/appen');
  location.hash='#compare/Appen/unknown/appen/Scale_AI';run('route()');assert.deepEqual(plain(run('state.selected')),['appen','scale_ai'],'Slash links ignore case, unknown and repeated companies');assert.equal(location.hash,'#compare/appen/scale_ai');
  run('setSelection([])');assert.equal(location.hash,'#compare');location.hash='#market';run('route()');
+ // A research alias opens its company: #compare/<alias>/<unknown>/<id> keeps the known companies, in order, under their ids.
+ location.hash='#compare/Polymath/no-such-company/appen';run('route()');assert.deepEqual(plain(run('state.selected')),['polymath_ai_labs','appen'],'Compare links resolve research aliases and drop unknown parts');assert.equal(location.hash,'#compare/polymath_ai_labs/appen');
+ // The table box is a plain box. comparisonScrollRegion() names it as a focusable region only when it scrolls sideways.
+ assert.ok(node('compare-content').innerHTML.includes('<div class="comparison-scroll"><table'),'The comparison box is not a Tab stop by default');
+ run('setSelection([])');location.hash='#market';run('route()');
+ // The overview counts paid work listings and does not call them open.
+ assert.match(node('overview-work').innerHTML,/<b>\d+<\/b> paid work listings<\/span>/);assert.ok(!/open/i.test(node('overview-work').innerHTML.split('<p class="overview-safety">')[0]),'Overview work counts never say open');
+ // #companies/<group> filters the list to that group. An address that names no group shows the full list and becomes #companies.
+ location.hash='#companies/expert-data-evaluation';run('route()');assert.equal(node('companies-view').hidden,false);assert.equal(run('state.category'),'Expert data & evaluation');assert.equal(run('filtered().length'),9);assert.equal(location.hash,'#companies/expert-data-evaluation');
+ location.hash='#companies/no-such-group';run('route()');assert.equal(run('state.category'),'','An unknown group address shows the full list');assert.equal(run('filtered().length'),39);assert.equal(location.hash,'#companies','An unknown group address is rewritten to #companies');
+ run(`state.query='mercor'`);location.hash='#companies/No-Such-Group';run('route()');assert.equal(run('state.query'),'','An unknown group address clears a search too');assert.equal(run('filtered().length'),39);assert.equal(location.hash,'#companies');
+ // Plain #companies keeps the group the reader chose, and the address names it.
+ location.hash='#companies/AI-Evaluation-Safety';run('route()');assert.equal(run('state.category'),'AI evaluation & safety');location.hash='#companies';run('route()');assert.equal(run('state.category'),'AI evaluation & safety');assert.equal(location.hash,'#companies/ai-evaluation-safety');
+ run('reset()');location.hash='#market';run('route()');
+ // viewAnchorId names in-page places only. It ignores letter case and hash queries, and object keys are not places.
+ for(const [hash,id] of [['#venture','venture'],['#About','about'],['#downloads?x=1','downloads'],['#labels','labels'],['#corrections','corrections'],['#coverage','coverage'],['#market',''],['#method',''],['#company/mercor',''],['#constructor',''],['#__proto__',''],['','']])assert.equal(run(`viewAnchorId(${JSON.stringify(hash)})`),id,'viewAnchorId '+hash);
 
  // Curated profile headings render as text.
  const headed=curated.find(entry=>entry.traction_heading),heading=headed.traction_heading;headed.traction_heading='<b>x</b>';
@@ -235,6 +251,18 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  assert.equal(run(`preferredFinancial('snorkel_ai').value`),375000000);assert.equal(run(`preferredFinancial('snorkel_ai').kind`),'annualized_revenue_run_rate');
  assert.equal(run(`preferredFinancial('turing').id`),'turing.metric.major-growth_metrics-1');assert.equal(run(`preferredFinancial('turing').value`),300000000);assert.equal(run(`preferredFinancial('turing').as_of`),'2024-12');assert.equal(run(`preferredFinancial('turing').kind`),'annualized_revenue_run_rate');
  assert.ok(run(`profileHTML('turing')`).includes('turing.metric.major-growth_metrics-0'),'Undated pricing observation remains inspectable');assert.equal(run(`DATA.metrics.find(m=>m.id==='turing.metric.major-growth_metrics-0').value`),167000000);
+ // Both Turing run rates stay visible as their own tiles; the undated $167M one explains why it lists first.
+ for(const value of [300000000,167000000])assert.equal(run(`uniqueMetrics('turing').filter(m=>m.kind==='annualized_revenue_run_rate'&&m.value===${value}).length`),1,'Turing run rate '+value+' keeps its own tile');
+ assert.ok(run(`profileHTML('turing')`).includes('It does not give that date. In January 2025, Turing reported a $300M run rate for 2024.'),'The $167M note names the later $300M figure');
+ // A figure the research holds twice from the same source shows as one tile; the copy's claim stays inspectable.
+ // These checks hold before and after dataset 2.5.1 retires the copies.
+ assert.equal(run(`uniqueMetrics('mercor').filter(m=>m.kind==='annualized_revenue_run_rate'&&m.value===2000000000).length`),1,'Mercor $2B run rate shows once');
+ assert.equal(run(`uniqueMetrics('toloka').filter(m=>m.kind==='expert_network'&&m.value===200000).length`),1,'Toloka 200K network shows once');
+ assert.ok(run(`profileHTML('mercor')`).includes('mercor.claim.major-growth_metrics-0-metric'));assert.ok(run(`profileHTML('toloka')`).includes('toloka.claim.major-growth_metrics-3-metric'));
+ for(const [copy,kept] of Object.entries(plain(run('SAME_OBSERVATION')))){const company=copy.split('.')[0],tiles=plain(run(`uniqueMetrics(${JSON.stringify(company)})`));if(tiles.some(t=>t.id===kept))assert.ok(!tiles.some(t=>t.id===copy),copy+' must fold into '+kept);}
+ // Interim Scale AI wording: plain words for "shareholder liquidity" until 2.5.1. Funding-round notes keep their wording.
+ assert.ok(!run(`publicText(claims['scale_ai.claim.oct14-major-financial-0'].statement)`).includes('liquidity'));assert.ok(run(`publicText(claims['scale_ai.claim.oct14-major-financial-0'].statement)`).includes('Part of the money went to existing shareholders. The total is not all new company funding.'));
+ assert.ok(run(`publicText(DATA.editorial_readouts.find(e=>e.id==='scale_ai.editorial').readout)`).includes('included large payouts to existing shareholders.'));
  assert.equal(run(`preferredFinancial('appen').value`),119915000);assert.equal(run(`financialPeriod(preferredFinancial('appen'))`),'half');
  assert.equal(run(`preferredFinancial('handshake_ai').qualifier`),'nearly');assert.equal(run(`preferredFinancial('handshake_ai').segment_scope`),'ai_data');
  run(`state.revenuePeriod='annual';state.revenueCurrency='USD';renderCharts()`);assert.ok(node('revenue-chart').innerHTML.includes('$870M'));assert.ok(node('revenue-chart').innerHTML.includes('$230.8M'));assert.ok(!node('revenue-chart').innerHTML.includes('$614M'));

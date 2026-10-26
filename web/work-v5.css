@@ -67,7 +67,12 @@
  .w4-safety>p{font-size:13px}
  .w4-results-bar{gap:4px 12px;margin:8px 0 12px}
  .w4-results-bar #work-count{font-size:12px}
- .w4-sort select{min-height:40px;padding:6px 8px;font-size:12px}
+ /* 16px stops iOS Safari from zooming the page when a field takes focus. */
+ .w4-sort select{min-height:40px;padding:6px 8px;font-size:16px}
+ #work-view input,#work-view select{font-size:16px}
+ /* Phone tap targets: the company link keeps its look and gains a 44px tap area; link check notes get 44px rows. */
+ .work-card-v4 .w4-company{min-height:44px;margin:-10px 0}
+ .work-card-v4 .w4-source-notes>summary{padding:13px 0;line-height:18px}
  .w4-section-intro{margin-bottom:0}
  .w4-block-heading{margin-top:10px;padding-top:8px}
  /* Three equal columns, number above words, so long labels wrap instead of running off screen. */
@@ -84,3 +89,13 @@
  #work-overview{gap:8px}
  #work-overview button{font-size:11px}
 }
+
+/* Long lists stay light: the browser lays out and paints a full card only when it comes near the screen. On a
+   390 px phone at 4x CPU slowdown, with lazy card parts already in place, this cut the longest task when
+   opening #work from about 260 ms to about 150 ms, and after a one-letter search from about 190 ms to about
+   80 ms (see the budget note in work-v4.js). "auto" keeps each card's real height once drawn; the lengths
+   are median card heights at each width. Compact cards are one short row, so they always draw: a skipped
+   row whose height changed as it came near the screen moved the section jumps off their headings. */
+#work-cards .work-card-v4:not(.w4-compact-card){content-visibility:auto;contain-intrinsic-height:auto 210px}
+@media(min-width:1180px){#work-cards .work-card-v4:not(.w4-compact-card){contain-intrinsic-height:auto 160px}}
+@media(max-width:700px){#work-cards .work-card-v4:not(.w4-compact-card){contain-intrinsic-height:auto 320px}}

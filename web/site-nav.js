@@ -15,13 +15,13 @@ function siteSearchPages(){
  return [
   ['market','Overview','The front page, with the main figures and business groups','home start charts market'],
   ['companies','Companies',`All ${DATA.companies.length} companies, with search and filters`,'index directory list organizations organisations firms startups'],
-  ['work','Paid work',`${listings} open listings, with pay and location`,'jobs gigs hiring careers contract contractor freelance hourly pay earn'],
+  ['work','Paid work',`${listings} paid work listings, with pay and location`,'jobs gigs hiring careers contract contractor freelance hourly pay earn'],
   ['compare','Compare','Put up to three companies side by side','versus vs comparison'],
   ['method','Method','How each figure is checked and graded','methodology sources evidence research'],
   ['labels','What the labels mean','Evidence labels and confidence grades','grades confidence rubric'],
   ['about','About the publisher','Who publishes this guide, and the disclosure','contact publisher musa ozdem email disclosure removal privacy'],
   ['corrections','Request a correction','Tell us when a figure or listing is wrong','corrections error mistake wrong fix report'],
-  ['downloads','Download the data','JSON, CSV and SQLite files','downloads csv json sqlite dataset export'],
+  ['downloads','Download the data','JSON, CSV and SQLite files','downloads csv json sqlite dataset export license reuse'],
   ['venture','The publisher’s proposed AI lab','The publisher’s proposal, separate from the research','venture neolab investor pitch proposal']
  ].map(([id,name,meta,keys])=>({type:'page',id,name,meta,keys:keys.split(' '),href:'#'+id}));
 }
@@ -129,7 +129,8 @@ function siteSearchReveal(item){
 }
 function siteSearchChoose(item){
  if(!item)return;
- if(item.action==='work'){const field=$('work-search');field.value=item.query;field.dispatchEvent(new Event('input',{bubbles:true}));}
+ // Set up the Paid work page first, so its search field listens before it receives the query.
+ if(item.action==='work'){preparePage('work');const field=$('work-search');field.value=item.query;field.dispatchEvent(new Event('input',{bubbles:true}));}
  $('site-search').close();
  const reveal=item.type==='product'||item.type==='work'?()=>siteSearchReveal(item):null;
  if(location.hash===item.href){route({type:'hashchange'});reveal?.();return;}

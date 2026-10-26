@@ -22,15 +22,23 @@ assert.equal(g.hourly.length+g.task.length+g.project.length,g.contract.length,'p
 for(const id of g.closed)assert.ok(['historical','closed','contributions','paused','no_route','inquiry','information'].includes(byId[id].status),id);
 for(const id of g.boards)assert.equal(byId[id].status,'careers');
 for(const id of g.outside)assert.equal(byId[id].ai_data_work,false);
-// Persona fits sit in open blocks, not in closed groups.
-for(const id of ['afterquery.work.world-models','surge_ai.work.swe-environments','terac.work.ml-scenarios','toloka.work.mindrift-code','terac.work.rl-environment-creation','afterquery.work.fullstack-evaluation'])assert.ok(g.hourly.includes(id),'hourly fit '+id);
-// The 23 Oct check found the Elorian safety listing removed, so it moves to the closed group.
-assert.ok(g.closed.includes('elorian.work.model-safety'),'closed listing elorian.work.model-safety');
-for(const id of ['micro1.work.everyday-tasks','rws_trainai.work.community','toloka.work.toloka-work-now-on-mindrift'])assert.ok(g.task.includes(id),'task fit '+id);
-assert.ok(g.project.includes('prolific.work.study-participant'));
+// Pay blocks follow each listing's own fields, so the expected blocks are worked out from the data here.
+const TASK_PAY=['per_completed_task','task','accepted_task','approved_recording','approved_submission'];
+const statesHourly=r=>r.numeric_pay&&r.status!=='pay_conflict'&&r.pay_basis!=='conflicting_hourly'&&/\/\s*(approved\s+)?hour/i.test(r.pay_label||'')&&/[$€£¥]\s*\d/.test(r.pay_label||'');
+const open=r=>!['historical','closed','contributions','paused','no_route','inquiry','information','careers'].includes(r.status)&&r.ai_data_work!==false;
+// An Employment listing paid by the hour or by a one-time award is contract and task work (B7, same rule as static_pages.py).
+const contractRoute=r=>open(r)&&(['Expert & contractor projects','Contributor bounties'].includes(r.group)||(r.group==='Employment'&&['hour','one_time'].includes(r.pay_basis)));
+assert.deepEqual([...g.contract].sort(),routes.filter(contractRoute).map(r=>r.id).sort(),'contract bucket');
+assert.ok(routes.some(r=>r.group==='Employment'&&['hour','one_time'].includes(r.pay_basis)),'fixture lost the Employment listings paid by the hour or by award');
+assert.deepEqual([...g.hourly].sort(),routes.filter(r=>contractRoute(r)&&(statesHourly(r)||r.pay_basis==='conflicting_hourly')).map(r=>r.id).sort(),'hourly block');
+assert.deepEqual([...g.task].sort(),routes.filter(r=>contractRoute(r)&&!g.hourly.includes(r.id)&&TASK_PAY.includes(r.pay_basis)).map(r=>r.id).sort(),'task block');
+assert.ok(g.hourly.length&&g.task.length&&g.project.length,'fixture lost a pay block');
+// The 23 Oct check found the Elorian safety listing removed, so it is closed; G2i's senior SWE training work is listed again.
+assert.ok(g.closed.includes('elorian.work.model-safety')&&byId['elorian.work.model-safety'].status==='historical','closed listing elorian.work.model-safety');
+assert.ok(g.contract.includes('g2i.work.senior-swe-training')&&byId['g2i.work.senior-swe-training'].status==='listed','listed g2i.work.senior-swe-training');
 // Hourly ranges: only labels that state a rate per hour, never a conflict, all read as published.
 const ranged=ids('workRouteRows().filter(w4HourlyRange).map(r=>[r.id,w4HourlyRange(r)])');
-assert.equal(ranged.length,20);
+assert.deepEqual(ranged.map(([id])=>id).sort(),routes.filter(statesHourly).map(r=>r.id).sort(),'hourly ranges');
 for(const [id,range] of ranged){assert.match(byId[id].pay_label,/\/\s*(approved\s+)?hour/i,id);assert.notEqual(byId[id].status,'pay_conflict');assert.ok(range.high>=(range.low??0),id);}
 assert.deepEqual(plain(run(`w4HourlyRange(${JSON.stringify(byId['scale_ai.work.outlier-statistics'])})`)),{currency:'$',low:null,high:150,open:false});
 assert.deepEqual(plain(run(`w4HourlyRange(${JSON.stringify(byId['surge_ai.work.swe-environments'])})`)),{currency:'$',low:100,high:150,open:true});
@@ -39,15 +47,19 @@ assert.equal(run(`w4HourlyRange(${JSON.stringify(byId['afterquery.work.college-s
 const sorted=ids(`w4RouteGroups(workRouteRows(),'hourly').hourly.map(r=>r.id)`);
 const highs=sorted.map(id=>run(`w4HourlyRange(${JSON.stringify(byId[id])})`)?.high??-1);
 for(let i=1;i<highs.length;i++)if(highs[i]>=0)assert.ok(highs[i]<=highs[i-1],'rate order at '+sorted[i]);
-assert.equal(sorted.at(-1),'afterquery.work.college-swe');
-// The 23 Oct check relisted G2i's senior SWE training work at $100–200 / hour, so it ranks second.
-assert.deepEqual(sorted.slice(0,4),['afterquery.work.world-models','g2i.work.senior-swe-training','terac.work.finance-experts','surge_ai.work.swe-environments']);
+// Listings without a rate (the rate conflict) come after every listing with one, and the top is the highest rate.
+const firstUnrated=highs.indexOf(-1);if(firstUnrated>=0)assert.ok(highs.slice(firstUnrated).every(h=>h<0),'unrated listing among rated ones');
+assert.ok(sorted.slice(firstUnrated<0?sorted.length:firstUnrated).every(id=>!run(`w4HourlyRange(${JSON.stringify(byId[id])})`)),'conflict listings come last');
+assert.equal(highs[0],Math.max(...g.hourly.map(id=>run(`w4HourlyRange(${JSON.stringify(byId[id])})`)?.high??-1)),'highest rate first');
 // A non-USD hourly rate never outranks a USD one and is never compared by amount.
 assert.ok(run(`w4RateOrder({...${JSON.stringify(byId['appen.work.sage-media'])}},{...${JSON.stringify(byId['appen.work.sage-media'])},pay_label:'£900 / hour'})`)<0);
 // Pay filter values, including the two the old tests use.
 const pay=v=>{run(`resetWorkFilters();state.workPay=${JSON.stringify(v)}`);return ids('filteredWork().map(r=>r.id)');};
-assert.deepEqual(pay('task').sort(),['datacurve.work.shipd-bounties','micro1.work.everyday-tasks','rws_trainai.work.community','toloka.work.mindrift-code','toloka.work.toloka-work-now-on-mindrift']);
-assert.equal(pay('hourly').length,20);assert.equal(pay('monthly').length,6);assert.equal(pay('yearly').length,43);
+assert.deepEqual(pay('task').sort(),routes.filter(r=>TASK_PAY.includes(r.pay_basis)).map(r=>r.id).sort());
+assert.deepEqual(pay('hourly').sort(),routes.filter(statesHourly).map(r=>r.id).sort());
+assert.deepEqual(pay('monthly').sort(),routes.filter(r=>['month_stipend','undisclosed_stipend'].includes(r.pay_basis)).map(r=>r.id).sort());
+assert.deepEqual(pay('yearly').sort(),routes.filter(r=>/^(?:annual_salary|annual_target_cash)$|salary_period_unspecified$/.test(r.pay_basis||'')).map(r=>r.id).sort());
+for(const v of ['task','hourly','monthly','yearly'])assert.ok(pay(v).length>0,'fixture lost '+v+' pay');
 assert.equal(pay('numeric').length+pay('undisclosed').length,routes.length);
 // Where you work: the three new values split every listing; the US value still filters on the research field.
 const where=v=>{run(`resetWorkFilters();state.workEligibility=${JSON.stringify(v)}`);return ids('filteredWork().map(r=>r.id)');};
@@ -72,6 +84,20 @@ run(`resetWorkFilters();state.workQuery='AIXI';renderWork()`);assert.ok(!node('w
 run(`resetWorkFilters();state.workPay='monthly';state.workGroup='Contributor bounties';renderWork()`);
 assert.ok(node('work-cards').innerHTML.includes('No listing matches these filters.')&&node('work-cards').innerHTML.includes('data-work-clear="filters"'));
 run('resetWorkFilters()');
+// Counts and labels read the same on every surface (B1, B3, B5).
+run('renderWork()');
+const companiesReviewed=new Set(routes.map(r=>r.company_id)).size;
+assert.equal(node('work-count').textContent,`${routes.length} listings we reviewed at ${companiesReviewed} companies.`);
+run(`state.workSort='hourly';renderWork()`);
+const sortNote=node('work-sort-note').textContent;
+assert.ok(sortNote.includes(`of ${g.contract.length+g.jobs.length} paid work listings`)&&!/open listing/.test(sortNote),sortNote);
+run('resetWorkFilters()');
+for(const r of routes.filter(r=>r.status==='no_route'))assert.equal(run(`w4Status(${JSON.stringify(r)})`),'No confirmed paid listing',r.id);
+assert.ok(routes.some(r=>r.status==='no_route'),'fixture lost its no_route record');
+// The safety note names the latest link check of the paid work listings, worked out from the data.
+const latest=routes.filter(r=>g.contract.includes(r.id)||g.jobs.includes(r.id)).map(r=>[r.availability_checked_on,r.last_route_check?.date].filter(Boolean).sort().at(-1)).filter(Boolean).sort().at(-1);
+const safetyLine=run('workSafetyHTML(workRouteRows())');
+assert.ok(safetyLine.includes(run(`w4Date(${JSON.stringify(latest)})`)+'.'),'safety note lost the latest check date '+latest);
 // Cards: one plain date line, no research codes, named links that open new tabs.
 for(const route of routes){
  const card=run(`workCard(${JSON.stringify(route)})`),front=card.split('<details class="w4-details">')[0];
@@ -87,7 +113,7 @@ assert.ok(safety>=30,'safety note on profile tabs: '+safety);
 // Safety sources are public agency pages over https.
 const tips=run('workSafetyHTML(workRouteRows())');
 for(const href of tips.match(/href="[^"]+"/g))assert.match(href,/href="https:\/\/(consumer\.ftc\.gov|www\.ic3\.gov|pib\.gov\.in|reportfraud\.ftc\.gov|cybercrime\.gov\.in)\//);
-console.log(JSON.stringify({buckets:Object.fromEntries(Object.entries(g).map(([k,v])=>[k,v.length])),hourlyRanges:ranged.length,profileSafety:safety,status:'passed'}));
+console.log(JSON.stringify({buckets:Object.fromEntries(Object.entries(g).map(([k,v])=>[k,v.length])),hourlyRanges:ranged.length,latestCheck:latest,profileSafety:safety,status:'passed'}));
 '''
 
 

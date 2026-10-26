@@ -280,7 +280,8 @@ function settleInitialProfileAnchor(hash,destination){
   })));
 }
 // The Navigation API distinguishes a new fragment from history traversal.
-// Without it, retain the browser's existing scroll behavior.
+// Without it, an entry the reader has not scrolled yet has no saved position in history.state
+// (app.js writes one while they scroll), so that entry is new. Back and Forward keep the browser's restore.
 let profileFragmentNavigation=null;
 window.navigation?.addEventListener('navigate',event=>{
   profileFragmentNavigation=event.hashChange&&event.destination.sameDocument?{url:event.destination.url,type:event.navigationType}:null;
@@ -296,7 +297,8 @@ route=function(event){
   // Rewrite case-variant addresses (#company/MERCOR) to the canonical id.
   const company=String(parts[0]).toLowerCase()==='company'?profileRouteCompany(parts[1]):'';
   if(company&&(company!==parts[1]||parts[0]!=='company')){parts[0]='company';parts[1]=company;history.replaceState(history.state??null,'','#'+parts.map(encodeURIComponent).join('/'));parts=routeParts();}
-  const newFragment=event?.type==='hashchange'&&fragmentNavigation&&fragmentNavigation.url===event.newURL&&['push','replace'].includes(fragmentNavigation.type);
+  const freshEntry=!window.navigation&&typeof history.state?.scrollY!=='number';
+  const newFragment=event?.type==='hashchange'&&(fragmentNavigation?fragmentNavigation.url===event.newURL&&['push','replace'].includes(fragmentNavigation.type):freshEntry);
   if(newFragment&&previousCompany&&parts[0]==='company'&&isCompanyId(parts[1])&&parts[1]!==previousCompany&&!parts[2])window.scrollTo({left:0,top:0,behavior:'instant'});
   if(parts[0]==='company'&&isCompanyId(parts[1])&&parts[2]){
     const section=profileRouteSection(parts[2]);

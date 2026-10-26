@@ -44,6 +44,7 @@ process.stdout.write(vm.runInContext(`JSON.stringify((()=>{
  for(const c of DATA.companies){r.headlines[c.id]=preferredFinancial(c.id)?.id||null;r.eligible[c.id]=Object.fromEntries(kinds.map(k=>[k,eligibleMetrics(c.id,k).map(m=>m.id)]));}
  for(const m of DATA.metrics)r.metrics[m.id]={rank:dateRank(m.as_of),period:financialPeriod(m),compact:typeof m.value==='number'?compact(Math.abs(m.value)):null,scope:scopeText(m.segment_scope,m.company_id),currentPeriod:metricCurrentPeriod(m),basis:metricCurrentBasis(m,''),label:metricPresentationLabel(m,'')};
  for(const name of Object.keys(MODEL_GROUPS))r.slugs[name]=groupSlug(name);
+ r.work=Object.fromEntries(window.WORK_ROUTES.routes.map(w=>[w.id,{bucket:w4Bucket(w),status:w4Status(w),place:w4Location(w),pay:w4Pay(w)}]));
  r.ids=DATA.metrics.map(m=>m.id).sort((a,b)=>a.localeCompare(b));r.names=DATA.companies.map(c=>c.name).concat(window.WORK_ROUTES.routes.map(w=>w.role)).sort((a,b)=>a.localeCompare(b));
  return r;})())`,context));
 """
@@ -93,6 +94,23 @@ class PageFacts(HTMLParser):
 
 def structured_data(text):
     return json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', text, re.S).group(1))
+
+
+def ld_nodes(text):
+    """Every top-level JSON-LD node on a page, from every ld+json block, with lists and @graph flattened."""
+    nodes = []
+    for block in re.findall(r'<script type="application/ld\+json">(.*?)</script>', text, re.S):
+        payload = json.loads(block)
+        for item in payload if isinstance(payload, list) else [payload]:
+            nodes.extend(item["@graph"] if "@graph" in item else [item])
+    return nodes
+
+
+def visible_crumbs(text):
+    """The visible breadcrumb trail as (name, url) pairs; the current page has no link, so its url is the canonical one."""
+    trail = re.search(r'<nav class="crumbs" aria-label="Breadcrumb"><ol>(.*?)</ol></nav>', text).group(1)
+    canonical = PageFacts(text).canonicals[0]
+    return [(html.unescape(name), html.unescape(url) if url else canonical) for url, name in re.findall(r'<li>(?:<a href="([^"]+)">|<span aria-current="page">)(.*?)</(?:a|span)></li>', trail)]
 
 
 def plain(fragment):
@@ -159,8 +177,10 @@ class StaticPageTests(unittest.TestCase):
             name = self.companies[cid]["name"]
             self.assertEqual(facts.canonicals, [f"{ORIGIN}/company/{cid}/"], cid)
             self.assertEqual(facts.headings, [name], cid)
-            self.assertTrue(facts.title.startswith(name + ":"), (cid, facts.title))
+            self.assertTrue(facts.title.startswith(name + ":") or facts.title == name + sp.SUFFIX, (cid, facts.title))
             self.assertLessEqual(len(facts.title), sp.TITLE_LIMIT, (cid, facts.title))
+            # Topics go before the brand does: every name short enough to carry " · ScienceToStartup" keeps it.
+            if len(name + sp.SUFFIX) <= sp.TITLE_LIMIT: self.assertTrue(facts.title.endswith(sp.SUFFIX), (cid, facts.title))
             self.assertIn(f'href="{ORIGIN}/#company/{cid}"', text, cid)
             self.assertLessEqual(len(facts.meta["description"]), sp.DESCRIPTION_LIMIT, cid)
 
@@ -173,10 +193,37 @@ class StaticPageTests(unittest.TestCase):
             self.assertEqual(structured["mainEntity"]["name"], self.companies[cid]["name"], cid)
             self.assertEqual(structured["isPartOf"]["url"], ORIGIN + "/", cid)
             self.assertEqual(structured["about"], {"@id": structured["mainEntity"]["@id"]}, cid)
-            self.assertEqual([item["item"] for item in structured["breadcrumb"]["itemListElement"]], [ORIGIN + "/", ORIGIN + "/companies/", f"{ORIGIN}/company/{cid}/"], cid)
+            # The structured breadcrumb is the visible trail, business group included (coordinator E6).
+            items = structured["breadcrumb"]["itemListElement"]
+            self.assertEqual([(item["name"], item["item"]) for item in items], visible_crumbs(text), cid)
+            self.assertEqual([item["position"] for item in items], list(range(1, len(items) + 1)), cid)
+            self.assertEqual([item["item"] for item in items][:2] + [items[-1]["item"]], [ORIGIN + "/", ORIGIN + "/companies/", f"{ORIGIN}/company/{cid}/"], cid)
+            self.assertEqual(len(items), 4, cid)
             self.assertEqual(structured["publisher"]["name"], "Musa Ozdem", cid)
         for name in ("work", "method"):
             self.assertLess(len((self.dist / name / "index.html").read_bytes()), PAGE_LIMIT, name)
+        for path in self.indexable_files():
+            text = path.read_text()
+            page = next(node for node in ld_nodes(text) if "breadcrumb" in node)
+            self.assertEqual([(i["name"], i["item"]) for i in page["breadcrumb"]["itemListElement"]], visible_crumbs(text), str(path.relative_to(self.dist)))
+
+    def test_legal_names_leave_out_research_notes(self):
+        """schema.org legalName and the Legal entity row carry the registered name, not the notes after ';' (coordinator E7)."""
+        notes = 0
+        for cid, text in self.pages.items():
+            stored = self.companies[cid].get("legal_entity_name") or ""
+            organization = structured_data(text)["mainEntity"]
+            if not stored:
+                self.assertNotIn("legalName", organization, cid)
+                continue
+            expected = sp.clean(stored.split(";", 1)[0])
+            notes += ";" in stored
+            self.assertEqual(organization["legalName"], expected, cid)
+            self.assertNotIn(";", organization["legalName"], cid)
+            row = re.search(r"<dt>Legal entity</dt><dd>(.*?)</dd>", text)
+            if row: self.assertEqual(html.unescape(row.group(1)), expected, cid)
+        self.assertGreaterEqual(notes, 2)
+        self.assertEqual(structured_data(self.pages["scale_ai"])["mainEntity"]["legalName"], "Scale AI, Inc.")
 
     def test_sitemap_lists_every_page_with_lastmod(self):
         root = ET.parse(self.dist / "sitemap.xml").getroot()
@@ -257,6 +304,11 @@ class StaticPageTests(unittest.TestCase):
         self.assertIn('aria-current="true">Companies<', self.pages["mercor"])
         self.assertIn('aria-current="page">Paid work<', (self.dist / "work/index.html").read_text())
 
+    def test_footer_links_are_big_enough_to_tap_on_phones(self):
+        """Coordinator C5: footer links were 16 px tall on phones; at 700 px and below each one is at least 44 px."""
+        phone = re.search(r"@media\(max-width:700px\)\{(.*?)\}\}", sp.STYLE).group(1)
+        self.assertIn(".site-footer li a{display:inline-flex;align-items:center;min-height:44px", phone)
+
     def test_header_main_and_footer_share_one_column(self):
         inset = re.search(r"\.site-header\{[^}]*padding:0 ([^;}]+)", sp.STYLE).group(1)
         self.assertIn(f"main,.site-footer{{margin:0 {inset}}}", sp.STYLE)
@@ -264,9 +316,15 @@ class StaticPageTests(unittest.TestCase):
 
     def test_footer_names_publisher_disclosure_and_corrections(self):
         about = re.search(r'<article[^>]*\bid="about"[^>]*>.*?</article>', (ROOT / "web/index.html").read_text(), re.S).group(0)
-        disclosure = re.sub(r"<[^>]+>", "", re.search(r"<strong>Disclosure\.</strong>\s*(.*?)</p>", about, re.S).group(1)).strip()
+        disclosure = html.unescape(re.sub(r"<[^>]+>", "", re.search(r"<strong>Disclosure\.</strong>\s*(.*?)</p>", about, re.S).group(1))).replace("’", "'")
         publisher = re.search(r"ScienceToStartup is published by [^.]+\.", about).group(0)
-        self.assertEqual(sp.DISCLOSURE, html.unescape(disclosure))
+        # The paid-work line is About text only, so footers carry the lab disclosure alone wherever the app places that line.
+        self.assertEqual(sp.DISCLOSURE, " ".join(disclosure.replace(sp.WORK_DISCLOSURE, "").split()))
+        # The owner's one-line disclosure, word for word, in both About texts (the app's About panel and /method/).
+        method_about = (self.dist / "method/index.html").read_text().split('<h2 id="about">', 1)[1].split("<h2", 1)[0]
+        for label, text in (("web/index.html#about", about), ("method/index.html#about", method_about)):
+            self.assertIn(sp.WORK_DISCLOSURE, " ".join(html.unescape(re.sub(r"<[^>]+>", " ", text)).replace("’", "'").split()), label)
+            self.assertEqual(text.count("A.Team"), 1, label)
         for path in self.html_files():
             footer = self.footer(path)
             text = html.unescape(re.sub(r"<[^>]+>", "", footer))
@@ -325,10 +383,21 @@ class StaticPageTests(unittest.TestCase):
         head = text.split("</head>", 1)[0]
         self.assertEqual(PageFacts(head).canonicals, [ORIGIN + "/"])
         self.assertNotIn("data:image/svg+xml", head.split("<style>", 1)[0])
-        website = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', head, re.S).group(1))
+        nodes = ld_nodes(head)
+        website = next(node for node in nodes if node.get("@type") == "WebSite")
         self.assertEqual((website["@type"], website["@id"], website["url"], website["name"]), ("WebSite", ORIGIN + "/#website", ORIGIN + "/", "ScienceToStartup"))
-        self.assertEqual(website["publisher"], sp.PUBLISHER)
         self.assertIn(str(len(self.companies)), website["description"])
+        # One publisher, the Person, defined once on the page; every other node names it by @id.
+        people = [node for node in nodes if node.get("@type") == "Person"] + [value for node in nodes for value in node.values() if isinstance(value, dict) and value.get("@type") == "Person"]
+        self.assertEqual([(p["@id"], p["name"]) for p in people], [(sp.PUBLISHER["@id"], sp.PUBLISHER_NAME)])
+        # One dataset identity (APPLY-BRIEF): the home page's Dataset node, which /method/ describes under the same @id and name.
+        datasets = [node for node in nodes if node.get("@type") == "Dataset"]
+        self.assertEqual([d["@id"] for d in datasets], [sp.DATASET_ID])
+        self.assertEqual((datasets[0]["name"], datasets[0]["license"]), (sp.DATASET_NAME, sp.DATA_LICENSE))
+        for node in nodes:
+            for key in ("publisher", "creator"):
+                if key in node: self.assertEqual(node[key]["@id"], sp.PUBLISHER["@id"], (node.get("@type"), key))
+        self.assertNotIn("dated source", json.dumps(nodes), "each figure links to its source; not every source is dated")
 
     def test_no_email_addresses_leak_into_public_pages(self):
         for path in self.public_files():
@@ -483,6 +552,9 @@ class StaticPageTests(unittest.TestCase):
                 if metric["kind"] in REVENUE_KINDS and metric.get("gross_vs_net") == "unspecified": self.assertIn("gross or net not stated", text, mid)
                 extra = len(claim.get("source_ids", [])) - 1
                 if extra > 0: self.assertIn(f"+{extra} more source", text, mid)
+                # The source line says when we read the page, in the app's words (B6: the lede promises a checked or recorded date).
+                source, _ = sp.latest_source(self.research, metric)
+                if source: self.assertIn({"checked": "Checked ", "summary_only": "Summary only, page not reviewed · recorded ", "unverified": "Not checked again · recorded "}[source["retrieval_status"]] + sp.format_date(source["accessed_on"]), text, mid)
                 self.assertNotRegex(text, r"\b[a-z]+_[a-z_]+\b", mid)
                 self.assertNotRegex(text, r"[$£€]-|\d{4}-\d{2}(?:-\d{2})?", mid)
 
@@ -508,6 +580,9 @@ class StaticPageTests(unittest.TestCase):
         self.assertIn("mercor.metric.major-valuation_alternatives", [mid for mid, _ in mercor_pending])
         self.assertNotIn("$20B", "".join(plain(row) for _, row in mercor_rows))
         self.assertEqual(self.figures("turing")[0][0][0], "turing.metric.major-growth_metrics-1")
+        toloka = [mid for mid, _ in self.figures("toloka")[0]]
+        self.assertIn("toloka.metric.major-growth_metrics-1", toloka)
+        self.assertNotIn("toloka.metric.major-growth_metrics-0", toloka)
         taskus = dict(self.figures("taskus")[0])
         self.assertIn("AI Services", plain(taskus["taskus.metric.expansion-2"]))
         appen = dict(self.figures("appen")[0])
@@ -616,6 +691,42 @@ class StaticPageTests(unittest.TestCase):
         archive = re.search(r"const WORK_ROUTE_ARCHIVE=new Set\(\[([^\]]*)\]\)", app).group(1)
         self.assertEqual(set(re.findall(r"'([a-z_]+)'", archive)), set(sp.WORK_ARCHIVE))
 
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    def test_every_listing_gets_the_apps_group_status_place_and_pay(self):
+        """w4Bucket, w4Status, w4Location and w4Pay in web/work-v4.js, run in Node: the static pages print the same words (B5, B7)."""
+        modules = ["web/app.js", "web/editorial.js", "web/work-v3.js"] + ["web/" + name for name in PRESENTATION_JS]
+        result = subprocess.run(["node", "-e", APP_RULES, str(ROOT), json.dumps(modules)], capture_output=True, text=True, timeout=120)
+        self.assertEqual(result.returncode, 0, result.stderr[-2000:])
+        app = json.loads(result.stdout)["work"]
+        self.assertEqual(sorted(app), sorted(r["id"] for r in self.routes))
+        for route in self.routes:
+            static = {"bucket": sp.work_bucket(route), "status": sp.work_status(route), "place": sp.work_location(route), "pay": sp.work_pay(route)}
+            self.assertEqual(static, app[route["id"]], route["id"])
+        statuses = {r["id"]: sp.work_status(r) for r in self.routes}
+        for route in self.routes:
+            if route["status"] == "no_route": self.assertEqual(statuses[route["id"]], "No confirmed paid listing", route["id"])
+        # An Employment listing paid by the hour or by a one-time award is contract and task work (B7).
+        for route in self.routes:
+            if route.get("group") == "Employment" and route.get("pay_basis") in ("hour", "one_time") and sp.work_bucket(route) not in ("boards", "closed", "outside"):
+                self.assertEqual(sp.work_bucket(route), "contract", route["id"])
+        self.assertEqual({sp.work_bucket(r) for r in self.routes if r["id"] in ("afterquery.work.technical-content-writer-contract", "afterquery.work.research-scholar")}, {"contract"})
+
+    def test_listing_counts_come_from_the_data(self):
+        """Paid work listings are the contract and jobs groups; company counts follow the brief's wording (B1, B3)."""
+        paid = [r for r in self.routes if sp.work_bucket(r) in sp.PAID_OPEN_BUCKETS]
+        paid_companies, all_companies = len({r["company_id"] for r in paid}), len({r["company_id"] for r in self.routes})
+        work = (self.dist / "work/index.html").read_text()
+        facts = PageFacts(work)
+        self.assertEqual(facts.title, f"{len(paid)} paid work listings in AI training{sp.SUFFIX}")
+        self.assertTrue(facts.meta["description"].startswith(f"{len(paid)} paid work listings in AI training at {paid_companies} AI data companies,"), facts.meta["description"])
+        lede = plain(re.search(r'<p class="lede">.*?</p>', work).group(0))
+        self.assertTrue(lede.startswith(f"{len(paid)} paid work listings at {paid_companies} AI data companies, out of {len(self.routes)} listings we reviewed at {all_companies} companies."), lede)
+        self.assertIn(f"See {len(paid)} paid work listings</a>", (self.dist / "companies/index.html").read_text())
+        checked = max(d for r in self.routes for d in (r.get("availability_checked_on"), (r.get("last_route_check") or {}).get("date")) if d)
+        self.assertIn(f"links checked up to {sp.format_date(checked)}", work)
+        for path in self.html_files():
+            self.assertNotRegex(plain(path.read_text()), r"\bopen (?:paid work )?listings?\b", str(path.relative_to(self.dist)))
+
     def test_company_pages_list_their_listings_in_worker_groups(self):
         labels = [label for _, label, _ in sp.WORK_BUCKETS]
         closed_label = dict((key, label) for key, label, _ in sp.WORK_BUCKETS)["closed"]
@@ -628,15 +739,48 @@ class StaticPageTests(unittest.TestCase):
             if own: self.assertIn("Never pay to get work.", section, cid)
             closed = section.split(f"<h3>{closed_label}</h3>", 1)[1] if f"<h3>{closed_label}</h3>" in section else ""
             self.assertNotIn("Pay: ", closed, cid)
+            self.assertNotIn("Where: ", closed, cid)
+            # Field names are not repeated: "Pay not listed", never "Pay: Pay not listed" (coordinator E5).
+            self.assertNotRegex(section, r"Pay: Pay|Where: Location not listed", cid)
+            if not own: continue
+            # The count names paid work listings only, and the pay sentence appears only when there is one (B2).
+            paid = sum(1 for r in own if sp.work_bucket(r) in sp.PAID_OPEN_BUCKETS)
+            lead = plain(re.search(r"<p>(.*?)</p>", section).group(1))
+            name = self.companies[cid]["name"]
+            if paid: self.assertTrue(lead.startswith(f"{paid} paid work listing{'s' if paid != 1 else ''} at {name}. Pay is quoted"), (cid, lead))
+            else: self.assertEqual(lead, f"No confirmed paid listing for {name}. The groups below show what we found.", cid)
+        self.assertIn("No confirmed paid listing for Quesma.", self.pages["quesma"])
+        self.assertIn("Pay not listed. Where:", self.pages["turing"] + self.pages["prolific"])
 
-    def test_method_page_describes_the_dataset_without_a_license(self):
+    def test_method_page_describes_the_dataset_and_its_license(self):
+        """The owner chose CC BY 4.0 with ScienceToStartup as licensor (25 Oct 2026), so this test now requires the license
+        it used to forbid. /method/ describes the home page's Dataset node: same @id and name, one Person as publisher."""
         text = (self.dist / "method/index.html").read_text()
         facts = PageFacts(text)
         for anchor in ("about", "figures", "grades", "labels", "coverage", "downloads"): self.assertIn(anchor, facts.ids)
-        page, dataset = structured_data(text)
-        self.assertEqual(page["@type"], "AboutPage")
-        self.assertEqual(dataset["@type"], "Dataset")
-        self.assertNotIn("license", dataset)
+        nodes = ld_nodes(text)
+        self.assertEqual([node["@type"] for node in nodes], ["AboutPage", "Dataset"])
+        page, dataset = nodes
+        self.assertEqual((dataset["@id"], dataset["name"], dataset["license"]), (sp.DATASET_ID, sp.DATASET_NAME, "https://creativecommons.org/licenses/by/4.0/"))
+        self.assertEqual((dataset["publisher"], dataset["creator"]), ({"@id": sp.PUBLISHER["@id"]}, {"@id": sp.PUBLISHER["@id"]}))
+        self.assertEqual(page["publisher"], sp.PUBLISHER)
+        home = [node for node in ld_nodes((self.dist / "index.html").read_text().split("</head>", 1)[0]) if node.get("@type") == "Dataset"]
+        self.assertEqual([(node["@id"], node["name"], node["license"]) for node in home], [(dataset["@id"], dataset["name"], dataset["license"])], "one dataset identity")
+        downloads = text.split('<h2 id="downloads">', 1)[1].split("<h2", 1)[0]
+        license_paragraphs = [p for p in re.findall(r"<p>(.*?)</p>", downloads) if "license" in p]
+        self.assertEqual(len(license_paragraphs), 1, "one short license paragraph")
+        self.assertIn('<a class="ext" rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0 license</a>', license_paragraphs[0])
+        self.assertTrue(plain(license_paragraphs[0]).startswith("ScienceToStartup licenses this data under the CC BY 4.0 license"))
+        self.assertIn("Company names and logos belong to their owners.", license_paragraphs[0])
+        self.assertIn("The research data files keep every claim that later research replaced.", downloads)
+        self.assertNotIn("every original record", text)
+        self.assertIn("Profiles do not show personal contact details.", text)
+        rated = {a["company_id"] for a in self.data["assessments"]}
+        unrated = [c for c in self.data["companies"] if c["id"] not in rated]
+        self.assertTrue(unrated and all(c["entity_type"] == "adjacent_research" for c in unrated))
+        self.assertIn(f"{len(rated)} companies with a delivery evidence level", text)
+        self.assertIn(f"The {sp.count_word(len(unrated)).lower()} nonprofit research groups get no level.", text)
+        self.assertNotIn("delivery evidence rating", text)
         self.assertTrue(50 <= len(dataset["description"]) <= 5000)
         self.assertEqual(dataset["version"], self.data["dataset_version"])
         for download in dataset["distribution"]:

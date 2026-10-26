@@ -21,7 +21,7 @@ function w4Uncertain(route){
 }
 function w4Status(route){
   if(route.status==='program'&&/waitlist/i.test(route.availability_note||''))return 'Waitlist may apply';
-  const labels={intake_unverified:'Availability unconfirmed',unverified:'Availability unconfirmed',pay_conflict:'Pay conflict',historical:'Historical',closed:'Closed',paused:'Training paused',contributions:'Research contribution',no_route:'No paid listing found',inquiry:'Inquiry only',information:'Information only'};
+  const labels={intake_unverified:'Availability unconfirmed',unverified:'Availability unconfirmed',pay_conflict:'Pay conflict',historical:'Historical',closed:'Closed',paused:'Training paused',contributions:'Research contribution',no_route:'No confirmed paid listing',inquiry:'Inquiry only',information:'Information only'};
   if(route.status==='historical'&&['official_role_not_found_redirect','official_role_not_found'].includes(route.last_route_check?.result))return 'Historical · listing unavailable';
   return labels[route.status]||(w4Uncertain(route)?'Availability unconfirmed':'');
 }
@@ -240,23 +240,57 @@ function w4Details(route,level=4){
     ${typeof compareCheck==='function'?`<div class="w4-compare">${compareCheck(route.company_id)}</div>`:''}
   </div>`;
 }
-// level sets the role heading (3 under a section h2, 4 under a pay block h3); details use the next level.
-function workCard(route,mode,level=3){
+function w4PayNotes(route){
+  const payNote=w4PayNote(route),payQualification=w4PayQualification(route);
+  return `${route.pay_indicator?`<span class="w4-pay-note w4-pay-indicator">${w4Escape(route.pay_indicator)}</span>`:''}${payNote?`<span class="w4-pay-note">${w4Escape(payNote)}</span>`:''}${payQualification?`<span class="w4-pay-note w4-pay-qualification">${w4Escape(payQualification)}</span>`:''}`;
+}
+function w4StatusBadge(route){const status=w4Status(route);return status?`<span class="w4-status w4-status-${w4Escape(route.status)}">${w4Escape(status)}</span>`:'';}
+// Pieces of a card. A compact card shows its pay in the summary, so its offer leaves the pay out.
+function w4CardParts(route,compact){
+  const company=companies[route.company_id],commitment=w4Hours(route),scheduleNote=w4ScheduleNote(route),requirements=w4Requirements(route);
+  const logo=typeof logoHTML==='function'&&(typeof logoFor!=='function'||logoFor(company.id))?logoHTML(company.id,'w4-company-logo',true):'';
+  return {context:`${route.role}, ${company.name}`,
+    identity:`<a class="w4-company" href="#company/${w4Escape(company.id)}/work">${logo?`<span class="w4-logo" aria-hidden="true">${logo}</span>`:''}<span>${w4Escape(company.name)}</span></a>`,
+    offer:`<div class="w4-offer">${compact?'':`<p class="w4-pay ${route.numeric_pay?'':'w4-pay-unspecified'}"><strong>${w4Escape(w4Pay(route))}</strong>${w4PayNotes(route)}</p>`}${commitment?`<p class="w4-commitment">${w4Escape(commitment)}</p>`:''}${scheduleNote?`<p class="w4-schedule-note">${w4Escape(scheduleNote)}</p>`:''}</div>`,
+    conditions:`<p class="w4-location">${w4Escape(w4Location(route))}</p>${requirements.length?`<ul class="w4-requirements" aria-label="Requirements">${requirements.map(text=>`<li>${w4Escape(text)}</li>`).join('')}</ul>`:''}`,
+    dates:`<p class="w4-dates"><span>${w4Escape(w4FreshnessLabel(route))}</span></p>`};
+}
+// "Terms & sources". Lazy disclosures carry only their summary and draw the rest on first open (w4FillCard).
+function w4DetailsDisclosure(route,level,context,lazy){
+  const summary=`<summary>Terms & sources<span class="sr-only">: ${w4Escape(context)}</span><span aria-hidden="true">+</span></summary>`;
+  return lazy?`<details class="w4-details" data-w4-detail="${w4Escape(route.id)}" data-w4-level="${level}">${summary}</details>`:`<details class="w4-details">${summary}${w4Details(route,level)}</details>`;
+}
+// What an open compact card shows under its summary. level is the heading level its details sit under.
+function w4CompactBody(route,level,lazy){
+  const part=w4CardParts(route,true);
+  return `<div class="w4-card-front"><div class="w4-compact-company">${part.identity}</div>${part.offer}${part.conditions}<div class="w4-card-bottom">${part.dates}${w4SourceLink(route.url,w4Action(route),'class="w4-open"',part.context)}</div></div>${w4DetailsDisclosure(route,level+1,part.context,lazy)}`;
+}
+// level: for a full card, its role heading (3 under a section h2, 4 under a pay block h3); its details use the
+// next level. A compact card has no role heading, so level is the heading it sits under (2 under a section h2).
+// lazy: the page draws closed parts on first open, so a long list costs little until a reader opens a card.
+// workCard(route) with no lazy flag returns every part, which the tests read.
+function workCard(route,mode,level=3,lazy=false){
   if(!route.company_id)route=workRoutesFor(route.id)[0];
   if(!route)return '';
   const company=companies[route.company_id];
   if(!company)return '';
-  const status=w4Status(route),payNote=w4PayNote(route),payQualification=w4PayQualification(route),commitment=w4Hours(route),scheduleNote=w4ScheduleNote(route),requirements=w4Requirements(route);
-  const logo=typeof logoHTML==='function'&&(typeof logoFor!=='function'||logoFor(company.id))?logoHTML(company.id,'w4-company-logo',true):'';
-  const compact=mode==='compact',heading=Math.min(Math.max(Number(level)||3,2),5),context=`${route.role}, ${company.name}`;
-  const identity=`<a class="w4-company" href="#company/${w4Escape(company.id)}/work">${logo?`<span class="w4-logo" aria-hidden="true">${logo}</span>`:''}<span>${w4Escape(company.name)}</span></a>`;
-  const badge=status?`<span class="w4-status w4-status-${w4Escape(route.status)}">${w4Escape(status)}</span>`:'';
-  const payNotes=`${route.pay_indicator?`<span class="w4-pay-note w4-pay-indicator">${w4Escape(route.pay_indicator)}</span>`:''}${payNote?`<span class="w4-pay-note">${w4Escape(payNote)}</span>`:''}${payQualification?`<span class="w4-pay-note w4-pay-qualification">${w4Escape(payQualification)}</span>`:''}`;
-  const offer=`<div class="w4-offer">${compact?'':`<p class="w4-pay ${route.numeric_pay?'':'w4-pay-unspecified'}"><strong>${w4Escape(w4Pay(route))}</strong>${payNotes}</p>`}${commitment?`<p class="w4-commitment">${w4Escape(commitment)}</p>`:''}${scheduleNote?`<p class="w4-schedule-note">${w4Escape(scheduleNote)}</p>`:''}</div>`;
-  const conditions=`<p class="w4-location">${w4Escape(w4Location(route))}</p>${requirements.length?`<ul class="w4-requirements" aria-label="Requirements">${requirements.map(text=>`<li>${w4Escape(text)}</li>`).join('')}</ul>`:''}`;
-  const dates=`<p class="w4-dates"><span>${w4Escape(w4FreshnessLabel(route))}</span></p>`,action=w4SourceLink(route.url,w4Action(route),'class="w4-open"',context);
-  const details=`<details class="w4-details"><summary>Terms & sources<span class="sr-only">: ${w4Escape(context)}</span><span aria-hidden="true">+</span></summary>${w4Details(route,heading+1)}</details>`;
-  return `<article class="work-card work-card-v4 ${compact?'w4-compact-card':''}" data-work-route="${w4Escape(route.id)}" data-work-company="${w4Escape(company.id)}" aria-label="${w4Escape(company.name+': '+route.role)}">${compact?`<details class="w4-compact-toggle"><summary><span class="w4-compact-title"><small>${w4Escape(company.name)}</small><strong>${w4Escape(route.role)}</strong></span><span class="w4-compact-pay"><strong>${w4Escape(w4Pay(route))}</strong>${payNotes}${badge}</span><span class="w4-toggle-icon" aria-hidden="true">+</span></summary><div class="w4-card-front"><div class="w4-compact-company">${identity}</div>${offer}${conditions}<div class="w4-card-bottom">${dates}${action}</div></div>${details}</details>`:`<div class="w4-card-front"><div class="w4-role-column"><header class="w4-card-heading">${identity}${badge}</header><h${heading} class="w4-role">${w4Escape(route.role)}</h${heading}>${dates}</div><div class="w4-offer-column">${offer}</div><div class="w4-conditions-column">${conditions}</div><div class="w4-action-column">${action}</div></div>${details}`}</article>`;
+  const compact=mode==='compact',heading=Math.min(Math.max(Number(level)||3,2),5);
+  const open=`<article class="work-card work-card-v4 ${compact?'w4-compact-card':''}" data-work-route="${w4Escape(route.id)}" data-work-company="${w4Escape(company.id)}" aria-label="${w4Escape(company.name+': '+route.role)}">`;
+  if(compact){
+    const title=`<summary><span class="w4-compact-title"><small>${w4Escape(company.name)}</small><strong>${w4Escape(route.role)}</strong></span><span class="w4-compact-pay"><strong>${w4Escape(w4Pay(route))}</strong>${w4PayNotes(route)}${w4StatusBadge(route)}</span><span class="w4-toggle-icon" aria-hidden="true">+</span></summary>`;
+    return `${open}<details class="w4-compact-toggle"${lazy?` data-w4-card="${w4Escape(route.id)}" data-w4-level="${heading}"`:''}>${title}${lazy?'':w4CompactBody(route,heading,false)}</details></article>`;
+  }
+  const part=w4CardParts(route,false),action=w4SourceLink(route.url,w4Action(route),'class="w4-open"',part.context);
+  return `${open}<div class="w4-card-front"><div class="w4-role-column"><header class="w4-card-heading">${part.identity}${w4StatusBadge(route)}</header><h${heading} class="w4-role">${w4Escape(route.role)}</h${heading}>${part.dates}</div><div class="w4-offer-column">${part.offer}</div><div class="w4-conditions-column">${part.conditions}</div><div class="w4-action-column">${action}</div></div>${w4DetailsDisclosure(route,heading+1,part.context,lazy)}</article>`;
+}
+let w4RouteIndex=null,w4RouteIndexRows=null;
+function w4RouteById(id){const rows=workRouteRows();if(rows!==w4RouteIndexRows){w4RouteIndexRows=rows;w4RouteIndex=new Map(rows.map(route=>[route.id,route]));}return w4RouteIndex.get(id);}
+// Draws a lazy card part (a compact card's body or a card's Terms & sources) the first time it opens.
+function w4FillCard(box){
+  const data=box?.dataset;if(!data||!(data.w4Card||data.w4Detail))return;
+  const route=w4RouteById(data.w4Card||data.w4Detail),level=Number(data.w4Level)||3;
+  if(data.w4Card){box.removeAttribute('data-w4-card');if(route)box.insertAdjacentHTML('beforeend',w4CompactBody(route,level,true));}
+  else{box.removeAttribute('data-w4-detail');if(route)box.insertAdjacentHTML('beforeend',w4Details(route,level));}
 }
 // Work type options keep the research group values (tests and links use them); labels use plain words.
 const W4_TYPE_LABELS={'Expert & contractor projects':'Contract and task work','Employment':'Jobs','Research fellowship':'Research fellowships','Contributor bounties':'Bounties for contributions','Unverified route':'Type not confirmed'};
@@ -264,13 +298,16 @@ const W4_TYPE_LABELS={'Expert & contractor projects':'Contract and task work','E
 const W4_CONTRACT_GROUPS=new Set(['Expert & contractor projects','Contributor bounties']);
 const W4_TASK_PAY=new Set(['per_completed_task','task','accepted_task','approved_recording','approved_submission']);
 const W4_REMOTE=/remote|at home|worldwide|global/i,W4_ONSITE=/San Francisco|Palo Alto|Berkeley|London|Paris|Tokyo|Bangalore|on-?site|hybrid|in.person|office/i;
+// An Employment listing paid by the hour or by a one-time award is contract and task work, not a staff job.
+// scripts/static_pages.py work_bucket() uses the same rule (CONTRACT_PAY).
+const W4_CONTRACT_PAY=new Set(['hour','one_time']);
 // What a worker can do with a listing: contract or task work, a job or fellowship, a career page,
 // a company job outside AI training, or a closed or unpaid record.
 function w4Bucket(route){
   if(route.status==='careers')return 'boards';
   if(WORK_ROUTE_ARCHIVE.has(route.status))return 'closed';
   if(route.ai_data_work===false)return 'outside';
-  return W4_CONTRACT_GROUPS.has(route.group)?'contract':'jobs';
+  return W4_CONTRACT_GROUPS.has(route.group)||(route.group==='Employment'&&W4_CONTRACT_PAY.has(route.pay_basis))?'contract':'jobs';
 }
 // A published hourly range, read only from labels that state a rate per hour. "Up to" has no low end.
 function w4HourlyRange(route){
@@ -344,21 +381,26 @@ function w4RouteGroups(rows,sort=''){
 }
 const W4_GROUP_NOTES={boards:'Each link opens a company’s full list of openings. We did not record pay for these pages.',outside:'Open staff roles that are not AI training work.',closed:'Past or paused listings, and pages with no confirmed paid work. We keep them for the record.'};
 // A closed group carries only its listing ids. Its cards render on first open, which keeps the page light.
-// The trade-off: browser find-in-page cannot reach cards in a closed group. The Paid work search covers every listing.
-function w4GroupDisclosure(rows,label,open=false,key='',note=''){
-  return rows.length?`<details class="work-route-archive-group w4-route-group" ${key?`id="${w4Escape(key)}"`:""} ${open?'open':''}><summary>${w4Escape(label)} <span>(${rows.length})</span></summary>${note?`<p class="w4-group-note">${w4Escape(note)}</p>`:''}<div class="w4-secondary-list"${open?'':` data-w4-routes="${w4Escape(rows.map(route=>route.id).join(' '))}"`}>${open?rows.map(route=>workCard(route,'compact')).join(''):''}</div></details>`:'';
+// The trade-off: browser find-in-page cannot reach cards in a closed group, or the closed parts of a card.
+// The Paid work search covers every listing. level is the heading the group sits under (2 under a section h2),
+// so the compact cards' detail headings follow it (axe heading-order).
+function w4GroupDisclosure(rows,label,open=false,key='',note='',level=2){
+  return rows.length?`<details class="work-route-archive-group w4-route-group" ${key?`id="${w4Escape(key)}"`:""} ${open?'open':''}><summary>${w4Escape(label)} <span>(${rows.length})</span></summary>${note?`<p class="w4-group-note">${w4Escape(note)}</p>`:''}<div class="w4-secondary-list" data-w4-level="${level}"${open?'':` data-w4-routes="${w4Escape(rows.map(route=>route.id).join(' '))}"`}>${open?w4CompactCards(rows,level):''}</div></details>`:'';
 }
+function w4CompactCards(rows,level){return rows.map(route=>workCard(route,'compact',level,true)).join('');}
 function w4FillGroup(group){
   const list=group?.querySelector?.(':scope>.w4-secondary-list[data-w4-routes]');if(!list)return;
-  const routes=new Map(workRouteRows().map(route=>[route.id,route]));
-  list.innerHTML=list.dataset.w4Routes.split(' ').map(id=>routes.get(id)).filter(Boolean).map(route=>workCard(route,'compact')).join('');list.removeAttribute('data-w4-routes');
+  list.innerHTML=w4CompactCards(list.dataset.w4Routes.split(' ').map(w4RouteById).filter(Boolean),Number(list.dataset.w4Level)||2);list.removeAttribute('data-w4-routes');
 }
+// Lazy parts fill as they open: on the click, before the browser shows the disclosure, and on toggle for
+// disclosures opened by code or by find-in-page.
+function w4FillLazy(box){if(box?.tagName==='DETAILS'){w4FillGroup(box);w4FillCard(box);}}
 // Fills the closed group that holds one listing, so code that looks for its card (site search) finds it.
 function w4FillRouteGroup(scope,id){
   const root=typeof scope==='string'?document.querySelector(scope):scope;
   for(const list of root?.querySelectorAll?.('.w4-secondary-list[data-w4-routes]')||[])if(list.dataset.w4Routes.split(' ').includes(id))w4FillGroup(list.parentElement);
 }
-document.addEventListener('toggle',event=>{if(event.target.open)w4FillGroup(event.target);},true);
+document.addEventListener('toggle',event=>{if(event.target.open)w4FillLazy(event.target);},true);
 function w4ProfilePrimary(rows,id){
   const preferred=id==='afterquery'?['research-fellow','research-engineer','research-scientist-post-training','technical-content-writer-contract'].map(role=>`afterquery.work.${role}`):[];
   const rank=route=>{const index=preferred.indexOf(route.id);return index<0?preferred.length:index;};
@@ -384,12 +426,14 @@ function workReturnFocusTarget(){
 }
 document.addEventListener('click',rememberWorkCompanyLink);
 function w4Count(n,one,many){return `${n} ${n===1?one:many}`;}
-// Dates such as "14 and 15 Oct 2026"; dates across months read "between 30 Sep 2026 and 2 Oct 2026".
+// Dates such as "14 and 15 Oct 2026"; more dates read "between 14 and 23 Oct 2026", and dates across
+// months read "between 30 Sep 2026 and 2 Oct 2026".
 function w4DateList(dates){
   const parts=dates.map(date=>w4Date(date).split(' '));
   if(parts.length===1)return parts[0].join(' ');
-  if(parts.length<=3&&parts.every(p=>p.length===3&&p[1]===parts[0][1]&&p[2]===parts[0][2]))return `${parts.slice(0,-1).map(p=>p[0]).join(', ')} and ${parts.at(-1).join(' ')}`;
-  return `between ${parts[0].join(' ')} and ${parts.at(-1).join(' ')}`;
+  const sameMonth=parts.every(p=>p.length===3&&p[1]===parts[0][1]&&p[2]===parts[0][2]);
+  if(parts.length<=3&&sameMonth)return `${parts.slice(0,-1).map(p=>p[0]).join(', ')} and ${parts.at(-1).join(' ')}`;
+  return `between ${sameMonth?parts[0][0]:parts[0].join(' ')} and ${parts.at(-1).join(' ')}`;
 }
 function w4FreshnessSentence(rows){
   const open=rows.filter(route=>['contract','jobs'].includes(w4Bucket(route))),checked=open.filter(w4Checked);
@@ -422,29 +466,34 @@ function w4Jump(id,label,n){return `<button type="button" data-work-section="${i
 function w4ContractSection(groups){
   if(!groups.contract.length)return '';
   const blocks=[['work-hourly','Hourly pay','Hourly',groups.hourly,true],['work-task','Paid per task','Per task',groups.task,true],['work-project','Pay set per project or not published','Pay set per project',groups.project,false]].filter(block=>block[3].length);
-  return `<section class="w4-section"><h2 id="work-listed" class="work-list-heading">Contract and task work <span>(${groups.contract.length})</span></h2><div class="w4-section-intro"><p class="w4-section-note">Freelance and project work for AI training.</p>${blocks.length>1?`<p class="w4-jumps">${blocks.map(([id,,short,list])=>w4Jump(id,short,list.length)).join('')}</p>`:''}</div>${blocks.map(([id,label,,list,full])=>`<h3 id="${id}" class="w4-block-heading">${label} <span>(${list.length})</span></h3>${full?list.map(route=>workCard(route,'',4)).join(''):`<div class="w4-secondary-list">${list.map(route=>workCard(route,'compact')).join('')}</div>`}`).join('')}</section>`;
+  return `<section class="w4-section"><h2 id="work-listed" class="work-list-heading">Contract and task work <span>(${groups.contract.length})</span></h2><div class="w4-section-intro"><p class="w4-section-note">Freelance and project work for AI training.</p>${blocks.length>1?`<p class="w4-jumps">${blocks.map(([id,,short,list])=>w4Jump(id,short,list.length)).join('')}</p>`:''}</div>${blocks.map(([id,label,,list,full])=>`<h3 id="${id}" class="w4-block-heading">${label} <span>(${list.length})</span></h3>${full?list.map(route=>workCard(route,'',4,true)).join(''):`<div class="w4-secondary-list">${w4CompactCards(list,3)}</div>`}`).join('')}</section>`;
 }
 function w4JobsSection(shown,more){
   const total=shown.length+more.length;
-  return total?`<section class="w4-section"><h2 id="work-jobs" class="work-list-heading">Jobs and fellowships <span>(${total})</span></h2><p class="w4-section-note">Staff jobs and paid fellowships at these companies.</p>${shown.map(route=>workCard(route)).join('')}${w4GroupDisclosure(more,'More jobs and fellowships')}</section>`:'';
+  return total?`<section class="w4-section"><h2 id="work-jobs" class="work-list-heading">Jobs and fellowships <span>(${total})</span></h2><p class="w4-section-note">Staff jobs and paid fellowships at these companies.</p>${shown.map(route=>workCard(route,'',3,true)).join('')}${w4GroupDisclosure(more,'More jobs and fellowships')}</section>`:'';
 }
-// Phone budget for searches and filters, measured at 4x CPU slowdown on a 390 px screen. A one-letter search
-// matches nearly every listing, and drawing all of them took twice as long as the default view. So a search
-// draws about as many full cards as the default view (W4_FULL_CARDS: 20 contract cards with an hourly or
-// per-task rate, plus six jobs). Contract work is never cut; jobs get the rest of the budget, at least six.
-// Groups under Other listings open only when they hold 12 or fewer matches. Every other match waits in a
-// closed group that shows its count and draws its cards on first open.
+// Phone budget for typed searches. A one-letter search matches nearly every listing, so typing draws about as
+// many full cards as the default view (W4_FULL_CARDS: the contract cards with an hourly or per-task rate, plus
+// at least six jobs). Contract work is never cut; jobs get the rest of the budget. Groups under Other listings
+// open only when they hold 12 or fewer matches. Every other match waits in a closed group that shows its count
+// and draws its cards on first open. A filter change (a select field or Clear) skips the budget: it draws every
+// match and opens every group that holds one. Cards draw their closed parts on first open (workCard lazy), and
+// work-v5.css lets the browser skip cards far from the screen (content-visibility).
+// Measured 26 Oct 2026 on a 390x844 phone at 4x CPU slowdown, interleaved with main's build, median of 7 runs,
+// longest task in ms: opening #work main 339, before 413, now 188; typing "a" main 199, before 237, now 110;
+// "e" main 270, before 773, now 111; "s" main 199, before 806, now 118. The page draws 1,258 elements (main
+// 1,533, before 3,770). Most of the old cost was layout of card text hidden in closed disclosures.
 const W4_FULL_CARDS=26,W4_SEARCH_JOBS=6,W4_SEARCH_OPEN_MAX=12;
 function w4SearchJobBudget(groups){return Math.max(W4_SEARCH_JOBS,W4_FULL_CARDS-groups.hourly.length-groups.task.length);}
-function w4OtherSection(groups,filtered){
-  const total=groups.boards.length+groups.outside.length+groups.closed.length,open=list=>filtered&&list.length<=W4_SEARCH_OPEN_MAX;
+function w4OtherSection(groups,filtered,typed){
+  const total=groups.boards.length+groups.outside.length+groups.closed.length,open=list=>filtered&&(!typed||list.length<=W4_SEARCH_OPEN_MAX);
   return total?`<section class="w4-section"><h2 id="work-more" class="work-list-heading">Other listings <span>(${total})</span></h2>${w4GroupDisclosure(groups.boards,'Career pages',open(groups.boards),'work-careers',W4_GROUP_NOTES.boards)}${w4GroupDisclosure(groups.outside,'Company jobs outside AI training',open(groups.outside),'work-outside',W4_GROUP_NOTES.outside)}${w4GroupDisclosure(groups.closed,'Closed or unpaid listings',open(groups.closed),'work-other',W4_GROUP_NOTES.closed)}</section>`:'';
 }
 // Networks whose location rules are set per project: a next step when a search finds little contract work.
 const W4_PROJECT_RULES=/project|role-specific|country varies|eligibility varies|geographic restrictions|global/i;
 function w4NetworkSuggestions(shown){
   const seen=new Set(shown.map(route=>route.id)),rows=workRouteRows().filter(route=>w4Bucket(route)==='contract'&&W4_PROJECT_RULES.test(route.geography||'')&&!seen.has(route.id)).sort(w4BestOrder);
-  return rows.length?`<section class="w4-section w4-suggestions"><h2 id="work-suggested" class="work-list-heading">Expert networks worth checking <span>(${rows.length})</span></h2><p class="w4-section-note">These networks pick people for each project by skill and country. They may have work that your search words did not match.</p><div class="w4-secondary-list">${rows.map(route=>workCard(route,'compact')).join('')}</div></section>`:'';
+  return rows.length?`<section class="w4-section w4-suggestions"><h2 id="work-suggested" class="work-list-heading">Expert networks worth checking <span>(${rows.length})</span></h2><p class="w4-section-note">These networks pick people for each project by skill and country. They may have work that your search words did not match.</p><div class="w4-secondary-list">${w4CompactCards(rows,2)}</div></section>`:'';
 }
 function w4EmptyState(query,filters){
   if(!workRouteRows().length)return '<p class="w4-empty">No listings are available right now.</p>';
@@ -452,12 +501,22 @@ function w4EmptyState(query,filters){
   const message=!query?'No listing matches these filters.':queryAlone?'No listing matches this search with these filters.':`No listing mentions “${w4Escape(query)}”. Try a broader word.`;
   return `<div class="w4-empty-state"><p class="w4-empty">${message}</p><p class="w4-empty-actions">${query?'<button type="button" data-work-clear="search">Clear search</button>':''}${filters?'<button type="button" data-work-clear="filters">Clear filters</button>':''}</p></div>`;
 }
-// Each sort says how many open listings it can actually order.
+// Each sort says how many paid work listings (contract and task work plus jobs) it can actually order.
 function w4SortNote(sort,open,filtered){
-  const of=`of ${w4Count(open.length,filtered?'matching open listing':'open listing',filtered?'matching open listings':'open listings')}`;
+  const of=`of ${w4Count(open.length,filtered?'matching paid work listing':'paid work listing',filtered?'matching paid work listings':'paid work listings')}`;
   if(sort==='hourly'){const rated=open.filter(w4HourlyRange);return `Sorted by the top of each published hourly range. ${rated.length} ${of} ${rated.length===1?'publishes':'publish'} one.${rated.some(route=>w4HourlyRange(route).currency!=='$')?' Rates in other currencies follow the US dollar rates.':''}`;}
   if(sort==='checked'){const dated=open.filter(w4Checked);return `Sorted by the date we last checked each link. ${dated.length} ${of} ${dated.length===1?'has':'have'} a check date.`;}
   return '';
+}
+// What the last render drew from: the raw search text, the select fields (filters and sort), and whether it
+// kept the typing budget. A render whose only change is new search text is typing; one that changes a select
+// field or a Clear button is a filter change. Nothing changed (a repeat render) keeps the last choice.
+let w4LastSearch='',w4LastSelects='\n\n\n',w4LastTyped=false;
+function w4TypedRender(query){
+  const raw=String(state.workQuery??''),selects=[state.workGroup,state.workPay,state.workEligibility,state.workSort].map(value=>value||'').join('\n');
+  const typed=Boolean(query)&&(selects!==w4LastSelects?false:raw!==w4LastSearch?true:w4LastTyped);
+  w4LastSearch=raw;w4LastSelects=selects;w4LastTyped=typed;
+  return typed;
 }
 function renderWork(){
   if(w4RenderTimer){clearTimeout(w4RenderTimer);w4RenderTimer=0;}
@@ -465,25 +524,27 @@ function renderWork(){
   workReturnFocus=null;
   if(state.workSort===undefined)state.workSort='';
   const rows=filteredWork(),query=w4Text(state.workQuery),matcher=w4QueryMatcher(query),sort=state.workSort;
-  const filters=[state.workGroup,state.workPay,state.workEligibility].filter(Boolean).length,filtered=Boolean(query||filters);
+  const filters=[state.workGroup,state.workPay,state.workEligibility].filter(Boolean).length,filtered=Boolean(query||filters),typed=w4TypedRender(query);
   const groups=w4RouteGroups(rows,sort),orgs=new Set(rows.map(r=>r.company_id));
   // With a search and no chosen sort, listings whose role or company matches come first in each block.
   if(matcher&&!sort){const score=route=>matcher.all(`${companies[route.company_id]?.name} ${route.role}`.toLowerCase())?0:1;for(const key of ['hourly','task','project','jobs'])groups[key].sort((a,b)=>score(a)-score(b));}
   const summary=document.querySelector('.work-filters .responsive-filter-panel>summary');
   if(summary)summary.textContent=filters?`Filters (${filters})`:'Filters';
-  $('work-count').textContent=`${w4Count(rows.length,'listing','listings')} from ${w4Count(orgs.size,'company','companies')}.`;
+  // Every record counts here, including career pages and closed listings, so the line says "we reviewed".
+  $('work-count').textContent=`${w4Count(rows.length,'listing','listings')} we reviewed at ${w4Count(orgs.size,'company','companies')}.`;
   const other=groups.boards.length+groups.outside.length+groups.closed.length;
   if($('work-overview'))$('work-overview').innerHTML=[['work-listed',groups.contract.length,'contract and task listing','contract and task listings'],['work-jobs',groups.jobs.length,'job or fellowship','jobs and fellowships'],['work-more',other,'other listing','other listings']].map(([id,n,one,many])=>`<button type="button" data-work-section="${id}" ${n?'':'disabled'}><strong>${n}</strong> ${n===1?one:many}</button>`).join('');
   const note=$('work-sort-note');
   if(note){note.textContent=w4SortNote(sort,groups.primary,filtered);note.hidden=!note.textContent;}
-  // Unfiltered, the jobs section opens with six cards and at most three per company.
-  // A search or filter shows matching jobs in full up to the phone budget; the rest wait in the closed More group.
+  // Unfiltered, the jobs section opens with six cards and at most three per company. Typing shows matching
+  // jobs in full up to the phone budget, and the rest wait in the closed More group. A filter change draws
+  // every match and opens every group that holds one.
   let jobs=groups.jobs,moreJobs=[];
   if(!filtered){const perCompany={};jobs=[];for(const route of groups.jobs){const n=perCompany[route.company_id]||0;if(jobs.length<6&&n<3){jobs.push(route);perCompany[route.company_id]=n+1;}else moreJobs.push(route);}}
-  else{const budget=w4SearchJobBudget(groups);if(jobs.length>budget+1){moreJobs=jobs.slice(budget);jobs=jobs.slice(0,budget);}}
+  else if(typed){const budget=w4SearchJobBudget(groups);if(jobs.length>budget+1){moreJobs=jobs.slice(budget);jobs=jobs.slice(0,budget);}}
   // A search that finds little contract work, and does not name a company, also lists the per-project networks.
   const thin=matcher&&!filters&&groups.contract.length<5&&!rows.some(route=>matcher.all([companies[route.company_id]?.name,...(companies[route.company_id]?.aliases||[])].join(' ').toLowerCase()));
-  $('work-cards').innerHTML=w4ContractSection(groups)+w4JobsSection(jobs,moreJobs)+w4OtherSection(groups,filtered)+(rows.length?'':w4EmptyState(query,filters))+(thin?w4NetworkSuggestions(rows):'');
+  $('work-cards').innerHTML=w4ContractSection(groups)+w4JobsSection(jobs,moreJobs)+w4OtherSection(groups,filtered,typed)+(rows.length?'':w4EmptyState(query,filters))+(thin?w4NetworkSuggestions(rows):'');
   syncSelection();
 }
 // Clears the search, the filters, or everything (the Clear filters button in the panel).
@@ -499,11 +560,11 @@ function workSummary(id){
   const covered=new Set(rows.flatMap(r=>r.claim_ids||[]));
   const related=typeof workClaims==='function'?workClaims(id).filter(c=>!covered.has(c.id)).map(c=>c.id):[];
   // A "More" group never holds a single listing: that one is shown in full instead.
-  const section=(label,list,full,more)=>{const shown=list.length<=full+1?list.length:full;return list.length?`<h3 class="w4-profile-heading">${label} <span>(${list.length})</span></h3><div class="work-v4-profile-grid">${list.slice(0,shown).map(route=>workCard(route,'',4)).join('')}</div>${w4GroupDisclosure(list.slice(shown),more)}`:'';};
-  return `<div class="work-v4-profile">${open||groups.boards.length?workSafetyHTML(rows):''}${section('Contract and task work',groups.contract,4,'More contract and task listings')}${section('Jobs and fellowships',jobs,2,'More jobs and fellowships')}${open?'':`<p class="w4-empty">No open paid listing recorded for ${w4Escape(companies[id]?.name||'this company')}.</p>`}${w4GroupDisclosure(groups.boards,'Career pages',!open,'',W4_GROUP_NOTES.boards)}${w4GroupDisclosure(groups.outside,'Company jobs outside AI training',false,'',W4_GROUP_NOTES.outside)}${w4GroupDisclosure(groups.closed,'Closed or unpaid listings',!open&&!groups.boards.length,'',W4_GROUP_NOTES.closed)}${related.length?`<details class="w4-related"><summary>Related work evidence</summary><div class="w4-evidence-links">${w4ClaimAccess(related)}</div></details>`:''}</div>`;
+  const section=(label,list,full,more)=>{const shown=list.length<=full+1?list.length:full;return list.length?`<h3 class="w4-profile-heading">${label} <span>(${list.length})</span></h3><div class="work-v4-profile-grid">${list.slice(0,shown).map(route=>workCard(route,'',4,true)).join('')}</div>${w4GroupDisclosure(list.slice(shown),more,false,'','',3)}`:'';};
+  return `<div class="work-v4-profile">${open||groups.boards.length?workSafetyHTML(rows):''}${section('Contract and task work',groups.contract,4,'More contract and task listings')}${section('Jobs and fellowships',jobs,2,'More jobs and fellowships')}${open?'':`<p class="w4-empty">No confirmed paid listing for ${w4Escape(companies[id]?.name||'this company')}.</p>`}${w4GroupDisclosure(groups.boards,'Career pages',!open,'',W4_GROUP_NOTES.boards)}${w4GroupDisclosure(groups.outside,'Company jobs outside AI training',false,'',W4_GROUP_NOTES.outside)}${w4GroupDisclosure(groups.closed,'Closed or unpaid listings',!open&&!groups.boards.length,'',W4_GROUP_NOTES.closed)}${related.length?`<details class="w4-related"><summary>Related work evidence</summary><div class="w4-evidence-links">${w4ClaimAccess(related)}</div></details>`:''}</div>`;
 }
 
-document.addEventListener('click',event=>{const clear=event.target.closest?.('[data-work-clear]');if(clear){resetWorkFilters(clear.dataset.workClear);document.getElementById('work-search')?.focus();return;}const button=event.target.closest?.('[data-work-section]');if(!button)return;const target=document.getElementById(button.dataset.workSection);if(target){if(target.tagName==='DETAILS'){w4FillGroup(target);target.open=true;}const focus=target.tagName==='DETAILS'?target.querySelector('summary'):target;if(focus&&focus.tagName!=='SUMMARY')focus.setAttribute('tabindex','-1');focus?.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});}});
+document.addEventListener('click',event=>{const summary=event.target.closest?.('summary');if(summary&&!summary.parentElement?.open)w4FillLazy(summary.parentElement);const clear=event.target.closest?.('[data-work-clear]');if(clear){resetWorkFilters(clear.dataset.workClear);document.getElementById('work-search')?.focus();return;}const button=event.target.closest?.('[data-work-section]');if(!button)return;const target=document.getElementById(button.dataset.workSection);if(target){if(target.tagName==='DETAILS'){w4FillGroup(target);target.open=true;}const focus=target.tagName==='DETAILS'?target.querySelector('summary'):target;if(focus&&focus.tagName!=='SUMMARY')focus.setAttribute('tabindex','-1');focus?.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});}});
 
 let responsiveFiltersWide,responsiveFilterFocus;
 document.addEventListener('focusin',event=>{
