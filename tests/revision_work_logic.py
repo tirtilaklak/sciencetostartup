@@ -14,7 +14,7 @@ stub = next(ast.literal_eval(node.value) for node in tree.body if isinstance(nod
             and any(isinstance(target, ast.Name) and target.id == "STUB" for target in node.targets))
 checks = r'''
 const canonicalBefore=run('JSON.stringify(DATA)');
-const whitespace=[' ','\t','\r\n',' ',' \t\n '];
+const whitespace=[' ','\t','\r\n','\u00a0',' \t\n '];
 const clean=html=>html.replace(/evidence-description-\d+/g,'evidence-description-ID');
 const GROUP='<details class="work-route-archive-group w4-route-group"';
 const cardIds=html=>[...html.matchAll(/data-work-route="([^"]+)"/g)].map(m=>m[1]);

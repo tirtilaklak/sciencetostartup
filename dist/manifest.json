@@ -107,13 +107,13 @@
     "editorial_readouts.csv": "8f178ce867808fca5f2696c3a0dfdabac41a376a80f0d86844f8bc9de7e1f226",
     "favicon.ico": "064ee6374a7663967f291d781ed1b583de51aee21ca950d92bddbf5d7fd39f42",
     "funding_rounds.csv": "9699fd03f27d47db99e22460e089d16db2349157a8fc112c91c33a472120f1a2",
-    "index.html": "b79276af6c976e04a539682f0124b0f79ecbd49b60e68c53e0e1201e13117e86",
+    "index.html": "09caab30ef531c6fd1bd0bdf946d325a1fbca50b56cb332be8bdcf2b01a974a0",
     "investors.csv": "e29e8685a652a866447c5dd7f744fbbc1c285bb2226b44dbefa94fb3a9644c2f",
-    "js/app.4af84da8bd62.js": "4af84da8bd629a01e63cd9c8471e9600b966a0ba50261ea01b99f87f8f587720",
+    "js/app.f3aee18d0f08.js": "f3aee18d0f081078cbe55aa918ae0946dfddbdf78698de5abd3dec7d8baca516",
     "js/data.5eb76d8b381f.js": "5eb76d8b381ff5a4bad67627474b5762a2f5d32937631e8ab689266978f8a3ab",
     "link-health.json": "1a1f86435b0a08664061dbcbb4dac02a4ac7a83d858d761cc1247bc278289bbe",
     "logo-provenance.json": "e2de4f728b6d5852638a330545e19c462c461311d77eb6a7c82196e48fbc94d1",
-    "method/index.html": "ea8e3a8efa1cd8a8268e100175a4b56120052f5935177e89f1fe371afb974bd2",
+    "method/index.html": "0e2fae3c0fc39cf3c783fe6b5e20adf65312f714f348cb1f94c355a88d7b220f",
     "metrics.csv": "e2c0befaba8f73aca42646e6a26f79eeb43e49b8a376af1faae2873cd0ebcd26",
     "observatory.sqlite": "d802f333d6f8ec6bf200209e81794446958b680a91fe88abfa6f478c4ebe3e97",
     "people.csv": "405a2c8a576e5051657744f4cc482c452b9d2056d208a24e5da261a8357b43ce",
@@ -126,7 +126,7 @@
     "sitemap.xml": "b0ff26d06b14d5544dcccdfca3273e5509184f5f20daee59344912fdb8a9127e",
     "source-updates.json": "83557562e7df70be03a6fd25759e3f4fd6a24c6d94186a8ea65aac0d1e6f3d89",
     "sources.csv": "39657f93b70d751dfcffae80eb741d16c46376f6661eae4c226cd5635520e14e",
-    "work/index.html": "bfc7c9842f441bd4fcd25708c83802dff03fe2d4bc0fbe6fb803beba6a666baf",
+    "work/index.html": "344576f007e34fcd42aa3c80946ca071017d1acae427716bd9bb5029cce9a1af",
     "work-routes.json": "4f0e0ec29e06ce42f47f999aff4faab9a4bba55911565958cf8cfeaae8330195"
   }
 }
