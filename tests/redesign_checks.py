@@ -80,6 +80,10 @@ def main():
     assert any(a.get('id') == 'companies-view' for _, a in tags.elements), 'Separate directory route missing'
     assert len(re.findall(r'<h1\b', template.split('id="market-view"', 1)[1].split('id="companies-view"', 1)[0])) == 1, 'Overview must have one headline'
     assert 'company-cards' not in template.split('id="market-view"', 1)[1].split('id="companies-view"', 1)[0], 'Verbose directory must not be part of overview'
+    # The publisher's band is text only. The owner removed the portrait image of real people from the public site.
+    venture = template.split('id="venture"', 1)[1].split('</section>', 1)[0]
+    assert not re.search(r'<(?:img|picture|figure)\b', venture), 'The publisher band must stay text only'
+    assert 'id="venture-mercor"' in venture and 'href="#about"' in venture, 'The publisher band lost its sourced figure or its call to action'
 
     with tempfile.TemporaryDirectory(prefix='observatory-redesign-') as tmp:
         script = Path(tmp) / 'checks.cjs'
@@ -190,6 +194,7 @@ def main():
         assert not con.execute('PRAGMA foreign_key_check').fetchall()
         assert con.execute('SELECT count(*) FROM companies').fetchone()[0] == 39
     manifest = json.loads((ROOT / 'dist/manifest.json').read_text())
+    assert not [name for name in manifest['sha256'] if 'Investor_Snapshot' in name or 'investor-image' in name], 'The removed venture image still ships'
     for name, expected in manifest['sha256'].items():
         assert hashlib.sha256((ROOT / 'dist' / name).read_bytes()).hexdigest() == expected, name
     print(json.dumps({'audited_dataset_version': PINNED_VERSION, 'canonical_sha256': PINNED_SHA256, 'html_sha256': hashlib.sha256((ROOT / 'dist/index.html').read_bytes()).hexdigest(), 'canonical_unchanged': True, 'business_health_observations': len(rendered['healthObservations']), 'dashboard_headline_paces': len(headline_paces), 'model_groups': 7, 'categorized_companies': len(map_ids), 'company_cards': len(rows), 'conditional_clear': 'passed', 'visible_work_summaries': len(visible_work), 'search_filters_compare_download_handlers': 'passed', 'portable_data_integrity': 'passed', 'browser_rendering_verified': False}, indent=2))
