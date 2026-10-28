@@ -133,37 +133,25 @@ Cloudflare Web Analytics is injected at the edge and sets no cookies.
 
 ## Business health dashboard
 
-The overview explores revenue growth, delivery margins, customer durability, paid
-expert activity and cash resilience. It covers all 39 organizations, with 98 dated
-observations linked to 65 sources, explicit missing values and a separate
-hypothetical margin calculator. Employee and registered-expert counts are context.
-The recommended north star is gross profit from repeat paying customers.
+The overview starts with a comparable revenue chart, then offers profitability,
+customer durability, paid expert activity and cash measures. Reporting periods,
+currencies and business scopes stay separate. The complete 39-organization
+coverage grid and detailed evidence remain available in disclosures. There is no
+composite score or hypothetical financial calculator in the interface.
 
-See [dashboard definitions and evidence limits](docs/business-health-dashboard.md).
-The underlying research remains dataset v2.5.0; the October 23 dashboard curation
-does not imply all source material was freshly verified.
+The evidence layer contains 109 dated observations across 28 organizations, linked
+to 65 source records. On 28 October 2026, selected financial documents were read
+again and nine new source claims added with exact excerpts, locators, response
+hashes and separately validated quantities. The source-check ledger records 24
+checks (including a duplicate source alias and an upcoming-results notice): 21
+content checks, one availability-only check and two unavailable sources.
 
-## Owner steps
+Paid-work verification requested all 135 recorded route URLs. Of these, 67 received
+content review, including 55 compensation checks; 61 had link-only checks and seven
+were blocked. Link reachability does not establish hiring or current pay. Each
+route retains its own review scope, date and response receipt.
 
-1. Search. Verify the domain in Google Search Console and Bing Webmaster Tools,
-   and submit `https://sciencetostartup.com/sitemap.xml` in each.
-2. Dataset corrections. Corrections that need a new dataset version are listed
-   in `docs/pending-2.5.1-corrections.md`. Release them from the research
-   repository; this repository pins dataset 2.5.0.
-3. Deploying. Rebuild `dist/` with the commands under "View or reproduce", run
-   the checks above and commit. Then deploy all of `dist/`, including
-   `dist/js/`, to the `sciencetostartup` Worker, staging it without
-   `_redirects` as described under Hosting. Pushing to GitHub does not deploy.
-
-## License
-
-- Research data and the site's own text: CC BY 4.0, licensed by
-  ScienceToStartup. See `LICENSE-DATA.md`. This covers the files in `data/`,
-  the JSON, CSV and SQLite files built from them, and the text written for the
-  site.
-- Code: MIT, see `LICENSE`. This covers everything `LICENSE-DATA.md` does not
-  list, including `scripts/`, `tests/`, `schema/`, `design-system/`, `docs/`
-  and the HTML, CSS and JavaScript in `web/`.
-- Neither license covers third-party material such as company names and logos,
-  product images, photos of people and text quoted from sources.
-  `LICENSE-DATA.md` lists them.
+The underlying research remains dataset v2.5.0. New evidence is a validated
+supplement, not a claim that the entire historical dataset has been re-audited.
+See [dashboard definitions and evidence limits](docs/business-health-dashboard.md)
+and [financial source checks](data/fresh-source-checks.json).

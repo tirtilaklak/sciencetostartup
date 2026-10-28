@@ -13,9 +13,14 @@ function w4SourcePublicationDate(source){
 function w4Checked(route){return [route.availability_checked_on,route.last_route_check?.date].filter(Boolean).sort().at(-1)||null;}
 function w4CheckedLabel(route){const checked=w4Checked(route);return checked?w4Date(checked):'Not rechecked';}
 // One date per listing: the latest link check, or the research review when the link was never rechecked.
-function w4FreshnessLabel(route){const checked=w4Checked(route);return checked?`Checked ${w4Date(checked)}`:`${route.reviewed_on?`Reviewed ${w4Date(route.reviewed_on)} · `:''}Link not rechecked`;}
+function w4FreshnessLabel(route){
+  if(route.terms_checked_on)return `Terms checked ${w4Date(route.terms_checked_on)}`;
+  if(route.last_link_check?.result==='blocked')return `Recheck blocked ${w4Date(route.last_link_check.date)}`;
+  const checked=w4Checked(route);return checked?`Page checked ${w4Date(checked)}`:`${route.reviewed_on?`Recorded ${w4Date(route.reviewed_on)} · `:''}Terms not rechecked`;
+}
 function w4Uncertain(route){
   if(['unverified','intake_unverified','pay_conflict'].includes(route.status))return true;
+  if(['blocked','not_found','unavailable'].includes(route.last_link_check?.result))return true;
   const check=[route.last_route_check?.result,route.last_route_check?.note].filter(Boolean).join(' ');
   return route.research_record?.route?.live_application_verified===false||/HTTP 403|blocked.fetch|JavaScript.only|requires JavaScript|JavaScript shell|not verified open|could not be loaded/i.test(check);
 }
@@ -234,7 +239,7 @@ function w4Details(route,level=4){
       <p class="w4-source-dates"><span>Terms recorded: ${w4Escape(route.as_of&&route.as_of!=='undated'?w4Date(route.as_of):'date not stated')}</span><span>${w4Escape(w4FreshnessLabel(route))}</span></p>
       ${sourceRows.length?`<ul>${sourceRows.map(s=>`<li>${w4SourceLink(s.url,s.title||s.publisher||'Source')}<small>${w4Escape(published(s))}${s.accessed_on?` · Checked ${w4Escape(w4Date(s.accessed_on))}`:''}</small></li>`).join('')}</ul>`:''}
       ${route.source_quote?`<blockquote>${w4Escape(route.source_quote)}</blockquote>`:''}
-      ${route.last_route_check?.note?`<details class="w4-source-notes"><summary>Link check note</summary><p>${w4Escape(w4CheckNote(route.last_route_check))}</p></details>`:''}
+      ${route.last_route_check?.note?`<details class="w4-source-notes"><summary>What we checked</summary><p>${w4Escape(w4CheckNote(route.last_route_check))}</p>${route.last_link_check?`<p>Link requested ${w4Escape(w4Date(route.last_link_check.date))}: ${w4Escape(route.last_link_check.result)}.${route.last_link_check.note?' '+w4Escape(route.last_link_check.note):''}</p>`:''}</details>`:''}
       ${route.claim_ids?.length?`<div class="w4-evidence-links">${w4ClaimAccess(route.claim_ids,route.role)}</div>`:''}
     </div>
     ${typeof compareCheck==='function'?`<div class="w4-compare">${compareCheck(route.company_id)}</div>`:''}
@@ -468,13 +473,16 @@ const W4_SAFETY_TIPS=[
 ];
 function workSafetyHTML(rows=[]){
   const fresh=w4FreshnessSentence(rows);
-  return `<div class="w4-safety"><p><strong>Before you apply.</strong> Never pay to get work. Apply only on the company’s own website, and confirm the pay there.${fresh?' '+w4Escape(fresh):''}</p><details class="w4-safety-tips"><summary>How to spot a job scam</summary><ul>${W4_SAFETY_TIPS.map(([tip,keys])=>`<li><p>${w4Escape(tip)}</p><p class="w4-safety-sources">Sources: ${keys.map(key=>w4SourceLink(...W4_SAFETY_SOURCES[key])).join(' · ')}</p></li>`).join('')}</ul><p class="w4-safety-report">Report a scam: ${w4SourceLink('https://reportfraud.ftc.gov/','ReportFraud.ftc.gov')} in the US. In India, ${w4SourceLink('https://cybercrime.gov.in/','cybercrime.gov.in')} or call 1930.</p></details></div>`;
+  return `<div class="w4-safety"><details class="w4-safety-tips"><summary>Before you apply: pay, eligibility and safety</summary><p>Apply through the company. Confirm pay and eligibility before accepting.${fresh?' '+w4Escape(fresh):''}</p><ul>${W4_SAFETY_TIPS.map(([tip,keys])=>`<li><p>${w4Escape(tip)}</p><p class="w4-safety-sources">Sources: ${keys.map(key=>w4SourceLink(...W4_SAFETY_SOURCES[key])).join(' · ')}</p></li>`).join('')}</ul><p class="w4-safety-report">Report a scam: ${w4SourceLink('https://reportfraud.ftc.gov/','ReportFraud.ftc.gov')} in the US. In India, ${w4SourceLink('https://cybercrime.gov.in/','cybercrime.gov.in')} or call 1930.</p></details></div>`;
 }
 function w4Jump(id,label,n){return `<button type="button" data-work-section="${id}" ${n?'':'disabled'}>${label} <span>(${n})</span></button>`;}
-function w4ContractSection(groups){
+function w4ContractSection(groups,filtered=false){
   if(!groups.contract.length)return '';
   const blocks=[['work-hourly','Hourly pay','Hourly',groups.hourly,true],['work-task','Paid per task','Per task',groups.task,true],['work-project','Pay set per project or not published','Pay set per project',groups.project,false]].filter(block=>block[3].length);
-  return `<section class="w4-section"><h2 id="work-listed" class="work-list-heading">Contract and task work <span>(${groups.contract.length})</span></h2><div class="w4-section-intro"><p class="w4-section-note">Freelance and project work for AI training.</p>${blocks.length>1?`<p class="w4-jumps">${blocks.map(([id,,short,list])=>w4Jump(id,short,list.length)).join('')}</p>`:''}</div>${blocks.map(([id,label,,list,full])=>`<h3 id="${id}" class="w4-block-heading">${label} <span>(${list.length})</span></h3>${full?list.map(route=>workCard(route,'',4,true)).join(''):`<div class="w4-secondary-list">${w4CompactCards(list,3)}</div>`}`).join('')}</section>`;
+  return `<section class="w4-section"><h2 id="work-listed" class="work-list-heading">Contract and task work <span>(${groups.contract.length})</span></h2><div class="w4-section-intro"><p class="w4-section-note">Published offers and expert networks. Work is assigned by the employer.</p>${blocks.length>1?`<p class="w4-jumps">${blocks.map(([id,,short,list])=>w4Jump(id,short,list.length)).join('')}</p>`:''}</div>${blocks.map(([id,label,,list,full])=>{
+    const limit=filtered?list.length:full?(id==='work-hourly'?6:3):5,shown=list.slice(0,limit),more=list.slice(limit);
+    return `<h3 id="${id}" class="w4-block-heading">${label} <span>(${list.length})</span></h3>${full?shown.map(route=>workCard(route,'',4,true)).join(''):`<div class="w4-secondary-list">${w4CompactCards(shown,3)}</div>`}${w4GroupDisclosure(more,`More ${label.toLowerCase()} listings`,false,'','',3)}`;
+  }).join('')}</section>`;
 }
 function w4JobsSection(shown,more){
   const total=shown.length+more.length;
@@ -539,7 +547,7 @@ function renderWork(){
   const summary=document.querySelector('.work-filters .responsive-filter-panel>summary');
   if(summary)summary.textContent=filters?`Filters (${filters})`:'Filters';
   // Every record counts here, including career pages and closed listings, so the line says "we reviewed".
-  $('work-count').textContent=`${w4Count(rows.length,'listing','listings')} we reviewed at ${w4Count(orgs.size,'company','companies')}.`;
+  $('work-count').textContent=`${w4Count(rows.length,'recorded listing or program','recorded listings and programs')} · ${w4Count(orgs.size,'company','companies')}`;
   const other=groups.boards.length+groups.outside.length+groups.closed.length;
   if($('work-overview'))$('work-overview').innerHTML=[['work-listed',groups.contract.length,'contract and task listing','contract and task listings'],['work-jobs',groups.jobs.length,'job or fellowship','jobs and fellowships'],['work-more',other,'other listing','other listings']].map(([id,n,one,many])=>`<button type="button" data-work-section="${id}" ${n?'':'disabled'}><strong>${n}</strong> ${n===1?one:many}</button>`).join('');
   const note=$('work-sort-note');
@@ -552,7 +560,7 @@ function renderWork(){
   else if(typed){const budget=w4SearchJobBudget(groups);if(jobs.length>budget+1){moreJobs=jobs.slice(budget);jobs=jobs.slice(0,budget);}}
   // A search that finds little contract work, and does not name a company, also lists the per-project networks.
   const thin=matcher&&!filters&&groups.contract.length<5&&!rows.some(route=>matcher.all([companies[route.company_id]?.name,...(companies[route.company_id]?.aliases||[])].join(' ').toLowerCase()));
-  $('work-cards').innerHTML=w4ContractSection(groups)+w4JobsSection(jobs,moreJobs)+w4OtherSection(groups,filtered,typed)+(rows.length?'':w4EmptyState(query,filters))+(thin?w4NetworkSuggestions(rows):'');
+  $('work-cards').innerHTML=w4ContractSection(groups,filtered)+w4JobsSection(jobs,moreJobs)+w4OtherSection(groups,filtered,typed)+(rows.length?'':w4EmptyState(query,filters))+(thin?w4NetworkSuggestions(rows):'');
   syncSelection();
 }
 // Clears the search, the filters, or everything (the Clear filters button in the panel).

@@ -605,7 +605,7 @@ def status_words(research, metric):
 WORK_ARCHIVE = frozenset(("historical", "closed", "contributions", "paused", "no_route", "inquiry", "information"))
 WORK_ORDER = {"listed": 0, "pay_conflict": 2, "program": 3, "intake_unverified": 4, "careers": 5, "unverified": 6, "closed": 7, "historical": 8, "paused": 9, "contributions": 10, "inquiry": 10, "information": 10, "no_route": 11}
 WORK_BUCKETS = (
-    ("contract", "Contract and task work", "Freelance and project work for AI training."),
+    ("contract", "Contract and task work", "Published offers and expert networks. Work is assigned by the employer."),
     ("jobs", "Jobs and fellowships", "Staff jobs and paid fellowships at these companies."),
     ("boards", "Career pages", "Each link opens a company’s full list of openings. We did not record pay for these pages."),
     ("outside", "Company jobs outside AI training", "Open staff roles that are not AI training work."),

@@ -99,3 +99,24 @@
 #work-cards .work-card-v4:not(.w4-compact-card){content-visibility:auto;contain-intrinsic-height:auto 210px}
 @media(min-width:1180px){#work-cards .work-card-v4:not(.w4-compact-card){contain-intrinsic-height:auto 160px}}
 @media(max-width:700px){#work-cards .work-card-v4:not(.w4-compact-card){contain-intrinsic-height:auto 320px}}
+
+/* Short previews keep the first screen useful; full terms stay in each disclosure. */
+#work-cards .w4-card-front{padding-top:18px;padding-bottom:16px}
+#work-cards .w4-role{font-size:17px;line-height:1.35;margin-bottom:7px}
+#work-cards .w4-requirements{font-size:12px;line-height:1.5}
+#work-cards .w4-dates{font-size:11px;letter-spacing:.01em}
+#work-cards .w4-group-note{max-width:65ch}
+#work-cards .w4-route-group{margin-top:8px;margin-bottom:20px}
+#work-cards .w4-route-group>summary{min-height:44px;background:var(--surface,#f3f5f0);padding:12px 14px;border-radius:5px;font-size:13px}
+#work-cards .w4-block-heading{font-size:13px;color:var(--muted);font-weight:500;margin-top:18px}
+@media(min-width:1101px){#work-cards .w4-card-front{grid-template-columns:minmax(210px,1.3fr) minmax(180px,.9fr) minmax(180px,1fr) auto;gap:22px}}
+@media(max-width:700px){
+ #work-cards .w4-card-front{padding-top:16px;padding-bottom:12px;gap:8px}
+ #work-cards .w4-conditions-column .w4-requirements{display:none}
+ #work-cards .w4-role{font-size:16px}
+ #work-cards .w4-pay{font-size:18px}
+}
+.w4-safety{padding:0 12px;margin-bottom:14px;border-left:2px solid var(--border);background:transparent}
+.w4-safety-tips{margin:0}
+.w4-safety-tips>summary{min-height:40px;font-size:12px}
+.w4-safety-tips>p{font-size:13px;line-height:1.5;margin:4px 0 12px}

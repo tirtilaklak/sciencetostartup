@@ -1,6 +1,7 @@
 """Validate the dashboard's evidence layer without changing the canonical audit."""
 import json
 import math
+import re
 
 from observatory import SIDECAR_DATASET_VERSION
 
@@ -20,6 +21,31 @@ def load_business_health(path, data):
     claims = {c['id']: c for c in data['claims']}
     metrics = {m['id']: m for m in data['metrics']}
     sources = {s['id']: s for s in data['sources']}
+    # New source reads supplement this dashboard, not the frozen canonical release.
+    # Each new claim binds the exact quantity and period to a checked source excerpt.
+    checked = {entry['source_id']: entry for entry in health.get('source_checks', {}).get('entries', [])}
+    fresh_ids = set()
+    for claim in health.get('fresh_claims', []):
+        cid = claim.get('id')
+        if not cid or cid in claims or cid in fresh_ids:
+            raise ValueError('business-health: fresh claim must have a new unique ID')
+        if claim.get('company_id') not in companies or claim.get('status') != 'supported':
+            raise ValueError('business-health: fresh claim requires a supported company')
+        if not claim.get('statement') or not claim.get('excerpt') or not claim.get('source_locator') or not claim.get('fact'):
+            raise ValueError('business-health: fresh claim requires an excerpt, locator and exact fact')
+        if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', claim.get('observed_on', '')):
+            raise ValueError('business-health: fresh claim requires its actual review date')
+        if not claim.get('source_ids'):
+            raise ValueError('business-health: fresh claim requires a source')
+        for sid in claim['source_ids']:
+            check = checked.get(sid, {})
+            if (sid not in sources or check.get('url') != sources[sid]['url']
+                    or check.get('status') != 'content_checked' or check.get('http_status') != 200
+                    or check.get('checked_on') != claim['observed_on']
+                    or not re.fullmatch(r'[a-f0-9]{64}', check.get('content_sha256', ''))):
+                raise ValueError('business-health: fresh claim requires a successfully checked source')
+        claims[cid] = claim
+        fresh_ids.add(cid)
     if health.get('universe_count') != len(companies):
         raise ValueError('business-health: company universe changed')
     if {s['id'] for s in health.get('signals', [])} != SIGNALS:
@@ -47,6 +73,10 @@ def load_business_health(path, data):
         for cid in row['claim_ids']:
             if cid not in claims or claims[cid]['company_id'] != row['company_id'] or claims[cid]['status'] != 'supported':
                 raise ValueError(prefix + 'supported same-company claim required')
+            if cid in fresh_ids and row['evidence_type'] != 'calculated':
+                for field in ('measure', 'value', 'unit', 'currency', 'period', 'scope', 'accounting_basis'):
+                    if row.get(field) != claims[cid]['fact'].get(field):
+                        raise ValueError(prefix + 'fresh quantity or reporting basis differs from checked claim')
         linked_sources = {sid for cid in row['claim_ids'] for sid in claims[cid]['source_ids']}
         if any(sid not in sources or sid not in linked_sources for sid in row['source_ids']):
             raise ValueError(prefix + 'source must support the cited claim')

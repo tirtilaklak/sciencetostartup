@@ -125,3 +125,29 @@
   .grade-bar{display:none}
   .grade-key dt,.story-grade{border-color:CanvasText}
 }
+
+/* Keep the first useful comparison close to the introduction. */
+#market-view .market-hero{padding:34px 0 24px;column-gap:56px;row-gap:0;grid-template-columns:minmax(0,1fr) 220px}
+#market-view .market-hero h1{max-width:740px;font-size:clamp(32px,3.5vw,48px);line-height:1.12;letter-spacing:-1.4px;margin:12px 0 16px}
+#market-view .market-hero .intro{max-width:650px;font-size:18px;line-height:1.55;margin:0}
+#market-view .hero-actions{margin-top:22px}
+#market-view .hero-byline{font-size:12px;margin-top:14px}
+#market-view .hero-research{border:1px solid var(--border);border-radius:8px;padding:20px;background:#fffefa}
+#market-view .hero-logos{margin-top:24px;padding-top:12px}
+#market-view .hero-logo-label{display:none}
+#market-view .hero-logo-grid>a{flex-direction:row;justify-content:center;gap:8px}
+#market-view .hero-logo-grid .brand-asset{height:24px;max-width:100px}
+#market-view .hero-logo-grid>a>.hero-logo-name{display:none}
+@media(max-width:900px){
+#market-view .market-hero{grid-template-columns:minmax(0,1fr);padding-top:24px}
+#market-view .hero-research{display:none}
+#market-view .hero-logos{margin-top:20px}
+#market-view .hero-logo-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+}
+@media(max-width:700px){
+#market-view .market-hero h1{max-width:440px;font-size:34px;letter-spacing:-1px}
+#market-view .market-hero .intro{font-size:16px;line-height:1.5}
+#market-view .hero-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+#market-view .hero-actions a{padding:10px 12px;font-size:13px;gap:8px}
+#market-view .hero-logos{display:none}
+}

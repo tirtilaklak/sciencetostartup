@@ -137,7 +137,9 @@ def main():
         assert 'Terms & sources' in details
         assert f'data-work-route="{route_id}"' in before_details
         assert f'data-work-company="{route["company_id"]}"' in before_details
-        assert ('Checked ' in before_details or 'Reviewed ' in before_details) and 'Terms recorded:' in details
+        assert any(label in before_details for label in (
+            'Terms checked ', 'Page checked ', 'Recheck blocked ', 'Recorded ', 'Terms not rechecked'
+        )) and 'Terms recorded:' in details, route_id + ': missing freshness context'
         links = [a['href'] for tag, a in Elements(before_details).elements if tag == 'a' and 'w4-open' in a.get('class', '')]
         assert links == [route['url']], route_id + ': exact route target changed'
         for claim_id in route.get('claim_ids', []):

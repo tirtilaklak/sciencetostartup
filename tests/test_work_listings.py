@@ -87,7 +87,7 @@ run('resetWorkFilters()');
 // Counts and labels read the same on every surface (B1, B3, B5).
 run('renderWork()');
 const companiesReviewed=new Set(routes.map(r=>r.company_id)).size;
-assert.equal(node('work-count').textContent,`${routes.length} listings we reviewed at ${companiesReviewed} companies.`);
+assert.equal(node('work-count').textContent,`${routes.length} recorded listings and programs · ${companiesReviewed} companies`);
 run(`state.workSort='hourly';renderWork()`);
 const sortNote=node('work-sort-note').textContent;
 assert.ok(sortNote.includes(`of ${g.contract.length+g.jobs.length} paid work listings`)&&!/open listing/.test(sortNote),sortNote);
@@ -102,7 +102,7 @@ assert.ok(safetyLine.includes(run(`w4Date(${JSON.stringify(latest)})`)+'.'),'saf
 for(const route of routes){
  const card=run(`workCard(${JSON.stringify(route)})`),front=card.split('<details class="w4-details">')[0];
  assert.ok(!/Not yet checked|Undated terms|Pay periods unspecified|public_page_live|information_only_not_verified/.test(card),route.id);
- assert.ok(/Checked \d|Reviewed \d|Link not rechecked/.test(front),route.id+' date line');
+ assert.ok(/Terms checked \d|Page checked \d|Recheck blocked \d|Recorded \d|Terms not rechecked/.test(front),route.id+' date line');
  assert.ok(card.includes('<span class="sr-only">: '+run(`w4Escape(${JSON.stringify(route.role)})`)),route.id+' link context');
  assert.ok(card.includes('(opens in a new tab)')||!/^https?:/.test(route.url),route.id+' new tab note');
 }

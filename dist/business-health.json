@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "dashboard_curated_on": "2026-10-23",
+  "version": "1.1.0",
+  "dashboard_curated_on": "2026-10-28",
   "source_dataset_version": "2.5.0",
   "source_dataset_reviewed_on": "2026-10-15",
   "universe_count": 39,
@@ -54,7 +54,7 @@
     }
   ],
   "methodology": {
-    "selection": "Explicitly curated supported canonical claims/metrics only; superseded, unverified and contested claims are excluded. Forecasts and undated recruiting financial boasts are excluded from numeric comparisons.",
+    "selection": "Supported canonical claims plus separately documented fresh source excerpts for new interim financial observations. New observations preserve their exact period, scope, units and source checks; the underlying canonical release is unchanged.",
     "cohorts": [
       "Match period.type, period.year, currency, scope and accounting_basis before comparing revenue levels or calculating growth.",
       "Annualized revenue is a dated pace, not recognized annual revenue or subscription ARR.",
@@ -64,12 +64,229 @@
     ],
     "calculations": "Calculated observations retain formula, input observation IDs and original evidence. No interpolated revenue series, invented active-worker counts or undisclosed-margin estimates are presented as facts.",
     "estimates": "No new financial estimate is invented for missing data. A defensible future estimate must carry a range, explicit assumptions, date, scope and source inputs, and be switchable independently from reported observations.",
-    "freshness": "Dashboard curation on 23 October 2026 reuses the canonical source review compiled 15 October 2026. Curation date is not a new observation date or a claim that all linked pages were re-fetched."
+    "freshness": "Selected financial statements and company disclosures were read on 28 October 2026. Each source check records its outcome separately from the reporting period. Other observations retain the October 15 research review; a page retrieval does not verify every claim."
   },
   "source_checks": {
-    "checked_on": "2026-10-23",
-    "status": "refresh_attempted_network_denied",
-    "notes": "Fresh public-source retrieval attempts for the TaskUs FY2025 results, RWS H1 FY2026 statement and Appen H1 2026 statement returned HTTP 403 in this session. Existing reviewed canonical evidence is preserved; no fresh content verification is claimed."
+    "checked_on": "2026-10-28",
+    "status": "partial_content_refresh",
+    "notes": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results are scheduled for 4 November.",
+    "entries": [
+      {
+        "source_id": "appen.source.audit-ap_2025",
+        "url": "https://announcements.asx.com.au/asxpdf/20260225/pdf/06wq7806yk1ll4.pdf",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read the FY2025 annual report; $230.8M revenue and $12.2M underlying EBITDA before FX.",
+        "content_sha256": "03c798760ee0f37eb206dcb9d31aac774a65a98d973cf8370e1404e060465123"
+      },
+      {
+        "source_id": "appen.source.audit-ap_h1_2026",
+        "url": "https://cdn.financialreports.eu/financialreports/media/filings/64403/2026/RNS/64403_rns_2026-08-26_f02948b4-b58e-4caf-b147-419f335f3abf.pdf",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read H1 2026 statements: revenue $119.915M, net loss $4.454M, cash $44.705M, operating cash outflow $4.146M; top-five customers account for 67.9% of revenue.",
+        "content_sha256": "1bb82a6d4db4970bf46d5fdc04885a2de96c4974359781edfa2323aa5a85754c"
+      },
+      {
+        "source_id": "mercor.source.audit-audit_m18",
+        "url": "https://www.felicis.com/blog/mercor-profile-organizing-human-intelligence-to-power-the-ai-economy",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Investor profile says September 2025 run rate $500M, March 2026 $1B and June 2026 $2B; payouts are more than $4M daily. These are investor-published company statements.",
+        "content_sha256": "acb11433f3f66600de9c03f998b6cd83f695cc27f0a8a342d7dfd38fd7a5f131"
+      },
+      {
+        "source_id": "micro1.source.oct14-19eb5016dbc6",
+        "url": "https://www.micro1.ai/blog/q3",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Company post dated 12 October 2026 says annual run rate surpassed $1B. It is a company-reported pace, not realized annual sales.",
+        "content_sha256": "b990205be7e4f47eacbe534ab8ad23a411ab8c5806f8dfb266273c973f905a1c"
+      },
+      {
+        "source_id": "rws_trainai.source.d_rws4",
+        "url": "https://www.rws.com/media/images/RWS-HY26-Results-Statement-Final-260610_tcm228-298858.pdf",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read H1 FY2026 group statements: revenue £360.3M, gross margin 41.6%, pre-tax loss £9.5M, net operating cash inflow £21.5M and cash £33.7M. Period ends 31 March 2026; figures cover RWS, not TrainAI alone.",
+        "content_sha256": "0d535de82ded90c4679f488417a9ccf64426fd98c805b48d8b78cea55af1a473"
+      },
+      {
+        "source_id": "surge_ai.source.b_sg4",
+        "url": "https://www.aol.com/exclusive-scale-ais-bigger-rival-152327362.html",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read Reuters story dated 1 July 2025: prior-year Surge revenue over $1B and Scale $870M. These remain historical FY2024 figures.",
+        "content_sha256": "434ff633dffa71d49d106cd4a19bcd25f8b76b0e2a784985ba3e51a8a4c6e4d5"
+      },
+      {
+        "source_id": "taskus.source.fyrelease",
+        "url": "https://ir.taskus.com/news-releases/news-release-details/taskus-announces-fiscal-fourth-quarter-and-full-year-2025",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read reported FY2025 results and the 113% net revenue retention disclosure.",
+        "content_sha256": "41b681ac5c1fd9a558f8136f5a1bc7fac280a219f11eaf015dad1c2ebd45053c"
+      },
+      {
+        "source_id": "taskus.source.q22026",
+        "url": "https://ir.taskus.com/news-releases/news-release-details/taskus-announces-fiscal-second-quarter-2026-results",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read the six-month income statement, balance sheet and cash-flow tables; amounts are USD thousands and the interim statements are unaudited.",
+        "content_sha256": "af3d73c9372fcecdca07556b504f22db8f3f1a1afe76c5fe3ccf74c0dfae94d2"
+      },
+      {
+        "source_id": "turing.source.oct14-6d7f270a4e05",
+        "url": "https://markets.financialcontent.com/wss/article/bizwire-2025-1-28-turing-annual-revenue-runrate-nearly-triples-to-300m-in-profitable-year-as-company-sets-stage-for-agi-advancements-in-2025",
+        "checked_on": "2026-10-28",
+        "http_status": 301,
+        "status": "unavailable",
+        "note": "The source did not return readable content in this check. Historical evidence is retained with the failed refresh disclosed.",
+        "error": "curl: (47) Maximum (50) redirects followed\n"
+      },
+      {
+        "source_id": "afterquery.source.round2-funding",
+        "url": "https://www.afterquery.com/blog/human-expertise-reimagined",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Company post states revenue run rate surpassed $100M. This confirms the older company disclosure, not later independent reporting.",
+        "content_sha256": "152f663d228460a3c8a8e2709016196f29269f79b31a1b3d1b84ddcb3dda4ece"
+      },
+      {
+        "source_id": "appen.source.oct14-eeca86cfae44",
+        "url": "https://cdn.prod.website-files.com/656a605609413dfd3feb9d34/699fbc072974a573b2b7a48c_Appen%20Annual%20Report%202025.pdf",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read the company-hosted annual report; FY2025 revenue is $230.8M. Growth excluding Google differs from the whole-company comparison.",
+        "content_sha256": "93d65cd1fff04294c7847f20d6577b7073c5964bb78df7101e5ff44554657b38"
+      },
+      {
+        "source_id": "handshake_ai.source.oct14-e0de0f3911dc",
+        "url": "https://dealroom.co/news/127345-handshakes-arr-crosses-1b-as-ai-training-revenue-surges/",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Article is dated 14 April 2026, not 23 April. It reports nearly $1B gross annualized AI revenue, before contractor payments. Corrected the dashboard observation date.",
+        "content_sha256": "20a2b3331f5bf02caf512a43e4715b40b13749cba3f64ebb0e44797a1abcda00"
+      },
+      {
+        "source_id": "mercor.source.audit-m6",
+        "url": "https://sacra.com/c/mercor/",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read Sacra gross-basis analysis: June 2026 $2B annualized gross revenue, H1 2026 $614M gross revenue. These are secondary, unaudited figures.",
+        "content_sha256": "0a7a579c79374c83fe7f3848dc75dd0169d97f8e06d996dfb1168a5fcffa4299"
+      },
+      {
+        "source_id": "micro1.source.audit-u6",
+        "url": "https://techcrunch.com/2026/08/20/ai-data-startup-micro1-reaches-500m-gross-run-rate-amid-ai-training-boom/",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read the dated 20 August 2026 reporting of $500M gross run rate; retain as a historical snapshot.",
+        "content_sha256": "d5104df9242813988a546c67d73b20393e1aec286fc88f2eb3a80f9df975ed32"
+      },
+      {
+        "source_id": "prolific.source.audit-c6d6a9d995",
+        "url": "https://www.prolific.com/about",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "available_not_rechecked",
+        "note": "Page retrieved; this pass did not reconfirm every numeric claim.",
+        "content_sha256": "b0863bc8ccee2c74d768d2bfd586eab1fb226de5808562d5822627382af1ebe9"
+      },
+      {
+        "source_id": "prolific.source.audit-f1a6aacb51",
+        "url": "https://www.linkedin.com/posts/phelim-bradley-84300826_prolific-just-finished-a-10m-revenue-week-activity-7459649483899891713-2DAA",
+        "checked_on": "2026-10-28",
+        "http_status": 404,
+        "status": "unavailable",
+        "note": "The source did not return readable content in this check. Historical evidence is retained with the failed refresh disclosed."
+      },
+      {
+        "source_id": "proximal.source.oct14-4e72c4026cdf",
+        "url": "https://www.proximal.ai/blog/new-frontiers/",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Company post dated 29 September 2026 states $200M annualized revenue.",
+        "content_sha256": "d4ef948c0b00467303ac3401c43278ec141920143c28c94b5430ed84500eaf51"
+      },
+      {
+        "source_id": "scale_ai.source.oct14-891cd0d871ee",
+        "url": "https://www.aol.com/news/exclusive-scale-ais-bigger-rival-152327362.html",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read Reuters story dated 1 July 2025: Scale prior-year revenue was $870M. Historical FY2024, not a 2026 snapshot.",
+        "content_sha256": "912ce262e35d2abb3f96c6874b4ed65f2d14e8ff7a9a4eb382c744ef34a4f562"
+      },
+      {
+        "source_id": "snorkel_ai.source.oct14-006107ac93e3",
+        "url": "https://snorkel.ai/blog/data-2-0-and-the-research-era-of-ai-data/",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Company post dated 22 September 2026 states $375M annualized revenue run rate and a $350M fundraise; these are different measures.",
+        "content_sha256": "4e1e27b19dde860be8707118e6f4828eb424823c4ae94e6f14824ef9f84b3428"
+      },
+      {
+        "source_id": "surge_ai.source.oct14-891cd0d871ee",
+        "url": "https://www.aol.com/news/exclusive-scale-ais-bigger-rival-152327362.html",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read Reuters story dated 1 July 2025: Surge prior-year revenue exceeded $1B. Historical FY2024, not a 2026 snapshot.",
+        "content_sha256": "78d7388c5820a7d2f0a3a21930e10a1b6d035d988166a2a327dcb3bfc1b0eaff"
+      },
+      {
+        "source_id": "taskus.source.fy2025",
+        "url": "https://ir.taskus.com/static-files/bfe52a66-744f-4a64-a49f-d32bcd94d4d1",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Checked FY2025 group and AI Services revenue and net income in the annual report.",
+        "content_sha256": "03b92a6c03247ab5941a53afb2d310c985eb60d495e97948ffc70ddacf1bcf5f"
+      },
+      {
+        "source_id": "taskus.source.q2slides",
+        "url": "https://ir.taskus.com/static-files/70ebd544-0f80-4c46-b19e-aa02099f2f9a",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Checked AI Services H1 2026 revenue of $128.044M, H1 2025 revenue of $98.023M, and trailing-year revenue of $244.239M.",
+        "content_sha256": "51489e0cfa67504ca71986632b3750a54a17a164677a5c3edf70d1c3ab4e16f5"
+      },
+      {
+        "source_id": "mercor.source.oct14-88dab2271689",
+        "url": "https://www.felicis.com/blog/mercor-profile-organizing-human-intelligence-to-power-the-ai-economy",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Investor profile says September 2025 run rate $500M, March 2026 $1B and June 2026 $2B; payouts are more than $4M daily. These are investor-published company statements.",
+        "content_sha256": "acb11433f3f66600de9c03f998b6cd83f695cc27f0a8a342d7dfd38fd7a5f131"
+      },
+      {
+        "source_id": "taskus.refresh.q3-schedule",
+        "url": "https://ir.taskus.com/news-releases/news-release-details/taskus-inc-announce-third-quarter-2026-financial-results",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "content_sha256": "03a37e5f36f6be67afe02a35eb4ddc828816278a056c48a608e54ff3ab708fd6",
+        "note": "Issuer notice published 21 October schedules Q3 2026 results for 4 November. No Q3 financial results are inferred."
+      }
+    ]
   },
   "observations": [
     {
@@ -194,7 +411,8 @@
       "scope_detail": "Whole company",
       "cohort": "FY2025 · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "FY2025 · USD · Whole company · Gross/net undisclosed",
-      "cohort_key": "period_revenue|annual|2025|2025-12-31|USD|company|unspecified"
+      "cohort_key": "period_revenue|annual|2025|2025-12-31|USD|company|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "appen.metric.major-financial_metrics-6",
@@ -228,14 +446,15 @@
       "basis": "Revenue and other income of $120.776M is a different line.",
       "limitations": "Revenue and other income of $120.776M is a different line.",
       "original_text": "Revenue from contracts with customers: 119,915,000 USD. Period: H1 2026 (January–June).",
-      "evidence_assurance": "Reviewed public company interim",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "USD",
       "is_context": false,
       "scope_label": "Whole company",
       "scope_detail": "Whole company",
       "cohort": "H1 2026 · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "H1 2026 · USD · Whole company · Gross/net undisclosed",
-      "cohort_key": "period_revenue|half_year|2026|2026-06-30|USD|company|unspecified"
+      "cohort_key": "period_revenue|half_year|2026|2026-06-30|USD|company|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.metric.expansion-0",
@@ -317,7 +536,8 @@
       "scope_detail": "TaskUs consolidated group; not AI Services alone",
       "cohort": "FY2024 · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "FY2024 · USD · Whole company · Gross/net undisclosed",
-      "cohort_key": "period_revenue|annual|2024|2024-12-31|USD|company|unspecified"
+      "cohort_key": "period_revenue|annual|2024|2024-12-31|USD|company|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.metric.expansion-2",
@@ -399,7 +619,8 @@
       "scope_detail": "AI Services service line",
       "cohort": "FY2024 · USD · AI business / service line · Gross/net undisclosed",
       "cohort_label": "FY2024 · USD · AI business / service line · Gross/net undisclosed",
-      "cohort_key": "period_revenue|annual|2024|2024-12-31|USD|ai_data|unspecified"
+      "cohort_key": "period_revenue|annual|2024|2024-12-31|USD|ai_data|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.metric.expansion-4",
@@ -440,7 +661,8 @@
       "scope_detail": "AI Services service line",
       "cohort": "FY2023 · USD · AI business / service line · Gross/net undisclosed",
       "cohort_label": "FY2023 · USD · AI business / service line · Gross/net undisclosed",
-      "cohort_key": "period_revenue|annual|2023|2023-12-31|USD|ai_data|unspecified"
+      "cohort_key": "period_revenue|annual|2023|2023-12-31|USD|ai_data|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.metric.expansion-8",
@@ -474,14 +696,15 @@
       "basis": "Half-year revenue: 128,044,000 USD. Six months ended 2026-06-30.",
       "limitations": "Definitions, dates and scope are specific to the cited source; disclosure is not independent verification.",
       "original_text": "Half-year revenue: 128,044,000 USD. Six months ended 2026-06-30.",
-      "evidence_assurance": "Issuer-reported; unaudited investor presentation",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "USD",
       "is_context": false,
       "scope_label": "AI business / service line",
       "scope_detail": "AI Services service line",
       "cohort": "H1 2026 · USD · AI business / service line · Gross/net undisclosed",
       "cohort_label": "H1 2026 · USD · AI business / service line · Gross/net undisclosed",
-      "cohort_key": "period_revenue|half_year|2026|2026-06-30|USD|ai_data|unspecified"
+      "cohort_key": "period_revenue|half_year|2026|2026-06-30|USD|ai_data|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.metric.expansion-9",
@@ -515,14 +738,15 @@
       "basis": "Half-year revenue: 98,023,000 USD. Six months ended 2025-06-30.",
       "limitations": "Definitions, dates and scope are specific to the cited source; disclosure is not independent verification.",
       "original_text": "Half-year revenue: 98,023,000 USD. Six months ended 2025-06-30.",
-      "evidence_assurance": "Issuer-reported; unaudited investor presentation",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "USD",
       "is_context": false,
       "scope_label": "AI business / service line",
       "scope_detail": "AI Services service line",
       "cohort": "H1 2025 · USD · AI business / service line · Gross/net undisclosed",
       "cohort_label": "H1 2025 · USD · AI business / service line · Gross/net undisclosed",
-      "cohort_key": "period_revenue|half_year|2025|2025-06-30|USD|ai_data|unspecified"
+      "cohort_key": "period_revenue|half_year|2025|2025-06-30|USD|ai_data|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.metric.expansion-10",
@@ -556,14 +780,15 @@
       "basis": "Trailing twelve-month revenue: 244,239,000 USD. Twelve months ended 2026-06-30.",
       "limitations": "Definitions, dates and scope are specific to the cited source; disclosure is not independent verification.",
       "original_text": "Trailing twelve-month revenue: 244,239,000 USD. Twelve months ended 2026-06-30.",
-      "evidence_assurance": "Issuer-reported; unaudited investor presentation",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "USD",
       "is_context": false,
       "scope_label": "AI business / service line",
       "scope_detail": "AI Services service line",
       "cohort": "TTM to 30 Jun 2026 · USD · AI business / service line · Gross/net undisclosed",
       "cohort_label": "TTM to 30 Jun 2026 · USD · AI business / service line · Gross/net undisclosed",
-      "cohort_key": "period_revenue|trailing_year|2026|2026-06-30|USD|ai_data|unspecified"
+      "cohort_key": "period_revenue|trailing_year|2026|2026-06-30|USD|ai_data|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "scale_ai.metric.major-growth_metrics-0",
@@ -604,7 +829,8 @@
       "scope_detail": "Whole company",
       "cohort": "FY2024 · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "FY2024 · USD · Whole company · Gross/net undisclosed",
-      "cohort_key": "period_revenue|annual|2024|2024-12-31|USD|company|unspecified"
+      "cohort_key": "period_revenue|annual|2024|2024-12-31|USD|company|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "surge_ai.metric.oct14-major-financial-0",
@@ -645,7 +871,8 @@
       "scope_detail": "Whole company",
       "cohort": "FY2024 · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "FY2024 · USD · Whole company · Gross/net undisclosed",
-      "cohort_key": "period_revenue|annual|2024|2024-12-31|USD|company|unspecified"
+      "cohort_key": "period_revenue|annual|2024|2024-12-31|USD|company|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "invisible.metric.major-financial_metrics-0",
@@ -927,14 +1154,15 @@
       "basis": "Six months ended March 31, 2026: RWS group actual revenue £360.3m, +5% reported; adjusted EBITDA £45.7m; reported pre-tax loss £9.5m; net debt £32.5m. Group figures, not TrainAI revenues.",
       "limitations": "Definitions, dates and scope are specific to the cited source; disclosure is not independent verification.",
       "original_text": "Six months ended March 31, 2026: RWS group actual revenue £360.3m, +5% reported; adjusted EBITDA £45.7m; reported pre-tax loss £9.5m; net debt £32.5m. Group figures, not TrainAI revenues.",
-      "evidence_assurance": "Graded by the researchers as independent or buyer-side evidence.",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "GBP",
       "is_context": false,
       "scope_label": "Whole company",
       "scope_detail": "RWS parent group; not standalone TrainAI",
       "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · Gross/net undisclosed",
       "cohort_label": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · Gross/net undisclosed",
-      "cohort_key": "period_revenue|half_year|2026|2026-03-31|GBP|company|unspecified"
+      "cohort_key": "period_revenue|half_year|2026|2026-03-31|GBP|company|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "rws_trainai.claim.growth_metrics-1.metric-0",
@@ -968,14 +1196,15 @@
       "basis": "Generate segment revenue £99.4m, +44.7% reported (+52% organic constant currency), includes TrainAI and Content Technology. Not all segment revenue is TrainAI. Filing credits exceptional TrainAI activity and new client revenue; no standalone amount.",
       "limitations": "Generate includes both TrainAI and Content Technology. Standalone TrainAI revenue is not disclosed.",
       "original_text": "Generate segment revenue £99.4m, +44.7% reported (+52% organic constant currency), includes TrainAI and Content Technology. Not all segment revenue is TrainAI. Filing credits exceptional TrainAI activity and new client revenue; no standalone amount.",
-      "evidence_assurance": "Graded by the researchers as independent or buyer-side evidence.",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "GBP",
       "is_context": false,
       "scope_label": "Other or mixed segment",
       "scope_detail": "Generate: TrainAI + Content Technology",
       "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Other or mixed segment · Gross/net undisclosed",
       "cohort_label": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Other or mixed segment · Gross/net undisclosed",
-      "cohort_key": "period_revenue|half_year|2026|2026-03-31|GBP|other_segment|unspecified"
+      "cohort_key": "period_revenue|half_year|2026|2026-03-31|GBP|other_segment|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "mercor.metric.major-growth_metrics-1",
@@ -1016,7 +1245,8 @@
       "scope_detail": "AI business / service line",
       "cohort": "H1 2026 · USD · AI business / service line · Gross before delivery payouts",
       "cohort_label": "H1 2026 · USD · AI business / service line · Gross before delivery payouts",
-      "cohort_key": "period_revenue|half_year|2026|2026-06-30|USD|ai_data|gross"
+      "cohort_key": "period_revenue|half_year|2026|2026-06-30|USD|ai_data|gross",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "mercor.metric.oct14-major-financial-2",
@@ -1054,7 +1284,8 @@
       "scope_detail": "Whole company",
       "cohort": "Annualized snapshots · USD · Whole company · Gross before delivery payouts",
       "cohort_label": "Annualized snapshots · USD · Whole company · Gross before delivery payouts",
-      "cohort_key": "annualized_revenue|run_rate|||USD|company|gross"
+      "cohort_key": "annualized_revenue|run_rate|||USD|company|gross",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "mercor.metric.major-growth_metrics-2",
@@ -1092,7 +1323,8 @@
       "scope_detail": "AI business / service line",
       "cohort": "Annualized snapshots · USD · AI business / service line · Gross/net undisclosed",
       "cohort_label": "Annualized snapshots · USD · AI business / service line · Gross/net undisclosed",
-      "cohort_key": "annualized_revenue|run_rate|||USD|ai_data|unspecified"
+      "cohort_key": "annualized_revenue|run_rate|||USD|ai_data|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "mercor.metric.major-growth_metrics-3",
@@ -1130,7 +1362,8 @@
       "scope_detail": "AI business / service line",
       "cohort": "Annualized snapshots · USD · AI business / service line · Gross/net undisclosed",
       "cohort_label": "Annualized snapshots · USD · AI business / service line · Gross/net undisclosed",
-      "cohort_key": "annualized_revenue|run_rate|||USD|ai_data|unspecified"
+      "cohort_key": "annualized_revenue|run_rate|||USD|ai_data|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "handshake_ai.metric.major-growth_metrics-0",
@@ -1141,10 +1374,10 @@
       "value": 1000000000,
       "unit": "currency",
       "qualifier": "nearly",
-      "as_of": "2026-04-23",
+      "as_of": "2026-04-14",
       "period": {
         "type": "run_rate",
-        "label": "2026-04-23"
+        "label": "2026-04-14"
       },
       "scope": "ai_data",
       "accounting_basis": "gross",
@@ -1161,14 +1394,16 @@
       "basis": "Gross before contractor payments.",
       "limitations": "Gross before contractor payments. Annualized snapshot, not completed-year revenue or proven subscription ARR.",
       "original_text": "Nearly $1B AI gross annualized revenue.",
-      "evidence_assurance": "Attributed primary-source evidence",
+      "evidence_assurance": "Secondary reporting; unaudited",
       "currency": "USD",
       "is_context": false,
       "scope_label": "AI business / service line",
       "scope_detail": "Handshake AI business; excludes campus recruiting",
       "cohort": "Annualized snapshots · USD · AI business / service line · Gross before delivery payouts",
       "cohort_label": "Annualized snapshots · USD · AI business / service line · Gross before delivery payouts",
-      "cohort_key": "annualized_revenue|run_rate|||USD|ai_data|gross"
+      "cohort_key": "annualized_revenue|run_rate|||USD|ai_data|gross",
+      "evidence_checked_on": "2026-10-28",
+      "normalization": "Article date corrected to 14 April 2026 after reading the source. The earlier record used 23 April."
     },
     {
       "id": "micro1.metric.oct14-q3-run-rate",
@@ -1206,7 +1441,8 @@
       "scope_detail": "Whole company",
       "cohort": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
-      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified"
+      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "micro1.metric.major-growth_metrics-0",
@@ -1282,7 +1518,8 @@
       "scope_detail": "AI business / service line",
       "cohort": "Annualized snapshots · USD · AI business / service line · Gross before delivery payouts",
       "cohort_label": "Annualized snapshots · USD · AI business / service line · Gross before delivery payouts",
-      "cohort_key": "annualized_revenue|run_rate|||USD|ai_data|gross"
+      "cohort_key": "annualized_revenue|run_rate|||USD|ai_data|gross",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "snorkel_ai.metric.major-growth_metrics-0",
@@ -1359,7 +1596,8 @@
       "scope_detail": "Whole company",
       "cohort": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
-      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified"
+      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "proximal.metric.oct14-0-revenue-run-rate",
@@ -1397,7 +1635,8 @@
       "scope_detail": "Whole company",
       "cohort": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
-      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified"
+      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "prime_intellect.metric.audit-pi-run-rate",
@@ -1464,7 +1703,7 @@
         "prolific.source.audit-f1a6aacb51"
       ],
       "basis": "Previous-month threshold reported in CEO post; not subscription ARR, not full-year realized revenue. Date inferred from post activity timestamp.",
-      "limitations": "Definitions, dates and scope are specific to the cited source; disclosure is not independent verification. Annualized snapshot, not completed-year revenue or proven subscription ARR. Calendar month is inferred from a CEO post, not an exact observation date.",
+      "limitations": "Definitions, dates and scope are specific to the cited source; disclosure is not independent verification. Annualized snapshot, not completed-year revenue or proven subscription ARR. Calendar month is inferred from a CEO post, not an exact observation date. The cited page could not be re-read on 28 October 2026; this figure retains its earlier source review.",
       "original_text": "CEO Phelim Bradley reported that Prolific had crossed $300M annualized revenue in the previous month and completed a $10M revenue week. He separately projected $500M annualized revenue by end-May and said cumulative participant payouts exceeded $500M. The target is a forecast; payouts are neither revenue nor funding.",
       "evidence_assurance": "CEO-reported operating figures; unaudited",
       "currency": "USD",
@@ -1473,7 +1712,8 @@
       "scope_detail": "Prolific platform; includes research outside AI data",
       "cohort": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
-      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified"
+      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified",
+      "refresh_status": "source_unavailable"
     },
     {
       "id": "turing.metric.major-growth_metrics-1",
@@ -1502,7 +1742,7 @@
         "turing.source.oct14-6d7f270a4e05"
       ],
       "basis": "The primary company release says annual revenue run rate.",
-      "limitations": "The primary company release says annual revenue run rate. Annualized snapshot, not completed-year revenue or proven subscription ARR.",
+      "limitations": "The primary company release says annual revenue run rate. Annualized snapshot, not completed-year revenue or proven subscription ARR. The cited page could not be re-read on 28 October 2026; this figure retains its earlier source review.",
       "original_text": "$300M revenue run rate. The primary company release says annual revenue run rate.",
       "evidence_assurance": "Company-reported",
       "currency": "USD",
@@ -1511,7 +1751,8 @@
       "scope_detail": "Whole company",
       "cohort": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
-      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified"
+      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified",
+      "refresh_status": "source_unavailable"
     },
     {
       "id": "a-team.claim.growth_metrics-2.metric-0",
@@ -1589,7 +1830,8 @@
       "scope_detail": "Whole company",
       "cohort": "FY2025 · percent · Whole company · reported period revenue",
       "cohort_label": "FY2025 · percent · Whole company · reported period revenue",
-      "cohort_key": "revenue_growth_yoy|annual|2025|2025-12-31||company|reported_period_revenue"
+      "cohort_key": "revenue_growth_yoy|annual|2025|2025-12-31||company|reported_period_revenue",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "appen.metric.major-growth_metrics-5",
@@ -1623,13 +1865,14 @@
       "basis": "Revenue growth: 17.5 percent YoY. Period: H1 2026.",
       "limitations": "Definitions, dates and scope are specific to the cited source; disclosure is not independent verification.",
       "original_text": "Revenue growth: 17.5 percent YoY. Period: H1 2026.",
-      "evidence_assurance": "Attributed public statement",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "is_context": false,
       "scope_label": "Whole company",
       "scope_detail": "Whole company",
       "cohort": "H1 2026 · percent · Whole company · reported period revenue",
       "cohort_label": "H1 2026 · percent · Whole company · reported period revenue",
-      "cohort_key": "revenue_growth_yoy|half_year|2026|2026-06-30||company|reported_period_revenue"
+      "cohort_key": "revenue_growth_yoy|half_year|2026|2026-06-30||company|reported_period_revenue",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.metric.expansion-5",
@@ -1669,7 +1912,8 @@
       "scope_detail": "AI Services service line",
       "cohort": "FY2025 · percent · AI business / service line · reported period revenue",
       "cohort_label": "FY2025 · percent · AI business / service line · reported period revenue",
-      "cohort_key": "revenue_growth_yoy|annual|2025|2025-12-31||ai_data|reported_period_revenue"
+      "cohort_key": "revenue_growth_yoy|annual|2025|2025-12-31||ai_data|reported_period_revenue",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "dashboard.taskus.ai-h1-2026-revenue-growth",
@@ -1717,7 +1961,9 @@
       "scope_detail": "AI Services service line",
       "cohort": "H1 2026 · percent · AI business / service line · Gross/net undisclosed",
       "cohort_label": "H1 2026 · percent · AI business / service line · Gross/net undisclosed",
-      "cohort_key": "revenue_growth_yoy|half_year|2026|2026-06-30||ai_data|unspecified"
+      "cohort_key": "revenue_growth_yoy|half_year|2026|2026-06-30||ai_data|unspecified",
+      "evidence_checked_on": "2026-10-28",
+      "evidence_assurance": "Interim company reporting; unaudited"
     },
     {
       "id": "dashboard.taskus.group-fy2025-revenue-growth",
@@ -1851,14 +2097,15 @@
       "basis": "Statutory net profit after tax: -4,454,000 USD. Period: H1 2026.",
       "limitations": "Definitions, dates and scope are specific to the cited source; disclosure is not independent verification.",
       "original_text": "Statutory net profit after tax: -4,454,000 USD. Period: H1 2026.",
-      "evidence_assurance": "Reviewed public company interim",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "USD",
       "is_context": false,
       "scope_label": "Whole company",
       "scope_detail": "Whole company",
       "cohort": "H1 2026 · USD · Whole company · statutory net income",
       "cohort_label": "H1 2026 · USD · Whole company · statutory net income",
-      "cohort_key": "net_income|half_year|2026|2026-06-30|USD|company|statutory_net_income"
+      "cohort_key": "net_income|half_year|2026|2026-06-30|USD|company|statutory_net_income",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "appen.metric.major-financial_metrics-10",
@@ -1892,14 +2139,15 @@
       "basis": "Underlying EBITDA before FX: 5,336,000 USD. Period: H1 2026.",
       "limitations": "Definitions, dates and scope are specific to the cited source; disclosure is not independent verification.",
       "original_text": "Underlying EBITDA before FX: 5,336,000 USD. Period: H1 2026.",
-      "evidence_assurance": "Attributed public statement",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "USD",
       "is_context": false,
       "scope_label": "Whole company",
       "scope_detail": "Whole company",
       "cohort": "H1 2026 · USD · Whole company · underlying ebitda before fx",
       "cohort_label": "H1 2026 · USD · Whole company · underlying ebitda before fx",
-      "cohort_key": "adjusted_ebitda|half_year|2026|2026-06-30|USD|company|underlying_ebitda_before_fx"
+      "cohort_key": "adjusted_ebitda|half_year|2026|2026-06-30|USD|company|underlying_ebitda_before_fx",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "appen.metric.major-financial_metrics-5",
@@ -1940,7 +2188,8 @@
       "scope_detail": "Whole company",
       "cohort": "FY2025 · USD · Whole company · underlying ebitda before fx",
       "cohort_label": "FY2025 · USD · Whole company · underlying ebitda before fx",
-      "cohort_key": "adjusted_ebitda|annual|2025|2025-12-31|USD|company|underlying_ebitda_before_fx"
+      "cohort_key": "adjusted_ebitda|annual|2025|2025-12-31|USD|company|underlying_ebitda_before_fx",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.metric.expansion-6",
@@ -1981,7 +2230,8 @@
       "scope_detail": "TaskUs consolidated group; not AI Services alone",
       "cohort": "FY2025 · USD · Whole company · us gaap net income",
       "cohort_label": "FY2025 · USD · Whole company · us gaap net income",
-      "cohort_key": "net_income|annual|2025|2025-12-31|USD|company|us_gaap_net_income"
+      "cohort_key": "net_income|annual|2025|2025-12-31|USD|company|us_gaap_net_income",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "toloka.metric.major-financial_metrics-5",
@@ -2070,7 +2320,9 @@
       "scope_detail": "Whole company",
       "cohort": "H1 2026 · percent · Whole company · statutory net income",
       "cohort_label": "H1 2026 · percent · Whole company · statutory net income",
-      "cohort_key": "net_margin|half_year|2026|2026-06-30||company|statutory_net_income"
+      "cohort_key": "net_margin|half_year|2026|2026-06-30||company|statutory_net_income",
+      "evidence_checked_on": "2026-10-28",
+      "evidence_assurance": "Interim company reporting; unaudited"
     },
     {
       "id": "dashboard.taskus.fy2025-net-margin",
@@ -2168,7 +2420,9 @@
       "scope_detail": "Whole company",
       "cohort": "H1 2026 · percent · Whole company · underlying ebitda before fx",
       "cohort_label": "H1 2026 · percent · Whole company · underlying ebitda before fx",
-      "cohort_key": "adjusted_ebitda_margin|half_year|2026|2026-06-30||company|underlying_ebitda_before_fx"
+      "cohort_key": "adjusted_ebitda_margin|half_year|2026|2026-06-30||company|underlying_ebitda_before_fx",
+      "evidence_checked_on": "2026-10-28",
+      "evidence_assurance": "Interim company reporting; unaudited"
     },
     {
       "id": "dashboard.rws.h1-2026-gross-margin",
@@ -2200,13 +2454,14 @@
       "basis": "Parsed directly from the reviewed H1 FY2026 margin-context claim.",
       "limitations": "Group margin, not TrainAI margin. Declined 1.7 percentage points; faster-growing TrainAI work was described as lower margin.",
       "original_text": "H1 FY2026 group gross margin was 41.6%, down 1.7 percentage points. The filing attributes the mix effect partly to faster growth in lower-margin TrainAI work.\nCaveat: This supports the warning against treating data-services revenue as SaaS economics. It does not disclose a standalone TrainAI margin.",
-      "evidence_assurance": "Unaudited regulatory reporting. RWS H1 FY2026 reporting and management commentary supply group margin and mix explanation; no separate TrainAI margin is given.",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "is_context": false,
       "scope_label": "Whole company",
       "scope_detail": "RWS parent group; not standalone TrainAI",
       "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · percent · Whole company · group gross margin",
       "cohort_label": "H1 FY2026 · Oct 2025–Mar 2026 · percent · Whole company · group gross margin",
-      "cohort_key": "gross_margin|half_year|2026|2026-03-31||company|group_gross_margin"
+      "cohort_key": "gross_margin|half_year|2026|2026-03-31||company|group_gross_margin",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "dashboard.rws.h1-2026-adjusted-ebitda",
@@ -2238,14 +2493,15 @@
       "basis": "Amount parsed from the reviewed group half-year results claim.",
       "limitations": "Group-wide adjusted EBITDA; not statutory profit or TrainAI standalone economics.",
       "original_text": "Six months ended March 31, 2026: RWS group actual revenue £360.3m, +5% reported; adjusted EBITDA £45.7m; reported pre-tax loss £9.5m; net debt £32.5m. Group figures, not TrainAI revenues.",
-      "evidence_assurance": "Graded by the researchers as independent or buyer-side evidence.",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "GBP",
       "is_context": false,
       "scope_label": "Whole company",
       "scope_detail": "RWS parent group; not standalone TrainAI",
       "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · adjusted ebitda",
       "cohort_label": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · adjusted ebitda",
-      "cohort_key": "adjusted_ebitda|half_year|2026|2026-03-31|GBP|company|adjusted_ebitda"
+      "cohort_key": "adjusted_ebitda|half_year|2026|2026-03-31|GBP|company|adjusted_ebitda",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "dashboard.rws.h1-2026-pretax-income",
@@ -2277,14 +2533,15 @@
       "basis": "Reported pre-tax loss parsed from the reviewed group half-year results claim.",
       "limitations": "Pre-tax loss differs from net income after tax and from adjusted EBITDA. Group, not TrainAI.",
       "original_text": "Six months ended March 31, 2026: RWS group actual revenue £360.3m, +5% reported; adjusted EBITDA £45.7m; reported pre-tax loss £9.5m; net debt £32.5m. Group figures, not TrainAI revenues.",
-      "evidence_assurance": "Graded by the researchers as independent or buyer-side evidence.",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "GBP",
       "is_context": false,
       "scope_label": "Whole company",
       "scope_detail": "RWS parent group; not standalone TrainAI",
       "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · reported pretax income",
       "cohort_label": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · reported pretax income",
-      "cohort_key": "pretax_income|half_year|2026|2026-03-31|GBP|company|reported_pretax_income"
+      "cohort_key": "pretax_income|half_year|2026|2026-03-31|GBP|company|reported_pretax_income",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "dashboard.labelbox.claim.major-financial_metrics-3",
@@ -2393,7 +2650,8 @@
       "scope_detail": "AI business / service line",
       "cohort": "FY2024 · statement · AI business / service line · Source-defined measure",
       "cohort_label": "FY2024 · statement · AI business / service line · Source-defined measure",
-      "cohort_key": "profitability_statement|annual|2024|2024-12-31||ai_data|not_applicable"
+      "cohort_key": "profitability_statement|annual|2024|2024-12-31||ai_data|not_applicable",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "dashboard.afterquery.claim.round2-financial-signal-2",
@@ -2470,7 +2728,8 @@
       "scope_detail": "TaskUs consolidated group; not AI Services alone",
       "cohort": "FY2025 · percent · Whole company · company defined nrr",
       "cohort_label": "FY2025 · percent · Whole company · company defined nrr",
-      "cohort_key": "net_revenue_retention|annual|2025|2025-12-31||company|company_defined_nrr"
+      "cohort_key": "net_revenue_retention|annual|2025|2025-12-31||company|company_defined_nrr",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "appen.metric.major-growth_metrics-8",
@@ -2504,13 +2763,14 @@
       "basis": "Top-five customer revenue concentration: 67.9 percent. Period: H1 2026.",
       "limitations": "Concentration measures dependence, not customer satisfaction. Top-five and largest-customer shares are different metrics.",
       "original_text": "Top-five customer revenue concentration: 67.9 percent. Period: H1 2026.",
-      "evidence_assurance": "Attributed public statement",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "is_context": false,
       "scope_label": "Whole company",
       "scope_detail": "Whole company",
       "cohort": "H1 2026 · percent · Whole company · revenue concentration",
       "cohort_label": "H1 2026 · percent · Whole company · revenue concentration",
-      "cohort_key": "top_five_customer_share|half_year|2026|2026-06-30||company|revenue_concentration"
+      "cohort_key": "top_five_customer_share|half_year|2026|2026-06-30||company|revenue_concentration",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.metric.expansion-13",
@@ -2547,7 +2807,8 @@
       "scope_detail": "TaskUs consolidated group; not AI Services alone",
       "cohort": "Dated snapshots · count · Whole company · Gross/net undisclosed",
       "cohort_label": "Dated snapshots · count · Whole company · Gross/net undisclosed",
-      "cohort_key": "customer_count|snapshot|undated|||company|unspecified"
+      "cohort_key": "customer_count|snapshot|undated|||company|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "prime_intellect.metric.audit-pi-customers",
@@ -2771,7 +3032,8 @@
       "scope_detail": "AI business / service line",
       "cohort": "21 Jul 2026 snapshot · USD · AI business / service line · Gross/net undisclosed",
       "cohort_label": "21 Jul 2026 snapshot · USD · AI business / service line · Gross/net undisclosed",
-      "cohort_key": "daily_expert_payouts|daily|2026||USD|ai_data|unspecified"
+      "cohort_key": "daily_expert_payouts|daily|2026||USD|ai_data|unspecified",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "terac.metric.audit-terac-payout",
@@ -2878,7 +3140,7 @@
         "prolific.source.audit-f1a6aacb51"
       ],
       "basis": "Lifetime payments to participants; not annual revenue, funding or active-worker count.",
-      "limitations": "CEO-reported lifetime payments; participant work includes research beyond specialist AI data. Calendar month inferred from post timestamp.",
+      "limitations": "CEO-reported lifetime payments; participant work includes research beyond specialist AI data. Calendar month inferred from post timestamp. The cited page could not be re-read on 28 October 2026; this figure retains its earlier source review.",
       "original_text": "CEO Phelim Bradley reported that Prolific had crossed $300M annualized revenue in the previous month and completed a $10M revenue week. He separately projected $500M annualized revenue by end-May and said cumulative participant payouts exceeded $500M. The target is a forecast; payouts are neither revenue nor funding.",
       "evidence_assurance": "CEO-reported operating figures; unaudited",
       "currency": "USD",
@@ -2887,7 +3149,8 @@
       "scope_detail": "Prolific platform; includes research outside AI data",
       "cohort": "To May 2026 · month inferred · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "To May 2026 · month inferred · USD · Whole company · Gross/net undisclosed",
-      "cohort_key": "cumulative_expert_payouts|cumulative|2026||USD|company|unspecified"
+      "cohort_key": "cumulative_expert_payouts|cumulative|2026||USD|company|unspecified",
+      "refresh_status": "source_unavailable"
     },
     {
       "id": "g2i.metric.audit-g2i-payout",
@@ -3511,14 +3774,15 @@
       "basis": "Cash and cash equivalents: 44,705,000 USD. Period: 2026-06-30.",
       "limitations": "Balance-sheet cash is not runway. Operating cash flow, restrictions, debt and future burn are needed before estimating runway.",
       "original_text": "Cash and cash equivalents: 44,705,000 USD. Period: 2026-06-30.",
-      "evidence_assurance": "Attributed public statement",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "USD",
       "is_context": false,
       "scope_label": "Whole company",
       "scope_detail": "Whole company",
       "cohort": "Dated snapshots · USD · Whole company · cash and equivalents",
       "cohort_label": "Dated snapshots · USD · Whole company · cash and equivalents",
-      "cohort_key": "cash_balance|snapshot|2026|2026-06-30|USD|company|cash_and_equivalents"
+      "cohort_key": "cash_balance|snapshot|2026|2026-06-30|USD|company|cash_and_equivalents",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "dashboard.rws.h1-2026-net-debt",
@@ -3549,14 +3813,15 @@
       "basis": "Net debt parsed from the reviewed RWS group half-year claim.",
       "limitations": "Net debt is debt less qualifying cash under the issuer definition. It is not gross cash, cash burn or runway; group, not TrainAI.",
       "original_text": "Six months ended March 31, 2026: RWS group actual revenue £360.3m, +5% reported; adjusted EBITDA £45.7m; reported pre-tax loss £9.5m; net debt £32.5m. Group figures, not TrainAI revenues.",
-      "evidence_assurance": "Graded by the researchers as independent or buyer-side evidence.",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "GBP",
       "is_context": false,
       "scope_label": "Whole company",
       "scope_detail": "RWS parent group; not standalone TrainAI",
       "cohort": "Dated snapshots · GBP · Whole company · net debt",
       "cohort_label": "Dated snapshots · GBP · Whole company · net debt",
-      "cohort_key": "net_debt|snapshot|2026|2026-03-31|GBP|company|net_debt"
+      "cohort_key": "net_debt|snapshot|2026|2026-03-31|GBP|company|net_debt",
+      "evidence_checked_on": "2026-10-28"
     },
     {
       "id": "proximal.claim.growth_metrics-1.metric-0",
@@ -3920,13 +4185,477 @@
       "basis": "Headcount: 63,200 people. As of 2026-06-30. Teammates, not all data annotators or all full-time employees.",
       "limitations": "Cost-base context only. Dated payroll, employer/directory snapshots and teammates have different definitions; excludes unknown contractor labor. Headcount is not growth, efficiency or cash runway.",
       "original_text": "Headcount: 63,200 people. As of 2026-06-30. Teammates, not all data annotators or all full-time employees.",
-      "evidence_assurance": "Issuer-reported; unaudited quarterly results",
+      "evidence_assurance": "Interim company reporting; unaudited",
       "is_context": true,
       "scope_label": "Whole company",
       "scope_detail": "TaskUs consolidated group; not AI Services alone",
       "cohort": "Dated snapshots · people · Whole company · Gross/net undisclosed",
       "cohort_label": "Dated snapshots · people · Whole company · Gross/net undisclosed",
-      "cohort_key": "team_size|snapshot|undated|||company|unspecified"
+      "cohort_key": "team_size|snapshot|undated|||company|unspecified",
+      "evidence_checked_on": "2026-10-28"
+    },
+    {
+      "id": "refresh.taskus.h1-2026-group-revenue",
+      "company_id": "taskus",
+      "signal": "revenue",
+      "label": "Service revenue",
+      "qualifier": "exact",
+      "as_of": "H1 2026",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.taskus.h1-2026-group-revenue.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "basis": "Service revenue of USD 615,121,000 for H1 2026 (January–June).",
+      "limitations": "Whole-company figure; it does not isolate AI-data delivery economics. Interim financial reporting is unaudited.",
+      "original_text": "Service revenue $ 308,855 $ 294,086 $ 615,121 $ 571,878",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "Whole company",
+      "evidence_checked_on": "2026-10-28",
+      "measure": "period_revenue",
+      "value": 615121000,
+      "unit": "currency",
+      "currency": "USD",
+      "period": {
+        "type": "half_year",
+        "label": "H1 2026",
+        "year": 2026,
+        "start": "2026-01-01",
+        "end": "2026-06-30"
+      },
+      "scope": "company",
+      "accounting_basis": "unspecified",
+      "cohort": "H1 2026 · USD · Whole company · Gross/net undisclosed",
+      "cohort_label": "H1 2026 · USD · Whole company · Gross/net undisclosed",
+      "cohort_key": "period_revenue|half_year|2026|2026-06-30|USD|company|unspecified",
+      "source_locator": "Condensed consolidated statements of income; USD thousands; six months ended 30 June 2026 column"
+    },
+    {
+      "id": "refresh.taskus.h1-2025-group-revenue",
+      "company_id": "taskus",
+      "signal": "revenue",
+      "label": "Service revenue",
+      "qualifier": "exact",
+      "as_of": "H1 2025",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.taskus.h1-2025-group-revenue.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "basis": "Service revenue of USD 571,878,000 for H1 2025 (January–June).",
+      "limitations": "Whole-company figure; it does not isolate AI-data delivery economics. Interim financial reporting is unaudited.",
+      "original_text": "Service revenue $ 308,855 $ 294,086 $ 615,121 $ 571,878",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "Whole company",
+      "evidence_checked_on": "2026-10-28",
+      "measure": "period_revenue",
+      "value": 571878000,
+      "unit": "currency",
+      "currency": "USD",
+      "period": {
+        "type": "half_year",
+        "label": "H1 2025",
+        "year": 2025,
+        "start": "2025-01-01",
+        "end": "2025-06-30"
+      },
+      "scope": "company",
+      "accounting_basis": "unspecified",
+      "cohort": "H1 2025 · USD · Whole company · Gross/net undisclosed",
+      "cohort_label": "H1 2025 · USD · Whole company · Gross/net undisclosed",
+      "cohort_key": "period_revenue|half_year|2025|2025-06-30|USD|company|unspecified",
+      "source_locator": "Condensed consolidated statements of income; USD thousands; six months ended 30 June 2025 comparative column"
+    },
+    {
+      "id": "refresh.taskus.h1-2026-net-income",
+      "company_id": "taskus",
+      "signal": "profit",
+      "label": "Net income",
+      "qualifier": "exact",
+      "as_of": "H1 2026",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.taskus.h1-2026-net-income.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "basis": "Net income of USD 46,301,000 for H1 2026 (January–June).",
+      "limitations": "Whole-company figure; it does not isolate AI-data delivery economics. Interim financial reporting is unaudited.",
+      "original_text": "Net income $ 21,969 $ 20,047 $ 46,301 $ 41,195",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "Whole company",
+      "evidence_checked_on": "2026-10-28",
+      "measure": "net_income",
+      "value": 46301000,
+      "unit": "currency",
+      "currency": "USD",
+      "period": {
+        "type": "half_year",
+        "label": "H1 2026",
+        "year": 2026,
+        "start": "2026-01-01",
+        "end": "2026-06-30"
+      },
+      "scope": "company",
+      "accounting_basis": "reported",
+      "cohort": "H1 2026 (January–June) · USD · Whole company · Reported",
+      "cohort_label": "H1 2026 (January–June) · USD · Whole company · Reported",
+      "cohort_key": "net_income|half_year|2026|2026-06-30|USD|company|reported",
+      "source_locator": "Condensed consolidated statements of income; USD thousands; six months ended 30 June 2026 column"
+    },
+    {
+      "id": "refresh.taskus.june-2026-cash",
+      "company_id": "taskus",
+      "signal": "cash",
+      "label": "Cash and cash equivalents",
+      "qualifier": "exact",
+      "as_of": "2026-06-30",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.taskus.june-2026-cash.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "basis": "Cash and cash equivalents of USD 180,298,000 for 2026-06-30.",
+      "limitations": "Whole-company figure; it does not isolate AI-data delivery economics. Interim financial reporting is unaudited.",
+      "original_text": "Cash and cash equivalents $ 180,298 $ 211,676",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "Whole company",
+      "evidence_checked_on": "2026-10-28",
+      "measure": "cash_balance",
+      "value": 180298000,
+      "unit": "currency",
+      "currency": "USD",
+      "period": {
+        "type": "snapshot",
+        "label": "2026-06-30",
+        "year": 2026,
+        "end": "2026-06-30"
+      },
+      "scope": "company",
+      "accounting_basis": "reported",
+      "cohort": "2026-06-30 · USD · Whole company · Reported",
+      "cohort_label": "2026-06-30 · USD · Whole company · Reported",
+      "cohort_key": "cash_balance|snapshot|2026|2026-06-30|USD|company|reported",
+      "source_locator": "Condensed consolidated balance sheets; USD thousands; 30 June 2026 column"
+    },
+    {
+      "id": "refresh.taskus.h1-2026-operating-cash",
+      "company_id": "taskus",
+      "signal": "cash",
+      "label": "Net operating cash flow",
+      "qualifier": "exact",
+      "as_of": "H1 2026",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.taskus.h1-2026-operating-cash.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "basis": "Net operating cash flow of USD 89,412,000 for H1 2026 (January–June).",
+      "limitations": "Whole-company figure; it does not isolate AI-data delivery economics. Interim financial reporting is unaudited.",
+      "original_text": "Net cash provided by operating activities 89,412 53,285",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "Whole company",
+      "evidence_checked_on": "2026-10-28",
+      "measure": "operating_cash_flow",
+      "value": 89412000,
+      "unit": "currency",
+      "currency": "USD",
+      "period": {
+        "type": "half_year",
+        "label": "H1 2026",
+        "year": 2026,
+        "start": "2026-01-01",
+        "end": "2026-06-30"
+      },
+      "scope": "company",
+      "accounting_basis": "reported",
+      "cohort": "H1 2026 (January–June) · USD · Whole company · Reported",
+      "cohort_label": "H1 2026 (January–June) · USD · Whole company · Reported",
+      "cohort_key": "operating_cash_flow|half_year|2026|2026-06-30|USD|company|reported",
+      "source_locator": "Condensed consolidated statements of cash flows; USD thousands; six months ended 30 June 2026 column"
+    },
+    {
+      "id": "refresh.taskus.h1-2026-free-cash",
+      "company_id": "taskus",
+      "signal": "cash",
+      "label": "Free cash flow",
+      "qualifier": "exact",
+      "as_of": "H1 2026",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.taskus.h1-2026-free-cash.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "basis": "Free cash flow of USD 68,705,000 for H1 2026 (January–June).",
+      "limitations": "Issuer-defined non-GAAP free cash flow: operating cash flow less purchases of property and equipment. Whole-company figure, not adjusted free cash flow or AI-only cash flow.",
+      "original_text": "Free Cash Flow $ 32,606 $ 38 $ 68,705 $ 21,834",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "Whole company",
+      "evidence_checked_on": "2026-10-28",
+      "measure": "free_cash_flow",
+      "value": 68705000,
+      "unit": "currency",
+      "currency": "USD",
+      "period": {
+        "type": "half_year",
+        "label": "H1 2026",
+        "year": 2026,
+        "start": "2026-01-01",
+        "end": "2026-06-30"
+      },
+      "scope": "company",
+      "accounting_basis": "non_gaap",
+      "cohort": "H1 2026 (January–June) · USD · Whole company · Reported",
+      "cohort_label": "H1 2026 (January–June) · USD · Whole company · Reported",
+      "cohort_key": "free_cash_flow|half_year|2026|2026-06-30|USD|company|non_gaap",
+      "source_locator": "Non-GAAP free cash flow reconciliation; USD thousands; six months ended 30 June 2026 column"
+    },
+    {
+      "id": "refresh.appen.h1-2026-operating-cash",
+      "company_id": "appen",
+      "signal": "cash",
+      "label": "Net operating cash flow",
+      "qualifier": "exact",
+      "as_of": "H1 2026",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.appen.h1-2026-operating-cash.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "appen.source.audit-ap_h1_2026"
+      ],
+      "basis": "Net operating cash flow of USD -4,146,000 for H1 2026 (January–June).",
+      "limitations": "Whole-company figure; it does not isolate AI-data delivery economics. Interim financial reporting is unaudited.",
+      "original_text": "Net cash (used in) / from operating activities (4,146) 13,153",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "Whole company",
+      "evidence_checked_on": "2026-10-28",
+      "measure": "operating_cash_flow",
+      "value": -4146000,
+      "unit": "currency",
+      "currency": "USD",
+      "period": {
+        "type": "half_year",
+        "label": "H1 2026",
+        "year": 2026,
+        "start": "2026-01-01",
+        "end": "2026-06-30"
+      },
+      "scope": "company",
+      "accounting_basis": "reported",
+      "cohort": "H1 2026 (January–June) · USD · Whole company · Reported",
+      "cohort_label": "H1 2026 (January–June) · USD · Whole company · Reported",
+      "cohort_key": "operating_cash_flow|half_year|2026|2026-06-30|USD|company|reported",
+      "source_locator": "Page 11, consolidated statement of cash flows; USD thousands; 30 June 2026 column"
+    },
+    {
+      "id": "refresh.rws_trainai.h1-2026-operating-cash",
+      "company_id": "rws_trainai",
+      "signal": "cash",
+      "label": "Net operating cash flow",
+      "qualifier": "exact",
+      "as_of": "H1 FY2026 · Oct 2025–Mar 2026",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.rws_trainai.h1-2026-operating-cash.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "rws_trainai.source.d_rws4"
+      ],
+      "basis": "Net operating cash flow of GBP 21,500,000 for H1 FY2026 · Oct 2025–Mar 2026.",
+      "limitations": "Consolidated RWS group; TrainAI cash and profit are not separately disclosed. Interim financial reporting is unaudited.",
+      "original_text": "Net cash inflow from operating activities 21.5 37.2",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "RWS consolidated group, including language services and technology",
+      "evidence_checked_on": "2026-10-28",
+      "measure": "operating_cash_flow",
+      "value": 21500000,
+      "unit": "currency",
+      "currency": "GBP",
+      "period": {
+        "type": "half_year",
+        "label": "H1 FY2026 · Oct 2025–Mar 2026",
+        "year": 2026,
+        "start": "2025-10-01",
+        "end": "2026-03-31"
+      },
+      "scope": "company",
+      "accounting_basis": "reported",
+      "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · Reported",
+      "cohort_label": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · Reported",
+      "cohort_key": "operating_cash_flow|half_year|2026|2026-03-31|GBP|company|reported",
+      "source_locator": "Condensed consolidated cash flow statement; GBP millions; six months ended 31 March 2026 column"
+    },
+    {
+      "id": "refresh.rws_trainai.march-2026-cash",
+      "company_id": "rws_trainai",
+      "signal": "cash",
+      "label": "Cash and cash equivalents",
+      "qualifier": "exact",
+      "as_of": "2026-03-31",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.rws_trainai.march-2026-cash.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "rws_trainai.source.d_rws4"
+      ],
+      "basis": "Cash and cash equivalents of GBP 33,700,000 for 2026-03-31.",
+      "limitations": "Consolidated RWS group; TrainAI cash and profit are not separately disclosed. Interim financial reporting is unaudited.",
+      "original_text": "Cash and cash equivalents at the end of the period 8 33.7 69.5",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "RWS consolidated group, including language services and technology",
+      "evidence_checked_on": "2026-10-28",
+      "measure": "cash_balance",
+      "value": 33700000,
+      "unit": "currency",
+      "currency": "GBP",
+      "period": {
+        "type": "snapshot",
+        "label": "2026-03-31",
+        "year": 2026,
+        "end": "2026-03-31"
+      },
+      "scope": "company",
+      "accounting_basis": "reported",
+      "cohort": "2026-03-31 · GBP · Whole company · Reported",
+      "cohort_label": "2026-03-31 · GBP · Whole company · Reported",
+      "cohort_key": "cash_balance|snapshot|2026|2026-03-31|GBP|company|reported",
+      "source_locator": "Condensed consolidated cash flow statement; GBP millions; six months ended 31 March 2026 column"
+    },
+    {
+      "id": "refresh.taskus.h1-2026-revenue_growth_yoy",
+      "company_id": "taskus",
+      "signal": "revenue",
+      "label": "Revenue growth",
+      "qualifier": "exact",
+      "as_of": "H1 2026",
+      "evidence_type": "calculated",
+      "claim_ids": [
+        "refresh.taskus.h1-2026-group-revenue.claim",
+        "refresh.taskus.h1-2025-group-revenue.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "basis": "Calculated from the same-scope six-month figures in the interim financial statements.",
+      "limitations": "Whole-company figure; it does not isolate AI-data delivery economics. Interim financial reporting is unaudited.",
+      "original_text": "Service revenue $ 308,855 $ 294,086 $ 615,121 $ 571,878\nService revenue $ 308,855 $ 294,086 $ 615,121 $ 571,878",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "Whole company",
+      "evidence_checked_on": "2026-10-28",
+      "measure": "revenue_growth_yoy",
+      "value": 7.561577819045318,
+      "unit": "percent",
+      "currency": "USD",
+      "period": {
+        "type": "half_year",
+        "label": "H1 2026",
+        "year": 2026,
+        "start": "2026-01-01",
+        "end": "2026-06-30"
+      },
+      "scope": "company",
+      "accounting_basis": "calculated",
+      "cohort": "H1 2026 (January–June) · Whole company · Calculated",
+      "cohort_label": "H1 2026 (January–June) · Whole company · Calculated",
+      "cohort_key": "revenue_growth_yoy|half_year|2026|2026-06-30|USD|company|calculated",
+      "calculation": {
+        "formula": "(current / baseline - 1) * 100",
+        "input_observation_ids": [
+          "refresh.taskus.h1-2026-group-revenue",
+          "refresh.taskus.h1-2025-group-revenue"
+        ]
+      }
+    },
+    {
+      "id": "refresh.taskus.h1-2026-net_margin",
+      "company_id": "taskus",
+      "signal": "profit",
+      "label": "Net margin",
+      "qualifier": "exact",
+      "as_of": "H1 2026",
+      "evidence_type": "calculated",
+      "claim_ids": [
+        "refresh.taskus.h1-2026-net-income.claim",
+        "refresh.taskus.h1-2026-group-revenue.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "basis": "Calculated from the same-scope six-month figures in the interim financial statements.",
+      "limitations": "Whole-company figure; it does not isolate AI-data delivery economics. Interim financial reporting is unaudited.",
+      "original_text": "Net income $ 21,969 $ 20,047 $ 46,301 $ 41,195\nService revenue $ 308,855 $ 294,086 $ 615,121 $ 571,878",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "Whole company",
+      "evidence_checked_on": "2026-10-28",
+      "measure": "net_margin",
+      "value": 7.52713693728551,
+      "unit": "percent",
+      "currency": "USD",
+      "period": {
+        "type": "half_year",
+        "label": "H1 2026",
+        "year": 2026,
+        "start": "2026-01-01",
+        "end": "2026-06-30"
+      },
+      "scope": "company",
+      "accounting_basis": "calculated",
+      "cohort": "H1 2026 (January–June) · Whole company · Calculated",
+      "cohort_label": "H1 2026 (January–June) · Whole company · Calculated",
+      "cohort_key": "net_margin|half_year|2026|2026-06-30|USD|company|calculated",
+      "calculation": {
+        "formula": "net income / revenue * 100",
+        "input_observation_ids": [
+          "refresh.taskus.h1-2026-net-income",
+          "refresh.taskus.h1-2026-group-revenue"
+        ]
+      }
     }
   ],
   "measure_definitions": [
@@ -4076,6 +4805,20 @@
       "label": "Reported team size",
       "unit": "people",
       "note": "Employee, teammate and directory snapshots are cost/capacity context, not a health ranking."
+    },
+    {
+      "id": "operating_cash_flow",
+      "signal": "cash",
+      "label": "Net operating cash flow",
+      "unit": "currency",
+      "note": "Net cash from operating activities as reported; working-capital movements affect the result."
+    },
+    {
+      "id": "free_cash_flow",
+      "signal": "cash",
+      "label": "Free cash flow",
+      "unit": "currency",
+      "note": "Issuer-defined non-GAAP cash flow; definitions may differ. Kept separate from adjusted free cash flow."
     }
   ],
   "sources": [
@@ -4132,7 +4875,10 @@
       "publisher": "AfterQuery",
       "source_type": "company",
       "accessed_on": "2026-10-14",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "appen.source.audit-ap_2023",
@@ -4160,7 +4906,10 @@
       "source_type": "filing",
       "published_on": "2026-02-25",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "appen.source.audit-ap_h1_2026",
@@ -4170,7 +4919,10 @@
       "source_type": "filing",
       "published_on": "2026-08-27",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "appen.source.oct14-eeca86cfae44",
@@ -4179,7 +4931,10 @@
       "publisher": "cdn.prod.website-files.com",
       "source_type": "filing",
       "accessed_on": "2026-10-14",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "apto.source.oct14-62780bc97df6",
@@ -4260,7 +5015,10 @@
       "publisher": "dealroom.co",
       "source_type": "database",
       "accessed_on": "2026-10-14",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "imerit.source.audit-im-home",
@@ -4365,7 +5123,10 @@
       "source_type": "investor",
       "published_on": "2026-07-21",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "mercor.source.audit-m6",
@@ -4374,7 +5135,10 @@
       "publisher": "sacra.com",
       "source_type": "independent_reporting",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "mercor.source.oct14-88dab2271689",
@@ -4383,7 +5147,10 @@
       "publisher": "www.felicis.com",
       "source_type": "investor",
       "accessed_on": "2026-10-14",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "micro1.source.audit-u1",
@@ -4403,7 +5170,10 @@
       "source_type": "independent_reporting",
       "published_on": "2026-08-20",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "micro1.source.oct14-19eb5016dbc6",
@@ -4413,7 +5183,10 @@
       "source_type": "company",
       "published_on": "2026-10-12",
       "accessed_on": "2026-10-14",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "ooak.source.ooak-2",
@@ -4450,7 +5223,9 @@
       "publisher": "www.prolific.com",
       "source_type": "company",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "available_not_rechecked"
     },
     {
       "id": "prolific.source.audit-f1a6aacb51",
@@ -4459,7 +5234,9 @@
       "publisher": "www.linkedin.com",
       "source_type": "company",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "unavailable"
     },
     {
       "id": "prolific.source.oct14-c6d6a9d99551",
@@ -4487,7 +5264,10 @@
       "publisher": "www.proximal.ai",
       "source_type": "company",
       "accessed_on": "2026-10-14",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "rws_trainai.source.d_rws4",
@@ -4497,7 +5277,10 @@
       "source_type": "filing",
       "published_on": "2026-06-11",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "rws_trainai.source.oct14-13fae6ad835a",
@@ -4515,7 +5298,10 @@
       "publisher": "www.aol.com",
       "source_type": "independent_reporting",
       "accessed_on": "2026-10-14",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "snorkel_ai.source.audit-s5",
@@ -4535,7 +5321,10 @@
       "source_type": "company",
       "published_on": "2026-09-22",
       "accessed_on": "2026-10-14",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "surge_ai.source.audit-381ee9c6d1",
@@ -4554,7 +5343,10 @@
       "source_type": "independent_reporting",
       "published_on": "2025-07-01",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "summary_only"
+      "retrieval_status": "summary_only",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "surge_ai.source.oct14-891cd0d871ee",
@@ -4563,7 +5355,10 @@
       "publisher": "www.aol.com",
       "source_type": "independent_reporting",
       "accessed_on": "2026-10-14",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.source.fy2025",
@@ -4573,7 +5368,10 @@
       "source_type": "filing",
       "published_on": "2026-03-05",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.source.fyrelease",
@@ -4583,7 +5381,10 @@
       "source_type": "other",
       "published_on": "2026-03-05",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.source.oct14-af5dd6eee71b",
@@ -4602,7 +5403,10 @@
       "source_type": "filing",
       "published_on": "2026-08-05",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "taskus.source.q2slides",
@@ -4612,7 +5416,10 @@
       "source_type": "filing",
       "published_on": "2026-08-05",
       "accessed_on": "2026-10-12",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "content_checked",
+      "content_checked_on": "2026-10-28"
     },
     {
       "id": "terac.source.oct14-212d67d8f64a",
@@ -4687,7 +5494,270 @@
       "publisher": "markets.financialcontent.com",
       "source_type": "company",
       "accessed_on": "2026-10-14",
-      "retrieval_status": "checked"
+      "retrieval_status": "checked",
+      "last_check_on": "2026-10-28",
+      "last_check_status": "unavailable"
+    }
+  ],
+  "fresh_claims": [
+    {
+      "id": "refresh.taskus.h1-2026-group-revenue.claim",
+      "company_id": "taskus",
+      "status": "supported",
+      "statement": "Service revenue of USD 615,121,000 for H1 2026 (January–June).",
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Interim company reporting; unaudited",
+      "excerpt": "Service revenue $ 308,855 $ 294,086 $ 615,121 $ 571,878",
+      "source_locator": "Condensed consolidated statements of income; USD thousands; six months ended 30 June 2026 column",
+      "fact": {
+        "measure": "period_revenue",
+        "value": 615121000,
+        "unit": "currency",
+        "currency": "USD",
+        "period": {
+          "type": "half_year",
+          "label": "H1 2026",
+          "year": 2026,
+          "start": "2026-01-01",
+          "end": "2026-06-30"
+        },
+        "scope": "company",
+        "accounting_basis": "unspecified"
+      }
+    },
+    {
+      "id": "refresh.taskus.h1-2025-group-revenue.claim",
+      "company_id": "taskus",
+      "status": "supported",
+      "statement": "Service revenue of USD 571,878,000 for H1 2025 (January–June).",
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Interim company reporting; unaudited",
+      "excerpt": "Service revenue $ 308,855 $ 294,086 $ 615,121 $ 571,878",
+      "source_locator": "Condensed consolidated statements of income; USD thousands; six months ended 30 June 2025 comparative column",
+      "fact": {
+        "measure": "period_revenue",
+        "value": 571878000,
+        "unit": "currency",
+        "currency": "USD",
+        "period": {
+          "type": "half_year",
+          "label": "H1 2025",
+          "year": 2025,
+          "start": "2025-01-01",
+          "end": "2025-06-30"
+        },
+        "scope": "company",
+        "accounting_basis": "unspecified"
+      }
+    },
+    {
+      "id": "refresh.taskus.h1-2026-net-income.claim",
+      "company_id": "taskus",
+      "status": "supported",
+      "statement": "Net income of USD 46,301,000 for H1 2026 (January–June).",
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Interim company reporting; unaudited",
+      "excerpt": "Net income $ 21,969 $ 20,047 $ 46,301 $ 41,195",
+      "source_locator": "Condensed consolidated statements of income; USD thousands; six months ended 30 June 2026 column",
+      "fact": {
+        "measure": "net_income",
+        "value": 46301000,
+        "unit": "currency",
+        "currency": "USD",
+        "period": {
+          "type": "half_year",
+          "label": "H1 2026",
+          "year": 2026,
+          "start": "2026-01-01",
+          "end": "2026-06-30"
+        },
+        "scope": "company",
+        "accounting_basis": "reported"
+      }
+    },
+    {
+      "id": "refresh.taskus.june-2026-cash.claim",
+      "company_id": "taskus",
+      "status": "supported",
+      "statement": "Cash and cash equivalents of USD 180,298,000 for 2026-06-30.",
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Interim company reporting; unaudited",
+      "excerpt": "Cash and cash equivalents $ 180,298 $ 211,676",
+      "source_locator": "Condensed consolidated balance sheets; USD thousands; 30 June 2026 column",
+      "fact": {
+        "measure": "cash_balance",
+        "value": 180298000,
+        "unit": "currency",
+        "currency": "USD",
+        "period": {
+          "type": "snapshot",
+          "label": "2026-06-30",
+          "year": 2026,
+          "end": "2026-06-30"
+        },
+        "scope": "company",
+        "accounting_basis": "reported"
+      }
+    },
+    {
+      "id": "refresh.taskus.h1-2026-operating-cash.claim",
+      "company_id": "taskus",
+      "status": "supported",
+      "statement": "Net operating cash flow of USD 89,412,000 for H1 2026 (January–June).",
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Interim company reporting; unaudited",
+      "excerpt": "Net cash provided by operating activities 89,412 53,285",
+      "source_locator": "Condensed consolidated statements of cash flows; USD thousands; six months ended 30 June 2026 column",
+      "fact": {
+        "measure": "operating_cash_flow",
+        "value": 89412000,
+        "unit": "currency",
+        "currency": "USD",
+        "period": {
+          "type": "half_year",
+          "label": "H1 2026",
+          "year": 2026,
+          "start": "2026-01-01",
+          "end": "2026-06-30"
+        },
+        "scope": "company",
+        "accounting_basis": "reported"
+      }
+    },
+    {
+      "id": "refresh.taskus.h1-2026-free-cash.claim",
+      "company_id": "taskus",
+      "status": "supported",
+      "statement": "Free cash flow of USD 68,705,000 for H1 2026 (January–June).",
+      "source_ids": [
+        "taskus.source.q22026"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Interim company reporting; unaudited",
+      "excerpt": "Free Cash Flow $ 32,606 $ 38 $ 68,705 $ 21,834",
+      "source_locator": "Non-GAAP free cash flow reconciliation; USD thousands; six months ended 30 June 2026 column",
+      "fact": {
+        "measure": "free_cash_flow",
+        "value": 68705000,
+        "unit": "currency",
+        "currency": "USD",
+        "period": {
+          "type": "half_year",
+          "label": "H1 2026",
+          "year": 2026,
+          "start": "2026-01-01",
+          "end": "2026-06-30"
+        },
+        "scope": "company",
+        "accounting_basis": "non_gaap"
+      }
+    },
+    {
+      "id": "refresh.appen.h1-2026-operating-cash.claim",
+      "company_id": "appen",
+      "status": "supported",
+      "statement": "Net operating cash flow of USD -4,146,000 for H1 2026 (January–June).",
+      "source_ids": [
+        "appen.source.audit-ap_h1_2026"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Interim company reporting; unaudited",
+      "excerpt": "Net cash (used in) / from operating activities (4,146) 13,153",
+      "source_locator": "Page 11, consolidated statement of cash flows; USD thousands; 30 June 2026 column",
+      "fact": {
+        "measure": "operating_cash_flow",
+        "value": -4146000,
+        "unit": "currency",
+        "currency": "USD",
+        "period": {
+          "type": "half_year",
+          "label": "H1 2026",
+          "year": 2026,
+          "start": "2026-01-01",
+          "end": "2026-06-30"
+        },
+        "scope": "company",
+        "accounting_basis": "reported"
+      }
+    },
+    {
+      "id": "refresh.rws_trainai.h1-2026-operating-cash.claim",
+      "company_id": "rws_trainai",
+      "status": "supported",
+      "statement": "Net operating cash flow of GBP 21,500,000 for H1 FY2026 · Oct 2025–Mar 2026.",
+      "source_ids": [
+        "rws_trainai.source.d_rws4"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Interim company reporting; unaudited",
+      "excerpt": "Net cash inflow from operating activities 21.5 37.2",
+      "source_locator": "Condensed consolidated cash flow statement; GBP millions; six months ended 31 March 2026 column",
+      "fact": {
+        "measure": "operating_cash_flow",
+        "value": 21500000,
+        "unit": "currency",
+        "currency": "GBP",
+        "period": {
+          "type": "half_year",
+          "label": "H1 FY2026 · Oct 2025–Mar 2026",
+          "year": 2026,
+          "start": "2025-10-01",
+          "end": "2026-03-31"
+        },
+        "scope": "company",
+        "accounting_basis": "reported"
+      }
+    },
+    {
+      "id": "refresh.rws_trainai.march-2026-cash.claim",
+      "company_id": "rws_trainai",
+      "status": "supported",
+      "statement": "Cash and cash equivalents of GBP 33,700,000 for 2026-03-31.",
+      "source_ids": [
+        "rws_trainai.source.d_rws4"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Interim company reporting; unaudited",
+      "excerpt": "Cash and cash equivalents at the end of the period 8 33.7 69.5",
+      "source_locator": "Condensed consolidated cash flow statement; GBP millions; six months ended 31 March 2026 column",
+      "fact": {
+        "measure": "cash_balance",
+        "value": 33700000,
+        "unit": "currency",
+        "currency": "GBP",
+        "period": {
+          "type": "snapshot",
+          "label": "2026-03-31",
+          "year": 2026,
+          "end": "2026-03-31"
+        },
+        "scope": "company",
+        "accounting_basis": "reported"
+      }
     }
   ]
 }

@@ -30,6 +30,7 @@ class BusinessHealthTests(unittest.TestCase):
         cls.observations = cls.health["observations"]
         cls.companies = {row["id"]: row for row in cls.data["companies"]}
         cls.claims = {row["id"]: row for row in cls.data["claims"]}
+        cls.claims.update({row["id"]: row for row in cls.health.get("fresh_claims", [])})
         cls.metrics = {row["id"]: row for row in cls.data["metrics"]}
         cls.sources = {row["id"]: row for row in cls.data["sources"]}
 
@@ -145,6 +146,17 @@ class BusinessHealthTests(unittest.TestCase):
         baseline_id = derived["calculation"]["input_observation_ids"][1]
         next(row for row in bad["observations"] if row["id"] == baseline_id)["period"]["end"] = "2025-03-31"
         mutations.append(("mismatched growth period", bad))
+        bad = copy.deepcopy(self.health)
+        fresh_id = bad["fresh_claims"][0]["id"]
+        next(row for row in bad["observations"] if fresh_id in row["claim_ids"])["value"] += 1
+        mutations.append(("fresh value differs from source fact", bad))
+        bad = copy.deepcopy(self.health)
+        source_id = bad["fresh_claims"][0]["source_ids"][0]
+        next(entry for entry in bad["source_checks"]["entries"] if entry["source_id"] == source_id)["status"] = "unavailable"
+        mutations.append(("fresh claim relies on failed retrieval", bad))
+        bad = copy.deepcopy(self.health)
+        bad["fresh_claims"][0]["id"] = self.data["claims"][0]["id"]
+        mutations.append(("fresh claim overrides canonical history", bad))
         for name, value in mutations:
             with self.subTest(mutation=name), self.assertRaises(ValueError):
                 load(value)

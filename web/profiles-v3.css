@@ -9,8 +9,8 @@
 
 /* One grid for intro, products and relationships. */
 @media(min-width:701px){
-.profile-business-intro,.profile-business-layout:not(.has-case) .offering-card,.profile-v2 .relationship-card{max-width:none;grid-template-columns:minmax(160px,1fr) minmax(0,2fr) 4.5rem;gap:24px}
-.profile-business-layout:not(.has-case) .offering-card .profile-card-source,.relationship-card .profile-card-source{grid-column:3;grid-row:1;justify-self:end}
+.profile-business-intro,.profile-business-layout:not(.has-case) .offering-card,.profile-v2 .relationship-card{max-width:none;grid-template-columns:minmax(160px,1fr) minmax(0,2fr) 160px;gap:24px}
+.profile-business-layout:not(.has-case) .offering-card .profile-card-source,.relationship-card .profile-card-source{grid-column:3;grid-row:1;justify-self:stretch}
 }
 
 .profile-category-link{display:inline-flex;align-items:center;gap:6px;align-self:start;margin:3px 0 0;min-height:24px;color:var(--green);text-decoration:none}
@@ -60,4 +60,38 @@
 #evidence-content>.evidence-metric-context .evidence-metric-value{font-size:22px}
 /* Phone tap targets: the back link, the header links and the small links under each profile are 44px tall. */
 .profile-v2 .profile-back,.profile-v2 .profile-links a,.profile-category-link,.profile-correction a,.profile-peers-all,.evidence-correction a{min-height:44px}
+}
+
+/* The business tab starts with the two facts visitors most often need. */
+.profile-at-a-glance{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px;background:var(--pale);border:1px solid var(--border);border-radius:6px;padding:22px 24px;margin:0 0 32px}
+.profile-at-a-glance .eyebrow{display:block;margin-bottom:12px;font-size:11px}
+.profile-glance-metric .row-number{justify-content:flex-start;flex-wrap:wrap;gap:8px}
+.profile-glance-metric .number-button{font-size:30px;line-height:1.2;letter-spacing:-.7px}
+.profile-glance-metric .row-number>span{font-size:13px}
+.profile-glance-metric .row-period{display:block;margin-top:7px;white-space:normal;font-size:12px;line-height:1.6;color:var(--muted)}
+.profile-glance-work{border-left:1px solid var(--border);padding-left:24px}
+.profile-glance-work p{font-size:16px;line-height:1.5;margin:0 0 8px}
+.profile-glance-work>a{font-size:13px;display:inline-flex;align-items:center;gap:5px;min-height:32px}
+.profile-at-a-glance .unavailable{display:block;font-size:20px}
+@media(max-width:700px){
+ .profile-at-a-glance{grid-template-columns:1fr;gap:20px;padding:20px;margin-bottom:24px}
+ .profile-glance-work{border-left:0;border-top:1px solid var(--border);padding:16px 0 0}
+ .profile-glance-work>a{min-height:44px}
+ .profile-glance-metric .number-button{font-size:28px}
+}
+.historical-profile-metric{border:1px solid var(--border);padding:14px 18px;border-radius:5px;margin-bottom:16px}
+.historical-profile-metric>summary{cursor:pointer;color:var(--muted);font-size:14px;line-height:1.6;min-height:30px}
+.historical-profile-metric .profile-scale-observation{border-top:0;margin-bottom:0}
+.historical-profile-metric .scale-number,.historical-profile-metric .scale-number button{font-size:30px;color:var(--muted)}
+@media(max-width:700px){.historical-profile-metric>summary{min-height:44px}}
+
+/* Citation metadata needs a readable measure, with a full row on smaller screens. */
+.profile-v2 .offering-card .profile-card-source{min-width:0;font-size:12px;line-height:1.55}
+.profile-v2 .offering-card .profile-card-source>a{font-size:13px;line-height:1.5}
+@media(max-width:900px){
+ .profile-v2 .offering-card{grid-template-columns:minmax(0,1fr)}
+ .profile-v2 .offering-card .offering-title{grid-column:1;grid-row:1}
+ .profile-v2 .offering-card .offering-description{grid-column:1;grid-row:2}
+ .profile-v2 .offering-card .profile-card-source{grid-column:1;grid-row:3;justify-self:stretch;display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 16px}
+ .profile-v2 .offering-card .profile-card-source details[open]{flex-basis:100%}
 }

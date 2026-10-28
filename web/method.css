@@ -92,3 +92,15 @@
 .coverage-stats li{grid-template-columns:62px minmax(0,1fr)}
 }
 @media(max-width:380px){.correction-email a{font-size:16px}}
+
+.method-principles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:0 0 40px;padding:24px;background:#edf1eb;border:1px solid var(--border);border-radius:8px}
+.method-principles article{min-width:0}
+.method-principles span{font-size:11px;letter-spacing:1px;color:var(--green);font-weight:600}
+.method-principles h2{font-size:21px;margin:10px 0}
+.method-principles p{font-size:14px;line-height:1.6;margin:0;color:var(--muted)}
+.method-assessment{border-top:1px solid var(--border);margin-top:24px;padding-top:12px}
+.method-assessment>summary{padding:10px 0;font-weight:600;cursor:pointer;color:var(--green)}
+@media(max-width:700px){.method-principles{grid-template-columns:1fr;gap:24px;padding:20px}.method-principles h2{font-size:20px;margin:6px 0}.method-principles p{font-size:14px}}
+.review-update{margin:0 0 22px;padding:18px 22px;border-left:3px solid var(--green);background:#f0f3ed;font-size:14px;line-height:1.6}
+.review-update strong{color:var(--green);font-size:13px}
+.review-update p{margin:5px 0 0;color:var(--muted)}

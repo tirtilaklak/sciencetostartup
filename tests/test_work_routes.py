@@ -30,6 +30,34 @@ class WorkRouteValidationTests(unittest.TestCase):
         self.assertIn("laude.claim.worker_opportunities-1", related["claim_ids"])
         self.assertEqual(related["related_company_ids"], ["laude"])
 
+    def test_refresh_distinguishes_content_review_from_link_reachability(self):
+        receipt = self.work["verification"]
+        routes = self.work["routes"]
+        checked_on = receipt["checked_on"]
+        self.assertEqual(receipt["routes_link_checked"], len(routes))
+        content = link_only = blocked = terms = 0
+        for route in routes:
+            check = route["last_link_check"]
+            self.assertEqual(check["date"], checked_on)
+            self.assertRegex(check["response_sha256"], r"^[a-f0-9]{64}$")
+            if check.get("content_reviewed"):
+                content += 1
+                self.assertEqual(route["last_route_check"]["date"], checked_on)
+                self.assertTrue(any(source.get("accessed_on") == checked_on
+                                    and source["url"] == route["url"]
+                                    for source in route["sources"]))
+            elif check["result"] == "reachable":
+                link_only += 1
+            elif check["result"] == "blocked":
+                blocked += 1
+            if route.get("terms_checked_on") == checked_on:
+                terms += 1
+                self.assertTrue(check.get("content_reviewed"), route["id"])
+        self.assertEqual((content, link_only, blocked, terms),
+                         (receipt["listing_content_reviewed"], receipt["link_only"],
+                          receipt["blocked"], receipt["pay_terms_reviewed"]))
+        self.assertEqual(content + link_only + blocked, len(routes))
+
     def test_bad_sidecar_fails_before_destination_is_created(self):
         unknown = copy.deepcopy(self.work)
         unknown["routes"][0]["claim_ids"].append("missing-claim")

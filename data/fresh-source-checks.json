@@ -1,0 +1,221 @@
+{
+  "checked_on": "2026-10-28",
+  "scope": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results are scheduled for 4 November.",
+  "entries": [
+    {
+      "source_id": "appen.source.audit-ap_2025",
+      "url": "https://announcements.asx.com.au/asxpdf/20260225/pdf/06wq7806yk1ll4.pdf",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read the FY2025 annual report; $230.8M revenue and $12.2M underlying EBITDA before FX.",
+      "content_sha256": "03c798760ee0f37eb206dcb9d31aac774a65a98d973cf8370e1404e060465123"
+    },
+    {
+      "source_id": "appen.source.audit-ap_h1_2026",
+      "url": "https://cdn.financialreports.eu/financialreports/media/filings/64403/2026/RNS/64403_rns_2026-08-26_f02948b4-b58e-4caf-b147-419f335f3abf.pdf",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read H1 2026 statements: revenue $119.915M, net loss $4.454M, cash $44.705M, operating cash outflow $4.146M; top-five customers account for 67.9% of revenue.",
+      "content_sha256": "1bb82a6d4db4970bf46d5fdc04885a2de96c4974359781edfa2323aa5a85754c"
+    },
+    {
+      "source_id": "mercor.source.audit-audit_m18",
+      "url": "https://www.felicis.com/blog/mercor-profile-organizing-human-intelligence-to-power-the-ai-economy",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Investor profile says September 2025 run rate $500M, March 2026 $1B and June 2026 $2B; payouts are more than $4M daily. These are investor-published company statements.",
+      "content_sha256": "acb11433f3f66600de9c03f998b6cd83f695cc27f0a8a342d7dfd38fd7a5f131"
+    },
+    {
+      "source_id": "micro1.source.oct14-19eb5016dbc6",
+      "url": "https://www.micro1.ai/blog/q3",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Company post dated 12 October 2026 says annual run rate surpassed $1B. It is a company-reported pace, not realized annual sales.",
+      "content_sha256": "b990205be7e4f47eacbe534ab8ad23a411ab8c5806f8dfb266273c973f905a1c"
+    },
+    {
+      "source_id": "rws_trainai.source.d_rws4",
+      "url": "https://www.rws.com/media/images/RWS-HY26-Results-Statement-Final-260610_tcm228-298858.pdf",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read H1 FY2026 group statements: revenue £360.3M, gross margin 41.6%, pre-tax loss £9.5M, net operating cash inflow £21.5M and cash £33.7M. Period ends 31 March 2026; figures cover RWS, not TrainAI alone.",
+      "content_sha256": "0d535de82ded90c4679f488417a9ccf64426fd98c805b48d8b78cea55af1a473"
+    },
+    {
+      "source_id": "surge_ai.source.b_sg4",
+      "url": "https://www.aol.com/exclusive-scale-ais-bigger-rival-152327362.html",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read Reuters story dated 1 July 2025: prior-year Surge revenue over $1B and Scale $870M. These remain historical FY2024 figures.",
+      "content_sha256": "434ff633dffa71d49d106cd4a19bcd25f8b76b0e2a784985ba3e51a8a4c6e4d5"
+    },
+    {
+      "source_id": "taskus.source.fyrelease",
+      "url": "https://ir.taskus.com/news-releases/news-release-details/taskus-announces-fiscal-fourth-quarter-and-full-year-2025",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read reported FY2025 results and the 113% net revenue retention disclosure.",
+      "content_sha256": "41b681ac5c1fd9a558f8136f5a1bc7fac280a219f11eaf015dad1c2ebd45053c"
+    },
+    {
+      "source_id": "taskus.source.q22026",
+      "url": "https://ir.taskus.com/news-releases/news-release-details/taskus-announces-fiscal-second-quarter-2026-results",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read the six-month income statement, balance sheet and cash-flow tables; amounts are USD thousands and the interim statements are unaudited.",
+      "content_sha256": "af3d73c9372fcecdca07556b504f22db8f3f1a1afe76c5fe3ccf74c0dfae94d2"
+    },
+    {
+      "source_id": "turing.source.oct14-6d7f270a4e05",
+      "url": "https://markets.financialcontent.com/wss/article/bizwire-2025-1-28-turing-annual-revenue-runrate-nearly-triples-to-300m-in-profitable-year-as-company-sets-stage-for-agi-advancements-in-2025",
+      "checked_on": "2026-10-28",
+      "http_status": 301,
+      "status": "unavailable",
+      "note": "The source did not return readable content in this check. Historical evidence is retained with the failed refresh disclosed.",
+      "error": "curl: (47) Maximum (50) redirects followed\n"
+    },
+    {
+      "source_id": "afterquery.source.round2-funding",
+      "url": "https://www.afterquery.com/blog/human-expertise-reimagined",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Company post states revenue run rate surpassed $100M. This confirms the older company disclosure, not later independent reporting.",
+      "content_sha256": "152f663d228460a3c8a8e2709016196f29269f79b31a1b3d1b84ddcb3dda4ece"
+    },
+    {
+      "source_id": "appen.source.oct14-eeca86cfae44",
+      "url": "https://cdn.prod.website-files.com/656a605609413dfd3feb9d34/699fbc072974a573b2b7a48c_Appen%20Annual%20Report%202025.pdf",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read the company-hosted annual report; FY2025 revenue is $230.8M. Growth excluding Google differs from the whole-company comparison.",
+      "content_sha256": "93d65cd1fff04294c7847f20d6577b7073c5964bb78df7101e5ff44554657b38"
+    },
+    {
+      "source_id": "handshake_ai.source.oct14-e0de0f3911dc",
+      "url": "https://dealroom.co/news/127345-handshakes-arr-crosses-1b-as-ai-training-revenue-surges/",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Article is dated 14 April 2026, not 23 April. It reports nearly $1B gross annualized AI revenue, before contractor payments. Corrected the dashboard observation date.",
+      "content_sha256": "20a2b3331f5bf02caf512a43e4715b40b13749cba3f64ebb0e44797a1abcda00"
+    },
+    {
+      "source_id": "mercor.source.audit-m6",
+      "url": "https://sacra.com/c/mercor/",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read Sacra gross-basis analysis: June 2026 $2B annualized gross revenue, H1 2026 $614M gross revenue. These are secondary, unaudited figures.",
+      "content_sha256": "0a7a579c79374c83fe7f3848dc75dd0169d97f8e06d996dfb1168a5fcffa4299"
+    },
+    {
+      "source_id": "micro1.source.audit-u6",
+      "url": "https://techcrunch.com/2026/08/20/ai-data-startup-micro1-reaches-500m-gross-run-rate-amid-ai-training-boom/",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read the dated 20 August 2026 reporting of $500M gross run rate; retain as a historical snapshot.",
+      "content_sha256": "d5104df9242813988a546c67d73b20393e1aec286fc88f2eb3a80f9df975ed32"
+    },
+    {
+      "source_id": "prolific.source.audit-c6d6a9d995",
+      "url": "https://www.prolific.com/about",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "available_not_rechecked",
+      "note": "Page retrieved; this pass did not reconfirm every numeric claim.",
+      "content_sha256": "b0863bc8ccee2c74d768d2bfd586eab1fb226de5808562d5822627382af1ebe9"
+    },
+    {
+      "source_id": "prolific.source.audit-f1a6aacb51",
+      "url": "https://www.linkedin.com/posts/phelim-bradley-84300826_prolific-just-finished-a-10m-revenue-week-activity-7459649483899891713-2DAA",
+      "checked_on": "2026-10-28",
+      "http_status": 404,
+      "status": "unavailable",
+      "note": "The source did not return readable content in this check. Historical evidence is retained with the failed refresh disclosed."
+    },
+    {
+      "source_id": "proximal.source.oct14-4e72c4026cdf",
+      "url": "https://www.proximal.ai/blog/new-frontiers/",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Company post dated 29 September 2026 states $200M annualized revenue.",
+      "content_sha256": "d4ef948c0b00467303ac3401c43278ec141920143c28c94b5430ed84500eaf51"
+    },
+    {
+      "source_id": "scale_ai.source.oct14-891cd0d871ee",
+      "url": "https://www.aol.com/news/exclusive-scale-ais-bigger-rival-152327362.html",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read Reuters story dated 1 July 2025: Scale prior-year revenue was $870M. Historical FY2024, not a 2026 snapshot.",
+      "content_sha256": "912ce262e35d2abb3f96c6874b4ed65f2d14e8ff7a9a4eb382c744ef34a4f562"
+    },
+    {
+      "source_id": "snorkel_ai.source.oct14-006107ac93e3",
+      "url": "https://snorkel.ai/blog/data-2-0-and-the-research-era-of-ai-data/",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Company post dated 22 September 2026 states $375M annualized revenue run rate and a $350M fundraise; these are different measures.",
+      "content_sha256": "4e1e27b19dde860be8707118e6f4828eb424823c4ae94e6f14824ef9f84b3428"
+    },
+    {
+      "source_id": "surge_ai.source.oct14-891cd0d871ee",
+      "url": "https://www.aol.com/news/exclusive-scale-ais-bigger-rival-152327362.html",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read Reuters story dated 1 July 2025: Surge prior-year revenue exceeded $1B. Historical FY2024, not a 2026 snapshot.",
+      "content_sha256": "78d7388c5820a7d2f0a3a21930e10a1b6d035d988166a2a327dcb3bfc1b0eaff"
+    },
+    {
+      "source_id": "taskus.source.fy2025",
+      "url": "https://ir.taskus.com/static-files/bfe52a66-744f-4a64-a49f-d32bcd94d4d1",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Checked FY2025 group and AI Services revenue and net income in the annual report.",
+      "content_sha256": "03b92a6c03247ab5941a53afb2d310c985eb60d495e97948ffc70ddacf1bcf5f"
+    },
+    {
+      "source_id": "taskus.source.q2slides",
+      "url": "https://ir.taskus.com/static-files/70ebd544-0f80-4c46-b19e-aa02099f2f9a",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Checked AI Services H1 2026 revenue of $128.044M, H1 2025 revenue of $98.023M, and trailing-year revenue of $244.239M.",
+      "content_sha256": "51489e0cfa67504ca71986632b3750a54a17a164677a5c3edf70d1c3ab4e16f5"
+    },
+    {
+      "source_id": "mercor.source.oct14-88dab2271689",
+      "url": "https://www.felicis.com/blog/mercor-profile-organizing-human-intelligence-to-power-the-ai-economy",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Investor profile says September 2025 run rate $500M, March 2026 $1B and June 2026 $2B; payouts are more than $4M daily. These are investor-published company statements.",
+      "content_sha256": "acb11433f3f66600de9c03f998b6cd83f695cc27f0a8a342d7dfd38fd7a5f131"
+    },
+    {
+      "source_id": "taskus.refresh.q3-schedule",
+      "url": "https://ir.taskus.com/news-releases/news-release-details/taskus-inc-announce-third-quarter-2026-financial-results",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "content_sha256": "03a37e5f36f6be67afe02a35eb4ddc828816278a056c48a608e54ff3ab708fd6",
+      "note": "Issuer notice published 21 October schedules Q3 2026 results for 4 November. No Q3 financial results are inferred."
+    }
+  ]
+}
