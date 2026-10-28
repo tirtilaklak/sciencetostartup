@@ -1,0 +1,67 @@
+/* Shared shell for the compact company, revenue and work views. */
+body{background:#f8f8f4}
+.topbar{background:#fff;border-bottom:1px solid var(--border)}
+.topbar nav a{border-bottom:0;border-radius:5px;height:36px;min-height:36px;margin:0;padding:8px 12px;font-size:13px;line-height:20px}
+.topbar nav a[aria-current=page]{background:var(--pale);color:var(--green);border-bottom:0;font-weight:650}
+.page-heading{padding-top:34px;margin-bottom:24px}
+.page-heading h1{font-family:inherit;font-size:38px;font-weight:680;letter-spacing:-1.3px;line-height:1.15;margin:0 0 12px}
+.page-heading .intro{font-size:15px;line-height:1.6;margin:0;max-width:680px}
+#market-view .market-hero{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:28px 0;margin:0;border-bottom:1px solid var(--border)}
+#market-view .market-hero h1{font-size:34px;letter-spacing:-1.3px;line-height:1.15;margin:8px 0 10px;max-width:none}
+#market-view .market-hero .intro{font-size:15px;line-height:1.5}
+#market-view .market-hero .eyebrow{font-size:10px;letter-spacing:.6px;margin:0}
+#market-view .hero-actions{display:flex;flex-wrap:wrap;margin:0;gap:8px;flex:none}
+#market-view .hero-actions a{font-size:13px;min-height:42px;padding:10px 13px;gap:4px}
+#market-view .hero-research[hidden]{display:none!important}
+.financial-summary{min-width:0}
+.financial-summary .row-number{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.financial-summary .row-number>strong{font-size:27px;line-height:1.2;letter-spacing:-.7px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.financial-summary .row-number>span{font-size:12px;line-height:1.5;color:var(--muted)}
+.financial-summary .row-period{display:block;font-size:12px;line-height:1.6;margin-top:8px;white-space:normal;color:var(--muted)}
+.financial-citation{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:11px;line-height:1.5;margin-top:9px}
+.financial-citation>span{color:var(--muted)}
+.financial-citation a{display:inline-flex;min-height:28px;align-items:center}
+.financial-source-details{margin-top:6px;font-size:12px;line-height:1.6}
+.financial-source-details summary{color:var(--green);cursor:pointer;padding:5px 0;min-height:28px}
+.financial-source-details p{font-size:12px;line-height:1.6;margin:9px 0}
+.financial-source-details blockquote{margin:10px 0;padding-left:12px;border-left:2px solid var(--border);font-size:12px;color:var(--muted)}
+.financial-source-warning{font-size:11px;line-height:1.5;color:#795b2d;margin:6px 0}
+#compare-view .comparison-table{background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:none}
+#compare-view .comparison-table th,#compare-view .comparison-table td{padding:20px;vertical-align:top}
+#compare-view .comparison-table thead th{background:#eef1ea;border-bottom:1px solid var(--border);position:static}
+#compare-view .comparison-table thead .compare-logo{display:none}
+#compare-view .comparison-table th:first-child{font-size:12px;color:var(--muted);width:150px;min-width:0}
+#compare-view .comparison-table .financial-summary .row-number>strong{font-size:28px}
+#compare-view .comparison-table .category-label{font-size:11px;line-height:1.5}
+#compare-view .comparison-table td>p{font-size:14px;line-height:1.6;margin:8px 0 0}
+#compare-view .comparison-empty{background:#fff;padding:28px;border-radius:8px}
+#compare-view .comparison-context{font-size:12px;margin:8px 0 16px}
+#compare-view .compare-controls{padding:16px;background:#fff;border:1px solid var(--border);border-radius:8px}
+#method-view .review-update{font-size:13px;background:#fff;border:1px solid var(--border);border-left:3px solid var(--green);border-radius:6px}
+#method-view .method-principles{background:#fff}
+#method-view .method-layout{column-gap:38px}
+@media(max-width:900px){#market-view .market-hero{align-items:flex-start;flex-direction:column;gap:16px}.topbar nav{gap:3px}.topbar nav a{padding-inline:8px}}
+@media(max-width:700px){
+ .topbar nav{height:40px;align-items:center;justify-content:space-between;gap:1px}
+ .topbar nav a{height:32px;min-height:32px;line-height:18px;padding:7px 8px;font-size:12px;margin:0}
+ .page-heading{padding-top:24px;margin-bottom:18px}
+ .page-heading h1{font-size:29px;letter-spacing:-.9px;margin-bottom:9px}
+ .page-heading .intro{font-size:14px}
+ #market-view .market-hero{padding:20px 0;gap:14px}
+ #market-view .market-hero h1{font-size:30px;margin:8px 0}
+ #market-view .market-hero .intro{font-size:14px;max-width:320px}
+ #market-view .hero-actions a{min-height:40px;font-size:12px;padding:9px 11px}
+ #compare-view .comparison-table th,#compare-view .comparison-table td{padding:14px 10px}
+ #compare-view .comparison-table th:first-child{width:76px;min-width:0;font-size:11px}
+ #compare-view .comparison-table .financial-summary .row-number>strong{font-size:22px}
+ #compare-view .comparison-table .row-number>span{font-size:10px}
+ .financial-summary .row-period,.financial-citation{font-size:11px}
+ .financial-source-details summary{min-height:36px;display:flex;align-items:center}
+}
+/* The result count and section headings already cover these duplicate totals. */
+#work-overview{display:none}
+@media(max-width:700px){
+ .w4-section-intro .w4-section-note{display:none}
+ #work-view .w4-section-intro{margin-top:6px;margin-bottom:10px}
+ #work-view .work-list-heading{margin-top:18px;margin-bottom:8px}
+}

@@ -43,6 +43,10 @@ for(const [id,range] of ranged){assert.match(byId[id].pay_label,/\/\s*(approved\
 assert.deepEqual(plain(run(`w4HourlyRange(${JSON.stringify(byId['scale_ai.work.outlier-statistics'])})`)),{currency:'$',low:null,high:150,open:false});
 assert.deepEqual(plain(run(`w4HourlyRange(${JSON.stringify(byId['surge_ai.work.swe-environments'])})`)),{currency:'$',low:100,high:150,open:true});
 assert.equal(run(`w4HourlyRange(${JSON.stringify(byId['afterquery.work.college-swe'])})`),null);
+// Best match should not promote a higher claimed rate above reviewed, accessible terms.
+const reviewed=byId['labelbox.work.mechanical-engineering'],blocked=byId['afterquery.work.world-models'];
+assert.ok(reviewed.terms_checked_on&&blocked.last_link_check?.result==='blocked','reviewed/blocked ordering fixture');
+assert.ok(run(`w4BestOrder(${JSON.stringify(reviewed)},${JSON.stringify(blocked)})`)<0,'reviewed terms should lead a blocked higher-rate claim');
 // Highest hourly rate: the top of the range never rises down the block; the conflict listing is last.
 const sorted=ids(`w4RouteGroups(workRouteRows(),'hourly').hourly.map(r=>r.id)`);
 const highs=sorted.map(id=>run(`w4HourlyRange(${JSON.stringify(byId[id])})`)?.high??-1);

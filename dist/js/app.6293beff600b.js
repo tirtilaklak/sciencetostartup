@@ -528,7 +528,7 @@ function comparisonRows(){return [
  ];}
 // Like with like: when another column shows a 12-month figure, a half-year or quarter
 // headline gives way to the same scope's latest full year and moves to a second line.
-function comparisonRevenue(id){const m=preferredFinancial(id),period=m&&financialPeriod(m);if(!m||m.kind!=='revenue'||!['half','short'].includes(period))return compactSignal(id);const months=period==='half'?6:m.period_type==='quarter'||/quarter|three months|\bQ[1-4]\b/i.test(m.period_label||'')?3:0,span=months?months+' months':'',peers=compareIds().filter(x=>x!==id).map(x=>preferredFinancial(x)).filter(Boolean),twelve=peers.some(o=>['annualized_revenue_run_rate','arr'].includes(o.kind)||(o.kind==='revenue'&&['annual','ttm'].includes(financialPeriod(o))));const year=twelve?eligibleMetrics(id,'revenue').filter(x=>financialPeriod(x)==='annual'&&x.segment_scope===m.segment_scope&&(x.scope_detail||'')===(m.scope_detail||'')&&x.currency===m.currency).sort((a,b)=>dateRank(b.as_of).localeCompare(dateRank(a.as_of)))[0]:null;return year?signalFor(id,year)+`<p class="comparison-later"><span class="comparison-later-label">Latest ${esc(span||'shorter period')}</span>${numberButton(m)}<span class="row-period">${esc(readableDates(shortPeriod(m)))} · ${esc(compactMetricScope(m))}</span></p>`:signalFor(id,m,span);}
+function comparisonRevenue(id){if(financialObservationFor(id))return financialSummaryHTML(id);const m=preferredFinancial(id),period=m&&financialPeriod(m);if(!m||m.kind!=='revenue'||!['half','short'].includes(period))return compactSignal(id);const months=period==='half'?6:m.period_type==='quarter'||/quarter|three months|\bQ[1-4]\b/i.test(m.period_label||'')?3:0,span=months?months+' months':'',peers=compareIds().filter(x=>x!==id).map(x=>preferredFinancial(x)).filter(Boolean),twelve=peers.some(o=>['annualized_revenue_run_rate','arr'].includes(o.kind)||(o.kind==='revenue'&&['annual','ttm'].includes(financialPeriod(o))));const year=twelve?eligibleMetrics(id,'revenue').filter(x=>financialPeriod(x)==='annual'&&x.segment_scope===m.segment_scope&&(x.scope_detail||'')===(m.scope_detail||'')&&x.currency===m.currency).sort((a,b)=>dateRank(b.as_of).localeCompare(dateRank(a.as_of)))[0]:null;return year?signalFor(id,year)+`<p class="comparison-later"><span class="comparison-later-label">Latest ${esc(span||'shorter period')}</span>${numberButton(m)}<span class="row-period">${esc(readableDates(shortPeriod(m)))} · ${esc(compactMetricScope(m))}</span></p>`:signalFor(id,m,span);}
 const MOBILE_COMPARE_PAIRS=[[0,1],[0,2],[1,2]];
 function comparePairOptions(ids){return MOBILE_COMPARE_PAIRS.filter(pair=>pair.every(i=>i<ids.length));}
 let comparisonFocus=null,evidenceReturnFocus=null,pendingComparisonResize=false;
@@ -810,7 +810,31 @@ const SHORT_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct',
 function readableDates(text){return String(text??'').replace(/\b((?:19|20)\d{2})-(0[1-9]|1[0-2])(?:-(0[1-9]|[12]\d|3[01]))?\b(?![-\d])/g,(all,year,month,day)=>(day?Number(day)+' ':'')+SHORT_MONTHS[month-1]+' '+year);}
 function monthSpan(dates){const months=[...new Set(dates.map(d=>String(d).slice(0,7)))].sort(),first=months[0],last=months.at(-1);return first===last?readableDates(first):first.slice(0,4)===last.slice(0,4)?SHORT_MONTHS[first.slice(5)-1]+'–'+SHORT_MONTHS[last.slice(5)-1]+' '+first.slice(0,4):readableDates(first)+' to '+readableDates(last);}
 function listText(names){return names.length<3?names.join(' and '):names.slice(0,-1).join(', ')+' and '+names.at(-1);}
-function compactSignal(id){return signalFor(id,preferredFinancial(id));}
+// The same supplemental observation drives cards, profiles and Compare.
+function financialObservationFor(id){
+ const health=window.BUSINESS_HEALTH;if(!health)return null;
+ const candidates=(health.observations||[]).filter(o=>o.company_id===id&&o.signal==='revenue'&&['period_revenue','annualized_revenue'].includes(o.measure)&&typeof o.value==='number'&&Number.isFinite(o.value)&&!o.is_context&&o.evidence_type==='reported');
+ const scopes=['company','ai_data','other_segment','parent'];
+ const end=o=>o.period?.end||(String(o.as_of||'').match(/\d{4}(?:-\d{2}){0,2}/)||[''])[0];
+ const scopeRank=o=>{const rank=scopes.indexOf(o.scope);return rank<0?scopes.length:rank;};
+ const recent=candidates.filter(o=>end(o)>='2025-10-28');
+ return (recent.length?recent:candidates).sort((a,b)=>scopeRank(a)-scopeRank(b)||Number(b.measure==='period_revenue')-Number(a.measure==='period_revenue')||end(b).localeCompare(end(a)))[0]||null;
+}
+function financialSummaryHTML(id){
+ const o=financialObservationFor(id);if(!o)return signalFor(id,preferredFinancial(id));
+ const health=window.BUSINESS_HEALTH,record=(health.sources||[]).find(s=>o.source_ids.includes(s.id))||sources[o.source_ids[0]],fresh=(health.fresh_claims||[]).find(c=>o.claim_ids.includes(c.id));
+ const value=window.BusinessHealth?.valueText(o)||String(o.value),period=o.period?.label||o.as_of,scope=o.scope_label||scopeText(o.scope,id),basis=o.accounting_basis==='gross'?'Gross revenue':o.accounting_basis==='net'?'Net revenue':o.measure==='annualized_revenue'?'Gross/net not disclosed':'',type=o.measure==='annualized_revenue'?'Annualized pace':'Revenue';
+ const checked=fresh?.observed_on||(health.source_checks?.entries||[]).find(e=>o.source_ids.includes(e.source_id)&&e.status==='content_checked')?.checked_on;
+ const end=o.period?.end||(String(o.as_of||'').match(/\d{4}(?:-\d{2}){0,2}/)||[''])[0],old=!end||end<'2025-10-28';
+ const citation=record?external(record.url,record.publisher||'Original source'):'';
+ const quote=o.original_text||fresh?.excerpt||'';
+ const failed=o.refresh_status==='source_unavailable'||(health.source_checks?.entries||[]).some(e=>o.source_ids.includes(e.source_id)&&e.status==='unavailable');
+ const warning=failed?'<p class="financial-source-warning">Original citation could not be rechecked. Historical source attribution retained.</p>':'';
+ const observationAttr=String(o.id).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const content=`<div class="financial-summary" data-financial-observation="${observationAttr}"><div class="row-number"><strong>${esc(value)}</strong><span>${esc(type)}</span></div><span class="row-period">${esc(readableDates(period))} · ${esc(o.currency||'')} · ${esc(scope)}${basis?' · '+esc(basis):''}</span><div class="financial-citation">${citation}<span>${esc(o.evidence_assurance||'Attributed source')}</span></div>${warning}<details class="financial-source-details"><summary>Figure details</summary><p>${esc(o.limitations||'')}</p>${quote?`<blockquote>${esc(quote)}</blockquote>`:''}${checked?`<p>Source content checked ${esc(readableDates(checked))}. The figure covers ${esc(readableDates(period))}.</p>`:''}</details></div>`;
+ return old?`<span class="signal-label">No recent revenue figure</span><details class="historical-signal"><summary>Historical figure · ${esc(readableDates(period))}</summary>${content}</details>`:content;
+}
+function compactSignal(id){return financialSummaryHTML(id);}
 // Recency describes the observation period, not when an old source was fetched again.
 const FINANCIAL_RECENCY_REVIEW='2026-10-28';
 function financialObservationAge(m){
@@ -931,7 +955,10 @@ function groupSlug(name){return String(name||'').toLowerCase().replace(/[^a-z0-9
 // where the company name is printed next to the logo, so screen readers hear the name once.
 function logoInitials(id){return String(companies[id]?.name||id).split(/[\s/]+/).filter(word=>/^[\p{L}\p{N}]/u.test(word)).slice(0,2).map(word=>[...word][0]).join('').toUpperCase();}
 function logoHTML(id,extra='',decorative=false) { const a=logoFor(id);return a?`<span class="brand-asset ${extra} ${a.background==='dark'?'brand-dark':''}"><img src="${attr(a.local_path)}" alt="${decorative?'':esc(companies[id]?.name||id)+' logo'}" data-initials="${attr(logoInitials(id))}" loading="lazy" decoding="async"></span>`:`<span class="brand-asset brand-text ${extra}" aria-hidden="true">${esc(logoInitials(id))}</span>`; }
-function card(c){const e=entryFor(c.id),financial=preferredFinancial(c.id),research=c.entity_type==='adjacent_research';return `<article class="company-card" data-company-card="${esc(c.id)}"><a class="company-brand" href="#company/${esc(c.id)}" tabindex="-1" aria-hidden="true">${logoHTML(c.id)}</a><div class="company-card-content"><span class="category-label sr-only">${esc(groupLabel(modelGroup(c.id)))}</span><h3><a href="#company/${esc(c.id)}">${esc(c.name)}</a></h3><p class="company-description">${esc(modelFor(c.id))}</p><div class="capability-tags sr-only">${(e?.capability_tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div></div><div class="company-signal">${financial?compactSignal(c.id):`<span class="signal-label">${research?'Research organization':'Revenue not disclosed'}</span><a class="company-missing-source" href="#company/${esc(c.id)}/sources">See available sources ${iconHTML('right')}</a>`}</div><div class="company-card-footer">${compareCheck(c.id)}<a class="company-work-link" href="#company/${esc(c.id)}/work">Paid work ${iconHTML('right')}</a><button class="text-link" data-open-company="${esc(c.id)}" aria-label="Quick summary of ${esc(c.name)}">Quick summary</button></div></article>`;}
+function card(c){
+ const e=entryFor(c.id),financial=preferredFinancial(c.id),research=c.entity_type==='adjacent_research',products=typeof profileProducts==='function'?profileProducts(c.id):[],offering=products.find(p=>p.name),signal=financial?compactSignal(c.id):`<span class="signal-label">${research?'Research focus':'Main offering'}</span><p class="company-offering">${esc(offering?.name||(research?'Public AI research':'AI data services'))}</p><span class="company-disclosure-note">${research?'Nonprofit research organization':'Revenue not disclosed'}</span>`;
+ return `<article class="company-card" data-company-card="${esc(c.id)}"><div class="company-card-heading"><a class="company-brand" href="#company/${esc(c.id)}" tabindex="-1" aria-hidden="true">${logoHTML(c.id,'',true)}</a><div><span class="category-label sr-only">${esc(groupLabel(modelGroup(c.id)))}</span><h3><a href="#company/${esc(c.id)}">${esc(c.name)}</a></h3><p class="company-group">${esc(groupLabel(modelGroup(c.id)))}</p></div></div><div class="company-card-content"><p class="company-description">${esc(modelFor(c.id))}</p><div class="capability-tags sr-only">${(e?.capability_tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div></div><div class="company-signal">${signal}</div><div class="company-card-footer">${compareCheck(c.id)}<a class="company-work-link" href="#company/${esc(c.id)}/work">Work routes</a><a class="company-open-profile" href="#company/${esc(c.id)}">Open profile ${iconHTML('right')}</a></div></article>`;
+}
 
 // Overview business groups: each row links to the company list filtered to that group (#companies/<slug>).
 function renderModelMap(){const captions={'Expert data & evaluation':'Experts create examples and test AI','Managed AI & data services':'Teams prepare data and run AI projects','Frontier data & RL environments':'Tasks and simulations that help AI learn','AI software & analytics':'Tools for building and measuring AI','AI evaluation & safety':'Tests for reliability and security','Compute & model research':'Computing resources and research on AI models','Nonprofit research':'Public research and shared tests'},list=names=>names.length>2?names.slice(0,-1).join(', ')+' and '+names.at(-1):names.join(' and ');$('model-map').innerHTML=Object.entries(MODEL_GROUPS).map(([name,ids])=>{const names=ids.map(id=>companies[id]?.name).filter(Boolean).sort((a,b)=>a.localeCompare(b,'en',{sensitivity:'base'})),rest=names.length-3;return `<a class="category-card" href="#companies/${attr(groupSlug(name))}" data-category-jump="${attr(name)}"><span class="category-name">${esc(groupLabel(name))}</span><span class="category-description">${esc(captions[name])}</span><span class="category-members">${esc(rest>0?names.slice(0,3).join(', ')+' and '+rest+' more':list(names))}</span><span class="category-count">${ids.length}<small>${ids.length===1?'company':'companies'}</small></span>${iconHTML('right')}</a>`;}).join('');}
@@ -1283,9 +1310,8 @@ function w4StatusBadge(route){const status=w4Status(route);return status?`<span 
 // Pieces of a card. A compact card shows its pay in the summary, so its offer leaves the pay out.
 function w4CardParts(route,compact){
   const company=companies[route.company_id],commitment=w4Hours(route),scheduleNote=w4ScheduleNote(route),requirements=w4Requirements(route);
-  const logo=typeof logoHTML==='function'&&(typeof logoFor!=='function'||logoFor(company.id))?logoHTML(company.id,'w4-company-logo',true):'';
   return {context:`${route.role}, ${company.name}`,
-    identity:`<a class="w4-company" href="#company/${w4Escape(company.id)}/work">${logo?`<span class="w4-logo" aria-hidden="true">${logo}</span>`:''}<span>${w4Escape(company.name)}</span></a>`,
+    identity:`<a class="w4-company" href="#company/${w4Escape(company.id)}/work"><span>${w4Escape(company.name)}</span></a>`,
     offer:`<div class="w4-offer">${compact?'':`<p class="w4-pay ${route.numeric_pay?'':'w4-pay-unspecified'}"><strong>${w4Escape(w4Pay(route))}</strong>${w4PayNotes(route)}</p>`}${commitment?`<p class="w4-commitment">${w4Escape(commitment)}</p>`:''}${scheduleNote?`<p class="w4-schedule-note">${w4Escape(scheduleNote)}</p>`:''}</div>`,
     conditions:`<p class="w4-location">${w4Escape(w4Location(route))}</p>${requirements.length?`<ul class="w4-requirements" aria-label="Requirements">${requirements.map(text=>`<li>${w4Escape(text)}</li>`).join('')}</ul>`:''}`,
     dates:`<p class="w4-dates"><span>${w4Escape(w4FreshnessLabel(route))}</span></p>`};
@@ -1399,9 +1425,12 @@ function w4QueryMatcher(query){
   return {all:value=>tests.every(test=>test.test(value)),phrase:value=>Boolean(phrase?.test(value))};
 }
 
-// Best match: remote listings with an hourly rate first, then the strongest link check, then the latest
-// check, then the higher top rate (same currency only), then company and role names.
-function w4BestRank(route){return (w4HourlyRange(route)&&W4_REMOTE.test(route.geography||'')?0:10)+(route.research_record?.route?.live_application_verified===true?0:route.last_route_check?.result==='public_page_live'?1:route.status==='listed'?2:3);}
+// Best match prioritizes reviewed terms and explicit availability. A blocked or uncertain
+// listing follows comparable reviewed offers; hourly remote offers lead within each group.
+function w4BestRank(route){
+  const uncertainty=w4Uncertain(route)?20:0,terms=route.terms_checked_on?0:route.last_route_check?.result==='listing_content_reviewed'?2:5;
+  return uncertainty+terms+(w4HourlyRange(route)&&W4_REMOTE.test(route.geography||'')?0:10);
+}
 function w4RateTie(a,b){const x=w4HourlyRange(a),y=w4HourlyRange(b);return x&&y&&x.currency===y.currency?y.high-x.high:0;}
 function w4BestOrder(a,b){return w4BestRank(a)-w4BestRank(b)||(w4Checked(b)||'').localeCompare(w4Checked(a)||'')||w4RateTie(a,b)||companies[a.company_id].name.localeCompare(companies[b.company_id].name)||a.role.localeCompare(b.role);}
 // Highest hourly rate: top of the published range, then its low end ("up to" last), then open-ended
@@ -1833,17 +1862,21 @@ function profilePeersHTML(id){
  if(!peers.length)return '';
  return `<section class="profile-peers" aria-labelledby="profile-peers-title"><h2 id="profile-peers-title">More in ${esc(groupLabel(group))}</h2><ul>${peers.map(peer=>`<li><a href="#company/${attr(peer)}">${logoFor(peer)?profileLogoHTML(peer,'peer-logo'):''}<span>${esc(companies[peer].name)}</span></a></li>`).join('')}</ul><p><a class="profile-peers-all" href="#companies/${attr(groupSlug(group))}" data-category-jump="${attr(group)}">${members.length===2?'Both companies':'All '+members.length+' companies'} in this group ${iconHTML('right')}</a></p></section>`;
 }
-function profileAtAGlance(id){return `<div class="profile-at-a-glance"><div class="profile-glance-metric"><span class="eyebrow">Financial snapshot</span>${compactSignal(id)}</div><div class="profile-glance-work"><span class="eyebrow">Paid work</span><p>${esc(workType(id))}</p><a href="#company/${attr(id)}/work">Routes & requirements ${iconHTML('right')}</a></div></div>`;}
+function profileAtAGlance(id){
+ const financial=preferredFinancial(id),research=companies[id].entity_type==='adjacent_research',offering=profileProducts(id).find(p=>p.name),metric=financial?(typeof financialSummaryHTML==='function'?financialSummaryHTML(id):compactSignal(id)):`<span class="profile-main-offering">${esc(offering?.name||(research?'Public AI research':'AI data services'))}</span><p class="profile-revenue-note">${research?'Nonprofit research organization':'Revenue not disclosed in the reviewed sources.'}</p>`;
+ return `<div class="profile-at-a-glance"><div class="profile-glance-metric"><span class="eyebrow">${financial?'Latest financial evidence':research?'Research focus':'Main offering'}</span>${metric}</div><div class="profile-glance-work"><span class="eyebrow">Work routes</span><p>${esc(workType(id))}</p><a href="#company/${attr(id)}/work">View listings & requirements ${iconHTML('right')}</a></div></div>`;
+}
 function profileHTML(id,{deferArchive=false}={}){
  const c=companies[id],config=profileContent(id),target=profileTarget(id),active=target==='observations'?'traction':profileTabFor(target),archiveOpen=PROFILE_ARCHIVE_SECTIONS.includes(target);
  const notes=(config.notes||[]).map(n=>typeof n==='string'?`<p>${esc(n)}</p>`:`<p>${esc(n.text)} ${profileReferences(n.claim_ids)}</p>`).join('');
  const group=modelGroup(id),category=`<p class="profile-category">${esc(groupLabel(group))}</p>`;
- const panes={business:`<div class="profile-business-intro">${MODEL_GROUPS[group]?`<a class="profile-category-link" href="#companies/${attr(groupSlug(group))}" data-category-jump="${attr(group)}">${category}${iconHTML('right')}<span class="sr-only">: all companies in this business group</span></a>`:category}<p>${esc(config.summary||modelFor(id))}</p></div>${profileAtAGlance(id)}<div class="profile-business-layout ${config.featured_case?'has-case':''}">${profileSection('products',config.product_heading||'Products and services',profileProductGrid(id))}${profileCase(id)}</div>${typeof productMediaHTML==='function'?productMediaHTML(id):''}${profileSection('customers','Who it works with',profileRelationshipGrid(id))}${profileRisks(id)}`,
+ const background=config.summary&&config.summary!==modelFor(id)?`<details class="profile-background"><summary>About the business</summary><p>${esc(config.summary)}</p></details>`:'';
+ const panes={business:`${background}<div class="profile-business-layout ${config.featured_case?'has-case':''}">${profileSection('products',config.product_heading||'Products and services',profileProductGrid(id))}${profileCase(id)}</div>${typeof productMediaHTML==='function'?productMediaHTML(id):''}${profileSection('customers','Who it works with',profileRelationshipGrid(id))}${profileRisks(id)}`,
  traction:profileSection('traction',profileFiguresHeading(id),`${config.activity?`<div class="profile-activity"><h3>${esc(config.activity.title)}</h3><p>${esc(config.activity.description)}</p>${profileReferences(config.activity.claim_ids)}</div>`:''}${profileTraction(id)}`),
  people:`<div class="profile-people-layout">${profileSection('finance',c.entity_type==='adjacent_research'?'Research support':'Funding and valuation',profileCapital(id))}${profileSection('people','Founders and leadership',profilePeople(id))}</div>`+(notes?profileDisclosure('Further context',notes):''),
  work:profileSection('work','Paid work at '+c.name,workSummary(id))};
  const tabs=[['business','Business'],['traction','Figures'],['people','Funding & people'],['work','Paid work']];
- return `<div class="profile-v2" data-profile-company="${attr(id)}"><a class="profile-back" href="#companies">${iconHTML('left')} Companies</a><header class="profile-top profile-hero"><div class="profile-title-row">${profileLogoHTML(id,'profile-brand')}<h1>${esc(c.name)}</h1></div><div class="profile-links">${external(c.website,'Website')}${c.founded_year?`<span>Founded ${c.founded_year}</span>`:''}${compareCheck(id)}<a href="#company/${attr(id)}/sources">Sources ${iconHTML('right')}</a><a href="/company/${attr(id)}/">Plain page to share ${iconHTML('right')}</a></div></header><nav class="profile-tabs" role="tablist" aria-label="${attr(c.name)} details">${tabs.map(([key,label])=>`<button type="button" role="tab" id="profile-tab-${key}" data-profile-tab="${key}" aria-controls="profile-pane-${key}" aria-selected="${active===key}" tabindex="${active===key?0:-1}">${esc(label)}</button>`).join('')}</nav><div class="profile-panes">${tabs.map(([key])=>`<section id="profile-pane-${key}" role="tabpanel" aria-labelledby="profile-tab-${key}" tabindex="-1" data-profile-pane="${key}"${active===key?'':' hidden'}>${panes[key]}</section>`).join('')}</div><details class="profile-evidence"${archiveOpen?' open':''}><summary><span class="archive-summary-label">Sources and review <i aria-hidden="true">+</i></span><span>${companyClaims(id).length} claims · ${companySources(id).length} sources</span></summary>${deferArchive&&!archiveOpen?'':profileArchive(id)}</details><p class="profile-correction">Something wrong here? <a href="#corrections">Request a correction ${iconHTML('right')}</a></p>${profilePeersHTML(id)}</div>`;
+ return `<div class="profile-v2" data-profile-company="${attr(id)}"><a class="profile-back" href="#companies">${iconHTML('left')} Companies</a><header class="profile-top profile-hero"><div class="profile-title-row">${profileLogoHTML(id,'profile-brand')}<h1>${esc(c.name)}</h1></div><p class="profile-summary">${esc(modelFor(id))}</p><a class="profile-group-link" href="#companies/${attr(groupSlug(group))}" data-category-jump="${attr(group)}">${esc(groupLabel(group))} ${iconHTML('right')}</a><div class="profile-links">${external(c.website,'Website')}${c.founded_year?`<span>Founded ${c.founded_year}</span>`:''}${compareCheck(id)}<a href="#company/${attr(id)}/sources">Sources ${iconHTML('right')}</a><a href="/company/${attr(id)}/">Plain page to share ${iconHTML('right')}</a></div></header>${profileAtAGlance(id)}<nav class="profile-tabs" role="tablist" aria-label="${attr(c.name)} details">${tabs.map(([key,label])=>`<button type="button" role="tab" id="profile-tab-${key}" data-profile-tab="${key}" aria-controls="profile-pane-${key}" aria-selected="${active===key}" tabindex="${active===key?0:-1}">${esc(label)}</button>`).join('')}</nav><div class="profile-panes">${tabs.map(([key])=>`<section id="profile-pane-${key}" role="tabpanel" aria-labelledby="profile-tab-${key}" tabindex="-1" data-profile-pane="${key}"${active===key?'':' hidden'}>${panes[key]}</section>`).join('')}</div><details class="profile-evidence"${archiveOpen?' open':''}><summary><span class="archive-summary-label">Sources and review <i aria-hidden="true">+</i></span><span>${companyClaims(id).length} claims · ${companySources(id).length} sources</span></summary>${deferArchive&&!archiveOpen?'':profileArchive(id)}</details><p class="profile-correction">Something wrong here? <a href="#corrections">Request a correction ${iconHTML('right')}</a></p>${profilePeersHTML(id)}</div>`;
 }
 
 function ensureProfileArchive(root){
@@ -2345,7 +2378,7 @@ function initSiteNav(){
   history.replaceState(history.state,'',location.pathname.replace(/^\/{2,}/,'/')+location.hash);siteSearchOpen(text);
  }
 }
-/* Business health: comparable observations first, complete evidence on demand. */
+/* Revenue ledger first; matching comparisons and full evidence are available on demand. */
 (() => {
 'use strict';
 const bundle=window.BUSINESS_HEALTH;
@@ -2364,8 +2397,12 @@ const ACRONYMS={us:'US',gaap:'GAAP',ebitda:'EBITDA',fx:'FX',nrr:'NRR (net revenu
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const bhState={signal:'revenue',measure:'period_revenue',cohort:null,group:'',query:'',sort:'coverage',evidenceOnly:false,company:'',observation:''};
 const all=()=>bundle?.observations||[];
+let overviewMeasure='period_revenue';
+const overviewMeasures={period_revenue:'Actual revenue',annualized_revenue:'Annualized pace',revenue_growth_yoy:'Growth'};
 const freshClaims=new Map((bundle?.fresh_claims||[]).map(c=>[c.id,c]));
 const refreshedSources=new Map((bundle?.sources||[]).map(s=>[s.id,s]));
+const sourceChecks=new Map((bundle?.source_checks?.entries||[]).map(s=>[s.source_id,s]));
+let evidenceOrigin='';
 const claimRecord=id=>claims[id]||freshClaims.get(id);
 const sourceRecord=id=>refreshedSources.get(id)||sources[id];
 const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2475,9 +2512,14 @@ function pickCompanyObservation(company,signal){
  return list.sort((a,b)=>Number(numeric(b))-Number(numeric(a))||Number(!!a.is_context)-Number(!!b.is_context)||Number(b.measure===preferred)-Number(a.measure===preferred)||dateKey(b).slice(0,7).localeCompare(dateKey(a).slice(0,7))||Number(a.scope!=='company')-Number(b.scope!=='company')||(periodRank[a.period?.type]??2)-(periodRank[b.period?.type]??2))[0];
 }
 function evidenceLinks(o){return `<span class="bh-evidence-links">${o.claim_ids.filter(id=>claims[id]).map((id,i)=>claimButton(id,o.claim_ids.length>1?'Claim '+(i+1):'Inspect claim')).join('')}${o.source_ids.slice(0,3).map(id=>{const source=sourceRecord(id);return source?external(source.url,source.publisher||'Original source'):'';}).join('')}</span>`;}
+function checkedSource(o){
+ const checks=o.source_ids.map(id=>sourceChecks.get(id)).filter(Boolean);
+ return checks.find(c=>c.status==='content_checked')||checks.find(c=>c.status==='unavailable')||checks[0];
+}
 function freshnessNote(o){
- const fresh=o.claim_ids.map(id=>freshClaims.get(id)).filter(Boolean);
- return fresh.length?`<p class="bh-refresh-note">Content checked ${safe(shortDate(fresh[0].observed_on))}${fresh[0].source_locator?' · '+safe(fresh[0].source_locator):''}</p>`:'';
+ const check=checkedSource(o),fresh=o.claim_ids.map(id=>freshClaims.get(id)).filter(Boolean);
+ if(check?.status==='unavailable')return `<p class="bh-refresh-note is-unavailable">Source could not be retrieved on ${safe(shortDate(check.checked_on))}. The figure retains its earlier attribution.</p>`;
+ return check?.status==='content_checked'?`<p class="bh-refresh-note">Source page read ${safe(shortDate(check.checked_on))}${fresh[0]?.source_locator?' · '+safe(fresh[0].source_locator):''}. This check date is separate from the reporting period.</p>`:'';
 }
 
 function statusText(o){return o.evidence_type==='estimate'?'Third-party estimate':o.evidence_type==='calculated'?'Calculated':o.is_context?'Context only':'Reported';}
@@ -2488,22 +2530,57 @@ function dateRow(o){
  if(!/\d{4}-\d{2}/.test(o.as_of)||label.includes(o.as_of)||label.includes(month)||label.includes(dateKey(o).slice(0,7)))return label;
  return label+' · stated '+extra;
 }
+// One latest observation per company. Dates decide the order, never incompatible amounts.
+function latestFigures(measure){
+ const grouped=new Map();
+ for(const o of all().filter(o=>o.measure===measure&&numeric(o)&&!o.is_context&&(measure!=='period_revenue'||o.evidence_type!=='estimate'))){
+  if(!grouped.has(o.company_id))grouped.set(o.company_id,[]);grouped.get(o.company_id).push(o);
+ }
+ const periodPreference={half_year:0,annual:1,trailing_year:2,run_rate:0};
+ return [...grouped.values()].map(list=>list.sort((a,b)=>dateKey(b).localeCompare(dateKey(a))||Number(a.scope!=='company')-Number(b.scope!=='company')||(periodPreference[a.period.type]??3)-(periodPreference[b.period.type]??3))[0]).sort((a,b)=>dateKey(b).localeCompare(dateKey(a))||companies[a.company_id].name.localeCompare(companies[b.company_id].name));
+}
+function sourceKind(o){
+ if(o.evidence_type==='estimate')return 'Estimate';
+ const assurance=assuranceText(o);
+ if(/secondary|Reuters|press-reported|via press/i.test(assurance))return 'Reporting';
+ if(/annual report|Form 10-K|Form 20-F|ASX/i.test(assurance))return 'Filing';
+ if(/investor/i.test(assurance))return 'Investor';
+ if(/company|founder|CEO|CFO|acquisition disclosure/i.test(assurance))return 'Company';
+ return 'Attributed';
+}
+function ledgerPeriod(o){
+ const p=o.period||{};
+ if(p.type==='half_year'&&p.start&&p.end){
+  const start=shortDate(p.start,false),end=shortDate(p.end,false);
+  return p.start.slice(0,4)===p.end.slice(0,4)?start.replace(/ \d{4}$/,'')+'–'+end:start+'–'+end;
+ }
+ return periodShort(o,true);
+}
+function renderLedger(){
+ const list=latestFigures(overviewMeasure);
+ $('bh-overview-tabs').innerHTML=Object.entries(overviewMeasures).map(([id,label])=>`<button type="button" role="tab" id="bh-overview-${id}" aria-controls="bh-ledger-panel" aria-selected="${overviewMeasure===id}" tabindex="${overviewMeasure===id?0:-1}" data-bh-overview="${id}">${label}<span>${latestFigures(id).length}</span></button>`).join('');
+ $('bh-ledger-panel').setAttribute('aria-labelledby','bh-overview-'+overviewMeasure);
+ $('bh-ledger-note').textContent=overviewMeasure==='annualized_revenue'?'A projection of recent revenue across a year. Dates, scopes and gross/net definitions differ.':overviewMeasure==='revenue_growth_yoy'?'Year-on-year changes within each business. Full-year and half-year comparisons stay labeled.':'Latest disclosed revenue for each business. Reporting periods and scopes differ; rows are ordered by date.';
+ $('bh-ledger').innerHTML=list.map(o=>{const kind=sourceKind(o),check=checkedSource(o),unavailable=check?.status==='unavailable';return `<article class="bh-ledger-row${isHistorical(o)?' is-historical':''}"><div class="bh-ledger-company"><a href="#company/${safe(o.company_id)}">${safe(companies[o.company_id].name)}</a><span>${safe(scopeLabel(o))}${o.accounting_basis==='gross'?' · gross':''}</span></div><button type="button" class="bh-ledger-value" data-bh-ledger="${safe(o.id)}" aria-label="${safe(companies[o.company_id].name+' '+valueText(o)+': inspect evidence')}">${safe(valueText(o))}</button><div class="bh-ledger-period">${safe(ledgerPeriod(o))}${isHistorical(o)?'<small>Historical</small>':''}</div><button type="button" class="bh-ledger-source" data-bh-ledger="${safe(o.id)}" aria-label="${safe('Source for '+companies[o.company_id].name+' '+valueText(o))}"><span class="bh-source-kind" data-kind="${kind.toLowerCase()}">${kind}</span><span class="bh-source-action">View source ${iconHTML('right')}</span>${unavailable?'<small class="bh-source-unavailable">Retrieval failed</small>':check?.status==='content_checked'?`<small>Read ${safe(shortDate(check.checked_on))}</small>`:''}</button></article>`;}).join('');
+ $('bh-ledger-count').textContent=plural(list.length,'company')+' with a reviewed '+(overviewMeasure==='annualized_revenue'?'annualized figure':overviewMeasure==='revenue_growth_yoy'?'growth figure':'revenue figure')+'. Full sources and older observations are available on each figure.';
+}
+function openEvidence(origin=''){const dialog=$('bh-evidence-dialog');evidenceOrigin=origin||evidenceOrigin;if(dialog&&!dialog.open)dialog.showModal();}
 function renderDetail(){
  const o=byId(bhState.observation),id=bhState.company||(o?.company_id),name=companies[id]?.name,group=id?groupLabel(modelGroup(id)):'';
  if(id&&evidenceState(id,bhState.signal)==='n-a'){
-  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name)} · ${safe(group)}</p><h3>Not applied</h3><p class="bh-lede">${safe(name)} is a nonprofit research organization. Commercial measures are not applied to it.</p><a class="bh-profile" href="#company/${safe(id)}">Full company profile ${iconHTML('external')}</a>`;
+  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name)} · ${safe(group)}</p><h3 id="bh-detail-title">Not applied</h3><p class="bh-lede">${safe(name)} is a nonprofit research organization. Commercial measures are not applied to it.</p><a class="bh-profile" href="#company/${safe(id)}">Full company profile ${iconHTML('external')}</a>`;
   return;
  }
  if(!o||o.company_id!==id||o.signal!==bhState.signal){
   const context=all().filter(r=>r.company_id===id&&r.signal===bhState.signal);
-  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name?name+' · '+group:'Read the evidence')}</p><h3>${name?'No reviewed public figure':'Select a figure'}</h3><p class="bh-lede">${name?'The reviewed sources do not establish '+labels[bhState.signal].toLowerCase()+' for '+safe(name)+'. Missing is not zero.':'Select a chart bar to read its source and reporting details.'}</p><p class="bh-note">${esc(definition(bhState.signal).ideal_measure||questions[bhState.signal])}</p>${context.length?`<div class="bh-related"><p><strong>Available context</strong></p>${context.map(r=>`<p>${esc(r.label)}: ${numeric(r)?safe(valueText(r)):esc(r.original_text)} ${evidenceLinks(r)}</p>`).join('')}</div>`:''}${id?`<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`:''}`;
+  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name?name+' · '+group:'Read the evidence')}</p><h3 id="bh-detail-title">${name?'No reviewed public figure':'Select a figure'}</h3><p class="bh-lede">${name?'The reviewed sources do not establish '+labels[bhState.signal].toLowerCase()+' for '+safe(name)+'. Missing is not zero.':'Select a chart bar to read its source and reporting details.'}</p><p class="bh-note">${esc(definition(bhState.signal).ideal_measure||questions[bhState.signal])}</p>${context.length?`<div class="bh-related"><p><strong>Available context</strong></p>${context.map(r=>`<p>${esc(r.label)}: ${numeric(r)?safe(valueText(r)):esc(r.original_text)} ${evidenceLinks(r)}</p>`).join('')}</div>`:''}${id?`<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`:''}`;
   return;
  }
  const history=all().filter(r=>r.company_id===id&&r.signal===o.signal&&r.measure===o.measure&&r.id!==o.id).sort((a,b)=>dateKey(b).localeCompare(dateKey(a)));
  const related=all().filter(r=>r.company_id===id&&r.signal===o.signal&&r.measure!==o.measure);
  const sparkline=historySeries(id,o.measure).some(list=>list.length>1&&list.some(r=>r.id===o.id));
  const g=grade(o);
- $('bh-detail').innerHTML=`<p class="bh-kicker">Selected evidence</p><h3>${safe(name)}</h3><p class="bh-measure-name">${esc(measureLabel(o.measure))}</p>${isHistorical(o)?`<span class="bh-historical">Historical · ${yearOf(o)}</span>`:''}<p class="bh-value${isHistorical(o)?' is-historical':''}">${safe(numeric(o)?valueText(o):'Not quantified')}<span class="bh-pill ${pillClass(o)}">${statusText(o)}</span></p><dl class="bh-facts"><dt>Date</dt><dd>${safe(dateRow(o))}</dd><dt>Scope</dt><dd>${safe(scopeLabel(o))}</dd><dt>Basis</dt><dd>${safe(basisLabel(o))}</dd><dt>Source</dt><dd>${esc(assuranceText(o))} ${evidenceLinks(o)}${freshnessNote(o)}</dd></dl>${o.calculation?`<p class="bh-note"><strong>Calculated:</strong> ${esc(o.calculation.formula||o.calculation)}</p>`:''}${o.normalization?`<p class="bh-note">${esc(o.normalization)}</p>`:''}<details class="bh-caveats"><summary>Caveats and source wording</summary>${g?`<p class="bh-note">Research grade ${g}: ${safe(gradeText[g])}.</p>`:''}${basisText(o)&&!o.limitations.includes(o.basis)?`<p>${esc(basisText(o))}</p>`:''}<p class="bh-warning">${esc(limitationsText(o))}</p><p class="bh-quote">“${esc(o.original_text)}”</p></details>${history.length&&!sparkline?`<details class="bh-related"><summary>Other dates</summary><p> ${history.map(r=>`<button type="button" class="text-link" data-bh-observation="${safe(r.id)}">${safe(otherLabel(r,false))}</button>`).join(' ')}</p></details>`:''}${related.length?`<details class="bh-related"><summary>Other measures</summary><p> ${related.map(r=>`<button type="button" class="text-link" data-bh-context="${safe(r.id)}">${esc(otherLabel(r,true))}</button>`).join(' ')}</p></details>`:''}<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`;
+ $('bh-detail').innerHTML=`<p class="bh-kicker">Selected evidence</p><h3 id="bh-detail-title">${safe(name)}</h3><p class="bh-measure-name">${esc(measureLabel(o.measure))}</p>${isHistorical(o)?`<span class="bh-historical">Historical · ${yearOf(o)}</span>`:''}<p class="bh-value${isHistorical(o)?' is-historical':''}">${safe(numeric(o)?valueText(o):'Not quantified')}<span class="bh-pill ${pillClass(o)}">${statusText(o)}</span></p><dl class="bh-facts"><dt>Date</dt><dd>${safe(dateRow(o))}</dd><dt>Scope</dt><dd>${safe(scopeLabel(o))}</dd><dt>Basis</dt><dd>${safe(basisLabel(o))}</dd><dt>Source</dt><dd>${esc(assuranceText(o))} ${evidenceLinks(o)}${freshnessNote(o)}</dd></dl>${o.calculation?`<p class="bh-note"><strong>Calculated:</strong> ${esc(o.calculation.formula||o.calculation)}</p>`:''}${o.normalization?`<p class="bh-note">${esc(o.normalization)}</p>`:''}<details class="bh-caveats"><summary>Caveats and source wording</summary>${g?`<p class="bh-note">Research grade ${g}: ${safe(gradeText[g])}.</p>`:''}${basisText(o)&&!o.limitations.includes(o.basis)?`<p>${esc(basisText(o))}</p>`:''}<p class="bh-warning">${esc(limitationsText(o))}</p><p class="bh-quote">“${esc(o.original_text)}”</p></details>${history.length&&!sparkline?`<details class="bh-related"><summary>Other dates</summary><p> ${history.map(r=>`<button type="button" class="text-link" data-bh-observation="${safe(r.id)}">${safe(otherLabel(r,false))}</button>`).join(' ')}</p></details>`:''}${related.length?`<details class="bh-related"><summary>Other measures</summary><p> ${related.map(r=>`<button type="button" class="text-link" data-bh-context="${safe(r.id)}">${esc(otherLabel(r,true))}</button>`).join(' ')}</p></details>`:''}<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`;
 }
 function historySeries(company,measure){
  const grouped=new Map();
@@ -2587,7 +2664,7 @@ function render(){
  $('bh-cohort').innerHTML='<option value="">All reporting periods (separate charts)</option>'+cohorts.map(c=>`<option value="${safe(c)}">${safe(cohortDisplay(c,cohortRows.find(o=>cohort(o)===c)))}</option>`).join('');$('bh-cohort').value=bhState.cohort;
  $('bh-group').innerHTML='<option value="">All business groups</option>'+Object.keys(MODEL_GROUPS).map(g=>`<option value="${safe(g)}">${safe(groupLabel(g))}</option>`).join('');$('bh-group').value=bhState.group;
  $('bh-sort').value=bhState.sort;
- renderCompare();renderDetail();renderHistory();renderGrid();
+ renderCompare();renderDetail();renderHistory();renderGrid();renderLedger();
 }
 function selectSignal(signal,company=''){
  if(!company){bhState.sort='signal';bhState.measure=bestMeasure(signal,bhState.group);}
@@ -2596,8 +2673,12 @@ function selectSignal(signal,company=''){
  if(company){const o=pickCompanyObservation(company,signal);if(o){bhState.measure=o.measure;bhState.observation=o.id;bhState.cohort=cohort(o);}}
  render();
 }
-window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries};
+window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries,latestFigures};
 if(!bundle)return;
+$('bh-close-evidence').addEventListener('click',()=>$('bh-evidence-dialog').close());
+$('bh-evidence-dialog').addEventListener('close',()=>{const trigger=[...document.querySelectorAll('[data-bh-ledger]')].find(n=>n.dataset.bhLedger===evidenceOrigin);trigger?.focus({preventScroll:true});});
+$('bh-evidence-dialog').addEventListener('click',e=>{if(e.target===$('bh-evidence-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}});
+$('bh-overview-tabs').addEventListener('keydown',e=>{if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;e.preventDefault();const ids=Object.keys(overviewMeasures);let i=ids.indexOf(overviewMeasure);i=e.key==='Home'?0:e.key==='End'?ids.length-1:(i+(e.key==='ArrowRight'?1:-1)+ids.length)%ids.length;overviewMeasure=ids[i];renderLedger();$('bh-overview-'+overviewMeasure).focus();});
 $('bh-measure').addEventListener('change',e=>{bhState.measure=e.target.value;bhState.cohort=null;bhState.company='';bhState.observation='';render();});
 $('bh-cohort').addEventListener('change',e=>{bhState.cohort=e.target.value;bhState.company='';bhState.observation='';render();});
 $('bh-group').addEventListener('change',e=>{bhState.group=e.target.value;bhState.cohort=null;bhState.company='';bhState.observation='';bhState.measure=bestMeasure(bhState.signal,bhState.group);render();revealSelection();});
@@ -2605,16 +2686,18 @@ $('bh-sort').addEventListener('change',e=>{bhState.sort=e.target.value;renderGri
 $('bh-search').addEventListener('input',e=>{bhState.query=e.target.value;renderGrid();});
 $('bh-evidence-only').addEventListener('change',e=>{bhState.evidenceOnly=!!e.target.checked;renderGrid();});
 document.addEventListener('click',e=>{
+ const overview=e.target.closest('[data-bh-overview]');if(overview){overviewMeasure=overview.dataset.bhOverview;renderLedger();$('bh-overview-'+overviewMeasure).focus({preventScroll:true});return;}
+ const ledger=e.target.closest('[data-bh-ledger]');if(ledger){const o=byId(ledger.dataset.bhLedger);if(!o)return;bhState.signal=o.signal;bhState.company=o.company_id;bhState.observation=o.id;bhState.measure=o.measure;bhState.cohort=cohort(o);render();openEvidence(o.id);return;}
  // Header buttons are rebuilt with the grid, so focus returns to the new button in the same place.
  const sort=e.target.closest('[data-bh-sort]');if(sort){bhState.sort=sort.dataset.bhSort;$('bh-sort').value=bhState.sort;renderGrid();revealSelection();$('bh-grid-head').querySelector?.('[data-bh-sort]')?.focus({preventScroll:true});return;}
  const tab=e.target.closest('[data-bh-tab]');if(tab){const inGrid=!!tab.closest('thead');selectSignal(tab.dataset.bhTab);if(inGrid)revealSelection();(inGrid?$('bh-grid-head').querySelector?.(`[data-bh-tab="${tab.dataset.bhTab}"]`):$('bh-tab-'+tab.dataset.bhTab))?.focus({preventScroll:true});return;}
- const cell=e.target.closest('[data-bh-company]');if(cell){selectSignal(cell.dataset.bhSignal,cell.dataset.bhCompany);const inspector=$('bh-inspector');inspector.scrollTop=0;inspector.scrollIntoView({behavior:media('(prefers-reduced-motion: reduce)')?'auto':'smooth',block:'start'});inspector.focus({preventScroll:true});return;}
- const mark=e.target.closest('[data-bh-observation], [data-bh-context]');if(mark){const o=byId(mark.dataset.bhObservation||mark.dataset.bhContext);if(!o)return;const panel=mark.closest('#bh-plot, #bh-history, #bh-detail');bhState.company=o.company_id;bhState.observation=o.id;bhState.measure=o.measure;bhState.cohort=cohort(o);render();const home=panel&&document.getElementById(panel.id),find=root=>[...root.querySelectorAll('[data-bh-observation]')].find(el=>el.dataset.bhObservation===o.id);(home&&find(home)||find(document))?.focus({preventScroll:true});}
+ const cell=e.target.closest('[data-bh-company]');if(cell){selectSignal(cell.dataset.bhSignal,cell.dataset.bhCompany);openEvidence();return;}
+ const mark=e.target.closest('[data-bh-observation], [data-bh-context]');if(mark){const o=byId(mark.dataset.bhObservation||mark.dataset.bhContext);if(!o)return;const panel=mark.closest('#bh-plot, #bh-history, #bh-detail');bhState.company=o.company_id;bhState.observation=o.id;bhState.measure=o.measure;bhState.cohort=cohort(o);render();const home=panel&&document.getElementById(panel.id),find=root=>[...root.querySelectorAll('[data-bh-observation]')].find(el=>el.dataset.bhObservation===o.id);(home&&find(home)||find(document))?.focus({preventScroll:true});openEvidence();}
 });
 $('bh-tabs').addEventListener('keydown',e=>{
  if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;e.preventDefault();let i=signals.indexOf(bhState.signal);i=e.key==='Home'?0:e.key==='End'?4:(i+(e.key==='ArrowRight'?1:-1)+5)%5;selectSignal(signals[i]);const active=$('bh-tab-'+signals[i]);active.focus({preventScroll:true});active.scrollIntoView({block:'nearest',inline:'nearest'});
 });
-$('bh-method-content').innerHTML=`<p><strong>Reported</strong> means the source states the number. <strong>Calculated</strong> means arithmetic from cited inputs, shown with its formula. <strong>Context</strong> covers customer counts, registered expert networks, headcount and profitability claims: proxies, never a measured margin, retention rate or cash figure. The letter on each figure is the research grade of its claim: A independent or buyer-side evidence, B an attributed primary statement, C secondary reporting or an estimate.</p><p>Run rate (annualized pace), completed-period revenue, gross billings and net revenue mean different things, so each keeps its own panel and scale. Missing disclosure is not zero and not a sign of weakness. Nonprofit research organizations are not scored on commercial measures.</p><p>Curated ${safe(bundle.dashboard_curated_on||'23 October 2026')} from research dataset ${safe(DATA.dataset_version)}, reviewed ${safe(bundle.source_dataset_reviewed_on)}; review dates stay attached to each claim. Follow the original source before acting on a figure.</p>`;
+$('bh-method-content').innerHTML=`<p><strong>Reported</strong> means the source states the number. <strong>Calculated</strong> means arithmetic from cited inputs, shown with its formula. <strong>Context</strong> covers customer counts, registered expert networks, headcount and profitability claims: proxies, never a measured margin, retention rate or cash figure. The letter on each figure is the research grade of its claim: A independent or buyer-side evidence, B an attributed primary statement, C secondary reporting or an estimate.</p><p>Run rate (annualized pace), completed-period revenue, gross billings and net revenue mean different things, so the overview labels each row and matching comparisons keep their own panels and scales. Missing disclosure is not zero and not a sign of weakness. Nonprofit research organizations are not scored on commercial measures.</p><p>Curated ${safe(bundle.dashboard_curated_on||'23 October 2026')} from research dataset ${safe(DATA.dataset_version)}, reviewed ${safe(bundle.source_dataset_reviewed_on)}; review dates stay attached to each claim. Follow the original source before acting on a figure.</p>`;
 })();
 
 initialize();

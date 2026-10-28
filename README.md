@@ -133,17 +133,18 @@ Cloudflare Web Analytics is injected at the edge and sets no cookies.
 
 ## Business health dashboard
 
-The overview starts with a comparable revenue chart, then offers profitability,
-customer durability, paid expert activity and cash measures. Reporting periods,
-currencies and business scopes stay separate. The complete 39-organization
+The overview starts with a revenue ledger: actual revenue, annualized pace and
+growth. Each row keeps its period, business scope and source type. Select a figure
+to inspect the evidence and history. Advanced opens the full metric charts.
+Reporting periods, currencies and business scopes stay separate. The complete 39-organization
 coverage grid and detailed evidence remain available in disclosures. There is no
 composite score or hypothetical financial calculator in the interface.
 
-The evidence layer contains 109 dated observations across 28 organizations, linked
-to 65 source records. On 28 October 2026, selected financial documents were read
-again and nine new source claims added with exact excerpts, locators, response
-hashes and separately validated quantities. The source-check ledger records 24
-checks (including a duplicate source alias and an upcoming-results notice): 21
+The evidence layer contains 113 dated observations across 28 organizations, linked
+to 67 source records. On 28 October 2026, selected financial documents were read
+again and thirteen new source claims added with exact excerpts, locators, response
+hashes and separately validated quantities. The source-check ledger records 26
+checks (including a duplicate source alias and an upcoming-results notice): 23
 content checks, one availability-only check and two unavailable sources.
 
 Paid-work verification requested all 135 recorded route URLs. Of these, 67 received
@@ -155,3 +156,8 @@ The underlying research remains dataset v2.5.0. New evidence is a validated
 supplement, not a claim that the entire historical dataset has been re-audited.
 See [dashboard definitions and evidence limits](docs/business-health-dashboard.md)
 and [financial source checks](data/fresh-source-checks.json).
+
+Cards, profiles, Compare and plain company pages use the same supplemental
+financial selection. Mercor’s H1 $614M figure is identified as a Sacra estimate;
+its $2B annualized figure retains an undisclosed gross/net basis. Operating
+activity and registered networks stay separate from revenue and paid delivery.

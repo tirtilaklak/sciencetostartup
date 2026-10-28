@@ -110,7 +110,10 @@ def main():
     for card_html in re.findall(r'<article class="company-card".*?</article>', directory, re.S):
         card_tags = Elements(card_html)
         assert len(card_tags.with_attribute('data-compare')) == 1
-        assert len(card_tags.with_attribute('data-open-company')) == 1
+        profile_links = [a for tag, a in card_tags.elements if tag == 'a' and 'company-open-profile' in a.get('class', '')]
+        assert len(profile_links) == 1, 'Each company card needs one direct profile action'
+        assert profile_links[0].get('href') == '#company/' + next(a['data-company-card'] for _, a in card_tags.with_attribute('data-company-card'))
+        assert not card_tags.with_attribute('data-open-company'), 'Removed duplicate quick summary remains'
         assert sum('number-button' in a.get('class', '') for tag, a in card_tags.elements if tag == 'button') <= 1, 'Directory repeats financial headlines'
         assert 'company-description' in card_html and 'company-signal' in card_html
     assert 'One financial headline each' not in template, 'Removed directory subtitle remains'

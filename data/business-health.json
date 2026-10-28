@@ -64,12 +64,12 @@
     ],
     "calculations": "Calculated observations retain formula, input observation IDs and original evidence. No interpolated revenue series, invented active-worker counts or undisclosed-margin estimates are presented as facts.",
     "estimates": "No new financial estimate is invented for missing data. A defensible future estimate must carry a range, explicit assumptions, date, scope and source inputs, and be switchable independently from reported observations.",
-    "freshness": "Selected financial statements and company disclosures were read on 28 October 2026. Each source check records its outcome separately from the reporting period. Other observations retain the October 15 research review; a page retrieval does not verify every claim."
+    "freshness": "Selected financial statements and company disclosures were read on 28 October 2026. Each source check records its outcome separately from the reporting period. Other observations retain the October 15 research review; a page retrieval does not verify every claim. A second primary-source pass added separately dated company operating statements and corrected estimate/accounting-basis classifications; unavailable revenue sources remain flagged."
   },
   "source_checks": {
     "checked_on": "2026-10-28",
     "status": "partial_content_refresh",
-    "notes": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results are scheduled for 4 November.",
+    "notes": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results are scheduled for 4 November. Second pass reviewed private-company primary news indexes; no newer revenue is inferred from product announcements, funding, commitments or network reach.",
     "entries": [
       {
         "source_id": "appen.source.audit-ap_2025",
@@ -285,6 +285,24 @@
         "status": "content_checked",
         "content_sha256": "03a37e5f36f6be67afe02a35eb4ddc828816278a056c48a608e54ff3ab708fd6",
         "note": "Issuer notice published 21 October schedules Q3 2026 results for 4 November. No Q3 financial results are inferred."
+      },
+      {
+        "source_id": "refresh.source.mercor-organizing-20260303",
+        "url": "https://www.mercor.com/blog/organizing-human-intelligence-to-power-the-ai-economy/",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read CEO essay dated 3 March; company says daily expert payouts exceeded $2M. No revenue number disclosed in this essay.",
+        "content_sha256": "a959a6bd867be206061f184e2c68c88a55d2b340094c6bc2e6e7ebe4d086f859"
+      },
+      {
+        "source_id": "refresh.source.prolific-2025-review",
+        "url": "https://www.prolific.com/resources/prolific-in-2025-more-precision-larger-scale-and-stronger-safeguards-for-quality-human-data",
+        "checked_on": "2026-10-28",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read official review published 16 December 2025; 380K+ studies/tasks and8M+ contribution hours refer to 2025 through publication, not a verified completed financial year or paid-only series.",
+        "content_sha256": "60d0228bd550632e4e4166a9a1e2b9e28666e8e616987e3b8e5d542e46b7c327"
       }
     ]
   },
@@ -1116,10 +1134,10 @@
       "evidence_assurance": "Preliminary unaudited acquisition disclosure, transcribed CFO statement",
       "currency": "USD",
       "is_context": false,
-      "scope_label": "Whole company",
+      "scope_label": "iMerit standalone business",
       "scope_detail": "iMerit standalone business; not EXL consolidated group",
-      "cohort": "Year ended 31 Mar 2026 · USD · Whole company · Gross/net undisclosed",
-      "cohort_label": "Year ended 31 Mar 2026 · USD · Whole company · Gross/net undisclosed",
+      "cohort": "Year ended 31 Mar 2026 · USD · iMerit standalone business · Gross/net undisclosed",
+      "cohort_label": "Year ended 31 Mar 2026 · USD · iMerit standalone business · Gross/net undisclosed",
       "cohort_key": "period_revenue|annual|2026|2026-03-31|USD|company|unspecified"
     },
     {
@@ -1211,7 +1229,7 @@
       "company_id": "mercor",
       "signal": "revenue",
       "measure": "period_revenue",
-      "label": "Actual-period gross revenue",
+      "label": "Estimated H1 gross revenue",
       "value": 614000000,
       "unit": "currency",
       "qualifier": "exact",
@@ -1225,7 +1243,7 @@
       },
       "scope": "ai_data",
       "accounting_basis": "gross",
-      "evidence_type": "reported",
+      "evidence_type": "estimate",
       "claim_ids": [
         "mercor.claim.major-growth_metrics-1-metric"
       ],
@@ -1235,10 +1253,10 @@
       "source_ids": [
         "mercor.source.audit-m6"
       ],
-      "basis": "Actual-period gross revenue: 614,000,000 USD. Period: 2026-H1.",
-      "limitations": "Definitions, dates and scope are specific to the cited source; disclosure is not independent verification.",
+      "basis": "Sacra publishes this H1 gross-revenue estimate, not an issuer financial statement.",
+      "limitations": "Third-party estimate; independent primary financial statements were not located. Gross revenue precedes contractor payouts and is not retained revenue or profit.",
       "original_text": "Actual-period gross revenue: 614,000,000 USD. Period: 2026-H1.",
-      "evidence_assurance": "Secondary-reported, unaudited",
+      "evidence_assurance": "Sacra estimate; unaudited",
       "currency": "USD",
       "is_context": false,
       "scope_label": "AI business / service line",
@@ -1246,14 +1264,15 @@
       "cohort": "H1 2026 · USD · AI business / service line · Gross before delivery payouts",
       "cohort_label": "H1 2026 · USD · AI business / service line · Gross before delivery payouts",
       "cohort_key": "period_revenue|half_year|2026|2026-06-30|USD|ai_data|gross",
-      "evidence_checked_on": "2026-10-28"
+      "evidence_checked_on": "2026-10-28",
+      "normalization": "Classified as an estimate after re-reading the source; historical canonical record remains unchanged."
     },
     {
       "id": "mercor.metric.oct14-major-financial-2",
       "company_id": "mercor",
       "signal": "revenue",
       "measure": "annualized_revenue",
-      "label": "$2B annualized gross revenue",
+      "label": "Annualized revenue pace",
       "value": 2000000000,
       "unit": "currency",
       "qualifier": "exact",
@@ -1263,7 +1282,7 @@
         "label": "2026-06"
       },
       "scope": "company",
-      "accounting_basis": "gross",
+      "accounting_basis": "unspecified",
       "evidence_type": "reported",
       "claim_ids": [
         "mercor.claim.oct14-major-financial-2"
@@ -1274,18 +1293,19 @@
       "source_ids": [
         "mercor.source.oct14-88dab2271689"
       ],
-      "basis": "Felicis reports the pace; Sacra estimates the gross basis. Not net revenue or FY revenue.",
-      "limitations": "Felicis reports the pace; Sacra estimates the gross basis. Not net revenue or FY revenue. Annualized snapshot, not completed-year revenue or proven subscription ARR.",
+      "basis": "Investor Felicis attributes a $2B annualized revenue run rate to Mercor by June 2026; this source does not specify gross or net.",
+      "limitations": "Investor-published company claim; unaudited. Revenue pace is not completed financial year revenue or proven subscription ARR. Sacra separately estimates a gross basis, which is not imposed on this issuer-attributed figure.",
       "original_text": "$2B annualized gross revenue. Sacra estimates the gross basis. Not net revenue or FY revenue.",
       "evidence_assurance": "Investor-reported",
       "currency": "USD",
       "is_context": false,
       "scope_label": "Whole company",
       "scope_detail": "Whole company",
-      "cohort": "Annualized snapshots · USD · Whole company · Gross before delivery payouts",
-      "cohort_label": "Annualized snapshots · USD · Whole company · Gross before delivery payouts",
-      "cohort_key": "annualized_revenue|run_rate|||USD|company|gross",
-      "evidence_checked_on": "2026-10-28"
+      "cohort": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
+      "cohort_label": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
+      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified",
+      "evidence_checked_on": "2026-10-28",
+      "normalization": "Gross/net reset to undisclosed because the directly linked Felicis statement does not identify that accounting basis."
     },
     {
       "id": "mercor.metric.major-growth_metrics-2",
@@ -4656,6 +4676,156 @@
           "refresh.taskus.h1-2026-group-revenue"
         ]
       }
+    },
+    {
+      "id": "refresh.mercor.march-2026-daily-payouts",
+      "company_id": "mercor",
+      "signal": "delivery",
+      "measure": "daily_expert_payouts",
+      "label": "Daily expert payouts",
+      "value": 2000000,
+      "unit": "currency",
+      "qualifier": "greater_than",
+      "as_of": "2026-03-03",
+      "period": {
+        "type": "daily",
+        "label": "Reported 3 Mar 2026",
+        "year": 2026
+      },
+      "scope": "company",
+      "accounting_basis": "unspecified",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.mercor.march-2026-daily-payouts.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "refresh.source.mercor-organizing-20260303"
+      ],
+      "basis": "Company CEO describes payouts above $2M per day as of this post.",
+      "limitations": "Company statement, not an independently verified payment series or period average. Cannot establish retained revenue, margin, active experts or an annual payout total.",
+      "original_text": "We scaled from paying out nothing to over $2M/day within two years",
+      "evidence_assurance": "Company-reported; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "Whole company",
+      "evidence_checked_on": "2026-10-28",
+      "currency": "USD",
+      "cohort": "Reported 3 Mar 2026 · USD · Whole company · unspecified",
+      "cohort_label": "Reported 3 Mar 2026 · USD · Whole company · unspecified",
+      "cohort_key": "daily_expert_payouts|daily|2026||USD|company|unspecified"
+    },
+    {
+      "id": "refresh.micro1.october-2026-core-team",
+      "company_id": "micro1",
+      "signal": "cash",
+      "measure": "team_size",
+      "label": "Core team size",
+      "value": 180,
+      "unit": "people",
+      "qualifier": "approximately",
+      "as_of": "2026-10-12",
+      "period": {
+        "type": "snapshot",
+        "label": "12 Oct 2026",
+        "year": 2026,
+        "end": "2026-10-12"
+      },
+      "scope": "company",
+      "accounting_basis": "not_applicable",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.micro1.october-2026-core-team.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "micro1.source.oct14-19eb5016dbc6"
+      ],
+      "basis": "Company describes approximately 180 core team members; contributors and experts are separate.",
+      "limitations": "Core team headcount is cost/capacity context. It does not disclose active paid experts, profit margin or revenue per employee on a retained-revenue basis.",
+      "original_text": "Core team comprises approximately 180 people.",
+      "evidence_assurance": "Company-reported; unaudited",
+      "is_context": true,
+      "scope_label": "Whole company",
+      "scope_detail": "Core team excluding contributor network",
+      "evidence_checked_on": "2026-10-28",
+      "cohort": "12 Oct 2026 · people · Whole company · not applicable",
+      "cohort_label": "12 Oct 2026 · people · Whole company · not applicable",
+      "cohort_key": "team_size|snapshot|2026|2026-10-12|people|company|not_applicable"
+    },
+    {
+      "id": "refresh.prolific.2025-contribution-hours",
+      "company_id": "prolific",
+      "signal": "delivery",
+      "measure": "period_work_hours",
+      "label": "Participant contribution hours",
+      "value": 8000000,
+      "unit": "hours",
+      "qualifier": "greater_than",
+      "as_of": "2025-12-16",
+      "period": {
+        "type": "year_to_date",
+        "label": "2025 as reported 16 Dec; cutoff unstated",
+        "year": 2025
+      },
+      "scope": "company",
+      "accounting_basis": "not_applicable",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.prolific.2025-contribution-hours.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "refresh.source.prolific-2025-review"
+      ],
+      "basis": "2025 activity described in the 16 December review; exact data cutoff unstated.",
+      "limitations": "Includes surveys and research outside specialist AI work. Article does not establish that every counted hour was paid; this is contribution volume, not paid utilization or a completed financial year total.",
+      "original_text": "They spent over 8 million hours contributing human judgment and insights",
+      "evidence_assurance": "Company-reported; unaudited",
+      "is_context": true,
+      "scope_label": "Whole company",
+      "scope_detail": "Prolific platform; includes non-AI research",
+      "evidence_checked_on": "2026-10-28",
+      "cohort": "2025 as reported 16 Dec; cutoff unstated · hours · Whole company · not applicable",
+      "cohort_label": "2025 as reported 16 Dec; cutoff unstated · hours · Whole company · not applicable",
+      "cohort_key": "period_work_hours|year_to_date|2025||hours|company|not_applicable"
+    },
+    {
+      "id": "refresh.prolific.2025-studies-tasks",
+      "company_id": "prolific",
+      "signal": "delivery",
+      "measure": "period_completed_tasks",
+      "label": "Studies and tasks completed",
+      "value": 380000,
+      "unit": "count",
+      "qualifier": "greater_than",
+      "as_of": "2025-12-16",
+      "period": {
+        "type": "year_to_date",
+        "label": "2025 as reported 16 Dec; cutoff unstated",
+        "year": 2025
+      },
+      "scope": "company",
+      "accounting_basis": "not_applicable",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.prolific.2025-studies-tasks.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "refresh.source.prolific-2025-review"
+      ],
+      "basis": "2025 activity described in the 16 December review; exact data cutoff unstated.",
+      "limitations": "Mixes short surveys and AI evaluations without a common unit of task complexity or payment. Not an active-worker count, paid delivery rate or completed financial year total.",
+      "original_text": "In 2025, Prolific participants completed over 380,000 studies and tasks",
+      "evidence_assurance": "Company-reported; unaudited",
+      "is_context": true,
+      "scope_label": "Whole company",
+      "scope_detail": "Prolific platform; includes non-AI research",
+      "evidence_checked_on": "2026-10-28",
+      "cohort": "2025 as reported 16 Dec; cutoff unstated · count · Whole company · not applicable",
+      "cohort_label": "2025 as reported 16 Dec; cutoff unstated · count · Whole company · not applicable",
+      "cohort_key": "period_completed_tasks|year_to_date|2025||count|company|not_applicable"
     }
   ],
   "measure_definitions": [
@@ -4819,6 +4989,20 @@
       "label": "Free cash flow",
       "unit": "currency",
       "note": "Issuer-defined non-GAAP cash flow; definitions may differ. Kept separate from adjusted free cash flow."
+    },
+    {
+      "id": "period_work_hours",
+      "signal": "delivery",
+      "label": "Contribution hours over a stated period",
+      "unit": "hours",
+      "note": "Contribution volume; paid status and exact reporting cutoff may be undisclosed."
+    },
+    {
+      "id": "period_completed_tasks",
+      "signal": "delivery",
+      "label": "Studies and tasks over a stated period",
+      "unit": "count",
+      "note": "Tasks vary in duration and complexity. Not active paid experts or revenue."
     }
   ],
   "sources": [
@@ -5497,6 +5681,28 @@
       "retrieval_status": "checked",
       "last_check_on": "2026-10-28",
       "last_check_status": "unavailable"
+    },
+    {
+      "id": "refresh.source.mercor-organizing-20260303",
+      "company_id": "mercor",
+      "title": "Organizing human intelligence to power the AI economy",
+      "url": "https://www.mercor.com/blog/organizing-human-intelligence-to-power-the-ai-economy/",
+      "publisher": "Mercor",
+      "source_type": "company",
+      "published_on": "2026-03-03",
+      "accessed_on": "2026-10-28",
+      "retrieval_status": "checked"
+    },
+    {
+      "id": "refresh.source.prolific-2025-review",
+      "company_id": "prolific",
+      "title": "Prolific in 2025: More precision, larger scale, and stronger safeguards for quality human data",
+      "url": "https://www.prolific.com/resources/prolific-in-2025-more-precision-larger-scale-and-stronger-safeguards-for-quality-human-data",
+      "publisher": "Prolific",
+      "source_type": "company",
+      "published_on": "2025-12-16",
+      "accessed_on": "2026-10-28",
+      "retrieval_status": "checked"
     }
   ],
   "fresh_claims": [
@@ -5758,6 +5964,168 @@
         "scope": "company",
         "accounting_basis": "reported"
       }
+    },
+    {
+      "id": "refresh.mercor.march-2026-daily-payouts.claim",
+      "company_id": "mercor",
+      "status": "supported",
+      "statement": "Daily expert payouts. Company CEO describes payouts above $2M per day as of this post.",
+      "source_ids": [
+        "refresh.source.mercor-organizing-20260303"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Company-reported; unaudited",
+      "excerpt": "We scaled from paying out nothing to over $2M/day within two years",
+      "source_locator": "Closing section: expert payments",
+      "fact": {
+        "measure": "daily_expert_payouts",
+        "value": 2000000,
+        "unit": "currency",
+        "period": {
+          "type": "daily",
+          "label": "Reported 3 Mar 2026",
+          "year": 2026
+        },
+        "scope": "company",
+        "accounting_basis": "unspecified",
+        "currency": "USD"
+      }
+    },
+    {
+      "id": "refresh.micro1.october-2026-core-team.claim",
+      "company_id": "micro1",
+      "status": "supported",
+      "statement": "Core team size. Company describes approximately 180 core team members; contributors and experts are separate.",
+      "source_ids": [
+        "micro1.source.oct14-19eb5016dbc6"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Company-reported; unaudited",
+      "excerpt": "our core team is only ~180 people",
+      "source_locator": "Q3 update, core team paragraph",
+      "fact": {
+        "measure": "team_size",
+        "value": 180,
+        "unit": "people",
+        "period": {
+          "type": "snapshot",
+          "label": "12 Oct 2026",
+          "year": 2026,
+          "end": "2026-10-12"
+        },
+        "scope": "company",
+        "accounting_basis": "not_applicable"
+      }
+    },
+    {
+      "id": "refresh.prolific.2025-contribution-hours.claim",
+      "company_id": "prolific",
+      "status": "supported",
+      "statement": "Participant contribution hours. 2025 activity described in the 16 December review; exact data cutoff unstated.",
+      "source_ids": [
+        "refresh.source.prolific-2025-review"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Company-reported; unaudited",
+      "excerpt": "They spent over 8 million hours contributing human judgment and insights",
+      "source_locator": "Opening overview of 2025 contribution volume",
+      "fact": {
+        "measure": "period_work_hours",
+        "value": 8000000,
+        "unit": "hours",
+        "period": {
+          "type": "year_to_date",
+          "label": "2025 as reported 16 Dec; cutoff unstated",
+          "year": 2025
+        },
+        "scope": "company",
+        "accounting_basis": "not_applicable"
+      }
+    },
+    {
+      "id": "refresh.prolific.2025-studies-tasks.claim",
+      "company_id": "prolific",
+      "status": "supported",
+      "statement": "Studies and tasks completed. 2025 activity described in the 16 December review; exact data cutoff unstated.",
+      "source_ids": [
+        "refresh.source.prolific-2025-review"
+      ],
+      "observed_on": "2026-10-28",
+      "confidence": "B",
+      "evidence_label": "Company-reported; unaudited",
+      "excerpt": "In 2025, Prolific participants completed over 380,000 studies and tasks",
+      "source_locator": "Opening overview of 2025 contribution volume",
+      "fact": {
+        "measure": "period_completed_tasks",
+        "value": 380000,
+        "unit": "count",
+        "period": {
+          "type": "year_to_date",
+          "label": "2025 as reported 16 Dec; cutoff unstated",
+          "year": 2025
+        },
+        "scope": "company",
+        "accounting_basis": "not_applicable"
+      }
+    }
+  ],
+  "private_company_review": [
+    {
+      "company_id": "mercor",
+      "url": "https://www.mercor.com/blog/",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_reviewed",
+      "content_sha256": "0643d0bde6b55ad0bda12d20315ac6065a966ffb55dbf806fafb91d0222b0652",
+      "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
+    },
+    {
+      "company_id": "micro1",
+      "url": "https://www.micro1.ai/blog",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_reviewed",
+      "content_sha256": "bccab39c86860e1bc0ece70803daa3e34375b71f85567d705227addf5ab3aed1",
+      "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
+    },
+    {
+      "company_id": "scale_ai",
+      "url": "https://scale.com/blog",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_reviewed",
+      "content_sha256": "a4c13d4a22b9ce69de97763d242f245e63560965bbcc5e74de5c9b809565b52b",
+      "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
+    },
+    {
+      "company_id": "surge_ai",
+      "url": "https://www.surgehq.ai/blog",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_reviewed",
+      "content_sha256": "81c2a9c7f338c4ff345dd104843330b8cca0040b9de5dbc2eb24ae075b4b249a",
+      "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
+    },
+    {
+      "company_id": "handshake_ai",
+      "url": "https://joinhandshake.com/newsroom/",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_reviewed",
+      "content_sha256": "254ee0979333dd7d30b2f9ba81031b9d9840ac080f6587c1881c57749307de6e",
+      "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
+    },
+    {
+      "company_id": "afterquery",
+      "url": "https://www.afterquery.com/blog",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_reviewed",
+      "content_sha256": "2a85a44ab41ede137c829322d5c9034c309ba3bf84d2d6e1179c76ca8656402f",
+      "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
     }
   ]
 }

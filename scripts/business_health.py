@@ -2,6 +2,7 @@
 import json
 import math
 import re
+from urllib.parse import urlsplit
 
 from observatory import SIDECAR_DATASET_VERSION
 
@@ -24,6 +25,30 @@ def load_business_health(path, data):
     # New source reads supplement this dashboard, not the frozen canonical release.
     # Each new claim binds the exact quantity and period to a checked source excerpt.
     checked = {entry['source_id']: entry for entry in health.get('source_checks', {}).get('entries', [])}
+    # Supplemental sources may add new primary documents, but must not replace
+    # canonical URLs or bypass the successful content-read receipt requirement.
+    source_ids = set()
+    for source in health.get('sources', []):
+        sid = source.get('id')
+        if not sid or sid in source_ids:
+            raise ValueError('business-health: source IDs must be unique')
+        source_ids.add(sid)
+        if sid in sources:
+            if source.get('url') != sources[sid]['url']:
+                raise ValueError('business-health: canonical source URL cannot be overridden')
+            continue
+        url = source.get('url', '')
+        parsed = urlsplit(url)
+        check = checked.get(sid, {})
+        if (not sid.startswith('refresh.source.') or source.get('company_id') not in companies
+                or parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password
+                or any(ord(char) <= 32 for char in url)
+                or not source.get('title') or not source.get('publisher')
+                or check.get('url') != url or check.get('status') != 'content_checked'
+                or check.get('http_status') != 200
+                or not re.fullmatch(r'[a-f0-9]{64}', check.get('content_sha256', ''))):
+            raise ValueError('business-health: supplemental source requires a valid checked public document')
+        sources[sid] = source
     fresh_ids = set()
     for claim in health.get('fresh_claims', []):
         cid = claim.get('id')
@@ -41,6 +66,7 @@ def load_business_health(path, data):
             check = checked.get(sid, {})
             if (sid not in sources or check.get('url') != sources[sid]['url']
                     or check.get('status') != 'content_checked' or check.get('http_status') != 200
+                    or (sources[sid].get('company_id') and sources[sid]['company_id'] != claim['company_id'])
                     or check.get('checked_on') != claim['observed_on']
                     or not re.fullmatch(r'[a-f0-9]{64}', check.get('content_sha256', ''))):
                 raise ValueError('business-health: fresh claim requires a successfully checked source')

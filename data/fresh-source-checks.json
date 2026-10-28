@@ -216,6 +216,80 @@
       "status": "content_checked",
       "content_sha256": "03a37e5f36f6be67afe02a35eb4ddc828816278a056c48a608e54ff3ab708fd6",
       "note": "Issuer notice published 21 October schedules Q3 2026 results for 4 November. No Q3 financial results are inferred."
+    },
+    {
+      "source_id": "refresh.source.mercor-organizing-20260303",
+      "url": "https://www.mercor.com/blog/organizing-human-intelligence-to-power-the-ai-economy/",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read CEO essay dated 3 March; company says daily expert payouts exceeded $2M. No revenue number disclosed in this essay.",
+      "content_sha256": "a959a6bd867be206061f184e2c68c88a55d2b340094c6bc2e6e7ebe4d086f859"
+    },
+    {
+      "source_id": "refresh.source.prolific-2025-review",
+      "url": "https://www.prolific.com/resources/prolific-in-2025-more-precision-larger-scale-and-stronger-safeguards-for-quality-human-data",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read official review published 16 December 2025; 380K+ studies/tasks and8M+ contribution hours refer to 2025 through publication, not a verified completed financial year or paid-only series.",
+      "content_sha256": "60d0228bd550632e4e4166a9a1e2b9e28666e8e616987e3b8e5d542e46b7c327"
+    }
+  ],
+  "private_company_review": [
+    {
+      "company_id": "mercor",
+      "url": "https://www.mercor.com/blog/",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_reviewed",
+      "content_sha256": "0643d0bde6b55ad0bda12d20315ac6065a966ffb55dbf806fafb91d0222b0652",
+      "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
+    },
+    {
+      "company_id": "micro1",
+      "url": "https://www.micro1.ai/blog",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_reviewed",
+      "content_sha256": "bccab39c86860e1bc0ece70803daa3e34375b71f85567d705227addf5ab3aed1",
+      "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
+    },
+    {
+      "company_id": "scale_ai",
+      "url": "https://scale.com/blog",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_reviewed",
+      "content_sha256": "a4c13d4a22b9ce69de97763d242f245e63560965bbcc5e74de5c9b809565b52b",
+      "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
+    },
+    {
+      "company_id": "surge_ai",
+      "url": "https://www.surgehq.ai/blog",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_reviewed",
+      "content_sha256": "81c2a9c7f338c4ff345dd104843330b8cca0040b9de5dbc2eb24ae075b4b249a",
+      "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
+    },
+    {
+      "company_id": "handshake_ai",
+      "url": "https://joinhandshake.com/newsroom/",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_reviewed",
+      "content_sha256": "254ee0979333dd7d30b2f9ba81031b9d9840ac080f6587c1881c57749307de6e",
+      "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
+    },
+    {
+      "company_id": "afterquery",
+      "url": "https://www.afterquery.com/blog",
+      "checked_on": "2026-10-28",
+      "http_status": 200,
+      "status": "content_reviewed",
+      "content_sha256": "2a85a44ab41ede137c829322d5c9034c309ba3bf84d2d6e1179c76ca8656402f",
+      "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
     }
   ]
 }

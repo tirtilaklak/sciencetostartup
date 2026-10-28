@@ -491,7 +491,7 @@ function comparisonRows(){return [
  ];}
 // Like with like: when another column shows a 12-month figure, a half-year or quarter
 // headline gives way to the same scope's latest full year and moves to a second line.
-function comparisonRevenue(id){const m=preferredFinancial(id),period=m&&financialPeriod(m);if(!m||m.kind!=='revenue'||!['half','short'].includes(period))return compactSignal(id);const months=period==='half'?6:m.period_type==='quarter'||/quarter|three months|\bQ[1-4]\b/i.test(m.period_label||'')?3:0,span=months?months+' months':'',peers=compareIds().filter(x=>x!==id).map(x=>preferredFinancial(x)).filter(Boolean),twelve=peers.some(o=>['annualized_revenue_run_rate','arr'].includes(o.kind)||(o.kind==='revenue'&&['annual','ttm'].includes(financialPeriod(o))));const year=twelve?eligibleMetrics(id,'revenue').filter(x=>financialPeriod(x)==='annual'&&x.segment_scope===m.segment_scope&&(x.scope_detail||'')===(m.scope_detail||'')&&x.currency===m.currency).sort((a,b)=>dateRank(b.as_of).localeCompare(dateRank(a.as_of)))[0]:null;return year?signalFor(id,year)+`<p class="comparison-later"><span class="comparison-later-label">Latest ${esc(span||'shorter period')}</span>${numberButton(m)}<span class="row-period">${esc(readableDates(shortPeriod(m)))} · ${esc(compactMetricScope(m))}</span></p>`:signalFor(id,m,span);}
+function comparisonRevenue(id){if(financialObservationFor(id))return financialSummaryHTML(id);const m=preferredFinancial(id),period=m&&financialPeriod(m);if(!m||m.kind!=='revenue'||!['half','short'].includes(period))return compactSignal(id);const months=period==='half'?6:m.period_type==='quarter'||/quarter|three months|\bQ[1-4]\b/i.test(m.period_label||'')?3:0,span=months?months+' months':'',peers=compareIds().filter(x=>x!==id).map(x=>preferredFinancial(x)).filter(Boolean),twelve=peers.some(o=>['annualized_revenue_run_rate','arr'].includes(o.kind)||(o.kind==='revenue'&&['annual','ttm'].includes(financialPeriod(o))));const year=twelve?eligibleMetrics(id,'revenue').filter(x=>financialPeriod(x)==='annual'&&x.segment_scope===m.segment_scope&&(x.scope_detail||'')===(m.scope_detail||'')&&x.currency===m.currency).sort((a,b)=>dateRank(b.as_of).localeCompare(dateRank(a.as_of)))[0]:null;return year?signalFor(id,year)+`<p class="comparison-later"><span class="comparison-later-label">Latest ${esc(span||'shorter period')}</span>${numberButton(m)}<span class="row-period">${esc(readableDates(shortPeriod(m)))} · ${esc(compactMetricScope(m))}</span></p>`:signalFor(id,m,span);}
 const MOBILE_COMPARE_PAIRS=[[0,1],[0,2],[1,2]];
 function comparePairOptions(ids){return MOBILE_COMPARE_PAIRS.filter(pair=>pair.every(i=>i<ids.length));}
 let comparisonFocus=null,evidenceReturnFocus=null,pendingComparisonResize=false;
@@ -773,7 +773,31 @@ const SHORT_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct',
 function readableDates(text){return String(text??'').replace(/\b((?:19|20)\d{2})-(0[1-9]|1[0-2])(?:-(0[1-9]|[12]\d|3[01]))?\b(?![-\d])/g,(all,year,month,day)=>(day?Number(day)+' ':'')+SHORT_MONTHS[month-1]+' '+year);}
 function monthSpan(dates){const months=[...new Set(dates.map(d=>String(d).slice(0,7)))].sort(),first=months[0],last=months.at(-1);return first===last?readableDates(first):first.slice(0,4)===last.slice(0,4)?SHORT_MONTHS[first.slice(5)-1]+'–'+SHORT_MONTHS[last.slice(5)-1]+' '+first.slice(0,4):readableDates(first)+' to '+readableDates(last);}
 function listText(names){return names.length<3?names.join(' and '):names.slice(0,-1).join(', ')+' and '+names.at(-1);}
-function compactSignal(id){return signalFor(id,preferredFinancial(id));}
+// The same supplemental observation drives cards, profiles and Compare.
+function financialObservationFor(id){
+ const health=window.BUSINESS_HEALTH;if(!health)return null;
+ const candidates=(health.observations||[]).filter(o=>o.company_id===id&&o.signal==='revenue'&&['period_revenue','annualized_revenue'].includes(o.measure)&&typeof o.value==='number'&&Number.isFinite(o.value)&&!o.is_context&&o.evidence_type==='reported');
+ const scopes=['company','ai_data','other_segment','parent'];
+ const end=o=>o.period?.end||(String(o.as_of||'').match(/\d{4}(?:-\d{2}){0,2}/)||[''])[0];
+ const scopeRank=o=>{const rank=scopes.indexOf(o.scope);return rank<0?scopes.length:rank;};
+ const recent=candidates.filter(o=>end(o)>='2025-10-28');
+ return (recent.length?recent:candidates).sort((a,b)=>scopeRank(a)-scopeRank(b)||Number(b.measure==='period_revenue')-Number(a.measure==='period_revenue')||end(b).localeCompare(end(a)))[0]||null;
+}
+function financialSummaryHTML(id){
+ const o=financialObservationFor(id);if(!o)return signalFor(id,preferredFinancial(id));
+ const health=window.BUSINESS_HEALTH,record=(health.sources||[]).find(s=>o.source_ids.includes(s.id))||sources[o.source_ids[0]],fresh=(health.fresh_claims||[]).find(c=>o.claim_ids.includes(c.id));
+ const value=window.BusinessHealth?.valueText(o)||String(o.value),period=o.period?.label||o.as_of,scope=o.scope_label||scopeText(o.scope,id),basis=o.accounting_basis==='gross'?'Gross revenue':o.accounting_basis==='net'?'Net revenue':o.measure==='annualized_revenue'?'Gross/net not disclosed':'',type=o.measure==='annualized_revenue'?'Annualized pace':'Revenue';
+ const checked=fresh?.observed_on||(health.source_checks?.entries||[]).find(e=>o.source_ids.includes(e.source_id)&&e.status==='content_checked')?.checked_on;
+ const end=o.period?.end||(String(o.as_of||'').match(/\d{4}(?:-\d{2}){0,2}/)||[''])[0],old=!end||end<'2025-10-28';
+ const citation=record?external(record.url,record.publisher||'Original source'):'';
+ const quote=o.original_text||fresh?.excerpt||'';
+ const failed=o.refresh_status==='source_unavailable'||(health.source_checks?.entries||[]).some(e=>o.source_ids.includes(e.source_id)&&e.status==='unavailable');
+ const warning=failed?'<p class="financial-source-warning">Original citation could not be rechecked. Historical source attribution retained.</p>':'';
+ const observationAttr=String(o.id).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const content=`<div class="financial-summary" data-financial-observation="${observationAttr}"><div class="row-number"><strong>${esc(value)}</strong><span>${esc(type)}</span></div><span class="row-period">${esc(readableDates(period))} · ${esc(o.currency||'')} · ${esc(scope)}${basis?' · '+esc(basis):''}</span><div class="financial-citation">${citation}<span>${esc(o.evidence_assurance||'Attributed source')}</span></div>${warning}<details class="financial-source-details"><summary>Figure details</summary><p>${esc(o.limitations||'')}</p>${quote?`<blockquote>${esc(quote)}</blockquote>`:''}${checked?`<p>Source content checked ${esc(readableDates(checked))}. The figure covers ${esc(readableDates(period))}.</p>`:''}</details></div>`;
+ return old?`<span class="signal-label">No recent revenue figure</span><details class="historical-signal"><summary>Historical figure · ${esc(readableDates(period))}</summary>${content}</details>`:content;
+}
+function compactSignal(id){return financialSummaryHTML(id);}
 // Recency describes the observation period, not when an old source was fetched again.
 const FINANCIAL_RECENCY_REVIEW='2026-10-28';
 function financialObservationAge(m){

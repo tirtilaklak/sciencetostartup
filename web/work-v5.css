@@ -120,3 +120,86 @@
 .w4-safety-tips{margin:0}
 .w4-safety-tips>summary{min-height:40px;font-size:12px}
 .w4-safety-tips>p{font-size:13px;line-height:1.5;margin:4px 0 12px}
+
+/* Job board: the offer is readable without opening a dossier. */
+#work-cards .w4-section{margin-bottom:30px}
+#work-cards .w4-section>.work-list-heading{font-size:19px;letter-spacing:-.4px;margin:8px 0 14px}
+#work-cards .w4-section-intro{margin:0 0 8px;gap:12px;align-items:baseline}
+#work-cards .w4-section-intro>.w4-section-note{font-size:12px;line-height:1.45;color:var(--muted);margin:0}
+#work-cards .w4-jumps{margin-left:auto;gap:14px}
+#work-cards .w4-jumps button{font-size:12px;min-height:28px}
+#work-cards .w4-block-heading{margin:15px 0 8px;padding:0;font-size:12px;color:var(--muted);font-weight:500}
+#work-cards .work-card-v4{background:#fff;border:1px solid var(--border);border-radius:6px;margin:0 0 8px;overflow:visible;content-visibility:visible;contain-intrinsic-height:none}
+#work-cards .w4-card-front{display:grid;grid-template-columns:minmax(230px,1.6fr) minmax(160px,1fr) minmax(150px,.8fr) 90px;gap:16px;align-items:start;padding:16px 18px 0}
+#work-cards .w4-card-heading{margin:0 0 6px;gap:6px;justify-content:flex-start;flex-wrap:wrap}
+#work-cards .w4-company{font-size:12px;line-height:1.4;font-weight:500;color:var(--green);min-height:0;margin:0;gap:0}
+#work-cards .w4-status{font-size:10px;max-width:none;padding:2px 5px;line-height:1.4;text-align:left}
+#work-cards .w4-role{font-size:16px;line-height:1.35;letter-spacing:-.2px;margin:0 0 5px}
+#work-cards .w4-dates{font-size:10px;line-height:1.5;color:var(--muted)}
+#work-cards .w4-offer{margin:0}
+#work-cards .w4-pay strong{font-size:18px;line-height:1.3;letter-spacing:-.3px;color:var(--ink)}
+#work-cards .w4-pay.w4-pay-unspecified strong{font-size:14px;letter-spacing:0;font-weight:500}
+#work-cards .w4-pay-note{font-size:10px;line-height:1.45;max-width:30em;margin-top:4px}
+#work-cards .w4-commitment{font-size:11px;line-height:1.5;margin-top:6px;color:var(--muted)}
+#work-cards .w4-schedule-note{font-size:10px;line-height:1.5;margin-top:6px}
+#work-cards .w4-location{font-size:12px;line-height:1.5;margin:1px 0 0;color:var(--muted)}
+#work-cards .w4-conditions-column .w4-requirements{display:none}
+#work-cards .w4-action-column{justify-self:end;align-self:start;margin:0}
+#work-cards .w4-open{display:inline-flex;align-items:center;justify-content:center;min-height:34px;font-size:12px;line-height:1.4;border:1px solid var(--border);border-radius:4px;padding:5px 8px;background:#fff;white-space:nowrap}
+#work-cards .w4-open:hover{background:var(--pale)}
+#work-cards .w4-details{margin:0 18px 8px;border:0}
+#work-cards .w4-details>summary{display:inline-flex;width:auto;gap:8px;min-height:28px;padding:4px 0;font-size:10px;line-height:1.4;color:var(--muted)}
+#work-cards .w4-details>summary>span[aria-hidden]{font-size:14px}
+#work-cards .w4-details[open]>summary{background:transparent}
+#work-cards .w4-detail-content{padding:16px 0 4px;margin-top:4px;border-top:1px solid var(--border)}
+#work-cards .w4-route-group{margin:8px 0 16px;padding:0}
+#work-cards .w4-route-group>summary{background:transparent;min-height:36px;padding:8px 0;border:0;font-size:12px;line-height:1.5}
+#work-cards .w4-compact-card .w4-compact-toggle>summary{padding:12px 16px;gap:16px}
+#work-cards .w4-compact-title strong{font-size:14px;line-height:1.4;font-weight:500}
+#work-cards .w4-compact-title small{font-size:11px;line-height:1.4;color:var(--green)}
+#work-cards .w4-compact-pay>strong{font-size:13px;line-height:1.4}
+#work-cards .w4-compact-card .w4-card-front{display:block;padding:12px 16px 0}
+#work-cards .w4-compact-card .w4-card-bottom{padding:8px 0;align-items:center}
+#work-overview{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;padding:0;border:0}
+#work-overview button{display:inline-flex;flex-direction:row;align-items:center;gap:4px;min-height:32px;padding:5px 10px;border:1px solid var(--border);border-radius:4px;background:transparent;font-size:11px;line-height:1.4;color:var(--muted)}
+#work-overview button strong{font-size:12px;line-height:1.4;margin:0;color:var(--ink)}
+#work-overview button:hover{background:var(--pale)}
+#work-view .w4-safety{padding:0;margin:0 0 10px;border:0}
+#work-view .w4-safety-tips>summary{font-size:11px;min-height:32px;color:var(--muted)}
+#work-view .w4-results-bar{margin:10px 0 12px}
+@media(min-width:701px) and (max-width:1000px){
+ #work-cards .w4-card-front{grid-template-columns:minmax(220px,1.5fr) minmax(150px,1fr) minmax(120px,.8fr);gap:14px}
+ #work-cards .w4-role-column{grid-row:auto;grid-column:1}
+ #work-cards .w4-offer-column{grid-row:auto;grid-column:2}
+ #work-cards .w4-conditions-column{grid-row:auto;grid-column:3}
+ #work-cards .w4-action-column{grid-column:3;grid-row:2;justify-self:start;align-self:end}
+}
+@media(max-width:700px){
+ #work-cards .w4-card-front{grid-template-columns:minmax(0,1fr) minmax(100px,.65fr);gap:10px 14px;padding:14px 14px 0}
+ #work-cards .w4-role-column{grid-column:1;grid-row:1}
+ #work-cards .w4-offer-column{grid-column:2;grid-row:1;text-align:right}
+ #work-cards .w4-conditions-column{grid-column:1;grid-row:2;align-self:center}
+ #work-cards .w4-action-column{grid-column:2;grid-row:2;justify-self:end;align-self:center}
+ #work-cards .w4-company{font-size:11px;min-height:0;margin:0}
+ #work-cards .w4-role{font-size:15px;line-height:1.35;margin-bottom:6px}
+ #work-cards .w4-card-heading{margin-bottom:5px}
+ #work-cards .w4-status{font-size:10px;line-height:1.4}
+ #work-cards .w4-dates{font-size:10px;line-height:1.5}
+ #work-cards .w4-dates span{white-space:normal}
+ #work-cards .w4-pay strong{font-size:16px;line-height:1.35}
+ #work-cards .w4-pay-note{font-size:10px;line-height:1.5}
+ #work-cards .w4-pay.w4-pay-unspecified strong{font-size:13px}
+ #work-cards .w4-commitment{display:none}
+ #work-cards .w4-schedule-note{font-size:10px;line-height:1.45}
+ #work-cards .w4-location{font-size:11px;line-height:1.45;margin:0}
+ #work-cards .w4-open{min-height:36px;font-size:11px;padding:6px 8px}
+ #work-cards .w4-details{margin:0 14px 4px}
+ #work-cards .w4-details>summary{min-height:32px;padding:5px 0;font-size:10px}
+ #work-cards .w4-compact-card .w4-compact-toggle>summary{padding:12px;gap:10px}
+ #work-cards .w4-compact-pay{flex-basis:125px}
+ #work-cards .w4-compact-title strong{font-size:13px}
+ #work-cards .w4-compact-pay>strong{font-size:12px}
+ #work-overview{display:flex;gap:6px;margin-bottom:12px}
+ #work-overview button{font-size:10px;line-height:1.35;min-height:32px;gap:3px;padding:5px 7px;flex-direction:row}
+ #work-overview button strong{font-size:11px;line-height:1.35}
+}

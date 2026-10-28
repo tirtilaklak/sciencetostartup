@@ -33,6 +33,7 @@ class BusinessHealthTests(unittest.TestCase):
         cls.claims.update({row["id"]: row for row in cls.health.get("fresh_claims", [])})
         cls.metrics = {row["id"]: row for row in cls.data["metrics"]}
         cls.sources = {row["id"]: row for row in cls.data["sources"]}
+        cls.sources.update({row["id"]: row for row in cls.health.get("sources", [])})
 
     def test_every_number_has_traceable_same_company_evidence(self):
         self.assertTrue(self.observations)
@@ -157,11 +158,36 @@ class BusinessHealthTests(unittest.TestCase):
         bad = copy.deepcopy(self.health)
         bad["fresh_claims"][0]["id"] = self.data["claims"][0]["id"]
         mutations.append(("fresh claim overrides canonical history", bad))
+        bad = copy.deepcopy(self.health)
+        supplemental = next(source for source in bad["sources"] if source["id"].startswith("refresh.source."))
+        supplemental["url"] = "https://user:password@example.com/evidence"
+        mutations.append(("supplemental source includes credentials", bad))
+        bad = copy.deepcopy(self.health)
+        source = next(source for source in bad["sources"] if source["id"].startswith("refresh.source."))
+        source["company_id"] = "taskus"
+        mutations.append(("supplemental source belongs to a different company", bad))
+        bad = copy.deepcopy(self.health)
+        bad["sources"][0]["url"] = "https://example.com/substitute"
+        mutations.append(("supplemental layer overrides canonical source URL", bad))
         for name, value in mutations:
             with self.subTest(mutation=name), self.assertRaises(ValueError):
                 load(value)
         fixture = {"dataset_version": "fixture"}
         self.assertIsNone(load(self.health, fixture), "Other datasets must not inherit curated research")
+
+    def test_private_company_estimates_and_activity_do_not_become_financial_actuals(self):
+        rows = {row["id"]: row for row in self.observations}
+        mercor = rows["mercor.metric.major-growth_metrics-1"]
+        self.assertEqual(mercor["evidence_type"], "estimate")
+        self.assertIn("Sacra", mercor["evidence_assurance"])
+        self.assertEqual(rows["mercor.metric.oct14-major-financial-2"]["accounting_basis"], "unspecified")
+        for identifier in ("refresh.prolific.2025-contribution-hours", "refresh.prolific.2025-studies-tasks"):
+            row = rows[identifier]
+            self.assertTrue(row["is_context"])
+            self.assertEqual(row["period"]["type"], "year_to_date")
+            self.assertNotIn("end", row["period"], "Unstated activity cutoff must not become a precise completed period")
+        self.assertEqual(rows["refresh.micro1.october-2026-core-team"]["qualifier"], "approximately")
+        self.assertTrue(rows["refresh.micro1.october-2026-core-team"]["is_context"])
 
     def test_runtime_filters_preserve_context_bounds_and_scenario_uncertainty(self):
         tree = ast.parse((ROOT / "tests/js_logic.py").read_text())
@@ -245,7 +271,9 @@ console.log(JSON.stringify({observations:observations.length,filtering:true,cont
                     sentences = re.split(r"(?<=[.!?])\s+|\n", row.get(field) or "")
                     self.assertEqual([s for s in sentences if s[:1].islower() and not s.startswith(names)], [], "Sentences start with a capital letter")
         mercor = next(row for row in self.observations if row["id"] == "mercor.metric.oct14-major-financial-2")
-        self.assertIn("Sacra estimates the gross basis", mercor["limitations"])
+        self.assertEqual(mercor["accounting_basis"], "unspecified")
+        self.assertIn("Felicis", mercor["basis"])
+        self.assertIn("not imposed", mercor["limitations"])
 
     def test_no_reader_facing_text_calls_a_figure_audited(self):
         # The site has audited nothing, and a filing is not an audit readers can rely on, so notes name the

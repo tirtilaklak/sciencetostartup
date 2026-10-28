@@ -685,7 +685,7 @@ def load_work_routes(path, data):
 
 # Presentation layers in cascade order. Each page area owns one file loaded after edition.css.
 # business-health.css styles only the overview dashboard; the page area files after it may refine it.
-REDESIGN_CSS = ("profiles-v2.css", "work-v4.css", "investor.css", "edition.css", "business-health.css", "site-nav.css", "overview.css", "directory.css", "profiles-v3.css", "work-v5.css", "method.css")
+REDESIGN_CSS = ("profiles-v2.css", "work-v4.css", "investor.css", "edition.css", "business-health.css", "site-nav.css", "overview.css", "directory.css", "profiles-v3.css", "work-v5.css", "method.css", "refresh.css")
 # Scripts concatenated after work-v3.js and before initialize(); later declarations replace earlier ones.
 # business-health.js runs as soon as it loads and reads app.js constants, so it comes last, after every declaration.
 PRESENTATION_JS = ("work-v4.js", "profiles-v2.js", "source-updates.js", "site-nav.js", "business-health.js")
@@ -781,7 +781,7 @@ def build(data, destination):
     html = render_static_file_metadata(html, destination)
     html = externalize_scripts(html, destination)
     (destination / "index.html").write_text(html)
-    from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health)
+    from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health, business_health=health)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}
     (destination / "manifest.json").write_text(json.dumps({"dataset_version": data["dataset_version"], "schema_version": data["schema_version"], "sha256": files}, indent=2) + "\n")
 

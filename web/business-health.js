@@ -1,4 +1,4 @@
-/* Business health: comparable observations first, complete evidence on demand. */
+/* Revenue ledger first; matching comparisons and full evidence are available on demand. */
 (() => {
 'use strict';
 const bundle=window.BUSINESS_HEALTH;
@@ -17,8 +17,12 @@ const ACRONYMS={us:'US',gaap:'GAAP',ebitda:'EBITDA',fx:'FX',nrr:'NRR (net revenu
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const bhState={signal:'revenue',measure:'period_revenue',cohort:null,group:'',query:'',sort:'coverage',evidenceOnly:false,company:'',observation:''};
 const all=()=>bundle?.observations||[];
+let overviewMeasure='period_revenue';
+const overviewMeasures={period_revenue:'Actual revenue',annualized_revenue:'Annualized pace',revenue_growth_yoy:'Growth'};
 const freshClaims=new Map((bundle?.fresh_claims||[]).map(c=>[c.id,c]));
 const refreshedSources=new Map((bundle?.sources||[]).map(s=>[s.id,s]));
+const sourceChecks=new Map((bundle?.source_checks?.entries||[]).map(s=>[s.source_id,s]));
+let evidenceOrigin='';
 const claimRecord=id=>claims[id]||freshClaims.get(id);
 const sourceRecord=id=>refreshedSources.get(id)||sources[id];
 const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -128,9 +132,14 @@ function pickCompanyObservation(company,signal){
  return list.sort((a,b)=>Number(numeric(b))-Number(numeric(a))||Number(!!a.is_context)-Number(!!b.is_context)||Number(b.measure===preferred)-Number(a.measure===preferred)||dateKey(b).slice(0,7).localeCompare(dateKey(a).slice(0,7))||Number(a.scope!=='company')-Number(b.scope!=='company')||(periodRank[a.period?.type]??2)-(periodRank[b.period?.type]??2))[0];
 }
 function evidenceLinks(o){return `<span class="bh-evidence-links">${o.claim_ids.filter(id=>claims[id]).map((id,i)=>claimButton(id,o.claim_ids.length>1?'Claim '+(i+1):'Inspect claim')).join('')}${o.source_ids.slice(0,3).map(id=>{const source=sourceRecord(id);return source?external(source.url,source.publisher||'Original source'):'';}).join('')}</span>`;}
+function checkedSource(o){
+ const checks=o.source_ids.map(id=>sourceChecks.get(id)).filter(Boolean);
+ return checks.find(c=>c.status==='content_checked')||checks.find(c=>c.status==='unavailable')||checks[0];
+}
 function freshnessNote(o){
- const fresh=o.claim_ids.map(id=>freshClaims.get(id)).filter(Boolean);
- return fresh.length?`<p class="bh-refresh-note">Content checked ${safe(shortDate(fresh[0].observed_on))}${fresh[0].source_locator?' · '+safe(fresh[0].source_locator):''}</p>`:'';
+ const check=checkedSource(o),fresh=o.claim_ids.map(id=>freshClaims.get(id)).filter(Boolean);
+ if(check?.status==='unavailable')return `<p class="bh-refresh-note is-unavailable">Source could not be retrieved on ${safe(shortDate(check.checked_on))}. The figure retains its earlier attribution.</p>`;
+ return check?.status==='content_checked'?`<p class="bh-refresh-note">Source page read ${safe(shortDate(check.checked_on))}${fresh[0]?.source_locator?' · '+safe(fresh[0].source_locator):''}. This check date is separate from the reporting period.</p>`:'';
 }
 
 function statusText(o){return o.evidence_type==='estimate'?'Third-party estimate':o.evidence_type==='calculated'?'Calculated':o.is_context?'Context only':'Reported';}
@@ -141,22 +150,57 @@ function dateRow(o){
  if(!/\d{4}-\d{2}/.test(o.as_of)||label.includes(o.as_of)||label.includes(month)||label.includes(dateKey(o).slice(0,7)))return label;
  return label+' · stated '+extra;
 }
+// One latest observation per company. Dates decide the order, never incompatible amounts.
+function latestFigures(measure){
+ const grouped=new Map();
+ for(const o of all().filter(o=>o.measure===measure&&numeric(o)&&!o.is_context&&(measure!=='period_revenue'||o.evidence_type!=='estimate'))){
+  if(!grouped.has(o.company_id))grouped.set(o.company_id,[]);grouped.get(o.company_id).push(o);
+ }
+ const periodPreference={half_year:0,annual:1,trailing_year:2,run_rate:0};
+ return [...grouped.values()].map(list=>list.sort((a,b)=>dateKey(b).localeCompare(dateKey(a))||Number(a.scope!=='company')-Number(b.scope!=='company')||(periodPreference[a.period.type]??3)-(periodPreference[b.period.type]??3))[0]).sort((a,b)=>dateKey(b).localeCompare(dateKey(a))||companies[a.company_id].name.localeCompare(companies[b.company_id].name));
+}
+function sourceKind(o){
+ if(o.evidence_type==='estimate')return 'Estimate';
+ const assurance=assuranceText(o);
+ if(/secondary|Reuters|press-reported|via press/i.test(assurance))return 'Reporting';
+ if(/annual report|Form 10-K|Form 20-F|ASX/i.test(assurance))return 'Filing';
+ if(/investor/i.test(assurance))return 'Investor';
+ if(/company|founder|CEO|CFO|acquisition disclosure/i.test(assurance))return 'Company';
+ return 'Attributed';
+}
+function ledgerPeriod(o){
+ const p=o.period||{};
+ if(p.type==='half_year'&&p.start&&p.end){
+  const start=shortDate(p.start,false),end=shortDate(p.end,false);
+  return p.start.slice(0,4)===p.end.slice(0,4)?start.replace(/ \d{4}$/,'')+'–'+end:start+'–'+end;
+ }
+ return periodShort(o,true);
+}
+function renderLedger(){
+ const list=latestFigures(overviewMeasure);
+ $('bh-overview-tabs').innerHTML=Object.entries(overviewMeasures).map(([id,label])=>`<button type="button" role="tab" id="bh-overview-${id}" aria-controls="bh-ledger-panel" aria-selected="${overviewMeasure===id}" tabindex="${overviewMeasure===id?0:-1}" data-bh-overview="${id}">${label}<span>${latestFigures(id).length}</span></button>`).join('');
+ $('bh-ledger-panel').setAttribute('aria-labelledby','bh-overview-'+overviewMeasure);
+ $('bh-ledger-note').textContent=overviewMeasure==='annualized_revenue'?'A projection of recent revenue across a year. Dates, scopes and gross/net definitions differ.':overviewMeasure==='revenue_growth_yoy'?'Year-on-year changes within each business. Full-year and half-year comparisons stay labeled.':'Latest disclosed revenue for each business. Reporting periods and scopes differ; rows are ordered by date.';
+ $('bh-ledger').innerHTML=list.map(o=>{const kind=sourceKind(o),check=checkedSource(o),unavailable=check?.status==='unavailable';return `<article class="bh-ledger-row${isHistorical(o)?' is-historical':''}"><div class="bh-ledger-company"><a href="#company/${safe(o.company_id)}">${safe(companies[o.company_id].name)}</a><span>${safe(scopeLabel(o))}${o.accounting_basis==='gross'?' · gross':''}</span></div><button type="button" class="bh-ledger-value" data-bh-ledger="${safe(o.id)}" aria-label="${safe(companies[o.company_id].name+' '+valueText(o)+': inspect evidence')}">${safe(valueText(o))}</button><div class="bh-ledger-period">${safe(ledgerPeriod(o))}${isHistorical(o)?'<small>Historical</small>':''}</div><button type="button" class="bh-ledger-source" data-bh-ledger="${safe(o.id)}" aria-label="${safe('Source for '+companies[o.company_id].name+' '+valueText(o))}"><span class="bh-source-kind" data-kind="${kind.toLowerCase()}">${kind}</span><span class="bh-source-action">View source ${iconHTML('right')}</span>${unavailable?'<small class="bh-source-unavailable">Retrieval failed</small>':check?.status==='content_checked'?`<small>Read ${safe(shortDate(check.checked_on))}</small>`:''}</button></article>`;}).join('');
+ $('bh-ledger-count').textContent=plural(list.length,'company')+' with a reviewed '+(overviewMeasure==='annualized_revenue'?'annualized figure':overviewMeasure==='revenue_growth_yoy'?'growth figure':'revenue figure')+'. Full sources and older observations are available on each figure.';
+}
+function openEvidence(origin=''){const dialog=$('bh-evidence-dialog');evidenceOrigin=origin||evidenceOrigin;if(dialog&&!dialog.open)dialog.showModal();}
 function renderDetail(){
  const o=byId(bhState.observation),id=bhState.company||(o?.company_id),name=companies[id]?.name,group=id?groupLabel(modelGroup(id)):'';
  if(id&&evidenceState(id,bhState.signal)==='n-a'){
-  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name)} · ${safe(group)}</p><h3>Not applied</h3><p class="bh-lede">${safe(name)} is a nonprofit research organization. Commercial measures are not applied to it.</p><a class="bh-profile" href="#company/${safe(id)}">Full company profile ${iconHTML('external')}</a>`;
+  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name)} · ${safe(group)}</p><h3 id="bh-detail-title">Not applied</h3><p class="bh-lede">${safe(name)} is a nonprofit research organization. Commercial measures are not applied to it.</p><a class="bh-profile" href="#company/${safe(id)}">Full company profile ${iconHTML('external')}</a>`;
   return;
  }
  if(!o||o.company_id!==id||o.signal!==bhState.signal){
   const context=all().filter(r=>r.company_id===id&&r.signal===bhState.signal);
-  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name?name+' · '+group:'Read the evidence')}</p><h3>${name?'No reviewed public figure':'Select a figure'}</h3><p class="bh-lede">${name?'The reviewed sources do not establish '+labels[bhState.signal].toLowerCase()+' for '+safe(name)+'. Missing is not zero.':'Select a chart bar to read its source and reporting details.'}</p><p class="bh-note">${esc(definition(bhState.signal).ideal_measure||questions[bhState.signal])}</p>${context.length?`<div class="bh-related"><p><strong>Available context</strong></p>${context.map(r=>`<p>${esc(r.label)}: ${numeric(r)?safe(valueText(r)):esc(r.original_text)} ${evidenceLinks(r)}</p>`).join('')}</div>`:''}${id?`<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`:''}`;
+  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name?name+' · '+group:'Read the evidence')}</p><h3 id="bh-detail-title">${name?'No reviewed public figure':'Select a figure'}</h3><p class="bh-lede">${name?'The reviewed sources do not establish '+labels[bhState.signal].toLowerCase()+' for '+safe(name)+'. Missing is not zero.':'Select a chart bar to read its source and reporting details.'}</p><p class="bh-note">${esc(definition(bhState.signal).ideal_measure||questions[bhState.signal])}</p>${context.length?`<div class="bh-related"><p><strong>Available context</strong></p>${context.map(r=>`<p>${esc(r.label)}: ${numeric(r)?safe(valueText(r)):esc(r.original_text)} ${evidenceLinks(r)}</p>`).join('')}</div>`:''}${id?`<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`:''}`;
   return;
  }
  const history=all().filter(r=>r.company_id===id&&r.signal===o.signal&&r.measure===o.measure&&r.id!==o.id).sort((a,b)=>dateKey(b).localeCompare(dateKey(a)));
  const related=all().filter(r=>r.company_id===id&&r.signal===o.signal&&r.measure!==o.measure);
  const sparkline=historySeries(id,o.measure).some(list=>list.length>1&&list.some(r=>r.id===o.id));
  const g=grade(o);
- $('bh-detail').innerHTML=`<p class="bh-kicker">Selected evidence</p><h3>${safe(name)}</h3><p class="bh-measure-name">${esc(measureLabel(o.measure))}</p>${isHistorical(o)?`<span class="bh-historical">Historical · ${yearOf(o)}</span>`:''}<p class="bh-value${isHistorical(o)?' is-historical':''}">${safe(numeric(o)?valueText(o):'Not quantified')}<span class="bh-pill ${pillClass(o)}">${statusText(o)}</span></p><dl class="bh-facts"><dt>Date</dt><dd>${safe(dateRow(o))}</dd><dt>Scope</dt><dd>${safe(scopeLabel(o))}</dd><dt>Basis</dt><dd>${safe(basisLabel(o))}</dd><dt>Source</dt><dd>${esc(assuranceText(o))} ${evidenceLinks(o)}${freshnessNote(o)}</dd></dl>${o.calculation?`<p class="bh-note"><strong>Calculated:</strong> ${esc(o.calculation.formula||o.calculation)}</p>`:''}${o.normalization?`<p class="bh-note">${esc(o.normalization)}</p>`:''}<details class="bh-caveats"><summary>Caveats and source wording</summary>${g?`<p class="bh-note">Research grade ${g}: ${safe(gradeText[g])}.</p>`:''}${basisText(o)&&!o.limitations.includes(o.basis)?`<p>${esc(basisText(o))}</p>`:''}<p class="bh-warning">${esc(limitationsText(o))}</p><p class="bh-quote">“${esc(o.original_text)}”</p></details>${history.length&&!sparkline?`<details class="bh-related"><summary>Other dates</summary><p> ${history.map(r=>`<button type="button" class="text-link" data-bh-observation="${safe(r.id)}">${safe(otherLabel(r,false))}</button>`).join(' ')}</p></details>`:''}${related.length?`<details class="bh-related"><summary>Other measures</summary><p> ${related.map(r=>`<button type="button" class="text-link" data-bh-context="${safe(r.id)}">${esc(otherLabel(r,true))}</button>`).join(' ')}</p></details>`:''}<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`;
+ $('bh-detail').innerHTML=`<p class="bh-kicker">Selected evidence</p><h3 id="bh-detail-title">${safe(name)}</h3><p class="bh-measure-name">${esc(measureLabel(o.measure))}</p>${isHistorical(o)?`<span class="bh-historical">Historical · ${yearOf(o)}</span>`:''}<p class="bh-value${isHistorical(o)?' is-historical':''}">${safe(numeric(o)?valueText(o):'Not quantified')}<span class="bh-pill ${pillClass(o)}">${statusText(o)}</span></p><dl class="bh-facts"><dt>Date</dt><dd>${safe(dateRow(o))}</dd><dt>Scope</dt><dd>${safe(scopeLabel(o))}</dd><dt>Basis</dt><dd>${safe(basisLabel(o))}</dd><dt>Source</dt><dd>${esc(assuranceText(o))} ${evidenceLinks(o)}${freshnessNote(o)}</dd></dl>${o.calculation?`<p class="bh-note"><strong>Calculated:</strong> ${esc(o.calculation.formula||o.calculation)}</p>`:''}${o.normalization?`<p class="bh-note">${esc(o.normalization)}</p>`:''}<details class="bh-caveats"><summary>Caveats and source wording</summary>${g?`<p class="bh-note">Research grade ${g}: ${safe(gradeText[g])}.</p>`:''}${basisText(o)&&!o.limitations.includes(o.basis)?`<p>${esc(basisText(o))}</p>`:''}<p class="bh-warning">${esc(limitationsText(o))}</p><p class="bh-quote">“${esc(o.original_text)}”</p></details>${history.length&&!sparkline?`<details class="bh-related"><summary>Other dates</summary><p> ${history.map(r=>`<button type="button" class="text-link" data-bh-observation="${safe(r.id)}">${safe(otherLabel(r,false))}</button>`).join(' ')}</p></details>`:''}${related.length?`<details class="bh-related"><summary>Other measures</summary><p> ${related.map(r=>`<button type="button" class="text-link" data-bh-context="${safe(r.id)}">${esc(otherLabel(r,true))}</button>`).join(' ')}</p></details>`:''}<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`;
 }
 function historySeries(company,measure){
  const grouped=new Map();
@@ -240,7 +284,7 @@ function render(){
  $('bh-cohort').innerHTML='<option value="">All reporting periods (separate charts)</option>'+cohorts.map(c=>`<option value="${safe(c)}">${safe(cohortDisplay(c,cohortRows.find(o=>cohort(o)===c)))}</option>`).join('');$('bh-cohort').value=bhState.cohort;
  $('bh-group').innerHTML='<option value="">All business groups</option>'+Object.keys(MODEL_GROUPS).map(g=>`<option value="${safe(g)}">${safe(groupLabel(g))}</option>`).join('');$('bh-group').value=bhState.group;
  $('bh-sort').value=bhState.sort;
- renderCompare();renderDetail();renderHistory();renderGrid();
+ renderCompare();renderDetail();renderHistory();renderGrid();renderLedger();
 }
 function selectSignal(signal,company=''){
  if(!company){bhState.sort='signal';bhState.measure=bestMeasure(signal,bhState.group);}
@@ -249,8 +293,12 @@ function selectSignal(signal,company=''){
  if(company){const o=pickCompanyObservation(company,signal);if(o){bhState.measure=o.measure;bhState.observation=o.id;bhState.cohort=cohort(o);}}
  render();
 }
-window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries};
+window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries,latestFigures};
 if(!bundle)return;
+$('bh-close-evidence').addEventListener('click',()=>$('bh-evidence-dialog').close());
+$('bh-evidence-dialog').addEventListener('close',()=>{const trigger=[...document.querySelectorAll('[data-bh-ledger]')].find(n=>n.dataset.bhLedger===evidenceOrigin);trigger?.focus({preventScroll:true});});
+$('bh-evidence-dialog').addEventListener('click',e=>{if(e.target===$('bh-evidence-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}});
+$('bh-overview-tabs').addEventListener('keydown',e=>{if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;e.preventDefault();const ids=Object.keys(overviewMeasures);let i=ids.indexOf(overviewMeasure);i=e.key==='Home'?0:e.key==='End'?ids.length-1:(i+(e.key==='ArrowRight'?1:-1)+ids.length)%ids.length;overviewMeasure=ids[i];renderLedger();$('bh-overview-'+overviewMeasure).focus();});
 $('bh-measure').addEventListener('change',e=>{bhState.measure=e.target.value;bhState.cohort=null;bhState.company='';bhState.observation='';render();});
 $('bh-cohort').addEventListener('change',e=>{bhState.cohort=e.target.value;bhState.company='';bhState.observation='';render();});
 $('bh-group').addEventListener('change',e=>{bhState.group=e.target.value;bhState.cohort=null;bhState.company='';bhState.observation='';bhState.measure=bestMeasure(bhState.signal,bhState.group);render();revealSelection();});
@@ -258,14 +306,16 @@ $('bh-sort').addEventListener('change',e=>{bhState.sort=e.target.value;renderGri
 $('bh-search').addEventListener('input',e=>{bhState.query=e.target.value;renderGrid();});
 $('bh-evidence-only').addEventListener('change',e=>{bhState.evidenceOnly=!!e.target.checked;renderGrid();});
 document.addEventListener('click',e=>{
+ const overview=e.target.closest('[data-bh-overview]');if(overview){overviewMeasure=overview.dataset.bhOverview;renderLedger();$('bh-overview-'+overviewMeasure).focus({preventScroll:true});return;}
+ const ledger=e.target.closest('[data-bh-ledger]');if(ledger){const o=byId(ledger.dataset.bhLedger);if(!o)return;bhState.signal=o.signal;bhState.company=o.company_id;bhState.observation=o.id;bhState.measure=o.measure;bhState.cohort=cohort(o);render();openEvidence(o.id);return;}
  // Header buttons are rebuilt with the grid, so focus returns to the new button in the same place.
  const sort=e.target.closest('[data-bh-sort]');if(sort){bhState.sort=sort.dataset.bhSort;$('bh-sort').value=bhState.sort;renderGrid();revealSelection();$('bh-grid-head').querySelector?.('[data-bh-sort]')?.focus({preventScroll:true});return;}
  const tab=e.target.closest('[data-bh-tab]');if(tab){const inGrid=!!tab.closest('thead');selectSignal(tab.dataset.bhTab);if(inGrid)revealSelection();(inGrid?$('bh-grid-head').querySelector?.(`[data-bh-tab="${tab.dataset.bhTab}"]`):$('bh-tab-'+tab.dataset.bhTab))?.focus({preventScroll:true});return;}
- const cell=e.target.closest('[data-bh-company]');if(cell){selectSignal(cell.dataset.bhSignal,cell.dataset.bhCompany);const inspector=$('bh-inspector');inspector.scrollTop=0;inspector.scrollIntoView({behavior:media('(prefers-reduced-motion: reduce)')?'auto':'smooth',block:'start'});inspector.focus({preventScroll:true});return;}
- const mark=e.target.closest('[data-bh-observation], [data-bh-context]');if(mark){const o=byId(mark.dataset.bhObservation||mark.dataset.bhContext);if(!o)return;const panel=mark.closest('#bh-plot, #bh-history, #bh-detail');bhState.company=o.company_id;bhState.observation=o.id;bhState.measure=o.measure;bhState.cohort=cohort(o);render();const home=panel&&document.getElementById(panel.id),find=root=>[...root.querySelectorAll('[data-bh-observation]')].find(el=>el.dataset.bhObservation===o.id);(home&&find(home)||find(document))?.focus({preventScroll:true});}
+ const cell=e.target.closest('[data-bh-company]');if(cell){selectSignal(cell.dataset.bhSignal,cell.dataset.bhCompany);openEvidence();return;}
+ const mark=e.target.closest('[data-bh-observation], [data-bh-context]');if(mark){const o=byId(mark.dataset.bhObservation||mark.dataset.bhContext);if(!o)return;const panel=mark.closest('#bh-plot, #bh-history, #bh-detail');bhState.company=o.company_id;bhState.observation=o.id;bhState.measure=o.measure;bhState.cohort=cohort(o);render();const home=panel&&document.getElementById(panel.id),find=root=>[...root.querySelectorAll('[data-bh-observation]')].find(el=>el.dataset.bhObservation===o.id);(home&&find(home)||find(document))?.focus({preventScroll:true});openEvidence();}
 });
 $('bh-tabs').addEventListener('keydown',e=>{
  if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;e.preventDefault();let i=signals.indexOf(bhState.signal);i=e.key==='Home'?0:e.key==='End'?4:(i+(e.key==='ArrowRight'?1:-1)+5)%5;selectSignal(signals[i]);const active=$('bh-tab-'+signals[i]);active.focus({preventScroll:true});active.scrollIntoView({block:'nearest',inline:'nearest'});
 });
-$('bh-method-content').innerHTML=`<p><strong>Reported</strong> means the source states the number. <strong>Calculated</strong> means arithmetic from cited inputs, shown with its formula. <strong>Context</strong> covers customer counts, registered expert networks, headcount and profitability claims: proxies, never a measured margin, retention rate or cash figure. The letter on each figure is the research grade of its claim: A independent or buyer-side evidence, B an attributed primary statement, C secondary reporting or an estimate.</p><p>Run rate (annualized pace), completed-period revenue, gross billings and net revenue mean different things, so each keeps its own panel and scale. Missing disclosure is not zero and not a sign of weakness. Nonprofit research organizations are not scored on commercial measures.</p><p>Curated ${safe(bundle.dashboard_curated_on||'23 October 2026')} from research dataset ${safe(DATA.dataset_version)}, reviewed ${safe(bundle.source_dataset_reviewed_on)}; review dates stay attached to each claim. Follow the original source before acting on a figure.</p>`;
+$('bh-method-content').innerHTML=`<p><strong>Reported</strong> means the source states the number. <strong>Calculated</strong> means arithmetic from cited inputs, shown with its formula. <strong>Context</strong> covers customer counts, registered expert networks, headcount and profitability claims: proxies, never a measured margin, retention rate or cash figure. The letter on each figure is the research grade of its claim: A independent or buyer-side evidence, B an attributed primary statement, C secondary reporting or an estimate.</p><p>Run rate (annualized pace), completed-period revenue, gross billings and net revenue mean different things, so the overview labels each row and matching comparisons keep their own panels and scales. Missing disclosure is not zero and not a sign of weakness. Nonprofit research organizations are not scored on commercial measures.</p><p>Curated ${safe(bundle.dashboard_curated_on||'23 October 2026')} from research dataset ${safe(DATA.dataset_version)}, reviewed ${safe(bundle.source_dataset_reviewed_on)}; review dates stay attached to each claim. Follow the original source before acting on a figure.</p>`;
 })();

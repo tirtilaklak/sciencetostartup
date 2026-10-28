@@ -253,9 +253,8 @@ function w4StatusBadge(route){const status=w4Status(route);return status?`<span 
 // Pieces of a card. A compact card shows its pay in the summary, so its offer leaves the pay out.
 function w4CardParts(route,compact){
   const company=companies[route.company_id],commitment=w4Hours(route),scheduleNote=w4ScheduleNote(route),requirements=w4Requirements(route);
-  const logo=typeof logoHTML==='function'&&(typeof logoFor!=='function'||logoFor(company.id))?logoHTML(company.id,'w4-company-logo',true):'';
   return {context:`${route.role}, ${company.name}`,
-    identity:`<a class="w4-company" href="#company/${w4Escape(company.id)}/work">${logo?`<span class="w4-logo" aria-hidden="true">${logo}</span>`:''}<span>${w4Escape(company.name)}</span></a>`,
+    identity:`<a class="w4-company" href="#company/${w4Escape(company.id)}/work"><span>${w4Escape(company.name)}</span></a>`,
     offer:`<div class="w4-offer">${compact?'':`<p class="w4-pay ${route.numeric_pay?'':'w4-pay-unspecified'}"><strong>${w4Escape(w4Pay(route))}</strong>${w4PayNotes(route)}</p>`}${commitment?`<p class="w4-commitment">${w4Escape(commitment)}</p>`:''}${scheduleNote?`<p class="w4-schedule-note">${w4Escape(scheduleNote)}</p>`:''}</div>`,
     conditions:`<p class="w4-location">${w4Escape(w4Location(route))}</p>${requirements.length?`<ul class="w4-requirements" aria-label="Requirements">${requirements.map(text=>`<li>${w4Escape(text)}</li>`).join('')}</ul>`:''}`,
     dates:`<p class="w4-dates"><span>${w4Escape(w4FreshnessLabel(route))}</span></p>`};
@@ -369,9 +368,12 @@ function w4QueryMatcher(query){
   return {all:value=>tests.every(test=>test.test(value)),phrase:value=>Boolean(phrase?.test(value))};
 }
 
-// Best match: remote listings with an hourly rate first, then the strongest link check, then the latest
-// check, then the higher top rate (same currency only), then company and role names.
-function w4BestRank(route){return (w4HourlyRange(route)&&W4_REMOTE.test(route.geography||'')?0:10)+(route.research_record?.route?.live_application_verified===true?0:route.last_route_check?.result==='public_page_live'?1:route.status==='listed'?2:3);}
+// Best match prioritizes reviewed terms and explicit availability. A blocked or uncertain
+// listing follows comparable reviewed offers; hourly remote offers lead within each group.
+function w4BestRank(route){
+  const uncertainty=w4Uncertain(route)?20:0,terms=route.terms_checked_on?0:route.last_route_check?.result==='listing_content_reviewed'?2:5;
+  return uncertainty+terms+(w4HourlyRange(route)&&W4_REMOTE.test(route.geography||'')?0:10);
+}
 function w4RateTie(a,b){const x=w4HourlyRange(a),y=w4HourlyRange(b);return x&&y&&x.currency===y.currency?y.high-x.high:0;}
 function w4BestOrder(a,b){return w4BestRank(a)-w4BestRank(b)||(w4Checked(b)||'').localeCompare(w4Checked(a)||'')||w4RateTie(a,b)||companies[a.company_id].name.localeCompare(companies[b.company_id].name)||a.role.localeCompare(b.role);}
 // Highest hourly rate: top of the published range, then its low end ("up to" last), then open-ended

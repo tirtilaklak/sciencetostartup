@@ -1,30 +1,41 @@
 # Business health dashboard
 
-The overview starts with a chart of revenue over completed reporting periods.
-Its default selects the latest compatible group containing at least two companies.
-Five tabs expose revenue, profitability, customers, expert activity and cash.
-Company scopes, periods, currencies and accounting bases remain explicit. A source
-panel describes the selected figure; detailed caveats and the full company evidence
-grid open on request. The hypothetical margin calculator is removed from the UI.
+The overview starts with a compact ledger of latest dated figures, with separate
+views for actual revenue, annualized pace and growth. Every row shows period,
+business scope and source type; amounts from incompatible periods have no shared
+bar scale. Actual revenue excludes third-party estimates. Sources and history
+open in a dialog. Advanced exposes the five business signals, full numeric
+comparisons and complete evidence grid.
+
+Company cards, profiles, Compare and plain shareable pages use the same preferred
+supplemental observation. Whole-company observations are preferred when supported,
+then AI-line observations; exact dates and scopes stay visible. Historical or
+unavailable-source observations keep their warnings. Canonical records stay
+available in the original research snapshot.
 
 ## Evidence
 
-The October 28, 2026 supplement contains 109 observations across 28 organizations
-and 65 source records. The full grid covers 39 organizations and keeps missing
+The October 28, 2026 supplement contains 113 observations across 28 organizations
+and 67 source records. The full grid covers 39 organizations and keeps missing
 values separate from zero and nonprofit entities separate from commercial vendors.
 The original canonical dataset remains v2.5.0.
 
-Nine fresh claims bind exact values, units, scope and reporting periods to retrieved
+Thirteen fresh claims bind exact values, units, scope and reporting periods to retrieved
 source excerpts and document locators. Each cited response has a SHA-256 receipt.
 The validator checks those bindings alongside the canonical provenance and checks
-derived growth/margin arithmetic. There are 11 additional observations in total,
+derived growth/margin arithmetic. There are 15 additional observations in total,
 including two calculations. A successful request alone is not content verification.
 
-The source ledger records 24 checks: 21 content checks, one availability-only and
+The source ledger records 26 checks: 23 content checks, one availability-only and
 two unavailable sources. These include a duplicate alias and TaskUs's notice that
-Q3 results are scheduled for November 4, so they are not 24 newly published reports.
+Q3 results are scheduled for November 4, so they are not 26 newly published reports.
 Sources outside this refresh retain their earlier review dates. New source checks
 do not change the period measured by a historical figure.
+
+Mercor’s $614M H1 observation is a Sacra estimate, while its $2B annualized pace
+retains the gross/net uncertainty of the cited investor source. Prolific’s
+contribution hours and study/task counts are context through publication, not
+completed-year or verified paid-hour totals.
 
 TaskUs and Appen can be compared on H1 2026 whole-company USD revenue. RWS's fiscal
 half-year and GBP currency remain separate. Recognized revenue and annualized pace,
