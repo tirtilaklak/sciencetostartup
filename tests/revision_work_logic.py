@@ -1,8 +1,8 @@
-"""Verify work search spacing does not change disclosure state or filter results, typed searches keep the phone
-budget, filter changes draw every match, heading levels never skip, and closed parts draw on first open.
+"""Verify the simplified Work list preserves every result, search/filter behavior and lazy details.
 
-The budget's browser timings (390 px phone, 4x CPU slowdown, against main's build) are in the comment above
-W4_FULL_CARDS in web/work-v4.js; this Node run checks the structure those timings depend on."""
+The default presents twenty primary listings in one consistent list; searching or filtering exposes all
+matching primary listings. Other listings remain reachable in their labeled disclosure groups. This
+Node fixture checks structure and data, not browser performance or mobile rendering."""
 import ast
 import shutil
 import subprocess
@@ -24,13 +24,13 @@ function view(){
  const section=id=>{const start=html.indexOf(`<h2 id="${id}"`);if(start<0)return '';const end=html.indexOf('<section class="w4-section',start);return html.slice(start,end<0?undefined:end);};
  return{ids:plain(run('filteredWork().map(route=>route.id)')),html:clean(html),
   beforeGroups:(html.split(GROUP)[0].match(/data-work-route=/g)||[]).length,
-  more:html.includes('More jobs and fellowships'),
+  more:html.includes('More paid listings'),
   openGroups:(html.match(/<details class="work-route-archive-group w4-route-group"[^>]*\bopen\b/g)||[]).length,
   groups:(html.match(/<details class="work-route-archive-group w4-route-group"/g)||[]).length,
   // Listings drawn as cards, and listings a closed group draws on first open.
   drawn:cardIds(html),waiting:[...html.matchAll(/data-w4-routes="([^"]*)"/g)].flatMap(m=>m[1].split(' ')),
   full:(html.match(/class="work-card work-card-v4 "/g)||[]).length,
-  contractCards:cardIds(section('work-listed')).length,jobsFull:cardIds(section('work-jobs').split(GROUP)[0]).length,
+  primaryCards:cardIds(section('work-listed').split(GROUP)[0]).length,
   count:node('work-count').textContent,overview:node('work-overview').innerHTML};
 }
 // Typing: the filters are already set, then the search text changes.
@@ -51,21 +51,18 @@ function assertReachable(v,label){
  for(const id of v.ids)assert.ok(drawn.has(id)||v.waiting.includes(id),label+': match '+id+' cannot be reached');
 }
 const counts=()=>plain(run(`(()=>{const g=w4RouteGroups(filteredWork());return Object.fromEntries(['contract','hourly','task','jobs','boards','outside','closed'].map(k=>[k,g[k].length]));})()`));
-// The typing budget (W4_FULL_CARDS and friends in work-v4.js): contract work is never cut, jobs fill the
-// rest of 26 full cards (at least six, never a More group of one), and Other listings groups open at 12 or fewer.
+// Searching exposes every matching primary listing. Large Other groups may remain lazy, never unreachable.
 function assertTypedView(v,label){
- const g=counts(),budget=Math.max(6,26-g.hourly-g.task),cut=g.jobs>budget+1;
- assert.equal(v.contractCards,g.contract,label+': a search must show every matching contract listing');
- assert.equal(v.jobsFull,cut?budget:g.jobs,label+': matching jobs shown in full');
- assert.equal(v.more,cut,label+': jobs beyond the budget belong in the closed More jobs and fellowships group');
+ const g=counts();
+ assert.equal(v.primaryCards,g.contract+g.jobs,label+': every matching primary listing is shown');
+ assert.equal(v.more,false,label+': a search leaves no closed primary More group');
  assert.equal(v.openGroups,[g.boards,g.outside,g.closed].filter(n=>n&&n<=12).length,label+': only groups with 12 or fewer matches open');
  assertReachable(v,label);
 }
 // A filter change is exempt from the budget: every match is drawn and every group that holds one is open.
 function assertFilterView(v,label){
  const g=counts();
- assert.equal(v.contractCards,g.contract,label+': every matching contract listing');
- assert.equal(v.jobsFull,g.jobs,label+': every matching job in full');
+ assert.equal(v.primaryCards,g.contract+g.jobs,label+': every matching primary listing');
  assert.equal(v.more,false,label+': a filter change leaves no closed More group');
  assert.equal(v.openGroups,v.groups,label+': every group that holds a match is open');
  assert.equal(v.waiting.length,0,label+': nothing waits in a closed group');
@@ -73,16 +70,15 @@ function assertFilterView(v,label){
 }
 const baseline=typed('');
 assert.equal(baseline.ids.length,135,'Review route-count coverage after a research update');
-// The default view shows every contract listing, then six jobs (at most three per company).
-const preview=plain(run(`(()=>{const g=w4RouteGroups(filteredWork()),seen={};let jobs=0;
- for(const route of g.jobs){const n=seen[route.company_id]||0;if(jobs<6&&n<3){jobs++;seen[route.company_id]=n+1;}}
- return{contract:g.contract.length,jobs,allJobs:g.jobs.length};})()`));
-assert.ok(preview.contract>0&&preview.allJobs>6,'Fixture lost the contract or jobs listings the preview needs');
-assert.equal(preview.jobs,6,'Jobs preview should fill six cards from the current data');
-assert.equal(baseline.beforeGroups,6,'Default opens with six hourly listings before its first More disclosure');
-assert.equal(baseline.more,true,'Default work view lost its remaining-jobs disclosure');
+// One consistent list replaces separate hourly/task/job preview tiers.
+const preview=counts();
+assert.ok(preview.contract>0&&preview.jobs>0&&preview.contract+preview.jobs>20,'Fixture lost primary listings');
+assert.equal(baseline.beforeGroups,20,'Default must expose twenty primary listings before its More disclosure');
+assert.equal(baseline.more,true,'Default work view lost its remaining paid listings disclosure');
 assert.equal(baseline.openGroups,0,'Default secondary groups should start collapsed');
-assert.ok(baseline.drawn.length<=20&&baseline.drawn.length>preview.jobs,'Default uses short previews while retaining the jobs section');
+assert.equal(baseline.drawn.length,20,'Default renders one twenty-card preview');
+assert.match(baseline.html,/<h2[^>]*id="work-listed"[^>]*>/,'Primary cards need a parent heading');
+assert.ok(!/<h[23][^>]*id="work-(?:hourly|task)/.test(baseline.html),'Removed pay-tier heading remains');
 assert.ok(baseline.waiting.length>0,'Closed groups lost the listing ids they draw on first open');
 assertReachable(baseline,'default view');
 // Cards draw their closed parts on first open: the page holds no Terms & sources content until a reader opens one.
@@ -99,16 +95,16 @@ for(const query of ['AfterQuery','Python','no-such-work-route-qqz']){
  if(query==='no-such-work-route-qqz')assert.equal(exact.ids.length,0,'Unknown query should remain empty');
  nonemptyCases++;
 }
-// A one-letter search matches nearly every listing. Typed, it keeps the phone budget.
+// A one-letter search matches nearly every listing and still exposes every primary match.
 for(const query of ['a','e']){
  const broad=typed(query);
  assert.ok(broad.ids.length>=100,'One-letter fixture lost its broad match: '+query);
  assertTypedView(broad,query);
- assert.ok(broad.full<=Math.max(26,counts().hourly+counts().task+6),query+': a one-letter search drew more full cards than the default view');
+ assert.equal(broad.full,counts().contract+counts().jobs,query+': primary search results must use consistent full cards');
  assert.ok(broad.waiting.length>0,query+': a one-letter search should leave long groups closed');
  // A select change after typing (the Sort field here) is a filter change: every match, every group open.
  run(`state.workSort='checked';renderWork()`);const sorted=view();assertFilterView(sorted,query+' then a sort change');
- // A repeat render with nothing changed keeps that view; typing again brings the budget back.
+ // A repeat render with nothing changed keeps that view; typing again retains every primary match.
  run('renderWork()');assert.deepEqual(view(),sorted,query+': a repeat render changed the view');
  run(`state.workQuery=${JSON.stringify(query+' ')};renderWork()`);assertTypedView(view(),query+' typed after a sort change');
 }

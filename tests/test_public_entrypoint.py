@@ -49,7 +49,9 @@ class PublicEntrypointTests(unittest.TestCase):
                              json.loads((ROOT / source).read_text()), element)
         self.assertNotIn('id="outreach-data"', self.html,
                          "The alumni directory must not ship in the public page")
-        self.assertNotIn("mailto:", self.html.split("<footer>")[0].split('id="method-view"')[0],
+        about = re.compile(r'<article\b[^>]*\bid="about"[^>]*>.*?</article>', re.S)
+        self.assertEqual(len(about.findall(self.html)), 1, "Exactly one scoped About panel must remain")
+        self.assertNotIn("mailto:", about.sub("", self.html),
                          "No personal mailto links outside the About panel")
         self.assertEqual((self.dist / "research.json").read_bytes(),
                          (ROOT / "data/canonical.json").read_bytes())

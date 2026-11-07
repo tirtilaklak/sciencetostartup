@@ -48,7 +48,7 @@ SHARE_IMAGE = f"{ORIGIN}/assets/share/sciencetostartup-1200x630.png"
 SHARE_ALT = "ScienceToStartup, the AI data field guide: the businesses behind AI data. Company profiles and paid work listings, with every figure linked to its source."
 # The icon set web/index.html links: an SVG, a 48 px PNG and an opaque 180 px Apple touch icon. /favicon.ico sits at the root.
 ICON_LINKS = '<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">\n<link rel="icon" href="/assets/favicon-48.png" sizes="48x48" type="image/png">\n<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">\n'
-PUBLISHER = {"@type": "Person", "@id": f"{ORIGIN}/#publisher", "name": PUBLISHER_NAME, "url": f"{ORIGIN}/method/#about"}
+PUBLISHER = {"@type": "Person", "@id": f"{ORIGIN}/#publisher", "name": PUBLISHER_NAME, "url": "https://musaeminozdem.com"}
 WEBSITE = {"@type": "WebSite", "@id": f"{ORIGIN}/#website", "name": SITE_NAME, "url": f"{ORIGIN}/", "publisher": {"@id": PUBLISHER["@id"]}}
 # One dataset identity: the home page's Dataset node (web/index.html). /method/ describes the same node, so it shares the @id and name.
 DATASET_ID = f"{ORIGIN}/#dataset"
@@ -744,7 +744,15 @@ STYLE = (
 )
 WORDMARK_ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg>'
 RIGHT_ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg>'
-NAV = (("companies", "Companies", "/companies/"), ("work", "Paid work", "/work/"), ("compare", "Compare", "/#compare"), ("method", "Method", "/method/"), ("search", "Search", "/?search"))
+STYLE += (
+    ".site-footer{display:flex;align-items:center;flex-wrap:wrap;gap:8px 24px;margin-top:48px;padding:24px 0;font-size:12px}"
+    ".site-footer>p{margin:0}.site-footer nav{display:block;margin:0;max-width:none}.site-footer nav ul{display:flex;gap:20px}.site-footer nav li{margin:0}"
+    ".site-footer>p:last-child{margin-left:auto}.site-header .wordmark{font:600 22px/1.2 Georgia,serif;letter-spacing:-.6px}.site-header .mark,.site-header small{display:none}"
+    ".site-header .wordmark>span:last-child::after{content:'.';color:var(--green)}"
+    "@media(max-width:700px){.site-footer>p:last-child{margin-left:0;width:100%}.site-footer a{display:inline-flex;align-items:center;min-height:44px}}"
+)
+
+NAV = (("companies", "Companies", "/companies/"), ("work", "Paid work", "/work/"), ("about", "About", "/explore/#about"), ("search", "Search", "/?search"))
 
 
 def json_ld(payload):
@@ -778,13 +786,10 @@ def disclosure_html():
 
 
 def site_footer(research, note=""):
-    """The site map, then who publishes the guide with the About disclosure, then the research date and dataset version."""
-    groups = (("Explore", (("Overview", "/"), ("Companies", "/companies/"), ("Paid work", "/work/"), ("Compare", "/#compare"))),
-              ("Research", (("Method", "/method/"), ("What the labels mean", "/method/#labels"), ("Download the data", "/method/#downloads"))),
-              ("About", (("About the publisher", "/method/#about"), ("Request a correction", "/#corrections"), ("The publisher’s proposed AI lab", "/#venture"))))
-    columns = "".join(f"<div><h2>{heading}</h2><ul>" + "".join(f'<li><a href="{ORIGIN}{path}">{label}</a></li>' for label, path in links) + "</ul></div>" for heading, links in groups)
-    line = " · ".join(part for part in (f"Research compiled {format_date(research.as_of)}" if research.as_of else "", f"Dataset v{research.data.get('dataset_version')}" if research.data.get("dataset_version") else "") if part)
-    return (f'<footer class="site-footer"><nav aria-label="Site map">{columns}</nav><p>{SITE_NAME} is published by {PUBLISHER_NAME}. {disclosure_html()}</p>'
+    """Small, shared footer. Disclosures remain on the About page."""
+    line = f"Research compiled {format_date(research.as_of)}" if research.as_of else ""
+    return (f'<footer class="site-footer"><p>© {SITE_NAME} · <a href="https://musaeminozdem.com">{PUBLISHER_NAME}</a></p>'
+            f'<nav aria-label="Footer"><ul><li><a href="{ORIGIN}/explore/#downloads">Data</a></li><li><a href="{ORIGIN}/explore/#corrections">Corrections</a></li></ul></nav>'
             + (f"<p>{escape(line)}</p>" if line else "") + note + "</footer>\n")
 
 
@@ -1190,9 +1195,9 @@ def render_method(research, sizes, modified):
     doubtful = sum(1 for c in claims if c.get("status") in ("unverified", "contested"))
     compiled = f" · research compiled {format_date(research.as_of)}" if research.as_of else ""
     body = [crumb_nav(crumbs), f'<p class="eyebrow">Method{escape(compiled)}</p>\n<h1>How the research is checked.</h1>\n<p class="lede">Each claim links to its evidence. Financial figures keep their dates and the part of the business they cover.</p>\n',
-            f'<p class="actions">{cta(ORIGIN + "/#method", "Open the full method page")}</p>\n',
+
             '<h2 id="about">About and corrections</h2>\n'
-            f"<p>{SITE_NAME} is published by {PUBLISHER_NAME}. It is a public-source research guide to the companies that produce AI training data. No profiled company has paid for coverage, and none is a customer, investor or affiliate of the publisher. {escape(WORK_DISCLOSURE)}</p>\n"
+            f'<p>{SITE_NAME} is published by <a href="https://musaeminozdem.com">{PUBLISHER_NAME}</a>. It is a public-source research guide to the companies that produce AI training data. No profiled company has paid for coverage, and none is a customer, investor or affiliate of the publisher. {escape(WORK_DISCLOSURE)}</p>\n'
             f"<p><strong>Disclosure.</strong> {disclosure_html()}</p>\n"
             f'<p><strong>Corrections.</strong> If a figure or a listing is wrong, <a href="{ORIGIN}/#corrections">request a correction</a> with the company name and the source. We review each request within seven days.</p>\n'
             "<p><strong>Personal data and removal.</strong> Company profiles name founders and executives from public company sources only. Profiles do not show personal contact details. If you are named here and want a record corrected or removed, send a correction request. "
@@ -1241,7 +1246,7 @@ def render_method(research, sizes, modified):
 
 def render_not_found(research):
     count = len(research.companies)
-    pages = (("Overview", "/", "what the guide covers"), ("Companies", "/companies/", f"profiles of all {plural(count, 'company', 'companies')}" if count else "company profiles"), ("Paid work", "/work/", "public listings with pay and location"), ("Method", "/method/", "how we check figures and how to request a correction"), ("About the publisher", "/#about", "who publishes the guide and how to get in touch"), ("Search", "/?search", "find a company, product or listing"))
+    pages = (("Overview", "/", "what the guide covers"), ("Companies", "/companies/", f"profiles of all {plural(count, 'company', 'companies')}" if count else "company profiles"), ("Paid work", "/work/", "public listings with pay and location"), ("Data", "/explore/#downloads", "research files and source documentation"), ("About the publisher", "/#about", "who publishes the guide and how to get in touch"), ("Search", "/?search", "find a company, product or listing"))
     items = "".join(f'<li><a href="{ORIGIN}{path}">{label}</a>: {text}</li>' for label, path, text in pages)
     body = f'<p class="eyebrow">Page not found</p>\n<h1>We could not find that page.</h1>\n<p class="lede">The link may be old or mistyped. Start again from one of these pages:</p>\n<ul>{items}</ul>\n'
     return document(research, f"Page not found{SUFFIX}", "The page you asked for does not exist on ScienceToStartup.", "", body, robots="noindex")

@@ -157,13 +157,13 @@ supplement, not a claim that the entire historical dataset has been re-audited.
 See [dashboard definitions and evidence limits](docs/business-health-dashboard.md)
 and [financial source checks](data/fresh-source-checks.json).
 
-Cards, profiles, Compare and plain company pages use the same supplemental
+Cards, profiles and plain company pages use the same supplemental
 financial selection. Mercor’s H1 $614M figure is identified as a Sacra estimate;
 its $2B annualized figure retains an undisclosed gross/net basis. Operating
 activity and registered networks stay separate from revenue and paid delivery.
 
 ## Simplified homepage
 
-The lightweight homepage comes from `web/landing.html` and `web/landing.css` and uses the supplied collage at `web/assets/human-depth.png`. Its two primary routes are Companies and Paid work. The complete current guide, revenue ledger, search, sources and downloads remain at `/explore/`. Existing root hash routes and `?search` / `?q=` links forward without losing the route or query. Crawlable company, work and method pages stay unchanged. The interactive app declares its own canonical URL and noindex,follow; the homepage retains the original WebSite and Dataset structured identity.
+The lightweight homepage comes from `web/landing.html` and `web/landing.css` and uses the supplied collage at `web/assets/human-depth.png`. Its two primary routes are Companies and Paid work. The Work view uses one consistent list (twenty initial paid listings, a lazy More group, and separate archival disclosures); search and filters preserve access to every matching record. Compare and Method are retired from the app interface, including search, profile controls and navigation. Legacy `#compare` routes recover to Companies; `#method`, `#labels` and `#coverage` recover to the concise About view. About links the publisher’s personal website and retains correction, disclosure and download details behind native disclosures. The complete current guide, revenue ledger, search, sources and downloads remain at `/explore/`. Existing root hash routes and `?search` / `?q=` links forward without losing the route or query. Crawlable company and work pages retain the same data with the compact shared navigation and footer. `/method/` remains an evidence/data archive, without promotion as a top-level app view. The interactive app declares its own canonical URL and noindex,follow; the homepage retains the original WebSite and Dataset structured identity.
 
 Builds write both entrypoints and hash all files into the manifest. Do not overlay files directly into `dist/`: rebuild it using the standard public snapshot command above. Tests continue to inspect the app at `/explore/` and additionally verify the lightweight homepage, legacy navigation and supplied-image integrity.

@@ -109,7 +109,7 @@ def main():
     assert all('company-card' in a.get('class', '') for _, a in rows)
     for card_html in re.findall(r'<article class="company-card".*?</article>', directory, re.S):
         card_tags = Elements(card_html)
-        assert len(card_tags.with_attribute('data-compare')) == 1
+        assert not card_tags.with_attribute('data-compare'), 'Retired comparison controls remain on company cards'
         profile_links = [a for tag, a in card_tags.elements if tag == 'a' and 'company-open-profile' in a.get('class', '')]
         assert len(profile_links) == 1, 'Each company card needs one direct profile action'
         assert profile_links[0].get('href') == '#company/' + next(a['data-company-card'] for _, a in card_tags.with_attribute('data-company-card'))
