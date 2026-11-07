@@ -41,7 +41,7 @@ class DesignSystemTest(unittest.TestCase):
         self.assertEqual(result["problems"], [])
 
     def test_cascade_order_matches_the_built_page(self):
-        page = (ROOT / "dist/index.html").read_text()
+        page = (ROOT / "dist/explore/index.html").read_text()
         positions = [page.find((ROOT / "web" / name).read_text()) for name in CASCADE]
         self.assertNotIn(-1, positions)
         self.assertEqual(positions, sorted(positions))

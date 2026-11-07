@@ -24,3 +24,5 @@ docs/*
 *.tar.gz
 *.zip
 data/medalists.json
+
+.wrangler/

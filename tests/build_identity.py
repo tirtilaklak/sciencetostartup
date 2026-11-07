@@ -61,7 +61,9 @@ def snapshot_dist(directory: Path) -> dict:
     result = {'schemaVersion': 1, 'capturedAt': dt.datetime.now(dt.timezone.utc).isoformat(),
               'files': {}, 'errors': []}
     before, blobs = {}, {}
-    for name in FILES:
+    app_name = 'explore/index.html' if (directory / 'explore/index.html').is_file() else 'index.html'
+    result['appEntrypoint'] = app_name
+    for name in dict.fromkeys((*FILES, app_name)):
         try:
             before[name] = file_state(directory / name)
             blobs[name] = (directory / name).read_bytes()
@@ -77,7 +79,7 @@ def snapshot_dist(directory: Path) -> dict:
     try:
         research = json.loads(blobs['research.json'])
         manifest = json.loads(blobs['manifest.json'])
-        embedded = extract_research_script(blobs['index.html'].decode('utf-8'))
+        embedded = extract_research_script(blobs[app_name].decode('utf-8'))
         parsed = json.loads(embedded)
         result['datasetVersion'] = research['dataset_version']
         result['embeddedResearch'] = {'sha256': sha(embedded.encode('utf-8')),
@@ -88,7 +90,7 @@ def snapshot_dist(directory: Path) -> dict:
             result['errors'].append('Embedded research and research.json differ semantically')
         if manifest.get('dataset_version') != research['dataset_version']:
             result['errors'].append('Manifest dataset version differs from research.json')
-        for name in ('index.html', 'research.json'):
+        for name in dict.fromkeys(('index.html', app_name, 'research.json')):
             if manifest.get('sha256', {}).get(name) != result['files'][name]['sha256']:
                 result['errors'].append('Manifest hash differs from current ' + name)
     except (KeyError, ValueError, UnicodeError) as error:
@@ -109,7 +111,7 @@ def checkpoint_build_identity(snapshot: dict) -> dict:
     """Include every required file identity so old cursors cannot skip a rebuild."""
     expected_browser_identity(snapshot)
     return {'datasetVersion': snapshot['datasetVersion'],
-            'files': {name: snapshot['files'][name]['sha256'] for name in FILES},
+            'files': {name: snapshot['files'][name]['sha256'] for name in snapshot['files']},
             'researchScriptSha256': snapshot['embeddedResearch']['sha256']}
 
 
@@ -118,7 +120,7 @@ def assess_build_identity(before: dict, after: dict, browser: dict | None) -> di
     for label, snapshot in [('before', before), ('after', after)]:
         if not snapshot.get('valid'):
             errors.extend(label + ': ' + text for text in snapshot.get('errors', ['Missing valid snapshot']))
-    changed = [name for name in FILES if before.get('files', {}).get(name) != after.get('files', {}).get(name)]
+    changed = [name for name in set(before.get('files', {})) | set(after.get('files', {})) if before.get('files', {}).get(name) != after.get('files', {}).get(name)]
     if changed:
         errors.append('Dist files changed during the CLI invocation: ' + ', '.join(changed))
     actual = browser or {}

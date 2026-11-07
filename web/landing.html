@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="icon" href="/assets/favicon-48.png" sizes="48x48" type="image/png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png"><title>ScienceToStartup · The AI data field guide</title><meta name="description" content="Sourced profiles of {{COMPANY_COUNT}} AI data companies and the paid AI training work they offer. Every figure links to its source."><link rel="canonical" href="https://sciencetostartup.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ScienceToStartup · The AI data field guide">
+<meta property="og:description" content="Sourced profiles of {{COMPANY_COUNT}} AI data companies and the paid AI training work they offer. Every figure links to its source.">
+<meta property="og:url" content="https://sciencetostartup.com/">
+<meta property="og:site_name" content="ScienceToStartup">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://sciencetostartup.com/assets/share/sciencetostartup-1200x630.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ScienceToStartup, the AI data field guide: the businesses behind AI data. Company profiles and paid work listings, with every figure linked to its source.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image:alt" content="ScienceToStartup, the AI data field guide: the businesses behind AI data. Company profiles and paid work listings, with every figure linked to its source.">
+<meta name="twitter:title" content="ScienceToStartup · The AI data field guide">
+<meta name="twitter:description" content="Sourced profiles of {{COMPANY_COUNT}} AI data companies and the paid AI training work they offer. Every figure links to its source.">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://sciencetostartup.com/#website","name":"ScienceToStartup","url":"https://sciencetostartup.com/","description":"Sourced profiles of {{COMPANY_COUNT}} AI data companies and the paid AI training work they offer. Every figure links to its source.","inLanguage":"en","publisher":{"@id":"https://sciencetostartup.com/#publisher"}},{"@type":"Person","@id":"https://sciencetostartup.com/#publisher","name":"Musa Ozdem","url":"https://sciencetostartup.com/method/#about"},{"@type":"Dataset","@id":"https://sciencetostartup.com/#dataset","name":"ScienceToStartup research database","description":"Public-source research on {{COMPANY_COUNT}} AI data companies. Company profiles, financial figures and work listings, each linked to its source. Every claim has a confidence grade.","url":"https://sciencetostartup.com/method/","version":"{{DATASET_VERSION}}","license":"https://creativecommons.org/licenses/by/4.0/","isAccessibleForFree":true,"creator":{"@id":"https://sciencetostartup.com/#publisher"},"publisher":{"@id":"https://sciencetostartup.com/#publisher"},"distribution":[{"@type":"DataDownload","encodingFormat":"application/json","contentUrl":"https://sciencetostartup.com/research.json"},{"@type":"DataDownload","encodingFormat":"application/vnd.sqlite3","contentUrl":"https://sciencetostartup.com/observatory.sqlite"},{"@type":"DataDownload","encodingFormat":"text/csv","contentUrl":"https://sciencetostartup.com/companies.csv"},{"@type":"DataDownload","encodingFormat":"text/csv","contentUrl":"https://sciencetostartup.com/claims.csv"},{"@type":"DataDownload","encodingFormat":"application/json","contentUrl":"https://sciencetostartup.com/work-routes.json"}]}]}</script>
+
+<link rel="stylesheet" href="landing.css">
+<script>
+(function () {
+  function redirectLegacyRoute() {
+    var route = location.hash.slice(1).split('?')[0].split('/')[0].toLowerCase();
+    var search = new URLSearchParams(location.search);
+    var legacy = ['market', 'companies', 'work', 'compare', 'method', 'company',
+                  'venture', 'about', 'labels', 'corrections', 'coverage', 'downloads'];
+    if (legacy.includes(route) || search.has('q') || search.has('search')) {
+      location.replace('explore/' + location.search + location.hash);
+    }
+  }
+  window.addEventListener('hashchange', redirectLegacyRoute);
+  redirectLegacyRoute();
+}());
+</script>
+</head>
+<body>
+<a href="#main" class="skip">Skip to content</a>
+<div class="dark">
+<header class="site-header">
+<a class="wordmark" href="./" aria-label="ScienceToStartup home">ScienceToStartup<span aria-hidden="true">.</span></a>
+<nav aria-label="Main navigation"><a href="explore/#companies">Companies</a><a href="explore/#work">Paid work</a><a href="explore/#method">About the research <span aria-hidden="true">↗</span></a></nav>
+</header>
+</div>
+<main id="main">
+<div class="dark">
+<section class="hero" aria-labelledby="hero-title">
+<img class="hero-art" src="assets/human-depth.png" width="1168" height="792" alt="A monochrome collage of Carl Jung, Albert Einstein, and J. Robert Oppenheimer with mathematical diagrams." fetchpriority="high">
+<div class="hero-copy">
+<p class="eyebrow">An independent AI field guide</p>
+<h1 id="hero-title">The human<br>side of AI.</h1>
+<p class="hero-intro">A sourced guide to AI data companies<br class="desktop-break"> and the paid work behind AI training.</p>
+<a class="primary-link" href="explore/#companies">Explore the field guide <span aria-hidden="true">↗</span></a>
+</div>
+<p class="hero-caption">Human depth. Machine possibility.</p>
+</section>
+</div>
+<section class="paths" aria-labelledby="paths-title">
+<div class="section-intro"><p class="eyebrow">A clearer starting point</p><h2 id="paths-title">Less noise.<br>More understanding.</h2><p>Start with the companies building the market, or the work you can do within it.</p></div>
+<div class="path-list">
+<a class="path" href="explore/#companies"><div><span class="path-number">01 / Companies</span><h3>Understand the landscape.</h3><p>What organizations do, what they build, and the evidence behind their claims.</p></div><span class="path-arrow" aria-hidden="true">↗</span></a>
+<a class="path" href="explore/#work"><div><span class="path-number">02 / Paid work</span><h3>Find a way in.</h3><p>Public opportunities, with pay and requirements where disclosed, plus original listing links.</p></div><span class="path-arrow" aria-hidden="true">↗</span></a>
+</div>
+</section>
+<section id="research" class="research" aria-labelledby="research-title">
+<p class="eyebrow">Evidence first</p><div><h2 id="research-title">A field guide, not a claim of certainty.</h2><p>Facts link to their sources. Estimates are labeled. Historical figures keep their dates. Always check the original listing before applying.</p><a href="explore/#method">Read the method and download the data <span aria-hidden="true">↗</span></a><p class="snapshot">Research snapshot: October 2026.</p></div>
+</section>
+</main>
+<footer class="site-footer"><a class="wordmark" href="./">ScienceToStartup<span aria-hidden="true">.</span></a><nav aria-label="More resources"><a href="explore/#compare">Compare companies</a><a href="explore/#market">Market data</a><a href="explore/#method">Sources &amp; downloads</a></nav><p>Independent public research.</p></footer>
+</body>
+</html>

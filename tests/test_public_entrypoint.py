@@ -37,7 +37,8 @@ class PublicEntrypointTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.dist = ROOT / "dist"
-        cls.html = (cls.dist / "index.html").read_text()
+        cls.html = (cls.dist / "explore/index.html").read_text()
+        cls.home = (cls.dist / "index.html").read_text()
 
     def test_embedded_data_matches_preserved_downloads(self):
         for element, source in (("research-data", "data/canonical.json"),):
@@ -56,7 +57,7 @@ class PublicEntrypointTests(unittest.TestCase):
                         "Entrypoint exceeds the observed 4 MiB web-fetch limit")
 
     def test_real_crawler_files_identify_the_canonical_document(self):
-        self.assertEqual(HeadLinks(self.html).canonicals, [ORIGIN + "/"])
+        self.assertEqual(HeadLinks(self.home).canonicals, [ORIGIN + "/"])
         robots = (self.dist / "robots.txt").read_text()
         directives = [line.strip() for line in robots.splitlines() if line.strip()]
         self.assertEqual(directives,
@@ -66,7 +67,7 @@ class PublicEntrypointTests(unittest.TestCase):
         self.assertEqual(root.tag, namespace + "urlset")
         locs = [node.text for node in root.iter(namespace + "loc")]
         companies = json.loads((ROOT / "data/canonical.json").read_text())["companies"]
-        self.assertEqual(locs[0], ORIGIN + "/", "The app document stays first")
+        self.assertEqual(locs[0], ORIGIN + "/", "The landing document stays first")
         for page in ("/companies/", "/work/", "/method/"): self.assertIn(ORIGIN + page, locs)
         self.assertEqual(len(locs), 4 + len(companies), "One static page per company plus the company list, paid work and method pages")
         for company in companies:

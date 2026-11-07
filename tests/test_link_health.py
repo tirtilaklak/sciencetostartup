@@ -47,7 +47,7 @@ class LinkHealthTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             target = Path(folder)
             build(data, target)
-            html = (target / "index.html").read_text()
+            html = (target / "explore/index.html").read_text()
             # The data and app scripts load from js/ files in page order; check the order across them.
             html += "".join((target / src).read_text() for src in dict.fromkeys(re.findall(r'"(js/[^"]+[.]js)"', html)))
             self.assertLess(html.index("window.LINK_HEALTH="), html.index("window.linkAvailabilityHTML=url=>"))

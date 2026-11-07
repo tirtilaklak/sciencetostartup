@@ -41,7 +41,7 @@ internal reports, credentials, browser output and deployment configuration.
 
 `build()` in `scripts/observatory.py` turns `web/` and the data into `dist/`.
 
-- CSS is inlined into `dist/index.html`: `style.css` first, then the files in
+- App CSS is inlined into `dist/explore/index.html`: `style.css` first, then the files in
   `REDESIGN_CSS`, then `icons.css`. Between two equally specific rules, the
   later file wins.
 - `icons.js` runs first in its own tag. The other scripts join into one
@@ -54,7 +54,7 @@ internal reports, credentials, browser output and deployment configuration.
 - That script and the page data go to content-hashed files,
   `dist/js/app.<hash>.js` and `dist/js/data.<hash>.js` (the name changes when
   the content changes). They load after the first paint. The research dataset
-  stays inline in `index.html` as JSON.
+  stays inline in `/explore/` as JSON.
 - `scripts/static_pages.py` writes the plain pages from the same data.
 
 ## View or reproduce
@@ -121,7 +121,7 @@ Assets on the apex and www custom domains. Deployment publishes the reviewed
 `dist/` build; a GitHub push alone does not trigger deployment.
 
 A deploy must upload all of `dist/`, including `dist/js/`: the app page
-(`index.html`) loads its scripts from there. Those file names change with their
+(`/explore/`) loads its scripts from there. Those file names change with their
 content, so `web/_headers` and `vercel.json` let browsers cache them for a year.
 
 The Worker staging omits the domain-level `_redirects` file because Workers
@@ -161,3 +161,9 @@ Cards, profiles, Compare and plain company pages use the same supplemental
 financial selection. Mercor’s H1 $614M figure is identified as a Sacra estimate;
 its $2B annualized figure retains an undisclosed gross/net basis. Operating
 activity and registered networks stay separate from revenue and paid delivery.
+
+## Simplified homepage
+
+The lightweight homepage comes from `web/landing.html` and `web/landing.css` and uses the supplied collage at `web/assets/human-depth.png`. Its two primary routes are Companies and Paid work. The complete current guide, revenue ledger, search, sources and downloads remain at `/explore/`. Existing root hash routes and `?search` / `?q=` links forward without losing the route or query. Crawlable company, work and method pages stay unchanged. The interactive app declares its own canonical URL and noindex,follow; the homepage retains the original WebSite and Dataset structured identity.
+
+Builds write both entrypoints and hash all files into the manifest. Do not overlay files directly into `dist/`: rebuild it using the standard public snapshot command above. Tests continue to inspect the app at `/explore/` and additionally verify the lightweight homepage, legacy navigation and supplied-image integrity.

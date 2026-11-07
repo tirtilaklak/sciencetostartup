@@ -1,6 +1,7 @@
 /* Editorial presentation layer. Canonical claims and measures remain inspectable. */
 const attr=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const entryFor=id=>window.EDITORIAL.entries.find(e=>e.company_id===id);
+const rootAssetPath=value=>{const path=String(value||'');return path.startsWith('assets/')?'/'+path:path;};
 const logoFor=id=>(window.LOGOS?.logos||[]).find(l=>l.company_id===id&&l.local_path);
 const GROUP_LABELS={
   'Expert data & evaluation':'Expert data & AI testing',
@@ -16,7 +17,7 @@ function groupSlug(name){return String(name||'').toLowerCase().replace(/[^a-z0-9
 // Every logo sits in a tile. Without an image the tile shows initials. Pass decorative=true
 // where the company name is printed next to the logo, so screen readers hear the name once.
 function logoInitials(id){return String(companies[id]?.name||id).split(/[\s/]+/).filter(word=>/^[\p{L}\p{N}]/u.test(word)).slice(0,2).map(word=>[...word][0]).join('').toUpperCase();}
-function logoHTML(id,extra='',decorative=false) { const a=logoFor(id);return a?`<span class="brand-asset ${extra} ${a.background==='dark'?'brand-dark':''}"><img src="${attr(a.local_path)}" alt="${decorative?'':esc(companies[id]?.name||id)+' logo'}" data-initials="${attr(logoInitials(id))}" loading="lazy" decoding="async"></span>`:`<span class="brand-asset brand-text ${extra}" aria-hidden="true">${esc(logoInitials(id))}</span>`; }
+function logoHTML(id,extra='',decorative=false) { const a=logoFor(id);return a?`<span class="brand-asset ${extra} ${a.background==='dark'?'brand-dark':''}"><img src="${attr(rootAssetPath(a.local_path))}" alt="${decorative?'':esc(companies[id]?.name||id)+' logo'}" data-initials="${attr(logoInitials(id))}" loading="lazy" decoding="async"></span>`:`<span class="brand-asset brand-text ${extra}" aria-hidden="true">${esc(logoInitials(id))}</span>`; }
 function card(c){
  const e=entryFor(c.id),financial=preferredFinancial(c.id),research=c.entity_type==='adjacent_research',products=typeof profileProducts==='function'?profileProducts(c.id):[],offering=products.find(p=>p.name),signal=financial?compactSignal(c.id):`<span class="signal-label">${research?'Research focus':'Main offering'}</span><p class="company-offering">${esc(offering?.name||(research?'Public AI research':'AI data services'))}</p><span class="company-disclosure-note">${research?'Nonprofit research organization':'Revenue not disclosed'}</span>`;
  return `<article class="company-card" data-company-card="${esc(c.id)}"><div class="company-card-heading"><a class="company-brand" href="#company/${esc(c.id)}" tabindex="-1" aria-hidden="true">${logoHTML(c.id,'',true)}</a><div><span class="category-label sr-only">${esc(groupLabel(modelGroup(c.id)))}</span><h3><a href="#company/${esc(c.id)}">${esc(c.name)}</a></h3><p class="company-group">${esc(groupLabel(modelGroup(c.id)))}</p></div></div><div class="company-card-content"><p class="company-description">${esc(modelFor(c.id))}</p><div class="capability-tags sr-only">${(e?.capability_tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div></div><div class="company-signal">${signal}</div><div class="company-card-footer">${compareCheck(c.id)}<a class="company-work-link" href="#company/${esc(c.id)}/work">Work routes</a><a class="company-open-profile" href="#company/${esc(c.id)}">Open profile ${iconHTML('right')}</a></div></article>`;
@@ -76,6 +77,6 @@ route=function(event){
 document.addEventListener('error',e=>{if(e.target.matches?.('.brand-asset img')){const img=e.target,tile=img.parentElement,label=img.alt;tile.textContent=img.dataset.initials||label.replace(/ logo$/,'');tile.classList.add('brand-text');if(label){tile.setAttribute('role','img');tile.setAttribute('aria-label',label);}else tile.setAttribute('aria-hidden','true');}},true);
 
 const PRODUCT_MEDIA_DIMENSIONS={labelbox:[1200,627],imerit:[1024,576],sama:[2180,1117]};
-function productMediaHTML(id){const e=entryFor(id),m=e?.product_media,dimensions=PRODUCT_MEDIA_DIMENSIONS[id];return m?`<figure class="product-media"><img src="${attr(m.local_path)}" alt="${attr(m.title)}"${dimensions?` width="${dimensions[0]}" height="${dimensions[1]}"`:''} loading="lazy" decoding="async"><figcaption>${esc(m.caption)} ${external(m.source_page,'Source')}</figcaption></figure>`:'';}
+function productMediaHTML(id){const e=entryFor(id),m=e?.product_media,dimensions=PRODUCT_MEDIA_DIMENSIONS[id];return m?`<figure class="product-media"><img src="${attr(rootAssetPath(m.local_path))}" alt="${attr(m.title)}"${dimensions?` width="${dimensions[0]}" height="${dimensions[1]}"`:''} loading="lazy" decoding="async"><figcaption>${esc(m.caption)} ${external(m.source_page,'Source')}</figcaption></figure>`:'';}
 
 function publicOfferingName(name){return String(name).replace(/\bRL\b/g,'AI practice').replace(/\bSFT\b/g,'training from examples');}

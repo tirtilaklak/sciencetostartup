@@ -65,3 +65,9 @@ body{background:#f8f8f4}
  #work-view .w4-section-intro{margin-top:6px;margin-bottom:10px}
  #work-view .work-list-heading{margin-top:18px;margin-bottom:8px}
 }
+
+/* Carry the simplified homepage's serif wordmark into the interactive guide. */
+.topbar .wordmark{font:600 22px/1.2 Georgia,"Times New Roman",serif;letter-spacing:-.6px;gap:0}
+.topbar .wordmark>.mark,.topbar .wordmark>span>small{display:none}
+.topbar .wordmark>span:not(.mark)::after{content:'.';color:var(--green)}
+@media(max-width:700px){.topbar .wordmark{font-size:21px}}

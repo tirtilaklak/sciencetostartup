@@ -720,6 +720,17 @@ def externalize_scripts(html, destination):
     require(html.count("/* BUNDLES */[]") == 2, "build: script loader placeholders missing")
     return html.replace("/* BUNDLES */[]", json.dumps(files, separators=(",", ":")))
 
+def root_relative_resources(html):
+    """The guide lives under /explore/; local files stay rooted at the public site."""
+    def reference(match):
+        attribute, value = match.groups()
+        if value.startswith(("/", "#")) or urlsplit(value).scheme:
+            return match.group(0)
+        path = "/" if value in (".", "./") else "/" + value.removeprefix("./")
+        return attribute + '="' + path + '"'
+    return re.sub(r'(href|src)="([^"]+)"', reference, html)
+
+
 def build(data, destination):
     validate(data)
     work_path = ROOT / "data/work-routes.json"
@@ -780,7 +791,13 @@ def build(data, destination):
     html = render_snapshot_metadata(html, data)
     html = render_static_file_metadata(html, destination)
     html = externalize_scripts(html, destination)
-    (destination / "index.html").write_text(html)
+    (destination / "explore").mkdir(exist_ok=True)
+    (destination / "explore/index.html").write_text(root_relative_resources(html))
+    landing = (ROOT / "web/landing.html").read_text()
+    landing = landing.replace("{{COMPANY_COUNT}}", str(len(data["companies"])))
+    landing = render_snapshot_metadata(landing, data)
+    (destination / "landing.css").write_text((ROOT / "web/landing.css").read_text())
+    (destination / "index.html").write_text(landing)
     from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health, business_health=health)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}
     (destination / "manifest.json").write_text(json.dumps({"dataset_version": data["dataset_version"], "schema_version": data["schema_version"], "sha256": files}, indent=2) + "\n")
