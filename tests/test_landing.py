@@ -1,12 +1,15 @@
 """The simplified homepage stays lightweight while preserving the full current guide."""
+import html
 import json
 import re
 import subprocess
 import sys
+import tempfile
 import unittest
+from unittest import mock
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import urlparse, unquote
+from urllib.parse import urlparse, unquote, urljoin
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tests"))
@@ -20,10 +23,12 @@ class Structure(HTMLParser):
         self.main_count = 0
         self.main_ids = set()
         self.local_references = []
+        self.elements = []
         self.feed(text)
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        self.elements.append((tag, attrs))
         if tag == "main":
             self.in_main = True
             self.main_count += 1
@@ -46,6 +51,78 @@ class LandingTests(unittest.TestCase):
     def setUpClass(cls):
         cls.home = (ROOT / "dist/index.html").read_text()
         cls.guide = (ROOT / "dist/explore/index.html").read_text()
+
+    def assert_counters(self, document, expected):
+        counters = re.findall(r'<strong\b[^>]*\bdata-count="([^"]+)"[^>]*>([^<]+)</strong>', document)
+        self.assertEqual(len(counters), 3)
+        self.assertEqual({key for key, _ in counters}, set(expected))
+        for key, value in counters:
+            self.assertRegex(value.strip(), r"^\d[\d,]*$")
+            self.assertEqual(int(value.replace(",", "").strip()), expected[key])
+        for key, label in {"companies": "companies", "work": "work records", "sources": "source records"}.items():
+            match = re.search(r'<p\b[^>]*>\s*<strong\b[^>]*\bdata-count="' + key +
+                              r'"[^>]*>[^<]+</strong>\s*([^<]+)</p>', document)
+            self.assertIsNotNone(match, key)
+            self.assertEqual(html.unescape(match.group(1)).strip(), label)
+
+    def test_coverage_counters_match_actual_records_and_do_not_claim_open_jobs(self):
+        data = json.loads((ROOT / "data/canonical.json").read_text())
+        work = json.loads((ROOT / "data/work-routes.json").read_text())
+        self.assert_counters(self.home, {"companies": len(data["companies"]),
+                                        "work": len(work["routes"]), "sources": len(data["sources"])})
+        self.assertNotRegex(self.home, r"\{\{[A-Z_]+\}\}")
+
+    def test_coverage_counters_are_generated_for_changed_input_not_hardcoded(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import observatory
+        from fixtures import fixture
+        data = fixture()
+        work = json.loads((ROOT / "data/work-routes.json").read_text())
+        sample = {**work, "routes": [next(r for r in work["routes"] if r["status"] == status)
+                                    for status in ("historical", "careers")]}
+        with tempfile.TemporaryDirectory(prefix="landing-counter-fixture-") as folder:
+            with mock.patch.object(observatory, "load_work_routes", return_value=sample):
+                observatory.build(data, Path(folder))
+            self.assert_counters((Path(folder) / "index.html").read_text(),
+                                 {"companies": 1, "work": 2, "sources": 1})
+
+    def test_hero_has_exactly_the_two_useful_destinations(self):
+        hero = re.search(r'<section\b[^>]*\bclass="hero"[^>]*>.*?</section>', self.home, re.S)
+        self.assertIsNotNone(hero)
+        links = [attrs["href"] for tag, attrs in Structure(hero.group(0)).elements
+                 if tag == "a" and attrs.get("href")]
+        self.assertEqual(len(links), 2)
+        self.assertEqual({urljoin("https://sciencetostartup.com/", link) for link in links},
+                         {"https://sciencetostartup.com/explore/#companies",
+                          "https://sciencetostartup.com/explore/#work"})
+
+    def test_about_navigation_has_one_consistent_destination(self):
+        for file, path in (("index.html", "/"), ("explore/index.html", "/explore/"),
+                           ("companies/index.html", "/companies/")):
+            with self.subTest(file=file):
+                document = (ROOT / "dist" / file).read_text()
+                header = re.search(r'<header\b[^>]*>.*?</header>', document, re.S)
+                self.assertIsNotNone(header)
+                anchors = re.findall(r'<a\b[^>]*\bhref="([^"]+)"[^>]*>(.*?)</a>', header.group(0), re.S)
+                about = [href for href, text in anchors
+                         if html.unescape(re.sub(r"<[^>]+>", "", text)).strip() == "About"]
+                self.assertEqual(len(about), 1)
+                self.assertEqual(urljoin("https://sciencetostartup.com" + path, about[0]),
+                                 "https://sciencetostartup.com/explore/#about")
+
+    def test_landing_requires_no_external_fonts_or_script_runtime(self):
+        for tag, attrs in Structure(self.home).elements:
+            if tag == "script":
+                self.assertNotIn("src", attrs)
+            if tag == "link" and (attrs.get("rel") in ("stylesheet", "preconnect", "dns-prefetch")
+                                  or attrs.get("as") == "font"):
+                url = urlparse(attrs.get("href", ""))
+                self.assertFalse(url.scheme or url.netloc, attrs)
+        css = (ROOT / "dist/landing.css").read_text()
+        self.assertNotRegex(css, r"(?i)@import\b")
+        for value in re.findall(r'url\(\s*[\'"]?([^\)\'"\s]+)', css):
+            url = urlparse(value)
+            self.assertTrue(not url.netloc and url.scheme in ("", "data"), value)
 
     def test_home_has_one_complete_main_and_the_supplied_image(self):
         structure = Structure(self.home)

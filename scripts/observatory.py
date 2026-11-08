@@ -795,6 +795,7 @@ def build(data, destination):
     (destination / "explore/index.html").write_text(root_relative_resources(html))
     landing = (ROOT / "web/landing.html").read_text()
     landing = landing.replace("{{COMPANY_COUNT}}", str(len(data["companies"])))
+    landing = landing.replace("{{WORK_RECORD_COUNT}}", str(len(work_data["routes"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"])))
     landing = render_snapshot_metadata(landing, data)
     (destination / "landing.css").write_text((ROOT / "web/landing.css").read_text())
     (destination / "index.html").write_text(landing)

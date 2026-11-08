@@ -1429,11 +1429,11 @@ body{background:#f8f8f4}
  #work-view .work-list-heading{margin-top:18px;margin-bottom:8px}
 }
 
-/* Carry the simplified homepage's serif wordmark into the interactive guide. */
-.topbar .wordmark{font:600 22px/1.2 Georgia,"Times New Roman",serif;letter-spacing:-.6px;gap:0}
+/* One sans-serif identity from the homepage to the interactive guide. */
+.topbar .wordmark{font:650 21px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.9px;gap:0}
 .topbar .wordmark>.mark,.topbar .wordmark>span>small{display:none}
 .topbar .wordmark>span:not(.mark)::after{content:'.';color:var(--green)}
-@media(max-width:700px){.topbar .wordmark{font-size:21px}}
+@media(max-width:700px){.topbar .wordmark{font-size:20px}}
 
 /* One focused guide: a quiet shell, readable work rows, compact support links. */
 .guide-footer{width:calc(100% - 40px);display:flex;align-items:center;flex-wrap:wrap;gap:10px 26px;margin:56px auto 0;padding:24px 0 32px;border-top:1px solid var(--border);max-width:1120px;font-size:12px;color:var(--muted)}
@@ -1529,6 +1529,21 @@ body{background:#f8f8f4}
 }
 /* Replace the closed plus with one minus, including older card styles. */
 .work-card-v4 .w4-details[open]>summary>span[aria-hidden]{font-size:0!important}
+
+/* Reference-led refinement: less card chrome, tighter research summaries. */
+#company-cards{gap:16px}
+#company-cards .company-card{padding:20px 22px 0;border-radius:4px;box-shadow:none}
+#company-cards .company-card-heading{margin-bottom:10px}
+#company-cards .company-card-content{min-height:0;margin-bottom:14px}
+#company-cards .company-card h3{font-size:20px;letter-spacing:-.4px}
+#company-cards .company-signal{min-height:0;padding:12px 0}
+#company-cards .company-signal .row-number .number-button{font-size:23px;letter-spacing:-.5px}
+#company-cards .company-signal .financial-summary .row-number>strong{font-size:23px}
+#company-cards .company-card-footer{padding:6px 0;gap:14px}
+#company-cards .company-description{line-height:1.55}
+#companies-view .page-heading{padding-top:38px}
+#companies-view .page-heading h1{font-weight:600}
+@media(max-width:700px){#company-cards .company-card{padding:18px 18px 0}#companies-view .page-heading{padding-top:26px}.company-open-profile,#company-cards .company-work-link{min-height:44px}}
 
 /* Fixed geometry keeps icons consistent across devices and font families. */
 .ui-icon.ui-icon{display:inline-block;width:16px;height:16px;min-height:0;max-width:none;max-height:none;margin:0;flex:none;vertical-align:-3px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}

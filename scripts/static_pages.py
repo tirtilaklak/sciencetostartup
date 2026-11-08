@@ -707,7 +707,7 @@ STYLE = (
     "main,.site-footer{margin:0 max(var(--gutter),calc((100% - var(--content))/2))}main{padding:24px 0 8px}main>*{max-width:var(--measure)}main>.wide{max-width:none}"
     ".crumbs ol{display:flex;flex-wrap:wrap;gap:2px 8px;margin:0 0 24px;padding:0;list-style:none;font-size:13px;color:var(--muted)}.crumbs li+li::before{content:'/';margin-right:8px;color:var(--mark)}.crumbs a{color:var(--muted)}"
     ".eyebrow{margin:0 0 12px;font-size:11px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted)}"
-    "h1{margin:0 0 14px;font:400 52px/1.08 var(--serif);letter-spacing:-1.7px;overflow-wrap:break-word}"
+    "h1{margin:0 0 14px;font:500 52px/1.08 var(--sans);letter-spacing:-1.7px;overflow-wrap:break-word}"
     "h2{margin:48px 0 16px;padding-top:24px;border-top:1px solid var(--border);font-size:24px;line-height:1.25;font-weight:600;letter-spacing:-.35px}h3{margin:28px 0 8px;font-size:17px;line-height:1.35}"
     "p{margin:0 0 14px}.lede{margin:0 0 24px;font-size:18px;line-height:1.5;color:var(--muted)}"
     ".actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px}"
@@ -747,7 +747,7 @@ RIGHT_ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><pa
 STYLE += (
     ".site-footer{display:flex;align-items:center;flex-wrap:wrap;gap:8px 24px;margin-top:48px;padding:24px 0;font-size:12px}"
     ".site-footer>p{margin:0}.site-footer nav{display:block;margin:0;max-width:none}.site-footer nav ul{display:flex;gap:20px}.site-footer nav li{margin:0}"
-    ".site-footer>p:last-child{margin-left:auto}.site-header .wordmark{font:600 22px/1.2 Georgia,serif;letter-spacing:-.6px}.site-header .mark,.site-header small{display:none}"
+    ".site-footer>p:last-child{margin-left:auto}.site-header .wordmark{font:650 21px/1.2 var(--sans);letter-spacing:-.9px}.site-header .mark,.site-header small{display:none}"
     ".site-header .wordmark>span:last-child::after{content:'.';color:var(--green)}"
     "@media(max-width:700px){.site-footer>p:last-child{margin-left:0;width:100%}.site-footer a{display:inline-flex;align-items:center;min-height:44px}}"
 )
