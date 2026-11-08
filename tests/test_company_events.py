@@ -21,7 +21,7 @@ EMPTY = {"version": "1.0.0", "events": []}
 
 def embedded(dist, name):
     """Run the built data bundle (dist/js/data.<hash>.js) as the page does and return one window value."""
-    bundle = dist / re.search(r'"(js/data[.][0-9a-f]+[.]js)"', (dist / "index.html").read_text()).group(1)
+    bundle = dist / re.search(r'"(/?js/data[.][0-9a-f]+[.]js)"', (dist / "explore/index.html").read_text()).group(1).lstrip('/')
     script = "const fs=require('fs'),vm=require('vm'),window={};vm.runInNewContext(fs.readFileSync(process.argv[1],'utf8'),{window,JSON});process.stdout.write(JSON.stringify(window[process.argv[2]]??null));"
     return json.loads(subprocess.run(["node", "-e", script, str(bundle), name], capture_output=True, text=True, check=True).stdout)
 
@@ -144,7 +144,8 @@ class CompanyEventsBuildTests(unittest.TestCase):
         cls.temp = tempfile.TemporaryDirectory(prefix="company-events-")
         root, cls.dist = Path(cls.temp.name) / "root", Path(cls.temp.name) / "dist"
         (root / "data").mkdir(parents=True)
-        for name in ("web", "docs", "schema"): (root / name).symlink_to(ROOT / name)
+        for name in ("web", "docs", "schema", "scripts", "design-system", "release-assets"): (root / name).symlink_to(ROOT / name)
+        (root / "deployment.json").symlink_to(ROOT / "deployment.json")
         for path in (ROOT / "data").iterdir():
             if path.name != "company-events.json": (root / "data" / path.name).symlink_to(path)
         (root / "data/company-events.json").write_text(json.dumps(sample()))
@@ -156,10 +157,16 @@ class CompanyEventsBuildTests(unittest.TestCase):
     def page(self, cid): return (self.dist / "company" / cid / "index.html").read_text()
 
     def test_build_embeds_and_copies_the_sidecar(self):
-        # The sidecar ships in the data bundle, which the page runs before the app bundle that reads it.
-        files = json.loads(re.search(r"const files=(\[[^\]]*\])", (self.dist / "index.html").read_text()).group(1))
-        self.assertEqual([name.split(".")[0] for name in files], ["js/data", "js/app"])
-        self.assertEqual(embedded(self.dist, "COMPANY_EVENTS"), sample())
+        # The index is compact; every dated event remains in the company detail and full sidecar.
+        files = json.loads(re.search(r"const files=(\[[^\]]*\])", (self.dist / "explore/index.html").read_text()).group(1))
+        self.assertEqual([name.lstrip('/').split(".")[0] for name in files], ["js/data", "js/app"])
+        self.assertEqual(embedded(self.dist, "COMPANY_EVENTS"), EMPTY)
+        manifest = json.loads((self.dist / "manifest.json").read_text())
+        summary = json.loads((self.dist / manifest["summary"]["href"].lstrip('/')).read_text())
+        for cid in ("scale_ai", "mercor", "prolific"):
+            detail = json.loads((self.dist / summary["companyDetails"][cid]["href"].lstrip('/')).read_text())
+            expected = [event for event in sample()["events"] if event["company_id"] == cid or cid in event["related_company_ids"]]
+            self.assertEqual(detail["companyEvents"]["events"], expected)
         self.assertEqual(json.loads((self.dist / "company-events.json").read_text()), sample())
         self.assertIn("company-events.json", json.loads((self.dist / "manifest.json").read_text())["sha256"])
 

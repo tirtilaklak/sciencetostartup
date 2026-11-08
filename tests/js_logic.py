@@ -27,7 +27,7 @@ window.BUSINESS_HEALTH=synthetic?null:readJSON('data/business-health.json');
 const history={state:null,scrollRestoration:'auto',replaceState(state,title,url){this.state=state;if(url!==undefined)location.hash=String(url).includes('#')?'#'+String(url).split('#').slice(1).join('#'):'';}};
 let downloadedBlob;
 class CaptureURL extends URL {static createObjectURL(blob){downloadedBlob=blob;return 'blob:test'}static revokeObjectURL(){}}
-const context=vm.createContext({document,window,history,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,Blob,queueMicrotask,setTimeout:()=>{},clearTimeout:()=>{},console});
+const context=vm.createContext({document,window,history,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,URLSearchParams,Blob,queueMicrotask,setTimeout:()=>{},clearTimeout:()=>{},console});
 // The icon script runs first. This stub's window is separate from its global.
 // Combining the remaining modules matches declaration hoisting in the build.
 const modules=['web/icons.js','web/app.js','web/editorial.js','web/work-v3.js','web/work-v4.js','web/profiles-v2.js','web/source-updates.js','web/site-nav.js','web/business-health.js'];
@@ -181,7 +181,7 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  assert.ok(/data-comparison-company="scale_ai" class=""/.test(node('compare-content').innerHTML));run('setSelection([])');
 
  // Routes ignore hash queries and letter case, land on in-page sections and carry the comparison.
- for(const [hash,view] of [['#work?utm_source=x','work'],['#venture','market'],['#about','method'],['#labels','method'],['#corrections','method'],['#downloads','method']]){location.hash=hash;run('route()');assert.equal(node(view+'-view').hidden,false,hash);assert.equal(location.hash,hash,hash+' must stay linkable');}
+ for(const [hash,view] of [['#work?utm_source=x','work'],['#venture','market'],['#about','method'],['#labels','method'],['#corrections','method'],['#downloads','method']]){location.hash=hash;run('route()');assert.equal(node(view+'-view').hidden,false,hash);assert.equal(location.hash,hash.startsWith('#work?')?'#work':hash,hash+' must stay linkable (work links are canonicalized)');}
  // The overview's tab title names the site; the other views lead with their own name.
  location.hash='#market';run('route()');assert.equal(run('document.title'),'ScienceToStartup · The AI data field guide');
  // A plain view link after #venture or #about starts at the top of that view, even though the view is unchanged.
@@ -221,7 +221,7 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  // Role routes, pay units and availability remain separate, with no company pay band.
  const routes=window.WORK_ROUTES.routes;assert.equal(run('filteredWork().length'),routes.length);
  assert.ok(routes.length>39);assert.equal(new Set(routes.map(r=>r.id)).size,routes.length);
- run(`state.workQuery='AIXI';renderWork()`);assert.deepEqual(plain(run('filteredWork().map(r=>r.company_id)')),routes.filter(r=>r.company_id==='aixi').map(r=>r.company_id));assert.ok(node('work-count').textContent.includes('1 company'));node('work-reset').callbacks.click();
+ run(`state.workQuery='AIXI';renderWork()`);assert.deepEqual(plain(run('filteredWork().map(r=>r.company_id)')),routes.filter(r=>r.company_id==='aixi').map(r=>r.company_id));assert.equal(run('summarizeWorkResults(filteredWork()).companies'),1);assert.equal(node('work-count').textContent,run('workResultsLabel(summarizeWorkResults(filteredWork()))'));node('work-reset').callbacks.click();
  for(const route of routes){
   const html=run(`workCard(${JSON.stringify(route)})`),details=html.slice(html.indexOf('<details class="w4-details">'));
   assert.ok(html.includes('data-work-route="'+route.id+'"'),route.id);assert.ok(html.includes(run(`esc(${JSON.stringify(route.role)})`)));
@@ -231,7 +231,7 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
   checkSvgControls(html,route.id+' work card');
  }
  run(`state.workPay='numeric'`);assert.ok(run('filteredWork().every(r=>r.numeric_pay)'));assert.ok(run(`filteredWork().some(r=>r.company_id==='g2i')`));assert.ok(!run(`filteredWork().some(r=>r.company_id==='handshake_ai')`));
- run(`state.workEligibility='US listing evidence'`);assert.ok(run(`filteredWork().every(r=>r.eligibility==='US listing evidence')`));assert.ok(run(`filteredWork().some(r=>r.company_id==='terac')`));
+ assert.ok(run(`workRouteRows().filter(r=>w4WhereMatches(r,'US listing evidence')).every(r=>r.eligibility==='US listing evidence')`));assert.ok(run(`workRouteRows().filter(r=>w4WhereMatches(r,'US listing evidence')).some(r=>r.company_id==='terac')`));
  run(`state.workPay='';state.workEligibility='';state.workGroup='Research fellowship'`);for(const id of ['surge_ai','proximal','aixi'])assert.ok(run(`filteredWork().some(r=>r.company_id==='${id}')`),id);
  node('work-reset').callbacks.click();assert.equal(run('filteredWork().length'),routes.length);
  const after=routes.filter(r=>r.company_id==='afterquery');assert.ok(after.length>=3);assert.ok(after.some(r=>r.role.includes('World Models')&&r.pay_label.includes('150')));assert.ok(after.some(r=>r.role.includes('College')&&r.status==='pay_conflict'));

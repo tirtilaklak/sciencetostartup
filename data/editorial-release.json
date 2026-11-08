@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0.0",
+  "release_id": "2026-11-08.1",
+  "as_of": "2026-11-08",
+  "publication_as_of": "2026-11-08T22:51:47Z",
+  "canonical_dataset_version": "2.5.0",
+  "canonical_sha256": "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061",
+  "work_routes_sha256": "1701249bf7cd163c8dfc5536bd997af5c7024599ff7a72908a90f9375c140f39",
+  "counts": {
+    "records": 135,
+    "work_routes": 78,
+    "named_listings": 56,
+    "networks_programs": 22,
+    "providers": 29,
+    "career_pages": 23,
+    "past_other_records": 23,
+    "other_company_jobs": 11
+  },
+  "calibration_route_ids": [
+    "g2i.work.senior-swe-training",
+    "appen.work.sage-media",
+    "labelbox.work.mechanical-engineering",
+    "afterquery.work.technical-content-writer-contract",
+    "aixi.work.research-fellowship",
+    "ooak.work.data-quality-specialist",
+    "mercor.work.expert-network",
+    "snorkel_ai.work.expert-community",
+    "turing.work.expert-network",
+    "prolific.work.study-participant",
+    "terac.work.finance-experts",
+    "toloka.work.mindrift-code"
+  ],
+  "review_scope": "All 135 stored records classified and given explicit field states. Twelve records received a detailed stored-evidence audit and a public retrieval attempt. Only separately approved key-terms receipts refresh factual review dates.",
+  "publication_policy": {
+    "automated_checks_change_facts": false,
+    "automated_check_interval_days": 1,
+    "editor_days_per_week": 5,
+    "editorial_hours_per_week": [
+      5,
+      7
+    ],
+    "homepage_work_max_age_days": 3,
+    "homepage_window_applies_to": "Every promoted work example, including approved network fallbacks.",
+    "named_review_interval_days": 7,
+    "named_needs_recheck_days": 14,
+    "program_review_interval_days": 30,
+    "program_promotion_max_age_days": 45,
+    "age_does_not_mean_closed": true,
+    "failed_attempts_refresh_fact_dates": false,
+    "expiry_mechanism": "Evaluate approved review age at build and in the small homepage runtime guard; keep absolute dates and a neutral Browse fallback.",
+    "approval_required": "Material source changes remain candidates until a source-content review records evidence and an explicit reviewer."
+  },
+  "homepage": {
+    "work_candidate_route_ids": [
+      "appen.work.sage-media",
+      "mercor.work.expert-network"
+    ],
+    "require_approved_key_terms_receipt": true,
+    "fallback": "browse_paid_work"
+  },
+  "fact_state_definitions": {
+    "sourced": "A value is supported by cited stored research or an explicitly receipted source-content review; dates and scope remain visible.",
+    "source_not_stated": "The specific reviewed source did not state this field; this is not a claim that no provider source publishes it.",
+    "not_researched": "The field has not been reviewed; no successful review date is asserted.",
+    "conflicting": "Recorded source statements or field components need reconciliation; no personal eligibility or universal rate is inferred."
+  },
+  "retrieval_state_note": "Blocked, missing, unavailable and script-shell responses are retrieval outcomes. They preserve last sourced facts and never establish closure or current intake."
+}

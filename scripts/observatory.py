@@ -688,7 +688,7 @@ def load_work_routes(path, data):
 
 # Presentation layers in cascade order. Each page area owns one file loaded after edition.css.
 # business-health.css styles only the overview dashboard; the page area files after it may refine it.
-REDESIGN_CSS = ("profiles-v2.css", "work-v4.css", "investor.css", "edition.css", "business-health.css", "site-nav.css", "overview.css", "directory.css", "profiles-v3.css", "work-v5.css", "method.css", "refresh.css")
+REDESIGN_CSS = ("profiles-v2.css", "work-v4.css", "investor.css", "edition.css", "business-health.css", "site-nav.css", "overview.css", "directory.css", "profiles-v3.css", "work-v5.css", "method.css", "refresh.css", "field-guide.css")
 # Scripts concatenated after work-v3.js and before initialize(); later declarations replace earlier ones.
 # business-health.js runs as soon as it loads and reads app.js constants, so it comes last, after every declaration.
 PRESENTATION_JS = ("work-v4.js", "profiles-v2.js", "source-updates.js", "site-nav.js", "business-health.js")
@@ -718,10 +718,20 @@ def externalize_scripts(html, destination):
         path = "js/" + name + "." + hashlib.sha256(code.encode("utf-8")).hexdigest()[:12] + ".js"
         (destination / "js").mkdir(parents=True, exist_ok=True)
         (destination / path).write_text(code, encoding="utf-8")
-        files.append(path)
+        files.append("/" + path)
         html = html[:match.start()] + html[match.end():]
     require(html.count("/* BUNDLES */[]") == 2, "build: script loader placeholders missing")
     return html.replace("/* BUNDLES */[]", json.dumps(files, separators=(",", ":")))
+
+
+def root_relative_resources(html):
+    """Keep public files rooted when the interactive guide lives at /explore/."""
+    def reference(match):
+        attribute, value = match.groups()
+        if value.startswith(("/", "#")) or urlsplit(value).scheme:
+            return match.group(0)
+        return attribute + '="' + ("/" if value in (".", "./") else "/" + value.removeprefix("./")) + '"'
+    return re.sub(r'(href|src)="([^"]+)"', reference, html)
 
 def build(data, destination):
     validate(data)
@@ -758,7 +768,24 @@ def build(data, destination):
     from business_health import load_business_health
     health_path = ROOT / "data/business-health.json"
     health = load_business_health(health_path, data)
-    injected = LAZY_DATA + "".join(lazy_data(name, value) for name, value in (("EDITORIAL", editorial), ("RESEARCH_ALIASES", aliases), ("LOGOS", logo_data), ("WORK_ROUTES", work_data), ("PROFILE_CONTENT", profile_content), ("COMPANY_EVENTS", company_events), ("SOURCE_UPDATES", source_updates), ("BUSINESS_HEALTH", health))) + "})();"
+    sidecars = dict(EDITORIAL=editorial, RESEARCH_ALIASES=aliases, LOGOS=logo_data,
+                    WORK_ROUTES=work_data, PROFILE_CONTENT=profile_content, COMPANY_EVENTS=company_events,
+                    SOURCE_UPDATES=source_updates, BUSINESS_HEALTH=health)
+    release_path = ROOT / "data/editorial-release.json"
+    release = json.loads(release_path.read_text()) if release_path.exists() else {"editorial_release_id": "baseline-2026-10-28", "publication_as_of": "2026-11-08T20:30:00Z"}
+    if release_path.exists() and data["dataset_version"] == SIDECAR_DATASET_VERSION:
+        from editorial_work import load_editorial_release
+        release = load_editorial_release(release_path, work_data, data)
+    from presentation import build_presentation
+    summary, summary_asset = build_presentation(data, destination, ROOT, sidecars, release)
+    bootstrap = json.dumps(summary["bootstrap"], ensure_ascii=False, separators=(",", ":"), sort_keys=True, allow_nan=False).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
+    html = html.replace(embedded, bootstrap)
+    from presentation import health_subset, rooted_assets
+    compact_sidecars = rooted_assets({**sidecars, "WORK_ROUTES": summary["work"], "PROFILE_CONTENT": {"entries": [{"company_id": entry["company_id"], "products": entry.get("products", [])} for entry in profile_content["entries"]]}, "COMPANY_EVENTS": {"version": company_events["version"], "events": []}, "LOGOS": {"logos": [{k: v for k, v in logo.items() if k in ("company_id", "local_path", "background")} for logo in logo_data["logos"]]}, "BUSINESS_HEALTH": health_subset(health, [o for o in (health or {}).get("observations", []) if o["signal"] == "revenue"])})
+    public_summary = {key: value for key, value in summary.items() if key not in ("bootstrap", "companies", "work")}
+    public_summary["asset"] = summary_asset
+    injected = "window.SUMMARY_INDEX=" + script_safe(json.dumps(public_summary, separators=(",", ":"))) + ";"
+    injected += LAZY_DATA + "".join(lazy_data(name, value) for name, value in compact_sidecars.items()) + "})();"
     # link-health.js reads this one while it loads, so it stays a plain assignment.
     injected += "window.LINK_HEALTH=" + script_safe(json.dumps(link_health)) + ";"
     html = html.replace("/* EDITORIAL_DATA */", injected)
@@ -768,25 +795,41 @@ def build(data, destination):
     html = html.replace("/* EDITORIAL_JS */", (ROOT / "web/editorial.js").read_text())
     work_js = ROOT / "web/work-v3.js"
     html = html.replace("/* WORK_V3_JS */", (work_js.read_text() if work_js.exists() else "") + "".join((ROOT / "web" / name).read_text() for name in PRESENTATION_JS))
+    html = html.replace("/* DATA_RUNTIME_JS */", (ROOT / "web/data-runtime.js").read_text().replace("/* APP_BUILD_ID */null", json.dumps(summary["buildId"])))
+    html = html.replace('<html lang="en">', '<html lang="en" data-build-id="' + summary["buildId"] + '" data-editorial-release="' + summary["editorialReleaseId"] + '" data-dataset-version="' + summary["datasetVersion"] + '">')
     import shutil
     assets = ROOT / "web/assets"
     if assets.exists(): shutil.copytree(assets, destination / "assets", dirs_exist_ok=True)
     # 404.html is generated by static_pages.py, so it is not copied from web/.
     for name in ("robots.txt", "sitemap.xml", "_headers", "_redirects", "favicon.ico"):
         shutil.copy2(ROOT / "web" / name, destination / name)
-    for source in [ROOT / "data/editorial.json", ROOT / "data/portrait-provenance.json", logo_path, work_path, link_health_path, events_path, source_updates_path]:
+    for source in [ROOT / "data/editorial.json", ROOT / "data/portrait-provenance.json", logo_path, work_path, link_health_path, events_path, source_updates_path, release_path]:
         if source.exists(): shutil.copy2(source, destination / source.name)
     if health is not None:
         (destination / "business-health.json").write_text(json.dumps(health, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
     (destination / "profile-content.json").write_text(json.dumps(profile_content, indent=2, ensure_ascii=False) + "\n")
+    for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js"):
+        path = ROOT / "web" / name
+        if path.exists():
+            shutil.copy2(path, destination / name)
     html = html.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{GROUP_COUNT}}", str(len({e["primary_offering"] for e in editorial["entries"]})))
     html = render_snapshot_metadata(html, data)
     html = render_static_file_metadata(html, destination)
     html = externalize_scripts(html, destination)
-    (destination / "index.html").write_text(html)
+    (destination / "explore").mkdir(exist_ok=True)
+    html = html.replace('<link rel="canonical" href="https://sciencetostartup.com/">', '<link rel="canonical" href="https://sciencetostartup.com/explore/"><meta name="robots" content="noindex,follow">')
+    (destination / "explore/index.html").write_text(root_relative_resources(html))
+    landing = (ROOT / "web/landing.html").read_text()
+    landing = landing.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{WORK_RECORD_COUNT}}", str(len(work_data["routes"])))
+    landing = render_snapshot_metadata(landing, data)
+    from home import render_home
+    landing = render_home(landing, data, sidecars, release, summary)
+    (destination / "index.html").write_text(landing)
     from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health, business_health=health)
+    from presentation import retain_runtime_generations
+    retain_runtime_generations(ROOT, destination)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}
-    (destination / "manifest.json").write_text(json.dumps({"dataset_version": data["dataset_version"], "schema_version": data["schema_version"], "sha256": files}, indent=2) + "\n")
+    (destination / "manifest.json").write_text(json.dumps({"dataset_version": data["dataset_version"], "schema_version": data["schema_version"], "build_id": summary["buildId"], "editorial_release_id": summary["editorialReleaseId"], "publication_as_of": summary["publicationAsOf"], "summary": summary_asset, "sha256": files}, indent=2) + "\n")
 
 def release(input_path, root=ROOT):
     data = json.loads(input_path.read_text())

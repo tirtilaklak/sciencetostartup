@@ -16,6 +16,12 @@ jobs:
           node-version: "22"
       - name: Unit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py'
+      - name: Install the pinned QA tools
+        run: npm ci
+      - name: Performance tool contracts
+        run: node --test tests/performance_tools.test.mjs
+      - name: Hero and bootstrap payload budgets
+        run: node scripts/payload_budgets.mjs --dist dist
       - name: Checked-in dist matches a fresh build, file for file
         run: python3 scripts/build_public_snapshot.py --verify
       - name: Logic checks

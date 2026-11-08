@@ -214,7 +214,7 @@ function profileHTML(id,{deferArchive=false}={}){
  people:`<div class="profile-people-layout">${profileSection('finance',c.entity_type==='adjacent_research'?'Research support':'Funding and valuation',profileCapital(id))}${profileSection('people','Founders and leadership',profilePeople(id))}</div>`+(notes?profileDisclosure('Further context',notes):''),
  work:profileSection('work','Paid work at '+c.name,workSummary(id))};
  const tabs=[['business','Business'],['traction','Figures'],['people','Funding & people'],['work','Paid work']];
- return `<div class="profile-v2" data-profile-company="${attr(id)}"><a class="profile-back" href="#companies">${iconHTML('left')} Companies</a><header class="profile-top profile-hero"><div class="profile-introduction"><div class="profile-title-row">${profileLogoHTML(id,'profile-brand')}<h1>${esc(c.name)}</h1></div><p class="profile-summary">${esc(modelFor(id))}</p><a class="profile-group-link" href="#companies/${attr(groupSlug(group))}" data-category-jump="${attr(group)}">${esc(groupLabel(group))} ${iconHTML('right')}</a><div class="profile-links">${external(c.website,'Website')}${c.founded_year?`<span>Founded ${c.founded_year}</span>`:''}${compareCheck(id)}<a href="#company/${attr(id)}/sources">Sources ${iconHTML('right')}</a><a href="/company/${attr(id)}/">Plain page to share ${iconHTML('right')}</a></div></div>${profileHeroVisual(id)}</header>${profileAtAGlance(id)}<nav class="profile-tabs" role="tablist" aria-label="${attr(c.name)} details">${tabs.map(([key,label])=>`<button type="button" role="tab" id="profile-tab-${key}" data-profile-tab="${key}" aria-controls="profile-pane-${key}" aria-selected="${active===key}" tabindex="${active===key?0:-1}">${esc(label)}</button>`).join('')}</nav><div class="profile-panes">${tabs.map(([key])=>`<section id="profile-pane-${key}" role="tabpanel" aria-labelledby="profile-tab-${key}" tabindex="-1" data-profile-pane="${key}"${active===key?'':' hidden'}>${panes[key]}</section>`).join('')}</div><details class="profile-evidence"${archiveOpen?' open':''}><summary><span class="archive-summary-label">Sources and review <i aria-hidden="true">+</i></span><span>${companyClaims(id).length} claims · ${companySources(id).length} sources</span></summary>${deferArchive&&!archiveOpen?'':profileArchive(id)}</details><p class="profile-correction">Something wrong here? <a href="#corrections">Request a correction ${iconHTML('right')}</a></p>${profilePeersHTML(id)}</div>`;
+ return `<div class="profile-v2" data-profile-company="${attr(id)}"><a class="profile-back" href="#companies">${iconHTML('left')} Companies</a><header class="profile-top profile-hero"><div class="profile-introduction"><div class="profile-title-row">${profileLogoHTML(id,'profile-brand')}<h1>${esc(c.name)}</h1></div><p class="profile-summary">${esc(modelFor(id))}</p><a class="profile-group-link" href="#companies/${attr(groupSlug(group))}" data-category-jump="${attr(group)}">${esc(groupLabel(group))} ${iconHTML('right')}</a><div class="profile-links">${external(c.website,'Website')}<a href="#company/${attr(id)}/work">Paid work ${iconHTML('right')}</a><a href="#company/${attr(id)}/sources">Sources ${iconHTML('right')}</a></div></div></header><nav class="profile-tabs" role="tablist" aria-label="${attr(c.name)} details">${tabs.map(([key,label])=>`<button type="button" role="tab" id="profile-tab-${key}" data-profile-tab="${key}" aria-controls="profile-pane-${key}" aria-selected="${active===key}" tabindex="${active===key?0:-1}">${esc(label)}</button>`).join('')}</nav><div class="profile-panes">${tabs.map(([key])=>`<section id="profile-pane-${key}" role="tabpanel" aria-labelledby="profile-tab-${key}" tabindex="-1" data-profile-pane="${key}"${active===key?'':' hidden'}>${panes[key]}</section>`).join('')}</div><details class="profile-evidence"${archiveOpen?' open':''}><summary><span class="archive-summary-label">Sources and review <i aria-hidden="true">+</i></span><span>${companyClaims(id).length} claims · ${companySources(id).length} sources</span></summary>${deferArchive&&!archiveOpen?'':profileArchive(id)}</details><p class="profile-correction">Something wrong here? <a href="#corrections">Request a correction ${iconHTML('right')}</a></p>${profilePeersHTML(id)}</div>`;
 }
 
 function ensureProfileArchive(root){
@@ -323,8 +323,9 @@ route=function(event){
       const focusTarget=destination.tagName==='DETAILS'?destination.querySelector('summary'):destination;
       if(focusTarget&&focusTarget.tagName!=='SUMMARY')focusTarget.setAttribute('tabindex','-1');
       if(event?.type==='hashchange')focusTarget?.focus({preventScroll:true});
-      (primary?document.querySelector('.profile-tabs'):destination)?.scrollIntoView({block:'start',behavior:'instant'});
-      if(initial&&!primary)settleInitialProfileAnchor(location.hash,destination);
+      const anchor=primary?document.querySelector('.profile-tabs'):destination;
+      if(initial&&anchor)settleInitialProfileAnchor(location.hash,anchor);
+      else anchor?.scrollIntoView({block:'start',behavior:'instant'});
     }
   }
   if(company&&parts[2]==='claim'&&claims[parts[3]]?.company_id===company)showEvidence(parts[3]);
@@ -335,7 +336,9 @@ document.addEventListener('keydown',event=>{
   const tab=event.target.closest?.('[data-profile-tab]');if(!tab||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
   const ids=['business','traction','people','work'],index=ids.indexOf(tab.dataset.profileTab),next=event.key==='Home'?0:event.key==='End'?3:(index+(event.key==='ArrowRight'?1:3))%4;
   event.preventDefault();activateProfileTab(ids[next]);
-  document.getElementById('profile-tab-'+ids[next])?.focus({preventScroll:true});
+  const nextTab=document.getElementById('profile-tab-'+ids[next]);
+  nextTab?.focus({preventScroll:true});
+  nextTab?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});
 });
 
 document.addEventListener('click',event=>{if(event.target.closest?.('.skip')){event.preventDefault();$('main').focus({preventScroll:true});$('main').scrollIntoView({behavior:'instant'});}});

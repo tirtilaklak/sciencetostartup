@@ -3,12 +3,17 @@
 ScienceToStartup is a static, evidence-linked field guide to AI data organizations.
 The current public site is https://sciencetostartup.com.
 
-The overview pairs company and paid-work navigation with official product imagery,
-then six dated revenue figures. “Show all” expands the ledger; charts, coverage and
-research notes open on request. Company and work cards show official logos, and
-profiles feature product images or founder photos where available. The publisher’s
-proposal includes its restored concept picture, clearly separate from company evidence.
-If the app cannot load, recovery links open the plain company, work and method pages.
+The homepage introduces two equal journeys: understand AI data companies and find
+paid AI training work. Its portrait collage preserves all three faces in responsive
+WebP derivatives. Two examples show an offer-led company and a recently reviewed
+public work route; stale work promotion falls back to an approved program or an
+evergreen browse link. Without JavaScript the evergreen link remains available.
+
+The interactive guide lives at `/explore/`; existing root hash links redirect there.
+A compact, versioned summary powers discovery. Company evidence loads on demand,
+with release identity, integrity and navigation guards. The full research JSON and
+SQLite remain unchanged downloads. Script and evidence failures offer retry and
+plain company, work and method pages rather than misleading empty results.
 
 ## Where this source came from
 
@@ -23,13 +28,20 @@ history was not imported.
 The snapshot includes the already-public research data, official assets and
 their provenance. See License below for what each license covers. The alumni
 outreach directory is no longer published or tracked here. It excludes raw research archives, unpublished personal records,
-internal reports, credentials, browser output and deployment configuration.
+internal reports, credentials and browser output. `deployment.json` records only
+sanitized public deployment settings; credentials never enter the repository.
 
 ## Files
 
 - `web/`: editable HTML, CSS, JavaScript and local assets.
 - `data/canonical.json`: authoritative research dataset 2.5.0.
 - `data/work-routes.json`: curated Work routes, including reviewed additions and availability checks.
+- `data/editorial-release.json`: separately versioned review identity, approved counts and publication policy; canonical v2.5.0 stays byte-identical.
+- `EDITORIAL.md`: the approved 5–7 hour weekly review workflow and candidate-only checks.
+- `scripts/presentation.py`, `scripts/home.py`: reproducible summaries, evidence graphs and promotion templates.
+- `web/data-runtime.js`: the single asynchronous route owner and guarded evidence loading.
+- `release-assets/`: checksummed assets from the prior two public runtime generations.
+- `deployment.json`, `scripts/release_artifact.py`: exact-artifact upload preparation and short-lived asset upload authorization.
 - `data/company-events.json`: dated lawsuits, incidents, customer and workforce changes and filings, reviewed after dataset 2.5.0.
 - `data/business-health.json`: sourced business observations, reporting cohorts and calculations for the interactive dashboard.
 - Other `data/*.json`: public profiles, editorial context and source updates.

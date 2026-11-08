@@ -312,9 +312,9 @@ console.log(JSON.stringify({observations:observations.length,filtering:true,cont
     def test_delivered_assets_preserve_research_and_include_the_workbench(self):
         self.assertEqual((ROOT / "dist/research.json").read_bytes(), (ROOT / "data/canonical.json").read_bytes())
         self.assertEqual(json.loads((ROOT / "dist/business-health.json").read_text()), self.health)
-        html = (ROOT / "dist/index.html").read_text()
+        html = (ROOT / "dist/explore/index.html").read_text()
         # The page scripts load from content-hashed files in dist/js/; the CSS stays inline.
-        scripts = "".join((ROOT / "dist" / src).read_text() for src in dict.fromkeys(re.findall(r'"(js/[^"]+[.]js)"', html)))
+        scripts = "".join((ROOT / "dist" / src.lstrip('/')).read_text() for src in dict.fromkeys(re.findall(r'"(/?js/[^"]+[.]js)"', html)))
         self.assertIn((ROOT / "web/business-health.js").read_text(), scripts)
         self.assertIn((ROOT / "web/business-health.css").read_text(), html)
         self.assertIn('id="business-health"', html)

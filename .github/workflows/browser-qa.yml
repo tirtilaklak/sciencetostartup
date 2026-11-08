@@ -1,0 +1,64 @@
+name: Browser QA
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:browser:install
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-qa
+          path: output/browser-qa/
+          retention-days: 14
+  performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: python3 scripts/build_public_snapshot.py --verify
+      - name: Serve the exact artifact with gzip
+        run: |
+          python3 scripts/preview_server.py --directory dist --port 18770 > /tmp/static-preview.log 2>&1 &
+          python3 - <<'PY'
+          import time, urllib.request
+          for attempt in range(50):
+              try:
+                  with urllib.request.urlopen('http://127.0.0.1:18770/manifest.json') as response:
+                      assert response.status == 200
+                  break
+              except OSError:
+                  if attempt == 49: raise
+                  time.sleep(.2)
+          PY
+      - name: Three pinned mobile audits on five representative routes
+        run: node scripts/performance_audit.mjs --base-url http://127.0.0.1:18770 --dist dist --runs 3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-performance
+          path: output/performance/
+          retention-days: 14

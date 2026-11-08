@@ -1,5 +1,6 @@
 """Crawlable static pages, the figure rules and wording they share with the app, and the generated sitemap, built into a scratch directory."""
 import html
+import gzip
 import json
 import re
 import shutil
@@ -44,7 +45,7 @@ process.stdout.write(vm.runInContext(`JSON.stringify((()=>{
  for(const c of DATA.companies){r.headlines[c.id]=preferredFinancial(c.id)?.id||null;r.eligible[c.id]=Object.fromEntries(kinds.map(k=>[k,eligibleMetrics(c.id,k).map(m=>m.id)]));}
  for(const m of DATA.metrics)r.metrics[m.id]={rank:dateRank(m.as_of),period:financialPeriod(m),compact:typeof m.value==='number'?compact(Math.abs(m.value)):null,scope:scopeText(m.segment_scope,m.company_id),currentPeriod:metricCurrentPeriod(m),basis:metricCurrentBasis(m,''),label:metricPresentationLabel(m,'')};
  for(const name of Object.keys(MODEL_GROUPS))r.slugs[name]=groupSlug(name);
- r.work=Object.fromEntries(window.WORK_ROUTES.routes.map(w=>[w.id,{bucket:w4Bucket(w),status:w4Status(w),place:w4Location(w),pay:w4Pay(w)}]));
+ r.work=Object.fromEntries(window.WORK_ROUTES.routes.map(w=>{const d=w4Destination(w);return[w.id,{bucket:w4Bucket(w),status:w4Status(w),place:w4Location(w),pay:w4Pay(w),kind:w4OpportunityKind(w),engagement:w4Engagement(w),destination:{url:d.url,label:d.label},terms:w4TermsReviewDate(w),freshness:w4FreshnessLabel(w)}]}));
  r.ids=DATA.metrics.map(m=>m.id).sort((a,b)=>a.localeCompare(b));r.names=DATA.companies.map(c=>c.name).concat(window.WORK_ROUTES.routes.map(w=>w.role)).sort((a,b)=>a.localeCompare(b));
  return r;})())`,context));
 """
@@ -181,7 +182,7 @@ class StaticPageTests(unittest.TestCase):
             self.assertLessEqual(len(facts.title), sp.TITLE_LIMIT, (cid, facts.title))
             # Topics go before the brand does: every name short enough to carry " · ScienceToStartup" keeps it.
             if len(name + sp.SUFFIX) <= sp.TITLE_LIMIT: self.assertTrue(facts.title.endswith(sp.SUFFIX), (cid, facts.title))
-            self.assertIn(f'href="{ORIGIN}/#company/{cid}"', text, cid)
+            self.assertIn(f'href="{ORIGIN}/explore/#company/{cid}"', text, cid)
             self.assertLessEqual(len(facts.meta["description"]), sp.DESCRIPTION_LIMIT, cid)
 
     def test_pages_stay_lean_without_app_script_or_dataset(self):
@@ -201,7 +202,9 @@ class StaticPageTests(unittest.TestCase):
             self.assertEqual(len(items), 4, cid)
             self.assertEqual(structured["publisher"]["name"], "Musa Ozdem", cid)
         for name in ("work", "method"):
-            self.assertLess(len((self.dist / name / "index.html").read_bytes()), PAGE_LIMIT, name)
+            self.assertLess(len((self.dist / name / "index.html").read_bytes()), 300_000 if name == "work" else PAGE_LIMIT, name)
+        self.assertLess(len(gzip.compress((self.dist / "work/index.html").read_bytes())), 45_000,
+                        "All recorded work stays available without JavaScript within a compact transfer budget")
         for path in self.indexable_files():
             text = path.read_text()
             page = next(node for node in ld_nodes(text) if "breadcrumb" in node)
@@ -254,13 +257,13 @@ class StaticPageTests(unittest.TestCase):
         facts = PageFacts(text)
         self.assertEqual(facts.canonicals, [ORIGIN + "/companies/"])
         for cid in self.companies: self.assertIn(f'href="{ORIGIN}/company/{cid}/"', text, cid)
-        self.assertIn(f'href="{ORIGIN}/#companies"', text)
+        self.assertIn(f'href="{ORIGIN}/explore/#companies"', text)
         labels = sp.read_js_object(ROOT / "web/editorial.js", "GROUP_LABELS")
         for group in {e["primary_offering"] for e in self.editorial.values()}:
             slug = re.sub(r"[^a-z0-9]+", "-", group.lower()).strip("-")
             self.assertIn(slug, facts.ids, group)
             self.assertIn(f'<h2 id="{slug}">{labels.get(group, group).replace("&", "&amp;")}</h2>', text)
-            self.assertIn(f'href="{ORIGIN}/#companies/{slug}"', text)
+            self.assertIn(f'href="{ORIGIN}/explore/#companies/{slug}"', text)
         nonprofits = sum(1 for e in self.editorial.values() if e["primary_offering"] == "Nonprofit research")
         self.assertIn(f"{sp.count_word(nonprofits)} of the {len(self.companies)} are nonprofit research groups.", text)
 
@@ -284,17 +287,17 @@ class StaticPageTests(unittest.TestCase):
             self.assertEqual(sorted(re.findall(r'/company/([^/]+)/"', related)), sorted(peers), cid)
 
     def test_header_footer_and_icons_are_shared_by_every_page(self):
-        expected_nav = [f"{ORIGIN}/companies/", f"{ORIGIN}/work/", f"{ORIGIN}/#compare", f"{ORIGIN}/method/", f"{ORIGIN}/?search"]
+        expected_nav = [f"{ORIGIN}/companies/", f"{ORIGIN}/work/", f"{ORIGIN}/explore/#about"]
         for path in self.html_files():
             text, label = path.read_text(), str(path.relative_to(self.dist))
             facts = PageFacts(text)
-            nav = re.search(r'<nav class="site-nav" aria-label="Site">(.*?)</nav>', text).group(1)
+            nav = re.search(r'<nav class="site-nav" aria-label="Main">(.*?)</nav>', text).group(1)
             self.assertEqual(re.findall(r'href="([^"]+)"', nav), expected_nav, label)
             self.assertIn("Site map", facts.navs, label)
             icons = [l for l in facts.links if "icon" in str(l.get("rel"))]
             self.assertEqual([(l.get("rel"), l.get("href")) for l in icons], ICONS, label)
             self.assertEqual(icons[0].get("type"), "image/svg+xml", label)
-            self.assertIn(f'href="{ORIGIN}/#corrections"', text, label)
+            self.assertIn(f'href="{ORIGIN}/explore/#corrections"', text, label)
             self.assertNotIn("—", text, label)
             for anchor in facts.anchors:
                 href = anchor.get("href", "")
@@ -330,8 +333,8 @@ class StaticPageTests(unittest.TestCase):
             text = html.unescape(re.sub(r"<[^>]+>", "", footer))
             self.assertIn(publisher, text, path)
             self.assertIn(sp.DISCLOSURE, text, path)
-            self.assertIn(f'<a href="{ORIGIN}/#venture">overview page</a>', footer, path)
-            self.assertIn(f'<a href="{ORIGIN}/#corrections">Request a correction</a>', footer, path)
+            self.assertIn(f'<a href="{ORIGIN}/explore/#venture">overview page</a>', footer, path)
+            self.assertIn(f'<a href="{ORIGIN}/explore/#corrections">Request a correction</a>', footer, path)
 
     def test_head_tags_make_every_page_share_ready(self):
         for path in self.indexable_files() + [self.dist / "404.html"]:
@@ -662,7 +665,7 @@ class StaticPageTests(unittest.TestCase):
             self.assertEqual(re.findall(r'<tr data-risk="([^"]+)">', section), [c["id"] for c in risks], cid)
             self.assertEqual([e["date"] for e in dated], sorted((e["date"] for e in dated), reverse=True), cid)
             self.assertEqual(sp.EVENTS_NOTE in section, bool(dated), cid)
-            self.assertIn(f'href="{ORIGIN}/#company/{cid}/risks"', section, cid)
+            self.assertIn(f'href="{ORIGIN}/explore/#company/{cid}/risks"', section, cid)
         mercor = self.pages["mercor"].split("<h3>Risks named in the evidence</h3>", 1)[1].split("</table>", 1)[0]
         self.assertIn('<td class="date" data-label="As of">Jun 2026</td>', mercor)
         self.assertIn('<td class="date" data-label="Date">Source date not stated</td>', mercor)
@@ -681,7 +684,7 @@ class StaticPageTests(unittest.TestCase):
         text = (self.dist / "work/index.html").read_text()
         listed = re.findall(r'<tr data-work-route="([^"]+)">', text)
         self.assertEqual(sorted(listed), sorted(r["id"] for r in self.routes))
-        order = [key for key, _, _ in sp.WORK_BUCKETS if any(sp.work_bucket(r) == key for r in self.routes)]
+        order = [key for key, _, _ in sp.WORK_DISPLAY_BUCKETS if any(sp.work_display_bucket(r) == key for r in self.routes)]
         self.assertEqual(re.findall(r'<h2 id="([a-z]+)">', text), order)
         self.assertIn(f'href="{sp.SCAM_GUIDE}"', text)
         self.assertIn("Never pay to get work.", text)
@@ -691,9 +694,9 @@ class StaticPageTests(unittest.TestCase):
 
     def test_work_groups_match_the_app(self):
         app = (ROOT / "web/work-v4.js").read_text() + (ROOT / "web/work-v3.js").read_text()
-        for _, label, note in sp.WORK_BUCKETS:
+        for _, label, note in sp.WORK_DISPLAY_BUCKETS:
             self.assertIn(label, app, "static work group label drifted from the app")
-            self.assertIn(note, app, "static work group note drifted from the app")
+            self.assertIn(note, (self.dist / "work/index.html").read_text(), "static work group explanation must remain visible")
         archive = re.search(r"const WORK_ROUTE_ARCHIVE=new Set\(\[([^\]]*)\]\)", app).group(1)
         self.assertEqual(set(re.findall(r"'([a-z_]+)'", archive)), set(sp.WORK_ARCHIVE))
 
@@ -706,7 +709,8 @@ class StaticPageTests(unittest.TestCase):
         app = json.loads(result.stdout)["work"]
         self.assertEqual(sorted(app), sorted(r["id"] for r in self.routes))
         for route in self.routes:
-            static = {"bucket": sp.work_bucket(route), "status": sp.work_status(route), "place": sp.work_location(route), "pay": sp.work_pay(route)}
+            destination, label = sp.work_destination(route, self.research)
+            static = {"bucket": sp.work_bucket(route), "status": sp.work_status(route), "place": sp.work_location(route), "pay": sp.work_pay(route), "kind": sp.work_kind(route), "engagement": sp.work_engagement(route), "destination": {"url": destination, "label": label}, "terms": sp.work_terms_review_date(route), "freshness": sp.work_freshness(route)}
             self.assertEqual(static, app[route["id"]], route["id"])
         statuses = {r["id"]: sp.work_status(r) for r in self.routes}
         for route in self.routes:
@@ -719,23 +723,25 @@ class StaticPageTests(unittest.TestCase):
 
     def test_listing_counts_come_from_the_data(self):
         """Paid work listings are the contract and jobs groups; company counts follow the brief's wording (B1, B3)."""
-        paid = [r for r in self.routes if sp.work_bucket(r) in sp.PAID_OPEN_BUCKETS]
+        paid = [r for r in self.routes if sp.work_primary(r)]
+        named = sum(sp.work_display_bucket(r) == "named" for r in self.routes)
+        programs = sum(sp.work_display_bucket(r) == "programs" for r in self.routes)
         paid_companies, all_companies = len({r["company_id"] for r in paid}), len({r["company_id"] for r in self.routes})
         work = (self.dist / "work/index.html").read_text()
         facts = PageFacts(work)
-        self.assertEqual(facts.title, f"{len(paid)} paid work listings in AI training{sp.SUFFIX}")
-        self.assertTrue(facts.meta["description"].startswith(f"{len(paid)} paid work listings in AI training at {paid_companies} AI data companies,"), facts.meta["description"])
+        self.assertEqual(facts.title, f"Paid AI training work: {len(paid)} sourced routes{sp.SUFFIX}")
+        self.assertTrue(facts.meta["description"].startswith(f"{named} named listings and {programs} expert networks and programs at {paid_companies} AI data companies,"), facts.meta["description"])
         lede = plain(re.search(r'<p class="lede">.*?</p>', work).group(0))
-        self.assertTrue(lede.startswith(f"{len(paid)} paid work listings at {paid_companies} AI data companies, out of {len(self.routes)} listings we reviewed at {all_companies} companies."), lede)
-        self.assertIn(f"See {len(paid)} paid work listings</a>", (self.dist / "companies/index.html").read_text())
+        self.assertTrue(lede.startswith(f"{len(paid)} sourced work routes: {named} named listings and {programs} networks and programs at {paid_companies} AI data companies. All {len(self.routes)} records at {all_companies} companies"), lede)
+        self.assertIn(f"See {len(paid)} paid work routes</a>", (self.dist / "companies/index.html").read_text())
         checked = max(d for r in self.routes for d in (r.get("availability_checked_on"), (r.get("last_route_check") or {}).get("date")) if d)
         self.assertIn(f"links checked up to {sp.format_date(checked)}", work)
         for path in self.html_files():
             self.assertNotRegex(plain(path.read_text()), r"\bopen (?:paid work )?listings?\b", str(path.relative_to(self.dist)))
 
     def test_company_pages_list_their_listings_in_worker_groups(self):
-        labels = [label for _, label, _ in sp.WORK_BUCKETS]
-        closed_label = dict((key, label) for key, label, _ in sp.WORK_BUCKETS)["closed"]
+        labels = [label for _, label, _ in sp.WORK_DISPLAY_BUCKETS]
+        closed_label = dict((key, label) for key, label, _ in sp.WORK_DISPLAY_BUCKETS)["closed"]
         for cid, text in self.pages.items():
             own = [r for r in self.routes if r["company_id"] == cid]
             section = text.split('<h2 id="work">', 1)[1].split("<h2", 1)[0]
@@ -744,16 +750,17 @@ class StaticPageTests(unittest.TestCase):
             self.assertEqual(headings, sorted(headings, key=labels.index), cid)
             if own: self.assertIn("Never pay to get work.", section, cid)
             closed = section.split(f"<h3>{closed_label}</h3>", 1)[1] if f"<h3>{closed_label}</h3>" in section else ""
-            self.assertNotIn("Pay: ", closed, cid)
-            self.assertNotIn("Where: ", closed, cid)
+            closed_summary = re.sub(r'<details class="work-terms">.*?</details>', '', closed, flags=re.S)
+            self.assertNotIn("Pay: ", closed_summary, cid)
+            self.assertNotIn("Where: ", closed_summary, cid)
             # Field names are not repeated: "Pay not listed", never "Pay: Pay not listed" (coordinator E5).
             self.assertNotRegex(section, r"Pay: Pay|Where: Location not listed", cid)
             if not own: continue
             # The count names paid work listings only, and the pay sentence appears only when there is one (B2).
-            paid = sum(1 for r in own if sp.work_bucket(r) in sp.PAID_OPEN_BUCKETS)
+            paid = sum(1 for r in own if sp.work_primary(r))
             lead = plain(re.search(r"<p>(.*?)</p>", section).group(1))
             name = self.companies[cid]["name"]
-            if paid: self.assertTrue(lead.startswith(f"{paid} paid work listing{'s' if paid != 1 else ''} at {name}. Pay is quoted"), (cid, lead))
+            if paid: self.assertTrue(lead.startswith(f"{paid} paid work route{'s' if paid != 1 else ''} at {name}. Pay is quoted"), (cid, lead))
             else: self.assertEqual(lead, f"No confirmed paid listing for {name}. The groups below show what we found.", cid)
         self.assertIn("No confirmed paid listing for Quesma.", self.pages["quesma"])
         self.assertIn("Pay not listed. Where:", self.pages["turing"] + self.pages["prolific"])

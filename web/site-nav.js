@@ -6,10 +6,9 @@ const SITE_SEARCH_GROUPS={company:['Companies',5],group:['Business groups',2],wo
 const SITE_SEARCH_SUGGESTED=['scale_ai','mercor','surge_ai','labelbox'];
 let siteSearchEntries=null,siteSearchItems=[],siteSearchActive=-1,siteSearchStatusTimer=0;
 const siteSearchFold=v=>String(v??'').normalize('NFKD').replace(/\p{M}+/gu,'').toLowerCase();
-const siteSearchWords=v=>siteSearchFold(Array.isArray(v)?v.join(' '):v).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+const siteSearchWords=v=>siteSearchFold(Array.isArray(v)?v.join(' '):v).match(/[\p{L}\p{N}]+(?:\+\+|#)?/gu)||[];
 // "Outlier (contributor brand)" is matched as "Outlier"; the note stays with it in the result.
 function siteSearchAlias(value){const m=String(value).match(/^(.+?)\s*\((.+)\)$/);return m?{name:m[1],note:m[2]}:{name:String(value),note:''};}
-function siteSearchTopRate(label){const m=String(label||'').match(/\$\s?([\d,.]+)(?:\s*[–-]\s*\$?([\d,.]+))?\+?\s*\/\s*(?:approved\s+)?hour/i);return m?Number((m[2]||m[1]).replace(/,/g,''))||0:0;}
 function siteSearchPages(){
  const listings=typeof workRouteRows==='function'?workRouteRows().filter(route=>typeof w4Bucket!=='function'||['contract','jobs'].includes(w4Bucket(route))).length:0;
  return [
@@ -33,7 +32,7 @@ function siteSearchIndex(){
  for(const c of DATA.companies)for(const p of typeof profileProducts==='function'?profileProducts(c.id):[])rows.push({type:'product',id:c.id+'/'+p.name,company:c.id,product:p.name,name:p.name,aliases:[...(p.aliases||[]),typeof publicOfferingName==='function'?publicOfferingName(p.name):''].filter(Boolean).map(siteSearchAlias),ctx:[c.name],text:[p.description,p.kind],meta:'From '+c.name,href:`#company/${c.id}/products`});
  for(const r of typeof workRouteRows==='function'?workRouteRows():[]){const c=companies[r.company_id];if(!c)continue;
   const pay=typeof w4Pay==='function'?w4Pay(r):r.pay_label,place=typeof w4Location==='function'?w4Location(r):r.geography,status=typeof w4Status==='function'?w4Status(r):'';
-  rows.push({type:'work',id:r.id,company:c.id,name:r.role,ctx:[c.name,...aliasesOf(c).map(a=>a.name),r.group,r.geography,r.pay_label],text:[r.summary,r.hours,...(r.requirements||[])],meta:[c.name,pay,place].filter(Boolean).join(' · '),badge:status,order:WORK_ROUTE_ORDER[r.status]??10,rate:siteSearchTopRate(r.pay_label),href:`#company/${c.id}/work`});}
+  rows.push({type:'work',id:r.id,company:c.id,name:r.role,ctx:[c.name,...aliasesOf(c).map(a=>a.name),r.group,r.geography,r.pay_label],text:[r.summary,r.hours,...(r.requirements||[])],meta:[c.name,pay,place].filter(Boolean).join(' · '),badge:status,order:WORK_ROUTE_ORDER[r.status]??10,href:`#company/${c.id}/work`});}
  rows.push(...siteSearchPages());
  return siteSearchEntries=rows.map(row=>{
   const name=siteSearchWords(row.name),aliases=(row.aliases||[]).map(a=>siteSearchWords(a.name)).filter(w=>w.length),keys=siteSearchWords(row.keys||[]),core=[...name,...aliases.flat(),...keys,...siteSearchWords(row.ctx||[])];
@@ -60,15 +59,15 @@ function siteSearchNear(t,words){if(t.length<3)return words.some(w=>w.startsWith
 function siteSearch(query,opts={}){
  const o=typeof opts==='number'?{limit:opts}:opts||{},tokens=siteSearchWords(query);
  if(!tokens.length)return [];
- const key=tokens.join(' '),stems=tokens.map(siteSearchStem),entries=siteSearchIndex().filter(e=>!o.types||o.types.includes(e.type));
+ const key=tokens.join(' '),stems=tokens.map(siteSearchStem),entries=siteSearchIndex().filter(e=>!o.types||o.types.includes(e.type)),workMatches=new Set(typeof selectWorkRoutes==='function'?selectWorkRoutes(workRouteRows(),{q:query}).map(row=>row.id):[]);
  // One or two letters match names, aliases and context only; descriptions join from three letters.
  const most=key.length<3?4:5;
- let hits=entries.map(e=>{let rank=siteSearchRank(e,tokens,key);if(rank<0&&stems.join(' ')!==key&&siteSearchRank(e,stems,stems.join(' '))>=0)rank=5;return [rank,e];}).filter(([rank])=>rank>=0&&rank<=most);
- if(!hits.length)hits=entries.filter(e=>tokens.every(t=>siteSearchNear(t,e.labelWords))).map(e=>[6,e]);
+ let hits=entries.map(e=>{let rank=siteSearchRank(e,tokens,key);if(e.type==='work')return [workMatches.has(e.id)?(rank<0?5:rank):-1,e];if(rank<0&&stems.join(' ')!==key&&siteSearchRank(e,stems,stems.join(' '))>=0)rank=5;return [rank,e];}).filter(([rank,e])=>rank>=0&&(e.type==='work'||rank<=most));
+ if(!hits.length)hits=entries.filter(e=>e.type!=='work'&&tokens.every(t=>siteSearchNear(t,e.labelWords))).map(e=>[6,e]);
  // Groups follow their best match. On a tie the default order holds, except that listings lead
  // when only descriptions match (skill words such as "python" are usually a worker's search).
  const groups=Object.keys(SITE_SEARCH_GROUPS).map((type,order)=>{
-  const rows=hits.filter(([,e])=>e.type===type).sort(([ra,a],[rb,b])=>ra-rb||(type==='work'?a.order-b.order||b.rate-a.rate||companies[a.company].name.localeCompare(companies[b.company].name)||a.name.localeCompare(b.name):a.name.length-b.name.length||a.name.localeCompare(b.name)));
+  const rows=hits.filter(([,e])=>e.type===type).sort(([ra,a],[rb,b])=>ra-rb||(type==='work'?a.order-b.order||w4BestOrder(w4RouteById(a.id),w4RouteById(b.id)):a.name.length-b.name.length||a.name.localeCompare(b.name)));
   return {type,order,best:rows[0]?.[0],total:rows.length,rows:rows.slice(0,o.limit||SITE_SEARCH_GROUPS[type][1])};
  }).filter(g=>g.total).sort((a,b)=>a.best-b.best||(a.best===5?(b.type==='work')-(a.type==='work'):0)||a.order-b.order);
  return groups.flatMap(g=>g.rows.map(([rank,e])=>{
@@ -77,14 +76,14 @@ function siteSearch(query,opts={}){
  }));
 }
 // Global search covers every listing, independent of earlier Paid work filters.
-function siteSearchWorkCount(query){if(typeof filteredWork!=='function')return 0;const saved=Object.fromEntries(['workQuery','workGroup','workPay','workEligibility'].map(key=>[key,state[key]]));try{Object.assign(state,{workQuery:query,workGroup:'',workPay:'',workEligibility:''});return filteredWork().length;}finally{Object.assign(state,saved);}}
+function siteSearchWorkCount(query){return typeof selectWorkRoutes==='function'?selectWorkRoutes(workRouteRows(),{q:query}).length:0;}
 function siteSearchView(query){
  const tokens=siteSearchWords(query);
  if(!tokens.length){const pages=siteSearchPages();return [{label:'Suggested',items:[...SITE_SEARCH_SUGGESTED.filter(isCompanyId).map(id=>({type:'company',name:companies[id].name,meta:groupLabel(modelGroup(id)),href:'#company/'+id})),...['work','compare','method'].map(id=>pages.find(p=>p.id===id))]}];}
  const results=siteSearch(query),groups=[];
  for(const item of results){if(groups.at(-1)?.type!==item.type)groups.push({type:item.type,label:item.group,items:[]});groups.at(-1).items.push(item);}
- const work=groups.find(g=>g.type==='work'),text=tokens.join(' '),count=work?siteSearchWorkCount(text):0;
- if(work&&count){const all={type:'action',action:'work',query:text,name:`See all ${count} ${count===1?'listing':'listings'} for “${query.trim()}”`,meta:'Opens Paid work with this search',href:'#work'};if(work.items[0].rank>=4)work.items.unshift(all);else work.items.push(all);}
+ const work=groups.find(g=>g.type==='work'),text=String(query).trim().slice(0,256),matches=work?selectWorkRoutes(workRouteRows(),{q:text}):[],count=matches.length;
+ if(work&&count){const all={type:'action',action:'work',query:text,name:`See all ${count} ${count===1?'match':'matches'} for “${text}”`,meta:workResultsLabel(summarizeWorkResults(matches)),href:workHashFor({q:text})};if(work.items[0].rank>=4)work.items.unshift(all);else work.items.push(all);}
  if(!groups.length)groups.push({label:'Try instead',items:[{type:'action',action:'companies',name:`Browse all ${DATA.companies.length} companies`,meta:'The full company list',href:'#companies'},{type:'action',action:'work',query:'',name:'See all paid work',meta:'Every listing, with filters',href:'#work'}]});
  return groups;
 }
@@ -130,10 +129,10 @@ function siteSearchReveal(item){
 function siteSearchChoose(item){
  if(!item)return;
  // Set up the Paid work page first, so its search field listens before it receives the query.
- if(item.action==='work'){preparePage('work');resetWorkFilters();const field=$('work-search');field.value=item.query||'';field.dispatchEvent(new Event('input',{bubbles:true}));}
+ if(item.action==='work'){preparePage('work');applyWorkCriteria({q:item.query||''});item={...item,href:workHashFor({q:item.query||''})};renderWork();}
  if(item.action==='companies'){preparePage('companies');reset();}
  $('site-search').close();
- const reveal=item.type==='product'||item.type==='work'?()=>siteSearchReveal(item):null;
+ const reveal=item.type==='product'||item.type==='work'?()=>queueMicrotask(()=>{const pending=window.APP_ROUTE_READY;Promise.resolve(pending).then(()=>{if(location.hash===item.href&&pending===window.APP_ROUTE_READY)siteSearchReveal(item);}).catch(()=>{});}):null;
  if(location.hash===item.href){route({type:'hashchange'});reveal?.();return;}
  if(reveal)window.addEventListener('hashchange',reveal,{once:true});
  keepEntryScroll();location.hash=item.href;

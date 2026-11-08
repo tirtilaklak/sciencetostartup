@@ -38,14 +38,22 @@ class PublicEntrypointTests(unittest.TestCase):
     def setUpClass(cls):
         cls.dist = ROOT / "dist"
         cls.html = (cls.dist / "index.html").read_text()
+        cls.app_html = (cls.dist / "explore/index.html").read_text()
 
-    def test_embedded_data_matches_preserved_downloads(self):
-        for element, source in (("research-data", "data/canonical.json"),):
+    def test_summary_matches_its_full_preserved_archive_and_downloads(self):
+        manifest = json.loads((self.dist / "manifest.json").read_text())
+        summary = json.loads((self.dist / manifest["summary"]["href"].lstrip("/")).read_text())
+        for element in ("research-data",):
             match = re.search(r'<script\b[^>]*\bid="' + element +
-                              r'"[^>]*>(.*?)</script>', self.html, re.S)
+                              r'"[^>]*>(.*?)</script>', self.app_html, re.S)
             self.assertIsNotNone(match, element)
-            self.assertEqual(json.loads(match.group(1)),
-                             json.loads((ROOT / source).read_text()), element)
+            self.assertEqual(json.loads(match.group(1)), summary["bootstrap"], element)
+        archive = json.loads((self.dist / summary["archive"]["href"].lstrip("/")).read_text())
+        self.assertEqual(archive["data"], json.loads((ROOT / "data/canonical.json").read_text()))
+        self.assertEqual(summary["buildId"], manifest["build_id"])
+        self.assertEqual(summary["datasetVersion"], "2.5.0")
+        self.assertEqual(summary["exports"]["research"]["sha256"], hashlib.sha256((ROOT / "data/canonical.json").read_bytes()).hexdigest())
+        self.assertNotIn('id="research-data"', self.html, "The homepage must not load research")
         self.assertNotIn('id="outreach-data"', self.html,
                          "The alumni directory must not ship in the public page")
         self.assertNotIn("mailto:", self.html.split("<footer>")[0].split('id="method-view"')[0],

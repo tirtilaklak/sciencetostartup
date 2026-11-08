@@ -1,7 +1,7 @@
 /* Revenue ledger first; matching comparisons and full evidence are available on demand. */
 (() => {
 'use strict';
-const bundle=window.BUSINESS_HEALTH;
+let bundle=window.BUSINESS_HEALTH;
 const signals=['revenue','profit','customers','delivery','cash'];
 const labels={revenue:'Revenue',profit:'Profitability',customers:'Customers',delivery:'Expert activity',cash:'Cash'};
 const columns={revenue:'Revenue',profit:'Profit',customers:'Customers',delivery:'Paid delivery',cash:'Cash'};
@@ -21,9 +21,10 @@ let overviewMeasure='period_revenue';
 let overviewExpanded=false;
 const overviewLimit=6;
 const overviewMeasures={period_revenue:'Actual revenue',annualized_revenue:'Annualized pace',revenue_growth_yoy:'Growth'};
-const freshClaims=new Map((bundle?.fresh_claims||[]).map(c=>[c.id,c]));
-const refreshedSources=new Map((bundle?.sources||[]).map(s=>[s.id,s]));
-const sourceChecks=new Map((bundle?.source_checks?.entries||[]).map(s=>[s.source_id,s]));
+let freshClaims=new Map((bundle?.fresh_claims||[]).map(c=>[c.id,c]));
+let refreshedSources=new Map((bundle?.sources||[]).map(s=>[s.id,s]));
+let sourceChecks=new Map((bundle?.source_checks?.entries||[]).map(s=>[s.source_id,s]));
+function refreshBundle(){bundle=window.BUSINESS_HEALTH;freshClaims=new Map((bundle?.fresh_claims||[]).map(c=>[c.id,c]));refreshedSources=new Map((bundle?.sources||[]).map(s=>[s.id,s]));sourceChecks=new Map((bundle?.source_checks?.entries||[]).map(s=>[s.source_id,s]));}
 let evidenceOrigin='';
 const claimRecord=id=>claims[id]||freshClaims.get(id);
 const sourceRecord=id=>refreshedSources.get(id)||sources[id];
@@ -298,7 +299,7 @@ function selectSignal(signal,company=''){
  if(company){const o=pickCompanyObservation(company,signal);if(o){bhState.measure=o.measure;bhState.observation=o.id;bhState.cohort=cohort(o);}}
  render();
 }
-window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries,latestFigures};
+window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries,latestFigures,refreshBundle};
 if(!bundle)return;
 $('bh-close-evidence').addEventListener('click',()=>$('bh-evidence-dialog').close());
 $('bh-evidence-dialog').addEventListener('close',()=>{const trigger=[...document.querySelectorAll('[data-bh-ledger]')].find(n=>n.dataset.bhLedger===evidenceOrigin);trigger?.focus({preventScroll:true});});
