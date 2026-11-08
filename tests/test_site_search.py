@@ -30,8 +30,14 @@ for(const [q,id] of [['outlier','scale_ai'],['Remotasks','scale_ai'],['mindrift'
 }
 assert.ok(search('outlier')[0].meta.startsWith('Also known as Outlier'),'Alias matches say which name matched');
 // Pages answer by name and by plain words.
-for(const [q,id] of [['corrections','corrections'],['contact','about'],['musa ozdem','about'],['csv','downloads'],['vs','compare'],['jobs','work'],['method','method'],['grades','labels'],['neolab','venture']]){
+for(const [q,id] of [['corrections','corrections'],['contact','about'],['musa ozdem','about'],['csv','downloads'],['jobs','work']]){
  const first=search(q)[0];assert.equal(first?.type,'page',q);assert.equal(first.id,id,q);assert.equal(first.href,'#'+id,q);
+}
+// Retired pages cannot reappear through search or its empty-query suggestions.
+for(const query of ['', 'vs', 'method', 'grades', 'neolab']){
+ const results=query?search(query):view(query);
+ assert.ok(!results.some(item=>item.type==='page'&&['compare','method','labels','venture'].includes(item.id)),query);
+ assert.ok(results.every(item=>item&&item.href),'Removed suggestions must not leave undefined entries');
 }
 // One slip still finds the company.
 for(const [q,id] of [['mecor','mercor'],['lablebox','labelbox'],['scael','scale_ai']])assert.equal(search(q)[0]?.id,id,q);

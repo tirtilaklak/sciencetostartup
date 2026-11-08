@@ -21,7 +21,7 @@ EMPTY = {"version": "1.0.0", "events": []}
 
 def embedded(dist, name):
     """Run the built data bundle (dist/js/data.<hash>.js) as the page does and return one window value."""
-    bundle = dist / re.search(r'"(js/data[.][0-9a-f]+[.]js)"', (dist / "index.html").read_text()).group(1)
+    bundle = dist / re.search(r'"(js/data[.][0-9a-f]+[.]js)"', (dist / "explore/index.html").read_text()).group(1)
     script = "const fs=require('fs'),vm=require('vm'),window={};vm.runInNewContext(fs.readFileSync(process.argv[1],'utf8'),{window,JSON});process.stdout.write(JSON.stringify(window[process.argv[2]]??null));"
     return json.loads(subprocess.run(["node", "-e", script, str(bundle), name], capture_output=True, text=True, check=True).stdout)
 
@@ -157,7 +157,7 @@ class CompanyEventsBuildTests(unittest.TestCase):
 
     def test_build_embeds_and_copies_the_sidecar(self):
         # The sidecar ships in the data bundle, which the page runs before the app bundle that reads it.
-        files = json.loads(re.search(r"const files=(\[[^\]]*\])", (self.dist / "index.html").read_text()).group(1))
+        files = json.loads(re.search(r"const files=(\[[^\]]*\])", (self.dist / "explore/index.html").read_text()).group(1))
         self.assertEqual([name.split(".")[0] for name in files], ["js/data", "js/app"])
         self.assertEqual(embedded(self.dist, "COMPANY_EVENTS"), sample())
         self.assertEqual(json.loads((self.dist / "company-events.json").read_text()), sample())

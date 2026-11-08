@@ -113,7 +113,7 @@ class PipelineTests(unittest.TestCase):
         self.data["companies"][0]["description"]='</script><script>window.PWNED=1</script>'
         with tempfile.TemporaryDirectory() as tmp:
             build(self.data,Path(tmp))
-            html=(Path(tmp)/'index.html').read_text()
+            html=(Path(tmp)/'explore/index.html').read_text()
             self.assertNotIn('</script><script>window.PWNED',html)
     def test_database_relations_round_sums_and_round_trip(self):
         with tempfile.TemporaryDirectory() as tmp:

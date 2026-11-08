@@ -61,3 +61,7 @@ When these hold, the bundle and the site compute the same styles.
 - Publish `project/tokens.json` and `project/components/bundle.css` from the build
   folder to the artifact. In Claude Code, ask to re-sync the design system from
   the repository.
+
+## Simplified landing
+
+The homepage uses `web/landing.html` and `web/landing.css`. Its `landing-*` colour tokens are separate from the app cascade and are checked directly by `tests/test_landing.py`. The complete research app is built at `/explore/`; no research data or application bundles are loaded by the landing.

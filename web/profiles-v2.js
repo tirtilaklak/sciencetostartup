@@ -73,7 +73,7 @@ function profilePeopleRows(id){
 }
 function profilePeople(id){
   const rows=profilePeopleRows(id);
-  return rows.length?`<div class="leadership-grid">${rows.map(p=>`<article class="leadership-card">${p.portrait?`<span class="leadership-photo ${p.portrait.includes('carlos')?'photo-tighter':''}"><img class="leadership-portrait" src="${attr(p.portrait)}" alt="" width="80" height="80" loading="lazy"></span>`:''}<div><h3>${esc(people[p.person_id]?.name||p.name)}</h3><p class="leadership-role">${esc(p.role)}</p>${p.bio?`<p>${esc(p.bio)}</p>`:''}${profileReferences(p.claim_ids,'Source',people[p.person_id]?.name||p.name)}</div></article>`).join('')}</div>`:'<p class="profile-empty">Leadership is not established in the reviewed sources.</p>';
+  return rows.length?`<div class="leadership-grid">${rows.map(p=>`<article class="leadership-card">${p.portrait?`<span class="leadership-photo ${p.portrait.includes('carlos')?'photo-tighter':''}"><img class="leadership-portrait" src="${attr(rootAssetPath(p.portrait))}" alt="" width="80" height="80" loading="lazy"></span>`:''}<div><h3>${esc(people[p.person_id]?.name||p.name)}</h3><p class="leadership-role">${esc(p.role)}</p>${p.bio?`<p>${esc(p.bio)}</p>`:''}${profileReferences(p.claim_ids,'Source',people[p.person_id]?.name||p.name)}</div></article>`).join('')}</div>`:'<p class="profile-empty">Leadership is not established in the reviewed sources.</p>';
 }
 const PROFILE_CAPITAL_CONTEXT={
  'bespoke_labs.round.1':{qualification:'Series A amount differs by source: Wing reports $31.3M; SiliconANGLE reports $31.75M.'},

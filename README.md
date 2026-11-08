@@ -41,7 +41,7 @@ internal reports, credentials, browser output and deployment configuration.
 
 `build()` in `scripts/observatory.py` turns `web/` and the data into `dist/`.
 
-- CSS is inlined into `dist/index.html`: `style.css` first, then the files in
+- App CSS is inlined into `dist/explore/index.html`: `style.css` first, then the files in
   `REDESIGN_CSS`, then `icons.css`. Between two equally specific rules, the
   later file wins.
 - `icons.js` runs first in its own tag. The other scripts join into one
@@ -54,7 +54,7 @@ internal reports, credentials, browser output and deployment configuration.
 - That script and the page data go to content-hashed files,
   `dist/js/app.<hash>.js` and `dist/js/data.<hash>.js` (the name changes when
   the content changes). They load after the first paint. The research dataset
-  stays inline in `index.html` as JSON.
+  stays inline in `/explore/` as JSON.
 - `scripts/static_pages.py` writes the plain pages from the same data.
 
 ## View or reproduce
@@ -104,7 +104,7 @@ python3 tests/reliability_failure_state_logic.py
 python3 tests/risk_section_logic.py
 ```
 
-The 149 unit tests cover the pipeline, the build, the design system tokens
+The 169 unit tests cover the pipeline, the build, the design system tokens
 (the same check as `python3 scripts/design_system.py --check`), download sizes,
 static pages, company events, the business health data, Work routes, the Paid
 work page, site search, link health and a privacy scan of every file in `dist/`.
@@ -121,7 +121,7 @@ Assets on the apex and www custom domains. Deployment publishes the reviewed
 `dist/` build; a GitHub push alone does not trigger deployment.
 
 A deploy must upload all of `dist/`, including `dist/js/`: the app page
-(`index.html`) loads its scripts from there. Those file names change with their
+(`/explore/`) loads its scripts from there. Those file names change with their
 content, so `web/_headers` and `vercel.json` let browsers cache them for a year.
 
 The Worker staging omits the domain-level `_redirects` file because Workers
@@ -157,7 +157,13 @@ supplement, not a claim that the entire historical dataset has been re-audited.
 See [dashboard definitions and evidence limits](docs/business-health-dashboard.md)
 and [financial source checks](data/fresh-source-checks.json).
 
-Cards, profiles, Compare and plain company pages use the same supplemental
+Cards, profiles and plain company pages use the same supplemental
 financial selection. Mercor’s H1 $614M figure is identified as a Sacra estimate;
 its $2B annualized figure retains an undisclosed gross/net basis. Operating
 activity and registered networks stay separate from revenue and paid delivery.
+
+## Simplified homepage
+
+The lightweight homepage comes from `web/landing.html` and `web/landing.css` and uses the supplied collage at `web/assets/human-depth.png`. Its light, sans-serif layout uses the same brand palette as the guide. Its two primary routes are Companies and Paid work; the coverage row is generated from actual company, total Work-record and source-record counts, not a claim that every recorded opportunity is open or paid. The supplied image remains supporting artwork without overlaying the navigation or main copy. The Work view uses one consistent list (twenty initial paid listings, a lazy More group, and separate archival disclosures); search and filters preserve access to every matching record. Compare and Method are retired from the app interface, including search, profile controls and navigation. Legacy `#compare` routes recover to Companies; `#method`, `#labels` and `#coverage` recover to the concise About view. About links the publisher’s personal website and retains correction, disclosure and download details behind native disclosures. The complete current guide, revenue ledger, search, sources and downloads remain at `/explore/`. Existing root hash routes and `?search` / `?q=` links forward without losing the route or query. Crawlable company and work pages retain the same data with the compact shared navigation and footer. `/method/` remains an evidence/data archive, without promotion as a top-level app view. The interactive app declares its own canonical URL and noindex,follow; the homepage retains the original WebSite and Dataset structured identity.
+
+Builds write both entrypoints and hash all files into the manifest. Do not overlay files directly into `dist/`: rebuild it using the standard public snapshot command above. Tests continue to inspect the app at `/explore/` and additionally verify the lightweight homepage, legacy navigation and supplied-image integrity.

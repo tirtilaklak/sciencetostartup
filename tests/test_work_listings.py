@@ -90,8 +90,9 @@ assert.ok(node('work-cards').innerHTML.includes('No listing matches these filter
 run('resetWorkFilters()');
 // Counts and labels read the same on every surface (B1, B3, B5).
 run('renderWork()');
-const companiesReviewed=new Set(routes.map(r=>r.company_id)).size;
-assert.equal(node('work-count').textContent,`${routes.length} recorded listings and programs · ${companiesReviewed} companies`);
+const primaryIds=new Set([...g.contract,...g.jobs]);
+const primaryCompanies=new Set(routes.filter(r=>primaryIds.has(r.id)).map(r=>r.company_id)).size;
+assert.equal(node('work-count').textContent,`${primaryIds.size} paid listings · ${primaryCompanies} companies`);
 run(`state.workSort='hourly';renderWork()`);
 const sortNote=node('work-sort-note').textContent;
 assert.ok(sortNote.includes(`of ${g.contract.length+g.jobs.length} paid work listings`)&&!/open listing/.test(sortNote),sortNote);

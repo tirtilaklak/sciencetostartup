@@ -169,7 +169,7 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  for(const [alias,id] of Object.entries(window.RESEARCH_ALIASES)){location.hash='#company/'+alias;run('route()');assert.equal(location.hash,'#company/'+id);assert.ok(node('profile-view').innerHTML.includes(data.companies.find(c=>c.id===id).name.replaceAll('&','&amp;')));}
  location.hash='#market';run('route()');
 
- // Selection preserves identity across repeated controls and rejects a fourth.
+ // Inert compatibility computations retain their data guarantees. These fabricated controls are not public UI.
  for(const id of ['mercor','snorkel_ai','labelbox','appen','g2i','surge_ai','toloka'])for(const view of ['directory','work','profile'])boxes.push({dataset:{compare:id},checked:false,view});
  run(`setSelection(['mercor','snorkel_ai','labelbox','appen'])`);assert.equal(run('state.selected.length'),3);assert.ok(boxes.filter(b=>b.dataset.compare==='mercor').every(b=>b.checked));
  boxes.filter(b=>b.dataset.compare==='g2i').forEach(b=>b.checked=true);run(`chooseCompare('g2i',true)`);assert.ok(boxes.filter(b=>b.dataset.compare==='g2i').every(b=>!b.checked));
@@ -178,29 +178,27 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  node('compare-preset').value='work';node('compare-preset').callbacks.change({target:node('compare-preset')});assert.deepEqual(plain(run('state.selected')),['surge_ai','toloka','labelbox']);assert.ok(boxes.filter(b=>b.dataset.compare==='surge_ai').every(b=>b.checked));
  run('setSelection([])');assert.ok(node('compare-content').innerHTML.includes('comparison-empty'),'Clearing selection must show an honest empty state');assert.equal((node('compare-content').innerHTML.match(/data-comparison-company=/g)||[]).length,0,'Empty selection must not render unselected companies');
  run("setSelection(['taskus','appen','scale_ai'])");assert.equal((node('compare-content').innerHTML.match(/data-mobile-compare=/g)||[]).length,3);assert.ok(node('compare-content').innerHTML.includes('TaskUs + Appen'));assert.ok(node('compare-content').innerHTML.includes('data-mobile-compare="2"'));click(button({mobileCompare:'1'}));assert.equal(run('state.mobileCompare'),1,'Explicit three-company comparison must reach final company');
- assert.ok(/data-comparison-company="scale_ai" class=""/.test(node('compare-content').innerHTML));run('setSelection([])');
+ assert.ok(/data-comparison-company="scale_ai" class=""/.test(node('compare-content').innerHTML));
+ assert.ok(node('compare-content').innerHTML.includes('<div class="comparison-scroll"><table'),'Compatibility table markup stays non-focusable by default');run('setSelection([])');
 
- // Routes ignore hash queries and letter case, land on in-page sections and carry the comparison.
- for(const [hash,view] of [['#work?utm_source=x','work'],['#venture','market'],['#about','method'],['#labels','method'],['#corrections','method'],['#downloads','method']]){location.hash=hash;run('route()');assert.equal(node(view+'-view').hidden,false,hash);assert.equal(location.hash,hash,hash+' must stay linkable');}
+ // Routes ignore hash queries and letter case; retired Method/labels links recover into concise About.
+ for(const [hash,view,target] of [['#work?utm_source=x','work'],['#venture','market'],['#about','about'],['#method','about','#about'],['#labels','about','#about'],['#coverage','about','#about'],['#corrections','about'],['#downloads','about']]){location.hash=hash;run('route()');assert.equal(node(view+'-view').hidden,false,hash);assert.equal(location.hash,target||hash,hash+' must stay useful');}
  // The overview's tab title names the site; the other views lead with their own name.
  location.hash='#market';run('route()');assert.equal(run('document.title'),'ScienceToStartup · The AI data field guide');
- // A plain view link after #venture or #about starts at the top of that view, even though the view is unchanged.
+ // A plain overview link after #venture starts at the top of that view, even though the view is unchanged.
  const scrolls=[];window.scrollTo=options=>scrolls.push(options);
- for(const [section,next] of [['#venture','#market'],['#about','#method']]){location.hash=section;run('route()');scrolls.length=0;location.hash=next;run('route()');assert.deepEqual(scrolls.map(options=>options.top),[0],section+' then '+next+' must scroll to the top');}
+ for(const [section,next] of [['#venture','#market']]){location.hash=section;run('route()');scrolls.length=0;location.hash=next;run('route()');assert.deepEqual(scrolls.map(options=>options.top),[0],section+' then '+next+' must scroll to the top');}
  window.scrollTo=()=>{};location.hash='#market';run('route()');
  location.hash='#company/Scale_AI/WORK';run('route()');assert.ok(node('profile-view').innerHTML.includes('data-profile-pane="work">'),'Section case must not hide the Paid work tab');
  assert.equal(location.hash,'#company/scale_ai/work','Mixed-case company links are rewritten to their canonical form');run(`activateProfileTab('traction')`);assert.equal(location.hash,'#company/scale_ai/traction','Profile tabs work after a mixed-case link');
- // Compare links use #compare/<id>/<id>. The earlier comma form (#compare/a,b) still opens and is rewritten to it.
- location.hash='#compare/mercor,Handshake_AI,unknown,mercor';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai']);assert.equal(location.hash,'#compare/mercor/handshake_ai');
- run(`chooseCompare('appen',true)`);assert.equal(location.hash,'#compare/mercor/handshake_ai/appen');
- location.hash='#compare/junk,nope';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai','appen'],'A compare link naming no known company keeps the selection');assert.equal(location.hash,'#compare/mercor/handshake_ai/appen');
- location.hash='#compare/Appen/unknown/appen/Scale_AI';run('route()');assert.deepEqual(plain(run('state.selected')),['appen','scale_ai'],'Slash links ignore case, unknown and repeated companies');assert.equal(location.hash,'#compare/appen/scale_ai');
- run('setSelection([])');assert.equal(location.hash,'#compare');location.hash='#market';run('route()');
- // A research alias opens its company: #compare/<alias>/<unknown>/<id> keeps the known companies, in order, under their ids.
- location.hash='#compare/Polymath/no-such-company/appen';run('route()');assert.deepEqual(plain(run('state.selected')),['polymath_ai_labs','appen'],'Compare links resolve research aliases and drop unknown parts');assert.equal(location.hash,'#compare/polymath_ai_labs/appen');
- // The table box is a plain box. comparisonScrollRegion() names it as a focusable region only when it scrolls sideways.
- assert.ok(node('compare-content').innerHTML.includes('<div class="comparison-scroll"><table'),'The comparison box is not a Tab stop by default');
- run('setSelection([])');location.hash='#market';run('route()');
+ // Every old comparison URL retires to Companies; identities, aliases or malformed IDs cannot revive the screen.
+ for(const hash of ['#compare','#compare/mercor,Handshake_AI,unknown,mercor','#compare/junk,nope','#compare/Appen/unknown/appen/Scale_AI','#compare/Polymath/no-such-company/appen','#COMPARE/mercor?utm_source=old']){
+  const selected=plain(run('state.selected'));location.hash=hash;run('route()');
+  assert.equal(location.hash,'#companies'+(hash.match(/\?.*$/)?.[0]||''),hash);
+  assert.equal(node('companies-view').hidden,false,hash);assert.equal(node('compare-view').hidden,true,hash);
+  assert.deepEqual(plain(run('state.selected')),selected,'Retired URL must not silently select companies');
+ }
+ location.hash='#market';run('route()');
  // The overview counts paid work listings and does not call them open.
  assert.match(node('overview-work').innerHTML,/<b>\d+<\/b> paid work listings<\/span>/);assert.ok(!/open/i.test(node('overview-work').innerHTML.split('<p class="overview-safety">')[0]),'Overview work counts never say open');
  // #companies/<group> filters the list to that group. An address that names no group shows the full list and becomes #companies.
@@ -211,7 +209,7 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  location.hash='#companies/AI-Evaluation-Safety';run('route()');assert.equal(run('state.category'),'AI evaluation & safety');location.hash='#companies';run('route()');assert.equal(run('state.category'),'AI evaluation & safety');assert.equal(location.hash,'#companies/ai-evaluation-safety');
  run('reset()');location.hash='#market';run('route()');
  // viewAnchorId names in-page places only. It ignores letter case and hash queries, and object keys are not places.
- for(const [hash,id] of [['#venture','venture'],['#About','about'],['#downloads?x=1','downloads'],['#labels','labels'],['#corrections','corrections'],['#coverage','coverage'],['#market',''],['#method',''],['#company/mercor',''],['#constructor',''],['#__proto__',''],['','']])assert.equal(run(`viewAnchorId(${JSON.stringify(hash)})`),id,'viewAnchorId '+hash);
+ for(const [hash,id] of [['#venture','venture'],['#About','about'],['#downloads?x=1','downloads'],['#labels',''],['#corrections','corrections'],['#coverage',''],['#market',''],['#method',''],['#company/mercor',''],['#constructor',''],['#__proto__',''],['','']])assert.equal(run(`viewAnchorId(${JSON.stringify(hash)})`),id,'viewAnchorId '+hash);
 
  // Curated profile headings render as text.
  const headed=curated.find(entry=>entry.traction_heading),heading=headed.traction_heading;headed.traction_heading='<b>x</b>';

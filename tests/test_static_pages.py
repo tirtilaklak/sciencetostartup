@@ -284,21 +284,21 @@ class StaticPageTests(unittest.TestCase):
             self.assertEqual(sorted(re.findall(r'/company/([^/]+)/"', related)), sorted(peers), cid)
 
     def test_header_footer_and_icons_are_shared_by_every_page(self):
-        expected_nav = [f"{ORIGIN}/companies/", f"{ORIGIN}/work/", f"{ORIGIN}/#compare", f"{ORIGIN}/method/", f"{ORIGIN}/?search"]
+        expected_nav = [f"{ORIGIN}/companies/", f"{ORIGIN}/work/", f"{ORIGIN}/explore/#about", f"{ORIGIN}/?search"]
         for path in self.html_files():
             text, label = path.read_text(), str(path.relative_to(self.dist))
             facts = PageFacts(text)
             nav = re.search(r'<nav class="site-nav" aria-label="Site">(.*?)</nav>', text).group(1)
             self.assertEqual(re.findall(r'href="([^"]+)"', nav), expected_nav, label)
-            self.assertIn("Site map", facts.navs, label)
+            self.assertIn("Footer", facts.navs, label)
             icons = [l for l in facts.links if "icon" in str(l.get("rel"))]
             self.assertEqual([(l.get("rel"), l.get("href")) for l in icons], ICONS, label)
             self.assertEqual(icons[0].get("type"), "image/svg+xml", label)
-            self.assertIn(f'href="{ORIGIN}/#corrections"', text, label)
+            self.assertIn(f'href="{ORIGIN}/explore/#corrections"', text, label)
             self.assertNotIn("—", text, label)
             for anchor in facts.anchors:
                 href = anchor.get("href", "")
-                if href.startswith("http") and not href.startswith(ORIGIN): self.assertEqual(anchor.get("class"), "ext", (label, href))
+                if href.startswith("http") and not href.startswith(ORIGIN) and href != "https://musaeminozdem.com": self.assertEqual(anchor.get("class"), "ext", (label, href))
                 if href.startswith(ORIGIN): self.assertNotEqual(anchor.get("class"), "ext", (label, href))
         self.assertIn('aria-current="page">Companies<', (self.dist / "companies/index.html").read_text())
         self.assertIn('aria-current="true">Companies<', self.pages["mercor"])
@@ -314,24 +314,28 @@ class StaticPageTests(unittest.TestCase):
         self.assertIn(f"main,.site-footer{{margin:0 {inset}}}", sp.STYLE)
         self.assertIn("max(var(--gutter),calc((100% - var(--content))/2))", inset)
 
-    def test_footer_names_publisher_disclosure_and_corrections(self):
+    def test_footer_is_concise_and_disclosures_remain_in_about(self):
         about = re.search(r'<article[^>]*\bid="about"[^>]*>.*?</article>', (ROOT / "web/index.html").read_text(), re.S).group(0)
         disclosure = html.unescape(re.sub(r"<[^>]+>", "", re.search(r"<strong>Disclosure\.</strong>\s*(.*?)</p>", about, re.S).group(1))).replace("’", "'")
-        publisher = re.search(r"ScienceToStartup is published by [^.]+\.", about).group(0)
-        # The paid-work line is About text only, so footers carry the lab disclosure alone wherever the app places that line.
+        self.assertIn('href="https://musaeminozdem.com"', about)
+        # Disclosures remain explicit in About instead of being repeated in every footer.
         self.assertEqual(sp.DISCLOSURE, " ".join(disclosure.replace(sp.WORK_DISCLOSURE, "").split()))
         # The owner's one-line disclosure, word for word, in both About texts (the app's About panel and /method/).
         method_about = (self.dist / "method/index.html").read_text().split('<h2 id="about">', 1)[1].split("<h2", 1)[0]
         for label, text in (("web/index.html#about", about), ("method/index.html#about", method_about)):
             self.assertIn(sp.WORK_DISCLOSURE, " ".join(html.unescape(re.sub(r"<[^>]+>", " ", text)).replace("’", "'").split()), label)
             self.assertEqual(text.count("A.Team"), 1, label)
+            self.assertIn("No profiled company has paid for coverage", text, label)
+            self.assertIn(sp.DISCLOSURE, " ".join(html.unescape(re.sub(r"<[^>]+>", "", text)).split()), label)
         for path in self.html_files():
             footer = self.footer(path)
             text = html.unescape(re.sub(r"<[^>]+>", "", footer))
-            self.assertIn(publisher, text, path)
-            self.assertIn(sp.DISCLOSURE, text, path)
-            self.assertIn(f'<a href="{ORIGIN}/#venture">overview page</a>', footer, path)
-            self.assertIn(f'<a href="{ORIGIN}/#corrections">Request a correction</a>', footer, path)
+            self.assertIn("© ScienceToStartup", text, path)
+            self.assertIn(sp.PUBLISHER_NAME, text, path)
+            self.assertEqual(re.findall(r'href="([^"]+)"', footer),
+                             ["https://musaeminozdem.com", f"{ORIGIN}/explore/#downloads", f"{ORIGIN}/explore/#corrections"], path)
+            self.assertNotIn(sp.DISCLOSURE, text, path)
+            self.assertNotIn("#compare", footer, path)
 
     def test_head_tags_make_every_page_share_ready(self):
         for path in self.indexable_files() + [self.dist / "404.html"]:
@@ -803,7 +807,8 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(facts.meta.get("robots"), "noindex")
         self.assertEqual(facts.canonicals, [])
         self.assertEqual(facts.headings, ["We could not find that page."])
-        for path in ("/", "/companies/", "/work/", "/method/", "/#about", "/?search"): self.assertIn(f'href="{ORIGIN}{path}"', text)
+        for path in ("/", "/companies/", "/work/", "/explore/#downloads", "/#about", "/?search"): self.assertIn(f'href="{ORIGIN}{path}"', text)
+        self.assertNotIn(f'href="{ORIGIN}/method/"', text)
         self.assertEqual([(l.get("rel"), l.get("href")) for l in facts.links if "icon" in str(l.get("rel"))], ICONS)
         self.assertIn("--bg:#f8f8f4;--ink:#18231f", sp.STYLE, "the edition palette")
         self.assertFalse((ROOT / "web/404.html").exists(), "404.html is generated by scripts/static_pages.py")

@@ -28,14 +28,14 @@ SECTIONS = {"about": re.compile(r'<article\b[^>]*\bid="about"[^>]*>.*?</article>
 # Every address that may ship, and the only places it may appear.
 ALLOWED = {
     # The publisher's own correction and contact address, shown in the About panel.
-    "musaeminozdem@gmail.com": {"index.html#about"},
+    "musaeminozdem@gmail.com": {"explore/index.html#about"},
     # Role address Bespoke Labs publishes for domain experts on https://bespokelabs.ai/contact
     # (checked 2026-10-23); the reviewed Work route cites that page. The app reads the routes from the data bundle.
     "experts@bespokelabs.ai": {"work-routes.json", "js/data.js"},
     # A named person's address quoted in canonical claim benchflow.claim.worker_opportunities-0.
     # Dataset 2.5.0 is pinned, so it stays in canonical-derived files until the pending 2.5.1
     # release removes it. It must never appear in Work routes or a static page.
-    "xiangyi@benchflow.ai": {"research.json", "claims.csv", "observatory.sqlite", "index.html#research-data"},
+    "xiangyi@benchflow.ai": {"research.json", "claims.csv", "observatory.sqlite", "explore/index.html#research-data"},
 }
 
 
@@ -60,7 +60,7 @@ def places(dist):
             yield name, printable_text(path)
         elif path.suffix in TEXT or not path.suffix:
             text = path.read_text()
-            if name == "index.html":
+            if name == "explore/index.html":
                 for section, pattern in SECTIONS.items():
                     yield name + "#" + section, "\n".join(pattern.findall(text))
                     text = pattern.sub("", text)
@@ -81,7 +81,7 @@ class PublicPrivacyTests(unittest.TestCase):
             self.assertIn(place, self.places)
 
     def test_scan_reads_every_public_text(self):
-        for place in ("index.html", "index.html#about", "index.html#research-data", "observatory.sqlite", "js/app.js", "js/data.js",
+        for place in ("index.html", "explore/index.html", "explore/index.html#about", "explore/index.html#research-data", "observatory.sqlite", "js/app.js", "js/data.js",
                       "research.json", "claims.csv", "work-routes.json", "sitemap.xml", "companies/index.html",
                       "work/index.html", "method/index.html", "404.html", "business-health.json", "company-events.json",
                       "source-updates.json", "link-health.json", "manifest.json", "robots.txt", "_headers"):

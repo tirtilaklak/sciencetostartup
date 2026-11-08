@@ -242,7 +242,7 @@ function w4Details(route,level=4){
       ${route.last_route_check?.note?`<details class="w4-source-notes"><summary>What we checked</summary><p>${w4Escape(w4CheckNote(route.last_route_check))}</p>${route.last_link_check?`<p>Link requested ${w4Escape(w4Date(route.last_link_check.date))}: ${w4Escape(route.last_link_check.result)}.${route.last_link_check.note?' '+w4Escape(route.last_link_check.note):''}</p>`:''}</details>`:''}
       ${route.claim_ids?.length?`<div class="w4-evidence-links">${w4ClaimAccess(route.claim_ids,route.role)}</div>`:''}
     </div>
-    ${typeof compareCheck==='function'?`<div class="w4-compare">${compareCheck(route.company_id)}</div>`:''}
+
   </div>`;
 }
 function w4PayNotes(route){
@@ -549,7 +549,8 @@ function renderWork(){
   const summary=document.querySelector('.work-filters .responsive-filter-panel>summary');
   if(summary)summary.textContent=filters?`Filters (${filters})`:'Filters';
   // Every record counts here, including career pages and closed listings, so the line says "we reviewed".
-  $('work-count').textContent=`${w4Count(rows.length,'recorded listing or program','recorded listings and programs')} · ${w4Count(orgs.size,'company','companies')}`;
+  const paidCompanies=new Set(groups.primary.map(r=>r.company_id));
+  $('work-count').textContent=groups.primary.length?`${w4Count(groups.primary.length,'paid listing','paid listings')} · ${w4Count(paidCompanies.size,'company','companies')}`:`No paid listings${rows.length?` · ${w4Count(rows.length,'other record','other records')}`:''}`;
   const other=groups.boards.length+groups.outside.length+groups.closed.length;
   if($('work-overview'))$('work-overview').innerHTML=[['work-listed',groups.contract.length,'contract and task listing','contract and task listings'],['work-jobs',groups.jobs.length,'job or fellowship','jobs and fellowships'],['work-more',other,'other listing','other listings']].map(([id,n,one,many])=>`<button type="button" data-work-section="${id}" ${n?'':'disabled'}><strong>${n}</strong> ${n===1?one:many}</button>`).join('');
   const note=$('work-sort-note');
@@ -562,7 +563,13 @@ function renderWork(){
   else if(typed){const budget=w4SearchJobBudget(groups);if(jobs.length>budget+1){moreJobs=jobs.slice(budget);jobs=jobs.slice(0,budget);}}
   // A search that finds little contract work, and does not name a company, also lists the per-project networks.
   const thin=matcher&&!filters&&groups.contract.length<5&&!rows.some(route=>matcher.all([companies[route.company_id]?.name,...(companies[route.company_id]?.aliases||[])].join(' ').toLowerCase()));
-  $('work-cards').innerHTML=w4ContractSection(groups,filtered)+w4JobsSection(jobs,moreJobs)+w4OtherSection(groups,filtered,typed)+(rows.length?'':w4EmptyState(query,filters))+(thin?w4NetworkSuggestions(rows):'');
+  // One calm result list. Pay bases remain literal, never compared across currencies or periods.
+  const order=sort==='hourly'?w4RateOrder:sort==='checked'?w4CheckedOrder:w4BestOrder;
+  const primary=[...groups.primary].sort(order);
+  if(matcher&&!sort){const score=r=>matcher.all(`${companies[r.company_id]?.name} ${r.role}`.toLowerCase())?0:1;primary.sort((a,b)=>score(a)-score(b));}
+  const limit=filtered?primary.length:20,shown=primary.slice(0,limit),more=primary.slice(limit);
+  const paid=primary.length?`<section class="w4-section w4-primary-list"><h2 id="work-listed" class="sr-only">Paid listings</h2>${shown.map(r=>workCard(r,'',3,true)).join('')}${w4GroupDisclosure(more,'More paid listings',false,'work-jobs')}</section>`:'';
+  $('work-cards').innerHTML=paid+w4OtherSection(groups,filtered,typed)+(rows.length?'':w4EmptyState(query,filters))+(thin?w4NetworkSuggestions(rows):'');
   syncSelection();
 }
 // Clears the search, the filters, or everything (the Clear filters button in the panel).

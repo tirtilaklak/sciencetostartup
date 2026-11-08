@@ -109,7 +109,7 @@ def main():
     assert all('company-card' in a.get('class', '') for _, a in rows)
     for card_html in re.findall(r'<article class="company-card".*?</article>', directory, re.S):
         card_tags = Elements(card_html)
-        assert len(card_tags.with_attribute('data-compare')) == 1
+        assert not card_tags.with_attribute('data-compare'), 'Retired comparison controls remain on company cards'
         profile_links = [a for tag, a in card_tags.elements if tag == 'a' and 'company-open-profile' in a.get('class', '')]
         assert len(profile_links) == 1, 'Each company card needs one direct profile action'
         assert profile_links[0].get('href') == '#company/' + next(a['data-company-card'] for _, a in card_tags.with_attribute('data-company-card'))
@@ -186,7 +186,7 @@ def main():
 
     export = ROOT / 'dist/research.json'
     assert export.read_bytes() == canonical, 'Portable JSON changed'
-    html = (ROOT / 'dist/index.html').read_text()
+    html = (ROOT / 'dist/explore/index.html').read_text()
     # The build moves the data and app scripts into content-hashed files under dist/js/.
     bundles = json.loads(re.search(r'const files=(\[[^\]]*\])', html).group(1))
     app_bundle = (ROOT / 'dist' / next(name for name in bundles if name.startswith('js/app.'))).read_text()
@@ -202,7 +202,7 @@ def main():
     assert not [name for name in manifest['sha256'] if 'Investor_Snapshot' in name or 'investor-image' in name], 'The removed venture image still ships'
     for name, expected in manifest['sha256'].items():
         assert hashlib.sha256((ROOT / 'dist' / name).read_bytes()).hexdigest() == expected, name
-    print(json.dumps({'audited_dataset_version': PINNED_VERSION, 'canonical_sha256': PINNED_SHA256, 'html_sha256': hashlib.sha256((ROOT / 'dist/index.html').read_bytes()).hexdigest(), 'canonical_unchanged': True, 'business_health_observations': len(rendered['healthObservations']), 'dashboard_headline_paces': len(headline_paces), 'model_groups': 7, 'categorized_companies': len(map_ids), 'company_cards': len(rows), 'conditional_clear': 'passed', 'visible_work_summaries': len(visible_work), 'search_filters_compare_download_handlers': 'passed', 'portable_data_integrity': 'passed', 'browser_rendering_verified': False}, indent=2))
+    print(json.dumps({'audited_dataset_version': PINNED_VERSION, 'canonical_sha256': PINNED_SHA256, 'html_sha256': hashlib.sha256((ROOT / 'dist/explore/index.html').read_bytes()).hexdigest(), 'canonical_unchanged': True, 'business_health_observations': len(rendered['healthObservations']), 'dashboard_headline_paces': len(headline_paces), 'model_groups': 7, 'categorized_companies': len(map_ids), 'company_cards': len(rows), 'conditional_clear': 'passed', 'visible_work_summaries': len(visible_work), 'search_filters_compare_download_handlers': 'passed', 'portable_data_integrity': 'passed', 'browser_rendering_verified': False}, indent=2))
 
 
 if __name__ == '__main__':
