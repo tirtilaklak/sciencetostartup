@@ -68,6 +68,11 @@ Python's standard library is sufficient for the snapshot build. Node.js runs
 the logic checks. No hosted database, API key or npm install is
 required to view or build the dashboard.
 
+The downloadable database was built with SQLite 3.46.1. Check your Python's
+SQLite version with `python3 -c 'import sqlite3; print(sqlite3.sqlite_version)'`.
+Use that version for release builds: newer SQLite versions can produce different
+database bytes even with identical rows (observed with SQLite 3.53.1).
+
 ```sh
 python3 -m http.server 8765 --directory dist
 python3 scripts/build_public_snapshot.py --verify
