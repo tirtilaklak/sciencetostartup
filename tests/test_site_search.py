@@ -17,6 +17,31 @@ def run_stub(checks):
 
 
 class SiteSearchTests(unittest.TestCase):
+    def test_browse_actions_start_with_all_results(self):
+        checks = r'''
+run('initialize()');
+context.Event=class{constructor(type,init={}){this.type=type;this.bubbles=Boolean(init.bubbles);this.isTrusted=false;}};
+node('work-search').dispatchEvent=function(event){event.target=this;this.callbacks[event.type]?.(event);};
+const allRemote=run(`state.workQuery='remote';filteredWork().length`);
+run(`state.workQuery='';state.workGroup='Contributor bounties';state.workPay='monthly';state.workEligibility='onsite'`);
+const action=plain(run(`siteSearchView('remote')`)).flatMap(g=>g.items).find(i=>i.action==='work');
+assert.ok(action,'Global search must still offer all listings when earlier Work filters hide them');
+assert.ok(action.name.includes(String(allRemote)),'The global listing count ignores page filters');
+assert.equal(run('state.workGroup'),'Contributor bounties','Counting must not change the active filters');
+run(`siteSearchChoose(${JSON.stringify(action)})`);
+assert.equal(run('filteredWork().length'),allRemote,'Opening all matches clears the earlier filters');
+for(const key of ['workGroup','workPay','workEligibility'])assert.equal(run('state.'+key),'');
+run(`state.query='zzqx';state.category=Object.keys(MODEL_GROUPS)[0];renderDirectory()`);
+const fallback=plain(run(`siteSearchView('zzqx')`)).flatMap(g=>g.items);
+run(`siteSearchChoose(${JSON.stringify(fallback.find(i=>i.href==='#companies'))})`);
+assert.equal(run('filtered().length'),data.companies.length,'Browse all companies clears an earlier company search');
+run(`state.workQuery='zzqx';state.workPay='monthly';renderWork()`);
+run(`siteSearchChoose(${JSON.stringify(fallback.find(i=>i.href==='#work'))})`);
+assert.equal(run('filteredWork().length'),window.WORK_ROUTES.routes.length,'See all paid work clears an earlier work search');
+'''
+        result = run_stub(checks)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_every_company_listing_product_and_page_is_findable(self):
         checks = r'''
 run('initialize()');

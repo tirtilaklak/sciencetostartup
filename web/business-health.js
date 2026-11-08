@@ -18,6 +18,8 @@ const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov',
 const bhState={signal:'revenue',measure:'period_revenue',cohort:null,group:'',query:'',sort:'coverage',evidenceOnly:false,company:'',observation:''};
 const all=()=>bundle?.observations||[];
 let overviewMeasure='period_revenue';
+let overviewExpanded=false;
+const overviewLimit=6;
 const overviewMeasures={period_revenue:'Actual revenue',annualized_revenue:'Annualized pace',revenue_growth_yoy:'Growth'};
 const freshClaims=new Map((bundle?.fresh_claims||[]).map(c=>[c.id,c]));
 const refreshedSources=new Map((bundle?.sources||[]).map(s=>[s.id,s]));
@@ -178,11 +180,14 @@ function ledgerPeriod(o){
 }
 function renderLedger(){
  const list=latestFigures(overviewMeasure);
+ const visible=overviewExpanded?list:list.slice(0,overviewLimit);
  $('bh-overview-tabs').innerHTML=Object.entries(overviewMeasures).map(([id,label])=>`<button type="button" role="tab" id="bh-overview-${id}" aria-controls="bh-ledger-panel" aria-selected="${overviewMeasure===id}" tabindex="${overviewMeasure===id?0:-1}" data-bh-overview="${id}">${label}<span>${latestFigures(id).length}</span></button>`).join('');
  $('bh-ledger-panel').setAttribute('aria-labelledby','bh-overview-'+overviewMeasure);
  $('bh-ledger-note').textContent=overviewMeasure==='annualized_revenue'?'A projection of recent revenue across a year. Dates, scopes and gross/net definitions differ.':overviewMeasure==='revenue_growth_yoy'?'Year-on-year changes within each business. Full-year and half-year comparisons stay labeled.':'Latest disclosed revenue for each business. Reporting periods and scopes differ; rows are ordered by date.';
- $('bh-ledger').innerHTML=list.map(o=>{const kind=sourceKind(o),check=checkedSource(o),unavailable=check?.status==='unavailable';return `<article class="bh-ledger-row${isHistorical(o)?' is-historical':''}"><div class="bh-ledger-company"><a href="#company/${safe(o.company_id)}">${safe(companies[o.company_id].name)}</a><span>${safe(scopeLabel(o))}${o.accounting_basis==='gross'?' · gross':''}</span></div><button type="button" class="bh-ledger-value" data-bh-ledger="${safe(o.id)}" aria-label="${safe(companies[o.company_id].name+' '+valueText(o)+': inspect evidence')}">${safe(valueText(o))}</button><div class="bh-ledger-period">${safe(ledgerPeriod(o))}${isHistorical(o)?'<small>Historical</small>':''}</div><button type="button" class="bh-ledger-source" data-bh-ledger="${safe(o.id)}" aria-label="${safe('Source for '+companies[o.company_id].name+' '+valueText(o))}"><span class="bh-source-kind" data-kind="${kind.toLowerCase()}">${kind}</span><span class="bh-source-action">View source ${iconHTML('right')}</span>${unavailable?'<small class="bh-source-unavailable">Retrieval failed</small>':check?.status==='content_checked'?`<small>Read ${safe(shortDate(check.checked_on))}</small>`:''}</button></article>`;}).join('');
- $('bh-ledger-count').textContent=plural(list.length,'company')+' with a reviewed '+(overviewMeasure==='annualized_revenue'?'annualized figure':overviewMeasure==='revenue_growth_yoy'?'growth figure':'revenue figure')+'. Full sources and older observations are available on each figure.';
+ $('bh-ledger').innerHTML=visible.map(o=>{const kind=sourceKind(o),check=checkedSource(o),unavailable=check?.status==='unavailable';return `<article class="bh-ledger-row${isHistorical(o)?' is-historical':''}"><div class="bh-ledger-company"><a href="#company/${safe(o.company_id)}">${safe(companies[o.company_id].name)}</a><span>${safe(scopeLabel(o))}${o.accounting_basis==='gross'?' · gross':''}</span></div><button type="button" class="bh-ledger-value" data-bh-ledger="${safe(o.id)}" aria-label="${safe(companies[o.company_id].name+' '+valueText(o)+': inspect evidence')}">${safe(valueText(o))}</button><div class="bh-ledger-period">${safe(ledgerPeriod(o))}${isHistorical(o)?'<small>Historical</small>':''}</div><button type="button" class="bh-ledger-source" data-bh-ledger="${safe(o.id)}" aria-label="${safe('Source for '+companies[o.company_id].name+' '+valueText(o))}"><span class="bh-source-kind" data-kind="${kind.toLowerCase()}">${kind}</span><span class="bh-source-action">Source ${iconHTML('right')}</span>${unavailable?'<small class="bh-source-unavailable">Retrieval failed</small>':''}</button></article>`;}).join('');
+ $('bh-ledger-count').textContent=(visible.length<list.length?'Showing '+visible.length+' of '+list.length+' companies.':plural(list.length,'company')+'.')+' Select a figure for its source and history.';
+ const more=$('bh-ledger-more');
+ if(more){more.hidden=list.length<=overviewLimit;more.textContent=overviewExpanded?'Show fewer companies':'Show all '+list.length+' companies';more.setAttribute('aria-expanded',String(overviewExpanded));}
 }
 function openEvidence(origin=''){const dialog=$('bh-evidence-dialog');evidenceOrigin=origin||evidenceOrigin;if(dialog&&!dialog.open)dialog.showModal();}
 function renderDetail(){
@@ -306,6 +311,7 @@ $('bh-sort').addEventListener('change',e=>{bhState.sort=e.target.value;renderGri
 $('bh-search').addEventListener('input',e=>{bhState.query=e.target.value;renderGrid();});
 $('bh-evidence-only').addEventListener('change',e=>{bhState.evidenceOnly=!!e.target.checked;renderGrid();});
 document.addEventListener('click',e=>{
+ const expand=e.target.closest('#bh-ledger-more');if(expand){overviewExpanded=!overviewExpanded;renderLedger();expand.focus({preventScroll:true});return;}
  const overview=e.target.closest('[data-bh-overview]');if(overview){overviewMeasure=overview.dataset.bhOverview;renderLedger();$('bh-overview-'+overviewMeasure).focus({preventScroll:true});return;}
  const ledger=e.target.closest('[data-bh-ledger]');if(ledger){const o=byId(ledger.dataset.bhLedger);if(!o)return;bhState.signal=o.signal;bhState.company=o.company_id;bhState.observation=o.id;bhState.measure=o.measure;bhState.cohort=cohort(o);render();openEvidence(o.id);return;}
  // Header buttons are rebuilt with the grid, so focus returns to the new button in the same place.

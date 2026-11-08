@@ -24,7 +24,7 @@ if(fs.existsSync(afterqueryPath))profileData.entries=profileData.entries.filter(
 const window={scrollY:0,scrollTo(){},addEventListener(k,f){(windowCallbacks[k]??=[]).push(f)},EDITORIAL:readJSON('data/editorial.json'),LOGOS:readJSON('data/logo-provenance.json'),WORK_ROUTES:synthetic?{routes:[]}:readJSON('data/work-routes.json'),PROFILE_CONTENT:profileData,RESEARCH_ALIASES:readJSON('docs/research-id-crosswalk.json')};
 window.SOURCE_UPDATES=readJSON('data/source-updates.json');
 window.BUSINESS_HEALTH=synthetic?null:readJSON('data/business-health.json');
-const history={replaceState(state,title,hash){location.hash=hash;}};
+const history={state:null,scrollRestoration:'auto',replaceState(state,title,url){this.state=state;if(url!==undefined)location.hash=String(url).includes('#')?'#'+String(url).split('#').slice(1).join('#'):'';}};
 let downloadedBlob;
 class CaptureURL extends URL {static createObjectURL(blob){downloadedBlob=blob;return 'blob:test'}static revokeObjectURL(){}}
 const context=vm.createContext({document,window,history,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,Blob,queueMicrotask,setTimeout:()=>{},clearTimeout:()=>{},console});

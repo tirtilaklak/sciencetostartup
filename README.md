@@ -3,6 +3,11 @@
 ScienceToStartup is a static, evidence-linked field guide to AI data organizations.
 The current public site is https://sciencetostartup.com.
 
+The overview starts with company and paid-work navigation, then six dated revenue
+figures. “Show all” expands the ledger; charts, coverage and research notes open
+on request. Company, work and shareable pages use the same restrained visual shell.
+If the app cannot load, recovery links open the plain company, work and method pages.
+
 ## Where this source came from
 
 This repository began with the reviewed public source and distribution for Sites
@@ -104,7 +109,7 @@ python3 tests/reliability_failure_state_logic.py
 python3 tests/risk_section_logic.py
 ```
 
-The 149 unit tests cover the pipeline, the build, the design system tokens
+The 157 unit tests cover the pipeline, the build, the design system tokens
 (the same check as `python3 scripts/design_system.py --check`), download sizes,
 static pages, company events, the business health data, Work routes, the Paid
 work page, site search, link health and a privacy scan of every file in `dist/`.

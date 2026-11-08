@@ -1,31 +1,29 @@
-/* Site menus, global search and footer. Loaded after edition.css. */
-
-/* Header: wordmark, four menu links and search. Its edges line up with the page content at
-   every width; % resolves against the page width, so a classic scrollbar no longer shifts it. */
-.topbar{padding:0 max(48px,calc((100% - 1232px)/2));gap:28px}
-.wordmark{gap:10px}
-.wordmark small{font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
-.topbar nav{gap:20px}
-/* The focus ring sits inside the bar instead of losing its top edge above the window. */
-.topbar nav a{font-size:14px;padding-inline:8px;margin-inline:-8px}
+/* Site navigation and search. A single quiet masthead across every route. */
+.topbar{height:var(--header-height);padding:0 max(48px,calc((100% - 1232px)/2));gap:32px;background:var(--bg);border-bottom:1px solid var(--border)}
+.wordmark{gap:0;font-size:19px;font-weight:600;letter-spacing:-.6px;line-height:1.2}
+.wordmark small{margin-top:5px;font-size:11px;letter-spacing:.02em;text-transform:none;font-weight:400}
+.topbar nav{height:100%;gap:28px;margin-left:auto}
+.topbar nav a{height:100%;min-height:44px;margin:0;padding:0;border:0;border-bottom:2px solid transparent;border-radius:0;background:none;color:var(--muted);font-size:14px;line-height:1.4;font-weight:400}
+.topbar nav a:hover{background:none;color:var(--ink)}
+.topbar nav a[aria-current=page]{background:none;color:var(--ink);border-bottom-color:var(--green);font-weight:500}
 .topbar nav a:focus-visible{outline-offset:-4px}
 #nav-count:empty{display:none}
-.site-search-open{display:flex;align-items:center;gap:8px;flex:none;min-width:180px;min-height:40px;margin:0;padding:0 8px 0 12px;border:1px solid #7b8978;border-radius:6px;background:#fff;color:var(--muted);font-size:14px;font-weight:400;line-height:1;white-space:nowrap}
-.site-search-open:hover{background:#fff;border-color:var(--green);color:var(--ink)}
-.site-search-open>.ui-icon{width:18px;height:18px;vertical-align:0}
-.site-search-open kbd,.site-search-enter{min-width:22px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--muted);font:12px/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:center}
+.site-search-open{display:flex;align-items:center;gap:10px;flex:none;min-width:150px;min-height:42px;margin:0;padding:0 12px;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--muted);font-size:13px;font-weight:400;line-height:1;white-space:nowrap}
+.site-search-open:hover{background:var(--pale);border-color:var(--green);color:var(--ink)}
+.site-search-open>.ui-icon{width:17px;height:17px;vertical-align:0}
+.site-search-open kbd,.site-search-enter{min-width:22px;padding:2px 6px;border:1px solid var(--border);border-radius:3px;background:var(--bg);color:var(--muted);font:11px/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:center}
 .site-search-open kbd{margin-left:auto}
-@media(max-width:1100px){.topbar{padding-left:32px;padding-right:32px;gap:20px}.topbar nav{gap:18px}.site-search-open{min-width:0;padding-right:12px}.site-search-open kbd{display:none}}
-@media(max-width:900px){.wordmark small{font-size:11px}.topbar{gap:16px}.topbar nav{gap:16px}.site-search-open{width:40px;padding:0;justify-content:center}.site-search-open .site-search-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
-/* Phones: the wordmark and a 44 px search button, then the four links across the full width. */
+@media(max-width:1100px){.topbar{padding-inline:32px;gap:24px}.topbar nav{gap:22px}.site-search-open{min-width:0}.site-search-open kbd{display:none}}
+@media(max-width:900px){.topbar{gap:20px}.topbar nav{gap:18px}.site-search-open{width:44px;padding:0;justify-content:center}.site-search-open .site-search-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
 @media(max-width:700px){
- .topbar{padding:8px 20px 0;align-items:center;row-gap:4px;column-gap:12px}
- .wordmark{gap:9px}
+ .topbar{height:var(--header-height);padding:12px 20px 0;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:0 12px}
+ .wordmark{font-size:18px}
+ .wordmark small{font-size:10px;margin-top:4px}
  .site-search-open{order:1;margin-left:auto;width:44px;height:44px}
- .topbar nav{order:2;height:42px;gap:0}
- .topbar nav a{height:42px;font-size:14px;padding:0 8px 8px}
+ .topbar nav{order:2;flex:0 0 100%;height:48px;justify-content:space-between;gap:16px;margin:8px 0 0}
+ .topbar nav a{height:48px;min-height:44px;padding:0;font-size:13px;line-height:1.4;margin:0}
 }
-@media(max-width:380px){.topbar{padding-left:16px;padding-right:16px}.topbar nav a{font-size:13px;padding-inline:6px;margin-inline:-6px}}
+@media(max-width:380px){.topbar{padding-inline:16px}.topbar nav{gap:10px}.topbar nav a{font-size:12px}}
 
 /* Global search: a 640 px panel on wide screens, the full screen on phones. */
 .site-search{width:min(640px,calc(100% - 32px));max-width:none;max-height:calc(100vh - 144px);margin:72px auto auto;padding:0;border:1px solid #aebba8;border-radius:8px;background:var(--bg);color:var(--ink);box-shadow:0 18px 60px #10221033;overflow:hidden}
@@ -60,18 +58,16 @@
  .site-search-option.is-first .site-search-enter,.site-search-option.is-active .site-search-enter{display:none}
 }
 
-/* Footer: a site map with three columns, then the snapshot and dataset version. */
-footer{display:block;margin-top:64px;padding-top:28px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;line-height:1.5}
-.site-map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 40px}
-.site-map h2,.site-map h3{margin:0 0 6px;font-size:12px;font-weight:600;line-height:1.5;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.site-map h3{margin-top:16px}
-.site-map ul{margin:0;padding:0;list-style:none}
-.site-map a{display:inline-flex;align-items:center;min-height:32px;font-size:14px}
-.footer-meta{margin:24px 0 0;font-size:12px}
-@media(max-width:700px){footer{margin-top:40px;padding-top:22px}.site-map{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 20px}.site-map a{min-height:40px}}
-@media(max-width:380px){.site-map{grid-template-columns:minmax(0,1fr)}}
+/* Compact footer: the same few routes as the main navigation. */
+footer{display:flex;align-items:center;justify-content:space-between;gap:20px 32px;margin-top:80px;padding-top:28px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;line-height:1.6}
+.footer-brand{color:var(--ink);font-size:16px;font-weight:500;letter-spacing:-.35px;text-decoration:none}
+.site-map{display:flex;flex-wrap:wrap;align-items:center;gap:8px 28px}
+.site-map a{display:inline-flex;align-items:center;min-height:44px;color:var(--muted);font-size:13px;text-decoration:none}
+.site-map a:hover{color:var(--green);text-decoration:underline}
+.footer-meta{flex-basis:100%;margin:0;font-size:12px;color:var(--muted)}
+@media(max-width:700px){footer{margin-top:56px;padding-top:24px;gap:12px 24px}.site-map{gap:2px 24px;flex-basis:100%}.site-map a{min-height:44px}.footer-meta{font-size:11px}}
 
-/* Without JavaScript only the plain notice can work: hide search, the app menus and the empty overview. */
+/* Without JavaScript, direct users to the plain pages. */
 .availability-notice h1{margin:0 0 12px;font-size:32px}
 @media(scripting:none){.site-search-open,.topbar nav,.site-map,#market-view{display:none}}
 @media(scripting:none) and (max-width:700px){.topbar{height:auto;min-height:0;padding-bottom:12px}}

@@ -1,153 +1,117 @@
-/* Overview page (#market): hero, paid work, business groups, how we check and the publisher's proposed lab. The business health dashboard has its own file. */
-/* Hero: what the guide is, who publishes it, and the two main paths. */
-#market-view .market-hero{grid-template-columns:minmax(0,740px) minmax(220px,1fr);align-items:center;padding:48px 0 20px}
-.hero-eyebrow{text-transform:uppercase}
-#market-view .market-hero h1{max-width:640px}
-#market-view .hero-actions{gap:12px;flex-wrap:wrap}
-#market-view .button-primary{gap:14px}
-#market-view .button-secondary{display:inline-flex;align-items:center;gap:14px;min-height:44px;padding:10px 16px;border:1px solid var(--green);border-radius:3px;background:transparent;color:var(--green);text-decoration:none;font-size:14px;font-weight:550}
-#market-view .button-secondary:hover{background:#eef1eb}
-.hero-byline{margin:18px 0 0;max-width:600px;font-size:14px;line-height:1.55;color:var(--muted)}
-#market-view .hero-research{display:block;align-self:center;font-size:14px;color:var(--ink)}
-#market-view .hero-research>p{font-size:14px;margin:0 0 10px}
-#market-view .hero-meta{gap:6px;font-size:14px;margin:0 0 12px}
-#market-view .hero-meta b{min-width:36px}
-#hero-work-stat[data-pending]{visibility:hidden}
-#market-view .hero-research>a{font-size:14px}
-.hero-logos{grid-column:1/-1;margin-top:28px;padding-top:16px;border-top:1px solid var(--border)}
-.hero-logo-label{margin:0 0 6px;font-size:12px;line-height:1.5;color:var(--muted)}
-#market-view .hero-logo-grid{margin:0;padding:6px 0 0;border:0;gap:24px}
-#market-view .hero-logo-grid>a{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
-#market-view .hero-logo-grid>a>.hero-logo-name{display:block;max-width:100%;font-size:12px;line-height:1.4;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#market-view .hero-logo-grid>a:hover>.hero-logo-name{color:var(--green);text-decoration:underline;text-underline-offset:3px}
-/* Section headings and the grade key. */
-#market-view .product-story .story-number{display:block}
-#market-view .section-heading>div>p:not(.eyebrow):not(.story-number){margin:10px 0 0;max-width:640px;font-size:15px;line-height:1.55;color:var(--muted)}
-.grade-key{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin:14px 0 0;font-size:13px;line-height:1.5;color:var(--muted)}
-.grade-key>p{margin:0;color:var(--ink)}
-.grade-key dl{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0}
-.grade-key dl>div{display:flex;align-items:baseline;gap:6px}
-.grade-key dd{margin:0}
-.grade-key dt,.story-grade{display:inline-flex;align-items:center;justify-content:center;min-width:20px;padding:2px 6px;border:1px solid #aab4ad;border-radius:999px;font-size:11px;font-weight:600;line-height:1.3;color:var(--ink);white-space:nowrap;background:var(--bg)}
-.story-grade[data-grade="U"],.grade-key dl>div:last-child dt{border-style:dashed}
-/* Paid work. */
-.overview-work{display:grid;grid-template-columns:minmax(180px,.8fr) minmax(0,2.3fr);gap:0 46px;margin:30px 0 0;padding:32px 0 36px;border-top:1px solid var(--border)}
-.overview-work>.section-heading{margin:0;align-items:start}
-.overview-work-body,.overview-work-action{grid-column:2}
-.overview-stats{display:flex;flex-wrap:wrap;gap:12px 40px;margin:0 0 14px}
-.overview-stats span{font-size:14px;color:var(--muted)}
-.overview-stats b{display:block;font-size:30px;font-weight:600;line-height:1.2;letter-spacing:-.6px;color:var(--ink)}
-.overview-work-body>p:not(.overview-stats){max-width:640px;margin:0 0 12px;font-size:15px;line-height:1.55;color:var(--muted)}
-#market-view .overview-safety{padding:10px 14px;border-left:3px solid var(--green);background:var(--pale);color:var(--ink);font-size:14px}
-.overview-work-action{margin:8px 0 0}
-/* Business groups: each row is a link to the filtered company list. */
-#model-map .category-card{grid-template-columns:minmax(220px,1.1fr) minmax(220px,1.4fr) 120px 24px;grid-template-areas:"name desc count icon" "members desc count icon";gap:4px 28px;text-decoration:none;color:var(--ink)}
-#model-map .category-name{grid-area:name}
-#model-map .category-members{grid-area:members;font-size:13px;line-height:1.5;color:var(--muted)}
-#model-map .category-description{grid-area:desc}
-#model-map .category-count{grid-area:count}
+/* Overview: a clear introduction, a small market view, and optional research detail. */
+#market-view .market-hero{display:block;max-width:none;margin:0;padding:78px 0 0;border:0}
+#market-view .hero-copy{max-width:850px}
+#market-view .hero-eyebrow{margin:0 0 22px;font-size:11px;line-height:1.5;font-weight:600;letter-spacing:1.8px;color:var(--green)}
+#market-view .market-hero h1{max-width:900px;margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(60px,7.3vw,96px);font-weight:400;line-height:1.02;letter-spacing:-3.5px}
+#market-view .market-hero h1 em{color:var(--green);font-style:normal}
+#market-view .market-hero .intro{max-width:510px;margin:26px 0 0;font-size:18px;line-height:1.65;color:var(--muted)}
+#market-view .hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:30px 0 0}
+#market-view .hero-actions a{display:inline-flex;justify-content:space-between;align-items:center;gap:24px;min-height:48px;padding:12px 20px;border:1px solid var(--green);border-radius:4px;font-size:14px;font-weight:550;line-height:1.5;text-decoration:none}
+#market-view .hero-actions .button-primary{background:var(--green);color:#fff}
+#market-view .hero-actions .button-primary:hover{background:#173d2e;border-color:#173d2e}
+#market-view .hero-actions .button-secondary{background:transparent;color:var(--green);border-color:var(--border)}
+#market-view .hero-actions .button-secondary:hover{background:var(--pale);border-color:var(--green)}
+#market-view .hero-source-note{margin:20px 0 0;font-size:12px;line-height:1.6;color:var(--muted)}
+#market-view .hero-research[hidden]{display:none}
+.hero-company-strip{display:flex;align-items:center;gap:32px;margin:60px 0 0;padding:24px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.hero-company-strip>p{flex:none;margin:0;font-size:12px;line-height:1.5;color:var(--muted)}
+#market-view .hero-logo-grid{display:flex;flex:1;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 24px;margin:0;padding:0;border:0;overflow:visible}
+#market-view .hero-logo-grid>a{display:inline-flex;flex:0 1 auto;justify-content:flex-start;align-items:center;min-width:0;min-height:32px;font-size:15px;font-weight:550;line-height:1.4;color:var(--ink);text-decoration:none}
+#market-view .hero-logo-grid>a:hover{color:var(--green);text-decoration:underline;text-underline-offset:4px}
+#market-view .hero-logo-grid .brand-asset{display:none}
+#market-view .hero-logo-grid .hero-logo-name{display:inline;font:inherit;color:inherit}
+
+/* Secondary explanations are available without making the page longer by default. */
+.overview-more{margin-top:44px;border-top:1px solid var(--border)}
+.overview-disclosure{margin:0;border-bottom:1px solid var(--border)}
+.overview-disclosure>summary{display:flex;align-items:center;gap:20px;min-height:76px;padding:20px 0;cursor:pointer;font-size:17px;font-weight:550;line-height:1.4;color:var(--ink)}
+.overview-disclosure>summary>span:first-child{flex:1}
+.overview-disclosure>summary::after{flex:none;margin-left:4px;font-size:22px}
+.overview-disclosure>summary:hover{color:var(--green)}
+.overview-disclosure .overview-summary-note{font-size:12px;font-weight:400;letter-spacing:0;color:var(--muted)}
+.overview-disclosure-body{padding:2px 0 30px}
+.overview-disclosure-body>p{max-width:680px;margin:0 0 22px;font-size:15px;line-height:1.7;color:var(--muted)}
+#model-map .category-card{display:grid;grid-template-columns:minmax(200px,1.2fr) minmax(180px,1.4fr) 110px 20px;grid-template-areas:"name desc count icon" "members desc count icon";gap:5px 28px;padding:22px 0;text-decoration:none;color:var(--ink)}
+#model-map .category-card:hover{background:transparent}
+#model-map .category-name{grid-area:name;font-size:16px;font-weight:550}
+#model-map .category-members{grid-area:members;font-size:12px;line-height:1.6;color:var(--muted)}
+#model-map .category-description{grid-area:desc;font-size:14px;line-height:1.6}
+#model-map .category-count{grid-area:count;font-size:20px}
 #model-map .category-card>.ui-icon{grid-area:icon}
-#model-map .category-card:hover .category-name{color:var(--green);text-decoration:underline;text-underline-offset:3px}
-/* How we check. */
-.overview-check{margin:44px 0 0;padding-top:8px;border-top:1px solid var(--border)}
-.overview-check-body{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px;margin-top:6px}
-.check-item h3{font-size:16px;margin:0 0 8px}
-.check-item p{font-size:14px;line-height:1.55;color:var(--muted);margin:0 0 10px}
+#model-map .category-card:hover .category-name{color:var(--green);text-decoration:underline;text-underline-offset:4px}
+.grade-key{margin:0 0 28px}
+.grade-key dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 32px;margin:0}
+.grade-key dl>div{display:flex;align-items:baseline;gap:10px;font-size:13px;line-height:1.6;color:var(--muted)}
+.grade-key dd{margin:0}
+.grade-key dt,.story-grade{display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:22px;padding:2px 5px;border:1px solid #aab4ad;border-radius:3px;background:transparent;font-size:11px;font-weight:600;line-height:1.4;color:var(--ink)}
+.story-grade[data-grade="U"],.grade-key dl>div:last-child dt{border-style:dashed}
+.overview-check-body{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;padding-top:24px;border-top:1px solid var(--border)}
+.check-item h3,.overview-work-audit h3{margin:0 0 12px;font-size:16px;font-weight:550}
+.check-item p{margin:0 0 12px;font-size:13px;line-height:1.7;color:var(--muted)}
 .check-item p b{color:var(--ink);font-weight:600}
-.check-item p a{font-size:14px}
-/* One-hue ordinal ramp (A darkest), validated against the page surface; 2px surface gaps between segments. */
-.grade-bar{display:flex;gap:2px;height:10px;margin:10px 0}
+.check-item .sub{font-size:12px}
+.grade-bar{display:flex;gap:2px;height:7px;margin:12px 0}
 .grade-bar span{min-width:3px}
-.grade-bar span:first-child{border-radius:2px 0 0 2px}
-.grade-bar span:last-child{border-radius:0 2px 2px 0}
 .grade-bar [data-grade="A"]{background:#1f4a38}
 .grade-bar [data-grade="B"]{background:#46705b}
 .grade-bar [data-grade="C"]{background:#6e8e7b}
 .grade-bar [data-grade="U"]{background:#9db4a5}
-.grade-counts{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 10px;padding:0;list-style:none;font-size:14px;color:var(--ink)}
-.grade-counts li{display:flex;align-items:center;gap:6px}
-.check-item .sub{font-size:13px}
-/* From the publisher: the proposed lab, kept apart from the research in a tinted band. Text only: the copy and the sourced figures. */
-.venture-band{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px;align-items:start;margin:60px 0 0;padding:32px;background:var(--pale);border-top:2px solid var(--green)}
-.venture-copy h2{font-size:26px;margin:0 0 14px}
-.venture-copy>p{font-size:15px;line-height:1.6;color:var(--ink);margin:0 0 14px;max-width:560px}
-#market-view .venture-copy .investor-status,#market-view .venture-copy .investor-lab-positioning{font-size:14px;line-height:1.55;color:var(--muted);margin:0 0 12px}
-.venture-figures{max-width:560px}
-#market-view .venture-figures h3{margin:0;font-size:14px;line-height:1.5;font-weight:600;letter-spacing:0;color:var(--ink)}
-#market-view .venture-band .investor-qualifications{margin:8px 0 0}
-#market-view .venture-band .investor-qualifications>div{padding:10px 0;border-top:1px solid #cdd4cb}
-#market-view .venture-band .investor-qualifications dt{font-size:13px;line-height:1.45}
-#market-view .venture-band .investor-qualifications dd{margin:4px 0 0;font-size:13px;line-height:1.55;color:var(--muted)}
-@media(max-width:1100px){
-  #market-view .market-hero{grid-template-columns:minmax(0,1fr) 230px;column-gap:40px}
-  #model-map .category-card{grid-template-columns:minmax(200px,1.1fr) minmax(180px,1.3fr) 100px 20px;gap:4px 20px}
-  .venture-band{gap:32px}
-}
-@media(max-width:900px){
-  #market-view .market-hero{grid-template-columns:minmax(0,1fr)}
-  #market-view .hero-research{display:block;margin-top:24px;padding:14px 0 0;border-left:0;border-top:1px solid var(--border);min-width:0;justify-self:stretch}
-  #market-view .hero-research>p{font-size:13px;margin-bottom:8px}
-  #market-view .hero-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 10px;font-size:13px;line-height:1.35;color:var(--muted)}
-  #market-view .hero-meta b{display:block;min-width:0;font-size:24px;font-weight:600;line-height:1.2;color:var(--ink)}
-  .hero-logos{margin-top:20px}
-  #market-view .hero-logo-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;overflow:visible}
-  #market-view .hero-logo-grid .brand-asset{width:100%;max-width:108px}
-  .overview-work{display:block}
-  .overview-work>.section-heading{margin-bottom:16px}
-  #model-map .category-card{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 60px 20px}
-  .overview-check-body{grid-template-columns:1fr;gap:22px}
-  .venture-band{display:block}
-  .venture-figures{margin-top:20px}
+.grade-counts{display:flex;flex-wrap:wrap;gap:8px 16px;margin:0 0 12px;padding:0;list-style:none;font-size:12px;color:var(--ink)}
+.grade-counts li{display:flex;align-items:center;gap:5px}
+.overview-work-audit{margin-top:24px;padding-top:24px;border-top:1px solid var(--border);font-size:13px}
+.overview-stats{display:flex;flex-wrap:wrap;gap:16px 40px;margin:16px 0}
+.overview-stats span{font-size:12px;color:var(--muted)}
+.overview-stats b{display:block;font-size:28px;line-height:1.3;font-weight:500;letter-spacing:-.5px;color:var(--ink)}
+.overview-work-body>p:not(.overview-stats){max-width:720px;margin:0 0 16px;font-size:13px;line-height:1.7;color:var(--muted)}
+.overview-safety strong{color:var(--ink);font-weight:550}
+.venture-note{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;padding:4px 0 30px}
+.venture-copy>.eyebrow{display:none}
+.venture-copy h2{margin:0 0 14px;font-size:24px;font-weight:500;line-height:1.3}
+.venture-copy>p{max-width:660px;margin:0 0 16px;font-size:14px;line-height:1.75;color:var(--muted)}
+#market-view .venture-copy .investor-status,#market-view .venture-copy .investor-lab-positioning{font-size:13px;line-height:1.7;color:var(--muted)}
+.venture-figures h3{margin:0 0 12px;font-size:15px;font-weight:550}
+.venture-figures .investor-qualifications{margin:0}
+.venture-figures .investor-qualifications>div{padding:16px 0;border-top:1px solid var(--border)}
+.venture-figures .investor-qualifications dt{font-size:13px;line-height:1.6;font-weight:550}
+.venture-figures .investor-qualifications dd{margin:6px 0 0;font-size:13px;line-height:1.7;color:var(--muted)}
+
+@media(max-width:1050px){
+  .hero-company-strip{display:block}
+  .hero-company-strip>p{margin-bottom:14px}
+  #market-view .hero-logo-grid{justify-content:flex-start;gap:8px 32px}
+  #model-map .category-card{grid-template-columns:minmax(180px,1.2fr) minmax(150px,1.4fr) 90px 18px;gap:5px 20px}
 }
 @media(max-width:700px){
-  #market-view .market-hero{padding:28px 0 8px}
-  #market-view .hero-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:22px}
-  #market-view .hero-actions a{justify-content:space-between}
-  .hero-byline{font-size:14px;margin-top:16px}
-  #market-view .hero-logo-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 12px}
-  #market-view .hero-logo-grid .brand-asset{width:90px;max-width:100%;height:28px}
-  .grade-key{margin:0;font-size:13px}
-  .grade-key dl{display:grid;grid-template-columns:1fr;gap:6px}
-  .overview-work{margin-top:20px;padding:24px 0 28px}
-  .overview-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-  .overview-stats span{font-size:13px;line-height:1.35}
+  #market-view .market-hero{padding-top:46px}
+  #market-view .hero-eyebrow{font-size:10px;letter-spacing:1.3px;margin-bottom:20px}
+  #market-view .market-hero h1{font-size:clamp(51px,11.8vw,72px);line-height:1.04;letter-spacing:-2.2px}
+  #market-view .market-hero .intro{max-width:440px;margin-top:22px;font-size:16px;line-height:1.65}
+  #market-view .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:26px}
+  #market-view .hero-actions a{min-height:48px;padding:12px 15px;font-size:13px;gap:8px}
+  #market-view .hero-source-note{font-size:11px;margin-top:18px}
+  .hero-company-strip{margin-top:38px;padding:20px 0}
+  .hero-company-strip>p{font-size:11px;margin-bottom:10px}
+  #market-view .hero-logo-grid{gap:4px 24px}
+  #market-view .hero-logo-grid>a{min-height:36px;font-size:13px}
+  .overview-more{margin-top:28px}
+  .overview-disclosure>summary{min-height:68px;font-size:15px;gap:12px}
+  .overview-disclosure .overview-summary-note{display:none}
+  .overview-disclosure-body{padding-bottom:22px}
+  .overview-disclosure-body>p{font-size:14px;line-height:1.7}
+  #model-map .category-card{grid-template-columns:minmax(0,1fr) 42px 18px;grid-template-areas:"name count icon" "desc count icon" "members count icon";gap:6px 14px;padding:20px 0}
+  #model-map .category-name{font-size:15px}
+  #model-map .category-description{font-size:13px}
+  #model-map .category-count small{display:none}
+  .grade-key dl{grid-template-columns:1fr;gap:12px}
+  .overview-check-body{grid-template-columns:1fr;gap:20px}
+  .overview-stats{gap:16px 28px}
   .overview-stats b{font-size:24px}
-  #model-map .category-card{grid-template-columns:minmax(0,1fr) 44px 18px;grid-template-areas:"name count icon" "desc count icon" "members count icon";gap:4px 14px}
-  .overview-check{margin-top:32px}
-  .venture-band{margin:40px -20px 0;padding:24px 20px}
-  .venture-copy h2{font-size:24px}
+  .venture-note{grid-template-columns:1fr;gap:18px;padding-bottom:22px}
+  .venture-copy h2{font-size:22px}
 }
 @media(max-width:380px){
-  #market-view .hero-meta b{font-size:22px}
-  .venture-band{margin-left:-16px;margin-right:-16px;padding:24px 16px}
+  #market-view .market-hero h1{font-size:48px;letter-spacing:-2px}
+  #market-view .hero-actions{grid-template-columns:1fr}
+  #market-view .hero-actions a{width:100%}
 }
-@media(forced-colors:active){
-  .grade-bar{display:none}
-  .grade-key dt,.story-grade{border-color:CanvasText}
-}
-
-/* Keep the first useful comparison close to the introduction. */
-#market-view .market-hero{padding:34px 0 24px;column-gap:56px;row-gap:0;grid-template-columns:minmax(0,1fr) 220px}
-#market-view .market-hero h1{max-width:740px;font-size:clamp(32px,3.5vw,48px);line-height:1.12;letter-spacing:-1.4px;margin:12px 0 16px}
-#market-view .market-hero .intro{max-width:650px;font-size:18px;line-height:1.55;margin:0}
-#market-view .hero-actions{margin-top:22px}
-#market-view .hero-byline{font-size:12px;margin-top:14px}
-#market-view .hero-research{border:1px solid var(--border);border-radius:8px;padding:20px;background:#fffefa}
-#market-view .hero-logos{margin-top:24px;padding-top:12px}
-#market-view .hero-logo-label{display:none}
-#market-view .hero-logo-grid>a{flex-direction:row;justify-content:center;gap:8px}
-#market-view .hero-logo-grid .brand-asset{height:24px;max-width:100px}
-#market-view .hero-logo-grid>a>.hero-logo-name{display:none}
-@media(max-width:900px){
-#market-view .market-hero{grid-template-columns:minmax(0,1fr);padding-top:24px}
-#market-view .hero-research{display:none}
-#market-view .hero-logos{margin-top:20px}
-#market-view .hero-logo-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
-}
-@media(max-width:700px){
-#market-view .market-hero h1{max-width:440px;font-size:34px;letter-spacing:-1px}
-#market-view .market-hero .intro{font-size:16px;line-height:1.5}
-#market-view .hero-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
-#market-view .hero-actions a{padding:10px 12px;font-size:13px;gap:8px}
-#market-view .hero-logos{display:none}
-}
+@media(forced-colors:active){.grade-bar{display:none}.grade-key dt,.story-grade{border-color:CanvasText}}

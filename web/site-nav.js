@@ -76,8 +76,8 @@ function siteSearch(query,opts={}){
   return {type:e.type,id:e.id,name:e.name,meta:alias?`Also known as ${alias.name}${alias.note?' ('+alias.note+')':''}`:e.meta,badge:e.badge||'',href:e.href,company:e.company||'',product:e.product||'',rank,group:SITE_SEARCH_GROUPS[e.type][0],total:g.total};
  }));
 }
-// Listing count as the Paid work page will show it after the query is applied to its own search.
-function siteSearchWorkCount(query){if(typeof filteredWork!=='function')return 0;const saved=state.workQuery;try{state.workQuery=query;return filteredWork().length;}catch{return 0;}finally{state.workQuery=saved;}}
+// Global search covers every listing, independent of earlier Paid work filters.
+function siteSearchWorkCount(query){if(typeof filteredWork!=='function')return 0;const saved=Object.fromEntries(['workQuery','workGroup','workPay','workEligibility'].map(key=>[key,state[key]]));try{Object.assign(state,{workQuery:query,workGroup:'',workPay:'',workEligibility:''});return filteredWork().length;}finally{Object.assign(state,saved);}}
 function siteSearchView(query){
  const tokens=siteSearchWords(query);
  if(!tokens.length){const pages=siteSearchPages();return [{label:'Suggested',items:[...SITE_SEARCH_SUGGESTED.filter(isCompanyId).map(id=>({type:'company',name:companies[id].name,meta:groupLabel(modelGroup(id)),href:'#company/'+id})),...['work','compare','method'].map(id=>pages.find(p=>p.id===id))]}];}
@@ -85,7 +85,7 @@ function siteSearchView(query){
  for(const item of results){if(groups.at(-1)?.type!==item.type)groups.push({type:item.type,label:item.group,items:[]});groups.at(-1).items.push(item);}
  const work=groups.find(g=>g.type==='work'),text=tokens.join(' '),count=work?siteSearchWorkCount(text):0;
  if(work&&count){const all={type:'action',action:'work',query:text,name:`See all ${count} ${count===1?'listing':'listings'} for “${query.trim()}”`,meta:'Opens Paid work with this search',href:'#work'};if(work.items[0].rank>=4)work.items.unshift(all);else work.items.push(all);}
- if(!groups.length)groups.push({label:'Try instead',items:[{type:'page',name:`Browse all ${DATA.companies.length} companies`,meta:'The full company list',href:'#companies'},{type:'page',name:'See all paid work',meta:'Every listing, with filters',href:'#work'}]});
+ if(!groups.length)groups.push({label:'Try instead',items:[{type:'action',action:'companies',name:`Browse all ${DATA.companies.length} companies`,meta:'The full company list',href:'#companies'},{type:'action',action:'work',query:'',name:'See all paid work',meta:'Every listing, with filters',href:'#work'}]});
  return groups;
 }
 function siteSearchMark(text,tokens){
@@ -130,12 +130,13 @@ function siteSearchReveal(item){
 function siteSearchChoose(item){
  if(!item)return;
  // Set up the Paid work page first, so its search field listens before it receives the query.
- if(item.action==='work'){preparePage('work');const field=$('work-search');field.value=item.query;field.dispatchEvent(new Event('input',{bubbles:true}));}
+ if(item.action==='work'){preparePage('work');resetWorkFilters();const field=$('work-search');field.value=item.query||'';field.dispatchEvent(new Event('input',{bubbles:true}));}
+ if(item.action==='companies'){preparePage('companies');reset();}
  $('site-search').close();
  const reveal=item.type==='product'||item.type==='work'?()=>siteSearchReveal(item):null;
  if(location.hash===item.href){route({type:'hashchange'});reveal?.();return;}
  if(reveal)window.addEventListener('hashchange',reveal,{once:true});
- location.hash=item.href;
+ keepEntryScroll();location.hash=item.href;
 }
 function siteSearchKey(event){
  if(event.isComposing)return;
