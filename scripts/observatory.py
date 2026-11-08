@@ -321,6 +321,9 @@ def create_database(path, data):
     con = sqlite3.connect(path)
     try:
         con.execute("PRAGMA foreign_keys=ON")
+        # SQLite builds have different defaults for clearing freed b-tree bytes.
+        # Clear them explicitly so release files remain byte-identical.
+        con.execute("PRAGMA secure_delete=ON")
         con.executescript((ROOT / "schema/database.sql").read_text())
         with con:
             con.execute("PRAGMA defer_foreign_keys=ON")
@@ -341,7 +344,7 @@ def create_database(path, data):
         require(con.execute("PRAGMA integrity_check").fetchone()[0] == "ok", "SQLite integrity failure")
     finally: con.close()
     # Bytes 96-100 hold the SQLite library version that wrote the file. They are informational only;
-    # zeroing them keeps the database byte-identical across machines so --verify is reproducible.
+    # zeroing them removes the writer version from the reproducible database bytes.
     with open(path, "r+b") as handle:
         handle.seek(96); handle.write(b"\x00" * 4)
 

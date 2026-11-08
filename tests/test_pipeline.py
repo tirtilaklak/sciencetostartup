@@ -7,10 +7,11 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT / "scripts"))
-from observatory import validate, ValidationError, classify, stage_confidence, release, build, safe_csv, canonical_bytes
+from observatory import validate, ValidationError, classify, stage_confidence, release, build, safe_csv, canonical_bytes, create_database
 from fixtures import fixture
 
 class PipelineTests(unittest.TestCase):
@@ -126,6 +127,21 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(json.loads(con.execute('SELECT canonical_json FROM dataset').fetchone()[0]),self.data)
             self.assertEqual(con.execute("SELECT stage FROM classifications WHERE segment_scope='ai_data'").fetchone()[0],classify(self.data,'test-alpha'))
             con.close()
+    def test_database_bytes_ignore_sqlite_secure_delete_default(self):
+        connect = sqlite3.connect
+        outputs = []
+        with tempfile.TemporaryDirectory() as tmp:
+            for default in (0, 1):
+                def with_default(*args, **kwargs):
+                    con = connect(*args, **kwargs)
+                    con.execute(f'PRAGMA secure_delete={default}')
+                    return con
+                path = Path(tmp) / f'default-{default}.sqlite'
+                with patch('observatory.sqlite3.connect', side_effect=with_default):
+                    create_database(path, self.data)
+                outputs.append(path.read_bytes())
+        self.assertEqual(outputs[0], outputs[1],
+                         'SQLite builds with different secure_delete defaults must produce identical release bytes')
     def test_failed_import_preserves_prior_release(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);source=root/'input.json';source.write_bytes(canonical_bytes(self.data))
