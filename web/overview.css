@@ -1,25 +1,58 @@
-/* Overview: a clear introduction, a small market view, and optional research detail. */
-#market-view .market-hero{display:block;max-width:none;margin:0;padding:78px 0 0;border:0}
-#market-view .hero-copy{max-width:850px}
+/* A visual field guide: real company tools, clear routes, and optional research detail. */
+#market-view .market-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:32px 52px;max-width:none;margin:0;padding:52px 0 0;border:0}
+#market-view .hero-copy{max-width:590px;padding-bottom:12px}
 #market-view .hero-eyebrow{margin:0 0 22px;font-size:11px;line-height:1.5;font-weight:600;letter-spacing:1.8px;color:var(--green)}
-#market-view .market-hero h1{max-width:900px;margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(60px,7.3vw,96px);font-weight:400;line-height:1.02;letter-spacing:-3.5px}
+#market-view .market-hero h1{max-width:640px;margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(58px,6.1vw,82px);font-weight:400;line-height:1.03;letter-spacing:-3px}
 #market-view .market-hero h1 em{color:var(--green);font-style:normal}
-#market-view .market-hero .intro{max-width:510px;margin:26px 0 0;font-size:18px;line-height:1.65;color:var(--muted)}
-#market-view .hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:30px 0 0}
-#market-view .hero-actions a{display:inline-flex;justify-content:space-between;align-items:center;gap:24px;min-height:48px;padding:12px 20px;border:1px solid var(--green);border-radius:4px;font-size:14px;font-weight:550;line-height:1.5;text-decoration:none}
-#market-view .hero-actions .button-primary{background:var(--green);color:#fff}
+#market-view .market-hero .intro{max-width:470px;margin:24px 0 0;font-size:17px;line-height:1.65;color:var(--muted)}
+#market-view .hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:28px 0 0}
+#market-view .hero-actions a{display:inline-flex;justify-content:space-between;align-items:center;gap:22px;min-height:48px;padding:12px 19px;border:1px solid var(--green);border-radius:7px;font-size:14px;font-weight:550;line-height:1.5;text-decoration:none}
+#market-view .hero-actions .button-primary{background:var(--green);color:#fff;box-shadow:0 4px 12px #173d2e15}
 #market-view .hero-actions .button-primary:hover{background:#173d2e;border-color:#173d2e}
-#market-view .hero-actions .button-secondary{background:transparent;color:var(--green);border-color:var(--border)}
+#market-view .hero-actions .button-secondary{background:#fff;color:var(--green);border-color:var(--border)}
 #market-view .hero-actions .button-secondary:hover{background:var(--pale);border-color:var(--green)}
 #market-view .hero-source-note{margin:20px 0 0;font-size:12px;line-height:1.6;color:var(--muted)}
 #market-view .hero-research[hidden]{display:none}
-.hero-company-strip{display:flex;align-items:center;gap:32px;margin:60px 0 0;padding:24px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.hero-company-strip>p{flex:none;margin:0;font-size:12px;line-height:1.5;color:var(--muted)}
-#market-view .hero-logo-grid{display:flex;flex:1;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 24px;margin:0;padding:0;border:0;overflow:visible}
-#market-view .hero-logo-grid>a{display:inline-flex;flex:0 1 auto;justify-content:flex-start;align-items:center;min-width:0;min-height:32px;font-size:15px;font-weight:550;line-height:1.4;color:var(--ink);text-decoration:none}
-#market-view .hero-logo-grid>a:hover{color:var(--green);text-decoration:underline;text-underline-offset:4px}
-#market-view .hero-logo-grid .brand-asset{display:none}
-#market-view .hero-logo-grid .hero-logo-name{display:inline;font:inherit;color:inherit}
+.hero-visual{position:relative;isolation:isolate;min-width:0;margin:0;padding:24px;border:1px solid #2e604c;border-radius:24px;background:#183f31;color:#fff;overflow:hidden;box-shadow:0 16px 32px #193c2f12}
+.hero-visual::before{content:"";position:absolute;z-index:-1;width:340px;height:340px;right:-140px;top:-140px;border:1px solid #719e7650;border-radius:50%;box-shadow:0 0 0 52px #719e7618,0 0 0 104px #719e7610}
+.hero-visual-top{display:flex;justify-content:space-between;align-items:center;min-height:24px;font-size:10px;font-weight:550;letter-spacing:1.7px;color:#c6dfcd}
+.hero-visual-symbol{display:grid;place-items:center;width:30px;height:30px;color:#bde09b}
+.hero-image-link{display:block;margin:20px 0 22px;border:1px solid #7da38c50;border-radius:12px;overflow:hidden;background:#101c18;box-shadow:0 14px 24px #0003;transform:rotate(-2deg)}
+.hero-image-link img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain}
+.hero-image-link:focus-visible{outline-color:#c7e6a4}
+.hero-visual figcaption{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.hero-visual figcaption strong{display:block;font:400 25px/1.25 Georgia,"Times New Roman",serif;letter-spacing:-.3px}
+.hero-visual figcaption p{max-width:340px;margin:8px 0 0;font-size:11px;line-height:1.65;color:#cbdbd0}
+.hero-visual figcaption>a{display:inline-flex;align-items:center;flex:none;gap:8px;min-height:40px;font-size:12px;line-height:1.5;color:#fff;text-decoration:none;white-space:nowrap}
+.hero-visual figcaption>a:hover{text-decoration:underline;text-underline-offset:4px}
+.hero-image-source{display:inline-flex;min-height:28px;margin-top:6px;font-size:10px;line-height:1.5;color:#c6d9cd;text-decoration:underline;text-underline-offset:3px}
+.hero-company-strip{display:flex;grid-column:1/-1;align-items:center;gap:32px;margin:12px 0 0;padding:28px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.hero-company-strip>p{flex:none;margin:0;font-size:12px;line-height:1.65;color:var(--muted)}
+#market-view .hero-logo-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));flex:1;align-items:center;gap:12px 24px;margin:0;padding:0;border:0;overflow:visible}
+#market-view .hero-logo-grid>a{display:flex;flex:none;justify-content:center;align-items:center;min-width:0;min-height:52px;padding:4px;font-size:15px;font-weight:550;line-height:1.4;color:var(--ink);text-decoration:none;border-radius:8px}
+#market-view .hero-logo-grid>a:hover{background:#fff;box-shadow:0 2px 10px #163b2910}
+#market-view .hero-logo-grid .brand-asset{display:inline-flex;width:118px;max-width:100%;height:42px;padding:5px;background:transparent}
+#market-view .hero-logo-grid .brand-dark{background:#172f28;padding:8px 10px;border-radius:5px}
+#market-view .hero-logo-grid .brand-asset img{max-width:100%;max-height:100%;object-fit:contain}
+.product-showcase{margin:56px 0 16px}
+.product-showcase-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:24px}
+.product-showcase-heading .eyebrow{margin:0 0 10px;font-size:10px;letter-spacing:1.5px;color:var(--green)}
+.product-showcase-heading h2{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:38px;line-height:1.15;font-weight:400;letter-spacing:-1px}
+.product-showcase-heading>a{display:inline-flex;align-items:center;gap:12px;min-height:44px;font-size:13px;text-decoration:none}
+.product-showcase-heading>a:hover{text-decoration:underline;text-underline-offset:4px}
+.product-preview-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.product-preview{min-width:0;overflow:hidden;border:1px solid #dce1d8;border-radius:20px;background:#fff;box-shadow:0 5px 18px #263b2510}
+.product-preview-image{display:flex;align-items:center;justify-content:center;aspect-ratio:16/9;padding:18px;overflow:hidden;background:#e5e9e1;border-bottom:1px solid #dce1d8}
+.product-preview-labelbox .product-preview-image{background:#eee7dc}
+.product-preview-sama .product-preview-image{background:#e8e3f1}
+.product-preview-image img{display:block;width:100%;height:100%;object-fit:contain;border-radius:7px}
+.product-preview-body{padding:23px 24px 20px}
+.product-preview-company{margin:0 0 8px;font-size:11px;font-weight:550;letter-spacing:.7px;text-transform:uppercase;color:var(--muted)}
+.product-preview h3{margin:0 0 12px;font-size:23px;font-weight:550;line-height:1.3;letter-spacing:-.5px}
+.product-preview h3 a{display:flex;align-items:center;justify-content:space-between;gap:14px;color:var(--ink);text-decoration:none}
+.product-preview h3 a:hover{color:var(--green)}
+.product-preview-caption{min-height:54px;margin:0 0 12px;font-size:12px;line-height:1.7;color:var(--muted)}
+.product-preview-source{display:inline-flex;align-items:center;min-height:32px;font-size:11px;text-decoration:underline;text-underline-offset:3px}
 
 /* Secondary explanations are available without making the page longer by default. */
 .overview-more{margin-top:44px;border-top:1px solid var(--border)}
@@ -64,9 +97,15 @@
 .overview-stats b{display:block;font-size:28px;line-height:1.3;font-weight:500;letter-spacing:-.5px;color:var(--ink)}
 .overview-work-body>p:not(.overview-stats){max-width:720px;margin:0 0 16px;font-size:13px;line-height:1.7;color:var(--muted)}
 .overview-safety strong{color:var(--ink);font-weight:550}
-.venture-note{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;padding:4px 0 30px}
+.publisher-disclosure{margin-top:24px;padding:0 26px;border:1px solid var(--border);border-radius:20px;background:#fff}
+.venture-note{display:grid;grid-template-columns:1.05fr 1fr;gap:28px 36px;align-items:start;padding:4px 0 28px}
+.venture-visual{min-width:0;margin:0;overflow:hidden;border:1px solid #ded9cd;border-radius:14px;background:#f5f0e7}
+.venture-visual img{display:block;width:100%;height:auto;aspect-ratio:1000/563;object-fit:contain;background:#100e09}
+.venture-visual figcaption{padding:16px 18px;font-size:12px;line-height:1.7;color:var(--muted)}
+.venture-figures{grid-column:1/-1}
+.venture-figures .investor-qualifications{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
 .venture-copy>.eyebrow{display:none}
-.venture-copy h2{margin:0 0 14px;font-size:24px;font-weight:500;line-height:1.3}
+.venture-copy h2{margin:0 0 14px;font-family:Georgia,"Times New Roman",serif;font-size:29px;font-weight:400;line-height:1.2;letter-spacing:-.7px}
 .venture-copy>p{max-width:660px;margin:0 0 16px;font-size:14px;line-height:1.75;color:var(--muted)}
 #market-view .venture-copy .investor-status,#market-view .venture-copy .investor-lab-positioning{font-size:13px;line-height:1.7;color:var(--muted)}
 .venture-figures h3{margin:0 0 12px;font-size:15px;font-weight:550}
@@ -75,24 +114,53 @@
 .venture-figures .investor-qualifications dt{font-size:13px;line-height:1.6;font-weight:550}
 .venture-figures .investor-qualifications dd{margin:6px 0 0;font-size:13px;line-height:1.7;color:var(--muted)}
 
-@media(max-width:1050px){
+@media(max-width:1100px){
+  #market-view .market-hero{gap:28px 32px}
+  #market-view .market-hero h1{font-size:64px;letter-spacing:-2.6px}
+  #market-view .hero-actions{gap:10px}
+  #market-view .hero-actions a{padding:12px 14px;font-size:13px;gap:14px}
+  .hero-visual{padding:22px}
+  .hero-visual figcaption{display:block}
+  .hero-visual figcaption>a{min-height:32px;margin-top:4px}
   .hero-company-strip{display:block}
   .hero-company-strip>p{margin-bottom:14px}
-  #market-view .hero-logo-grid{justify-content:flex-start;gap:8px 32px}
+  .hero-company-strip>p br{display:none}
+  #market-view .hero-logo-grid{gap:12px 28px}
   #model-map .category-card{grid-template-columns:minmax(180px,1.2fr) minmax(150px,1.4fr) 90px 18px;gap:5px 20px}
+  .product-preview-grid{gap:16px}
+  .product-preview-body{padding:20px}
 }
-@media(max-width:700px){
-  #market-view .market-hero{padding-top:46px}
-  #market-view .hero-eyebrow{font-size:10px;letter-spacing:1.3px;margin-bottom:20px}
-  #market-view .market-hero h1{font-size:clamp(51px,11.8vw,72px);line-height:1.04;letter-spacing:-2.2px}
-  #market-view .market-hero .intro{max-width:440px;margin-top:22px;font-size:16px;line-height:1.65}
-  #market-view .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:26px}
-  #market-view .hero-actions a{min-height:48px;padding:12px 15px;font-size:13px;gap:8px}
-  #market-view .hero-source-note{font-size:11px;margin-top:18px}
-  .hero-company-strip{margin-top:38px;padding:20px 0}
-  .hero-company-strip>p{font-size:11px;margin-bottom:10px}
-  #market-view .hero-logo-grid{gap:4px 24px}
-  #market-view .hero-logo-grid>a{min-height:36px;font-size:13px}
+@media(max-width:760px){
+  #market-view .market-hero{grid-template-columns:1fr;gap:24px;padding-top:30px}
+  #market-view .hero-copy{padding:0;max-width:560px}
+  #market-view .hero-eyebrow{font-size:10px;letter-spacing:1.3px;margin-bottom:16px}
+  #market-view .market-hero h1{font-size:clamp(49px,9.5vw,68px);line-height:1.03;letter-spacing:-2.2px}
+  #market-view .market-hero .intro{max-width:480px;margin-top:18px;font-size:15px;line-height:1.65}
+  #market-view .hero-actions{gap:10px;margin-top:20px}
+  #market-view .hero-actions a{min-height:46px;padding:11px 15px;font-size:13px;gap:18px}
+  #market-view .hero-source-note{font-size:11px;margin-top:14px}
+  .hero-visual{padding:20px;border-radius:20px}
+  .hero-image-link{margin:15px 0 20px;transform:rotate(-1.5deg)}
+  .hero-visual figcaption{display:flex;align-items:center;gap:16px}
+  .hero-visual figcaption strong{font-size:22px}
+  .hero-visual figcaption p{font-size:10px;line-height:1.6}
+  .hero-visual figcaption>a{font-size:11px}
+  .hero-visual-symbol{width:24px;height:24px}
+  .hero-company-strip{margin-top:0;padding:22px 0}
+  .hero-company-strip>p{font-size:11px;margin-bottom:12px}
+  #market-view .hero-logo-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 20px}
+  #market-view .hero-logo-grid>a{min-height:46px;padding:2px}
+  #market-view .hero-logo-grid .brand-asset{height:35px;width:104px}
+  .product-showcase{margin-top:34px}
+  .product-showcase-heading{display:block;margin-bottom:18px}
+  .product-showcase-heading h2{font-size:31px;letter-spacing:-.7px}
+  .product-showcase-heading>a{min-height:36px;margin-top:8px;font-size:12px}
+  .product-preview-grid{grid-template-columns:1fr;gap:18px}
+  .product-preview{border-radius:18px}
+  .product-preview-image{padding:20px;aspect-ratio:16/8.5}
+  .product-preview-body{padding:20px 22px 17px}
+  .product-preview h3{font-size:22px}
+  .product-preview-caption{min-height:0;max-width:500px;margin-bottom:8px;font-size:12px}
   .overview-more{margin-top:28px}
   .overview-disclosure>summary{min-height:68px;font-size:15px;gap:12px}
   .overview-disclosure .overview-summary-note{display:none}
@@ -106,12 +174,17 @@
   .overview-check-body{grid-template-columns:1fr;gap:20px}
   .overview-stats{gap:16px 28px}
   .overview-stats b{font-size:24px}
-  .venture-note{grid-template-columns:1fr;gap:18px;padding-bottom:22px}
+  .publisher-disclosure{padding:0 18px}
+  .venture-note{grid-template-columns:1fr;gap:24px;padding-bottom:22px}
+  .venture-figures .investor-qualifications{grid-template-columns:1fr;gap:0}
   .venture-copy h2{font-size:22px}
 }
-@media(max-width:380px){
+@media(max-width:400px){
   #market-view .market-hero h1{font-size:48px;letter-spacing:-2px}
-  #market-view .hero-actions{grid-template-columns:1fr}
-  #market-view .hero-actions a{width:100%}
+  #market-view .hero-actions{gap:8px}
+  #market-view .hero-actions a{padding:11px 12px;font-size:12px;gap:12px}
+  .hero-visual figcaption{display:block}
+  .hero-visual figcaption p{max-width:280px}
+  .hero-visual figcaption>a{min-height:30px;margin-top:4px}
 }
-@media(forced-colors:active){.grade-bar{display:none}.grade-key dt,.story-grade{border-color:CanvasText}}
+@media(forced-colors:active){.grade-bar{display:none}.grade-key dt,.story-grade{border-color:CanvasText}.hero-visual{border-color:CanvasText}.hero-visual::before{display:none}}

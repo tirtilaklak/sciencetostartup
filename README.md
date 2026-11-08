@@ -3,9 +3,11 @@
 ScienceToStartup is a static, evidence-linked field guide to AI data organizations.
 The current public site is https://sciencetostartup.com.
 
-The overview starts with company and paid-work navigation, then six dated revenue
-figures. “Show all” expands the ledger; charts, coverage and research notes open
-on request. Company, work and shareable pages use the same restrained visual shell.
+The overview pairs company and paid-work navigation with official product imagery,
+then six dated revenue figures. “Show all” expands the ledger; charts, coverage and
+research notes open on request. Company and work cards show official logos, and
+profiles feature product images or founder photos where available. The publisher’s
+proposal includes its restored concept picture, clearly separate from company evidence.
 If the app cannot load, recovery links open the plain company, work and method pages.
 
 ## Where this source came from

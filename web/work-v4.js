@@ -254,7 +254,7 @@ function w4StatusBadge(route){const status=w4Status(route);return status?`<span 
 function w4CardParts(route,compact){
   const company=companies[route.company_id],commitment=w4Hours(route),scheduleNote=w4ScheduleNote(route),requirements=w4Requirements(route);
   return {context:`${route.role}, ${company.name}`,
-    identity:`<a class="w4-company" href="#company/${w4Escape(company.id)}/work"><span>${w4Escape(company.name)}</span></a>`,
+    identity:`<a class="w4-company" href="#company/${w4Escape(company.id)}/work"><span class="w4-logo">${typeof logoHTML==='function'?logoHTML(company.id,'',true):''}</span><span>${w4Escape(company.name)}</span></a>`,
     offer:`<div class="w4-offer">${compact?'':`<p class="w4-pay ${route.numeric_pay?'':'w4-pay-unspecified'}"><strong>${w4Escape(w4Pay(route))}</strong>${w4PayNotes(route)}</p>`}${commitment?`<p class="w4-commitment">${w4Escape(commitment)}</p>`:''}${scheduleNote?`<p class="w4-schedule-note">${w4Escape(scheduleNote)}</p>`:''}</div>`,
     conditions:`<p class="w4-location">${w4Escape(w4Location(route))}</p>${requirements.length?`<ul class="w4-requirements" aria-label="Requirements">${requirements.map(text=>`<li>${w4Escape(text)}</li>`).join('')}</ul>`:''}`,
     dates:`<p class="w4-dates"><span>${w4Escape(w4FreshnessLabel(route))}</span></p>`};

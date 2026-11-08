@@ -1,4 +1,4 @@
-/* Paid work: readable offer rows, with full terms and evidence in disclosures. */
+/* Paid work: official company marks, a readable offer, then full terms and evidence. */
 .w4-safety{max-width:860px;margin:0 0 20px;padding:0;border:0;background:transparent}
 .w4-safety>p{margin:0;font-size:14px;line-height:1.6;color:var(--ink)}
 .w4-safety-tips{margin:0}
@@ -50,10 +50,13 @@
 
 /* All preview metadata remains readable; evidence stays beside its offer. */
 #work-cards .w4-section{margin-bottom:40px}
-#work-cards .work-card-v4{background:transparent;border:0;border-top:1px solid var(--border);border-radius:0;margin:0;overflow:visible;box-shadow:none;content-visibility:visible;contain-intrinsic-height:none}
-#work-cards .w4-card-front{display:grid;grid-template-columns:minmax(240px,1.65fr) minmax(190px,1fr) minmax(150px,.85fr) 106px;gap:28px;align-items:start;padding:26px 0 2px}
-#work-cards .w4-card-heading{margin:0 0 10px;gap:10px;justify-content:flex-start;flex-wrap:wrap}
-#work-cards .w4-company{font-size:13px;line-height:1.5;font-weight:400;color:var(--green);min-height:28px;margin:0;gap:0}
+#work-cards .work-card-v4{background:#fff;border:1px solid var(--border);border-radius:18px;margin:0 0 14px;overflow:visible;box-shadow:none;content-visibility:visible;contain-intrinsic-height:none}
+#work-cards .w4-card-front{display:grid;grid-template-columns:minmax(240px,1.65fr) minmax(190px,1fr) minmax(150px,.85fr) 106px;gap:24px;align-items:start;padding:24px 24px 2px}
+#work-cards .w4-card-heading{margin:0 0 14px;gap:10px;justify-content:flex-start;flex-wrap:wrap}
+#work-cards .w4-company{font-size:13px;line-height:1.5;font-weight:500;color:var(--green);min-height:44px;margin:0;gap:12px}
+#work-cards .w4-logo{display:inline-flex;align-items:center;justify-content:center;flex:0 0 66px;width:66px;height:44px;border-radius:8px;background:var(--pale)}
+#work-cards .w4-logo .brand-asset{width:60px;height:38px;max-width:60px;padding:6px;border-radius:6px;background:transparent}
+#work-cards .w4-logo .brand-asset.brand-dark{background:#162d29}
 #work-cards .w4-status{font-size:11px;max-width:none;padding:0;line-height:1.5;text-align:left;border:0;border-radius:0;background:none;color:var(--amber)}
 #work-cards .w4-role{font-size:19px;line-height:1.4;letter-spacing:-.35px;margin:0 0 8px}
 #work-cards .w4-dates{font-size:11px;line-height:1.6;color:var(--muted)}
@@ -66,21 +69,22 @@
 #work-cards .w4-location{font-size:13px;line-height:1.6;margin:2px 0 0;color:var(--muted)}
 #work-cards .w4-conditions-column .w4-requirements{display:none}
 #work-cards .w4-action-column{justify-self:end;align-self:start;margin:0}
-#work-cards .w4-open{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;font-size:13px;line-height:1.4;border:1px solid var(--border);border-radius:5px;padding:10px 12px;background:transparent;white-space:nowrap}
-#work-cards .w4-open:hover{background:var(--pale);border-color:var(--green)}
-#work-cards .w4-details{margin:0 0 12px;border:0}
+#work-cards .w4-open{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;font-size:13px;line-height:1.4;border:1px solid var(--border);border-radius:5px;padding:10px 12px;background:var(--green);color:#fff;white-space:nowrap;border-color:var(--green)}
+#work-cards .w4-open:hover{background:#193f2f;border-color:#193f2f}
+#work-cards .w4-details{margin:0 24px 12px;border:0}
 #work-cards .w4-details>summary{display:inline-flex;width:auto;gap:8px;min-height:44px;padding:8px 0;font-size:12px;line-height:1.5;color:var(--muted)}
 #work-cards .w4-details>summary>span[aria-hidden]{font-size:16px}
+#work-cards .w4-details[open]>summary>span[aria-hidden]{font-size:0}
 #work-cards .w4-details[open]>summary{background:transparent}
-#work-cards .w4-detail-content{padding:24px;margin:0 0 16px;border:0;background:var(--pale);font-size:14px;line-height:1.65}
+#work-cards .w4-detail-content{padding:24px;margin:0 0 16px;border:0;border-radius:12px;background:var(--pale);font-size:14px;line-height:1.65}
 #work-cards .w4-detail-content>p{font-size:14px;line-height:1.65}
 #work-cards .w4-route-group{margin:16px 0 24px!important;padding:0;border-top:1px solid var(--border)}
 #work-cards .w4-route-group>summary{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;background:transparent;min-height:56px;padding:14px 0;border:0;font-size:14px;line-height:1.5}
-#work-cards .w4-compact-card .w4-compact-toggle>summary{padding:20px 0;gap:20px;min-height:64px}
+#work-cards .w4-compact-card .w4-compact-toggle>summary{padding:20px 24px;gap:20px;min-height:64px}
 #work-cards .w4-compact-title strong{font-size:16px;line-height:1.5;font-weight:500}
 #work-cards .w4-compact-title small{font-size:12px;line-height:1.5;color:var(--green)}
 #work-cards .w4-compact-pay>strong{font-size:14px;line-height:1.5}
-#work-cards .w4-compact-card .w4-card-front{display:block;padding:20px 0 0}
+#work-cards .w4-compact-card .w4-card-front{display:block;padding:20px 24px 0}
 #work-cards .w4-compact-card .w4-card-bottom{padding:12px 0;align-items:center}
 @media(min-width:701px) and (max-width:1100px){
  #work-cards .w4-card-front{grid-template-columns:minmax(200px,1.4fr) minmax(170px,1fr) minmax(120px,.8fr);gap:20px}
@@ -103,12 +107,12 @@
  .w4-jumps{margin-left:0;gap:18px}
  .w4-jumps button{font-size:12px}
  .w4-block-heading{margin:20px 0 10px;font-size:13px}
- #work-cards .w4-card-front{grid-template-columns:minmax(0,1fr) auto;gap:16px;padding:22px 0 0}
+ #work-cards .w4-card-front{grid-template-columns:minmax(0,1fr) auto;gap:16px;padding:20px 20px 0}
  #work-cards .w4-role-column{grid-column:1/-1;grid-row:1}
  #work-cards .w4-offer-column{grid-column:1;grid-row:2;text-align:left}
  #work-cards .w4-conditions-column{grid-column:1/-1;grid-row:3;align-self:center}
  #work-cards .w4-action-column{grid-column:2;grid-row:2;justify-self:end;align-self:start}
- #work-cards .w4-company{font-size:13px;min-height:36px;margin:0}
+ #work-cards .w4-company{font-size:13px;min-height:44px;margin:0}
  #work-cards .w4-role{font-size:19px;line-height:1.4;margin-bottom:8px}
  #work-cards .w4-card-heading{margin-bottom:6px;gap:8px 12px}
  #work-cards .w4-status{font-size:11px;line-height:1.5}
@@ -121,10 +125,10 @@
  #work-cards .w4-schedule-note{font-size:12px;line-height:1.6}
  #work-cards .w4-location{font-size:13px;line-height:1.6;margin:0}
  #work-cards .w4-open{min-height:44px;font-size:12px;padding:10px}
- #work-cards .w4-details{margin:4px 0 10px}
+ #work-cards .w4-details{margin:4px 20px 10px}
  #work-cards .w4-details>summary{min-height:44px;padding:8px 0;font-size:12px}
  #work-cards .w4-detail-content{padding:18px;margin-bottom:16px}
- #work-cards .w4-compact-card .w4-compact-toggle>summary{padding:18px 0;gap:14px}
+ #work-cards .w4-compact-card .w4-compact-toggle>summary{padding:18px 20px;gap:14px}
  #work-cards .w4-compact-pay{flex-basis:120px}
  #work-cards .w4-compact-title strong{font-size:15px}
  #work-cards .w4-compact-pay>strong{font-size:13px}
