@@ -238,6 +238,8 @@ test('all work criteria survive reload and Back/Forward', async ({ page }) => {
   await page.locator('#work-sort').selectOption('checked');
   await expect.poll(() => page.evaluate(() => location.hash)).toContain('sort=checked');
   const hash = await page.evaluate(() => location.hash);
+  await expect(page.locator('#work-cards')).not.toHaveAttribute('aria-busy', 'true');
+  await expect(page.locator('#work-count')).not.toHaveText('Loading search…');
   const count = await page.locator('#work-count').textContent();
   expect(new URLSearchParams(hash.split('?')[1]).get('q')).toBe('C++ C# café 研究');
   await page.reload();
