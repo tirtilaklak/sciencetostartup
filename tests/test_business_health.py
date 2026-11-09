@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SIGNALS = {"revenue", "profit", "customers", "delivery", "cash"}
 sys.path.insert(0, str(ROOT / "scripts"))
 from business_health import load_business_health
+from artifact_verification import verify_artifact
 
 
 class BusinessHealthTests(unittest.TestCase):
@@ -312,11 +313,10 @@ console.log(JSON.stringify({observations:observations.length,filtering:true,cont
     def test_delivered_assets_preserve_research_and_include_the_workbench(self):
         self.assertEqual((ROOT / "dist/research.json").read_bytes(), (ROOT / "data/canonical.json").read_bytes())
         self.assertEqual(json.loads((ROOT / "dist/business-health.json").read_text()), self.health)
-        html = (ROOT / "dist/index.html").read_text()
-        # The page scripts load from content-hashed files in dist/js/; the CSS stays inline.
-        scripts = "".join((ROOT / "dist" / src).read_text() for src in dict.fromkeys(re.findall(r'"(js/[^"]+[.]js)"', html)))
-        self.assertIn((ROOT / "web/business-health.js").read_text(), scripts)
-        self.assertIn((ROOT / "web/business-health.css").read_text(), html)
+        html = (ROOT / "dist/explore/index.html").read_text()
+        # Minified output is checked against a complete fresh build, while the
+        # manifest retains exact provenance for the editable component inputs.
+        verify_artifact(ROOT / "dist", ("web/business-health.js", "web/business-health.css"))
         self.assertIn('id="business-health"', html)
         manifest = json.loads((ROOT / "dist/manifest.json").read_text())["sha256"]
         self.assertEqual(manifest["business-health.json"], hashlib.sha256((ROOT / "dist/business-health.json").read_bytes()).hexdigest())

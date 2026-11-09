@@ -17,14 +17,18 @@ const workLabels=plain(run(`DATA.companies.map(company=>{
  const groups=w4RouteGroups(workRoutesFor(company.id));
  return {id:company.id,label:workType(company.id),included:hasWorkRoute(company.id),primary:groups.primary,careers:groups.careers};
 })`));
+const archived=new Set(['historical','closed','contributions','paused','no_route','inquiry','information']);
 for(const row of workLabels){
- assert.equal(row.included,Boolean(row.primary.length||row.careers.length),row.id+' filter classification drift');
- if(row.primary.length){
-  for(const group of new Set(row.primary.map(route=>route.group)))assert.ok(row.label.includes(run(`WORK_TYPES[${JSON.stringify(group)}]`)||group||'Paid work listings'),row.id+' missing retained route type '+group);
- }else assert.equal(row.label,row.careers.length?'Career page only':'No confirmed paid listing',row.id+' unsupported current route label');
+ const records=window.WORK_ROUTES.routes.filter(route=>route.company_id===row.id),primary=records.filter(route=>!archived.has(route.status)&&route.ai_data_work!==false&&['named_listing','network_program'].includes(route.route_kind)),careers=records.filter(route=>!archived.has(route.status)&&route.route_kind==='career_page');
+ const kinds=new Set(primary.map(route=>route.route_kind)),label=[kinds.has('named_listing')?'Named listings':'',kinds.has('network_program')?'Networks and programs':''].filter(Boolean).join(' · ')||(careers.length?'Career page only':records.length?'No confirmed paid listing':'Paid work not reviewed yet');
+ assert.equal(row.included,Boolean(primary.length||careers.length),row.id+' filter classification drift');
+ assert.equal(row.label,label,row.id+' summary must follow approved opportunity kinds, independent of legacy group/pay/engagement');
+ assert.deepEqual(row.primary.map(route=>route.id).sort(),primary.map(route=>route.id).sort(),row.id+' primary membership');
 }
-// APTO lists a contractor route and an employment route; both types must stay in its label.
-assert.equal(run('workType("apto")'),'Contract and task work · Jobs');
+assert.equal(run('workType("apto")'),'Named listings · Networks and programs');
+assert.equal(run('workType("afterquery")'),'Named listings');
+assert.equal(run('workType("mercor")'),'Networks and programs','A varies-engagement network is not labeled employment or contract work');
+assert.equal(run('workType("turing")'),'Named listings · Networks and programs');
 // The 23 Oct listing check found Elorian's Model Safety Contractor posting gone, so it is historical like
 // the earlier engineering role. Elorian has no other paid listing or career page.
 assert.equal(run('workType("elorian")'),'No confirmed paid listing');
@@ -35,8 +39,7 @@ assert.equal(run('workType("taskus")'),'Career page only');
 assert.equal(run('workType("sama")'),'Career page only');
 assert.equal(run('hasWorkRoute("hackerrank")'),false);
 assert.equal(run('hasWorkRoute("quesma")'),false);
-assert.ok(run('workType("aixi")').includes('Jobs'));
-assert.ok(run('workType("aixi")').includes('Research fellowships'));
+assert.equal(run('workType("aixi")'),'Named listings');
 const writer=plain(run(`workRouteRows().find(route=>route.id==='afterquery.work.technical-content-writer-contract')`));
 assert.equal(run(`w4Hours(${JSON.stringify(writer)})`),'10–15 h/week · Initial commitment; may expand · Six months');
 for(const mode of ['', 'compact']){
@@ -58,7 +61,7 @@ for(const route of plain(run('workRouteRows()')).filter(route=>route.last_route_
 assert.ok(checkNotes>=17,'Fixture lost the route check notes');
 const revised={...writer,availability_note:'No schedule conflict stated.'};
 assert.equal(run(`w4ScheduleNote(${JSON.stringify(revised)})`),'','Do not retain an obsolete conflict after source text changes');
-console.log(JSON.stringify({companies_checked:workLabels.length,summary_filter_alignment:true,apto_employment:true,no_route_label:true,check_notes:checkNotes,writer_card_variants:2,writer_qualifications:true,browser_verified:false}));
+console.log(JSON.stringify({companies_checked:workLabels.length,summary_filter_alignment:true,approved_opportunity_kinds:true,no_route_label:true,check_notes:checkNotes,writer_card_variants:2,writer_qualifications:true,browser_verified:false}));
 '''
 node = shutil.which("node") or "/opt/homebrew/bin/node"
 result = subprocess.run(

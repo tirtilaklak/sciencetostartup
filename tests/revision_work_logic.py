@@ -18,13 +18,13 @@ const whitespace=[' ','\t','\r\n','\u00a0',' \t\n '];
 const clean=html=>html.replace(/evidence-description-\d+/g,'evidence-description-ID');
 const GROUP='<details class="work-route-archive-group w4-route-group"';
 const cardIds=html=>[...html.matchAll(/data-work-route="([^"]+)"/g)].map(m=>m[1]);
-const NO_FILTERS={workGroup:'',workPay:'',workEligibility:'',workSort:''};
+const NO_FILTERS={workKind:'',workGroup:'',workPay:'',workEligibility:'',workSort:''};
 function view(){
  const html=node('work-cards').innerHTML;
  const section=id=>{const start=html.indexOf(`<h2 id="${id}"`);if(start<0)return '';const end=html.indexOf('<section class="w4-section',start);return html.slice(start,end<0?undefined:end);};
  return{ids:plain(run('filteredWork().map(route=>route.id)')),html:clean(html),
   beforeGroups:(html.split(GROUP)[0].match(/data-work-route=/g)||[]).length,
-  more:html.includes('More jobs and fellowships'),
+  more:/More (?:named listings|networks and programs)/.test(html),
   openGroups:(html.match(/<details class="work-route-archive-group w4-route-group"[^>]*\bopen\b/g)||[]).length,
   groups:(html.match(/<details class="work-route-archive-group w4-route-group"/g)||[]).length,
   // Listings drawn as cards, and listings a closed group draws on first open.
@@ -50,22 +50,19 @@ function assertReachable(v,label){
  for(const id of v.waiting)assert.ok(!drawn.has(id),label+': '+id+' is drawn and also waits in a closed group');
  for(const id of v.ids)assert.ok(drawn.has(id)||v.waiting.includes(id),label+': match '+id+' cannot be reached');
 }
-const counts=()=>plain(run(`(()=>{const g=w4RouteGroups(filteredWork());return Object.fromEntries(['contract','hourly','task','jobs','boards','outside','closed'].map(k=>[k,g[k].length]));})()`));
-// The typing budget (W4_FULL_CARDS and friends in work-v4.js): contract work is never cut, jobs fill the
-// rest of 26 full cards (at least six, never a More group of one), and Other listings groups open at 12 or fewer.
+const counts=()=>plain(run(`(()=>{const g=w4DiscoveryGroups(filteredWork());return Object.fromEntries(['named','programs','boards','outside','closed'].map(k=>[k,g[k].length]));})()`));
+// Typed searches keep the primary preview bounded and every remaining record reachable.
 function assertTypedView(v,label){
- const g=counts(),budget=Math.max(6,26-g.hourly-g.task),cut=g.jobs>budget+1;
- assert.equal(v.contractCards,g.contract,label+': a search must show every matching contract listing');
- assert.equal(v.jobsFull,cut?budget:g.jobs,label+': matching jobs shown in full');
- assert.equal(v.more,cut,label+': jobs beyond the budget belong in the closed More jobs and fellowships group');
- assert.equal(v.openGroups,[g.boards,g.outside,g.closed].filter(n=>n&&n<=12).length,label+': only groups with 12 or fewer matches open');
+ const g=counts();
+ assert.ok(v.full<=26,label+': full-card typing budget');
+ assert.equal(v.openGroups,[g.boards,g.outside,g.closed].filter(n=>n&&n<=12).length,label+': only short secondary groups open');
  assertReachable(v,label);
 }
 // A filter change is exempt from the budget: every match is drawn and every group that holds one is open.
 function assertFilterView(v,label){
  const g=counts();
- assert.equal(v.contractCards,g.contract,label+': every matching contract listing');
- assert.equal(v.jobsFull,g.jobs,label+': every matching job in full');
+ assert.equal(v.contractCards,g.named,label+': every matching named listing');
+ assert.equal(v.jobsFull,g.programs,label+': every matching network or program');
  assert.equal(v.more,false,label+': a filter change leaves no closed More group');
  assert.equal(v.openGroups,v.groups,label+': every group that holds a match is open');
  assert.equal(v.waiting.length,0,label+': nothing waits in a closed group');
@@ -73,17 +70,11 @@ function assertFilterView(v,label){
 }
 const baseline=typed('');
 assert.equal(baseline.ids.length,135,'Review route-count coverage after a research update');
-// The default view shows every contract listing, then six jobs (at most three per company).
-const preview=plain(run(`(()=>{const g=w4RouteGroups(filteredWork()),seen={};let jobs=0;
- for(const route of g.jobs){const n=seen[route.company_id]||0;if(jobs<6&&n<3){jobs++;seen[route.company_id]=n+1;}}
- return{contract:g.contract.length,jobs,allJobs:g.jobs.length};})()`));
-assert.ok(preview.contract>0&&preview.allJobs>6,'Fixture lost the contract or jobs listings the preview needs');
-assert.equal(preview.jobs,6,'Jobs preview should fill six cards from the current data');
-assert.equal(baseline.beforeGroups,6,'Default opens with six hourly listings before its first More disclosure');
-assert.equal(baseline.more,true,'Default work view lost its remaining-jobs disclosure');
-assert.equal(baseline.openGroups,0,'Default secondary groups should start collapsed');
-assert.ok(baseline.drawn.length<=20&&baseline.drawn.length>preview.jobs,'Default uses short previews while retaining the jobs section');
-assert.ok(baseline.waiting.length>0,'Closed groups lost the listing ids they draw on first open');
+assert.equal(baseline.beforeGroups,10,'Default named-listing preview');
+assert.equal(baseline.more,true,'Default view retains reachable additional records');
+assert.equal(baseline.openGroups,0,'Default secondary groups start collapsed');
+assert.equal(baseline.drawn.length,15,'Default draws ten named roles and five program previews');
+assert.ok(baseline.waiting.length>0,'Closed groups retain listing ids');
 assertReachable(baseline,'default view');
 // Cards draw their closed parts on first open: the page holds no Terms & sources content until a reader opens one.
 assert.ok(!baseline.html.includes('w4-detail-content')&&!baseline.html.includes('w4-card-front"><div class="w4-compact-company'),'Default view drew closed card parts');
@@ -104,7 +95,7 @@ for(const query of ['a','e']){
  const broad=typed(query);
  assert.ok(broad.ids.length>=100,'One-letter fixture lost its broad match: '+query);
  assertTypedView(broad,query);
- assert.ok(broad.full<=Math.max(26,counts().hourly+counts().task+6),query+': a one-letter search drew more full cards than the default view');
+ assert.ok(broad.full<=26,query+': a one-letter search drew more full cards than the default view');
  assert.ok(broad.waiting.length>0,query+': a one-letter search should leave long groups closed');
  // A select change after typing (the Sort field here) is a filter change: every match, every group open.
  run(`state.workSort='checked';renderWork()`);const sorted=view();assertFilterView(sorted,query+' then a sort change');
@@ -112,24 +103,16 @@ for(const query of ['a','e']){
  run('renderWork()');assert.deepEqual(view(),sorted,query+': a repeat render changed the view');
  run(`state.workQuery=${JSON.stringify(query+' ')};renderWork()`);assertTypedView(view(),query+' typed after a sort change');
 }
-// The type filter follows the section rule: an Employment listing paid by the hour or by a
-// one-time award is contract work in the sections and in the "Contract and task work" filter.
+// Staff engagement is independent of a task/hourly pay label.
 {
- const ids=group=>plain(run(`(()=>{Object.assign(state,{workQuery:'',workGroup:${JSON.stringify(group)},workPay:'',workEligibility:''});return filteredWork().map(r=>r.id);})()`));
- const contract=ids('Expert & contractor projects'),jobs=ids('Employment');
- const moved=plain(run(`workRouteRows().filter(r=>r.group==='Employment'&&W4_CONTRACT_PAY.has(r.pay_basis)).map(r=>r.id)`));
- assert.ok(moved.length>0,'Fixture lost the Employment listings paid by the hour or one-time award');
- for(const id of moved){
-  assert.ok(contract.includes(id),'Contract filter hides a listing the contract section shows: '+id);
-  assert.ok(!jobs.includes(id),'Jobs filter shows a listing the contract section owns: '+id);
- }
- assert.deepEqual(contract.filter(id=>jobs.includes(id)),[],'A listing matched both the contract and the jobs filter');
- run(`Object.assign(state,{workGroup:''})`);
+ const staff={...plain(run('workRouteRows()[0]')),engagement_type:'employment',pay_basis:'hour',pay_terms:{unit:'hour',hourly_comparable:true}};
+ assert.equal(run(`w4GroupMatches(${JSON.stringify(staff)},'employment')`),true);
+ assert.equal(run(`w4GroupMatches(${JSON.stringify(staff)},'contract')`),false);
 }
 let filterCases=0;
 for(const filters of [{workGroup:'Employment'},{workPay:'numeric'},
- {workEligibility:'US listing evidence'},
- {workGroup:'Employment',workPay:'numeric',workEligibility:'US listing evidence'}]){
+ {workEligibility:'remote'},
+ {workGroup:'Employment',workPay:'numeric',workEligibility:'remote'}]){
  const result=filtered('',filters);
  assert.ok(result.ids.length>0,'Filter intersection lost its fixture results');
  assertFilterView(result,JSON.stringify(filters));

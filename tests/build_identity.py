@@ -61,7 +61,8 @@ def snapshot_dist(directory: Path) -> dict:
     result = {'schemaVersion': 1, 'capturedAt': dt.datetime.now(dt.timezone.utc).isoformat(),
               'files': {}, 'errors': []}
     before, blobs = {}, {}
-    for name in FILES:
+    required_files = FILES + (('explore/index.html',) if (directory / 'explore/index.html').exists() else ())
+    for name in required_files:
         try:
             before[name] = file_state(directory / name)
             blobs[name] = (directory / name).read_bytes()
@@ -77,21 +78,40 @@ def snapshot_dist(directory: Path) -> dict:
     try:
         research = json.loads(blobs['research.json'])
         manifest = json.loads(blobs['manifest.json'])
-        embedded = extract_research_script(blobs['index.html'].decode('utf-8'))
+        embedded = extract_research_script(blobs.get('explore/index.html', blobs['index.html']).decode('utf-8'))
         parsed = json.loads(embedded)
         result['datasetVersion'] = research['dataset_version']
         result['embeddedResearch'] = {'sha256': sha(embedded.encode('utf-8')),
                                       'bytes': len(embedded.encode('utf-8')),
                                       'datasetVersion': parsed.get('dataset_version'),
                                       'semanticallyMatchesResearch': parsed == research}
-        if parsed != research:
+        if manifest.get('summary'):
+            descriptor = manifest['summary']
+            summary_bytes = (directory / descriptor['href'].lstrip('/')).read_bytes()
+            summary = json.loads(summary_bytes)
+            if sha(summary_bytes) != descriptor['sha256']:
+                result['errors'].append('Summary asset differs from manifest identity')
+            if parsed != summary['bootstrap']:
+                result['errors'].append('Embedded bootstrap and summary differ semantically')
+            for key, manifest_key in [('buildId', 'build_id'), ('editorialReleaseId', 'editorial_release_id'), ('datasetVersion', 'dataset_version')]:
+                if summary[key] != manifest.get(manifest_key):
+                    result['errors'].append('Summary ' + key + ' differs from manifest')
+            if summary['exports']['research']['sha256'] != sha(blobs['research.json']):
+                result['errors'].append('Summary research export identity differs')
+            archive_bytes = (directory / summary['archive']['href'].lstrip('/')).read_bytes()
+            archive = json.loads(archive_bytes)
+            if sha(archive_bytes) != summary['archive']['sha256'] or archive['data'] != research:
+                result['errors'].append('On-demand archive differs from canonical research')
+            result['presentation'] = {'buildId': summary['buildId'], 'editorialReleaseId': summary['editorialReleaseId'], 'summarySha256': descriptor['sha256']}
+            result['embeddedResearch']['semanticallyMatchesSummary'] = parsed == summary['bootstrap']
+        elif parsed != research:
             result['errors'].append('Embedded research and research.json differ semantically')
         if manifest.get('dataset_version') != research['dataset_version']:
             result['errors'].append('Manifest dataset version differs from research.json')
-        for name in ('index.html', 'research.json'):
+        for name in tuple(n for n in required_files if n != 'manifest.json'):
             if manifest.get('sha256', {}).get(name) != result['files'][name]['sha256']:
                 result['errors'].append('Manifest hash differs from current ' + name)
-    except (KeyError, ValueError, UnicodeError) as error:
+    except (KeyError, ValueError, UnicodeError, OSError) as error:
         result['errors'].append('Cannot reconcile dist identity: ' + str(error))
     result['valid'] = not result['errors']
     return result
@@ -100,7 +120,7 @@ def snapshot_dist(directory: Path) -> dict:
 def expected_browser_identity(snapshot: dict) -> dict:
     if not snapshot['valid']:
         raise ValueError('Dist snapshot is inconsistent: ' + '; '.join(snapshot['errors']))
-    return {'datasetVersion': snapshot['datasetVersion'],
+    return {**snapshot.get('presentation', {}), 'datasetVersion': snapshot['datasetVersion'],
             'researchScriptSha256': snapshot['embeddedResearch']['sha256'],
             'researchFileSha256': snapshot['files']['research.json']['sha256']}
 
@@ -109,7 +129,7 @@ def checkpoint_build_identity(snapshot: dict) -> dict:
     """Include every required file identity so old cursors cannot skip a rebuild."""
     expected_browser_identity(snapshot)
     return {'datasetVersion': snapshot['datasetVersion'],
-            'files': {name: snapshot['files'][name]['sha256'] for name in FILES},
+            'files': {name: value['sha256'] for name, value in snapshot['files'].items()},
             'researchScriptSha256': snapshot['embeddedResearch']['sha256']}
 
 
@@ -118,7 +138,7 @@ def assess_build_identity(before: dict, after: dict, browser: dict | None) -> di
     for label, snapshot in [('before', before), ('after', after)]:
         if not snapshot.get('valid'):
             errors.extend(label + ': ' + text for text in snapshot.get('errors', ['Missing valid snapshot']))
-    changed = [name for name in FILES if before.get('files', {}).get(name) != after.get('files', {}).get(name)]
+    changed = [name for name in set(before.get('files', {})) | set(after.get('files', {})) if before.get('files', {}).get(name) != after.get('files', {}).get(name)]
     if changed:
         errors.append('Dist files changed during the CLI invocation: ' + ', '.join(changed))
     actual = browser or {}
@@ -129,7 +149,7 @@ def assess_build_identity(before: dict, after: dict, browser: dict | None) -> di
             errors.append('Missing actual in-page identity ' + label + ' browser work')
             continue
         if expected:
-            for key in ('datasetVersion', 'researchScriptSha256'):
+            for key in ('datasetVersion', 'researchScriptSha256') + tuple(before.get('presentation', {})):
                 if observed.get(key) != expected[key]:
                     errors.append('In-page ' + key + ' differs from dist ' + label + ' browser work')
             fetched = observed.get('fetchedResearch', {})

@@ -1,6 +1,7 @@
 """Validate minimal public availability observations and their rendering hooks."""
 import ast
 import copy
+import hashlib
 import json
 import re
 import shutil
@@ -47,11 +48,14 @@ class LinkHealthTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             target = Path(folder)
             build(data, target)
-            html = (target / "index.html").read_text()
+            html = (target / "explore/index.html").read_text()
             # The data and app scripts load from js/ files in page order; check the order across them.
-            html += "".join((target / src).read_text() for src in dict.fromkeys(re.findall(r'"(js/[^"]+[.]js)"', html)))
-            self.assertLess(html.index("window.LINK_HEALTH="), html.index("window.linkAvailabilityHTML=url=>"))
-            self.assertLess(html.index("window.linkAvailabilityHTML=url=>"), html.index("const external=(url,label)=>"))
+            html += "".join((target / src.lstrip('/')).read_text() for src in dict.fromkeys(re.findall(r'"(/?js/[^"]+[.]js)"', html)))
+            self.assertLess(html.index("window.LINK_HEALTH="), html.index("window.linkAvailabilityHTML="))
+            self.assertLess(html.index("window.linkAvailabilityHTML="), re.search(r"\bexternal=", html).start())
+            manifest = json.loads((target / "manifest.json").read_text())
+            for name in ("web/link-health.js", "web/app.js"):
+                self.assertEqual(manifest["source_sha256"][name], hashlib.sha256((ROOT / name).read_bytes()).hexdigest())
             self.assertEqual(json.loads((target / "link-health.json").read_text()), json.loads((ROOT / "data/link-health.json").read_text()))
             self.assertFalse((target / "link-health.js").exists())
             self.assertIn("link-health.json", json.loads((target / "manifest.json").read_text())["sha256"])

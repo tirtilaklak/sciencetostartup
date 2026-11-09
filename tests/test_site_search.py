@@ -172,7 +172,7 @@ assert.equal(press('Enter'),true);
 assert.equal(run('workSetupSaw'),'','The Paid work page is set up before its search field is filled');
 assert.equal(run('PAGE_SETUP.work.length'),0);
 assert.equal(node('work-search').value,'remote');assert.equal(run('state.workQuery'),'remote');
-assert.equal(location.hash,'#work');assert.equal(dialog.open,false);
+assert.equal(location.hash,'#work?q=remote');assert.equal(dialog.open,false);
 // The overview's business group links set up the company list before they set its group field.
 const key=run('Object.keys(MODEL_GROUPS)[0]');
 run(`globalThis.listSetupSaw=null;PAGE_SETUP.companies=[()=>{globalThis.listSetupSaw=document.getElementById('category').value;}]`);

@@ -17,6 +17,11 @@ PRINTABLE = re.compile(rb"[\x20-\x7e]{6,}")
 # The build moves the app code and the sidecar data out of index.html into content-hashed files in js/.
 # They are scanned under a stable name, so the allowlist does not change with every build.
 BUNDLE = re.compile(r"^js/([a-z]+)\.[0-9a-f]{12}\.js$")
+PRESENTATION = re.compile(r"^presentation/(archive|company-benchflow|company-bespoke_labs)\.[0-9a-f]{16}\.json$")
+
+
+def stable_name(name):
+    return PRESENTATION.sub(r"presentation/\1.json", BUNDLE.sub(r"js/\1.js", name))
 EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
 PHONE = re.compile(r"""tel:
     | (?<![\w.$£€+-]) (?:\+1[ .-]?)? (?:\(\d{3}\)\ ?|\d{3}[ .-]) \d{3}[ .-]\d{4} (?![\w%-]|\.\d)
@@ -28,14 +33,15 @@ SECTIONS = {"about": re.compile(r'<article\b[^>]*\bid="about"[^>]*>.*?</article>
 # Every address that may ship, and the only places it may appear.
 ALLOWED = {
     # The publisher's own correction and contact address, shown in the About panel.
-    "musaeminozdem@gmail.com": {"index.html#about"},
+    "musaeminozdem@gmail.com": {"explore/index.html#about"},
     # Role address Bespoke Labs publishes for domain experts on https://bespokelabs.ai/contact
-    # (checked 2026-10-23); the reviewed Work route cites that page. The app reads the routes from the data bundle.
-    "experts@bespokelabs.ai": {"work-routes.json", "js/data.js"},
+    # (checked 2026-10-23); the reviewed Work route cites that page. The same
+    # record's complete research now also loads through its company detail asset.
+    "experts@bespokelabs.ai": {"work-routes.json", "js/data.js", "presentation/company-bespoke_labs.json"},
     # A named person's address quoted in canonical claim benchflow.claim.worker_opportunities-0.
     # Dataset 2.5.0 is pinned, so it stays in canonical-derived files until the pending 2.5.1
     # release removes it. It must never appear in Work routes or a static page.
-    "xiangyi@benchflow.ai": {"research.json", "claims.csv", "observatory.sqlite", "index.html#research-data"},
+    "xiangyi@benchflow.ai": {"research.json", "claims.csv", "observatory.sqlite", "presentation/archive.json", "presentation/company-benchflow.json"},
 }
 
 
@@ -53,14 +59,14 @@ def printable_text(path):
 
 def places(dist):
     for path in sorted(p for p in dist.rglob("*") if p.is_file()):
-        name = BUNDLE.sub(r"js/\1.js", path.relative_to(dist).as_posix())
+        name = stable_name(path.relative_to(dist).as_posix())
         if path.suffix == ".sqlite":
             yield name, "\n".join(sqlite_text(path))
         elif path.suffix in BINARY:
             yield name, printable_text(path)
         elif path.suffix in TEXT or not path.suffix:
             text = path.read_text()
-            if name == "index.html":
+            if name == "explore/index.html":
                 for section, pattern in SECTIONS.items():
                     yield name + "#" + section, "\n".join(pattern.findall(text))
                     text = pattern.sub("", text)
@@ -70,18 +76,20 @@ def places(dist):
 class PublicPrivacyTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.places = dict(places(ROOT / "dist"))
+        cls.places = {}
+        for place, text in places(ROOT / "dist"):
+            cls.places[place] = cls.places.get(place, "") + "\n" + text
 
     def test_scan_covers_every_dist_file(self):
         """No export escapes the scan: every file in dist/ is text, SQLite or a known binary type (coordinator A4)."""
         dist = ROOT / "dist"
-        files = {BUNDLE.sub(r"js/\1.js", p.relative_to(dist).as_posix()) for p in dist.rglob("*") if p.is_file()}
+        files = {stable_name(p.relative_to(dist).as_posix()) for p in dist.rglob("*") if p.is_file()}
         self.assertEqual(files, {place.split("#", 1)[0] for place in self.places})
         for place in ("_headers", "_redirects", "assets/favicon.svg", "assets/logos/mercor.svg", "favicon.ico", "assets/share/sciencetostartup-1200x630.png"):
             self.assertIn(place, self.places)
 
     def test_scan_reads_every_public_text(self):
-        for place in ("index.html", "index.html#about", "index.html#research-data", "observatory.sqlite", "js/app.js", "js/data.js",
+        for place in ("index.html", "explore/index.html", "explore/index.html#about", "explore/index.html#research-data", "presentation/archive.json", "presentation/company-benchflow.json", "observatory.sqlite", "js/app.js", "js/data.js",
                       "research.json", "claims.csv", "work-routes.json", "sitemap.xml", "companies/index.html",
                       "work/index.html", "method/index.html", "404.html", "business-health.json", "company-events.json",
                       "source-updates.json", "link-health.json", "manifest.json", "robots.txt", "_headers"):

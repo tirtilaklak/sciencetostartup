@@ -1,0 +1,58 @@
+name: Daily source and browser monitor
+on:
+  schedule:
+    - cron: '17 7 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: output/monitor/previous.json
+          key: source-monitor-${{ github.run_id }}
+          restore-keys: source-monitor-
+      - name: Collect candidates without changing reviewed facts
+        run: |
+          if [ -f output/monitor/previous.json ]; then
+            python3 scripts/check_work_sources.py --previous output/monitor/previous.json --output output/monitor/source-candidates.json
+          else
+            python3 scripts/check_work_sources.py --output output/monitor/source-candidates.json
+          fi
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Best-effort production browser check
+        env:
+          QA_BASE_URL: https://sciencetostartup.com
+        run: npx playwright test --project=chromium --grep 'global search|all work criteria|company detail failure|binding conditions|static work'
+      - name: Record monitor heartbeat
+        if: always()
+        env:
+          MONITOR_STATUS: ${{ job.status }}
+          MONITOR_RUN_ID: ${{ github.run_id }}
+        run: |
+          python3 - <<'PY'
+          import datetime, json, os, shutil
+          from pathlib import Path
+          target = Path('output/monitor'); target.mkdir(parents=True, exist_ok=True)
+          if (target / 'source-candidates.json').exists():
+              shutil.copyfile(target / 'source-candidates.json', target / 'previous.json')
+          (target / 'heartbeat.json').write_text(json.dumps({'completed_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'status': os.environ['MONITOR_STATUS'], 'run_id': os.environ['MONITOR_RUN_ID'], 'source_commit': os.environ['GITHUB_SHA'], 'schedule': '07:17 UTC daily; best effort, not an availability guarantee'}, indent=2) + '\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: monitor-heartbeat-and-review-candidates
+          path: output/monitor/
+          retention-days: 30

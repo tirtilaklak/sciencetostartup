@@ -9,6 +9,16 @@ import tempfile
 from observatory import ROOT, build
 
 
+def validate_output_path(destination):
+    """Reject protected trees, including symlinks and nested destinations."""
+    destination = Path(destination).resolve()
+    root = ROOT.resolve()
+    protected = tuple((root / name).resolve() for name in ("dist", "data", "web", ".git", "scripts", "schema", "tests", "design-system", "docs", "release-assets", ".github"))
+    if destination == root or any(destination == path or path in destination.parents for path in protected):
+        raise SystemExit("Choose a separate output directory; source and reviewed release trees are protected.")
+    return destination
+
+
 def verify(destination, dist=ROOT / "dist"):
     expected = json.loads((dist / "manifest.json").read_text())
     actual = json.loads((destination / "manifest.json").read_text())
@@ -44,9 +54,7 @@ def main():
             build(data, destination)
             verify(destination)
     else:
-        destination = args.output.resolve()
-        if destination == ROOT / "dist" or destination in (ROOT, ROOT / "data", ROOT / "web"):
-            raise SystemExit("Choose a separate output directory; the reviewed snapshot stays unchanged.")
+        destination = validate_output_path(args.output)
         if destination.exists() and any(destination.iterdir()):
             raise SystemExit("Output directory must be empty.")
         build(data, destination)

@@ -12,19 +12,44 @@ function w4SourcePublicationDate(source){
 }
 function w4Checked(route){return [route.availability_checked_on,route.last_route_check?.date].filter(Boolean).sort().at(-1)||null;}
 function w4CheckedLabel(route){const checked=w4Checked(route);return checked?w4Date(checked):'Not rechecked';}
+function w4ApprovedTermsReceipt(route){
+  const review=route.editorial_review,receipt=(review?.receipts||[]).find(item=>item.id===review.approved_terms_receipt_id);
+  return receipt?.approved===true&&receipt.scope==='key_terms'&&receipt.result==='readable'&&receipt.approval_basis==='source_content_review'&&/^\d{4}-\d{2}-\d{2}$/.test(receipt.checked_on||'')?receipt:null;
+}
+function w4TermsReviewDate(route){return w4ApprovedTermsReceipt(route)?.checked_on||route.terms_checked_on||null;}
+function w4TermsAge(route,asOf=new Date().toISOString().slice(0,10)){
+  if(typeof asOf!=='string'||!asOf)throw new Error('Work terms age requires an explicit publication date');
+  const dayOnly=/^\d{4}-\d{2}-\d{2}$/.test(asOf);
+  if(!dayOnly&&!/(?:Z|[+-]\d{2}:\d{2})$/.test(asOf))throw new Error('Publication timestamp requires an explicit timezone');
+  const instant=Date.parse(dayOnly?asOf+'T00:00:00Z':asOf);
+  if(!Number.isFinite(instant))throw new Error('Invalid work terms age date');
+  const day=new Date(instant).toISOString().slice(0,10);
+  if(dayOnly&&day!==asOf)throw new Error('Invalid work terms age date');
+  const result={state:'not_applicable',reviewed_on:null,as_of:day,age_days:null,label:''};
+  if(w4OpportunityKind(route)!=='named_listing'||WORK_ROUTE_ARCHIVE.has(route.status)||route.ai_data_work===false)return result;
+  const receipt=w4ApprovedTermsReceipt(route),reviewed=receipt?.checked_on;
+  if(!reviewed||reviewed>day)return {...result,state:'not_reviewed',label:'Full terms review not recorded'};
+  const reviewedInstant=Date.parse(reviewed+'T00:00:00Z');
+  if(!Number.isFinite(reviewedInstant)||new Date(reviewedInstant).toISOString().slice(0,10)!==reviewed)return {...result,state:'not_reviewed',label:'Full terms review not recorded'};
+  const age=Math.floor((Date.parse(day+'T00:00:00Z')-reviewedInstant)/86400000),overdue=age>=14;
+  return {...result,state:overdue?'needs_recheck':'current',reviewed_on:reviewed,age_days:age,label:overdue?'Needs recheck':''};
+}
 // One date per listing: the latest link check, or the research review when the link was never rechecked.
 function w4FreshnessLabel(route){
-  if(route.terms_checked_on)return `Terms checked ${w4Date(route.terms_checked_on)}`;
+  const approved=w4ApprovedTermsReceipt(route);if(approved)return `Terms checked ${w4Date(approved.checked_on)}`;
+  if(route.terms_checked_on)return `Pay terms reviewed ${w4Date(route.terms_checked_on)}`;
   if(route.last_link_check?.result==='blocked')return `Recheck blocked ${w4Date(route.last_link_check.date)}`;
   const checked=w4Checked(route);return checked?`Page checked ${w4Date(checked)}`:`${route.reviewed_on?`Recorded ${w4Date(route.reviewed_on)} · `:''}Terms not rechecked`;
 }
 function w4Uncertain(route){
+  if(typeof route.uncertain==='boolean')return route.uncertain;
   if(['unverified','intake_unverified','pay_conflict'].includes(route.status))return true;
   if(['blocked','not_found','unavailable'].includes(route.last_link_check?.result))return true;
   const check=[route.last_route_check?.result,route.last_route_check?.note].filter(Boolean).join(' ');
   return route.research_record?.route?.live_application_verified===false||/HTTP 403|blocked.fetch|JavaScript.only|requires JavaScript|JavaScript shell|not verified open|could not be loaded/i.test(check);
 }
 function w4Status(route){
+  if(route.editorial_review?.disposition?.state==='historical_page_unavailable')return 'Past listing · page unavailable';
   if(route.status==='program'&&/waitlist/i.test(route.availability_note||''))return 'Waitlist may apply';
   const labels={intake_unverified:'Availability unconfirmed',unverified:'Availability unconfirmed',pay_conflict:'Pay conflict',historical:'Historical',closed:'Closed',paused:'Training paused',contributions:'Research contribution',no_route:'No confirmed paid listing',inquiry:'Inquiry only',information:'Information only'};
   if(route.status==='historical'&&['official_role_not_found_redirect','official_role_not_found'].includes(route.last_route_check?.result))return 'Historical · listing unavailable';
@@ -193,6 +218,7 @@ function w4BoundDestinationAction(route){
   return binding.label;
 }
 function w4Action(route){
+  if(typeof route.source_action==='string'&&route.source_action)return route.source_action;
   if(route.status==='closed'||route.status==='historical'||route.status==='no_route')return 'View source';
   if(route.status==='paused'||route.status==='contributions')return 'View research';
   if(route.status==='information')return 'Program details';
@@ -206,6 +232,11 @@ function w4Action(route){
     if(entry?.url===route.url&&['expert community','expert fellowship','experts'].includes(entry.type))return 'View program';
   }
   return 'View role';
+}
+function w4Destination(route){
+  const review=route.editorial_review,alternative=review?.alternative_destination;
+  const bound=alternative&&review?.disposition?.state==='historical_page_unavailable'&&review.disposition.approval_basis==='source_content_review'&&review.disposition.source_ids?.includes(alternative.source_id)&&(route.sources||[]).some(source=>source.id===alternative.source_id&&source.url===alternative.url);
+  return bound?{url:alternative.url,label:'Browse current company careers'}:{url:route.url,label:w4Action(route)};
 }
 function w4ClaimAccess(ids,topic=''){
   return [...new Set(ids||[])].filter(id=>claims[id]).map((id,i)=>`<span data-work-claim="${w4Escape(id)}">${claimButton(id,`Original evidence${ids.length>1?' '+(i+1):''}`,topic)}</span>`).join('');
@@ -228,6 +259,7 @@ function w4Details(route,level=4){
   const rows=[['Payment',route.pay_label],['Commitment',commitment],['Duration',route.duration],['Location',route.geography]].filter(([,v])=>v);
   const h=`h${Math.min(Math.max(level,2),6)}`,published=s=>{const date=w4SourcePublicationDate(s);return date&&date!=='undated'?`Published ${w4Date(date)}`:'Publication date not stated';};
   return `<div class="w4-detail-content">
+    ${route.details_deferred?`<p><a href="#company/${w4Escape(route.company_id)}/work">Read the full research profile and source history ${iconHTML('right')}</a></p>`:''}
     ${route.summary?`<p class="w4-role-summary">${w4Escape(route.summary)}</p>`:''}
     <dl class="w4-term-table">${rows.map(([label,value])=>`<div><dt>${w4Escape(label)}</dt><dd>${w4Escape(value)}</dd></div>`).join('')}</dl>
     ${requirements.length?`<div class="w4-detail-block"><${h}>Requirements</${h}><ul>${requirements.map(t=>`<li>${w4Escape(t)}</li>`).join('')}</ul></div>`:''}
@@ -240,23 +272,32 @@ function w4Details(route,level=4){
       ${sourceRows.length?`<ul>${sourceRows.map(s=>`<li>${w4SourceLink(s.url,s.title||s.publisher||'Source')}<small>${w4Escape(published(s))}${s.accessed_on?` · Checked ${w4Escape(w4Date(s.accessed_on))}`:''}</small></li>`).join('')}</ul>`:''}
       ${route.source_quote?`<blockquote>${w4Escape(route.source_quote)}</blockquote>`:''}
       ${route.last_route_check?.note?`<details class="w4-source-notes"><summary>What we checked</summary><p>${w4Escape(w4CheckNote(route.last_route_check))}</p>${route.last_link_check?`<p>Link requested ${w4Escape(w4Date(route.last_link_check.date))}: ${w4Escape(route.last_link_check.result)}.${route.last_link_check.note?' '+w4Escape(route.last_link_check.note):''}</p>`:''}</details>`:''}
-      ${route.claim_ids?.length?`<div class="w4-evidence-links">${w4ClaimAccess(route.claim_ids,route.role)}</div>`:''}
+      ${w4FieldReviewHTML(route)}${route.claim_ids?.length?`<div class="w4-evidence-links">${w4ClaimAccess(route.claim_ids,route.role)}</div>`:''}
     </div>
-    ${typeof compareCheck==='function'?`<div class="w4-compare">${compareCheck(route.company_id)}</div>`:''}
   </div>`;
+}
+function w4FieldReviewHTML(route){
+ const labels={destination:'Application destination',pay:'Pay',location:'Location',requirements:'Requirements',commitment:'Commitment',duration:'Duration',assessment:'Assessment'};
+ const states={sourced:'Source evidence recorded',source_not_stated:'Not stated in the reviewed source',not_researched:'Not researched',conflicting:'Sources conflict'};
+ const reviews=Object.entries(route.field_reviews||{}).filter(([field,review])=>labels[field]&&states[review.state]);
+ if(!reviews.length)return '';
+ return `<div class="w4-field-reviews"><h4>What the sources establish</h4><dl class="w4-term-table">${reviews.map(([field,review])=>`<div><dt>${labels[field]}</dt><dd>${states[review.state]}${review.reviewed_on?` · Reviewed ${w4Escape(w4Date(review.reviewed_on))}`:''}${review.note?`<span class="sub">${w4Escape(review.note)}</span>`:''}</dd></div>`).join('')}</dl></div>`;
 }
 function w4PayNotes(route){
   const payNote=w4PayNote(route),payQualification=w4PayQualification(route);
   return `${route.pay_indicator?`<span class="w4-pay-note w4-pay-indicator">${w4Escape(route.pay_indicator)}</span>`:''}${payNote?`<span class="w4-pay-note">${w4Escape(payNote)}</span>`:''}${payQualification?`<span class="w4-pay-note w4-pay-qualification">${w4Escape(payQualification)}</span>`:''}`;
 }
-function w4StatusBadge(route){const status=w4Status(route);return status?`<span class="w4-status w4-status-${w4Escape(route.status)}">${w4Escape(status)}</span>`:'';}
+function w4StatusBadge(route){const status=w4Status(route),age=w4TermsAge(route);return (status?`<span class="w4-status w4-status-${w4Escape(route.status)}">${w4Escape(status)}</span>`:'')+(age.label?`<span class="w4-status w4-status-review" data-work-review-age="${w4Escape(age.state)}" title="As of ${w4Escape(w4Date(age.as_of))}">${w4Escape(age.label)}</span>`:'');}
 // Pieces of a card. A compact card shows its pay in the summary, so its offer leaves the pay out.
 function w4CardParts(route,compact){
   const company=companies[route.company_id],commitment=w4Hours(route),scheduleNote=w4ScheduleNote(route),requirements=w4Requirements(route);
+  const assessment=w4Text(route.assessment);
+  if(assessment&&!requirements.some(text=>w4SearchFold(text).includes(w4SearchFold(assessment))))requirements.push(assessment);
+  const locationReview=route.field_reviews?.location,locationWarning=locationReview?.state==='conflicting'?`<p class="w4-location-warning">Location sources conflict.${locationReview.note?' '+w4Escape(locationReview.note):' Confirm the role-specific location rules.'}</p>`:'';
   return {context:`${route.role}, ${company.name}`,
     identity:`<a class="w4-company" href="#company/${w4Escape(company.id)}/work"><span class="w4-logo">${typeof logoHTML==='function'?logoHTML(company.id,'',true):''}</span><span>${w4Escape(company.name)}</span></a>`,
     offer:`<div class="w4-offer">${compact?'':`<p class="w4-pay ${route.numeric_pay?'':'w4-pay-unspecified'}"><strong>${w4Escape(w4Pay(route))}</strong>${w4PayNotes(route)}</p>`}${commitment?`<p class="w4-commitment">${w4Escape(commitment)}</p>`:''}${scheduleNote?`<p class="w4-schedule-note">${w4Escape(scheduleNote)}</p>`:''}</div>`,
-    conditions:`<p class="w4-location">${w4Escape(w4Location(route))}</p>${requirements.length?`<ul class="w4-requirements" aria-label="Requirements">${requirements.map(text=>`<li>${w4Escape(text)}</li>`).join('')}</ul>`:''}`,
+    conditions:`<p class="w4-engagement">${w4Escape(({contract:'Contract work',employment:'Staff employment',fellowship:'Fellowship',bounty:'Contribution bounty',study:'Paid study',varies:'Engagement varies',unknown:'Engagement not established'})[w4Engagement(route)])}</p><p class="w4-location">${w4Escape(w4Location(route))}</p>${locationWarning}${requirements.length?`<ul class="w4-requirements" aria-label="Requirements">${requirements.map(text=>`<li>${w4Escape(text)}</li>`).join('')}</ul>`:''}`,
     dates:`<p class="w4-dates"><span>${w4Escape(w4FreshnessLabel(route))}</span></p>`};
 }
 // "Terms & sources". Lazy disclosures carry only their summary and draw the rest on first open (w4FillCard).
@@ -266,8 +307,8 @@ function w4DetailsDisclosure(route,level,context,lazy){
 }
 // What an open compact card shows under its summary. level is the heading level its details sit under.
 function w4CompactBody(route,level,lazy){
-  const part=w4CardParts(route,true);
-  return `<div class="w4-card-front"><div class="w4-compact-company">${part.identity}</div>${part.offer}${part.conditions}<div class="w4-card-bottom">${part.dates}${w4SourceLink(route.url,w4Action(route),'class="w4-open"',part.context)}</div></div>${w4DetailsDisclosure(route,level+1,part.context,lazy)}`;
+  const part=w4CardParts(route,true),destination=w4Destination(route);
+  return `<div class="w4-card-front"><div class="w4-compact-company">${part.identity}</div>${part.offer}${part.conditions}<div class="w4-card-bottom">${part.dates}${w4SourceLink(destination.url,destination.label,'class="w4-open"',part.context)}</div></div>${w4DetailsDisclosure(route,level+1,part.context,lazy)}`;
 }
 // level: for a full card, its role heading (3 under a section h2, 4 under a pay block h3); its details use the
 // next level. A compact card has no role heading, so level is the heading it sits under (2 under a section h2).
@@ -284,7 +325,7 @@ function workCard(route,mode,level=3,lazy=false){
     const title=`<summary><span class="w4-compact-title"><small>${w4Escape(company.name)}</small><strong>${w4Escape(route.role)}</strong></span><span class="w4-compact-pay"><strong>${w4Escape(w4Pay(route))}</strong>${w4PayNotes(route)}${w4StatusBadge(route)}</span><span class="w4-toggle-icon" aria-hidden="true">+</span></summary>`;
     return `${open}<details class="w4-compact-toggle"${lazy?` data-w4-card="${w4Escape(route.id)}" data-w4-level="${heading}"`:''}>${title}${lazy?'':w4CompactBody(route,heading,false)}</details></article>`;
   }
-  const part=w4CardParts(route,false),action=w4SourceLink(route.url,w4Action(route),'class="w4-open"',part.context);
+  const part=w4CardParts(route,false),destination=w4Destination(route),action=w4SourceLink(destination.url,destination.label,'class="w4-open"',part.context);
   return `${open}<div class="w4-card-front"><div class="w4-role-column"><header class="w4-card-heading">${part.identity}${w4StatusBadge(route)}</header><h${heading} class="w4-role">${w4Escape(route.role)}</h${heading}>${part.dates}</div><div class="w4-offer-column">${part.offer}</div><div class="w4-conditions-column">${part.conditions}</div><div class="w4-action-column">${action}</div></div>${w4DetailsDisclosure(route,heading+1,part.context,lazy)}</article>`;
 }
 let w4RouteIndex=null,w4RouteIndexRows=null;
@@ -302,28 +343,33 @@ const W4_TYPE_LABELS={'Expert & contractor projects':'Contract and task work','E
 const W4_CONTRACT_GROUPS=new Set(['Expert & contractor projects','Contributor bounties']);
 const W4_TASK_PAY=new Set(['per_completed_task','task','accepted_task','approved_recording','approved_submission']);
 const W4_REMOTE=/remote|at home|worldwide|global/i,W4_ONSITE=/San Francisco|Palo Alto|Berkeley|London|Paris|Tokyo|Bangalore|on-?site|hybrid|in.person|office/i;
-// An Employment listing paid by the hour or by a one-time award is contract and task work, not a staff job.
-// scripts/static_pages.py work_bucket() uses the same rule (CONTRACT_PAY).
-const W4_CONTRACT_PAY=new Set(['hour','one_time']);
+function w4OpportunityKind(route){
+  if(['named_listing','network_program','career_page','other_record'].includes(route.route_kind))return route.route_kind;
+  if(route.status==='careers')return 'career_page';
+  if(route.status==='program')return 'network_program';
+  return ['information','inquiry','contributions','no_route'].includes(route.status)?'other_record':'named_listing';
+}
+function w4Engagement(route){
+  if(['contract','employment','fellowship','bounty','study','varies','unknown'].includes(route.engagement_type))return route.engagement_type;
+  return {'Expert & contractor projects':'contract',Employment:'employment','Research fellowship':'fellowship','Contributor bounties':'bounty'}[route.group]||'unknown';
+}
 // What a worker can do with a listing: contract or task work, a job or fellowship, a career page,
 // a company job outside AI training, or a closed or unpaid record.
 function w4Bucket(route){
   if(route.status==='careers')return 'boards';
   if(WORK_ROUTE_ARCHIVE.has(route.status))return 'closed';
   if(route.ai_data_work===false)return 'outside';
-  return W4_CONTRACT_GROUPS.has(route.group)||(route.group==='Employment'&&W4_CONTRACT_PAY.has(route.pay_basis))?'contract':'jobs';
+  return ['contract','bounty','study','varies','unknown'].includes(w4Engagement(route))?'contract':'jobs';
 }
-// The "Contract and task work" and "Jobs" filter options follow the same rule as the sections,
-// so an Employment listing paid by the hour shows under contract work in both places.
+// Engagement is independent of how the source describes payment.
 function w4GroupMatches(route,group){
-  const contractPay=route.group==='Employment'&&W4_CONTRACT_PAY.has(route.pay_basis);
-  if(group==='Expert & contractor projects')return route.group===group||contractPay;
-  if(group==='Employment')return route.group===group&&!contractPay;
-  return route.group===group;
+  const wanted=Object.hasOwn(WORK_TYPE_GROUPS,group)?group:Object.keys(WORK_TYPE_GROUPS).find(key=>WORK_TYPE_GROUPS[key]===group);
+  return wanted?w4Engagement(route)===wanted:route.group===group;
 }
 // A published hourly range, read only from labels that state a rate per hour. "Up to" has no low end.
 function w4HourlyRange(route){
   if(!route?.numeric_pay||route.status==='pay_conflict'||route.pay_basis==='conflicting_hourly')return null;
+  if(route.pay_terms?route.pay_terms.hourly_comparable!==true:['hour_equivalent','per_completed_task','task','accepted_task','approved_recording','approved_submission'].includes(route.pay_basis))return null;
   const label=w4Text(route.pay_label);
   if(!/\/\s*(?:approved\s+)?hour/i.test(label))return null;
   const match=label.match(/([$€£¥])\s*([\d,]+(?:\.\d+)?)(?:\s*[–-]\s*[$€£¥]?\s*([\d,]+(?:\.\d+)?))?(\+)?/);
@@ -331,19 +377,23 @@ function w4HourlyRange(route){
   const number=value=>Number(value.replace(/,/g,''));
   return {currency:match[1],low:/^up to\b/i.test(label)?null:number(match[2]),high:number(match[3]||match[2]),open:Boolean(match[4])};
 }
-function w4PayBlock(route){return w4HourlyRange(route)||route.pay_basis==='conflicting_hourly'?'hourly':W4_TASK_PAY.has(route.pay_basis)?'task':'project';}
+function w4PayBlock(route){return w4HourlyRange(route)||route.pay_basis==='conflicting_hourly'?'hourly':W4_TASK_PAY.has(route.pay_basis)||['task','hour_equivalent'].includes(route.pay_terms?.unit||route.pay_basis)?'task':'project';}
 function w4PayMatches(route,value){
   if(!value)return true;
   if(value==='numeric'||value==='undisclosed')return (value==='numeric')===Boolean(route.numeric_pay);
   if(value==='hourly')return Boolean(w4HourlyRange(route));
-  if(value==='task')return W4_TASK_PAY.has(route.pay_basis);
-  if(value==='monthly')return ['month_stipend','undisclosed_stipend'].includes(route.pay_basis);
-  if(value==='yearly')return /^(?:annual_salary|annual_target_cash)$|salary_period_unspecified$/.test(route.pay_basis||'');
+  if(value==='task')return route.pay_terms?['task','hour_equivalent'].includes(route.pay_terms.unit):W4_TASK_PAY.has(route.pay_basis)||route.pay_basis==='hour_equivalent';
+  if(value==='monthly')return route.pay_terms?route.pay_terms.unit==='month':['month_stipend','undisclosed_stipend'].includes(route.pay_basis);
+  if(value==='yearly')return route.pay_terms?route.pay_terms.unit==='year':/^(?:annual_salary|annual_target_cash)$|salary_period_unspecified$/.test(route.pay_basis||'');
   return false;
 }
-function w4Where(route){const place=route.geography||'';return W4_REMOTE.test(place)?'remote':W4_ONSITE.test(place)?'onsite':'varies';}
+function w4Arrangements(route){
+  if(Array.isArray(route.arrangements))return route.arrangements.filter(value=>['remote','onsite','hybrid'].includes(value));
+  const place=route.geography||'';return [...(W4_REMOTE.test(place)?['remote']:[]),...(W4_ONSITE.test(place)?['onsite']:[])];
+}
+function w4Where(route){const values=w4Arrangements(route);return values.includes('remote')?'remote':values.some(value=>['onsite','hybrid'].includes(value))?'onsite':'varies';}
 // Older eligibility values (such as "US listing evidence") still filter on the research field itself.
-function w4WhereMatches(route,value){return !value||(['remote','onsite','varies'].includes(value)?w4Where(route)===value:route.eligibility===value);}
+function w4WhereMatches(route,value){const values=w4Arrangements(route);return !value||(value==='remote'?values.includes('remote'):value==='onsite'?values.some(item=>['onsite','hybrid'].includes(item)):value==='varies'?!values.length:route.eligibility===value);}
 
 // Worker words map to the words listings use. Each term must start a word, so "doctor" skips "doctorate".
 const W4_WORD_START='(?:^|[^\\p{L}\\p{N}])',W4_WORD_END='(?![\\p{L}\\p{N}])';
@@ -357,9 +407,10 @@ const W4_SEARCH_GROUPS=[
   {words:['worldwide','global','anywhere','international'],terms:['worldwide','global','anywhere','international']}
 ];
 function w4RegExpEscape(value){return value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
-function w4SearchText(route){const c=companies[route.company_id];return [c?.name,...(c?.aliases||[]),route.role,route.summary,route.group,route.geography,w4Location(route),route.pay_label,route.hours,route.duration,...(route.requirements||[])].filter(Boolean).join(' ').toLowerCase();}
+function w4SearchFold(value){return String(value??'').normalize('NFKD').replace(/\p{M}+/gu,'').toLowerCase();}
+function w4SearchText(route){const compiled=window.SEARCH_INDEX?.workSearch?.[route.id]??window.SEARCH_INDEX?.workSearchText?.[route.id];if(compiled!==undefined)return compiled;const c=companies[route.company_id];return w4SearchFold([c?.name,...(c?.aliases||[]),route.role,route.summary,route.group,route.geography,w4Location(route),route.pay_label,route.hours,route.duration,...(route.requirements||[])].filter(Boolean).join(' '));}
 function w4QueryMatcher(query){
-  let text=w4Text(query).toLowerCase();
+  let text=w4SearchFold(w4Text(query));
   if(!text)return null;
   for(const group of W4_SEARCH_GROUPS)for(const phrase of group.phrases||[])text=text.split(phrase).join(group.words[0]);
   const tokens=text.split(' ').filter(Boolean);
@@ -371,26 +422,30 @@ function w4QueryMatcher(query){
 // Best match prioritizes reviewed terms and explicit availability. A blocked or uncertain
 // listing follows comparable reviewed offers; hourly remote offers lead within each group.
 function w4BestRank(route){
-  const uncertainty=w4Uncertain(route)?20:0,terms=route.terms_checked_on?0:route.last_route_check?.result==='listing_content_reviewed'?2:5;
-  return uncertainty+terms+(w4HourlyRange(route)&&W4_REMOTE.test(route.geography||'')?0:10);
+  const uncertainty=w4Uncertain(route)?20:0,terms=w4TermsReviewDate(route)?0:route.last_route_check?.result==='listing_content_reviewed'?2:5;
+  return uncertainty+terms+(w4HourlyRange(route)&&w4Arrangements(route).includes('remote')?0:10);
 }
-function w4RateTie(a,b){const x=w4HourlyRange(a),y=w4HourlyRange(b);return x&&y&&x.currency===y.currency?y.high-x.high:0;}
+function w4CurrencyCode(route){const code=route.pay_terms?.currency;return /^[A-Z]{3}$/.test(code||'')?code:null;}
+function w4RateTie(a,b){const x=w4HourlyRange(a),y=w4HourlyRange(b),currency=w4CurrencyCode(a);return x&&y&&currency&&currency===w4CurrencyCode(b)?y.high-x.high:0;}
 function w4BestOrder(a,b){return w4BestRank(a)-w4BestRank(b)||(w4Checked(b)||'').localeCompare(w4Checked(a)||'')||w4RateTie(a,b)||companies[a.company_id].name.localeCompare(companies[b.company_id].name)||a.role.localeCompare(b.role);}
 // Highest hourly rate: top of the published range, then its low end ("up to" last), then open-ended
 // ranges. Listings without a rate keep best-match order after them. US dollar rates come before other
-// currencies, and amounts in different currencies are never compared.
+// currencies, and unknown currencies retain best-match order without comparing amounts.
 function w4RateOrder(a,b){
   const x=w4HourlyRange(a),y=w4HourlyRange(b);
   if(!x||!y)return Number(Boolean(y))-Number(Boolean(x))||w4BestOrder(a,b);
-  if(x.currency!==y.currency)return Number(y.currency==='$')-Number(x.currency==='$')||x.currency.localeCompare(y.currency);
+  const currencyA=w4CurrencyCode(a),currencyB=w4CurrencyCode(b);
+  if(!currencyA||!currencyB)return Number(Boolean(currencyB))-Number(Boolean(currencyA))||w4BestOrder(a,b);
+  if(currencyA!==currencyB)return Number(currencyB==='USD')-Number(currencyA==='USD')||currencyA.localeCompare(currencyB);
   return y.high-x.high||(y.low??-1)-(x.low??-1)||Number(y.open)-Number(x.open)||w4BestOrder(a,b);
 }
 function w4CheckedOrder(a,b){return (w4Checked(b)||'').localeCompare(w4Checked(a)||'')||(b.reviewed_on||'').localeCompare(a.reviewed_on||'')||w4BestOrder(a,b);}
-// primary, careers and other keep their old meaning for callers in app.js (workType, hasWorkRoute).
+// Legacy engagement aliases use the same approved primary selection as discovery.
 function w4RouteGroups(rows,sort=''){
-  const groups={contract:[],jobs:[],boards:[],outside:[],closed:[]},order=sort==='hourly'?w4RateOrder:sort==='checked'?w4CheckedOrder:w4BestOrder;
-  for(const route of rows)groups[w4Bucket(route)].push(route);
-  for(const list of Object.values(groups))list.sort(order);
+  const discovery=w4DiscoveryGroups(rows,sort),groups={contract:[],jobs:[],boards:discovery.boards,outside:discovery.outside,closed:discovery.closed};
+  for(const route of discovery.primary)groups[['contract','bounty','study','varies','unknown'].includes(w4Engagement(route))?'contract':'jobs'].push(route);
+  const order=sort==='hourly'?w4RateOrder:sort==='checked'?w4CheckedOrder:w4BestOrder;
+  groups.contract.sort(order);groups.jobs.sort(order);
   for(const block of ['hourly','task','project'])groups[block]=groups.contract.filter(route=>w4PayBlock(route)===block);
   return Object.assign(groups,{primary:[...groups.contract,...groups.jobs],careers:groups.boards,other:[...groups.outside,...groups.closed]});
 }
@@ -421,7 +476,7 @@ function w4ProfilePrimary(rows,id){
   const rank=route=>{const index=preferred.indexOf(route.id);return index<0?preferred.length:index;};
   return [...rows].sort((a,b)=>rank(a)-rank(b));
 }
-let workReturnFocus=null,workViewRendered=false;
+let workReturnFocus=null,workReturnOrigin=null,workViewRendered=false;
 // Typing in the Paid work search draws the list once typing pauses for 180 ms, so each keystroke paints at
 // once (measured on a phone at 4x CPU slowdown). A direct render, such as a filter change, cancels a waiting one.
 let w4RenderTimer=0;
@@ -431,9 +486,16 @@ function rememberWorkCompanyLink(event){
   const link=event.target.closest?.('#work-view a[href^="#company/"]');
   if(!link||link.hasAttribute('download')||(link.getAttribute('target')&&link.getAttribute('target')!=='_self'))return;
   workReturnFocus=link;
+  workReturnOrigin={routeId:link.closest('[data-work-route]')?.dataset.workRoute,href:link.getAttribute('href'),criteria:workHashFor()};
 }
 function workReturnFocusTarget(){
-  const link=workReturnFocus;
+  let link=workReturnFocus;
+  if(!link?.isConnected&&workReturnOrigin?.criteria===workHashFor()){
+    if(workReturnOrigin.routeId)w4FillRouteGroup('#work-view',workReturnOrigin.routeId);
+    const card=[...document.querySelectorAll('#work-view [data-work-route]')].find(node=>node.dataset.workRoute===workReturnOrigin.routeId);
+    link=[...(card?.querySelectorAll('a[href]')||[])].find(node=>node.getAttribute('href')===workReturnOrigin.href)||null;
+    workReturnFocus=link;
+  }
   if(!link?.isConnected||link.closest('[hidden]')||!link.getClientRects().length){workReturnFocus=null;return null;}
   const box=link.getBoundingClientRect();
   if(box.bottom<=0||box.top>=window.innerHeight||box.right<=0||box.left>=window.innerWidth){workReturnFocus=null;return null;}
@@ -451,7 +513,7 @@ function w4DateList(dates){
   return `between ${sameMonth?parts[0][0]:parts[0].join(' ')} and ${parts.at(-1).join(' ')}`;
 }
 function w4FreshnessSentence(rows){
-  const open=rows.filter(route=>['contract','jobs'].includes(w4Bucket(route))),checked=open.filter(w4Checked);
+  const open=w4DiscoveryGroups(rows).primary,checked=open.filter(w4Checked);
   if(!checked.length)return '';
   const which=open.length===1?'this link':checked.length===open.length?'these links':checked.length*2>=open.length?'most links':'some links',dates=w4DateList([...new Set(checked.map(w4Checked))].sort());
   return `We checked ${which} ${dates.startsWith('between')?'':'on '}${dates}.`;
@@ -475,9 +537,20 @@ const W4_SAFETY_TIPS=[
 ];
 function workSafetyHTML(rows=[]){
   const fresh=w4FreshnessSentence(rows);
-  return `<div class="w4-safety"><details class="w4-safety-tips"><summary>Before you apply: pay, eligibility and safety</summary><p>Apply through the company. Confirm pay and eligibility before accepting.${fresh?' '+w4Escape(fresh):''}</p><ul>${W4_SAFETY_TIPS.map(([tip,keys])=>`<li><p>${w4Escape(tip)}</p><p class="w4-safety-sources">Sources: ${keys.map(key=>w4SourceLink(...W4_SAFETY_SOURCES[key])).join(' · ')}</p></li>`).join('')}</ul><p class="w4-safety-report">Report a scam: ${w4SourceLink('https://reportfraud.ftc.gov/','ReportFraud.ftc.gov')} in the US. In India, ${w4SourceLink('https://cybercrime.gov.in/','cybercrime.gov.in')} or call 1930.</p></details></div>`;
+  return `<div class="w4-safety"><details class="w4-safety-tips"><summary>Before you apply: pay, eligibility and safety</summary><p>Apply through the company. Confirm pay and eligibility before accepting. Recorded role and fellowship pages do not guarantee a current opening or individual eligibility. Joining a network or program does not guarantee a project.${fresh?' '+w4Escape(fresh):''}</p><ul>${W4_SAFETY_TIPS.map(([tip,keys])=>`<li><p>${w4Escape(tip)}</p><p class="w4-safety-sources">Sources: ${keys.map(key=>w4SourceLink(...W4_SAFETY_SOURCES[key])).join(' · ')}</p></li>`).join('')}</ul><p class="w4-safety-report">Report a scam: ${w4SourceLink('https://reportfraud.ftc.gov/','ReportFraud.ftc.gov')} in the US. In India, ${w4SourceLink('https://cybercrime.gov.in/','cybercrime.gov.in')} or call 1930.</p></details></div>`;
 }
 function w4Jump(id,label,n){return `<button type="button" data-work-section="${id}" ${n?'':'disabled'}>${label} <span>(${n})</span></button>`;}
+function w4DiscoveryGroups(rows,sort=''){
+ const groups={named:[],programs:[],boards:[],outside:[],closed:[]},order=sort==='hourly'?w4RateOrder:sort==='checked'?w4CheckedOrder:w4BestOrder;
+ for(const route of rows){const kind=w4OpportunityKind(route);groups[WORK_ROUTE_ARCHIVE.has(route.status)?'closed':kind==='career_page'?'boards':route.ai_data_work===false?'outside':kind==='named_listing'?'named':kind==='network_program'?'programs':'closed'].push(route);}
+ for(const list of Object.values(groups))list.sort(order);
+ groups.primary=[...groups.named,...groups.programs];return groups;
+}
+function w4KindSection(id,label,list,limit,compact=false){
+ if(!list.length)return '';
+ const shown=list.slice(0,limit),more=list.slice(limit);
+ return `<section class="w4-section w4-primary-section"><h2 id="${id}" class="work-list-heading">${label} <span>(${list.length})</span></h2>${compact?`<div class="w4-secondary-list">${w4CompactCards(shown,2)}</div>`:shown.map(route=>workCard(route,'',3,true)).join('')}${w4GroupDisclosure(more,'More '+label.toLowerCase())}</section>`;
+}
 function w4ContractSection(groups,filtered=false){
   if(!groups.contract.length)return '';
   const blocks=[['work-hourly','Hourly pay','Hourly',groups.hourly,true],['work-task','Paid per task','Per task',groups.task,true],['work-project','Pay set per project or not published','Pay set per project',groups.project,false]].filter(block=>block[3].length);
@@ -505,12 +578,12 @@ const W4_FULL_CARDS=26,W4_SEARCH_JOBS=6,W4_SEARCH_OPEN_MAX=12;
 function w4SearchJobBudget(groups){return Math.max(W4_SEARCH_JOBS,W4_FULL_CARDS-groups.hourly.length-groups.task.length);}
 function w4OtherSection(groups,filtered,typed){
   const total=groups.boards.length+groups.outside.length+groups.closed.length,open=list=>filtered&&(!typed||list.length<=W4_SEARCH_OPEN_MAX);
-  return total?`<section class="w4-section"><h2 id="work-more" class="work-list-heading">Other listings <span>(${total})</span></h2>${w4GroupDisclosure(groups.boards,'Career pages',open(groups.boards),'work-careers',W4_GROUP_NOTES.boards)}${w4GroupDisclosure(groups.outside,'Company jobs outside AI training',open(groups.outside),'work-outside',W4_GROUP_NOTES.outside)}${w4GroupDisclosure(groups.closed,'Closed or unpaid listings',open(groups.closed),'work-other',W4_GROUP_NOTES.closed)}</section>`:'';
+  return total?`<section class="w4-section"><h2 id="work-more" class="work-list-heading">Other listings <span>(${total})</span></h2>${w4GroupDisclosure(groups.boards,'Career pages',open(groups.boards),'work-careers',W4_GROUP_NOTES.boards)}${w4GroupDisclosure(groups.outside,'Company jobs outside AI training',open(groups.outside),'work-outside',W4_GROUP_NOTES.outside)}${w4GroupDisclosure(groups.closed,'Past and other records',open(groups.closed),'work-other',W4_GROUP_NOTES.closed)}</section>`:'';
 }
 // Networks whose location rules are set per project: a next step when a search finds little contract work.
 const W4_PROJECT_RULES=/project|role-specific|country varies|eligibility varies|geographic restrictions|global/i;
 function w4NetworkSuggestions(shown){
-  const seen=new Set(shown.map(route=>route.id)),rows=workRouteRows().filter(route=>w4Bucket(route)==='contract'&&W4_PROJECT_RULES.test(route.geography||'')&&!seen.has(route.id)).sort(w4BestOrder);
+  const seen=new Set(shown.map(route=>route.id)),rows=w4DiscoveryGroups(workRouteRows()).programs.filter(route=>W4_PROJECT_RULES.test(route.geography||'')&&!seen.has(route.id));
   return rows.length?`<section class="w4-section w4-suggestions"><h2 id="work-suggested" class="work-list-heading">Expert networks worth checking <span>(${rows.length})</span></h2><p class="w4-section-note">These networks pick people for each project by skill and country. They may have work that your search words did not match.</p><div class="w4-secondary-list">${w4CompactCards(rows,2)}</div></section>`:'';
 }
 function w4EmptyState(query,filters){
@@ -519,11 +592,11 @@ function w4EmptyState(query,filters){
   const message=!query?'No listing matches these filters.':queryAlone?'No listing matches this search with these filters.':`No listing mentions “${w4Escape(query)}”. Try a broader word.`;
   return `<div class="w4-empty-state"><p class="w4-empty">${message}</p><p class="w4-empty-actions">${query?'<button type="button" data-work-clear="search">Clear search</button>':''}${filters?'<button type="button" data-work-clear="filters">Clear filters</button>':''}</p></div>`;
 }
-// Each sort says how many paid work listings (contract and task work plus jobs) it can actually order.
+// Each sort names the primary listings and programs it can actually order.
 function w4SortNote(sort,open,filtered){
-  const of=`of ${w4Count(open.length,filtered?'matching paid work listing':'paid work listing',filtered?'matching paid work listings':'paid work listings')}`;
-  if(sort==='hourly'){const rated=open.filter(w4HourlyRange);return `Sorted by the top of each published hourly range. ${rated.length} ${of} ${rated.length===1?'publishes':'publish'} one.${rated.some(route=>w4HourlyRange(route).currency!=='$')?' Rates in other currencies follow the US dollar rates.':''}`;}
-  if(sort==='checked'){const dated=open.filter(w4Checked);return `Sorted by the date we last checked each link. ${dated.length} ${of} ${dated.length===1?'has':'have'} a check date.`;}
+  const of=`of ${w4Count(open.length,filtered?'matching work route':'work route',filtered?'matching work routes':'work routes')}`;
+  if(sort==='hourly'){const rated=open.filter(w4HourlyRange),unknown=rated.some(route=>!w4CurrencyCode(route));return `Within each opportunity type and stated currency, sorted by the top of the published hourly range. ${rated.length} ${of} ${rated.length===1?'publishes':'publish'} one.${unknown?' Rates without an established currency follow in best-match order.':''}`;}
+  if(sort==='checked'){const dated=open.filter(w4Checked);return `Within each opportunity type, sorted by the date we last checked each link. ${dated.length} ${of} ${dated.length===1?'has':'have'} a check date.`;}
   return '';
 }
 // What the last render drew from: the raw search text, the select fields (filters and sort), and whether it
@@ -531,55 +604,50 @@ function w4SortNote(sort,open,filtered){
 // field or a Clear button is a filter change. Nothing changed (a repeat render) keeps the last choice.
 let w4LastSearch='',w4LastSelects='\n\n\n',w4LastTyped=false;
 function w4TypedRender(query){
-  const raw=String(state.workQuery??''),selects=[state.workGroup,state.workPay,state.workEligibility,state.workSort].map(value=>value||'').join('\n');
+  const raw=String(state.workQuery??''),selects=[state.workKind,state.workGroup,state.workPay,state.workEligibility,state.workSort].map(value=>value||'').join('\n');
   const typed=Boolean(query)&&(selects!==w4LastSelects?false:raw!==w4LastSearch?true:w4LastTyped);
   w4LastSearch=raw;w4LastSelects=selects;w4LastTyped=typed;
   return typed;
 }
 function renderWork(){
+  if(searchContextPending(state.workQuery)){requestWorkSearch();return;}
+  workSearchGeneration++;
+  $('work-cards').removeAttribute?.('aria-busy');
   if(w4RenderTimer){clearTimeout(w4RenderTimer);w4RenderTimer=0;}
   workViewRendered=true;
-  workReturnFocus=null;
   if(state.workSort===undefined)state.workSort='';
   const rows=filteredWork(),query=w4Text(state.workQuery),matcher=w4QueryMatcher(query),sort=state.workSort;
-  const filters=[state.workGroup,state.workPay,state.workEligibility].filter(Boolean).length,filtered=Boolean(query||filters),typed=w4TypedRender(query);
-  const groups=w4RouteGroups(rows,sort),orgs=new Set(rows.map(r=>r.company_id));
-  // With a search and no chosen sort, listings whose role or company matches come first in each block.
-  if(matcher&&!sort){const score=route=>matcher.all(`${companies[route.company_id]?.name} ${route.role}`.toLowerCase())?0:1;for(const key of ['hourly','task','project','jobs'])groups[key].sort((a,b)=>score(a)-score(b));}
+  const filters=[state.workKind,state.workGroup,state.workPay,state.workEligibility].filter(Boolean).length,filtered=Boolean(query||filters),typed=w4TypedRender(query);
+  const groups=w4DiscoveryGroups(rows,sort),orgs=new Set(rows.map(r=>r.company_id));
+  if(matcher&&!sort){const score=route=>matcher.all(w4SearchFold(`${companies[route.company_id]?.name} ${route.role}`))?0:1;for(const key of ['named','programs'])groups[key].sort((a,b)=>score(a)-score(b));}
   const summary=document.querySelector('.work-filters .responsive-filter-panel>summary');
   if(summary)summary.textContent=filters?`Filters (${filters})`:'Filters';
-  // Every record counts here, including career pages and closed listings, so the line says "we reviewed".
-  $('work-count').textContent=`${w4Count(rows.length,'recorded listing or program','recorded listings and programs')} · ${w4Count(orgs.size,'company','companies')}`;
+  $('work-count').textContent=workResultsLabel(summarizeWorkResults(rows));
   const other=groups.boards.length+groups.outside.length+groups.closed.length;
-  if($('work-overview'))$('work-overview').innerHTML=[['work-listed',groups.contract.length,'contract and task listing','contract and task listings'],['work-jobs',groups.jobs.length,'job or fellowship','jobs and fellowships'],['work-more',other,'other listing','other listings']].map(([id,n,one,many])=>`<button type="button" data-work-section="${id}" ${n?'':'disabled'}><strong>${n}</strong> ${n===1?one:many}</button>`).join('');
-  const note=$('work-sort-note');
-  if(note){note.textContent=w4SortNote(sort,groups.primary,filtered);note.hidden=!note.textContent;}
-  // Unfiltered, the jobs section opens with six cards and at most three per company. Typing shows matching
-  // jobs in full up to the phone budget, and the rest wait in the closed More group. A filter change draws
-  // every match and opens every group that holds one.
-  let jobs=groups.jobs,moreJobs=[];
-  if(!filtered){const perCompany={};jobs=[];for(const route of groups.jobs){const n=perCompany[route.company_id]||0;if(jobs.length<6&&n<3){jobs.push(route);perCompany[route.company_id]=n+1;}else moreJobs.push(route);}}
-  else if(typed){const budget=w4SearchJobBudget(groups);if(jobs.length>budget+1){moreJobs=jobs.slice(budget);jobs=jobs.slice(0,budget);}}
-  // A search that finds little contract work, and does not name a company, also lists the per-project networks.
-  const thin=matcher&&!filters&&groups.contract.length<5&&!rows.some(route=>matcher.all([companies[route.company_id]?.name,...(companies[route.company_id]?.aliases||[])].join(' ').toLowerCase()));
-  $('work-cards').innerHTML=w4ContractSection(groups,filtered)+w4JobsSection(jobs,moreJobs)+w4OtherSection(groups,filtered,typed)+(rows.length?'':w4EmptyState(query,filters))+(thin?w4NetworkSuggestions(rows):'');
+  if($('work-overview'))$('work-overview').innerHTML=[['work-listed',groups.named.length,'named listing','named listings'],['work-jobs',groups.programs.length,'network or program','networks and programs'],['work-more',other,'other record','other records']].map(([id,n,one,many])=>`<button type="button" data-work-section="${id}" ${n?'':'disabled'}><strong>${n}</strong> ${n===1?one:many}</button>`).join('');
+  const note=$('work-sort-note');if(note){note.textContent=w4SortNote(sort,groups.primary,filtered);note.hidden=!note.textContent;}
+  const limit=filtered&&!typed?Infinity:W4_FULL_CARDS;
+  const namedLimit=Math.min(limit,filtered?Math.max(10,limit-groups.programs.length):10),programLimit=filtered?Math.max(6,limit-Math.min(groups.named.length,namedLimit)):5;
+  const thin=matcher&&!filters&&groups.named.length<5&&!rows.some(route=>matcher.all(w4SearchFold([companies[route.company_id]?.name,...(companies[route.company_id]?.aliases||[])].join(' '))));
+  $('work-cards').innerHTML=w4KindSection('work-listed','Named listings',groups.named,namedLimit)+w4KindSection('work-jobs','Networks and programs',groups.programs,programLimit,true)+w4OtherSection(groups,filtered,typed)+(rows.length?'':w4EmptyState(query,filters))+(thin?w4NetworkSuggestions(rows):'');
   syncSelection();
 }
 // Clears the search, the filters, or everything (the Clear filters button in the panel).
 function resetWorkFilters(scope='all'){
-  const fields={search:[['work-search','workQuery']],filters:[['work-group','workGroup'],['work-pay','workPay'],['work-eligibility','workEligibility']]};
-  for(const [id,key] of scope==='all'?[...fields.search,...fields.filters,['work-sort','workSort']]:fields[scope]||[]){state[key]='';$(id).value='';}
+  const fields={search:[['work-search','workQuery']],filters:[['work-kind','workKind'],['work-group','workGroup'],['work-pay','workPay'],['work-eligibility','workEligibility']]};
+  for(const [id,key] of scope==='all'?[...fields.search,...fields.filters,['work-sort','workSort']]:fields[scope]||[]){state[key]='';if($(id))$(id).value='';}
   renderWork();
+  if(typeof queueWorkRoute==='function')queueWorkRoute(true);
 }
 function workSummary(id){
   const rows=workRoutesFor(id);
   if(!rows.length)return '<p class="w4-empty">No paid work listing recorded for this company.</p>';
-  const groups=w4RouteGroups(rows),jobs=w4ProfilePrimary(groups.jobs,id),open=groups.primary.length;
+  const groups=w4DiscoveryGroups(rows),open=groups.primary.length;
   const covered=new Set(rows.flatMap(r=>r.claim_ids||[]));
   const related=typeof workClaims==='function'?workClaims(id).filter(c=>!covered.has(c.id)).map(c=>c.id):[];
   // A "More" group never holds a single listing: that one is shown in full instead.
   const section=(label,list,full,more)=>{const shown=list.length<=full+1?list.length:full;return list.length?`<h3 class="w4-profile-heading">${label} <span>(${list.length})</span></h3><div class="work-v4-profile-grid">${list.slice(0,shown).map(route=>workCard(route,'',4,true)).join('')}</div>${w4GroupDisclosure(list.slice(shown),more,false,'','',3)}`:'';};
-  return `<div class="work-v4-profile">${open||groups.boards.length?workSafetyHTML(rows):''}${section('Contract and task work',groups.contract,4,'More contract and task listings')}${section('Jobs and fellowships',jobs,2,'More jobs and fellowships')}${open?'':`<p class="w4-empty">No confirmed paid listing for ${w4Escape(companies[id]?.name||'this company')}.</p>`}${w4GroupDisclosure(groups.boards,'Career pages',!open,'',W4_GROUP_NOTES.boards)}${w4GroupDisclosure(groups.outside,'Company jobs outside AI training',false,'',W4_GROUP_NOTES.outside)}${w4GroupDisclosure(groups.closed,'Closed or unpaid listings',!open&&!groups.boards.length,'',W4_GROUP_NOTES.closed)}${related.length?`<details class="w4-related"><summary>Related work evidence</summary><div class="w4-evidence-links">${w4ClaimAccess(related)}</div></details>`:''}</div>`;
+  return `<div class="work-v4-profile">${open||groups.boards.length?workSafetyHTML(rows):''}${section('Named listings',w4ProfilePrimary(groups.named,id),4,'More named listings')}${section('Networks and programs',groups.programs,2,'More networks and programs')}${open?'':`<p class="w4-empty">No confirmed paid listing for ${w4Escape(companies[id]?.name||'this company')}.</p>`}${w4GroupDisclosure(groups.boards,'Career pages',!open,'',W4_GROUP_NOTES.boards)}${w4GroupDisclosure(groups.outside,'Company jobs outside AI training',false,'',W4_GROUP_NOTES.outside)}${w4GroupDisclosure(groups.closed,'Past and other records',!open&&!groups.boards.length,'',W4_GROUP_NOTES.closed)}${related.length?`<details class="w4-related"><summary>Related work evidence</summary><div class="w4-evidence-links">${w4ClaimAccess(related)}</div></details>`:''}</div>`;
 }
 
 document.addEventListener('click',event=>{const summary=event.target.closest?.('summary');if(summary&&!summary.parentElement?.open)w4FillLazy(summary.parentElement);const clear=event.target.closest?.('[data-work-clear]');if(clear){resetWorkFilters(clear.dataset.workClear);document.getElementById('work-search')?.focus();return;}const button=event.target.closest?.('[data-work-section]');if(!button)return;const target=document.getElementById(button.dataset.workSection);if(target){if(target.tagName==='DETAILS'){w4FillGroup(target);target.open=true;}const focus=target.tagName==='DETAILS'?target.querySelector('summary'):target;if(focus&&focus.tagName!=='SUMMARY')focus.setAttribute('tabindex','-1');focus?.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});}});

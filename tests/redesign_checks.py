@@ -13,10 +13,13 @@ import re
 import sqlite3
 import subprocess
 import tempfile
+import sys
 from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tests"))
+from artifact_verification import verify_artifact
 # The old pin was immutable 2.0.1 (921613996550332bf70fa5270eeee259ff9c460281d42c4fe168a74fe52f2e69).
 # Later reviewed source deltas are recorded in docs/research-update-20261014.json,
 # docs/research-update-round2-20261014.json and docs/release-verification-20261015.json.
@@ -142,10 +145,25 @@ def main():
         assert f'data-work-route="{route_id}"' in before_details
         assert f'data-work-company="{route["company_id"]}"' in before_details
         assert any(label in before_details for label in (
-            'Terms checked ', 'Page checked ', 'Recheck blocked ', 'Recorded ', 'Terms not rechecked'
+            'Terms checked ', 'Pay terms reviewed ', 'Page checked ', 'Recheck blocked ', 'Recorded ', 'Terms not rechecked'
         )) and 'Terms recorded:' in details, route_id + ': missing freshness context'
         links = [a['href'] for tag, a in Elements(before_details).elements if tag == 'a' and 'w4-open' in a.get('class', '')]
-        assert links == [route['url']], route_id + ': exact route target changed'
+        review = route.get('editorial_review', {})
+        alternative = review.get('alternative_destination')
+        disposition = review.get('disposition', {})
+        if alternative:
+            assert route['status'] == 'historical', route_id + ': an alternative must not imply the original role remains current'
+            assert disposition.get('state') == 'historical_page_unavailable', route_id + ': alternative lacks an unavailable-page disposition'
+            assert disposition.get('approval_basis') == 'source_content_review', route_id + ': alternative lacks source review'
+            assert alternative['source_id'] in disposition.get('source_ids', []), route_id + ': alternative is outside the reviewed source set'
+            assert any(source['id'] == alternative['source_id'] and source['url'] == alternative['url']
+                       for source in route.get('sources', [])), route_id + ': alternative source binding changed'
+            assert links == [alternative['url']], route_id + ': approved alternative target changed'
+            assert 'Browse current company careers' in before_details, route_id + ': alternative must be labeled as a different destination'
+            assert any(source['url'] == route['url'] for source in route.get('sources', [])), route_id + ': original role URL lost from source history'
+            assert any(a.get('href') == route['url'] for tag, a in Elements(details).elements if tag == 'a'), route_id + ': original role URL is no longer accessible in Terms and sources'
+        else:
+            assert links == [route['url']], route_id + ': exact route target changed'
         for claim_id in route.get('claim_ids', []):
             assert claim_id in claim_index and f'data-claim="{claim_id}"' in details, route_id + ': original claim inaccessible'
         for source in route.get('sources', []):
@@ -187,14 +205,15 @@ def main():
 
     export = ROOT / 'dist/research.json'
     assert export.read_bytes() == canonical, 'Portable JSON changed'
-    html = (ROOT / 'dist/index.html').read_text()
+    html = (ROOT / 'dist/explore/index.html').read_text()
     # The build moves the data and app scripts into content-hashed files under dist/js/.
     bundles = json.loads(re.search(r'const files=(\[[^\]]*\])', html).group(1))
-    app_bundle = (ROOT / 'dist' / next(name for name in bundles if name.startswith('js/app.'))).read_text()
-    assert (ROOT / 'web/app.js').read_text() in app_bundle, 'Build is stale relative to dashboard JavaScript'
-    assert (ROOT / 'web/style.css').read_text() in html, 'Build is stale relative to dashboard CSS'
+    verify_artifact(ROOT / 'dist', ('web/app.js', 'web/style.css'))
     embedded = re.search(r'<script id="research-data" type="application/json">(.*?)</script>', html, re.S)
-    assert embedded and json.loads(embedded.group(1)) == data
+    summary_descriptor = json.loads((ROOT / 'dist/manifest.json').read_text())['summary']
+    summary = json.loads((ROOT / 'dist' / summary_descriptor['href'].lstrip('/')).read_text())
+    assert embedded and json.loads(embedded.group(1)) == summary['bootstrap']
+    assert summary['exports']['research']['sha256'] == PINNED_SHA256
     with sqlite3.connect(ROOT / 'dist/observatory.sqlite') as con:
         assert con.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
         assert not con.execute('PRAGMA foreign_key_check').fetchall()

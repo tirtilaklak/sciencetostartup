@@ -1,5 +1,6 @@
 """The design system's tokens and stylesheet stay in step with web/ and the built page."""
 import json
+import hashlib
 import re
 import sys
 import tempfile
@@ -10,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import design_system
 from design_system import CASCADE, TOKENS, build, normal_hex
+from frontend_packaging import minify_css
 
 
 def tokens():
@@ -41,10 +43,22 @@ class DesignSystemTest(unittest.TestCase):
         self.assertEqual(result["problems"], [])
 
     def test_cascade_order_matches_the_built_page(self):
-        page = (ROOT / "dist/index.html").read_text()
-        positions = [page.find((ROOT / "web" / name).read_text()) for name in CASCADE]
+        page = (ROOT / "dist/explore/index.html").read_text()
+        template = (ROOT / "web/index.html").read_text()
+        original = re.search(r"<style[^>]*>(.*?)</style>", template, re.S).group(1)
+        original = original.replace("/* OBSERVATORY_CSS */", (ROOT / "web/style.css").read_text())
+        original = original.replace("/* REDESIGN_CSS */", "".join((ROOT / "web" / name).read_text() for name in CASCADE[1:-1]))
+        original = original.replace("/* ICONS_CSS */", (ROOT / "web/icons.css").read_text())
+        positions = [original.find((ROOT / "web" / name).read_text()) for name in CASCADE]
         self.assertNotIn(-1, positions)
         self.assertEqual(positions, sorted(positions))
+        compiled = re.search(r"<style[^>]*>(.*?)</style>", page, re.S).group(1)
+        self.assertEqual(compiled, minify_css(original))
+        manifest = json.loads((ROOT / "dist/manifest.json").read_text())
+        for name in ("index.html", *CASCADE):
+            self.assertEqual(manifest["source_sha256"]["web/" + name], hashlib.sha256((ROOT / "web" / name).read_bytes()).hexdigest())
+        for name in ("field-guide.css", "landing.css"):
+            self.assertEqual((ROOT / "dist" / name).read_text(), minify_css((ROOT / "web" / name).read_text()))
 
     def test_every_wired_colour_is_read_from_its_token(self):
         bundle = build()["files"]["project/components/bundle.css"]
