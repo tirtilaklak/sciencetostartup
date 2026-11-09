@@ -211,7 +211,7 @@ const currentClaims=id=>DATA.claims.filter(c=>c.company_id===id&&c.status!=='sup
 const companyClaims=id=>DATA.claims.filter(c=>c.company_id===id);
 const companySources=id=>DATA.sources.filter(s=>s.company_id===id||s.id.startsWith(id+'.source.'));
 const brief=text=>String(text||'').split(/(?<=[.!?])\s+(?=[A-Z“])/).slice(0,2).join(' ').trim();
-const editorialFor=id=>DATA.editorial_readouts.find(e=>e.company_id===id);
+const editorialFor=id=>DATA.editorial_readouts.find(e=>e.company_id===id)||(window.SEARCH_INDEX?.editorialReadouts||[]).find(e=>e.company_id===id);
 const scopeText=(scope,id)=>({company:['handshake_ai','hackerrank','rws_trainai'].includes(id)?'Parent company':'Whole company',ai_data:'AI business',research:companies[id]?.entity_type==='adjacent_research'?'Research organization':'Research activity',other_segment:id==='rws_trainai'?'Generate segment (includes TrainAI)':'Other business segment'}[scope]||title(scope));
 const dateText=s=>s==='undated'?'Source date not stated':s;
 function sourceReviewText(source){
@@ -309,11 +309,15 @@ const provenance=cl=>`<div class="record-meta">${cl.status!=='supported'?`<b>${e
 function metricMeta(m){const accounting=metricCurrentBasis(m,['revenue','annualized_revenue_run_rate','arr'].includes(m.kind)?m.gross_vs_net==='unspecified'?'Gross or net revenue not stated':title(m.gross_vs_net)+' basis':'');return `${m.currency?m.currency+' · ':''}${metricContextMetaPeriod(m,m.kind==='revenue'?m.period_label||m.as_of:dateText(m.as_of))} · ${m.scope_detail&&m.scope_detail!=='company'&&m.scope_detail!=='ai_data'?m.scope_detail:scopeText(m.segment_scope,m.company_id)}${accounting?' · '+accounting:''}`;}
 function eligibleMetrics(id,kind){return DATA.metrics.filter(m=>(!id||m.company_id===id)&&(!kind||m.kind===kind)&&m.preferred_for_comparison!==false&&claims[m.claim_id].status==='supported'&&(!m.observation_status||m.observation_status==='reported')).sort(byRecent);}
 function metricFor(id,kind){return eligibleMetrics(id,kind)[0];}
+function companySummaryFor(id){return window.SUMMARY_INDEX?.companySummaries?.[id]||null;}
+function companyContextReady(id){return !window.COMPANY_CONTEXTS_READY||window.COMPANY_CONTEXTS_READY.has(id);}
+function hasFinancialEvidence(id){const summary=companySummaryFor(id);return summary&&!companyContextReady(id)?summary.hasFinancial:Boolean(preferredFinancial(id));}
+function searchContextPending(query){return Boolean(String(query??'').trim()&&typeof window.ensureSearchContext==='function'&&!window.SEARCH_INDEX);}
 // Keep headline views on the same reviewed records; earlier observations remain in the archive.
 const FINANCIAL_HEADLINES={mercor:'mercor.metric.oct14-major-financial-2',surge_ai:'surge_ai.metric.oct14-major-financial-0',handshake_ai:'handshake_ai.metric.major-growth_metrics-0',turing:'turing.metric.major-growth_metrics-1'};
 function preferredFinancial(id){const reviewed=FINANCIAL_HEADLINES[id];if(reviewed){const metric=eligibleMetrics(id).find(m=>m.id===reviewed);if(metric)return metric;}const explicit=assessmentFor(id)?.headline_metric_id;if(explicit){const metric=eligibleMetrics(id).find(m=>m.id===explicit);if(metric)return metric;}const all=eligibleMetrics(id),scope=['handshake_ai','taskus'].includes(id)?'ai_data':all.some(m=>['revenue','arr','annualized_revenue_run_rate'].includes(m.kind)&&m.segment_scope==='company')?'company':all.some(m=>['revenue','arr','annualized_revenue_run_rate'].includes(m.kind)&&m.segment_scope==='ai_data')?'ai_data':null;const scoped=all.filter(m=>!scope||m.segment_scope===scope),kind=k=>scoped.filter(m=>m.kind===k),actual=kind('revenue').filter(m=>['annual','half','ttm'].includes(financialPeriod(m))).sort((a,b)=>dateRank(b.as_of).localeCompare(dateRank(a.as_of))||({ttm:3,annual:2,half:1}[financialPeriod(b)]||0)-({ttm:3,annual:2,half:1}[financialPeriod(a)]||0)||byRecent(a,b));return actual[0]||kind('annualized_revenue_run_rate')[0]||kind('arr').find(m=>dateRank(m.as_of)>='2025')||kind('revenue')[0];}
 function assessmentFor(id,scope){return DATA.assessments.find(a=>a.company_id===id&&a.segment_scope===(scope||'ai_data'))||(!scope?DATA.assessments.find(a=>a.company_id===id):undefined);}
-function stageFor(id,scope){if(companies[id].entity_type==='adjacent_research')return 'not_applicable';if(DATA.rubric.status!=='final')return 'pending';const a=assessmentFor(id,scope);if(!a)return 'pending';return DATA.rubric.stages.find(s=>Object.entries(s.minimums).every(([d,n])=>a.gates[d].level!=='U'&&Number(a.gates[d].level)>=Number(n)))?.id||'insufficient_public_evidence';}
+function stageFor(id,scope){const summary=companySummaryFor(id);if(!scope&&summary?.stageId&&!companyContextReady(id))return summary.stageId;if(companies[id].entity_type==='adjacent_research')return 'not_applicable';if(DATA.rubric.status!=='final')return 'pending';const a=assessmentFor(id,scope);if(!a)return 'pending';return DATA.rubric.stages.find(s=>Object.entries(s.minimums).every(([d,n])=>a.gates[d].level!=='U'&&Number(a.gates[d].level)>=Number(n)))?.id||'insufficient_public_evidence';}
 const stageLabels={established_commercial_evidence:'Established',repeatable_commercial_evidence:'Repeat business',demonstrated_delivery:'Demonstrated delivery',visible_operating_offer:'Offer visible',insufficient_public_evidence:'Evidence incomplete',not_applicable:'Research organization',pending:'Assessment pending'};
 const stageLabel=id=>stageLabels[id]||id;
 const businessHeadline=id=>assessmentFor(id)?.business_headline||'';
@@ -323,7 +327,6 @@ const modelFor=id=>window.EDITORIAL?.entries.find(e=>e.company_id===id)?.summary
 // Navigation taxonomy is editorial grouping, not a maturity or quality score.
 const MODEL_GROUPS=Object.fromEntries(["Expert data & evaluation", "Managed AI & data services", "Frontier data & RL environments", "AI software & analytics", "AI evaluation & safety", "Compute & model research", "Nonprofit research"].map(name=>[name,(window.EDITORIAL?.entries||[]).filter(e=>e.primary_offering===name).map(e=>e.company_id)]));
 const modelGroup=id=>Object.entries(MODEL_GROUPS).find(([,ids])=>ids.includes(id))?.[0]||'Other';
-const WORK_TYPES={'Employment':'Jobs','Expert & contractor projects':'Contract and task work','Research fellowship':'Research fellowships','Contributor bounties':'Bounties for contributions'};
 const workClaims=id=>currentClaims(id).filter(c=>c.subject==='worker opportunities');
 function workRouteSummary(id){
  const rows=typeof workRoutesFor==='function'?workRoutesFor(id):[];
@@ -331,7 +334,7 @@ function workRouteSummary(id){
 }
 function workType(id){
  const {rows,primary,careers}=workRouteSummary(id);
- if(primary.length)return [...new Set(primary.map(r=>WORK_TYPES[r.group]||r.group||'Paid work listings'))].join(' · ');
+ if(primary.length)return [['named_listing','Named listings'],['network_program','Networks and programs']].filter(([kind])=>primary.some(route=>w4OpportunityKind(route)===kind)).map(([,label])=>label).join(' · ');
  if(careers.length)return 'Career page only';
  return rows.length?'No confirmed paid listing':'Paid work not reviewed yet';
 }
@@ -341,14 +344,15 @@ const unknownFor=id=>currentClaims(id).filter(c=>c.subject==='unknowns').sort((a
 function financialSignal(id){const m=preferredFinancial(id);return m?`${numberButton(m)}<span class="sub">${esc(metricLabels[m.kind])}${m.gross_vs_net==='gross'?' · '+esc(metricCurrentBasis(m,'gross basis')):''}</span><span class="sub">${esc(m.currency||'')} · ${esc(metricCurrentPeriod(m,dateText(m.as_of)))} · ${esc(scopeText(m.segment_scope,id))}</span><span class="sub">${esc(metricCurrentAttribution(m,evidenceLabel(claims[m.claim_id])))}</span>`:`<strong style="font-size:15px">${companies[id].entity_type==='adjacent_research'?'Commercial revenue not applicable':'Revenue not publicly established'}</strong><span class="sub">${claimButton((currentClaims(id).find(c=>c.subject==='growth metrics')||claims[companies[id].identity_claim_id]).id,'See reviewed evidence')}</span>`;}
 function compareCheck(id){return `<label class="compare-check"><input type="checkbox" data-compare="${esc(id)}" aria-label="Compare ${attr(companies[id]?.name||id)}" ${state.selected.includes(id)?'checked':''}> Compare</label>`;}
 function filtered(){
+ if(searchContextPending(state.query))throw new Error('Company search context is not ready');
  const tokens=state.query.trim().toLowerCase().split(/\s+/).filter(Boolean);
  // Match literal term prefixes at word starts; keep letters, numbers and combining marks together.
  const prefixes=tokens.map(token=>new RegExp('(?:^|[^\\p{L}\\p{N}\\p{M}])'+token.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'u'));
  return DATA.companies.filter(c=>{
   const products=DATA.products.filter(p=>p.company_id===c.id).flatMap(p=>[p.name,p.work_performed]);
   const offerings=typeof profileProducts==='function'?profileProducts(c.id).flatMap(p=>[p.name,p.description,...(p.aliases||[])]):[];
-  const searchable=[c.name,...(c.aliases||[]),c.description,modelFor(c.id),...products,...offerings].filter(Boolean).join(' ').toLowerCase();
-  return prefixes.every(prefix=>prefix.test(searchable))&&(!state.category||modelGroup(c.id)===state.category)&&(!state.stage||stageFor(c.id)===state.stage)&&(!state.financial||preferredFinancial(c.id))&&(!state.work||hasWorkRoute(c.id));
+  const searchable=window.SEARCH_INDEX?.companySearch?.[c.id]??window.SEARCH_INDEX?.companySearchText?.[c.id]??[c.name,...(c.aliases||[]),c.description,modelFor(c.id),...products,...offerings].filter(Boolean).join(' ').toLowerCase();
+  return prefixes.every(prefix=>prefix.test(searchable))&&(!state.category||modelGroup(c.id)===state.category)&&(!state.stage||stageFor(c.id)===state.stage)&&(!state.financial||hasFinancialEvidence(c.id))&&(!state.work||hasWorkRoute(c.id));
  }).sort((a,b)=>(state.sort==='name-desc'?-1:1)*a.name.localeCompare(b.name));
 }
 
@@ -545,6 +549,10 @@ function compareRouteId(value){let id=String(value||'');try{id=decodeURIComponen
 function syncCompareRoute(){if(!onCompareRoute())return;const parts=routeParts().slice(1).flatMap(part=>String(part).split(',')).filter(Boolean);if(parts.length){const ids=[...new Set(parts.map(compareRouteId).filter(Boolean))].slice(0,3);if(ids.length&&ids.join('|')!==state.selected.join('|')){state.selected=ids;state.mobileCompare=0;syncSelection();renderTray();}}if(location.hash!==compareHash())history.replaceState(history.state,'',compareHash());document.title=(state.selected.length?listText(state.selected.map(id=>companies[id].name))+' · ':'')+VIEW_TITLES.compare;}
 function syncCompareAdd(){const select=$('compare-add'),full=state.selected.length>=3;if(!select)return;select.innerHTML=`<option value="">${full?'Remove one to add another':'Choose a company'}</option>`+[...DATA.companies].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option value="${esc(c.id)}"${full||state.selected.includes(c.id)?' disabled':''}>${esc(c.name)}</option>`).join('');select.value='';const add=$('compare-add-button');if(add)add.hidden=true;}
 function renderCompare(){
+ if(window.COMPANY_CONTEXTS_READY){
+  if(!onCompareRoute())return;
+  if(compareIds().some(id=>!window.COMPANY_CONTEXTS_READY.has(id))){route();return;}
+ }
  syncCompareRoute();syncComparisonPreset();syncCompareAdd();const ids=compareIds(),names=listText(ids.map(id=>companies[id].name));
  if(!ids.length){
   $('compare-content').innerHTML='<div class="comparison-empty"><span class="eyebrow">Build your comparison</span><h2>Which companies are you considering?</h2><p>Add up to three companies above, or start with a selection.</p><div class="comparison-starts"><button type="button" data-preset="scale">TaskUs, Appen & Scale AI</button><button type="button" data-preset="work">Surge AI, Toloka & Labelbox</button></div><p class="sub">Every figure keeps its reporting period, business scope and source.</p></div>';
@@ -757,6 +765,7 @@ function download(name,body,type){const url=URL.createObjectURL(new Blob([body],
 function csvCell(v){let s=String(v??'');if(/^[\t\r\n]/.test(s)||/^\s*[=+@-]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';}
 // The CSV starts with a byte order mark, so spreadsheet software such as Excel reads it as UTF-8.
 function currentCompanyResult(id){
+ const summary=companySummaryFor(id);if(summary&&!companyContextReady(id))return summary.currentCompanyResult;
  const observation=financialObservationFor(id);
  if(observation){
   const sourceMap={...sources,...Object.fromEntries((window.BUSINESS_HEALTH?.sources||[]).map(source=>[source.id,source]))};
@@ -766,9 +775,24 @@ function currentCompanyResult(id){
  return {id:metric.id,kind:metric.kind,value:metric.value,qualifier:metric.qualifier||'',display:metricValue(metric),upper_value:metric.upper_value??'',observation_status:metric.observation_status||'',currency:metric.currency||'',as_of:metric.as_of||'',period:metric.period_label||'',scope:metric.segment_scope||'',scope_detail:metric.scope_detail||'',accounting_basis:metric.gross_vs_net||'',source_urls:(claims[metric.claim_id]?.source_ids||[]).map(sourceId=>sources[sourceId]?.url).filter(Boolean).join(' | '),scope_label:scopeText(metric.segment_scope,id),limitations:metric.limitations||''};
 }
 function exportCsv(){
+ if(searchContextPending(state.query)||DATA.companies.some(company=>!editorialFor(company.id))){
+  const query=state.query;companyExportStatus('loading');
+  if(typeof window.ensureSearchContext!=='function'){companyExportStatus('failed');return;}
+  return window.ensureSearchContext().then(()=>{if(DATA.companies.some(company=>!editorialFor(company.id)))throw new Error('Company readouts are incomplete');companyExportStatus('');if(state.query===query)exportCsv();}).catch(()=>companyExportStatus('failed'));
+ }
+ companyExportStatus('');
  const head=['company_id','company','business_model','delivery_evidence','assessment_scope','financial_metric','financial_value','financial_qualifier','financial_display','upper_value','observation_status','currency','metric_date','metric_period','metric_scope','scope_detail','accounting_basis','financial_source_urls','work_route','readout','snapshot_as_of','financial_record_id','scope_label','limitations'];
  const rows=filtered().map(c=>{const m=currentCompanyResult(c.id);return[c.id,c.name,modelFor(c.id),stageLabel(stageFor(c.id)),assessmentFor(c.id)?.segment_scope||'',m?.kind||'',m?.value??'',m?.qualifier||'',m?.display||'',m?.upper_value??'',m?.observation_status||'',m?.currency||'',m?.as_of||'',m?.period||'',m?.scope||'',m?.scope_detail||'',m?.accounting_basis||'',m?.source_urls||'',workType(c.id),publicText(editorialFor(c.id)?.readout||''),DATA.meta.as_of,m?.id||'',m?.scope_label||'',m?.limitations||''];});
  download('observatory-current-company-results.csv','\ufeff'+[head,...rows].map(row=>row.map(csvCell).join(',')).join('\r\n')+'\r\n','text/csv;charset=utf-8');
+}
+function companyExportStatus(state){
+ const button=$('download-csv');let status=$('company-export-status');
+ if(!status){button.insertAdjacentHTML('afterend','<p id="company-export-status" role="status" hidden></p>');status=$('company-export-status');}
+ button.disabled=state==='loading';if(state==='loading')button.setAttribute('aria-busy','true');else button.removeAttribute('aria-busy');
+ status.hidden=!state;status.setAttribute('role',state==='failed'?'alert':'status');
+ if(state==='loading')status.textContent='Preparing company CSV…';
+ else if(state==='failed')status.innerHTML='The company CSV could not be prepared. <button type="button" data-retry-company-export>Try again</button> or <a href="/research.json" download>download the complete research JSON</a>.';
+ else status.textContent='';
 }
 
 // Editorial views of existing reviewed records; no research data is modified.
@@ -782,17 +806,15 @@ function storyDate(value){return String(value??'').replace(/\b(\d{4})-(\d{2})(?:
 // "on 15 Oct 2026", "on 16 and 17 Oct 2026" or "between 12 and 15 Oct 2026", from ISO dates.
 function storyDateRange(values){const dates=[...new Set(values.filter(Boolean))].sort(),first=dates[0],last=dates.at(-1);if(!first)return '';const a=storyDate(first),b=storyDate(last);if(first===last)return 'on '+b;const word=dates.length===2?'on':'between';return a.split(' ').slice(1).join(' ')===b.split(' ').slice(1).join(' ')?`${word} ${a.split(' ')[0]} and ${b}`:`${word} ${a} and ${b}`;}
 function shortPeriod(m){const corrected=metricCurrentPeriod(m);if(corrected)return corrected;const s=m.period_label||m.as_of;return /FY ended (\d{4})/.test(s)?'FY'+s.match(/FY ended (\d{4})/)[1]:storyDate(s);}
-// Paid work on the overview: counts, freshness and a safety line. It names no single listing.
-// The paid work listings follow the Paid work page: its contract and job buckets when they exist, otherwise its main group.
-// Cards keep their own availability labels, so the count does not call these listings open.
-function storyWorkRows(){const rows=typeof workRouteRows==='function'?workRouteRows():[];if(typeof w4Bucket==='function'){const paid=rows.filter(r=>['contract','jobs'].includes(w4Bucket(r)));if(paid.length)return paid;}return typeof w4RouteGroups==='function'?w4RouteGroups(rows).primary:[];}
-function renderStoryWork(){const rows=storyWorkRows(),box=$('overview-work');if(!box||!rows.length)return;const count=new Set(rows.map(r=>r.company_id)).size,paid=rows.filter(r=>r.numeric_pay).length,contract=rows.filter(r=>typeof w4Bucket==='function'?w4Bucket(r)==='contract':['Expert & contractor projects','Contributor bounties'].includes(r.group)).length,jobs=rows.filter(r=>typeof w4Bucket==='function'?w4Bucket(r)==='jobs':['Employment','Research fellowship'].includes(r.group)).length,range=storyDateRange(rows.map(r=>[r.reviewed_on,typeof w4Checked==='function'?w4Checked(r):null].filter(Boolean).sort().at(-1)));
+// The overview uses the same primary listings/programs as Paid work, without implying vacancies.
+function storyWorkRows(){return typeof w4DiscoveryGroups==='function'?w4DiscoveryGroups(workRouteRows()).primary:[];}
+function renderStoryWork(){const rows=storyWorkRows(),box=$('overview-work');if(!box||!rows.length)return;const count=new Set(rows.map(r=>r.company_id)).size,groups=w4DiscoveryGroups(rows);
  $('hero-work-count').textContent=rows.length;$('hero-work-stat')?.removeAttribute('data-pending');
- box.innerHTML=`<p class="overview-stats"><span><b>${rows.length}</b> paid work listings</span><span><b>${count}</b> companies</span><span><b>${paid}</b> show a pay amount</span></p><p>${contract+jobs===rows.length?`Of these, ${contract} are contract or task work and ${jobs} are jobs or fellowships. `:''}${range?`We reviewed every listing ${range}.`:''}</p><p class="overview-safety"><strong>Before you apply:</strong> never pay to get work, and be careful with job offers that come out of the blue from a stranger. <a href="https://consumer.ftc.gov/articles/job-scams" target="_blank" rel="noopener noreferrer">How to spot a job scam ${iconHTML('external')}<span class="sr-only"> (opens in a new tab)</span></a></p>`;
+ box.innerHTML=`<p class="overview-stats"><span><b>${rows.length}</b> work routes</span><span><b>${count}</b> providers</span></p><p>${groups.named.length} named listings and ${groups.programs.length} networks and programs. Each record keeps its own source and review dates. Page checks do not establish current terms or availability.</p><p class="overview-safety"><strong>Before you apply:</strong> never pay to get work, and be careful with job offers that come out of the blue from a stranger. <a href="https://consumer.ftc.gov/articles/job-scams" target="_blank" rel="noopener noreferrer">How to spot a job scam ${iconHTML('external')}<span class="sr-only"> (opens in a new tab)</span></a></p>`;
 }
 // How we check: grade mix, source mix and later corrections, all counted from the loaded data.
-function renderStoryCheck(){const box=$('overview-check');if(!box)return;const current=DATA.claims.filter(c=>c.status!=='superseded'),grades=['A','B','C','U'].map(g=>[g,current.filter(c=>c.confidence===g).length]),open=current.filter(c=>c.subject==='unknowns'&&c.confidence==='U').length,own=DATA.sources.filter(s=>s.source_type==='company').length,pages=new Set(DATA.sources.map(s=>s.url)).size,updates=window.SOURCE_UPDATES||{},fixes=[...(updates.updates||[]).map(u=>[u.company_id,u.source?.observed_on]),...(updates.evidence_context?.corrections||[]).map(u=>[u.company_id,u.reviewed_on])],when=storyDateRange(fixes.map(f=>f[1])),n=v=>v.toLocaleString('en-US');
- box.innerHTML=`<div class="check-item"><h3>Confidence grades</h3><p><b>${n(current.length)}</b> current claims, by grade</p><div class="grade-bar" aria-hidden="true">${grades.map(([g,c])=>`<span data-grade="${g}" style="flex-grow:${c}"></span>`).join('')}</div><ul class="grade-counts">${grades.map(([g,c])=>`<li><span class="story-grade" data-grade="${g}"><span class="sr-only">Grade </span>${g}</span> ${n(c)}<span class="sr-only"> claims</span></li>`).join('')}</ul><p class="sub">U includes ${n(open)} open questions, such as figures a company has not disclosed. ${n(DATA.claims.length-current.length)} earlier versions stay on file.</p></div><div class="check-item"><h3>Sources</h3><p><b>${n(DATA.sources.length)}</b> source records point to <b>${n(pages)}</b> distinct web pages. <b>${n(own)}</b> of the records come from the companies themselves.</p><p><a href="#downloads">Download the data ${iconHTML('right')}</a></p></div><div class="check-item"><h3>Corrections</h3><p>${fixes.length?`<b>${n((updates.updates||[]).length)}</b> corrections from later sources${(updates.evidence_context?.corrections||[]).length?` and <b>${n(updates.evidence_context.corrections.length)}</b> clarifications of existing records`:''} ${when}, for <b>${n(new Set(fixes.map(f=>f[0])).size)}</b> companies. `:''}We review reported errors within seven days.</p><p><a href="#corrections">Request a correction ${iconHTML('right')}</a></p></div>`;
+function renderStoryCheck(){const box=$('overview-check');if(!box)return;const stats=window.SUMMARY_INDEX?.statistics,current=stats?[]:DATA.claims.filter(c=>c.status!=='superseded'),currentCount=stats?stats.currentClaims:current.length,sourceCount=stats?stats.sources:DATA.sources.length,earlier=stats?stats.supersededClaims:DATA.claims.length-current.length,grades=['A','B','C','U'].map(g=>[g,stats?stats.gradeCounts[g]:current.filter(c=>c.confidence===g).length]),open=stats?stats.openUnknowns:current.filter(c=>c.subject==='unknowns'&&c.confidence==='U').length,own=stats?stats.companySources:DATA.sources.filter(s=>s.source_type==='company').length,pages=stats?stats.sourcePages:new Set(DATA.sources.map(s=>s.url)).size,updates=window.SOURCE_UPDATES||{},fixes=[...(updates.updates||[]).map(u=>[u.company_id,u.source?.observed_on]),...(updates.evidence_context?.corrections||[]).map(u=>[u.company_id,u.reviewed_on])],when=storyDateRange(fixes.map(f=>f[1])),n=v=>v.toLocaleString('en-US');
+ box.innerHTML=`<div class="check-item"><h3>Confidence grades</h3><p><b>${n(currentCount)}</b> current claims, by grade</p><div class="grade-bar" aria-hidden="true">${grades.map(([g,c])=>`<span data-grade="${g}" style="flex-grow:${c}"></span>`).join('')}</div><ul class="grade-counts">${grades.map(([g,c])=>`<li><span class="story-grade" data-grade="${g}"><span class="sr-only">Grade </span>${g}</span> ${n(c)}<span class="sr-only"> claims</span></li>`).join('')}</ul><p class="sub">U includes ${n(open)} open questions, such as figures a company has not disclosed. ${n(earlier)} earlier versions stay on file.</p></div><div class="check-item"><h3>Sources</h3><p><b>${n(sourceCount)}</b> source records point to <b>${n(pages)}</b> distinct web pages. <b>${n(own)}</b> of the records come from the companies themselves.</p><p><a href="#downloads">Download the data ${iconHTML('right')}</a></p></div><div class="check-item"><h3>Corrections</h3><p>${fixes.length?`<b>${n((updates.updates||[]).length)}</b> corrections from later sources${(updates.evidence_context?.corrections||[]).length?` and <b>${n(updates.evidence_context.corrections.length)}</b> clarifications of existing records`:''} ${when}, for <b>${n(new Set(fixes.map(f=>f[0])).size)}</b> companies. `:''}We review reported errors within seven days.</p><p><a href="#corrections">Request a correction ${iconHTML('right')}</a></p></div>`;
 }
 function renderStory(){$('organization-count').textContent=DATA.companies.length;$('group-count').textContent=Object.keys(MODEL_GROUPS).length;document.querySelectorAll('[data-company-count]').forEach(node=>{node.textContent=DATA.companies.length;});const nonprofit=(MODEL_GROUPS['Nonprofit research']||[]).length;if($('nonprofit-count'))$('nonprofit-count').textContent=STORY_NUMBER_WORDS[nonprofit]||nonprofit;$('hero-snapshot').textContent=window.BUSINESS_HEALTH?.source_checks?.checked_on?'Selected sources checked '+storyDate(window.BUSINESS_HEALTH.source_checks.checked_on):compiledSnapshotLabel(DATA.meta.as_of);if(!DATA.companies.some(c=>Object.values(MODEL_GROUPS).flat().includes(c.id)))return;const mercor=preferredFinancial('mercor'),sentence=s=>s&&!/[.!?]$/.test(s)?s+'.':s;if(mercor)$('venture-mercor').textContent=[`The latest is ${metricValue(mercor)} for ${metricCurrentPeriod(mercor,storyDate(dateText(mercor.as_of)))}.`,sentence(metricCurrentAttribution(mercor,evidenceLabel(claims[mercor.claim_id]))),metricCurrentBasisDescription(mercor,'')].filter(Boolean).join(' ');if(window.BusinessHealth)window.BusinessHealth.render();renderModelMap();renderStoryWork();renderStoryCheck();}
 
@@ -816,6 +838,7 @@ function financialObservationFor(id){
  return (recent.length?recent:candidates).sort((a,b)=>scopeRank(a)-scopeRank(b)||Number(b.measure==='period_revenue')-Number(a.measure==='period_revenue')||end(b).localeCompare(end(a)))[0]||null;
 }
 function financialSummaryHTML(id){
+ const summary=companySummaryFor(id);if(summary&&!companyContextReady(id))return summaryFinancialHTML(id,summary.financial);
  const o=financialObservationFor(id);if(!o)return signalFor(id,preferredFinancial(id));
  const health=window.BUSINESS_HEALTH,record=(health.sources||[]).find(s=>o.source_ids.includes(s.id))||sources[o.source_ids[0]],fresh=(health.fresh_claims||[]).find(c=>o.claim_ids.includes(c.id));
  const value=window.BusinessHealth?.valueText(o)||String(o.value),period=o.period?.label||o.as_of,scope=o.scope_label||scopeText(o.scope,id),basis=o.accounting_basis==='gross'?'Gross revenue':o.accounting_basis==='net'?'Net revenue':o.measure==='annualized_revenue'?'Gross/net not disclosed':'',type=o.measure==='annualized_revenue'?'Annualized pace':'Revenue';
@@ -829,6 +852,13 @@ function financialSummaryHTML(id){
  const content=`<div class="financial-summary" data-financial-observation="${observationAttr}"><div class="row-number"><strong>${esc(value)}</strong><span>${esc(type)}</span></div><span class="row-period">${esc(readableDates(period))} · ${esc(o.currency||'')} · ${esc(scope)}${basis?' · '+esc(basis):''}</span><div class="financial-citation">${citation}<span>${esc(o.evidence_assurance||'Attributed source')}</span></div>${warning}<details class="financial-source-details"><summary>Figure details</summary><p>${esc(o.limitations||'')}</p>${quote?`<blockquote>${esc(quote)}</blockquote>`:''}${checked?`<p>Source content checked ${esc(readableDates(checked))}. The figure covers ${esc(readableDates(period))}.</p>`:''}</details></div>`;
  return old?`<span class="signal-label">No recent revenue figure</span><details class="historical-signal"><summary>Historical figure · ${esc(readableDates(period))}</summary>${content}</details>`:content;
 }
+function summaryFinancialHTML(id,financial){
+ if(!financial)return `<span class="unavailable">${companies[id].entity_type==='adjacent_research'?'Research organization':'Not disclosed'}</span>`;
+ const f=financial,source=f.source?external(f.source.url,f.source.publisher||'Original source'):'',period=readableDates(f.period||''),basis=f.basis?' · '+esc(f.basis):'';
+ const value=f.recordType==='metric'&&f.claimId?`<a class="number-button" href="#company/${attr(id)}/claim/${attr(f.claimId)}">${esc(f.display)}</a>`:`<strong>${esc(f.display)}</strong>`;
+ const content=`<div class="financial-summary" data-financial-observation="${attr(f.id)}"><div class="row-number">${value}<span>${esc(f.type)}</span></div><span class="row-period">${esc(period)} · ${esc(f.currency||'')} · ${esc(f.scope||'')}${basis}</span><div class="financial-citation">${source}<span>${esc(f.attribution||'Attributed source')}</span></div>${f.failed?'<p class="financial-source-warning">Original citation could not be rechecked. Historical source attribution retained.</p>':''}<details class="financial-source-details"><summary>Figure details</summary>${f.limitations?`<p>${esc(f.limitations)}</p>`:''}${f.quote?`<blockquote>${esc(f.quote)}</blockquote>`:''}${f.checkedOn?`<p>Source content checked ${esc(readableDates(f.checkedOn))}. The figure covers ${esc(period)}.</p>`:''}</details></div>`;
+ return f.age==='current'?content:`<span class="signal-label">${f.age==='undated'?'No dated revenue figure':'No recent revenue figure'}</span><details class="historical-signal"><summary>${f.age==='undated'?'Undated financial claim':'Historical figure · '+esc(period)}</summary>${content}</details>`;
+}
 function compactSignal(id){return financialSummaryHTML(id);}
 // Recency describes the observation period, not when an old source was fetched again.
 const FINANCIAL_RECENCY_REVIEW='2026-10-28';
@@ -841,6 +871,9 @@ function financialObservationAge(m){
 }
 function signalFor(id,m,span=''){if(!m)return `<span class="unavailable">${companies[id].entity_type==='adjacent_research'?'Research organization':'Not disclosed'}</span>`;const kind={revenue:'Revenue',annualized_revenue_run_rate:'Annualized pace',arr:'Yearly recurring subscription revenue'}[m.kind]||metricLabels[m.kind];const rank=dateRank(m.as_of),year=rank==='0000'?null:Number(rank.slice(0,4)),historical=year&&year<Number(DATA.meta.as_of.slice(0,4))-1;const html=`${historical?`<span class="signal-history">Historical · ${year}</span>`:''}<div class="row-number ${historical?'is-historical':''}">${numberButton(m)}<span>${esc(kind)}${m.gross_vs_net==='gross'?' · '+esc(metricCurrentBasis(m,'gross')):''}</span></div><span class="row-period">${esc(readableDates(shortPeriod(m)))}${span?' · '+esc(span):''} · ${esc(m.currency||'')} · ${esc(compactMetricScope(m))}${m.gross_vs_net==='net'?' · net':m.gross_vs_net!=='gross'?' · gross or net not stated':''}</span><span class="signal-attribution">${esc(typeof profileMetricAttribution==='function'?profileMetricAttribution(m):evidenceLabel(claims[m.claim_id]))}</span>`;const age=financialObservationAge(m);return age==='current'?html:`<span class="signal-label">${age==='undated'?'No dated revenue figure':'No recent revenue figure'}</span><details class="historical-signal"><summary>${age==='undated'?'Undated financial claim':'Historical figure · '+esc(readableDates(shortPeriod(m)))}</summary>${html}</details>`;}
 function renderDirectory(){
+ if(searchContextPending(state.query)){requestDirectorySearch();return;}
+ directorySearchGeneration++;
+ $('company-cards').removeAttribute?.('aria-busy');
  companyReturnFocus=null;
  const rows=filtered(),query=state.query.trim(),secondaryCount=[state.stage,state.financial,state.work,state.sort!=='name'].filter(Boolean).length;
  const summary=document.querySelector('.more-filters>summary');if(summary)summary.textContent=secondaryCount?`More filters (${secondaryCount})`:'More filters';
@@ -850,6 +883,26 @@ function renderDirectory(){
 
 // Shared <select> option helper for page filters.
 function addOptions(id,rows){$(id).innerHTML+=[...rows].map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('');}
+let directorySearchGeneration=0,workSearchGeneration=0;
+function requestDirectorySearch(){
+ const generation=++directorySearchGeneration;
+ $('company-cards').setAttribute?.('aria-busy','true');$('result-count').textContent='Loading search…';
+ return window.ensureSearchContext().then(()=>{if(generation!==directorySearchGeneration)return;if(routeParts()[0]==='companies'||VIEW_ANCHORS[routeParts()[0]]==='method')renderDirectory();else directoryShown=false;}).catch(()=>{if(generation===directorySearchGeneration)directorySearchFailure();});
+}
+function directorySearchFailure(){
+ $('company-cards').removeAttribute?.('aria-busy');$('result-count').textContent='Search could not load.';
+ $('company-cards').innerHTML='<p class="availability-notice" role="alert">The search index could not load. <button type="button" data-retry-company-search>Try again</button> or <a href="/companies/">browse the plain company list</a>.</p>';
+}
+function requestWorkSearch(){
+ const generation=++workSearchGeneration;
+ $('work-cards').setAttribute?.('aria-busy','true');$('work-count').textContent='Loading search…';
+ return window.ensureSearchContext().then(()=>{if(generation===workSearchGeneration&&routeParts()[0]==='work')renderWork();}).catch(()=>{if(generation===workSearchGeneration)workSearchFailure();});
+}
+function workSearchFailure(){
+ $('work-cards').removeAttribute?.('aria-busy');$('work-count').textContent='Search could not load.';
+ $('work-cards').innerHTML='<p class="availability-notice" role="alert">The search index could not load. <button type="button" data-retry-work-search>Try again</button> or <a href="/work/">browse the plain work list</a>.</p>';
+}
+document.addEventListener('click',event=>{if(event.target.closest?.('[data-retry-company-search]'))requestDirectorySearch();if(event.target.closest?.('[data-retry-work-search]'))requestWorkSearch();if(event.target.closest?.('[data-retry-company-export]'))exportCsv();});
 
 // Company index: apply a #companies/<group-slug> route to the filters.
 // A new group shows the whole group; a bare #companies keeps the visitor's filters.

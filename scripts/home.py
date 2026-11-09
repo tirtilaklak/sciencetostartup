@@ -15,7 +15,8 @@ def approved_receipt(route):
 
 
 def promotion_candidates(work, release):
-    routes = {r["id"]: r for r in work["routes"]}
+    from editorial_work import primary_routes
+    routes = {r["id"]: r for r in primary_routes(work)}
     max_age = release.get("publication_policy", {}).get("homepage_work_max_age_days", 3)
     result = []
     for route_id in release.get("homepage", {}).get("work_candidate_route_ids", []):
@@ -60,7 +61,7 @@ def render_home(html, data, sidecars, release, summary):
         company = '<article class="example-card company-example"><h3>Understand AI data companies.</h3><p><a href="/companies/">Browse sourced company profiles →</a></p></article>'
     fallback = '<article class="example-card work-example home-work-fallback"><p class="example-kind">Paid AI training work</p><h3 class="example-title">Find a route that fits your expertise.</h3><p class="example-summary">Compare public listings and expert networks, with pay conditions and requirements beside the source.</p><div class="example-actions"><a class="example-action" href="/work/">Browse paid work →</a></div></article>'
     candidates = promotion_candidates(sidecars["WORK_ROUTES"], release)
-    config = {"buildId": summary["buildId"], "editorialReleaseId": summary["editorialReleaseId"], "search": summary["homeSearch"], "candidates": []}
+    config = {**{key: summary[key] for key in ("schemaVersion", "buildId", "editorialReleaseId", "datasetVersion")}, "search": summary["homeSearch"], "candidates": []}
     templates = []
     for i, candidate in enumerate(candidates):
         if candidate["route"]["company_id"] not in companies:

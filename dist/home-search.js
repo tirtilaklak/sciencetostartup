@@ -7,11 +7,15 @@
  async function load(){
   if(entries)return entries;if(pending)return pending;
   message.textContent='Loading the search index…';
-  pending=fetch(config.search.href).then(async response=>{
-   if(!response.ok)throw new Error('Search unavailable');const data=await response.json();
-   if(data.buildId!==config.buildId||data.editorialReleaseId!==config.editorialReleaseId)throw new Error('Search release mismatch');
+  const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),15000);
+  pending=fetch(config.search.href,{signal:controller.signal}).then(async response=>{
+   if(!response.ok)throw new Error('Search unavailable');const bytes=await response.arrayBuffer();
+   if(globalThis.crypto?.subtle){const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(b=>b.toString(16).padStart(2,'0')).join('');if(digest!==config.search.sha256)throw new Error('Search integrity mismatch');}
+   const data=JSON.parse(new TextDecoder().decode(bytes));
+   for(const key of ['schemaVersion','buildId','editorialReleaseId','datasetVersion'])if(data[key]!==config[key])throw new Error('Search release mismatch');
+   if(!Array.isArray(data.entries)||!data.entries.every(row=>typeof row.name==='string'&&typeof row.summary==='string'&&typeof row.group==='string'&&Array.isArray(row.products)&&typeof row.href==='string'))throw new Error('Invalid search index');
    entries=data.entries;return entries;
-  }).finally(()=>{pending=null;});return pending;
+  }).finally(()=>{clearTimeout(deadline);pending=null;});return pending;
  }
  function render(){
   const raw=input.value.trim(),q=text(raw),tokens=q.split(/\s+/u).filter(Boolean);
@@ -22,7 +26,8 @@
   message.textContent=raw?(matches.length?matches.length+' company matches. Paid work uses its own listing filters.':'No recorded company matches. You can search paid work or browse all companies.'):'Search companies, their offerings, or continue to paid work.';
   $('home-search-status').textContent=message.textContent;
  }
- window.openHomeSearch=async()=>{if(!dialog.open)dialog.showModal();$('home-search-open').setAttribute('aria-expanded','true');input.focus();try{await load();render();}catch(error){message.innerHTML='Search could not load. <a href="/companies/">Browse companies</a> or <a href="/work/">browse paid work</a>.';}};
+ window.openHomeSearch=async()=>{if(!dialog.open)dialog.showModal();$('home-search-open').setAttribute('aria-expanded','true');input.focus();try{await load();render();}catch(error){message.innerHTML='Search could not load. <button type="button" data-home-search-retry>Try again</button> <a href="/companies/">Browse companies</a> or <a href="/work/">browse paid work</a>.';}};
+ message.addEventListener('click',event=>{if(event.target.closest('[data-home-search-retry]'))window.openHomeSearch();});
  $('home-search-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});dialog.addEventListener('close',()=>{$('home-search-open').setAttribute('aria-expanded','false');$('home-search-open').focus();});
  input.addEventListener('input',()=>{if(entries)render();});
  input.addEventListener('keydown',event=>{

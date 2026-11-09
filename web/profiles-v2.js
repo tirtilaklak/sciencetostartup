@@ -23,6 +23,11 @@ document.addEventListener('click',event=>{const button=event.target.closest?.('[
 // Copy the record link; without clipboard access, show it.
 document.addEventListener('click',event=>{const button=event.target.closest?.('[data-copy-record]');if(!button)return;const url=new URL(button.dataset.copyRecord,location.href).href,status=$('evidence-copy-status'),say=text=>{if(status)status.textContent=text;};const copy=navigator.clipboard?.writeText?navigator.clipboard.writeText(url):Promise.reject();copy.then(()=>say('Link copied.'),()=>say('Copy this link: '+url));});
 function profileProducts(id){
+  if(!companyContextReady(id)){
+    const products=window.SEARCH_INDEX?.profileProducts?.[id]||window.SEARCH_INDEX?.companyProducts?.[id];
+    if(products)return products;
+    const first=companySummaryFor(id)?.firstOffering;return first?[first]:[];
+  }
   const curated=profileContent(id).products;if(curated?.length)return typeof applyProductSourceUpdates==='function'?applyProductSourceUpdates(id,curated):curated;
   const all=DATA.products.filter(p=>p.company_id===id&&claims[p.claim_id]?.status!=='superseded');
   const named=all.filter(p=>!/^Offer \/ product evidence|^Product evidence/i.test(p.name));
@@ -189,7 +194,7 @@ function profileLogoHTML(id,extra){return logoHTML(id,extra,true).replace(/ alt=
 function profilePeersHTML(id){
  const group=modelGroup(id),members=(MODEL_GROUPS[group]||[]).filter(peer=>companies[peer]),peers=members.filter(peer=>peer!==id).sort((a,b)=>companies[a].name.localeCompare(companies[b].name));
  if(!peers.length)return '';
- return `<section class="profile-peers" aria-labelledby="profile-peers-title"><h2 id="profile-peers-title">More in ${esc(groupLabel(group))}</h2><ul>${peers.map(peer=>`<li><a href="#company/${attr(peer)}">${logoFor(peer)?profileLogoHTML(peer,'peer-logo'):''}<span>${esc(companies[peer].name)}</span></a></li>`).join('')}</ul><p><a class="profile-peers-all" href="#companies/${attr(groupSlug(group))}" data-category-jump="${attr(group)}">${members.length===2?'Both companies':'All '+members.length+' companies'} in this group ${iconHTML('right')}</a></p></section>`;
+ return `<section class="profile-peers" aria-labelledby="profile-peers-title"><h2 id="profile-peers-title">More in ${esc(groupLabel(group))}</h2><ul>${peers.map(peer=>`<li><a href="#company/${attr(peer)}"><span>${esc(companies[peer].name)}</span></a></li>`).join('')}</ul><p><a class="profile-peers-all" href="#companies/${attr(groupSlug(group))}" data-category-jump="${attr(group)}">${members.length===2?'Both companies':'All '+members.length+' companies'} in this group ${iconHTML('right')}</a></p></section>`;
 }
 // Official visuals use the same local, attributed assets as the business record.
 function profileHeroVisual(id){

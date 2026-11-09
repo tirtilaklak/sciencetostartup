@@ -19,13 +19,13 @@ const g=ids('(()=>{const x=w4RouteGroups(workRouteRows());return Object.fromEntr
 const total=['contract','jobs','boards','outside','closed'].reduce((n,k)=>n+g[k].length,0);
 assert.equal(total,routes.length,'every listing has one bucket');
 assert.equal(g.hourly.length+g.task.length+g.project.length,g.contract.length,'pay blocks split contract work');
-for(const id of g.closed)assert.ok(['historical','closed','contributions','paused','no_route','inquiry','information'].includes(byId[id].status),id);
+for(const id of g.closed)assert.ok(['historical','closed','contributions','paused','no_route','inquiry','information'].includes(byId[id].status)||byId[id].route_kind==='other_record',id);
 for(const id of g.boards)assert.equal(byId[id].status,'careers');
 for(const id of g.outside)assert.equal(byId[id].ai_data_work,false);
 // Pay blocks follow each listing's own fields, so the expected blocks are worked out from the data here.
 const TASK_PAY=['per_completed_task','task','accepted_task','approved_recording','approved_submission','hour_equivalent'];
 const statesHourly=r=>r.numeric_pay&&r.pay_terms.hourly_comparable===true&&r.status!=='pay_conflict'&&r.pay_basis!=='conflicting_hourly'&&/\/\s*(approved\s+)?hour/i.test(r.pay_label||'')&&/[$€£¥]\s*\d/.test(r.pay_label||'');
-const open=r=>!['historical','closed','contributions','paused','no_route','inquiry','information','careers'].includes(r.status)&&r.ai_data_work!==false;
+const open=r=>!['historical','closed','contributions','paused','no_route','inquiry','information','careers'].includes(r.status)&&r.ai_data_work!==false&&['named_listing','network_program'].includes(r.route_kind);
 // Engagement is independent of its pay unit.
 const contractRoute=r=>open(r)&&['contract','bounty','study','varies','unknown'].includes(r.engagement_type);
 assert.deepEqual([...g.contract].sort(),routes.filter(contractRoute).map(r=>r.id).sort(),'contract bucket');
@@ -94,7 +94,7 @@ const companiesReviewed=new Set(routes.map(r=>r.company_id)).size;
 assert.equal(node('work-count').textContent,run('workResultsLabel(summarizeWorkResults(workRouteRows()))'));
 run(`state.workSort='hourly';renderWork()`);
 const sortNote=node('work-sort-note').textContent;
-assert.ok(sortNote.includes(`of ${run('w4DiscoveryGroups(workRouteRows()).primary.length')} paid work listings`)&&!/open listing/.test(sortNote),sortNote);
+assert.ok(sortNote.includes(`of ${run('w4DiscoveryGroups(workRouteRows()).primary.length')} work routes`)&&!/open listing/.test(sortNote),sortNote);
 run('resetWorkFilters()');
 for(const r of routes.filter(r=>r.status==='no_route'))assert.equal(run(`w4Status(${JSON.stringify(r)})`),'No confirmed paid listing',r.id);
 assert.ok(routes.some(r=>r.status==='no_route'),'fixture lost its no_route record');

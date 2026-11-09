@@ -109,12 +109,24 @@ Use the approved candidate order, then a neutral Browse paid work panel. A compa
 summary has its own semantic review date; do not borrow a financial date or work
 receipt for it.
 
-Named listings are reviewed weekly and marked Needs recheck after 14 days.
-Programs are reviewed monthly, sooner on a material change, and leave recent-review
-promotion after 45 days. All dated records remain browsable. Daily regeneration
-and the small homepage guard enforce promotion age; monitoring alone cannot alter
-already deployed HTML. Failed regeneration must alert the release owner. Absolute
-review dates remain visible in the static fallback.
+Named listings are reviewed weekly. A successful approved key-terms receipt starts
+the review clock: at 14 UTC days the listing is marked Needs recheck. Pay-only
+reviews, page checks and failed retrievals do not reset that clock. A named listing
+without an approved full-terms receipt says Full terms review not recorded. These
+labels do not assert closure. Static pages calculate age at the explicit publication
+timestamp and print that date; the interactive guide may age the label using the
+current UTC day without changing the stored facts or review dates.
+
+Programs are reviewed monthly, sooner on a material change. The 45-day limit is an
+editorial rule for any future recent-review promotion; this release adds no such
+filter or badge. Homepage network fallbacks already use the stricter three-day
+rule. All dated records remain browsable.
+
+The small homepage runtime guard withdraws expired work examples. A publication
+regenerates the static HTML; the scheduled quality monitor checks the deployed
+release and does not rebuild or deploy it. Without JavaScript the homepage retains
+the neutral Browse paid work panel. Failed publications must alert the release
+owner. Absolute review dates remain attached to the recorded facts.
 
 ## Prepare a reproducible publication
 

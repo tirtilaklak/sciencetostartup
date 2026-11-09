@@ -171,6 +171,7 @@ h1,h2,h3,h4{font-family:var(--fg-sans);color:var(--ink)}
 #work-cards .w4-compact-card .w4-card-front{display:block;padding:12px 0 0}
 
 /* Profile navigation leads to content, rather than following a large finance tile. */
+#profile-view[aria-busy=true]{min-height:100vh;min-height:100svh}
 .profile-v2 .profile-back{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:12px 0;font-size:var(--fg-meta);line-height:1.5}
 .profile-v2 .profile-hero{display:block;padding:0 0 16px;border:0}
 .profile-v2 .profile-title-row{display:flex;align-items:center;gap:16px;margin:0}

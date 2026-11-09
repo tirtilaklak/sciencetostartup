@@ -22,19 +22,28 @@ def digest(content):
     return hashlib.sha256(content).hexdigest()
 
 
-def prepare(directory, output, source_commit):
+def validate_artifact(directory):
     directory = directory.resolve()
     manifest_bytes = (directory / 'manifest.json').read_bytes()
     release = json.loads(manifest_bytes)
     actual = {p.relative_to(directory).as_posix() for p in directory.rglob('*') if p.is_file()}
     if actual != set(release['sha256']) | {'manifest.json'}:
         raise ValueError('Artifact file set differs from its tested manifest')
-    assets, lookup = {}, {}
     for name in sorted(actual):
         path = directory / name
         content = path.read_bytes()
         if name != 'manifest.json' and digest(content) != release['sha256'][name]:
             raise ValueError('Artifact digest differs: ' + name)
+    return release, manifest_bytes, actual
+
+
+def prepare(directory, output, source_commit):
+    directory = directory.resolve()
+    release, manifest_bytes, actual = validate_artifact(directory)
+    assets, lookup = {}, {}
+    for name in sorted(actual):
+        path = directory / name
+        content = path.read_bytes()
         if name in ('_headers', '_redirects'):
             continue
         encoded = base64.b64encode(content)
@@ -44,6 +53,7 @@ def prepare(directory, output, source_commit):
     config = json.loads((ROOT / 'deployment.json').read_text())
     asset_config = {**config['assets'], '_headers': (directory / '_headers').read_text()}
     metadata = {'assets': {'config': asset_config}, 'compatibility_date': config['compatibility_date'],
+                'compatibility_flags': config['compatibility_flags'], 'usage_model': config['usage_model'],
                 'annotations': {'workers/commit_sha': source_commit,
                                 'workers/message': f"ScienceToStartup build {release['build_id']}; editorial {release['editorial_release_id']}; manifest {digest(manifest_bytes)}"}}
     output.mkdir(parents=True, exist_ok=True)
@@ -52,7 +62,9 @@ def prepare(directory, output, source_commit):
     (output / 'version-metadata.json').write_text(json.dumps(metadata, indent=2) + '\n')
     receipt = {'source_commit': source_commit, 'build_id': release['build_id'], 'editorial_release_id': release['editorial_release_id'],
                'manifest_sha256': digest(manifest_bytes), 'publication_as_of': release['publication_as_of'],
-               'artifact_directory': str(directory), 'assets': len(assets), 'cloudflare_worker': config['worker']}
+               'artifact_directory': str(directory), 'assets': len(assets), 'cloudflare_worker': config['worker'],
+               'deployment_config_sha256': digest((ROOT / 'deployment.json').read_bytes()),
+               'preserved_non_versioned_settings': config['non_versioned_settings']}
     (output / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
     return receipt
 
@@ -68,6 +80,12 @@ def secret_file(path, value):
 
 
 def upload(directory, prepared, session_path, completion_path):
+    release, manifest_bytes, _ = validate_artifact(directory)
+    receipt = json.loads((prepared / 'receipt.json').read_text())
+    if release['build_id'] != receipt['build_id'] or digest(manifest_bytes) != receipt['manifest_sha256']:
+        raise ValueError('Prepared release and artifact identities differ')
+    if digest((ROOT / 'deployment.json').read_bytes()) != receipt['deployment_config_sha256']:
+        raise ValueError('Deployment configuration changed after release preparation')
     session = json.loads(session_path.read_text())
     lookup = json.loads((prepared / 'asset-lookup.json').read_text())
     config = json.loads((ROOT / 'deployment.json').read_text())

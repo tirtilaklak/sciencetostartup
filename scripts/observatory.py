@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Validate public evidence; build immutable JSON releases, SQLite, CSV, offline UI."""
 import argparse
+import base64
 import csv
 import hashlib
 import io
@@ -15,6 +16,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 from schema_def import SCHEMA, TABLES
+from frontend_packaging import ESBUILD_VERSION, package_frontend
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIDENCE = {"U": 0, "C": 1, "B": 2, "A": 3}
@@ -692,6 +694,9 @@ REDESIGN_CSS = ("profiles-v2.css", "work-v4.css", "investor.css", "edition.css",
 # Scripts concatenated after work-v3.js and before initialize(); later declarations replace earlier ones.
 # business-health.js runs as soon as it loads and reads app.js constants, so it comes last, after every declaration.
 PRESENTATION_JS = ("work-v4.js", "profiles-v2.js", "source-updates.js", "site-nav.js", "business-health.js")
+# Keep the logical source order above for full-context/VM checks. The overview
+# workbench is registered separately and initialized only by the route loader.
+INITIAL_PRESENTATION_JS = tuple(name for name in PRESENTATION_JS if name != "business-health.js")
 # Presentation data ships as JSON text that is parsed on first read. JSON parses much faster than the
 # same data compiled as a JavaScript object, and a page that never reads a dataset never parses it.
 LAZY_DATA = "(()=>{const lazy=(name,text)=>{let value,ready=false;Object.defineProperty(window,name,{configurable:true,enumerable:true,get(){if(!ready){ready=true;value=JSON.parse(text);text=null;}return value;},set(next){ready=true;value=next;text=null;}});};"
@@ -706,21 +711,65 @@ def lazy_data(name, value):
     return "lazy(" + json.dumps(name) + ",'" + script_safe(text) + "');"
 
 
-def externalize_scripts(html, destination):
-    """Move the data and app bundles to content-hashed files. The page paints first. The loader in
-    web/index.html requests both files (at once on deep links, after the first frame on the overview)
-    and runs them in order after the first paint."""
+def write_business_health_module(destination, build_id):
+    """Emit a classic factory without running the workbench or touching the DOM."""
+    source = "window.SCIENCE_HEALTH_MODULE={buildId:" + json.dumps(build_id) + ",initialize:function(){\n" + (ROOT / "web/business-health.js").read_text() + "\n}};"
+    transformed = package_frontend(javascript={"health": source})["javascript"]["health"]
+    # Independent classic transforms can generate similarly named helpers.
+    # Isolate this module's minifier helpers; its public API is on window.
+    content = ("(()=>{" + transformed + "})();\n").encode("utf-8")
+    digest = hashlib.sha256(content)
+    name = "js/health." + digest.hexdigest()[:12] + ".js"
+    path = destination / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(content)
+    return {"href": "/" + name, "sha256": digest.hexdigest(), "integrity": "sha256-" + base64.b64encode(digest.digest()).decode("ascii"), "bytes": len(content)}
+
+
+def presentation_preload_config(summary, aliases):
+    """Head discovery contains only immutable descriptors and company aliases."""
+    def fields(value, names):
+        return {name: value[name] for name in names}
+    companies = {key: fields(value, ("href", "sha256")) for key, value in summary["companyDetails"].items()}
+    return {"buildId": summary["buildId"], "companyDetails": companies,
+            "overview": fields(summary["overview"], ("href", "sha256")),
+            "archive": fields(summary["archive"], ("href", "sha256")),
+            "modules": {"businessHealth": fields(summary["modules"]["businessHealth"], ("href", "integrity"))},
+            "aliases": {key: value for key, value in aliases.items() if value in companies}}
+
+
+def externalize_scripts(html, destination, preload_config):
+    """Discover immutable scripts in the head; execute them sequentially after first paint."""
+    app = re.search(r'<script data-bundle="app">(.*?)</script>', html, re.S)
+    require(app is not None, "build: missing app script bundle")
+    style_blocks = list(re.finditer(r'<style([^>]*)>(.*?)</style>', html, re.S))
+    copied_styles = {name: (ROOT / "web" / name).read_text() for name in ("landing.css", "field-guide.css")}
+    packaged = package_frontend(
+        javascript={"app": app.group(1), "prefetch": (ROOT / "web/presentation-prefetch.js").read_text()},
+        stylesheets={**{"inline-" + str(i): match.group(2) for i, match in enumerate(style_blocks)}, **copied_styles},
+    )
+    style_index = iter(range(len(style_blocks)))
+    html = re.sub(r'<style([^>]*)>(.*?)</style>', lambda match: '<style' + match.group(1) + '>' + packaged["stylesheets"]["inline-" + str(next(style_index))] + '</style>', html, flags=re.S)
+    for name in copied_styles:
+        (destination / name).write_text(packaged["stylesheets"][name], encoding="utf-8")
     files = []
     for name in ("data", "app"):
         match = re.search(r'<script data-bundle="' + name + r'">(.*?)</script>', html, re.S)
         require(match is not None, "build: missing " + name + " script bundle")
-        code = match.group(1)
+        code = packaged["javascript"]["app"] if name == "app" else match.group(1)
         path = "js/" + name + "." + hashlib.sha256(code.encode("utf-8")).hexdigest()[:12] + ".js"
         (destination / "js").mkdir(parents=True, exist_ok=True)
         (destination / path).write_text(code, encoding="utf-8")
         files.append("/" + path)
         html = html[:match.start()] + html[match.end():]
     require(html.count("/* BUNDLES */[]") == 2, "build: script loader placeholders missing")
+    require(html.count("<!-- BOOT_PRELOADS -->") == 1, "build: early script discovery placeholder missing")
+    html = html.replace("<!-- BOOT_PRELOADS -->", "".join('<link rel="preload" as="script" href="' + path + '">' for path in files))
+    require(html.count("<!-- EVIDENCE_PRELOAD -->") == 1, "build: early evidence discovery placeholder missing")
+    prefetch = packaged["javascript"]["prefetch"]
+    require("</script" not in prefetch.lower(), "build: unsafe closing-script text in the head prefetch helper")
+    discovery = '<script>window.PRESENTATION_PRELOAD_CONFIG=' + script_safe(json.dumps(preload_config, separators=(",", ":"))) + ';(()=>{' + prefetch + '})();</script>'
+    html = html.replace("<!-- EVIDENCE_PRELOAD -->", discovery)
     return html.replace("/* BUNDLES */[]", json.dumps(files, separators=(",", ":")))
 
 
@@ -776,12 +825,18 @@ def build(data, destination):
     if release_path.exists() and data["dataset_version"] == SIDECAR_DATASET_VERSION:
         from editorial_work import load_editorial_release
         release = load_editorial_release(release_path, work_data, data)
-    from presentation import build_presentation
+    from presentation import build_presentation, write_asset
     summary, summary_asset = build_presentation(data, destination, ROOT, sidecars, release)
+    original_summary = destination / summary_asset["href"].lstrip("/")
+    summary["modules"] = {"businessHealth": write_business_health_module(destination, summary["buildId"])}
+    summary_asset = write_asset(destination, "summary", summary)
+    # The pre-module intermediate is not an extra public presentation generation.
+    if original_summary != destination / summary_asset["href"].lstrip("/"):
+        original_summary.unlink()
     bootstrap = json.dumps(summary["bootstrap"], ensure_ascii=False, separators=(",", ":"), sort_keys=True, allow_nan=False).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
     html = html.replace(embedded, bootstrap)
-    from presentation import health_subset, rooted_assets
-    compact_sidecars = rooted_assets({**sidecars, "WORK_ROUTES": summary["work"], "PROFILE_CONTENT": {"entries": [{"company_id": entry["company_id"], "products": entry.get("products", [])} for entry in profile_content["entries"]]}, "COMPANY_EVENTS": {"version": company_events["version"], "events": []}, "LOGOS": {"logos": [{k: v for k, v in logo.items() if k in ("company_id", "local_path", "background")} for logo in logo_data["logos"]]}, "BUSINESS_HEALTH": health_subset(health, [o for o in (health or {}).get("observations", []) if o["signal"] == "revenue"])})
+    from presentation import health_skeleton, source_updates_context, rooted_assets
+    compact_sidecars = rooted_assets({**sidecars, "WORK_ROUTES": summary["work"], "PROFILE_CONTENT": {"entries": []}, "SOURCE_UPDATES": source_updates_context(source_updates), "COMPANY_EVENTS": {"version": company_events["version"], "events": []}, "LOGOS": {"logos": [{k: v for k, v in logo.items() if k in ("company_id", "local_path", "background")} for logo in logo_data["logos"]]}, "BUSINESS_HEALTH": health_skeleton(health)})
     public_summary = {key: value for key, value in summary.items() if key not in ("bootstrap", "companies", "work")}
     public_summary["asset"] = summary_asset
     injected = "window.SUMMARY_INDEX=" + script_safe(json.dumps(public_summary, separators=(",", ":"))) + ";"
@@ -794,7 +849,7 @@ def build(data, destination):
     html = html.replace("/* ICONS_JS */", (ROOT / "web/icons.js").read_text())
     html = html.replace("/* EDITORIAL_JS */", (ROOT / "web/editorial.js").read_text())
     work_js = ROOT / "web/work-v3.js"
-    html = html.replace("/* WORK_V3_JS */", (work_js.read_text() if work_js.exists() else "") + "".join((ROOT / "web" / name).read_text() for name in PRESENTATION_JS))
+    html = html.replace("/* WORK_V3_JS */", (work_js.read_text() if work_js.exists() else "") + "".join((ROOT / "web" / name).read_text() for name in INITIAL_PRESENTATION_JS))
     html = html.replace("/* DATA_RUNTIME_JS */", (ROOT / "web/data-runtime.js").read_text().replace("/* APP_BUILD_ID */null", json.dumps(summary["buildId"])))
     html = html.replace('<html lang="en">', '<html lang="en" data-build-id="' + summary["buildId"] + '" data-editorial-release="' + summary["editorialReleaseId"] + '" data-dataset-version="' + summary["datasetVersion"] + '">')
     import shutil
@@ -815,7 +870,7 @@ def build(data, destination):
     html = html.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{GROUP_COUNT}}", str(len({e["primary_offering"] for e in editorial["entries"]})))
     html = render_snapshot_metadata(html, data)
     html = render_static_file_metadata(html, destination)
-    html = externalize_scripts(html, destination)
+    html = externalize_scripts(html, destination, presentation_preload_config(summary, aliases))
     (destination / "explore").mkdir(exist_ok=True)
     html = html.replace('<link rel="canonical" href="https://sciencetostartup.com/">', '<link rel="canonical" href="https://sciencetostartup.com/explore/"><meta name="robots" content="noindex,follow">')
     (destination / "explore/index.html").write_text(root_relative_resources(html))
@@ -829,7 +884,8 @@ def build(data, destination):
     from presentation import retain_runtime_generations
     retain_runtime_generations(ROOT, destination)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}
-    (destination / "manifest.json").write_text(json.dumps({"dataset_version": data["dataset_version"], "schema_version": data["schema_version"], "build_id": summary["buildId"], "editorial_release_id": summary["editorialReleaseId"], "publication_as_of": summary["publicationAsOf"], "summary": summary_asset, "sha256": files}, indent=2) + "\n")
+    source_files = {p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted((ROOT / "web").rglob("*")) if p.is_file() and p.suffix in (".html", ".js", ".css")}
+    (destination / "manifest.json").write_text(json.dumps({"dataset_version": data["dataset_version"], "schema_version": data["schema_version"], "build_id": summary["buildId"], "editorial_release_id": summary["editorialReleaseId"], "publication_as_of": summary["publicationAsOf"], "summary": summary_asset, "frontend_packaging": {"esbuild": ESBUILD_VERSION, "format": "classic", "css": "whitespace-only"}, "source_sha256": source_files, "sha256": files}, indent=2) + "\n")
 
 def release(input_path, root=ROOT):
     data = json.loads(input_path.read_text())

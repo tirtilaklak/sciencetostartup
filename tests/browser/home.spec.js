@@ -72,3 +72,35 @@ test('failed homepage search keeps usable browse actions and a retry', async ({ 
   await page.locator('#home-search-open').click();
   await expect(page.locator('#home-search-message')).not.toContainText('could not load');
 });
+
+test('homepage search times out a stalled index and retries without reporting empty results', async ({ page }) => {
+  await page.clock.install({ time: new Date(reviewed + day) });
+  let stalled;
+  await page.route('**/presentation/search.*.json', route => { stalled = route; });
+  await page.goto('/');
+  await page.locator('#home-search-open').click();
+  await expect(page.locator('#home-search-message')).toContainText('Loading');
+  await page.clock.fastForward(15_001);
+  await expect(page.locator('#home-search-message')).toContainText('Search could not load');
+  await expect(page.locator('#home-search-message')).not.toContainText('No recorded company matches');
+  await expect(page.locator('#home-search-message a[href="/work/"]')).toBeVisible();
+  await stalled.abort().catch(() => {});
+  await page.unroute('**/presentation/search.*.json');
+  await page.locator('[data-home-search-retry]').click();
+  await expect(page.locator('#home-search-results')).toBeVisible();
+});
+
+test('homepage search rejects stale index bytes and offers a usable retry', async ({ page }) => {
+  await page.route('**/presentation/search.*.json', async route => {
+    const response = await route.fetch();
+    const data = await response.json();
+    await route.fulfill({ response, json: { ...data, buildId: 'stale-release' } });
+  });
+  await page.goto('/');
+  await page.locator('#home-search-open').click();
+  await expect(page.locator('#home-search-message')).toContainText('Search could not load');
+  await expect(page.locator('#home-search-results')).not.toBeVisible();
+  await page.unroute('**/presentation/search.*.json');
+  await page.locator('[data-home-search-retry]').click();
+  await expect(page.locator('#home-search-results')).toBeVisible();
+});

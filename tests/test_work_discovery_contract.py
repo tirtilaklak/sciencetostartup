@@ -5,6 +5,23 @@ from test_site_search import run_stub
 
 
 class WorkDiscoveryContractTests(unittest.TestCase):
+    def test_displayed_primary_counts_share_the_approved_selection(self):
+        result = run_stub(r'''
+run('initialize()');
+const expected=plain(run('w4DiscoveryGroups(workRouteRows())'));
+assert.equal(expected.named.length,56);assert.equal(expected.programs.length,22);assert.equal(expected.primary.length,78);
+assert.deepEqual(plain(run('storyWorkRows().map(r=>r.id)')),expected.primary.map(r=>r.id));
+assert.deepEqual(plain(run('w4RouteGroups(workRouteRows()).primary.map(r=>r.id).sort()')),expected.primary.map(r=>r.id).sort());
+assert.equal(run("siteSearchPages().find(page=>page.id==='work').meta"),'56 named listings · 22 networks and programs');
+run("state.workQuery='Sage';state.workKind='named'");
+assert.equal(run("siteSearchView('').flatMap(group=>group.items).find(item=>item.id==='work').meta"),'56 named listings · 22 networks and programs','Suggested scope ignores prior filters');
+for(const company of data.companies){const id=JSON.stringify(company.id);assert.deepEqual(plain(run(`workRouteSummary(${id}).primary.map(r=>r.id).sort()`)),plain(run(`w4DiscoveryGroups(workRoutesFor(${id})).primary.map(r=>r.id).sort()`)),company.id);}
+assert.equal(run('new Set(storyWorkRows().map(r=>r.company_id)).size'),29);
+assert.equal(run('workRouteRows().length'),135,'All recorded research remains reachable');
+for(const row of expected.closed.filter(route=>route.route_kind==='other_record'&&!['historical','closed','contributions','paused','no_route','inquiry','information'].includes(route.status)))assert.ok(!expected.primary.some(primary=>primary.id===row.id),row.id+' informational record cannot count as primary');
+''')
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_literal_search_and_semantic_filters(self):
         result = run_stub(r'''
 run('initialize()');

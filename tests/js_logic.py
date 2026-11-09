@@ -201,8 +201,8 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  // The table box is a plain box. comparisonScrollRegion() names it as a focusable region only when it scrolls sideways.
  assert.ok(node('compare-content').innerHTML.includes('<div class="comparison-scroll"><table'),'The comparison box is not a Tab stop by default');
  run('setSelection([])');location.hash='#market';run('route()');
- // The overview counts paid work listings and does not call them open.
- assert.match(node('overview-work').innerHTML,/<b>\d+<\/b> paid work listings<\/span>/);assert.ok(!/open/i.test(node('overview-work').innerHTML.split('<p class="overview-safety">')[0]),'Overview work counts never say open');
+ // The overview counts approved listings and programs, without treating page checks as terms review.
+ assert.match(node('overview-work').innerHTML,/<b>78<\/b> work routes<\/span>/);assert.ok(node('overview-work').innerHTML.includes('56 named listings and 22 networks and programs.'));assert.ok(node('overview-work').innerHTML.includes('Page checks do not establish current terms or availability.'));assert.ok(!/We reviewed every listing|open/i.test(node('overview-work').innerHTML.split('<p class="overview-safety">')[0]),'Overview work counts never imply vacancies or full terms review');
  // #companies/<group> filters the list to that group. An address that names no group shows the full list and becomes #companies.
  location.hash='#companies/expert-data-evaluation';run('route()');assert.equal(node('companies-view').hidden,false);assert.equal(run('state.category'),'Expert data & evaluation');assert.equal(run('filtered().length'),9);assert.equal(location.hash,'#companies/expert-data-evaluation');
  location.hash='#companies/no-such-group';run('route()');assert.equal(run('state.category'),'','An unknown group address shows the full list');assert.equal(run('filtered().length'),39);assert.equal(location.hash,'#companies','An unknown group address is rewritten to #companies');

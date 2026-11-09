@@ -13,10 +13,13 @@ import re
 import sqlite3
 import subprocess
 import tempfile
+import sys
 from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tests"))
+from artifact_verification import verify_artifact
 # The old pin was immutable 2.0.1 (921613996550332bf70fa5270eeee259ff9c460281d42c4fe168a74fe52f2e69).
 # Later reviewed source deltas are recorded in docs/research-update-20261014.json,
 # docs/research-update-round2-20261014.json and docs/release-verification-20261015.json.
@@ -205,9 +208,7 @@ def main():
     html = (ROOT / 'dist/explore/index.html').read_text()
     # The build moves the data and app scripts into content-hashed files under dist/js/.
     bundles = json.loads(re.search(r'const files=(\[[^\]]*\])', html).group(1))
-    app_bundle = (ROOT / 'dist' / next(name.lstrip('/') for name in bundles if name.lstrip('/').startswith('js/app.'))).read_text()
-    assert (ROOT / 'web/app.js').read_text() in app_bundle, 'Build is stale relative to dashboard JavaScript'
-    assert (ROOT / 'web/style.css').read_text() in html, 'Build is stale relative to dashboard CSS'
+    verify_artifact(ROOT / 'dist', ('web/app.js', 'web/style.css'))
     embedded = re.search(r'<script id="research-data" type="application/json">(.*?)</script>', html, re.S)
     summary_descriptor = json.loads((ROOT / 'dist/manifest.json').read_text())['summary']
     summary = json.loads((ROOT / 'dist' / summary_descriptor['href'].lstrip('/')).read_text())

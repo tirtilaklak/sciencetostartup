@@ -21,6 +21,7 @@ import html
 import json
 import re
 import unicodedata
+from datetime import date, datetime, timezone
 from decimal import ROUND_HALF_UP, Decimal
 from functools import cmp_to_key
 from pathlib import Path
@@ -325,7 +326,7 @@ class Research:
     The rules read the records as stored, like the app. `say` (public_wording) only changes the words the pages print.
     `health` (link_health_index) carries the link checks."""
 
-    def __init__(self, data, headlines=None, updates=None, say=None, health=None):
+    def __init__(self, data, headlines=None, updates=None, say=None, health=None, publication_as_of=None):
         self.data = data
         self.say = say or (lambda value: "" if value is None else str(value))
         self.health = health or {}
@@ -335,6 +336,7 @@ class Research:
         self.by_company = {}
         for row in data.get("metrics", []): self.by_company.setdefault(row.get("company_id"), []).append(row)
         self.as_of = str(data.get("meta", {}).get("as_of", ""))
+        self.publication_as_of = publication_as_of or self.as_of
         self.headlines = dict(headlines or {})
         current = isinstance(updates, dict) and updates.get("baseline_dataset_version") == data.get("dataset_version")
         self.corrections = self._corrections(updates) if current else {}
@@ -724,6 +726,39 @@ def work_terms_review_date(route):
     return (work_approved_terms_receipt(route) or {}).get("checked_on") or route.get("terms_checked_on")
 
 
+def work_terms_age(route, as_of):
+    """A named listing's full-terms review age; retrieval/pay-only dates cannot reset it.
+
+    The caller supplies the publication date explicitly. Static builds never read
+    the clock, and the original review date is never rewritten by aging.
+    """
+    if not isinstance(as_of, str) or not as_of:
+        raise ValueError("work terms age requires an explicit publication date")
+    if len(as_of) == 10:
+        day = date.fromisoformat(as_of)
+    else:
+        timestamp = datetime.fromisoformat(as_of.replace("Z", "+00:00"))
+        if timestamp.tzinfo is None:
+            raise ValueError("publication timestamp must have an explicit timezone")
+        day = timestamp.astimezone(timezone.utc).date()
+    result = {"state": "not_applicable", "reviewed_on": None, "as_of": day.isoformat(), "age_days": None, "label": ""}
+    if work_kind(route) != "named_listing" or not work_primary(route):
+        return result
+    receipt = work_approved_terms_receipt(route)
+    reviewed = date.fromisoformat(receipt["checked_on"]) if receipt else None
+    if reviewed is None or reviewed > day:
+        return {**result, "state": "not_reviewed", "label": "Full terms review not recorded"}
+    age = (day - reviewed).days
+    return {**result, "state": "needs_recheck" if age >= 14 else "current", "reviewed_on": reviewed.isoformat(), "age_days": age,
+            "label": "Needs recheck" if age >= 14 else ""}
+
+
+def work_review_label(research, route):
+    label = work_freshness(route)
+    age = work_terms_age(route, research.publication_as_of)
+    return label + (" · " + age["label"] + " (as of " + format_date(age["as_of"]) + ")" if age["label"] else "")
+
+
 def work_freshness(route):
     """w4FreshnessLabel(): terms, pay-only review, blocked recheck, then page check."""
     receipt = work_approved_terms_receipt(route)
@@ -1051,7 +1086,7 @@ def work_item(research, route):
     """One source-backed route; critical conditions and review scope precede its action."""
     status, bucket = work_status(route), work_display_bucket(route)
     place = work_location(route)
-    parts = [labelled("Pay", work_pay(route)) if bucket not in ("boards", "closed") else "", (place if place == NO_PLACE else labelled("Where", place)) if bucket != "closed" else "", work_freshness(route)]
+    parts = [labelled("Pay", work_pay(route)) if bucket not in ("boards", "closed") else "", (place if place == NO_PLACE else labelled("Where", place)) if bucket != "closed" else "", work_review_label(research, route)]
     tag = f' <span class="tag">{escape(status)}</span>' if status else ""
     destination, action = work_destination(route, research)
     return f'<li data-work-route="{escape(route.get("id"))}"><strong>{escape(clean(route.get("role")) or "Listing")}</strong>{tag}<span class="sub">{escape(". ".join(p for p in parts if p))}</span>{work_pay_notes(route) if bucket not in ("boards", "closed") else ""}{work_conditions(route)}{work_terms_html(research, route)}<p class="work-action">{external_link(destination, action, clean(route.get("role")))}{availability(destination, research.health)}</p></li>'
@@ -1310,7 +1345,7 @@ def work_table(research, rows, names, key):
         cid, status = r.get("company_id"), work_status(r)
         company = names.get(cid, cid)
         destination, action = work_destination(r, research)
-        cells = {"Company": f'<a href="{ORIGIN}/company/{escape(cid)}/#work">{escape(company)}</a>', "Pay": escape(work_pay(r)) + work_pay_notes(r), "Where": escape(work_location(r)), "Status": escape(status or "Other record"), "Review": escape(work_freshness(r)), "Action": external_link(destination, action, clean(r.get("role")) + ", " + company) + availability(destination, research.health)}
+        cells = {"Company": f'<a href="{ORIGIN}/company/{escape(cid)}/#work">{escape(company)}</a>', "Pay": escape(work_pay(r)) + work_pay_notes(r), "Where": escape(work_location(r)), "Status": escape(status or "Other record"), "Review": escape(work_review_label(research, r)), "Action": external_link(destination, action, clean(r.get("role")) + ", " + company) + availability(destination, research.health)}
         role = clean(r.get("role")) or "Listing"
         tag = f' <span class="tag">{escape(status)}</span>' if status and key != "closed" else ""
         out.append(f'<tr data-work-route="{escape(r.get("id"))}"><th scope="row">{escape(role)}{tag}{work_conditions(r)}{work_terms_html(research, r)}</th>' + "".join(f'<td data-label="{c}">{cells[c]}</td>' for c in columns) + "</tr>")
@@ -1437,8 +1472,10 @@ def write_static_pages(data, destination, work_data=None, profile_content=None, 
     """Write /company/<id>/, /companies/, /work/, /method/, 404.html and sitemap.xml.
     `events` is the company events sidecar and `link_health` the link checks, both as the build validated them."""
     destination, root = Path(destination), Path(root)
+    publication = read_json(root / "data/editorial-release.json") or {}
+    publication_as_of = publication.get("publication_as_of") if publication.get("canonical_dataset_version") == data["dataset_version"] else data.get("meta", {}).get("as_of")
     research = Research(data, read_js_object(root / "web/app.js", "FINANCIAL_HEADLINES"), read_json(root / "data/source-updates.json"),
-                        say=public_wording(data, load_copy_edits(root / "web/app.js")), health=link_health_index(link_health))
+                        say=public_wording(data, load_copy_edits(root / "web/app.js")), health=link_health_index(link_health), publication_as_of=publication_as_of)
     # A company page with dated events changes when the events are reviewed, so its lastmod follows that review too.
     events_reviewed = str((events or {}).get("reviewed_on") or "")
     labels = read_js_object(root / "web/editorial.js", "GROUP_LABELS")

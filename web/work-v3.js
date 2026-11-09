@@ -87,6 +87,7 @@ function syncWorkRoute(traversal=false){
 document.addEventListener('click',event=>{const link=event.target?.closest?.('a[href]');if(normalSelfLinkActivation(event,link)&&routeParts()[0]==='work')flushWorkRoute();},true);
 window.addEventListener('pagehide',flushWorkRoute);
 function selectWorkRoutes(input,criteria={}){
+  if(searchContextPending(criteria.q))throw new Error('Work search context is not ready');
   const filter=normalizeWorkCriteria(criteria),matcher=w4QueryMatcher(filter.q),group=WORK_TYPE_GROUPS[filter.type]||'';
   let rows=input.filter(route=>(!filter.kind||w4OpportunityKind(route)===(filter.kind==='named'?'named_listing':'network_program'))&&(!group||w4GroupMatches(route,group))&&w4PayMatches(route,filter.pay)&&w4WhereMatches(route,filter.arrangement));
   if(matcher){const text=new Map(rows.map(route=>[route,w4SearchText(route)])),phrase=rows.filter(route=>matcher.phrase(text.get(route)));rows=phrase.length?phrase:rows.filter(route=>matcher.all(text.get(route)));}
@@ -102,11 +103,17 @@ function workResultsLabel(summary){
   if(!summary.total)return 'No recorded matches';
   return [`${summary.total} ${summary.total===1?'record':'records'}`,summary.named?`${summary.named} ${summary.named===1?'listing':'listings'}`:'',summary.programs?`${summary.programs} ${summary.programs===1?'program':'programs'}`:''].filter(Boolean).join(' · ');
 }
+// Current-results CSV keeps fact states and source identities; full narrative
+// notes and history are linked separately so opening a profile cannot alter it.
+function workReviewMetadata(route){
+ return Object.fromEntries(Object.entries(route.field_reviews||{}).sort(([a],[b])=>a.localeCompare(b)).map(([field,review])=>[field,{state:review.state,reviewed_on:review.reviewed_on??null,source_ids:[...(review.source_ids||[])],basis:review.basis,...(field==='location'&&review.note?{note:review.note}:{})}]));
+}
 function exportWorkCsv(){
+  if(searchContextPending(state.workQuery)){const hash=workHashFor();return window.ensureSearchContext().then(()=>{if(routeParts()[0]==='work'&&workHashFor()===hash)exportWorkCsv();}).catch(()=>workSearchFailure());}
   flushWorkRoute();const criteria=currentWorkCriteria();
-  const head=['route_id','company','role','opportunity_kind','engagement_type','availability','advertised_pay','pay_unit','hourly_comparable','currency','arrangements','location','requirements','assessment','commitment','duration','terms_reviewed_on','terms_review_scope','original_application_url','current_action_url','current_action_label','source_urls','field_reviews','search_query','opportunity_filter','engagement_filter','pay_filter','arrangement_filter','sort'];
+  const head=['route_id','company','role','opportunity_kind','engagement_type','availability','advertised_pay','pay_unit','hourly_comparable','currency','arrangements','location','requirements','assessment','commitment','duration','terms_reviewed_on','terms_review_scope','original_application_url','current_action_url','current_action_label','source_urls','field_review_metadata','full_research_profile_url','search_query','opportunity_filter','engagement_filter','pay_filter','arrangement_filter','sort'];
   const groups=w4DiscoveryGroups(selectWorkRoutes(workRouteRows(),criteria),criteria.sort);
-  const rows=['named','programs','boards','outside','closed'].flatMap(key=>groups[key]).map(route=>[route.id,companies[route.company_id]?.name||route.company_id,route.role,w4OpportunityKind(route),w4Engagement(route),w4Status(route)||'Recorded listing',route.pay_label||'',route.pay_terms?.unit||'',route.pay_terms?.hourly_comparable===true,route.pay_terms?.currency||'',w4Arrangements(route).join(' | '),route.geography||'',(route.requirements||[]).join(' | '),route.assessment||'',route.hours||'',route.duration||'',w4TermsReviewDate(route)||'',w4ApprovedTermsReceipt(route)?'key_terms':route.terms_checked_on?'pay_terms':'',route.url||'',w4Destination(route).url||'',w4Destination(route).label||'',(route.sources||[]).map(source=>source.url).join(' | '),JSON.stringify(route.field_reviews||{}),criteria.q,criteria.kind,criteria.type,criteria.pay,criteria.arrangement,criteria.sort]);
+  const rows=['named','programs','boards','outside','closed'].flatMap(key=>groups[key]).map(route=>[route.id,companies[route.company_id]?.name||route.company_id,route.role,w4OpportunityKind(route),w4Engagement(route),w4Status(route)||'Recorded listing',route.pay_label||'',route.pay_terms?.unit||'',route.pay_terms?.hourly_comparable===true,route.pay_terms?.currency||'',w4Arrangements(route).join(' | '),route.geography||'',(route.requirements||[]).join(' | '),route.assessment||'',route.hours||'',route.duration||'',w4TermsReviewDate(route)||'',w4ApprovedTermsReceipt(route)?'key_terms':route.terms_checked_on?'pay_terms':'',route.url||'',w4Destination(route).url||'',w4Destination(route).label||'',(route.sources||[]).map(source=>source.url).join(' | '),JSON.stringify(workReviewMetadata(route)),'https://sciencetostartup.com/company/'+encodeURIComponent(route.company_id)+'/',criteria.q,criteria.kind,criteria.type,criteria.pay,criteria.arrangement,criteria.sort]);
   download('sciencetostartup-current-work-results.csv','\ufeff'+[head,...rows].map(row=>row.map(csvCell).join(',')).join('\r\n')+'\r\n','text/csv;charset=utf-8');
 }
 // The page renderers (workCard, renderWork, workSummary) live in work-v4.js, which loads after this file.

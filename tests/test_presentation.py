@@ -24,10 +24,13 @@ class PresentationTests(unittest.TestCase):
         required = {cid for observation in overview["businessHealth"]["observations"] for cid in observation["claim_ids"] if cid in canonical_claims}
         actual = {claim["id"]: claim for claim in overview["data"].get("claims", [])}
         self.assertTrue(required)
-        self.assertEqual(set(actual), required)
-        self.assertTrue(all(actual[cid] == canonical_claims[cid] for cid in required))
+        financial = [metric for metric in canonical["metrics"] if metric["kind"] in ("revenue", "arr", "annualized_revenue_run_rate")]
+        required.update(metric["claim_id"] for metric in financial)
+        self.assertTrue(required <= set(actual))
+        self.assertTrue(all(claim == canonical_claims[cid] for cid, claim in actual.items()))
+        self.assertEqual(overview["data"]["metrics"], financial)
         available_sources = {source["id"] for source in overview["data"].get("sources", [])}
-        self.assertTrue({sid for claim in actual.values() for sid in claim["source_ids"]} <= available_sources)
+        self.assertTrue({sid for claim in actual.values() for field in ("source_ids", "historical_source_ids") for sid in claim.get(field, [])} <= available_sources)
 
     def test_nested_protected_output_and_symlinks_are_rejected(self):
         for name in ("dist/nested", "web/assets/nested", "data/versions/nested", "scripts/nested", "tests/nested"):
@@ -67,6 +70,16 @@ class PresentationTests(unittest.TestCase):
         self.assertEqual(promotion_candidates(work, release), candidates)
         route["editorial_review"]["approved_terms_receipt_id"] = "blocked"
         self.assertEqual(promotion_candidates(work, release), [])
+
+    def test_recent_receipt_cannot_promote_archived_or_unrelated_work(self):
+        receipt = {"id": "approved", "approved": True, "scope": "key_terms", "result": "readable", "approval_basis": "source_content_review", "checked_on": "2026-11-08"}
+        route = {"id": "example", "route_kind": "named_listing", "status": "intake_unverified", "ai_data_work": True,
+                 "editorial_review": {"approved_terms_receipt_id": "approved", "receipts": [receipt]}}
+        release = {"homepage": {"work_candidate_route_ids": ["example"]}}
+        self.assertEqual(len(promotion_candidates({"routes": [route]}, release)), 1)
+        for update in ({"status": "historical"}, {"status": "closed"}, {"ai_data_work": False}, {"route_kind": "career_page"}):
+            self.assertEqual(promotion_candidates({"routes": [{**route, **update}]}, release), [], update)
+        self.assertEqual(route["editorial_review"]["receipts"], [receipt])
 
     def test_exactly_two_validated_prior_generations_are_retained(self):
         with tempfile.TemporaryDirectory() as temporary:

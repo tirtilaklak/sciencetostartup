@@ -17,7 +17,7 @@ PRINTABLE = re.compile(rb"[\x20-\x7e]{6,}")
 # The build moves the app code and the sidecar data out of index.html into content-hashed files in js/.
 # They are scanned under a stable name, so the allowlist does not change with every build.
 BUNDLE = re.compile(r"^js/([a-z]+)\.[0-9a-f]{12}\.js$")
-PRESENTATION = re.compile(r"^presentation/(archive|company-benchflow)\.[0-9a-f]{16}\.json$")
+PRESENTATION = re.compile(r"^presentation/(archive|company-benchflow|company-bespoke_labs)\.[0-9a-f]{16}\.json$")
 
 
 def stable_name(name):
@@ -35,8 +35,9 @@ ALLOWED = {
     # The publisher's own correction and contact address, shown in the About panel.
     "musaeminozdem@gmail.com": {"explore/index.html#about"},
     # Role address Bespoke Labs publishes for domain experts on https://bespokelabs.ai/contact
-    # (checked 2026-10-23); the reviewed Work route cites that page. The app reads the routes from the data bundle.
-    "experts@bespokelabs.ai": {"work-routes.json", "js/data.js"},
+    # (checked 2026-10-23); the reviewed Work route cites that page. The same
+    # record's complete research now also loads through its company detail asset.
+    "experts@bespokelabs.ai": {"work-routes.json", "js/data.js", "presentation/company-bespoke_labs.json"},
     # A named person's address quoted in canonical claim benchflow.claim.worker_opportunities-0.
     # Dataset 2.5.0 is pinned, so it stays in canonical-derived files until the pending 2.5.1
     # release removes it. It must never appear in Work routes or a static page.

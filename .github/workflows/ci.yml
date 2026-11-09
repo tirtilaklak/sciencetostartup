@@ -14,10 +14,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Unit tests
-        run: python3 -m unittest discover -s tests -p 'test_*.py'
       - name: Install the pinned QA tools
         run: npm ci
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -p 'test_*.py'
       - name: Performance tool contracts
         run: node --test tests/performance_tools.test.mjs
       - name: Hero and bootstrap payload budgets

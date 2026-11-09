@@ -60,27 +60,38 @@ sanitized public deployment settings; credentials never enter the repository.
 
 `build()` in `scripts/observatory.py` turns `web/` and the data into `dist/`.
 
-- CSS is inlined into `dist/index.html`: `style.css` first, then the files in
+- CSS is inlined into `dist/explore/index.html`: `style.css` first, then the files in
   `REDESIGN_CSS`, then `icons.css`. Between two equally specific rules, the
   later file wins.
 - `icons.js` runs first in its own tag. The other scripts join into one
   classic script in this order: `link-health.js`, `app.js`, `editorial.js`,
-  `work-v3.js`, then the files in `PRESENTATION_JS` (`work-v4.js`,
-  `profiles-v2.js`, `source-updates.js`, `site-nav.js`, `business-health.js`).
+  `work-v3.js`, then `INITIAL_PRESENTATION_JS` (`work-v4.js`,
+  `profiles-v2.js`, `source-updates.js`, `site-nav.js`).
   When two files declare a function with the same name, the later one is the
-  one that runs. `business-health.js` sets up the dashboard as soon as it
-  loads, so it comes last, after everything it reads.
+  one that runs. `data-runtime.js` owns asynchronous navigation, validated
+  context installation and readiness. The logical test order in `PRESENTATION_JS`
+  also includes `business-health.js`; production loads it as an inert, hashed
+  factory with native subresource integrity. Company, overview and archive routes
+  initialize it once before installing full evidence. Directory and work browsing
+  use the compiled financial models without downloading the dashboard module.
 - That script and the page data go to content-hashed files,
   `dist/js/app.<hash>.js` and `dist/js/data.<hash>.js` (the name changes when
-  the content changes). They load after the first paint. The research dataset
-  stays inline in `index.html` as JSON.
+  the content changes). Head preloads discover them early; execution remains
+  sequential after the first paint. A compact bootstrap stays inline in the
+  interactive page. Search text, company evidence and the full archive load
+  through versioned presentation assets when requested.
+  Small route hints in the document head overlap the initial research route's
+  byte request with app loading. They cannot install or render evidence;
+  the route owner still verifies the digest, release and current navigation.
 - `scripts/static_pages.py` writes the plain pages from the same data.
 
 ## View or reproduce
 
-Python's standard library is sufficient for the snapshot build. Node.js runs
-the logic checks. No hosted database, API key or npm install is
-required to view or build the dashboard.
+Viewing the checked-in static site requires only a file server. Rebuilding uses
+Python and Node.js 22 or later. Run `npm ci` once to install the pinned frontend
+packager and QA tools. Python builds the research exports and presentation models;
+esbuild minifies the classic JavaScript without bundling or hiding its globals.
+The deployed site remains static and requires no application server or API key.
 
 The builder explicitly enables SQLite secure deletion so different library
 defaults do not leave different bytes in unused database space. Exact snapshot
@@ -88,6 +99,7 @@ verification passes with SQLite 3.46.1 and 3.53.1.
 
 ```sh
 python3 -m http.server 8765 --directory dist
+npm ci
 python3 scripts/build_public_snapshot.py --verify
 python3 scripts/build_public_snapshot.py --output build/public-snapshot
 ```
@@ -143,14 +155,39 @@ The live website is served by the `sciencetostartup` Cloudflare Worker with Stat
 Assets on the apex and www custom domains. Deployment publishes the reviewed
 `dist/` build; a GitHub push alone does not trigger deployment.
 
-A deploy must upload all of `dist/`, including `dist/js/`: the app page
-(`index.html`) loads its scripts from there. Those file names change with their
-content, so `web/_headers` and `vercel.json` let browsers cache them for a year.
+A deploy must upload all manifested public assets, including `dist/js/` and
+`dist/presentation/`. The homepage and `/explore/` use different entry points;
+company evidence and the full search index load on demand. Hashed file names
+change with their content, so `web/_headers` lets browsers cache them for a year.
 
 The Worker staging omits the domain-level `_redirects` file because Workers
 Static Assets accepts relative source paths. Equivalent zone redirects enforce
 HTTPS and the apex hostname while preserving paths and queries. `_headers` is
-deployed unchanged.
+passed unchanged as asset configuration, rather than served as a public file.
+
+The release sequence is deliberate:
+
+1. Freeze one complete build and run unit, logic, exact-build, payload, browser
+   and three-run mobile performance gates against that directory. Record manual
+   accessibility checks separately; an automated score does not certify VoiceOver.
+2. Commit the matching source and `dist/`. Prepare the upload with
+   `python3 scripts/release_artifact.py prepare --dist <frozen-directory> --output <receipt-directory> --source-commit <commit>`.
+   The receipt binds source, build, editorial release, manifest and sanitized
+   deployment configuration. Preparation and upload both verify every asset.
+3. Create an asset upload session through the connected Cloudflare API. Keep
+   short-lived authorization files outside this repository. Upload those exact
+   bytes once, create an assets-only version, and test its immutable version URL.
+   Preserve `deployment.json`'s existing non-versioned logs and analytics settings.
+4. Confirm the current production predecessor, then promote that tested version
+   to 100 percent. Verify identity, routes, source dialogs, downloads, redirects
+   and headers again. If a functional or identity check fails, immediately restore
+   the predecessor at 100 percent and record the failure.
+
+Keep the prior two production generations in `release-assets/generations.json`,
+including their hashed JavaScript and presentation JSON. Add the outgoing
+generation before the next build; never prune assets from a frozen artifact.
+The release receipt must add the Cloudflare version, deployment and post-release
+check results. A GitHub push or a successful upload is not a production release.
 
 Cloudflare Web Analytics is injected at the edge and sets no cookies.
 
