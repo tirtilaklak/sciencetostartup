@@ -39,6 +39,8 @@ def approved_graph(captured_on="2026-11-06T20:00:00Z", reviewed_on="2026-11-09T2
     from research_graph import ENTITY_FIELDS
     if "parent_id" in ENTITY_FIELDS:
         graph["entities"][0]["parent_id"] = None
+    if "review_depth" in ENTITY_FIELDS:
+        graph["entities"][0]["review_depth"] = "full_source"
     if "taxonomy" in ENTITY_FIELDS:
         graph["entities"][0]["taxonomy"] = {key: [] for key in (
             "domain", "modality", "workflow", "expertise", "origin", "labels", "oversight")}
