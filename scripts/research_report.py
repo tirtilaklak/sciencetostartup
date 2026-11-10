@@ -392,9 +392,14 @@ def build_context(root=ROOT):
         path = root / f"data/research/{kind}-audit.json"
         if path.is_file():
             policy["audits"][kind] = json.loads(path.read_text())
+    correction_path = root / 'data/research/corrections.json'
+    correction_registry = json.loads(correction_path.read_text()) if correction_path.is_file() else {'schema_version': '1.0.0', 'corrections': []}
+    if correction_registry.get('schema_version') != '1.0.0' or not isinstance(correction_registry.get('corrections'), list):
+        raise ValueError('Unsupported corrections registry')
     return {"graph": graph, "report": report, "gate": publication_gate(graph, report, policy),
             "identity": load_identity(root), "policy": policy,
-            "edition_snapshots": load_edition_snapshots(root, report)}
+            "edition_snapshots": load_edition_snapshots(root, report),
+            "corrections": correction_registry['corrections']}
 
 
 if __name__ == "__main__":
