@@ -1,7 +1,27 @@
 # Research evidence graph
 
 This additive graph is **prelaunch**. It does not replace canonical dataset 2.5.0,
-its JSON, its SQLite database, or their dates. The current baseline retains 39
+its JSON, its SQLite database, or their dates.
+
+## Reviewed integration checkpoint
+
+The 10 November 2026 integration checkpoint retains 39 historical organization
+descriptions and 959 approved assertions. Computed coverage is 43 qualifying
+suppliers, 72 reviewed paper works, 45 dataset families, 21 benchmark families and
+25 of 39 legacy inclusion dispositions. Its 991 scoped source records represent
+334 distinct captured document versions. These counts exclude pending candidates,
+versions and unresolved family boundaries. Each approval has exact-content,
+separate author, source-verifier and adversarial AI receipts. Source reading depth
+is retained per invocation; a scoped methods/results/limitations review does not
+claim every appendix page, proof, corpus row or experimental result was reproduced.
+
+The eligible core and both actual 200-record audits remain unfinished. The expanded
+report and matching package are not yet prepared. Prior synthesis receipts and
+frozen archive bytes remain bound to their original graph.
+
+## Historical initial baseline
+
+The initial baseline retained 39
 historical organization descriptions and 173 approved assertions. The latest batch
 contributes 163 assertions after separate author, source-verifier and adversarial
 AI review of pinned primary sources. Eight disputed assertions remain quarantined;
@@ -12,6 +32,11 @@ suppliers, eight full-source paper works, eight dataset families and five benchm
 families. The 194 scoped evidence records represent 75 distinct captured document
 versions, not 194 independent documents. These are reviewed baseline observations,
 not a comprehensive market census or completed launch audit.
+
+That initial calculation counted FineWeb-Edu separately. The current identity
+review treats it as a FineWeb subset release and counts one family. Historical
+frozen files retain their exact bytes; the next synthesis must identify this
+correction rather than silently rewriting archived calculations.
 
 The graph retains the actual UTC capture and review times. Captures on 9 November
 in Los Angeles occur on 10 November UTC; they do not retroactively satisfy the

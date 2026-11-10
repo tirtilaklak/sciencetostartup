@@ -13,15 +13,21 @@ and `/review/` accepts source-backed corrections, section review and reuse.
 Essential content and downloads work without JavaScript. Both site search
 implementations link directly to native research and organization pages.
 
-The comprehensive weekly series is **prelaunch**. Its reviewed baseline contains
-173 approved assertions, 12 substantive chapters and six evidence-bound executive
-findings. Source assertions received separate author, source-verifier and
-adversarial AI reviews; the exact report then received separate evidence-auditor
-and adversarial synthesis reviews. Coverage is eight qualifying suppliers, eight
-full-source paper works, eight dataset families, five benchmark families and eight
-of the 39 existing organization inclusion audits. Scoped evidence records (194)
-represent 75 distinct pinned document versions. Eight disputed assertions remain
-quarantined. Historical field-guide evidence retains its dates and labels.
+The comprehensive weekly series is **prelaunch**. The reviewed integration
+checkpoint contains 959 approved assertions: 43 qualifying suppliers, 72 reviewed
+paper works, 45 dataset families, 21 benchmark families and 25 of the 39 existing
+organization inclusion dispositions. Its 991 scoped evidence records represent
+334 distinct captured document versions. Every approved assertion has separate
+author, source-verifier and adversarial AI source-content reviews at its exact
+digest. Reading scopes remain explicit; this does not imply cover-to-cover paper
+reading, experiment reproduction or an operational supplier audit.
+
+The expanded report synthesis, its independent content reviews and its matching
+PDF/archive are unfinished. The earlier frozen 173-assertion report has 12 chapters,
+six executive findings and its own synthesis reviews; those receipts and prepared
+bytes cannot approve this expanded graph. Historical field-guide evidence retains
+its real dates and labels. Unresolved dataset-family boundaries remain pending and
+do not inflate coverage.
 
 This is not a comprehensive market census. The frozen core and both real
 200-record launch audits are still outstanding. No published edition, human peer
