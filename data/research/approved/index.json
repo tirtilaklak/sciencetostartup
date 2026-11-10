@@ -51,6 +51,10 @@
     {
       "path": "13-papers-cohort5-2026-11-10.json",
       "sha256": "754053c91dd9e3f725ed3767ab567a141e1ee990617adc381f71a91f74ca7571"
+    },
+    {
+      "path": "14-papers-cohort6-2026-11-10.json",
+      "sha256": "93e9500fa2af1a04b309a196e764d8fe7c8570544aa626347d7def32320c91c0"
     }
   ],
   "schema_version": "1.0.0"

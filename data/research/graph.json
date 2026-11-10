@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-11-10T11:24:51.008659Z",
+  "as_of": "2026-11-10T11:46:30.333851Z",
   "assertions": [
     {
       "as_of": "2026-10-15",
@@ -12531,6 +12531,164 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2311.07911",
+      "identifiers": {
+        "arxiv": "2311.07911"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Instruction-Following Evaluation for Large Language Models",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.ifeval.gpt4-result",
+        "cohort6.claim.ifeval.loose-limit",
+        "cohort6.claim.ifeval.manual-curation",
+        "cohort6.claim.ifeval.prompt-metric"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2311.07911v1",
+      "identifiers": {
+        "arxiv_version": "2311.07911v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Instruction-Following Evaluation for Large Language Models (2311.07911v1)",
+      "parent_id": "paper.arxiv.2311.07911",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2311.12022",
+      "identifiers": {
+        "arxiv": "2311.12022"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "GPQA: A Graduate-Level Google-Proof Q&A Benchmark",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.gpqa.contractors",
+        "cohort6.claim.gpqa.gpt4-result",
+        "cohort6.claim.gpqa.representativeness-limit",
+        "cohort6.claim.gpqa.selection-bias"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2311.12022v1",
+      "identifiers": {
+        "arxiv_version": "2311.12022v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "GPQA: A Graduate-Level Google-Proof Q&A Benchmark (2311.12022v1)",
+      "parent_id": "paper.arxiv.2311.12022",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "Pinned paper methods, results, limitations and assertion-relevant appendix passages received separate AI source-content review. Per-role page scopes remain explicitly partial; this is neither exhaustive reading nor benchmark execution, experiment reproduction, raw-data audit or human peer review. Benchmark-family and supplier records are not automatically promoted from this paper review.",
       "eligible_core": false,
       "family_id": null,
@@ -13673,6 +13831,85 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2405.21075",
+      "identifiers": {
+        "arxiv": "2405.21075"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Video-MME: The First-Ever Comprehensive Evaluation Benchmark of Multi-modal LLMs in Video Analysis",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.videomme.gemini-result",
+        "cohort6.claim.videomme.human-qa",
+        "cohort6.claim.videomme.sampling-asymmetry",
+        "cohort6.claim.videomme.second-review"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2405.21075v1",
+      "identifiers": {
+        "arxiv_version": "2405.21075v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Video-MME: The First-Ever Comprehensive Evaluation Benchmark of Multi-modal LLMs in Video Analysis (2405.21075v1)",
+      "parent_id": "paper.arxiv.2405.21075",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "Pinned paper methods, results, limitations and assertion-relevant appendix passages received separate AI source-content review. Per-role page scopes remain explicitly partial; this is neither exhaustive reading nor benchmark execution, experiment reproduction, raw-data audit or human peer review. Benchmark-family and supplier records are not automatically promoted from this paper review.",
       "eligible_core": false,
       "family_id": null,
@@ -14200,6 +14437,483 @@
       "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
       "eligible_core": false,
       "family_id": null,
+      "id": "paper.arxiv.2409.02813",
+      "identifiers": {
+        "arxiv": "2409.02813"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "MMMU-Pro: A More Robust Multi-discipline Multimodal Understanding Benchmark",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.mmmupro.gpt4o-result",
+        "cohort6.claim.mmmupro.human-distractors",
+        "cohort6.claim.mmmupro.paired-count",
+        "cohort6.claim.mmmupro.prompt-selection"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2409.02813v1",
+      "identifiers": {
+        "arxiv_version": "2409.02813v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "MMMU-Pro: A More Robust Multi-discipline Multimodal Understanding Benchmark (2409.02813v1)",
+      "parent_id": "paper.arxiv.2409.02813",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2410.03859",
+      "identifiers": {
+        "arxiv": "2410.03859"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "SWE-bench Multimodal: Do AI Systems Generalize to Visual Software Domains?",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.swemultimodal.environment-labor",
+        "cohort6.claim.swemultimodal.gpt4o-result",
+        "cohort6.claim.swemultimodal.human-image-annotations",
+        "cohort6.claim.swemultimodal.scope-limit",
+        "cohort6.claim.swemultimodal.stability-appendix"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2410.03859v1",
+      "identifiers": {
+        "arxiv_version": "2410.03859v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "SWE-bench Multimodal: Do AI Systems Generalize to Visual Software Domains? (2410.03859v1)",
+      "parent_id": "paper.arxiv.2410.03859",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2410.05080",
+      "identifiers": {
+        "arxiv": "2410.05080"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "ScienceAgentBench: Toward Rigorous Assessment of Language Agents for Data-Driven Scientific Discovery",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.scienceagentbench.human-validation",
+        "cohort6.claim.scienceagentbench.python-selection",
+        "cohort6.claim.scienceagentbench.selfdebug-result",
+        "cohort6.claim.scienceagentbench.sr-definition"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2410.05080v1",
+      "identifiers": {
+        "arxiv_version": "2410.05080v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "ScienceAgentBench: Toward Rigorous Assessment of Language Agents for Data-Driven Scientific Discovery (2410.05080v1)",
+      "parent_id": "paper.arxiv.2410.05080",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2410.07095",
+      "identifiers": {
+        "arxiv": "2410.07095"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "MLE-bench: Evaluating Machine Learning Agents on Machine Learning Engineering",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.mlebench.contamination-limit",
+        "cohort6.claim.mlebench.curation",
+        "cohort6.claim.mlebench.metric",
+        "cohort6.claim.mlebench.o1-result",
+        "cohort6.claim.mlebench.plagiarism-review"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2410.07095v1",
+      "identifiers": {
+        "arxiv_version": "2410.07095v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "MLE-bench: Evaluating Machine Learning Agents on Machine Learning Engineering (2410.07095v1)",
+      "parent_id": "paper.arxiv.2410.07095",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2411.15114",
+      "identifiers": {
+        "arxiv": "2411.15114"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "RE-Bench: Evaluating frontier AI R&D capabilities of language model agents against human experts",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.rebench.agent-result",
+        "cohort6.claim.rebench.human-count",
+        "cohort6.claim.rebench.human-tools",
+        "cohort6.claim.rebench.representativeness",
+        "cohort6.claim.rebench.score-normalization"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2411.15114v1",
+      "identifiers": {
+        "arxiv_version": "2411.15114v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "RE-Bench: Evaluating frontier AI R&D capabilities of language model agents against human experts (2411.15114v1)",
+      "parent_id": "paper.arxiv.2411.15114",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2412.14161",
+      "identifiers": {
+        "arxiv": "2412.14161"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "TheAgentCompany: Benchmarking LLM Agents on Consequential Real World Tasks",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.agentcompany.claude-result",
+        "cohort6.claim.agentcompany.curation-labor",
+        "cohort6.claim.agentcompany.full-score",
+        "cohort6.claim.agentcompany.human-baseline-limit"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2412.14161v1",
+      "identifiers": {
+        "arxiv_version": "2412.14161v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "TheAgentCompany: Benchmarking LLM Agents on Consequential Real World Tasks (2412.14161v1)",
+      "parent_id": "paper.arxiv.2412.14161",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
       "id": "paper.arxiv.2412.16339",
       "identifiers": {
         "arxiv": "2412.16339"
@@ -14441,6 +15155,85 @@
       "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
       "eligible_core": false,
       "family_id": null,
+      "id": "paper.arxiv.2501.14249",
+      "identifiers": {
+        "arxiv": "2501.14249"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Humanity's Last Exam",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.hle.capability-limit",
+        "cohort6.claim.hle.o1-result",
+        "cohort6.claim.hle.review-filter",
+        "cohort6.claim.hle.two-review-rounds"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2501.14249v1",
+      "identifiers": {
+        "arxiv_version": "2501.14249v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Humanity's Last Exam (2501.14249v1)",
+      "parent_id": "paper.arxiv.2501.14249",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
       "id": "paper.arxiv.2501.18837",
       "identifiers": {
         "arxiv": "2501.18837"
@@ -14517,6 +15310,245 @@
     },
     {
       "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2502.12115",
+      "identifiers": {
+        "arxiv": "2502.12115"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "SWE-Lancer: Can Frontier LLMs Earn $1 Million from Real-World Freelance Software Engineering?",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.swelancer.diamond-denominator",
+        "cohort6.claim.swelancer.implementation-result",
+        "cohort6.claim.swelancer.instruction",
+        "cohort6.claim.swelancer.no-clarification",
+        "cohort6.claim.swelancer.review-labor"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2502.12115v1",
+      "identifiers": {
+        "arxiv_version": "2502.12115v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "SWE-Lancer: Can Frontier LLMs Earn $1 Million from Real-World Freelance Software Engineering? (2502.12115v1)",
+      "parent_id": "paper.arxiv.2502.12115",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2504.01848",
+      "identifiers": {
+        "arxiv": "2504.01848"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "PaperBench: Evaluating AI's Ability to Replicate AI Research",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.paperbench.claude-result",
+        "cohort6.claim.paperbench.codedev-limit",
+        "cohort6.claim.paperbench.judge-validation",
+        "cohort6.claim.paperbench.original-code-rule",
+        "cohort6.claim.paperbench.rubric"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2504.01848v1",
+      "identifiers": {
+        "arxiv_version": "2504.01848v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "PaperBench: Evaluating AI's Ability to Replicate AI Research (2504.01848v1)",
+      "parent_id": "paper.arxiv.2504.01848",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2504.12516",
+      "identifiers": {
+        "arxiv": "2504.12516"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "BrowseComp: A Simple Yet Challenging Benchmark for Browsing Agents",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.browsecomp.grading-restriction",
+        "cohort6.claim.browsecomp.human-origin",
+        "cohort6.claim.browsecomp.human-result",
+        "cohort6.claim.browsecomp.uniqueness-limit"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2504.12516v1",
+      "identifiers": {
+        "arxiv_version": "2504.12516v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "BrowseComp: A Simple Yet Challenging Benchmark for Browsing Agents (2504.12516v1)",
+      "parent_id": "paper.arxiv.2504.12516",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
       "assertion_ids": [
         "claim.helpsteer3.preference-dataset"
       ],
@@ -14575,6 +15607,565 @@
         "oversight": [],
         "workflow": [
           "research"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2506.01937",
+      "identifiers": {
+        "arxiv": "2506.01937"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "RewardBench 2: Advancing Reward Model Evaluation",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.rewardbench2.four-way-scoring",
+        "cohort6.claim.rewardbench2.manual-math",
+        "cohort6.claim.rewardbench2.ppo-limit",
+        "cohort6.claim.rewardbench2.prompt-count",
+        "cohort6.claim.rewardbench2.rm-result"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2506.01937v1",
+      "identifiers": {
+        "arxiv_version": "2506.01937v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "RewardBench 2: Advancing Reward Model Evaluation (2506.01937v1)",
+      "parent_id": "paper.arxiv.2506.01937",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2506.07982",
+      "identifiers": {
+        "arxiv": "2506.07982"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "$\\tau^2$-Bench: Evaluating Conversational Agents in a Dual-Control Environment",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.tau2.assertion-eval",
+        "cohort6.claim.tau2.generated-refined",
+        "cohort6.claim.tau2.gpt41-result",
+        "cohort6.claim.tau2.simulator-error",
+        "cohort6.claim.tau2.telecom-denominator"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2506.07982v1",
+      "identifiers": {
+        "arxiv_version": "2506.07982v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "$\\tau^2$-Bench: Evaluating Conversational Agents in a Dual-Control Environment (2506.07982v1)",
+      "parent_id": "paper.arxiv.2506.07982",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2509.16941",
+      "identifiers": {
+        "arxiv": "2509.16941"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "SWE-Bench Pro: Can AI Agents Solve Long-Horizon Software Engineering Tasks?",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.swepro.augmentation",
+        "cohort6.claim.swepro.gpt5-result",
+        "cohort6.claim.swepro.partitions",
+        "cohort6.claim.swepro.test-limit",
+        "cohort6.claim.swepro.test-review"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2509.16941v1",
+      "identifiers": {
+        "arxiv_version": "2509.16941v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "SWE-Bench Pro: Can AI Agents Solve Long-Horizon Software Engineering Tasks? (2509.16941v1)",
+      "parent_id": "paper.arxiv.2509.16941",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2510.04374",
+      "identifiers": {
+        "arxiv": "2510.04374"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "GDPval: Evaluating AI Model Performance on Real-World Economically Valuable Tasks",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.gdpval.expert-control",
+        "cohort6.claim.gdpval.grader-agreement",
+        "cohort6.claim.gdpval.human-review-count",
+        "cohort6.claim.gdpval.one-shot-limit"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2510.04374v1",
+      "identifiers": {
+        "arxiv_version": "2510.04374v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "GDPval: Evaluating AI Model Performance on Real-World Economically Valuable Tasks (2510.04374v1)",
+      "parent_id": "paper.arxiv.2510.04374",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2601.11868",
+      "identifiers": {
+        "arxiv": "2601.11868"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.terminalbench.exploit-audit",
+        "cohort6.claim.terminalbench.internet-limit",
+        "cohort6.claim.terminalbench.oracle",
+        "cohort6.claim.terminalbench.selection",
+        "cohort6.claim.terminalbench.trials"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2601.11868v1",
+      "identifiers": {
+        "arxiv_version": "2601.11868v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces (2601.11868v1)",
+      "parent_id": "paper.arxiv.2601.11868",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2602.12670",
+      "identifiers": {
+        "arxiv": "2602.12670"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "SkillsBench: Benchmarking How Well Agent Skills Work Across Diverse Tasks",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.skillsbench.context-confound",
+        "cohort6.claim.skillsbench.evaluated-scope",
+        "cohort6.claim.skillsbench.gemini-result",
+        "cohort6.claim.skillsbench.selection-bias",
+        "cohort6.claim.skillsbench.verifier"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2602.12670v1",
+      "identifiers": {
+        "arxiv_version": "2602.12670v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "SkillsBench: Benchmarking How Well Agent Skills Work Across Diverse Tasks (2602.12670v1)",
+      "parent_id": "paper.arxiv.2602.12670",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2604.24955",
+      "identifiers": {
+        "arxiv": "2604.24955"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "BenchGuard: Who Guards the Benchmarks? Automated Auditing of LLM Agent Benchmarks",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort6.claim.benchguard.adjudication",
+        "cohort6.claim.benchguard.bix-result",
+        "cohort6.claim.benchguard.four-artifact-input",
+        "cohort6.claim.benchguard.hallucination-limit",
+        "cohort6.claim.benchguard.precision-scope"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2604.24955v1",
+      "identifiers": {
+        "arxiv_version": "2604.24955v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "BenchGuard: Who Guards the Benchmarks? Automated Auditing of LLM Agent Benchmarks (2604.24955v1)",
+      "parent_id": "paper.arxiv.2604.24955",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "agent_evaluation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "evaluation",
+          "data_curation",
+          "agent_workflows"
         ]
       }
     },
