@@ -348,7 +348,7 @@ class PublicationTests(unittest.TestCase):
         # context digest is written before publication and never refreshed.
         pdf = b"UNIT TEST PDF FIXTURE - not an actual research publication"
         pdf_directory = Path(context["root"]) / "data/research"
-        pdf_directory.mkdir(parents=True)
+        pdf_directory.mkdir(parents=True, exist_ok=True)
         (pdf_directory / "report.pdf").write_bytes(pdf)
         frozen_digest = citations.context_digest(context)
         (pdf_directory / "report-pdf.json").write_bytes(citations.json_bytes({"context_contract_version": citations.CONTEXT_CONTRACT_VERSION, "sha256": citations.sha256(pdf), "context_sha256": frozen_digest}))

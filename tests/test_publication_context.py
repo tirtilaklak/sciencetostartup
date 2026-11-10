@@ -31,7 +31,7 @@ def prepare_fixture(directory, *, committed_path=False, publish_enabled=False):
     populate_owned_inputs(root)
     pdf = b'TEST-ONLY synthetic PDF byte fixture, never a research publication.'
     pdf_root = root / 'data/research'
-    pdf_root.mkdir(parents=True)
+    pdf_root.mkdir(parents=True, exist_ok=True)
     (pdf_root / 'report.pdf').write_bytes(pdf)
     (pdf_root / 'report-pdf.json').write_bytes(citations.json_bytes({
         'schema_version': 1, 'context_contract_version': citations.CONTEXT_CONTRACT_VERSION, 'sha256': citations.sha256(pdf),
