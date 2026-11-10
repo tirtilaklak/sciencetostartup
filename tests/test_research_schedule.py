@@ -1,4 +1,5 @@
 import copy
+import hashlib
 import io
 import json
 import os
@@ -12,9 +13,10 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from research_schedule import (activate_candidate, edition_window, load_edition, main, prepare_candidate,
+from research_schedule import (activate_candidate, edition_window, export_edition, load_edition, main, prepare_candidate,
                                read_journal, record_approval, resolve_edition_reference, schedule_status,
                                source_in_window, state_lock)
+from research_report import canonical_hash
 from test_research_report import approved_graph, empty_graph, test_report
 
 
@@ -222,6 +224,132 @@ class ScheduleTests(unittest.TestCase):
             self.assertEqual(delayed["scheduled_publish_at"], "2026-11-09T17:00:00Z")
             self.assertEqual(delayed["publication"], "not_published")
             self.assertFalse(delayed["external_mutations"])
+
+    def test_export_is_deterministic_standalone_and_does_not_claim_publication(self):
+        supplied = context()
+        supplied["report"]["editions"] = [{"release_id": "prior-fixture", "status": "prepared",
+                                            "snapshot_sha256": "a" * 64}]
+        with tempfile.TemporaryDirectory() as temporary:
+            state = Path(temporary) / "state"
+            output = Path(temporary) / "tracked-editions" / "research-2026-11-09.1.prepared.json"
+            candidate = prepare_candidate(supplied, state, "2026-11-09", "2026-11-08T20:00:00Z")
+            candidate_path = state / "candidates" / f"{candidate['candidate_sha256']}.json"
+            frozen_bytes = candidate_path.read_bytes()
+            first = export_edition(state, candidate["candidate_sha256"], output)
+            second = export_edition(state, candidate["candidate_sha256"], output)
+            exported = json.loads(output.read_text())
+            self.assertEqual(first, second)
+            self.assertEqual(first["snapshot_sha256"], hashlib.sha256(output.read_bytes()).hexdigest())
+            self.assertEqual(first, json.loads(output.with_suffix(".receipt.json").read_text()))
+            self.assertEqual(first["publication"], "not_published")
+            self.assertEqual(exported["report"]["status"], "prepared")
+            self.assertEqual(exported["report"]["editions"], [])
+            self.assertEqual(exported["graph"], candidate["snapshot"]["graph"])
+            self.assertEqual(candidate_path.read_bytes(), frozen_bytes)
+            self.assertEqual(len(read_journal(state)), 1)
+            output.write_text('{}')
+            with self.assertRaises(ValueError):
+                export_edition(state, candidate["candidate_sha256"], output)
+
+    def test_export_refuses_credentials_without_mutating_bound_inputs(self):
+        for private_fields in ({"api_key": "fixture-only-secret"}, {"password": "fixture-only-secret"},
+                               {"description": "Bearer fixture-only-secret"}):
+            supplied = context()
+            supplied["roles"] = {"fixture-only": private_fields}
+            original = copy.deepcopy(supplied)
+            with tempfile.TemporaryDirectory() as temporary:
+                candidate = prepare_candidate(supplied, temporary, "2026-11-09", "2026-11-08T20:00:00Z")
+                output = Path(temporary) / "export.json"
+                with self.assertRaises(ValueError):
+                    export_edition(temporary, candidate["candidate_sha256"], output)
+                self.assertFalse(output.exists())
+                self.assertEqual(supplied, original)
+
+    def test_cli_export_edition_writes_source_and_sha_receipt(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            candidate = prepare_candidate(context(), temporary, "2026-11-09", "2026-11-08T20:00:00Z")
+            output = Path(temporary) / "edition.json"
+            stdout = io.StringIO()
+            with patch("sys.argv", ["research_schedule.py", "export-edition", "--state-directory", temporary,
+                                     "--candidate", candidate["candidate_sha256"], "--output", str(output)]), redirect_stdout(stdout):
+                main()
+            self.assertEqual(json.loads(stdout.getvalue())["snapshot_sha256"], hashlib.sha256(output.read_bytes()).hexdigest())
+            self.assertTrue(output.with_suffix(".receipt.json").is_file())
+
+    def test_later_archive_receipt_can_export_and_activate_frozen_science(self):
+        supplied = context()
+        supplied["policy"]["mode"] = "publish_enabled"
+        def final_gate(graph, report, policy):
+            published = report.get("archive", {}).get("status") == "published"
+            return {"ready": published, "archival_ready": True, "reasons": [] if published else ["Archive missing"]}
+        with tempfile.TemporaryDirectory() as temporary, patch("research_report.publication_gate", side_effect=final_gate):
+            candidate = prepare_candidate(supplied, temporary, "2026-11-09", "2026-11-08T20:00:00Z")
+            candidate_path = Path(temporary) / "candidates" / f"{candidate['candidate_sha256']}.json"
+            original = candidate_path.read_bytes()
+            approval = {"candidate_sha256": candidate["candidate_sha256"], "release_id": candidate["identity"]["release_id"],
+                        "decision": "approved", "approved_by": "Test AI coordinator fixture only", "reviewer_type": "ai",
+                        "role": "coordinator", "invocation_id": "test-only-coordinator", "method": "final_quality_review",
+                        "fixture": False, "rationale": "Test fixture only", "approved_on": "2026-11-08T21:00:00Z"}
+            record_approval(temporary, candidate["candidate_sha256"], approval, "2026-11-08T22:00:00Z")
+            archive = {"status": "published", "verified": True, "api_origin": "https://zenodo.org", "environment": "production",
+                       "release_id": candidate["identity"]["release_id"], "doi": "10.1234/test-fixture-only",
+                       "record_url": "https://zenodo.org/records/1234", "artifact_sha256": "a" * 64,
+                       "confirmed_on": "2026-11-11T18:00:00Z"}
+            output = Path(temporary) / "final-source.json"
+            exported = export_edition(temporary, candidate["candidate_sha256"], output, archive)
+            source = json.loads(output.read_text())
+            self.assertEqual(source["report"]["status"], "published")
+            self.assertEqual(source["report"]["archive"], archive)
+            self.assertEqual(exported["archive_receipt_sha256"], canonical_hash(archive))
+            self.assertEqual(exported["publication"], "published")
+            self.assertEqual(source["graph"]["as_of"], "2026-11-10T00:00:00Z")
+            self.assertEqual(source["graph"], candidate["snapshot"]["graph"])
+            self.assertEqual(activate_candidate(temporary, candidate["candidate_sha256"], "2026-11-11T20:00:00Z")["status"], "held")
+            activated = activate_candidate(temporary, candidate["candidate_sha256"], "2026-11-11T20:00:00Z", archive)
+            self.assertEqual(activated["status"], "activated_locally")
+            self.assertEqual(activated["archive_receipt_sha256"], canonical_hash(archive))
+            self.assertEqual(activated["artifact_sha256"], archive["artifact_sha256"])
+            self.assertEqual(activated["archive_confirmed_on"], archive["confirmed_on"])
+            self.assertEqual(activated["activation_timing"], "delayed")
+            self.assertEqual(candidate_path.read_bytes(), original)
+            self.assertEqual(load_edition(temporary, "2026-11-09")["report"]["archive"]["status"], "not_published")
+            (Path(temporary) / "active.json").unlink()
+            self.assertEqual(activate_candidate(temporary, candidate["candidate_sha256"], "2026-11-12T20:00:00Z")["status"], "already_active")
+            with self.assertRaises(ValueError):
+                activate_candidate(temporary, candidate["candidate_sha256"], "2026-11-12T20:00:00Z", {**archive, "artifact_sha256": "b" * 64})
+
+    def test_archive_overlay_rejects_wrong_release_sandbox_early_and_failed_gates(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            candidate = prepare_candidate(context(), temporary, "2026-11-09", "2026-11-08T20:00:00Z")
+            archive = {"status": "published", "verified": True, "api_origin": "https://zenodo.org", "environment": "production",
+                       "release_id": candidate["identity"]["release_id"], "artifact_sha256": "a" * 64,
+                       "confirmed_on": "2026-11-11T18:00:00Z"}
+            for changed in ({"release_id": "wrong-fixture"}, {"environment": "sandbox"}, {"verified": False},
+                            {"api_origin": "https://sandbox.zenodo.org"}, {"confirmed_on": "2026-11-09T16:59:59Z"}, {}):
+                output = Path(temporary) / "held.json"
+                with self.assertRaises(ValueError):
+                    export_edition(temporary, candidate["candidate_sha256"], output, {**archive, **changed})
+                self.assertFalse(output.exists())
+            with patch("research_report.publication_gate", return_value={"ready": True, "archival_ready": True, "reasons": []}):
+                with self.assertRaises(ValueError):
+                    activate_candidate(temporary, candidate["candidate_sha256"], "2026-11-10T18:00:00Z", archive)
+
+    def test_archive_overlay_preserves_frozen_reservation(self):
+        supplied = context()
+        supplied["report"].update({"edition_date": "2026-11-09", "release_id": "research-2026-11-09.1",
+                                   "archive": {"status": "reserved", "reserved_doi": "10.1234/frozen-fixture",
+                                               "deposition_id": 1234, "api_origin": "https://zenodo.org", "environment": "production"}})
+        with tempfile.TemporaryDirectory() as temporary:
+            candidate = prepare_candidate(supplied, temporary, "2026-11-09", "2026-11-08T20:00:00Z")
+            archive = {"status": "published", "verified": True, "api_origin": "https://zenodo.org", "environment": "production",
+                       "release_id": candidate["identity"]["release_id"], "artifact_sha256": "a" * 64,
+                       "reserved_doi": "10.1234/different-fixture", "deposition_id": 1234,
+                       "confirmed_on": "2026-11-11T18:00:00Z"}
+            output = Path(temporary) / "final.json"
+            with patch("research_report.publication_gate", return_value={"ready": True, "reasons": []}):
+                with self.assertRaises(ValueError):
+                    export_edition(temporary, candidate["candidate_sha256"], output, archive)
+            self.assertFalse(output.exists())
 
     def test_live_lock_is_not_stolen(self):
         with tempfile.TemporaryDirectory() as temporary:

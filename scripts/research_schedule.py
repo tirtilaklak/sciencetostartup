@@ -12,6 +12,7 @@ import contextlib
 import copy
 import json
 import os
+import re
 import socket
 import tempfile
 import uuid
@@ -363,21 +364,112 @@ def record_approval(directory, candidate_id, receipt, now):
         return _append(directory, "approved", {"candidate_sha256": candidate_id, "approval_sha256": digest, "receipt": receipt}, now)
 
 
-def activate_candidate(directory, candidate_id, now):
-    """Journal local activation after receipts; never performs external mutations."""
+def _publication_snapshot(candidate, archive_receipt=None):
+    """Overlay later lifecycle evidence without changing frozen science inputs."""
     from research_report import publication_gate
+
+    snapshot = copy.deepcopy(candidate["snapshot"])
+    if archive_receipt is not None:
+        if not isinstance(archive_receipt, dict):
+            raise ValueError("Archive receipt must be an object.")
+        if archive_receipt.get("release_id") != candidate["identity"]["release_id"]:
+            raise ValueError("Archive receipt does not bind the exact candidate release.")
+        if (archive_receipt.get("status") != "published" or archive_receipt.get("verified") is not True
+                or archive_receipt.get("api_origin") != "https://zenodo.org"
+                or archive_receipt.get("environment") != "production"
+                or not re.fullmatch(r"[0-9a-f]{64}", archive_receipt.get("artifact_sha256") or "")):
+            raise ValueError("An actual verified production archive receipt and exact artifact digest are required.")
+        if _aware(archive_receipt.get("confirmed_on")) < _aware(candidate["identity"]["window"]["publish_at"]):
+            raise ValueError("Archive confirmation predates this edition's publication window.")
+        existing = snapshot["report"].get("archive", {})
+        for key in ("reserved_doi", "deposition_id", "api_origin", "environment"):
+            if existing.get(key) is not None and archive_receipt.get(key) != existing[key]:
+                raise ValueError("Archive receipt changes the frozen reservation: " + key)
+        snapshot["report"]["archive"] = copy.deepcopy(archive_receipt)
+    gate = publication_gate(snapshot["graph"], snapshot["report"], snapshot["policy"])
+    if archive_receipt is not None and gate.get("ready"):
+        snapshot["report"]["status"] = "published"
+    return snapshot, gate
+
+
+def _assert_public_snapshot(snapshot):
+    """Reject private inputs instead of altering evidence and invalidating hashes."""
+    from research_citations import privacy_filter
+
+    if privacy_filter(snapshot) != snapshot:
+        raise ValueError("Edition export requires public inputs; remove private fields before preparing a new candidate.")
+    credential_key = re.compile(r"(?:^|_)(?:authorization|password|passwd|cookie|private_key|access_key)(?:$|_)", re.I)
+    def inspect(value):
+        if isinstance(value, dict):
+            if any(credential_key.search(key) for key in value):
+                raise ValueError("Credentials cannot enter an exported edition snapshot.")
+            for child in value.values():
+                inspect(child)
+        elif isinstance(value, list):
+            for child in value:
+                inspect(child)
+        elif isinstance(value, str) and re.search(r"(?:^|\s)Bearer\s+\S+|https?://[^/\s]+:[^/\s]+@", value, re.I):
+            raise ValueError("Credentials cannot enter an exported edition snapshot.")
+    inspect(snapshot)
+
+
+def export_edition(directory, candidate_id, output, archive_receipt=None):
+    """Write deterministic, public frozen source inputs and a byte-SHA receipt.
+
+    An optional later archive receipt is transient: the scientific candidate is
+    never overwritten. Only a passing final gate can export published status.
+    """
+    from research_citations import json_bytes, sha256
+
+    output = Path(output)
+    if output.suffix != ".json":
+        raise ValueError("Edition snapshot output must name a .json file.")
+    with state_lock(directory):
+        candidate = _read_candidate(directory, candidate_id)
+        snapshot, gate = _publication_snapshot(candidate, archive_receipt)
+        if archive_receipt is not None and not gate.get("ready"):
+            raise ValueError("Archive receipt did not pass the final publication gate: " + "; ".join(gate["reasons"]))
+        # The current edition is self-contained. Its historical ledger belongs
+        # to the coordinator's report, not recursively inside this source file.
+        snapshot["report"]["editions"] = []
+        _assert_public_snapshot(snapshot)
+        blob = json_bytes(snapshot)
+        receipt = {"schema_version": 1, "candidate_sha256": candidate_id,
+                   "release_id": candidate["identity"]["release_id"],
+                   "edition_date": candidate["identity"]["edition_id"],
+                   "snapshot_sha256": sha256(blob), "snapshot_bytes": len(blob),
+                   "frozen_snapshot_sha256": candidate["identity"]["snapshot_sha256"],
+                   "prepared_on": candidate["prepared_on"],
+                   "publication": "published" if archive_receipt is not None and gate.get("ready") else "not_published"}
+        if archive_receipt is not None:
+            receipt["archive_receipt_sha256"] = canonical_hash(archive_receipt)
+        if output.exists() and output.read_bytes() != blob:
+            raise ValueError("An exported edition source snapshot cannot be overwritten.")
+        _immutable_json(output, snapshot)
+        if output.read_bytes() != blob:
+            raise ValueError("Exported source bytes differ from their deterministic representation.")
+        _immutable_json(output.with_suffix(".receipt.json"), receipt)
+    return receipt
+
+
+def activate_candidate(directory, candidate_id, now, archive_receipt=None):
+    """Journal local activation after receipts; never performs external mutations."""
     with state_lock(directory):
         candidate = _read_candidate(directory, candidate_id)
         events = read_journal(directory)
         activated = [event for event in events if event["kind"] == "activated"]
         if activated and activated[-1]["payload"].get("candidate_sha256") == candidate_id:
-            _atomic_json(Path(directory) / "active.json", activated[-1]["payload"])
-            return {"status": "already_active", "candidate_sha256": candidate_id}
+            payload = activated[-1]["payload"]
+            if archive_receipt is not None and payload.get("archive_receipt_sha256") != canonical_hash(archive_receipt):
+                raise ValueError("A different archive receipt is already bound to this activation.")
+            _atomic_json(Path(directory) / "active.json", payload)
+            return {"status": "already_active", **payload, "external_mutations": False}
         edition = candidate["identity"]["edition_id"]
         if activated and edition <= activated[-1]["payload"]["edition_id"]:
             raise ValueError("Publication identity must advance monotonically; old candidates cannot replace newer editions.")
-        snapshot = candidate["snapshot"]
-        gate = publication_gate(snapshot["graph"], snapshot["report"], snapshot["policy"])
+        snapshot, gate = _publication_snapshot(candidate, archive_receipt)
+        if archive_receipt is not None and _aware(archive_receipt["confirmed_on"]) > _aware(now):
+            raise ValueError("Archive confirmation cannot be in the future at activation.")
         held = list(gate["reasons"])
         if snapshot["policy"].get("mode", "prepare_only") != "publish_enabled":
             held.append("External accounts are not connected; policy permits package preparation only.")
@@ -392,11 +484,17 @@ def activate_candidate(directory, candidate_id, now):
                 _append(directory, "held", payload, now)
             return {"status": "held", **payload}
         opened_on = _aware(candidate["identity"]["window"]["publish_at"])
-        event = _append(directory, "activated", {"candidate_sha256": candidate_id, "edition_id": edition,
-                                                "release_id": candidate["identity"]["release_id"],
-                                                "activated_on": _iso(_aware(now)), "scheduled_publish_at": _iso(opened_on),
-                                                "activation_timing": "at_window" if _aware(now) == opened_on else "delayed",
-                                                "publication": "not_published"}, now)
+        payload = {"candidate_sha256": candidate_id, "edition_id": edition,
+                   "release_id": candidate["identity"]["release_id"],
+                   "activated_on": _iso(_aware(now)), "scheduled_publish_at": _iso(opened_on),
+                   "activation_timing": "at_window" if _aware(now) == opened_on else "delayed",
+                   "publication": "not_published"}
+        if archive_receipt is not None:
+            payload.update(archive_receipt_sha256=canonical_hash(archive_receipt),
+                           archive_release_id=archive_receipt["release_id"],
+                           artifact_sha256=archive_receipt["artifact_sha256"],
+                           archive_confirmed_on=archive_receipt["confirmed_on"])
+        event = _append(directory, "activated", payload, now)
         # The journal is authoritative. A crash before this convenience pointer
         # is harmless: activation() recognizes and restores the same candidate.
         _atomic_json(Path(directory) / "active.json", event["payload"])
@@ -405,20 +503,26 @@ def activate_candidate(directory, candidate_id, now):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("status", "prepare", "prepare-due", "approve", "activate"))
+    parser.add_argument("action", choices=("status", "prepare", "prepare-due", "approve", "activate", "export-edition"))
     parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--state-directory", type=Path, default=ROOT / "build/research-state")
+    parser.add_argument("--state-directory", type=Path, default=ROOT / "output/research-state")
     parser.add_argument("--now", help="Timezone-aware timestamp; default is current UTC.")
     edition = parser.add_mutually_exclusive_group()
     edition.add_argument("--edition", help="Monday ISO date; prepare defaults to the next edition.")
     edition.add_argument("--due", action="store_true", help="Prepare the latest due edition, including a missed Monday run.")
     parser.add_argument("--candidate", help="Exact prepared candidate SHA-256.")
     parser.add_argument("--receipt", type=Path, help="Existing explicit approval receipt JSON.")
+    parser.add_argument("--archive-receipt", type=Path, help="Actual verified production archive receipt JSON, for export or activation.")
+    parser.add_argument("--output", type=Path, help="Immutable exported edition source .json file.")
     args = parser.parse_args()
     if args.due and args.action != "prepare":
         parser.error("--due is valid with prepare; prepare-due already selects the latest due edition")
     if args.action == "prepare-due" and args.edition:
         parser.error("prepare-due selects the latest due edition; use prepare --edition for an explicit date")
+    if args.archive_receipt and args.action not in {"activate", "export-edition"}:
+        parser.error("--archive-receipt is valid with activate or export-edition")
+    if args.output and args.action != "export-edition":
+        parser.error("--output is valid with export-edition")
     now = _aware(args.now) if args.now else datetime.now(timezone.utc)
     state = args.state_directory.resolve()
     root = args.root.resolve()
@@ -447,10 +551,16 @@ def main():
         if not args.candidate or not args.receipt:
             parser.error("approve requires --candidate and --receipt")
         result = record_approval(state, args.candidate, json.loads(args.receipt.read_text()), now)
+    elif args.action == "export-edition":
+        if not args.candidate or not args.output:
+            parser.error("export-edition requires --candidate and --output")
+        receipt = json.loads(args.archive_receipt.read_text()) if args.archive_receipt else None
+        result = export_edition(state, args.candidate, args.output, receipt)
     else:
         if not args.candidate:
             parser.error("activate requires --candidate")
-        result = activate_candidate(state, args.candidate, now)
+        receipt = json.loads(args.archive_receipt.read_text()) if args.archive_receipt else None
+        result = activate_candidate(state, args.candidate, now, receipt)
     print(json.dumps(result, indent=2, ensure_ascii=False))
 
 

@@ -22,13 +22,13 @@ Never backdate a capture or relabel a later source as an earlier version.
 ```sh
 python3 scripts/research_schedule.py status
 # Daily preparation: the upcoming edition.
-python3 scripts/research_schedule.py prepare --state-directory build/research-state
+python3 scripts/research_schedule.py prepare --state-directory output/research-state
 # Monday publication check, or a catchup after the local computer was offline.
-python3 scripts/research_schedule.py prepare-due --state-directory build/research-state
+python3 scripts/research_schedule.py prepare-due --state-directory output/research-state
 # Equivalent explicit due selection:
-python3 scripts/research_schedule.py prepare --due --state-directory build/research-state
+python3 scripts/research_schedule.py prepare --due --state-directory output/research-state
 # A deliberately selected Monday:
-python3 scripts/research_schedule.py prepare --edition 2026-11-16 --state-directory build/research-state
+python3 scripts/research_schedule.py prepare --edition 2026-11-16 --state-directory output/research-state
 ```
 
 The `status` command reports the latest due Monday, next Monday, and whether
@@ -83,11 +83,65 @@ freezing another weekly report does not embed every prior report inside itself.
 Current canonical `report.editions` is empty: this storage does not invent a
 published history, public edition URL, or feed item.
 
+## Committable edition source snapshots
+
+Scheduler state defaults to `output/research-state`, outside disposable `build/`
+artifacts. Preserve that directory and its journal across local runs. State files
+are operational inputs, not an automatically published or tracked edition ledger.
+
+Export one verified candidate's public source inputs to a deliberately selected
+JSON file with:
+
+```sh
+python3 scripts/research_schedule.py export-edition --candidate SHA256 \
+  --output output/research-2026-11-09.1.prepared.json
+```
+
+The helper `export_edition(state, candidate_id, output)` writes deterministic
+JSON and a sibling `.receipt.json`. The receipt includes the **SHA-256 of the
+exact JSON file bytes** as `snapshot_sha256`, its byte count, original candidate
+and frozen snapshot digests, edition/release identity, and actual preparation
+time. An exact retry writes the same bytes. Existing different output cannot be
+overwritten. The source file contains graph, report, policy, public identity,
+and roles; its `report.editions` is empty to avoid recursive histories. Private
+or credential-bearing inputs make export fail rather than silently redacting
+bound evidence. Correct the public inputs and prepare a new candidate instead.
+
+Default exports remain `prepared` / `not_published`. After actual archive
+publication, the caller may supply the real receipt from
+`Release.archive_receipt()` with `--archive-receipt /absolute/path/archive.json`.
+It must bind the exact release and artifact, identify verified **production**
+Zenodo publication, preserve any frozen reserved DOI/deposition identity, and
+pass the authoritative final gate. Its confirmation must follow the edition's
+publication window. This overlay affects only the exported copy, never the
+frozen scientific candidate. Only a passing receipt overlay permits exported
+`report.status: published`; invalid or still-held receipts produce no output.
+Use a separate final output filename rather than overwriting a prepared export.
+
+A final source export can then be committed under `data/research/editions/`.
+The coordinator's `report.editions` entry uses `snapshot_path` relative to
+`data/research`, such as `editions/research-2026-11-09.1.json`, and the sidecar's
+raw-file `snapshot_sha256`. The loader must reject unsafe paths, hash mismatches,
+or release mismatches before hydrating the renderer. Preparing/exporting a file
+does not itself add an entry or claim an earlier edition exists.
+
+The actual archive receipt may postdate the graph's evidence `as_of` and Friday
+source cutoff: those timestamps describe different events. Source and review
+dates remain unchanged. Published rendering also needs the exact frozen package,
+`PREPARED.json`, and artifact digest at the receipt's `bundle_path`, preferably a
+tracked `data/research/releases/<release-id>/publication` bundle. This source
+export and its SHA receipt do not substitute for those verified archive bytes.
+
+## Coordinator review and local activation
+
 An actual coordinator review receipt can be imported with:
 
 ```sh
 python3 scripts/research_schedule.py approve --candidate SHA256 --receipt /absolute/path/approval.json
 python3 scripts/research_schedule.py activate --candidate SHA256
+# Once the archive was actually published after the preparation snapshot:
+python3 scripts/research_schedule.py activate --candidate SHA256 \
+  --archive-receipt /absolute/path/archive.json
 ```
 
 The receipt needs `candidate_sha256`, `release_id`, `decision: approved`,
@@ -101,8 +155,12 @@ manufacture approval, and it cannot turn a failed scientific gate into a pass.
 
 `activate` records local activation only after scientific and archive gates,
 actual coordinator review, the publication window, and `publish_enabled` policy
-all pass. It does not publish to external services. Present policy therefore
-holds every activation attempt. A production release adapter must additionally
+all pass. An optional `--archive-receipt` overlays a later actual publication
+receipt in a transient context and rechecks the final gate. It cannot edit the
+candidate's science identity or frozen inputs. Activation journals that receipt's
+digest, release, exact artifact digest, and actual confirmation time; it refuses
+a future confirmation or a different receipt on retry. It does not publish to
+external services. Present policy therefore holds every activation attempt. A production release adapter must additionally
 verify actual account connections, archive and mirror receipts, exact-artifact
 preview tests, and serialized website promotion. Changing JSON policy is not
 evidence of an external publication.
