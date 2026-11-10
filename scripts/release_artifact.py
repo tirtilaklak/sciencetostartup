@@ -14,6 +14,7 @@ import time
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 import uuid
+from research_citations import STATIC_ASSET_LIMIT_BYTES
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -31,6 +32,8 @@ def validate_artifact(directory):
         raise ValueError('Artifact file set differs from its tested manifest')
     for name in sorted(actual):
         path = directory / name
+        if path.stat().st_size > STATIC_ASSET_LIMIT_BYTES:
+            raise ValueError('Static asset exceeds the hosting limit: ' + name)
         content = path.read_bytes()
         if name != 'manifest.json' and digest(content) != release['sha256'][name]:
             raise ValueError('Artifact digest differs: ' + name)

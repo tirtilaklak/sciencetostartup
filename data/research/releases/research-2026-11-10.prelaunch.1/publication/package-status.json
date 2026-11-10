@@ -1,0 +1,22 @@
+{
+  "archive": "not-published",
+  "archive_sha256": "6098504f665a0810d93a4d684328d2eb0f5f9c6dc8989c21d50d5db09a60ca7e",
+  "blocked_reasons": [
+    "Coverage core_disposition_rate: 0.0 / 0.9 required.",
+    "Eligible core denominator has not been frozen with its cutoff and date.",
+    "The edition cutoff is in the future relative to the actual evidence snapshot.",
+    "Actual reference audit has not been supplied.",
+    "Actual screening audit has not been supplied.",
+    "An actual public versioned archive receipt with DOI and exact artifact digest is required; a prepared package is not publication."
+  ],
+  "github": "prepared",
+  "huggingface": "prepared",
+  "manifest_sha256": "9195b0af8b39507c59639820ea0e959ff2d4adb47cfb4fa18e4098c437d3a303",
+  "pdf": "prepared",
+  "pdf_sha256": "ad3e80619b45edde081f0d51e92ea34416971d5faba0392aa022839bc4fff8eb",
+  "publication_ready": false,
+  "release_id": "research-2026-11-10.prelaunch.1",
+  "schema_version": 1,
+  "status": "prepared",
+  "website": "independent"
+}

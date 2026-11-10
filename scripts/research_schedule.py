@@ -160,6 +160,11 @@ def _append(directory, kind, payload, now):
         stream.write(json.dumps(event, sort_keys=True, separators=(",", ":")) + "\n")
         stream.flush()
         os.fsync(stream.fileno())
+    descriptor = os.open(directory, os.O_RDONLY)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
     return event
 
 
@@ -279,6 +284,99 @@ def resolve_edition_reference(directory, reference):
     return snapshot
 
 
+def _core_record(snapshot, snapshot_id=None):
+    """Validate before deriving any durable inventory or authorizing a release."""
+    from research_graph import validate_graph
+
+    if not isinstance(snapshot, dict) or "graph" not in snapshot:
+        raise ValueError("Core inventory requires an immutable graph snapshot.")
+    graph = snapshot["graph"]
+    validate_graph(graph)
+    frozen = graph["coverage"]["frozen_core"]
+    return {"snapshot": snapshot, "snapshot_sha256": snapshot_id,
+            "entity_ids": sorted(frozen["entity_ids"]), "core_sha256": frozen["sha256"],
+            "source_graph_sha256": canonical_hash(graph)}
+
+
+def _ensure_core_continuity(directory, snapshot, now):
+    """Under the shared lock, freeze scope before readiness and retain every ID.
+
+    The journal is the inventory authority. Source snapshots make certificates
+    independently verifiable, including a freeze recorded before any candidate
+    passes its scientific gate or finishes writing its preparation event.
+    """
+    current = _core_record(snapshot)
+    events = read_journal(directory)
+    latest, history, seen = None, [], set()
+    for event in events:
+        payload = event["payload"]
+        if event["kind"] in {"core_frozen", "core_expanded"}:
+            try:
+                bound = _core_record(load_snapshot(directory, payload.get("snapshot_sha256")),
+                                     payload.get("snapshot_sha256"))
+            except OSError as error:
+                raise ValueError("Frozen-core certificate source snapshot cannot be verified.") from error
+            expected = {key: bound[key] for key in ("entity_ids", "core_sha256", "source_graph_sha256", "snapshot_sha256")}
+            expected.update(schema_version=1, previous_core_sha256=latest["core_sha256"] if latest else None)
+            old = set(latest["entity_ids"]) if latest else set()
+            if (payload != expected or not bound["entity_ids"]
+                    or event["kind"] != ("core_expanded" if latest else "core_frozen")
+                    or not old < set(bound["entity_ids"])):
+                raise ValueError("Frozen-core certificate failed verification.")
+            latest = bound
+            history.append(bound)
+        elif event["kind"] in {"prepared", "activated", "published"}:
+            # Older scheduler journals predate certificates. Recover their exact
+            # inputs rather than allowing a fresh empty/smaller declaration.
+            candidate_id, snapshot_id = payload.get("candidate_sha256"), payload.get("snapshot_sha256")
+            reference = (candidate_id, snapshot_id)
+            if reference in seen:
+                continue
+            seen.add(reference)
+            try:
+                if candidate_id:
+                    candidate = _read_candidate(directory, candidate_id)
+                    historical = candidate["snapshot"]
+                    if snapshot_id and canonical_hash(historical) != snapshot_id:
+                        raise ValueError("Journal preparation and candidate snapshot digests differ.")
+                    snapshot_id = canonical_hash(historical)
+                elif snapshot_id:
+                    historical = load_snapshot(directory, snapshot_id)
+                else:
+                    raise ValueError("Journal edition has no immutable source binding for core recovery.")
+            except (OSError, KeyError) as error:
+                raise ValueError("Journal edition source cannot be verified for core recovery.") from error
+            history.append(_core_record(historical, snapshot_id))
+
+    required = set().union(*(set(record["entity_ids"]) for record in history))
+
+    def certify(record):
+        nonlocal latest
+        snapshot_id = _store_snapshot(directory, record["snapshot"])
+        payload = {key: record[key] for key in ("entity_ids", "core_sha256", "source_graph_sha256")}
+        payload.update(schema_version=1, snapshot_sha256=snapshot_id,
+                       previous_core_sha256=latest["core_sha256"] if latest else None)
+        _append(directory, "core_expanded" if latest else "core_frozen", payload, now)
+        latest = record
+
+    if required and (latest is None or not required <= set(latest["entity_ids"])):
+        # Prefer an existing frozen edition when seeding a legacy journal. If
+        # past inventories diverged, only a validated graph retaining their union
+        # can reconcile them; a smaller current declaration cannot erase history.
+        recovered = next((record for record in reversed(history)
+                          if required <= set(record["entity_ids"])), None)
+        if recovered is None and required <= set(current["entity_ids"]):
+            recovered = current
+        if recovered is None:
+            raise ValueError("Historical frozen-core inventories require reconciliation retaining every ID.")
+        certify(recovered)
+    missing = (set(latest["entity_ids"]) if latest else required) - set(current["entity_ids"])
+    if missing:
+        raise ValueError("Frozen core cannot shrink or unfreeze; retain previously frozen IDs: " + ", ".join(sorted(missing)))
+    if current["entity_ids"] and (latest is None or set(current["entity_ids"]) > set(latest["entity_ids"])):
+        certify(current)
+
+
 def prepare_candidate(context, directory, monday, now):
     """Stage an edition copy; stable inputs resume without changing canonical data."""
     from research_report import publication_gate
@@ -293,6 +391,8 @@ def prepare_candidate(context, directory, monday, now):
                 for key in ("graph", "report", "policy", "identity", "roles")}
     with state_lock(directory):
         events = read_journal(directory)
+        # Invalid graphs must not write snapshots, references or certificates.
+        _core_record(snapshot)
         prior_snapshot = copy.deepcopy(snapshot)
         report = snapshot["report"]
         report["editions"] = _edition_references(report.get("editions", []), directory, prior_snapshot)
@@ -303,6 +403,7 @@ def prepare_candidate(context, directory, monday, now):
         if new_edition:
             # A previous DOI or reserved deposition does not belong to this issue.
             report["archive"] = {"status": "not_published", "doi": None, "record_url": None}
+        _ensure_core_continuity(directory, snapshot, now)
         gate = publication_gate(snapshot["graph"], report, snapshot["policy"])
         snapshot_id = _store_snapshot(directory, snapshot)
         identity = {"edition_id": window["edition_id"], "edition_date": window["edition_id"],
@@ -345,6 +446,7 @@ def record_approval(directory, candidate_id, receipt, now):
                 or not receipt.get("invocation_id")):
             raise ValueError("An actual attributed coordinator review invocation is required; AI review is allowed.")
         snapshot = candidate["snapshot"]
+        _ensure_core_continuity(directory, snapshot, now)
         review_invocations = {review.get("invocation_id") for review in snapshot["graph"].get("reviews", [])}
         if receipt["invocation_id"] in review_invocations:
             raise ValueError("Coordinator approval must use its own review invocation.")
@@ -426,6 +528,8 @@ def export_edition(directory, candidate_id, output, archive_receipt=None):
         raise ValueError("Edition snapshot output must name a .json file.")
     with state_lock(directory):
         candidate = _read_candidate(directory, candidate_id)
+        if archive_receipt is not None:
+            _ensure_core_continuity(directory, candidate["snapshot"], datetime.now(timezone.utc))
         snapshot, gate = _publication_snapshot(candidate, archive_receipt)
         if archive_receipt is not None and not gate.get("ready"):
             raise ValueError("Archive receipt did not pass the final publication gate: " + "; ".join(gate["reasons"]))
@@ -456,6 +560,7 @@ def activate_candidate(directory, candidate_id, now, archive_receipt=None):
     """Journal local activation after receipts; never performs external mutations."""
     with state_lock(directory):
         candidate = _read_candidate(directory, candidate_id)
+        _ensure_core_continuity(directory, candidate["snapshot"], now)
         events = read_journal(directory)
         activated = [event for event in events if event["kind"] == "activated"]
         if activated and activated[-1]["payload"].get("candidate_sha256") == candidate_id:

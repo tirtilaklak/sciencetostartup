@@ -20,11 +20,13 @@ from zoneinfo import ZoneInfo
 import xml.etree.ElementTree as ET
 
 import static_pages as sp
-from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
+from research_corrections import correction_records as _correction_records
+from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD, paragraph_supported, WITHHELD_PARAGRAPH
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = "/research/state-of-ai-data-labs/"
 CORRECTIONS_PATH = "/research/corrections/"
+LEDGER_BUCKETS = "0123456789abcdef"
 CATEGORIES = (
     ("papers", "Papers", {"paper", "paper_work", "paper_version"},
      "Read the source, distinguish versions, and trace what an operational finding actually supports."),
@@ -36,7 +38,7 @@ CATEGORIES = (
      "Connect the work to its evidence: recruitment, annotation, adjudication, filtering, and evaluation."),
 )
 PROGRESS = (
-    ("legacy_dispositions", "Legacy organizations reviewed", 39),
+    ("legacy_inclusion_audits", "Legacy inclusion audits", 39),
     ("qualifying_suppliers", "Qualifying suppliers", 60),
     ("reviewed_papers", "Distinct reviewed papers", 150),
     ("dataset_families", "Dataset families", 60),
@@ -70,7 +72,19 @@ def _anchor(kind, stable_id):
 
 
 def _evidence_url(kind, stable_id):
-    return "/research/data/#" + _token(_anchor(kind, stable_id))
+    path = _ledger_path(kind, _ledger_bucket(stable_id)) if kind in {"assertion", "source"} else "/research/data/"
+    return path + "#" + _token(_anchor(kind, stable_id))
+
+
+def _ledger_bucket(stable_id):
+    """A corpus-independent destination; adding records never moves old IDs."""
+    return hashlib.sha256(str(stable_id).encode("utf-8")).hexdigest()[0]
+
+
+def _ledger_path(kind, bucket):
+    if kind not in {"assertion", "source"} or bucket not in LEDGER_BUCKETS or len(bucket) != 1:
+        raise ValueError("Unknown ledger kind or partition")
+    return "/research/data/" + {"assertion": "assertions", "source": "sources"}[kind] + "/" + bucket + "/"
 
 
 def _safe_url(value):
@@ -101,6 +115,87 @@ def _day(value):
 
 def _date(value):
     return sp.format_date(_day(value)) if value else "Not recorded"
+
+
+def _revision_dates(context):
+    """Dates of this page's substantive inputs, never the build/snapshot clock.
+
+    A claim review contributes only to the exact assertion it actually binds.
+    Entity metadata has no revision timestamp in the graph schema; a metadata
+    only page therefore has an unknown revision date rather than an invented one.
+    """
+    from research_graph import assertion_digest
+    from research_report import canonical_hash, report_review_digest
+
+    def latest(values):
+        days = [_day(value) for value in values if value]
+        return max((day for day in days if re.fullmatch(r'\d{4}-\d{2}-\d{2}', day)), default=None)
+
+    graph = context['graph']
+    reviews = {row['id']: row for row in graph.get('reviews', [])}
+    claims, source_reviews = {}, {}
+    for assertion in graph['assertions']:
+        aid = assertion['id']
+        bound = [reviews[rid] for rid in assertion.get('review_ids', []) if rid in reviews
+                 and aid in reviews[rid].get('assertion_ids', [])
+                 and reviews[rid].get('assertion_sha256', {}).get(aid) == assertion_digest(assertion)]
+        claims[aid] = latest([assertion.get('as_of')] + [row.get('reviewed_on') for row in bound])
+        for evidence in assertion.get('evidence', []):
+            source_reviews.setdefault(evidence['source_id'], []).extend(row.get('reviewed_on') for row in bound)
+    dates = {}
+    for entity in graph['entities']:
+        dates[entity_url(entity, context)] = latest(claims[row['id']] for row in _assertions(context, entity))
+    for slug, _, kinds, _ in CATEGORIES:
+        dates['/research/' + slug + '/'] = latest(dates.get(entity_url(entity, context))
+                                                for entity in graph['entities'] if entity.get('kind') in kinds)
+    corrections = context.get('_render_corrections')
+    if corrections is None:
+        corrections = _correction_records(context)
+    corrected = {}
+    for row in corrections:
+        corrected.setdefault(row['claim_id'], []).append(row['corrected_on'])
+    assertions, stubs, sources = _ledger_records(context)
+    for kind, records in (('assertion', {**assertions, **{aid: {'id': aid} for aid in stubs}}),
+                          ('source', sources)):
+        for bucket in LEDGER_BUCKETS:
+            values = []
+            for row in records.values():
+                if _ledger_bucket(row['id']) != bucket:
+                    continue
+                if kind == 'assertion':
+                    values.extend([claims.get(row['id']), *corrected.get(row['id'], [])])
+                else:
+                    values.extend([row.get('captured_on'), *source_reviews.get(row['id'], [])])
+            dates[_ledger_path(kind, bucket)] = latest(values)
+    report_hash, graph_hash = report_review_digest(context['report']), canonical_hash(graph)
+    report_reviews = [row.get('reviewed_on') for row in context.get('policy', {}).get('report_reviews', [])
+                      if row.get('fixture') is False and row.get('method') == 'report_content_review'
+                      and row.get('report_sha256') == report_hash and row.get('graph_sha256') == graph_hash
+                      and row.get('reviewer') and row.get('invocation_id')]
+    report_date = latest([context['report'].get('updated_on'), *report_reviews])
+    dates[REPORT_PATH] = report_date
+    dates[CORRECTIONS_PATH] = latest(row['corrected_on'] for row in corrections)
+    corpus_date = latest(dates.values())
+    for path in ('/research/', '/research/data/', '/review/'):
+        dates[path] = latest([report_date, corpus_date])
+    return dates
+
+
+def _page_revision(context, path):
+    dates = context.get('_page_revisions')
+    if dates is None:
+        dates = _revision_dates(context)
+    # Immutable editions use their own snapshot's map, never today's inputs.
+    if re.fullmatch(r'/research/editions/[^/]+/', path):
+        path = REPORT_PATH
+    else:
+        path = re.sub(r'^/research/editions/[^/]+/data/', '/research/data/', path)
+    return dates.get(path)
+
+
+def _sitemap_record(context, path):
+    modified = _page_revision(context, path)
+    return {'path': path, **({'lastmod': modified} if modified else {})}
 
 
 def _category(entity):
@@ -188,7 +283,9 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
     publisher = {"@type": person.get("type", "Person"), "@id": person.get("id", sp.ORIGIN + "/#publisher"),
                  "name": person.get("name", sp.PUBLISHER_NAME), "url": person.get("url", sp.ORIGIN + "/method/#about")}
     structured = sp.page_node(page_type, title, description, sp.ORIGIN + path,
-                              context["report"]["updated_on"], crumbs, publisher=publisher)
+                              _page_revision(context, path), crumbs, publisher=publisher)
+    if not structured['dateModified']:
+        structured.pop('dateModified')
     if page_type == "TechArticle":
         structured.update({"author": publisher, "creativeWorkStatus": _status(context),
                            "version": context["report"]["release_id"],
@@ -410,21 +507,34 @@ def _source_evidence(context, assertion):
     return '<ul class="r-evidence-links">' + "".join(rows) + "</ul>"
 
 
-def _assertion(context, assertion):
+def _assertion(context, assertion, *, compact=False):
     status = assertion.get("status")
     aid = assertion["id"]
+    public_rows = context.get('_render_corrections')
+    if public_rows is None:
+        public_rows = _correction_records(context)
+    corrections = [row for row in public_rows if row['claim_id'] == aid]
     body = f'<p class="r-kicker">{sp.escape(STATUS_LABELS.get(status, status))} · As of {_date(assertion.get("as_of"))}</p>'
     if status in {"approved", "historical"}:
         body += '<p class="r-assertion-text">' + _claim_text(context, assertion) + "</p>"
         body += _claim_scope(assertion)
     else:
-        body += '<p>Candidate wording is withheld from findings while source verification and adversarial review are pending.</p>'
+        body += ('<p>Superseded candidate wording is withheld. Follow the correction record and approved replacement below.</p>'
+                 if any(row.get('replacement_claim_id') for row in corrections) else
+                 '<p>Candidate wording is withheld from findings while source verification and adversarial review are pending.</p>')
+    for correction in corrections:
+        body += '<p>Correction: ' + _link(_correction_url(correction), correction['summary']) + '</p>'
+        if correction.get('replacement_claim_id'):
+            body += '<p>Approved replacement: ' + _link(_evidence_url('assertion', correction['replacement_claim_id']), correction['replacement_claim_id']) + '</p>'
     body += f'<p class="r-record-id">{_link(_evidence_url("assertion", aid), aid)}</p>'
     if assertion.get("qualifications") and status in {"approved", "historical"}:
-        author_stage = 'Author-only candidate; no independent source-verifier or adversarial approval exists in this batch.'
         body += '<ul class="r-qualifications">' + "".join(
-            '<li>' + ('<strong>Original author-stage note:</strong> ' if q == author_stage else '') + sp.escape(q) + '</li>'
+            '<li>' + ('<strong>Original author-stage note:</strong> ' if q.startswith('Author-only candidate') else '') + sp.escape(q) + '</li>'
             for q in assertion["qualifications"]) + "</ul>"
+    if compact:
+        body += '<p class="r-meta">' + _link(_evidence_url("assertion", aid),
+                    "Inspect pinned sources, evidence and separate AI review receipts") + '</p>'
+        return f'<article class="r-assertion" data-status="{sp.escape(status)}" id="{sp.escape(_anchor("assertion", aid))}">{body}</article>'
     body += _source_evidence(context, assertion)
     reviews = {row["id"]: row for row in context["graph"].get("reviews", [])}
     receipts = [reviews[rid] for rid in assertion.get("review_ids", []) if rid in reviews]
@@ -435,17 +545,14 @@ def _assertion(context, assertion):
             for r in sorted(receipts, key=lambda row: (row.get("role", ""), row["id"]))) + "</ul></details>"
     elif status == "historical":
         body += '<p class="r-meta">Inherited provenance; no fresh research review is claimed.</p>'
-    return f'<article class="r-assertion" id="{sp.escape(_anchor("assertion", aid))}">{body}</article>'
+    return f'<article class="r-assertion" data-status="{sp.escape(status)}" id="{sp.escape(_anchor("assertion", aid))}">{body}</article>'
 
 
 def _paragraph(context, paragraph):
     ids = paragraph.get("claim_ids", [])
-    claims = {a["id"]: a for a in context["graph"]["assertions"]}
     kind = paragraph.get("kind")
-    valid = all(cid in claims and (claims[cid].get("status") == "approved" or
-                (claims[cid].get("status") == "historical" and paragraph.get("historical") is True)) for cid in ids)
-    if (kind == "sourced_fact" and (not ids or not valid)) or (ids and not valid):
-        return '<div class="r-paragraph is-gap"><span class="r-paragraph-kind">Research gap</span><p>A proposed finding is withheld because its evidence is not approved for publication.</p></div>'
+    if not paragraph_supported(context, paragraph):
+        return '<div class="r-paragraph is-gap"><span class="r-paragraph-kind">Research gap</span><p>' + WITHHELD_PARAGRAPH + '</p></div>'
     label = "Historical example" if paragraph.get("historical") else KIND_LABELS.get(kind, "Research note")
     links = ('<p class="r-paragraph-citations">Evidence: ' + ", ".join(_link(_evidence_url("assertion", cid), cid) for cid in ids) + "</p>") if ids else ""
     return (f'<div class="r-paragraph' + (' is-gap' if kind == "research_gap" else '') + '">'
@@ -504,16 +611,85 @@ def _source(source):
             '<p class="r-meta">A source capture records retrieval. Assertion-specific review is recorded separately.</p></article>')
 
 
+def _ledger_records(context):
+    """Full record membership, including metadata-only retained corrections."""
+    assertions = {row['id']: row for row in context['graph']['assertions']}
+    stubs = {}
+    for row in _correction_records(context):
+        if row['claim_id'] not in assertions:
+            stubs.setdefault(row['claim_id'], row)
+    return assertions, stubs, {row['id']: row for row in context['graph']['sources']}
+
+
+def _correction_stub(aid, row):
+    return ('<article class="r-assertion" id="' + sp.escape(_anchor('assertion', aid)) + '"><h3>'
+        + sp.escape(aid) + '</h3><p>This historical identifier is retained as correction metadata. '
+        'Its earlier finding text is outside this current evidence snapshot.</p><p>'
+        + _link(_correction_url(row), 'Read the correction and supporting evidence')
+        + (' · ' + _link(_evidence_url('assertion', row['replacement_claim_id']), 'Read the approved replacement')
+           if row.get('replacement_claim_id') else '') + '</p></article>')
+
+
+def _ledger_parts(kind, ids, current=None):
+    counts = {bucket: 0 for bucket in LEDGER_BUCKETS}
+    for stable_id in ids:
+        counts[_ledger_bucket(stable_id)] += 1
+    return '<ol class="r-ledger-parts">' + ''.join(
+        '<li><a href="' + _ledger_path(kind, bucket) + '"'
+        + (' aria-current="page"' if current == bucket else '') + '>Part '
+        + str(index + 1).zfill(2) + '<span class="r-meta"> · ' + str(counts[bucket]) + ' records</span></a></li>'
+        for index, bucket in enumerate(LEDGER_BUCKETS)) + '</ol>'
+
+
+def _ledger_pages(context):
+    """Thirty-two bounded static documents; no per-record pages or runtime API."""
+    assertions, stubs, sources = _ledger_records(context)
+    pages = []
+    for kind, ids, label in (("assertion", sorted(set(assertions) | set(stubs)), "Assertion"),
+                             ("source", sorted(sources), "Source")):
+        for index, bucket in enumerate(LEDGER_BUCKETS):
+            selected = [stable_id for stable_id in ids if _ledger_bucket(stable_id) == bucket]
+            title = label + " ledger · Part " + str(index + 1).zfill(2)
+            description = "Complete " + label.lower() + " records, precise evidence bindings and original review scope for this part of the versioned ledger."
+            body = ('<header class="r-page-head"><p class="r-kicker">' + _status(context) + '</p><h1>'
+                    + title + '</h1><p class="r-lede">' + str(len(selected)) + ' records. '
+                    'Read source bindings and review scope, use find in page, or print this complete part.</p>'
+                    + _meta(context) + '<p>' + _link('/research/data/', 'All ledger parts, downloads & citations →') + '</p></header>'
+                    '<nav class="r-ledger-nav" aria-label="' + label + ' ledger parts">'
+                    + _ledger_parts(kind, ids, current=bucket) + '</nav>'
+                    '<section class="r-section" aria-labelledby="records"><h2 id="records">' + label + ' records</h2>')
+            if kind == 'source':
+                body += ''.join(_source(sources[stable_id]) for stable_id in selected)
+            else:
+                body += ''.join(_assertion(context, assertions[stable_id]) if stable_id in assertions
+                                else _correction_stub(stable_id, stubs[stable_id]) for stable_id in selected)
+            if not selected:
+                body += '<p>No records in this part of the ledger.</p>'
+            body += '</section>'
+            pages.append((_ledger_path(kind, bucket), title, description, body, 'CollectionPage', ('data', 'Data & sources')))
+    return pages
+
+
+def _legacy_ledger_aliases(assertions, stubs, sources):
+    # Only ID + native destination are retained at old root fragments. Scientific
+    # wording, receipts, locators and source dossiers live on the bounded pages.
+    return ''.join('<a class="r-legacy-ledger-target" id="' + sp.escape(_anchor(kind, stable_id))
+                   + '" href="' + sp.escape(_evidence_url(kind, stable_id)) + '">'
+                   + sp.escape('Open ' + kind + ' record: ' + stable_id) + '</a>'
+                   for kind, ids in (('assertion', sorted(set(assertions) | set(stubs))), ('source', sorted(sources)))
+                   for stable_id in ids)
+
+
 def _data(context):
     graph, gate, report = context["graph"], context["gate"], context["report"]
-    approved = _assertions(context)
-    historical = _assertions(context, statuses=("historical",))
-    candidates = _assertions(context, statuses=("candidate",))
+    assertions, stubs, sources = _ledger_records(context)
     rows = [("Privacy-filtered research JSON", "/publication/clean-dataset.json"), ("CSV", "/publication/clean-dataset.csv"),
             ("SQLite", "/publication/clean-dataset.sqlite"), ("Full evidence graph JSON · explicit statuses", "/research/exports/research-graph.json"),
             ("Evidence graph SQLite", "/research/exports/research-graph.sqlite"), ("Export checksums", "/research/exports/research-exports-manifest.json")]
     if 'publication/report.pdf' in context.get('publication_assets', []):
         rows.insert(0, ('Read the report preparation PDF', '/publication/report.pdf'))
+    if 'publication/executive-brief.html' in context.get('publication_assets', []):
+        rows.insert(0, ('Read the executive brief', '/publication/executive-brief.html'))
     links = "".join('<li>' + _link(url, label) + '</li>' for label, url in rows)
     citation_prefix = 'current-' if gate.get('ready') and report.get('archive', {}).get('status') == 'published' else ''
     cite = "".join('<li>' + _link('/publication/' + citation_prefix + name, label) + '</li>' for name, label in
@@ -545,19 +721,19 @@ def _data(context):
             f'<ul class="r-downloads"><li>{_link("/publication/research-archive.zip", "Inspect the prepared reproduction package")}</li>'
             f'<li>{_link("/publication/MANIFEST.json", "Package SHA-256 inventory")}</li>'
             f'<li>{_link("/publication/package-status.json", "Archive & mirror status")}</li></ul></section>'
-            '<section class="r-section" aria-labelledby="approved"><h2 id="approved">Approved assertions</h2>'
-            + ("".join(_assertion(context, a) for a in approved) if approved else
+            '<section class="r-section" aria-labelledby="assertions"><h2 id="assertions">Assertion records</h2>'
+            '<p id="approved">Approved assertions retain their exact source bindings and review receipts.</p>'
+            + ('' if any(row.get('status') == 'approved' for row in assertions.values()) else
                '<p class="r-callout">No new assertions have completed the required separate reviews. Candidate evidence stays outside approved findings and coverage totals.</p>')
-            + '</section><section class="r-section" aria-labelledby="historical"><h2 id="historical">Historical baseline</h2>'
-            '<p>These descriptions were imported from canonical dataset 2.5.0. Their snapshot dates are historical provenance, '
-            'not fresh source reviews or current supplier findings.</p>' + "".join(_assertion(context, a) for a in historical)
-            + '</section><section class="r-section" aria-labelledby="candidates"><h2 id="candidates">Candidate review queue</h2>'
-            '<p>Captured sources and author proposals are inspectable preparation work. Separate source verification and '
-            'adversarial review have not established these as findings.</p>' + "".join(_assertion(context, a) for a in candidates)
+            + '<p id="historical">Historical baseline descriptions keep their original snapshot dates and inherited provenance.</p>'
+            '<p id="candidates">Candidates and retained correction identifiers carry metadata only while their original wording remains withheld.</p>'
+            + _ledger_parts('assertion', sorted(set(assertions) | set(stubs)))
             + '</section><section class="r-section" aria-labelledby="sources"><h2 id="sources">Source records</h2>'
-            + "".join(_source(source) for source in sorted(graph["sources"], key=lambda s: s["id"]))
+            '<p>A source capture records retrieval. Assertion-specific review is recorded separately.</p>'
+            + _ledger_parts('source', sources)
             + '</section><section class="r-section" aria-labelledby="organizations"><h2 id="organizations">Organizations & other entities</h2>'
-            + f'<ul class="r-entity-register">{entity_rows}</ul></section>')
+            + f'<ul class="r-entity-register">{entity_rows}</ul></section>'
+            + _legacy_ledger_aliases(assertions, stubs, sources))
 
 
 def _entity_card(context, entity):
@@ -583,7 +759,7 @@ def _evidence_table(context, entities):
     values = [_index_values(entity) for entity in entities]
     controls = '<form class="r-index-controls" data-index-controls hidden role="search" aria-label="Filter research records"><label>Search records<input name="q" type="search" autocomplete="off" placeholder="Title or identifier"></label>'
     for key in ('status', 'type') + INDEX_FACETS:
-        options = sorted({value for row in values for value in row[key]}, key=str.casefold)
+        options = sorted({value for row in values for value in row[key]}, key=lambda value: (value.casefold(), value))
         if not options and key in {'delivery_model', 'data_purpose'}:
             continue
         label = {'status': 'Review status', 'type': 'Record type'}.get(key, key.replace('_', ' ').capitalize())
@@ -780,42 +956,6 @@ def _feeds(output, context, editions):
         (output / 'research' / name).write_bytes(ET.tostring(tree, encoding='utf-8', xml_declaration=True) + b'\n')
 
 
-def _correction_records(context):
-    """Validate committed records; requests and rejected proposals stay private."""
-    rows = context.get('corrections', [])
-    if not isinstance(rows, list):
-        raise ValueError('Research corrections must be a list')
-    required = {'id', 'edition_id', 'claim_id', 'status', 'summary', 'corrected_on', 'evidence_urls'}
-    accepted, seen = [], set()
-    for row in rows:
-        if not isinstance(row, dict) or set(row) != required:
-            raise ValueError('Research correction has unexpected or missing fields')
-        for key in ('id', 'edition_id', 'claim_id'):
-            if not isinstance(row[key], str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:-]*', row[key]):
-                raise ValueError('Research correction requires stable record identifiers')
-        if row['id'] in seen:
-            raise ValueError('Research correction IDs must be unique')
-        seen.add(row['id'])
-        if not isinstance(row['status'], str) or row['status'] not in {'accepted', 'published', 'pending', 'rejected'}:
-            raise ValueError('Research correction has an unknown status')
-        if not isinstance(row['summary'], str) or not row['summary'].strip():
-            raise ValueError('Research correction requires a summary')
-        try:
-            instant = datetime.fromisoformat(row['corrected_on'].replace('Z', '+00:00'))
-            if instant.utcoffset() is None:
-                raise ValueError('Timezone required')
-        except (AttributeError, TypeError, ValueError) as error:
-            raise ValueError('Research correction requires a timezone-aware corrected_on timestamp') from error
-        evidence = row['evidence_urls']
-        if (not isinstance(evidence, list) or not evidence or
-                any(not isinstance(url, str) or not _safe_url(url) or re.search(r'[\x00-\x20\\]', url) for url in evidence) or
-                len(evidence) != len(set(evidence))):
-            raise ValueError('Research correction requires distinct safe HTTPS evidence URLs')
-        if row['status'] in {'accepted', 'published'}:
-            accepted.append({**row, 'instant': instant.astimezone(timezone.utc)})
-    return sorted(accepted, key=lambda row: (-row['instant'].timestamp(), row['id']))
-
-
 def _correction_url(row):
     return CORRECTIONS_PATH + '#' + _token('correction-' + row['id'])
 
@@ -831,10 +971,11 @@ def _corrections_page(context, rows):
     for row in rows:
         stamp = row['instant'].isoformat().replace('+00:00', 'Z')
         body += (f'<article class="r-source" id="{sp.escape("correction-" + row["id"])}"><h2>'
-                 + _link(_correction_url(row), row['summary']) + '</h2><dl class="r-facts">'
+                 + _link(_correction_url(row), 'Correction for ' + row['claim_id']) + '</h2><p>' + sp.escape(row['summary']) + '</p><dl class="r-facts">'
                  f'<dt>Status</dt><dd>{sp.escape(row["status"].capitalize())}</dd>'
                  f'<dt>Edition</dt><dd>{sp.escape(row["edition_id"])}</dd>'
-                 f'<dt>Claim</dt><dd>{sp.escape(row["claim_id"])}</dd>'
+                 '<dt>Claim</dt><dd>' + _link(_evidence_url('assertion', row['claim_id']), row['claim_id']) + '</dd>'
+                 + ('<dt>Approved replacement</dt><dd>' + _link(_evidence_url('assertion', row['replacement_claim_id']), row['replacement_claim_id']) + '</dd>' if row.get('replacement_claim_id') else '') +
                  f'<dt>Corrected</dt><dd><time datetime="{stamp}">{stamp}</time></dd></dl>'
                  '<h3>Supporting evidence</h3><ul>'
                  + ''.join('<li>' + _link(url, url) + '</li>' for url in row['evidence_urls']) + '</ul></article>')
@@ -864,7 +1005,7 @@ def _correction_feeds(output, context, rows):
     for row in rows:
         permalink = sp.ORIGIN + _correction_url(row)
         description = (f'Edition: {row["edition_id"]}. Claim: {row["claim_id"]}. '
-                       f'Status: {row["status"]}. {row["summary"]} Evidence: ' + ' '.join(row['evidence_urls']))
+                       f'Status: {row["status"]}. ' + (f'Approved replacement: {row["replacement_claim_id"]}. ' if row.get('replacement_claim_id') else '') + f'{row["summary"]} Evidence: ' + ' '.join(row['evidence_urls']))
         item = ET.SubElement(channel, 'item')
         for key, value in (('title', row['summary']), ('link', permalink), ('description', description),
                            ('pubDate', format_datetime(row['instant'], usegmt=True))):
@@ -892,6 +1033,7 @@ def write_company_supplements(output, context):
     Historical prose, figures, source dates and organization metadata are retained.
     """
     output = Path(output)
+    context = {**context, '_page_revisions': _revision_dates(context)}
     records = []
     for entity in sorted(context['graph']['entities'], key=lambda row: row['id']):
         legacy = entity.get('legacy_id')
@@ -906,8 +1048,7 @@ def write_company_supplements(output, context):
         canonical = sp.ORIGIN + path
         if f'<link rel="canonical" href="{sp.escape(canonical)}">' not in original or '</main>' not in original:
             raise ValueError('Legacy company supplement requires its existing canonical and main: ' + path)
-        modified = max(_day(context['graph']['as_of']), context['report']['updated_on'],
-                       *(_day(row.get('as_of')) for row in assertions))
+        modified = _page_revision(context, path)
         def update_page_date(match):
             nonlocal modified
             node = json.loads(match.group(2))
@@ -915,8 +1056,11 @@ def write_company_supplements(output, context):
                 nonlocal modified
                 if isinstance(value, dict):
                     if value.get('@id') == canonical and value.get('@type') in {'WebPage', 'ProfilePage'}:
-                        modified = max(modified, _day(value.get('dateModified')))
-                        value['dateModified'] = modified
+                        modified = max(filter(None, [modified, _day(value.get('dateModified'))]), default=None)
+                        if modified:
+                            value['dateModified'] = modified
+                        else:
+                            value.pop('dateModified', None)
                     for child in value.values():
                         update(child)
                 elif isinstance(value, list):
@@ -930,14 +1074,14 @@ def write_company_supplements(output, context):
                    + _date(context['graph']['as_of']) + ' · Added assessment ' + _date(context['report']['updated_on']) + '</p>'
                    '<p>These approved assertions supplement the historical profile. Each retains its own evidence date, scope and qualifications. '
                    'They do not establish commercial quality or an unstated supplier contribution.</p>'
-                   + ''.join(_assertion(context, assertion) for assertion in assertions)
+                   + ''.join(_assertion(context, assertion, compact=True) for assertion in assertions)
                    + '</section><!-- research-supplement:end -->')
         text = re.sub(r'<!-- research-supplement:start -->.*?<!-- research-supplement:end -->', '', text, flags=re.S)
         text = text.replace('</main>', section + '</main>', 1)
         if '<link rel="stylesheet" href="/research.css">' not in text:
             text = text.replace('</head>', '<link rel="stylesheet" href="/research.css">\n</head>', 1)
         target.write_text(text, encoding='utf-8')
-        records.append({'path': path, 'lastmod': modified})
+        records.append({'path': path, **({'lastmod': modified} if modified else {})})
     if records:
         (output / 'research.css').write_bytes((ROOT / 'web/research.css').read_bytes())
     return records
@@ -950,14 +1094,16 @@ def write_research_pages(output, context):
     site-relative and begin with '/'. Existing legacy company HTML is untouched.
     """
     output = Path(output)
-    modified = max(context["report"]["updated_on"], _day(context["graph"]["as_of"]))
     editions = _published_editions(context)
     corrections = _correction_records(context)
+    context = {**context, '_render_corrections': corrections}
+    context['_page_revisions'] = _revision_dates(context)
     pages = [("/research/", "Human data research", "Public-source research connecting AI data suppliers, papers, datasets, benchmarks, and workflows, with visible evidence and coverage.", _hub(context, editions), "CollectionPage", None),
              (REPORT_PATH, context["report"]["title"], context["report"].get("summary", "Research methods and findings."), _report(context), "TechArticle", None),
              ("/research/data/", "Research data & evidence", "Versioned research data, source and assertion permalinks, publication progress, citations, and reproducible downloads.", _data(context), "CollectionPage", None),
              ("/review/", "Review & correct the research", "Contribute a source-backed correction, scoped review, or public reuse of ScienceToStartup research.", _review(context), "WebPage", None),
              (CORRECTIONS_PATH, "Research corrections", "Accepted research corrections, with affected editions, claims, correction dates and supporting evidence.", _corrections_page(context, corrections), "CollectionPage", None)]
+    pages.extend(_ledger_pages(context))
     for category in CATEGORIES:
         slug, label, kinds, description = category
         pages.append(("/research/" + slug + "/", label, description, _index(context, category), "CollectionPage", None))
@@ -973,27 +1119,41 @@ def write_research_pages(output, context):
         target = output / path.lstrip('/') / 'index.html'
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(_render(context, title, description, path, body, page_type, parent), encoding='utf-8')
-        records.append({"path": path, "lastmod": modified})
+        records.append(_sitemap_record(context, path))
     for path, snapshot in editions:
+        snapshot = {**snapshot, '_page_revisions': _revision_dates(snapshot)}
         target = output / path.lstrip('/') / 'index.html'
         target.parent.mkdir(parents=True, exist_ok=True)
         def edition_links(text):
             # Evidence on an immutable edition must not silently resolve to this
-            # week's changed assertions or downloads.
-            text = text.replace('/research/data/#', path + 'data/#')
+            # week's changed assertions or downloads. Only site URL attributes
+            # and structured URL fields change; source URLs and quoted facts do
+            # not become edition links merely by containing the same path.
+            for prefix, replacement in (('/research/data/', path + 'data/'),
+                                        (sp.ORIGIN + '/research/data/', sp.ORIGIN + path + 'data/')):
+                text = re.sub(r'((?:href|content)=")' + re.escape(prefix),
+                              lambda match: match.group(1) + replacement, text)
+                text = re.sub(r'("(?:@id|url|item|contentUrl)"\s*:\s*")' + re.escape(prefix),
+                              lambda match: match.group(1) + replacement, text)
             archive = _safe_url(snapshot['report'].get('archive', {}).get('record_url'))
             if archive:
                 text = re.sub(r'href="/(?:publication|research/exports)/[^\"]+"', 'href="' + sp.escape(archive) + '"', text)
             return text
         target.write_text(edition_links(_render(snapshot, snapshot['report']['title'], snapshot['report'].get('summary', ''), path,
                                   _report(snapshot, edition=True), 'TechArticle')), encoding='utf-8')
-        records.append({"path": path, "lastmod": snapshot['report']['updated_on']})
+        records.append(_sitemap_record(snapshot, path))
         ledger_path = path + 'data/'
         ledger = output / ledger_path.lstrip('/') / 'index.html'
         ledger.parent.mkdir(parents=True, exist_ok=True)
         ledger.write_text(edition_links(_render(snapshot, 'Edition evidence and sources', 'Frozen assertion and source records for this exact archived edition.',
                                                ledger_path, _data(snapshot), 'CollectionPage')), encoding='utf-8')
-        records.append({"path": ledger_path, "lastmod": snapshot['report']['updated_on']})
+        records.append(_sitemap_record(snapshot, ledger_path))
+        for live_path, title, description, body, page_type, parent in _ledger_pages(snapshot):
+            bucket_path = ledger_path + live_path.removeprefix('/research/data/')
+            bucket = output / bucket_path.lstrip('/') / 'index.html'
+            bucket.parent.mkdir(parents=True, exist_ok=True)
+            bucket.write_text(edition_links(_render(snapshot, title, description, bucket_path, body, page_type, parent)), encoding='utf-8')
+            records.append(_sitemap_record(snapshot, bucket_path))
     (output / 'research.css').write_bytes((ROOT / 'web/research.css').read_bytes())
     (output / 'research-index.js').write_bytes((ROOT / 'web/research-index.js').read_bytes())
     _feeds(output, context, editions)

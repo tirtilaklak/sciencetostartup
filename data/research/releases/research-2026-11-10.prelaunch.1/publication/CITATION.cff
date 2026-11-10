@@ -1,0 +1,15 @@
+{
+  "authors": [
+    {
+      "family-names": "Ozdem",
+      "given-names": "Musa"
+    }
+  ],
+  "cff-version": "1.2.0",
+  "license": "CC-BY-4.0",
+  "message": "Preparation snapshot; not a published research edition. No DOI has been registered for this snapshot.",
+  "title": "State of AI Data Labs and Human Feedback",
+  "type": "dataset",
+  "url": "https://sciencetostartup.com/research/state-of-ai-data-labs/",
+  "version": "research-2026-11-10.prelaunch.1"
+}

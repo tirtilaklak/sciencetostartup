@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import research_citations as citations
 import research_publish as publish
 from test_research_citations import context_fixture
+from publication_fixtures import populate_owned_inputs
 
 
 class FakeZenodo:
@@ -327,6 +328,7 @@ class PublicationTests(unittest.TestCase):
         context = context_fixture()
         context["policy"]["mode"] = "publish_enabled"
         context["root"] = str(self.directory / "synthetic-input")
+        populate_owned_inputs(context["root"])
         context["gate"] = fixture_gate(context["graph"], context["report"], context["policy"])
         reservation_path = self.directory / "reservation-journal.json"
         plan = publish.PublicationPlan(context, reservation_path)
@@ -346,14 +348,14 @@ class PublicationTests(unittest.TestCase):
         # context digest is written before publication and never refreshed.
         pdf = b"UNIT TEST PDF FIXTURE - not an actual research publication"
         pdf_directory = Path(context["root"]) / "data/research"
-        pdf_directory.mkdir(parents=True)
+        pdf_directory.mkdir(parents=True, exist_ok=True)
         (pdf_directory / "report.pdf").write_bytes(pdf)
         frozen_digest = citations.context_digest(context)
-        (pdf_directory / "report-pdf.json").write_bytes(citations.json_bytes({"sha256": citations.sha256(pdf), "context_sha256": frozen_digest}))
+        (pdf_directory / "report-pdf.json").write_bytes(citations.json_bytes({"context_contract_version": citations.CONTEXT_CONTRACT_VERSION, "sha256": citations.sha256(pdf), "context_sha256": frozen_digest}))
         projection = citations.public_projection(context, {"dataset_version": "2.5.0", "companies": []})
         prepared = self.directory / "frozen-edition"
         with patch.object(citations, "public_projection", return_value=projection):
-            citations.freeze_publication_package(context, prepared / "publication")
+            citations.freeze_publication_package(context, prepared / "publication", archive_compression="deflate")
         package = prepared / "publication"
         archive = (package / "research-archive.zip").read_bytes()
         with patch.object(citations, "write_publication_assets", side_effect=AssertionError("Never regenerate an existing freeze")):

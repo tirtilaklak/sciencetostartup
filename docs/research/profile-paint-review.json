@@ -1,0 +1,107 @@
+{
+  "schema_version": "sciencetostartup-technical-review-summary-1",
+  "scope": "Schedule uncached company evidence installation after the sourced introduction first paints; retain all context verification and navigation guards.",
+  "scientific_approval": false,
+  "whole_release_approval": false,
+  "review_type": "separate AI technical source review",
+  "decision": "pass",
+  "review_sha256": "fd9b8da07050c364598bea6e4f4ccfc18e45a13644a4f935fdf1998c4127de69",
+  "runtime_source_sha256": "636caa11bed2c511fa511fe5e803b10b3243bc5e9082542a4a3448821366176c",
+  "unit_tests": 6,
+  "actual_function_scenarios": 8,
+  "candidate_build_id": "d55ed0e40080198c73c1",
+  "candidate_manifest_sha256": "e5f33467416da51993226fb2ce88aed404f85974aed39d4eaf21308a9def20a9",
+  "local_mobile": {
+    "passed": true,
+    "cold_runs": 27,
+    "summary_sha256": "edc7181b4cdb004be7904aec62f0b16dfb744c5d40a48e62226ca88d8a24ca72",
+    "routes": [
+      {
+        "route": "/",
+        "medians": {
+          "largest-contentful-paint": 1654.0064,
+          "total-blocking-time": 0,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      },
+      {
+        "route": "/explore/#companies",
+        "medians": {
+          "largest-contentful-paint": 2268.4258,
+          "total-blocking-time": 16.5,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      },
+      {
+        "route": "/explore/#work",
+        "medians": {
+          "largest-contentful-paint": 2042.8747847386899,
+          "total-blocking-time": 57,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      },
+      {
+        "route": "/explore/#company/mercor/work",
+        "medians": {
+          "largest-contentful-paint": 2226.3984202174997,
+          "total-blocking-time": 32,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      },
+      {
+        "route": "/work/",
+        "medians": {
+          "largest-contentful-paint": 1054.7931,
+          "total-blocking-time": 0,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      },
+      {
+        "route": "/research/",
+        "medians": {
+          "largest-contentful-paint": 904.4474,
+          "total-blocking-time": 0,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      },
+      {
+        "route": "/research/state-of-ai-data-labs/",
+        "medians": {
+          "largest-contentful-paint": 1954.9879,
+          "total-blocking-time": 30.117974999999888,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      },
+      {
+        "route": "/research/data/",
+        "medians": {
+          "largest-contentful-paint": 1354.1531999999997,
+          "total-blocking-time": 0,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      },
+      {
+        "route": "/review/",
+        "medians": {
+          "largest-contentful-paint": 905.768,
+          "total-blocking-time": 0,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      }
+    ]
+  },
+  "limitations": [
+    "The timer delay is not a hard deadline in a suspended or throttled tab.",
+    "Obsolete waits clear their own scheduled frames or timer; generation/hash/abort checks prevent stale requests and installations.",
+    "This summary does not replace final CI, real-browser integration or deployment verification."
+  ]
+}

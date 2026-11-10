@@ -7,6 +7,17 @@ JUDGMENT_FIELDS = (("buyer_implication", "Buyer implication"), ("limitations", "
                    ("confidence", "Confidence"), ("reasoning", "Reasoning"),
                    ("what_would_change", "What would change this assessment"))
 WITHHELD = "A proposed executive finding is withheld because its identifier, required fields or approved evidence are incomplete."
+WITHHELD_PARAGRAPH = "A proposed finding is withheld because its evidence is not approved for publication."
+
+
+def paragraph_supported(context, paragraph):
+    """Apply the same evidence rule to live, offline and PDF report blocks."""
+    ids = paragraph.get("claim_ids", [])
+    claims = {row["id"]: row for row in context["graph"].get("assertions", [])}
+    valid = all(claims.get(cid, {}).get("status") == "approved" or
+                (claims.get(cid, {}).get("status") == "historical" and
+                 paragraph.get("historical") is True) for cid in ids)
+    return valid and (paragraph.get("kind") != "sourced_fact" or bool(ids))
 
 
 def field_text(value):

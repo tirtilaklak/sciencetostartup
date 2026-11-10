@@ -1,51 +1,134 @@
 {
-  "schema_version": "1.0.0",
   "reviews": [
     {
-      "fixture": false,
-      "role": "evidence_auditor",
       "decision": "pass",
-      "method": "report_content_review",
-      "reviewer_type": "ai",
-      "reviewer": "Codex gpt-6.1-sol ultra /root/report_evidence_auditor",
-      "invocation_id": "sts-report-evidence-auditor-161c93d4-ffd6-40c6-98ef-8a91c5c743fb:content-review-2",
-      "reviewed_on": "2026-11-10T06:19:14.645605Z",
-      "report_sha256": "e318aa4294fa87a62cece18d742a48f5482eda9b115d79c62a54511e39f6c549",
+      "fixture": false,
       "graph_sha256": "1df0dd903cdee2c2bc1e2e1ac6cf681eefcc134edcce58082fa378a7848e08fd",
-      "scope": "All 76 paragraphs in 12 chapters and every field of six executive findings, using 137 unique approved claims. Complete first reading of revision 001; personal reread of all four changed revision 002 blocks and exact-object proof that the remaining 72 paragraphs, all six findings and metadata are unchanged. All 173 approved assertions and receipts, exclusion rules and 191 source pins independently checked.",
-      "rationale": "EA-001 now binds preference and evaluation deliverables to approved Toloka capability evidence. EA-002 restores the condition for infrequently changing datasets. Both revised licensing blocks explicitly name the pinned RewardBench 1 card. No unsupported entity, supply or performance upgrade or held claim enters the synthesis. Factual descriptions preserve source, period, currency, denominator, human and model provenance, artifact identity and license qualifications. Analytical judgments remain limited to the sample and distinguish proposed buyer procedures from observed results.",
+      "invocation_id": "sts-report-evidence-auditor-161c93d4-ffd6-40c6-98ef-8a91c5c743fb:content-review-2",
       "limitations": [
         "Actual AI evidence audit, not human expert peer review, empirical replication or operational certification.",
         "This exact-content pass does not satisfy launch coverage, frozen core, real 200-assertion or 200-record audits, source cutoff, DOI or archive requirements; the report remains prelaunch."
       ],
+      "method": "report_content_review",
+      "rationale": "EA-001 now binds preference and evaluation deliverables to approved Toloka capability evidence. EA-002 restores the condition for infrequently changing datasets. Both revised licensing blocks explicitly name the pinned RewardBench 1 card. No unsupported entity, supply or performance upgrade or held claim enters the synthesis. Factual descriptions preserve source, period, currency, denominator, human and model provenance, artifact identity and license qualifications. Analytical judgments remain limited to the sample and distinguish proposed buyer procedures from observed results.",
+      "report_sha256": "e318aa4294fa87a62cece18d742a48f5482eda9b115d79c62a54511e39f6c549",
+      "reviewed_on": "2026-11-10T06:19:14.645605Z",
+      "reviewer": "Codex gpt-6.1-sol ultra /root/report_evidence_auditor",
+      "reviewer_type": "ai",
+      "role": "evidence_auditor",
+      "scope": "All 76 paragraphs in 12 chapters and every field of six executive findings, using 137 unique approved claims. Complete first reading of revision 001; personal reread of all four changed revision 002 blocks and exact-object proof that the remaining 72 paragraphs, all six findings and metadata are unchanged. All 173 approved assertions and receipts, exclusion rules and 191 source pins independently checked.",
       "usage": {
+        "cost": null,
         "input_tokens": null,
         "output_tokens": null,
-        "total_tokens": null,
-        "cost": null,
-        "reason": "Provider telemetry is absent; usage/cost unknown."
+        "reason": "Provider telemetry is absent; usage/cost unknown.",
+        "total_tokens": null
       }
     },
     {
-      "schema_version": "1.0.0",
-      "fixture": false,
-      "role": "adversarial",
       "decision": "pass",
-      "method": "report_content_review",
-      "reviewer_type": "ai",
-      "reviewer": "gpt-6.1-sol /root/report_adversarial",
-      "invocation_id": "sts-report-adversarial-rereview-9fe9a193-f7ee-4617-a190-9e2d524f5d32",
-      "reviewed_on": "2026-11-10T06:19:18.632098+00:00",
-      "report_sha256": "e318aa4294fa87a62cece18d742a48f5482eda9b115d79c62a54511e39f6c549",
+      "fixture": false,
       "graph_sha256": "1df0dd903cdee2c2bc1e2e1ac6cf681eefcc134edcce58082fa378a7848e08fd",
-      "scope": "Final exact-content review of all 12 chapters, 76 paragraphs, six executive findings and their buyer implications: personally reread the four changed blocks and independently checked their approved claim/source bindings; confirmed all other 72 previously personally read paragraphs, all six findings and all report/section metadata are identical to the preserved original. Source-first pass and prior revise receipt preserved.",
+      "invocation_id": "sts-report-adversarial-rereview-9fe9a193-f7ee-4617-a190-9e2d524f5d32",
+      "method": "report_content_review",
       "rationale": "The two required RewardBench 1 license-scope corrections are resolved. The additional Toloka binding and conditional Datasheets wording are supported by the approved assertions and independently reread pinned source text. Findings and buyer recommendations remain sample-limited, evidence-bound and explicit about unknowns, historical dates, AI review and unmet launch gates. Pass is only for report content; it does not approve launch, source assertions, author role, human peer review, research accuracy audits, DOI registration, archive publication or deployment.",
-      "supersedes_receipt_path": "report-review-receipt.rev1.json",
+      "report_sha256": "e318aa4294fa87a62cece18d742a48f5482eda9b115d79c62a54511e39f6c549",
       "resolved_correction_ids": [
         "R1",
         "R2"
       ],
+      "reviewed_on": "2026-11-10T06:19:18.632098+00:00",
+      "reviewer": "gpt-6.1-sol /root/report_adversarial",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "schema_version": "1.0.0",
+      "scope": "Final exact-content review of all 12 chapters, 76 paragraphs, six executive findings and their buyer implications: personally reread the four changed blocks and independently checked their approved claim/source bindings; confirmed all other 72 previously personally read paragraphs, all six findings and all report/section metadata are identical to the preserved original. Source-first pass and prior revise receipt preserved.",
+      "supersedes_receipt_path": "report-review-receipt.rev1.json",
       "usage_telemetry": null
+    },
+    {
+      "decision": "pass",
+      "fixture": false,
+      "graph_sha256": "044a17dc52ae6e70d684e18fbf9dc6273be657aa6b80c1074a963f33513160d8",
+      "invocation_id": "expanded-report-evidence-auditor-2026-11-10-actual-v1",
+      "method": "report_content_review",
+      "note": "Actual independent synthesis review; author conclusions were deferred until independent-content-notes.frozen.json was frozen. Critical primary passages and the two table layouts support the scoped financial, agreement, reporting-audit, feedback and labor-time distinctions. No blocking unsupported synthesis or recommendation found. The pass approves evidential synthesis within this selected prelaunch corpus only. It is not human peer review, empirical replication, provider-performance verification, formal reference/screening audit completion, an inventory-completeness claim, eligible-core freeze, DOI/archive confirmation, deployment approval or launch readiness. Those holds remain.",
+      "read_scope_path": "/Users/musa.ozdem/Documents/ChatGPT/scienctostartup (new data lab)/site/output/research-next/expanded-report-evidence-auditor/independent-content-notes.frozen.json",
+      "report_file_sha256": "51cd1e60bca86a5be2c6b0e93dc44ad24a2a10932af160153fa4af97840f89e4",
+      "report_sha256": "2447254fb2e308e1056c164c1ab94e0b8083a35e666e3366e20d38451c2abc4f",
+      "reviewed_on": "2026-11-10T16:23:52.135718+00:00",
+      "reviewer": "Codex independent AI evidence auditor /root/expanded_report_evidence_auditor",
+      "reviewer_type": "ai",
+      "role": "evidence_auditor",
+      "scope": "Full direct reading of 58,566 words in 969 paragraphs across all 12 chapters and all fields of 9 executive findings; all 10 proposed buyer pilot designs, 65 dossiers, 152-work atlas and 152 bibliography entries. Exhaustive mechanical comparison of 1,476 cited approved assertions, all paragraph bindings, scientific values/qualifications and exact three-role receipts. Independent content review against the approved evidential layer plus selective pinned primary passages in 13 documents; no claim that all 1,790 scoped source records or 503 versions were independently reread.",
+      "validation_path": "/Users/musa.ozdem/Documents/ChatGPT/scienctostartup (new data lab)/site/output/research-next/expanded-report-evidence-auditor/independent-validation.json"
+    },
+    {
+      "decision": "pass",
+      "fixture": false,
+      "graph_sha256": "044a17dc52ae6e70d684e18fbf9dc6273be657aa6b80c1074a963f33513160d8",
+      "invocation_id": "expanded-report-adversarial-9ffcce1c-7482-4f66-bea6-d5c0357c5cd0",
+      "issues": [
+        {
+          "id": "AR-EDITORIAL-01",
+          "impact": "Readability only. Substantive HelpSteer3 workflow, role, provenance, filtering and family limits are covered elsewhere in the technical discussion, dataset paragraphs 39-41, Scale dossier and executive findings.",
+          "paragraph": 54,
+          "section_id": "technical-landscape",
+          "severity": "nonblocking",
+          "suggested_followup": "In a later report revision, replace the generic sentence with a short construction/selection summary already supported by approved claims; changed content requires fresh exact-report review.",
+          "text": "The HelpSteer3 atlas entry says only that the approved record attributes a documents relationship; this is a generic graph summary rather than an informative paper synopsis."
+        }
+      ],
+      "launch_decision": "not_ready; unfrozen core, future cutoff, incomplete formal reference/screening audits and absent archive remain held",
+      "method": "report_content_review",
+      "rationale": "The report is defensible as an explicitly provisional, sample-limited evidence-linked synthesis. It preserves source-reported versus independently measured distinctions, exact contribution roles, incompatible financial/labor denominators, benchmark protocols, component rights boundaries, uncertainty and falsifiable change conditions. No blocking unsupported relationship, procurement winner, performance ranking, causal labor inference or false publication/review status was found. Formal launch readiness remains false and is outside this positive synthesis decision.",
+      "report_file_sha256": "51cd1e60bca86a5be2c6b0e93dc44ad24a2a10932af160153fa4af97840f89e4",
+      "report_sha256": "2447254fb2e308e1056c164c1ab94e0b8083a35e666e3366e20d38451c2abc4f",
+      "reviewed_on": "2026-11-10T16:33:32.118587+00:00",
+      "reviewer": "Independent Codex adversarial synthesis reviewer; requested Sol Ultra, runtime model configuration not separately attested",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "scope": {
+        "actual_full_report_prose_read": true,
+        "all_26_replacement_claims_have_78_exact_pass_receipts": true,
+        "artifacts": [
+          "source-first-observations.frozen.json",
+          "comparison-observations.frozen.json",
+          "source-check-plan.json",
+          "raw-pin-verification.json",
+          "additional-source-check-plan.json",
+          "additional-pin-verification.json",
+          "replacement-receipt-checks.json"
+        ],
+        "buyer_use_cases_read": 10,
+        "chapter_paragraphs_read": {
+          "buyer-decision-guides": 35,
+          "commercial-evidence": 13,
+          "datasets-and-benchmarks": 194,
+          "executive-assessment": 10,
+          "governance": 16,
+          "human-expertise-and-operations": 17,
+          "market-structure": 13,
+          "methods-and-appendices": 173,
+          "provider-dossiers": 267,
+          "research-outlook": 9,
+          "technical-landscape": 215,
+          "weekly-developments": 7
+        },
+        "executive_findings_all_fields_read": 9,
+        "independence": "Source-first observations frozen before report conclusion comparison. No other report reviewer conclusions read. Comparison frozen before separate PDF formatting review.",
+        "new_primary_review_boundaries": "Targeted high-risk context rereads only, not a 1790-source or 503-document reread. Other assertions rely on the validated approved layer and its actual bounded three-role source reviews. No experiments, provider operations, worker payment reconciliation, legal compliance, security certificate scopes or formal launch audits reproduced.",
+        "paragraph_words": 58566,
+        "paragraphs": 969,
+        "primary_scoped_source_records_reopened": 30,
+        "provider_dossiers_read": 65,
+        "quarantined_or_historical_report_citations": 0,
+        "reviewed_work_bibliography_entries_read": 152,
+        "source_pin_hashes_verified": true,
+        "unique_primary_response_pins_reopened": 25,
+        "unique_report_assertions_approved_status_checked": 1476
+      }
     }
-  ]
+  ],
+  "schema_version": "1.0.0"
 }

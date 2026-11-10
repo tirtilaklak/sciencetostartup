@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "packages": [
+    {
+      "release_id": "research-2026-11-09.prelaunch.3",
+      "path": "data/research/releases/research-2026-11-09.prelaunch.3/publication",
+      "context_contract_version": 2,
+      "context_sha256": "6db6ffbff199f374ad834bba7833695bfa919a5ae5d7fb1c6b4b11e94e172537",
+      "manifest_sha256": "a3bd04d69bbe1c6a73989109c21b5d8b0e8bdc32bb5feb0534091af1182ef87b",
+      "archive_sha256": "a1d4934b4f16ec97849b1af4a4ab789afb71a52d336249797cb6c6e3d34f6b83"
+    },
+    {
+      "release_id": "research-2026-11-10.prelaunch.1",
+      "path": "data/research/releases/research-2026-11-10.prelaunch.1/publication",
+      "context_contract_version": 3,
+      "context_sha256": "d3e5652844b221ac4086065c529b9e4e675b9946ce845cd772d5d3d42c597591",
+      "manifest_sha256": "9195b0af8b39507c59639820ea0e959ff2d4adb47cfb4fa18e4098c437d3a303",
+      "archive_sha256": "6098504f665a0810d93a4d684328d2eb0f5f9c6dc8989c21d50d5db09a60ca7e"
+    }
+  ]
+}

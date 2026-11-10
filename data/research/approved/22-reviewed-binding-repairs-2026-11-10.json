@@ -1,0 +1,1790 @@
+{
+  "assertions": [
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "ec49b5a855a3cce519b273e38c5a879774d5ca6606fd23fb8da124810d968c33",
+          "locator": "labelbox.privacy.66ec60b1d22a6eb140d6d54608222e1b4dd1600b7bf98e4652b88eb510d845c0.txt UTF-8 lines 9-22 (1-based, inclusive); labelbox.privacy.66ec60b1d22a6eb140d6d54608222e1b4dd1600b7bf98e4652b88eb510d845c0.txt UTF-8 lines 60-63 (1-based, inclusive). Pinned version Exact response sha256:66ec60b1d22a6eb140d6d54608222e1b4dd1600b7bf98e4652b88eb510d845c0; response SHA-256 66ec60b1d22a6eb140d6d54608222e1b4dd1600b7bf98e4652b88eb510d845c0. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.8b32eaa3856c36bb3f27.1"
+        }
+      ],
+      "id": "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners",
+      "object_id": null,
+      "predicate": "documents",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "This assertion originated as an author proposal. First-party disclosure; operational execution and outcomes have not been independently audited. Separate review receipts determine its current status; publication status is recorded independently.",
+        "This notice covers the stated services scope and explicitly excludes employee and job-applicant personal information. It is not a contributor pay or IP agreement."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.8b32eaa3856c36bb3f27",
+        "review.source-verifier.repair.binding.v1.reference.8b32eaa3856c36bb3f27",
+        "review.adversarial.repair.binding.v1.reference.8b32eaa3856c36bb3f27"
+      ],
+      "status": "approved",
+      "subject_id": "org.labelbox",
+      "value": {
+        "type": "text",
+        "value": "{\"scope\":{\"claim_class\":\"governance\",\"company_entity_id\":\"org.labelbox\",\"provenance_scope\":\"first-party public disclosure; execution not independently audited\"},\"statement\":\"Labelbox’s privacy notice permits sharing personal information with service providers, consultants and Workforce Partners needing access to provide services.\"}"
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "758025f14e43da623e68541d393c617da841ac83c1dd757bd76b656887508187",
+          "locator": "chatbotarena--README.md UTF-8 lines 119-128 (1-based, inclusive); chatbotarena--README.md UTF-8 lines 154-165 (1-based, inclusive). Pinned version 1b6335d42a1d2c7e34870c905d03ab964f7f2bd8; response SHA-256 53ef9f134991f1c75a81cd24c7b77a602e78d2bc01c6d9666cac53d4e101c50d. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.57f93345ea1f30add099.1"
+        }
+      ],
+      "id": "repair.binding.v1.candidate.cohort3.dataset.chatbotarena.05",
+      "object_id": null,
+      "predicate": "licenses",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party creator-document statement, not an independent corpus audit.",
+        "Reviewed scope: Pinned lmsys/chatbot_arena_conversations creator card, April–June 2023 cleaned release.",
+        "Component-specific license statement; model output terms also apply according to card lines154-159."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.57f93345ea1f30add099",
+        "review.source-verifier.repair.binding.v1.reference.57f93345ea1f30add099",
+        "review.adversarial.repair.binding.v1.reference.57f93345ea1f30add099"
+      ],
+      "status": "approved",
+      "subject_id": "dataset.chatbot-arena-conversations",
+      "value": {
+        "type": "text",
+        "value": "Chatbot Arena user prompts are CC-BY-4.0, while model outputs are CC-BY-NC-4.0."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "f3cae36c4cdc3eb2e8a8d88ad4f1462364f750a68b490ba70821491d55f8de9e",
+          "locator": "videofeedback--README.md UTF-8 lines 1-11 (1-based, inclusive); videofeedback--README.md UTF-8 lines 100-106 (1-based, inclusive). Pinned version 4557cb71595098e68790bb35253225c2fe797dcf; response SHA-256 ae697b66418407ba534066f80252f7a9c9553e977755edfa5dfc80be4a9f96ed. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.36b97f9eaeec25694044.1"
+        },
+        {
+          "excerpt_sha256": "abb2896dc3c2a9402f901b88d5035cf0a83d5cf7c17e73642cdf562b0b9d3bc5",
+          "locator": "videofeedback--github--LICENSE UTF-8 lines 1-21 (1-based, inclusive). Pinned version f87faf4647e637066bcb74721670cd579e0f4349; response SHA-256 821d038afa755049f68fff5a0bcb4db416f16426b39447c095b80670be795fc8. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.36b97f9eaeec25694044.2"
+        },
+        {
+          "excerpt_sha256": "34d32371ffba3184485fb3a438f7313abc2b45c968193194ea33b2050e272c75",
+          "locator": "videofeedback--github--README.md UTF-8 lines 1-40 (1-based, inclusive). Pinned version f87faf4647e637066bcb74721670cd579e0f4349; response SHA-256 0e5765f6e0da01cc47bf8674218e07206da99ed40d39d644510e16ef067e3643. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.36b97f9eaeec25694044.3"
+        }
+      ],
+      "id": "repair.binding.v1.candidate.cohort3.dataset.videofeedback.05",
+      "object_id": null,
+      "predicate": "licenses",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party creator-document statement, not an independent corpus audit.",
+        "Reviewed scope: Pinned TIGER-Lab/VideoFeedback card and pinned official VideoScore README/LICENSE. Corrected the initial mistaken PKU-Alignment repository path; no source identity substitution in final claims.",
+        "VideoScore repository code uses MIT; original video component rights not independently audited."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.36b97f9eaeec25694044",
+        "review.source-verifier.repair.binding.v1.reference.36b97f9eaeec25694044",
+        "review.adversarial.repair.binding.v1.reference.36b97f9eaeec25694044"
+      ],
+      "status": "approved",
+      "subject_id": "dataset.videofeedback",
+      "value": {
+        "type": "text",
+        "value": "The VideoFeedback dataset card declares Apache-2.0."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "29d1a9c249706733ad141c243daf4e4797ec393eab11097d21588760953acf9f",
+          "locator": "benchflow-12.txt UTF-8 lines 223-238 (1-based, inclusive). Pinned version response-sha256:824bdc43ad23c0d6f327d7bc75d9392759dcd201f438650a5e6d04de13c863ac; response SHA-256 824bdc43ad23c0d6f327d7bc75d9392759dcd201f438650a5e6d04de13c863ac. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.5ba7fff11d68d4dc55c9.1"
+        }
+      ],
+      "id": "repair.binding.v1.candidate.cohort4.benchflow.version-boundary",
+      "object_id": null,
+      "predicate": "documents",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party disclosure supports the stated source-specific scope; operational execution and outcomes were not independently audited.",
+        "The HTML repository capture is retained but not relied on as a pinned Git commit. No exact repository revision is asserted."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.5ba7fff11d68d4dc55c9",
+        "review.source-verifier.repair.binding.v1.reference.5ba7fff11d68d4dc55c9",
+        "review.adversarial.repair.binding.v1.reference.5ba7fff11d68d4dc55c9"
+      ],
+      "status": "approved",
+      "subject_id": "org.benchflow",
+      "value": {
+        "type": "text",
+        "value": "{\"scope\":{\"claim_class\":\"version_scope\",\"execution_independently_audited\":false,\"legacy_id\":\"benchflow\",\"provenance\":\"first-party public disclosure\"},\"statement\":\"BenchFlow docs say their current documented release is 0.9.2 and explicitly flag pages requiring the 0.10.0rc2 prerelease.\"}"
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "969296aec40d5d84c9f351d9cf8be9f535904367e071c9bdf4a60a94e5b730de",
+          "locator": "prime_intellect-12.txt UTF-8 lines 73-80 (1-based, inclusive). Pinned version response-sha256:2ead413b724508b7ae120dad0e4d668725e0a80c549f2d0779682d6357264bbd; response SHA-256 2ead413b724508b7ae120dad0e4d668725e0a80c549f2d0779682d6357264bbd. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.24040633e2f280d610eb.1"
+        }
+      ],
+      "id": "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis",
+      "object_id": null,
+      "predicate": "access_terms",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party disclosure supports the stated source-specific scope; operational execution and outcomes were not independently audited.",
+        "Pricing basis is distinct from quoted public compute example prices, data-service pricing, company revenue and customer spend. No commercial amount is asserted."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.24040633e2f280d610eb",
+        "review.source-verifier.repair.binding.v1.reference.24040633e2f280d610eb",
+        "review.adversarial.repair.binding.v1.reference.24040633e2f280d610eb"
+      ],
+      "status": "approved",
+      "subject_id": "org.prime_intellect",
+      "value": {
+        "type": "text",
+        "value": "{\"scope\":{\"claim_class\":\"commercial_terms\",\"execution_independently_audited\":false,\"legacy_id\":\"prime_intellect\",\"provenance\":\"first-party public disclosure\"},\"statement\":\"Model Factory terms meter hosted training per GPU-hour allocated to a run, prorated to the second; rates come from the order or platform.\"}"
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "4e0e5603872abdc2519a037530958e499a8a7d655ce75c600b31fd9a5816d149",
+          "locator": "proximal-13.txt UTF-8 lines 9-16 (1-based, inclusive). Pinned version response-sha256:d4ef948c0b00467303ac3401c43278ec141920143c28c94b5430ed84500eaf51; response SHA-256 d4ef948c0b00467303ac3401c43278ec141920143c28c94b5430ed84500eaf51. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.1867168a0db0e5a1a9a8.1"
+        }
+      ],
+      "id": "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure",
+      "object_id": null,
+      "predicate": "documents",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party disclosure supports the stated source-specific scope; operational execution and outcomes were not independently audited.",
+        "Self-reported annualized pace, not an audited annual revenue total, recognized revenue, profit, bookings, valuation or contractor payout. The source does not specify the annualization window, currency code, gross-versus-net accounting, or revenue by business line."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.1867168a0db0e5a1a9a8",
+        "review.source-verifier.repair.binding.v1.reference.1867168a0db0e5a1a9a8",
+        "review.adversarial.repair.binding.v1.reference.1867168a0db0e5a1a9a8"
+      ],
+      "status": "approved",
+      "subject_id": "org.proximal",
+      "value": {
+        "type": "text",
+        "value": "{\"scope\":{\"actual_annual_revenue\":false,\"business_scope\":\"Proximal company overall; segment split unspecified\",\"claim_class\":\"commercial_observation\",\"currency_code\":\"not specified\",\"currency_symbol\":\"$\",\"disclosure_date\":\"2026-09-29\",\"execution_independently_audited\":false,\"gross_vs_net\":\"unspecified\",\"legacy_id\":\"proximal\",\"period_basis\":\"annualized run rate\",\"provenance\":\"first-party public disclosure\",\"reported_amount\":200000000},\"statement\":\"In its September 29, 2026 announcement, Proximal reports scaling to $200M in annualized revenue.\"}"
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "61e01b39532662fb27b3830f6c3047c036333da85eb637de1814240b7c2e5b8e",
+          "locator": "quesma-12.txt UTF-8 lines 15-47 (1-based, inclusive). Pinned version response-sha256:b8e2233698ec81e4515a9385bca254456c6be5b90f3430541283f2b06817c362; response SHA-256 b8e2233698ec81e4515a9385bca254456c6be5b90f3430541283f2b06817c362. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.de84c27fef1177407858.1"
+        }
+      ],
+      "id": "repair.binding.v1.candidate.cohort4.quesma.public-benchmarks",
+      "object_id": null,
+      "predicate": "documents",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party disclosure supports the stated source-specific scope; operational execution and outcomes were not independently audited.",
+        "Own benchmark publication and external contribution statements are not converted into a training-data supplier edge."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.de84c27fef1177407858",
+        "review.source-verifier.repair.binding.v1.reference.de84c27fef1177407858",
+        "review.adversarial.repair.binding.v1.reference.de84c27fef1177407858"
+      ],
+      "status": "approved",
+      "subject_id": "org.quesma",
+      "value": {
+        "type": "text",
+        "value": "{\"scope\":{\"claim_class\":\"named_artifact\",\"execution_independently_audited\":false,\"legacy_id\":\"quesma\",\"provenance\":\"first-party public disclosure\"},\"statement\":\"Quesma publishes open coding-agent benchmarks covering puzzle solving, binary security analysis, instrumentation and compilation tasks.\"}"
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "c67fb3233a9e0ff4771366d9503ab416f00531df81ccefea10565cad7a6061a3",
+          "locator": "apto-04.txt UTF-8 lines 57-61 (1-based, inclusive). Pinned version response-sha256:e9e373c333e7a87335b2a2944706aea5b4653f0df94d254804ed0db63e492185; response SHA-256 e9e373c333e7a87335b2a2944706aea5b4653f0df94d254804ed0db63e492185. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.59e535974fea4450697e.1"
+        },
+        {
+          "excerpt_sha256": "971365623cceb663dfb7eedead11557f26114f5a06101db12b039a9539eebdc0",
+          "locator": "apto-05.txt UTF-8 lines 32-35 (1-based, inclusive). Pinned version response-sha256:769a197c93259fa75670798ac4c3f713cc3a26e833bb93eb3099fcc715984b9c; response SHA-256 769a197c93259fa75670798ac4c3f713cc3a26e833bb93eb3099fcc715984b9c. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.59e535974fea4450697e.2"
+        }
+      ],
+      "id": "repair.binding.v1.candidate.cohort5.apto.company-identity",
+      "object_id": null,
+      "predicate": "documents",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Source-specific first-party disclosure; actual operations and customer outcomes were not independently audited.",
+        "The English privacy page separately uses APTO Corporation; these official renderings are retained without inventing a name-change or ownership event."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.59e535974fea4450697e",
+        "review.source-verifier.repair.binding.v1.reference.59e535974fea4450697e",
+        "review.adversarial.repair.binding.v1.reference.59e535974fea4450697e"
+      ],
+      "status": "approved",
+      "subject_id": "org.apto",
+      "value": {
+        "type": "text",
+        "value": "{\"scope\":{\"claim_class\":\"business_scope\",\"execution_independently_audited\":false,\"legacy_id\":\"apto\",\"provenance\":\"first-party public disclosure\"},\"statement\":\"APTO’s official company-information page names APTO, Inc. and a January 20, 2020 founding date.\"}"
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "3872cf79f116da0da67bdd5e2c543628302e11c55b8a23a75060672cf119dc01",
+          "locator": "physical PDF p6, pdftotext-layout lines 5-13 (1-based, inclusive); physical PDF p34, pdftotext-layout lines 1-30 (1-based, inclusive). Pinned version 2109.07958v2; response SHA-256 6e86175861d24d075bbd8fec987cbdabd0d6332700b001a1ccf335fa72f541b2. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.23199ddc3489ef69ca4b.1"
+        }
+      ],
+      "id": "repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation",
+      "object_id": null,
+      "predicate": "human_annotation",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-reported, version-specific full-source finding; not independently replicated or approved.",
+        "Section 3.2 (p.6) says the authors carried out all main-generation evaluations. A predefined qualitative rubric maps to scalar truth scores; it does not remove all judgment or disagreement."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.23199ddc3489ef69ca4b",
+        "review.source-verifier.repair.binding.v1.reference.23199ddc3489ef69ca4b",
+        "review.adversarial.repair.binding.v1.reference.23199ddc3489ef69ca4b"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2109.07958v2",
+      "value": {
+        "type": "text",
+        "value": "The human generation-evaluation procedure blinds evaluators to the model name and prompt that produced an answer."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "8e7e6a3cc2b1d595e3564ff4804f5aede72e5e1d01e5f208c61c68a53dce5440",
+          "locator": "physical PDF p4, pdftotext-layout lines 47-56 (1-based, inclusive); physical PDF p5, pdftotext-layout lines 1-26 (1-based, inclusive); physical PDF p39, pdftotext-layout lines 1-59 (1-based, inclusive). Pinned version 2109.07958v2; response SHA-256 6e86175861d24d075bbd8fec987cbdabd0d6332700b001a1ccf335fa72f541b2. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.3e6eb35aed69723ece00.1"
+        }
+      ],
+      "id": "repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-reported, version-specific full-source finding; not independently replicated or approved.",
+        "Section 2.3 (p.5) scopes the validator to 100 questions and the participant to 250 questions. The single participant’s baseline is not representative human performance; Appendix F (p.39) discusses disagreement and revisions."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.3e6eb35aed69723ece00",
+        "review.source-verifier.repair.binding.v1.reference.3e6eb35aed69723ece00",
+        "review.adversarial.repair.binding.v1.reference.3e6eb35aed69723ece00"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2109.07958v2",
+      "value": {
+        "type": "text",
+        "value": "The paper recruits two external researchers for separate reference-label validation and a human-answer baseline."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+          "locator": "physical PDF p4, pdftotext-layout lines 34-53 (1-based, inclusive); physical PDF p5, pdftotext-layout lines 1-4 (1-based, inclusive); physical PDF p22, pdftotext-layout lines 17-22 (1-based, inclusive). Pinned version 2404.01318v5; response SHA-256 78c2f251cc101bce36e3dd3138fc0c89f7b73c599099f79ec55318165fe4a981. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.1f1b674004fbf0001dee.1"
+        }
+      ],
+      "id": "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "This assertion originated as an author proposal; separate review receipts determine its current status.",
+        "Version-specific author-reported method; no experiment, dataset-record audit or formal proof was independently reproduced."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.1f1b674004fbf0001dee",
+        "review.source-verifier.repair.binding.v1.reference.1f1b674004fbf0001dee",
+        "review.adversarial.repair.binding.v1.reference.1f1b674004fbf0001dee"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2404.01318v5",
+      "value": {
+        "type": "text",
+        "value": "JBB-Behaviors contains 100 harmful behaviors and 100 corresponding topic-matched benign behaviors used to assess excessive refusal."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "3e55eb064b1550405f4ac631c8be9b5a2cd5edcd9c785db995c8533467633cd1",
+          "locator": "webshop.LICENSE.md UTF-8 lines 1-21 (1-based, inclusive). Pinned version 64fa2a5c15c7daa698b9ac93f5bb5437b634c9bd; response SHA-256 8872dbf8660b00890b5e07ce1ea1f7a44fa7ae4e1857da56caba172b51dab3cb. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.882d159793300a8f5982.1"
+        },
+        {
+          "excerpt_sha256": "1097fb9ca7a58474650b39429b25ffbd8f5d50ebfb52a89c63afe5f90a3afd1d",
+          "locator": "webshop.README.md UTF-8 lines 1-5 (1-based, inclusive). Pinned version 64fa2a5c15c7daa698b9ac93f5bb5437b634c9bd; response SHA-256 79b7a90a1413a52deb53142b5bbd81ecf40f61743bd4601c2835e91375898ec0. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.882d159793300a8f5982.2"
+        }
+      ],
+      "id": "repair.binding.v1.cohort4.dataset.claim.webshop.license",
+      "object_id": null,
+      "predicate": "licenses",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Pinned creator documentation statement; source commit identifies documentation, not verified corpus bytes. The README badge points to Princeton policy, while the actual license file says MIT; product/catalog content rights are not established.",
+        "This assertion originated as an author proposal; review receipts determine its evidentiary disposition."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.882d159793300a8f5982",
+        "review.source-verifier.repair.binding.v1.reference.882d159793300a8f5982",
+        "review.adversarial.repair.binding.v1.reference.882d159793300a8f5982"
+      ],
+      "status": "approved",
+      "subject_id": "benchmark-version.webshop.64fa2a5c15c7",
+      "value": {
+        "type": "text",
+        "value": "The WebShop LICENSE.md is MIT for software and associated documentation."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "db60c24a61ee6491ba4f7bb9ff96f23d362fd3491f85b6bb2bfd321b507a6705",
+          "locator": "xp3.README.md UTF-8 lines 104-108 (1-based, inclusive); xp3.README.md UTF-8 lines 123-137 (1-based, inclusive). Pinned version 0ab0411dca6e222e62d210bc681dbcb476d6fe4c; response SHA-256 b037cb4eac19ccc852b6570dda2ca0cc5017298407fbcc4aaaebef6382e110ea. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.4254b341e79f0eb00b45.1"
+        }
+      ],
+      "id": "repair.binding.v1.cohort4.dataset.claim.xp3.scope",
+      "object_id": null,
+      "predicate": "documents",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Pinned creator documentation statement; source commit identifies documentation, not verified corpus bytes. The broader card summary refers to 16 tasks; xP3all adds three evaluation tasks.",
+        "This assertion originated as an author proposal; review receipts determine its evidentiary disposition."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.4254b341e79f0eb00b45",
+        "review.source-verifier.repair.binding.v1.reference.4254b341e79f0eb00b45",
+        "review.adversarial.repair.binding.v1.reference.4254b341e79f0eb00b45"
+      ],
+      "status": "approved",
+      "subject_id": "dataset-release.xp3.0ab0411dca6e",
+      "value": {
+        "type": "text",
+        "value": "The xP3 family table identifies xP3 as 13 training tasks in 46 languages with English prompts."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "23346386f0044a4eb36dcd876efed4301a48525b7ad1baa07d31c825ee787faf",
+          "locator": "physical PDF p13, pdftotext-layout lines 56-62 (1-based, inclusive); physical PDF p14, pdftotext-layout lines 6-9 (1-based, inclusive). Pinned version 2412.14161v1; response SHA-256 3fd93217ad441ee1dbd3f7195d012093751c6feae50b2547c2891643255b4d15. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.2d419627b684bcf26558.1"
+        }
+      ],
+      "id": "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "This assertion originated as an author proposal; separate review receipts determine its current status.",
+        "Version-specific reported method or result; no experiment, proof, raw-corpus record or labor audit was independently reproduced."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.2d419627b684bcf26558",
+        "review.source-verifier.repair.binding.v1.reference.2d419627b684bcf26558",
+        "review.adversarial.repair.binding.v1.reference.2d419627b684bcf26558"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2412.14161v1",
+      "value": {
+        "type": "text",
+        "value": "The authors state that resource limits prevented a human-professional performance comparison in this iteration."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "7a913ff5dfcd29c412f0163965d60b5b2f11888da32ca322bda77f2696c42ca8",
+          "locator": "physical PDF p4, pdftotext-layout lines 8-20 (1-based, inclusive); physical PDF p4, pdftotext-layout lines 28-36 (1-based, inclusive); physical PDF p4, pdftotext-layout lines 50-61 (1-based, inclusive); physical PDF p5, pdftotext-layout lines 6-13 (1-based, inclusive). Pinned version 2402.16795v2; response SHA-256 ba747597683b1f80c2fbbfbb07308baa5bd206f13aa61e8d493e6f74c81b96f8. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.9cb5931cdf0efe3e6d9b.1"
+        }
+      ],
+      "id": "repair.binding.v1.cohort8.claim.gptpipeline.interface",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-only candidate: separate source-verifier and adversarial source-content reviews remain pending.",
+        "Version-specific primary-source report. Proofs, model experiments, underlying data, consent/pay records and supplier participation have not been independently reproduced or audited.",
+        "Interface treatments belong to the reported controlled grouping; this candidate makes no universal causal claim for each individual feature."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.9cb5931cdf0efe3e6d9b",
+        "review.source-verifier.repair.binding.v1.reference.9cb5931cdf0efe3e6d9b",
+        "review.adversarial.repair.binding.v1.reference.9cb5931cdf0efe3e6d9b"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2402.16795v2",
+      "value": {
+        "type": "text",
+        "value": "The advanced crowd interface includes visual click feedback, a color-coded overview and a time lock, while the basic interface emphasizes task simplicity."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "99b55e990bad2da179990592d3e4c823cfa17b98f1f25751100ef56ffb736295",
+          "locator": "physical PDF p8, pdftotext-layout lines 18-24 (1-based, inclusive). Pinned version 2504.05118v3; response SHA-256 a10387626b86a8f9a6a80d17e727eb5a5036dc237a81d370c26e60d7c4168457. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+          "source_id": "repair.binding.v1.reference.07c3daf1089af3b2958b.1"
+        }
+      ],
+      "id": "repair.binding.v1.cohort8.claim.vapo.decoupled-gae",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-only candidate: separate source-verifier and adversarial source-content reviews remain pending.",
+        "Version-specific primary-source report. Proofs, model experiments, underlying data, consent/pay records and supplier participation have not been independently reproduced or audited.",
+        "Policy lambda is separately length-adaptive in this recipe; no general unbiasedness theorem is asserted by this candidate."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.v1.reference.07c3daf1089af3b2958b",
+        "review.source-verifier.repair.binding.v1.reference.07c3daf1089af3b2958b",
+        "review.adversarial.repair.binding.v1.reference.07c3daf1089af3b2958b"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2504.05118v3",
+      "value": {
+        "type": "text",
+        "value": "VAPO separates GAE parameters for value targets and policy advantages, using lambda one for the value-network returns."
+      }
+    }
+  ],
+  "entities": [],
+  "reviews": [
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort8.claim.vapo.decoupled-gae"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort8.claim.vapo.decoupled-gae": "0ca77366cd17d11897751e873bcc3743205560a9ffb94feba1e71125268ad517"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.07c3daf1089af3b2958b",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Exact value agrees with p8 adjustment 2. Policy length-adaptive qualifier is adjustment 3; non-unbiasedness wording is a scope limit, not an alleged theorem. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.07c3daf1089af3b2958b.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure": "3a9a3e45e65c7837125cd1e8ec7f8a36372f64adbbdc1c0efc6f16e996ec7adb"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.1867168a0db0e5a1a9a8",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Exact nested statement, date, amount and annualized basis agree with provider paragraph. Unspecified window/currency code/accounting/segment fields reflect omissions in this disclosure, not invented financial measures. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.1867168a0db0e5a1a9a8.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors": "9c718917fccf10d4891d5ab724845b2ee058143466b3ed570447e81ac85e25b1"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.1f1b674004fbf0001dee",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. 100 harmful plus 100 topic-matched benign, refusal purpose and 200 total all agree across section 3.1 continuation and data card. Does not require every benign example to be uncontroversial. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.1f1b674004fbf0001dee.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation": "fac5e197883909bafdaa9eef3f794d5319ae013fb24812d04acc2c0572f21245"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.23199ddc3489ef69ca4b",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Value matches Appendix D first item on rendered physical p34. Human generation scope and author scoring are p6; qualitative-to-scalar rubric and fixed mapping p34 items 2-3 support qualifier. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.23199ddc3489ef69ca4b.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis": "92f979dcc824454c6b82b7fde9d7ca84aefbf7caa1256b42c0fb30736f597a55"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.24040633e2f280d610eb",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Exact metering statement combines section 4.1 rates and section 4.2 allocated GPU-hour / second proration. Source includes pods-ready/end boundaries, exclusions and dedicated-capacity section 4.3 exception; summary makes no universal billing or amount assertion. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.24040633e2f280d610eb.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit": "408d073216892b3fa2cc2a0600c0a59b1dcac0cfbffc3a72820070540d63f0b1"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.2d419627b684bcf26558",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Sentence correctly joins p13 limitation 3 to p14resource-limit continuation, preserving human-professional comparison and current iteration scope. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.2d419627b684bcf26558.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort3.dataset.videofeedback.05"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort3.dataset.videofeedback.05": "bc399b8b13e65eca79be272e3968ed89ffc26d6cfad92e121a70268c06f3839a"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.36b97f9eaeec25694044",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Value matches HF YAML Apache-2.0; MIT-code qualifier matches linked creator VideoScore LICENSE. Final three sources are creator-linked and raw-byte verified. Historical PKU-path remark is preserved process history only; no rights-clearance or source-substitution inference. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.36b97f9eaeec25694044.1",
+        "repair.binding.v1.reference.36b97f9eaeec25694044.2",
+        "repair.binding.v1.reference.36b97f9eaeec25694044.3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample": "a37d82237d591b0f9fa243f5fac36d1cb577cb7c98104f134e6d16586e9e14e4"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.3e6eb35aed69723ece00",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Two external researchers and separate roles agree with section 2.3; validator 100 versus participant 250 agree p5 and rendered AppendixF p39. Nonrepresentative-human-baseline caveat is a legitimate inference from single participant, not an asserted population result. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.3e6eb35aed69723ece00.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort4.dataset.claim.xp3.scope"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort4.dataset.claim.xp3.scope": "766e37b2b7ed4fd28dccead1861d4ec2a15fa5d2728b8fcb9d2b1c63c60dd8b2"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.4254b341e79f0eb00b45",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Raw family table explicitly binds xP3 name to 13 training tasks, 46 languages, and English prompts; broader 16-task summary and xP3all plus 3 evaluation tasks appear in same card and declared spans. Actual table headers and neighboring rows were also read. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.4254b341e79f0eb00b45.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort3.dataset.chatbotarena.05"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort3.dataset.chatbotarena.05": "8bfff2af8fd7688e2b41549009e494dc38d00b4980249cd9713b3013fb0d9ef2"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.57f93345ea1f30add099",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Exact prompt/output component-license split agrees README license section; April-June 2023 cleaned-release scope agrees card and specific-model terms remain explicit in lines 154-159. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.57f93345ea1f30add099.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort5.apto.company-identity"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort5.apto.company-identity": "9b76ac8fc9da4a77fad60cb93b19424a904cabdf5b21106d0e43e9e08a991770"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.59e535974fea4450697e",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Raw HTML table independently pairs Company Name / APTO, Inc. and Founded / January 20, 2020; privacy paragraph separately says APTO Corporation. Name-variation qualifier is supported without inventing legal reconciliation. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.59e535974fea4450697e.1",
+        "repair.binding.v1.reference.59e535974fea4450697e.2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort4.benchflow.version-boundary"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort4.benchflow.version-boundary": "46177b10921feb8d0e14024aa2ab6936808f82cb8e75844f191bd390090e1a07"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.5ba7fff11d68d4dc55c9",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Versions paragraph supports captured current 0.9.2 and explicit 0.10.0rc2 page labels. Repository HTML custody caveat is process-only; no exact commit is inferred and release freshness is capture-relative. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.5ba7fff11d68d4dc55c9.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort4.dataset.claim.webshop.license"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort4.dataset.claim.webshop.license": "571b60a70edd05cb2a01cefd838e2b3c6f4b6708e2c0d490156c8bfc78dc80ad"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.882d159793300a8f5982",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. MIT software/associated-documentation scope is explicit LICENSE grant. README badge Princeton policy link independently verified; source does not establish underlying product/catalog rights, as qualifier states. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.882d159793300a8f5982.1",
+        "repair.binding.v1.reference.882d159793300a8f5982.2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners": "09a0c90ba6d1e971222533ff285dc9a5f03073451c6fd2fe199d6dc862640993"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.8b32eaa3856c36bb3f27",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Raw service-provider list item supports personal-information sharing with service providers, consultants and Workforce Partners needing access. Scope and employee/applicant exclusion are lines 17-22. No contributor-pay/IP or all-customer-data claim is made. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.8b32eaa3856c36bb3f27.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort8.claim.gptpipeline.interface"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort8.claim.gptpipeline.interface": "bf563ea6aefcc4d306555d455349aaed698131b0d3aeb865767f4053be8c701e"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.9cb5931cdf0efe3e6d9b",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Value matches advanced/basic features on p4 and Figure 1-2 captions on p5. p4 grouping and separate development/test context support bounded treatment qualifier; no feature-level universal causation inferred. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.9cb5931cdf0efe3e6d9b.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort4.quesma.public-benchmarks"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort4.quesma.public-benchmarks": "35e133970de60b51965de686efb712b21a9868ddf8d8dc3767cc9e26188f9157"
+      },
+      "id": "review.adversarial.repair.binding.v1.reference.de84c27fef1177407858",
+      "invocation_id": "reference-binding-repair-independent-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent adversarial source-content review by this separate invocation. Independently opened all 20 pinned raw sources and froze observations before rendering proposed assertion values/qualifications or prior verdicts; freeze SHA256 e19bc083e8b9fc354235fe9ca0b942142a672c06e8fedc57a3fbd9832822a0ce. Four named open benchmark cards match puzzle, binary security, instrumentation, and compilation categories. Separate external audit/contribution section does not establish a training-data supplier relationship. Full value and every source-factual qualifier checked, with method/provenance limits distinguished from primary facts. Raw response/excerpt hashes, actual physical PDF pages, table/HTML relations, source identity/version/capture metadata and chronology verified. Administrative historical disclosures are retained without attesting unobserved author workflow. No experiment, proof, corpus-record, operational, labor or legal-rights audit; no approval/publication/entity-depth promotion. This receipt binds only this exact new assertion digest; all original and 32 earlier new-role receipts preserved. Requested gpt-6.1-sol/ultra configuration recorded without runtime identity attestation.",
+      "reviewed_on": "2026-11-10T15:43:44.306571Z",
+      "reviewer": "Codex independent adversarial reviewer; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.v1.reference.de84c27fef1177407858.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort8.claim.vapo.decoupled-gae"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort8.claim.vapo.decoupled-gae": "0ca77366cd17d11897751e873bcc3743205560a9ffb94feba1e71125268ad517"
+      },
+      "id": "review.author.repair.binding.v1.reference.07c3daf1089af3b2958b",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.07c3daf1089af3b2958b.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure": "3a9a3e45e65c7837125cd1e8ec7f8a36372f64adbbdc1c0efc6f16e996ec7adb"
+      },
+      "id": "review.author.repair.binding.v1.reference.1867168a0db0e5a1a9a8",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.1867168a0db0e5a1a9a8.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors": "9c718917fccf10d4891d5ab724845b2ee058143466b3ed570447e81ac85e25b1"
+      },
+      "id": "review.author.repair.binding.v1.reference.1f1b674004fbf0001dee",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.1f1b674004fbf0001dee.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation": "fac5e197883909bafdaa9eef3f794d5319ae013fb24812d04acc2c0572f21245"
+      },
+      "id": "review.author.repair.binding.v1.reference.23199ddc3489ef69ca4b",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.23199ddc3489ef69ca4b.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis": "92f979dcc824454c6b82b7fde9d7ca84aefbf7caa1256b42c0fb30736f597a55"
+      },
+      "id": "review.author.repair.binding.v1.reference.24040633e2f280d610eb",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.24040633e2f280d610eb.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit": "408d073216892b3fa2cc2a0600c0a59b1dcac0cfbffc3a72820070540d63f0b1"
+      },
+      "id": "review.author.repair.binding.v1.reference.2d419627b684bcf26558",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.2d419627b684bcf26558.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort3.dataset.videofeedback.05"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort3.dataset.videofeedback.05": "bc399b8b13e65eca79be272e3968ed89ffc26d6cfad92e121a70268c06f3839a"
+      },
+      "id": "review.author.repair.binding.v1.reference.36b97f9eaeec25694044",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.36b97f9eaeec25694044.1",
+        "repair.binding.v1.reference.36b97f9eaeec25694044.2",
+        "repair.binding.v1.reference.36b97f9eaeec25694044.3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample": "a37d82237d591b0f9fa243f5fac36d1cb577cb7c98104f134e6d16586e9e14e4"
+      },
+      "id": "review.author.repair.binding.v1.reference.3e6eb35aed69723ece00",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.3e6eb35aed69723ece00.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort4.dataset.claim.xp3.scope"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort4.dataset.claim.xp3.scope": "766e37b2b7ed4fd28dccead1861d4ec2a15fa5d2728b8fcb9d2b1c63c60dd8b2"
+      },
+      "id": "review.author.repair.binding.v1.reference.4254b341e79f0eb00b45",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.4254b341e79f0eb00b45.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort3.dataset.chatbotarena.05"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort3.dataset.chatbotarena.05": "8bfff2af8fd7688e2b41549009e494dc38d00b4980249cd9713b3013fb0d9ef2"
+      },
+      "id": "review.author.repair.binding.v1.reference.57f93345ea1f30add099",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.57f93345ea1f30add099.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort5.apto.company-identity"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort5.apto.company-identity": "9b76ac8fc9da4a77fad60cb93b19424a904cabdf5b21106d0e43e9e08a991770"
+      },
+      "id": "review.author.repair.binding.v1.reference.59e535974fea4450697e",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.59e535974fea4450697e.1",
+        "repair.binding.v1.reference.59e535974fea4450697e.2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort4.benchflow.version-boundary"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort4.benchflow.version-boundary": "46177b10921feb8d0e14024aa2ab6936808f82cb8e75844f191bd390090e1a07"
+      },
+      "id": "review.author.repair.binding.v1.reference.5ba7fff11d68d4dc55c9",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.5ba7fff11d68d4dc55c9.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort4.dataset.claim.webshop.license"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort4.dataset.claim.webshop.license": "571b60a70edd05cb2a01cefd838e2b3c6f4b6708e2c0d490156c8bfc78dc80ad"
+      },
+      "id": "review.author.repair.binding.v1.reference.882d159793300a8f5982",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.882d159793300a8f5982.1",
+        "repair.binding.v1.reference.882d159793300a8f5982.2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners": "09a0c90ba6d1e971222533ff285dc9a5f03073451c6fd2fe199d6dc862640993"
+      },
+      "id": "review.author.repair.binding.v1.reference.8b32eaa3856c36bb3f27",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.8b32eaa3856c36bb3f27.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort8.claim.gptpipeline.interface"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort8.claim.gptpipeline.interface": "bf563ea6aefcc4d306555d455349aaed698131b0d3aeb865767f4053be8c701e"
+      },
+      "id": "review.author.repair.binding.v1.reference.9cb5931cdf0efe3e6d9b",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.9cb5931cdf0efe3e6d9b.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort4.quesma.public-benchmarks"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort4.quesma.public-benchmarks": "35e133970de60b51965de686efb712b21a9868ddf8d8dc3767cc9e26188f9157"
+      },
+      "id": "review.author.repair.binding.v1.reference.de84c27fef1177407858",
+      "invocation_id": "reference-binding-repair-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review on the new exact candidate digest. Read byte-verified pinned contexts listed in assertion evidence, including all factual qualifications. Original scientific value and qualifications preserved exactly. Expanded locators are new author clarifications of old captures. Original negative reviews remain bound only to original digest in history. Separate source-verifier and adversarial reviews of this candidate are pending. No experiment, operations, underlying corpus, labor, rights or causal outcome independently reproduced. Requested gpt-6.1-sol/ultra configuration; runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:20:50.804838Z",
+      "reviewer": "Codex research author; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.v1.reference.de84c27fef1177407858.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort8.claim.vapo.decoupled-gae"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort8.claim.vapo.decoupled-gae": "0ca77366cd17d11897751e873bcc3743205560a9ffb94feba1e71125268ad517"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.07c3daf1089af3b2958b",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. VAPO 2504.05118v3 physical p8 parameter adjustments: value network return estimation lambda=1.0; policy advantages use separate lambda, adaptively chosen by sequence length with alpha .05. Table and adjacent ablation results concern Qwen-32b/AIME24, not a universal performance guarantee. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.07c3daf1089af3b2958b.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure": "3a9a3e45e65c7837125cd1e8ec7f8a36372f64adbbdc1c0efc6f16e996ec7adb"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.1867168a0db0e5a1a9a8",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. Proximal New Frontiers dated September 29, 2026: company says software-engineering work with frontier labs and enterprises enabled $200M annualized revenue. This is a self-report of annualized pace, not audited realized annual net revenue. Pinned HTML visible content independently agrees with extracted text. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.1867168a0db0e5a1a9a8.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors": "9c718917fccf10d4891d5ab724845b2ee058143466b3ed570447e81ac85e25b1"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.1f1b674004fbf0001dee",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. JailbreakBench v5 physical p4 section3.1: 100 harmful rows, each with behavior, goal, target, category, source; 100 benign counterparts matched on exact topic. p5 says refusal-rate evaluation, some borderline cases and provider disagreement. p22 data card confirms 200 total, 100 each, and v1.0 June2024 snapshot. Origins 18% AdvBench/27% TDC-HarmBench/55% original. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.1f1b674004fbf0001dee.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation": "fac5e197883909bafdaa9eef3f794d5319ae013fb24812d04acc2c0572f21245"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.23199ddc3489ef69ca4b",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. TruthfulQA v2 39 physical PDF pages; Appendix D is physical page34 (not any whole-text formfeed-derived page47). Evaluators blinded to model name AND prompt; authors conducted main generation evaluations (p6). Thirteen qualitative labels map to pre-fixed scores, binary truth >=.5; sourcing where appropriate. Blinding is procedure, not proof of independent external raters for every main result. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.23199ddc3489ef69ca4b.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis": "92f979dcc824454c6b82b7fde9d7ca84aefbf7caa1256b42c0fb30736f597a55"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.24040633e2f280d610eb",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. Prime Intellect Model Factory terms last updated November4,2026, section4.2: per allocated GPU-hour from pods ready to terminal/paused, second-prorated, no minimum. Queue/schedule/image-pull unbilled; running model-weight load and pausing/checkpoint billed. 4.1 orders/rates and4.3 dedicated-capacity exception constrain interpretation. Not a revenue disclosure. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.24040633e2f280d610eb.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit": "408d073216892b3fa2cc2a0600c0a59b1dcac0cfbffc3a72820070540d63f0b1"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.2d419627b684bcf26558",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. TheAgentCompany v1 physical p13 section8 sentence continues p14: resource limitations prevented actual human-professional performance comparison in current iteration. Other limits: simpler program-evaluable tasks, one scaffold, introspective task design/enterprise gap. Does not mean tasks untested by designers. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.2d419627b684bcf26558.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort3.dataset.videofeedback.05"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort3.dataset.videofeedback.05": "bc399b8b13e65eca79be272e3968ed89ffc26d6cfad92e121a70268c06f3839a"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.36b97f9eaeec25694044",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. VideoFeedback pinned HF card YAML declares apache-2.0; overview 37.6K pairs,11 models, human raters/five dimensions. Linked VideoScore repository README identifies dataset relationship; its pinned LICENSE is MIT for software/docs. This is differing license labels across related artifacts; repository MIT does not automatically supersede dataset Apache label or establish upstream video rights. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.36b97f9eaeec25694044.1",
+        "repair.binding.v1.reference.36b97f9eaeec25694044.2",
+        "repair.binding.v1.reference.36b97f9eaeec25694044.3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample": "a37d82237d591b0f9fa243f5fac36d1cb577cb7c98104f134e6d16586e9e14e4"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.3e6eb35aed69723ece00",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. TruthfulQA section2.3 physical p4-5: two external researchers, validator100 sampled questions with one true/false reference answer pair and7% disagreement; participant250 sampled questions, suggested2min/internet access,6% false, used as human baseline. AppendixF p39 repeats and qualifies likely mistakes, rough2-6% disagreement and43 modified questions. Samples are distinct roles; not two250-question validators. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.3e6eb35aed69723ece00.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort4.dataset.claim.xp3.scope"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort4.dataset.claim.xp3.scope": "766e37b2b7ed4fd28dccead1861d4ec2a15fa5d2728b8fcb9d2b1c63c60dd8b2"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.4254b341e79f0eb00b45",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. xP3 pinned README summary loosely says46languages/16tasks. Family table distinguishes xP3=13 training tasks/46 languages/English prompts; xP3mt=13training tasks/prompts20 languages; xP3all adds3 evaluation tasks for16. Scope must preserve these distinctions, not treat all16 as xP3 training tasks. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.4254b341e79f0eb00b45.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort3.dataset.chatbotarena.05"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort3.dataset.chatbotarena.05": "8bfff2af8fd7688e2b41549009e494dc38d00b4980249cd9713b3013fb0d9ef2"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.57f93345ea1f30add099",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. Chatbot Arena pinned README: user prompts CC-BY-4.0, model outputs CC-BY-NC-4.0. Dataset33K pairwise-preference conversations collected Apr-Jun2023; source warns unsafe content retained, filtering needed, model-specific terms, no reidentification. Split licenses do not grant one uniform commercial-use permission. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.57f93345ea1f30add099.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort5.apto.company-identity"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort5.apto.company-identity": "9b76ac8fc9da4a77fad60cb93b19424a904cabdf5b21106d0e43e9e08a991770"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.59e535974fea4450697e",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. APTO English company page says APTO,Inc., founded January20,2020; nearby CEO RyoTakashina/Tokyo headquarters. Same-site privacy page says APTO Corporation; established April1,2018/updatedJan1,2025 is policy metadata, not firm founding. Names differ by English rendering. Company identity is documented but no independent registry confirmation. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.59e535974fea4450697e.1",
+        "repair.binding.v1.reference.59e535974fea4450697e.2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort4.benchflow.version-boundary"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort4.benchflow.version-boundary": "46177b10921feb8d0e14024aa2ab6936808f82cb8e75844f191bd390090e1a07"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.5ba7fff11d68d4dc55c9",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. BenchFlow docs Versions span: documents current0.9.2;0.9.1 plus five grading-integrity fixes, results carry unless impacted. Published examples fetch docs-v0.9.2; repository/preview Markdown main.0.10.0rc2 explicitly prerelease, pages/sections flagged. Snapshot-specific statement, not lasting current version. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.5ba7fff11d68d4dc55c9.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort4.dataset.claim.webshop.license"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort4.dataset.claim.webshop.license": "571b60a70edd05cb2a01cefd838e2b3c6f4b6708e2c0d490156c8bfc78dc80ad"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.882d159793300a8f5982",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. WebShop pinned repository LICENSE.md contains MIT standard grant and conditions plus2023PrincetonNLP copyright. README badge links Princeton copyright policy. Describe repository file declaration only; badge is differing generic pointer, no proof of blanket licensing of every product/image/dataset asset. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.882d159793300a8f5982.1",
+        "repair.binding.v1.reference.882d159793300a8f5982.2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners": "09a0c90ba6d1e971222533ff285dc9a5f03073451c6fd2fe199d6dc862640993"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.8b32eaa3856c36bb3f27",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. Labelbox pinned Privacy Notice effectiveNov8,2019/updatedSep23,2026: selected-recipient personal-information sharing with service providers, third parties, partners/vendors/suppliers/consultants/Workforce Partners needing access to provide Services; excludes third-party direct marketing. Scope across products/site/services; does not establish named workforce supply chain or particular dataset participation. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.8b32eaa3856c36bb3f27.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.cohort8.claim.gptpipeline.interface"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.cohort8.claim.gptpipeline.interface": "bf563ea6aefcc4d306555d455349aaed698131b0d3aeb865767f4053be8c701e"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.9cb5931cdf0efe3e6d9b",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. GPT-4 crowdsourced annotation pipeline v2: basic interface newly designed, advanced adopted CODA-19/expert-designed; both original instructions. Advanced visual feedback/color-coded overview/time lock; caption physicalp5 confirms. p4 identifies biomedical abstracts/CODA19,200papers3177segments, disjoint200 interface-development papers. Interface comparison task-specific, not universal recommendation. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.9cb5931cdf0efe3e6d9b.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.v1.candidate.cohort4.quesma.public-benchmarks"
+      ],
+      "assertion_sha256": {
+        "repair.binding.v1.candidate.cohort4.quesma.public-benchmarks": "35e133970de60b51965de686efb712b21a9868ddf8d8dc3767cc9e26188f9157"
+      },
+      "id": "review.source-verifier.repair.binding.v1.reference.de84c27fef1177407858",
+      "invocation_id": "reference-binding-repair-independent-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual independent source-content review by this separate source_verifier invocation. Independent regenerated source observations were frozen before proposed assertion values/qualifications were rendered; freeze SHA256 a522463b5281b18282ae1546daa297079c0063adfad4188e3fc0100dfd5ca473. Complete value and every scientific qualification checked against all declared pinned support spans and context. Quesma pinned benchmarks page describes open-source AI coding-agent real-world software benchmarks: BabaIsBench puzzle game, BinaryAudit binary security, OTelBench instrumentation, CompileBench build-system repair; separate audit/contributor links. Page claim is first-party capability/catalog, no evidence of financial performance or provider involvement in others datasets. All raw identities and exact locators reproduced. Administrative provenance disclosures are preserved, with post-freeze custody checks separately recorded; no independent audit of historical author workflow is claimed. No experiment, corpus, operational, legal-rights, labor or causal audit performed; no approval, entity-depth promotion, or publication claim. New receipt binds only the new candidate scientific digest; original receipts untouched. Requested gpt-6.1-sol/ultra configuration, runtime model identity not attested.",
+      "reviewed_on": "2026-11-10T15:33:31.480890Z",
+      "reviewer": "Codex independent source verifier; requested gpt-6.1-sol/ultra (runtime identity not attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.v1.reference.de84c27fef1177407858.1"
+      ],
+      "verdict": "pass"
+    }
+  ],
+  "schema_version": "1.0.0",
+  "sources": [
+    {
+      "captured_on": "2026-11-10T12:06:05Z",
+      "excerpt": "decoupled GAE",
+      "excerpt_sha256": "99b55e990bad2da179990592d3e4c823cfa17b98f1f25751100ef56ffb736295",
+      "id": "repair.binding.v1.reference.07c3daf1089af3b2958b.1",
+      "license": null,
+      "locator": "physical PDF p8, pdftotext-layout lines 18-24 (1-based, inclusive). Pinned version 2504.05118v3; response SHA-256 a10387626b86a8f9a6a80d17e727eb5a5036dc237a81d370c26e60d7c4168457. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": "2025-04-11",
+      "publisher": "arXiv (author-deposited versioned preprint; not publisher VoR byte-verified)",
+      "response_sha256": "a10387626b86a8f9a6a80d17e727eb5a5036dc237a81d370c26e60d7c4168457",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "VAPO: Efficient and Reliable Reinforcement Learning for Advanced Reasoning Tasks",
+      "url": "https://arxiv.org/pdf/2504.05118v3",
+      "version": "2504.05118v3"
+    },
+    {
+      "captured_on": "2026-11-10T09:30:35.331476Z",
+      "excerpt": "scale to $200M in annualized revenue",
+      "excerpt_sha256": "4e0e5603872abdc2519a037530958e499a8a7d655ce75c600b31fd9a5816d149",
+      "id": "repair.binding.v1.reference.1867168a0db0e5a1a9a8.1",
+      "license": null,
+      "locator": "proximal-13.txt UTF-8 lines 9-16 (1-based, inclusive). Pinned version response-sha256:d4ef948c0b00467303ac3401c43278ec141920143c28c94b5430ed84500eaf51; response SHA-256 d4ef948c0b00467303ac3401c43278ec141920143c28c94b5430ed84500eaf51. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "Proximal",
+      "response_sha256": "d4ef948c0b00467303ac3401c43278ec141920143c28c94b5430ed84500eaf51",
+      "source_type": "provider_documentation",
+      "status": "captured",
+      "title": "New Frontiers",
+      "url": "https://www.proximal.ai/blog/new-frontiers/",
+      "version": "response-sha256:d4ef948c0b00467303ac3401c43278ec141920143c28c94b5430ed84500eaf51"
+    },
+    {
+      "captured_on": "2026-11-10T08:38:44Z",
+      "excerpt": "100",
+      "excerpt_sha256": "ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+      "id": "repair.binding.v1.reference.1f1b674004fbf0001dee.1",
+      "license": null,
+      "locator": "physical PDF p4, pdftotext-layout lines 34-53 (1-based, inclusive); physical PDF p5, pdftotext-layout lines 1-4 (1-based, inclusive); physical PDF p22, pdftotext-layout lines 17-22 (1-based, inclusive). Pinned version 2404.01318v5; response SHA-256 78c2f251cc101bce36e3dd3138fc0c89f7b73c599099f79ec55318165fe4a981. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "arXiv (author-deposited preprint)",
+      "response_sha256": "78c2f251cc101bce36e3dd3138fc0c89f7b73c599099f79ec55318165fe4a981",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "JailbreakBench: An Open Robustness Benchmark for Jailbreaking Large Language Models",
+      "url": "https://arxiv.org/pdf/2404.01318v5",
+      "version": "2404.01318v5"
+    },
+    {
+      "captured_on": "2026-11-10T05:01:29.228855Z",
+      "excerpt": "blinded to the model name",
+      "excerpt_sha256": "3872cf79f116da0da67bdd5e2c543628302e11c55b8a23a75060672cf119dc01",
+      "id": "repair.binding.v1.reference.23199ddc3489ef69ca4b.1",
+      "license": null,
+      "locator": "physical PDF p6, pdftotext-layout lines 5-13 (1-based, inclusive); physical PDF p34, pdftotext-layout lines 1-30 (1-based, inclusive). Pinned version 2109.07958v2; response SHA-256 6e86175861d24d075bbd8fec987cbdabd0d6332700b001a1ccf335fa72f541b2. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "arXiv / paper authors",
+      "response_sha256": "6e86175861d24d075bbd8fec987cbdabd0d6332700b001a1ccf335fa72f541b2",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "TruthfulQA: Measuring How Models Mimic Human Falsehoods",
+      "url": "https://arxiv.org/pdf/2109.07958v2",
+      "version": "2109.07958v2"
+    },
+    {
+      "captured_on": "2026-11-10T09:30:35.050812Z",
+      "excerpt": "Hosted Training Fees accrue per GPU-hour for each GPU allocated to a Run",
+      "excerpt_sha256": "969296aec40d5d84c9f351d9cf8be9f535904367e071c9bdf4a60a94e5b730de",
+      "id": "repair.binding.v1.reference.24040633e2f280d610eb.1",
+      "license": null,
+      "locator": "prime_intellect-12.txt UTF-8 lines 73-80 (1-based, inclusive). Pinned version response-sha256:2ead413b724508b7ae120dad0e4d668725e0a80c549f2d0779682d6357264bbd; response SHA-256 2ead413b724508b7ae120dad0e4d668725e0a80c549f2d0779682d6357264bbd. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "Prime Intellect",
+      "response_sha256": "2ead413b724508b7ae120dad0e4d668725e0a80c549f2d0779682d6357264bbd",
+      "source_type": "provider_documentation",
+      "status": "captured",
+      "title": "MODEL FACTORY SERVICE TERMS",
+      "url": "https://www.primeintellect.ai/legal/model-factory-terms",
+      "version": "response-sha256:2ead413b724508b7ae120dad0e4d668725e0a80c549f2d0779682d6357264bbd"
+    },
+    {
+      "captured_on": "2026-11-10T10:23:49Z",
+      "excerpt": "not able",
+      "excerpt_sha256": "23346386f0044a4eb36dcd876efed4301a48525b7ad1baa07d31c825ee787faf",
+      "id": "repair.binding.v1.reference.2d419627b684bcf26558.1",
+      "license": null,
+      "locator": "physical PDF p13, pdftotext-layout lines 56-62 (1-based, inclusive); physical PDF p14, pdftotext-layout lines 6-9 (1-based, inclusive). Pinned version 2412.14161v1; response SHA-256 3fd93217ad441ee1dbd3f7195d012093751c6feae50b2547c2891643255b4d15. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": "2024-12-18",
+      "publisher": "arXiv (author-deposited versioned preprint)",
+      "response_sha256": "3fd93217ad441ee1dbd3f7195d012093751c6feae50b2547c2891643255b4d15",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "TheAgentCompany: Benchmarking LLM Agents on Consequential Real World Tasks",
+      "url": "https://arxiv.org/pdf/2412.14161v1",
+      "version": "2412.14161v1"
+    },
+    {
+      "captured_on": "2026-11-10T09:08:33.064580Z",
+      "excerpt": "license: apache-2.0",
+      "excerpt_sha256": "f3cae36c4cdc3eb2e8a8d88ad4f1462364f750a68b490ba70821491d55f8de9e",
+      "id": "repair.binding.v1.reference.36b97f9eaeec25694044.1",
+      "license": null,
+      "locator": "videofeedback--README.md UTF-8 lines 1-11 (1-based, inclusive); videofeedback--README.md UTF-8 lines 100-106 (1-based, inclusive). Pinned version 4557cb71595098e68790bb35253225c2fe797dcf; response SHA-256 ae697b66418407ba534066f80252f7a9c9553e977755edfa5dfc80be4a9f96ed. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "TIGER-Lab/VideoFeedback",
+      "response_sha256": "ae697b66418407ba534066f80252f7a9c9553e977755edfa5dfc80be4a9f96ed",
+      "source_type": "dataset_card",
+      "status": "captured",
+      "title": "VideoFeedback creator README.md",
+      "url": "https://huggingface.co/datasets/TIGER-Lab/VideoFeedback/resolve/4557cb71595098e68790bb35253225c2fe797dcf/README.md",
+      "version": "4557cb71595098e68790bb35253225c2fe797dcf"
+    },
+    {
+      "captured_on": "2026-11-10T09:10:21.058407Z",
+      "excerpt": "MIT License",
+      "excerpt_sha256": "abb2896dc3c2a9402f901b88d5035cf0a83d5cf7c17e73642cdf562b0b9d3bc5",
+      "id": "repair.binding.v1.reference.36b97f9eaeec25694044.2",
+      "license": null,
+      "locator": "videofeedback--github--LICENSE UTF-8 lines 1-21 (1-based, inclusive). Pinned version f87faf4647e637066bcb74721670cd579e0f4349; response SHA-256 821d038afa755049f68fff5a0bcb4db416f16426b39447c095b80670be795fc8. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "TIGER-AI-Lab/VideoScore",
+      "response_sha256": "821d038afa755049f68fff5a0bcb4db416f16426b39447c095b80670be795fc8",
+      "source_type": "repository",
+      "status": "captured",
+      "title": "VideoScore repository LICENSE",
+      "url": "https://raw.githubusercontent.com/TIGER-AI-Lab/VideoScore/f87faf4647e637066bcb74721670cd579e0f4349/LICENSE",
+      "version": "f87faf4647e637066bcb74721670cd579e0f4349"
+    },
+    {
+      "captured_on": "2026-11-10T09:10:20.852204Z",
+      "excerpt": "human-provided multiaspect score",
+      "excerpt_sha256": "34d32371ffba3184485fb3a438f7313abc2b45c968193194ea33b2050e272c75",
+      "id": "repair.binding.v1.reference.36b97f9eaeec25694044.3",
+      "license": null,
+      "locator": "videofeedback--github--README.md UTF-8 lines 1-40 (1-based, inclusive). Pinned version f87faf4647e637066bcb74721670cd579e0f4349; response SHA-256 0e5765f6e0da01cc47bf8674218e07206da99ed40d39d644510e16ef067e3643. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "TIGER-AI-Lab/VideoScore",
+      "response_sha256": "0e5765f6e0da01cc47bf8674218e07206da99ed40d39d644510e16ef067e3643",
+      "source_type": "repository",
+      "status": "captured",
+      "title": "VideoFeedback creator README.md",
+      "url": "https://raw.githubusercontent.com/TIGER-AI-Lab/VideoScore/f87faf4647e637066bcb74721670cd579e0f4349/README.md",
+      "version": "f87faf4647e637066bcb74721670cd579e0f4349"
+    },
+    {
+      "captured_on": "2026-11-10T05:01:29.228855Z",
+      "excerpt": "two external researchers",
+      "excerpt_sha256": "8e7e6a3cc2b1d595e3564ff4804f5aede72e5e1d01e5f208c61c68a53dce5440",
+      "id": "repair.binding.v1.reference.3e6eb35aed69723ece00.1",
+      "license": null,
+      "locator": "physical PDF p4, pdftotext-layout lines 47-56 (1-based, inclusive); physical PDF p5, pdftotext-layout lines 1-26 (1-based, inclusive); physical PDF p39, pdftotext-layout lines 1-59 (1-based, inclusive). Pinned version 2109.07958v2; response SHA-256 6e86175861d24d075bbd8fec987cbdabd0d6332700b001a1ccf335fa72f541b2. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "arXiv / paper authors",
+      "response_sha256": "6e86175861d24d075bbd8fec987cbdabd0d6332700b001a1ccf335fa72f541b2",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "TruthfulQA: Measuring How Models Mimic Human Falsehoods",
+      "url": "https://arxiv.org/pdf/2109.07958v2",
+      "version": "2109.07958v2"
+    },
+    {
+      "captured_on": "2026-11-10T10:05:15.352747Z",
+      "excerpt": "Mixture of 13 training tasks in 46 languages with English prompts",
+      "excerpt_sha256": "db60c24a61ee6491ba4f7bb9ff96f23d362fd3491f85b6bb2bfd321b507a6705",
+      "id": "repair.binding.v1.reference.4254b341e79f0eb00b45.1",
+      "license": null,
+      "locator": "xp3.README.md UTF-8 lines 104-108 (1-based, inclusive); xp3.README.md UTF-8 lines 123-137 (1-based, inclusive). Pinned version 0ab0411dca6e222e62d210bc681dbcb476d6fe4c; response SHA-256 b037cb4eac19ccc852b6570dda2ca0cc5017298407fbcc4aaaebef6382e110ea. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "bigscience/xP3",
+      "response_sha256": "b037cb4eac19ccc852b6570dda2ca0cc5017298407fbcc4aaaebef6382e110ea",
+      "source_type": "dataset_card",
+      "status": "captured",
+      "title": "xP3 — README.md",
+      "url": "https://huggingface.co/datasets/bigscience/xP3/raw/0ab0411dca6e222e62d210bc681dbcb476d6fe4c/README.md",
+      "version": "0ab0411dca6e222e62d210bc681dbcb476d6fe4c"
+    },
+    {
+      "captured_on": "2026-11-10T09:08:17.166495Z",
+      "excerpt": "model outputs are licensed",
+      "excerpt_sha256": "758025f14e43da623e68541d393c617da841ac83c1dd757bd76b656887508187",
+      "id": "repair.binding.v1.reference.57f93345ea1f30add099.1",
+      "license": null,
+      "locator": "chatbotarena--README.md UTF-8 lines 119-128 (1-based, inclusive); chatbotarena--README.md UTF-8 lines 154-165 (1-based, inclusive). Pinned version 1b6335d42a1d2c7e34870c905d03ab964f7f2bd8; response SHA-256 53ef9f134991f1c75a81cd24c7b77a602e78d2bc01c6d9666cac53d4e101c50d. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "lmsys/chatbot_arena_conversations",
+      "response_sha256": "53ef9f134991f1c75a81cd24c7b77a602e78d2bc01c6d9666cac53d4e101c50d",
+      "source_type": "dataset_card",
+      "status": "captured",
+      "title": "Chatbot Arena Conversations creator README.md",
+      "url": "https://huggingface.co/datasets/lmsys/chatbot_arena_conversations/resolve/1b6335d42a1d2c7e34870c905d03ab964f7f2bd8/README.md",
+      "version": "1b6335d42a1d2c7e34870c905d03ab964f7f2bd8"
+    },
+    {
+      "captured_on": "2026-11-10T11:27:27.457340Z",
+      "excerpt": "APTO, Inc.",
+      "excerpt_sha256": "c67fb3233a9e0ff4771366d9503ab416f00531df81ccefea10565cad7a6061a3",
+      "id": "repair.binding.v1.reference.59e535974fea4450697e.1",
+      "license": null,
+      "locator": "apto-04.txt UTF-8 lines 57-61 (1-based, inclusive). Pinned version response-sha256:e9e373c333e7a87335b2a2944706aea5b4653f0df94d254804ed0db63e492185; response SHA-256 e9e373c333e7a87335b2a2944706aea5b4653f0df94d254804ed0db63e492185. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "APTO",
+      "response_sha256": "e9e373c333e7a87335b2a2944706aea5b4653f0df94d254804ed0db63e492185",
+      "source_type": "provider_documentation",
+      "status": "captured",
+      "title": "About Us | APTO",
+      "url": "https://apto.co.jp/en/company/",
+      "version": "response-sha256:e9e373c333e7a87335b2a2944706aea5b4653f0df94d254804ed0db63e492185"
+    },
+    {
+      "captured_on": "2026-11-10T11:27:28.795597Z",
+      "excerpt": "APTO Corporation",
+      "excerpt_sha256": "971365623cceb663dfb7eedead11557f26114f5a06101db12b039a9539eebdc0",
+      "id": "repair.binding.v1.reference.59e535974fea4450697e.2",
+      "license": null,
+      "locator": "apto-05.txt UTF-8 lines 32-35 (1-based, inclusive). Pinned version response-sha256:769a197c93259fa75670798ac4c3f713cc3a26e833bb93eb3099fcc715984b9c; response SHA-256 769a197c93259fa75670798ac4c3f713cc3a26e833bb93eb3099fcc715984b9c. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "APTO",
+      "response_sha256": "769a197c93259fa75670798ac4c3f713cc3a26e833bb93eb3099fcc715984b9c",
+      "source_type": "provider_documentation",
+      "status": "captured",
+      "title": "Privacy Policy | APTO",
+      "url": "https://apto.co.jp/en/privacy-policy/",
+      "version": "response-sha256:769a197c93259fa75670798ac4c3f713cc3a26e833bb93eb3099fcc715984b9c"
+    },
+    {
+      "captured_on": "2026-11-10T09:30:35.227250Z",
+      "excerpt": "These pages document BenchFlow 0.9.2, the current release.",
+      "excerpt_sha256": "29d1a9c249706733ad141c243daf4e4797ec393eab11097d21588760953acf9f",
+      "id": "repair.binding.v1.reference.5ba7fff11d68d4dc55c9.1",
+      "license": null,
+      "locator": "benchflow-12.txt UTF-8 lines 223-238 (1-based, inclusive). Pinned version response-sha256:824bdc43ad23c0d6f327d7bc75d9392759dcd201f438650a5e6d04de13c863ac; response SHA-256 824bdc43ad23c0d6f327d7bc75d9392759dcd201f438650a5e6d04de13c863ac. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "BenchFlow",
+      "response_sha256": "824bdc43ad23c0d6f327d7bc75d9392759dcd201f438650a5e6d04de13c863ac",
+      "source_type": "provider_documentation",
+      "status": "captured",
+      "title": "BenchFlow documentation — BenchFlow",
+      "url": "https://www.benchflow.ai/docs/benchflow",
+      "version": "response-sha256:824bdc43ad23c0d6f327d7bc75d9392759dcd201f438650a5e6d04de13c863ac"
+    },
+    {
+      "captured_on": "2026-11-10T10:07:18.710953Z",
+      "excerpt": "this software and associated documentation files",
+      "excerpt_sha256": "3e55eb064b1550405f4ac631c8be9b5a2cd5edcd9c785db995c8533467633cd1",
+      "id": "repair.binding.v1.reference.882d159793300a8f5982.1",
+      "license": null,
+      "locator": "webshop.LICENSE.md UTF-8 lines 1-21 (1-based, inclusive). Pinned version 64fa2a5c15c7daa698b9ac93f5bb5437b634c9bd; response SHA-256 8872dbf8660b00890b5e07ce1ea1f7a44fa7ae4e1857da56caba172b51dab3cb. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "princeton-nlp/WebShop",
+      "response_sha256": "8872dbf8660b00890b5e07ce1ea1f7a44fa7ae4e1857da56caba172b51dab3cb",
+      "source_type": "repository",
+      "status": "captured",
+      "title": "WebShop — LICENSE.md",
+      "url": "https://raw.githubusercontent.com/princeton-nlp/WebShop/64fa2a5c15c7daa698b9ac93f5bb5437b634c9bd/LICENSE.md",
+      "version": "64fa2a5c15c7daa698b9ac93f5bb5437b634c9bd"
+    },
+    {
+      "captured_on": "2026-11-10T10:05:16.489461Z",
+      "excerpt": "https://copyright.princeton.edu/policy",
+      "excerpt_sha256": "1097fb9ca7a58474650b39429b25ffbd8f5d50ebfb52a89c63afe5f90a3afd1d",
+      "id": "repair.binding.v1.reference.882d159793300a8f5982.2",
+      "license": null,
+      "locator": "webshop.README.md UTF-8 lines 1-5 (1-based, inclusive). Pinned version 64fa2a5c15c7daa698b9ac93f5bb5437b634c9bd; response SHA-256 79b7a90a1413a52deb53142b5bbd81ecf40f61743bd4601c2835e91375898ec0. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "princeton-nlp/WebShop",
+      "response_sha256": "79b7a90a1413a52deb53142b5bbd81ecf40f61743bd4601c2835e91375898ec0",
+      "source_type": "repository",
+      "status": "captured",
+      "title": "WebShop — README.md",
+      "url": "https://raw.githubusercontent.com/princeton-nlp/WebShop/64fa2a5c15c7daa698b9ac93f5bb5437b634c9bd/README.md",
+      "version": "64fa2a5c15c7daa698b9ac93f5bb5437b634c9bd"
+    },
+    {
+      "captured_on": "2026-11-10T06:40:18Z",
+      "excerpt": "consultants and Workforce Partners",
+      "excerpt_sha256": "ec49b5a855a3cce519b273e38c5a879774d5ca6606fd23fb8da124810d968c33",
+      "id": "repair.binding.v1.reference.8b32eaa3856c36bb3f27.1",
+      "license": null,
+      "locator": "labelbox.privacy.66ec60b1d22a6eb140d6d54608222e1b4dd1600b7bf98e4652b88eb510d845c0.txt UTF-8 lines 9-22 (1-based, inclusive); labelbox.privacy.66ec60b1d22a6eb140d6d54608222e1b4dd1600b7bf98e4652b88eb510d845c0.txt UTF-8 lines 60-63 (1-based, inclusive). Pinned version Exact response sha256:66ec60b1d22a6eb140d6d54608222e1b4dd1600b7bf98e4652b88eb510d845c0; response SHA-256 66ec60b1d22a6eb140d6d54608222e1b4dd1600b7bf98e4652b88eb510d845c0. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "Labelbox, Inc.",
+      "response_sha256": "66ec60b1d22a6eb140d6d54608222e1b4dd1600b7bf98e4652b88eb510d845c0",
+      "source_type": "provider_documentation",
+      "status": "captured",
+      "title": "Privacy Notice - Labelbox",
+      "url": "https://docs.labelbox.com/page/privacy-notice",
+      "version": "Exact response sha256:66ec60b1d22a6eb140d6d54608222e1b4dd1600b7bf98e4652b88eb510d845c0"
+    },
+    {
+      "captured_on": "2026-11-10T12:08:25Z",
+      "excerpt": "time lock",
+      "excerpt_sha256": "7a913ff5dfcd29c412f0163965d60b5b2f11888da32ca322bda77f2696c42ca8",
+      "id": "repair.binding.v1.reference.9cb5931cdf0efe3e6d9b.1",
+      "license": null,
+      "locator": "physical PDF p4, pdftotext-layout lines 8-20 (1-based, inclusive); physical PDF p4, pdftotext-layout lines 28-36 (1-based, inclusive); physical PDF p4, pdftotext-layout lines 50-61 (1-based, inclusive); physical PDF p5, pdftotext-layout lines 6-13 (1-based, inclusive). Pinned version 2402.16795v2; response SHA-256 ba747597683b1f80c2fbbfbb07308baa5bd206f13aa61e8d493e6f74c81b96f8. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": "2024-06-28",
+      "publisher": "arXiv (author-deposited versioned preprint; not publisher VoR byte-verified)",
+      "response_sha256": "ba747597683b1f80c2fbbfbb07308baa5bd206f13aa61e8d493e6f74c81b96f8",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "If in a Crowdsourced Data Annotation Pipeline, a GPT-4",
+      "url": "https://arxiv.org/pdf/2402.16795v2",
+      "version": "2402.16795v2"
+    },
+    {
+      "captured_on": "2026-11-10T09:30:35.100880Z",
+      "excerpt": "Open-source benchmarks for evaluating AI coding agents on real-world software engineering tasks.",
+      "excerpt_sha256": "61e01b39532662fb27b3830f6c3047c036333da85eb637de1814240b7c2e5b8e",
+      "id": "repair.binding.v1.reference.de84c27fef1177407858.1",
+      "license": null,
+      "locator": "quesma-12.txt UTF-8 lines 15-47 (1-based, inclusive). Pinned version response-sha256:b8e2233698ec81e4515a9385bca254456c6be5b90f3430541283f2b06817c362; response SHA-256 b8e2233698ec81e4515a9385bca254456c6be5b90f3430541283f2b06817c362. Binding clarification v1 authored 2026-11-10T15:18:08.038273Z; no new retrieval.",
+      "published_on": null,
+      "publisher": "Quesma",
+      "response_sha256": "b8e2233698ec81e4515a9385bca254456c6be5b90f3430541283f2b06817c362",
+      "source_type": "provider_documentation",
+      "status": "captured",
+      "title": "AI Coding Agent Benchmarks & Evaluations | Quesma",
+      "url": "https://quesma.com/benchmarks/",
+      "version": "response-sha256:b8e2233698ec81e4515a9385bca254456c6be5b90f3430541283f2b06817c362"
+    }
+  ]
+}

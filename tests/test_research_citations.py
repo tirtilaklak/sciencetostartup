@@ -15,6 +15,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import research_citations as citations
+from publication_fixtures import populate_owned_inputs
 
 
 def context_fixture():
@@ -57,6 +58,15 @@ class ProjectionTests(unittest.TestCase):
                             "source_quote": "third-party quote", "raw_response": "entire page", "count": 0}], "raw_inputs": []}
         clean = citations.privacy_filter(value)
         self.assertEqual(clean, {"items": [{"statement": "Ask [contact removed] now.", "count": 0}]})
+
+    def test_public_metadata_excludes_local_paths_but_keeps_repository_locators(self):
+        review = {"reviewer": "AI /root/evidence_auditor", "read_scope_path": "/Users/person/private notes.json",
+                  "validation_path": "C:\\Users\\person\\checks.json", "cache_path": "/tmp/body",
+                  "file_path": "file:///home/person/private.json", "path": "src/public/data.py",
+                  "source_url": "https://example.org/research/data/", "scope_sha256": "a" * 64}
+        self.assertEqual(citations.privacy_filter(review), {"reviewer": review["reviewer"],
+                         "path": review["path"], "source_url": review["source_url"],
+                         "scope_sha256": review["scope_sha256"]})
 
     def test_json_csv_sqlite_round_trip_preserves_types_empty_arrays_and_unicode(self):
         projection = {"schema_version": 1, "canonical": {"dataset_version": "2.5.0", "empty": [],
@@ -149,6 +159,7 @@ class CitationTests(unittest.TestCase):
         projection = citations.public_projection(context, {"dataset_version": "2.5.0", "companies": []})
         with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
             context["root"] = first  # This synthetic publication has no prepared real-report PDF.
+            populate_owned_inputs(first)
             with patch.object(citations, "public_projection", return_value=projection), patch("urllib.request.urlopen", side_effect=AssertionError("network in build")):
                 a = citations.write_publication_assets(context, first)
                 b = citations.write_publication_assets(context, second)
@@ -157,7 +168,7 @@ class CitationTests(unittest.TestCase):
                 self.assertEqual((Path(first) / name).read_bytes(), (Path(second) / name).read_bytes(), name)
             package = Path(first) / "publication"
             manifest = json.loads((package / "MANIFEST.json").read_text())
-            self.assertTrue({"zenodo-metadata.json", "huggingface-README.md"} <= set(manifest["files"]))
+            self.assertTrue({"zenodo-metadata.json", "huggingface-README.md", "executive-brief.html", "executive-brief.md"} <= set(manifest["files"]))
             with zipfile.ZipFile(package / "research-archive.zip") as archive:
                 self.assertEqual(set(archive.namelist()), set(manifest["files"]) | {"MANIFEST.json"})
                 for name, descriptor in manifest["files"].items():

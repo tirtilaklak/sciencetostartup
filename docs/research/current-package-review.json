@@ -1,0 +1,86 @@
+{
+  "bindings": {
+    "archive_bytes": 10442497,
+    "archive_sha256": "6098504f665a0810d93a4d684328d2eb0f5f9c6dc8989c21d50d5db09a60ca7e",
+    "context_contract_version": 3,
+    "context_sha256": "d3e5652844b221ac4086065c529b9e4e675b9946ce845cd772d5d3d42c597591",
+    "manifest_sha256": "9195b0af8b39507c59639820ea0e959ff2d4adb47cfb4fa18e4098c437d3a303",
+    "pdf_bytes": 732843,
+    "pdf_sha256": "ad3e80619b45edde081f0d51e92ea34416971d5faba0392aa022839bc4fff8eb",
+    "release_id": "research-2026-11-10.prelaunch.1",
+    "schema_version": 1
+  },
+  "completed_on": "2026-11-10T17:56:54.539283+00:00",
+  "decision": "PASS",
+  "evidence": {
+    "html-completeness.json": {
+      "sha256": "e1813cff1a130617148c2b7962aaa979962981949a1c5a8bb8258b0de16207c2"
+    },
+    "markdown-completeness.json": {
+      "sha256": "e5317c46ea56adbdf127039f038b335fd9726831bc558c8cebfb259d61578688"
+    },
+    "offline-reproduction.json": {
+      "sha256": "fd8bedd836b8d65912a5f300ee8d1feac1d182bf15f18112971baaa8ac488180"
+    },
+    "pdf-visual-review.json": {
+      "sha256": "6480ceca15312ee5472e4fca328387a8b9bed1606be9fd3767b72dbee8b992a8"
+    },
+    "privacy-scan.json": {
+      "sha256": "2c1c2a9ad162ce663dc3969f908d247b304e93743e6f6f7916f53eeb788451b9"
+    },
+    "replacement-diff.json": {
+      "sha256": "3561aadd81a36babffe0a38021f65bb502f3019b6f5505d1f20a40433372be0f"
+    },
+    "verification.json": {
+      "sha256": "ace19e517659e03a4e74c0f0b8f0395d44772730649338529573fa2064444e4a"
+    }
+  },
+  "executed_evidence": {
+    "approved_assertions_reproduced": 1713,
+    "artifact_checks_passed": 34,
+    "artifact_checks_total": 34,
+    "correction_mappings_verified": 26,
+    "equivalent_formats": [
+      "JSON",
+      "CSV",
+      "SQLite"
+    ],
+    "executive_findings_verified": 9,
+    "focused_privacy_regression_tests": {
+      "command": "PYTHONPATH=scripts:tests python3 -m unittest test_research_citations.ProjectionTests.test_public_metadata_excludes_local_paths_but_keeps_repository_locators test_research_citations.ProjectionTests.test_nested_contacts_raw_text_and_quotes_are_excluded",
+      "executed": true,
+      "passed": 2
+    },
+    "full_report_paragraphs_verified": 969,
+    "manifested_files_verified": 42,
+    "offline_network_attempts": 0,
+    "pdf_bbox_out_of_page_words": 0,
+    "pdf_pages_rendered": 244,
+    "zip_members_verified": 43
+  },
+  "package_path": "data/research/releases/research-2026-11-10.prelaunch.1/publication",
+  "privacy_resolution": "The withdrawn candidate retained two absolute reviewer-output paths. Replacement source context differs only by removal of those two fields; science, report and PDF bytes are unchanged. No personal contact, credential or private-path matches remain in scanned UTF-8 package members. Required unmodified upstream font license contact notice is retained.",
+  "publication": false,
+  "publication_state": {
+    "archival_ready": false,
+    "doi_claimed": false,
+    "external_services_used": false,
+    "huggingface_credentials_used": false,
+    "publication_ready": false,
+    "remaining_blockers": [
+      "Coverage core_disposition_rate: 0.0 / 0.9 required.",
+      "Eligible core denominator has not been frozen with its cutoff and date.",
+      "The edition cutoff is in the future relative to the actual evidence snapshot.",
+      "Actual reference audit has not been supplied.",
+      "Actual screening audit has not been supplied.",
+      "An actual public versioned archive receipt with DOI and exact artifact digest is required; a prepared package is not publication."
+    ],
+    "report_review_ready": true,
+    "zenodo_credentials_used": false
+  },
+  "release_id": "research-2026-11-10.prelaunch.1",
+  "reviewed": true,
+  "scope": "Independent artifact-level review of this exact local prelaunch preparation. This is not a new scientific source-content audit, human peer review, launch approval, external publication or DOI confirmation.",
+  "public_projection_note": "Deterministic privacy projection of the independently authored receipt; local evidence paths omitted, evidence hashes retained.",
+  "original_review_sha256": "f76cb6bd0eb3b7e501a7398396975e58b28f027aa663c15a59fe9379a0b94fdf"
+}

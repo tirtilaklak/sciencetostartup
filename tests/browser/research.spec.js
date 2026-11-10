@@ -1,5 +1,10 @@
 const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
+const { evidenceURL } = require('./research-ledger');
+
+// Serializing the complete evidence DOM for each trace step exceeds the test
+// timeout independently of page behavior. Retain screenshots, network and code.
+test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
 
 const reportPath = '/research/state-of-ai-data-labs/';
 const publicPages = ['/', '/research/', reportPath, '/research/data/', '/review/', '/company/scale_ai/'];
@@ -48,14 +53,17 @@ test.describe('research without JavaScript', () => {
     await page.goto(reportPath);
     const evidence = page.locator('.r-paragraph-citations a').first();
     const assertionHref = await evidence.getAttribute('href');
-    expect(assertionHref).toMatch(/^\/research\/data\/#assertion-/);
+    expect(assertionHref).toMatch(/^\/research\/data\/assertions\/[0-9a-f]\/#assertion-/);
+    expect(assertionHref).toBe(evidenceURL('assertion', decodeURIComponent(assertionHref.split('#')[1]).slice('assertion-'.length)));
     await evidence.click();
-    const assertion = page.locator('[id=' + JSON.stringify(assertionHref.split('#')[1]) + ']');
+    const assertion = page.locator('[id=' + JSON.stringify(decodeURIComponent(assertionHref.split('#')[1])) + ']');
     await expect(assertion).toBeVisible();
     const sourceLink = assertion.locator('a[href*="#source-"]').first();
     const sourceHref = await sourceLink.getAttribute('href');
     await sourceLink.click();
-    const source = page.locator('[id=' + JSON.stringify(sourceHref.split('#')[1]) + ']');
+    expect(sourceHref).toMatch(/^\/research\/data\/sources\/[0-9a-f]\/#source-/);
+    expect(sourceHref).toBe(evidenceURL('source', decodeURIComponent(sourceHref.split('#')[1]).slice('source-'.length)));
+    const source = page.locator('[id=' + JSON.stringify(decodeURIComponent(sourceHref.split('#')[1])) + ']');
     await expect(source).toBeVisible();
     await expect(source.locator('h3 a')).toHaveAttribute('href', /^https:\/\//);
     for (const label of ['Publisher', 'Published', 'Captured', 'Version', 'Locator']) {
@@ -96,6 +104,9 @@ test.describe('research without JavaScript', () => {
       expect(content, name).toContain('State of AI Data Labs and Human Feedback');
     }
     await expect(page.locator('#sources')).toBeVisible();
+    const sourceParts = page.locator('section[aria-labelledby="sources"] .r-ledger-parts a');
+    await expect(sourceParts).toHaveCount(16);
+    await sourceParts.first().click();
     expect(await page.locator('.r-source').count()).toBeGreaterThan(0);
   });
 });
@@ -151,7 +162,11 @@ test('public pages retain keyboard skip navigation into the main content', async
   for (const path of publicPages) {
     await page.goto(path);
     await page.keyboard.press(nextLink);
-    const skip = page.getByRole('link', { name: 'Skip to content', exact: true });
+    // Inspect the focused native skip link itself; a page-wide role query walks
+    // the complete evidence ledger before it can assert this one header link.
+    const skip = page.locator('body > a.skip[href="#main"]');
+    await expect(skip, path).toHaveRole('link');
+    await expect(skip, path).toHaveAccessibleName('Skip to content');
     await expect(skip, path).toBeFocused();
     await expect(skip, path).toBeInViewport();
     await page.keyboard.press('Enter');
@@ -201,9 +216,35 @@ test('at 320 pixels the public header, navigation and page fit without horizonta
 });
 
 for (const path of publicPages) {
-  test('no serious or critical accessibility violations on ' + path, async ({ page }) => {
+  test('no serious or critical accessibility violations on ' + path, async ({ page }, info) => {
+    const started = Date.now();
     await page.goto(path);
+    const nodes = await page.locator('*').count();
+    const analyzing = Date.now();
     const result = await new AxeBuilder({ page }).analyze();
+    await info.attach('axe-scan-metrics.json', { body: Buffer.from(JSON.stringify({ path, nodes,
+      navigationMs: analyzing - started, analysisMs: Date.now() - analyzing,
+      testBudgetMs: 30_000,
+      fullPage: true, ruleExclusions: [] })), contentType: 'application/json' });
     expect(result.violations.filter(violation => ['serious', 'critical'].includes(violation.impact))).toEqual([]);
   });
+}
+
+// The complete ledger spans these bounded static documents. Audit every node
+// and default Axe rule on every part, retaining the original severity gate.
+for (const kind of ['assertions', 'sources']) {
+  for (const bucket of '0123456789abcdef') {
+    const path = '/research/data/' + kind + '/' + bucket + '/';
+    test('ledger part ' + path + ' has no serious or critical accessibility violations', async ({ page }, info) => {
+      await page.goto(path);
+      const nodes = await page.locator('*').count();
+      const started = Date.now();
+      const result = await new AxeBuilder({ page }).analyze();
+      await info.attach('axe-scan-metrics.json', { body: Buffer.from(JSON.stringify({ path, nodes,
+        analysisMs: Date.now() - started, testBudgetMs: 30_000, fullPage: true, ruleExclusions: [],
+        resultRules: Object.fromEntries(['violations', 'incomplete', 'passes', 'inapplicable'].map(kind =>
+          [kind, result[kind].map(rule => rule.id)])) })), contentType: 'application/json' });
+      expect(result.violations.filter(violation => ['serious', 'critical'].includes(violation.impact))).toEqual([]);
+    });
+  }
 }

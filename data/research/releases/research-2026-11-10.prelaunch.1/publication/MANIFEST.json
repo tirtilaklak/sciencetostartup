@@ -1,0 +1,176 @@
+{
+  "context_contract_version": 3,
+  "context_sha256": "d3e5652844b221ac4086065c529b9e4e675b9946ce845cd772d5d3d42c597591",
+  "files": {
+    "CITATION.cff": {
+      "bytes": 461,
+      "sha256": "268120c59cdf9218ea4a9fcf51c48c8c98cfa3c196cd50ecec3cfd2263cba57e"
+    },
+    "CJK-OFL.txt": {
+      "bytes": 4388,
+      "sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9"
+    },
+    "CJK-PROVENANCE.json": {
+      "bytes": 2888,
+      "sha256": "f5074d8855a72b17777858a7ab8ba1090040d8a58bf3a86c2f7fc40dfaab62bb"
+    },
+    "DejaVu-LICENSE.txt": {
+      "bytes": 8816,
+      "sha256": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93"
+    },
+    "DejaVu-PROVENANCE.json": {
+      "bytes": 1243,
+      "sha256": "0f260c81923ee15bda00505af0e5378b78f6ca8a51901e43180a83687292b873"
+    },
+    "DejaVuSans-Bold.ttf": {
+      "bytes": 705684,
+      "sha256": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724"
+    },
+    "DejaVuSans.ttf": {
+      "bytes": 757076,
+      "sha256": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954"
+    },
+    "LICENSE": {
+      "bytes": 1068,
+      "sha256": "926dadbac2507caa52f16b54c092122bfbb4c2a3ef237fa1266d26ede1690a1f"
+    },
+    "LICENSE-DATA.md": {
+      "bytes": 3356,
+      "sha256": "c9e15cdf9ad9bfb01c74229f462811bb42e577bd9a08a2f4e9a09ed25d0a38c6"
+    },
+    "LOCATORS.md": {
+      "bytes": 3340,
+      "sha256": "8040265667423ae10d5e6ea55633687b9e16d000be7837c7cb263faeb9cc4944"
+    },
+    "METHODS.md": {
+      "bytes": 42247,
+      "sha256": "10caf8832827b7ccf9364c475c75c9283880c3a12b994cf84b952de1f77ae1b7"
+    },
+    "README.md": {
+      "bytes": 1571,
+      "sha256": "af7b3b1003a3ca326f12ccac38ae00278b316bbf37aee4626f16fbbdfb0b9070"
+    },
+    "ScienceToStartupCJKSubset.ttf": {
+      "bytes": 2376,
+      "sha256": "37f8f1a6db368902ee4a7f09cbb2ad7c9dd4c8ab61763ec6de431450f0811b16"
+    },
+    "citation.bib": {
+      "bytes": 369,
+      "sha256": "b14571aeebf59f28f445404d12032c56e34e1edf9e67f1b082bc1083e15a56a3"
+    },
+    "citation.csl.json": {
+      "bytes": 452,
+      "sha256": "bdb2f4253b84f1eb644a3b51a6332afffc60ef46acc2a535e6bfc533162509bf"
+    },
+    "citation.ris": {
+      "bytes": 296,
+      "sha256": "3130d4224f7d7b1e337e4b1dadaa50af25c2b09864a4c2e4ccce4ea265df8e43"
+    },
+    "clean-dataset.csv": {
+      "bytes": 14179356,
+      "sha256": "56e039a2044d7c11150364e951822a1b40791873c62f5e88ae99f133e92a5e3b"
+    },
+    "clean-dataset.json": {
+      "bytes": 15726299,
+      "sha256": "1824e43242854fc847df547d4778338d3922003cdba461abc3b5884b71aaa854"
+    },
+    "clean-dataset.sqlite": {
+      "bytes": 16572416,
+      "sha256": "24e1fff758e31543ecc22c1d8f8042e79b11f01bee73b4781f7ecb8339df15ec"
+    },
+    "corrections.json": {
+      "bytes": 33160,
+      "sha256": "013f5cde38a26b1aa318ae4237c5d3cce2cea3d441fac054163d241a90fae75e"
+    },
+    "evidence.html": {
+      "bytes": 14382236,
+      "sha256": "0842b65d1e2f0434fd7c43c074617e114ea8f7c0484ecff773741d05642876d5"
+    },
+    "executive-brief.html": {
+      "bytes": 14866,
+      "sha256": "277559e43ce6905cfe59ff125bb88775b34ae77507723bd2c36f38d9a1a5b234"
+    },
+    "executive-brief.md": {
+      "bytes": 11650,
+      "sha256": "65f5d2a82d2fd437748ee5f65a6a10a77a698d163500ec4ab9e9539a69aec452"
+    },
+    "huggingface-README.md": {
+      "bytes": 569,
+      "sha256": "75977f7de66971fb195504a4ce58a7f3b35af18ce67cee17a2ae52b7e4daa5da"
+    },
+    "metadata.json": {
+      "bytes": 526,
+      "sha256": "34a2f2356dd1fbd998edc17f98fa8222adeb73b838801590173e4e2eb98dfc9c"
+    },
+    "publication-metadata.schema.json": {
+      "bytes": 1531,
+      "sha256": "d74db01b43f2a757380cb42951c90b379b47baa0bc8962fc01bd0747d837bbc2"
+    },
+    "publication-projection.schema.json": {
+      "bytes": 1003,
+      "sha256": "51013f710b452561867abfbe349d392131d41e351d1a3917493371e9ad054c34"
+    },
+    "readiness.json": {
+      "bytes": 2210,
+      "sha256": "dc3e6500d9ec6df604b14a8b12a4ca986944fa5b6036777278d73d69d4c9e842"
+    },
+    "report-audit.schema.json": {
+      "bytes": 2110,
+      "sha256": "ff43465063a984bc7a207127ded82e2530eacbd3872a063849ec35404c4ecdaa"
+    },
+    "report-review.schema.json": {
+      "bytes": 1258,
+      "sha256": "8e2acebaf0ea17b3c3ffd3d9a2f208ca1147f15f0940a2cb643146121a5cf5f4"
+    },
+    "report.html": {
+      "bytes": 987792,
+      "sha256": "d640be94fb0a1865170db90bc118cfdca27a087e65c1350536e8a475dd7d9e6b"
+    },
+    "report.md": {
+      "bytes": 930010,
+      "sha256": "c09ce7cf0f62d10e66976323a2ffbff1082d30c9f8e7cf6f84e792803f254433"
+    },
+    "report.pdf": {
+      "bytes": 732843,
+      "sha256": "ad3e80619b45edde081f0d51e92ea34416971d5faba0392aa022839bc4fff8eb"
+    },
+    "report.schema.json": {
+      "bytes": 1876,
+      "sha256": "ccfec5b77ecf90166f5cce6c4d3facf4beb75d79769d22874447ea49d26e74cf"
+    },
+    "reproduce.py": {
+      "bytes": 4027,
+      "sha256": "355a72b650ce30cb1cdcf8a6f3227277aec6cb01ced856a8fae91d8c213c96e8"
+    },
+    "research-corrections.schema.json": {
+      "bytes": 1876,
+      "sha256": "9ffb055dd6809662d9fc05db35835127768bc60f8f531afa90f20b7bb5606769"
+    },
+    "research-graph.schema.json": {
+      "bytes": 19467,
+      "sha256": "2b333daf47b8e7c65132b57f09790f8962ef73f627c43be160e983fa03dbbbe2"
+    },
+    "research_corrections.py": {
+      "bytes": 5581,
+      "sha256": "b3b1062a23cd1c0300701cf8e6af0037b026faaa66c66f48683f56fd847f2776"
+    },
+    "research_graph.py": {
+      "bytes": 49487,
+      "sha256": "9399750493566ab2340d2d3ad45a556cb679f0b608a57d7450f2da8c59a247c4"
+    },
+    "source-context.json": {
+      "bytes": 13266250,
+      "sha256": "d3e5652844b221ac4086065c529b9e4e675b9946ce845cd772d5d3d42c597591"
+    },
+    "source-manifest.json": {
+      "bytes": 1571603,
+      "sha256": "d16dfe31d39630cd00eaa4fb8e6eaa15e4223d48e1d595b4bb9279a132e5751a"
+    },
+    "zenodo-metadata.json": {
+      "bytes": 533,
+      "sha256": "2474e608fb339b58d33a4a130c9338e8503debfc1eecab3a077b3e026e992e21"
+    }
+  },
+  "release_id": "research-2026-11-10.prelaunch.1",
+  "schema_version": 1
+}

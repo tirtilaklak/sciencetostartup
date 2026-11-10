@@ -1,4 +1,347 @@
 {
   "schema_version": "1.0.0",
-  "corrections": []
+  "corrections": [
+    {
+      "id": "correction.binding.02585122003366d0",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort2.labelbox.privacy-partners",
+      "replacement_claim_id": "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.8b32eaa3856c36bb3f27, review.source-verifier.repair.binding.v1.reference.8b32eaa3856c36bb3f27, review.adversarial.repair.binding.v1.reference.8b32eaa3856c36bb3f27.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://docs.labelbox.com/page/privacy-notice",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.candidate.cohort2.labelbox.privacy-partners"
+      ]
+    },
+    {
+      "id": "correction.binding.381b4d5b55fac6d2",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort3.dataset.chatbotarena.05",
+      "replacement_claim_id": "repair.binding.v1.candidate.cohort3.dataset.chatbotarena.05",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.57f93345ea1f30add099, review.source-verifier.repair.binding.v1.reference.57f93345ea1f30add099, review.adversarial.repair.binding.v1.reference.57f93345ea1f30add099.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/lmsys/chatbot_arena_conversations/resolve/1b6335d42a1d2c7e34870c905d03ab964f7f2bd8/README.md",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.candidate.cohort3.dataset.chatbotarena.05"
+      ]
+    },
+    {
+      "id": "correction.binding.f5d9dee6fc227a9a",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort3.dataset.numinamath.05",
+      "replacement_claim_id": "repair.binding.ten.v1.candidate.cohort3.dataset.numinamath.05",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities; bound the corrected extraction/context excerpts to their recorded digests while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.ten.v1.02, review.source-verifier.repair.binding.ten.v1.02, review.adversarial.repair.binding.ten.v1.02.",
+      "corrected_on": "2026-11-10T15:54:37.977556Z",
+      "evidence_urls": [
+        "https://raw.githubusercontent.com/project-numina/aimo-progress-prize/712e1abbcbcf870dccf4c6a3e7837e2967bd7d7f/report/numina_dataset.pdf",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.ten.v1.candidate.cohort3.dataset.numinamath.05"
+      ]
+    },
+    {
+      "id": "correction.binding.7650ab8cb34dffe7",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort3.dataset.pickapic.01",
+      "replacement_claim_id": "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.01",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities; bound the corrected extraction/context excerpts to their recorded digests while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.ten.v1.08, review.source-verifier.repair.binding.ten.v1.08, review.adversarial.repair.binding.ten.v1.08.",
+      "corrected_on": "2026-11-10T15:54:37.977556Z",
+      "evidence_urls": [
+        "https://papers.neurips.cc/paper_files/paper/2023/file/73aacd8b3b05b4b503d58310b523553c-Paper-Conference.pdf",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.01"
+      ]
+    },
+    {
+      "id": "correction.binding.645ba7c34d118d1b",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort3.dataset.pickapic.02",
+      "replacement_claim_id": "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.02",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.ten.v1.05, review.source-verifier.repair.binding.ten.v1.05, review.adversarial.repair.binding.ten.v1.05.",
+      "corrected_on": "2026-11-10T15:54:37.977556Z",
+      "evidence_urls": [
+        "https://papers.neurips.cc/paper_files/paper/2023/file/73aacd8b3b05b4b503d58310b523553c-Paper-Conference.pdf",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.02"
+      ]
+    },
+    {
+      "id": "correction.binding.6834e59497ccafdb",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort3.dataset.videofeedback.05",
+      "replacement_claim_id": "repair.binding.v1.candidate.cohort3.dataset.videofeedback.05",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities; bound the corrected extraction/context excerpts to their recorded digests; added the supporting source contexts required for the existing assertion while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.36b97f9eaeec25694044, review.source-verifier.repair.binding.v1.reference.36b97f9eaeec25694044, review.adversarial.repair.binding.v1.reference.36b97f9eaeec25694044.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/TIGER-Lab/VideoFeedback/resolve/4557cb71595098e68790bb35253225c2fe797dcf/README.md",
+        "https://raw.githubusercontent.com/TIGER-AI-Lab/VideoScore/f87faf4647e637066bcb74721670cd579e0f4349/LICENSE",
+        "https://raw.githubusercontent.com/TIGER-AI-Lab/VideoScore/f87faf4647e637066bcb74721670cd579e0f4349/README.md",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.candidate.cohort3.dataset.videofeedback.05"
+      ]
+    },
+    {
+      "id": "correction.binding.52d0a4b224bf1bf9",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort4.benchflow.version-boundary",
+      "replacement_claim_id": "repair.binding.v1.candidate.cohort4.benchflow.version-boundary",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.5ba7fff11d68d4dc55c9, review.source-verifier.repair.binding.v1.reference.5ba7fff11d68d4dc55c9, review.adversarial.repair.binding.v1.reference.5ba7fff11d68d4dc55c9.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://www.benchflow.ai/docs/benchflow",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.candidate.cohort4.benchflow.version-boundary"
+      ]
+    },
+    {
+      "id": "correction.binding.6f668215e313e337",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort4.polymath_ai_labs.horizon-swe",
+      "replacement_claim_id": "repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities; bound the corrected extraction/context excerpts to their recorded digests while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.ten.v1.03, review.source-verifier.repair.binding.ten.v1.03, review.adversarial.repair.binding.ten.v1.03.",
+      "corrected_on": "2026-11-10T15:54:37.977556Z",
+      "evidence_urls": [
+        "https://polymathlabs.ai/blog/horizon-swe",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe"
+      ]
+    },
+    {
+      "id": "correction.binding.61c28e9273deb7c1",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort4.prime_intellect.gpu-billing-basis",
+      "replacement_claim_id": "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.24040633e2f280d610eb, review.source-verifier.repair.binding.v1.reference.24040633e2f280d610eb, review.adversarial.repair.binding.v1.reference.24040633e2f280d610eb.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://www.primeintellect.ai/legal/model-factory-terms",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis"
+      ]
+    },
+    {
+      "id": "correction.binding.64facd6f202c081a",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort4.proximal.annualized-revenue-disclosure",
+      "replacement_claim_id": "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.1867168a0db0e5a1a9a8, review.source-verifier.repair.binding.v1.reference.1867168a0db0e5a1a9a8, review.adversarial.repair.binding.v1.reference.1867168a0db0e5a1a9a8.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://www.proximal.ai/blog/new-frontiers/",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure"
+      ]
+    },
+    {
+      "id": "correction.binding.41560ed4db1dd327",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort4.proximal.frontierswe-collaboration",
+      "replacement_claim_id": "repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities; bound the corrected extraction/context excerpts to their recorded digests; added the supporting source contexts required for the existing assertion while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.ten.v1.10, review.source-verifier.repair.binding.ten.v1.10, review.adversarial.repair.binding.ten.v1.10.",
+      "corrected_on": "2026-11-10T15:54:37.977556Z",
+      "evidence_urls": [
+        "https://www.proximal.ai/blog/frontierswe/",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration"
+      ]
+    },
+    {
+      "id": "correction.binding.c020f88606527b80",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort4.quesma.public-benchmarks",
+      "replacement_claim_id": "repair.binding.v1.candidate.cohort4.quesma.public-benchmarks",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.de84c27fef1177407858, review.source-verifier.repair.binding.v1.reference.de84c27fef1177407858, review.adversarial.repair.binding.v1.reference.de84c27fef1177407858.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://quesma.com/benchmarks/",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.candidate.cohort4.quesma.public-benchmarks"
+      ]
+    },
+    {
+      "id": "correction.binding.6cc1773297ecd66f",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.cohort5.apto.company-identity",
+      "replacement_claim_id": "repair.binding.v1.candidate.cohort5.apto.company-identity",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities; bound the corrected extraction/context excerpts to their recorded digests; added the supporting source contexts required for the existing assertion while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.59e535974fea4450697e, review.source-verifier.repair.binding.v1.reference.59e535974fea4450697e, review.adversarial.repair.binding.v1.reference.59e535974fea4450697e.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://apto.co.jp/en/company/",
+        "https://apto.co.jp/en/privacy-policy/",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.candidate.cohort5.apto.company-identity"
+      ]
+    },
+    {
+      "id": "correction.binding.134c79bc73afde97",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.paperfull.truthfulqa.blinded-human-evaluation",
+      "replacement_claim_id": "repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.23199ddc3489ef69ca4b, review.source-verifier.repair.binding.v1.reference.23199ddc3489ef69ca4b, review.adversarial.repair.binding.v1.reference.23199ddc3489ef69ca4b.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2109.07958v2",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation"
+      ]
+    },
+    {
+      "id": "correction.binding.53b348640e5e7ecd",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "candidate.paperfull.truthfulqa.external-validation-sample",
+      "replacement_claim_id": "repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.3e6eb35aed69723ece00, review.source-verifier.repair.binding.v1.reference.3e6eb35aed69723ece00, review.adversarial.repair.binding.v1.reference.3e6eb35aed69723ece00.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2109.07958v2",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample"
+      ]
+    },
+    {
+      "id": "correction.binding.83ba8f9dc3ac8bd0",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "cohort3.claim.dclm.final-model-mixture",
+      "replacement_claim_id": "repair.binding.ten.v1.cohort3.claim.dclm.final-model-mixture",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities; bound the corrected extraction/context excerpts to their recorded digests; added the supporting source contexts required for the existing assertion while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.ten.v1.09, review.source-verifier.repair.binding.ten.v1.09, review.adversarial.repair.binding.ten.v1.09.",
+      "corrected_on": "2026-11-10T15:54:37.977556Z",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2406.11794v1",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.ten.v1.cohort3.claim.dclm.final-model-mixture"
+      ]
+    },
+    {
+      "id": "correction.binding.ef5a0763e4a8c092",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "cohort4.claim.jailbreakbench.paired-behaviors",
+      "replacement_claim_id": "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.1f1b674004fbf0001dee, review.source-verifier.repair.binding.v1.reference.1f1b674004fbf0001dee, review.adversarial.repair.binding.v1.reference.1f1b674004fbf0001dee.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2404.01318v5",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors"
+      ]
+    },
+    {
+      "id": "correction.binding.e3b9cee18263969a",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "cohort4.dataset.claim.no-robots.splits",
+      "replacement_claim_id": "repair.binding.ten.v1.cohort4.dataset.claim.no-robots.splits",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities; bound the corrected extraction/context excerpts to their recorded digests while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.ten.v1.07, review.source-verifier.repair.binding.ten.v1.07, review.adversarial.repair.binding.ten.v1.07.",
+      "corrected_on": "2026-11-10T15:54:37.977556Z",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/HuggingFaceH4/no_robots/raw/e6f9a4ac5c37faeb744ba9ecf0473184d7f8105b/README.md",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.ten.v1.cohort4.dataset.claim.no-robots.splits"
+      ]
+    },
+    {
+      "id": "correction.binding.98d5ca21b3f49f62",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "cohort4.dataset.claim.webshop.license",
+      "replacement_claim_id": "repair.binding.v1.cohort4.dataset.claim.webshop.license",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities; bound the corrected extraction/context excerpts to their recorded digests; added the supporting source contexts required for the existing assertion while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.882d159793300a8f5982, review.source-verifier.repair.binding.v1.reference.882d159793300a8f5982, review.adversarial.repair.binding.v1.reference.882d159793300a8f5982.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://raw.githubusercontent.com/princeton-nlp/WebShop/64fa2a5c15c7daa698b9ac93f5bb5437b634c9bd/LICENSE.md",
+        "https://raw.githubusercontent.com/princeton-nlp/WebShop/64fa2a5c15c7daa698b9ac93f5bb5437b634c9bd/README.md",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.cohort4.dataset.claim.webshop.license"
+      ]
+    },
+    {
+      "id": "correction.binding.64c24df102ee1a9c",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "cohort4.dataset.claim.xp3.scope",
+      "replacement_claim_id": "repair.binding.v1.cohort4.dataset.claim.xp3.scope",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.4254b341e79f0eb00b45, review.source-verifier.repair.binding.v1.reference.4254b341e79f0eb00b45, review.adversarial.repair.binding.v1.reference.4254b341e79f0eb00b45.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/bigscience/xP3/raw/0ab0411dca6e222e62d210bc681dbcb476d6fe4c/README.md",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.cohort4.dataset.claim.xp3.scope"
+      ]
+    },
+    {
+      "id": "correction.binding.e84815a2ba39db6a",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "cohort5.claim.languagefeedback.main-evaluator",
+      "replacement_claim_id": "repair.binding.ten.v1.cohort5.claim.languagefeedback.main-evaluator",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities; bound the corrected extraction/context excerpts to their recorded digests; added the supporting source contexts required for the existing assertion while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.ten.v1.04, review.source-verifier.repair.binding.ten.v1.04, review.adversarial.repair.binding.ten.v1.04.",
+      "corrected_on": "2026-11-10T15:54:37.977556Z",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2204.14146v1",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.ten.v1.cohort5.claim.languagefeedback.main-evaluator"
+      ]
+    },
+    {
+      "id": "correction.binding.b37bf144f0240a2d",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "cohort6.claim.agentcompany.human-baseline-limit",
+      "replacement_claim_id": "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.2d419627b684bcf26558, review.source-verifier.repair.binding.v1.reference.2d419627b684bcf26558, review.adversarial.repair.binding.v1.reference.2d419627b684bcf26558.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2412.14161v1",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit"
+      ]
+    },
+    {
+      "id": "correction.binding.e931911afc8b47b5",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "cohort7.claim.consentcrisis.head",
+      "replacement_claim_id": "repair.binding.ten.v1.cohort7.claim.consentcrisis.head",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities; bound the corrected extraction/context excerpts to their recorded digests while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.ten.v1.06, review.source-verifier.repair.binding.ten.v1.06, review.adversarial.repair.binding.ten.v1.06.",
+      "corrected_on": "2026-11-10T15:54:37.977556Z",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2407.14933v1",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.ten.v1.cohort7.claim.consentcrisis.head"
+      ]
+    },
+    {
+      "id": "correction.binding.9e756d3becb8feb1",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "cohort8.claim.gptpipeline.interface",
+      "replacement_claim_id": "repair.binding.v1.cohort8.claim.gptpipeline.interface",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.9cb5931cdf0efe3e6d9b, review.source-verifier.repair.binding.v1.reference.9cb5931cdf0efe3e6d9b, review.adversarial.repair.binding.v1.reference.9cb5931cdf0efe3e6d9b.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2402.16795v2",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.cohort8.claim.gptpipeline.interface"
+      ]
+    },
+    {
+      "id": "correction.binding.e461778928405908",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "cohort8.claim.ttrl.vote-then-sample",
+      "replacement_claim_id": "repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities; bound the corrected extraction/context excerpts to their recorded digests; added the supporting source contexts required for the existing assertion while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.ten.v1.01, review.source-verifier.repair.binding.ten.v1.01, review.adversarial.repair.binding.ten.v1.01.",
+      "corrected_on": "2026-11-10T15:54:37.977556Z",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2504.16084v3",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample"
+      ]
+    },
+    {
+      "id": "correction.binding.7850e2073d7ef454",
+      "edition_id": "research-2026-11-10.prelaunch.1",
+      "claim_id": "cohort8.claim.vapo.decoupled-gae",
+      "replacement_claim_id": "repair.binding.v1.cohort8.claim.vapo.decoupled-gae",
+      "status": "accepted",
+      "summary": "Citation-binding repair: replaced underspecified source locators with pinned extraction coordinates and response identities while preserving the scientific assertion wording. The retained candidate identifier is superseded by the approved replacement. Original positive and negative review receipts remain in the research graph; the replacement has separate author, source-verifier and adversarial PASS receipts: review.author.repair.binding.v1.reference.07c3daf1089af3b2958b, review.source-verifier.repair.binding.v1.reference.07c3daf1089af3b2958b, review.adversarial.repair.binding.v1.reference.07c3daf1089af3b2958b.",
+      "corrected_on": "2026-11-10T15:43:44.306571Z",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2504.05118v3",
+        "https://sciencetostartup.com/research/data/#assertion-repair.binding.v1.cohort8.claim.vapo.decoupled-gae"
+      ]
+    }
+  ]
 }

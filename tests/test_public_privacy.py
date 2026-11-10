@@ -6,6 +6,7 @@ import io
 import json
 import re
 import sqlite3
+import struct
 import tempfile
 import unittest
 import zipfile
@@ -17,7 +18,7 @@ from pypdf.generic import TextStringObject, IndirectObject
 ROOT = Path(__file__).resolve().parents[1]
 TEXT = {".html", ".json", ".csv", ".xml", ".txt", ".js", ".svg", ".css", ".md", ".cff", ".bib", ".ris", ".py"}
 # Host config files such as _headers and _redirects have no suffix and are text.
-BINARY = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".ico", ".avif", ".pdf", ".woff", ".woff2"}
+BINARY = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".ico", ".avif", ".pdf", ".woff", ".woff2", ".ttf"}
 PRINTABLE = re.compile(rb"[\x20-\x7e]{6,}")
 # The build moves the app code and the sidecar data out of index.html into content-hashed files in js/.
 # They are scanned under a stable name, so the allowlist does not change with every build.
@@ -60,6 +61,32 @@ def sqlite_text(path):
 def printable_text(path):
     """The runs of printable ASCII inside a binary file, as the strings tool shows them."""
     return "\n".join(run.decode("ascii") for run in PRINTABLE.findall(path.read_bytes()))
+
+
+def font_text(content):
+    """Read SFNT name metadata; glyph instructions are binary, not contact text."""
+    try:
+        count = struct.unpack_from('>H', content, 4)[0]
+        if content[:4] not in {b'\x00\x01\x00\x00', b'OTTO', b'true'}:
+            raise ValueError('Unsupported font header')
+        strings = []
+        for index in range(count):
+            tag, _, offset, size = struct.unpack_from('>4sIII', content, 12 + 16 * index)
+            if offset + size > len(content):
+                raise ValueError('Truncated font table')
+            if tag == b'name':
+                _, records, start = struct.unpack_from('>HHH', content, offset)
+                for item in range(records):
+                    platform, _, _, _, length, position = struct.unpack_from('>HHHHHH', content, offset + 6 + 12 * item)
+                    begin, end = offset + start + position, offset + start + position + length
+                    if begin < offset or end > offset + size:
+                        raise ValueError('Truncated font name')
+                    strings.append(content[begin:end].decode('utf-16-be' if platform in {0, 3} else 'mac_roman'))
+            elif tag in {b'meta', b'SVG '}:
+                strings.append(content[offset:offset + size].decode('utf-8', errors='replace'))
+        return '\n'.join(strings)
+    except (struct.error, UnicodeError, ValueError) as error:
+        raise AssertionError('Unreadable public font metadata: ' + str(error)) from error
 
 
 def pdf_text(content):
@@ -114,6 +141,8 @@ def places(dist):
                         collected.append(content.decode("utf-8"))
                     elif suffix == '.pdf':
                         collected.append(pdf_text(content))
+                    elif suffix == '.ttf':
+                        collected.append(font_text(content))
                     elif suffix in BINARY:
                         collected.append("\n".join(run.decode("ascii") for run in PRINTABLE.findall(content)))
                     else:
@@ -121,6 +150,8 @@ def places(dist):
             yield name, "\n".join(collected)
         elif path.suffix == '.pdf':
             yield name, pdf_text(path.read_bytes())
+        elif path.suffix == '.ttf':
+            yield name, font_text(path.read_bytes())
         elif path.suffix in BINARY:
             yield name, printable_text(path)
         elif path.suffix in TEXT or not path.suffix:
@@ -130,6 +161,21 @@ def places(dist):
                     yield name + "#" + section, "\n".join(pattern.findall(text))
                     text = pattern.sub("", text)
             yield name, text
+
+
+class FontMetadataTests(unittest.TestCase):
+    def test_unicode_names_are_scanned_without_treating_glyph_bytes_as_contacts(self):
+        value = 'Private name@example.org +1 415-555-0123'.encode('utf-16-be')
+        names = struct.pack('>HHH', 0, 1, 18) + struct.pack('>HHHHHH', 3, 1, 0x409, 1, len(value), 0) + value
+        glyphs = b'l%@t.duw'
+        header = struct.pack('>4sHHHH', b'\x00\x01\x00\x00', 2, 32, 1, 0)
+        tables = struct.pack('>4sIII', b'name', 0, 44, len(names)) + struct.pack('>4sIII', b'glyf', 0, 44 + len(names), len(glyphs))
+        text = font_text(header + tables + names + glyphs)
+        self.assertRegex(text, EMAIL)
+        self.assertRegex(text, PHONE)
+        self.assertNotIn('l%@t.duw', text)
+        with self.assertRaisesRegex(AssertionError, 'Unreadable public font metadata'):
+            font_text(header + tables)
 
 
 class PublicPrivacyTests(unittest.TestCase):

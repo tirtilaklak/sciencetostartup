@@ -1,0 +1,1204 @@
+{
+  "assertions": [
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "3c65e9f397d97dddb1b53b907dc87329a61acae040f27a8138e780385588b7d9",
+          "locator": "Synthetic Data Validation and Improving CoT Solutions for Complex Problems bullets; pypdf 6.10.0 marked global text lines 524-531 (1-based inclusive), physical PDF p12. UTF-8 text artifact site/output/research-next/reference-binding-repair-ten-author/source-first/numinamath.pypdf-global.txt; extracted-text SHA-256 1eafde410e61dd6e20921dad861c42fb81a36e2edd02629678f9bef0bb4c6e4e; 727 lines and 16 physical PDF pages. Exact Python recipe (import pypdf and pathlib.Path; INPUT.pdf is the downloaded pinned PDF filename): reader = pypdf.PdfReader('INPUT.pdf'); pieces = [f'=== PDF PAGE {i} ===\\n' + (page.extract_text() or '') for i, page in enumerate(reader.pages, 1)]; text = '\\n'.join(pieces) + '\\n'; Path('TEXT.txt').write_bytes(text.encode('utf-8')); line coordinates use text.splitlines(). Page markers, the inter-page newline join, and the final newline are included in the text hash. Pinned source version 712e1abbcbcf870dccf4c6a3e7837e2967bd7d7f; URL https://raw.githubusercontent.com/project-numina/aimo-progress-prize/712e1abbcbcf870dccf4c6a3e7837e2967bd7d7f/report/numina_dataset.pdf; response SHA-256 613b93a38d0fdc24bc2bf4866a9b78a1eaab3855956d273253b461982054c4f6. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.02.1"
+        }
+      ],
+      "id": "repair.binding.ten.v1.candidate.cohort3.dataset.numinamath.05",
+      "object_id": null,
+      "predicate": "access_terms",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party creator-document statement, not an independent corpus audit.",
+        "Reviewed scope: Full pinned CoT card; partial textual read of pinned 16-page creator report (pages1-8 and12). Remaining experiment pages, references and visuals are not claimed fully reviewed.",
+        "Report page12, limitations; no independent correctness audit performed."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.ten.v1.02",
+        "review.source-verifier.repair.binding.ten.v1.02",
+        "review.adversarial.repair.binding.ten.v1.02"
+      ],
+      "status": "approved",
+      "subject_id": "dataset.numinamath",
+      "value": {
+        "type": "text",
+        "value": "NuminaMath acknowledges challenges validating synthetic problem correctness and incomplete CoT detail on hard problems."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "d5567b8aadc1d4c450dd6707ca2627ce556c7b6c049e67c25a5396bd1d83f24d",
+          "locator": "Introduction; real user prompts/preferences, image pair, and tie option; pypdf 6.10.0 marked global text lines 40-48 (1-based inclusive), physical PDF p2. UTF-8 text artifact site/output/research-next/reference-binding-repair-ten-author/source-first/pickapic.pypdf-global.txt; extracted-text SHA-256 09f3e1271f5636690eace950ebf4752c62e06995ceedd1a6ce156a9485c24db3; 644 lines and 12 physical PDF pages. Exact Python recipe (import pypdf and pathlib.Path; INPUT.pdf is the downloaded pinned PDF filename): reader = pypdf.PdfReader('INPUT.pdf'); pieces = [f'=== PDF PAGE {i} ===\\n' + (page.extract_text() or '') for i, page in enumerate(reader.pages, 1)]; text = '\\n'.join(pieces) + '\\n'; Path('TEXT.txt').write_bytes(text.encode('utf-8')); line coordinates use text.splitlines(). Page markers, the inter-page newline join, and the final newline are included in the text hash. Pinned source version NeurIPS2023-73aacd8b3b05b4b503d58310b523553c-Paper-Conference; URL https://papers.neurips.cc/paper_files/paper/2023/file/73aacd8b3b05b4b503d58310b523553c-Paper-Conference.pdf; response SHA-256 b83f0f8b9bc43413a8a9d2a3e2d511a7ef13bd847e7d735f961f8caa79562b9a. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.08.1"
+        }
+      ],
+      "id": "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.01",
+      "object_id": null,
+      "predicate": "human_annotation",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party creator-document statement, not an independent corpus audit.",
+        "Reviewed scope: Full pinned creator family card, PickScore README and code LICENSE; partial textual read of NeurIPS2023paper pages1–6and10. Dataset v1 API endpoint returned401; v1/v2 data access is not established.",
+        "NeurIPS2023paper page2; v1-study scope rather than a present corpus inspection."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.ten.v1.08",
+        "review.source-verifier.repair.binding.ten.v1.08",
+        "review.adversarial.repair.binding.ten.v1.08"
+      ],
+      "status": "approved",
+      "subject_id": "dataset.pick-a-pic",
+      "value": {
+        "type": "text",
+        "value": "Pick-a-Pic collects real users’ prompts and preferences over two generated images, allowing a tie."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "67a0fa68956bab0bb9143b223600d2ecd291deb659473158e9280dabd42a6717",
+          "locator": "Section 2 Pick-a-Pic Dataset; backbone model enumeration; pypdf 6.10.0 marked global text lines 91-102 (1-based inclusive), physical PDF p3. UTF-8 text artifact site/output/research-next/reference-binding-repair-ten-author/source-first/pickapic.pypdf-global.txt; extracted-text SHA-256 09f3e1271f5636690eace950ebf4752c62e06995ceedd1a6ce156a9485c24db3; 644 lines and 12 physical PDF pages. Exact Python recipe (import pypdf and pathlib.Path; INPUT.pdf is the downloaded pinned PDF filename): reader = pypdf.PdfReader('INPUT.pdf'); pieces = [f'=== PDF PAGE {i} ===\\n' + (page.extract_text() or '') for i, page in enumerate(reader.pages, 1)]; text = '\\n'.join(pieces) + '\\n'; Path('TEXT.txt').write_bytes(text.encode('utf-8')); line coordinates use text.splitlines(). Page markers, the inter-page newline join, and the final newline are included in the text hash. Pinned source version NeurIPS2023-73aacd8b3b05b4b503d58310b523553c-Paper-Conference; URL https://papers.neurips.cc/paper_files/paper/2023/file/73aacd8b3b05b4b503d58310b523553c-Paper-Conference.pdf; response SHA-256 b83f0f8b9bc43413a8a9d2a3e2d511a7ef13bd847e7d735f961f8caa79562b9a. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.05.1"
+        }
+      ],
+      "id": "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.02",
+      "object_id": null,
+      "predicate": "generated",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party creator-document statement, not an independent corpus audit.",
+        "Reviewed scope: Full pinned creator family card, PickScore README and code LICENSE; partial textual read of NeurIPS2023paper pages1–6and10. Dataset v1 API endpoint returned401; v1/v2 data access is not established.",
+        "NeurIPS2023paper page3; not exhaustive for later versions."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.ten.v1.05",
+        "review.source-verifier.repair.binding.ten.v1.05",
+        "review.adversarial.repair.binding.ten.v1.05"
+      ],
+      "status": "approved",
+      "subject_id": "dataset.pick-a-pic",
+      "value": {
+        "type": "text",
+        "value": "Pick-a-Pic paper identifies Stable Diffusion2.1, Dreamlike Photoreal2.0 and Stable Diffusion XL variants as image generators."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "87dd879726fbb87a67c1816fd59e930841609d5510225ee0d991585372f0edad",
+          "locator": "Introducing Horizon-SWE paragraph; relation-bearing benchmark introduction on Polymath's source; captured HTML parsed with BeautifulSoup 4.14.3 using html.parser, remove script/style/noscript elements, then soup.get_text('\\n', strip=True) + '\\n', encoded UTF-8. Text artifact site/output/research-next/reference-binding-repair-ten-author/source-first/polymath.html-visible.txt; extracted-text SHA-256 a646a51bde5184e420c7f2048b930dacc5b4836c725210d0e91bffbec8a6eb4e; visible-text lines 62-69 (1-based inclusive, Python str.splitlines()). Exact literal anchor also occurs in captured raw HTML: true. Pinned source version response-sha256:6bee82d9f5b2ed107faa27dc2c26fec39fe768835a299eff04ac154da47c85c7; URL https://polymathlabs.ai/blog/horizon-swe; response SHA-256 6bee82d9f5b2ed107faa27dc2c26fec39fe768835a299eff04ac154da47c85c7. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.03.1"
+        }
+      ],
+      "id": "repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe",
+      "object_id": "cohort4.benchmark.horizon-swe",
+      "predicate": "creates",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party disclosure supports the stated source-specific scope; operational execution and outcomes were not independently audited.",
+        "Self-published benchmark methods are distinct from customer deployments or downstream model-training supply."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.ten.v1.03",
+        "review.source-verifier.repair.binding.ten.v1.03",
+        "review.adversarial.repair.binding.ten.v1.03"
+      ],
+      "status": "approved",
+      "subject_id": "org.polymath_ai_labs",
+      "value": null
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "7edebe9b0241ef52e76ddcb458e8048c36dd5ca7d81774e84fd4055efefc3a56",
+          "locator": "FrontierSWE introduction and Benchmark Design; includes curation collaboration relation and named partners; captured HTML parsed with BeautifulSoup 4.14.3 using html.parser, remove script/style/noscript elements, then soup.get_text('\\n', strip=True) + '\\n', encoded UTF-8. Text artifact site/output/research-next/reference-binding-repair-ten-author/source-first/proximal.html-visible.txt; extracted-text SHA-256 d10e4f3314f07f01ee0fb6a450f9b380f9cbf729cb2e88b16f0fae51061d62c5; visible-text lines 29-38 (1-based inclusive, Python str.splitlines()). Exact literal anchor also occurs in captured raw HTML: true. Pinned source version response-sha256:95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba; URL https://www.proximal.ai/blog/frontierswe/; response SHA-256 95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.10.1"
+        },
+        {
+          "excerpt_sha256": "f0c7de2d57948a591b8ae83edd4ae60c7767f0d2acb5af24f24c9f8e73259b8b",
+          "locator": "Acknowledgements; direct development-by-Proximal relation and named collaboration partners; captured HTML parsed with BeautifulSoup 4.14.3 using html.parser, remove script/style/noscript elements, then soup.get_text('\\n', strip=True) + '\\n', encoded UTF-8. Text artifact site/output/research-next/reference-binding-repair-ten-author/source-first/proximal.html-visible.txt; extracted-text SHA-256 d10e4f3314f07f01ee0fb6a450f9b380f9cbf729cb2e88b16f0fae51061d62c5; visible-text lines 379-386 (1-based inclusive, Python str.splitlines()). Exact literal anchor also occurs in captured raw HTML: true. Pinned source version response-sha256:95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba; URL https://www.proximal.ai/blog/frontierswe/; response SHA-256 95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.10.2"
+        }
+      ],
+      "id": "repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration",
+      "object_id": "cohort4.benchmark.frontierswe",
+      "predicate": "creates",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party disclosure supports the stated source-specific scope; operational execution and outcomes were not independently audited.",
+        "An owned benchmark with named curation collaborators; it is not a customer list or proof of training-data supply to those collaborators."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.ten.v1.10",
+        "review.source-verifier.repair.binding.ten.v1.10",
+        "review.adversarial.repair.binding.ten.v1.10"
+      ],
+      "status": "approved",
+      "subject_id": "org.proximal",
+      "value": null
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "15273a99452780d0a39b66ffbf9af5d2f0915e770b1a247f3894def7a493d25e",
+          "locator": "Section 5 mixture, math-enriched annealing and context extension; physical PDF p11, per-page pdftotext-layout lines 16-27 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 11 -l 11 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/dclm.physical-p011.layout.txt; page-text SHA-256 37c916907d0fa3291ac31fff1954e46f021bb595a627229be7967b54f3ac6b35. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2406.11794v1; URL https://arxiv.org/pdf/2406.11794v1; response SHA-256 f19ea7fda1bf30fd9fe877ef6996c2dbc7f84538d813903b66a7bb7ff8f38bc0. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.09.1"
+        },
+        {
+          "excerpt_sha256": "b4dc3640bf1a1a7ab3f6bd70c6b67249d2e917d4b4d6016811c8b8d8bf32c46c",
+          "locator": "Table 9 complete caption, column headers and final-model rows; exact 63.7 MMLU at 7B/2.6T; physical PDF p12, per-page pdftotext-layout lines 1-25 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 12 -l 12 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/dclm.physical-p012.layout.txt; page-text SHA-256 72cba359abca40c3790a2b9557d6ab213966d24b40b8cb5c5681783f7fa7fd3e. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2406.11794v1; URL https://arxiv.org/pdf/2406.11794v1; response SHA-256 f19ea7fda1bf30fd9fe877ef6996c2dbc7f84538d813903b66a7bb7ff8f38bc0. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.09.2"
+        },
+        {
+          "excerpt_sha256": "332d53e1061690e11956f087fa40842c7a56911dd86d684695ebb9c37775024c",
+          "locator": "Abstract; paper headline 64% explicitly stated, paired with Table 9's unrounded 63.7; physical PDF p1, per-page pdftotext-layout lines 38-43 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 1 -l 1 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/dclm.physical-p001.layout.txt; page-text SHA-256 bd8536c0f670159ecb6c5639a825b9fb807c1a209e4e7a9d5ffd5e48ac56ad52. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2406.11794v1; URL https://arxiv.org/pdf/2406.11794v1; response SHA-256 f19ea7fda1bf30fd9fe877ef6996c2dbc7f84538d813903b66a7bb7ff8f38bc0. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.09.3"
+        }
+      ],
+      "id": "repair.binding.ten.v1.cohort3.claim.dclm.final-model-mixture",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "This assertion originated as an author proposal; separate review receipts determine its current status.",
+        "Version-specific author-reported study; experiments, raw dataset records and formal proofs were not independently reproduced or verified.",
+        "The result is not attributable to raw Common Crawl or the baseline filter alone. The paper’s headline64% is rounded."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.ten.v1.09",
+        "review.source-verifier.repair.binding.ten.v1.09",
+        "review.adversarial.repair.binding.ten.v1.09"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2406.11794v1",
+      "value": {
+        "type": "text",
+        "value": "For the reported 2.6T-token 7B model, the authors augment DCLM-Baseline with StarCoder and ProofPile2, use a math-enriched annealing phase and extend context; Table 9 reports 63.7% MMLU."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "78ffd8028d4e40b9b6b390e0ce0b3514d937767513d6a639fce5a9477aad0066",
+          "locator": "README.md, Data Splits; raw UTF-8 source lines 118-120 (1-based inclusive, Python str.splitlines()); includes train_sft/test_sft column headers, separator, and no_robots row so both count-to-split relations are explicit. Raw response artifact site/output/research-next/reference-binding-repair-ten-author/source-bytes/norobots.response; raw text bytes are the pinned response, without normalization or extraction. Pinned source version e6f9a4ac5c37faeb744ba9ecf0473184d7f8105b; URL https://huggingface.co/datasets/HuggingFaceH4/no_robots/raw/e6f9a4ac5c37faeb744ba9ecf0473184d7f8105b/README.md; response SHA-256 22b642520e082ba1a6c4a93047bd5946aeca099763c6f2d11b59d91e61e79186. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.07.1"
+        }
+      ],
+      "id": "repair.binding.ten.v1.cohort4.dataset.claim.no-robots.splits",
+      "object_id": null,
+      "predicate": "dataset_size",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Pinned creator documentation statement; source commit identifies documentation, not verified corpus bytes. Metadata counts, not independent recount; no new benchmark family is proposed.",
+        "This assertion originated as an author proposal; review receipts determine its evidentiary disposition."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.ten.v1.07",
+        "review.source-verifier.repair.binding.ten.v1.07",
+        "review.adversarial.repair.binding.ten.v1.07"
+      ],
+      "status": "approved",
+      "subject_id": "dataset-release.no-robots.e6f9a4ac5c37",
+      "value": {
+        "type": "text",
+        "value": "The No Robots card lists 9,500 training and 500 test examples."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "20783a1995f1b692fccd38eb92c0c36f7a3b6c17f9e6e49a07bac7362df44de3",
+          "locator": "Appendix C continuation, left column; one-author evaluator role; physical PDF p8, per-page pdftotext-layout lines 1-10 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 8 -l 8 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/languagefeedback.physical-p008.layout.txt; page-text SHA-256 cfb7dc2d1689921a6a48e39bbacc88c6177b68bfe5213618ba0639e61e3d76f7. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2204.14146v1; URL https://arxiv.org/pdf/2204.14146v1; response SHA-256 7f0316658554df7a538ca89a6e44438c36cf31c9bc76b0246964b42f4824ee0d. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.04.1"
+        },
+        {
+          "excerpt_sha256": "87bd0ab5dd9324823955fc0dfdf6bfa7518653092bedb81c94cd7e99f4a8b563",
+          "locator": "Figure 2 labels/caption, Finetuning, Evaluation and Main Results; fine-tuned-model comparison description; physical PDF p3, per-page pdftotext-layout lines 19-77 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 3 -l 3 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/languagefeedback.physical-p003.layout.txt; page-text SHA-256 2848f5a53461f660d44dd73bc575b75a1b86f467df8b5e2d55f5f5b2b4f323f6. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2204.14146v1; URL https://arxiv.org/pdf/2204.14146v1; response SHA-256 7f0316658554df7a538ca89a6e44438c36cf31c9bc76b0246964b42f4824ee0d. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.04.2"
+        },
+        {
+          "excerpt_sha256": "1dacc50cb5c874f53f579e388a9fdb9f458d296f07ed85c7fb25cd700a2422a9",
+          "locator": "Figure 5 chart labels/caption; includes GPT-3 finetuned alternatives; physical PDF p7, per-page pdftotext-layout lines 43-52 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 7 -l 7 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/languagefeedback.physical-p007.layout.txt; page-text SHA-256 2375a578245d37514b74e2ad09a68b1078fb5d5dba08fcd1e5014eb83c83d71a. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2204.14146v1; URL https://arxiv.org/pdf/2204.14146v1; response SHA-256 7f0316658554df7a538ca89a6e44438c36cf31c9bc76b0246964b42f4824ee0d. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.04.3"
+        }
+      ],
+      "id": "repair.binding.ten.v1.cohort5.claim.languagefeedback.main-evaluator",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "This assertion originated as an author proposal; separate review receipts determine its current status.",
+        "Version-specific reported method or result; no experiment, proof, raw-corpus record or labor audit was independently reproduced."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.ten.v1.04",
+        "review.source-verifier.repair.binding.ten.v1.04",
+        "review.adversarial.repair.binding.ten.v1.04"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2204.14146v1",
+      "value": {
+        "type": "text",
+        "value": "One author conducted the human evaluation for the fine-tuned-model comparisons in Figures 2 and 5."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "37601a1afb6372941cc1452cf6019067e72c110095ec3d12a7122e70d4266244",
+          "locator": "Data sources plus Head sample and random sample; binds all three named corpora, token ranking, HeadAll and HeadC4 distinction; physical PDF p3, per-page pdftotext-layout lines 33-56 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 3 -l 3 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/consentcrisis.physical-p003.layout.txt; page-text SHA-256 6fc5e63045b2df5b900bfa2413a626494d64739d3535f090ca0434d6d4c0813c. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2407.14933v1; URL https://arxiv.org/pdf/2407.14933v1; response SHA-256 890f0591edfaf9938f9e72046b1d7fe2c476c94a9911712921bde59b5dd9cf38. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.06.1"
+        }
+      ],
+      "id": "repair.binding.ten.v1.cohort7.claim.consentcrisis.head",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-only candidate: separate source-verifier and adversarial source-content reviews remain pending.",
+        "Version-specific primary-source report; experiments, raw datasets, consent forms, labor records and formal derivations were not independently reproduced or audited.",
+        "HeadAll is a union across the three corpora; some analyses instead use only HeadC4. Token-ranking design differs from uniform domain sampling."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.ten.v1.06",
+        "review.source-verifier.repair.binding.ten.v1.06",
+        "review.adversarial.repair.binding.ten.v1.06"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2407.14933v1",
+      "value": {
+        "type": "text",
+        "value": "The head sample unions the top 2,000 domains by token count from each corpus into 3,950 domains."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "7540ead0caf3ffe400d1373a9124bcecb95a45332088333609cd4e0ee6dc628d",
+          "locator": "Section 3.1 Implementation Details; physical PDF p7, per-page pdftotext-layout lines 6-15 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 7 -l 7 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/ttrl.physical-p007.layout.txt; page-text SHA-256 fad3b051c5671dc7c8bbdbf4383fa849edd15e4000f33a6f17feead24d2acc3b. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2504.16084v3; URL https://arxiv.org/pdf/2504.16084v3; response SHA-256 3828cc886a0133749fe857dc12fff190f76c17dd7421dccfca01c96ec1dd5882. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.01.1"
+        },
+        {
+          "excerpt_sha256": "fe609d7d9aeb39953f681cca6ba1c17eb0980a619cb392dec3fc03e86b13b815",
+          "locator": "Section 3.1 Evaluation Setup; binds qualification that evaluation sampling uses separate counts; physical PDF p6, per-page pdftotext-layout lines 44-60 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 6 -l 6 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/ttrl.physical-p006.layout.txt; page-text SHA-256 49a4bfd055c0d902997ce1cbe6600d31a4120321636bb74892fb1abaf7f990ef. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2504.16084v3; URL https://arxiv.org/pdf/2504.16084v3; response SHA-256 3828cc886a0133749fe857dc12fff190f76c17dd7421dccfca01c96ec1dd5882. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+          "source_id": "repair.binding.ten.v1.source.01.2"
+        }
+      ],
+      "id": "repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-only candidate: separate source-verifier and adversarial source-content reviews remain pending.",
+        "Version-specific primary-source report. Proofs, model experiments, underlying data, consent/pay records and supplier participation have not been independently reproduced or audited.",
+        "Reported training uses GRPO, AdamW and 8 A100 80 GB GPUs; generation temperature and token budgets vary by model class, and evaluation sampling has separate counts."
+      ],
+      "review_ids": [
+        "review.author.repair.binding.ten.v1.01",
+        "review.source-verifier.repair.binding.ten.v1.01",
+        "review.adversarial.repair.binding.ten.v1.01"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2504.16084v3",
+      "value": {
+        "type": "text",
+        "value": "The implementation samples 64 responses for voting and downsamples 32 per prompt for policy training."
+      }
+    }
+  ],
+  "entities": [],
+  "reviews": [
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample": "c443ddb7ca222b07fefe448b749d56530bcc978f96509ea515c29de36f821366"
+      },
+      "id": "review.adversarial.repair.binding.ten.v1.01",
+      "invocation_id": "reference-binding-repair-ten-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p7 establishes the 64-response voting rollout and 32-response policy-training subset; the same complete paragraph supports GRPO, AdamW, GPU, and model-dependent temperature/token-budget qualification. Separately bound physical p6 Evaluation Setup supplies the distinct 16/4 evaluation counts, preventing training/evaluation conflation. Actual independent source-content review of the exact new digest, full value/relation and every source-factual qualifier. Own frozen primary-byte physical-page/HTML observations preceded candidate/proposed-value and prior-verdict comparison. Pinned extraction recipes and line/page/hash bindings independently executed. Original read-scope, endpoint-access, pending-review and no-reproduction disclosures are preserved historical process metadata and do not attest this invocation repeating earlier actions. No experiment, raw-corpus recount, consent/labor/rights or operational audit is claimed. Old approvals/negative history remain on original IDs/digests; this receipt is not a status promotion or transfer.",
+      "reviewed_on": "2026-11-10T15:54:37.977556Z",
+      "reviewer": "Codex independent adversarial reviewer /root/reference_ten_fresh_adversarial; requested gpt-6.1-sol ultra (runtime identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.ten.v1.source.01.1",
+        "repair.binding.ten.v1.source.01.2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort3.dataset.numinamath.05"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort3.dataset.numinamath.05": "491b8aa48e1c144a8a6c9b487b8e7e3d426bf47e6acb0a9262293ae1d9037bf8"
+      },
+      "id": "review.adversarial.repair.binding.ten.v1.02",
+      "invocation_id": "reference-binding-repair-ten-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p12 has both source propositions: synthetic correctness validation is challenging, and hard-problem CoT may lack sufficient detail. The exact marked pypdf 6.10.0 recipe reproduces declared lines524-531 and hash; the complete physical p12 render confirms these separate bullets. Prior read-scope disclosure is retained as process history, not adopted as evidence of this invocation inspecting other documents. Actual independent source-content review of the exact new digest, full value/relation and every source-factual qualifier. Own frozen primary-byte physical-page/HTML observations preceded candidate/proposed-value and prior-verdict comparison. Pinned extraction recipes and line/page/hash bindings independently executed. Original read-scope, endpoint-access, pending-review and no-reproduction disclosures are preserved historical process metadata and do not attest this invocation repeating earlier actions. No experiment, raw-corpus recount, consent/labor/rights or operational audit is claimed. Old approvals/negative history remain on original IDs/digests; this receipt is not a status promotion or transfer.",
+      "reviewed_on": "2026-11-10T15:54:37.977556Z",
+      "reviewer": "Codex independent adversarial reviewer /root/reference_ten_fresh_adversarial; requested gpt-6.1-sol ultra (runtime identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.ten.v1.source.02.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe": "c88ace4d4c40a317a91042476cc801c737fa640d84f6204c5927abacadf3066d"
+      },
+      "id": "review.adversarial.repair.binding.ten.v1.03",
+      "invocation_id": "reference-binding-repair-ten-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Polymath provider HTML explicitly introduces Horizon-SWE; the expanded paragraph includes benchmark name, creator voice and the long-horizon production-grade software engineering purpose. This supports Polymath creates Horizon-SWE in a first-party benchmark scope, with no customer or downstream supply inference. Actual independent source-content review of the exact new digest, full value/relation and every source-factual qualifier. Own frozen primary-byte physical-page/HTML observations preceded candidate/proposed-value and prior-verdict comparison. Pinned extraction recipes and line/page/hash bindings independently executed. Original read-scope, endpoint-access, pending-review and no-reproduction disclosures are preserved historical process metadata and do not attest this invocation repeating earlier actions. No experiment, raw-corpus recount, consent/labor/rights or operational audit is claimed. Old approvals/negative history remain on original IDs/digests; this receipt is not a status promotion or transfer.",
+      "reviewed_on": "2026-11-10T15:54:37.977556Z",
+      "reviewer": "Codex independent adversarial reviewer /root/reference_ten_fresh_adversarial; requested gpt-6.1-sol ultra (runtime identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.ten.v1.source.03.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort5.claim.languagefeedback.main-evaluator"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort5.claim.languagefeedback.main-evaluator": "8d9f9dd2057ac9f3cec5de28a3912c7a619bfc02e83f571000b6d9d80b1be7fe"
+      },
+      "id": "review.adversarial.repair.binding.ten.v1.04",
+      "invocation_id": "reference-binding-repair-ten-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p8 Appendix C says one author conducted evaluation for Figs.2/5. Physical p3 Figure2 and finetuning/results text plus physical p7 Figure5 identify these as fine-tuned-model comparisons. The two authors for generated-refinement comparisons and one author for feedback incorporation are separately scoped, avoiding evaluator-role conflation. Actual independent source-content review of the exact new digest, full value/relation and every source-factual qualifier. Own frozen primary-byte physical-page/HTML observations preceded candidate/proposed-value and prior-verdict comparison. Pinned extraction recipes and line/page/hash bindings independently executed. Original read-scope, endpoint-access, pending-review and no-reproduction disclosures are preserved historical process metadata and do not attest this invocation repeating earlier actions. No experiment, raw-corpus recount, consent/labor/rights or operational audit is claimed. Old approvals/negative history remain on original IDs/digests; this receipt is not a status promotion or transfer.",
+      "reviewed_on": "2026-11-10T15:54:37.977556Z",
+      "reviewer": "Codex independent adversarial reviewer /root/reference_ten_fresh_adversarial; requested gpt-6.1-sol ultra (runtime identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.ten.v1.source.04.1",
+        "repair.binding.ten.v1.source.04.2",
+        "repair.binding.ten.v1.source.04.3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.02"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.02": "2cd4830e3b3601b801ef99d4bdf8f29305a7acf2b1713c247bd1ce2d268f310d"
+      },
+      "id": "review.adversarial.repair.binding.ten.v1.05",
+      "invocation_id": "reference-binding-repair-ten-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p3 section2 names Stable Diffusion2.1, Dreamlike Photoreal2.0 and Stable Diffusion XL variants. The source binding reproduces exact marked pypdf6.10.0 global coordinates91-102 including the model enumeration. The assertion remains the NeurIPS2023 paper scope; no later-version exhaustiveness or live corpus-access claim is inferred. Actual independent source-content review of the exact new digest, full value/relation and every source-factual qualifier. Own frozen primary-byte physical-page/HTML observations preceded candidate/proposed-value and prior-verdict comparison. Pinned extraction recipes and line/page/hash bindings independently executed. Original read-scope, endpoint-access, pending-review and no-reproduction disclosures are preserved historical process metadata and do not attest this invocation repeating earlier actions. No experiment, raw-corpus recount, consent/labor/rights or operational audit is claimed. Old approvals/negative history remain on original IDs/digests; this receipt is not a status promotion or transfer.",
+      "reviewed_on": "2026-11-10T15:54:37.977556Z",
+      "reviewer": "Codex independent adversarial reviewer /root/reference_ten_fresh_adversarial; requested gpt-6.1-sol ultra (runtime identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.ten.v1.source.05.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort7.claim.consentcrisis.head"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort7.claim.consentcrisis.head": "bdaf07e85f64d1748be78056a2b77b13bcaadfd0f46d5fec85046682f8571f3f"
+      },
+      "id": "review.adversarial.repair.binding.ten.v1.06",
+      "invocation_id": "reference-binding-repair-ten-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p3 names C4, RefinedWeb and Dolma and selects each corpus top2k token-ranked domains into the3.95k HEADAll union. The bound range also explicitly distinguishes HEADC4 and token-ranked head sampling from the intersection-based random sample, supporting the complete qualification. Actual independent source-content review of the exact new digest, full value/relation and every source-factual qualifier. Own frozen primary-byte physical-page/HTML observations preceded candidate/proposed-value and prior-verdict comparison. Pinned extraction recipes and line/page/hash bindings independently executed. Original read-scope, endpoint-access, pending-review and no-reproduction disclosures are preserved historical process metadata and do not attest this invocation repeating earlier actions. No experiment, raw-corpus recount, consent/labor/rights or operational audit is claimed. Old approvals/negative history remain on original IDs/digests; this receipt is not a status promotion or transfer.",
+      "reviewed_on": "2026-11-10T15:54:37.977556Z",
+      "reviewer": "Codex independent adversarial reviewer /root/reference_ten_fresh_adversarial; requested gpt-6.1-sol ultra (runtime identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.ten.v1.source.06.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort4.dataset.claim.no-robots.splits"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort4.dataset.claim.no-robots.splits": "e57c6ebbb05a202b84469ba2f1dead159d00cea3486cbbcc3716a604db13531f"
+      },
+      "id": "review.adversarial.repair.binding.ten.v1.07",
+      "invocation_id": "reference-binding-repair-ten-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "The pinned raw No Robots README range118-120 includes train_sft/test_sft headers and the9500/500 row, making the count-to-split relation reproducible. YAML agrees. The claim remains creator-documented metadata; no corpus recount or present data-byte access is established. Actual independent source-content review of the exact new digest, full value/relation and every source-factual qualifier. Own frozen primary-byte physical-page/HTML observations preceded candidate/proposed-value and prior-verdict comparison. Pinned extraction recipes and line/page/hash bindings independently executed. Original read-scope, endpoint-access, pending-review and no-reproduction disclosures are preserved historical process metadata and do not attest this invocation repeating earlier actions. No experiment, raw-corpus recount, consent/labor/rights or operational audit is claimed. Old approvals/negative history remain on original IDs/digests; this receipt is not a status promotion or transfer.",
+      "reviewed_on": "2026-11-10T15:54:37.977556Z",
+      "reviewer": "Codex independent adversarial reviewer /root/reference_ten_fresh_adversarial; requested gpt-6.1-sol ultra (runtime identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.ten.v1.source.07.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.01"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.01": "a1a6ac0e2b958a0617c0a301341c5695dd986ec3f56f0ad38fc0d044a202d6e2"
+      },
+      "id": "review.adversarial.repair.binding.ten.v1.08",
+      "invocation_id": "reference-binding-repair-ten-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p2 explicitly describes collecting real users prompts/preferences, the two-image comparison and a tie option. Exact marked pypdf6.10.0 global lines40-48 reproduce the full relation, not a label-only token. The v1-study and lack-of-present-corpus-inspection scope is retained. Actual independent source-content review of the exact new digest, full value/relation and every source-factual qualifier. Own frozen primary-byte physical-page/HTML observations preceded candidate/proposed-value and prior-verdict comparison. Pinned extraction recipes and line/page/hash bindings independently executed. Original read-scope, endpoint-access, pending-review and no-reproduction disclosures are preserved historical process metadata and do not attest this invocation repeating earlier actions. No experiment, raw-corpus recount, consent/labor/rights or operational audit is claimed. Old approvals/negative history remain on original IDs/digests; this receipt is not a status promotion or transfer.",
+      "reviewed_on": "2026-11-10T15:54:37.977556Z",
+      "reviewer": "Codex independent adversarial reviewer /root/reference_ten_fresh_adversarial; requested gpt-6.1-sol ultra (runtime identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.ten.v1.source.08.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort3.claim.dclm.final-model-mixture"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort3.claim.dclm.final-model-mixture": "4cd52a9e4903186ac3a52a9ed28ad1f628324a86d65a0eb3385e96d858a8bfee"
+      },
+      "id": "review.adversarial.repair.binding.ten.v1.09",
+      "invocation_id": "reference-binding-repair-ten-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p11 establishes StarCoder/ProofPile2 augmentation, math-enriched annealing and context extension. Physical p12 Table9 complete headers and final7B/2.6T row assign63.7 to MMLU. Bound physical p1 abstract states64%; reading both establishes the rounding qualification. The recipe is a mixed scaled model, so the result cannot be attributed solely to raw Common Crawl or baseline filtering. Actual independent source-content review of the exact new digest, full value/relation and every source-factual qualifier. Own frozen primary-byte physical-page/HTML observations preceded candidate/proposed-value and prior-verdict comparison. Pinned extraction recipes and line/page/hash bindings independently executed. Original read-scope, endpoint-access, pending-review and no-reproduction disclosures are preserved historical process metadata and do not attest this invocation repeating earlier actions. No experiment, raw-corpus recount, consent/labor/rights or operational audit is claimed. Old approvals/negative history remain on original IDs/digests; this receipt is not a status promotion or transfer.",
+      "reviewed_on": "2026-11-10T15:54:37.977556Z",
+      "reviewer": "Codex independent adversarial reviewer /root/reference_ten_fresh_adversarial; requested gpt-6.1-sol ultra (runtime identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.ten.v1.source.09.1",
+        "repair.binding.ten.v1.source.09.2",
+        "repair.binding.ten.v1.source.09.3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration": "acd416df2e5e774cbb08d9d21d2ce8eaa9fe7dc10053893e38d4eb1a7d22b7b4"
+      },
+      "id": "review.adversarial.repair.binding.ten.v1.10",
+      "invocation_id": "reference-binding-repair-ten-adversarial-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "FrontierSWE Benchmark Design names Modular, Prime Intellect and Thoughtful Lab as problem-curation partners; Acknowledgements explicitly says developed by the Proximal team with outside academia/industry collaborators. Both relation-bearing source bindings support the creates relation and named-curation-collaborator qualification. No contract, customer, payment or downstream supply relation is inferred; mixed release banners/task counts are outside this exact assertion. Actual independent source-content review of the exact new digest, full value/relation and every source-factual qualifier. Own frozen primary-byte physical-page/HTML observations preceded candidate/proposed-value and prior-verdict comparison. Pinned extraction recipes and line/page/hash bindings independently executed. Original read-scope, endpoint-access, pending-review and no-reproduction disclosures are preserved historical process metadata and do not attest this invocation repeating earlier actions. No experiment, raw-corpus recount, consent/labor/rights or operational audit is claimed. Old approvals/negative history remain on original IDs/digests; this receipt is not a status promotion or transfer.",
+      "reviewed_on": "2026-11-10T15:54:37.977556Z",
+      "reviewer": "Codex independent adversarial reviewer /root/reference_ten_fresh_adversarial; requested gpt-6.1-sol ultra (runtime identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "repair.binding.ten.v1.source.10.1",
+        "repair.binding.ten.v1.source.10.2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample": "c443ddb7ca222b07fefe448b749d56530bcc978f96509ea515c29de36f821366"
+      },
+      "id": "review.author.repair.binding.ten.v1.01",
+      "invocation_id": "reference-binding-repair-ten-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review of this new exact candidate digest and all source-factual qualifications. Own source-first byte/physical-page/HTML observations were frozen before comparing original assertion values and final tie-breaker adjudication. Scientific value and every original qualification are preserved exactly. Prior author read-scope and access/audit disclosures remain historical process metadata; they do not claim this author reread all previously listed documents or retried dataset endpoints. This author read only the precise new source contexts, primary page renders and metadata stated in the repair package. Existing source captures reused; all expanded bindings and extraction recipes are explicit. Original receipts remain attached to old IDs/digests in history; no original approval is transferred. Separate source-verifier and adversarial reviews on this candidate digest remain pending. No experiment, corpus, rights, labor or downstream operational result independently reproduced.",
+      "reviewed_on": "2026-11-10T15:35:41.846248Z",
+      "reviewer": "Codex author /root/reference_remaining_ten_author; requested SolUltra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.ten.v1.source.01.1",
+        "repair.binding.ten.v1.source.01.2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort3.dataset.numinamath.05"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort3.dataset.numinamath.05": "491b8aa48e1c144a8a6c9b487b8e7e3d426bf47e6acb0a9262293ae1d9037bf8"
+      },
+      "id": "review.author.repair.binding.ten.v1.02",
+      "invocation_id": "reference-binding-repair-ten-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review of this new exact candidate digest and all source-factual qualifications. Own source-first byte/physical-page/HTML observations were frozen before comparing original assertion values and final tie-breaker adjudication. Scientific value and every original qualification are preserved exactly. Prior author read-scope and access/audit disclosures remain historical process metadata; they do not claim this author reread all previously listed documents or retried dataset endpoints. This author read only the precise new source contexts, primary page renders and metadata stated in the repair package. Existing source captures reused; all expanded bindings and extraction recipes are explicit. Original receipts remain attached to old IDs/digests in history; no original approval is transferred. Separate source-verifier and adversarial reviews on this candidate digest remain pending. No experiment, corpus, rights, labor or downstream operational result independently reproduced.",
+      "reviewed_on": "2026-11-10T15:35:41.846248Z",
+      "reviewer": "Codex author /root/reference_remaining_ten_author; requested SolUltra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.ten.v1.source.02.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe": "c88ace4d4c40a317a91042476cc801c737fa640d84f6204c5927abacadf3066d"
+      },
+      "id": "review.author.repair.binding.ten.v1.03",
+      "invocation_id": "reference-binding-repair-ten-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review of this new exact candidate digest and all source-factual qualifications. Own source-first byte/physical-page/HTML observations were frozen before comparing original assertion values and final tie-breaker adjudication. Scientific value and every original qualification are preserved exactly. Prior author read-scope and access/audit disclosures remain historical process metadata; they do not claim this author reread all previously listed documents or retried dataset endpoints. This author read only the precise new source contexts, primary page renders and metadata stated in the repair package. Existing source captures reused; all expanded bindings and extraction recipes are explicit. Original receipts remain attached to old IDs/digests in history; no original approval is transferred. Separate source-verifier and adversarial reviews on this candidate digest remain pending. No experiment, corpus, rights, labor or downstream operational result independently reproduced.",
+      "reviewed_on": "2026-11-10T15:35:41.846248Z",
+      "reviewer": "Codex author /root/reference_remaining_ten_author; requested SolUltra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.ten.v1.source.03.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort5.claim.languagefeedback.main-evaluator"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort5.claim.languagefeedback.main-evaluator": "8d9f9dd2057ac9f3cec5de28a3912c7a619bfc02e83f571000b6d9d80b1be7fe"
+      },
+      "id": "review.author.repair.binding.ten.v1.04",
+      "invocation_id": "reference-binding-repair-ten-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review of this new exact candidate digest and all source-factual qualifications. Own source-first byte/physical-page/HTML observations were frozen before comparing original assertion values and final tie-breaker adjudication. Scientific value and every original qualification are preserved exactly. Prior author read-scope and access/audit disclosures remain historical process metadata; they do not claim this author reread all previously listed documents or retried dataset endpoints. This author read only the precise new source contexts, primary page renders and metadata stated in the repair package. Existing source captures reused; all expanded bindings and extraction recipes are explicit. Original receipts remain attached to old IDs/digests in history; no original approval is transferred. Separate source-verifier and adversarial reviews on this candidate digest remain pending. No experiment, corpus, rights, labor or downstream operational result independently reproduced.",
+      "reviewed_on": "2026-11-10T15:35:41.846248Z",
+      "reviewer": "Codex author /root/reference_remaining_ten_author; requested SolUltra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.ten.v1.source.04.1",
+        "repair.binding.ten.v1.source.04.2",
+        "repair.binding.ten.v1.source.04.3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.02"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.02": "2cd4830e3b3601b801ef99d4bdf8f29305a7acf2b1713c247bd1ce2d268f310d"
+      },
+      "id": "review.author.repair.binding.ten.v1.05",
+      "invocation_id": "reference-binding-repair-ten-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review of this new exact candidate digest and all source-factual qualifications. Own source-first byte/physical-page/HTML observations were frozen before comparing original assertion values and final tie-breaker adjudication. Scientific value and every original qualification are preserved exactly. Prior author read-scope and access/audit disclosures remain historical process metadata; they do not claim this author reread all previously listed documents or retried dataset endpoints. This author read only the precise new source contexts, primary page renders and metadata stated in the repair package. Existing source captures reused; all expanded bindings and extraction recipes are explicit. Original receipts remain attached to old IDs/digests in history; no original approval is transferred. Separate source-verifier and adversarial reviews on this candidate digest remain pending. No experiment, corpus, rights, labor or downstream operational result independently reproduced.",
+      "reviewed_on": "2026-11-10T15:35:41.846248Z",
+      "reviewer": "Codex author /root/reference_remaining_ten_author; requested SolUltra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.ten.v1.source.05.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort7.claim.consentcrisis.head"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort7.claim.consentcrisis.head": "bdaf07e85f64d1748be78056a2b77b13bcaadfd0f46d5fec85046682f8571f3f"
+      },
+      "id": "review.author.repair.binding.ten.v1.06",
+      "invocation_id": "reference-binding-repair-ten-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review of this new exact candidate digest and all source-factual qualifications. Own source-first byte/physical-page/HTML observations were frozen before comparing original assertion values and final tie-breaker adjudication. Scientific value and every original qualification are preserved exactly. Prior author read-scope and access/audit disclosures remain historical process metadata; they do not claim this author reread all previously listed documents or retried dataset endpoints. This author read only the precise new source contexts, primary page renders and metadata stated in the repair package. Existing source captures reused; all expanded bindings and extraction recipes are explicit. Original receipts remain attached to old IDs/digests in history; no original approval is transferred. Separate source-verifier and adversarial reviews on this candidate digest remain pending. No experiment, corpus, rights, labor or downstream operational result independently reproduced.",
+      "reviewed_on": "2026-11-10T15:35:41.846248Z",
+      "reviewer": "Codex author /root/reference_remaining_ten_author; requested SolUltra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.ten.v1.source.06.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort4.dataset.claim.no-robots.splits"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort4.dataset.claim.no-robots.splits": "e57c6ebbb05a202b84469ba2f1dead159d00cea3486cbbcc3716a604db13531f"
+      },
+      "id": "review.author.repair.binding.ten.v1.07",
+      "invocation_id": "reference-binding-repair-ten-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review of this new exact candidate digest and all source-factual qualifications. Own source-first byte/physical-page/HTML observations were frozen before comparing original assertion values and final tie-breaker adjudication. Scientific value and every original qualification are preserved exactly. Prior author read-scope and access/audit disclosures remain historical process metadata; they do not claim this author reread all previously listed documents or retried dataset endpoints. This author read only the precise new source contexts, primary page renders and metadata stated in the repair package. Existing source captures reused; all expanded bindings and extraction recipes are explicit. Original receipts remain attached to old IDs/digests in history; no original approval is transferred. Separate source-verifier and adversarial reviews on this candidate digest remain pending. No experiment, corpus, rights, labor or downstream operational result independently reproduced.",
+      "reviewed_on": "2026-11-10T15:35:41.846248Z",
+      "reviewer": "Codex author /root/reference_remaining_ten_author; requested SolUltra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.ten.v1.source.07.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.01"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.01": "a1a6ac0e2b958a0617c0a301341c5695dd986ec3f56f0ad38fc0d044a202d6e2"
+      },
+      "id": "review.author.repair.binding.ten.v1.08",
+      "invocation_id": "reference-binding-repair-ten-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review of this new exact candidate digest and all source-factual qualifications. Own source-first byte/physical-page/HTML observations were frozen before comparing original assertion values and final tie-breaker adjudication. Scientific value and every original qualification are preserved exactly. Prior author read-scope and access/audit disclosures remain historical process metadata; they do not claim this author reread all previously listed documents or retried dataset endpoints. This author read only the precise new source contexts, primary page renders and metadata stated in the repair package. Existing source captures reused; all expanded bindings and extraction recipes are explicit. Original receipts remain attached to old IDs/digests in history; no original approval is transferred. Separate source-verifier and adversarial reviews on this candidate digest remain pending. No experiment, corpus, rights, labor or downstream operational result independently reproduced.",
+      "reviewed_on": "2026-11-10T15:35:41.846248Z",
+      "reviewer": "Codex author /root/reference_remaining_ten_author; requested SolUltra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.ten.v1.source.08.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort3.claim.dclm.final-model-mixture"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort3.claim.dclm.final-model-mixture": "4cd52a9e4903186ac3a52a9ed28ad1f628324a86d65a0eb3385e96d858a8bfee"
+      },
+      "id": "review.author.repair.binding.ten.v1.09",
+      "invocation_id": "reference-binding-repair-ten-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review of this new exact candidate digest and all source-factual qualifications. Own source-first byte/physical-page/HTML observations were frozen before comparing original assertion values and final tie-breaker adjudication. Scientific value and every original qualification are preserved exactly. Prior author read-scope and access/audit disclosures remain historical process metadata; they do not claim this author reread all previously listed documents or retried dataset endpoints. This author read only the precise new source contexts, primary page renders and metadata stated in the repair package. Existing source captures reused; all expanded bindings and extraction recipes are explicit. Original receipts remain attached to old IDs/digests in history; no original approval is transferred. Separate source-verifier and adversarial reviews on this candidate digest remain pending. No experiment, corpus, rights, labor or downstream operational result independently reproduced.",
+      "reviewed_on": "2026-11-10T15:35:41.846248Z",
+      "reviewer": "Codex author /root/reference_remaining_ten_author; requested SolUltra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.ten.v1.source.09.1",
+        "repair.binding.ten.v1.source.09.2",
+        "repair.binding.ten.v1.source.09.3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration": "acd416df2e5e774cbb08d9d21d2ce8eaa9fe7dc10053893e38d4eb1a7d22b7b4"
+      },
+      "id": "review.author.repair.binding.ten.v1.10",
+      "invocation_id": "reference-binding-repair-ten-author-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Actual author source-content review of this new exact candidate digest and all source-factual qualifications. Own source-first byte/physical-page/HTML observations were frozen before comparing original assertion values and final tie-breaker adjudication. Scientific value and every original qualification are preserved exactly. Prior author read-scope and access/audit disclosures remain historical process metadata; they do not claim this author reread all previously listed documents or retried dataset endpoints. This author read only the precise new source contexts, primary page renders and metadata stated in the repair package. Existing source captures reused; all expanded bindings and extraction recipes are explicit. Original receipts remain attached to old IDs/digests in history; no original approval is transferred. Separate source-verifier and adversarial reviews on this candidate digest remain pending. No experiment, corpus, rights, labor or downstream operational result independently reproduced.",
+      "reviewed_on": "2026-11-10T15:35:41.846248Z",
+      "reviewer": "Codex author /root/reference_remaining_ten_author; requested SolUltra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "repair.binding.ten.v1.source.10.1",
+        "repair.binding.ten.v1.source.10.2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample": "c443ddb7ca222b07fefe448b749d56530bcc978f96509ea515c29de36f821366"
+      },
+      "id": "review.source-verifier.repair.binding.ten.v1.01",
+      "invocation_id": "reference-binding-repair-ten-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p7 Implementation Details explicitly samples 64 responses for voting-based label estimation, then downsamples 32 per prompt for training. The complete paragraph supports GRPO, AdamW, eight A100 80GB GPUs and model-dependent temperatures and token limits. Physical p6 Evaluation Setup supports separate evaluation sampling counts. No evaluation/rollout count conflation remains. Independent source-first review of the complete assertion value, subject/predicate/object relation, all source-factual qualifications, version/body identity, literal excerpt and declared extraction/page/line coordinates. Pinned primary bytes were independently extracted and physical pages visually inspected where relevant before comparing proposed values or author verdicts. Prior author read-scope, API-access observations, pending-review statements and no-reproduction disclosures are retained historical process metadata; this receipt does not independently attest those prior actions, retry endpoints, establish live dataset access, or use them as primary scientific evidence. No underlying experiment, corpus recount, ownership-rights, labor, consent or operational outcome audit is claimed. Exact new scientific digest only; this is not an approval or transfer of old receipts. Adversarial review remains separate.",
+      "reviewed_on": "2026-11-10T15:45:38.365452Z",
+      "reviewer": "Codex independent source verifier /root/reference_ten_fresh_verifier; requested gpt-6.1-sol ultra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.ten.v1.source.01.1",
+        "repair.binding.ten.v1.source.01.2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort3.dataset.numinamath.05"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort3.dataset.numinamath.05": "491b8aa48e1c144a8a6c9b487b8e7e3d426bf47e6acb0a9262293ae1d9037bf8"
+      },
+      "id": "review.source-verifier.repair.binding.ten.v1.02",
+      "invocation_id": "reference-binding-repair-ten-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p12 Synthetic Data Validation and Improving CoT Solutions bullets support both components of the full value: synthetic correctness is challenging to validate and hard-problem CoT may lack sufficient detail. Marked pypdf lines 524-531 map to physical p12, reproduced with 6.10.0 and the exact original 727-line,16-page extraction. Section5 starts p11; p13 References does not displace the p12 caveat. Independent source-first review of the complete assertion value, subject/predicate/object relation, all source-factual qualifications, version/body identity, literal excerpt and declared extraction/page/line coordinates. Pinned primary bytes were independently extracted and physical pages visually inspected where relevant before comparing proposed values or author verdicts. Prior author read-scope, API-access observations, pending-review statements and no-reproduction disclosures are retained historical process metadata; this receipt does not independently attest those prior actions, retry endpoints, establish live dataset access, or use them as primary scientific evidence. No underlying experiment, corpus recount, ownership-rights, labor, consent or operational outcome audit is claimed. Exact new scientific digest only; this is not an approval or transfer of old receipts. Adversarial review remains separate.",
+      "reviewed_on": "2026-11-10T15:45:38.365452Z",
+      "reviewer": "Codex independent source verifier /root/reference_ten_fresh_verifier; requested gpt-6.1-sol ultra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.ten.v1.source.02.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe": "c88ace4d4c40a317a91042476cc801c737fa640d84f6204c5927abacadf3066d"
+      },
+      "id": "review.source-verifier.repair.binding.ten.v1.03",
+      "invocation_id": "reference-binding-repair-ten-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "The captured Polymath body introduces Horizon-SWE as its benchmark and describes long-horizon production-grade software engineering tasks. This supports Polymath creates Horizon-SWE. The subject/object relation is supported by the complete introduction rather than only its short anchor. Both qualifications correctly limit the record to provider disclosure and benchmark methods. Independent source-first review of the complete assertion value, subject/predicate/object relation, all source-factual qualifications, version/body identity, literal excerpt and declared extraction/page/line coordinates. Pinned primary bytes were independently extracted and physical pages visually inspected where relevant before comparing proposed values or author verdicts. Prior author read-scope, API-access observations, pending-review statements and no-reproduction disclosures are retained historical process metadata; this receipt does not independently attest those prior actions, retry endpoints, establish live dataset access, or use them as primary scientific evidence. No underlying experiment, corpus recount, ownership-rights, labor, consent or operational outcome audit is claimed. Exact new scientific digest only; this is not an approval or transfer of old receipts. Adversarial review remains separate.",
+      "reviewed_on": "2026-11-10T15:45:38.365452Z",
+      "reviewer": "Codex independent source verifier /root/reference_ten_fresh_verifier; requested gpt-6.1-sol ultra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.ten.v1.source.03.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort5.claim.languagefeedback.main-evaluator"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort5.claim.languagefeedback.main-evaluator": "8d9f9dd2057ac9f3cec5de28a3912c7a619bfc02e83f571000b6d9d80b1be7fe"
+      },
+      "id": "review.source-verifier.repair.binding.ten.v1.04",
+      "invocation_id": "reference-binding-repair-ten-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Appendix C continuation on physical p8 explicitly assigns one author to human evaluation for Figures2 and5. Physical p3 Figure2 and Finetuning/Evaluation/Main Results, plus physical p7 Figure5 labels and caption, establish that these are the fine-tuned-model comparisons. AppendixC distinguishes two other authors for refinement comparisons and another one-author incorporation evaluation, avoiding evaluator-role conflation. Independent source-first review of the complete assertion value, subject/predicate/object relation, all source-factual qualifications, version/body identity, literal excerpt and declared extraction/page/line coordinates. Pinned primary bytes were independently extracted and physical pages visually inspected where relevant before comparing proposed values or author verdicts. Prior author read-scope, API-access observations, pending-review statements and no-reproduction disclosures are retained historical process metadata; this receipt does not independently attest those prior actions, retry endpoints, establish live dataset access, or use them as primary scientific evidence. No underlying experiment, corpus recount, ownership-rights, labor, consent or operational outcome audit is claimed. Exact new scientific digest only; this is not an approval or transfer of old receipts. Adversarial review remains separate.",
+      "reviewed_on": "2026-11-10T15:45:38.365452Z",
+      "reviewer": "Codex independent source verifier /root/reference_ten_fresh_verifier; requested gpt-6.1-sol ultra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.ten.v1.source.04.1",
+        "repair.binding.ten.v1.source.04.2",
+        "repair.binding.ten.v1.source.04.3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.02"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.02": "2cd4830e3b3601b801ef99d4bdf8f29305a7acf2b1713c247bd1ce2d268f310d"
+      },
+      "id": "review.source-verifier.repair.binding.ten.v1.05",
+      "invocation_id": "reference-binding-repair-ten-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p3 Section2 lists Stable Diffusion2.1, Dreamlike Photoreal2.0 and Stable DiffusionXL variants as the image-generating backbones. The exact 644-line,12-page marked pypdf6.10.0 extraction reproduces declared lines91-102 and hash. The qualification correctly restricts this to the NeurIPS2023 paper rather than exhaustive later versions. Independent source-first review of the complete assertion value, subject/predicate/object relation, all source-factual qualifications, version/body identity, literal excerpt and declared extraction/page/line coordinates. Pinned primary bytes were independently extracted and physical pages visually inspected where relevant before comparing proposed values or author verdicts. Prior author read-scope, API-access observations, pending-review statements and no-reproduction disclosures are retained historical process metadata; this receipt does not independently attest those prior actions, retry endpoints, establish live dataset access, or use them as primary scientific evidence. No underlying experiment, corpus recount, ownership-rights, labor, consent or operational outcome audit is claimed. Exact new scientific digest only; this is not an approval or transfer of old receipts. Adversarial review remains separate.",
+      "reviewed_on": "2026-11-10T15:45:38.365452Z",
+      "reviewer": "Codex independent source verifier /root/reference_ten_fresh_verifier; requested gpt-6.1-sol ultra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.ten.v1.source.05.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort7.claim.consentcrisis.head"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort7.claim.consentcrisis.head": "bdaf07e85f64d1748be78056a2b77b13bcaadfd0f46d5fec85046682f8571f3f"
+      },
+      "id": "review.source-verifier.repair.binding.ten.v1.06",
+      "invocation_id": "reference-binding-repair-ten-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p3 Data sources names C4, RefinedWeb and Dolma; Head sample and random sample selects top2k web domains per corpus ranked by token count and calls their 3.95k union HeadAll. It separately distinguishes HeadC4 and random-domain samples, supporting both the full value and the source-factual qualification. 3,950 is the numerical expansion of the paper reported3.95k; no independent domain recount is claimed. Independent source-first review of the complete assertion value, subject/predicate/object relation, all source-factual qualifications, version/body identity, literal excerpt and declared extraction/page/line coordinates. Pinned primary bytes were independently extracted and physical pages visually inspected where relevant before comparing proposed values or author verdicts. Prior author read-scope, API-access observations, pending-review statements and no-reproduction disclosures are retained historical process metadata; this receipt does not independently attest those prior actions, retry endpoints, establish live dataset access, or use them as primary scientific evidence. No underlying experiment, corpus recount, ownership-rights, labor, consent or operational outcome audit is claimed. Exact new scientific digest only; this is not an approval or transfer of old receipts. Adversarial review remains separate.",
+      "reviewed_on": "2026-11-10T15:45:38.365452Z",
+      "reviewer": "Codex independent source verifier /root/reference_ten_fresh_verifier; requested gpt-6.1-sol ultra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.ten.v1.source.06.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort4.dataset.claim.no-robots.splits"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort4.dataset.claim.no-robots.splits": "e57c6ebbb05a202b84469ba2f1dead159d00cea3486cbbcc3716a604db13531f"
+      },
+      "id": "review.source-verifier.repair.binding.ten.v1.07",
+      "invocation_id": "reference-binding-repair-ten-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "The pinned README Data Splits table includes train_sft and test_sft headers, then the no_robots row9500 and500, directly binding each count to its split. YAML metadata independently repeats train9500/test500. The value is explicitly a card report, with the documentation-versus-corpus-recount limitation preserved. Independent source-first review of the complete assertion value, subject/predicate/object relation, all source-factual qualifications, version/body identity, literal excerpt and declared extraction/page/line coordinates. Pinned primary bytes were independently extracted and physical pages visually inspected where relevant before comparing proposed values or author verdicts. Prior author read-scope, API-access observations, pending-review statements and no-reproduction disclosures are retained historical process metadata; this receipt does not independently attest those prior actions, retry endpoints, establish live dataset access, or use them as primary scientific evidence. No underlying experiment, corpus recount, ownership-rights, labor, consent or operational outcome audit is claimed. Exact new scientific digest only; this is not an approval or transfer of old receipts. Adversarial review remains separate.",
+      "reviewed_on": "2026-11-10T15:45:38.365452Z",
+      "reviewer": "Codex independent source verifier /root/reference_ten_fresh_verifier; requested gpt-6.1-sol ultra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.ten.v1.source.07.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.01"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.01": "a1a6ac0e2b958a0617c0a301341c5695dd986ec3f56f0ad38fc0d044a202d6e2"
+      },
+      "id": "review.source-verifier.repair.binding.ten.v1.08",
+      "invocation_id": "reference-binding-repair-ten-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p2 Introduction explicitly describes collecting real users prompts/preferences, two generated images and preferred-image-or-tie labels. Marked pypdf lines40-48 include the whole relation and reproduce the original hash and644 lines/12pages. The retained scientific scope is the NeurIPS2023 v1 study, without asserting present corpus access. Independent source-first review of the complete assertion value, subject/predicate/object relation, all source-factual qualifications, version/body identity, literal excerpt and declared extraction/page/line coordinates. Pinned primary bytes were independently extracted and physical pages visually inspected where relevant before comparing proposed values or author verdicts. Prior author read-scope, API-access observations, pending-review statements and no-reproduction disclosures are retained historical process metadata; this receipt does not independently attest those prior actions, retry endpoints, establish live dataset access, or use them as primary scientific evidence. No underlying experiment, corpus recount, ownership-rights, labor, consent or operational outcome audit is claimed. Exact new scientific digest only; this is not an approval or transfer of old receipts. Adversarial review remains separate.",
+      "reviewed_on": "2026-11-10T15:45:38.365452Z",
+      "reviewer": "Codex independent source verifier /root/reference_ten_fresh_verifier; requested gpt-6.1-sol ultra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.ten.v1.source.08.1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.cohort3.claim.dclm.final-model-mixture"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.cohort3.claim.dclm.final-model-mixture": "4cd52a9e4903186ac3a52a9ed28ad1f628324a86d65a0eb3385e96d858a8bfee"
+      },
+      "id": "review.source-verifier.repair.binding.ten.v1.09",
+      "invocation_id": "reference-binding-repair-ten-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "Physical p11 Section5 explicitly combines DCLM-BASELINE with StarCoder andProofPile2, adds a math-enriched annealing stage and context extension; physical p12 Table9 headers and final row identify7B,2.6T tokens,MMLU63.7. Physical p1 Abstract reports64%, supporting the rounding qualifier. The attribution qualification is supported by the named mixture and training changes, not merely a bare StarCoder token. Independent source-first review of the complete assertion value, subject/predicate/object relation, all source-factual qualifications, version/body identity, literal excerpt and declared extraction/page/line coordinates. Pinned primary bytes were independently extracted and physical pages visually inspected where relevant before comparing proposed values or author verdicts. Prior author read-scope, API-access observations, pending-review statements and no-reproduction disclosures are retained historical process metadata; this receipt does not independently attest those prior actions, retry endpoints, establish live dataset access, or use them as primary scientific evidence. No underlying experiment, corpus recount, ownership-rights, labor, consent or operational outcome audit is claimed. Exact new scientific digest only; this is not an approval or transfer of old receipts. Adversarial review remains separate.",
+      "reviewed_on": "2026-11-10T15:45:38.365452Z",
+      "reviewer": "Codex independent source verifier /root/reference_ten_fresh_verifier; requested gpt-6.1-sol ultra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.ten.v1.source.09.1",
+        "repair.binding.ten.v1.source.09.2",
+        "repair.binding.ten.v1.source.09.3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration"
+      ],
+      "assertion_sha256": {
+        "repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration": "acd416df2e5e774cbb08d9d21d2ce8eaa9fe7dc10053893e38d4eb1a7d22b7b4"
+      },
+      "id": "review.source-verifier.repair.binding.ten.v1.10",
+      "invocation_id": "reference-binding-repair-ten-source-verifier-v1-2026-11-10",
+      "method": "source_content_review",
+      "note": "The captured FrontierSWE Benchmark Design paragraph explicitly links Proximal collaboration with academic/industry partners includingModular,PrimeIntellect,ThoughtfulLab to problem curation; Acknowledgements says developed by the Proximal team and names the same partners. These complete relation-bearing contexts support Proximal creates FrontierSWE and the named-collaborator qualifier. The mixed v2banner/first-release counts are outside this assertion and no task-count inference is made. Independent source-first review of the complete assertion value, subject/predicate/object relation, all source-factual qualifications, version/body identity, literal excerpt and declared extraction/page/line coordinates. Pinned primary bytes were independently extracted and physical pages visually inspected where relevant before comparing proposed values or author verdicts. Prior author read-scope, API-access observations, pending-review statements and no-reproduction disclosures are retained historical process metadata; this receipt does not independently attest those prior actions, retry endpoints, establish live dataset access, or use them as primary scientific evidence. No underlying experiment, corpus recount, ownership-rights, labor, consent or operational outcome audit is claimed. Exact new scientific digest only; this is not an approval or transfer of old receipts. Adversarial review remains separate.",
+      "reviewed_on": "2026-11-10T15:45:38.365452Z",
+      "reviewer": "Codex independent source verifier /root/reference_ten_fresh_verifier; requested gpt-6.1-sol ultra (runtime model identity not independently attested)",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "repair.binding.ten.v1.source.10.1",
+        "repair.binding.ten.v1.source.10.2"
+      ],
+      "verdict": "pass"
+    }
+  ],
+  "schema_version": "1.0.0",
+  "sources": [
+    {
+      "captured_on": "2026-11-10T12:07:22Z",
+      "excerpt": "for voting-based label estimation and downsample 32 responses per prompt for training.",
+      "excerpt_sha256": "7540ead0caf3ffe400d1373a9124bcecb95a45332088333609cd4e0ee6dc628d",
+      "id": "repair.binding.ten.v1.source.01.1",
+      "license": null,
+      "locator": "Section 3.1 Implementation Details; physical PDF p7, per-page pdftotext-layout lines 6-15 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 7 -l 7 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/ttrl.physical-p007.layout.txt; page-text SHA-256 fad3b051c5671dc7c8bbdbf4383fa849edd15e4000f33a6f17feead24d2acc3b. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2504.16084v3; URL https://arxiv.org/pdf/2504.16084v3; response SHA-256 3828cc886a0133749fe857dc12fff190f76c17dd7421dccfca01c96ec1dd5882. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": "2025-06-30",
+      "publisher": "arXiv (author-deposited versioned preprint; not publisher VoR byte-verified)",
+      "response_sha256": "3828cc886a0133749fe857dc12fff190f76c17dd7421dccfca01c96ec1dd5882",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "TTRL: Test-Time Reinforcement Learning",
+      "url": "https://arxiv.org/pdf/2504.16084v3",
+      "version": "2504.16084v3"
+    },
+    {
+      "captured_on": "2026-11-10T12:07:22Z",
+      "excerpt": "sampling. Specifically, we generate 16 responses (4 for 32k context) per question using a",
+      "excerpt_sha256": "fe609d7d9aeb39953f681cca6ba1c17eb0980a619cb392dec3fc03e86b13b815",
+      "id": "repair.binding.ten.v1.source.01.2",
+      "license": null,
+      "locator": "Section 3.1 Evaluation Setup; binds qualification that evaluation sampling uses separate counts; physical PDF p6, per-page pdftotext-layout lines 44-60 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 6 -l 6 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/ttrl.physical-p006.layout.txt; page-text SHA-256 49a4bfd055c0d902997ce1cbe6600d31a4120321636bb74892fb1abaf7f990ef. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2504.16084v3; URL https://arxiv.org/pdf/2504.16084v3; response SHA-256 3828cc886a0133749fe857dc12fff190f76c17dd7421dccfca01c96ec1dd5882. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": "2025-06-30",
+      "publisher": "arXiv (author-deposited versioned preprint; not publisher VoR byte-verified)",
+      "response_sha256": "3828cc886a0133749fe857dc12fff190f76c17dd7421dccfca01c96ec1dd5882",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "TTRL: Test-Time Reinforcement Learning",
+      "url": "https://arxiv.org/pdf/2504.16084v3",
+      "version": "2504.16084v3"
+    },
+    {
+      "captured_on": "2026-11-10T09:10:20.259529Z",
+      "excerpt": "the current CoT solutions may lack sufﬁcient detail.",
+      "excerpt_sha256": "3c65e9f397d97dddb1b53b907dc87329a61acae040f27a8138e780385588b7d9",
+      "id": "repair.binding.ten.v1.source.02.1",
+      "license": null,
+      "locator": "Synthetic Data Validation and Improving CoT Solutions for Complex Problems bullets; pypdf 6.10.0 marked global text lines 524-531 (1-based inclusive), physical PDF p12. UTF-8 text artifact site/output/research-next/reference-binding-repair-ten-author/source-first/numinamath.pypdf-global.txt; extracted-text SHA-256 1eafde410e61dd6e20921dad861c42fb81a36e2edd02629678f9bef0bb4c6e4e; 727 lines and 16 physical PDF pages. Exact Python recipe (import pypdf and pathlib.Path; INPUT.pdf is the downloaded pinned PDF filename): reader = pypdf.PdfReader('INPUT.pdf'); pieces = [f'=== PDF PAGE {i} ===\\n' + (page.extract_text() or '') for i, page in enumerate(reader.pages, 1)]; text = '\\n'.join(pieces) + '\\n'; Path('TEXT.txt').write_bytes(text.encode('utf-8')); line coordinates use text.splitlines(). Page markers, the inter-page newline join, and the final newline are included in the text hash. Pinned source version 712e1abbcbcf870dccf4c6a3e7837e2967bd7d7f; URL https://raw.githubusercontent.com/project-numina/aimo-progress-prize/712e1abbcbcf870dccf4c6a3e7837e2967bd7d7f/report/numina_dataset.pdf; response SHA-256 613b93a38d0fdc24bc2bf4866a9b78a1eaab3855956d273253b461982054c4f6. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "project-numina/aimo-progress-prize",
+      "response_sha256": "613b93a38d0fdc24bc2bf4866a9b78a1eaab3855956d273253b461982054c4f6",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "NuminaMath creator report/numina_dataset.pdf",
+      "url": "https://raw.githubusercontent.com/project-numina/aimo-progress-prize/712e1abbcbcf870dccf4c6a3e7837e2967bd7d7f/report/numina_dataset.pdf",
+      "version": "712e1abbcbcf870dccf4c6a3e7837e2967bd7d7f"
+    },
+    {
+      "captured_on": "2026-11-10T09:31:39.367495Z",
+      "excerpt": "a benchmark that evaluates the ability of AI agents to perform",
+      "excerpt_sha256": "87dd879726fbb87a67c1816fd59e930841609d5510225ee0d991585372f0edad",
+      "id": "repair.binding.ten.v1.source.03.1",
+      "license": null,
+      "locator": "Introducing Horizon-SWE paragraph; relation-bearing benchmark introduction on Polymath's source; captured HTML parsed with BeautifulSoup 4.14.3 using html.parser, remove script/style/noscript elements, then soup.get_text('\\n', strip=True) + '\\n', encoded UTF-8. Text artifact site/output/research-next/reference-binding-repair-ten-author/source-first/polymath.html-visible.txt; extracted-text SHA-256 a646a51bde5184e420c7f2048b930dacc5b4836c725210d0e91bffbec8a6eb4e; visible-text lines 62-69 (1-based inclusive, Python str.splitlines()). Exact literal anchor also occurs in captured raw HTML: true. Pinned source version response-sha256:6bee82d9f5b2ed107faa27dc2c26fec39fe768835a299eff04ac154da47c85c7; URL https://polymathlabs.ai/blog/horizon-swe; response SHA-256 6bee82d9f5b2ed107faa27dc2c26fec39fe768835a299eff04ac154da47c85c7. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "Polymath",
+      "response_sha256": "6bee82d9f5b2ed107faa27dc2c26fec39fe768835a299eff04ac154da47c85c7",
+      "source_type": "provider_documentation",
+      "status": "captured",
+      "title": "Polymath",
+      "url": "https://polymathlabs.ai/blog/horizon-swe",
+      "version": "response-sha256:6bee82d9f5b2ed107faa27dc2c26fec39fe768835a299eff04ac154da47c85c7"
+    },
+    {
+      "captured_on": "2026-11-10T09:51:45Z",
+      "excerpt": "human evaluation for Figs. 2 and 5.",
+      "excerpt_sha256": "20783a1995f1b692fccd38eb92c0c36f7a3b6c17f9e6e49a07bac7362df44de3",
+      "id": "repair.binding.ten.v1.source.04.1",
+      "license": null,
+      "locator": "Appendix C continuation, left column; one-author evaluator role; physical PDF p8, per-page pdftotext-layout lines 1-10 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 8 -l 8 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/languagefeedback.physical-p008.layout.txt; page-text SHA-256 cfb7dc2d1689921a6a48e39bbacc88c6177b68bfe5213618ba0639e61e3d76f7. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2204.14146v1; URL https://arxiv.org/pdf/2204.14146v1; response SHA-256 7f0316658554df7a538ca89a6e44438c36cf31c9bc76b0246964b42f4824ee0d. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "arXiv (author-deposited versioned preprint)",
+      "response_sha256": "7f0316658554df7a538ca89a6e44438c36cf31c9bc76b0246964b42f4824ee0d",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "Learning from Natural Language Feedback",
+      "url": "https://arxiv.org/pdf/2204.14146v1",
+      "version": "2204.14146v1"
+    },
+    {
+      "captured_on": "2026-11-10T09:51:45Z",
+      "excerpt": "Finetuning We finetune GPT-3 (175B; Brown",
+      "excerpt_sha256": "87bd0ab5dd9324823955fc0dfdf6bfa7518653092bedb81c94cd7e99f4a8b563",
+      "id": "repair.binding.ten.v1.source.04.2",
+      "license": null,
+      "locator": "Figure 2 labels/caption, Finetuning, Evaluation and Main Results; fine-tuned-model comparison description; physical PDF p3, per-page pdftotext-layout lines 19-77 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 3 -l 3 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/languagefeedback.physical-p003.layout.txt; page-text SHA-256 2848f5a53461f660d44dd73bc575b75a1b86f467df8b5e2d55f5f5b2b4f323f6. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2204.14146v1; URL https://arxiv.org/pdf/2204.14146v1; response SHA-256 7f0316658554df7a538ca89a6e44438c36cf31c9bc76b0246964b42f4824ee0d. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "arXiv (author-deposited versioned preprint)",
+      "response_sha256": "7f0316658554df7a538ca89a6e44438c36cf31c9bc76b0246964b42f4824ee0d",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "Learning from Natural Language Feedback",
+      "url": "https://arxiv.org/pdf/2204.14146v1",
+      "version": "2204.14146v1"
+    },
+    {
+      "captured_on": "2026-11-10T09:51:45Z",
+      "excerpt": "Figure 5: Win rate of our learning algorithm over InstructGPT",
+      "excerpt_sha256": "1dacc50cb5c874f53f579e388a9fdb9f458d296f07ed85c7fb25cd700a2422a9",
+      "id": "repair.binding.ten.v1.source.04.3",
+      "license": null,
+      "locator": "Figure 5 chart labels/caption; includes GPT-3 finetuned alternatives; physical PDF p7, per-page pdftotext-layout lines 43-52 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 7 -l 7 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/languagefeedback.physical-p007.layout.txt; page-text SHA-256 2375a578245d37514b74e2ad09a68b1078fb5d5dba08fcd1e5014eb83c83d71a. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2204.14146v1; URL https://arxiv.org/pdf/2204.14146v1; response SHA-256 7f0316658554df7a538ca89a6e44438c36cf31c9bc76b0246964b42f4824ee0d. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "arXiv (author-deposited versioned preprint)",
+      "response_sha256": "7f0316658554df7a538ca89a6e44438c36cf31c9bc76b0246964b42f4824ee0d",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "Learning from Natural Language Feedback",
+      "url": "https://arxiv.org/pdf/2204.14146v1",
+      "version": "2204.14146v1"
+    },
+    {
+      "captured_on": "2026-11-10T09:10:21.766987Z",
+      "excerpt": "Diffusion 2.1, Dreamlike Photoreal 2.0",
+      "excerpt_sha256": "67a0fa68956bab0bb9143b223600d2ecd291deb659473158e9280dabd42a6717",
+      "id": "repair.binding.ten.v1.source.05.1",
+      "license": null,
+      "locator": "Section 2 Pick-a-Pic Dataset; backbone model enumeration; pypdf 6.10.0 marked global text lines 91-102 (1-based inclusive), physical PDF p3. UTF-8 text artifact site/output/research-next/reference-binding-repair-ten-author/source-first/pickapic.pypdf-global.txt; extracted-text SHA-256 09f3e1271f5636690eace950ebf4752c62e06995ceedd1a6ce156a9485c24db3; 644 lines and 12 physical PDF pages. Exact Python recipe (import pypdf and pathlib.Path; INPUT.pdf is the downloaded pinned PDF filename): reader = pypdf.PdfReader('INPUT.pdf'); pieces = [f'=== PDF PAGE {i} ===\\n' + (page.extract_text() or '') for i, page in enumerate(reader.pages, 1)]; text = '\\n'.join(pieces) + '\\n'; Path('TEXT.txt').write_bytes(text.encode('utf-8')); line coordinates use text.splitlines(). Page markers, the inter-page newline join, and the final newline are included in the text hash. Pinned source version NeurIPS2023-73aacd8b3b05b4b503d58310b523553c-Paper-Conference; URL https://papers.neurips.cc/paper_files/paper/2023/file/73aacd8b3b05b4b503d58310b523553c-Paper-Conference.pdf; response SHA-256 b83f0f8b9bc43413a8a9d2a3e2d511a7ef13bd847e7d735f961f8caa79562b9a. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "NeurIPS 2023 proceedings",
+      "response_sha256": "b83f0f8b9bc43413a8a9d2a3e2d511a7ef13bd847e7d735f961f8caa79562b9a",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "Pick-a-Pic creator paper.pdf",
+      "url": "https://papers.neurips.cc/paper_files/paper/2023/file/73aacd8b3b05b4b503d58310b523553c-Paper-Conference.pdf",
+      "version": "NeurIPS2023-73aacd8b3b05b4b503d58310b523553c-Paper-Conference"
+    },
+    {
+      "captured_on": "2026-11-10T11:25:15Z",
+      "excerpt": "Head sample and random sample For each data source, we identified and selected the top 2k web",
+      "excerpt_sha256": "37601a1afb6372941cc1452cf6019067e72c110095ec3d12a7122e70d4266244",
+      "id": "repair.binding.ten.v1.source.06.1",
+      "license": null,
+      "locator": "Data sources plus Head sample and random sample; binds all three named corpora, token ranking, HeadAll and HeadC4 distinction; physical PDF p3, per-page pdftotext-layout lines 33-56 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 3 -l 3 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/consentcrisis.physical-p003.layout.txt; page-text SHA-256 6fc5e63045b2df5b900bfa2413a626494d64739d3535f090ca0434d6d4c0813c. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2407.14933v1; URL https://arxiv.org/pdf/2407.14933v1; response SHA-256 890f0591edfaf9938f9e72046b1d7fe2c476c94a9911712921bde59b5dd9cf38. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": "2024-07-20",
+      "publisher": "arXiv (author-deposited versioned preprint)",
+      "response_sha256": "890f0591edfaf9938f9e72046b1d7fe2c476c94a9911712921bde59b5dd9cf38",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "Consent in Crisis: The Rapid Decline of the AI Data Commons",
+      "url": "https://arxiv.org/pdf/2407.14933v1",
+      "version": "2407.14933v1"
+    },
+    {
+      "captured_on": "2026-11-10T10:05:15.127390Z",
+      "excerpt": "|               | train_sft | test_sft |",
+      "excerpt_sha256": "78ffd8028d4e40b9b6b390e0ce0b3514d937767513d6a639fce5a9477aad0066",
+      "id": "repair.binding.ten.v1.source.07.1",
+      "license": null,
+      "locator": "README.md, Data Splits; raw UTF-8 source lines 118-120 (1-based inclusive, Python str.splitlines()); includes train_sft/test_sft column headers, separator, and no_robots row so both count-to-split relations are explicit. Raw response artifact site/output/research-next/reference-binding-repair-ten-author/source-bytes/norobots.response; raw text bytes are the pinned response, without normalization or extraction. Pinned source version e6f9a4ac5c37faeb744ba9ecf0473184d7f8105b; URL https://huggingface.co/datasets/HuggingFaceH4/no_robots/raw/e6f9a4ac5c37faeb744ba9ecf0473184d7f8105b/README.md; response SHA-256 22b642520e082ba1a6c4a93047bd5946aeca099763c6f2d11b59d91e61e79186. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "HuggingFaceH4/no_robots",
+      "response_sha256": "22b642520e082ba1a6c4a93047bd5946aeca099763c6f2d11b59d91e61e79186",
+      "source_type": "dataset_card",
+      "status": "captured",
+      "title": "No Robots — README.md",
+      "url": "https://huggingface.co/datasets/HuggingFaceH4/no_robots/raw/e6f9a4ac5c37faeb744ba9ecf0473184d7f8105b/README.md",
+      "version": "e6f9a4ac5c37faeb744ba9ecf0473184d7f8105b"
+    },
+    {
+      "captured_on": "2026-11-10T09:10:21.766987Z",
+      "excerpt": "our dataset includes a prompt, two generated images, and a label indicating the preferred image, or a",
+      "excerpt_sha256": "d5567b8aadc1d4c450dd6707ca2627ce556c7b6c049e67c25a5396bd1d83f24d",
+      "id": "repair.binding.ten.v1.source.08.1",
+      "license": null,
+      "locator": "Introduction; real user prompts/preferences, image pair, and tie option; pypdf 6.10.0 marked global text lines 40-48 (1-based inclusive), physical PDF p2. UTF-8 text artifact site/output/research-next/reference-binding-repair-ten-author/source-first/pickapic.pypdf-global.txt; extracted-text SHA-256 09f3e1271f5636690eace950ebf4752c62e06995ceedd1a6ce156a9485c24db3; 644 lines and 12 physical PDF pages. Exact Python recipe (import pypdf and pathlib.Path; INPUT.pdf is the downloaded pinned PDF filename): reader = pypdf.PdfReader('INPUT.pdf'); pieces = [f'=== PDF PAGE {i} ===\\n' + (page.extract_text() or '') for i, page in enumerate(reader.pages, 1)]; text = '\\n'.join(pieces) + '\\n'; Path('TEXT.txt').write_bytes(text.encode('utf-8')); line coordinates use text.splitlines(). Page markers, the inter-page newline join, and the final newline are included in the text hash. Pinned source version NeurIPS2023-73aacd8b3b05b4b503d58310b523553c-Paper-Conference; URL https://papers.neurips.cc/paper_files/paper/2023/file/73aacd8b3b05b4b503d58310b523553c-Paper-Conference.pdf; response SHA-256 b83f0f8b9bc43413a8a9d2a3e2d511a7ef13bd847e7d735f961f8caa79562b9a. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "NeurIPS 2023 proceedings",
+      "response_sha256": "b83f0f8b9bc43413a8a9d2a3e2d511a7ef13bd847e7d735f961f8caa79562b9a",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "Pick-a-Pic creator paper.pdf",
+      "url": "https://papers.neurips.cc/paper_files/paper/2023/file/73aacd8b3b05b4b503d58310b523553c-Paper-Conference.pdf",
+      "version": "NeurIPS2023-73aacd8b3b05b4b503d58310b523553c-Paper-Conference"
+    },
+    {
+      "captured_on": "2026-11-10T07:39:35Z",
+      "excerpt": "with the StarCoder [88] and ProofPile2 [13] data to arrive at a 4.1T token dataset. We",
+      "excerpt_sha256": "15273a99452780d0a39b66ffbf9af5d2f0915e770b1a247f3894def7a493d25e",
+      "id": "repair.binding.ten.v1.source.09.1",
+      "license": null,
+      "locator": "Section 5 mixture, math-enriched annealing and context extension; physical PDF p11, per-page pdftotext-layout lines 16-27 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 11 -l 11 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/dclm.physical-p011.layout.txt; page-text SHA-256 37c916907d0fa3291ac31fff1954e46f021bb595a627229be7967b54f3ac6b35. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2406.11794v1; URL https://arxiv.org/pdf/2406.11794v1; response SHA-256 f19ea7fda1bf30fd9fe877ef6996c2dbc7f84538d813903b66a7bb7ff8f38bc0. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "arXiv (author-deposited preprint)",
+      "response_sha256": "f19ea7fda1bf30fd9fe877ef6996c2dbc7f84538d813903b66a7bb7ff8f38bc0",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "DataComp-LM: In search of the next generation of training sets for language models",
+      "url": "https://arxiv.org/pdf/2406.11794v1",
+      "version": "2406.11794v1"
+    },
+    {
+      "captured_on": "2026-11-10T07:39:35Z",
+      "excerpt": "DCLM- BASELINE           7B       2.6T         ✓       57.1      63.7        45.4",
+      "excerpt_sha256": "b4dc3640bf1a1a7ab3f6bd70c6b67249d2e917d4b4d6016811c8b8d8bf32c46c",
+      "id": "repair.binding.ten.v1.source.09.2",
+      "license": null,
+      "locator": "Table 9 complete caption, column headers and final-model rows; exact 63.7 MMLU at 7B/2.6T; physical PDF p12, per-page pdftotext-layout lines 1-25 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 12 -l 12 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/dclm.physical-p012.layout.txt; page-text SHA-256 72cba359abca40c3790a2b9557d6ab213966d24b40b8cb5c5681783f7fa7fd3e. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2406.11794v1; URL https://arxiv.org/pdf/2406.11794v1; response SHA-256 f19ea7fda1bf30fd9fe877ef6996c2dbc7f84538d813903b66a7bb7ff8f38bc0. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "arXiv (author-deposited preprint)",
+      "response_sha256": "f19ea7fda1bf30fd9fe877ef6996c2dbc7f84538d813903b66a7bb7ff8f38bc0",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "DataComp-LM: In search of the next generation of training sets for language models",
+      "url": "https://arxiv.org/pdf/2406.11794v1",
+      "version": "2406.11794v1"
+    },
+    {
+      "captured_on": "2026-11-10T07:39:35Z",
+      "excerpt": "to 64% 5-shot accuracy on MMLU with 2.6T training tokens.",
+      "excerpt_sha256": "332d53e1061690e11956f087fa40842c7a56911dd86d684695ebb9c37775024c",
+      "id": "repair.binding.ten.v1.source.09.3",
+      "license": null,
+      "locator": "Abstract; paper headline 64% explicitly stated, paired with Table 9's unrounded 63.7; physical PDF p1, per-page pdftotext-layout lines 38-43 (1-based, inclusive). Extract using Poppler pdftotext 26.10.0: pdftotext -f 1 -l 1 -layout INPUT.pdf PAGE.txt; UTF-8 PAGE.txt line numbers are Python str.splitlines() indices plus 1, including blank lines. Page extraction artifact site/output/research-next/reference-binding-repair-ten-author/source-first/dclm.physical-p001.layout.txt; page-text SHA-256 bd8536c0f670159ecb6c5639a825b9fb807c1a209e4e7a9d5ffd5e48ac56ad52. Page is the PDF physical page from the PDF page tree; do not count whole-document form-feed glyphs as physical page boundaries. Pinned source version 2406.11794v1; URL https://arxiv.org/pdf/2406.11794v1; response SHA-256 f19ea7fda1bf30fd9fe877ef6996c2dbc7f84538d813903b66a7bb7ff8f38bc0. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "arXiv (author-deposited preprint)",
+      "response_sha256": "f19ea7fda1bf30fd9fe877ef6996c2dbc7f84538d813903b66a7bb7ff8f38bc0",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "DataComp-LM: In search of the next generation of training sets for language models",
+      "url": "https://arxiv.org/pdf/2406.11794v1",
+      "version": "2406.11794v1"
+    },
+    {
+      "captured_on": "2026-11-10T09:30:35.307958Z",
+      "excerpt": "to curate problems that experts outside of Proximal are uniquely aware of.",
+      "excerpt_sha256": "7edebe9b0241ef52e76ddcb458e8048c36dd5ca7d81774e84fd4055efefc3a56",
+      "id": "repair.binding.ten.v1.source.10.1",
+      "license": null,
+      "locator": "FrontierSWE introduction and Benchmark Design; includes curation collaboration relation and named partners; captured HTML parsed with BeautifulSoup 4.14.3 using html.parser, remove script/style/noscript elements, then soup.get_text('\\n', strip=True) + '\\n', encoded UTF-8. Text artifact site/output/research-next/reference-binding-repair-ten-author/source-first/proximal.html-visible.txt; extracted-text SHA-256 d10e4f3314f07f01ee0fb6a450f9b380f9cbf729cb2e88b16f0fae51061d62c5; visible-text lines 29-38 (1-based inclusive, Python str.splitlines()). Exact literal anchor also occurs in captured raw HTML: true. Pinned source version response-sha256:95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba; URL https://www.proximal.ai/blog/frontierswe/; response SHA-256 95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "Proximal",
+      "response_sha256": "95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba",
+      "source_type": "provider_documentation",
+      "status": "captured",
+      "title": "FrontierSWE",
+      "url": "https://www.proximal.ai/blog/frontierswe/",
+      "version": "response-sha256:95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba"
+    },
+    {
+      "captured_on": "2026-11-10T09:30:35.307958Z",
+      "excerpt": "FrontierSWE is developed by the Proximal team in collaboration with external collaborators from academia and industry.",
+      "excerpt_sha256": "f0c7de2d57948a591b8ae83edd4ae60c7767f0d2acb5af24f24c9f8e73259b8b",
+      "id": "repair.binding.ten.v1.source.10.2",
+      "license": null,
+      "locator": "Acknowledgements; direct development-by-Proximal relation and named collaboration partners; captured HTML parsed with BeautifulSoup 4.14.3 using html.parser, remove script/style/noscript elements, then soup.get_text('\\n', strip=True) + '\\n', encoded UTF-8. Text artifact site/output/research-next/reference-binding-repair-ten-author/source-first/proximal.html-visible.txt; extracted-text SHA-256 d10e4f3314f07f01ee0fb6a450f9b380f9cbf729cb2e88b16f0fae51061d62c5; visible-text lines 379-386 (1-based inclusive, Python str.splitlines()). Exact literal anchor also occurs in captured raw HTML: true. Pinned source version response-sha256:95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba; URL https://www.proximal.ai/blog/frontierswe/; response SHA-256 95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba. Binding clarification authored 2026-11-10T15:35:41.846248Z; existing capture, no new network retrieval.",
+      "published_on": null,
+      "publisher": "Proximal",
+      "response_sha256": "95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba",
+      "source_type": "provider_documentation",
+      "status": "captured",
+      "title": "FrontierSWE",
+      "url": "https://www.proximal.ai/blog/frontierswe/",
+      "version": "response-sha256:95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba"
+    }
+  ]
+}

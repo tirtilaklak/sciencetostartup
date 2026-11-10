@@ -13,15 +13,21 @@ and `/review/` accepts source-backed corrections, section review and reuse.
 Essential content and downloads work without JavaScript. Both site search
 implementations link directly to native research and organization pages.
 
-The comprehensive weekly series is **prelaunch**. Its reviewed baseline contains
-173 approved assertions, 12 substantive chapters and six evidence-bound executive
-findings. Source assertions received separate author, source-verifier and
-adversarial AI reviews; the exact report then received separate evidence-auditor
-and adversarial synthesis reviews. Coverage is eight qualifying suppliers, eight
-full-source paper works, eight dataset families, five benchmark families and eight
-of the 39 existing organization inclusion audits. Scoped evidence records (194)
-represent 75 distinct pinned document versions. Eight disputed assertions remain
-quarantined. Historical field-guide evidence retains its dates and labels.
+The comprehensive weekly series is **prelaunch**. The recorded integration
+checkpoint at commit `5b414bd` contains 959 approved assertions: 43 qualifying suppliers, 72 reviewed
+paper works, 45 dataset families, 21 benchmark families and 25 of the 39 existing
+organization inclusion dispositions. Its 991 scoped evidence records represent
+334 distinct captured document versions. Every approved assertion has separate
+author, source-verifier and adversarial AI source-content reviews at its exact
+digest. Reading scopes remain explicit; this does not imply cover-to-cover paper
+reading, experiment reproduction or an operational supplier audit.
+
+The expanded report synthesis, its independent content reviews and its matching
+PDF/archive are unfinished. The earlier frozen 173-assertion report has 12 chapters,
+six executive findings and its own synthesis reviews; those receipts and prepared
+bytes cannot approve this expanded graph. Historical field-guide evidence retains
+its real dates and labels. Unresolved dataset-family boundaries remain pending and
+do not inflate coverage.
 
 This is not a comprehensive market census. The frozen core and both real
 200-record launch audits are still outstanding. No published edition, human peer
@@ -35,6 +41,13 @@ schemas, JSON/CSV/SQLite exports, checksums and a standalone reproduction packag
 The optional PDF preparation uses ReportLab; ordinary builds only verify and
 copy its prepared bytes and require no network, credentials or extra Python
 packages. Independent source review is identified as **Separate AI review**.
+
+The committed prepared-package registry selects a frozen compressed archive,
+including a readable offline evidence appendix. New packages bind every owned
+schema, validator, reproducer and license; verified published editions retain
+their exact pinned recipe for historical replay. Builders verify and copy frozen
+bytes, without regenerating their PDF, SQLite projection or ZIP. Publication and
+website preparation reject any file above Cloudflare's 25 MiB static asset limit.
 
 Daily preparation targets 16:00 Pacific; the sole weekly release check targets
 Monday 09:00, with the preceding Friday 17:00 captured-source cutoff. Native

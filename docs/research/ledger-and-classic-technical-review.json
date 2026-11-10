@@ -1,0 +1,44 @@
+{
+  "schema_version": "sciencetostartup-technical-review-summary-1",
+  "review_type": "separate AI technical review",
+  "scientific_approval": false,
+  "whole_release_approval": false,
+  "reviews": [
+    {
+      "scope": "Stable static evidence ledger partitions, native links, complete compact company supplements and report print/find/history behavior",
+      "reviewed_source_commit": "50e28983b6cb9b399cecfb1d83a00b157bfe5ab8",
+      "candidate_build_id": "47d7110218f6237796de",
+      "sealed_on": "2026-11-10T19:02:29.209789Z",
+      "verdict": "pass",
+      "handoff_sha256": "5d6966b20681359f952faf1a6043f3e19c28ecce9312fb8ba0ad0d58bee808ff",
+      "checks": {
+        "unit_tests": 62,
+        "record_and_link_invariants": 10846,
+        "reviewed_static_components": 646
+      },
+      "limitations": [
+        "No explorer prefetch or performance approval",
+        "Final generated artifact requires exact-build, browser and mobile gates"
+      ]
+    },
+    {
+      "scope": "Removing esbuild keepNames from classic-script transforms while preserving public property keys and ordered global overrides",
+      "candidate_build_id": "796a5ed81f5b5eae63d8",
+      "sealed_on": "2026-11-10T19:16:02.279942Z",
+      "verdict": "pass",
+      "handoff_sha256": "b759e1b63886e23118fc2c6370dd0acfdb06794e584df37ef1dc802c7880fdcf",
+      "checks": {
+        "frontend_unit_tests": 9,
+        "artifact_checks": 707,
+        "company_runtime_parity_records": 39
+      },
+      "limitations": [
+        "Function.name and debug stack labels may change",
+        "No Function.name dispatch consumers found",
+        "Minimal VM parity is not whole-browser startup proof",
+        "No performance or whole-release approval"
+      ]
+    }
+  ],
+  "evidence_retention": "Full technical handoffs and source/variant probes are retained by the publisher; this public summary excludes private filesystem paths."
+}

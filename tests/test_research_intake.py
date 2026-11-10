@@ -111,18 +111,17 @@ class ResearchIntakeTests(unittest.TestCase):
             self.assertEqual(starts, [0])
             self.assertEqual(results[0]["attempted"][0]["discovery_generation"], 2)
 
-    def test_rolling_oai_query_stays_frozen_until_its_last_page(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            row = {"id": "oai-updates", "adapter": "oai", "query": "2026-10-26", "limit": 2}
-            self.run_pages(temporary, [9], row=row)
-            next_day = {**row, "query": "2026-10-27"}
-            starts, results = self.run_pages(temporary, [10], row=next_day)
-            self.assertEqual(starts, [2])
-            self.assertEqual(results[0]["attempted"][0]["partition"]["query"], row["query"])
-            self.assertEqual(results[0]["completed_partitions"], 1)
-            starts, results = self.run_pages(temporary, [11], row={**row, "query": "2026-10-28"})
-            self.assertEqual(starts, [0])
-            self.assertEqual(results[0]["attempted"][0]["partition"]["query"], "2026-10-28")
+    def test_oai_priority_retains_a_fair_queue_for_old_years(self):
+        rows = [{"id": "oai-updates", "adapter": "oai"}] + [
+            {"id": "arxiv-" + str(year), "adapter": "arxiv"} for year in range(2026, 2019, -1)]
+        previous, visited = {}, set()
+        for attempt in range(7):
+            selected = select_partitions(rows, previous, 2)
+            self.assertEqual(selected[0]["id"], "oai-updates")
+            visited.add(selected[1]["id"])
+            for row in selected:
+                previous[row["id"]] = {"attempted_at": str(attempt)}
+        self.assertEqual(visited, {"arxiv-" + str(year) for year in range(2020, 2027)})
 
 
 if __name__ == "__main__":

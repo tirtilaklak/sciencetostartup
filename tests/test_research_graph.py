@@ -82,6 +82,37 @@ class ResearchGraphTests(unittest.TestCase):
         rg.validate_graph(graph)
         self.assertEqual(rg.coverage_summary(graph)["reviewed_papers"], 1)
 
+    def test_completed_legacy_audit_preserves_unresolved_commercial_status(self):
+        graph = fixture()
+        org = graph['entities'][0]
+        org.update(kind='organization', identifiers={}, legacy_id='test_only_legacy',
+                   status='candidate', disposition='pending')
+        graph['assertions'][0]['predicate'] = 'documents'
+        for review in graph['reviews']:
+            review['assertion_sha256'] = {'claim': rg.assertion_digest(graph['assertions'][0])}
+        counts = rg.coverage_summary(graph)
+        self.assertEqual(counts['legacy_inclusion_audits'], 1)
+        self.assertEqual(counts['legacy_dispositions'], 0)
+        self.assertEqual(counts['qualifying_suppliers'], 0)
+        self.assertEqual(counts['launch_floors']['legacy_inclusion_audits'], 39)
+        self.assertEqual(org['disposition'], 'pending')
+        self.assertFalse(counts['coverage_floors_met'])
+
+    def test_legacy_audit_requires_deep_owned_approved_evidence_and_three_roles(self):
+        graph = fixture()
+        graph['entities'][0].update(kind='organization', identifiers={}, legacy_id='test_only_legacy',
+                                    status='candidate', disposition='pending', review_depth='metadata')
+        graph['assertions'][0]['predicate'] = 'documents'
+        for review in graph['reviews']:
+            review['assertion_sha256'] = {'claim': rg.assertion_digest(graph['assertions'][0])}
+        self.assertEqual(rg.coverage_summary(graph)['legacy_inclusion_audits'], 0)
+        graph['entities'][0]['review_depth'] = 'full_source'
+        graph['assertions'][0]['status'] = 'candidate'
+        self.assertEqual(rg.coverage_summary(graph)['legacy_inclusion_audits'], 0)
+        graph['assertions'][0]['status'] = 'approved'
+        graph['assertions'][0]['review_ids'].remove('adversarial')
+        self.assert_invalid(graph)
+
     def test_abstracts_do_not_count_as_deeply_reviewed_papers(self):
         graph = fixture()
         graph["entities"][0]["review_depth"] = "abstract"
@@ -114,6 +145,36 @@ class ResearchGraphTests(unittest.TestCase):
         self.assertEqual(exported["assertions"], [])
         self.assertEqual(exported["reviews"], [])
         self.assertNotIn("Synthetic test observation", rg.stable_json(exported))
+
+    def test_scientific_token_identifier_keeps_exact_public_review_bindings(self):
+        graph = fixture()
+        identifier = 'claim.token-format'
+        graph['assertions'][0]['id'] = identifier
+        graph['entities'][0]['assertion_ids'] = [identifier]
+        expected = rg.assertion_digest(graph['assertions'][0])
+        for review in graph['reviews']:
+            review['assertion_ids'] = [identifier]
+            review['assertion_sha256'] = {identifier: expected}
+        rg.validate_graph(graph)
+        projected = rg.public_graph(graph)
+        self.assertEqual(projected['assertions'], graph['assertions'])
+        for review in projected['reviews']:
+            self.assertEqual(review['assertion_sha256'], {identifier: expected})
+        with tempfile.TemporaryDirectory() as folder:
+            rg.write_exports(graph, Path(folder))
+            exported = json.loads((Path(folder) / 'research-graph.json').read_text())
+            self.assertEqual(exported, projected)
+
+    def test_binding_key_exception_does_not_preserve_private_fields_or_values(self):
+        graph = fixture()
+        graph['entities'][0]['identifiers']['api_token'] = 'synthetic-private-value'
+        projected = rg.public_graph(graph)
+        self.assertNotIn('api_token', projected['entities'][0]['identifiers'])
+        self.assertEqual(rg._redact({'assertion_sha256': {'token-format': 'test'}}),
+                         {'assertion_sha256': {}})
+        graph['reviews'][0]['assertion_sha256']['claim'] = 'ghp_' + 'a' * 24
+        with self.assertRaises(rg.GraphValidationError):
+            rg.public_graph(graph)
 
     def test_single_invocation_cannot_impersonate_reviewers(self):
         graph = fixture()
@@ -178,6 +239,19 @@ class ResearchGraphTests(unittest.TestCase):
         graph["entities"].append(duplicate)
         self.assert_invalid(graph, "duplicate paper work")
 
+    def test_pmlr_published_work_needs_no_invented_arxiv_or_doi_and_deduplicates_urls(self):
+        graph = fixture()
+        graph['entities'][0]['identifiers'] = {'pmlr': 'v70/shi17a'}
+        rg.validate_graph(graph)
+        self.assertEqual(rg.coverage_summary(graph)['reviewed_papers'], 1)
+        for identifier in ('https://proceedings.mlr.press/v70/shi17a.html',
+                           'https://proceedings.mlr.press/v70/shi17a/shi17a.pdf'):
+            with self.subTest(identifier=identifier):
+                duplicate = entity('paper.duplicate', identifiers={'pmlr': identifier}, assertion_ids=[])
+                self.assert_invalid({**graph, 'entities': graph['entities'] + [duplicate]}, 'duplicate paper work')
+        graph['entities'][0]['identifiers']['pmlr'] = 'v70/../unverified'
+        self.assert_invalid(graph, 'PMLR volume/publication key')
+
     def test_dataset_versions_do_not_inflate_family_counts(self):
         graph = fixture()
         graph["entities"] = [entity("paper", "dataset", family_id="family", identifiers={})]
@@ -216,6 +290,68 @@ class ResearchGraphTests(unittest.TestCase):
         self.assertEqual(rg.coverage_summary(graph)["core_disposition_rate"], 1.0)
         graph["coverage"]["frozen_core"]["sha256"] = "a" * 64
         self.assert_invalid(graph, "core hash mismatch")
+
+    def test_core_work_disposition_uses_reviewed_exact_version_without_copying_claims(self):
+        graph = fixture()
+        graph['entities'][0].update(kind='paper_work', assertion_ids=[], eligible_core=True)
+        graph['entities'].append(entity('paper.v1', kind='paper_version', parent_id='paper',
+                                        identifiers={'arxiv': '2203.02155v1'}))
+        graph['assertions'][0]['subject_id'] = 'paper.v1'
+        for review in graph['reviews']:
+            review['assertion_sha256'] = {'claim': rg.assertion_digest(graph['assertions'][0])}
+        graph['coverage']['frozen_core'] = {'entity_ids': ['paper'], 'frozen_on': '2026-11-08T00:00:00Z',
+            'source_cutoff': '2026-11-07T17:00:00Z', 'sha256': rg.digest(rg.stable_json(['paper']))}
+        self.assertEqual(rg.coverage_summary(graph)['core_disposition_rate'], 1.0)
+        self.assertEqual(graph['entities'][0]['assertion_ids'], [])
+        baseline = copy.deepcopy(graph)
+        for entity_index in (0, 1):
+            for field, value in (('review_depth', 'abstract'), ('status', 'candidate'), ('disposition', 'pending')):
+                altered = copy.deepcopy(baseline)
+                altered['entities'][entity_index][field] = value
+                self.assertEqual(rg.coverage_summary(altered)['core_dispositioned'], 0, (entity_index, field))
+        graph['assertions'][0]['status'] = 'candidate'
+        self.assertEqual(rg.coverage_summary(graph)['core_dispositioned'], 0)
+
+    def test_frozen_core_cannot_inflate_units_with_paper_versions(self):
+        graph = fixture()
+        graph['entities'].append(entity('paper.v2', kind='paper_version', identifiers={'arxiv':'2203.02155v2'},
+                                        parent_id='paper', assertion_ids=[], eligible_core=True))
+        graph['coverage']['frozen_core'] = {'entity_ids': ['paper.v2'], 'frozen_on': '2026-11-08T00:00:00Z',
+            'source_cutoff': '2026-11-07T17:00:00Z', 'sha256': rg.digest(rg.stable_json(['paper.v2']))}
+        self.assert_invalid(graph, 'versions and releases cannot inflate disposition')
+
+    def test_core_disposition_requires_substantive_review_and_preserves_supported_exclusions(self):
+        graph = fixture()
+        graph['entities'][0]['eligible_core'] = True
+        graph['coverage']['frozen_core'] = {'entity_ids': ['paper'], 'frozen_on': '2026-11-08T00:00:00Z',
+            'source_cutoff': '2026-11-07T17:00:00Z', 'sha256': rg.digest(rg.stable_json(['paper']))}
+        baseline = copy.deepcopy(graph)
+        for field, value in (('review_depth', 'abstract'), ('status', 'candidate'), ('disposition', 'pending')):
+            altered = copy.deepcopy(baseline)
+            altered['entities'][0][field] = value
+            self.assertEqual(rg.coverage_summary(altered)['core_dispositioned'], 0, field)
+        graph['entities'][0].update(status='excluded', disposition='excluded')
+        summary = rg.coverage_summary(graph)
+        self.assertEqual(summary['core_dispositioned'], 1)
+        self.assertEqual(summary['reviewed_papers'], 0)
+        graph['assertions'][0]['status'] = 'candidate'
+        self.assertEqual(rg.coverage_summary(graph)['core_dispositioned'], 0)
+
+    def test_supplier_relationship_alone_cannot_certify_an_artifact_dossier(self):
+        graph = fixture()
+        graph['entities'][0]['eligible_core'] = True
+        graph['entities'].append(entity('supplier', kind='supplier', identifiers={}))
+        claim = graph['assertions'][0]
+        claim.update(subject_id='supplier', object_id='paper', value=None, predicate='supplies_data_for')
+        for review in graph['reviews']:
+            review['assertion_sha256'] = {'claim': rg.assertion_digest(claim)}
+        graph['coverage']['frozen_core'] = {'entity_ids': ['paper'], 'frozen_on': '2026-11-08T00:00:00Z',
+            'source_cutoff': '2026-11-07T17:00:00Z', 'sha256': rg.digest(rg.stable_json(['paper']))}
+        for status, disposition in (('approved','included'),('excluded','excluded'),('historical','historical_only')):
+            graph['entities'][0].update(status=status, disposition=disposition)
+            counts = rg.coverage_summary(graph)
+            self.assertEqual(counts['core_dispositioned'], 0, disposition)
+            self.assertEqual(counts['reviewed_papers'], 0, disposition)
 
     def test_private_extensions_are_removed_and_free_text_email_redacted(self):
         graph = fixture()

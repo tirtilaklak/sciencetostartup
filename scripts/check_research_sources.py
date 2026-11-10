@@ -65,8 +65,14 @@ def check_public_url(url, hosts=None, resolver=socket.getaddrinfo):
         raise ValueError("public credential-free HTTPS URL without fragment required")
     if hosts is not None and parsed.hostname not in hosts:
         raise ValueError("redirect/source host outside explicitly allowed public hosts")
+    parameters = urllib.parse.parse_qsl(parsed.query)
+    # This is a public pagination cursor, not an authentication token. Keep the
+    # exception specific to the documented arXiv ListRecords continuation URL.
+    oai_cursor = (parsed.hostname == "oaipmh.arxiv.org" and parsed.path == "/oai"
+                  and len(parameters) == 2 and dict(parameters).get("verb") == "ListRecords"
+                  and set(dict(parameters)) == {"verb", "resumptionToken"})
     if any(re.search(r"token|secret|password|signature|credential|api.?key|auth", key, re.I)
-           for key, _ in urllib.parse.parse_qsl(parsed.query)):
+           and not (oai_cursor and key == "resumptionToken") for key, _ in parameters):
         raise ValueError("credential-bearing URL forbidden")
     addresses = resolver(parsed.hostname, 443, type=socket.SOCK_STREAM)
     if not addresses or any(not ipaddress.ip_address(row[4][0]).is_global for row in addresses):
@@ -275,19 +281,43 @@ def parse_arxiv(body):
     return rows, None
 
 
+class OAIError(ValueError):
+    def __init__(self, codes):
+        self.codes = set(codes)
+        super().__init__("OAI endpoint error: " + "; ".join(sorted(self.codes)))
+
+
+def oai_candidate_rank(value):
+    versions = [int(version["version"][1:]) for version in value.get("versions", [])
+                if re.fullmatch(r"v\d+", str(version.get("version", "")))]
+    return (value.get("metadata_datestamp") or "", value.get("metadata_status") == "deleted", max(versions, default=0))
+
+
 def parse_oai(body):
     xml = ET.fromstring(body)
     errors = xml.findall("{*}error")
+    codes = {e.get("code", "unknown") for e in errors}
+    if codes == {"noRecordsMatch"}:
+        return [], None
     if errors:
-        raise ValueError("OAI endpoint error: " + "; ".join(e.get("code", "unknown") for e in errors))
+        raise OAIError(codes)
+    if xml.find("{*}ListRecords") is None:
+        raise ValueError("OAI ListRecords response required")
     rows = []
     for record in xml.findall(".//{*}record"):
         header = record.find("{*}header")
+        if header is None or not header.findtext("{*}identifier") or not header.findtext("{*}datestamp"):
+            raise ValueError("OAI record needs identifier and modification datestamp")
         if header is not None and header.get("status") == "deleted":
+            identifier = header.findtext("{*}identifier", "").removeprefix("oai:arXiv.org:")
+            candidate = _candidate("oai", identifier, "Deleted arXiv metadata record", "https://arxiv.org/abs/" + identifier, {"arxiv": identifier})
+            candidate.update(metadata_status="deleted", metadata_datestamp=header.findtext("{*}datestamp"),
+                             date_note="OAI datestamp is the metadata deletion date; this is a review candidate, not a graph deletion.")
+            rows.append(candidate)
             continue
         metadata = record.find("{*}metadata")
         if metadata is None:
-            continue
+            raise ValueError("OAI record missing metadata")
         identifier = metadata.findtext(".//{*}id")
         title = metadata.findtext(".//{*}title")
         if identifier and title:
@@ -295,8 +325,11 @@ def parse_oai(body):
             candidate["versions"] = [{"version": version.get("version"), "date": version.findtext("{*}date"),
                                       "size": version.findtext("{*}size")} for version in metadata.findall(".//{*}version")]
             candidate["metadata_datestamp"] = header.findtext("{*}datestamp") if header is not None else None
+            candidate["metadata_status"] = "present"
             candidate["date_note"] = "OAI datestamp is a metadata modification date; version history dates are not replaced by it."
             rows.append(candidate)
+        else:
+            raise ValueError("OAI metadata missing identifier or title")
     token = xml.findtext(".//{*}resumptionToken")
     return rows, token.strip() if token and token.strip() else None
 
@@ -352,7 +385,16 @@ def discovery_url(adapter, query, limit, cursor=None):
         params = {"search_query": query, "start": cursor or "0", "max_results": limit, "sortBy": "submittedDate", "sortOrder": "descending"}
         return "https://export.arxiv.org/api/query?" + urllib.parse.urlencode(params)
     if adapter == "oai":
-        params = {"verb": "ListRecords", "resumptionToken": cursor} if cursor else {"verb": "ListRecords", "metadataPrefix": "arXivRaw", "from": query}
+        dates = query.split("/")
+        if not cursor and (len(dates) not in {1, 2} or any(not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value) for value in dates)):
+            raise ValueError("OAI query must be YYYY-MM-DD or inclusive YYYY-MM-DD/YYYY-MM-DD")
+        for value in dates if not cursor else []:
+            datetime.strptime(value, "%Y-%m-%d")
+        if len(dates) == 2 and dates[0] > dates[1]:
+            raise ValueError("OAI from must not exceed until")
+        params = {"verb": "ListRecords", "resumptionToken": cursor} if cursor else {"verb": "ListRecords", "metadataPrefix": "arXivRaw", "from": dates[0]}
+        if not cursor and len(dates) == 2:
+            params["until"] = dates[1]
         return "https://oaipmh.arxiv.org/oai?" + urllib.parse.urlencode(params)
     if adapter == "acl":
         if not re.fullmatch(r"(?:\d{4}\.[a-z0-9-]+|[A-Z]\d{2})", query):
@@ -376,21 +418,43 @@ def discover(client, adapter, query, *, limit=50, pages=1, window=None):
     window = window or now()[:10]
     query_key = sha256((adapter + "\0" + query + "\0" + str(limit) + "\0" + window).encode())
     progress = client.state.setdefault("cursors", {}).get(query_key, {"next": None, "complete": False, "candidates": [], "receipts": []})
+    requests_made, restarted = 0, False
+    progress.pop("retry_reason", None)
     if not progress["complete"]:
         for _ in range(pages):
             url = discovery_url(adapter, query, limit, progress["next"])
             receipt, body = client.get(url)
+            requests_made += 1
             progress["receipts"].append(receipt)
             if receipt.get("result") not in {"retrieved", "unchanged"}:
+                progress["retry_reason"] = "request_" + receipt.get("result", "unknown")
                 client.state["cursors"][query_key] = progress
                 client.save()
                 break
-            if adapter == "acl":
-                rows, cursor = parse_acl(body, query)
-            else:
-                rows, cursor = {"arxiv": parse_arxiv, "oai": parse_oai, "huggingface": parse_huggingface, "crossref": parse_crossref}[adapter](body)
+            try:
+                if adapter == "acl":
+                    rows, cursor = parse_acl(body, query)
+                else:
+                    rows, cursor = {"arxiv": parse_arxiv, "oai": parse_oai, "huggingface": parse_huggingface, "crossref": parse_crossref}[adapter](body)
+            except OAIError as error:
+                if error.codes != {"badResumptionToken"} or not progress["next"]:
+                    raise
+                # Never change the captured date range or discard already parsed
+                # candidates. Re-fetching its first page is safe after expiry.
+                progress["next"] = None
+                progress["token_restarts"] = progress.get("token_restarts", 0) + 1
+                progress["retry_reason"] = "expired_oai_token_restart_same_query"
+                client.state["cursors"][query_key] = progress
+                client.save()
+                if restarted:
+                    break
+                restarted = True
+                continue
+            progress.pop("retry_reason", None)
             existing = {r["id"]: r for r in progress["candidates"]}
-            existing.update({r["id"]: r for r in rows})
+            for row in rows:
+                if adapter != "oai" or row["id"] not in existing or oai_candidate_rank(row) >= oai_candidate_rank(existing[row["id"]]):
+                    existing[row["id"]] = row
             progress["candidates"] = sorted(existing.values(), key=lambda r: r["id"])
             if adapter == "arxiv" and len(rows) >= limit:
                 cursor = str(int(progress["next"] or "0") + len(rows))
@@ -401,7 +465,9 @@ def discover(client, adapter, query, *, limit=50, pages=1, window=None):
                     client.url_checker(cursor, client.hosts)
                 if len(rows) >= limit and not cursor:
                     progress["truncated"] = True
-            if (not cursor or cursor == progress["next"]) and not progress.get("truncated"):
+            if cursor and cursor == progress["next"]:
+                progress["retry_reason"] = "repeated_cursor_requires_operator_attention"
+            elif not cursor and not progress.get("truncated"):
                 progress["complete"] = True
             progress["next"] = cursor
             client.state["cursors"][query_key] = progress
@@ -410,10 +476,14 @@ def discover(client, adapter, query, *, limit=50, pages=1, window=None):
                 break
             if progress.get("truncated"):
                 break
+            if progress.get("retry_reason") == "repeated_cursor_requires_operator_attention":
+                break
     return {"schema_version": "1.0.0", "generated_at": now(), "status": "candidates_only", "approved": False,
             "facts_modified": False, "adapter": adapter, "query": query, "window": window,
             "complete": progress["complete"], "truncated": progress.get("truncated", False),
             "next_cursor": progress["next"], "candidates": progress["candidates"], "receipts": progress["receipts"],
+            "requests_made": requests_made, "token_restarts": progress.get("token_restarts", 0),
+            "retry_reason": progress.get("retry_reason"),
             "limitations": ["Metadata matching is discovery only; it establishes no supplier contribution, dataset provenance, rights or paper review.",
                              "Completeness refers only to this adapter query and dated window. A full page without next-page metadata remains truncated."] if adapter == "huggingface" else ["Metadata matching is discovery only; no factual approvals or review dates are changed.", "Completeness refers only to this adapter query and dated window, not the eligible research universe."]}
 

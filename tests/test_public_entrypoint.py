@@ -85,7 +85,16 @@ class PublicEntrypointTests(unittest.TestCase):
         for company in companies:
             self.assertIn(ORIGIN + "/company/" + company["id"] + "/", locs)
             self.assertTrue((self.dist / "company" / company["id"] / "index.html").is_file(), company["id"])
-        self.assertEqual(len(list(root.iter(namespace + "lastmod"))), len(locs), "Every URL carries lastmod")
+        from artifact_verification import verify_undated_research_metadata
+        from research_graph import load_graph
+        graph = load_graph(ROOT)
+        for entry in root:
+            loc = entry.findtext(namespace + "loc")
+            modified = entry.findtext(namespace + "lastmod")
+            if modified is None:
+                verify_undated_research_metadata(self.dist, loc, graph)
+            else:
+                self.assertRegex(modified, r'^\d{4}-\d{2}-\d{2}$', loc)
         manifest = json.loads((self.dist / "manifest.json").read_text())["sha256"]
         robots_raw = (self.dist / "robots.txt").read_bytes()
         self.assertEqual(robots_raw, (ROOT / "web/robots.txt").read_bytes())

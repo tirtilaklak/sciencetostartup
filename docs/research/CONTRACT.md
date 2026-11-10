@@ -47,11 +47,14 @@ Pure new modules and their focused tests belong to the relevant workstream.
 
 An approved assertion has stable subject/predicate/object or typed value,
 source/version-specific evidence and locator, qualifications and actual AI review
-receipts. Candidate records never count as deeply reviewed. A provider's public
+receipts. Candidate assertions and metadata-only discoveries do not count as
+deeply reviewed evidence. A completed organization audit may leave commercial
+qualification unresolved; that entity adds no qualifying supplier or disposed
+frozen-core coverage. A provider's public
 capability does not establish its contribution to a particular dataset/paper.
 Historical evidence retains its original source and review dates.
 
-Launch floors: 39 legacy organization dispositions, 60 qualifying suppliers,
+Launch floors: inclusion audits of all 39 legacy organizations, 60 qualifying suppliers,
 150 distinct reviewed paper works, 60 dataset families, 20 benchmark families,
 90% frozen eligible core disposition, source-anchored 200-assertion quality
 holdout (98% precision/95% recall, no critical false attribution), and separate

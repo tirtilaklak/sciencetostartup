@@ -1,8 +1,39 @@
 {
-  "context_sha256": "ca5ad0779bad654c45c72bad9d219aff6a0e84d7401964c75b095dcc0f1d106b",
-  "release_id": "research-2026-11-09.prelaunch.3",
-  "renderer": "ReportLab with embedded Bitstream Vera",
+  "context_contract_version": 3,
+  "context_sha256": "d3e5652844b221ac4086065c529b9e4e675b9946ce845cd772d5d3d42c597591",
+  "font_assets": {
+    "CJK-OFL.txt": {
+      "bytes": 4388,
+      "sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9"
+    },
+    "CJK-PROVENANCE.json": {
+      "bytes": 2888,
+      "sha256": "f5074d8855a72b17777858a7ab8ba1090040d8a58bf3a86c2f7fc40dfaab62bb"
+    },
+    "DejaVu-LICENSE.txt": {
+      "bytes": 8816,
+      "sha256": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93"
+    },
+    "DejaVu-PROVENANCE.json": {
+      "bytes": 1243,
+      "sha256": "0f260c81923ee15bda00505af0e5378b78f6ca8a51901e43180a83687292b873"
+    },
+    "DejaVuSans-Bold.ttf": {
+      "bytes": 705684,
+      "sha256": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724"
+    },
+    "DejaVuSans.ttf": {
+      "bytes": 757076,
+      "sha256": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954"
+    },
+    "ScienceToStartupCJKSubset.ttf": {
+      "bytes": 2376,
+      "sha256": "37f8f1a6db368902ee4a7f09cbb2ad7c9dd4c8ab61763ec6de431450f0811b16"
+    }
+  },
+  "release_id": "research-2026-11-10.prelaunch.1",
+  "renderer": "ReportLab with embedded DejaVu Sans 2.37 and Noto Sans SC derived CJK subset",
   "schema_version": 1,
-  "sha256": "ad2a76d373c6cdfd73322b55f7c3a3d2286b1303dd26ac3c9eb9ab4efe3e3202",
+  "sha256": "ad3e80619b45edde081f0d51e92ea34416971d5faba0392aa022839bc4fff8eb",
   "verification": "Rendering and text inspection are required before archival publication."
 }

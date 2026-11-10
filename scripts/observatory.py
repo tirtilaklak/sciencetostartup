@@ -693,10 +693,10 @@ def load_work_routes(path, data):
 REDESIGN_CSS = ("profiles-v2.css", "work-v4.css", "investor.css", "edition.css", "business-health.css", "site-nav.css", "overview.css", "directory.css", "profiles-v3.css", "work-v5.css", "method.css", "refresh.css", "field-guide.css")
 # Scripts concatenated after work-v3.js and before initialize(); later declarations replace earlier ones.
 # business-health.js runs as soon as it loads and reads app.js constants, so it comes last, after every declaration.
-PRESENTATION_JS = ("work-v4.js", "profiles-v2.js", "source-updates.js", "site-nav.js", "business-health.js")
+PRESENTATION_JS = ("work-v4.js", "profiles-v2.js", "source-updates.js", "site-nav.js", "detail-views.js", "source-update-details.js", "profile-details.js", "business-health.js")
 # Keep the logical source order above for full-context/VM checks. The overview
 # workbench is registered separately and initialized only by the route loader.
-INITIAL_PRESENTATION_JS = tuple(name for name in PRESENTATION_JS if name != "business-health.js")
+INITIAL_PRESENTATION_JS = tuple(name for name in PRESENTATION_JS if name not in {"detail-views.js", "source-update-details.js", "profile-details.js", "business-health.js"})
 # Presentation data ships as JSON text that is parsed on first read. JSON parses much faster than the
 # same data compiled as a JavaScript object, and a page that never reads a dataset never parses it.
 LAZY_DATA = "(()=>{const lazy=(name,text)=>{let value,ready=false;Object.defineProperty(window,name,{configurable:true,enumerable:true,get(){if(!ready){ready=true;value=JSON.parse(text);text=null;}return value;},set(next){ready=true;value=next;text=null;}});};"
@@ -713,7 +713,8 @@ def lazy_data(name, value):
 
 def write_business_health_module(destination, build_id):
     """Emit a classic factory without running the workbench or touching the DOM."""
-    source = "window.SCIENCE_HEALTH_MODULE={buildId:" + json.dumps(build_id) + ",initialize:function(){\n" + (ROOT / "web/business-health.js").read_text() + "\n}};"
+    deferred = "\n".join((ROOT / 'web' / name).read_text() for name in ('detail-views.js', 'source-update-details.js', 'profile-details.js', 'business-health.js'))
+    source = "window.SCIENCE_HEALTH_MODULE={buildId:" + json.dumps(build_id) + ",initialize:function(){\n" + deferred + "\n}};"
     transformed = package_frontend(javascript={"health": source})["javascript"]["health"]
     # Independent classic transforms can generate similarly named helpers.
     # Isolate this module's minifier helpers; its public API is on window.
@@ -843,8 +844,8 @@ def build(data, destination):
         original_summary.unlink()
     bootstrap = json.dumps(summary["bootstrap"], ensure_ascii=False, separators=(",", ":"), sort_keys=True, allow_nan=False).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
     html = html.replace(embedded, bootstrap)
-    from presentation import health_skeleton, source_updates_context, rooted_assets
-    compact_sidecars = rooted_assets({**sidecars, "WORK_ROUTES": summary["work"], "PROFILE_CONTENT": {"entries": []}, "SOURCE_UPDATES": source_updates_context(source_updates), "COMPANY_EVENTS": {"version": company_events["version"], "events": []}, "LOGOS": {"logos": [{k: v for k, v in logo.items() if k in ("company_id", "local_path", "background")} for logo in logo_data["logos"]]}, "BUSINESS_HEALTH": health_skeleton(health)})
+    from presentation import compact_editorial, health_skeleton, source_updates_context, rooted_assets
+    compact_sidecars = rooted_assets({**sidecars, "EDITORIAL": compact_editorial(editorial), "WORK_ROUTES": summary["work"], "PROFILE_CONTENT": {"entries": []}, "SOURCE_UPDATES": source_updates_context(source_updates), "COMPANY_EVENTS": {"version": company_events["version"], "events": []}, "LOGOS": {"logos": [{k: v for k, v in logo.items() if k in ("company_id", "local_path", "background")} for logo in logo_data["logos"]]}, "BUSINESS_HEALTH": health_skeleton(health)})
     compact_sidecars.pop("RESEARCH_SEARCH", None)
     public_summary = {key: value for key, value in summary.items() if key not in ("bootstrap", "companies", "work")}
     public_summary["asset"] = summary_asset
@@ -892,20 +893,25 @@ def build(data, destination):
     from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health, business_health=health)
     if research_context is not None:
         from research_graph import write_exports
-        from research_citations import write_publication_assets
+        from research_citations import write_publication_assets, publication_asset_inventory
         from research_pages import write_research_pages, write_company_supplements
         write_exports(research_context["graph"], destination / "research/exports")
         research_context["publication_assets"] = write_publication_assets(research_context, destination)
+        inventory = publication_asset_inventory(destination / 'publication')
+        if inventory['oversized']:
+            raise ValueError('Publication files exceed the static asset limit: '
+                             + ', '.join(sorted(inventory['oversized']))
+                             + '. Prepare a compressed frozen package; keep every research record and export.')
         research_entries = write_research_pages(destination, research_context)
-        company_updates = {"https://sciencetostartup.com" + row['path']: row['lastmod']
+        company_updates = {"https://sciencetostartup.com" + row['path']: row.get('lastmod')
                            for row in write_company_supplements(destination, research_context)}
         import xml.etree.ElementTree as ET
         from static_pages import render_sitemap
         namespace = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
         sitemap = ET.parse(destination / "sitemap.xml").getroot()
         entries = [(node.findtext(namespace + "loc"), node.findtext(namespace + "lastmod")) for node in sitemap]
-        entries = [(url, max(modified, company_updates.get(url, modified))) for url, modified in entries]
-        entries += [("https://sciencetostartup.com" + entry["path"], entry["lastmod"]) for entry in research_entries]
+        entries = [(url, max(filter(None, [modified, company_updates.get(url)]), default=None)) for url, modified in entries]
+        entries += [("https://sciencetostartup.com" + entry["path"], entry.get("lastmod")) for entry in research_entries]
         if len({entry[0] for entry in entries}) != len(entries):
             raise ValueError("Duplicate canonical URL in research sitemap")
         (destination / "sitemap.xml").write_text(render_sitemap(entries), encoding="utf-8")

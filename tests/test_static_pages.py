@@ -250,10 +250,16 @@ class StaticPageTests(unittest.TestCase):
         newest = max(newest, context['report']['updated_on'], context['graph']['as_of'][:10])
         lastmods = {}
         for url in urls:
-            loc, lastmod = url.find(NAMESPACE + "loc").text, url.find(NAMESPACE + "lastmod").text
+            loc = url.find(NAMESPACE + "loc").text
+            lastmod = url.findtext(NAMESPACE + "lastmod")
+            if lastmod is None:
+                from artifact_verification import verify_undated_research_metadata
+                verify_undated_research_metadata(self.dist, loc, context['graph'])
+                continue
             lastmods[loc] = lastmod
             self.assertRegex(lastmod, r"^\d{4}-\d{2}-\d{2}$")
-            self.assertGreaterEqual(lastmod, self.data["meta"]["as_of"], loc)
+            if loc in legacy:
+                self.assertGreaterEqual(lastmod, self.data["meta"]["as_of"], loc)
             self.assertLessEqual(lastmod, newest, loc)
         # Events reviewed after the dataset change the pages that show them, and dateModified agrees with lastmod.
         for cid in {e["company_id"] for e in self.events["events"]} | {r for e in self.events["events"] for r in e["related_company_ids"]}:
@@ -308,7 +314,10 @@ class StaticPageTests(unittest.TestCase):
             self.assertEqual([(l.get("rel"), l.get("href")) for l in icons], ICONS, label)
             self.assertEqual(icons[0].get("type"), "image/svg+xml", label)
             self.assertIn(f'href="{ORIGIN}/explore/#corrections"', text, label)
-            self.assertNotIn("—", text, label)
+            # Publisher navigation follows the house style; exact third-party
+            # source titles and scientific qualifications retain their wording.
+            for chrome in re.findall(r'<(?:header|footer)\b.*?</(?:header|footer)>', text, re.S):
+                self.assertNotIn("—", chrome, label)
             for anchor in facts.anchors:
                 href = anchor.get("href", "")
                 if href.startswith("http") and not href.startswith(ORIGIN): self.assertEqual(anchor.get("class"), "ext", (label, href))

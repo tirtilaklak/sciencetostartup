@@ -1,8 +1,14 @@
 const { test, expect } = require('@playwright/test');
-const { readFileSync } = require('node:fs');
+const { readFileSync, mkdtempSync, writeFileSync, rmSync } = require('node:fs');
 const { resolve } = require('node:path');
+const { tmpdir } = require('node:os');
+const { pathToFileURL } = require('node:url');
 const { spawnSync } = require('node:child_process');
 const { createHash } = require('node:crypto');
+const { evidenceURL } = require('./research-ledger');
+
+// Keep failure evidence without repeatedly serializing the full offline ledger.
+test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
 
 const reportPath = '/research/state-of-ai-data-labs/';
 const categories = {
@@ -141,25 +147,45 @@ test.describe('complete research tables without JavaScript', () => {
       await expect(page.locator('[data-index-row]:visible')).toHaveCount(entities.length);
       await expect(page.locator('[data-index-count]')).toHaveText(`${entities.length} records`);
       await expect(page.getByRole('table')).toHaveAccessibleName('Evidence records. Taxonomy on candidate records is provisional.');
+      // JavaScript is disabled and all rows are already attached/visible. Read
+      // every rendered cell once, then retain every per-record assertion below.
+      // Hundreds of locator round trips otherwise consume the test deadline.
+      const records = await page.locator('[data-index-row]').evaluateAll(rows => rows.map(row => {
+        const header = row.querySelector('th');
+        const evidence = row.querySelector('[data-label="Evidence"] a');
+        return { id: row.querySelector('th .r-record-id')?.textContent,
+          headerTag: header?.tagName, headerScope: header?.getAttribute('scope'), headerText: header?.textContent,
+          review: row.querySelector('[data-label="Review"]')?.textContent,
+          type: row.querySelector('[data-label="Type"]')?.textContent,
+          taxonomy: row.querySelector('[data-label="Taxonomy"]')?.textContent,
+          titleHref: row.querySelector('th a')?.getAttribute('href'),
+          evidenceText: evidence?.textContent, evidenceHref: evidence?.getAttribute('href') };
+      }));
+      const rowHeaders = await page.getByRole('rowheader').evaluateAll(headers => headers.map(header => ({
+        rowId: header.closest('[data-index-row]')?.querySelector('th .r-record-id')?.textContent,
+        text: header.textContent })));
       for (const entity of entities) {
-        const row = page.locator('[data-index-row]').filter({ has: page.locator('th .r-record-id').filter({ hasText: new RegExp('^' + entity.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$') }) });
-        await expect(row).toHaveCount(1);
-        await expect(row.getByRole('rowheader')).toContainText(entity.name);
-        await expect(row.locator('[data-label="Review"]')).toContainText(labels[entity.status]);
-        await expect(row.locator('[data-label="Review"]')).toContainText((entity.review_depth || '').replaceAll('_', ' '));
-        await expect(row.locator('[data-label="Type"]')).toHaveText(entity.kind.replaceAll('_', ' '));
+        const matching = records.filter(row => row.id === entity.id);
+        expect(matching, entity.id).toHaveLength(1);
+        const row = matching[0];
+        expect({ tag: row.headerTag, scope: row.headerScope }, entity.id + ' native rowheader').toEqual({ tag: 'TH', scope: 'row' });
+        const accessibleHeaders = rowHeaders.filter(header => header.rowId === entity.id);
+        expect(accessibleHeaders, entity.id + ' accessible rowheader').toHaveLength(1);
+        expect(normalize(accessibleHeaders[0].text), entity.id).toContain(normalize(entity.name));
+        expect(normalize(row.review), entity.id).toContain(labels[entity.status]);
+        expect(normalize(row.review), entity.id).toContain((entity.review_depth || '').replaceAll('_', ' '));
+        expect(normalize(row.type), entity.id).toBe(entity.kind.replaceAll('_', ' '));
         const taxonomy = facets.filter(name => values(entity, name).length).map(name => `${name.replaceAll('_', ' ')}: ${values(entity, name).join(', ')}`).join('; ');
-        await expect(row.locator('[data-label="Taxonomy"]')).toHaveText(taxonomy || 'Not recorded');
+        expect(normalize(row.taxonomy), entity.id).toBe(taxonomy || 'Not recorded');
         const scope = new Set([entity.id]);
         if (['paper', 'paper_work', 'dataset', 'dataset_family', 'benchmark', 'benchmark_family'].includes(entity.kind)) {
           graph.entities.filter(item => item.parent_id === entity.id).forEach(item => scope.add(item.id));
         }
         const approved = graph.assertions.filter(assertion => assertion.status === 'approved' && (scope.has(assertion.subject_id) || scope.has(assertion.object_id)));
-        const titleLink = row.locator('th a');
-        const href = await titleLink.getAttribute('href');
+        const href = row.titleHref;
         expect(href).toMatch(new RegExp(`^/research/${category}/[^/#]+/$`));
-        await expect(row.locator('[data-label="Evidence"] a')).toHaveText(`${approved.length} approved assertions`);
-        await expect(row.locator('[data-label="Evidence"] a')).toHaveAttribute('href', href + '#approved-findings');
+        expect(normalize(row.evidenceText), entity.id).toBe(`${approved.length} approved assertions`);
+        expect(row.evidenceHref, entity.id).toBe(href + '#approved-findings');
       }
       const first = page.locator('[data-index-row] th a').first();
       const href = await first.getAttribute('href');
@@ -296,19 +322,95 @@ test.describe('legacy evidence remains independently readable', () => {
       await expect(record.locator('.r-kicker')).toContainText('Approved evidence · As of');
       const date = await record.locator('.r-kicker').innerText();
       expect(date).toContain(assertion.as_of.slice(0, 4));
-      await expect(record.locator('.r-record-id a')).toHaveAttribute('href', '/research/data/#' + encodeURIComponent('assertion-' + assertion.id));
-      await expect(record.locator('.r-evidence-links li')).toHaveCount(assertion.evidence.length);
+      await expect(record.locator('.r-record-id a')).toHaveAttribute('href', evidenceURL('assertion', assertion.id));
       for (const qualification of assertion.qualifications || []) await expect(record).toContainText(qualification);
+      // The compact profile keeps each fact/scope and links its complete source
+      // bindings. Follow that native link and retain the original exact count.
+      await record.locator('.r-record-id a').click();
+      const full = page.locator('article.r-assertion' + selector('assertion-' + assertion.id));
+      await expect(full.locator('.r-evidence-links li')).toHaveCount(assertion.evidence.length);
+      const bindings = await full.locator('.r-evidence-links li').evaluateAll(items => items.map(item => ({
+        href: item.querySelector('a')?.getAttribute('href'), locator: item.querySelector('.r-source-locator')?.textContent })));
+      for (const [index, binding] of assertion.evidence.entries()) {
+        expect(bindings[index].href).toBe(evidenceURL('source', binding.source_id));
+        expect(normalize(bindings[index].locator)).toContain(normalize(binding.locator));
+      }
+      await page.goBack();
+      await expect(supplement).toBeVisible();
     }
   });
 });
 
-test('imported executive judgments retain stable anchors and approved evidence in HTML and offline archive', async ({ page, request, browser }, info) => {
+async function importedFindings(request) {
   const source = await getJSON(request, '/publication/source-context.json');
   const findings = source.report.executive_findings || [];
   test.skip(findings.length === 0, 'The tested artifact has no imported executive findings yet; run this case against the integrated report.');
   expect(source.gate.report_review_ready, 'Imported report judgments require completed report review').not.toBe(false);
-  const claims = new Map(source.graph.assertions.map(assertion => [assertion.id, assertion]));
+  return { source, findings, claims: new Map(source.graph.assertions.map(assertion => [assertion.id, assertion])) };
+}
+
+// These are separate behaviors with independent 30s budgets. Every finding,
+// judgment field, citation, native anchor reload and offline record stays tested.
+test('imported executive judgments retain complete content and approved evidence in HTML', async ({ page, request }) => {
+  const { findings, claims } = await importedFindings(request);
+  await page.goto(reportPath);
+  await expect(page.locator('.r-finding')).toHaveCount(findings.length);
+  for (const finding of findings) {
+    const id = 'finding-' + finding.id;
+    const article = page.locator(selector(id));
+    await expect(article).toHaveCount(1);
+    await expect(article.getByRole('heading', { level: 3 }).getByRole('link')).toHaveAttribute('href', '#' + id);
+    await expect(article).toContainText(normalize(text(finding.text)));
+    for (const [key, label] of Object.entries(judgmentFields)) {
+      if (!text(finding[key])) continue;
+      await expect(article.locator('dt', { hasText: new RegExp('^' + label + '$') })).toHaveCount(1);
+      await expect(article).toContainText(normalize(text(finding[key])));
+    }
+    for (const cid of finding.claim_ids) {
+      expect(claims.get(cid)?.status, cid).toBe('approved');
+      await expect(article.locator('.r-paragraph-citations').getByRole('link', { name: cid, exact: true }))
+        .toHaveAttribute('href', evidenceURL('assertion', cid));
+    }
+  }
+  const byPart = new Map();
+  for (const cid of new Set(findings.flatMap(finding => finding.claim_ids))) {
+    const path = evidenceURL('assertion', cid).split('#')[0];
+    byPart.set(path, [...(byPart.get(path) || []), cid]);
+  }
+  for (const [path, ids] of byPart) {
+    await page.goto(path);
+    const ledger = await page.locator('.r-assertion').evaluateAll(assertions => assertions.map(assertion => ({
+      id: assertion.id, kicker: assertion.querySelector('.r-kicker')?.textContent,
+      evidenceLinks: assertion.querySelectorAll('.r-evidence-links a').length })));
+    for (const cid of ids) {
+      const matching = ledger.filter(assertion => assertion.id === 'assertion-' + cid);
+      expect(matching, cid).toHaveLength(1);
+      expect(normalize(matching[0].kicker), cid).toContain('Approved evidence');
+      expect(matching[0].evidenceLinks, cid).toBeGreaterThan(0);
+    }
+  }
+});
+
+test('imported executive judgments retain stable native anchors after reload', async ({ page, request }) => {
+  const { findings } = await importedFindings(request);
+  // A direct native fragment must position correctly before any script or
+  // test-triggered scrolling; then every finding also survives reload.
+  const firstId = 'finding-' + findings[0].id;
+  await page.goto(reportPath + '#' + firstId);
+  await expect(page.locator(selector(firstId))).toBeInViewport();
+  await expect(page.locator('.r-finding')).toHaveCount(findings.length);
+  for (const finding of findings) {
+    const id = 'finding-' + finding.id;
+    const article = page.locator(selector(id));
+    await article.getByRole('heading', { level: 3 }).getByRole('link').click();
+    expect(decodeURIComponent(new URL(page.url()).hash)).toBe('#' + id);
+    await page.reload();
+    await expect(page.locator(selector(id))).toBeInViewport();
+  }
+});
+
+test('imported executive judgments retain approved evidence in the offline archive', async ({ request, browser }, info) => {
+  const { source, findings, claims } = await importedFindings(request);
   const htmlResponse = await request.get('/publication/report.html');
   const markdownResponse = await request.get('/publication/report.md');
   const archiveResponse = await request.get('/publication/research-archive.zip');
@@ -317,11 +419,11 @@ test('imported executive judgments retain stable anchors and approved evidence i
   expect(archiveResponse.ok()).toBeTruthy();
   const archive = await archiveResponse.body();
   // Use only Python's standard-library ZIP reader, with the actual downloaded bytes.
-  const extraction = spawnSync('python3', ['-c', 'import io,json,sys,zipfile\nz=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read()))\nprint(json.dumps({name:z.read(name).decode() for name in ["report.html","report.md","MANIFEST.json","source-context.json"]}))'], { input: archive, maxBuffer: 20 * 1024 * 1024 });
+  const extraction = spawnSync('python3', ['-c', 'import io,json,sys,zipfile\nz=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read()))\nprint(json.dumps({name:z.read(name).decode() for name in ["report.html","report.md","evidence.html","MANIFEST.json","source-context.json"]}))'], { input: archive, maxBuffer: 64 * 1024 * 1024 });
   expect(extraction.status, extraction.stderr?.toString()).toBe(0);
   const packaged = JSON.parse(extraction.stdout.toString());
   const inventory = JSON.parse(packaged['MANIFEST.json']);
-  for (const name of ['report.html', 'report.md', 'source-context.json']) {
+  for (const name of ['report.html', 'report.md', 'evidence.html', 'source-context.json']) {
     expect(createHash('sha256').update(packaged[name]).digest('hex'), name).toBe(inventory.files[name].sha256);
   }
   expect(packaged['report.html']).toBe(await htmlResponse.text());
@@ -329,48 +431,58 @@ test('imported executive judgments retain stable anchors and approved evidence i
   expect(JSON.parse(packaged['source-context.json'])).toEqual(source);
   await info.attach('executive-findings-archive.json', { body: Buffer.from(JSON.stringify({ findings: findings.map(finding => finding.id),
     archiveSHA256: createHash('sha256').update(archive).digest('hex') })), contentType: 'application/json' });
-  await page.goto(reportPath);
-  await expect(page.locator('.r-finding')).toHaveCount(findings.length);
-  const offlineContext = await browser.newContext({ javaScriptEnabled: false, offline: true });
+  const offlineContext = await browser.newContext({ javaScriptEnabled: false, offline: true, viewport: { width: 412, height: 915 } });
+  const offlineDirectory = mkdtempSync(resolve(tmpdir(), 'sts-research-archive-'));
   try {
+    for (const name of ['report.html', 'evidence.html']) writeFileSync(resolve(offlineDirectory, name), packaged[name]);
+    const unexpectedRequests = [];
+    await offlineContext.route(/^https?:\/\//, route => {
+      unexpectedRequests.push(route.request().url());
+      return route.abort();
+    });
     const offline = await offlineContext.newPage();
-    await offline.setContent(packaged['report.html']);
+    await offline.goto(pathToFileURL(resolve(offlineDirectory, 'report.html')).href);
+    const citedClaims = [...new Set(findings.flatMap(finding => finding.claim_ids))];
+    const citedNames = new RegExp('^(?:' + citedClaims.map(cid => cid.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')$');
+    // Query actual accessible link names once, retaining every matching occurrence.
+    const offlineLinkRecords = await offline.getByRole('link', { name: citedNames }).evaluateAll(links => links.map(link => ({
+      text: link.textContent.replace(/\s+/g, ' ').trim(), label: link.getAttribute('aria-label'),
+      labelledBy: link.getAttribute('aria-labelledby'), href: link.getAttribute('href') })));
+    for (const link of offlineLinkRecords) {
+      expect(link.labelledBy).toBeNull();
+      expect(citedClaims).toContain(link.label || link.text);
+    }
+    const offlineFindings = await offline.locator('article[id^="finding-"]').evaluateAll(articles => articles.map(article => ({
+      id: article.id, text: article.textContent.replace(/\s+/g, ' ').trim() })));
     for (const finding of findings) {
       const id = 'finding-' + finding.id;
-      const article = page.locator(selector(id));
-      await expect(article).toHaveCount(1);
-      await expect(article.getByRole('heading', { level: 3 }).getByRole('link')).toHaveAttribute('href', '#' + id);
-      await expect(article).toContainText(normalize(text(finding.text)));
-      await expect(offline.locator(selector(id))).toHaveCount(1);
+      const matching = offlineFindings.filter(article => article.id === id);
+      expect(matching, id).toHaveLength(1);
       expect(packaged['report.md']).toContain('<a id="' + id + '"></a>');
-      for (const [key, label] of Object.entries(judgmentFields)) {
-        if (!text(finding[key])) continue;
-        await expect(article.locator('dt', { hasText: new RegExp('^' + label + '$') })).toHaveCount(1);
-        await expect(article).toContainText(normalize(text(finding[key])));
-        await expect(offline.locator('main')).toContainText(normalize(text(finding[key])));
+      for (const key of Object.keys(judgmentFields)) {
+        if (text(finding[key])) expect(matching[0].text, id + ' ' + key).toContain(normalize(text(finding[key])));
       }
-      const expectedLinks = finding.claim_ids.map(cid => ({ id: cid, href: 'https://sciencetostartup.com/research/data/#' + encodeURIComponent('assertion-' + cid) }));
-      for (const { id: cid, href } of expectedLinks) {
+      for (const cid of finding.claim_ids) {
         expect(claims.get(cid)?.status, cid).toBe('approved');
-        await expect(article.locator('.r-paragraph-citations').getByRole('link', { name: cid, exact: true })).toHaveAttribute('href', new URL(href).pathname + new URL(href).hash);
-        const offlineLinks = offline.getByRole('link', { name: cid, exact: true });
-        expect(await offlineLinks.count(), cid).toBeGreaterThan(0);
-        for (const link of await offlineLinks.all()) await expect(link).toHaveAttribute('href', href);
-        expect(packaged['report.md']).toContain('[' + cid + '](' + href + ')');
+        const offlineLinks = offlineLinkRecords.filter(link => (link.label || link.text) === cid);
+        expect(offlineLinks.length, cid).toBeGreaterThan(0);
+        const localHref = 'evidence.html#' + encodeURIComponent('assertion-' + cid);
+        for (const link of offlineLinks) expect(link.href, cid).toBe(localHref);
+        expect(packaged['report.md']).toContain('[' + cid + '](' + localHref + ')');
       }
-      await article.getByRole('heading', { level: 3 }).getByRole('link').click();
-      expect(decodeURIComponent(new URL(page.url()).hash)).toBe('#' + id);
-      await page.reload();
-      await expect(page.locator(selector(id))).toBeInViewport();
     }
-    await page.goto('/research/data/');
-    for (const cid of new Set(findings.flatMap(finding => finding.claim_ids))) {
-      const assertion = page.locator(selector('assertion-' + cid));
-      await expect(assertion).toHaveCount(1);
-      await expect(assertion.locator('.r-kicker')).toContainText('Approved evidence');
-      expect(await assertion.locator('.r-evidence-links a').count(), cid).toBeGreaterThan(0);
-    }
+    await offline.locator(selector('finding-' + findings[0].id)).getByRole('link', { name: citedClaims[0], exact: true }).first().click();
+    await expect(offline).toHaveURL(pathToFileURL(resolve(offlineDirectory, 'evidence.html')).href + '#' + encodeURIComponent('assertion-' + citedClaims[0]));
+    // A native file URL commits before a large document finishes parsing.
+    // Batch only after load, preserving the old per-ID assertions' auto-wait.
+    await offline.waitForLoadState('load');
+    const offlineAssertionIds = await offline.locator('[id^="assertion-"]').evaluateAll(assertions => assertions.map(assertion => assertion.id));
+    for (const cid of citedClaims) expect(offlineAssertionIds.filter(id => id === 'assertion-' + cid), cid).toHaveLength(1);
+    expect(await offline.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+      'The complete offline appendix must fit a mobile viewport, including long record IDs and review notes').toBe(true);
+    expect(unexpectedRequests, 'Archived report and evidence must require no external requests').toEqual([]);
   } finally {
     await offlineContext.close();
+    rmSync(offlineDirectory, { recursive: true, force: true });
   }
 });

@@ -51,6 +51,39 @@ relabelled. An old archive receipt or reserved DOI is cleared when staging a new
 edition. Staging sets the report status to `prepared`, never `published`.
 Corrections to an already released edition use the separate revision process.
 
+## Frozen core continuity
+
+The first validated, nonempty `coverage.frozen_core.entity_ids` inventory is
+recorded as `core_frozen` in the shared scheduler journal **before** readiness is
+evaluated. This also happens while coverage is incomplete and the candidate is
+held. A gate interruption therefore cannot discard the declared denominator.
+The certificate records the actual sorted IDs, their frozen-core digest, the
+source graph digest, and an immutable source snapshot digest. Invalid graphs
+write no snapshot or journal state. The journal and referenced snapshots must be
+preserved together across daily preparations, catchups, and later editions.
+
+An unchanged inventory reuses its certificate, including after draft, source,
+review, or identity changes. A strict superset records `core_expanded`, bound to
+its exact validated graph and preceding inventory digest. Every previously
+frozen ID must remain in the declared universe: documented exclusions and
+historical-only dispositions do not remove IDs. Rewriting eligibility flags,
+freeze metadata, or the inventory hash cannot authorize a smaller inventory or
+return it to an unfrozen state. An ordinary job has no shrink override; a genuine
+scope correction needs an explicitly versioned methodology process.
+
+Before accepting an inventory, the scheduler also reconciles older journaled
+preparations, activations, or published snapshots that predate certificates.
+Their immutable source bindings establish the retained inventory; a new empty
+declaration cannot erase it. Divergent historical inventories require a validated
+source graph retaining their union. Missing, changed, or invalid historical
+sources stop processing for inspection.
+
+Coordinator approval, local activation (including `already_active` retries),
+and exports authorized by an archive receipt recheck the latest recorded
+inventory. A candidate prepared before a later expansion cannot authorize
+release until a new candidate retains the expanded scope. Read-only historical
+resolution and ordinary prepared exports still preserve the older frozen inputs.
+
 ## Exact identity, coordinator review, and retries
 
 Each candidate binds its edition date, report release, calendar window, and all
@@ -181,7 +214,7 @@ only when its local owner PID no longer exists. A malformed lock or a lock from
 another host requires inspection; age alone does not establish safe recovery.
 
 `journal.jsonl` is append-only, fsynced, sequenced and hash chained. It is the
-authoritative history for prepared, approved, held and locally activated states.
+authoritative history for frozen-core inventories, prepared, approved, held and locally activated states.
 Candidate writes are atomic and fsynced; a crash after candidate write but before
 journaling resumes by verifying the existing candidate and recording the missing
 event. A crash after activation journaling resumes from the journal.

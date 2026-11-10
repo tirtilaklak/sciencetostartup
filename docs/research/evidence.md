@@ -1,7 +1,65 @@
 # Research evidence graph
 
 This additive graph is **prelaunch**. It does not replace canonical dataset 2.5.0,
-its JSON, its SQLite database, or their dates. The current baseline retains 39
+its JSON, its SQLite database, or their dates.
+
+## Reviewed integration checkpoint
+
+The 10 November 2026 integration checkpoint selected through approved partitions
+`20-papers-cohort9-2026-11-10.json` and `21-identity-bridges-2026-11-10.json`
+initially retained 39 historical organization descriptions and 1,713 approved
+assertions. The subsequent independent reference-panel review quarantined 26
+original citation bindings. All 26 now have separately reviewed new-ID replacements,
+bringing the current graph to 1,713 approved assertions and 26 retained candidates.
+These holds concern complete source spans and reproducible extraction details;
+they do not assert that the underlying scientific statements are false. Original
+values, qualifications, scientific digests, passing receipts and original partition
+files remain unchanged. Derived partition selections remove the held assertions;
+the central registry retains them alongside 52 actual follow-up review receipts.
+Partitions 22 and 23 add the replacements and 78 fresh author, verifier and
+adversarial receipts. No old review was retargeted to a changed digest.
+Computed coverage is 65 qualifying suppliers, 152 reviewed paper works,
+63 dataset families and 21 benchmark families. All 39 legacy organizations have
+completed source inclusion audits; 38 have conclusive commercial dispositions.
+BenchFlow remains commercially unresolved and contributes no qualifying supplier
+or disposed frozen-core unit. Coverage method 1.3 keeps these measures distinct.
+
+Its 1,790 scoped source records include 1,789 captured records representing
+503 distinct captured document versions. The 187 identity edges connect
+124 paper versions to works and 63 documentation manifestations to families.
+Documentation pins do not establish underlying corpus-byte releases. Source
+versions, aliases and mirrored releases do not inflate the object counts.
+
+Each approved assertion has exact-content, separate author, source-verifier and
+adversarial AI receipts. Seven cohort 9 locator gaps were repaired with fresh
+three-role receipts for the new digests; 21 superseded receipts, including seven
+negative records, remain preserved separately. All 73 unaffected triples retain
+their original records. A scoped methods/results/limitations review does not claim
+every appendix, proof, corpus row or experimental result was reproduced.
+
+The FHIBE institutional manuscript copy remains distinct from the publisher PDF.
+MuSiQue counts once as a human-composed question family; seed datasets,
+answerability configurations and serializations do not add families. Restrictive
+or unresolved corpus licenses are catalogue findings and imply no permission to
+redistribute underlying third-party data.
+
+The eligible core and both formal launch audits remain unfinished. A separate,
+frozen 250-case diagnostic reference challenge measured 184 true positives,
+3 false positives, 2 false negatives and 61 true negatives: 98.4% precision and
+98.9% recall. This constructed challenge over the previously approved corpus
+does not measure production-wide accuracy or discovery recall. Two independent
+AI source adjudications and a third tie-breaker preceded outcome comparison;
+the locator/context boundary was clarified during adjudication. All cases and
+prior keys are retained, including sensitivity to three disputed labels. Its
+passing numerical thresholds do not complete the launch audit.
+
+The expanded provisional report and offline executive-brief renderer are prepared;
+fresh synthesis review and a matching expanded PDF/archive remain pending. Prior
+synthesis receipts and frozen archive bytes remain bound to their original graph.
+
+## Historical initial baseline
+
+The initial baseline retained 39
 historical organization descriptions and 173 approved assertions. The latest batch
 contributes 163 assertions after separate author, source-verifier and adversarial
 AI review of pinned primary sources. Eight disputed assertions remain quarantined;
@@ -12,6 +70,11 @@ suppliers, eight full-source paper works, eight dataset families and five benchm
 families. The 194 scoped evidence records represent 75 distinct captured document
 versions, not 194 independent documents. These are reviewed baseline observations,
 not a comprehensive market census or completed launch audit.
+
+That initial calculation counted FineWeb-Edu separately. The current identity
+review treats it as a FineWeb subset release and counts one family. Historical
+frozen files retain their exact bytes; the next synthesis must identify this
+correction rather than silently rewriting archived calculations.
 
 The graph retains the actual UTC capture and review times. Captures on 9 November
 in Los Angeles occur on 10 November UTC; they do not retroactively satisfy the
@@ -235,8 +298,12 @@ The default window is the current UTC day; use `--window` for an explicit run
 identity. Same-window retries resume completed pages. A new day or window starts
 fresh discovery instead of retaining a permanently completed mutable query. A
 completed query covers only that adapter's returned partition, not all relevant
-research. OAI resumption tokens expire daily; restart with a new window after an
-expired token and retain the prior candidate records for deduplication.
+research. OAI resumption tokens expire daily; an expired token restarts the same
+query and window, preserving checkpointed candidates for deduplication. Do not
+change the date range to bypass unread pages. An OAI query may be an inclusive
+`from/until` pair, for example `2026-11-01/2026-11-07`. The durable preparation
+runner manages these ranges, catch-up, and candidate materialization; see
+[intake operation and recovery](intake.md).
 
 Each request uses public credential-free HTTPS, TLS verification, an explicit host
 allowlist, DNS checks that reject local/private/reserved destinations, redirect
@@ -256,20 +323,47 @@ Raw bodies stay in the private/untracked cache and never enter the public graph.
 
 ## Floors and remaining work
 
-The launch floors remain 39 actual legacy dispositions, 60 qualifying suppliers,
+The launch floors require inclusion audits of all 39 legacy organizations, 60 qualifying suppliers,
 150 distinct deeply reviewed paper works, 60 dataset families, 20 benchmark
 families, and 90% disposition of a hash-bound frozen eligible core. Countable
-entities require an included disposition, full-source review depth, and an approved
+supplier/paper/family entities require an included disposition, full-source review depth, and an approved
 assertion; suppliers additionally require an approved capability assertion. Versions,
 aliases, candidate matches, historical descriptions, and duplicate releases do not
 inflate coverage.
 
-Coverage method 1.1.0 rolls an explicit, approved, full-source paper version or
-release up to its approved, full-source, included parent work or family. It counts
+Legacy inclusion auditing is measured separately from commercial qualification.
+`legacy_inclusion_audits` requires full-source depth and approved subject-owned
+source evidence with actual three-role reviews; candidate assertions, metadata
+and inherited historical descriptions do not suffice. Pending commercial
+qualification does not contribute a supplier or a disposed core unit.
+`legacy_dispositions` continues to count only conclusive dispositions. The
+1.3.0 method and `research-launch-2` policy correct the earlier implementation's
+label/count mismatch without changing the agreed 39-audit minimum or any other
+launch threshold. Frozen historical methods and archives are unchanged.
+
+Coverage method 1.3.0 retains the 1.2.0 identity rollup: an explicit, approved, full-source paper version or
+release rolls up to its approved, full-source, included parent work or family. The same
+reviewed-parent proof applies to the frozen core's disposition counter, without
+copying version claims onto the parent. Candidate, abstract-only or pending
+parents or manifestations cannot supply that proof. Frozen core units are
+organization, paper-work and dataset/benchmark-family identities; versions,
+releases, model rows and workflow labels cannot inflate its denominator. It counts
 each parent once. This identity rollup creates no supplier relationship and never
 turns a metadata-only parent into a reviewed work. Suppliers still need direct
 approved capability evidence. Source-record totals count scoped evidence records;
 `captured_source_versions` deduplicates their exact version and response digest.
+
+Core inclusion counts require the same approved substantive review. A documented
+exclusion or historical-only disposition requires a full-source review and its
+own subject-bound approved evidence; being the object of a supplier relationship
+does not certify an artifact dossier. Conclusive `legacy_dispositions` counts use
+the same substantive-disposition requirement. Completed `legacy_inclusion_audits`
+use the separate full-source, approved subject-owned evidence rule above;
+pending commercial qualification adds no supplier or disposed core coverage. A candidate,
+abstract-only screen or failed
+retrieval cannot satisfy the 90% gate. Historical calculation behavior remains
+in each edition's exact checksummed validator/reproducer, rather than being
+rewritten when the current coverage method changes.
 
 The initial eligible core is explicitly **not frozen**. Both the source-anchored
 200-assertion quality holdout and separate 200-record screening audit are null.
