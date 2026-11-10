@@ -1,5 +1,6 @@
 """Public rendering invariants; synthetic approval receipts stay inside tests."""
 import copy
+from html import escape
 from html.parser import HTMLParser
 from pathlib import Path
 import re
@@ -104,9 +105,9 @@ class ResearchPageTests(unittest.TestCase):
         facts = Facts(report)
         for section in self.context['report']['sections']:
             self.assertIn(section['id'], facts.ids)
-            self.assertIn(section['title'].replace('&', '&amp;'), report)
+            self.assertIn(escape(section['title']), report)
             for paragraph in section['paragraphs']:
-                self.assertIn(paragraph['text'][:45].replace("'", '&#x27;').replace('&', '&amp;'), report)
+                self.assertIn(escape(paragraph['text'][:45]), report)
         self.assertEqual(len(self.context['report']['sections']), 12)
         self.assertTrue(all(s.get('type') == 'application/ld+json' for s in facts.scripts))
         self.assertNotIn('type="module"', report)
@@ -196,6 +197,8 @@ class ResearchPageTests(unittest.TestCase):
 
     def test_edition_routes_and_feed_entries_use_a_recomputed_passing_gate(self):
         self.context['report']['status'] = 'published'
+        # This historical routing fixture stays fixed as the current report advances.
+        self.context['report']['source_cutoff'] = '2026-11-06T17:00:00-08:00'
         self.context['report']['editions'] = [{'release_id': self.context['report']['release_id'], 'status': 'published'}]
         # Publication gate itself has separate holdout tests; this isolates its routing contract.
         with patch('research_report.publication_gate', return_value={**self.context['gate'], 'ready': True}) as gate:
