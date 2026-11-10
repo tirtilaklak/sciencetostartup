@@ -29,6 +29,12 @@ FLOORS = {
     "screening_stratum_recall": 0.90,
 }
 PARAGRAPH_KINDS = {"sourced_fact", "analysis", "method", "research_gap"}
+CHAPTER_IDS = (
+    "executive-assessment", "weekly-developments", "market-structure",
+    "technical-landscape", "provider-dossiers", "datasets-and-benchmarks",
+    "human-expertise-and-operations", "commercial-evidence", "governance",
+    "buyer-decision-guides", "research-outlook", "methods-and-appendices",
+)
 
 
 def canonical_hash(value):
@@ -63,11 +69,15 @@ def _validate_report(report, graph):
     sections = report.get("sections", [])
     if len(sections) != 12:
         reasons.append("The report requires all 12 stable chapters.")
+    if tuple(section.get("id") for section in sections) != CHAPTER_IDS:
+        reasons.append("The report requires the agreed 12-chapter research structure.")
     for section in sections:
         section_id = section.get("id")
         if not section_id or section_id in seen or not section.get("title"):
             reasons.append("Report chapter IDs must be unique and titled.")
         seen.add(section_id)
+        if not section.get("paragraphs"):
+            reasons.append(f"Research chapter {section_id} has no substantive content.")
         for paragraph in section.get("paragraphs", []):
             kind = paragraph.get("kind")
             if kind not in PARAGRAPH_KINDS or not paragraph.get("text"):
@@ -75,6 +85,8 @@ def _validate_report(report, graph):
             ids = paragraph.get("claim_ids", [])
             if kind == "sourced_fact" and not ids:
                 reasons.append(f"Unbound factual paragraph in {section_id}.")
+            if report.get("status") != "prelaunch" and kind == "analysis" and not ids:
+                reasons.append(f"Analytical conclusion in {section_id} must bind its research inputs.")
             for claim_id in ids:
                 claim = assertions.get(claim_id)
                 if not claim:
@@ -84,6 +96,33 @@ def _validate_report(report, graph):
                 elif claim.get("status") == "historical" and not paragraph.get("historical"):
                     reasons.append(f"Historical assertion {claim_id} needs an explicit historical label.")
     return reasons
+
+
+def _launch_content(report, graph):
+    """A methods-only framework cannot become a complete report by adding counts."""
+    errors = []
+    assertions = {row.get("id"): row for row in graph.get("assertions", [])}
+    findings = report.get("executive_findings", [])
+    if not isinstance(findings, list) or len(findings) < 5:
+        errors.append("The full report needs at least five evidence-backed executive findings.")
+        findings = findings if isinstance(findings, list) else []
+    for finding in findings:
+        if not all(finding.get(key) for key in ("id", "text", "buyer_implication", "limitations", "claim_ids")):
+            errors.append("Executive findings require their evidence, implications and limitations.")
+        if any(assertions.get(cid, {}).get("status") != "approved" for cid in finding.get("claim_ids", [])):
+            errors.append("Executive findings must use approved current assertions.")
+    for section in report.get("sections", []):
+        if section.get("id") in {"weekly-developments", "methods-and-appendices"}:
+            continue
+        if not any(paragraph.get("claim_ids") and paragraph.get("kind") in {"sourced_fact", "analysis"}
+                   for paragraph in section.get("paragraphs", [])):
+            errors.append(f"Full report chapter {section.get('id')} still lacks reviewed findings.")
+    comparison = report.get("weekly_comparison", {})
+    if comparison.get("status") not in {"first_edition", "compared"}:
+        errors.append("The edition needs an explicit baseline or prior-edition comparison.")
+    if comparison.get("status") == "compared" and not comparison.get("prior_release_id"):
+        errors.append("Weekly comparison must identify the actual previous edition.")
+    return errors
 
 
 def _audit(audit, kind, graph, thresholds):
@@ -220,6 +259,7 @@ def publication_gate(graph, report, policy=None):
         reasons.append(f"Evidence graph is invalid: {error}")
         coverage = {}
     reasons.extend(_validate_report(report, graph))
+    reasons.extend(_launch_content(report, graph))
     for key in ("legacy_dispositions", "qualifying_suppliers", "reviewed_papers", "dataset_families", "benchmark_families", "core_disposition_rate"):
         observed = coverage.get(key, 0)
         if not isinstance(observed, (int, float)) or observed < thresholds[key]:
