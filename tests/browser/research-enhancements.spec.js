@@ -323,8 +323,20 @@ test.describe('legacy evidence remains independently readable', () => {
       const date = await record.locator('.r-kicker').innerText();
       expect(date).toContain(assertion.as_of.slice(0, 4));
       await expect(record.locator('.r-record-id a')).toHaveAttribute('href', evidenceURL('assertion', assertion.id));
-      await expect(record.locator('.r-evidence-links li')).toHaveCount(assertion.evidence.length);
       for (const qualification of assertion.qualifications || []) await expect(record).toContainText(qualification);
+      // The compact profile keeps each fact/scope and links its complete source
+      // bindings. Follow that native link and retain the original exact count.
+      await record.locator('.r-record-id a').click();
+      const full = page.locator('article.r-assertion' + selector('assertion-' + assertion.id));
+      await expect(full.locator('.r-evidence-links li')).toHaveCount(assertion.evidence.length);
+      const bindings = await full.locator('.r-evidence-links li').evaluateAll(items => items.map(item => ({
+        href: item.querySelector('a')?.getAttribute('href'), locator: item.querySelector('.r-source-locator')?.textContent })));
+      for (const [index, binding] of assertion.evidence.entries()) {
+        expect(bindings[index].href).toBe(evidenceURL('source', binding.source_id));
+        expect(normalize(bindings[index].locator)).toContain(normalize(binding.locator));
+      }
+      await page.goBack();
+      await expect(supplement).toBeVisible();
     }
   });
 });
@@ -457,6 +469,9 @@ test('imported executive judgments retain approved evidence in the offline archi
     }
     await offline.locator(selector('finding-' + findings[0].id)).getByRole('link', { name: citedClaims[0], exact: true }).first().click();
     await expect(offline).toHaveURL(pathToFileURL(resolve(offlineDirectory, 'evidence.html')).href + '#' + encodeURIComponent('assertion-' + citedClaims[0]));
+    // A native file URL commits before a large document finishes parsing.
+    // Batch only after load, preserving the old per-ID assertions' auto-wait.
+    await offline.waitForLoadState('load');
     const offlineAssertionIds = await offline.locator('[id^="assertion-"]').evaluateAll(assertions => assertions.map(assertion => assertion.id));
     for (const cid of citedClaims) expect(offlineAssertionIds.filter(id => id === 'assertion-' + cid), cid).toHaveLength(1);
     expect(await offline.evaluate(() => document.documentElement.scrollWidth <= innerWidth),

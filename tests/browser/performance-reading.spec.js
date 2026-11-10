@@ -23,13 +23,15 @@ test.describe('native ledger rendering', () => {
       const paths = await links.evaluateAll(links => links.map(link => link.getAttribute('href')));
       expect(paths).toEqual([... '0123456789abcdef'].map(bucket => '/research/data/' + (kind === 'source' ? 'sources' : 'assertions') + '/' + bucket + '/'));
       const observed = [];
+      const metadataOnly = [];
       for (const path of paths) {
         await page.goto(path);
         await expect(page.locator('h1')).toContainText(kind === 'source' ? 'Source ledger' : 'Assertion ledger');
         await expect(page.locator('script:not([type="application/ld+json"])')).toHaveCount(0);
         if (kind === 'assertion') {
-          await expect(page.locator('.r-assertion[data-status="candidate"] .r-assertion-text')).toHaveCount(0);
+          await expect(page.locator('.r-assertion:not([data-status="approved"]):not([data-status="historical"]) .r-assertion-text')).toHaveCount(0);
           observed.push(...await page.locator('.r-assertion[data-status="approved"],.r-assertion[data-status="historical"]').evaluateAll(rows => rows.map(row => row.id)));
+          metadataOnly.push(...await page.locator('.r-assertion:not([data-status="approved"]):not([data-status="historical"])').evaluateAll(rows => rows.map(row => row.id)));
         } else {
           observed.push(...await page.locator('.r-source').evaluateAll(rows => rows.map(row => row.id)));
         }
@@ -38,6 +40,16 @@ test.describe('native ledger rendering', () => {
         .map(row => kind + '-' + row.id).sort();
       expect(observed.sort()).toEqual(expected);
       expect(new Set(observed).size).toBe(observed.length);
+      if (kind === 'assertion') {
+        const correctionResponse = await request.get('/publication/corrections.json');
+        expect(correctionResponse.ok()).toBeTruthy();
+        const correctionData = await correctionResponse.json();
+        expect(Array.isArray(correctionData.corrections), 'The correction registry must retain its complete record array').toBe(true);
+        for (const row of correctionData.corrections) {
+          const retained = 'assertion-' + row.claim_id;
+          if (!expected.includes(retained)) expect(metadataOnly, 'Retained correction identifier ' + row.claim_id).toContain(retained);
+        }
+      }
     });
   }
 

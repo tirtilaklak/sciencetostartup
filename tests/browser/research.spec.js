@@ -229,3 +229,22 @@ for (const path of publicPages) {
     expect(result.violations.filter(violation => ['serious', 'critical'].includes(violation.impact))).toEqual([]);
   });
 }
+
+// The complete ledger spans these bounded static documents. Audit every node
+// and default Axe rule on every part, retaining the original severity gate.
+for (const kind of ['assertions', 'sources']) {
+  for (const bucket of '0123456789abcdef') {
+    const path = '/research/data/' + kind + '/' + bucket + '/';
+    test('ledger part ' + path + ' has no serious or critical accessibility violations', async ({ page }, info) => {
+      await page.goto(path);
+      const nodes = await page.locator('*').count();
+      const started = Date.now();
+      const result = await new AxeBuilder({ page }).analyze();
+      await info.attach('axe-scan-metrics.json', { body: Buffer.from(JSON.stringify({ path, nodes,
+        analysisMs: Date.now() - started, testBudgetMs: 30_000, fullPage: true, ruleExclusions: [],
+        resultRules: Object.fromEntries(['violations', 'incomplete', 'passes', 'inapplicable'].map(kind =>
+          [kind, result[kind].map(rule => rule.id)])) })), contentType: 'application/json' });
+      expect(result.violations.filter(violation => ['serious', 'critical'].includes(violation.impact))).toEqual([]);
+    });
+  }
+}
