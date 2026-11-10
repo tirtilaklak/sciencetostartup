@@ -532,6 +532,9 @@ def _feeds(output, context, editions):
     ET.SubElement(atom, '{' + ns + '}title').text = 'ScienceToStartup published research'
     ET.SubElement(atom, '{' + ns + '}id').text = sp.ORIGIN + '/research/'
     ET.SubElement(atom, '{' + ns + '}link', {'href': sp.ORIGIN + '/research/atom.xml', 'rel': 'self'})
+    author = ET.SubElement(atom, '{' + ns + '}author')
+    ET.SubElement(author, '{' + ns + '}name').text = context['identity'].get('publisher', {}).get('name', sp.PUBLISHER_NAME)
+    ET.SubElement(author, '{' + ns + '}uri').text = context['identity'].get('publisher', {}).get('url', sp.ORIGIN + '/method/#about')
     newest = max([context['report']['updated_on']] + [snapshot['report']['updated_on'] for _, snapshot in editions])
     ET.SubElement(atom, '{' + ns + '}updated').text = newest + 'T00:00:00Z'
     for path, snapshot in editions:
