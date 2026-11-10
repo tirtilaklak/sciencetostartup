@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-11-10T10:11:14.337073Z",
+  "as_of": "2026-11-10T11:24:51.008659Z",
   "assertions": [
     {
       "as_of": "2026-10-15",
@@ -1330,6 +1330,41 @@
     {
       "aliases": [],
       "assertion_ids": [
+        "cohort4.dataset.claim.gaia.format-version",
+        "cohort4.dataset.claim.gaia.gate",
+        "cohort4.dataset.claim.gaia.levels-private",
+        "cohort4.dataset.claim.gaia.schema",
+        "cohort4.dataset.claim.gaia.task"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.gaia",
+      "id": "benchmark-version.gaia.682dd723ee1e",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:8a160e2df36b843c33ec12fdecd731ae8281e0dae553375207707b506a36c11e",
+        "documentation_revision": "682dd723ee1e1697e00360edccf2366dc8418dd9",
+        "repository": "gaia-benchmark/GAIA"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "GAIA documentation snapshot gaia-benchmark/GAIA @ 682dd723ee1e",
+      "parent_id": "benchmark.gaia",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
         "cohort2.dataset.claim.gpqa.baseline-conditions",
         "cohort2.dataset.claim.gpqa.human-task",
         "cohort2.dataset.claim.gpqa.repository-license",
@@ -1349,6 +1384,41 @@
       "legacy_id": null,
       "name": "GPQA creator documentation at 56686c0",
       "parent_id": "benchmark.gpqa",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.harmbench.automated-judge",
+        "cohort4.dataset.claim.harmbench.generation-budget",
+        "cohort4.dataset.claim.harmbench.input-format",
+        "cohort4.dataset.claim.harmbench.license",
+        "cohort4.dataset.claim.harmbench.pipeline"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.harmbench",
+      "id": "benchmark-version.harmbench.8e1604d1171f",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:d900abc3ef8ca94179ba247da3a40fcafe4c26bfb6ddcbc5af797ef7f73d6cec",
+        "documentation_revision": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+        "repository": "CenterForAISafety/HarmBench"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "HarmBench documentation snapshot CenterForAISafety/HarmBench @ 8e1604d1171f",
+      "parent_id": "benchmark.harmbench",
       "review_depth": "full_source",
       "status": "approved",
       "taxonomy": {
@@ -1429,6 +1499,208 @@
     {
       "aliases": [],
       "assertion_ids": [
+        "cohort4.dataset.claim.humaneval.license",
+        "cohort4.dataset.claim.humaneval.metric",
+        "cohort4.dataset.claim.humaneval.prediction-format",
+        "cohort4.dataset.claim.humaneval.runtime",
+        "cohort4.dataset.claim.humaneval.task-origin"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.humaneval",
+      "id": "benchmark-version.humaneval.b9453e8f1865",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:a6a3741a64527ae20026b7880e37af5de88e8ae4dcfed81eb19620c674b6e272",
+        "documentation_revision": "b9453e8f1865df0a0057a1383767caa400acfbcf",
+        "repository": "openai/human-eval"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "HumanEval documentation snapshot openai/human-eval @ b9453e8f1865",
+      "parent_id": "benchmark.humaneval",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.jailbreakbench.automatic-judges",
+        "cohort4.dataset.claim.jailbreakbench.construction",
+        "cohort4.dataset.claim.jailbreakbench.human-validation",
+        "cohort4.dataset.claim.jailbreakbench.metric-conditions",
+        "cohort4.dataset.claim.jailbreakbench.scope-count"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.jailbreakbench",
+      "id": "benchmark-version.jailbreakbench.23dbdf6b1965",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:aa7d1c4154ac4defadb533a7c686a720a808022f24c73763567e028cd5825d8a",
+        "documentation_revision": "23dbdf6b19650521604456229bc1d9c4156c85c1",
+        "repository": "JailbreakBench/jailbreakbench"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "JailbreakBench documentation snapshot JailbreakBench/jailbreakbench @ 23dbdf6b1965",
+      "parent_id": "benchmark.jailbreakbench",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.jailbreakbench.terms"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.jailbreakbench",
+      "id": "benchmark-version.jailbreakbench.886acc352a31",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:fc84ea5865e60ba15f3776ff43ace47cbbf3470775f389afbb6bdb4d6333618a",
+        "documentation_revision": "886acc352a31533ffbcf4ef22c744658688086fc",
+        "repository": "JailbreakBench/JBB-Behaviors"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "JailbreakBench documentation snapshot JailbreakBench/JBB-Behaviors @ 886acc352a31",
+      "parent_id": "benchmark.jailbreakbench",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.mathvista.splits"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.mathvista",
+      "id": "benchmark-version.mathvista.2b6ad69445fb",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:b2c1784e13e6a4bf1935930e20a7472a04b40e2d47b7509508266352d0e121ed",
+        "documentation_revision": "2b6ad69445fbb5695c9b165475e8decdbeb97747",
+        "repository": "AI4Math/MathVista"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "MathVista documentation snapshot AI4Math/MathVista @ 2b6ad69445fb",
+      "parent_id": "benchmark.mathvista",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.mathvista.answer-extraction",
+        "cohort4.dataset.claim.mathvista.composite-count",
+        "cohort4.dataset.claim.mathvista.parity-limit",
+        "cohort4.dataset.claim.mathvista.scoring",
+        "cohort4.dataset.claim.mathvista.terms"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.mathvista",
+      "id": "benchmark-version.mathvista.5f6b4deca69e",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:f55ef5c9f27869c73cb180d93cb9ea5681eca056b9312970a8620e27329ddc19",
+        "documentation_revision": "5f6b4deca69ecd1b8a1a4f338cee085e50524e4b",
+        "repository": "lupantech/MathVista"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "MathVista documentation snapshot lupantech/MathVista @ 5f6b4deca69e",
+      "parent_id": "benchmark.mathvista",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.mbpp.construction",
+        "cohort4.dataset.claim.mbpp.fewshot-protocol",
+        "cohort4.dataset.claim.mbpp.human-qc",
+        "cohort4.dataset.claim.mbpp.license",
+        "cohort4.dataset.claim.mbpp.split"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.mbpp",
+      "id": "benchmark-version.mbpp.03ac4dca9776",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:02d63a4ffdad806c3c87b5ea2aa91e946f6eec0c2869643b09831650883f41be",
+        "documentation_revision": "03ac4dca9776084a3a002d4513a55dc7348f680e",
+        "repository": "google-research/google-research"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "MBPP documentation snapshot google-research/google-research @ 03ac4dca9776",
+      "parent_id": "benchmark.mbpp",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
         "next.claim.mmlu.tasks"
       ],
       "disposition": "included",
@@ -1444,6 +1716,72 @@
       "legacy_id": null,
       "name": "MMLU pinned HF distribution",
       "parent_id": "benchmark.mmlu",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.mmmu.construction",
+        "cohort4.dataset.claim.mmmu.copyright-oversight",
+        "cohort4.dataset.claim.mmmu.parser-conditions",
+        "cohort4.dataset.claim.mmmu.splits",
+        "cohort4.dataset.claim.mmmu.test-version"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.mmmu",
+      "id": "benchmark-version.mmmu.268471d0d488",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:a4e89dd389f9b4c82b92e54b5d50a58e55a53c077a5009f7d4b4e53c09bdcc3a",
+        "documentation_revision": "268471d0d488258990025331c7528359c324aa25",
+        "repository": "MMMU-Benchmark/MMMU"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "MMMU documentation snapshot MMMU-Benchmark/MMMU @ 268471d0d488",
+      "parent_id": "benchmark.mmmu",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.mmmu.license"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.mmmu",
+      "id": "benchmark-version.mmmu.876ce5cb130f",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:0c9190b5582c5798f5744d37215858de0df51c74de49fc4e64f925c3efd725a8",
+        "documentation_revision": "876ce5cb130f7f7e290ce4d9984357737d4db5cf",
+        "repository": "MMMU/MMMU"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "MMMU documentation snapshot MMMU/MMMU @ 876ce5cb130f",
+      "parent_id": "benchmark.mmmu",
       "review_depth": "full_source",
       "status": "approved",
       "taxonomy": {
@@ -1478,6 +1816,42 @@
       "legacy_id": null,
       "name": "MT-Bench creator documentation at 587d5cf",
       "parent_id": "benchmark.mtbench",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.osworld.evaluation",
+        "cohort4.dataset.claim.osworld.infrastructure",
+        "cohort4.dataset.claim.osworld.license",
+        "cohort4.dataset.claim.osworld.run-settings",
+        "cohort4.dataset.claim.osworld.task-schema",
+        "cohort4.dataset.claim.osworld.version-change"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.osworld",
+      "id": "benchmark-version.osworld.8903ebeb0efd",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:9a01ccee12ac531c0a86d54e0d4399cdaae7774eef33c5a0d5a019317471e814",
+        "documentation_revision": "8903ebeb0efdf74331bd7dc37ed91ccbbff22317",
+        "repository": "xlang-ai/OSWorld"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "OSWorld documentation snapshot xlang-ai/OSWorld @ 8903ebeb0efd",
+      "parent_id": "benchmark.osworld",
       "review_depth": "full_source",
       "status": "approved",
       "taxonomy": {
@@ -1569,6 +1943,42 @@
       "legacy_id": null,
       "name": "Original SWE-bench pinned dataset",
       "parent_id": "benchmark.swebench",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.tau-bench.license",
+        "cohort4.dataset.claim.tau-bench.required-output",
+        "cohort4.dataset.claim.tau-bench.reward-state",
+        "cohort4.dataset.claim.tau-bench.simulation",
+        "cohort4.dataset.claim.tau-bench.user-settings",
+        "cohort4.dataset.claim.tau-bench.version-limit"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.tau-bench",
+      "id": "benchmark-version.tau-bench.59a200c6d575",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:1a4b1b00634fe46fd677dd11dfa25a9bf357b5d7c3d726ff83025e8f104329f9",
+        "documentation_revision": "59a200c6d575d595120f1cb70fea53cef0632f6b",
+        "repository": "sierra-research/tau-bench"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "τ-bench documentation snapshot sierra-research/tau-bench @ 59a200c6d575",
+      "parent_id": "benchmark.tau-bench",
       "review_depth": "full_source",
       "status": "approved",
       "taxonomy": {
@@ -1676,6 +2086,41 @@
         "workflow": [
           "benchmark_evaluation"
         ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.webshop.catalog-condition",
+        "cohort4.dataset.claim.webshop.construction-count",
+        "cohort4.dataset.claim.webshop.human-trajectories",
+        "cohort4.dataset.claim.webshop.license",
+        "cohort4.dataset.claim.webshop.observations"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.webshop",
+      "id": "benchmark-version.webshop.64fa2a5c15c7",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:79b7a90a1413a52deb53142b5bbd81ecf40f61743bd4601c2835e91375898ec0",
+        "documentation_revision": "64fa2a5c15c7daa698b9ac93f5bb5437b634c9bd",
+        "repository": "princeton-nlp/WebShop"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "WebShop documentation snapshot princeton-nlp/WebShop @ 64fa2a5c15c7",
+      "parent_id": "benchmark.webshop",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
       }
     },
     {
@@ -1790,6 +2235,47 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.gaia",
+      "id": "benchmark.gaia",
+      "identifiers": {
+        "family": "benchmark.gaia"
+      },
+      "kind": "benchmark_family",
+      "legacy_id": null,
+      "name": "GAIA",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "general assistant tool use"
+        ],
+        "expertise": [],
+        "labels": [
+          "final answer",
+          "difficulty level",
+          "annotator metadata"
+        ],
+        "modality": [
+          "text",
+          "image",
+          "document",
+          "audio"
+        ],
+        "origin": [
+          "creator question collection",
+          "optional attachments"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "Creator-maintained family/release documentation received separate AI source-content review of construction, label origin, format, evaluation conditions and stated access/license limitations. This is documentation review, not download or independent recount of corpus rows. The pinned release and parent family remain distinct; rights conflicts and version-specific unknowns are preserved in approved assertions.",
       "eligible_core": false,
       "family_id": "family.gpqa",
@@ -1809,6 +2295,45 @@
         "labels": [],
         "modality": [],
         "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.harmbench",
+      "id": "benchmark.harmbench",
+      "identifiers": {
+        "family": "benchmark.harmbench"
+      },
+      "kind": "benchmark_family",
+      "legacy_id": null,
+      "name": "HarmBench",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "LLM robustness",
+          "automated red teaming"
+        ],
+        "expertise": [],
+        "labels": [
+          "attack success rate"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "behavior specifications",
+          "attack-generated prompts",
+          "target LLM completions",
+          "automated classifier labels"
+        ],
         "oversight": [],
         "workflow": []
       }
@@ -1865,6 +2390,159 @@
         "labels": [],
         "modality": [],
         "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.humaneval",
+      "id": "benchmark.humaneval",
+      "identifiers": {
+        "family": "benchmark.humaneval"
+      },
+      "kind": "benchmark_family",
+      "legacy_id": null,
+      "name": "HumanEval",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "Python code generation"
+        ],
+        "expertise": [],
+        "labels": [
+          "test pass/fail",
+          "pass@k"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "hand-written evaluation problems",
+          "model-generated completions"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.jailbreakbench",
+      "id": "benchmark.jailbreakbench",
+      "identifiers": {
+        "family": "benchmark.jailbreakbench"
+      },
+      "kind": "benchmark_family",
+      "legacy_id": null,
+      "name": "JailbreakBench",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "LLM robustness",
+          "misuse and benign behavior"
+        ],
+        "expertise": [],
+        "labels": [
+          "jailbreak/refusal labels",
+          "human-majority labels"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "original behavior curation",
+          "HarmBench/AdvBench sources",
+          "target LLM responses",
+          "human/model judge comparisons"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.mathvista",
+      "id": "benchmark.mathvista",
+      "identifiers": {
+        "family": "benchmark.mathvista"
+      },
+      "kind": "benchmark_family",
+      "legacy_id": null,
+      "name": "MathVista",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "visual mathematical reasoning"
+        ],
+        "expertise": [],
+        "labels": [
+          "answer-type normalization",
+          "accuracy"
+        ],
+        "modality": [
+          "text",
+          "image"
+        ],
+        "origin": [
+          "28 inherited multimodal datasets",
+          "3 newly created source datasets",
+          "answer extraction model outputs"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.mbpp",
+      "id": "benchmark.mbpp",
+      "identifiers": {
+        "family": "benchmark.mbpp"
+      },
+      "kind": "benchmark_family",
+      "legacy_id": null,
+      "name": "MBPP",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "Python programming"
+        ],
+        "expertise": [],
+        "labels": [
+          "functional test outcomes"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "crowdsourced programming problems",
+          "reference solutions",
+          "automated test cases"
+        ],
         "oversight": [],
         "workflow": []
       }
@@ -1936,6 +2614,44 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.mmmu",
+      "id": "benchmark.mmmu",
+      "identifiers": {
+        "family": "benchmark.mmmu"
+      },
+      "kind": "benchmark_family",
+      "legacy_id": null,
+      "name": "MMMU",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "college-level multimodal reasoning"
+        ],
+        "expertise": [],
+        "labels": [
+          "multiple-choice/open answers",
+          "parsed prediction accuracy"
+        ],
+        "modality": [
+          "text",
+          "image"
+        ],
+        "origin": [
+          "college exams/quizzes/textbooks",
+          "annotator curation"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "Creator-maintained MT-Bench documentation received separate AI source-content review. The source verifier also independently parsed the pinned 80-question JSONL artifact: unique IDs 81-160, eight categories of ten questions, and two turns per question. That check covers structure and counts; no semantic correctness, authorship, model answers, human judgments or model evaluation was audited. The pinned benchmark snapshot and parent family remain distinct; stated evaluator and rights limitations remain assertion-specific.",
       "eligible_core": false,
       "family_id": "family.mtbench",
@@ -1955,6 +2671,44 @@
         "labels": [],
         "modality": [],
         "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.osworld",
+      "id": "benchmark.osworld",
+      "identifiers": {
+        "family": "benchmark.osworld"
+      },
+      "kind": "benchmark_family",
+      "legacy_id": null,
+      "name": "OSWorld",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "desktop computer use"
+        ],
+        "expertise": [],
+        "labels": [
+          "task completion score"
+        ],
+        "modality": [
+          "text",
+          "image"
+        ],
+        "origin": [
+          "task instructions and setup",
+          "environment state",
+          "programmatic evaluator results"
+        ],
         "oversight": [],
         "workflow": []
       }
@@ -2106,6 +2860,45 @@
     },
     {
       "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.tau-bench",
+      "id": "benchmark.tau-bench",
+      "identifiers": {
+        "family": "benchmark.tau-bench"
+      },
+      "kind": "benchmark_family",
+      "legacy_id": null,
+      "name": "τ-bench",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "retail/airline tool use"
+        ],
+        "expertise": [],
+        "labels": [
+          "reward",
+          "database hash agreement",
+          "required response outputs"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "model-simulated users",
+          "tool calls",
+          "database-state outcomes"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
       "assertion_ids": [
         "claim.truthfulqa.question-coverage"
       ],
@@ -2218,6 +3011,45 @@
         "workflow": [
           "benchmark_evaluation"
         ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.webshop",
+      "id": "benchmark.webshop",
+      "identifiers": {
+        "family": "benchmark.webshop"
+      },
+      "kind": "benchmark_family",
+      "legacy_id": null,
+      "name": "WebShop",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "grounded web interaction",
+          "shopping"
+        ],
+        "expertise": [],
+        "labels": [
+          "goal-directed trajectories",
+          "simulation reward"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "real product catalog",
+          "crowdsourced instructions",
+          "MTurk demonstrations"
+        ],
+        "oversight": [],
+        "workflow": []
       }
     },
     {
@@ -2507,6 +3339,41 @@
     {
       "aliases": [],
       "assertion_ids": [
+        "cohort4.dataset.claim.aya-dataset.count-units",
+        "cohort4.dataset.claim.aya-dataset.human-types",
+        "cohort4.dataset.claim.aya-dataset.limitations",
+        "cohort4.dataset.claim.aya-dataset.qa",
+        "cohort4.dataset.claim.aya-dataset.terms"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.aya-dataset",
+      "id": "dataset-release.aya-dataset.f9ea04583f02",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:3ac54f63eec84100c155571945da01c7c18cd8ec97ea94639e2b94a6860e8573",
+        "documentation_revision": "f9ea04583f02a8f86404ff6c58bf75fe637df8a2",
+        "repository": "CohereForAI/aya_dataset"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "Aya Dataset documentation snapshot CohereForAI/aya_dataset @ f9ea04583f02",
+      "parent_id": "dataset.aya-dataset",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
         "cohort2.dataset.claim.beavertails.fourteen-categories",
         "cohort2.dataset.claim.beavertails.human-qa",
         "cohort2.dataset.claim.beavertails.intended-use",
@@ -2526,6 +3393,171 @@
       "legacy_id": null,
       "name": "BeaverTails creator documentation at 8401fe6",
       "parent_id": "dataset.beavertails",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.code-feedback.new-interactions"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.code-feedback",
+      "id": "dataset-release.code-feedback.9674d8a521df",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:43ec99edb44440d79ca2229d64c3b1a165f039eada68647b6f34f9757da9eba1",
+        "documentation_revision": "9674d8a521df7f92becd8a7a8e60a8792e71869a",
+        "repository": "OpenCodeInterpreter/OpenCodeInterpreter"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "Code-Feedback documentation snapshot OpenCodeInterpreter/OpenCodeInterpreter @ 9674d8a521df",
+      "parent_id": "dataset.code-feedback",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.code-feedback.seed-composite",
+        "cohort4.dataset.claim.code-feedback.seed-filter"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.code-feedback",
+      "id": "dataset-release.code-feedback.a08c213a9748",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:1842787cdd4c324bacbc7e44239af3561d70e32a82b4ff27c2506ebaf1392de8",
+        "documentation_revision": "a08c213a9748c66c15d0225814be80a2e77adf4a",
+        "repository": "m-a-p/CodeFeedback-Filtered-Instruction"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "Code-Feedback documentation snapshot m-a-p/CodeFeedback-Filtered-Instruction @ a08c213a9748",
+      "parent_id": "dataset.code-feedback",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.code-feedback.model-content",
+        "cohort4.dataset.claim.code-feedback.terms"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.code-feedback",
+      "id": "dataset-release.code-feedback.f411b16a97c9",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:0c77b55d450a864e9e2c5f69ce266e8e2061f52b6c6f8c2c7710dff034f2b70f",
+        "documentation_revision": "f411b16a97c910ac9acf8b0d0948e340aa77cc34",
+        "repository": "m-a-p/Code-Feedback"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "Code-Feedback documentation snapshot m-a-p/Code-Feedback @ f411b16a97c9",
+      "parent_id": "dataset.code-feedback",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.dolly-15k.count",
+        "cohort4.dataset.claim.dolly-15k.human-origin",
+        "cohort4.dataset.claim.dolly-15k.oversight",
+        "cohort4.dataset.claim.dolly-15k.reference-origin",
+        "cohort4.dataset.claim.dolly-15k.terms"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.dolly-15k",
+      "id": "dataset-release.dolly-15k.bdd27f4d94b9",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:db06c60090a11b20e79d1933b2f316f781605f07761ff2ae2795d6523e3e960b",
+        "documentation_revision": "bdd27f4d94b9c1f951818a7da7fd7aeea5dbff1a",
+        "repository": "databricks/databricks-dolly-15k"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "Databricks Dolly 15k documentation snapshot databricks/databricks-dolly-15k @ bdd27f4d94b9",
+      "parent_id": "dataset.dolly-15k",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.flan-collection.composite",
+        "cohort4.dataset.claim.flan-collection.fields",
+        "cohort4.dataset.claim.flan-collection.license-scope",
+        "cohort4.dataset.claim.flan-collection.mixtures",
+        "cohort4.dataset.claim.flan-collection.release-gap"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.flan-collection",
+      "id": "dataset-release.flan-collection.e9e4ec6e2701",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:bc1037acf7fea6c913352785fd24080bc223336bf21d6617aaa44dcd95794042",
+        "documentation_revision": "e9e4ec6e2701182c7a91af176f705310da541277",
+        "repository": "google-research/FLAN"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "The Flan Collection documentation snapshot google-research/FLAN @ e9e4ec6e2701",
+      "parent_id": "dataset.flan-collection",
       "review_depth": "full_source",
       "status": "approved",
       "taxonomy": {
@@ -2709,6 +3741,172 @@
     {
       "aliases": [],
       "assertion_ids": [
+        "cohort4.dataset.claim.intel-orca-dpo-pairs.chosen-origin",
+        "cohort4.dataset.claim.intel-orca-dpo-pairs.new-rejected",
+        "cohort4.dataset.claim.intel-orca-dpo-pairs.training-use"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.intel-orca-dpo-pairs",
+      "id": "dataset-release.intel-orca-dpo-pairs.087056c348f3",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:32fa604aba553e57270297b868074d87babb1dbcebd16b9c3f6d7e26415c678e",
+        "documentation_revision": "087056c348f3321a78bffde6fc35c81a6aaf19d9",
+        "repository": "intel/intel-extension-for-transformers"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "Intel Orca DPO Pairs documentation snapshot intel/intel-extension-for-transformers @ 087056c348f3",
+      "parent_id": "dataset.intel-orca-dpo-pairs",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.intel-orca-dpo-pairs.license",
+        "cohort4.dataset.claim.intel-orca-dpo-pairs.selected-source"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.intel-orca-dpo-pairs",
+      "id": "dataset-release.intel-orca-dpo-pairs.624952e3f420",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:3059107fa3f36cb558142b2b80e6dfdbaa5d8d6d3a26564487420fe402eceb52",
+        "documentation_revision": "624952e3f420ae18d88b31977ee2ea436c833abb",
+        "repository": "Intel/orca_dpo_pairs"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "Intel Orca DPO Pairs documentation snapshot Intel/orca_dpo_pairs @ 624952e3f420",
+      "parent_id": "dataset.intel-orca-dpo-pairs",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.math-shepherd.automatic-label",
+        "cohort4.dataset.claim.math-shepherd.label-semantics",
+        "cohort4.dataset.claim.math-shepherd.reproducibility-gap",
+        "cohort4.dataset.claim.math-shepherd.schema",
+        "cohort4.dataset.claim.math-shepherd.training-position"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.math-shepherd",
+      "id": "dataset-release.math-shepherd.ae6b0c54fca9",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:5cd51153b70134d08a71362c29c3d7b8788e14700ff7917bfcc7f172039a2065",
+        "documentation_revision": "ae6b0c54fca9fa26096f7de175c747e4b262e01a",
+        "repository": "peiyi9979/Math-Shepherd"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "Math-Shepherd documentation snapshot peiyi9979/Math-Shepherd @ ae6b0c54fca9",
+      "parent_id": "dataset.math-shepherd",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.medinstruct.count-units",
+        "cohort4.dataset.claim.medinstruct.generated-responses",
+        "cohort4.dataset.claim.medinstruct.license",
+        "cohort4.dataset.claim.medinstruct.seed-human"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.medinstruct",
+      "id": "dataset-release.medinstruct.2934ad53c825",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:d6a1ca0c60549f9c01b92a316681c527d7f94d94e76c10f6d53e46b2b2445f30",
+        "documentation_revision": "2934ad53c8250ba4e4130464a6dae3139d1053de",
+        "repository": "xz97/MedInstruct"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "MedInstruct documentation snapshot xz97/MedInstruct @ 2934ad53c825",
+      "parent_id": "dataset.medinstruct",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.medinstruct.schema-engine-gap",
+        "cohort4.dataset.claim.medinstruct.test-rating"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.medinstruct",
+      "id": "dataset-release.medinstruct.b469c41bcd7d",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:39477f146c3bbae7e8a41601f78ef9b73d14e3c029ee76595dceab533cf63c6b",
+        "documentation_revision": "b469c41bcd7ddd57dd0bc072ef99d017c5cb0e4b",
+        "repository": "XZhang97666/AlpaCare"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "MedInstruct documentation snapshot XZhang97666/AlpaCare @ b469c41bcd7d",
+      "parent_id": "dataset.medinstruct",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
         "cohort2.dataset.claim.nectar.ai-ranking",
         "cohort2.dataset.claim.nectar.nature-label",
         "cohort2.dataset.claim.nectar.rubric",
@@ -2728,6 +3926,41 @@
       "legacy_id": null,
       "name": "Nectar creator documentation at 3c6b4c4",
       "parent_id": "dataset.nectar",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.no-robots.annotation-gap",
+        "cohort4.dataset.claim.no-robots.human-origin",
+        "cohort4.dataset.claim.no-robots.schema",
+        "cohort4.dataset.claim.no-robots.splits",
+        "cohort4.dataset.claim.no-robots.terms"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.no-robots",
+      "id": "dataset-release.no-robots.e6f9a4ac5c37",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:22b642520e082ba1a6c4a93047bd5946aeca099763c6f2d11b59d91e61e79186",
+        "documentation_revision": "e6f9a4ac5c37faeb744ba9ecf0473184d7f8105b",
+        "repository": "HuggingFaceH4/no_robots"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "No Robots documentation snapshot HuggingFaceH4/no_robots @ e6f9a4ac5c37",
+      "parent_id": "dataset.no-robots",
       "review_depth": "full_source",
       "status": "approved",
       "taxonomy": {
@@ -2775,6 +4008,41 @@
     {
       "aliases": [],
       "assertion_ids": [
+        "cohort4.dataset.claim.opencodeinstruct.automated-origin",
+        "cohort4.dataset.claim.opencodeinstruct.count",
+        "cohort4.dataset.claim.opencodeinstruct.generation-schema",
+        "cohort4.dataset.claim.opencodeinstruct.quality-schema",
+        "cohort4.dataset.claim.opencodeinstruct.terms"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.opencodeinstruct",
+      "id": "dataset-release.opencodeinstruct.8f3ba5bafe4d",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:2449b70191f455f0e904ff78fabfd7185f20dbe89165ce70ca39a8193241ebd4",
+        "documentation_revision": "8f3ba5bafe4d6e8db46082cf7ae6741bc370604d",
+        "repository": "nvidia/OpenCodeInstruct"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "OpenCodeInstruct documentation snapshot nvidia/OpenCodeInstruct @ 8f3ba5bafe4d",
+      "parent_id": "dataset.opencodeinstruct",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
         "cohort2.dataset.claim.openhermes.component-provenance",
         "cohort2.dataset.claim.openhermes.conversation-schema",
         "cohort2.dataset.claim.openhermes.provenance-gap",
@@ -2793,6 +4061,41 @@
       "legacy_id": null,
       "name": "OpenHermes creator documentation at b820378",
       "parent_id": "dataset.openhermes",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.openthoughts.count",
+        "cohort4.dataset.claim.openthoughts.license",
+        "cohort4.dataset.claim.openthoughts.metadata-schema",
+        "cohort4.dataset.claim.openthoughts.new-traces",
+        "cohort4.dataset.claim.openthoughts.source-mixture"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.openthoughts",
+      "id": "dataset-release.openthoughts.bd093c3994fd",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:87dd0984b1ae912cd50507327d1358e378b3de07740600895734c939d0a55946",
+        "documentation_revision": "bd093c3994fd54d2390985b66988ddf282a55eb6",
+        "repository": "open-thoughts/OpenThoughts-114k"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "OpenThoughts documentation snapshot open-thoughts/OpenThoughts-114k @ bd093c3994fd",
+      "parent_id": "dataset.openthoughts",
       "review_depth": "full_source",
       "status": "approved",
       "taxonomy": {
@@ -2977,6 +4280,112 @@
     {
       "aliases": [],
       "assertion_ids": [
+        "cohort4.dataset.claim.stanford-alpaca.count-schema",
+        "cohort4.dataset.claim.stanford-alpaca.datasheet-license-conflict",
+        "cohort4.dataset.claim.stanford-alpaca.license",
+        "cohort4.dataset.claim.stanford-alpaca.new-generation",
+        "cohort4.dataset.claim.stanford-alpaca.noise",
+        "cohort4.dataset.claim.stanford-alpaca.split"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.stanford-alpaca",
+      "id": "dataset-release.stanford-alpaca.761dc5bfbdee",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:bc335b356f6de0a3294cf65d0a389edc4a796764e31e777b7a8d61a7cb7aa551",
+        "documentation_revision": "761dc5bfbdeeffa89b8bff5d038781a4055f796a",
+        "repository": "tatsu-lab/stanford_alpaca"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "Stanford Alpaca documentation snapshot tatsu-lab/stanford_alpaca @ 761dc5bfbdee",
+      "parent_id": "dataset.stanford-alpaca",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.summarize-from-feedback.count",
+        "cohort4.dataset.claim.summarize-from-feedback.evaluation-conditions",
+        "cohort4.dataset.claim.summarize-from-feedback.license-scope",
+        "cohort4.dataset.claim.summarize-from-feedback.pair-format",
+        "cohort4.dataset.claim.summarize-from-feedback.worker-notes"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.summarize-from-feedback",
+      "id": "dataset-release.summarize-from-feedback.700967448d10",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:5c5c30159193e8d5d104fa0aeda27cbfdee1ba7053ca43807cc7d59b5af917d0",
+        "documentation_revision": "700967448d10004279f138666442bf1497d0e705",
+        "repository": "openai/summarize-from-feedback"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "OpenAI Summarize from Feedback documentation snapshot openai/summarize-from-feedback @ 700967448d10",
+      "parent_id": "dataset.summarize-from-feedback",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.super-naturalinstructions.community",
+        "cohort4.dataset.claim.super-naturalinstructions.component-terms",
+        "cohort4.dataset.claim.super-naturalinstructions.contribution-qc",
+        "cohort4.dataset.claim.super-naturalinstructions.schema",
+        "cohort4.dataset.claim.super-naturalinstructions.task-split"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.super-naturalinstructions",
+      "id": "dataset-release.super-naturalinstructions.55a365637381",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:bd5c0768d317f0184c00afd3233d166672aa63a6fee52fa368f3aa117111ccd7",
+        "documentation_revision": "55a365637381ce7f3748fa2eac7aef1a113bbb82",
+        "repository": "allenai/natural-instructions"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "Super-NaturalInstructions documentation snapshot allenai/natural-instructions @ 55a365637381",
+      "parent_id": "dataset.super-naturalinstructions",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
         "cohort2.dataset.claim.tulu3.component-terms",
         "cohort2.dataset.claim.tulu3.count-discrepancy",
         "cohort2.dataset.claim.tulu3.mixed-origins",
@@ -3077,6 +4486,141 @@
     {
       "aliases": [],
       "assertion_ids": [
+        "cohort4.dataset.claim.ultramedical.composite",
+        "cohort4.dataset.claim.ultramedical.count",
+        "cohort4.dataset.claim.ultramedical.license",
+        "cohort4.dataset.claim.ultramedical.model-roles"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.ultramedical",
+      "id": "dataset-release.ultramedical.8930b349985d",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:d1f52a4de8b015cae1386ceee29568855fe229128292d3aaa4d362a0d0026228",
+        "documentation_revision": "8930b349985de8345df14d65eb894cf8fce36d9c",
+        "repository": "TsinghuaC3I/UltraMedical"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "UltraMedical documentation snapshot TsinghuaC3I/UltraMedical @ 8930b349985d",
+      "parent_id": "dataset.ultramedical",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.ultramedical.accuracy-limit"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.ultramedical",
+      "id": "dataset-release.ultramedical.e53eab0a5d0b",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:479f472c4f06fc4ed9aaeffae3c12b28271b3540806033dea0947860d0071fb6",
+        "documentation_revision": "e53eab0a5d0bf981c8cb9c55744d61dc0b4d56a9",
+        "repository": "TsinghuaC3I/UltraMedical"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "UltraMedical documentation snapshot TsinghuaC3I/UltraMedical @ e53eab0a5d0b",
+      "parent_id": "dataset.ultramedical",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.webgpt-comparisons.evidence-origin",
+        "cohort4.dataset.claim.webgpt-comparisons.human-labels",
+        "cohort4.dataset.claim.webgpt-comparisons.label-convention",
+        "cohort4.dataset.claim.webgpt-comparisons.selection-count",
+        "cohort4.dataset.claim.webgpt-comparisons.token-format"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.webgpt-comparisons",
+      "id": "dataset-release.webgpt-comparisons.f30e1bd2f0a5",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:50ea5bd9737deb4ea6275b7ec9b6080233d4cf10fe1a46fe89c473aa2aca1502",
+        "documentation_revision": "f30e1bd2f0a51535b493de36d3686cfcfff47abe",
+        "repository": "openai/webgpt_comparisons"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "WebGPT Comparisons documentation snapshot openai/webgpt_comparisons @ f30e1bd2f0a5",
+      "parent_id": "dataset.webgpt-comparisons",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort4.dataset.claim.xp3.count-units",
+        "cohort4.dataset.claim.xp3.license",
+        "cohort4.dataset.claim.xp3.schema",
+        "cohort4.dataset.claim.xp3.scope",
+        "cohort4.dataset.claim.xp3.translated-variant"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.xp3",
+      "id": "dataset-release.xp3.0ab0411dca6e",
+      "identifiers": {
+        "documentation_primary_sha256": "sha256:b037cb4eac19ccc852b6570dda2ca0cc5017298407fbcc4aaaebef6382e110ea",
+        "documentation_revision": "0ab0411dca6e222e62d210bc681dbcb476d6fe4c",
+        "repository": "bigscience/xP3"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "xP3 documentation snapshot bigscience/xP3 @ 0ab0411dca6e",
+      "parent_id": "dataset.xp3",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
         "candidate.cohort3.dataset.alignanything.01",
         "candidate.cohort3.dataset.alignanything.02",
         "candidate.cohort3.dataset.alignanything.03",
@@ -3135,6 +4679,44 @@
           "preference annotation",
           "language critique and refinement"
         ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.aya-dataset",
+      "id": "dataset.aya-dataset",
+      "identifiers": {
+        "family": "dataset.aya-dataset"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "Aya Dataset",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "multilingual instruction following"
+        ],
+        "expertise": [],
+        "labels": [
+          "annotation type",
+          "language",
+          "annotator identifier"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "volunteer-written prompt-completion pairs",
+          "human-edited generated pairs"
+        ],
+        "oversight": [],
+        "workflow": []
       }
     },
     {
@@ -3281,6 +4863,45 @@
     },
     {
       "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.code-feedback",
+      "id": "dataset.code-feedback",
+      "identifiers": {
+        "family": "dataset.code-feedback"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "Code-Feedback",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "code generation",
+          "iterative refinement"
+        ],
+        "expertise": [],
+        "labels": [
+          "multi-turn conversations",
+          "automated complexity scores"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "upstream code instructions",
+          "GPT-generated conversations",
+          "execution feedback"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
       "assertion_ids": [
         "candidate.cohort3.dataset.daringanteater.01",
         "candidate.cohort3.dataset.daringanteater.02",
@@ -3337,6 +4958,44 @@
           "synthetic instruction tuning",
           "SFT before preference tuning"
         ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.dolly-15k",
+      "id": "dataset.dolly-15k",
+      "identifiers": {
+        "family": "dataset.dolly-15k"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "Databricks Dolly 15k",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "general instruction following"
+        ],
+        "expertise": [],
+        "labels": [
+          "instruction-response pairs",
+          "task category"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "employee-written prompts",
+          "employee-written responses",
+          "Wikipedia reference passages"
+        ],
+        "oversight": [],
+        "workflow": []
       }
     },
     {
@@ -3474,6 +5133,45 @@
           "text"
         ],
         "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "pending",
+      "disposition_reason": "The pinned creator-document assertions have separate passing author, source-verifier and adversarial AI reviews. Strict family independence from constituent collections is not yet adjudicated; this documentation family remains visible but adds no separate family to launch coverage. No new-row count, disjointness or corpus-level inspection is inferred.",
+      "eligible_core": false,
+      "family_id": "family.flan-collection",
+      "id": "dataset.flan-collection",
+      "identifiers": {
+        "family": "dataset.flan-collection"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "The Flan Collection",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "candidate",
+      "taxonomy": {
+        "domain": [
+          "multitask instruction tuning"
+        ],
+        "expertise": [],
+        "labels": [
+          "task targets",
+          "template types",
+          "task names"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "upstream task datasets",
+          "instruction templates",
+          "composite mixture"
+        ],
         "oversight": [],
         "workflow": []
       }
@@ -3652,6 +5350,43 @@
     },
     {
       "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.intel-orca-dpo-pairs",
+      "id": "dataset.intel-orca-dpo-pairs",
+      "identifiers": {
+        "family": "dataset.intel-orca-dpo-pairs"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "Intel Orca DPO Pairs",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "general preferences"
+        ],
+        "expertise": [],
+        "labels": [
+          "chosen/rejected preference assignment"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "OpenOrca prompts",
+          "GPT-4/GPT-3.5 chosen completions",
+          "new Llama-2-13b-chat rejected completions"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
       "assertion_ids": [
         "candidate.cohort3.dataset.lmsyschat1m.01",
         "candidate.cohort3.dataset.lmsyschat1m.02",
@@ -3769,6 +5504,82 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.math-shepherd",
+      "id": "dataset.math-shepherd",
+      "identifiers": {
+        "family": "dataset.math-shepherd"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "Math-Shepherd",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "mathematical reasoning"
+        ],
+        "expertise": [],
+        "labels": [
+          "good/bad step labels",
+          "task indicator"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "GSM8K/MATH problems",
+          "step-by-step solutions",
+          "automatic step labels"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.medinstruct",
+      "id": "dataset.medinstruct",
+      "identifiers": {
+        "family": "dataset.medinstruct"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "MedInstruct",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "medicine"
+        ],
+        "expertise": [],
+        "labels": [
+          "instruction/input/output",
+          "test-only clinician difficulty"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "clinician-crafted seed tasks",
+          "GPT-4 instructions",
+          "synthetic responses"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "Creator-maintained family/release documentation received separate AI source-content review of construction, label origin, format, evaluation conditions and stated access/license limitations. This is documentation review, not download or independent recount of corpus rows. The pinned release and parent family remain distinct; rights conflicts and version-specific unknowns are preserved in approved assertions.",
       "eligible_core": false,
       "family_id": "family.nectar",
@@ -3788,6 +5599,43 @@
         "labels": [],
         "modality": [],
         "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.no-robots",
+      "id": "dataset.no-robots",
+      "identifiers": {
+        "family": "dataset.no-robots"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "No Robots",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "general instruction following"
+        ],
+        "expertise": [],
+        "labels": [
+          "messages",
+          "category",
+          "prompt identifier"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "human-written instructions and demonstrations"
+        ],
         "oversight": [],
         "workflow": []
       }
@@ -3882,6 +5730,46 @@
           "text"
         ],
         "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.opencodeinstruct",
+      "id": "dataset.opencodeinstruct",
+      "identifiers": {
+        "family": "dataset.opencodeinstruct"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "OpenCodeInstruct",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "code generation"
+        ],
+        "expertise": [],
+        "labels": [
+          "unit tests",
+          "pass/fail status",
+          "average test score"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "synthetic coding questions",
+          "LLM responses",
+          "LLM judgments",
+          "test execution"
+        ],
         "oversight": [],
         "workflow": []
       }
@@ -4028,6 +5916,47 @@
           "synthetic reasoning augmentation",
           "instruction tuning"
         ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.openthoughts",
+      "id": "dataset.openthoughts",
+      "identifiers": {
+        "family": "dataset.openthoughts"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "OpenThoughts",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "math",
+          "science",
+          "code",
+          "puzzles"
+        ],
+        "expertise": [],
+        "labels": [
+          "reasoning and solution text",
+          "source metadata",
+          "ground truth"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "upstream problems",
+          "DeepSeek-R1 reasoning traces"
+        ],
+        "oversight": [],
+        "workflow": []
       }
     },
     {
@@ -4320,6 +6249,122 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.stanford-alpaca",
+      "id": "dataset.stanford-alpaca",
+      "identifiers": {
+        "family": "dataset.stanford-alpaca"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "Stanford Alpaca",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "general instruction following"
+        ],
+        "expertise": [],
+        "labels": [
+          "SFT responses"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "model-generated instructions",
+          "model-generated responses",
+          "Self-Instruct seeds"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.summarize-from-feedback",
+      "id": "dataset.summarize-from-feedback",
+      "identifiers": {
+        "family": "dataset.summarize-from-feedback"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "OpenAI Summarize from Feedback",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "summarization",
+          "human preferences"
+        ],
+        "expertise": [],
+        "labels": [
+          "pairwise choice",
+          "Likert axis ratings",
+          "worker notes"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "Reddit TL;DR posts",
+          "CNN/DM articles",
+          "model/reference summaries",
+          "worker labels"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.super-naturalinstructions",
+      "id": "dataset.super-naturalinstructions",
+      "identifiers": {
+        "family": "dataset.super-naturalinstructions"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "Super-NaturalInstructions",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "multitask NLP"
+        ],
+        "expertise": [],
+        "labels": [
+          "task definitions",
+          "positive and negative examples",
+          "input-output instances"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "community-written task definitions",
+          "inherited task instances"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "Creator-maintained family/release documentation received separate AI source-content review of construction, label origin, format, evaluation conditions and stated access/license limitations. This is documentation review, not download or independent recount of corpus rows. The pinned release and parent family remain distinct; rights conflicts and version-specific unknowns are preserved in approved assertions.",
       "eligible_core": false,
       "family_id": "family.tulu3",
@@ -4455,6 +6500,46 @@
     },
     {
       "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.ultramedical",
+      "id": "dataset.ultramedical",
+      "identifiers": {
+        "family": "dataset.ultramedical"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "UltraMedical",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "biomedicine"
+        ],
+        "expertise": [],
+        "labels": [
+          "instruction score",
+          "original answer",
+          "conversation"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "adapted medical datasets",
+          "custom synthetic questions",
+          "GPT-4 responses",
+          "GPT-3.5 instruction scores"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
       "assertion_ids": [
         "candidate.cohort3.dataset.videofeedback.01",
         "candidate.cohort3.dataset.videofeedback.02",
@@ -4568,6 +6653,43 @@
     },
     {
       "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
+      "eligible_core": false,
+      "family_id": "family.webgpt-comparisons",
+      "id": "dataset.webgpt-comparisons",
+      "identifiers": {
+        "family": "dataset.webgpt-comparisons"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "WebGPT Comparisons",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "long-form question answering"
+        ],
+        "expertise": [],
+        "labels": [
+          "signed pairwise preference"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "questions from source datasets",
+          "model browsing extracts and answers",
+          "human preference scores"
+        ],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
       "assertion_ids": [
         "candidate.cohort3.dataset.wildchat.01",
         "candidate.cohort3.dataset.wildchat.02",
@@ -4624,6 +6746,44 @@
           "de-identification",
           "moderation filtering"
         ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "pending",
+      "disposition_reason": "The pinned creator-document assertions have separate passing author, source-verifier and adversarial AI reviews. Strict family independence from constituent collections is not yet adjudicated; this documentation family remains visible but adds no separate family to launch coverage. No new-row count, disjointness or corpus-level inspection is inferred.",
+      "eligible_core": false,
+      "family_id": "family.xp3",
+      "id": "dataset.xp3",
+      "identifiers": {
+        "family": "dataset.xp3"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "xP3",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "candidate",
+      "taxonomy": {
+        "domain": [
+          "multilingual NLP",
+          "program synthesis"
+        ],
+        "expertise": [],
+        "labels": [
+          "inputs",
+          "targets"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "prompted upstream datasets",
+          "PromptSource prompt contributions"
+        ],
+        "oversight": [],
+        "workflow": []
       }
     },
     {
@@ -8122,6 +10282,88 @@
       }
     },
     {
+      "aliases": [
+        "Training Language Models with Language Feedback"
+      ],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2204.14146",
+      "identifiers": {
+        "arxiv": "2204.14146"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Learning from Natural Language Feedback",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.languagefeedback.human-feedback",
+        "cohort5.claim.languagefeedback.main-evaluator",
+        "cohort5.claim.languagefeedback.result",
+        "cohort5.claim.languagefeedback.selection",
+        "cohort5.claim.languagefeedback.test-protocol"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2204.14146v1",
+      "identifiers": {
+        "arxiv_version": "2204.14146v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Learning from Natural Language Feedback (2204.14146v1)",
+      "parent_id": "paper.arxiv.2204.14146",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
@@ -8557,6 +10799,86 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2303.08774",
+      "identifiers": {
+        "arxiv": "2303.08774"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "GPT-4 Technical Report",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.gpt4.disclosure",
+        "cohort5.claim.gpt4.exam-grading",
+        "cohort5.claim.gpt4.factuality-result",
+        "cohort5.claim.gpt4.human-pipeline",
+        "cohort5.claim.gpt4.rubric-reward"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2303.08774v1",
+      "identifiers": {
+        "arxiv_version": "2303.08774v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "GPT-4 Technical Report (2303.08774v1)",
+      "parent_id": "paper.arxiv.2303.08774",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "Pinned paper methods, results, limitations and assertion-relevant appendix passages received separate AI source-content review. The disclosed page ledgers retain partial and unread material; full_source means substantive source review beyond metadata, not exhaustive reading, proof certification, reproduction or an audit of underlying records. Dataset and supplier identities are not promoted from paper mentions.",
       "eligible_core": false,
       "family_id": null,
@@ -8627,6 +10949,166 @@
           "inference_time_refinement",
           "automatic_evaluation",
           "human_evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2304.05302",
+      "identifiers": {
+        "arxiv": "2304.05302"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "RRHF: Rank Responses to Align Language Models with Human Feedback without tears",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.rrhf.data-origin",
+        "cohort5.claim.rrhf.length-score",
+        "cohort5.claim.rrhf.reward-result",
+        "cohort5.claim.rrhf.sampling-limit",
+        "cohort5.claim.rrhf.training-loss"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2304.05302v1",
+      "identifiers": {
+        "arxiv_version": "2304.05302v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "RRHF: Rank Responses to Align Language Models with Human Feedback without tears (2304.05302v1)",
+      "parent_id": "paper.arxiv.2304.05302",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2304.06767",
+      "identifiers": {
+        "arxiv": "2304.06767"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "RAFT: Reward rAnked FineTuning for Generative Foundation Model Alignment",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.raft.batch-selection",
+        "cohort5.claim.raft.fluency-protocol",
+        "cohort5.claim.raft.imdb-result",
+        "cohort5.claim.raft.sparse-limit",
+        "cohort5.claim.raft.teacher-option"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2304.06767v1",
+      "identifiers": {
+        "arxiv_version": "2304.06767v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "RAFT: Reward rAnked FineTuning for Generative Foundation Model Alignment (2304.06767v1)",
+      "parent_id": "paper.arxiv.2304.06767",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
         ]
       }
     },
@@ -8779,6 +11261,86 @@
           "multimodal_curation",
           "data_filtering",
           "benchmark_evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2305.10425",
+      "identifiers": {
+        "arxiv": "2305.10425"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "SLiC-HF: Sequence Likelihood Calibration with Human Feedback",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.slichf.candidate-budget",
+        "cohort5.claim.slichf.direct-variant",
+        "cohort5.claim.slichf.distribution-limit",
+        "cohort5.claim.slichf.human-result",
+        "cohort5.claim.slichf.loss"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2305.10425v1",
+      "identifiers": {
+        "arxiv_version": "2305.10425v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "SLiC-HF: Sequence Likelihood Calibration with Human Feedback (2305.10425v1)",
+      "parent_id": "paper.arxiv.2305.10425",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
         ]
       }
     },
@@ -9148,6 +11710,86 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2307.09288",
+      "identifiers": {
+        "arxiv": "2307.09288"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Llama 2: Open Foundation and Fine-Tuned Chat Models",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.llama2.evaluation-limit",
+        "cohort5.claim.llama2.human-result",
+        "cohort5.claim.llama2.preference",
+        "cohort5.claim.llama2.sampling",
+        "cohort5.claim.llama2.sft"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2307.09288v1",
+      "identifiers": {
+        "arxiv_version": "2307.09288v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Llama 2: Open Foundation and Fine-Tuned Chat Models (2307.09288v1)",
+      "parent_id": "paper.arxiv.2307.09288",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "Pinned paper methods, results, limitations and essential appendix passages received separate source-content AI reviews. This is bounded substantive review, not cover-to-cover reading, proof certification, experiment reproduction or a raw-data audit. Exact per-role page scopes remain in the review provenance.",
       "eligible_core": false,
       "family_id": null,
@@ -9413,6 +12055,87 @@
     },
     {
       "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2309.06657",
+      "identifiers": {
+        "arxiv": "2309.06657"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Statistical Rejection Sampling Improves Preference Optimization",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.rso.budget",
+        "cohort5.claim.rso.cross-task",
+        "cohort5.claim.rso.helpfulness-scope",
+        "cohort5.claim.rso.human-protocol",
+        "cohort5.claim.rso.human-result",
+        "cohort5.claim.rso.rejection"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2309.06657v1",
+      "identifiers": {
+        "arxiv_version": "2309.06657v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Statistical Rejection Sampling Improves Preference Optimization (2309.06657v1)",
+      "parent_id": "paper.arxiv.2309.06657",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
       "assertion_ids": [
         "candidate.supplier.prolific.cohere-recruitment"
       ],
@@ -9578,6 +12301,87 @@
         "oversight": [],
         "workflow": [
           "research"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2310.10505",
+      "identifiers": {
+        "arxiv": "2310.10505"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "ReMax: A Simple, Effective, and Efficient Method for Aligning Large Language Models",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.remax.evaluation",
+        "cohort5.claim.remax.greedy-baseline",
+        "cohort5.claim.remax.reward-limit",
+        "cohort5.claim.remax.speed-limit",
+        "cohort5.claim.remax.speed-result",
+        "cohort5.claim.remax.stage-split"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2310.10505v1",
+      "identifiers": {
+        "arxiv_version": "2310.10505v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "ReMax: A Simple, Effective, and Efficient Method for Aligning Large Language Models (2310.10505v1)",
+      "parent_id": "paper.arxiv.2310.10505",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
         ]
       }
     },
@@ -10101,6 +12905,87 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2402.03300",
+      "identifiers": {
+        "arxiv": "2402.03300"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.deepseekmath.decontamination",
+        "cohort5.claim.deepseekmath.group-reward",
+        "cohort5.claim.deepseekmath.math-result",
+        "cohort5.claim.deepseekmath.sampling-budget",
+        "cohort5.claim.deepseekmath.scope-limit",
+        "cohort5.claim.deepseekmath.sft-data"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2402.03300v1",
+      "identifiers": {
+        "arxiv_version": "2402.03300v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models (2402.03300v1)",
+      "parent_id": "paper.arxiv.2402.03300",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "Pinned paper methods, results, limitations and assertion-relevant appendix passages received separate AI source-content review. Per-role page scopes remain explicitly partial; this is neither exhaustive reading nor benchmark execution, experiment reproduction, raw-data audit or human peer review. Benchmark-family and supplier records are not automatically promoted from this paper review.",
       "eligible_core": false,
       "family_id": null,
@@ -10167,6 +13052,86 @@
         "oversight": [],
         "workflow": [
           "benchmark_evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2402.14740",
+      "identifiers": {
+        "arxiv": "2402.14740"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Back to Basics: Revisiting REINFORCE Style Optimization for Learning from Human Feedback in LLMs",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.rloo.human-limit",
+        "cohort5.claim.rloo.leave-one-out",
+        "cohort5.claim.rloo.rollout-prompts",
+        "cohort5.claim.rloo.tldr-result",
+        "cohort5.claim.rloo.whole-generation"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2402.14740v1",
+      "identifiers": {
+        "arxiv_version": "2402.14740v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Back to Basics: Revisiting REINFORCE Style Optimization for Learning from Human Feedback in LLMs (2402.14740v1)",
+      "parent_id": "paper.arxiv.2402.14740",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
         ]
       }
     },
@@ -10380,6 +13345,247 @@
         "oversight": [],
         "workflow": [
           "benchmark_evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2404.16767",
+      "identifiers": {
+        "arxiv": "2404.16767"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "REBEL: Reinforcement Learning via Regressing Relative Rewards",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.rebel.distribution",
+        "cohort5.claim.rebel.judge-protocol",
+        "cohort5.claim.rebel.online-experiment",
+        "cohort5.claim.rebel.relative-regression",
+        "cohort5.claim.rebel.tldr-result"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2404.16767v1",
+      "identifiers": {
+        "arxiv_version": "2404.16767v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "REBEL: Reinforcement Learning via Regressing Relative Rewards (2404.16767v1)",
+      "parent_id": "paper.arxiv.2404.16767",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2405.00675",
+      "identifiers": {
+        "arxiv": "2405.00675"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Self-Play Preference Optimization for Language Model Alignment",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.sppo.alignment-limit",
+        "cohort5.claim.sppo.game",
+        "cohort5.claim.sppo.iterations",
+        "cohort5.claim.sppo.result",
+        "cohort5.claim.sppo.selection",
+        "cohort5.claim.sppo.theorem-scope"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2405.00675v1",
+      "identifiers": {
+        "arxiv_version": "2405.00675v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Self-Play Preference Optimization for Language Model Alignment (2405.00675v1)",
+      "parent_id": "paper.arxiv.2405.00675",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2405.14734",
+      "identifiers": {
+        "arxiv": "2405.14734"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "SimPO: Simple Preference Optimization with a Reference-Free Reward",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.simpo.instruct-data",
+        "cohort5.claim.simpo.margin",
+        "cohort5.claim.simpo.result",
+        "cohort5.claim.simpo.reward",
+        "cohort5.claim.simpo.scope-limit"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2405.14734v1",
+      "identifiers": {
+        "arxiv_version": "2405.14734v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "SimPO: Simple Preference Optimization with a Reference-Free Reward (2405.14734v1)",
+      "parent_id": "paper.arxiv.2405.14734",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
         ]
       }
     },
@@ -10614,6 +13820,86 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2406.11827",
+      "identifiers": {
+        "arxiv": "2406.11827"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "WPO: Enhancing RLHF with Weighted Preference Optimization",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.wpo.assumption",
+        "cohort5.claim.wpo.coverage-limit",
+        "cohort5.claim.wpo.hybrid-labels",
+        "cohort5.claim.wpo.result",
+        "cohort5.claim.wpo.weights"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2406.11827v1",
+      "identifiers": {
+        "arxiv_version": "2406.11827v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "WPO: Enhancing RLHF with Weighted Preference Optimization (2406.11827v1)",
+      "parent_id": "paper.arxiv.2406.11827",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "Pinned paper methods, results, limitations and assertion-relevant appendix passages received separate AI source-content review. Per-role page scopes remain explicitly partial; this is neither exhaustive reading nor benchmark execution, experiment reproduction, raw-data audit or human peer review. Benchmark-family and supplier records are not automatically promoted from this paper review.",
       "eligible_core": false,
       "family_id": null,
@@ -10743,6 +14029,489 @@
         "oversight": [],
         "workflow": [
           "research"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2406.18629",
+      "identifiers": {
+        "arxiv": "2406.18629"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Step-DPO: Step-wise Preference Optimization for Long-chain Reasoning of LLMs",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.stepdpo.ablation-result",
+        "cohort5.claim.stepdpo.judge-role",
+        "cohort5.claim.stepdpo.pair-count",
+        "cohort5.claim.stepdpo.step-limit",
+        "cohort5.claim.stepdpo.step-objective"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2406.18629v1",
+      "identifiers": {
+        "arxiv_version": "2406.18629v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Step-DPO: Step-wise Preference Optimization for Long-chain Reasoning of LLMs (2406.18629v1)",
+      "parent_id": "paper.arxiv.2406.18629",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2407.21783",
+      "identifiers": {
+        "arxiv": "2407.21783"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "The Llama 3 Herd of Models",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.llama3.dpo-masking",
+        "cohort5.claim.llama3.edited-ranking",
+        "cohort5.claim.llama3.human-result",
+        "cohort5.claim.llama3.human-win",
+        "cohort5.claim.llama3.rounds",
+        "cohort5.claim.llama3.sampling"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2407.21783v1",
+      "identifiers": {
+        "arxiv_version": "2407.21783v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "The Llama 3 Herd of Models (2407.21783v1)",
+      "parent_id": "paper.arxiv.2407.21783",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2412.16339",
+      "identifiers": {
+        "arxiv": "2412.16339"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Deliberative Alignment: Reasoning Enables Safer Language Models",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.deliberative.human-protocol",
+        "cohort5.claim.deliberative.human-result",
+        "cohort5.claim.deliberative.minimum-filter",
+        "cohort5.claim.deliberative.remove-spec",
+        "cohort5.claim.deliberative.rl-trace",
+        "cohort5.claim.deliberative.synthetic-generation"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2412.16339v1",
+      "identifiers": {
+        "arxiv_version": "2412.16339v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Deliberative Alignment: Reasoning Enables Safer Language Models (2412.16339v1)",
+      "parent_id": "paper.arxiv.2412.16339",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2412.19437",
+      "identifiers": {
+        "arxiv": "2412.19437"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "DeepSeek-V3 Technical Report",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.deepseekv3.distill-tradeoff",
+        "cohort5.claim.deepseekv3.grpo",
+        "cohort5.claim.deepseekv3.human-check",
+        "cohort5.claim.deepseekv3.instruction-data",
+        "cohort5.claim.deepseekv3.math-result"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2412.19437v1",
+      "identifiers": {
+        "arxiv_version": "2412.19437v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "DeepSeek-V3 Technical Report (2412.19437v1)",
+      "parent_id": "paper.arxiv.2412.19437",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2501.12948",
+      "identifiers": {
+        "arxiv": "2501.12948"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.deepseekr1.distill-result",
+        "cohort5.claim.deepseekr1.distilled-training",
+        "cohort5.claim.deepseekr1.human-coldstart",
+        "cohort5.claim.deepseekr1.reasoning-sft",
+        "cohort5.claim.deepseekr1.zero-reward"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2501.12948v1",
+      "identifiers": {
+        "arxiv_version": "2501.12948v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning (2501.12948v1)",
+      "parent_id": "paper.arxiv.2501.12948",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2501.18837",
+      "identifiers": {
+        "arxiv": "2501.18837"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Constitutional Classifiers: Defending against Universal Jailbreaks across Thousands of Hours of Red Teaming",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort5.claim.constitutionalclassifiers.dual-classifiers",
+        "cohort5.claim.constitutionalclassifiers.evaluation-limit",
+        "cohort5.claim.constitutionalclassifiers.production-refusal",
+        "cohort5.claim.constitutionalclassifiers.prototype-result",
+        "cohort5.claim.constitutionalclassifiers.synthetic-data",
+        "cohort5.claim.constitutionalclassifiers.system-separation"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2501.18837v1",
+      "identifiers": {
+        "arxiv_version": "2501.18837v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Constitutional Classifiers: Defending against Universal Jailbreaks across Thousands of Hours of Red Teaming (2501.18837v1)",
+      "parent_id": "paper.arxiv.2501.18837",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "language_model_alignment"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_source_research"
+        ],
+        "oversight": [],
+        "workflow": [
+          "post_training",
+          "preference_learning",
+          "evaluation"
         ]
       }
     },
