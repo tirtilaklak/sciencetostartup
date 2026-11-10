@@ -1,6 +1,8 @@
 const { test, expect } = require('@playwright/test');
-const { readFileSync } = require('node:fs');
+const { readFileSync, mkdtempSync, writeFileSync, rmSync } = require('node:fs');
 const { resolve } = require('node:path');
+const { tmpdir } = require('node:os');
+const { pathToFileURL } = require('node:url');
 const { spawnSync } = require('node:child_process');
 const { createHash } = require('node:crypto');
 
@@ -332,21 +334,17 @@ test('imported executive judgments retain stable anchors and approved evidence i
   await page.goto(reportPath);
   await expect(page.locator('.r-finding')).toHaveCount(findings.length);
   const offlineContext = await browser.newContext({ javaScriptEnabled: false, offline: true });
+  const offlineDirectory = mkdtempSync(resolve(tmpdir(), 'sts-research-archive-'));
   try {
-    const offlineOrigin = 'https://research-archive.invalid';
+    for (const name of ['report.html', 'evidence.html']) writeFileSync(resolve(offlineDirectory, name), packaged[name]);
     const unexpectedRequests = [];
-    // Resolve pages from the downloaded archive only; no live-site fallback.
-    await offlineContext.route('**/*', route => {
-      const url = new URL(route.request().url());
-      const name = url.pathname.slice(1);
-      if (url.origin === offlineOrigin && ['report.html', 'evidence.html'].includes(name)) {
-        return route.fulfill({ status: 200, contentType: 'text/html', body: packaged[name] });
-      }
-      unexpectedRequests.push(url.href);
+    // Open the downloaded pages as local files, with networking disabled.
+    await offlineContext.route(/^https?:\/\//, route => {
+      unexpectedRequests.push(route.request().url());
       return route.abort();
     });
     const offline = await offlineContext.newPage();
-    await offline.goto(offlineOrigin + '/report.html');
+    await offline.goto(pathToFileURL(resolve(offlineDirectory, 'report.html')).href);
     for (const finding of findings) {
       const id = 'finding-' + finding.id;
       const article = page.locator(selector(id));
@@ -378,7 +376,7 @@ test('imported executive judgments retain stable anchors and approved evidence i
     }
     const citedClaims = [...new Set(findings.flatMap(finding => finding.claim_ids))];
     await offline.getByRole('link', { name: citedClaims[0], exact: true }).first().click();
-    await expect(offline).toHaveURL(offlineOrigin + '/evidence.html#' + encodeURIComponent('assertion-' + citedClaims[0]));
+    await expect(offline).toHaveURL(pathToFileURL(resolve(offlineDirectory, 'evidence.html')).href + '#' + encodeURIComponent('assertion-' + citedClaims[0]));
     for (const cid of citedClaims) {
       await expect(offline.locator(selector('assertion-' + cid))).toHaveCount(1);
     }
@@ -392,5 +390,6 @@ test('imported executive judgments retain stable anchors and approved evidence i
     }
   } finally {
     await offlineContext.close();
+    rmSync(offlineDirectory, { recursive: true, force: true });
   }
 });
