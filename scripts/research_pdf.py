@@ -74,7 +74,9 @@ def render_report_pdf(context):
     for section in report.get("sections", []):
         heading = Paragraph(escape(section["title"]), styles["Heading2"])
         for index, paragraph in enumerate(section.get("paragraphs", [])):
-            group = ([heading] if index == 0 else []) + [Paragraph("<b>" + escape(paragraph.get("kind", "analysis")) + ":</b> " + escape(paragraph["text"]), styles["BodyText"])]
+            label = {"method": "Method", "sourced_fact": "Historical evidence" if paragraph.get('historical') else "Evidence",
+                     "analysis": "Analysis", "research_gap": "Research gap"}.get(paragraph.get('kind'), 'Analysis')
+            group = ([heading] if index == 0 else []) + [Paragraph("<b>" + label + ":</b> " + escape(paragraph["text"]), styles["BodyText"])]
             if paragraph.get("claim_ids"):
                 cited = sorted({source_numbers[item["source_id"]] for cid in paragraph["claim_ids"]
                                 for item in assertions.get(cid, {}).get("evidence", []) if item.get("source_id") in source_numbers})

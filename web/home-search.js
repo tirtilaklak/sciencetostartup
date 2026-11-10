@@ -31,6 +31,7 @@
  $('home-search-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});dialog.addEventListener('close',()=>{$('home-search-open').setAttribute('aria-expanded','false');$('home-search-open').focus();});
  input.addEventListener('input',()=>{if(entries)render();});
  input.addEventListener('keydown',event=>{
+  if(event.key==='Escape'){event.preventDefault();dialog.close();return;}
   const options=[...results.querySelectorAll('[role=option]')];if(!options.length)return;
   if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){event.preventDefault();active=event.key==='Home'?0:event.key==='End'?options.length-1:(active+(event.key==='ArrowDown'?1:options.length-1))%options.length;options.forEach((node,i)=>{node.id='home-result-'+i;node.setAttribute('aria-selected',String(i===active));});input.setAttribute('aria-activedescendant',options[active].id);options[active].scrollIntoView({block:'nearest'});}
   if(event.key==='Enter'){event.preventDefault();options[Math.max(active,0)].click();}
