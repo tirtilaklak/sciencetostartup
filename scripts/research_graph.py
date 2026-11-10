@@ -16,7 +16,7 @@ import io
 import ipaddress
 import json
 import math
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import sqlite3
 from urllib.parse import urlsplit, parse_qsl
@@ -37,6 +37,7 @@ PREDICATES = {"legacy_description", "has_capability", "supplies_data_for", "publ
               "has_stage", "version_of", "release_of", "recruited_for", "annotated_for",
               "adjudicated_for", "generated_for", "labeled_for", "filtered_for"}
 FACETS = {"domain", "modality", "workflow", "expertise", "origin", "labels", "oversight"}
+OPTIONAL_FACETS = {"delivery_model", "data_purpose"}
 REVIEW_ROLES = {"author", "source_verifier", "adversarial"}
 EMAIL = re.compile(r"[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.I)
 SECRET = re.compile(r"(?:sk-(?:proj-)?[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)")
@@ -52,6 +53,7 @@ ASSERTION_FIELDS = {"id", "subject_id", "predicate", "object_id", "value", "evid
                     "qualifications", "status", "review_ids", "as_of", "provenance_kind"}
 REVIEW_FIELDS = {"id", "assertion_ids", "role", "reviewer", "reviewer_type", "invocation_id",
                  "reviewed_on", "verdict", "method", "source_ids", "note", "assertion_sha256"}
+PARTITION_TABLES = ("entities", "sources", "assertions", "reviews")
 
 
 class GraphValidationError(ValueError):
@@ -111,10 +113,142 @@ def _public_url(value):
         return False
 
 
+def _partition_json(content, path):
+    """Parse pinned JSON without silently accepting duplicate keys or NaN values."""
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError("duplicate object key " + key)
+            result[key] = value
+        return result
+
+    def constant(value):
+        raise ValueError("non-finite number " + value)
+
+    try:
+        return json.loads(content, object_pairs_hook=pairs, parse_constant=constant)
+    except (ValueError, UnicodeError) as error:
+        raise GraphValidationError([f"{path}: invalid JSON ({error})"]) from error
+
+
+def _partition_file(root, relative, label):
+    """Require a regular local file with no symlink in its path below root."""
+    path = root
+    for part in relative.parts:
+        path = path / part
+        if path.is_symlink():
+            raise GraphValidationError([f"{label}: symlinks forbidden"])
+    try:
+        if not path.is_file() or not path.resolve(strict=True).is_relative_to(root.resolve(strict=True)):
+            raise GraphValidationError([f"{label}: expected file inside data/research/approved"])
+        return path.read_bytes()
+    except OSError as error:
+        raise GraphValidationError([f"{label}: cannot read pinned file ({error.strerror})"]) from error
+
+
+def load_partition_records(root=ROOT):
+    """Load optional SHA256-pinned approved records, without resolving graph references.
+
+    ``data/research/approved/index.json`` alone selects inputs; unlisted files are
+    ignored. Index entries and each partition's rows must be strictly sorted by
+    relative POSIX path and stable id respectively. The result contains only the
+    four record arrays, in index/row order. The base graph owns all root metadata.
+    Call load_graph for canonical binding and full merged-reference/review checks.
+    """
+    root = Path(root)
+    approved = root / "data/research/approved"
+    index = approved / "index.json"
+    records = {table: [] for table in PARTITION_TABLES}
+    if not index.exists() and not index.is_symlink():
+        return records
+    # Also reject symlinked data/research/approved directories, not just files.
+    content = _partition_file(root, PurePosixPath("data/research/approved/index.json"),
+                              "data/research/approved/index.json")
+    manifest = _partition_json(content, "data/research/approved/index.json")
+    if not isinstance(manifest, dict) or set(manifest) != {"schema_version", "partitions"}:
+        raise GraphValidationError(["data/research/approved/index.json: fields must be exactly schema_version, partitions"])
+    if manifest["schema_version"] != SCHEMA_VERSION:
+        raise GraphValidationError(["data/research/approved/index.json/schema_version: unsupported partition schema"])
+    if not isinstance(manifest["partitions"], list):
+        raise GraphValidationError(["data/research/approved/index.json/partitions: expected array"])
+    previous = None
+    seen = {}
+    for position, entry in enumerate(manifest["partitions"]):
+        label = f"data/research/approved/index.json/partitions/{position}"
+        if not isinstance(entry, dict) or set(entry) != {"path", "sha256"}:
+            raise GraphValidationError([f"{label}: fields must be exactly path, sha256"])
+        name = entry["path"]
+        if not isinstance(name, str) or not name or "\\" in name or "\x00" in name:
+            raise GraphValidationError([f"{label}/path: expected canonical relative POSIX path"])
+        relative = PurePosixPath(name)
+        if relative.is_absolute() or relative.as_posix() != name or any(p in {".", ".."} for p in relative.parts):
+            raise GraphValidationError([f"{label}/path: expected canonical relative POSIX path inside data/research/approved"])
+        if previous is not None and name <= previous:
+            raise GraphValidationError([f"{label}/path: partition paths must be unique and strictly sorted"])
+        previous = name
+        expected = entry["sha256"]
+        if not isinstance(expected, str) or not SHA.fullmatch(expected):
+            raise GraphValidationError([f"{label}/sha256: invalid exact SHA256"])
+        part_label = "data/research/approved/" + name
+        content = _partition_file(approved, relative, part_label)
+        if digest(content) != expected:
+            raise GraphValidationError([f"{part_label}: pinned SHA256 mismatch"])
+        partition = _partition_json(content, part_label)
+        if not isinstance(partition, dict) or "schema_version" not in partition or set(partition) - ({"schema_version"} | set(PARTITION_TABLES)):
+            raise GraphValidationError([f"{part_label}: only schema_version and optional entities, sources, assertions, reviews are allowed"])
+        if partition["schema_version"] != SCHEMA_VERSION:
+            raise GraphValidationError([f"{part_label}/schema_version: unsupported partition schema"])
+        for table in PARTITION_TABLES:
+            rows = partition.get(table, [])
+            if not isinstance(rows, list):
+                raise GraphValidationError([f"{part_label}/{table}: expected array"])
+            fields = {"entities": ENTITY_FIELDS, "sources": SOURCE_FIELDS,
+                      "assertions": ASSERTION_FIELDS, "reviews": REVIEW_FIELDS}[table]
+            prior_id = None
+            for offset, row in enumerate(rows):
+                row_label = f"{part_label}/{table}/{offset}"
+                if not isinstance(row, dict) or set(row) != fields:
+                    raise GraphValidationError([f"{row_label}: fields must be exactly {', '.join(sorted(fields))}"])
+                identifier = row.get("id") if isinstance(row, dict) else None
+                if not isinstance(identifier, str) or not ID.fullmatch(identifier):
+                    raise GraphValidationError([f"{row_label}/id: invalid stable id"])
+                if identifier in seen:
+                    raise GraphValidationError([f"{row_label}/id: duplicate id {identifier}; first seen at {seen[identifier]}"])
+                if prior_id is not None and identifier <= prior_id:
+                    raise GraphValidationError([f"{row_label}/id: partition rows must be strictly sorted by stable id"])
+                if table == "assertions" and row.get("status") != "approved":
+                    raise GraphValidationError([f"{row_label}/status: approved partitions may contain only approved assertions; keep candidates in output"])
+                seen[identifier] = row_label
+                prior_id = identifier
+                records[table].append(row)
+    return records
+
+
 def load_graph(root=ROOT):
-    """Load and strictly validate against the actual canonical bytes, without IO to URLs."""
+    """Merge optional pinned approvals, then validate the complete graph offline.
+
+    Base record order is retained; partition records append in explicit index
+    order. Neither partition filenames nor provenance become public graph fields.
+    With no index the original monolithic load path and graph are unchanged.
+    """
     root = Path(root)
     graph = json.loads((root / "data/research/graph.json").read_text(encoding="utf-8"))
+    partitions = load_partition_records(root)
+    if any(partitions.values()):
+        if not isinstance(graph, dict):
+            raise GraphValidationError(["$: expected object"])
+        seen = {}
+        for table in PARTITION_TABLES:
+            if not isinstance(graph.get(table), list):
+                raise GraphValidationError([f"$/{table}: expected array"])
+            for offset, row in enumerate(graph[table] + partitions[table]):
+                identifier = row.get("id") if isinstance(row, dict) else None
+                if isinstance(identifier, str):
+                    if identifier in seen:
+                        raise GraphValidationError([f"$/{table}/{offset}/id: duplicate id {identifier}; first seen at {seen[identifier]}"])
+                    seen[identifier] = f"$/{table}/{offset}"
+            graph[table].extend(partitions[table])
     canonical_bytes = (root / "data/canonical.json").read_bytes()
     validate_graph(graph, canonical=canonical_bytes)
     return graph
@@ -231,8 +365,11 @@ def _validate_graph(graph, canonical=None):
         identifiers = entity.get("identifiers")
         require(isinstance(identifiers, dict) and all(isinstance(k, str) and isinstance(v, str) and v.strip() for k, v in identifiers.items()), p + "/identifiers", "expected string identifiers")
         taxonomy = entity.get("taxonomy")
-        if shape(taxonomy, FACETS, p + "/taxonomy"):
-            for facet in FACETS:
+        # Existing records keep seven required facets; only these two additions
+        # may be omitted. Present optional facets obey the same string-list rules.
+        facets = FACETS | (set(taxonomy) & OPTIONAL_FACETS if isinstance(taxonomy, dict) else set())
+        if shape(taxonomy, facets, p + "/taxonomy"):
+            for facet in facets:
                 strings(taxonomy.get(facet), p + "/taxonomy/" + facet)
         if isinstance(identifiers, dict) and entity.get("kind") in {"paper", "paper_work"}:
             require(bool(set(identifiers) & {"doi", "arxiv", "acl"}), p + "/identifiers", "paper needs DOI, arXiv or ACL work identifier")

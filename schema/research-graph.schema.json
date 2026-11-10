@@ -404,6 +404,22 @@
           "taxonomy": {
             "additionalProperties": false,
             "properties": {
+              "data_purpose": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "delivery_model": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
               "domain": {
                 "items": {
                   "minLength": 1,
