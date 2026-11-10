@@ -119,6 +119,13 @@
 .r-downloads{display:flex;flex-wrap:wrap;list-style:none;gap:4px 24px;padding:0;margin:20px 0}
 .r-downloads li{margin:0}
 .r-downloads a{display:inline-flex;align-items:center;min-height:44px;font-size:13px}
+.r-ledger-parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));list-style:none;gap:6px 24px;padding:0;margin:20px 0}
+.r-ledger-parts a{display:block;min-height:44px;padding:10px 0;border-bottom:1px solid var(--r-rule);font-size:14px}
+.r-ledger-parts a[aria-current="page"]{font-weight:600;color:var(--r-ink)}
+.r-ledger-parts .r-meta{display:block;font-weight:400}
+.r-ledger-nav{margin:24px 0}
+.r-legacy-ledger-target{display:none}
+.r-legacy-ledger-target:target{display:block;max-width:900px;min-height:44px;margin:24px 0;padding:20px;border-left:2px solid var(--r-accent);overflow-wrap:anywhere}
 .r-assertion,.r-source{max-width:900px;padding:24px 0;margin:0;border-bottom:1px solid var(--r-rule)}
 /* Every ledger record stays in the native document, including citations and
    disclosures. Let the browser skip offscreen layout, while fragment targets,

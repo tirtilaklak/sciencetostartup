@@ -1,5 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
+const { evidenceURL } = require('./research-ledger');
 
 // Serializing the complete evidence DOM for each trace step exceeds the test
 // timeout independently of page behavior. Retain screenshots, network and code.
@@ -52,14 +53,17 @@ test.describe('research without JavaScript', () => {
     await page.goto(reportPath);
     const evidence = page.locator('.r-paragraph-citations a').first();
     const assertionHref = await evidence.getAttribute('href');
-    expect(assertionHref).toMatch(/^\/research\/data\/#assertion-/);
+    expect(assertionHref).toMatch(/^\/research\/data\/assertions\/[0-9a-f]\/#assertion-/);
+    expect(assertionHref).toBe(evidenceURL('assertion', decodeURIComponent(assertionHref.split('#')[1]).slice('assertion-'.length)));
     await evidence.click();
-    const assertion = page.locator('[id=' + JSON.stringify(assertionHref.split('#')[1]) + ']');
+    const assertion = page.locator('[id=' + JSON.stringify(decodeURIComponent(assertionHref.split('#')[1])) + ']');
     await expect(assertion).toBeVisible();
     const sourceLink = assertion.locator('a[href*="#source-"]').first();
     const sourceHref = await sourceLink.getAttribute('href');
     await sourceLink.click();
-    const source = page.locator('[id=' + JSON.stringify(sourceHref.split('#')[1]) + ']');
+    expect(sourceHref).toMatch(/^\/research\/data\/sources\/[0-9a-f]\/#source-/);
+    expect(sourceHref).toBe(evidenceURL('source', decodeURIComponent(sourceHref.split('#')[1]).slice('source-'.length)));
+    const source = page.locator('[id=' + JSON.stringify(decodeURIComponent(sourceHref.split('#')[1])) + ']');
     await expect(source).toBeVisible();
     await expect(source.locator('h3 a')).toHaveAttribute('href', /^https:\/\//);
     for (const label of ['Publisher', 'Published', 'Captured', 'Version', 'Locator']) {
@@ -100,6 +104,9 @@ test.describe('research without JavaScript', () => {
       expect(content, name).toContain('State of AI Data Labs and Human Feedback');
     }
     await expect(page.locator('#sources')).toBeVisible();
+    const sourceParts = page.locator('section[aria-labelledby="sources"] .r-ledger-parts a');
+    await expect(sourceParts).toHaveCount(16);
+    await sourceParts.first().click();
     expect(await page.locator('.r-source').count()).toBeGreaterThan(0);
   });
 });

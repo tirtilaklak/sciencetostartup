@@ -26,6 +26,7 @@ from research_findings import executive_findings, finding_anchor, field_text, JU
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = "/research/state-of-ai-data-labs/"
 CORRECTIONS_PATH = "/research/corrections/"
+LEDGER_BUCKETS = "0123456789abcdef"
 CATEGORIES = (
     ("papers", "Papers", {"paper", "paper_work", "paper_version"},
      "Read the source, distinguish versions, and trace what an operational finding actually supports."),
@@ -71,7 +72,19 @@ def _anchor(kind, stable_id):
 
 
 def _evidence_url(kind, stable_id):
-    return "/research/data/#" + _token(_anchor(kind, stable_id))
+    path = _ledger_path(kind, _ledger_bucket(stable_id)) if kind in {"assertion", "source"} else "/research/data/"
+    return path + "#" + _token(_anchor(kind, stable_id))
+
+
+def _ledger_bucket(stable_id):
+    """A corpus-independent destination; adding records never moves old IDs."""
+    return hashlib.sha256(str(stable_id).encode("utf-8")).hexdigest()[0]
+
+
+def _ledger_path(kind, bucket):
+    if kind not in {"assertion", "source"} or bucket not in LEDGER_BUCKETS or len(bucket) != 1:
+        raise ValueError("Unknown ledger kind or partition")
+    return "/research/data/" + {"assertion": "assertions", "source": "sources"}[kind] + "/" + bucket + "/"
 
 
 def _safe_url(value):
@@ -515,24 +528,78 @@ def _source(source):
             '<p class="r-meta">A source capture records retrieval. Assertion-specific review is recorded separately.</p></article>')
 
 
-def _data(context):
-    graph, gate, report = context["graph"], context["gate"], context["report"]
-    approved = _assertions(context)
-    historical = _assertions(context, statuses=("historical",))
-    candidates = _assertions(context, statuses=("candidate",))
-    present = {row['id'] for row in graph['assertions']}
-    correction_stubs = {}
+def _ledger_records(context):
+    """Full record membership, including metadata-only retained corrections."""
+    assertions = {row['id']: row for row in context['graph']['assertions']}
+    stubs = {}
     for row in _correction_records(context):
-        if row['claim_id'] not in present:
-            correction_stubs.setdefault(row['claim_id'], row)
-    retained_corrections = ''.join(
-        '<article class="r-assertion" id="' + sp.escape(_anchor('assertion', aid)) + '"><h3>'
+        if row['claim_id'] not in assertions:
+            stubs.setdefault(row['claim_id'], row)
+    return assertions, stubs, {row['id']: row for row in context['graph']['sources']}
+
+
+def _correction_stub(aid, row):
+    return ('<article class="r-assertion" id="' + sp.escape(_anchor('assertion', aid)) + '"><h3>'
         + sp.escape(aid) + '</h3><p>This historical identifier is retained as correction metadata. '
         'Its earlier finding text is outside this current evidence snapshot.</p><p>'
         + _link(_correction_url(row), 'Read the correction and supporting evidence')
         + (' · ' + _link(_evidence_url('assertion', row['replacement_claim_id']), 'Read the approved replacement')
-           if row.get('replacement_claim_id') else '') + '</p></article>'
-        for aid, row in sorted(correction_stubs.items()))
+           if row.get('replacement_claim_id') else '') + '</p></article>')
+
+
+def _ledger_parts(kind, ids, current=None):
+    counts = {bucket: 0 for bucket in LEDGER_BUCKETS}
+    for stable_id in ids:
+        counts[_ledger_bucket(stable_id)] += 1
+    return '<ol class="r-ledger-parts">' + ''.join(
+        '<li><a href="' + _ledger_path(kind, bucket) + '"'
+        + (' aria-current="page"' if current == bucket else '') + '>Part '
+        + str(index + 1).zfill(2) + '<span class="r-meta"> · ' + str(counts[bucket]) + ' records</span></a></li>'
+        for index, bucket in enumerate(LEDGER_BUCKETS)) + '</ol>'
+
+
+def _ledger_pages(context):
+    """Thirty-two bounded static documents; no per-record pages or runtime API."""
+    assertions, stubs, sources = _ledger_records(context)
+    pages = []
+    for kind, ids, label in (("assertion", sorted(set(assertions) | set(stubs)), "Assertion"),
+                             ("source", sorted(sources), "Source")):
+        for index, bucket in enumerate(LEDGER_BUCKETS):
+            selected = [stable_id for stable_id in ids if _ledger_bucket(stable_id) == bucket]
+            title = label + " ledger · Part " + str(index + 1).zfill(2)
+            description = "Complete " + label.lower() + " records, precise evidence bindings and original review scope for this part of the versioned ledger."
+            body = ('<header class="r-page-head"><p class="r-kicker">' + _status(context) + '</p><h1>'
+                    + title + '</h1><p class="r-lede">' + str(len(selected)) + ' records. '
+                    'Read source bindings and review scope, use find in page, or print this complete part.</p>'
+                    + _meta(context) + '<p>' + _link('/research/data/', 'All ledger parts, downloads & citations →') + '</p></header>'
+                    '<nav class="r-ledger-nav" aria-label="' + label + ' ledger parts">'
+                    + _ledger_parts(kind, ids, current=bucket) + '</nav>'
+                    '<section class="r-section" aria-labelledby="records"><h2 id="records">' + label + ' records</h2>')
+            if kind == 'source':
+                body += ''.join(_source(sources[stable_id]) for stable_id in selected)
+            else:
+                body += ''.join(_assertion(context, assertions[stable_id]) if stable_id in assertions
+                                else _correction_stub(stable_id, stubs[stable_id]) for stable_id in selected)
+            if not selected:
+                body += '<p>No records in this part of the ledger.</p>'
+            body += '</section>'
+            pages.append((_ledger_path(kind, bucket), title, description, body, 'CollectionPage', ('data', 'Data & sources')))
+    return pages
+
+
+def _legacy_ledger_aliases(assertions, stubs, sources):
+    # Only ID + native destination are retained at old root fragments. Scientific
+    # wording, receipts, locators and source dossiers live on the bounded pages.
+    return ''.join('<a class="r-legacy-ledger-target" id="' + sp.escape(_anchor(kind, stable_id))
+                   + '" href="' + sp.escape(_evidence_url(kind, stable_id)) + '">'
+                   + sp.escape('Open ' + kind + ' record: ' + stable_id) + '</a>'
+                   for kind, ids in (('assertion', sorted(set(assertions) | set(stubs))), ('source', sorted(sources)))
+                   for stable_id in ids)
+
+
+def _data(context):
+    graph, gate, report = context["graph"], context["gate"], context["report"]
+    assertions, stubs, sources = _ledger_records(context)
     rows = [("Privacy-filtered research JSON", "/publication/clean-dataset.json"), ("CSV", "/publication/clean-dataset.csv"),
             ("SQLite", "/publication/clean-dataset.sqlite"), ("Full evidence graph JSON · explicit statuses", "/research/exports/research-graph.json"),
             ("Evidence graph SQLite", "/research/exports/research-graph.sqlite"), ("Export checksums", "/research/exports/research-exports-manifest.json")]
@@ -571,20 +638,19 @@ def _data(context):
             f'<ul class="r-downloads"><li>{_link("/publication/research-archive.zip", "Inspect the prepared reproduction package")}</li>'
             f'<li>{_link("/publication/MANIFEST.json", "Package SHA-256 inventory")}</li>'
             f'<li>{_link("/publication/package-status.json", "Archive & mirror status")}</li></ul></section>'
-            '<section class="r-section" aria-labelledby="approved"><h2 id="approved">Approved assertions</h2>'
-            + ("".join(_assertion(context, a) for a in approved) if approved else
+            '<section class="r-section" aria-labelledby="assertions"><h2 id="assertions">Assertion records</h2>'
+            '<p id="approved">Approved assertions retain their exact source bindings and review receipts.</p>'
+            + ('' if any(row.get('status') == 'approved' for row in assertions.values()) else
                '<p class="r-callout">No new assertions have completed the required separate reviews. Candidate evidence stays outside approved findings and coverage totals.</p>')
-            + '</section><section class="r-section" aria-labelledby="historical"><h2 id="historical">Historical baseline</h2>'
-            '<p>These descriptions were imported from canonical dataset 2.5.0. Their snapshot dates are historical provenance, '
-            'not fresh source reviews or current supplier findings.</p>' + "".join(_assertion(context, a) for a in historical)
-            + '</section><section class="r-section" aria-labelledby="candidates"><h2 id="candidates">Candidate review queue</h2>'
-            '<p>Captured sources and author proposals are inspectable preparation work. Separate source verification and '
-            'adversarial review have not established these as findings.</p>' + "".join(_assertion(context, a) for a in candidates)
-            + ('</section><section class="r-section"><h2>Retained correction identifiers</h2>' + retained_corrections if retained_corrections else '')
+            + '<p id="historical">Historical baseline descriptions keep their original snapshot dates and inherited provenance.</p>'
+            '<p id="candidates">Candidates and retained correction identifiers carry metadata only while their original wording remains withheld.</p>'
+            + _ledger_parts('assertion', sorted(set(assertions) | set(stubs)))
             + '</section><section class="r-section" aria-labelledby="sources"><h2 id="sources">Source records</h2>'
-            + "".join(_source(source) for source in sorted(graph["sources"], key=lambda s: s["id"]))
+            '<p>A source capture records retrieval. Assertion-specific review is recorded separately.</p>'
+            + _ledger_parts('source', sources)
             + '</section><section class="r-section" aria-labelledby="organizations"><h2 id="organizations">Organizations & other entities</h2>'
-            + f'<ul class="r-entity-register">{entity_rows}</ul></section>')
+            + f'<ul class="r-entity-register">{entity_rows}</ul></section>'
+            + _legacy_ledger_aliases(assertions, stubs, sources))
 
 
 def _entity_card(context, entity):
@@ -951,6 +1017,7 @@ def write_research_pages(output, context):
              ("/research/data/", "Research data & evidence", "Versioned research data, source and assertion permalinks, publication progress, citations, and reproducible downloads.", _data(context), "CollectionPage", None),
              ("/review/", "Review & correct the research", "Contribute a source-backed correction, scoped review, or public reuse of ScienceToStartup research.", _review(context), "WebPage", None),
              (CORRECTIONS_PATH, "Research corrections", "Accepted research corrections, with affected editions, claims, correction dates and supporting evidence.", _corrections_page(context, corrections), "CollectionPage", None)]
+    pages.extend(_ledger_pages(context))
     for category in CATEGORIES:
         slug, label, kinds, description = category
         pages.append(("/research/" + slug + "/", label, description, _index(context, category), "CollectionPage", None))
@@ -972,8 +1039,15 @@ def write_research_pages(output, context):
         target.parent.mkdir(parents=True, exist_ok=True)
         def edition_links(text):
             # Evidence on an immutable edition must not silently resolve to this
-            # week's changed assertions or downloads.
-            text = text.replace('/research/data/#', path + 'data/#')
+            # week's changed assertions or downloads. Only site URL attributes
+            # and structured URL fields change; source URLs and quoted facts do
+            # not become edition links merely by containing the same path.
+            for prefix, replacement in (('/research/data/', path + 'data/'),
+                                        (sp.ORIGIN + '/research/data/', sp.ORIGIN + path + 'data/')):
+                text = re.sub(r'((?:href|content)=")' + re.escape(prefix),
+                              lambda match: match.group(1) + replacement, text)
+                text = re.sub(r'("(?:@id|url|item|contentUrl)"\s*:\s*")' + re.escape(prefix),
+                              lambda match: match.group(1) + replacement, text)
             archive = _safe_url(snapshot['report'].get('archive', {}).get('record_url'))
             if archive:
                 text = re.sub(r'href="/(?:publication|research/exports)/[^\"]+"', 'href="' + sp.escape(archive) + '"', text)
@@ -987,6 +1061,12 @@ def write_research_pages(output, context):
         ledger.write_text(edition_links(_render(snapshot, 'Edition evidence and sources', 'Frozen assertion and source records for this exact archived edition.',
                                                ledger_path, _data(snapshot), 'CollectionPage')), encoding='utf-8')
         records.append({"path": ledger_path, "lastmod": snapshot['report']['updated_on']})
+        for live_path, title, description, body, page_type, parent in _ledger_pages(snapshot):
+            bucket_path = ledger_path + live_path.removeprefix('/research/data/')
+            bucket = output / bucket_path.lstrip('/') / 'index.html'
+            bucket.parent.mkdir(parents=True, exist_ok=True)
+            bucket.write_text(edition_links(_render(snapshot, title, description, bucket_path, body, page_type, parent)), encoding='utf-8')
+            records.append({"path": bucket_path, "lastmod": snapshot['report']['updated_on']})
     (output / 'research.css').write_bytes((ROOT / 'web/research.css').read_bytes())
     (output / 'research-index.js').write_bytes((ROOT / 'web/research-index.js').read_bytes())
     _feeds(output, context, editions)

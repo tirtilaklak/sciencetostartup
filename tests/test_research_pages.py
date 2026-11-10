@@ -1,5 +1,7 @@
 """Public rendering invariants; synthetic approval receipts stay inside tests."""
 import copy
+import hashlib
+import json
 from html import escape
 from html.parser import HTMLParser
 from pathlib import Path
@@ -23,14 +25,20 @@ class Facts(HTMLParser):
         super().__init__()
         self.ids, self.links, self.canonicals, self.scripts = [], [], [], []
         self.headings = 0
+        self.nodes, self.records, self.aliases = 0, {}, {}
         self.feed(text)
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        self.nodes += 1
         if attrs.get('id'):
             self.ids.append(attrs['id'])
+            if tag == 'article':
+                self.records[attrs['id']] = attrs
         if tag == 'a' and attrs.get('href'):
             self.links.append(attrs['href'])
+            if 'r-legacy-ledger-target' in attrs.get('class', '').split():
+                self.aliases[attrs['id']] = attrs['href']
         if tag == 'h1':
             self.headings += 1
         if tag == 'link' and attrs.get('rel') == 'canonical':
@@ -131,13 +139,13 @@ class ResearchPageTests(unittest.TestCase):
 
     def test_historical_evidence_keeps_its_date_locator_and_legacy_canonical(self):
         self.build()
-        data = self.page('/research/data/')
         assertion = next(a for a in self.context['graph']['assertions'] if a['status'] == 'historical')
+        data = self.page(urlsplit(rp._evidence_url('assertion', assertion['id'])).path)
         self.assertIn(assertion['value']['value'].replace("'", '&#x27;'), data)
         self.assertIn('Historical record · As of ' + rp._date(assertion['as_of']), data)
         self.assertIn(assertion['evidence'][0]['locator'], data)
         self.assertIn('Inherited provenance; no fresh research review is claimed.', data)
-        self.assertIn('/company/mercor/', data)
+        self.assertIn('/company/mercor/', self.page('/research/data/'))
 
     def test_approved_subject_creates_only_its_new_company_page_with_receipts(self):
         claim = approved_new_org(self.context)
@@ -167,10 +175,14 @@ class ResearchPageTests(unittest.TestCase):
         self.build()
         data = Facts(self.page('/research/data/'))
         self.assertEqual(len(data.ids), len(set(data.ids)))
+        partitions = {rp._ledger_path(kind, bucket): Facts(self.page(rp._ledger_path(kind, bucket)))
+                      for kind in ('assertion', 'source') for bucket in '0123456789abcdef'}
         for kind, rows in (('source', self.context['graph']['sources']), ('assertion', self.context['graph']['assertions'])):
             for row in rows:
                 self.assertIn(kind + '-' + row['id'], data.ids)
-                self.assertIn(unquote(urlsplit(rp._evidence_url(kind, row['id'])).fragment), data.ids)
+                destination = urlsplit(rp._evidence_url(kind, row['id']))
+                self.assertEqual(data.aliases[kind + '-' + row['id']], rp._evidence_url(kind, row['id']))
+                self.assertIn(unquote(destination.fragment), partitions[destination.path].records)
         for path in self.output.rglob('*.html'):
             facts = Facts(path.read_text())
             self.assertEqual(facts.headings, 1, str(path))
@@ -200,6 +212,8 @@ class ResearchPageTests(unittest.TestCase):
 
     def test_edition_routes_and_feed_entries_use_a_recomputed_passing_gate(self):
         self.context['report']['status'] = 'published'
+        self.context['graph']['sources'][0]['url'] = 'https://example.org/research/data/frozen-source'
+        self.context['graph']['sources'][0]['title'] = 'Literal /research/data/#quoted-source-title'
         # This historical routing fixture stays fixed as the current report advances.
         self.context['report']['source_cutoff'] = '2026-11-06T17:00:00-08:00'
         self.context['report']['editions'] = [{'release_id': self.context['report']['release_id'], 'status': 'published'}]
@@ -210,7 +224,17 @@ class ResearchPageTests(unittest.TestCase):
         edition = next(path for path in paths if '/editions/' in path)
         self.assertEqual(edition, '/research/editions/2026-11-09/')
         self.assertIn(edition + 'data/', paths)
+        for kind in ('assertions', 'sources'):
+            for bucket in '0123456789abcdef':
+                route = edition + 'data/' + kind + '/' + bucket + '/'
+                self.assertIn(route, paths)
+                self.assertIn(rp.sp.ORIGIN + route, Facts(self.page(route)).canonicals)
+                self.assertFalse(any(link.startswith('/research/data/') for link in Facts(self.page(route)).links))
         self.assertIn('Published edition', self.page(edition))
+        source = self.context['graph']['sources'][0]
+        source_path = edition + 'data/sources/' + hashlib.sha256(source['id'].encode('utf-8')).hexdigest()[0] + '/'
+        self.assertIn('href="https://example.org/research/data/frozen-source"', self.page(source_path))
+        self.assertIn('Literal /research/data/#quoted-source-title', self.page(source_path))
         self.assertEqual(len(ET.parse(self.output / 'research/feed.xml').findall('./channel/item')), 1)
         self.assertEqual(len(ET.parse(self.output / 'research/atom.xml').findall('{http://www.w3.org/2005/Atom}entry')), 1)
 
@@ -239,6 +263,73 @@ class ResearchPageTests(unittest.TestCase):
             self.assertIn(entry['url'], paths)
             self.assertLess(len(entry['summary']), 220)
         self.assertEqual((self.output / 'research.css').read_bytes(), (ROOT / 'web/research.css').read_bytes())
+
+    def test_full_ledger_is_partitioned_once_with_thin_legacy_fragment_hub(self):
+        records = self.build()
+        paths = {row['path'] for row in records}
+        hub = Facts(self.page('/research/data/'))
+        self.assertEqual(hub.records, {})
+        self.assertEqual(len([url for url in hub.links if re.fullmatch(r'/research/data/(?:assertions|sources)/[0-9a-f]/', url)]), 32)
+        all_records = {}
+        for kind, rows in (('assertion', self.context['graph']['assertions']), ('source', self.context['graph']['sources'])):
+            expected = {kind + '-' + row['id'] for row in rows}
+            observed = set()
+            for bucket in '0123456789abcdef':
+                path = '/research/data/' + ('assertions' if kind == 'assertion' else 'sources') + '/' + bucket + '/'
+                self.assertIn(path, paths)
+                facts = Facts(self.page(path))
+                matching = {key: value for key, value in facts.records.items() if key.startswith(kind + '-')}
+                self.assertFalse(observed & set(matching))
+                observed.update(matching)
+                all_records.update(matching)
+                self.assertEqual(facts.canonicals, [rp.sp.ORIGIN + path])
+                self.assertTrue(all(item.get('type') == 'application/ld+json' for item in facts.scripts))
+            self.assertTrue(expected <= observed)
+            for row in rows:
+                anchor = kind + '-' + row['id']
+                self.assertEqual(hub.aliases[anchor], rp._evidence_url(kind, row['id']))
+                expected_bucket = hashlib.sha256(row['id'].encode('utf-8')).hexdigest()[0]
+                self.assertIn('/' + expected_bucket + '/#', hub.aliases[anchor])
+        self.assertEqual(len(hub.aliases), len(all_records))
+        # An ID and one native link replace each former full record in the hub.
+        # The fixed shell/entity register stays bounded independently of receipts.
+        self.assertLess(hub.nodes, len(hub.aliases) + 2500)
+
+    def test_old_correction_identifier_has_only_metadata_in_its_canonical_part(self):
+        correction = self.correction(claim_id='fixture.removed-claim', corrected_on='2026-11-11T00:00:00Z', replacement_claim_id=next(
+            row['id'] for row in self.context['graph']['assertions'] if row['status'] == 'approved'))
+        self.context['corrections'] = [correction]
+        self.build()
+        target = rp._evidence_url('assertion', correction['claim_id'])
+        self.assertEqual(Facts(self.page('/research/data/')).aliases['assertion-fixture.removed-claim'], target)
+        self.assertIn('retained as correction metadata', self.page(urlsplit(target).path))
+        self.assertIn('Read the approved replacement', self.page(urlsplit(target).path))
+
+    def test_ledger_destination_is_stable_after_unrelated_records_are_added(self):
+        vectors = ['claim.alpha', 'source.example/α:version1', 'entity.unchanged']
+        before = {(kind, value): rp._evidence_url(kind, value) for kind in ('assertion', 'source', 'entity') for value in vectors}
+        self.context['graph']['sources'].append({**self.context['graph']['sources'][0], 'id': 'fixture.unrelated-source'})
+        self.build()
+        self.assertEqual(before, {(kind, value): rp._evidence_url(kind, value) for kind, value in before})
+        self.assertEqual(rp._evidence_url('entity', 'entity.unchanged'), '/research/data/#entity-entity.unchanged')
+
+    def test_live_ledger_routing_keeps_frozen_pdf_and_doi_context_exact(self):
+        import research_citations as citations
+        import research_offline
+        from research_corrections import public_corrections
+        projection = citations.public_projection(self.context)
+        before = (citations.context_digest(self.context), citations.offline_html(self.context),
+                  research_offline.offline_appendix(projection, corrections=public_corrections(self.context)),
+                  citations.citation_formats(citations.publication_metadata(self.context)))
+        pdf = ROOT / 'data/research/report.pdf'
+        pdf_digest = hashlib.sha256(pdf.read_bytes()).hexdigest() if pdf.is_file() else None
+        self.build()
+        after = (citations.context_digest(self.context), citations.offline_html(self.context),
+                 research_offline.offline_appendix(projection, corrections=public_corrections(self.context)),
+                 citations.citation_formats(citations.publication_metadata(self.context)))
+        self.assertEqual(before, after)
+        if pdf_digest:
+            self.assertEqual(hashlib.sha256(pdf.read_bytes()).hexdigest(), pdf_digest)
 
     def correction(self, **changes):
         return {'id': 'fixture.correction.1', 'edition_id': 'research.fixture.1',

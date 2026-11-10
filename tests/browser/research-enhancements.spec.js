@@ -5,6 +5,7 @@ const { tmpdir } = require('node:os');
 const { pathToFileURL } = require('node:url');
 const { spawnSync } = require('node:child_process');
 const { createHash } = require('node:crypto');
+const { evidenceURL } = require('./research-ledger');
 
 // Keep failure evidence without repeatedly serializing the full offline ledger.
 test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
@@ -321,7 +322,7 @@ test.describe('legacy evidence remains independently readable', () => {
       await expect(record.locator('.r-kicker')).toContainText('Approved evidence · As of');
       const date = await record.locator('.r-kicker').innerText();
       expect(date).toContain(assertion.as_of.slice(0, 4));
-      await expect(record.locator('.r-record-id a')).toHaveAttribute('href', '/research/data/#' + encodeURIComponent('assertion-' + assertion.id));
+      await expect(record.locator('.r-record-id a')).toHaveAttribute('href', evidenceURL('assertion', assertion.id));
       await expect(record.locator('.r-evidence-links li')).toHaveCount(assertion.evidence.length);
       for (const qualification of assertion.qualifications || []) await expect(record).toContainText(qualification);
     }
@@ -356,18 +357,25 @@ test('imported executive judgments retain complete content and approved evidence
     for (const cid of finding.claim_ids) {
       expect(claims.get(cid)?.status, cid).toBe('approved');
       await expect(article.locator('.r-paragraph-citations').getByRole('link', { name: cid, exact: true }))
-        .toHaveAttribute('href', '/research/data/#' + encodeURIComponent('assertion-' + cid));
+        .toHaveAttribute('href', evidenceURL('assertion', cid));
     }
   }
-  await page.goto('/research/data/');
-  const ledger = await page.locator('.r-assertion').evaluateAll(assertions => assertions.map(assertion => ({
-    id: assertion.id, kicker: assertion.querySelector('.r-kicker')?.textContent,
-    evidenceLinks: assertion.querySelectorAll('.r-evidence-links a').length })));
+  const byPart = new Map();
   for (const cid of new Set(findings.flatMap(finding => finding.claim_ids))) {
-    const matching = ledger.filter(assertion => assertion.id === 'assertion-' + cid);
-    expect(matching, cid).toHaveLength(1);
-    expect(normalize(matching[0].kicker), cid).toContain('Approved evidence');
-    expect(matching[0].evidenceLinks, cid).toBeGreaterThan(0);
+    const path = evidenceURL('assertion', cid).split('#')[0];
+    byPart.set(path, [...(byPart.get(path) || []), cid]);
+  }
+  for (const [path, ids] of byPart) {
+    await page.goto(path);
+    const ledger = await page.locator('.r-assertion').evaluateAll(assertions => assertions.map(assertion => ({
+      id: assertion.id, kicker: assertion.querySelector('.r-kicker')?.textContent,
+      evidenceLinks: assertion.querySelectorAll('.r-evidence-links a').length })));
+    for (const cid of ids) {
+      const matching = ledger.filter(assertion => assertion.id === 'assertion-' + cid);
+      expect(matching, cid).toHaveLength(1);
+      expect(normalize(matching[0].kicker), cid).toContain('Approved evidence');
+      expect(matching[0].evidenceLinks, cid).toBeGreaterThan(0);
+    }
   }
 });
 

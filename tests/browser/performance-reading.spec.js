@@ -1,4 +1,6 @@
 const { test, expect } = require('@playwright/test');
+const { evidenceURL, token } = require('./research-ledger');
+const selector = id => '[id=' + JSON.stringify(id) + ']';
 
 // Full-ledger DOM trace snapshots obscure native navigation timing; screenshots,
 // source and network traces remain available when a functional check fails.
@@ -9,28 +11,66 @@ test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: tr
 test.describe('native ledger rendering', () => {
   test.use({ javaScriptEnabled: false });
 
-  test('all records remain accessible through fragments, find, keyboard focus and print', async ({ page, request, browserName }) => {
+  for (const kind of ['assertion', 'source']) {
+    test(`all ${kind} records remain complete in their no-JavaScript ledger parts`, async ({ page, request }) => {
+      const response = await request.get('/research/exports/research-graph.json');
+      expect(response.ok()).toBeTruthy();
+      const graph = await response.json();
+      await page.goto('/research/data/');
+      await expect(page.locator('.r-assertion,.r-source')).toHaveCount(0);
+      const links = page.locator('section[aria-labelledby="' + (kind === 'source' ? 'sources' : 'assertions') + '"] .r-ledger-parts a');
+      await expect(links).toHaveCount(16);
+      const paths = await links.evaluateAll(links => links.map(link => link.getAttribute('href')));
+      expect(paths).toEqual([... '0123456789abcdef'].map(bucket => '/research/data/' + (kind === 'source' ? 'sources' : 'assertions') + '/' + bucket + '/'));
+      const observed = [];
+      for (const path of paths) {
+        await page.goto(path);
+        await expect(page.locator('h1')).toContainText(kind === 'source' ? 'Source ledger' : 'Assertion ledger');
+        await expect(page.locator('script:not([type="application/ld+json"])')).toHaveCount(0);
+        if (kind === 'assertion') {
+          await expect(page.locator('.r-assertion[data-status="candidate"] .r-assertion-text')).toHaveCount(0);
+          observed.push(...await page.locator('.r-assertion[data-status="approved"],.r-assertion[data-status="historical"]').evaluateAll(rows => rows.map(row => row.id)));
+        } else {
+          observed.push(...await page.locator('.r-source').evaluateAll(rows => rows.map(row => row.id)));
+        }
+      }
+      const expected = (kind === 'source' ? graph.sources : graph.assertions.filter(row => ['approved', 'historical'].includes(row.status)))
+        .map(row => kind + '-' + row.id).sort();
+      expect(observed.sort()).toEqual(expected);
+      expect(new Set(observed).size).toBe(observed.length);
+    });
+  }
+
+  test('legacy fragments lead natively to complete source records, find, keyboard focus and print', async ({ page, request, browserName }) => {
     const response = await request.get('/research/exports/research-graph.json');
     expect(response.ok()).toBeTruthy();
     const graph = await response.json();
-    await page.goto('/research/data/');
-    await expect(page.locator('.r-assertion[data-status="approved"],.r-assertion[data-status="historical"]')).toHaveCount(graph.assertions.filter(row => ['approved', 'historical'].includes(row.status)).length);
-    // Quarantined identifiers remain correction-only placeholders. They are
-    // outside the approved export and must never be sampled as findings.
-    await expect(page.locator('.r-assertion[data-status="candidate"] .r-assertion-text')).toHaveCount(0);
-    await expect(page.locator('.r-source')).toHaveCount(graph.sources.length);
-    const last = page.locator('.r-source').last();
-    const id = await last.getAttribute('id');
+    const sourceRow = [...graph.sources].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0).at(-1);
+    const id = 'source-' + sourceRow.id;
+    const destination = evidenceURL('source', sourceRow.id);
+    await page.goto('/research/data/#' + token(id));
+    const alias = page.locator(selector(id));
+    await expect(alias).toBeVisible();
+    const nativeLink = alias;
+    await expect(nativeLink).toHaveRole('link');
+    await expect(nativeLink).toHaveAccessibleName('Open source record: ' + sourceRow.id);
+    await expect(nativeLink).toHaveAttribute('href', destination);
+    await nativeLink.focus();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(new RegExp(destination.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'));
+    const last = page.locator('article.r-source' + selector(id));
     const title = (await last.locator('h3 a').textContent()).trim();
-    // The role lookup includes offscreen content in the accessibility tree.
     await expect(last.getByRole('link', { name: title, exact: true })).toBeAttached();
-    await page.goto('/research/data/#' + id);
     await expect(last.locator('h3')).toBeInViewport();
     await expect(last.locator('dt').filter({ hasText: /^Locator$/ })).toBeVisible();
     await expect(last.locator('h3 a')).toHaveAttribute('href', /^https?:\/\//);
+    await page.goBack();
+    await expect(alias).toBeVisible();
+    await page.goForward();
+    await expect(last.locator('h3')).toBeInViewport();
 
-    await page.goto('/research/data/');
-    // window.find invokes the browser's native document search, including skipped records.
+    const path = destination.split('#')[0];
+    await page.goto(path);
     const found = await page.evaluate(text => {
       if (typeof window.find !== 'function') return null;
       return window.find(text, false, true);
@@ -39,34 +79,43 @@ test.describe('native ledger rendering', () => {
       expect(found).toBe(true);
       await expect(last.locator('h3')).toBeInViewport();
     }
-    await page.goto('/research/data/');
+    await page.goto(path);
     await last.locator('h3 a').focus();
     await expect(last.locator('h3 a')).toBeFocused();
     await expect(last.locator('h3')).toBeInViewport();
-    // Native Tab navigation reaches the next source action inside the revealed record.
     await page.keyboard.press(browserName === 'webkit' && process.platform === 'darwin' ? 'Alt+Tab' : 'Tab');
     expect(await last.evaluate(node => node.contains(document.activeElement))).toBe(true);
 
     await page.emulateMedia({ media: 'print' });
-    for (const selector of ['.r-assertion', '.r-source']) {
-      expect(await page.locator(selector).last().evaluate(node => ({
-        visibility: getComputedStyle(node).contentVisibility,
-        containment: getComputedStyle(node).contain,
-      }))).toEqual({ visibility: 'visible', containment: 'none' });
+    const assertionRow = graph.assertions.filter(row => row.status === 'approved').at(-1);
+    for (const [printPath, recordSelector] of [[path, '.r-source'], [evidenceURL('assertion', assertionRow.id).split('#')[0], '.r-assertion']]) {
+      await page.goto(printPath);
+      const styles = await page.locator(recordSelector).evaluateAll(nodes => nodes.map(node => ({
+        visibility: getComputedStyle(node).contentVisibility, containment: getComputedStyle(node).contain })));
+      expect(styles.length).toBeGreaterThan(0);
+      for (const style of styles) expect(style).toEqual({ visibility: 'visible', containment: 'none' });
     }
   });
 
-  test('late assertion citations reveal their source and preserve native history', async ({ page }) => {
-    await page.goto('/research/data/');
-    const assertion = page.locator('.r-assertion[data-status="approved"]').last();
-    const id = await assertion.getAttribute('id');
-    await page.goto('/research/data/#' + id);
+  test('late assertion citations reveal their source and preserve native history', async ({ page, request }) => {
+    const response = await request.get('/research/exports/research-graph.json');
+    expect(response.ok()).toBeTruthy();
+    const graph = await response.json();
+    const row = graph.assertions.filter(row => row.status === 'approved').at(-1);
+    const id = 'assertion-' + row.id;
+    await page.goto('/research/data/#' + token(id));
+    const alias = page.locator(selector(id));
+    await expect(alias).toHaveRole('link');
+    await expect(alias).toHaveAttribute('href', evidenceURL('assertion', row.id));
+    await alias.focus();
+    await page.keyboard.press('Enter');
+    const assertion = page.locator('article.r-assertion' + selector(id));
     await expect(assertion.locator('.r-assertion-text')).toBeInViewport();
     const citation = assertion.locator('a[href*="#source-"]').first();
     const href = await citation.getAttribute('href');
     await citation.focus();
     await page.keyboard.press('Enter');
-    const source = page.locator('[id=' + JSON.stringify(href.split('#')[1]) + ']');
+    const source = page.locator('[id=' + JSON.stringify(decodeURIComponent(href.split('#')[1])) + ']');
     await expect(source.locator('h3')).toBeInViewport();
     await page.goBack();
     await expect(page).toHaveURL(new RegExp('#' + id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'));
