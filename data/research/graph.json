@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-11-10T13:20:39.432001Z",
+  "as_of": "2026-11-10T13:34:00.934459Z",
   "assertions": [
     {
       "as_of": "2026-10-15",
@@ -8901,10 +8901,15 @@
         "candidate.cohort4.benchflow.skillsbench-publication",
         "candidate.cohort4.benchflow.stateful-data-lab",
         "candidate.cohort4.benchflow.version-boundary",
+        "candidate.cohort6.benchflow.pinned-code-license",
+        "candidate.cohort6.benchflow.pinned-readme-version",
+        "candidate.cohort6.benchflow.run-output-records",
+        "candidate.cohort6.benchflow.sandbox-backends",
+        "candidate.cohort6.benchflow.training-export-interface",
         "legacy.benchflow.description"
       ],
       "disposition": "pending",
-      "disposition_reason": "Public pages establish an environment research lab, owned benchmarks and runtime capabilities, while this scoped source set does not resolve a current commercial data-supply service or responsibility for client delivery. Research artifacts are retained without forcing supplier qualification. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. Fresh immutable repository commit a61a26f4db4d566de16928565ea58abf3dbaf064 documents public evaluation/RL runtime software. README says0.10; the separately captured website docs and old approved0.9.2 assertion remain source/version-specific. No old claim or review digest is retargeted. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.benchflow",
@@ -9061,6 +9066,41 @@
     },
     {
       "aliases": [
+        "Cogito Tech LLC."
+      ],
+      "assertion_ids": [
+        "candidate.cohort6.cogito_tech.custom-review-workflows",
+        "candidate.cohort6.cogito_tech.human-quality-roles",
+        "candidate.cohort6.cogito_tech.llm-response-feedback",
+        "candidate.cohort6.cogito_tech.managed-multimodal-annotation",
+        "candidate.cohort6.cogito_tech.published-operator"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. The official labeling page offers managed text/audio/image/video annotation and expert-verified prompt-response pairs with RLHF response ratings. Qualification is managed annotation and expert feedback, without a claim of software-only delivery. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.cogito_tech",
+      "identifiers": {
+        "website": "https://www.cogitotech.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "Cogito Tech",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
         "Datacurve AI, Inc.",
         "Shipd (contributor platform)"
       ],
@@ -9154,6 +9194,112 @@
       }
     },
     {
+      "aliases": [
+        "Dataloop Ltd."
+      ],
+      "assertion_ids": [
+        "candidate.cohort6.dataloop.annotation-quality-tools",
+        "candidate.cohort6.dataloop.data-operations",
+        "candidate.cohort6.dataloop.feedback-platform",
+        "candidate.cohort6.dataloop.privacy-operator",
+        "candidate.cohort6.dataloop.rlhf-rlaif-workflows"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. The proposed category is software for unstructured data operations, annotation and feedback orchestration. Prebuilt workflows combine human and AI feedback for RLHF/RLAIF; data cleaning, curation and versioning remain platform features. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.dataloop",
+      "identifiers": {
+        "website": "https://dataloop.ai/"
+      },
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "Dataloop",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Datasaur, Inc.",
+        "Data Studio (product)"
+      ],
+      "assertion_ids": [
+        "candidate.cohort6.datasaur.customer-data-use-scope",
+        "candidate.cohort6.datasaur.data-studio-offer",
+        "candidate.cohort6.datasaur.expert-facing-interface",
+        "candidate.cohort6.datasaur.human-machine-labeling",
+        "candidate.cohort6.datasaur.terms-operator"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. Data Studio explicitly offers NLP annotation software with configurable project interfaces, automation and quality workflows. The broader private model and agent deployment offer is recorded as context, not a second supplier category or proof of data delivery. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.datasaur",
+      "identifiers": {
+        "website": "https://datasaur.ai/"
+      },
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "Datasaur",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Deepen AI Inc."
+      ],
+      "assertion_ids": [
+        "candidate.cohort6.deepen_ai.batch-quality-controls",
+        "candidate.cohort6.deepen_ai.dpa-operator",
+        "candidate.cohort6.deepen_ai.inhouse-team-model",
+        "candidate.cohort6.deepen_ai.managed-versus-software",
+        "candidate.cohort6.deepen_ai.multisensor-labeling"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. Deepen separates managed Annotate as a Service from the customer-run Annotate platform. The managed scope spans2D/3D/fused sensors, scenario and behavior tags. Custom collection is advertised separately; a coming-soon Refinery is not treated as a live marketplace. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.deepen_ai",
+      "identifiers": {
+        "website": "https://www.deepen.ai/"
+      },
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "Deepen AI",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
       "aliases": [],
       "assertion_ids": [
         "candidate.cohort2.defined_ai.capture-qa",
@@ -9207,6 +9353,81 @@
           "annotation",
           "human demonstration"
         ]
+      }
+    },
+    {
+      "aliases": [
+        "DDD"
+      ],
+      "assertion_ids": [
+        "candidate.cohort6.digital_divide_data.ai-data-operations",
+        "candidate.cohort6.digital_divide_data.human-preference-optimization",
+        "candidate.cohort6.digital_divide_data.legal-page-discrepancy",
+        "candidate.cohort6.digital_divide_data.physical-ai-labeling",
+        "candidate.cohort6.digital_divide_data.platform-agnostic-delivery",
+        "candidate.cohort6.digital_divide_data.safety-data-quality-stage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. DDD offers ML data operations, LLM/computer-vision training data, human preference optimization and sensor/physical-AI annotation. Its task scope includes perception, tracking, point clouds, robot manipulation and safety labels. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.digital_divide_data",
+      "identifiers": {
+        "website": "https://www.digitaldividedata.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "Digital Divide Data",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "e2f",
+        "TrustScale",
+        "Humanus (service)"
+      ],
+      "assertion_ids": [
+        "candidate.cohort6.e2f.annotation-modalities",
+        "candidate.cohort6.e2f.current-rebrand",
+        "candidate.cohort6.e2f.expert-supervised-data",
+        "candidate.cohort6.e2f.golden-and-review-qa",
+        "candidate.cohort6.e2f.human-preference-data",
+        "candidate.cohort6.e2f.independence-disclosure",
+        "candidate.cohort6.e2f.organization-processor-role"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. Humanus explicitly offers ranked/rated responses, expert-written supervised examples, annotation, benchmarks/red teaming and multilingual services. Qualification is managed human training/evaluation data, distinct from automated Argus claims checking. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.e2f",
+      "identifiers": {
+        "website": "https://www.e2f.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "TrustScale / e2f",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
       }
     },
     {
@@ -9457,6 +9678,44 @@
       }
     },
     {
+      "aliases": [
+        "Hive",
+        "Deploy",
+        "Castle Global, Inc.",
+        "Hive Workers (contributor label)"
+      ],
+      "assertion_ids": [
+        "candidate.cohort6.hive.contracting-operator",
+        "candidate.cohort6.hive.current-brand",
+        "candidate.cohort6.hive.labeling-service",
+        "candidate.cohort6.hive.manual-review-default",
+        "candidate.cohort6.hive.worker-and-quality-boundary"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. The retained supplier category is the explicit annotation and sourcing service in Schedule A. Model APIs and the customer-operated Arbiter platform have separate service definitions. Customer-requested tasks can involve annotation, categorization, tagging and labeling. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.hive",
+      "identifiers": {
+        "website": "https://thehive.ai/"
+      },
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "Deploy / Hive",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
       "aliases": [],
       "assertion_ids": [
         "candidate.cohort3.humans_in_the_loop.annotation-trial",
@@ -9693,6 +9952,41 @@
       }
     },
     {
+      "aliases": [
+        "iSoftStone, Inc."
+      ],
+      "assertion_ids": [
+        "candidate.cohort6.isoftstone.managed-relevance",
+        "candidate.cohort6.isoftstone.qa-feedback-loop",
+        "candidate.cohort6.isoftstone.speech-data-services",
+        "candidate.cohort6.isoftstone.vision-annotation",
+        "candidate.cohort6.isoftstone.website-operator"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. The AI data page offers speech collection/transcription/segmentation, vision labeling and managed search/advertising relevance evaluation. It lists in-person, remote and crowd delivery modes. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.isoftstone",
+      "identifiers": {
+        "website": "https://www.isoftstoneinc.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "iSoftStone",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
       "aliases": [],
       "assertion_ids": [
         "candidate.cohort3.keymakr.expert-review",
@@ -9737,6 +10031,44 @@
           "video annotation",
           "guideline-based review"
         ]
+      }
+    },
+    {
+      "aliases": [
+        "Kili",
+        "MYAI SAS (published website editor)",
+        "KILI-TECHNOLOGY SAS (published EULA name)"
+      ],
+      "assertion_ids": [
+        "candidate.cohort6.kili_technology.consensus-honeypot-qa",
+        "candidate.cohort6.kili_technology.expert-data-platform",
+        "candidate.cohort6.kili_technology.license-deployment-modes",
+        "candidate.cohort6.kili_technology.partner-boundary",
+        "candidate.cohort6.kili_technology.published-operator-name",
+        "candidate.cohort6.kili_technology.sam-image-labeling"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. The proposed supplier category is customer-expert annotation, evaluation and post-training software, with an external specialist partner network. Tasks include specialist judgments, post-training examples, NLP tags, image masks and audio/transcription workflows. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.kili_technology",
+      "identifiers": {
+        "website": "https://kili-technology.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "Kili Technology",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
       }
     },
     {
@@ -9994,6 +10326,42 @@
       "kind": "supplier",
       "legacy_id": "micro1",
       "name": "micro1",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Steldia Services Ltd.",
+        "Mindy Support (trademark)"
+      ],
+      "assertion_ids": [
+        "candidate.cohort6.mindy_support.annotation-offer",
+        "candidate.cohort6.mindy_support.customer-defined-kpis",
+        "candidate.cohort6.mindy_support.project-tool-selection",
+        "candidate.cohort6.mindy_support.recruitment-screening",
+        "candidate.cohort6.mindy_support.trial-offer"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. The official undated FAQ offers managed image, text, speech-recognition, video and3D point-cloud annotation. The scope is separate from its general BPO/customer-support services. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.mindy_support",
+      "identifiers": {
+        "website": "https://mindy-support.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "Mindy Support",
       "parent_id": null,
       "review_depth": "full_source",
       "status": "approved",
@@ -10593,6 +10961,42 @@
       }
     },
     {
+      "aliases": [
+        "Speechocean (source-domain bridge)",
+        "DATAOCEAN AI"
+      ],
+      "assertion_ids": [
+        "candidate.cohort6.speechocean.annotation-assistance",
+        "candidate.cohort6.speechocean.current-data-offer",
+        "candidate.cohort6.speechocean.speech-collection-transcription",
+        "candidate.cohort6.speechocean.speechocean-domain-brand",
+        "candidate.cohort6.speechocean.website-privacy-scope"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. The commercial offer includes off-the-shelf datasets, custom collection/labeling, speech transcription, multimodal data and annotation tooling. Catalog descriptions are not independently licensed or reviewed as dataset families in this pass. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.speechocean",
+      "identifiers": {
+        "website": "https://en.speechocean.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "Dataocean AI / Speechocean",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
       "aliases": [],
       "assertion_ids": [
         "candidate.cohort2.superannotate.databricks-delivery",
@@ -10991,6 +11395,43 @@
       "kind": "organization",
       "legacy_id": null,
       "name": "Upwork",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "V7 Ltd.",
+        "V7 Darwin (product)",
+        "V7 Go (product)"
+      ],
+      "assertion_ids": [
+        "candidate.cohort6.v7.assisted-labeling",
+        "candidate.cohort6.v7.darwin-operator-platform",
+        "candidate.cohort6.v7.reseller-delivery-boundary",
+        "candidate.cohort6.v7.review-workflows",
+        "candidate.cohort6.v7.specialist-labeling-access"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. Darwin is an annotation/data management software offer. It supports AI-assisted masks/segmentation, video tracking, pre-labeling and multistage reviews. The product also advertises specialist-service access for medical and language/RLHF tasks. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.v7",
+      "identifiers": {
+        "website": "https://www.v7labs.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "V7 / Darwin",
       "parent_id": null,
       "review_depth": "full_source",
       "status": "approved",
