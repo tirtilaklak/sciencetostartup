@@ -23,7 +23,7 @@ test.describe('native ledger rendering', () => {
     const id = await last.getAttribute('id');
     const title = (await last.locator('h3 a').textContent()).trim();
     // The role lookup includes offscreen content in the accessibility tree.
-    await expect(page.getByRole('link', { name: title, exact: true }).last()).toBeAttached();
+    await expect(last.getByRole('link', { name: title, exact: true })).toBeAttached();
     await page.goto('/research/data/#' + id);
     await expect(last.locator('h3')).toBeInViewport();
     await expect(last.locator('dt').filter({ hasText: /^Locator$/ })).toBeVisible();

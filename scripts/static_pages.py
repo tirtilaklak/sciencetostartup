@@ -944,7 +944,7 @@ def document(research, title, description, canonical, body, structured=None, cur
         head.append(f'<meta property="og:type" content="website">\n<meta property="og:title" content="{escape(title)}">\n<meta property="og:description" content="{escape(description)}">\n<meta property="og:url" content="{escape(canonical)}">\n<meta property="og:site_name" content="{SITE_NAME}">\n<meta property="og:locale" content="en_US">\n'
                     f'<meta property="og:image" content="{SHARE_IMAGE}">\n<meta property="og:image:type" content="image/png">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta property="og:image:alt" content="{escape(SHARE_ALT)}">\n'
                     f'<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:title" content="{escape(title)}">\n<meta name="twitter:description" content="{escape(description)}">\n<meta name="twitter:image:alt" content="{escape(SHARE_ALT)}">\n')
-    head.append(f"<style>{STYLE}</style>\n<link rel=\"stylesheet\" href=\"/field-guide.css\">\n")
+    head.append('<link rel="stylesheet" href="/static-pages.css">\n<link rel="stylesheet" href="/field-guide.css">\n')
     if structured: head.append(f'<script type="application/ld+json">{json_ld(structured)}</script>\n')
     return "".join(head) + "</head>\n<body class=\"static-page\">\n" + site_header(current, state) + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + "</body>\n</html>\n"
 
@@ -1474,6 +1474,8 @@ def write_static_pages(data, destination, work_data=None, profile_content=None, 
     """Write /company/<id>/, /companies/, /work/, /method/, 404.html and sitemap.xml.
     `events` is the company events sidecar and `link_health` the link checks, both as the build validated them."""
     destination, root = Path(destination), Path(root)
+    destination.mkdir(parents=True, exist_ok=True)
+    (destination / 'static-pages.css').write_text(STYLE, encoding='utf-8')
     publication = read_json(root / "data/editorial-release.json") or {}
     publication_as_of = publication.get("publication_as_of") if publication.get("canonical_dataset_version") == data["dataset_version"] else data.get("meta", {}).get("as_of")
     research = Research(data, read_js_object(root / "web/app.js", "FINANCIAL_HEADLINES"), read_json(root / "data/source-updates.json"),

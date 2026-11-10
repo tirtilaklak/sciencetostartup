@@ -97,6 +97,16 @@
 .r-report-body{max-width:780px;min-width:0}
 .r-chapter{padding-top:26px;margin-bottom:56px;border-top:1px solid var(--r-rule)}
 .r-chapter h2{font-family:var(--serif);font-size:31px;font-weight:400;letter-spacing:-.7px;line-height:1.25;margin-bottom:24px}
+/* Retain the complete native report while postponing offscreen chapter layout. */
+@supports(content-visibility:auto){
+ @media screen{
+  .r-report-body>.r-chapter{content-visibility:auto;contain-intrinsic-block-size:auto 64rem}
+  .r-report-body>.r-chapter:target{content-visibility:visible;contain-intrinsic-size:none}
+ }
+ @media print{
+  .r-report-body>.r-chapter{content-visibility:visible;contain:none;contain-intrinsic-size:none}
+ }
+}
 .r-paragraph{margin-bottom:26px}
 .r-paragraph-kind{display:block;color:var(--r-quiet);font-size:10px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:7px;font-weight:600}
 .r-paragraph>p{font-size:16px;line-height:1.85;margin-bottom:10px}

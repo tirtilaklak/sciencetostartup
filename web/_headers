@@ -9,6 +9,8 @@
   Cache-Control: public, max-age=31536000, immutable
 /presentation/*
   Cache-Control: public, max-age=31536000, immutable
+/static-pages.css
+  Cache-Control: public, max-age=0, must-revalidate
 /assets/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 /*.json

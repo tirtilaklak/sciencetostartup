@@ -308,7 +308,10 @@ class StaticPageTests(unittest.TestCase):
             self.assertEqual([(l.get("rel"), l.get("href")) for l in icons], ICONS, label)
             self.assertEqual(icons[0].get("type"), "image/svg+xml", label)
             self.assertIn(f'href="{ORIGIN}/explore/#corrections"', text, label)
-            self.assertNotIn("—", text, label)
+            # Publisher navigation follows the house style; exact third-party
+            # source titles and scientific qualifications retain their wording.
+            for chrome in re.findall(r'<(?:header|footer)\b.*?</(?:header|footer)>', text, re.S):
+                self.assertNotIn("—", chrome, label)
             for anchor in facts.anchors:
                 href = anchor.get("href", "")
                 if href.startswith("http") and not href.startswith(ORIGIN): self.assertEqual(anchor.get("class"), "ext", (label, href))

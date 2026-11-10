@@ -144,9 +144,9 @@ class CompanyEventsBuildTests(unittest.TestCase):
         cls.temp = tempfile.TemporaryDirectory(prefix="company-events-")
         root, cls.dist = Path(cls.temp.name) / "root", Path(cls.temp.name) / "dist"
         (root / "data").mkdir(parents=True)
-        for name in ("web", "docs", "design-system", "release-assets"): (root / name).symlink_to(ROOT / name)
+        for name in ("web", "design-system", "release-assets"): (root / name).symlink_to(ROOT / name)
         import shutil
-        for name in ('schema', 'scripts'):
+        for name in ('schema', 'scripts', 'docs'):
             shutil.copytree(ROOT / name, root / name,
                             ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
         from publication_fixtures import populate_owned_inputs
@@ -155,7 +155,7 @@ class CompanyEventsBuildTests(unittest.TestCase):
         for path in (ROOT / "data").iterdir():
             if path.name == 'research':
                 # Approved partitions intentionally refuse symlinked inputs.
-                shutil.copytree(path, root / 'data' / path.name)
+                shutil.copytree(path, root / 'data' / path.name, dirs_exist_ok=True)
             elif path.name != "company-events.json":
                 (root / "data" / path.name).symlink_to(path)
         (root / "data/company-events.json").write_text(json.dumps(sample()))

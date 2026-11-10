@@ -411,7 +411,7 @@ def _source_evidence(context, assertion):
     return '<ul class="r-evidence-links">' + "".join(rows) + "</ul>"
 
 
-def _assertion(context, assertion):
+def _assertion(context, assertion, *, compact=False):
     status = assertion.get("status")
     aid = assertion["id"]
     public_rows = context.get('_render_corrections')
@@ -435,6 +435,10 @@ def _assertion(context, assertion):
         body += '<ul class="r-qualifications">' + "".join(
             '<li>' + ('<strong>Original author-stage note:</strong> ' if q.startswith('Author-only candidate') else '') + sp.escape(q) + '</li>'
             for q in assertion["qualifications"]) + "</ul>"
+    if compact:
+        body += '<p class="r-meta">' + _link(_evidence_url("assertion", aid),
+                    "Inspect pinned sources, evidence and separate AI review receipts") + '</p>'
+        return f'<article class="r-assertion" data-status="{sp.escape(status)}" id="{sp.escape(_anchor("assertion", aid))}">{body}</article>'
     body += _source_evidence(context, assertion)
     reviews = {row["id"]: row for row in context["graph"].get("reviews", [])}
     receipts = [reviews[rid] for rid in assertion.get("review_ids", []) if rid in reviews]
@@ -918,7 +922,7 @@ def write_company_supplements(output, context):
                    + _date(context['graph']['as_of']) + ' · Added assessment ' + _date(context['report']['updated_on']) + '</p>'
                    '<p>These approved assertions supplement the historical profile. Each retains its own evidence date, scope and qualifications. '
                    'They do not establish commercial quality or an unstated supplier contribution.</p>'
-                   + ''.join(_assertion(context, assertion) for assertion in assertions)
+                   + ''.join(_assertion(context, assertion, compact=True) for assertion in assertions)
                    + '</section><!-- research-supplement:end -->')
         text = re.sub(r'<!-- research-supplement:start -->.*?<!-- research-supplement:end -->', '', text, flags=re.S)
         text = text.replace('</main>', section + '</main>', 1)
