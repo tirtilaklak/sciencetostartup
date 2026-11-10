@@ -26,7 +26,7 @@ floors cannot be lowered in generated JSON policy:
 
 | Requirement | Minimum |
 |---|---:|
-| Legacy organization dispositions | 39 |
+| Legacy organization inclusion audits | 39 |
 | Qualifying suppliers | 60 |
 | Distinct reviewed paper works | 150 |
 | Dataset families | 60 |
@@ -38,6 +38,13 @@ floors cannot be lowered in generated JSON policy:
 | Separate screening holdout | 200 eligible records |
 | Screening recovered | 190 |
 | Each major screening stratum recall | 90% |
+
+Organization inclusion audits and commercial dispositions are separate. A pending
+commercial qualification can have a completed full-source inclusion audit with
+subject-owned approved three-role evidence. It contributes neither a qualifying
+supplier nor a disposed frozen-core unit. Conclusive dispositions remain visible
+as `legacy_dispositions`; the unchanged 39-audit floor uses
+`legacy_inclusion_audits`. Historical method versions retain their original counts.
 
 `archival_ready` reports whether the scientific coverage, report, cutoff, and
 audit requirements pass **before** an archive exists. This avoids requiring a

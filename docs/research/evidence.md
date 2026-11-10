@@ -297,16 +297,26 @@ Raw bodies stay in the private/untracked cache and never enter the public graph.
 
 ## Floors and remaining work
 
-The launch floors remain 39 actual legacy dispositions, 60 qualifying suppliers,
+The launch floors require inclusion audits of all 39 legacy organizations, 60 qualifying suppliers,
 150 distinct deeply reviewed paper works, 60 dataset families, 20 benchmark
 families, and 90% disposition of a hash-bound frozen eligible core. Countable
-entities require an included disposition, full-source review depth, and an approved
+supplier/paper/family entities require an included disposition, full-source review depth, and an approved
 assertion; suppliers additionally require an approved capability assertion. Versions,
 aliases, candidate matches, historical descriptions, and duplicate releases do not
 inflate coverage.
 
-Coverage method 1.2.0 rolls an explicit, approved, full-source paper version or
-release up to its approved, full-source, included parent work or family. The same
+Legacy inclusion auditing is measured separately from commercial qualification.
+`legacy_inclusion_audits` requires full-source depth and approved subject-owned
+source evidence with actual three-role reviews; candidate assertions, metadata
+and inherited historical descriptions do not suffice. Pending commercial
+qualification does not contribute a supplier or a disposed core unit.
+`legacy_dispositions` continues to count only conclusive dispositions. The
+1.3.0 method and `research-launch-2` policy correct the earlier implementation's
+label/count mismatch without changing the agreed 39-audit minimum or any other
+launch threshold. Frozen historical methods and archives are unchanged.
+
+Coverage method 1.3.0 retains the 1.2.0 identity rollup: an explicit, approved, full-source paper version or
+release rolls up to its approved, full-source, included parent work or family. The same
 reviewed-parent proof applies to the frozen core's disposition counter, without
 copying version claims onto the parent. Candidate, abstract-only or pending
 parents or manifestations cannot supply that proof. Frozen core units are
