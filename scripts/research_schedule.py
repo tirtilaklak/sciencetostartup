@@ -2,14 +2,14 @@
 """Offline, resumable Pacific-time research edition preparation.
 
 This command prepares held packages. It never connects to an archive, mirror,
-website or credentialed API. Journaled local activation requires explicit bound
-approval and actual publication receipts; the present policy is prepare-only.
+website or credentialed API. Journaled local activation requires an actual bound
+coordinator review and publication receipts; the present policy is prepare-only.
 """
 from __future__ import annotations
 
 import argparse
 import contextlib
-import hashlib
+import copy
 import json
 import os
 import socket
@@ -44,7 +44,7 @@ def edition_window(monday):
         raise ValueError("Edition date must be an ISO Monday calendar date.")
     publication = datetime.combine(monday, time(9), PACIFIC)
     cutoff = datetime.combine(monday - timedelta(days=3), time(17), PACIFIC)
-    return {"edition_id": monday.isoformat(), "timezone": PACIFIC.key,
+    return {"edition_id": monday.isoformat(), "edition_date": monday.isoformat(), "timezone": PACIFIC.key,
             "publish_at": _iso(publication), "source_cutoff": _iso(cutoff),
             "publish_local": publication.isoformat(), "cutoff_local": cutoff.isoformat()}
 
@@ -168,51 +168,188 @@ def _candidate_path(directory, candidate_id):
     return Path(directory) / "candidates" / f"{candidate_id}.json"
 
 
+def _digest_path(directory, category, digest):
+    # Reuse the strict digest validator before constructing any state path.
+    _candidate_path(directory, digest)
+    return Path(directory) / category / f"{digest}.json"
+
+
+def _immutable_json(path, value):
+    """Never replace an existing immutable record, including on retry."""
+    if path.exists():
+        if json.loads(path.read_text()) != value:
+            raise ValueError("An immutable scheduler record no longer matches its digest.")
+        return
+    _atomic_json(path, value)
+
+
+def load_snapshot(directory, snapshot_id):
+    """Load an older compact edition reference without using current report inputs."""
+    snapshot = json.loads(_digest_path(directory, "snapshots", snapshot_id).read_text())
+    if canonical_hash(snapshot) != snapshot_id:
+        raise ValueError("Edition snapshot digest failed verification.")
+    return snapshot
+
+
+def _store_snapshot(directory, snapshot):
+    digest = canonical_hash(snapshot)
+    _immutable_json(_digest_path(directory, "snapshots", digest), snapshot)
+    return digest
+
+
+def _edition_references(entries, directory, current_snapshot):
+    """Externalize old embedded snapshots so editions never recursively grow."""
+    references = []
+    snapshot_keys = ("graph", "report", "policy", "identity", "roles")
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise ValueError("Edition references must be objects.")
+        reference = {key: copy.deepcopy(value) for key, value in entry.items()
+                     if key not in {*snapshot_keys, "snapshot", "gate"}}
+        embedded = entry.get("snapshot")
+        if not isinstance(embedded, dict) and all(key in entry for key in snapshot_keys[:4]):
+            embedded = {key: entry.get(key, {}) for key in snapshot_keys}
+        if (not isinstance(embedded, dict) and entry.get("status") == "published"
+                and entry.get("release_id") == current_snapshot["report"].get("release_id")):
+            embedded = copy.deepcopy(current_snapshot)
+            # A reference to this current edition is not another nested archive.
+            embedded["report"]["editions"] = []
+        if isinstance(embedded, dict):
+            frozen = {key: copy.deepcopy(embedded.get(key, {})) for key in snapshot_keys}
+            frozen["report"]["editions"] = _edition_references(
+                frozen["report"].get("editions", []), directory, frozen)
+            reference["snapshot_sha256"] = _store_snapshot(directory, frozen)
+            reference.setdefault("release_id", frozen["report"].get("release_id"))
+            reference.setdefault("edition_date", frozen["report"].get("edition_date"))
+        references.append(reference)
+    return references
+
+
 def _read_candidate(directory, candidate_id):
     candidate = json.loads(_candidate_path(directory, candidate_id).read_text())
     if candidate.get("candidate_sha256") != candidate_id or canonical_hash(candidate.get("identity")) != candidate_id:
         raise ValueError("Candidate identity digest failed verification.")
+    if candidate.get("record_sha256"):
+        record = {key: value for key, value in candidate.items() if key != "record_sha256"}
+        if canonical_hash(record) != candidate["record_sha256"]:
+            raise ValueError("Candidate record digest failed verification.")
     for key, digest in candidate["identity"]["bindings"].items():
         if canonical_hash(candidate["snapshot"][key]) != digest:
             raise ValueError(f"Candidate {key} bytes no longer match its identity.")
+    snapshot_id = candidate["identity"].get("snapshot_sha256")
+    if snapshot_id and load_snapshot(directory, snapshot_id) != candidate["snapshot"]:
+        raise ValueError("Candidate differs from its immutable edition snapshot.")
     return candidate
 
 
+def load_edition(directory, monday, candidate_id=None):
+    """Resolve an edition to its frozen inputs, never to the current live report.
+
+    Multiple preparations can belong to one edition. Without an explicit digest,
+    resolve the most recently journaled preparation for that edition.
+    """
+    edition = edition_window(monday)["edition_id"]
+    if candidate_id is None:
+        matches = [event for event in read_journal(directory) if event["kind"] == "prepared"
+                   and event["payload"].get("edition_id") == edition]
+        if not matches:
+            raise ValueError("No immutable preparation exists for this edition.")
+        candidate_id = matches[-1]["payload"]["candidate_sha256"]
+    candidate = _read_candidate(directory, candidate_id)
+    if candidate["identity"]["edition_id"] != edition:
+        raise ValueError("Candidate does not belong to the requested edition.")
+    return candidate["snapshot"]
+
+
+def resolve_edition_reference(directory, reference):
+    """Hydrate a compact archive entry; this does not establish publication."""
+    if reference.get("candidate_sha256"):
+        candidate = _read_candidate(directory, reference["candidate_sha256"])
+        snapshot = candidate["snapshot"]
+        expected = reference.get("snapshot_sha256")
+        if expected and canonical_hash(snapshot) != expected:
+            raise ValueError("Edition reference and candidate snapshot digests differ.")
+    elif reference.get("snapshot_sha256"):
+        snapshot = load_snapshot(directory, reference["snapshot_sha256"])
+    else:
+        raise ValueError("An immutable candidate or snapshot reference is required.")
+    if reference.get("release_id") and reference["release_id"] != snapshot["report"].get("release_id"):
+        raise ValueError("Edition reference release does not match its immutable snapshot.")
+    return snapshot
+
+
 def prepare_candidate(context, directory, monday, now):
-    """Freeze exact inputs. Repeating the same identity resumes the same candidate."""
+    """Stage an edition copy; stable inputs resume without changing canonical data."""
+    from research_report import publication_gate
+
     directory = Path(directory)
     window = edition_window(monday)
-    report = dict(context["report"])
-    report["source_cutoff"] = window["source_cutoff"]
-    from research_report import publication_gate
-    gate = publication_gate(context["graph"], report, context["policy"])
-    snapshot = {"graph": context["graph"], "report": report, "policy": context["policy"], "identity": context["identity"]}
-    identity = {"edition_id": window["edition_id"], "release_id": report["release_id"],
-                "window": window, "bindings": {key: canonical_hash(value) for key, value in snapshot.items()}}
-    candidate_id = canonical_hash(identity)
-    candidate = {"candidate_sha256": candidate_id, "identity": identity, "snapshot": snapshot,
-                 "created_on": _iso(_aware(now)), "status": "prepared" if gate["ready"] else "held",
-                 "gate": gate, "publication": "not_published"}
+    prepared_on = _iso(_aware(now))
+    release_id = f"research-{window['edition_id']}.1"
+    # All changes are confined to this deep copy. Review/capture dates and actual
+    # graph/audit release bindings stay unchanged; they must not be relabeled.
+    snapshot = {key: copy.deepcopy(context.get(key, {}))
+                for key in ("graph", "report", "policy", "identity", "roles")}
     with state_lock(directory):
         events = read_journal(directory)
+        prior_snapshot = copy.deepcopy(snapshot)
+        report = snapshot["report"]
+        report["editions"] = _edition_references(report.get("editions", []), directory, prior_snapshot)
+        new_edition = report.get("release_id") != release_id or report.get("edition_date") != window["edition_id"]
+        report.update({"edition_date": window["edition_id"], "release_id": release_id,
+                       "source_cutoff": window["source_cutoff"], "publish_at": window["publish_at"],
+                       "status": "prepared"})
+        if new_edition:
+            # A previous DOI or reserved deposition does not belong to this issue.
+            report["archive"] = {"status": "not_published", "doi": None, "record_url": None}
+        gate = publication_gate(snapshot["graph"], report, snapshot["policy"])
+        snapshot_id = _store_snapshot(directory, snapshot)
+        identity = {"edition_id": window["edition_id"], "edition_date": window["edition_id"],
+                    "release_id": release_id, "window": window, "snapshot_sha256": snapshot_id,
+                    "bindings": {key: canonical_hash(value) for key, value in snapshot.items()}}
+        candidate_id = canonical_hash(identity)
+        candidate = {"candidate_sha256": candidate_id, "identity": identity, "snapshot": snapshot,
+                     "created_on": prepared_on, "prepared_on": prepared_on,
+                     "prepared_after_window": _aware(now) > _aware(window["publish_at"]),
+                     "status": "prepared" if gate["ready"] else "held", "gate": gate,
+                     "publication": "not_published"}
+        candidate["record_sha256"] = canonical_hash(candidate)
         path = _candidate_path(directory, candidate_id)
         if path.exists():
             candidate = _read_candidate(directory, candidate_id)
         else:
-            _atomic_json(path, candidate)
+            _immutable_json(path, candidate)
+        reference = {"candidate_sha256": candidate_id, "edition_date": window["edition_id"],
+                     "release_id": release_id, "snapshot_sha256": snapshot_id,
+                     "prepared_on": candidate["prepared_on"], "publication": "not_published"}
+        _immutable_json(directory / "editions" / window["edition_id"] / f"{candidate_id}.json", reference)
         if not any(event["kind"] == "prepared" and event["payload"].get("candidate_sha256") == candidate_id for event in events):
-            _append(directory, "prepared", {"candidate_sha256": candidate_id, "edition_id": window["edition_id"], "status": candidate["status"]}, now)
+            _append(directory, "prepared", {"candidate_sha256": candidate_id, "edition_id": window["edition_id"],
+                                            "snapshot_sha256": snapshot_id, "status": candidate["status"]}, now)
     return candidate
 
 
 def record_approval(directory, candidate_id, receipt, now):
-    """Import an explicit review receipt; this function does not create approval."""
+    """Import an actual coordinator review receipt, including an AI coordinator."""
+    from research_report import publication_gate
+
     with state_lock(directory):
         candidate = _read_candidate(directory, candidate_id)
         if receipt.get("candidate_sha256") != candidate_id or receipt.get("release_id") != candidate["identity"]["release_id"]:
             raise ValueError("Approval does not bind the exact candidate and release.")
         if receipt.get("decision") != "approved" or not receipt.get("approved_by") or not receipt.get("rationale"):
             raise ValueError("An explicit attributed approval receipt is required.")
+        if (receipt.get("role") != "coordinator" or receipt.get("reviewer_type") not in {"ai", "human"}
+                or receipt.get("method") != "final_quality_review" or receipt.get("fixture") is not False
+                or not receipt.get("invocation_id")):
+            raise ValueError("An actual attributed coordinator review invocation is required; AI review is allowed.")
+        snapshot = candidate["snapshot"]
+        review_invocations = {review.get("invocation_id") for review in snapshot["graph"].get("reviews", [])}
+        if receipt["invocation_id"] in review_invocations:
+            raise ValueError("Coordinator approval must use its own review invocation.")
+        gate = publication_gate(snapshot["graph"], snapshot["report"], snapshot["policy"])
+        if not gate.get("archival_ready"):
+            raise ValueError("The scientific quality gate must pass before coordinator approval.")
         approved_on = _aware(receipt.get("approved_on"))
         if approved_on < _aware(candidate["created_on"]) or approved_on > _aware(now):
             raise ValueError("Approval time must follow preparation and cannot be in the future.")
@@ -254,8 +391,12 @@ def activate_candidate(directory, candidate_id, now):
             if not previous_holds:
                 _append(directory, "held", payload, now)
             return {"status": "held", **payload}
+        opened_on = _aware(candidate["identity"]["window"]["publish_at"])
         event = _append(directory, "activated", {"candidate_sha256": candidate_id, "edition_id": edition,
-                                                "release_id": candidate["identity"]["release_id"]}, now)
+                                                "release_id": candidate["identity"]["release_id"],
+                                                "activated_on": _iso(_aware(now)), "scheduled_publish_at": _iso(opened_on),
+                                                "activation_timing": "at_window" if _aware(now) == opened_on else "delayed",
+                                                "publication": "not_published"}, now)
         # The journal is authoritative. A crash before this convenience pointer
         # is harmless: activation() recognizes and restores the same candidate.
         _atomic_json(Path(directory) / "active.json", event["payload"])
@@ -264,14 +405,20 @@ def activate_candidate(directory, candidate_id, now):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("status", "prepare", "approve", "activate"))
+    parser.add_argument("action", choices=("status", "prepare", "prepare-due", "approve", "activate"))
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--state-directory", type=Path, default=ROOT / "build/research-state")
     parser.add_argument("--now", help="Timezone-aware timestamp; default is current UTC.")
-    parser.add_argument("--edition", help="Monday ISO date; prepare defaults to the next edition.")
+    edition = parser.add_mutually_exclusive_group()
+    edition.add_argument("--edition", help="Monday ISO date; prepare defaults to the next edition.")
+    edition.add_argument("--due", action="store_true", help="Prepare the latest due edition, including a missed Monday run.")
     parser.add_argument("--candidate", help="Exact prepared candidate SHA-256.")
     parser.add_argument("--receipt", type=Path, help="Existing explicit approval receipt JSON.")
     args = parser.parse_args()
+    if args.due and args.action != "prepare":
+        parser.error("--due is valid with prepare; prepare-due already selects the latest due edition")
+    if args.action == "prepare-due" and args.edition:
+        parser.error("prepare-due selects the latest due edition; use prepare --edition for an explicit date")
     now = _aware(args.now) if args.now else datetime.now(timezone.utc)
     state = args.state_directory.resolve()
     root = args.root.resolve()
@@ -284,11 +431,18 @@ def main():
         result = schedule_status(now, preparations[-1] if preparations else None)
         result["journal_events"] = len(events)
         result["mode"] = "offline"
-    elif args.action == "prepare":
+    elif args.action in {"prepare", "prepare-due"}:
         from research_report import build_context
-        monday = args.edition or schedule_status(now)["next_edition"]["edition_id"]
-        candidate = prepare_candidate(build_context(root), state, monday, now)
-        result = {key: candidate[key] for key in ("candidate_sha256", "identity", "status", "gate", "publication")}
+        selection = "latest_due_edition" if args.due or args.action == "prepare-due" else "next_edition"
+        monday = args.edition or schedule_status(now)[selection]["edition_id"]
+        context = build_context(root)
+        roles_path = root / "data/research/roles.json"
+        if "roles" not in context and roles_path.is_file():
+            context["roles"] = json.loads(roles_path.read_text())
+        candidate = prepare_candidate(context, state, monday, now)
+        result = {key: candidate[key] for key in ("candidate_sha256", "identity", "status", "gate", "publication",
+                                                "prepared_on", "prepared_after_window")}
+        result["selection"] = "explicit" if args.edition else selection
     elif args.action == "approve":
         if not args.candidate or not args.receipt:
             parser.error("approve requires --candidate and --receipt")

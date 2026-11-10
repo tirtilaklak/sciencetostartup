@@ -21,26 +21,69 @@ Never backdate a capture or relabel a later source as an earlier version.
 
 ```sh
 python3 scripts/research_schedule.py status
+# Daily preparation: the upcoming edition.
+python3 scripts/research_schedule.py prepare --state-directory build/research-state
+# Monday publication check, or a catchup after the local computer was offline.
+python3 scripts/research_schedule.py prepare-due --state-directory build/research-state
+# Equivalent explicit due selection:
+python3 scripts/research_schedule.py prepare --due --state-directory build/research-state
+# A deliberately selected Monday:
 python3 scripts/research_schedule.py prepare --edition 2026-11-16 --state-directory build/research-state
 ```
 
 The `status` command reports the latest due Monday, next Monday, and whether
-today's 16:00 preparation is due. `prepare` defaults to the next edition, freezes
-its graph/report/policy/public-identity inputs, computes the strict gate at that
-edition's cutoff, and writes a candidate keyed by SHA-256. It prints `held`
-with reasons when prerequisites are missing. A scheduler should call `status`
-before preparing, and explicitly choose the latest due edition for a Monday
-publication check. A daily preparation is not itself a publication attempt.
+today's 16:00 preparation is due. Daily `prepare` selects `next_edition`.
+Weekly jobs must call `prepare-due` (or `prepare --due`), which selects
+`latest_due_edition`. At Monday 09:00 these are different editions: a run on
+2026-11-09 at 17:00 UTC stages **2026-11-09** with `prepare-due`, while daily
+`prepare` stages **2026-11-16**. A Wednesday catchup still selects that week's
+Monday. Before Monday 09:00, the latest due edition is the preceding Monday.
+A local computer that was offline cannot run retroactively or claim an on-time
+release; every journal entry and preparation retains its actual timestamp.
 
-## Exact identity, approval, and retries
+Preparation stages a deep copy of graph/report/policy/public identity and, when
+present, the roles registry. It never edits those source inputs. The staged
+report gets the Monday `edition_date`, deterministic first-release identity
+`research-YYYY-MM-DD.1`, the Friday `source_cutoff`, and scheduled `publish_at`.
+Actual `prepared_on` stays outside the stable input identity; source capture and
+review dates, graph/audit release bindings, and content `updated_on` are not
+relabelled. An old archive receipt or reserved DOI is cleared when staging a new
+edition. Staging sets the report status to `prepared`, never `published`.
+Corrections to an already released edition use the separate revision process.
 
-Each candidate binds its edition date, report release, window, and the digests
-of all inputs. Identical input retries resume the same candidate; any changed
-input produces a new identity requiring its own approval. Candidates contain
-only the public projection and public report inputs; no credentials or raw
-caches belong in state that may be archived.
+## Exact identity, coordinator review, and retries
 
-An existing approval receipt can be imported with:
+Each candidate binds its edition date, report release, calendar window, and all
+input digests. Identical input retries resume the same candidate and its original
+preparation timestamp; changed input produces another candidate requiring its own
+review. Two editions remain distinct even when no facts changed. A preparation
+is not itself a publication attempt. Current missing research/archive prerequisites
+are printed as `held` with reasons.
+
+Frozen input objects live in `snapshots/<snapshot-sha256>.json`; candidates in
+`candidates/<candidate-sha256>.json` bind them by digest. Compact per-edition
+references live in `editions/<Monday>/<candidate-sha256>.json`. These files are
+immutable and verified on retry. No credentials or raw caches belong in this
+public state. Candidate records include a separate digest over their actual
+preparation metadata so a changed timestamp is detected too.
+
+An older edition must resolve its stored inputs, never fall back to the current
+report. The coordinator can use `load_edition(state, "2026-11-09", candidate_id)`
+or `resolve_edition_reference(state, entry)` from `research_schedule`. The latter
+accepts a `candidate_sha256` and/or `snapshot_sha256` compact reference and checks
+its release binding. To feed the existing renderer, hydrate each reference as
+`{**entry, **resolve_edition_reference(state, entry)}` before rendering. Recompute
+its publication gate and require its actual archive receipt; a stored preparation
+or an entry labelled published does not establish publication. Without a candidate
+digest, `load_edition` selects that Monday's latest journaled preparation.
+
+Older embedded snapshots in `report.editions` are externalized to compact digest
+references when staging. Nested edition histories are externalized as well, so
+freezing another weekly report does not embed every prior report inside itself.
+Current canonical `report.editions` is empty: this storage does not invent a
+published history, public edition URL, or feed item.
+
+An actual coordinator review receipt can be imported with:
 
 ```sh
 python3 scripts/research_schedule.py approve --candidate SHA256 --receipt /absolute/path/approval.json
@@ -48,24 +91,29 @@ python3 scripts/research_schedule.py activate --candidate SHA256
 ```
 
 The receipt needs `candidate_sha256`, `release_id`, `decision: approved`,
-`approved_by`, `approved_on` (aware timestamp), and `rationale`. Importing a
-receipt does not perform research review or manufacture approval. It must name
-the exact prepared candidate; a later edit invalidates the binding. A held
-candidate remains held even if an approval receipt is imported.
+`approved_by`, `approved_on` (aware timestamp), `rationale`, `role: coordinator`,
+`reviewer_type: ai` (or `human` only for an actual human review), a distinct
+`invocation_id`, `method: final_quality_review`, and `fixture: false`. Its time
+must follow actual preparation and cannot be in the future. Scientific quality
+(`archival_ready`) must already pass. A real AI coordinator may approve; there is
+no human approval requirement. Importing a receipt does not perform the review or
+manufacture approval, and it cannot turn a failed scientific gate into a pass.
 
-`activate` records local activation only after the scientific and archive gates,
-explicit approval, publication window, and `publish_enabled` policy all pass.
-It does not publish to external services. Present policy therefore holds every
-activation attempt. A production release adapter must additionally verify
-actual account connections, archive and mirror receipts, exact-artifact preview
-tests, and serialized website promotion. Changing JSON policy is not evidence
-of an external publication.
+`activate` records local activation only after scientific and archive gates,
+actual coordinator review, the publication window, and `publish_enabled` policy
+all pass. It does not publish to external services. Present policy therefore
+holds every activation attempt. A production release adapter must additionally
+verify actual account connections, archive and mirror receipts, exact-artifact
+preview tests, and serialized website promotion. Changing JSON policy is not
+evidence of an external publication.
 
-Activation dates advance monotonically. A delayed old job cannot replace a
-newer edition. Retrying the active candidate returns `already_active` and
-restores the convenience pointer if a prior process stopped after journaling.
-Corrections to an active edition require the documented new release process;
-do not overwrite an already active edition's identity.
+Activation dates advance monotonically. A delayed old job cannot replace a newer
+edition. Retrying the active candidate returns `already_active` and restores the
+convenience pointer if a prior process stopped after journaling. An activation
+records `activated_on`, `scheduled_publish_at`, and whether it occurred at the
+window or was delayed. Delayed work keeps its actual later time; local activation
+still reports `publication: not_published` and performs no external mutation.
+Do not overwrite an already active edition's identity.
 
 ## Lock and journal recovery
 
