@@ -98,8 +98,14 @@ class PublicCorrectionTests(unittest.TestCase):
         text = pages._data(context)
         parsed = Links(text)
         self.assertEqual(parsed.ids.count('assertion-' + row['claim_id']), 1)
-        self.assertIn(pages._correction_url(row), parsed.hrefs)
-        self.assertIn('historical identifier is retained as correction metadata', text)
+        destination = pages._evidence_url('assertion', row['claim_id'])
+        self.assertIn(destination, parsed.hrefs)
+        ledger = next(body for path, _, _, body, _, _ in pages._ledger_pages(context)
+                      if path == destination.split('#')[0])
+        record = Links(ledger)
+        self.assertEqual(record.ids.count('assertion-' + row['claim_id']), 1)
+        self.assertIn(pages._correction_url(row), record.hrefs)
+        self.assertIn('historical identifier is retained as correction metadata', ledger)
 
     def test_replacement_correction_cannot_predate_passing_approval(self):
         row = {**self.context['corrections'][0], 'corrected_on': '2000-01-01T00:00:00Z'}

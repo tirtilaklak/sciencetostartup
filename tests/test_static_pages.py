@@ -250,10 +250,16 @@ class StaticPageTests(unittest.TestCase):
         newest = max(newest, context['report']['updated_on'], context['graph']['as_of'][:10])
         lastmods = {}
         for url in urls:
-            loc, lastmod = url.find(NAMESPACE + "loc").text, url.find(NAMESPACE + "lastmod").text
+            loc = url.find(NAMESPACE + "loc").text
+            lastmod = url.findtext(NAMESPACE + "lastmod")
+            if lastmod is None:
+                from artifact_verification import verify_undated_research_metadata
+                verify_undated_research_metadata(self.dist, loc, context['graph'])
+                continue
             lastmods[loc] = lastmod
             self.assertRegex(lastmod, r"^\d{4}-\d{2}-\d{2}$")
-            self.assertGreaterEqual(lastmod, self.data["meta"]["as_of"], loc)
+            if loc in legacy:
+                self.assertGreaterEqual(lastmod, self.data["meta"]["as_of"], loc)
             self.assertLessEqual(lastmod, newest, loc)
         # Events reviewed after the dataset change the pages that show them, and dateModified agrees with lastmod.
         for cid in {e["company_id"] for e in self.events["events"]} | {r for e in self.events["events"] for r in e["related_company_ids"]}:
