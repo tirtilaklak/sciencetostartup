@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0.0",
+  "policy_id": "research-launch-1",
+  "mode": "prepare_only",
+  "timezone": "America/Los_Angeles",
+  "daily_prepare_local": "16:00",
+  "weekly_publish_day": "Monday",
+  "weekly_publish_local": "09:00",
+  "source_cutoff_day": "Friday",
+  "source_cutoff_local": "17:00",
+  "reference_audit_required": true,
+  "screening_audit_required": true,
+  "archive_required": true,
+  "launch_floors": {
+    "legacy_dispositions": 39,
+    "qualifying_suppliers": 60,
+    "reviewed_papers": 150,
+    "dataset_families": 60,
+    "benchmark_families": 20,
+    "core_disposition_rate": 0.9,
+    "reference_sample_size": 200,
+    "reference_precision": 0.98,
+    "reference_recall": 0.95,
+    "screening_sample_size": 200,
+    "screening_recovered": 190,
+    "screening_stratum_recall": 0.9
+  },
+  "external_accounts": {
+    "zenodo": "not_connected",
+    "hugging_face": "not_connected"
+  },
+  "note": "Prepare inspectable packages until the external accounts are connected. A staged archive, reserved DOI, uploaded mirror, and deployed website are different states. No research edition is published by this policy. Launch floors are also enforced in code and cannot be lowered by generated policy."
+}
