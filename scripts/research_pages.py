@@ -245,7 +245,11 @@ def _claim_text(context, assertion):
         value = assertion["value"]
         if isinstance(value, dict):
             value = value.get("value", "")
-        return f'{subject_html}: {sp.escape(value)}'
+        relation = str(assertion.get("predicate", "observation")).replace("_", " ")
+        label = "" if assertion.get("predicate") == "legacy_description" else " · " + relation
+        if isinstance(value, bool):
+            value = 'Yes' if value else 'No'
+        return f'{subject_html}{sp.escape(label)}: {sp.escape(value)}'
     relation = str(assertion.get("predicate", "relationship")).replace("_", " ")
     object_html = _link(entity_url(obj), obj.get("name", "Unknown object")) if obj else "Unknown object"
     return f'{subject_html} {sp.escape(relation)} {object_html}.'
@@ -407,7 +411,7 @@ def _index(context, category):
                '<section class="r-section"><h2>How this index will be built</h2><p>No records have entered this index yet. '
                'A workflow must identify its inputs, work stages, output artifact, qualifications, and version-specific source evidence. '
                'Separate source verification and adversarial review precede approval.</p>'
-               + _link(REPORT_PATH + '#evidence-and-review', 'Read the evidence standard →', 'r-text-link') + '</section>'))
+               + _link(REPORT_PATH, 'Read the evidence standard →', 'r-text-link') + '</section>'))
 
 
 def _detail(context, entity):
@@ -514,7 +518,8 @@ def _feeds(output, context, editions):
     ET.SubElement(atom, '{' + ns + '}title').text = 'ScienceToStartup published research'
     ET.SubElement(atom, '{' + ns + '}id').text = sp.ORIGIN + '/research/'
     ET.SubElement(atom, '{' + ns + '}link', {'href': sp.ORIGIN + '/research/atom.xml', 'rel': 'self'})
-    ET.SubElement(atom, '{' + ns + '}updated').text = context['report']['updated_on'] + 'T00:00:00Z'
+    newest = max([context['report']['updated_on']] + [snapshot['report']['updated_on'] for _, snapshot in editions])
+    ET.SubElement(atom, '{' + ns + '}updated').text = newest + 'T00:00:00Z'
     for path, snapshot in editions:
         report = snapshot['report']
         item = ET.SubElement(channel, 'item')
