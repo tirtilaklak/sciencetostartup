@@ -353,7 +353,7 @@ class PublicationTests(unittest.TestCase):
         projection = citations.public_projection(context, {"dataset_version": "2.5.0", "companies": []})
         prepared = self.directory / "frozen-edition"
         with patch.object(citations, "public_projection", return_value=projection):
-            citations.freeze_publication_package(context, prepared / "publication")
+            citations.freeze_publication_package(context, prepared / "publication", archive_compression="deflate")
         package = prepared / "publication"
         archive = (package / "research-archive.zip").read_bytes()
         with patch.object(citations, "write_publication_assets", side_effect=AssertionError("Never regenerate an existing freeze")):

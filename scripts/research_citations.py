@@ -18,12 +18,13 @@ import sqlite3
 import shutil
 import tempfile
 import zipfile
-from urllib.parse import quote
 
 try:
     from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
+    from research_offline import evidence_href, offline_appendix
 except ImportError:
     from scripts.research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
+    from scripts.research_offline import evidence_href, offline_appendix
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECTION_VERSION = "1.0.0"
@@ -35,6 +36,12 @@ PRIVATE_KEYS = {"email", "personal_email", "contact_email", "phone", "telephone"
                 "full_text", "credentials", "access_token", "api_key"}
 DOI = re.compile(r"10\.\d{4,9}/\S+")
 RESERVATION_FIELDS = ("reserved_doi", "deposition_id", "api_origin", "environment")
+# Cloudflare Workers Static Assets: 25 MiB per file on both Free and Paid.
+# https://developers.cloudflare.com/workers/platform/limits/#static-assets
+STATIC_ASSET_LIMIT_BYTES = 25 * 1024 * 1024
+ARCHIVE_COMPRESSION = {"stored": zipfile.ZIP_STORED, "deflate": zipfile.ZIP_DEFLATED}
+LIVE_PACKAGE_FILES = {"package-status.json", "current-metadata.json", "current-CITATION.cff",
+                      "current-citation.bib", "current-citation.ris", "current-citation.csl.json"}
 
 
 def json_bytes(value):
@@ -239,7 +246,7 @@ def report_markdown(context):
         for paragraph in section.get("paragraphs", []):
             lines.extend(["[" + paragraph.get("kind", "analysis") + "] " + paragraph["text"], ""])
             if paragraph.get("claim_ids"):
-                lines.extend(["Evidence IDs: " + ", ".join(paragraph["claim_ids"]), ""])
+                lines.extend(["Evidence IDs: " + ", ".join('[' + cid + '](' + evidence_href('assertion', cid) + ')' for cid in paragraph["claim_ids"]), ""])
         if section.get('id') == 'executive-assessment':
             findings, withheld = executive_findings(context)
             def safe(value):
@@ -252,12 +259,12 @@ def report_markdown(context):
                     if field_text(finding.get(key)):
                         lines.extend([label + ': ' + safe(finding[key]), ''])
                 lines.extend(['Approved evidence: ' + ', '.join(
-                    '[' + cid + '](https://sciencetostartup.com/research/data/#' + quote('assertion-' + cid, safe='._-') + ')'
+                    '[' + cid + '](' + evidence_href('assertion', cid) + ')'
                     for cid in finding['claim_ids']), ''])
             if withheld:
                 lines.extend([WITHHELD, ''])
     lines.extend(["## Evidence and reproduction", "", "The accompanying clean-dataset.json, CSV and SQLite contain the same versioned public projection. Canonical dataset 2.5.0 remains unchanged outside this archive. Contact details and raw source text are excluded from this projection. Review receipts describe actual review scope; a candidate is not a deeply reviewed record.", "",
-                  "Use MANIFEST.json to verify each file's SHA-256. The archive is self-contained and makes no network requests. Source URLs and identifiers are retained in the accompanying public graph.", ""])
+                  "Open evidence.html for offline entity dossiers, a recorded-scope comparison table, assertions, source bindings and review receipts. Use MANIFEST.json to verify each file's SHA-256. The archive is self-contained and makes no network requests. Source URLs and identifiers are retained in the accompanying public graph.", ""])
     return privacy_filter("\n".join(lines))
 
 
@@ -265,17 +272,17 @@ def offline_html(context):
     # Preserve every paragraph as text without interpreting embedded HTML.
     body = []
     in_finding = False
-    evidence_link = r'\[[^\]]+\]\(https://sciencetostartup.com/research/data/#[A-Za-z0-9%._-]+\)'
+    evidence_link = r'\[[^\]]+\]\(evidence\.html#[A-Za-z0-9%._-]+\)'
     for line in report_markdown(context).splitlines():
         if re.fullmatch(r'<a id="finding-[A-Za-z0-9][A-Za-z0-9._:-]{0,199}"></a>', line):
             body.append(line)
             in_finding = True
         elif line.startswith('### '):
             body.append('<h3>' + html.escape(line[4:]) + '</h3>')
-        elif (line.startswith('Approved evidence: ')
-              and re.fullmatch(evidence_link + r'(?:, ' + evidence_link + r')*', line[len('Approved evidence: '):])):
-            links = re.findall(r'\[([^\]]+)\]\((https://sciencetostartup.com/research/data/#[A-Za-z0-9%._-]+)\)', line)
-            body.append('<p>Approved evidence: ' + ', '.join('<a href="' + html.escape(url, quote=True) + '">' + html.escape(label) + '</a>' for label, url in links) + '</p>')
+        elif (line.startswith(('Approved evidence: ', 'Evidence IDs: '))
+              and re.fullmatch(evidence_link + r'(?:, ' + evidence_link + r')*', line.split(': ', 1)[1])):
+            links = re.findall(r'\[([^\]]+)\]\((evidence\.html#[A-Za-z0-9%._-]+)\)', line)
+            body.append('<p>' + line.split(': ', 1)[0] + ': ' + ', '.join('<a href="' + html.escape(url, quote=True) + '">' + html.escape(label) + '</a>' for label, url in links) + '</p>')
         elif line.startswith("# "):
             body.append("<h1>" + html.escape(line[2:]) + "</h1>")
         elif line.startswith("## "):
@@ -287,7 +294,7 @@ def offline_html(context):
             body.append("<p>" + html.escape(line) + "</p>")
     return ('<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>'
             + html.escape(context["report"]["title"]) + '</title><style>body{max-width:72ch;margin:3rem auto;padding:0 1rem;font:18px/1.6 system-ui;color:#18312c}h1,h2{line-height:1.2}p{overflow-wrap:anywhere}h2{margin-top:2.5rem}@media print{body{font-size:11pt}}</style><main>'
-            + "\n".join(body) + "</main></html>\n").encode()
+            + '<nav aria-label="Offline edition"><a href="evidence.html">Evidence appendix and recorded scope comparison</a></nav>' + "\n".join(body) + "</main></html>\n").encode()
 
 
 def source_context(context, *, reservation=True):
@@ -384,6 +391,10 @@ def read_prepared_package(context, package, *, expected_archive_sha256=None):
         if sha256(blob) != descriptor.get("sha256") or len(blob) != descriptor.get("bytes"):
             raise ValueError("Prepared package file changed: " + name)
         files[name] = blob
+    expected = set(files) | {"PREPARED.json", "research-archive.zip"}
+    if any(path.name not in expected | LIVE_PACKAGE_FILES or path.is_symlink() or not path.is_file()
+           for path in package.iterdir()):
+        raise ValueError("Unexpected or unsafe prepared package inventory")
     if files.get("source-context.json") != json_bytes(source_context(context)):
         raise ValueError("Frozen source context differs from the current research inputs")
     archive = read("research-archive.zip")
@@ -398,12 +409,14 @@ def read_prepared_package(context, package, *, expected_archive_sha256=None):
         if len(zipped.namelist()) != len(files) or set(zipped.namelist()) != set(files):
             raise ValueError("Frozen archive members differ from its manifest")
         for name, blob in files.items():
+            if zipped.getinfo(name).compress_type not in ARCHIVE_COMPRESSION.values():
+                raise ValueError("Unsupported frozen archive compression: " + name)
             if zipped.read(name) != blob:
                 raise ValueError("Frozen archive differs from prepared file: " + name)
     return {**files, "PREPARED.json": contract_blob, "research-archive.zip": archive}
 
 
-def freeze_publication_package(context, package):
+def freeze_publication_package(context, package, *, archive_compression="stored"):
     """Create an immutable edition package, or verify an identical prior freeze.
 
     An existing target is never regenerated or overwritten. Missing/incomplete
@@ -417,7 +430,7 @@ def freeze_publication_package(context, package):
         read_prepared_package(context, target)
         return target
     with tempfile.TemporaryDirectory(prefix="research-freeze-", dir=target.parent) as temporary:
-        write_publication_assets(context, temporary)
+        write_publication_assets(context, temporary, archive_compression=archive_compression)
         prepared = Path(temporary) / "publication"
         read_prepared_package(context, prepared)
         for source in prepared.iterdir():
@@ -442,18 +455,34 @@ def verified_pdf(context):
     return blob
 
 
-def deterministic_zip(files):
+def deterministic_zip(files, *, compression="stored"):
+    """Stable ZIP metadata; explicit deflate is for preparation before freezing.
+
+    Deflate output can vary between zlib versions. Cross-runtime builds reuse the
+    frozen archive bytes rather than regenerating compressed streams.
+    """
+    if compression not in ARCHIVE_COMPRESSION:
+        raise ValueError("Archive compression must be stored or deflate")
     stream = io.BytesIO()
-    with zipfile.ZipFile(stream, "w", compression=zipfile.ZIP_STORED) as archive:
+    with zipfile.ZipFile(stream, "w") as archive:
         for name, blob in sorted(files.items()):
             info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
             info.create_system = 3
             info.external_attr = 0o100644 << 16
-            archive.writestr(info, blob)
+            archive.writestr(info, blob, compress_type=ARCHIVE_COMPRESSION[compression],
+                             compresslevel=9 if compression == "deflate" else None)
     return stream.getvalue()
 
 
-def write_publication_assets(context, output):
+def publication_asset_inventory(package, *, limit=STATIC_ASSET_LIMIT_BYTES):
+    """Inspect every exposed file, not just the compressed archive."""
+    package = Path(package)
+    sizes = {path.name: path.stat().st_size for path in sorted(package.iterdir()) if path.is_file()}
+    return {"limit_bytes": limit, "files": sizes,
+            "oversized": {name: size for name, size in sizes.items() if size > limit}}
+
+
+def write_publication_assets(context, output, *, archive_compression="stored"):
     """Prepare local files even while accounts and launch gates are unavailable."""
     output = Path(output)
     publication = output / "publication"
@@ -467,12 +496,14 @@ def write_publication_assets(context, output):
         for name, blob in frozen.items():
             (publication / name).write_bytes(blob)
         return write_package_status(context, publication, frozen)
-    paths = write_projection(public_projection(context), publication)
+    projection = public_projection(context)
+    paths = write_projection(projection, publication)
     metadata = publication_metadata(context)
     files = {name: (publication / name).read_bytes() for name in paths}
     files.update(citation_formats(metadata))
     files.update({"metadata.json": json_bytes(metadata), "report.md": report_markdown(context).encode(),
-                  "report.html": offline_html(context), "readiness.json": json_bytes(privacy_filter(context["gate"])),
+                  "report.html": offline_html(context), "evidence.html": offline_appendix(projection),
+                  "readiness.json": json_bytes(privacy_filter(context["gate"])),
                   "source-context.json": json_bytes(source_context(context))})
     pdf = verified_pdf(context)
     if pdf:
@@ -487,12 +518,12 @@ def write_publication_assets(context, output):
         if path.is_file():
             files[target_name] = path.read_bytes()
     files["source-manifest.json"] = json_bytes(privacy_filter(context["graph"]["sources"]))
-    files["METHODS.md"] = ("# Research methods\n\n" + "\n\n".join(paragraph["text"] for section in context["report"].get("sections", [])
+    files["METHODS.md"] = privacy_filter("# Research methods\n\n" + "\n\n".join(paragraph["text"] for section in context["report"].get("sections", [])
                                            if section["id"] == "methods-and-appendices" for paragraph in section.get("paragraphs", []))).encode()
     for name in ("LICENSE-DATA.md", "LICENSE"):
         if (root / name).is_file():
             files[name] = (root / name).read_bytes()
-    files["README.md"] = ("# ScienceToStartup research package\n\n" + metadata["note"] + "\n\nOpen report.html for the full offline report. Citation files reflect archive status. JSON, CSV and SQLite are equivalent privacy-filtered projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Full source text and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party evidence retains its rights.\n\nRun `python3 reproduce.py --write-tables reproduced` inside this extracted package to verify MANIFEST.json, compare all three exports, validate the graph and reproduce coverage and approved-assertion tables. This needs only Python's standard library and no network. Schemas, methods and a source manifest are included. The PDF is accepted only when its receipt binds this exact context. No remote publication occurs during the build.\n").encode()
+    files["README.md"] = ("# ScienceToStartup research package\n\n" + metadata["note"] + "\n\nOpen report.html for the full offline report, then evidence.html for entity dossiers, a recorded-scope comparison, assertions, source metadata and review receipts. Evidence links resolve within the extracted edition without the live site. Citation files reflect archive status. JSON, CSV and SQLite are equivalent privacy-filtered projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Full source text and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party evidence retains its rights.\n\nRun `python3 reproduce.py --write-tables reproduced` inside this extracted package to verify MANIFEST.json, compare all three exports, validate the graph and reproduce coverage and approved-assertion tables. This needs only Python's standard library and no network. Schemas, methods and a source manifest are included. The PDF is accepted only when its receipt binds this exact context. No remote publication occurs during the build.\n").encode()
     # These files are sent to external services, so they belong to the same
     # immutable manifest and archive as the report and dataset.
     files["zenodo-metadata.json"] = json_bytes(zenodo_metadata(metadata))
@@ -500,7 +531,7 @@ def write_publication_assets(context, output):
     manifest = {"schema_version": 1, "release_id": metadata["version"], "context_sha256": context_digest(context),
                 "files": {name: {"sha256": sha256(blob), "bytes": len(blob)} for name, blob in sorted(files.items())}}
     files["MANIFEST.json"] = json_bytes(manifest)
-    files["research-archive.zip"] = deterministic_zip(files)
+    files["research-archive.zip"] = deterministic_zip(files, compression=archive_compression)
     # Receipts contain the ZIP digest and therefore cannot be ZIP members.
     files["PREPARED.json"] = json_bytes({"schema_version": 1, "release_id": metadata["version"],
         "context_sha256": context_digest(context), "manifest_sha256": sha256(files["MANIFEST.json"]),

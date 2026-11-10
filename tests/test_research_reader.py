@@ -42,7 +42,7 @@ class ReaderTests(unittest.TestCase):
         md, offline = citations.report_markdown(self.context), citations.offline_html(self.context).decode()
         self.assertIn('<a id="finding-assessment-1"></a>', md)
         self.assertIn('finding-assessment-1', Facts(offline).ids)
-        self.assertIn('https://sciencetostartup.com' + pages._evidence_url('assertion', self.claim['id']), Facts(offline).links)
+        self.assertIn(citations.evidence_href('assertion', self.claim['id']), Facts(offline).links)
         for text in ('Evidence <scope> & limits.', 'Inspect the task.', 'Narrow evidence.; No quality audit.',
                      'Limited', 'Specific sources.', 'A new source.'):
             self.assertIn(html.escape(text), report)
@@ -83,7 +83,7 @@ class ReaderTests(unittest.TestCase):
         self.finding['text'] = 'Approved evidence: this synthetic fixture remains limited to one task'
         offline = citations.offline_html(self.context).decode()
         self.assertIn(self.finding['text'], offline)
-        self.assertIn('https://sciencetostartup.com' + pages._evidence_url('assertion', self.claim['id']), Facts(offline).links)
+        self.assertIn(citations.evidence_href('assertion', self.claim['id']), Facts(offline).links)
 
     @unittest.skipUnless(importlib.util.find_spec('reportlab') and importlib.util.find_spec('pypdf'), 'Optional PDF preparation dependencies')
     def test_prepared_pdf_retains_same_supported_finding_and_readable_identifier(self):
