@@ -378,6 +378,44 @@ test('profile tabs keep keyboard focus visible after narrow reflow', async ({ pa
   await expect(page.locator('#profile-pane-business')).not.toBeVisible();
 });
 
+test('a pending profile keeps its sourced introduction while withholding evidence and retains it after validation', async ({ page }) => {
+  await ready(page);
+  let releaseMercor;
+  const mercorGate = new Promise(resolve => { releaseMercor = resolve; });
+  await page.route('**/presentation/company-mercor.*.json', async route => { await mercorGate; await route.continue(); });
+  await page.evaluate(() => { location.hash = '#company/mercor/work'; });
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'loading');
+  await expect(page.locator('#profile-view')).toHaveAttribute('aria-busy', 'true');
+  await expect(page.locator('.profile-summary')).toHaveText('Connects specialists with AI training and testing work. It also helps businesses put AI programs to work.');
+  await expect(page.locator('[data-profile-loading-content]')).toContainText('Loading the sourced profile');
+  await expect(page.locator('[data-profile-loading-content] a')).toHaveAttribute('href', '/company/mercor/');
+  await expect(page.locator('.profile-tabs, .profile-archive, #profile-work')).toHaveCount(0);
+  expect(await page.evaluate(() => window.COMPANY_CONTEXTS_READY.has('mercor'))).toBe(false);
+  await page.evaluate(() => { window.pendingProfileIntroduction = document.querySelector('.profile-top'); });
+  releaseMercor();
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  await expect(page.locator('#profile-view')).not.toHaveAttribute('aria-busy');
+  await expect(page.locator('[data-profile-loading]')).toHaveCount(0);
+  await expect(page.locator('#profile-pane-work')).toBeVisible();
+  expect(await page.evaluate(() => document.querySelector('.profile-top') === window.pendingProfileIntroduction)).toBe(true);
+  expect(await page.evaluate(() => window.COMPANY_CONTEXTS_READY.has('mercor'))).toBe(true);
+
+  // Returning to cached evidence while another company is pending must replace its introduction.
+  let releaseScale;
+  const scaleGate = new Promise(resolve => { releaseScale = resolve; });
+  await page.route('**/presentation/company-scale_ai.*.json', async route => { await scaleGate; await route.continue(); });
+  await page.evaluate(() => { location.hash = '#company/scale_ai/work'; });
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'loading');
+  await expect(page.locator('.profile-title-row h1')).toHaveText('Scale AI');
+  await page.evaluate(() => { location.hash = '#company/mercor/work'; });
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  await expect(page.locator('.profile-title-row h1')).toHaveText('Mercor');
+  releaseScale();
+  await expect(page.locator('#profile-pane-work')).toBeVisible();
+  await expect(page.locator('.profile-title-row h1')).toHaveText('Mercor');
+  expect(await page.evaluate(() => location.hash)).toBe('#company/mercor/work');
+});
+
 test('slow stale company response cannot replace the new route', async ({ page }) => {
   let release;
   const gate = new Promise(resolve => { release = resolve; });

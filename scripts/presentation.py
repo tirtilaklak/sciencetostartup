@@ -355,7 +355,6 @@ def build_presentation(data, destination, root, sidecars, release):
         if isinstance(keywords, str):
             keywords = keywords.split()
         search_rows.append({"id": entry["url"], "name": entry["title"], "summary": entry["summary"], "group": entry["kind"], "products": keywords, "href": entry["url"]})
-    summary["researchSearchEntries"] = sidecars.get("RESEARCH_SEARCH", [])
     summary["homeSearch"] = write_asset(destination, "search", dict(identity, entries=search_rows))
     company_map = {company["id"]: company for company in data["companies"]}
     editorial_map = {entry["company_id"]: entry for entry in sidecars["EDITORIAL"]["entries"]}
@@ -367,6 +366,7 @@ def build_presentation(data, destination, root, sidecars, release):
         company_search[cid] = " ".join(str(value) for value in values if value).lower()
     summary["fullSearch"] = write_asset(destination, "full-search", dict(identity, data={"dataset_version": data["dataset_version"]}, companySearch=company_search,
                                                                      profileProducts=rooted_assets(current_products), editorialReadouts=copy.deepcopy(data["editorial_readouts"]),
+                                                                     researchSearchEntries=sidecars.get("RESEARCH_SEARCH", []),
                                                                      workSearch={route["id"]: work_search_text(route, company_map) for route in sidecars["WORK_ROUTES"]["routes"]}))
     # The full archive is fetched only by the explicitly opened method/archive view.
     summary["archive"] = write_asset(destination, "archive", dict(identity, data=data, businessHealth=sidecars["BUSINESS_HEALTH"], sourceUpdates=copy.deepcopy(sidecars["SOURCE_UPDATES"])))

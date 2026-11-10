@@ -1,7 +1,7 @@
 /* Site menus, global search and footer. Loaded after source-updates.js and before initialize(). */
 
 // Global search over companies, business groups, products, paid work listings and pages.
-// The index is built from data already in the page on first use, never at load.
+// The index is built from the validated deferred search context on first use.
 const SITE_SEARCH_GROUPS={company:['Companies',5],group:['Business groups',2],work:['Paid work',5],product:['Products',3],page:['Pages',3]};
 const SITE_SEARCH_SUGGESTED=['scale_ai','mercor','surge_ai','labelbox'];
 let siteSearchEntries=null,siteSearchItems=[],siteSearchActive=-1,siteSearchStatusTimer=0,siteSearchGeneration=0;
@@ -23,7 +23,7 @@ function siteSearchPages(){
   ['downloads','Download the data','JSON, CSV and SQLite files','downloads csv json sqlite dataset export license reuse'],
   ['venture','The publisher’s proposed AI lab','The publisher’s proposal, separate from the research','venture neolab investor pitch proposal']
  ].map(([id,name,meta,keys])=>({type:'page',id,name,meta,keys:keys.split(' '),href:'#'+id})).concat(
-  ((typeof window!=='undefined'&&window.SUMMARY_INDEX?.researchSearchEntries)||[]).map(entry=>({type:'page',id:entry.url,name:entry.title,meta:entry.summary,keys:entry.keywords||[],href:entry.url}))
+  ((typeof window!=='undefined'&&window.SEARCH_INDEX?.researchSearchEntries)||[]).map(entry=>({type:'page',id:entry.url,name:entry.title,meta:entry.summary,keys:entry.keywords||[],href:entry.url}))
  );
 }
 function siteSearchIndex(){
