@@ -276,6 +276,22 @@ class ResearchGraphTests(unittest.TestCase):
         graph['assertions'][0]['status'] = 'candidate'
         self.assertEqual(rg.coverage_summary(graph)['core_dispositioned'], 0)
 
+    def test_supplier_relationship_alone_cannot_certify_an_artifact_dossier(self):
+        graph = fixture()
+        graph['entities'][0]['eligible_core'] = True
+        graph['entities'].append(entity('supplier', kind='supplier', identifiers={}))
+        claim = graph['assertions'][0]
+        claim.update(subject_id='supplier', object_id='paper', value=None, predicate='supplies_data_for')
+        for review in graph['reviews']:
+            review['assertion_sha256'] = {'claim': rg.assertion_digest(claim)}
+        graph['coverage']['frozen_core'] = {'entity_ids': ['paper'], 'frozen_on': '2026-11-08T00:00:00Z',
+            'source_cutoff': '2026-11-07T17:00:00Z', 'sha256': rg.digest(rg.stable_json(['paper']))}
+        for status, disposition in (('approved','included'),('excluded','excluded'),('historical','historical_only')):
+            graph['entities'][0].update(status=status, disposition=disposition)
+            counts = rg.coverage_summary(graph)
+            self.assertEqual(counts['core_dispositioned'], 0, disposition)
+            self.assertEqual(counts['reviewed_papers'], 0, disposition)
+
     def test_private_extensions_are_removed_and_free_text_email_redacted(self):
         graph = fixture()
         graph["entities"][0]["private_email"] = "person@example.org"

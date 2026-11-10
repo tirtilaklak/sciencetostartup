@@ -585,7 +585,9 @@ def coverage_summary(graph):
     assertions = {a["id"]: a for a in graph["assertions"] if a["status"] == "approved"}
     reviewed = {e['id']: e for e in graph['entities'] if e['status'] == 'approved'
                 and e['disposition'] == 'included' and e['review_depth'] == 'full_source'}
-    direct = {eid for eid, e in reviewed.items() if any(aid in assertions for aid in e['assertion_ids'])}
+    def own_evidence(e):
+        return any(aid in assertions and assertions[aid]['subject_id'] == e['id'] for aid in e['assertion_ids'])
+    direct = {eid for eid, e in reviewed.items() if own_evidence(e)}
     # Count a reviewed work/family once when its explicitly linked, reviewed
     # manifestation has approved evidence. This is coverage roll-up only: no
     # supplier relationship or other factual edge is inferred through a parent.
@@ -596,7 +598,6 @@ def coverage_summary(graph):
         assertions[aid]["subject_id"] == e["id"] and assertions[aid]["predicate"] == "has_capability"
         for aid in e["assertion_ids"] if aid in assertions)]
     legacy = [e for e in graph["entities"] if e["legacy_id"] is not None]
-    disposed = lambda e: e["disposition"] in {"included", "excluded", "historical_only"} and any(aid in assertions for aid in e["assertion_ids"])
     core_ids = set(graph["coverage"]["frozen_core"]["entity_ids"])
     # A deeply reviewed work/family has an explicit disposition even when its
     # approved observations correctly attach to the exact inspected version.
@@ -609,9 +610,9 @@ def coverage_summary(graph):
             return e['id'] in qualifying_ids
         return (e['disposition'] in {'excluded', 'historical_only'}
                 and e['status'] != 'candidate' and e['review_depth'] == 'full_source'
-                and any(aid in assertions for aid in e['assertion_ids']))
+                and own_evidence(e))
     core_disposed = sum(core_dispositioned(e) for e in graph["entities"] if e["id"] in core_ids)
-    counts = {"coverage_method_version": "1.2.0", "legacy_organizations": len(legacy), "legacy_dispositions": sum(disposed(e) for e in legacy),
+    counts = {"coverage_method_version": "1.2.0", "legacy_organizations": len(legacy), "legacy_dispositions": sum(core_dispositioned(e) for e in legacy),
               "qualifying_suppliers": len(suppliers), "reviewed_papers": sum(e["kind"] in {"paper", "paper_work"} for e in qualifying),
               "dataset_families": len({e["family_id"] for e in qualifying if e["kind"] in {"dataset", "dataset_family"}}),
               "benchmark_families": len({e["family_id"] for e in qualifying if e["kind"] in {"benchmark", "benchmark_family"}}),
