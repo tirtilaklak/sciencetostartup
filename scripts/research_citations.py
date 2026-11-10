@@ -33,6 +33,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECTION_VERSION = "1.0.0"
 EMAIL = re.compile(r"[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9.-]*[A-Z0-9])?\.[A-Z]{2,}", re.I)
 PRIVATE_KEY = re.compile(r"(?:^|_)(?:email|phone|secret|token|raw_body|cache_path|credential)(?:$|_)", re.I)
+LOCAL_PATH = re.compile(r"^(?:file://|/(?:Users|home|private|tmp|var/folders)/|[A-Za-z]:[\\/]|\\\\)", re.I)
 SECRET = re.compile(r"(?:sk-(?:proj-)?[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)")
 PRIVATE_KEYS = {"email", "personal_email", "contact_email", "phone", "telephone",
                 "raw_inputs", "raw_cache", "raw_response", "response_body", "source_quote",
@@ -80,7 +81,9 @@ def privacy_filter(value):
     """
     if isinstance(value, dict):
         return {key: privacy_filter(item) for key, item in sorted(value.items())
-                if key.lower() not in PRIVATE_KEYS and not PRIVATE_KEY.search(key)}
+                if key.lower() not in PRIVATE_KEYS and not PRIVATE_KEY.search(key)
+                and not (isinstance(item, str) and (key.lower() == "path" or key.lower().endswith("_path"))
+                         and LOCAL_PATH.match(item))}
     if isinstance(value, list):
         return [privacy_filter(item) for item in value]
     if isinstance(value, str):

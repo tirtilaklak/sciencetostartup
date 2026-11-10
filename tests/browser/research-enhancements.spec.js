@@ -6,6 +6,9 @@ const { pathToFileURL } = require('node:url');
 const { spawnSync } = require('node:child_process');
 const { createHash } = require('node:crypto');
 
+// Keep failure evidence without repeatedly serializing the full offline ledger.
+test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
+
 const reportPath = '/research/state-of-ai-data-labs/';
 const categories = {
   papers: ['paper', 'paper_work', 'paper_version'],

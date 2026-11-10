@@ -1,0 +1,67 @@
+{
+  "archival_ready": false,
+  "archive_reasons": [
+    "An actual public versioned archive receipt with DOI and exact artifact digest is required; a prepared package is not publication."
+  ],
+  "audit_metrics": {
+    "reference": {},
+    "screening": {}
+  },
+  "coverage": {
+    "abstract_reviewed_entities": 0,
+    "approved_assertions": 1713,
+    "benchmark_families": 21,
+    "candidate_assertions": 26,
+    "candidate_entities": 19,
+    "captured_source_versions": 503,
+    "captured_sources": 1789,
+    "core_disposition_rate": 0.0,
+    "core_dispositioned": 0,
+    "core_eligible": 0,
+    "coverage_floors_met": false,
+    "coverage_method_version": "1.3.0",
+    "dataset_families": 63,
+    "historical_assertions": 39,
+    "launch_floors": {
+      "benchmark_families": 20,
+      "core_disposition_rate": 0.9,
+      "dataset_families": 60,
+      "legacy_inclusion_audits": 39,
+      "qualifying_suppliers": 60,
+      "reviewed_papers": 150
+    },
+    "legacy_dispositions": 38,
+    "legacy_inclusion_audits": 39,
+    "legacy_organizations": 39,
+    "qualifying_suppliers": 65,
+    "quality_audit_recorded": false,
+    "reviewed_papers": 152,
+    "screening_audit_recorded": false
+  },
+  "ready": false,
+  "reasons": [
+    "Coverage core_disposition_rate: 0.0 / 0.9 required.",
+    "Eligible core denominator has not been frozen with its cutoff and date.",
+    "The edition cutoff is in the future relative to the actual evidence snapshot.",
+    "Actual reference audit has not been supplied.",
+    "Actual screening audit has not been supplied.",
+    "An actual public versioned archive receipt with DOI and exact artifact digest is required; a prepared package is not publication."
+  ],
+  "report_review_ready": true,
+  "source_cutoff": "2026-11-13T17:00:00-08:00",
+  "status": "prelaunch",
+  "thresholds": {
+    "benchmark_families": 20,
+    "core_disposition_rate": 0.9,
+    "dataset_families": 60,
+    "legacy_inclusion_audits": 39,
+    "qualifying_suppliers": 60,
+    "reference_precision": 0.98,
+    "reference_recall": 0.95,
+    "reference_sample_size": 200,
+    "reviewed_papers": 150,
+    "screening_recovered": 190,
+    "screening_sample_size": 200,
+    "screening_stratum_recall": 0.9
+  }
+}

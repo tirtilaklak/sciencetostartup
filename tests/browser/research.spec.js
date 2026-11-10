@@ -1,6 +1,10 @@
 const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 
+// Serializing the complete evidence DOM for each trace step exceeds the test
+// timeout independently of page behavior. Retain screenshots, network and code.
+test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
+
 const reportPath = '/research/state-of-ai-data-labs/';
 const publicPages = ['/', '/research/', reportPath, '/research/data/', '/review/', '/company/scale_ai/'];
 

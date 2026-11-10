@@ -445,7 +445,7 @@ def _assertion(context, assertion):
             for r in sorted(receipts, key=lambda row: (row.get("role", ""), row["id"]))) + "</ul></details>"
     elif status == "historical":
         body += '<p class="r-meta">Inherited provenance; no fresh research review is claimed.</p>'
-    return f'<article class="r-assertion" id="{sp.escape(_anchor("assertion", aid))}">{body}</article>'
+    return f'<article class="r-assertion" data-status="{sp.escape(status)}" id="{sp.escape(_anchor("assertion", aid))}">{body}</article>'
 
 
 def _paragraph(context, paragraph):

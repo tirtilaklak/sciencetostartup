@@ -1,0 +1,11 @@
+{
+  "archive_bytes": 10442497,
+  "archive_sha256": "6098504f665a0810d93a4d684328d2eb0f5f9c6dc8989c21d50d5db09a60ca7e",
+  "context_contract_version": 3,
+  "context_sha256": "d3e5652844b221ac4086065c529b9e4e675b9946ce845cd772d5d3d42c597591",
+  "manifest_sha256": "9195b0af8b39507c59639820ea0e959ff2d4adb47cfb4fa18e4098c437d3a303",
+  "pdf_bytes": 732843,
+  "pdf_sha256": "ad3e80619b45edde081f0d51e92ea34416971d5faba0392aa022839bc4fff8eb",
+  "release_id": "research-2026-11-10.prelaunch.1",
+  "schema_version": 1
+}

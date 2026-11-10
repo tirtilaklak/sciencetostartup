@@ -1,5 +1,9 @@
 const { test, expect } = require('@playwright/test');
 
+// Full-ledger DOM trace snapshots obscure native navigation timing; screenshots,
+// source and network traces remain available when a functional check fails.
+test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
+
 // These checks exercise browser-native revelation of the complete HTML ledger.
 // They also run with scripting disabled and with each configured browser engine.
 test.describe('native ledger rendering', () => {
@@ -10,7 +14,10 @@ test.describe('native ledger rendering', () => {
     expect(response.ok()).toBeTruthy();
     const graph = await response.json();
     await page.goto('/research/data/');
-    await expect(page.locator('.r-assertion')).toHaveCount(graph.assertions.filter(row => ['approved', 'historical'].includes(row.status)).length);
+    await expect(page.locator('.r-assertion[data-status="approved"],.r-assertion[data-status="historical"]')).toHaveCount(graph.assertions.filter(row => ['approved', 'historical'].includes(row.status)).length);
+    // Quarantined identifiers remain correction-only placeholders. They are
+    // outside the approved export and must never be sampled as findings.
+    await expect(page.locator('.r-assertion[data-status="candidate"] .r-assertion-text')).toHaveCount(0);
     await expect(page.locator('.r-source')).toHaveCount(graph.sources.length);
     const last = page.locator('.r-source').last();
     const id = await last.getAttribute('id');
@@ -51,7 +58,7 @@ test.describe('native ledger rendering', () => {
 
   test('late assertion citations reveal their source and preserve native history', async ({ page }) => {
     await page.goto('/research/data/');
-    const assertion = page.locator('.r-assertion').last();
+    const assertion = page.locator('.r-assertion[data-status="approved"]').last();
     const id = await assertion.getAttribute('id');
     await page.goto('/research/data/#' + id);
     await expect(assertion.locator('.r-assertion-text')).toBeInViewport();

@@ -59,6 +59,15 @@ class ProjectionTests(unittest.TestCase):
         clean = citations.privacy_filter(value)
         self.assertEqual(clean, {"items": [{"statement": "Ask [contact removed] now.", "count": 0}]})
 
+    def test_public_metadata_excludes_local_paths_but_keeps_repository_locators(self):
+        review = {"reviewer": "AI /root/evidence_auditor", "read_scope_path": "/Users/person/private notes.json",
+                  "validation_path": "C:\\Users\\person\\checks.json", "cache_path": "/tmp/body",
+                  "file_path": "file:///home/person/private.json", "path": "src/public/data.py",
+                  "source_url": "https://example.org/research/data/", "scope_sha256": "a" * 64}
+        self.assertEqual(citations.privacy_filter(review), {"reviewer": review["reviewer"],
+                         "path": review["path"], "source_url": review["source_url"],
+                         "scope_sha256": review["scope_sha256"]})
+
     def test_json_csv_sqlite_round_trip_preserves_types_empty_arrays_and_unicode(self):
         projection = {"schema_version": 1, "canonical": {"dataset_version": "2.5.0", "empty": [],
                       "items": [{"x": "τ\ncomma,quote\"", "zero": 0, "flag": False, "null": None}]}, "graph": {"entities": []}}
