@@ -115,6 +115,36 @@ class ResearchGraphTests(unittest.TestCase):
         self.assertEqual(exported["reviews"], [])
         self.assertNotIn("Synthetic test observation", rg.stable_json(exported))
 
+    def test_scientific_token_identifier_keeps_exact_public_review_bindings(self):
+        graph = fixture()
+        identifier = 'claim.token-format'
+        graph['assertions'][0]['id'] = identifier
+        graph['entities'][0]['assertion_ids'] = [identifier]
+        expected = rg.assertion_digest(graph['assertions'][0])
+        for review in graph['reviews']:
+            review['assertion_ids'] = [identifier]
+            review['assertion_sha256'] = {identifier: expected}
+        rg.validate_graph(graph)
+        projected = rg.public_graph(graph)
+        self.assertEqual(projected['assertions'], graph['assertions'])
+        for review in projected['reviews']:
+            self.assertEqual(review['assertion_sha256'], {identifier: expected})
+        with tempfile.TemporaryDirectory() as folder:
+            rg.write_exports(graph, Path(folder))
+            exported = json.loads((Path(folder) / 'research-graph.json').read_text())
+            self.assertEqual(exported, projected)
+
+    def test_binding_key_exception_does_not_preserve_private_fields_or_values(self):
+        graph = fixture()
+        graph['entities'][0]['identifiers']['api_token'] = 'synthetic-private-value'
+        projected = rg.public_graph(graph)
+        self.assertNotIn('api_token', projected['entities'][0]['identifiers'])
+        self.assertEqual(rg._redact({'assertion_sha256': {'token-format': 'test'}}),
+                         {'assertion_sha256': {}})
+        graph['reviews'][0]['assertion_sha256']['claim'] = 'ghp_' + 'a' * 24
+        with self.assertRaises(rg.GraphValidationError):
+            rg.public_graph(graph)
+
     def test_single_invocation_cannot_impersonate_reviewers(self):
         graph = fixture()
         for review in graph["reviews"]:

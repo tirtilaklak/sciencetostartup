@@ -632,11 +632,18 @@ def coverage_summary(graph):
     return counts
 
 
-def _redact(value):
+def _redact(value, path=()):
     if isinstance(value, dict):
-        return {k: _redact(v) for k, v in value.items() if not re.search(r"email|phone|secret|token|cache_path|raw_body|credential", k, re.I)}
+        # This typed map is keyed by assertion IDs, not by metadata field names.
+        # For example, a scientific "token-format" ID must retain its review
+        # binding. Validation still checks every ID, digest and exact assertion;
+        # all values still pass through credential/contact redaction below.
+        bindings = (len(path) == 3 and path[0] == 'reviews'
+                    and isinstance(path[1], int) and path[2] == 'assertion_sha256')
+        return {k: _redact(v, path + (k,)) for k, v in value.items()
+                if bindings or not re.search(r"email|phone|secret|token|cache_path|raw_body|credential", k, re.I)}
     if isinstance(value, list):
-        return [_redact(v) for v in value]
+        return [_redact(v, path + (i,)) for i, v in enumerate(value)]
     if isinstance(value, str):
         return SECRET.sub("[redacted credential]", EMAIL.sub("[redacted email]", value))
     return value
