@@ -97,6 +97,8 @@
 .r-evidence-links{list-style:none;padding:0;margin:16px 0 0;font-size:13px;line-height:1.6}
 .r-evidence-links li{margin:0 0 12px}
 .r-source-locator{display:block;font-size:12px;line-height:1.7;color:var(--r-quiet);margin-top:4px}
+.r-evidence-excerpt{margin:14px 0;padding-left:16px;border-left:2px solid var(--r-rule);font-size:13px;color:var(--r-quiet)}
+.r-evidence-excerpt p{margin:0}
 .r-receipts{margin-top:12px}
 .r-receipts ul{font-size:12px;line-height:1.7;color:var(--r-quiet)}
 .r-source h3{font-size:18px;margin-bottom:10px;line-height:1.4}

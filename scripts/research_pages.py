@@ -81,14 +81,14 @@ def _category(entity):
     return next((row for row in CATEGORIES if entity.get("kind") in row[2]), None)
 
 
-def entity_url(entity):
+def entity_url(entity, context=None):
     """Use existing company canonicals; create new organization pages only on approval."""
     if entity.get("legacy_id"):
         return "/company/" + _token(entity["legacy_id"]) + "/"
     category = _category(entity)
     if category:
         return "/research/" + category[0] + "/" + _token(entity["id"]) + "/"
-    if entity.get("kind") in {"supplier", "organization", "institution"} and entity.get("status") == "approved":
+    if context is not None and _new_company(context, entity):
         return "/company/" + _token(entity["id"]) + "/"
     return _evidence_url("entity", entity["id"])
 
@@ -106,6 +106,12 @@ def _assertions(context, entity=None, statuses=("approved",)):
 
 def _approved_entity(context, entity):
     return entity.get("status") == "approved" and bool(_assertions(context, entity))
+
+
+def _new_company(context, entity):
+    return (not entity.get('legacy_id') and entity.get('kind') in {'supplier', 'organization', 'institution'}
+            and _approved_entity(context, entity)
+            and any(a.get('subject_id') == entity['id'] for a in _assertions(context, entity)))
 
 
 def _label(entity):
@@ -210,10 +216,13 @@ def _browse(context):
     return '<div class="r-browse-grid">' + "".join(cards) + "</div>"
 
 
-def _hub(context):
+def _hub(context, editions=()):
     report = context["report"]
     chapters = "".join(f'<li>{_link(REPORT_PATH + "#" + _token(section["id"]), section["title"])}</li>'
                        for section in report["sections"])
+    archive_links = ('<section class="r-section"><h2>Published editions</h2><ul class="r-entity-list">'
+                     + ''.join(f'<li>{_link(path, snapshot["report"]["release_id"])} · {_date(snapshot["report"]["updated_on"])}</li>'
+                               for path, snapshot in editions) + '</ul></section>') if editions else ''
     return ('<header class="r-hero"><div><p class="r-kicker">Independent public-source research</p>'
             '<h1>The human work<br>behind AI.</h1><p class="r-lede">Follow the evidence connecting AI data suppliers, '
             'papers, datasets, benchmarks, and the work that brings them together.</p>'
@@ -233,14 +242,15 @@ def _hub(context):
             '<section class="r-section r-chapter-preview" aria-labelledby="chapters"><div><p class="r-kicker">A practical research framework</p>'
             '<h2 id="chapters">From source to decision.</h2><p>Read the methods and decision framework while the evidence corpus is prepared. '
             'Historical examples carry their original dates; unresolved questions stay visible.</p>'
-            f'{_link("/review/", "Help review a specific claim →", "r-text-link")}</div><ol class="r-chapter-list">{chapters}</ol></section>')
+            f'{_link("/review/", "Help review a specific claim →", "r-text-link")}</div><ol class="r-chapter-list">{chapters}</ol></section>'
+            + archive_links)
 
 
 def _claim_text(context, assertion):
     entities = _entities(context)
     subject = entities.get(assertion.get("subject_id"), {})
     obj = entities.get(assertion.get("object_id"), {})
-    subject_html = _link(entity_url(subject), subject.get("name", "Unknown subject")) if subject else "Unknown subject"
+    subject_html = _link(entity_url(subject, context), subject.get("name", "Unknown subject")) if subject else "Unknown subject"
     if assertion.get("value") is not None:
         value = assertion["value"]
         if isinstance(value, dict):
@@ -251,7 +261,7 @@ def _claim_text(context, assertion):
             value = 'Yes' if value else 'No'
         return f'{subject_html}{sp.escape(label)}: {sp.escape(value)}'
     relation = str(assertion.get("predicate", "relationship")).replace("_", " ")
-    object_html = _link(entity_url(obj), obj.get("name", "Unknown object")) if obj else "Unknown object"
+    object_html = _link(entity_url(obj, context), obj.get("name", "Unknown object")) if obj else "Unknown object"
     return f'{subject_html} {sp.escape(relation)} {object_html}.'
 
 
@@ -260,8 +270,12 @@ def _source_evidence(context, assertion):
     rows = []
     for evidence in assertion.get("evidence", []):
         source = sources.get(evidence.get("source_id"), {})
+        excerpt = ''
+        if (assertion.get('status') == 'approved' and source.get('status') == 'captured'
+                and source.get('excerpt') and evidence.get('excerpt_sha256') == source.get('excerpt_sha256')):
+            excerpt = '<blockquote class="r-evidence-excerpt"><p>' + sp.escape(source['excerpt']) + '</p></blockquote>'
         rows.append('<li>' + _link(_evidence_url("source", source.get("id", "")), source.get("title", evidence.get("source_id")))
-                    + f'<span class="r-source-locator">Locator: {sp.escape(evidence.get("locator", "Not recorded"))}</span></li>')
+                    + f'<span class="r-source-locator">Locator: {sp.escape(evidence.get("locator", "Not recorded"))}</span>' + excerpt + '</li>')
     return '<ul class="r-evidence-links">' + "".join(rows) + "</ul>"
 
 
@@ -347,7 +361,7 @@ def _data(context):
     cite = "".join('<li>' + _link('/publication/' + name, label) + '</li>' for name, label in
                    (("citation.bib", "BibTeX"), ("citation.ris", "RIS"), ("citation.csl.json", "CSL JSON"), ("CITATION.cff", "CITATION.cff")))
     other = [e for e in graph["entities"] if not _category(e)]
-    entity_rows = "".join(f'<li id="{sp.escape(_anchor("entity", e["id"]))}">{_link(entity_url(e), e["name"])} '
+    entity_rows = "".join(f'<li id="{sp.escape(_anchor("entity", e["id"]))}">{_link(entity_url(e, context), e["name"])} '
                           f'<span class="r-meta">{sp.escape(_label(e))} · {sp.escape(e["id"])}</span></li>'
                           for e in sorted(other, key=lambda e: (e["name"].casefold(), e["id"])))
     return (f'<header class="r-page-head"><p class="r-kicker">{_status(context)}</p><h1>Open data.<br>Visible evidence.</h1>'
@@ -392,9 +406,9 @@ def _entity_card(context, entity):
     approved = _assertions(context, entity)
     summary = ('<p>' + _claim_text(context, approved[0]) + '</p>') if approved else '<p>Metadata record. Findings await the required source reviews.</p>'
     return (f'<li class="r-entity-card"><div><p class="r-kicker">{sp.escape(_label(entity))}</p>'
-            f'<h2>{_link(entity_url(entity), entity["name"])}</h2>{summary}'
+            f'<h2>{_link(entity_url(entity, context), entity["name"])}</h2>{summary}'
             f'<p class="r-meta">{len(approved)} approved assertions · Review depth: {sp.escape(entity.get("review_depth", "").replace("_", " "))}</p></div>'
-            f'{_link(entity_url(entity), "Inspect record →", "r-text-link")}</li>')
+            f'{_link(entity_url(entity, context), "Inspect record →", "r-text-link")}</li>')
 
 
 def _index(context, category):
@@ -545,7 +559,8 @@ def write_research_pages(output, context):
     """
     output = Path(output)
     modified = max(context["report"]["updated_on"], _day(context["graph"]["as_of"]))
-    pages = [("/research/", "Human data research", "Public-source research connecting AI data suppliers, papers, datasets, benchmarks, and workflows, with visible evidence and coverage.", _hub(context), "CollectionPage", None),
+    editions = _published_editions(context)
+    pages = [("/research/", "Human data research", "Public-source research connecting AI data suppliers, papers, datasets, benchmarks, and workflows, with visible evidence and coverage.", _hub(context, editions), "CollectionPage", None),
              (REPORT_PATH, context["report"]["title"], context["report"].get("summary", "Research methods and findings."), _report(context), "TechArticle", None),
              ("/research/data/", "Research data & evidence", "Versioned research data, source and assertion permalinks, publication progress, citations, and reproducible downloads.", _data(context), "CollectionPage", None),
              ("/review/", "Review & correct the research", "Contribute a source-backed correction, scoped review, or public reuse of ScienceToStartup research.", _review(context), "WebPage", None)]
@@ -554,19 +569,17 @@ def write_research_pages(output, context):
         pages.append(("/research/" + slug + "/", label, description, _index(context, category), "CollectionPage", None))
         for entity in sorted(context["graph"]["entities"], key=lambda row: row["id"]):
             if entity.get("kind") in kinds:
-                pages.append((entity_url(entity), entity["name"], _label(entity) + ". Evidence, source metadata, review status, and limitations.",
+                pages.append((entity_url(entity, context), entity["name"], _label(entity) + ". Evidence, source metadata, review status, and limitations.",
                               _detail(context, entity), "WebPage", category))
     for entity in sorted(context["graph"]["entities"], key=lambda row: row["id"]):
-        if (not entity.get("legacy_id") and entity.get("kind") in {"supplier", "organization", "institution"}
-                and _approved_entity(context, entity) and any(a.get("subject_id") == entity["id"] for a in _assertions(context, entity))):
-            pages.append((entity_url(entity), entity["name"], "Approved public research evidence and its qualifications.", _detail(context, entity), "WebPage", None))
+        if _new_company(context, entity):
+            pages.append((entity_url(entity, context), entity["name"], "Approved public research evidence and its qualifications.", _detail(context, entity), "WebPage", None))
     records = []
     for path, title, description, body, page_type, parent in pages:
         target = output / path.lstrip('/') / 'index.html'
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(_render(context, title, description, path, body, page_type, parent), encoding='utf-8')
         records.append({"path": path, "lastmod": modified})
-    editions = _published_editions(context)
     for path, snapshot in editions:
         target = output / path.lstrip('/') / 'index.html'
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -590,10 +603,9 @@ def research_search_entries(context):
         entries.append({"title": title, "summary": description, "url": '/research/' + slug + '/', "kind": "research", "keywords": title.lower()})
     for entity in sorted(context['graph']['entities'], key=lambda row: row['id']):
         category = _category(entity)
-        approved_org = (not entity.get('legacy_id') and entity.get('kind') in {'supplier', 'organization', 'institution'}
-                        and _approved_entity(context, entity) and any(a.get('subject_id') == entity['id'] for a in _assertions(context, entity)))
+        approved_org = _new_company(context, entity)
         if category or approved_org:
             entries.append({"title": entity['name'], "summary": _label(entity) + '. Inspect source metadata and assertion-specific qualifications.',
-                            "url": entity_url(entity), "kind": category[0][:-1] if category else 'company',
+                            "url": entity_url(entity, context), "kind": category[0][:-1] if category else 'company',
                             "keywords": ' '.join([entity['id']] + entity.get('aliases', []) + list(entity.get('identifiers', {}).values()))})
     return entries

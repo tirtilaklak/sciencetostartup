@@ -137,6 +137,8 @@ class ResearchPageTests(unittest.TestCase):
         self.assertIn('supplies data for', page)
         self.assertIn('Synthetic approval fixture only.', page)
         self.assertIn(claim['evidence'][0]['locator'], page)
+        source = next(s for s in self.context['graph']['sources'] if s['id'] == claim['evidence'][0]['source_id'])
+        self.assertIn(source['excerpt'].replace("'", '&#x27;'), page)
         for role in ('author', 'source_verifier', 'adversarial'):
             self.assertIn('test-only-distinct-' + role, page)
         self.assertTrue(any(e['url'] == '/company/org.translated/' for e in rp.research_search_entries(self.context)))
@@ -146,6 +148,7 @@ class ResearchPageTests(unittest.TestCase):
         claim['subject_id'], claim['object_id'] = claim['object_id'], claim['subject_id']
         paths = [row['path'] for row in self.build()]
         self.assertNotIn('/company/org.translated/', paths)
+        self.assertNotIn('href="/company/org.translated/"', self.page('/research/data/'))
 
     def test_source_and_assertion_permalinks_resolve_to_unique_visible_targets(self):
         self.build()
