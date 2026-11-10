@@ -57,11 +57,16 @@ def load_edition_snapshots(root, report):
     edition_dir = (base / 'editions').resolve()
     snapshots = {}
     for entry in report.get('editions', []):
-        if not isinstance(entry, dict) or not entry.get('snapshot_path'):
+        if not isinstance(entry, dict):
+            raise ValueError('Edition ledger entries must be objects')
+        if not entry.get('snapshot_path'):
+            if (entry.get('status') == 'published' and entry.get('release_id') != report.get('release_id')
+                    and not all(key in entry for key in ('graph', 'report', 'policy', 'identity'))):
+                raise ValueError('Published historical edition lacks immutable source inputs')
             continue
         relative = Path(entry['snapshot_path'])
         path = (base / relative).resolve()
-        if relative.is_absolute() or edition_dir not in path.parents or not path.is_file():
+        if relative.is_absolute() or base not in path.parents or edition_dir not in path.parents or not path.is_file():
             raise ValueError('Edition snapshot must be a committed file under data/research/editions')
         blob = path.read_bytes()
         if hashlib.sha256(blob).hexdigest() != entry.get('snapshot_sha256'):
