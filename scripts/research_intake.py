@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 import hashlib
 import json
 from pathlib import Path
 
-from check_research_sources import ADAPTER_HOSTS, PublicClient, discover, safe_output, write_json
+from check_research_sources import ADAPTER_HOSTS, PublicClient, discover, oai_candidate_rank, safe_output, write_json
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -31,8 +31,8 @@ def partitions(config, at):
         result.append({"id": "hf-" + query, "adapter": "huggingface", "query": query, "limit": size})
     for collection in config["acl_collections"]:
         result.append({"id": "acl-" + collection, "adapter": "acl", "query": collection, "limit": size})
-    # The rolling OAI query catches replacements to old arXiv works. Its stable
-    # partition ID lets an unfinished run retain the original query and token.
+    # Bootstrap only: after the first window starts, durable completed-through
+    # dates and captured queries replace the rolling lookback (see run_oai).
     since = (at - timedelta(days=14)).date().isoformat()
     result.insert(0, {"id": "oai-updates", "adapter": "oai", "query": since, "limit": size})
     if len({row["id"] for row in result}) != len(result):
@@ -41,11 +41,13 @@ def partitions(config, at):
 
 
 def select_partitions(rows, previous, limit):
-    """Fair oldest-attempt-first scheduling prevents an endless first-page loop."""
+    """Service expiring OAI tokens every run; fairly rotate the remaining slots."""
     if not 1 <= limit <= 20:
         raise ValueError("A run may attempt 1..20 partitions")
     order = {row["id"]: index for index, row in enumerate(rows)}
-    return sorted(rows, key=lambda row: (previous.get(row["id"], {}).get("attempted_at", ""), order[row["id"]]))[:limit]
+    updates = [row for row in rows if row.get("adapter") == "oai"]
+    others = [row for row in rows if row.get("adapter") != "oai"]
+    return (updates + sorted(others, key=lambda row: (previous.get(row["id"], {}).get("attempted_at", ""), order[row["id"]])))[:limit]
 
 
 def partition_digest(row):
@@ -53,15 +55,114 @@ def partition_digest(row):
 
 
 def configuration_digest(row):
-    # A rolling query date is a run input, not a configuration change. Freeze
-    # that date until pagination finishes; the next run refreshes its lookback.
+    # Preserve the v1 identity so existing unfinished queries resume verbatim.
+    # The dated query is a run input, not a configuration change.
     return partition_digest({**row, "query": "rolling-14-days-v1"} if row["adapter"] == "oai" else row)
 
 
-def run(root, state, at, max_partitions=4):
+def oai_completed_until(previous):
+    if previous.get("last_completed_until"):
+        return date.fromisoformat(previous["last_completed_until"])
+    if previous.get("window_complete", previous.get("complete")):
+        query = previous["partition"]["query"].split("/")
+        # Legacy open-ended queries have no captured upper bound. Conservatively
+        # credit only the last whole UTC day before their original run started.
+        return (date.fromisoformat(query[1]) if len(query) == 2 else
+                date.fromisoformat(previous["discovery_window"][:10]) - timedelta(days=1))
+    return None
+
+
+def oai_candidates(client, current):
+    """Rebuild the materialized candidate file even if its last write was lost."""
+    candidates = {}
+    batches = [progress.get("candidates", []) for progress in client.state.get("cursors", {}).values()] + [current]
+    for batch in batches:
+        for row in batch:
+            old = candidates.get(row["id"])
+            # An overlap replay must not restore older metadata over a deletion
+            # or a newer modification already captured in another window.
+            if old is None or oai_candidate_rank(row) >= oai_candidate_rank(old):
+                candidates[row["id"]] = row
+    return sorted(candidates.values(), key=lambda row: row["id"])
+
+
+def run_oai(row, ledger, ledger_path, state, stamp, request_times, page_budget):
+    """Drain inclusive, captured date ranges within a shared page-request budget.
+
+    Advancing the watermark is the final commit, after both the page checkpoint
+    and the cumulative candidate file exist. No wall-clock lookback can skip a
+    pending range. Queries cover metadata modifications, including old papers.
+    """
+    target = date.fromisoformat(stamp[:10]) - timedelta(days=1)
+    configuration = configuration_digest(row)
+    checkpoint = state / "checkpoints" / (row["id"] + ".json")
+    if ledger["partitions"].get(row["id"], {}).get("discovery_window") and not checkpoint.exists():
+        raise ValueError("OAI checkpoint missing; restore the original state before continuing")
+    client = PublicClient(state / "cache", checkpoint, ADAPTER_HOSTS["oai"])
+    if not checkpoint.exists():
+        # The query journal must never refer to a checkpoint that a process
+        # interruption prevented us from creating in the first place.
+        client.save()
+    client.last_request = request_times
+    requests, completed_windows = 0, 0
+    while requests < page_budget:
+        previous = ledger["partitions"].get(row["id"], {})
+        completed = oai_completed_until(previous)
+        compatible = previous.get("configuration_sha256") == configuration
+        resume = (previous.get("discovery_window") and
+                  (not previous.get("window_complete", previous.get("complete")) or
+                   (compatible and completed is not None and completed >= target)))
+        if resume:
+            active = previous["partition"]
+            if partition_digest(active) != previous.get("partition_sha256"):
+                raise ValueError("Stored discovery partition changed during pagination")
+        else:
+            since = completed - timedelta(days=1) if completed is not None else date.fromisoformat(row["query"].split("/")[0])
+            until = min(target, since + timedelta(days=6))
+            active = {**row, "query": since.isoformat() + "/" + until.isoformat()}
+        generation = previous.get("discovery_generation", 0) + (0 if resume else 1)
+        window = previous["discovery_window"] if resume else stamp[:10] + ":" + str(generation)
+        identity = {"partition_sha256": partition_digest(active), "configuration_sha256": configuration,
+                    "partition": active, "discovery_window": window, "discovery_generation": generation}
+        pending = {"attempted_at": stamp, "complete": False, "window_complete": False,
+                   "approved": False, "last_completed_until": completed.isoformat() if completed else None, **identity}
+        ledger["partitions"][row["id"]] = pending
+        write_json(ledger_path, ledger)
+        result = discover(client, "oai", active["query"], limit=active["limit"], pages=page_budget - requests, window=window)
+        requests += result["requests_made"]
+        result["current_window_candidates"] = len(result["candidates"])
+        result["candidates"] = oai_candidates(client, result["candidates"])
+        path = state / "candidates" / (row["id"] + ".json")
+        write_json(path, result)
+        # Never persist a completed-through date before materializing candidates.
+        if result["complete"]:
+            boundary = active["query"].split("/")
+            until = (date.fromisoformat(boundary[1]) if len(boundary) == 2 else
+                     date.fromisoformat(window[:10]) - timedelta(days=1))
+            completed = max(completed, until) if completed else until
+            completed_windows += 1
+        summary = {**pending, "complete": bool(result["complete"] and completed is not None and completed >= target),
+                   "window_complete": bool(result["complete"]), "candidates": len(result["candidates"]),
+                   "last_completed_until": completed.isoformat() if completed else None,
+                   "target_until": target.isoformat(), "requests_made": requests,
+                   "completed_windows": completed_windows, "result_path": str(path),
+                   "retry_reason": result.get("retry_reason"), "token_restarts": result.get("token_restarts", 0)}
+        if not summary["complete"] and requests >= page_budget:
+            summary["retry_reason"] = result.get("retry_reason") or "oai_page_budget_exhausted_resume_same_utc_day"
+        ledger["partitions"][row["id"]] = summary
+        write_json(ledger_path, ledger)
+        if not result["complete"] or summary["complete"]:
+            break
+    return summary
+
+
+def run(root, state, at, max_partitions=4, oai_pages=20):
     root, state = Path(root), safe_output(state)
     if at.tzinfo is None:
         raise ValueError("Intake time must have an explicit timezone")
+    if not 1 <= oai_pages <= 20:
+        raise ValueError("OAI page budget must be 1..20")
+    at = at.astimezone(timezone.utc)
     config = json.loads((root / "data/research/intake.json").read_text())
     rows = partitions(config, at)
     state.mkdir(parents=True, exist_ok=True)
@@ -76,6 +177,16 @@ def run(root, state, at, max_partitions=4):
     # to the same host must share throttling across those separate clients.
     request_times = {}
     for row in selected:
+        if row["adapter"] == "oai":
+            try:
+                summary = run_oai(row, ledger, ledger_path, state, stamp, request_times, oai_pages)
+            except Exception as error:
+                summary = {**ledger["partitions"].get(row["id"], {}), "attempted_at": stamp,
+                           "complete": False, "approved": False, "error_type": type(error).__name__, "error": str(error)[:300]}
+                ledger["partitions"][row["id"]] = summary
+                write_json(ledger_path, ledger)
+            outcomes.append({"id": row["id"], **summary})
+            continue
         previous = ledger["partitions"].get(row["id"], {})
         configuration = configuration_digest(row)
         resume = (previous.get("configuration_sha256") == configuration
@@ -130,10 +241,11 @@ def main():
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--state", type=Path, default=ROOT / "output/research-intake")
     parser.add_argument("--max-partitions", type=int, default=4)
+    parser.add_argument("--oai-pages", type=int, default=20, help="Total OAI page requests per run, 1..20; remaining partitions use one page")
     parser.add_argument("--now")
     args = parser.parse_args()
     at = datetime.fromisoformat(args.now.replace("Z", "+00:00")) if args.now else datetime.now(timezone.utc)
-    print(json.dumps(run(args.root, args.state, at, args.max_partitions), indent=2))
+    print(json.dumps(run(args.root, args.state, at, args.max_partitions, args.oai_pages), indent=2))
 
 
 if __name__ == "__main__":

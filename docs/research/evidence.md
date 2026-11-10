@@ -235,8 +235,12 @@ The default window is the current UTC day; use `--window` for an explicit run
 identity. Same-window retries resume completed pages. A new day or window starts
 fresh discovery instead of retaining a permanently completed mutable query. A
 completed query covers only that adapter's returned partition, not all relevant
-research. OAI resumption tokens expire daily; restart with a new window after an
-expired token and retain the prior candidate records for deduplication.
+research. OAI resumption tokens expire daily; an expired token restarts the same
+query and window, preserving checkpointed candidates for deduplication. Do not
+change the date range to bypass unread pages. An OAI query may be an inclusive
+`from/until` pair, for example `2026-11-01/2026-11-07`. The durable preparation
+runner manages these ranges, catch-up, and candidate materialization; see
+[intake operation and recovery](intake.md).
 
 Each request uses public credential-free HTTPS, TLS verification, an explicit host
 allowlist, DNS checks that reject local/private/reserved destinations, redirect

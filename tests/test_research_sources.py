@@ -148,13 +148,16 @@ class ResearchSourceTests(unittest.TestCase):
         <metadata><arXivRaw xmlns="http://arxiv.org/OAI/arXivRaw/"><id>2203.02155</id><title>Test work</title>
         <version version="v1"><date>Fri, 4 Mar 2022 07:04:42 GMT</date><size>1000kb</size></version>
         <version version="v2"><date>Sat, 5 Mar 2022 07:04:42 GMT</date><size>1001kb</size></version></arXivRaw></metadata></record>
-        <record><header status="deleted"><identifier>deleted</identifier></header></record>
+        <record><header status="deleted"><identifier>oai:arXiv.org:2001.00001</identifier><datestamp>2026-11-01</datestamp></header></record>
         <resumptionToken>next-token</resumptionToken></ListRecords></OAI-PMH>'''
         rows, cursor = checker.parse_oai(body)
-        self.assertEqual(len(rows), 1)
+        self.assertEqual(len(rows), 2)
         self.assertEqual(cursor, "next-token")
         self.assertEqual([v["version"] for v in rows[0]["versions"]], ["v1", "v2"])
         self.assertEqual(rows[0]["metadata_datestamp"], "2026-11-01")
+        self.assertEqual(rows[1]["id"], "oai:2001.00001")
+        self.assertEqual(rows[1]["metadata_status"], "deleted")
+        self.assertFalse(rows[1]["approved"])
         resumed = parse_qs(urlsplit(checker.discovery_url("oai", "ignored", 50, cursor)).query)
         self.assertEqual(resumed, {"verb": ["ListRecords"], "resumptionToken": [cursor]})
 
