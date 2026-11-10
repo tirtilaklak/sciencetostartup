@@ -7,8 +7,8 @@
   "status": "prelaunch",
   "source_cutoff": "2026-11-13T17:00:00-08:00",
   "canonical_dataset_version": "2.5.0",
-  "summary": "This comprehensive prelaunch synthesis covers the selected approved corpus of 65 qualifying suppliers, 132 paper works, 63 dataset families and 21 benchmark families. Twelve chapters connect documented offerings and delivery roles, technical methods, human operations, commercial scope, rights and security with practical paid pilots and acceptance criteria. Coverage remains incomplete, the frozen core and actual 200-record launch audits have not passed, and no published edition, DOI, human peer review, supplier ranking or market forecast is claimed.",
-  "review_statement": "AI-assisted research with Separate AI review. Approved assertions carry actual separate author, source-verifier and adversarial source-content receipts at their exact digests. Bounded reading depth and original-stage qualifications remain explicit. Fresh report-level evidence-auditor and adversarial review must bind this expanded synthesis and its final approved graph; older synthesis receipts do not approve it. No human peer review, experimental reproduction or operational certification is claimed.",
+  "summary": "This comprehensive prelaunch synthesis covers the selected approved corpus of 65 qualifying suppliers, 152 distinct reviewed paper works, 63 dataset families and 21 benchmark families. Twelve chapters connect documented offerings and delivery roles, technical methods, human operations, commercial scope, rights and security with ten practical paid-pilot designs and acceptance criteria. The eligible inventory remains a lower bound under active boundary review, the core is unfrozen, and the formal reference and screening launch audits are incomplete. No published edition, DOI, human peer review, supplier ranking, complete market inventory or market forecast is claimed.",
+  "review_statement": "AI-assisted research with Separate AI review. Approved assertions carry actual separate author, source-verifier and adversarial source-content receipts at their exact digests. Bounded reading depth and substantive qualifications remain explicit. Twenty-six original citation bindings were quarantined and replaced with newly approved IDs after fresh independent review; their scientific wording, original dates and historical review record are preserved. Fresh report-level evidence-auditor and adversarial review must bind this refreshed synthesis and its exact approved graph; previous synthesis receipts do not approve it. No human peer review, experimental reproduction or operational certification is claimed.",
   "archive": {
     "status": "not_published",
     "doi": null,
@@ -18,8 +18,115 @@
   "weekly_comparison": {
     "status": "first_edition",
     "prior_release_id": null,
-    "changed_claim_ids": [],
-    "summary": "Expanded first-edition prelaunch preparation. No prior published edition exists. The planned source cutoff is Friday 13 November 2026 at 17:00 Pacific and the planned weekly check is Monday 16 November; neither is an achieved cutoff or publication. Older newly reviewed sources retain their actual event, publication, capture and review dates."
+    "changed_claim_ids": [
+      "repair.binding.ten.v1.candidate.cohort3.dataset.numinamath.05",
+      "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.01",
+      "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.02",
+      "repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe",
+      "repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration",
+      "repair.binding.ten.v1.cohort3.claim.dclm.final-model-mixture",
+      "repair.binding.ten.v1.cohort4.dataset.claim.no-robots.splits",
+      "repair.binding.ten.v1.cohort5.claim.languagefeedback.main-evaluator",
+      "repair.binding.ten.v1.cohort7.claim.consentcrisis.head",
+      "repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample",
+      "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners",
+      "repair.binding.v1.candidate.cohort3.dataset.chatbotarena.05",
+      "repair.binding.v1.candidate.cohort3.dataset.videofeedback.05",
+      "repair.binding.v1.candidate.cohort4.benchflow.version-boundary",
+      "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis",
+      "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure",
+      "repair.binding.v1.candidate.cohort4.quesma.public-benchmarks",
+      "repair.binding.v1.candidate.cohort5.apto.company-identity",
+      "repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation",
+      "repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample",
+      "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors",
+      "repair.binding.v1.cohort4.dataset.claim.webshop.license",
+      "repair.binding.v1.cohort4.dataset.claim.xp3.scope",
+      "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit",
+      "repair.binding.v1.cohort8.claim.gptpipeline.interface",
+      "repair.binding.v1.cohort8.claim.vapo.decoupled-gae",
+      "cohort9.claim.autolibra.feedback-limit",
+      "cohort9.claim.autolibra.feedback-source",
+      "cohort9.claim.autolibra.induction-judge",
+      "cohort9.claim.autolibra.validation-denominator",
+      "cohort9.claim.aya.dataset-composition",
+      "cohort9.claim.aya.inclusion",
+      "cohort9.claim.aya.quality-limit",
+      "cohort9.claim.aya.review-pipeline",
+      "cohort9.claim.crowdagent.fixed-human-ratios",
+      "cohort9.claim.crowdagent.hidden-gold",
+      "cohort9.claim.crowdagent.human-routing",
+      "cohort9.claim.crowdagent.residual-errors",
+      "cohort9.claim.crowdtruth.iterative-metrics",
+      "cohort9.claim.crowdtruth.open-task-limit",
+      "cohort9.claim.crowdtruth.vectorization",
+      "cohort9.claim.crowdtruth.worker-score",
+      "cohort9.claim.earnings.causality-limit",
+      "cohort9.claim.earnings.sample",
+      "cohort9.claim.earnings.wage-definition",
+      "cohort9.claim.earnings.work-unit-wages",
+      "cohort9.claim.expertsrise.disagreement-targeting",
+      "cohort9.claim.expertsrise.expert-effort",
+      "cohort9.claim.expertsrise.heldout-result",
+      "cohort9.claim.expertsrise.scope-limit",
+      "cohort9.claim.gigo.audit-limit",
+      "cohort9.claim.gigo.instructions",
+      "cohort9.claim.gigo.reconciliation",
+      "cohort9.claim.gigo.source-disclosure",
+      "cohort9.claim.gilardi.consistency-scope",
+      "cohort9.claim.gilardi.crowd-control",
+      "cohort9.claim.gilardi.gold-denominator",
+      "cohort9.claim.gilardi.matched-instructions",
+      "cohort9.claim.helpsteer.attribute-correlations",
+      "cohort9.claim.helpsteer.independent-ratings",
+      "cohort9.claim.helpsteer.language-cultural-limit",
+      "cohort9.claim.helpsteer.recruitment-qa",
+      "cohort9.claim.helpsteer2.adaptive-redundancy",
+      "cohort9.claim.helpsteer2.agreement-selection",
+      "cohort9.claim.helpsteer2.rewardbench",
+      "cohort9.claim.helpsteer2.scope-limit",
+      "cohort9.claim.inherent.filtering",
+      "cohort9.claim.inherent.normalization-limit",
+      "cohort9.claim.inherent.sampling",
+      "cohort9.claim.inherent.secondary-mode",
+      "cohort9.claim.labelaid.adjudication-study",
+      "cohort9.claim.labelaid.precision-time",
+      "cohort9.claim.labelaid.sample-model-limit",
+      "cohort9.claim.labelaid.weak-supervision",
+      "cohort9.claim.labelerrors.correction-limit",
+      "cohort9.claim.labelerrors.five-reviewers",
+      "cohort9.claim.labelerrors.imagenet-validation",
+      "cohort9.claim.labelerrors.screening",
+      "cohort9.claim.lmcrowd.cost-boundary",
+      "cohort9.claim.lmcrowd.generalization-limit",
+      "cohort9.claim.lmcrowd.hierarchy",
+      "cohort9.claim.lmcrowd.main-setting",
+      "cohort9.claim.qualityassured.instruction-conditions",
+      "cohort9.claim.qualityassured.limits-identity",
+      "cohort9.claim.qualityassured.qa-result",
+      "cohort9.claim.qualityassured.study-units",
+      "cohort9.claim.recodeh.bounded-evaluation",
+      "cohort9.claim.recodeh.expert-construction",
+      "cohort9.claim.recodeh.metric-scope",
+      "cohort9.claim.recodeh.simulated-feedback",
+      "cohort9.claim.snow.affect-training",
+      "cohort9.claim.snow.redundancy",
+      "cohort9.claim.snow.restricted-task",
+      "cohort9.claim.snow.temporal-vote",
+      "cohort9.claim.ultrafeedback.bias-limit",
+      "cohort9.claim.ultrafeedback.human-agreement",
+      "cohort9.claim.ultrafeedback.model-sampling",
+      "cohort9.claim.ultrafeedback.simultaneous-rubrics",
+      "cohort9.claim.whoannotates.adjudication",
+      "cohort9.claim.whoannotates.audit-limit",
+      "cohort9.claim.whoannotates.reporting-pattern",
+      "cohort9.claim.whoannotates.task-level-audit",
+      "cohort9.claim.wildchat.anonymization",
+      "cohort9.claim.wildchat.consent-gate",
+      "cohort9.claim.wildchat.count-conflict",
+      "cohort9.claim.wildchat.selection-limit"
+    ],
+    "summary": "Refreshed first-edition prelaunch preparation: 20 newly reviewed paper works extend the prior unpublished 132-work synthesis to 152, and 26 source bindings receive new approved IDs without changing their scientific text. These are research-preparation changes, not a comparison between published editions. No prior published edition exists. The planned source cutoff is Friday 13 November 2026 at 17:00 Pacific and the planned weekly check is Monday 16 November; both remain future schedule points. Actual source, capture and review dates are retained."
   },
   "executive_findings": [
     {
@@ -52,7 +159,11 @@
         "next.claim.ultrafeedback.model_feedback",
         "candidate.paperfull.fineweb.synthetic-educational-labels",
         "cohort5.claim.deepseekv3.human-check",
-        "cohort8.claim.prime.online-prm"
+        "cohort8.claim.prime.online-prm",
+        "cohort9.claim.recodeh.simulated-feedback",
+        "cohort9.claim.recodeh.metric-scope",
+        "cohort9.claim.ultrafeedback.simultaneous-rubrics",
+        "cohort9.claim.ultrafeedback.human-agreement"
       ]
     },
     {
@@ -61,7 +172,7 @@
       "buyer_implication": "Request raw-to-retained counts, invalid-item rules, repeat labels, disagreement slices and corrected acceptance.",
       "limitations": "The reviewed workflows differ in task and sampling. They cannot rank provider quality, and no common reliability measurement was executed.",
       "confidence": "High for the methodological distinction; low for transferring a numerical agreement result between workflows.",
-      "reasoning": "HelpSteer3 selects agreeing labels and excludes disagreements; HelpSteer2 aggregates closest ratings; InstructGPT expands ranked sets into correlated pairs and usually uses one contractor per comparison. Final record totals therefore summarize different observation processes. DICES and the matched disagreement study further show why majority agreement and annotation formulation need separate interpretation.",
+      "reasoning": "HelpSteer3’s retained consensus, HelpSteer2’s post-filter closest-rating aggregation, InstructGPT’s ranked sets and DICES’ repeated judgments have different observation and selection denominators. The added HelpSteer2 paper makes the exclusions explicit; the inference study limits normalized scores to within-pair comparisons; Gilardi excludes trained-rater disagreement from the accuracy reference. These distinctions make raw counts, exclusions and adjudication necessary before comparison.",
       "what_would_change": "A common held-out task with independent raw judgments and the same exclusion rules could make reliability comparisons meaningful.",
       "claim_ids": [
         "candidate.paperfull.helpsteer3.postfilter-consensus",
@@ -69,7 +180,10 @@
         "candidate.paperfull.instructgpt.human-ranking-sets",
         "candidate.paperfull.instructgpt.single-contractor-comparisons",
         "cohort3.claim.dices.expert-crowd-difference",
-        "cohort3.claim.disagreement.agreement-not-superiority"
+        "cohort3.claim.disagreement.agreement-not-superiority",
+        "cohort9.claim.helpsteer2.agreement-selection",
+        "cohort9.claim.inherent.normalization-limit",
+        "cohort9.claim.gilardi.gold-denominator"
       ]
     },
     {
@@ -118,8 +232,11 @@
         "candidate.supplier.appen.segments-fy2025",
         "candidate.supplier.scale_ai.cumulative-payout",
         "candidate.supplier.prolific.active-pool",
-        "candidate.cohort4.proximal.annualized-revenue-disclosure",
-        "candidate.cohort2.labelbox.financing"
+        "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure",
+        "candidate.cohort2.labelbox.financing",
+        "cohort9.claim.lmcrowd.cost-boundary",
+        "cohort9.claim.earnings.work-unit-wages",
+        "cohort9.claim.earnings.causality-limit"
       ]
     },
     {
@@ -134,7 +251,10 @@
         "candidate.paperfull.helpsteer3.missing-domain-intersections",
         "cohort7.claim.mifeval.japanese-filter",
         "cohort7.claim.benchmax.pipeline",
-        "cohort7.claim.menlo.dimensions"
+        "cohort7.claim.menlo.dimensions",
+        "cohort9.claim.aya.dataset-composition",
+        "cohort9.claim.aya.quality-limit",
+        "cohort9.claim.helpsteer.language-cultural-limit"
       ]
     },
     {
@@ -149,7 +269,9 @@
         "cohort2.dataset.claim.alpacaeval.component-license",
         "next.claim.rewardbench.terms",
         "cohort4.dataset.claim.mathvista.terms",
-        "candidate.cohort4.afterquery.processor-privacy-boundary"
+        "candidate.cohort4.afterquery.processor-privacy-boundary",
+        "cohort9.claim.wildchat.consent-gate",
+        "cohort9.claim.wildchat.anonymization"
       ]
     },
     {
@@ -180,7 +302,7 @@
         },
         {
           "kind": "method",
-          "text": "The frozen authoring input currently contains 1,446 approved assertions, 65 qualifying suppliers, 132 distinct reviewed paper works, 63 dataset families and 21 benchmark families, computed with coverage method 1.2.0. It retains 39 historical organization assertions and 38 of 39 legacy inclusion dispositions. These are coverage counts within a selected corpus, not estimates of all suppliers, all research or market share. The eligible core and the two actual 200-record launch audits are unfinished. Crossing an individual count floor cannot substitute for those missing conditions.",
+          "text": "The pinned synthesis input contains 1,713 approved assertions, 65 qualifying suppliers, 152 distinct reviewed paper works, 63 dataset families and 21 benchmark families, computed with coverage method 1.3.0. All 39 legacy organizations have completed bounded inclusion audits; 38 have conclusive commercial dispositions, while BenchFlow remains commercially pending. The graph also preserves 26 quarantined candidate assertions and 39 historical assertions. These counts describe selected-source coverage. The eligible inventory remains a lower bound, the core is unfrozen, and the formal reference and screening launch audits are unfinished. Individual count floors do not establish completeness or publication readiness.",
           "claim_ids": []
         },
         {
@@ -228,7 +350,7 @@
           "text": "Public financial and workforce numbers answer different questions. Appen’s annual group revenue, Proximal’s annualized pace, Scale’s cumulative contributor payout and Prolific’s active-participant disclosure do not form a common revenue, capacity or labor denominator. Labelbox financing combines equity and a credit facility. The report therefore offers a commercial evidence ledger and project-cost methodology rather than market-share estimates or a valuation league table. Missing disclosure remains unknown, and a large advertised pool does not establish current paid availability for a particular language, credential or task.",
           "claim_ids": [
             "candidate.supplier.appen.revenue-fy2025",
-            "candidate.cohort4.proximal.annualized-revenue-disclosure",
+            "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure",
             "candidate.supplier.scale_ai.cumulative-payout",
             "candidate.supplier.prolific.active-pool",
             "candidate.cohort2.labelbox.financing"
@@ -246,8 +368,19 @@
         },
         {
           "kind": "method",
-          "text": "Six executive finding identifiers are retained from the earlier draft because their underlying reasoning remains materially the same: delivery-unit-before-provider, human-and-model-provenance, agreement-needs-denominators, artifact-role-is-narrow, benchmark-protocol-before-score and commercial-denominators-stay-separate. Their wording and limitations have been expanded against the larger graph. New findings address multilingual transfer, rights boundaries and verifier side effects. This is a revision of an unpublished synthesis; it neither rewrites a frozen historical archive nor creates a published weekly before-and-after series.",
+          "text": "All nine executive finding identifiers from the previous unpublished synthesis are retained. The additional studies refine their evidence and limits: post-selection agreement differs from raw agreement; model-simulated feedback differs from live expert assistance; disclosure audits describe reporting; and observed costs depend on the counted work and time. These refinements do not create a published weekly comparison or rewrite a historical archive. Confidence remains attached to each scoped judgment and to the evidence that could change it.",
           "claim_ids": []
+        },
+        {
+          "kind": "analysis",
+          "text": "The added annotation studies strengthen a practical distinction between an improved retained dataset and an improved production process. HelpSteer2 raises agreement after selecting and filtering labels; the surgical-annotation study compares instruction conditions and subsequent QA; LabelAId measures a particular intervention against researcher-adjudicated labels. Those designs answer different questions. A buyer should require raw-input, excluded-item and final-acceptance denominators, plus independent error inspection, before interpreting a high agreement score or a QA stage as evidence of better delivered work.",
+          "claim_ids": [
+            "cohort9.claim.helpsteer2.agreement-selection",
+            "cohort9.claim.qualityassured.qa-result",
+            "cohort9.claim.qualityassured.limits-identity",
+            "cohort9.claim.labelaid.adjudication-study",
+            "cohort9.claim.labelaid.precision-time"
+          ]
         }
       ]
     },
@@ -267,7 +400,7 @@
         },
         {
           "kind": "method",
-          "text": "Research expansion is the actual development described in this preparation: the synthesis is being rewritten from the earlier 173-assertion selected baseline against 1,446 approved assertions. This includes genuinely broader source review, not evidence that the corresponding business or scientific events all occurred this week. The count difference is an authoring-input comparison. It is not a supplier-growth rate, a weekly publication record, a research-accuracy score or a measure of production capacity. Pending dossiers and candidate entities are excluded until exact-content approval is integrated.",
+          "text": "This preparation extends the prior unpublished 1,446-assertion, 132-work synthesis to a pinned input of 1,713 approved assertions and 152 reviewed works. Twenty newly reviewed works add annotation, disagreement, multilingual, worker-time, documentation and interactive-feedback evidence. Twenty-six citation repairs replace quarantined source bindings with fresh approved IDs while preserving scientific values and qualifications. The increase describes research inputs and repairs, not events that all occurred this week, market growth, production capacity or an accuracy score. The planned future cutoff remains separate from this preparation date.",
           "claim_ids": []
         },
         {
@@ -275,7 +408,7 @@
           "text": "The commercial event dates illustrate why review time must not become news time. Labelbox’s financing announcement is dated 14 October 2026; Proximal’s annualized-revenue announcement is dated 29 September 2026; Mercor’s 25 June investigation account describes a March 2026 LiteLLM incident. Their inclusion in this newly expanded preparation does not make them November events. The financing, annualization and incident qualifications remain part of the respective evidence records.",
           "claim_ids": [
             "candidate.cohort2.labelbox.financing",
-            "candidate.cohort4.proximal.annualized-revenue-disclosure",
+            "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure",
             "candidate.supplier.mercor.incident"
           ]
         },
@@ -287,6 +420,11 @@
         {
           "kind": "research_gap",
           "text": "No prior published edition exists in this ledger, so a week-over-week market trend is not estimable from these records. The first publishable comparison will need an actual frozen predecessor, a current source cutoff, a claim-level change list and disclosure of whether each change is a new event, a newly captured older source, a corrected scope or a reclassified identity. Scheduled dates, package preparation and website visibility should be reported separately from archive confirmation.",
+          "claim_ids": []
+        },
+        {
+          "kind": "method",
+          "text": "Correction accounting distinguishes claim meaning from the evidence binding used to establish it. The 26 old IDs remain candidate records with earlier positive reviews and later negative/context-reconciliation history. Their new IDs carry fresh author, source-verifier and adversarial source-content receipts. This report uses only the approved replacements. Original source publication, capture and earlier review dates are preserved; the repair does not change the frozen 250-case diagnostic sample, its truth labels, predictions or results, and does not complete either launch audit.",
           "claim_ids": []
         }
       ]
@@ -408,6 +546,17 @@
           "kind": "research_gap",
           "text": "The sample cannot support a commercial quadrant, market size, share estimate, concentration index, price curve or fastest-growing-provider list. Comparable segment revenue, current buyer demand, accepted-unit volume, active paid contributor windows and task-matched outcomes are missing or inconsistent. The report instead makes a narrower, falsifiable judgment: supplier comparison should follow responsibility and deliverable structure. A later study could test that judgment using matched contracts, acceptance logs and common pilot tasks.",
           "claim_ids": []
+        },
+        {
+          "kind": "analysis",
+          "text": "A managed annotation offer and an annotation method are different comparison objects. CrowdAgent describes routing and hidden-gold aggregation; LMCrowd describes staged model-label purchasing. Neither establishes that a named supplier currently implements those workflows or achieves their results. For managed work, compare responsibility for guidelines, routing, escalation, independent acceptance and full cost. For a method implementation, compare the exact data, models, selection rules and held-out checks. A paper-to-practice connection can suggest questions without becoming an unsupported supplier-contribution edge.",
+          "claim_ids": [
+            "cohort9.claim.crowdagent.human-routing",
+            "cohort9.claim.crowdagent.hidden-gold",
+            "cohort9.claim.crowdagent.fixed-human-ratios",
+            "cohort9.claim.lmcrowd.hierarchy",
+            "cohort9.claim.lmcrowd.cost-boundary"
+          ]
         }
       ]
     },
@@ -524,7 +673,7 @@
             "cohort6.claim.paperbench.rubric",
             "cohort6.claim.paperbench.original-code-rule",
             "cohort6.claim.agentcompany.curation-labor",
-            "cohort6.claim.agentcompany.human-baseline-limit"
+            "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit"
           ]
         },
         {
@@ -585,7 +734,7 @@
           "claim_ids": [
             "cohort5.claim.llama3.sampling",
             "cohort5.claim.deepseekmath.sampling-budget",
-            "cohort8.claim.ttrl.vote-then-sample"
+            "repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample"
           ]
         },
         {
@@ -650,11 +799,22 @@
           ]
         },
         {
+          "kind": "analysis",
+          "text": "The additional annotation literature changes how the earlier technical methods should be read. Snow’s simplified temporal task and Gilardi’s agreed-human subset show that the reference population can change a model-versus-human comparison. HelpSteer2’s filtering changes the retained label population, while the label-error study shows that even corrected benchmark labels remain uncertain. A method comparison therefore needs three explicit objects: the items admitted, the rule defining reference truth and the items excluded before the headline result. This report treats those as experimental scope, rather than evidence of a universal labor or model advantage.",
+          "claim_ids": [
+            "cohort9.claim.snow.restricted-task",
+            "cohort9.claim.snow.temporal-vote",
+            "cohort9.claim.gilardi.gold-denominator",
+            "cohort9.claim.helpsteer2.agreement-selection",
+            "cohort9.claim.labelerrors.correction-limit"
+          ]
+        },
+        {
           "kind": "sourced_fact",
           "text": "Reviewed-work atlas — Documentation, labor and evidence quality: Consent in Crisis: The Rapid Decline of the AI Data Commons. The audited corpus sources are C4, RefinedWeb and Dolma. The head sample unions the top 2,000 domains by token count from each corpus into 3,950 domains. The random sample draws 10,000 domains from the 10,136,147-domain intersection and uses a random 2,000-domain subset for human annotation. The study reports inconsistencies between robots.txt signals and Terms of Service statements. Reading boundary: The study describes their differing crawl windows and filtering; paper version 2407.14933v1 is historical, not a current web-policy census.",
           "claim_ids": [
             "cohort7.claim.consentcrisis.corpora",
-            "cohort7.claim.consentcrisis.head",
+            "repair.binding.ten.v1.cohort7.claim.consentcrisis.head",
             "cohort7.claim.consentcrisis.random",
             "cohort7.claim.consentcrisis.signals"
           ]
@@ -971,7 +1131,7 @@
           "text": "Reviewed-work atlas — Feedback, rewards and policy optimization: If in a Crowdsourced Data Annotation Pipeline, a GPT-4. Against Bio Expert reference labels, combining GPT4 at temperature 0.2 with advanced-interface crowd labels surpasses GPT4 alone under the One-Coin Dawid-Skene and MACE settings. The advanced crowd interface includes visual click feedback, a color-coded overview and a time lock, while the basic interface emphasizes task simplicity. The study uses CODA19 to label abstract sentence segments as Background, Purpose, Method, Finding/Contribution or Other. The test set samples 200 papers from an English-language CORD19 pool restricted to 2022 or later publications, producing 3,177 abstract segments. Reading boundary: Only those two tested aggregation settings beat GPT4 in this study; outcomes depend on cleaning/aggregation and task, and worker LLM use cannot be excluded.",
           "claim_ids": [
             "cohort8.claim.gptpipeline.hybrid-aggregation",
-            "cohort8.claim.gptpipeline.interface",
+            "repair.binding.v1.cohort8.claim.gptpipeline.interface",
             "cohort8.claim.gptpipeline.label-scheme",
             "cohort8.claim.gptpipeline.sample-window"
           ]
@@ -1011,7 +1171,7 @@
           "text": "Reviewed-work atlas — Feedback, rewards and policy optimization: Learning from Natural Language Feedback. Two authors wrote feedback on initial summaries while seeing the title, post and initial summary. One author conducted the human evaluation for the fine-tuned-model comparisons in Figures 2 and 5. Fine-tuning GPT-3 on feedback-selected refinements reports 51±5.0% win rate against Reddit-user reference summaries. The method chooses among 20 generated refinements by maximum embedding cosine similarity to the natural-language feedback. The summarization test uses 100 unseen Reddit posts, ranks summaries with ties allowed and counts a tie as half a win. Reading boundary: The± value is standard error;100 test posts and the one-author evaluation apply. This does not establish parity with professional summarizers or humans generally.",
           "claim_ids": [
             "cohort5.claim.languagefeedback.human-feedback",
-            "cohort5.claim.languagefeedback.main-evaluator",
+            "repair.binding.ten.v1.cohort5.claim.languagefeedback.main-evaluator",
             "cohort5.claim.languagefeedback.result",
             "cohort5.claim.languagefeedback.selection",
             "cohort5.claim.languagefeedback.test-protocol"
@@ -1269,7 +1429,7 @@
             "cohort8.claim.ttrl.binary-vote",
             "cohort8.claim.ttrl.consensus-reward",
             "cohort8.claim.ttrl.test-adaptation",
-            "cohort8.claim.ttrl.vote-then-sample"
+            "repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample"
           ]
         },
         {
@@ -1328,8 +1488,8 @@
           "kind": "sourced_fact",
           "text": "Reviewed-work atlas — Feedback, rewards and policy optimization: TruthfulQA: Measuring How Models Mimic Human Falsehoods. The human generation-evaluation procedure blinds evaluators to the model name and prompt that produced an answer. The paper recruits two external researchers for separate reference-label validation and a human-answer baseline. GPT-judge training includes about 6,900 true/false-labelled author reference answers and about 15,500 human-evaluated model answers. Reading boundary: Section 3.2 (p.6) says the authors carried out all main-generation evaluations. A predefined qualitative rubric maps to scalar truth scores; it does not remove all judgment or disagreement.",
           "claim_ids": [
-            "candidate.paperfull.truthfulqa.blinded-human-evaluation",
-            "candidate.paperfull.truthfulqa.external-validation-sample",
+            "repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation",
+            "repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample",
             "candidate.paperfull.truthfulqa.gptjudge-training-labels"
           ]
         },
@@ -1347,7 +1507,7 @@
           "kind": "sourced_fact",
           "text": "Reviewed-work atlas — Feedback, rewards and policy optimization: VAPO: Efficient and Reliable Reinforcement Learning for Advanced Reasoning Tasks. VAPO separates GAE parameters for value targets and policy advantages, using lambda one for the value-network returns. VAPO adjusts policy GAE lambda as a function of output length and a bias-variance control parameter. VAPO combines policy-gradient loss with an additional negative-log-likelihood loss on correctly sampled outcomes. VAPO pretrains the value model on Monte Carlo returns from a fixed policy before saving and loading that value checkpoint for policy training. Reading boundary: Policy lambda is separately length-adaptive in this recipe; no general unbiasedness theorem is asserted by this candidate.",
           "claim_ids": [
-            "cohort8.claim.vapo.decoupled-gae",
+            "repair.binding.v1.cohort8.claim.vapo.decoupled-gae",
             "cohort8.claim.vapo.length-adaptive",
             "cohort8.claim.vapo.positive-example-loss",
             "cohort8.claim.vapo.value-pretraining"
@@ -1493,7 +1653,7 @@
           "kind": "sourced_fact",
           "text": "Reviewed-work atlas — Source curation and demonstrations: DataComp-LM: In search of the next generation of training sets for language models. For the reported 2.6T-token 7B model, the authors augment DCLM-Baseline with StarCoder and ProofPile2, use a math-enriched annealing phase and extend context; Table 9 reports 63.7% MMLU. The human-quality study samples 499 rule-filtered/deduplicated documents and obtains three labels per document from 16 English-speaking AI graduate students/professors; 281 documents have unanimous labels. DCLM’s first evaluation suite omits fairness, multilinguality and safety; compute limits prevent joint exploration of all curation dimensions, sufficient random-seed variation and testing beyond 7B models. The DCLM-Baseline quality filter uses fastText trained with OpenHermes 2.5 plus high-scoring ELI5 positives and RefinedWeb-sampled negatives, retaining the top 10% by classifier score. DCLM provides an unfiltered Common-Crawl-derived pool of 240T GPT-NeoX tokens and five fixed-recipe compute scales; evaluation separates 53-task extended performance, 22-task core performance and five-shot MMLU. Reading boundary: The result is not attributable to raw Common Crawl or the baseline filter alone. The paper’s headline64% is rounded.",
           "claim_ids": [
-            "cohort3.claim.dclm.final-model-mixture",
+            "repair.binding.ten.v1.cohort3.claim.dclm.final-model-mixture",
             "cohort3.claim.dclm.human-rubric-scope",
             "cohort3.claim.dclm.limits",
             "cohort3.claim.dclm.quality-filter",
@@ -1685,7 +1845,7 @@
             "cohort4.claim.jailbreakbench.adaptive-defense-condition",
             "cohort4.claim.jailbreakbench.author-license-statement",
             "cohort4.claim.jailbreakbench.expert-judge-calibration",
-            "cohort4.claim.jailbreakbench.paired-behaviors"
+            "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors"
           ]
         },
         {
@@ -1908,7 +2068,7 @@
             "cohort6.claim.agentcompany.claude-result",
             "cohort6.claim.agentcompany.curation-labor",
             "cohort6.claim.agentcompany.full-score",
-            "cohort6.claim.agentcompany.human-baseline-limit"
+            "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit"
           ]
         },
         {
@@ -1996,6 +2156,491 @@
             "cohort8.claim.openrlhf.ray-roles",
             "cohort8.claim.openrlhf.ring-attention",
             "cohort8.claim.openrlhf.vllm-deepspeed"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: AutoLibra: Agent Metric Induction from Open-Ended Human Feedback. AutoLibra turns open-ended feedback into a metric-and-judge pipeline. The inspected v3 uses 197 CoGym end-user trajectories with feedback and paper-author experts elsewhere; five authors act as expert annotators. Sotopia, WebArena and WebVoyager each contribute 100 GPT-4-based trajectories, with 20% held out for the Section 4 analysis. GPT-4o grounds feedback into signed behavioral aspects, o3-mini high clusters those aspects, and o3-mini medium rates trajectories +1, −1 or N/A against definitions and positive/negative examples.",
+          "claim_ids": [
+            "cohort9.claim.autolibra.feedback-source",
+            "cohort9.claim.autolibra.induction-judge"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — AutoLibra: Agent Metric Induction from Open-Ended Human Feedback. The human-alignment check samples 40 instances per validated step and task for binary judgments of complete correctness. Table 1 reports averages across five environments of 0.95 for grounding, 0.92 for LLM judging and 0.90 for meta-evaluation. These are step-specific validation summaries. Behavior clustering itself was not directly manually validated because reviewing more than 400 aspects was considered too costly.",
+          "claim_ids": [
+            "cohort9.claim.autolibra.validation-denominator"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — AutoLibra: Agent Metric Induction from Open-Ended Human Feedback. For a buyer, the deliverable is an induced rubric and trajectory judge whose intermediate transformations need their own checks. The demonstrated protocol collects one feedback element per complete text-rendered trajectory. Live or direct step feedback, generated programmatic evaluators and dense-reward RL remain future directions. The validation figures therefore cannot be transferred to those proposed products or read as an end-to-end accuracy guarantee for every induced metric.",
+          "claim_ids": [
+            "cohort9.claim.autolibra.feedback-limit",
+            "cohort9.claim.autolibra.validation-denominator"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: Aya Dataset: An Open-Access Collection for Multilingual Instruction Tuning. The inspected Aya v1 describes a sequence of original contribution, re-annotation and annotation-feedback tasks. Original examples receive review during re-annotation, and the resulting re-annotations receive feedback. Contributor leaderboard quality averages reviewer ratings. Inclusion also has distinct rules: all original annotations enter, while re-annotations need a summed prompt/completion character-level Levenshtein distance of at least five; a language needs at least 50 contributions.",
+          "claim_ids": [
+            "cohort9.claim.aya.review-pipeline",
+            "cohort9.claim.aya.inclusion"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — Aya Dataset: An Open-Access Collection for Multilingual Instruction Tuning. The paper reports 204,114 prompt/completion instances in 65 languages: 138,844 original annotations and 65,270 re-annotations. Its resource grouping is 22 high-resource, 12 mid-resource and 31 low-resource languages. These are statistics of the dataset described by that exact paper, rather than a count independently recomputed from a current downloadable artifact. Original contributions and revised versions remain distinguishable components of the total.",
+          "claim_ids": [
+            "cohort9.claim.aya.dataset-composition"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — Aya Dataset: An Open-Access Collection for Multilingual Instruction Tuning. Multilingual breadth does not establish equal validation depth in each language. The authors identify contributor concentration in some languages, no dedicated toxic/offensive-speech flags and no language-relabeling component; peer review does not guarantee removal of every unsafe or misclassified example. A proposed purchase should inspect language-specific contributor concentration and error samples. The paper review adds one reviewed work here without independently adding another inspected dataset family or implying a named commercial supplier.",
+          "claim_ids": [
+            "cohort9.claim.aya.quality-limit",
+            "cohort9.claim.aya.dataset-composition"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: CrowdAgent: Multi-Agent Managed Multi-Source Annotation System. CrowdAgent combines cheap model annotation, small-model denoising and human routing. Core-Set selection sends low-confidence, diverse cases to humans, while budget, round and confidence conditions govern stopping. A hidden golden set informs the QA agent’s Bayesian confusion-matrix estimates; the source says these labels are neither exposed to annotators nor supplied as in-context examples. Difficult residual cases are flagged for final human verification.",
+          "claim_ids": [
+            "cohort9.claim.crowdagent.human-routing",
+            "cohort9.claim.crowdagent.hidden-gold"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — CrowdAgent: Multi-Agent Managed Multi-Source Annotation System. The main table places CrowdAgent above its listed baselines on six multimodal classification tasks at fixed human-label proportions: 5% on MM-IMDb and COV-CTR, and 15% on the three CrisisMMD subtasks and V-SNLI. The matched quantity is the human annotation proportion. It is not a controlled equality of total operating cost, model computation or all system-selection effort; appendix training and budget details were not fully examined in this bounded review.",
+          "claim_ids": [
+            "cohort9.claim.crowdagent.fixed-human-ratios"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — CrowdAgent: Multi-Agent Managed Multi-Source Annotation System. A buyer can use this design to ask how uncertain cases reach people and how hidden checks remain hidden. Confidence-threshold convergence is an internal stopping condition, rather than proof of error-free output. The authors acknowledge residual errors and dependence on underlying models. Acceptance should retain independent error inspection after convergence and a separately stated total-cost boundary before any efficiency claim is adopted.",
+          "claim_ids": [
+            "cohort9.claim.crowdagent.hidden-gold",
+            "cohort9.claim.crowdagent.residual-errors",
+            "cohort9.claim.crowdagent.fixed-human-ratios"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: CrowdTruth 2.0: Quality Metrics for Crowdsourcing with Disagreement. CrowdTruth 2.0 represents a worker response as a binary annotation vector. Closed tasks share a predefined answer space; an open task instead builds each media unit’s answer space from the workers’ unique keywords. Its worker, media-unit and annotation scores are mutually dependent, start at one and are repeatedly recalculated until total variation falls below a selected threshold, using disagreement-weighted cosine agreement.",
+          "claim_ids": [
+            "cohort9.claim.crowdtruth.vectorization",
+            "cohort9.claim.crowdtruth.iterative-metrics"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — CrowdTruth 2.0: Quality Metrics for Crowdsourcing with Disagreement. The worker-quality definition multiplies worker–worker agreement by worker–media-unit agreement. Peer consistency and consistency with the aggregate of other workers both affect the score. The inspected paper supplies this operational definition rather than a new controlled accuracy improvement. In open-ended tasks, annotation quality cannot be estimated across multiple media units and is set to one; the model therefore has different information in open and closed settings.",
+          "claim_ids": [
+            "cohort9.claim.crowdtruth.worker-score",
+            "cohort9.claim.crowdtruth.open-task-limit"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — CrowdTruth 2.0: Quality Metrics for Crowdsourcing with Disagreement. The useful comparison is between assumptions about disagreement. A low consistency score can prompt examination of the worker, the item or the answer space; the formula alone cannot decide which is defective. Further comparative validation across tasks remains future work in this source. Buyers should test whether a proposed weighting rule preserves intended minority interpretations and improves independently checked outcomes before using it to exclude contributors or certify labels.",
+          "claim_ids": [
+            "cohort9.claim.crowdtruth.iterative-metrics",
+            "cohort9.claim.crowdtruth.worker-score",
+            "cohort9.claim.crowdtruth.open-task-limit"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: A Data-Driven Analysis of Workers' Earnings on Amazon Mechanical Turk. This earnings study uses plugin logs from September 2014 through January 2017: 3,808,020 HIT records from 2,676 workers before duration-outlier removal, and 3,471,580 HITs from 2,666 workers afterward. Zero-reward qualification tasks remain included. Its accounting compares reward over accept-to-submit intervals with temporal clustering at D=0 and D=1 minute to address overlapping queued work and between-task time; returned HITs contribute zero reward.",
+          "claim_ids": [
+            "cohort9.claim.earnings.sample",
+            "cohort9.claim.earnings.wage-definition"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — A Data-Driven Analysis of Workers' Earnings on Amazon Mechanical Turk. For the filtered data, Table 1 reports median work-unit hourly rates of $2.54 per HIT, $3.18 per D=0 cluster and $1.77 per D=1-minute cluster. Their denominators are respectively 3,471,580 HITs, 2,560,066 clusters and 635,198 clusters. These are medians across task or cluster units, not a median across workers. They are historical study figures and do not describe current compensation at any supplier in this report.",
+          "claim_ids": [
+            "cohort9.claim.earnings.work-unit-wages",
+            "cohort9.claim.earnings.sample"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — A Data-Driven Analysis of Workers' Earnings on Amazon Mechanical Turk. The operational lesson is to expose the time denominator, including unpaid qualification, returned work and between-task intervals where the project records them. Plugin selection, unknown demographics and script use limit population inference, while elapsed intervals need not equal active effort. Associations between work patterns and earnings are not causal. Neither the historical rates nor a selected plugin sample establishes current worker welfare or a commercial service’s labor cost.",
+          "claim_ids": [
+            "cohort9.claim.earnings.wage-definition",
+            "cohort9.claim.earnings.causality-limit",
+            "cohort9.claim.earnings.sample"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: Experts Rise Where LLMs Disagree: Using Cross-Model Disagreement to Target Expert Effort in LLM Codebook Revision for Large-Scale Annotation. Experts Rise Where LLMs Disagree prioritizes expert attention using normalized vote entropy from six model predictions and a vote-weighted mean by label across 6,595 unlabeled tutoring utterances. Disagreement is a routing signal, not a determination that any label is wrong. Two experts each supply rationales for 60 selected utterances; GPT 5.6 Sol uses the resulting 120 annotations to revise 24 codebook entries. Mean reported Rationale Labeling time is 169.0 minutes per expert.",
+          "claim_ids": [
+            "cohort9.claim.expertsrise.disagreement-targeting",
+            "cohort9.claim.expertsrise.expert-effort"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — Experts Rise Where LLMs Disagree: Using Cross-Model Disagreement to Target Expert Effort in LLM Codebook Revision for Large-Scale Annotation. On the same 4,032 expert-consensus held-out utterances, Rationale Labeling reaches 64.9% accuracy and 0.658 weighted F1, compared with 57.8% and 0.583 for the final expert-only codebook. The summary averages eight alternative aggregation methods using one temperature-zero run per codebook from each of six models. Aggregators reuse predictions, so they are not independent trials; 6.1% multi-label references are reduced to the first recorded label.",
+          "claim_ids": [
+            "cohort9.claim.expertsrise.heldout-result"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — Experts Rise Where LLMs Disagree: Using Cross-Model Disagreement to Target Expert Effort in LLM Codebook Revision for Large-Scale Annotation. The result supports a scoped codebook-revision comparison against the chosen reference label. One longitudinal project, two experts, unequal workflow effort/exposure, differing target-label assignments and possible carryover prevent isolation of input format as the cause. Transcript errors were not systematically measured or corrected. A buyer should preserve selection rules, rationale time and held-out label conventions before expecting similar returns from expert disagreement review in another domain.",
+          "claim_ids": [
+            "cohort9.claim.expertsrise.scope-limit",
+            "cohort9.claim.expertsrise.heldout-result",
+            "cohort9.claim.expertsrise.expert-effort"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: Garbage In, Garbage Out? Do Machine Learning Application Papers in Social Computing Report Where Human-Labeled Training Data Comes From?. This reporting audit began with five students independently coding the same papers and weekly discussion of disagreements; the team leader decided unresolved cases. After schema changes, at least two team members independently re-examined each of the 164 papers and the team reconciled them again. The repeated examination documents how this audit established its own coded reporting reference rather than assuming an initial extraction was gold.",
+          "claim_ids": [
+            "cohort9.claim.gigo.reconciliation"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — Garbage In, Garbage Out? Do Machine Learning Application Papers in Social Computing Report Where Human-Labeled Training Data Comes From?. Within the 74 papers coded for original human annotation, Table 5 finds no original-annotator identity information in 18 (24.32%) and paper-author annotation in 22 (29.73%). Table 7 finds no formal-instruction information in 35 (47.30%), formal definitions/examples in 32 (43.24%), and only question text as instructions in seven (9.46%). These are categories of publication disclosure in the sampled literature.",
+          "claim_ids": [
+            "cohort9.claim.gigo.source-disclosure",
+            "cohort9.claim.gigo.instructions"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — Garbage In, Garbage Out? Do Machine Learning Application Papers in Social Computing Report Where Human-Labeled Training Data Comes From?. The study audits what publications report, rather than observing the underlying labor process. Its Twitter-classification focus and mostly arXiv sampling limit transfer to other fields; it did not record actual agreement values or adjudication/reconciliation processes in those projects. The procurement implication is a request for missing evidence, not an inference that undocumented instruction, compensation or QA never occurred. Disclosure completeness and delivered label quality require different measurements.",
+          "claim_ids": [
+            "cohort9.claim.gigo.audit-limit",
+            "cohort9.claim.gigo.instructions",
+            "cohort9.claim.gigo.source-disclosure"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: ChatGPT Outperforms Crowd-Workers for Text-Annotation Tasks. The inspected v2 compares the same codebook wording across trained political-science students, screened US MTurk workers and gpt-3.5-turbo. Model annotations were collected in March–May 2023, using a fresh chat and one tweet per query, with two runs at each temperature of 1 and 0.2. Crowd recruitment required Masters status, over 90% approval, at least 50 approved HITs, two workers per tweet and no worker labeling over 20% of a task’s tweets.",
+          "claim_ids": [
+            "cohort9.claim.gilardi.matched-instructions",
+            "cohort9.claim.gilardi.crowd-control"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — ChatGPT Outperforms Crowd-Workers for Text-Annotation Tasks. Across the four study datasets, the paper reports ChatGPT accuracy about 25 percentage points above MTurk on average, defining accuracy against trained-human labels only where both trained annotators agreed. The difficult items with trained-rater disagreement are outside that gold denominator. Mean within-group agreement is about 56% for MTurk, 79% for trained annotators, 91% for ChatGPT at temperature 1 and 97% at 0.2.",
+          "claim_ids": [
+            "cohort9.claim.gilardi.gold-denominator",
+            "cohort9.claim.gilardi.consistency-scope"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — ChatGPT Outperforms Crowd-Workers for Text-Annotation Tasks. This is a dated, task-specific model-versus-recruitment comparison, not a universal replacement rule for annotation labor. Repeated model consistency does not establish truth or independence. The source records a relevance-task failure caused by missing prompt examples and leaves other languages and models for future evaluation. A buyer should inspect excluded disagreement cases and prompt sensitivity alongside the retained-set accuracy before deciding how much human review can be removed.",
+          "claim_ids": [
+            "cohort9.claim.gilardi.consistency-scope",
+            "cohort9.claim.gilardi.gold-denominator",
+            "cohort9.claim.gilardi.matched-instructions"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: HelpSteer: Multi-attribute Helpfulness Dataset for SteerLM. HelpSteer v1 independently rates each response on helpfulness, correctness, coherence, complexity and verbosity using a 0–4 Likert scale. It collects scalar attributes rather than pairwise preferences. The paper describes approximately 200 US-based annotators engaged through Scale AI, English screening, training ending in 35 sample responses, at least two human QA reviews per annotation, automated checks and later research-team QA. This documents a reported workflow rather than an independent supplier audit.",
+          "claim_ids": [
+            "cohort9.claim.helpsteer.independent-ratings",
+            "cohort9.claim.helpsteer.recruitment-qa"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — HelpSteer: Multi-attribute Helpfulness Dataset for SteerLM. Within the final 37,120 annotated samples, Table 2 reports Pearson correlation with helpfulness of 0.8525 for correctness and 0.6348 for coherence. These are descriptive associations among the collected 0–4 ratings. They do not estimate how helpfulness would change if a buyer causally changed correctness or coherence, and they should not be substituted for an independently measured improvement from any individual QA stage.",
+          "claim_ids": [
+            "cohort9.claim.helpsteer.attribute-correlations"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — HelpSteer: Multi-attribute Helpfulness Dataset for SteerLM. A multi-attribute contract can retain distinctions hidden by a single preference label, but its scales still need task and population calibration. All annotations here concern English prompts/responses and all annotators are US-based; the authors state uncertainty about other cultural judgments and non-English gains. The exact recruitment statement can support the scoped role it names, without extending it to every HelpSteer release, sole artifact authorship or current provider performance.",
+          "claim_ids": [
+            "cohort9.claim.helpsteer.language-cultural-limit",
+            "cohort9.claim.helpsteer.independent-ratings",
+            "cohort9.claim.helpsteer.recruitment-qa"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: HelpSteer2: Open-source dataset for training top-performing reward models. HelpSteer2 v1 initially assigns three raters per response, adding two if the helpfulness range exceeds two points; it reports 3.41 annotators per sample and approximately 1,000 US-based annotators engaged through Scale AI. The pipeline retains the three most-agreeing ratings from up to five, adds QA and removes responses still exceeding the spread rule. About half of collected annotations are excluded overall, leaving 21,362 responses for 10,681 prompts.",
+          "claim_ids": [
+            "cohort9.claim.helpsteer2.adaptive-redundancy",
+            "cohort9.claim.helpsteer2.agreement-selection"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — HelpSteer2: Open-source dataset for training top-performing reward models. Helpfulness quadratic-weighted Cohen κ rises from 0.465 initially to 0.791 after postprocessing, a multistage selection-and-QA comparison. The two-epoch regression reward models use batch size 128, validation-loss checkpoint selection and model-specific learning-rate search. Reported RewardBench overall accuracy is 88.8% for Llama 3 70B and 92.0% for Nemotron-4 340B: the mean of four categories over 2,985 tasks, excluding optional Prior Sets. These are unreproduced results of the selected version, not current ranks.",
+          "claim_ids": [
+            "cohort9.claim.helpsteer2.agreement-selection",
+            "cohort9.claim.helpsteer2.rewardbench"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — HelpSteer2: Open-source dataset for training top-performing reward models. Higher retained-set agreement cannot be read as a randomized estimate of one QA intervention or evidence that excluded preferences were invalid. English-only, exclusively US-based annotation, possible cultural bias, uneven attribute combinations and compute-dependent tuning narrow transfer. Buyers should cost the discarded annotations, preserve disagreement reasons and validate a new target population. Conclusions from the large models do not automatically extend to smaller models.",
+          "claim_ids": [
+            "cohort9.claim.helpsteer2.agreement-selection",
+            "cohort9.claim.helpsteer2.scope-limit"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: Inherent Disagreements in Human Textual Inferences. This study samples 100 short premise/hypothesis pairs from each of RTE2, SNLI, MNLI, JOCI and DNC, requesting 50 independent AMT ratings per pair on a −50 to 50 likelihood slider. Sentences have at most 20 words. After removing specified sparse/outlier workers, does-not-make-sense responses and pairs with fewer than 15 judgments, it retains 496 pairs averaging 39 labels each. Ratings are z-normalized within worker assignments.",
+          "claim_ids": [
+            "cohort9.claim.inherent.sampling",
+            "cohort9.claim.inherent.filtering"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — Inherent Disagreements in Human Textual Inferences. Using ten held-out judgments per pair and averaging ten random splits, the Gaussian-mixture analysis finds a second component with weight above 0.2 for about 20% of pairs; most pairs remain consistent with a single component. That is a model-based description of these collected, normalized judgments. It is not a universal estimate of linguistic ambiguity or an accuracy rate against an independently established single true interpretation.",
+          "claim_ids": [
+            "cohort9.claim.inherent.secondary-mode"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — Inherent Disagreements in Human Textual Inferences. A buyer can preserve distributions for ambiguous tasks rather than force all cases into a single scale. The authors explicitly warn that normalized scores are not comparable across batches containing different pairs; the meaningful analysis compares raters within the same pair. A data pipeline that merges these normalized numbers across batches without the assignment structure would change the measurement. Recruitment and filtering rules also remain part of the population being described.",
+          "claim_ids": [
+            "cohort9.claim.inherent.normalization-limit",
+            "cohort9.claim.inherent.filtering",
+            "cohort9.claim.inherent.sampling"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: LabelAId: Just-in-time AI Interventions for Improving Human Labeling Quality and Domain Knowledge in Crowdsourcing Systems. LabelAId combines domain-coded labeling functions in a Snorkel probabilistic label model, pretrains an FT-Transformer and fine-tunes on expert-validated city labels to infer image-label correctness. Its proof of concept concerns urban-accessibility imagery. The 34-person university/snowball study obtains consent and pays $30 per hour; two researchers independently validate all 3,574 participant labels, with a third resolving 74 disagreements to define the precision reference.",
+          "claim_ids": [
+            "cohort9.claim.labelaid.weak-supervision",
+            "cohort9.claim.labelaid.adjudication-study"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — LabelAId: Just-in-time AI Interventions for Improving Human Labeling Quality and Domain Knowledge in Crowdsourcing Systems. The between-subjects Project Sidewalk study reports higher overall precision in the intervention group by Mann–Whitney U (p≤0.01). Route-completion time does not differ significantly at p=0.693; reported means are 2,303.3 seconds for control and 2,801.4 for intervention. The nonsignificant test does not establish equal speed. The experiment and its label adjudication were not reproduced for this report.",
+          "claim_ids": [
+            "cohort9.claim.labelaid.precision-time"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — LabelAId: Just-in-time AI Interventions for Improving Human Labeling Quality and Domain Knowledge in Crowdsourcing Systems. The useful intervention target is a likely labeling mistake at the moment of work. The implementation cannot identify the exact cause and supplies neither explainability features nor global accuracy differences by label type. Its small university/snowball sample may differ from the wider user population. A buyer should separately test precision, time, error categories and participant representativeness rather than infer a general productivity gain from this one proof of concept.",
+          "claim_ids": [
+            "cohort9.claim.labelaid.sample-model-limit",
+            "cohort9.claim.labelaid.precision-time"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: Pervasive Label Errors in Test Sets Destabilize Machine Learning Benchmarks. The inspected v4 first screens possible benchmark-label errors using confident learning with out-of-sample class probabilities and observed labels. Its noise model assumes class-conditional noise; datasets without test splits use whole-dataset cross-validation. Five MTurk workers then independently choose the given label, predicted label, both or neither. Fewer than three accepting the given label triggers the study’s error rule; QuickDraw and Amazon Reviews use random samples of flagged cases, while the other flagged sets are fully checked.",
+          "claim_ids": [
+            "cohort9.claim.labelerrors.screening",
+            "cohort9.claim.labelerrors.five-reviewers"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — Pervasive Label Errors in Test Sets Destabilize Machine Learning Benchmarks. For ILSVRC 2012, unavailable ImageNet test labels are replaced by the 50,000-image validation set. Table 1 reports 5,440 screened and checked examples, of which 2,916 meet the five-worker rule, or 5.83% of that validation set. These validated issues include ambiguous categories. They are not all cases with a uniquely recoverable replacement label, and they do not give an error estimate for a newly purchased dataset.",
+          "claim_ids": [
+            "cohort9.claim.labelerrors.imagenet-validation"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — Pervasive Label Errors in Test Sets Destabilize Machine Learning Benchmarks. Gold-label review is itself a measurement process. The authors caution that even unanimous five-worker corrections can be wrong. Corrected-accuracy experiments remove unknown-label cases and change only the consensus alternative-label set, producing a different denominator from initial validated issues. Buyers should retain the screening candidate, uncertainty, adjudication and final usable correction as separate states rather than present every flagged example as a confirmed, correctable error.",
+          "claim_ids": [
+            "cohort9.claim.labelerrors.correction-limit",
+            "cohort9.claim.labelerrors.five-reviewers",
+            "cohort9.claim.labelerrors.screening"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: Efficient Data Labeling by Hierarchical Crowdsourcing with Large Language Models. LMCrowd starts with Llama2-7B, FLAN-T5-base, Zephyr-7B and Qwen-7B labels, then buys GPT-4 relabeling for uncertain distributions. The evaluated models use four-shot prompts, and the paid labels remain uncertain inputs rather than unquestioned gold. The main RTE, BoolQ and COPA experiments use majority voting, approximate query selection and two relabeled tasks per iteration; BoolQ is sampled to 1.5K cases.",
+          "claim_ids": [
+            "cohort9.claim.lmcrowd.hierarchy",
+            "cohort9.claim.lmcrowd.main-setting"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — Efficient Data Labeling by Hierarchical Crowdsourcing with Large Language Models. The paper plots annotation accuracy against budget and describes its reported results as maximum achieved accuracy across configurations, rather than repeated-trial averages. Tariff comparisons count API or annotation charges, excluding model selection, GPT-4 prompt selection and worker-selection overhead. The human comparators are three university and six graduate students. Historical tariff assumptions are not current verified prices and do not establish compute-cost parity for local deployment.",
+          "claim_ids": [
+            "cohort9.claim.lmcrowd.main-setting",
+            "cohort9.claim.lmcrowd.cost-boundary"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — Efficient Data Labeling by Hierarchical Crowdsourcing with Large Language Models. The study can inform a staged-label purchasing rule, but its cost boundary cannot be used as a complete service quote. Wider domains, datasets and model choices remain future evaluation beyond the three tasks and limited generic-model set. A buyer should reproduce selection overhead, human qualifications and uncertainty handling within the intended workload, then compare accepted-unit costs under a common end-to-end scope.",
+          "claim_ids": [
+            "cohort9.claim.lmcrowd.cost-boundary",
+            "cohort9.claim.lmcrowd.generalization-limit",
+            "cohort9.claim.lmcrowd.hierarchy"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: Quality Assured: Rethinking Annotation Strategies in Imaging AI. The inspected surgical-instrument segmentation study collects 57,648 instance masks on 4,050 unique laparoscopic frames, using 216 annotators and 34 QA workers at four unnamed annotation companies plus 708 MTurk workers. Masks are repeated annotation units, not distinct images. Its three instruction conditions contain 168 words/seven slides, 446 words/ten slides and 961 words/16 slides with pictures. Annotators and company QA workers see the same instructions.",
+          "claim_ids": [
+            "cohort9.claim.qualityassured.study-units",
+            "cohort9.claim.qualityassured.instruction-conditions"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — Quality Assured: Rethinking Annotation Strategies in Imaging AI. The researchers compare outputs before and after QA with Dice, normalized surface distance and severe-error counts. Under extended text or text-plus-picture instructions, two companies have no median-Dice change after QA and the other two have relative gains below 2%; the main figure describes larger gains from better instructions than additional QA in this project. Figure pixels were not separately inspected in this bounded review.",
+          "claim_ids": [
+            "cohort9.claim.qualityassured.instruction-conditions",
+            "cohort9.claim.qualityassured.qa-result"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — Quality Assured: Rethinking Annotation Strategies in Imaging AI. QA headcount alone is an inadequate comparison when instructions and acceptance constructs differ. The reported effects are conditional on one safety-critical domain and these project conditions; costs can change elsewhere. Confidential company identities prevent any mapping to the named suppliers profiled here. The study cannot establish their service quality or working conditions, and it does not show that QA is generally unnecessary.",
+          "claim_ids": [
+            "cohort9.claim.qualityassured.qa-result",
+            "cohort9.claim.qualityassured.limits-identity"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: RECODE-H: A Benchmark for Research Code Development with Interactive Human Feedback. RECODE-H uses 26 PhD-level researchers with relevant top-conference publications to review Gemini-2.5-Pro drafts of code comments, instructions and tests. Included research implementations must execute and require less than 24 GB GPU memory. At evaluation time GPT-o4-mini simulates an expert using execution results, canonical code and annotated comments. Its five feedback levels progress from logs through diagnosis and repair guidance to the correct code snippet.",
+          "claim_ids": [
+            "cohort9.claim.recodeh.expert-construction",
+            "cohort9.claim.recodeh.simulated-feedback"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — RECODE-H: A Benchmark for Research Code Development with Interactive Human Feedback. The seven-model study fixes temperature 0 and top-p 1, permits at most ten feedback rounds and three agent actions per turn, and reports correctness and task-solve gains with richer feedback. Those gains are conditional on the added information, including answer-code snippets at the highest level. MRR depends on the first test-correct turn; Recall@n counts tasks solved within n turns; CodeBLEU and CodeBERTScore compare to canonical implementations.",
+          "claim_ids": [
+            "cohort9.claim.recodeh.bounded-evaluation",
+            "cohort9.claim.recodeh.metric-scope"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — RECODE-H: A Benchmark for Research Code Development with Interactive Human Feedback. Expert-reviewed task construction and live expert feedback are distinct provenance claims. The evaluated feedback is model-generated, and the conclusion leaves actual human-in-the-loop feedback and broader research stages for future work. Temperature zero is a decoding setting, not proof of deterministic remote responses. A buyer should specify what the feedback provider can see, whether it reveals solution material, and which task-success metric is being purchased before comparing assistance levels.",
+          "claim_ids": [
+            "cohort9.claim.recodeh.simulated-feedback",
+            "cohort9.claim.recodeh.metric-scope",
+            "cohort9.claim.recodeh.bounded-evaluation"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: Cheap and Fast – But is it Good? Evaluating Non-Expert Annotations for Natural Language Tasks. Across five selected NLP tasks, this study obtains ten independent annotations per item with multiple-choice or fixed-range numeric responses. Its temporal-order experiment deliberately narrows the original noun-and-verb, fourteen-relation problem to verb events and two relations. Expert interannotator-agreement figures are unavailable for that simplified task. The restriction changes the comparison that a headline expert-versus-crowd result might otherwise suggest.",
+          "claim_ids": [
+            "cohort9.claim.snow.redundancy",
+            "cohort9.claim.snow.restricted-task"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — Cheap and Fast – But is it Good? Evaluating Non-Expert Annotations for Natural Language Tasks. On 462 TimeBank verb-event pairs restricted to strictly before versus strictly after, ten-label voting yields 0.94 agreement with dataset labels from 4,620 annotations. The cited 0.77 expert agreement comes from the broader task and is not a matched comparator. Separately, a unigram affect predictor trained on 100 headlines and tested on 900 reaches mean Pearson correlation 0.191 with ten-annotator-averaged non-expert training labels versus 0.122 with one expert, using five other experts as reference.",
+          "claim_ids": [
+            "cohort9.claim.snow.temporal-vote",
+            "cohort9.claim.snow.affect-training"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — Cheap and Fast – But is it Good? Evaluating Non-Expert Annotations for Natural Language Tasks. Redundancy, task simplification and reference construction explain the actionable scope. These results support testing pooled labels for similarly bounded tasks; they do not establish that ten general annotators outperform specialists on arbitrary work. A procurement comparison should hold the ontology and evaluation reference fixed and cost all repeated labels. The historical experiment is not a current provider or platform performance measurement.",
+          "claim_ids": [
+            "cohort9.claim.snow.restricted-task",
+            "cohort9.claim.snow.redundancy",
+            "cohort9.claim.snow.temporal-vote",
+            "cohort9.claim.snow.affect-training"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: UltraFeedback: Boosting Language Models with Scaled AI Feedback. UltraFeedback v2 samples four different models per instruction from a 17-model pool, yielding 255,864 completions for 63,967 instructions. Family/size diversity and varied system principles are intended to reduce style–quality confounding. GPT-4 jointly scores each prompt’s four completions on 1–5 instruction-following, truthfulness, honesty and helpfulness rubrics with rationales; a separate tutor-style prompt creates an overall critique per completion.",
+          "claim_ids": [
+            "cohort9.claim.ultrafeedback.model-sampling",
+            "cohort9.claim.ultrafeedback.simultaneous-rubrics"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — UltraFeedback: Boosting Language Models with Scaled AI Feedback. For a 400-comparison check—100 each from UltraFeedback, AlpacaEval, Evol-Instruct and UltraChat—three independent student judges give win/tie/lose labels. GPT-4 agreement averages 59.7% with individual judges and 68.6% with their majority, including ties. Agreement assesses consistency with these judgments rather than verified factual correctness. A later 266-pair evaluation uses a separate filtered denominator and should not be merged with this check.",
+          "claim_ids": [
+            "cohort9.claim.ultrafeedback.human-agreement"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — UltraFeedback: Boosting Language Models with Scaled AI Feedback. Rubric-rich synthetic feedback still needs independent calibration. The impact statement identifies answer-position, length and style biases that can cause inaccurate or unfair annotation and evaluation. Model diversity is an intended safeguard rather than a proof those biases disappear. Buyers should retain the joint-scoring context and test order/style perturbations; neither the label volume nor majority agreement establishes universal truthfulness or equivalence to independent human judgments.",
+          "claim_ids": [
+            "cohort9.claim.ultrafeedback.bias-limit",
+            "cohort9.claim.ultrafeedback.human-agreement",
+            "cohort9.claim.ultrafeedback.model-sampling",
+            "cohort9.claim.ultrafeedback.simultaneous-rubrics"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: Who Annotates in NLP? A Large-scale Assessment of Human Annotation Reporting between 2018 and 2025. The inspected study extracts one structured record per annotation experiment using a 26-category taxonomy from keyword-selected 2018–2025 ACL-family main/Findings papers. The selected corpus has 1,603 papers and 2,667 tasks, separate from its human-adjudicated gold set. Gold construction compares two independent annotations, discusses disagreements and uses a third annotator for unresolved cases before evaluating extraction.",
+          "claim_ids": [
+            "cohort9.claim.whoannotates.task-level-audit",
+            "cohort9.claim.whoannotates.adjudication"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — Who Annotates in NLP? A Large-scale Assessment of Human Annotation Reporting between 2018 and 2025. For the final Gemini-3.1-Pro-extracted corpus, reported information appears for recruitment in 90.4% of tasks, expertise in 86.5% and item volume in 86.0%, compared with training in 18.7%, language proficiency in 24.0% and released guidelines in 34.1%. These percentages describe automated extraction of publication reporting. Their denominator is annotation tasks in the selected corpus, rather than workers, suppliers or all ACL research.",
+          "claim_ids": [
+            "cohort9.claim.whoannotates.reporting-pattern",
+            "cohort9.claim.whoannotates.task-level-audit"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — Who Annotates in NLP? A Large-scale Assessment of Human Annotation Reporting between 2018 and 2025. Documentation omissions are prompts for follow-up, not findings that the underlying practices were absent. Keyword selection is not fully representative, model extraction can misclassify papers or categories, and the released records lack calibrated per-instance confidence. The study makes disclosure comparison useful while preserving uncertainty about the actual work. Its reconciliation design also illustrates why an independently established reference should precede scoring a research extraction system.",
+          "claim_ids": [
+            "cohort9.claim.whoannotates.audit-limit",
+            "cohort9.claim.whoannotates.adjudication"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work atlas — Annotation, feedback and evidence design: WildChat: 1M ChatGPT Interaction Logs in the Wild. The inspected WildChat v1 describes public GPT-3.5-Turbo/GPT-4 chat services collected from 9 April 2023 to 1 May 2024. Users must accept a collection/use/sharing agreement and a second confirmation before opening the chat interface. The authors report multilingual PII removal using Presidio, spaCy and custom rules, followed by GeoLite2 country/state mapping and hashed IP release. This is a description of their process, not an independently tested de-identification guarantee.",
+          "claim_ids": [
+            "cohort9.claim.wildchat.consent-gate",
+            "cohort9.claim.wildchat.anonymization"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Study result — WildChat: 1M ChatGPT Interaction Logs in the Wild. The exact v1 PDF contains an unresolved count discrepancy: its public-release statement gives 1,039,785 conversations after reserving 14,743 for WildBench, while the following Basic Statistics paragraph gives 1,009,245. This report preserves both statements instead of choosing a canonical artifact count. Neither figure has been recomputed from corpus bytes here, and this paper review does not independently add a dataset-family inspection.",
+          "claim_ids": [
+            "cohort9.claim.wildchat.count-conflict"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Study limitations and buyer implications — WildChat: 1M ChatGPT Interaction Logs in the Wild. Consent gates and filtering do not establish population representativeness or zero privacy risk. The authors warn that hashed IPs and request headers can still link conversations from the same user; Hugging Face hosting and subreddit dissemination can favor IT communities, while anonymous access may select more toxic discourse. Buyers should inspect the actual release and linkage risk under their use case rather than treat conversational realism, anonymization or a headline million count as a certification.",
+          "claim_ids": [
+            "cohort9.claim.wildchat.anonymization",
+            "cohort9.claim.wildchat.selection-limit",
+            "cohort9.claim.wildchat.count-conflict"
           ]
         }
       ]
@@ -2284,7 +2929,7 @@
           "kind": "sourced_fact",
           "text": "APTO — disclosed delivery and operating model. APTO’s official company-information page names APTO, Inc. and a January 20, 2020 founding date.",
           "claim_ids": [
-            "candidate.cohort5.apto.company-identity"
+            "repair.binding.v1.candidate.cohort5.apto.company-identity"
           ]
         },
         {
@@ -2292,7 +2937,7 @@
           "text": "APTO — source-specific boundaries. The English privacy page separately uses APTO Corporation; these official renderings are retained without inventing a name-change or ownership event. Listed domains are advertised formats and applications, not delivered-language coverage or independently tested capability.",
           "claim_ids": [
             "candidate.cohort5.apto.commissioned-solutions",
-            "candidate.cohort5.apto.company-identity",
+            "repair.binding.v1.candidate.cohort5.apto.company-identity",
             "candidate.cohort5.apto.harbest-platform",
             "candidate.cohort5.apto.modalities",
             "candidate.cohort5.apto.ready-made-datasets"
@@ -2303,7 +2948,7 @@
           "text": "APTO — buyer assessment and unknowns. The documented comparison has two purchase paths: ready-made data and commissioned collection-to-system work. Require separate version, rights and acceptance schedules for each. A broad modality menu supports asking for representative image, LiDAR or audio samples; it does not establish domain-specific expert qualifications or a named completed customer delivery in the inspected dossier.",
           "claim_ids": [
             "candidate.cohort5.apto.commissioned-solutions",
-            "candidate.cohort5.apto.company-identity",
+            "repair.binding.v1.candidate.cohort5.apto.company-identity",
             "candidate.cohort5.apto.harbest-platform",
             "candidate.cohort5.apto.modalities",
             "candidate.cohort5.apto.ready-made-datasets"
@@ -3486,7 +4131,7 @@
           "claim_ids": [
             "candidate.cohort2.labelbox.domain-matching",
             "candidate.cohort2.labelbox.financing",
-            "candidate.cohort2.labelbox.privacy-partners",
+            "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners",
             "candidate.cohort2.labelbox.quality-calibration",
             "candidate.cohort2.labelbox.speech-delivery"
           ]
@@ -3498,7 +4143,7 @@
             "candidate.cohort2.labelbox.domain-matching",
             "candidate.cohort2.labelbox.financing",
             "candidate.cohort2.labelbox.offering",
-            "candidate.cohort2.labelbox.privacy-partners",
+            "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners",
             "candidate.cohort2.labelbox.quality-calibration",
             "candidate.cohort2.labelbox.speech-delivery"
           ]
@@ -3510,7 +4155,7 @@
             "candidate.cohort2.labelbox.domain-matching",
             "candidate.cohort2.labelbox.financing",
             "candidate.cohort2.labelbox.offering",
-            "candidate.cohort2.labelbox.privacy-partners",
+            "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners",
             "candidate.cohort2.labelbox.quality-calibration",
             "candidate.cohort2.labelbox.speech-delivery"
           ]
@@ -3825,7 +4470,7 @@
           "claim_ids": [
             "candidate.cohort4.polymath_ai_labs.anthology-identity",
             "candidate.cohort4.polymath_ai_labs.community-no-work-guarantee",
-            "candidate.cohort4.polymath_ai_labs.horizon-swe",
+            "repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe",
             "candidate.cohort4.polymath_ai_labs.interview-training-restriction",
             "candidate.cohort4.polymath_ai_labs.verifiable-partial-credit"
           ]
@@ -3836,7 +4481,7 @@
           "claim_ids": [
             "candidate.cohort4.polymath_ai_labs.anthology-identity",
             "candidate.cohort4.polymath_ai_labs.community-no-work-guarantee",
-            "candidate.cohort4.polymath_ai_labs.horizon-swe",
+            "repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe",
             "candidate.cohort4.polymath_ai_labs.interview-training-restriction",
             "candidate.cohort4.polymath_ai_labs.simulation-service",
             "candidate.cohort4.polymath_ai_labs.verifiable-partial-credit"
@@ -3848,7 +4493,7 @@
           "claim_ids": [
             "candidate.cohort4.polymath_ai_labs.anthology-identity",
             "candidate.cohort4.polymath_ai_labs.community-no-work-guarantee",
-            "candidate.cohort4.polymath_ai_labs.horizon-swe",
+            "repair.binding.ten.v1.candidate.cohort4.polymath_ai_labs.horizon-swe",
             "candidate.cohort4.polymath_ai_labs.interview-training-restriction",
             "candidate.cohort4.polymath_ai_labs.simulation-service",
             "candidate.cohort4.polymath_ai_labs.verifiable-partial-credit"
@@ -3866,7 +4511,7 @@
           "kind": "sourced_fact",
           "text": "Prime Intellect — disclosed delivery and operating model. Model Factory terms meter hosted training per GPU-hour allocated to a run, prorated to the second; rates come from the order or platform. The NVIDIA case attributes verified enterprise tasks to the specific Prime Intellect workflow. It does not establish all NVIDIA training input or a causal share of model gains. The NVIDIA case study says enterprise tasks are scored on changes to simulated applications and files, with objectives and guardrails. Model Factory terms distinguish platform services from any personnel-performed post-training work, which needs a separate professional-services order.",
           "claim_ids": [
-            "candidate.cohort4.prime_intellect.gpu-billing-basis",
+            "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis",
             "candidate.cohort4.prime_intellect.nvidia-verified-tasks",
             "candidate.cohort4.prime_intellect.outcome-checks",
             "candidate.cohort4.prime_intellect.professional-service-separation"
@@ -3877,7 +4522,7 @@
           "text": "Prime Intellect — source-specific boundaries. Pricing basis is distinct from quoted public compute example prices, data-service pricing, company revenue and customer spend. No commercial amount is asserted. Platform capability alone is not evidence of human-data staffing or bespoke task generation.",
           "claim_ids": [
             "candidate.cohort4.prime_intellect.environment-framework",
-            "candidate.cohort4.prime_intellect.gpu-billing-basis",
+            "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis",
             "candidate.cohort4.prime_intellect.managed-training-platform",
             "candidate.cohort4.prime_intellect.nvidia-verified-tasks",
             "candidate.cohort4.prime_intellect.outcome-checks",
@@ -3889,7 +4534,7 @@
           "text": "Prime Intellect — buyer assessment and unknowns. Separate open framework access, hosted compute/training and personnel-performed professional services. GPU-hours allocated to a run are a billing unit, not accepted data units or actual productive compute. For an enterprise-task pilot, inspect objective and guardrail checks in addition to final file/application changes. The named case does not establish all downstream model input or causal performance gains.",
           "claim_ids": [
             "candidate.cohort4.prime_intellect.environment-framework",
-            "candidate.cohort4.prime_intellect.gpu-billing-basis",
+            "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis",
             "candidate.cohort4.prime_intellect.managed-training-platform",
             "candidate.cohort4.prime_intellect.nvidia-verified-tasks",
             "candidate.cohort4.prime_intellect.outcome-checks",
@@ -3965,10 +4610,10 @@
           "kind": "sourced_fact",
           "text": "Proximal — disclosed delivery and operating model. In its September 29, 2026 announcement, Proximal reports scaling to $200M in annualized revenue. Proximal’s privacy policy requires prior written consent and an executed agreement before using customer material to improve generalized models. Proximal’s MSA identifies Proximal AI, Inc. and requires executed order forms for customer services. Proximal documents its scoped FrontierSWE collaboration; no broader customer contribution or exclusive production role is inferred. Proximal’s MSA permits independent contractors and keeps Proximal responsible for subcontracted services.",
           "claim_ids": [
-            "candidate.cohort4.proximal.annualized-revenue-disclosure",
+            "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure",
             "candidate.cohort4.proximal.customer-material-training-consent",
             "candidate.cohort4.proximal.development-order-contract",
-            "candidate.cohort4.proximal.frontierswe-collaboration",
+            "repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration",
             "candidate.cohort4.proximal.subcontractor-responsibility"
           ]
         },
@@ -3976,11 +4621,11 @@
           "kind": "sourced_fact",
           "text": "Proximal — source-specific boundaries. Self-reported annualized pace, not an audited annual revenue total, recognized revenue, profit, bookings, valuation or contractor payout. The source does not specify the annualization window, currency code, gross-versus-net accounting, or revenue by business line. This applies to generalized model training; it does not prohibit customer-authorized training services or prove compliance in individual projects.",
           "claim_ids": [
-            "candidate.cohort4.proximal.annualized-revenue-disclosure",
+            "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure",
             "candidate.cohort4.proximal.customer-material-training-consent",
             "candidate.cohort4.proximal.data-research-business",
             "candidate.cohort4.proximal.development-order-contract",
-            "candidate.cohort4.proximal.frontierswe-collaboration",
+            "repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration",
             "candidate.cohort4.proximal.subcontractor-responsibility",
             "candidate.cohort4.proximal.targeted-posttraining-data"
           ]
@@ -3989,11 +4634,11 @@
           "kind": "analysis",
           "text": "Proximal — buyer assessment and unknowns. The disclosed organization takes responsibility for data research and engineering rather than presenting itself as a recruiting marketplace. The MSA’s subcontractor responsibility is relevant to acceptance accountability. Inspect one trace-to-task transformation and consent boundary. The $200M announcement is self-reported annualized pace with undisclosed annualization window, currency code and gross/net basis, not audited annual or segment revenue.",
           "claim_ids": [
-            "candidate.cohort4.proximal.annualized-revenue-disclosure",
+            "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure",
             "candidate.cohort4.proximal.customer-material-training-consent",
             "candidate.cohort4.proximal.data-research-business",
             "candidate.cohort4.proximal.development-order-contract",
-            "candidate.cohort4.proximal.frontierswe-collaboration",
+            "repair.binding.ten.v1.candidate.cohort4.proximal.frontierswe-collaboration",
             "candidate.cohort4.proximal.subcontractor-responsibility",
             "candidate.cohort4.proximal.targeted-posttraining-data"
           ]
@@ -4810,6 +5455,16 @@
             "candidate.cohort6.benchflow.sandbox-backends",
             "candidate.cohort6.benchflow.training-export-interface"
           ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Dossier-reading qualification: the newly reviewed HelpSteer and HelpSteer2 papers explicitly describe recruitment through Scale AI in their respective pinned versions. They support those scoped reported recruitment/workflow roles, rather than sole artifact authorship, other releases or measured current service quality. Conversely, the surgical QA study keeps its four companies anonymous, so its results cannot be assigned to any named dossier. Software used inside a paper, including LabelAId’s Snorkel label model, does not by itself establish a commercial data-service contribution.",
+          "claim_ids": [
+            "cohort9.claim.helpsteer.recruitment-qa",
+            "cohort9.claim.helpsteer2.adaptive-redundancy",
+            "cohort9.claim.qualityassured.limits-identity",
+            "cohort9.claim.labelaid.weak-supervision"
+          ]
         }
       ]
     },
@@ -5465,7 +6120,7 @@
           "claim_ids": [
             "cohort4.dataset.claim.no-robots.human-origin",
             "cohort4.dataset.claim.no-robots.schema",
-            "cohort4.dataset.claim.no-robots.splits"
+            "repair.binding.ten.v1.cohort4.dataset.claim.no-robots.splits"
           ]
         },
         {
@@ -5484,7 +6139,7 @@
             "candidate.cohort3.dataset.numinamath.02",
             "candidate.cohort3.dataset.numinamath.03",
             "candidate.cohort3.dataset.numinamath.04",
-            "candidate.cohort3.dataset.numinamath.05",
+            "repair.binding.ten.v1.candidate.cohort3.dataset.numinamath.05",
             "candidate.cohort3.dataset.numinamath.06"
           ]
         },
@@ -5496,7 +6151,7 @@
             "candidate.cohort3.dataset.numinamath.02",
             "candidate.cohort3.dataset.numinamath.03",
             "candidate.cohort3.dataset.numinamath.04",
-            "candidate.cohort3.dataset.numinamath.05",
+            "repair.binding.ten.v1.candidate.cohort3.dataset.numinamath.05",
             "candidate.cohort3.dataset.numinamath.06"
           ]
         },
@@ -5661,8 +6316,8 @@
           "kind": "sourced_fact",
           "text": "Dataset-family atlas — Pick-a-Pic: construction, signal and protocol. Pick-a-Pic collects real users’ prompts and preferences over two generated images, allowing a tie. Pick-a-Pic paper identifies Stable Diffusion2.1, Dreamlike Photoreal2.0 and Stable Diffusion XL variants as image generators. Pick-a-Pic reports user authentication, activity monitoring, bans and NSFW phrase filters as data-quality controls. Pick-a-Pic paper forms validation/test data from unique-user prompts and excludes their prompts from training. Pick-a-Pic creator distinguishes original v1 data from v2 with more than one million examples. PickScore repository MIT terms apply to software and associated documentation.",
           "claim_ids": [
-            "candidate.cohort3.dataset.pickapic.01",
-            "candidate.cohort3.dataset.pickapic.02",
+            "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.01",
+            "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.02",
             "candidate.cohort3.dataset.pickapic.03",
             "candidate.cohort3.dataset.pickapic.04",
             "candidate.cohort3.dataset.pickapic.05",
@@ -5673,8 +6328,8 @@
           "kind": "sourced_fact",
           "text": "Dataset-family atlas — Pick-a-Pic: inspected-source qualification. Reviewed scope: Full pinned creator family card, PickScore README and code LICENSE; partial textual read of NeurIPS2023paper pages1–6and10. Dataset v1 API endpoint returned401; v1/v2 data access is not established.",
           "claim_ids": [
-            "candidate.cohort3.dataset.pickapic.01",
-            "candidate.cohort3.dataset.pickapic.02",
+            "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.01",
+            "repair.binding.ten.v1.candidate.cohort3.dataset.pickapic.02",
             "candidate.cohort3.dataset.pickapic.03",
             "candidate.cohort3.dataset.pickapic.04",
             "candidate.cohort3.dataset.pickapic.05",
@@ -6106,7 +6761,7 @@
             "candidate.cohort3.dataset.videofeedback.02",
             "candidate.cohort3.dataset.videofeedback.03",
             "candidate.cohort3.dataset.videofeedback.04",
-            "candidate.cohort3.dataset.videofeedback.05"
+            "repair.binding.v1.candidate.cohort3.dataset.videofeedback.05"
           ]
         },
         {
@@ -6117,7 +6772,7 @@
             "candidate.cohort3.dataset.videofeedback.02",
             "candidate.cohort3.dataset.videofeedback.03",
             "candidate.cohort3.dataset.videofeedback.04",
-            "candidate.cohort3.dataset.videofeedback.05"
+            "repair.binding.v1.candidate.cohort3.dataset.videofeedback.05"
           ]
         },
         {
@@ -6609,7 +7264,7 @@
           "kind": "sourced_fact",
           "text": "Benchmark-family atlas — WebShop: access, version and interpretation boundaries. The WebShop LICENSE.md is MIT for software and associated documentation.",
           "claim_ids": [
-            "cohort4.dataset.claim.webshop.license"
+            "repair.binding.v1.cohort4.dataset.claim.webshop.license"
           ]
         },
         {
@@ -6634,6 +7289,26 @@
           "kind": "method",
           "text": "Atlas interpretation: a source can document a dataset’s declared license, retained record count or human-checking procedure without this study inspecting every row or reproducing a training run. Unknown or restrictive licensing is a catalogue finding rather than an instruction to retrieve or redistribute the corpus. Empty taxonomy facets remain unknown. A release’s disclosed aggregate count can coexist with a README/example inconsistency; both are retained instead of silently manufacturing a reconciled number.",
           "claim_ids": []
+        },
+        {
+          "kind": "analysis",
+          "text": "Reference-label provenance should accompany benchmark protocol. The label-error study uses model screening followed by five-worker judgments and distinguishes ambiguous or unknown cases from correctable alternatives. Gilardi evaluates only texts on which two trained annotators agree; HelpSteer2 removes remaining high-spread responses. These are different decisions about which items enter a score. A buyer should retain the original denominator, review-selection rule and accepted reference rather than compare the resulting percentages as if they measured the same difficulty distribution.",
+          "claim_ids": [
+            "cohort9.claim.labelerrors.screening",
+            "cohort9.claim.labelerrors.five-reviewers",
+            "cohort9.claim.labelerrors.correction-limit",
+            "cohort9.claim.gilardi.gold-denominator",
+            "cohort9.claim.helpsteer2.agreement-selection"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "A paper’s dataset statistics are evidence about its described release, rather than independent confirmation of a current download. Aya separates original annotations from re-annotations and imposes a language inclusion threshold. WildChat v1 contains two unreconciled conversation totals, which this synthesis preserves. These additional paper reviews do not add another dataset family here. A future artifact inspection should bind the exact bytes, reconcile paper/card/repository counts and preserve component lineage before changing family or release accounting.",
+          "claim_ids": [
+            "cohort9.claim.aya.dataset-composition",
+            "cohort9.claim.aya.inclusion",
+            "cohort9.claim.wildchat.count-conflict"
+          ]
         }
       ]
     },
@@ -6792,6 +7467,29 @@
           "kind": "research_gap",
           "text": "Important labor unknowns remain: independently measured effective pay, qualification rejection and appeal outcomes, subcontractor payment reconciliation, harmful-content exposure, contributor retention and the relation between monitoring and acceptance. The public-source corpus does not resolve these for the covered market. Research can progress through consented worker studies, project-level anonymized logs and comparable definitions, while avoiding inference from registered pools or recruitment advertisements.",
           "claim_ids": []
+        },
+        {
+          "kind": "analysis",
+          "text": "Disagreement routing should distinguish uncertainty from error. Experts Rise uses cross-model entropy to select expert attention, while Inherent Disagreements models multiple interpretations of the same short sentence pairs. CrowdTruth defines mutually dependent consistency scores but leaves broader comparative validation open. The practical choice is whether the task seeks one verifiable answer, a distribution of valid interpretations or a codebook revision. Record that choice before using disagreement to exclude workers, remove items or declare a quality improvement.",
+          "claim_ids": [
+            "cohort9.claim.expertsrise.disagreement-targeting",
+            "cohort9.claim.expertsrise.scope-limit",
+            "cohort9.claim.inherent.secondary-mode",
+            "cohort9.claim.inherent.normalization-limit",
+            "cohort9.claim.crowdtruth.worker-score",
+            "cohort9.claim.crowdtruth.open-task-limit"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Instruction design and assistance need separate acceptance checks. The surgical study’s comparison is conditional on instruction richness and project-specific QA; LabelAId’s intervention improves precision within a 34-person study without an equivalence finding on time. Neither supports a general staffing reduction. In a proposed pilot, log instruction revisions, assistance shown, human corrections and downstream acceptance, then inspect whether the intervention changes errors or merely which cases remain. Preserve any effect on contributor effort and disagreement as part of the operating record.",
+          "claim_ids": [
+            "cohort9.claim.qualityassured.instruction-conditions",
+            "cohort9.claim.qualityassured.qa-result",
+            "cohort9.claim.qualityassured.limits-identity",
+            "cohort9.claim.labelaid.precision-time",
+            "cohort9.claim.labelaid.sample-model-limit"
+          ]
         }
       ]
     },
@@ -6811,7 +7509,7 @@
           "kind": "sourced_fact",
           "text": "Proximal — annualized pace. Its 29 September 2026 announcement reports $200 million in annualized revenue. The inspected disclosure does not specify an ISO currency code, annualization window, gross-versus-net basis or revenue split by business line. It is self-reported pace, not an audited annual revenue total, profit, bookings, valuation or contractor payout. No annual recognized-revenue amount is calculated from it in this report.",
           "claim_ids": [
-            "candidate.cohort4.proximal.annualized-revenue-disclosure"
+            "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure"
           ]
         },
         {
@@ -6840,7 +7538,7 @@
           "kind": "sourced_fact",
           "text": "Other disclosed billing units differ. Prime Intellect’s Model Factory terms meter allocated GPU-hours prorated to the second, with rates in the order or platform; personnel post-training needs a separate professional-services order. A.Team lists hourly and other builder-engagement models. Terac describes expert payout plus a platform fee and separately monthly USD payment per verified completion for partnerships. AfterQuery reserves fees to order forms or separate agreements. These documents describe commercial structure, not a comparable price per accepted preference pair or environment.",
           "claim_ids": [
-            "candidate.cohort4.prime_intellect.gpu-billing-basis",
+            "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis",
             "candidate.cohort4.prime_intellect.professional-service-separation",
             "candidate.cohort5.a-team.delivery-model",
             "candidate.cohort5.terac.buyer-billing-model",
@@ -6853,7 +7551,7 @@
           "text": "The analytical rule is to keep commercial denominators separate. A company-wide annualized rate cannot be divided by a benchmark count to estimate task price; cumulative payouts cannot identify a current take rate; financing cannot measure demand; a broad expert pool cannot be a capacity denominator. The selected disclosures support questions for diligence, not supplier market shares. A defensible future comparison would need the same reporting period, currency, gross/net basis, organizational segment and accepted-unit definition across every included provider.",
           "claim_ids": [
             "candidate.supplier.appen.revenue-fy2025",
-            "candidate.cohort4.proximal.annualized-revenue-disclosure",
+            "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure",
             "candidate.supplier.scale_ai.cumulative-payout",
             "candidate.cohort2.labelbox.financing",
             "candidate.supplier.mercor.expert-pool"
@@ -6878,6 +7576,24 @@
           "kind": "research_gap",
           "text": "The commercial research gap is task-matched economics. This corpus does not supply comparable current contracts, realized gross/net human-data revenue, project margins, cancellation/rework charges or accepted-unit costs across suppliers. Missing financial disclosure is unknown rather than zero. No financial forecast, market-size projection, provider-return model or inferred valuation multiple is warranted by this evidence.",
           "claim_ids": []
+        },
+        {
+          "kind": "analysis",
+          "text": "Cost comparisons must include the measured boundary. LMCrowd excludes model, prompt and worker selection from its tariff comparison; CrowdAgent holds human annotation proportions rather than all computation or operating cost equal. HelpSteer2 discards about half of collected annotations overall, so accepted responses and purchased ratings have different denominators. Request setup, failed/rejected work, QA, adjudication, model calls, compute and accepted-unit totals explicitly. These studies inform accounting questions; they do not provide current service prices or a cross-provider cost ranking.",
+          "claim_ids": [
+            "cohort9.claim.lmcrowd.cost-boundary",
+            "cohort9.claim.crowdagent.fixed-human-ratios",
+            "cohort9.claim.helpsteer2.agreement-selection"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Worker-time accounting is also distinct from project billing. The historical MTurk log study produces different work-unit rates under accept-to-submit and temporal-cluster definitions; its task/cluster medians are not median worker wages. Selected plugin users, unknown active effort and noncausal associations constrain inference. For a new project, request consented, task-appropriate compensation and time evidence rather than convert historical platform figures or supplier revenue into a claim about present worker earnings.",
+          "claim_ids": [
+            "cohort9.claim.earnings.wage-definition",
+            "cohort9.claim.earnings.work-unit-wages",
+            "cohort9.claim.earnings.causality-limit"
+          ]
         }
       ]
     },
@@ -7009,6 +7725,27 @@
           "kind": "research_gap",
           "text": "Governance unknowns include project-specific contracts, current assurance-report scopes, removal-request outcomes, consent withdrawals, subprocessor execution and worker appeal effectiveness. These cannot be resolved by treating a top-level license, policy statement or source-content review as an operational audit. Buyer diligence should obtain the relevant documents and test the actual project boundary; future research should record both support and unresolved limitations.",
           "claim_ids": []
+        },
+        {
+          "kind": "analysis",
+          "text": "Disclosure completeness is an observable governance input, while actual conduct remains a separate question. GIGO audits publication reporting in a selected literature; Who Annotates extracts task-level disclosures with an automated model and a separately adjudicated reference. Both reject equating missing reporting with absent practice. Their results justify asking for training, language proficiency, instructions and reconciliation records. They do not justify ranking a supplier’s ethics or data quality from how many public fields are filled.",
+          "claim_ids": [
+            "cohort9.claim.gigo.audit-limit",
+            "cohort9.claim.gigo.instructions",
+            "cohort9.claim.whoannotates.task-level-audit",
+            "cohort9.claim.whoannotates.adjudication",
+            "cohort9.claim.whoannotates.reporting-pattern",
+            "cohort9.claim.whoannotates.audit-limit"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "A documented consent workflow does not finish privacy diligence. WildChat reports an agreement plus secondary confirmation and multilingual PII filtering, yet warns that hashed IPs and request headers can link conversations. The reported process was not independently tested here. For a proposed conversational-data use, examine the exact released fields, linkage routes, permissions and intended population; preserve the difference between a source’s stated control and demonstrated residual risk reduction.",
+          "claim_ids": [
+            "cohort9.claim.wildchat.consent-gate",
+            "cohort9.claim.wildchat.anonymization",
+            "cohort9.claim.wildchat.selection-limit"
+          ]
         }
       ]
     },
@@ -7210,7 +7947,7 @@
             "candidate.cohort5.trajectory_labs_pbc.safety-evaluation-method",
             "cohort4.claim.harmbench.comparison-budget",
             "cohort4.claim.jailbreakbench.adaptive-defense-condition",
-            "cohort4.claim.jailbreakbench.paired-behaviors",
+            "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors",
             "cohort3.claim.redteam.coverage-expertise-limits"
           ]
         },
@@ -7223,7 +7960,7 @@
             "candidate.cohort5.trajectory_labs_pbc.safety-evaluation-method",
             "cohort4.claim.harmbench.comparison-budget",
             "cohort4.claim.jailbreakbench.adaptive-defense-condition",
-            "cohort4.claim.jailbreakbench.paired-behaviors",
+            "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors",
             "cohort3.claim.redteam.coverage-expertise-limits"
           ]
         },
@@ -7236,7 +7973,7 @@
             "candidate.cohort5.trajectory_labs_pbc.safety-evaluation-method",
             "cohort4.claim.harmbench.comparison-budget",
             "cohort4.claim.jailbreakbench.adaptive-defense-condition",
-            "cohort4.claim.jailbreakbench.paired-behaviors",
+            "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors",
             "cohort3.claim.redteam.coverage-expertise-limits"
           ]
         },
@@ -7385,6 +8122,37 @@
           "kind": "method",
           "text": "Common pilot record: versioned brief; source and rights manifest; task/environment version; contributor qualification rule; raw judgments or trajectories; review and exclusion log; adjudication reasons; acceptance denominator; cost inclusions; and residual risks. Separate supplier process errors from buyer guideline defects, environment failures and model failures. The final purchase decision should state which evidence established suitability and which assumptions remain conditional. Keep unsuccessful pilots and rejected examples in the internal learning record so later comparisons do not inherit survivorship bias.",
           "claim_ids": []
+        },
+        {
+          "kind": "analysis",
+          "text": "Pilot refinement for expert preference and multilingual data: retain an unfiltered calibration sample alongside the accepted sample. Score raw agreement, exclusions, adjudication and acceptance separately; inspect whether difficult but relevant cases disappear. HelpSteer2’s κ change is conditional on multistage filtering, Aya’s language total does not guarantee uniform contributor diversity or safety review, and Inherent Disagreements warns against pooling batch-normalized scales. Predeclare whether the buyer needs consensus labels, calibrated scalar attributes or a distribution of valid preferences before requesting a price per example.",
+          "claim_ids": [
+            "cohort9.claim.helpsteer2.agreement-selection",
+            "cohort9.claim.aya.quality-limit",
+            "cohort9.claim.aya.dataset-composition",
+            "cohort9.claim.inherent.normalization-limit"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Pilot refinement for research agents and feedback services: freeze the feedback visibility contract. RECODE-H’s richest condition supplies correct code and its evaluated expert is simulated; AutoLibra collects one feedback element for a complete trajectory and does not demonstrate live step-level guidance. Compare these against the buyer’s actual need: post-hoc diagnosis, interactive help or verifiable task scoring. Count feedback rounds, solution material disclosed, human effort and independent final success separately so richer assistance is not mistaken for better unaided agent capability.",
+          "claim_ids": [
+            "cohort9.claim.recodeh.simulated-feedback",
+            "cohort9.claim.recodeh.bounded-evaluation",
+            "cohort9.claim.recodeh.metric-scope",
+            "cohort9.claim.autolibra.feedback-limit",
+            "cohort9.claim.autolibra.validation-denominator"
+          ]
+        },
+        {
+          "kind": "analysis",
+          "text": "Pilot refinement for label automation and judge calibration: establish reference labels independently before comparing the system under test. Who Annotates resolves two independent annotations through discussion and third-person adjudication; the benchmark-label study retains uncertainty even after five-worker review. Include easy, ambiguous and rejected cases, then state whether the metric measures agreement with a chosen reference or verified outcome correctness. This proposed acceptance design should document disagreements and confidence rather than silently discard cases that challenge either the reference or the evaluated system.",
+          "claim_ids": [
+            "cohort9.claim.whoannotates.adjudication",
+            "cohort9.claim.labelerrors.five-reviewers",
+            "cohort9.claim.labelerrors.correction-limit",
+            "cohort9.claim.gilardi.gold-denominator"
+          ]
         }
       ]
     },
@@ -7458,6 +8226,16 @@
           "kind": "method",
           "text": "The weekly outlook should be revised through falsifiable change conditions. Each stable executive finding records confidence, reasoning, limitations and what would change the assessment. New primary evidence can strengthen, narrow or supersede a finding; a changed source version should not silently overwrite its predecessor. A meaningful revision will identify which observed assumption changed and whether the effect is task-specific or supports a broader conclusion. No growth, revenue, employment or technology-adoption forecast is produced from this selected corpus.",
           "claim_ids": []
+        },
+        {
+          "kind": "analysis",
+          "text": "Hypothesis — a stronger documentation audit will improve diligence only if reporting signals are checked against project evidence. GIGO and Who Annotates observe disclosure, not undisclosed practice; the latter also exposes extraction uncertainty. Confidence is moderate in the need to distinguish those objects and unmeasured in the commercial value of an audit score. A follow-up could compare disclosed instructions, training and compensation fields with consented project records and independently sampled outputs. If completeness fails to predict agreement between disclosure and practice, its role should remain a transparency measure rather than a performance proxy.",
+          "claim_ids": [
+            "cohort9.claim.gigo.audit-limit",
+            "cohort9.claim.gigo.source-disclosure",
+            "cohort9.claim.whoannotates.audit-limit",
+            "cohort9.claim.whoannotates.reporting-pattern"
+          ]
         }
       ]
     },
@@ -7477,7 +8255,7 @@
         },
         {
           "kind": "method",
-          "text": "Original-stage notes and current status. Some approved records preserve literal Author-only candidate language or proposal-stage qualifications in their frozen author packets. Those strings describe the stage at which that packet was written; they are not silently rewritten or removed from the evidence record. Current approval is determined by the record’s approved status and its exact-digest, three-role passing source-content receipts. The original source-depth and substantive limitations still apply. When an atlas reproduces an original-stage qualification, read it with this distinction rather than infer that the current approved assertion lacks its subsequent reviews.",
+          "text": "Original-stage notes and current status. Frozen source records retain historical author-only or proposal-stage wording where it was part of the original packet. Those notes describe that earlier stage and do not replace current status. This report reads approval from exact-digest three-role receipts while retaining source-depth and substantive limitations. Twenty-six later-disputed bindings remain candidate/history records; approved replacements use new IDs after fresh independent review. The original scientific values and qualifications are unchanged, and earlier positive or negative receipts and actual capture/review dates are not erased.",
           "claim_ids": []
         },
         {
@@ -7497,27 +8275,27 @@
         },
         {
           "kind": "method",
-          "text": "Reproduction snapshot. The approved graph used by this authoring recipe has canonical JSON SHA-256 b11f06db72effcdf19e400c3618fb746349e4e6ddf7422ba3c9abd8b5e3c8ed7. Its canonical dataset version is 2.5.0 and canonical file SHA-256 is 948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061. Recompute the graph digest with research_report.canonical_hash after scripts/research_graph.load_graph(root) validates the indexed partitions and canonical bytes. Coverage is recomputed by coverage_summary, rather than copied from a declared total. These identifiers bind this report’s input; they do not claim that a newly prepared archive has been published.",
+          "text": "Reproduction snapshot. This refreshed synthesis binds the validated merged graph with canonical JSON SHA-256 044a17dc52ae6e70d684e18fbf9dc6273be657aa6b80c1074a963f33513160d8. Canonical dataset version 2.5.0 and its exact-file SHA-256 948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061 remain unchanged. Recompute the graph digest with research_report.canonical_hash after research_graph.load_graph validates indexed partitions and canonical bytes. This is a pinned synthesis input, not a frozen eligible-core inventory or a published archive. Any later graph change requires a new synthesis binding and actual separate report reviews.",
           "claim_ids": []
         },
         {
           "kind": "method",
-          "text": "Computed coverage appendix. There are 1,446 approved assertions and 39 historical assertions; 1,486 captured scoped source records represent 480 distinct captured document versions under the version/response-hash rule. Several locators or excerpts can refer to one document version, so scoped-record totals are not independent-document totals. The qualifying corpus has 65 suppliers, 132 paper works, 63 dataset families and 21 benchmark families. Of 39 legacy organizations, 38 have conclusive reviewed inclusion dispositions. These counts are selected-source coverage, not recall against a complete universe.",
+          "text": "Computed coverage appendix. Coverage method 1.3.0 counts 1,713 approved assertions, 26 quarantined candidate assertions and 39 historical assertions. There are 1,790 scoped source records, of which 1,789 are captured; those captured records represent 503 distinct document versions under the version/response-hash rule. Multiple excerpts or locators can refer to one version and are not independent documents. The selected qualifying corpus contains 65 suppliers, 152 distinct paper works, 63 dataset families and 21 benchmark families. All 39 legacy organizations have completed bounded inclusion audits; 38 have conclusive commercial dispositions and BenchFlow remains commercially pending. These are separate measures, and no pending qualification contributes a qualifying supplier or frozen-core disposition.",
           "claim_ids": []
         },
         {
           "kind": "method",
-          "text": "Relationship appendix. Exactly 29 approved assertions in this input use explicit object relationships. The remainder are source-bound typed-text observations, many of which describe workflow stages without a complete typed relationship map. Every predicate is nontransitive. Parent links support work/family coverage accounting only. Neither a paper’s mention of a supplier nor a provider’s capability authorizes an unstated contribution edge, exclusive authorship, contract value or causal performance attribution.",
+          "text": "Relationship appendix. Exactly 216 approved assertions in this input use explicit object relationships. Other observations use source-bound typed values. Every predicate is nontransitive: parent links support work/family accounting only. A paper mentioning a company, using its software or documenting expert recruitment does not authorize an unstated supplier edge, exclusive authorship, contract value or causal performance attribution. Paper versions, dataset releases, formats, aliases and mirrors remain identity evidence rather than automatically creating additional counted objects.",
           "claim_ids": []
         },
         {
           "kind": "method",
-          "text": "Launch gate appendix. The fixed floors require 39 legacy dispositions, 60 qualifying suppliers, 150 reviewed paper works, 60 dataset families, 20 benchmark families and disposition of at least 90% of a frozen eligible core. The core is not yet frozen here. Two separate completed non-fixture audits each require actual 200-record holdouts, source-bound adjudication and independent review identities. Reference precision must reach 98% and recall 95% with no critical false attribution; screening must recover at least 190 eligible records with at least 90% recall in each declared major stratum. These are requirements, not achieved measurements.",
+          "text": "Launch gate appendix. The fixed floors require 39 completed legacy inclusion audits, 60 qualifying suppliers, 150 reviewed paper works, 60 dataset families, 20 benchmark families and disposition of at least 90% of a frozen eligible core. Commercial dispositions are separately reported; BenchFlow’s pending status does not invalidate its completed inclusion audit. The eligible core remains unfrozen. The formal reference and screening audits each require completed non-fixture holdouts and their source-bound, independently adjudicated provenance. Reference precision must reach 98% and recall 95% with no critical false attribution; screening needs at least 190 of 200 eligible records and at least 90% recall in each major stratum. Meeting numerical thresholds in a separate diagnostic does not complete these audits.",
           "claim_ids": []
         },
         {
           "kind": "method",
-          "text": "Audit status and limitations. No audit metric is inferred from assertion approval or a passing schema validator. The actual reference and screening audits have not passed, and no synthetic fixture is presented as publication evidence. Until a frozen eligible core, actual holdout rows and independently adjudicated outcomes exist, market completeness and research precision/recall remain unmeasured. A large reviewed corpus can still be systematically incomplete because discovery favors accessible, documented and searchable sources.",
+          "text": "Audit status and limitations. Formal reference and screening launch audits are incomplete; no approval count, schema pass or diagnostic threshold comparison changes that state. The eligible inventory remains a lower bound under active independent boundary-policy review. Open discovery partitions, unresolved identities and mandatory deep-review gaps prevent a final denominator, census claim or core disposition rate. Accessible and well-documented sources can remain overrepresented despite a large approved corpus. A pinned authoring graph and a frozen diagnostic sample are distinct from a completed, frozen eligible inventory.",
           "claim_ids": []
         },
         {
@@ -7548,6 +8326,26 @@
         {
           "kind": "method",
           "text": "Bibliography reading guide. The entries below provide the reviewed paper-work title, a source URL from its bound evidence and the inspected source version. Claim links carry the exact locator, excerpt hash, qualifications and review identities. A source URL can resolve to a later page; the recorded version and response digest define the reviewed content. Dataset and supplier bibliography records are available through each atlas/dossier’s claim bindings and the evidence ledger; no external affiliation is used as a substitute for a documented contribution.",
+          "claim_ids": []
+        },
+        {
+          "kind": "method",
+          "text": "Reference diagnostic, not launch audit. A private constructed challenge retains all 250 frozen cases sampled from the previously approved corpus. Two independent AI truth workers using the same requested model family established judgments with a third tie-breaker before comparison with the system under test; locator-context boundaries were clarified during adjudication. Under the strict consensus key, the unchanged run records 184 true positives, three false positives, two false negatives and 61 true negatives: precision 184/187 = 98.3957% and recall 184/186 = 98.9247%. These are challenge-specific results, not production accuracy, discovery recall, human peer review or completed reference-audit evidence.",
+          "claim_ids": []
+        },
+        {
+          "kind": "method",
+          "text": "Diagnostic run binding and repair separation. The private reference-holdout-v1/diagnostic-results.v1.json run receipt has file SHA-256 870e45072181561da4203d256f97803b26a9ac0376573cb2024bd57d47b5f46e. Its consensus freeze is 1d6b81a6bf1cf80cc326ced6a3671ea0b100078d48d876360f6e8a63efddba3a and its evaluated-predictions digest is 7fe7d94ff17aa1f60c9339b72b85c33cea9a3df7baef0589cfa36a0b8ececb5c. Source-binding repairs are subsequent remediation. They do not remove or relabel challenge cases, replace the recorded predictions or revise the frozen diagnostic scores. Threshold comparisons leave unresolved formal audit provenance and protocol conditions held.",
+          "claim_ids": []
+        },
+        {
+          "kind": "method",
+          "text": "Source-binding correction ledger. The 26 old-to-new mappings are preserved in the authoring correction ledger with file SHA-256 0ce874b0aacd4fbe9bd70a5074e28b8da0fdb8077bfbac65484344de70cd131c, bound to this exact graph. The ledger records newly approved replacement IDs and their 78 fresh three-role review IDs. This report remaps citations to those approved IDs while retaining the underlying scientific text and substantive qualifications. Original candidate IDs and earlier positive/negative review history remain available in the graph; fresh source review does not serve as an exact-report synthesis review.",
+          "claim_ids": []
+        },
+        {
+          "kind": "method",
+          "text": "Locator reproduction. A locator identifies pinned source bytes and an extraction convention. One-based physical PDF pages differ from printed labels; global marked-text lines count markers and blank lines, while per-page pdftotext-layout coordinates use their declared physical page and tool convention. Preserve source versions, raw-response hashes and supplied derived-text hashes before interpreting a line range. Dataset-card revisions document the inspected card and do not automatically identify every corpus shard. A successful re-extraction is reproducibility evidence, rather than a new capture, scientific finding or independent content review.",
           "claim_ids": []
         },
         {
@@ -7656,7 +8454,7 @@
           "text": "Reviewed-work bibliography — Consent in Crisis: The Rapid Decline of the AI Data Commons. Source: https://arxiv.org/pdf/2407.14933v1. Inspected version: 2407.14933v1.",
           "claim_ids": [
             "cohort7.claim.consentcrisis.corpora",
-            "cohort7.claim.consentcrisis.head",
+            "repair.binding.ten.v1.cohort7.claim.consentcrisis.head",
             "cohort7.claim.consentcrisis.random",
             "cohort7.claim.consentcrisis.signals"
           ]
@@ -7727,7 +8525,7 @@
           "kind": "sourced_fact",
           "text": "Reviewed-work bibliography — DataComp-LM: In search of the next generation of training sets for language models. Source: https://arxiv.org/pdf/2406.11794v1. Inspected version: 2406.11794v1.",
           "claim_ids": [
-            "cohort3.claim.dclm.final-model-mixture",
+            "repair.binding.ten.v1.cohort3.claim.dclm.final-model-mixture",
             "cohort3.claim.dclm.human-rubric-scope",
             "cohort3.claim.dclm.limits",
             "cohort3.claim.dclm.quality-filter",
@@ -7998,7 +8796,7 @@
           "text": "Reviewed-work bibliography — If in a Crowdsourced Data Annotation Pipeline, a GPT-4. Source: https://arxiv.org/pdf/2402.16795v2. Inspected version: 2402.16795v2.",
           "claim_ids": [
             "cohort8.claim.gptpipeline.hybrid-aggregation",
-            "cohort8.claim.gptpipeline.interface",
+            "repair.binding.v1.cohort8.claim.gptpipeline.interface",
             "cohort8.claim.gptpipeline.label-scheme",
             "cohort8.claim.gptpipeline.sample-window"
           ]
@@ -8040,7 +8838,7 @@
             "cohort4.claim.jailbreakbench.adaptive-defense-condition",
             "cohort4.claim.jailbreakbench.author-license-statement",
             "cohort4.claim.jailbreakbench.expert-judge-calibration",
-            "cohort4.claim.jailbreakbench.paired-behaviors"
+            "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors"
           ]
         },
         {
@@ -8058,7 +8856,7 @@
           "text": "Reviewed-work bibliography — Learning from Natural Language Feedback. Source: https://arxiv.org/pdf/2204.14146v1. Inspected version: 2204.14146v1.",
           "claim_ids": [
             "cohort5.claim.languagefeedback.human-feedback",
-            "cohort5.claim.languagefeedback.main-evaluator",
+            "repair.binding.ten.v1.cohort5.claim.languagefeedback.main-evaluator",
             "cohort5.claim.languagefeedback.result",
             "cohort5.claim.languagefeedback.selection",
             "cohort5.claim.languagefeedback.test-protocol"
@@ -8719,7 +9517,7 @@
             "cohort6.claim.agentcompany.claude-result",
             "cohort6.claim.agentcompany.curation-labor",
             "cohort6.claim.agentcompany.full-score",
-            "cohort6.claim.agentcompany.human-baseline-limit"
+            "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit"
           ]
         },
         {
@@ -8766,8 +9564,8 @@
           "kind": "sourced_fact",
           "text": "Reviewed-work bibliography — TruthfulQA: Measuring How Models Mimic Human Falsehoods. Source: https://arxiv.org/pdf/2109.07958v2. Inspected version: 2109.07958v2.",
           "claim_ids": [
-            "candidate.paperfull.truthfulqa.blinded-human-evaluation",
-            "candidate.paperfull.truthfulqa.external-validation-sample",
+            "repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation",
+            "repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample",
             "candidate.paperfull.truthfulqa.gptjudge-training-labels"
           ]
         },
@@ -8778,7 +9576,7 @@
             "cohort8.claim.ttrl.binary-vote",
             "cohort8.claim.ttrl.consensus-reward",
             "cohort8.claim.ttrl.test-adaptation",
-            "cohort8.claim.ttrl.vote-then-sample"
+            "repair.binding.ten.v1.cohort8.claim.ttrl.vote-then-sample"
           ]
         },
         {
@@ -8795,7 +9593,7 @@
           "kind": "sourced_fact",
           "text": "Reviewed-work bibliography — VAPO: Efficient and Reliable Reinforcement Learning for Advanced Reasoning Tasks. Source: https://arxiv.org/pdf/2504.05118v3. Inspected version: 2504.05118v3.",
           "claim_ids": [
-            "cohort8.claim.vapo.decoupled-gae",
+            "repair.binding.v1.cohort8.claim.vapo.decoupled-gae",
             "cohort8.claim.vapo.length-adaptive",
             "cohort8.claim.vapo.positive-example-loss",
             "cohort8.claim.vapo.value-pretraining"
@@ -8897,6 +9695,206 @@
             "cohort3.claim.cascades.four-categories",
             "cohort3.claim.cascades.interview-design",
             "cohort3.claim.cascades.within-sample-prevalence"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — AutoLibra: Agent Metric Induction from Open-Ended Human Feedback. Source: https://arxiv.org/pdf/2505.02820v3. Inspected version: 2505.02820v3.",
+          "claim_ids": [
+            "cohort9.claim.autolibra.feedback-limit",
+            "cohort9.claim.autolibra.feedback-source",
+            "cohort9.claim.autolibra.induction-judge",
+            "cohort9.claim.autolibra.validation-denominator"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — Aya Dataset: An Open-Access Collection for Multilingual Instruction Tuning. Source: https://arxiv.org/pdf/2402.06619v1. Inspected version: 2402.06619v1.",
+          "claim_ids": [
+            "cohort9.claim.aya.dataset-composition",
+            "cohort9.claim.aya.inclusion",
+            "cohort9.claim.aya.quality-limit",
+            "cohort9.claim.aya.review-pipeline"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — CrowdAgent: Multi-Agent Managed Multi-Source Annotation System. Source: https://aclanthology.org/2025.emnlp-demos.72.pdf. Inspected version: ACL-Anthology-2025.emnlp-demos.72-captured-copy.",
+          "claim_ids": [
+            "cohort9.claim.crowdagent.fixed-human-ratios",
+            "cohort9.claim.crowdagent.hidden-gold",
+            "cohort9.claim.crowdagent.human-routing",
+            "cohort9.claim.crowdagent.residual-errors"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — CrowdTruth 2.0: Quality Metrics for Crowdsourcing with Disagreement. Source: https://arxiv.org/pdf/1808.06080v1. Inspected version: 1808.06080v1.",
+          "claim_ids": [
+            "cohort9.claim.crowdtruth.iterative-metrics",
+            "cohort9.claim.crowdtruth.open-task-limit",
+            "cohort9.claim.crowdtruth.vectorization",
+            "cohort9.claim.crowdtruth.worker-score"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — A Data-Driven Analysis of Workers' Earnings on Amazon Mechanical Turk. Source: https://arxiv.org/pdf/1712.05796v2. Inspected version: 1712.05796v2.",
+          "claim_ids": [
+            "cohort9.claim.earnings.causality-limit",
+            "cohort9.claim.earnings.sample",
+            "cohort9.claim.earnings.wage-definition",
+            "cohort9.claim.earnings.work-unit-wages"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — Experts Rise Where LLMs Disagree: Using Cross-Model Disagreement to Target Expert Effort in LLM Codebook Revision for Large-Scale Annotation. Source: https://arxiv.org/pdf/2609.26926v1. Inspected version: 2609.26926v1.",
+          "claim_ids": [
+            "cohort9.claim.expertsrise.disagreement-targeting",
+            "cohort9.claim.expertsrise.expert-effort",
+            "cohort9.claim.expertsrise.heldout-result",
+            "cohort9.claim.expertsrise.scope-limit"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — Garbage In, Garbage Out? Do Machine Learning Application Papers in Social Computing Report Where Human-Labeled Training Data Comes From?. Source: https://arxiv.org/pdf/1912.08320v1. Inspected version: 1912.08320v1.",
+          "claim_ids": [
+            "cohort9.claim.gigo.audit-limit",
+            "cohort9.claim.gigo.instructions",
+            "cohort9.claim.gigo.reconciliation",
+            "cohort9.claim.gigo.source-disclosure"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — ChatGPT Outperforms Crowd-Workers for Text-Annotation Tasks. Source: https://arxiv.org/pdf/2303.15056v2. Inspected version: 2303.15056v2.",
+          "claim_ids": [
+            "cohort9.claim.gilardi.consistency-scope",
+            "cohort9.claim.gilardi.crowd-control",
+            "cohort9.claim.gilardi.gold-denominator",
+            "cohort9.claim.gilardi.matched-instructions"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — HelpSteer: Multi-attribute Helpfulness Dataset for SteerLM. Source: https://arxiv.org/pdf/2311.09528v1. Inspected version: 2311.09528v1.",
+          "claim_ids": [
+            "cohort9.claim.helpsteer.attribute-correlations",
+            "cohort9.claim.helpsteer.independent-ratings",
+            "cohort9.claim.helpsteer.language-cultural-limit",
+            "cohort9.claim.helpsteer.recruitment-qa"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — HelpSteer2: Open-source dataset for training top-performing reward models. Source: https://arxiv.org/pdf/2406.08673v1. Inspected version: 2406.08673v1.",
+          "claim_ids": [
+            "cohort9.claim.helpsteer2.adaptive-redundancy",
+            "cohort9.claim.helpsteer2.agreement-selection",
+            "cohort9.claim.helpsteer2.rewardbench",
+            "cohort9.claim.helpsteer2.scope-limit"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — Inherent Disagreements in Human Textual Inferences. Source: https://aclanthology.org/Q19-1043.pdf. Inspected version: ACL-Anthology-Q19-1043-captured-copy.",
+          "claim_ids": [
+            "cohort9.claim.inherent.filtering",
+            "cohort9.claim.inherent.normalization-limit",
+            "cohort9.claim.inherent.sampling",
+            "cohort9.claim.inherent.secondary-mode"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — LabelAId: Just-in-time AI Interventions for Improving Human Labeling Quality and Domain Knowledge in Crowdsourcing Systems. Source: https://arxiv.org/pdf/2403.09810v1. Inspected version: 2403.09810v1.",
+          "claim_ids": [
+            "cohort9.claim.labelaid.adjudication-study",
+            "cohort9.claim.labelaid.precision-time",
+            "cohort9.claim.labelaid.sample-model-limit",
+            "cohort9.claim.labelaid.weak-supervision"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — Pervasive Label Errors in Test Sets Destabilize Machine Learning Benchmarks. Source: https://arxiv.org/pdf/2103.14749v4. Inspected version: 2103.14749v4.",
+          "claim_ids": [
+            "cohort9.claim.labelerrors.correction-limit",
+            "cohort9.claim.labelerrors.five-reviewers",
+            "cohort9.claim.labelerrors.imagenet-validation",
+            "cohort9.claim.labelerrors.screening"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — Efficient Data Labeling by Hierarchical Crowdsourcing with Large Language Models. Source: https://aclanthology.org/2025.coling-main.748.pdf. Inspected version: ACL-Anthology-2025.coling-main.748-captured-copy.",
+          "claim_ids": [
+            "cohort9.claim.lmcrowd.cost-boundary",
+            "cohort9.claim.lmcrowd.generalization-limit",
+            "cohort9.claim.lmcrowd.hierarchy",
+            "cohort9.claim.lmcrowd.main-setting"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — Quality Assured: Rethinking Annotation Strategies in Imaging AI. Source: https://arxiv.org/pdf/2407.17596v2. Inspected version: 2407.17596v2.",
+          "claim_ids": [
+            "cohort9.claim.qualityassured.instruction-conditions",
+            "cohort9.claim.qualityassured.limits-identity",
+            "cohort9.claim.qualityassured.qa-result",
+            "cohort9.claim.qualityassured.study-units"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — RECODE-H: A Benchmark for Research Code Development with Interactive Human Feedback. Source: https://arxiv.org/pdf/2510.06186v2. Inspected version: 2510.06186v2.",
+          "claim_ids": [
+            "cohort9.claim.recodeh.bounded-evaluation",
+            "cohort9.claim.recodeh.expert-construction",
+            "cohort9.claim.recodeh.metric-scope",
+            "cohort9.claim.recodeh.simulated-feedback"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — Cheap and Fast – But is it Good? Evaluating Non-Expert Annotations for Natural Language Tasks. Source: https://aclanthology.org/D08-1027.pdf. Inspected version: ACL-Anthology-D08-1027-captured-copy.",
+          "claim_ids": [
+            "cohort9.claim.snow.affect-training",
+            "cohort9.claim.snow.redundancy",
+            "cohort9.claim.snow.restricted-task",
+            "cohort9.claim.snow.temporal-vote"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — UltraFeedback: Boosting Language Models with Scaled AI Feedback. Source: https://arxiv.org/pdf/2310.01377v2. Inspected version: 2310.01377v2.",
+          "claim_ids": [
+            "cohort9.claim.ultrafeedback.bias-limit",
+            "cohort9.claim.ultrafeedback.human-agreement",
+            "cohort9.claim.ultrafeedback.model-sampling",
+            "cohort9.claim.ultrafeedback.simultaneous-rubrics"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — Who Annotates in NLP? A Large-scale Assessment of Human Annotation Reporting between 2018 and 2025. Source: https://arxiv.org/pdf/2606.02255v3. Inspected version: 2606.02255v3.",
+          "claim_ids": [
+            "cohort9.claim.whoannotates.adjudication",
+            "cohort9.claim.whoannotates.audit-limit",
+            "cohort9.claim.whoannotates.reporting-pattern",
+            "cohort9.claim.whoannotates.task-level-audit"
+          ]
+        },
+        {
+          "kind": "sourced_fact",
+          "text": "Reviewed-work bibliography — WildChat: 1M ChatGPT Interaction Logs in the Wild. Source: https://arxiv.org/pdf/2405.01470v1. Inspected version: 2405.01470v1.",
+          "claim_ids": [
+            "cohort9.claim.wildchat.anonymization",
+            "cohort9.claim.wildchat.consent-gate",
+            "cohort9.claim.wildchat.count-conflict",
+            "cohort9.claim.wildchat.selection-limit"
           ]
         }
       ]
