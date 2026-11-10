@@ -580,7 +580,7 @@ def normalize_identifier(scheme, identifier):
 
 
 def coverage_summary(graph):
-    """Compute counts from records; candidates, aliases and versions do not inflate them."""
+    """Compute coverage from records; candidate assertions, aliases and versions add no approved coverage."""
     validate_graph(graph)
     assertions = {a["id"]: a for a in graph["assertions"] if a["status"] == "approved"}
     reviewed = {e['id']: e for e in graph['entities'] if e['status'] == 'approved'

@@ -268,7 +268,7 @@ def report_markdown(context):
                     for cid in finding['claim_ids']), ''])
             if withheld:
                 lines.extend([WITHHELD, ''])
-    lines.extend(["## Evidence and reproduction", "", "The accompanying clean-dataset.json, CSV and SQLite contain the same versioned public projection. Canonical dataset 2.5.0 remains unchanged outside this archive. Contact details and raw source text are excluded from this projection. Review receipts describe actual review scope; a candidate is not a deeply reviewed record.", "",
+    lines.extend(["## Evidence and reproduction", "", "The accompanying clean-dataset.json, CSV and SQLite contain the same versioned public projection. Canonical dataset 2.5.0 remains unchanged outside this archive. Contact details and raw source text are excluded from this projection. Review receipts describe actual scope. Candidate assertions and metadata-only discoveries are excluded from approved evidence; completed inclusion audits may leave commercial qualification unresolved.", "",
                   "Open evidence.html for offline entity dossiers, a recorded-scope comparison table, assertions, source bindings and review receipts. Use MANIFEST.json to verify each file's SHA-256. The archive is self-contained and makes no network requests. Source URLs and identifiers are retained in the accompanying public graph.", ""])
     return privacy_filter("\n".join(lines))
 
