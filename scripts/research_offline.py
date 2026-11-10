@@ -59,6 +59,14 @@ def _article(kind, stable_id, title, body):
     return '<article id="' + _escape(kind + '-' + stable_id) + '"><h3>' + _escape(title) + '</h3>' + body + '</article>'
 
 
+def _qualifications(assertion):
+    # Creation-stage wording remains digest-bound. Its original pending state
+    # must not be confused with the later approval and receipts shown beside it.
+    return '<ul>' + ''.join('<li>' + (
+        '<strong>Original author-stage note:</strong> ' if text.startswith('Author-only candidate') else ''
+    ) + _escape(text) + '</li>' for text in assertion.get('qualifications', [])) + '</ul>'
+
+
 def _source_url(value):
     try:
         parsed = urlsplit(value)
@@ -100,7 +108,7 @@ def offline_appendix(projection):
         evidence = '<ul>' + ''.join('<li>' + _link('source', item['source_id']) + ' · Locator: ' + _escape(item.get('locator', 'Not recorded')) + ' · Excerpt SHA-256: ' + _escape(item.get('excerpt_sha256') or 'Not recorded') + '</li>' for item in assertion.get('evidence', [])) + '</ul>'
         reviews = ', '.join(_link('review', rid) for rid in assertion.get('review_ids', [])) or 'No fresh research review claimed.'
         approved_or_historical = assertion.get('status') in {'approved', 'historical'}
-        content = _statement(assertion, entities) + '<h4>Qualifications</h4>' + _value(assertion.get('qualifications', [])) if approved_or_historical else '<p>Unapproved wording is withheld from findings.</p>'
+        content = _statement(assertion, entities) + '<h4>Qualifications</h4>' + _qualifications(assertion) if approved_or_historical else '<p>Unapproved wording is withheld from findings.</p>'
         body.append(_article('assertion', assertion['id'], assertion['id'], '<p><strong>' + _escape(assertion['status'].capitalize()) + '</strong> · As of ' + _escape(assertion.get('as_of', 'Not recorded')) + ' · Provenance: ' + _escape(assertion.get('provenance_kind', 'Not recorded')) + '</p>' + content + '<h4>Source bindings</h4>' + evidence + '<p>Review receipts: ' + reviews + '</p>'))
     body.append('</section><section id="sources"><h2>Source metadata</h2><p>URLs are citations for optional consultation. Reading this appendix needs no connection; source bodies and excerpts are not reproduced here.</p>')
     for source in sorted(graph['sources'], key=lambda row: row['id']):
@@ -111,4 +119,4 @@ def offline_appendix(projection):
         details = {key: review.get(key) for key in ('role', 'reviewer', 'reviewer_type', 'invocation_id', 'reviewed_on', 'verdict', 'method', 'note', 'assertion_sha256')}
         body.append(_article('review', review['id'], review['id'], _value(details) + '<p>Assertions: ' + ', '.join(_link('assertion', aid) for aid in review.get('assertion_ids', [])) + '</p><p>Sources: ' + ', '.join(_link('source', sid) for sid in review.get('source_ids', [])) + '</p>'))
     body.append('</section>')
-    return ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Offline evidence appendix</title><style>body{max-width:100ch;margin:3rem auto;padding:0 1rem;font:17px/1.6 system-ui;color:#18312c}h1,h2,h3{line-height:1.25}h2{margin-top:3rem}article{border-top:1px solid #ccd6d0;padding:1rem 0}p,dd,td,th{overflow-wrap:anywhere}dt{font-weight:600}dd{margin:0 0 .5rem 1rem}.table{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{padding:.6rem;border:1px solid #ccd6d0;text-align:left;vertical-align:top}a{color:#125b4b}nav{margin:1.5rem 0}@media print{body{font-size:10pt}.table{overflow:visible}}</style></head><body><main>' + '\n'.join(body) + '</main></body></html>\n').encode('utf-8')
+    return ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Offline evidence appendix</title><style>body{max-width:100ch;margin:3rem auto;padding:0 1rem;font:17px/1.6 system-ui;color:#18312c;overflow-wrap:anywhere}h1,h2,h3{line-height:1.25}h2{margin-top:3rem}article{border-top:1px solid #ccd6d0;padding:1rem 0}h1,h2,h3,h4,p,dt,dd,td,th,nav{overflow-wrap:anywhere}dt{font-weight:600}dd{margin:0 0 .5rem 1rem}.table{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{padding:.6rem;border:1px solid #ccd6d0;text-align:left;vertical-align:top}a{color:#125b4b}nav{margin:1.5rem 0}@media print{body{font-size:10pt}.table{overflow:visible}}</style></head><body><main>' + '\n'.join(body) + '</main></body></html>\n').encode('utf-8')

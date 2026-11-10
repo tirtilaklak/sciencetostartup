@@ -319,7 +319,7 @@ test('imported executive judgments retain stable anchors and approved evidence i
   expect(archiveResponse.ok()).toBeTruthy();
   const archive = await archiveResponse.body();
   // Use only Python's standard-library ZIP reader, with the actual downloaded bytes.
-  const extraction = spawnSync('python3', ['-c', 'import io,json,sys,zipfile\nz=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read()))\nprint(json.dumps({name:z.read(name).decode() for name in ["report.html","report.md","evidence.html","MANIFEST.json","source-context.json"]}))'], { input: archive, maxBuffer: 20 * 1024 * 1024 });
+  const extraction = spawnSync('python3', ['-c', 'import io,json,sys,zipfile\nz=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read()))\nprint(json.dumps({name:z.read(name).decode() for name in ["report.html","report.md","evidence.html","MANIFEST.json","source-context.json"]}))'], { input: archive, maxBuffer: 64 * 1024 * 1024 });
   expect(extraction.status, extraction.stderr?.toString()).toBe(0);
   const packaged = JSON.parse(extraction.stdout.toString());
   const inventory = JSON.parse(packaged['MANIFEST.json']);
@@ -333,7 +333,7 @@ test('imported executive judgments retain stable anchors and approved evidence i
     archiveSHA256: createHash('sha256').update(archive).digest('hex') })), contentType: 'application/json' });
   await page.goto(reportPath);
   await expect(page.locator('.r-finding')).toHaveCount(findings.length);
-  const offlineContext = await browser.newContext({ javaScriptEnabled: false, offline: true });
+  const offlineContext = await browser.newContext({ javaScriptEnabled: false, offline: true, viewport: { width: 412, height: 915 } });
   const offlineDirectory = mkdtempSync(resolve(tmpdir(), 'sts-research-archive-'));
   try {
     for (const name of ['report.html', 'evidence.html']) writeFileSync(resolve(offlineDirectory, name), packaged[name]);
@@ -380,6 +380,8 @@ test('imported executive judgments retain stable anchors and approved evidence i
     for (const cid of citedClaims) {
       await expect(offline.locator(selector('assertion-' + cid))).toHaveCount(1);
     }
+    expect(await offline.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+      'The complete offline appendix must fit a mobile viewport, including long record IDs and review notes').toBe(true);
     expect(unexpectedRequests, 'Archived report and evidence must require no external requests').toEqual([]);
     await page.goto('/research/data/');
     for (const cid of new Set(findings.flatMap(finding => finding.claim_ids))) {
