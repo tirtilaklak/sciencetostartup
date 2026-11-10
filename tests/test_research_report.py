@@ -66,6 +66,19 @@ def approved_graph(captured_on="2026-11-06T20:00:00Z", reviewed_on="2026-11-09T2
 
 
 class ReportGateTests(unittest.TestCase):
+    def test_final_archive_gate_requires_verified_production_zenodo_receipt(self):
+        report = test_report()
+        receipt = {"status": "published", "doi": "10.5281/zenodo.12345", "record_url": "https://zenodo.org/records/12345",
+                   "api_origin": "https://zenodo.org", "environment": "production", "verified": True,
+                   "artifact_sha256": "a" * 64, "release_id": "test-fixture", "confirmed_on": "2026-11-10T01:00:00Z"}
+        report["archive"] = receipt
+        self.assertFalse(publication_gate(empty_graph(), report)["archive_reasons"])
+        for changes in ({"api_origin": "https://sandbox.zenodo.org"}, {"environment": "sandbox"}, {"verified": False},
+                        {"record_url": "https://example.org/records/12345"}, {"doi": "10.5281/zenodo.999"},
+                        {"confirmed_on": "2026-11-10"}, {"status": "prepared"}):
+            report["archive"] = {**receipt, **changes}
+            self.assertTrue(publication_gate(empty_graph(), report)["archive_reasons"], changes)
+
     def test_audit_cannot_borrow_receipts_from_another_assertion_on_same_source(self):
         graph = approved_graph()
         graph["assertions"].append({**copy.deepcopy(graph["assertions"][0]), "id": "other-claim"})

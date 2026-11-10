@@ -12,6 +12,7 @@ import math
 import re
 from datetime import date, datetime, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -321,10 +322,21 @@ def publication_gate(graph, report, policy=None):
     archival_ready = not reasons
     archive_reasons = []
     archive = report.get("archive", {})
-    if not (archive.get("status") == "published" and re.fullmatch(r"10\.\d{4,9}/\S+", archive.get("doi") or "")
-            and str(archive.get("record_url", "")).startswith("https://")
+    record_url = urlparse(str(archive.get("record_url", "")))
+    try:
+        _timestamp(archive.get("confirmed_on"))
+        confirmation_valid = True
+    except (TypeError, ValueError):
+        confirmation_valid = False
+    if not (archive.get("status") == "published" and re.fullmatch(r"10\.5281/zenodo\.\d+", archive.get("doi") or "")
+            and archive.get("api_origin") == "https://zenodo.org"
+            and archive.get("environment") == "production" and archive.get("verified") is True
+            and record_url.scheme == "https" and record_url.netloc == "zenodo.org"
+            and re.fullmatch(r"/records/\d+/?", record_url.path)
+            and not record_url.query and not record_url.fragment
+            and (archive.get("doi") or "").rsplit(".", 1)[-1] == record_url.path.strip("/").split("/")[-1]
             and re.fullmatch(r"[0-9a-f]{64}", archive.get("artifact_sha256") or "")
-            and archive.get("release_id") == report.get("release_id") and archive.get("confirmed_on")):
+            and archive.get("release_id") == report.get("release_id") and confirmation_valid):
         archive_reasons.append("An actual public versioned archive receipt with DOI and exact artifact digest is required; a prepared package is not publication.")
     reasons.extend(archive_reasons)
     reasons = list(dict.fromkeys(reasons))

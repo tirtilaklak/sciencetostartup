@@ -93,6 +93,10 @@ class ResearchGraphTests(unittest.TestCase):
         summary = rg.coverage_summary(graph)
         self.assertEqual(summary["approved_assertions"], 0)
         self.assertEqual(summary["reviewed_papers"], 0)
+        exported = rg.public_graph(graph)
+        self.assertEqual(exported["assertions"], [])
+        self.assertEqual(exported["reviews"], [])
+        self.assertNotIn("Synthetic test observation", rg.stable_json(exported))
 
     def test_single_invocation_cannot_impersonate_reviewers(self):
         graph = fixture()

@@ -477,6 +477,20 @@ def public_graph(graph):
     for key, fields in (("entities", ENTITY_FIELDS), ("sources", SOURCE_FIELDS),
                         ("assertions", ASSERTION_FIELDS), ("reviews", REVIEW_FIELDS)):
         projection[key] = [{k: row[k] for k in fields if k in row} for row in projection.get(key, [])]
+    # Unreviewed draft wording stays in the private intake/review queue. Public
+    # metadata may describe a coverage gap, but exports must not leak its proposed
+    # factual claim merely because the row has a candidate label.
+    projection["assertions"] = [row for row in projection["assertions"] if row.get("status") != "candidate"]
+    kept = {row["id"] for row in projection["assertions"]}
+    for entity in projection["entities"]:
+        entity["assertion_ids"] = [aid for aid in entity.get("assertion_ids", []) if aid in kept]
+    retained_reviews = []
+    for review in projection["reviews"]:
+        review["assertion_ids"] = [aid for aid in review.get("assertion_ids", []) if aid in kept]
+        if review["assertion_ids"]:
+            review["assertion_sha256"] = {aid: review["assertion_sha256"][aid] for aid in review["assertion_ids"]}
+            retained_reviews.append(review)
+    projection["reviews"] = retained_reviews
     projection = _redact(projection)
     validate_graph(projection)
     for key in ("entities", "sources", "assertions", "reviews"):

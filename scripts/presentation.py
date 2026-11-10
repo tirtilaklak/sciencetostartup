@@ -351,7 +351,10 @@ def build_presentation(data, destination, root, sidecars, release):
         products = next((e.get("products", []) for e in sidecars["PROFILE_CONTENT"]["entries"] if e["company_id"] == company["id"]), [])
         search_rows.append({"id": company["id"], "name": company["name"], "summary": entry.get("summary", company.get("description", "")), "group": entry.get("primary_offering", ""), "products": [p["name"] for p in products], "href": "/company/" + company["id"] + "/"})
     for entry in sidecars.get("RESEARCH_SEARCH", []):
-        search_rows.append({"id": entry["url"], "name": entry["title"], "summary": entry["summary"], "group": entry["kind"], "products": entry.get("keywords", []), "href": entry["url"]})
+        keywords = entry.get("keywords", [])
+        if isinstance(keywords, str):
+            keywords = keywords.split()
+        search_rows.append({"id": entry["url"], "name": entry["title"], "summary": entry["summary"], "group": entry["kind"], "products": keywords, "href": entry["url"]})
     summary["researchSearchEntries"] = sidecars.get("RESEARCH_SEARCH", [])
     summary["homeSearch"] = write_asset(destination, "search", dict(identity, entries=search_rows))
     company_map = {company["id"]: company for company in data["companies"]}
