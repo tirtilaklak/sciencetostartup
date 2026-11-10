@@ -275,7 +275,7 @@ def _hub(context, editions=()):
             '<aside class="r-report-card" aria-label="Current research report"><p class="r-kicker">The research report</p>'
             f'<h2>{_link(REPORT_PATH, report["title"])}</h2><p>12 chapters. Source-level evidence. Clear limits.</p>'
             '<div class="r-report-rule" aria-hidden="true"><span></span><span></span><span></span><span></span></div>'
-            f'<p>{sp.escape(report.get("summary"))}</p>{_link(REPORT_PATH, "Read the framework →", "r-button")}</aside></header>'
+            f'<p>{sp.escape(report.get("summary"))}</p>{_link(REPORT_PATH, "Read the research →", "r-button")}</aside></header>'
             '<section class="r-section" aria-labelledby="coverage"><div class="r-section-head"><div><p class="r-kicker">Progress you can inspect</p>'
             '<h2 id="coverage">Evidence before conclusions.</h2></div>'
             f'{_link("/research/data/", "Coverage, sources & downloads →", "r-text-link")}</div>'
@@ -284,8 +284,8 @@ def _hub(context, editions=()):
             + f'<p class="r-meta">{sp.escape(_counts(context))}</p></section>'
             '<section class="r-section" aria-labelledby="browse"><div class="r-section-head"><div><p class="r-kicker">Explore the evidence</p>'
             '<h2 id="browse">Start with a question.</h2></div></div>' + _browse(context) + "</section>"
-            '<section class="r-section r-chapter-preview" aria-labelledby="chapters"><div><p class="r-kicker">A practical research framework</p>'
-            '<h2 id="chapters">From source to decision.</h2><p>Read the methods and decision framework while the evidence corpus is prepared. '
+            '<section class="r-section r-chapter-preview" aria-labelledby="chapters"><div><p class="r-kicker">Evidence and buyer decisions</p>'
+            '<h2 id="chapters">From source to decision.</h2><p>Read the reviewed baseline, methods, and buyer decision guides while coverage expands. '
             'Historical examples carry their original dates; unresolved questions stay visible.</p>'
             f'{_link("/review/", "Help review a specific claim →", "r-text-link")}</div><ol class="r-chapter-list">{chapters}</ol></section>'
             + archive_links)
@@ -488,7 +488,7 @@ def _report(context, edition=False):
             + chapters + '<section class="r-chapter" id="cite"><h2>Cite this work</h2>'
             f'<p>{sp.escape(context["identity"].get("publisher", {}).get("name", sp.PUBLISHER_NAME))}. '
             f'<cite>{sp.escape(report["title"])}</cite>. {sp.escape(report["release_id"])}. {_date(report["updated_on"])}.</p>'
-            + ('' if edition or (context["gate"].get("ready") and report.get("status") == "published") else '<p>This is a prepublication framework. No published research edition or DOI is claimed.</p>')
+            + ('' if edition or (context["gate"].get("ready") and report.get("status") == "published") else '<p>This is a prepublication research snapshot. No published research edition or DOI is claimed.</p>')
             + _link("/research/data/#citation", "Citation formats & reuse →", "r-text-link") + '</section></div></div>')
 
 
@@ -538,7 +538,7 @@ def _data(context):
             '<section class="r-section" id="citation"><h2>Cite and reproduce</h2>'
             f'<p>{sp.escape(context["identity"].get("publisher", {}).get("name", sp.PUBLISHER_NAME))}. <cite>{sp.escape(report["title"])}</cite>. '
             f'{sp.escape(report["release_id"])}. {_date(report["updated_on"])}.</p>'
-            + ('' if gate.get("ready") and report.get("status") == "published" else '<p>Prepublication framework. No published edition, permanent archive, or DOI is claimed.</p>')
+            + ('' if gate.get("ready") and report.get("status") == "published" else '<p>Prepublication research snapshot. No published edition, permanent archive, or DOI is claimed.</p>')
             + f'<ul class="r-downloads">{cite}</ul><p>Reuse owned research under '
             + _link(sp.DATA_LICENSE, "CC BY 4.0") + '. Credit the publisher, release ID, original sources, and your changes. '
             'Source material retains its own rights and qualifications.</p>'

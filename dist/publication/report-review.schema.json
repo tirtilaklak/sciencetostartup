@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sciencetostartup.com/schema/report-review.schema.json",
+  "title": "Actual report synthesis review registry",
+  "type": "object",
+  "required": ["schema_version", "reviews"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "reviews": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["fixture", "role", "decision", "method", "reviewer_type", "reviewer", "invocation_id", "reviewed_on", "report_sha256", "graph_sha256"],
+        "properties": {
+          "fixture": {"const": false},
+          "role": {"enum": ["evidence_auditor", "adversarial"]},
+          "decision": {"enum": ["pass", "revise", "reject"]},
+          "method": {"const": "report_content_review"},
+          "reviewer_type": {"enum": ["ai", "human"]},
+          "reviewer": {"type": "string", "minLength": 1},
+          "invocation_id": {"type": "string", "minLength": 1},
+          "reviewed_on": {"type": "string", "format": "date-time"},
+          "report_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "graph_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,13 +1,13 @@
 {
   "files": {
-    "research-assertions.csv": "e44bfe75786726a3c0e5f3eccfd5ae6c0f32195f23508dc0ae0d2407ccc80f8a",
-    "research-entities.csv": "8eb9bb2ffcaa9917e9ad7b4b4514a2a99152d8c6ca59da3145dbecdce76e684d",
-    "research-graph.json": "f36014d5c8da20330a102a2283c79f654f27f7ff545e97b914086ffa5f6a9479",
-    "research-graph.sqlite": "665890e77fbe372bdf7402640c6a6203e0e2578b48ee1428e95a12abba52180e",
-    "research-reviews.csv": "7e417808e7b286639d3f8ad87fbfe4db6e8e9470e9a7b9d1aff573a066098899",
-    "research-sources.csv": "5d17d6d69cad7072b519cb290728c43748e9ce80133e29dfb2cedf7f0bb304b4"
+    "research-assertions.csv": "48691eefb025f86aa73cc017381bce4d1c00d72e7a491389534823aab034d876",
+    "research-entities.csv": "2a58edd8c6cc69a617e3e107b2877faa78e1995c62738595f294c0667aa0de5e",
+    "research-graph.json": "6aa2d4ac1e399f28d1966401df48a26a746f044f27b1245c4196bb7fcc03c5d8",
+    "research-graph.sqlite": "333991a7f5a9a81d51b9ef53284abb9036071311eac84a39282104c400fc7404",
+    "research-reviews.csv": "8ce8b156c78ee690dc504b7643d1cf003d60f8fd99d38434b82a1ef746f0e3bb",
+    "research-sources.csv": "be65f879ed358524f95091fd05f25be070ea71131686f202e657f497e76afc86"
   },
   "projection": "privacy-filtered-research-graph",
-  "release_id": "research-2026-11-09.prelaunch.2",
+  "release_id": "research-2026-11-09.prelaunch.3",
   "schema_version": "1.0.0"
 }

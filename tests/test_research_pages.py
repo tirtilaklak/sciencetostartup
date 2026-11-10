@@ -40,12 +40,15 @@ class Facts(HTMLParser):
 
 def approved_new_org(context):
     """Promote one test-only source-bound assertion with honest fixture receipts."""
-    assertion = next(a for a in context['graph']['assertions'] if a['subject_id'] == 'org.translated')
-    assertion.update(status='approved', review_ids=[], qualifications=['Synthetic approval fixture only.'])
-    for entity in context['graph']['entities']:
-        if entity['id'] == 'org.translated':
-            entity.update(status='approved', disposition='included', review_depth='full_source')
-    context['graph']['reviews'] = [r for r in context['graph']['reviews'] if assertion['id'] not in r['assertion_ids']]
+    original = next(a for a in context['graph']['assertions'] if a['subject_id'] == 'org.translated')
+    assertion = copy.deepcopy(original)
+    assertion.update(id='fixture.claim.new-org', subject_id='org.fixture_translated', status='approved',
+                     review_ids=[], qualifications=['Synthetic approval fixture only.'])
+    entity = copy.deepcopy(next(e for e in context['graph']['entities'] if e['id'] == 'org.translated'))
+    entity.update(id='org.fixture_translated', status='approved', disposition='included',
+                  review_depth='full_source', identifiers={}, assertion_ids=[assertion['id']])
+    context['graph']['entities'].append(entity)
+    context['graph']['assertions'].append(assertion)
     for role in ('author', 'source_verifier', 'adversarial'):
         review_id = 'fixture.review.' + role
         assertion['review_ids'].append(review_id)
@@ -136,9 +139,9 @@ class ResearchPageTests(unittest.TestCase):
         claim = approved_new_org(self.context)
         records = self.build()
         paths = [row['path'] for row in records]
-        self.assertIn('/company/org.translated/', paths)
+        self.assertIn('/company/org.fixture_translated/', paths)
         self.assertNotIn('/company/mercor/', paths)
-        page = self.page('/company/org.translated/')
+        page = self.page('/company/org.fixture_translated/')
         self.assertIn('Translated', page)
         self.assertIn('supplies data for', page)
         self.assertIn('Synthetic approval fixture only.', page)
@@ -147,14 +150,14 @@ class ResearchPageTests(unittest.TestCase):
         self.assertIn(source['excerpt'].replace("'", '&#x27;'), page)
         for role in ('author', 'source_verifier', 'adversarial'):
             self.assertIn('test-only-distinct-' + role, page)
-        self.assertTrue(any(e['url'] == '/company/org.translated/' for e in rp.research_search_entries(self.context)))
+        self.assertTrue(any(e['url'] == '/company/org.fixture_translated/' for e in rp.research_search_entries(self.context)))
 
     def test_object_only_approval_does_not_create_new_company_profile(self):
         claim = approved_new_org(self.context)
         claim['subject_id'], claim['object_id'] = claim['object_id'], claim['subject_id']
         paths = [row['path'] for row in self.build()]
-        self.assertNotIn('/company/org.translated/', paths)
-        self.assertNotIn('href="/company/org.translated/"', self.page('/research/data/'))
+        self.assertNotIn('/company/org.fixture_translated/', paths)
+        self.assertNotIn('href="/company/org.fixture_translated/"', self.page('/research/data/'))
 
     def test_source_and_assertion_permalinks_resolve_to_unique_visible_targets(self):
         self.build()

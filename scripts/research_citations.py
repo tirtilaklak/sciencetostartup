@@ -226,6 +226,8 @@ def citation_formats(metadata):
 
 
 def report_markdown(context):
+    # Filter before Markdown escaping can split an email or credential pattern.
+    context = {**context, 'report': privacy_filter(context['report'])}
     report, gate = context["report"], context["gate"]
     lines = ["# " + report["title"], "", "Release: " + report["release_id"],
              "Updated: " + report["updated_on"], "Status: " + publication_metadata(context)["status"], "",
@@ -263,13 +265,15 @@ def offline_html(context):
     # Preserve every paragraph as text without interpreting embedded HTML.
     body = []
     in_finding = False
+    evidence_link = r'\[[^\]]+\]\(https://sciencetostartup.com/research/data/#[A-Za-z0-9%._-]+\)'
     for line in report_markdown(context).splitlines():
         if re.fullmatch(r'<a id="finding-[A-Za-z0-9][A-Za-z0-9._:-]{0,199}"></a>', line):
             body.append(line)
             in_finding = True
         elif line.startswith('### '):
             body.append('<h3>' + html.escape(line[4:]) + '</h3>')
-        elif line.startswith('Approved evidence: '):
+        elif (line.startswith('Approved evidence: ')
+              and re.fullmatch(evidence_link + r'(?:, ' + evidence_link + r')*', line[len('Approved evidence: '):])):
             links = re.findall(r'\[([^\]]+)\]\((https://sciencetostartup.com/research/data/#[A-Za-z0-9%._-]+)\)', line)
             body.append('<p>Approved evidence: ' + ', '.join('<a href="' + html.escape(url, quote=True) + '">' + html.escape(label) + '</a>' for label, url in links) + '</p>')
         elif line.startswith("# "):
@@ -474,7 +478,7 @@ def write_publication_assets(context, output):
     if pdf:
         files["report.pdf"] = pdf
     root = Path(context.get("root", ROOT))
-    for schema_name in ("research-graph.schema.json", "report.schema.json", "report-audit.schema.json", "publication-projection.schema.json", "publication-metadata.schema.json"):
+    for schema_name in ("research-graph.schema.json", "report.schema.json", "report-review.schema.json", "report-audit.schema.json", "publication-projection.schema.json", "publication-metadata.schema.json"):
         path = root / "schema" / schema_name
         if path.is_file():
             files[schema_name] = path.read_bytes()

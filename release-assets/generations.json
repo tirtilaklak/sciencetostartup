@@ -1,6 +1,59 @@
 {
   "generations": [
     {
+      "cloudflare_version": "640101f3-3995-4317-bec1-c9cde141a15f",
+      "sha256": {
+        "js/app.f0d78a2deb22.js": "f0d78a2deb221c815b289af028d775ce30357ff32489517a4809b36054e9e9e2",
+        "js/data.3c48d85346df.js": "3c48d85346df87bbcd06b963bd9e0b16077d2fd4021a7e9aabade01e40b2ab44",
+        "js/health.d913882072b3.js": "d913882072b3aef6b3fcad50c6c2a182d271eebf974460f00255a20a5a59aa2a",
+        "presentation/archive.1c09c055a5b93821.json": "1c09c055a5b9382185b6038ccbd40928175667c62edfa38d53ff60a8421f4089",
+        "presentation/company-a-team.2d548ce547a216e5.json": "2d548ce547a216e5569148c3530f7d2b529a88061c65e35d3f414b9fe8d5e9fd",
+        "presentation/company-abundant_ai.4c84bda953fd3e45.json": "4c84bda953fd3e45c0982a8cfa42be0d2a578bffa6dcc2e89521004dc8c116ff",
+        "presentation/company-afterquery.e92f85b0532e527a.json": "e92f85b0532e527af2e35236a9acf91cf4285783a90accd15abb1f69b897755a",
+        "presentation/company-aixi.82476f3b49925770.json": "82476f3b49925770557b059e24a4a1bbb0708ed66be5d2556a91d268130f4cb5",
+        "presentation/company-alinia.9a10166f19d96c6e.json": "9a10166f19d96c6eaaea8e4addcf30fc4fd1c062413ff5baba30315c82d30c68",
+        "presentation/company-appen.51faf82b872441f7.json": "51faf82b872441f73303c0d904008388481f411271042f88d8b1a1c95e42c83e",
+        "presentation/company-apto.575180e83754f103.json": "575180e83754f1030074cab00197d225ad213d41ee9b473290058a5af76eeb41",
+        "presentation/company-benchflow.606e915ee3ecf4ba.json": "606e915ee3ecf4ba5e066d2ebf0c154c6288b57a9ff7c8aafcccf0acdb08efdb",
+        "presentation/company-bespoke_labs.ae62268a0bdfb870.json": "ae62268a0bdfb87003fb3fae391c1d7ff7274d0ee9a56cb2c05ba1cb451defa9",
+        "presentation/company-datacurve.fbb3c06294b98078.json": "fbb3c06294b98078ed24651f721c4bfa1dea384f02659be05a655d58d4656749",
+        "presentation/company-elorian.d5fd687712d5e70e.json": "d5fd687712d5e70e979fb51ae1bee8f3f6cc828568d5cba6aea8009c1b24ad50",
+        "presentation/company-g2i.b73d03840dbee35f.json": "b73d03840dbee35f7fc682b77c77b4108ef6be9730d3552295e659725db3e49f",
+        "presentation/company-giskard.0e4ef3e14b49442e.json": "0e4ef3e14b49442eb415ac599459010fbef3880b40d5ee1c4ee9a8f5223ad52a",
+        "presentation/company-hackerrank.55a2b91d8b74ff27.json": "55a2b91d8b74ff272a8a028dcb8b34dadf18db197bbddbc91fe033906f07af9e",
+        "presentation/company-handshake_ai.d02341277ed82fb9.json": "d02341277ed82fb95b73bc91ef25fb4cb4d170bfa626714456aab63063dfc0f8",
+        "presentation/company-imerit.545f5f9b927a5192.json": "545f5f9b927a519297011e5796c781f198c2e9b1dcae0aece2afbf0fa1fe2ebe",
+        "presentation/company-invisible.7f63c4f200304330.json": "7f63c4f2003043302744784b5d123fc6b651a542f72c8f9676f15cbac8af0586",
+        "presentation/company-labelbox.cf63a04e97b885a1.json": "cf63a04e97b885a168ad2324b91f373b1396c51333c7188e545319c334d745ca",
+        "presentation/company-laude.300b4002b8ce5fd4.json": "300b4002b8ce5fd4fe678138031180c93163cef21b25b3c65755866df2975b3d",
+        "presentation/company-mercor.5abd535fb166be0b.json": "5abd535fb166be0b16f2b06b5fcdadb0b2a45a27d36f3ee861b4a599478816d3",
+        "presentation/company-micro1.854b9f8c48ee8c10.json": "854b9f8c48ee8c103bdf4678aac43f322049e94f75c38905421c45b56b24d756",
+        "presentation/company-ooak.fdfd279b02cc64e5.json": "fdfd279b02cc64e51b07b17d619fa2a8027c9d4e406e00c824dbef19a228c6da",
+        "presentation/company-pareto.92a9098cd7d50e1f.json": "92a9098cd7d50e1f7350dcbe4583949d5419fab9029d1a56928227594759ed0b",
+        "presentation/company-polymath_ai_labs.69d362c2e89d82bb.json": "69d362c2e89d82bb7bcc8f6e088e72c60fbd1a2bfb4426a7015f2d6ef0c52cfa",
+        "presentation/company-prime_intellect.323c96382e8628db.json": "323c96382e8628dbcea5760733875aaf636bfc9c02a786e0961ba2b2f7c9fb6b",
+        "presentation/company-prolific.8156f7d37dc7c160.json": "8156f7d37dc7c16066e434e7b0789938eba90f9601a2de055e8cf009e64febf3",
+        "presentation/company-proximal.44f2d35cfbdfa373.json": "44f2d35cfbdfa37317a289a0d5136efbe23aa2efd9ee40b96353509b27d060c0",
+        "presentation/company-quesma.d2eb5caa447e80a0.json": "d2eb5caa447e80a090b45ffd8c2aac4a6b9841249b878fdf6ec4550442e9c08f",
+        "presentation/company-refresh.d54af43170a1e1fb.json": "d54af43170a1e1fbed6492ab79db182f98f8478c32c76d1879a5f230530ed12b",
+        "presentation/company-rws_trainai.e6f5d1717201090e.json": "e6f5d1717201090e04b32db8955f794962e99ca0bae5296f7ab046b73c286372",
+        "presentation/company-sama.718b216a4dc96245.json": "718b216a4dc96245e4024919334d4d1ca84d53cd3cb3fd0f342b516c05d43957",
+        "presentation/company-scale_ai.839c7b7faea04908.json": "839c7b7faea04908be6827eac926686f19738d8d0c8ac0a1dfd2bc1966c8422c",
+        "presentation/company-snorkel_ai.6ee5c68a5d7152ce.json": "6ee5c68a5d7152cebd0c1a30aa7ff8b992cd81de6d2f8db307acca7e4e9b7414",
+        "presentation/company-surge_ai.a24fb07785a72b8f.json": "a24fb07785a72b8f6ef8aa6546b640762b63c88bdc04dcfb764dbcb954eae217",
+        "presentation/company-taskus.0f7160eb3aaac641.json": "0f7160eb3aaac6418a4d9f750f654938aa6f86e75c1aaa24dae36e43d10a4c01",
+        "presentation/company-terac.2a5c22f6ebec4a08.json": "2a5c22f6ebec4a08b368d9470326d037c9590302dee27fc64a0bb9e8b447b1a5",
+        "presentation/company-toloka.47fda3b61577cf72.json": "47fda3b61577cf7220c106cf1066095c4a6ec8d2385c607f016d5363801408a6",
+        "presentation/company-trajectory_labs_pbc.bb7fda6d692ad0ff.json": "bb7fda6d692ad0ff522efab3186b5064fd7013d95dd11a86c31a09c8ef85fa57",
+        "presentation/company-turing.8a35546aa5bddacc.json": "8a35546aa5bddacc9532edff3b08a98f7b106c968efeed02ad3c21081b53f373",
+        "presentation/full-search.09482b23461d53b0.json": "09482b23461d53b0a5115ae379c05b98ab7be1916bbd47e3bfa15c9ae95a82c5",
+        "presentation/overview.5fb28e8df1298dbc.json": "5fb28e8df1298dbcf896542aa73c11635bff4710d7c66410f0d1ef15b4b7f162",
+        "presentation/search.5751c36bd653fe62.json": "5751c36bd653fe62b8b44f931d0dd27da1a5f087be3339d17dd49f499b5c6b3f",
+        "presentation/summary.8a237eb4013ba3c6.json": "8a237eb4013ba3c69405e5906ca6b24e7311a4e4a3dab83dbb1c158cc4bc32b8"
+      },
+      "source_commit": "ba97925c777b6d0c0b2bbda48e83e788ccacfd97"
+    },
+    {
       "cloudflare_version": "ff7b2352-c6b7-4257-9cd3-d5a3dc3f3c26",
       "sha256": {
         "js/app.6e8a5b8b6ab6.js": "6e8a5b8b6ab60e17d185b8564138edb87c3e2d5127de2881cc7f25d303017c49",
@@ -54,14 +107,6 @@
         "presentation/summary.7c48c530cb864e9a.json": "7c48c530cb864e9a7e139d22d77b4e725ac44186bf476467c4fd3d0b5baed1f5"
       },
       "source_commit": "b35e095acf3ee4ef776069b2310994da62edfa74"
-    },
-    {
-      "cloudflare_version": "778a4bca-4eb3-455f-aecc-589355799451",
-      "sha256": {
-        "js/app.f7565b15e629.js": "f7565b15e629fe4763b3a20d7a1b01e05ab4be5e984f2b70c8347daf6ef1d766",
-        "js/data.5360d416f7b2.js": "5360d416f7b28120554534d7b1560a282ce0ecad3693296744d43bbf181eaa45"
-      },
-      "source_commit": "2b899ee5645caaa5d4cd2bb0933ffd2170cffabd"
     }
   ],
   "schema_version": "1.0.0"

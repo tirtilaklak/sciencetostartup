@@ -1,11 +1,17 @@
 # Research evidence graph
 
 This additive graph is **prelaunch**. It does not replace canonical dataset 2.5.0,
-its JSON, its SQLite database, or their dates. The first graph imports 39 historical
-organization descriptions without new review receipts. It includes eight actual
-version-specific paper-abstract reads and an NVIDIA HelpSteer3 dataset-card read.
-Those reads yield ten author-reviewed **candidate** assertions. They are not a
-150-paper deep review, an independent supplier census, or a completed audit.
+its JSON, its SQLite database, or their dates. The current baseline retains 39
+historical organization descriptions and 173 approved assertions. The latest batch
+contributes 163 assertions after separate author, source-verifier and adversarial
+AI review of pinned primary sources. Eight disputed assertions remain quarantined;
+one redundant MMLU assertion was omitted rather than counting a study twice.
+
+Coverage is eight existing organization inclusion audits, eight qualifying
+suppliers, eight full-source paper works, eight dataset families and five benchmark
+families. The 194 scoped evidence records represent 75 distinct captured document
+versions, not 194 independent documents. These are reviewed baseline observations,
+not a comprehensive market census or completed launch audit.
 
 The graph retains the actual UTC capture and review times. Captures on 9 November
 in Los Angeles occur on 10 November UTC; they do not retroactively satisfy the
@@ -166,6 +172,12 @@ metadata review, unresolved negative review, invented reviewer, or automated
 retrieval cannot supply an approval. The validator enforces the structural and
 chronological receipts; editors remain responsible for their truthfulness.
 
+Some approved assertions retain an original qualification beginning “Author-only
+candidate”. This is an unchanged record of their original author stage. The reader
+labels it “Original author-stage note”; current approval is established separately
+by the exact-content, three-role review receipts. Changing that stored assertion
+text would require new reviews, so promotion never silently rewrites it.
+
 The initial author invocation records only its own work. It creates no independent
 source-verifier or adversarial receipt. Abstract-method claims remain candidates
 until those separate reviews happen; full paper review must examine methods,
@@ -251,6 +263,13 @@ entities require an included disposition, full-source review depth, and an appro
 assertion; suppliers additionally require an approved capability assertion. Versions,
 aliases, candidate matches, historical descriptions, and duplicate releases do not
 inflate coverage.
+
+Coverage method 1.1.0 rolls an explicit, approved, full-source paper version or
+release up to its approved, full-source, included parent work or family. It counts
+each parent once. This identity rollup creates no supplier relationship and never
+turns a metadata-only parent into a reviewed work. Suppliers still need direct
+approved capability evidence. Source-record totals count scoped evidence records;
+`captured_source_versions` deduplicates their exact version and response digest.
 
 The initial eligible core is explicitly **not frozen**. Both the source-anchored
 200-assertion quality holdout and separate 200-record screening audit are null.

@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0.0",
+  "reviews": [
+    {
+      "fixture": false,
+      "role": "evidence_auditor",
+      "decision": "pass",
+      "method": "report_content_review",
+      "reviewer_type": "ai",
+      "reviewer": "Codex gpt-6.1-sol ultra /root/report_evidence_auditor",
+      "invocation_id": "sts-report-evidence-auditor-161c93d4-ffd6-40c6-98ef-8a91c5c743fb:content-review-2",
+      "reviewed_on": "2026-11-10T06:19:14.645605Z",
+      "report_sha256": "e318aa4294fa87a62cece18d742a48f5482eda9b115d79c62a54511e39f6c549",
+      "graph_sha256": "1df0dd903cdee2c2bc1e2e1ac6cf681eefcc134edcce58082fa378a7848e08fd",
+      "scope": "All 76 paragraphs in 12 chapters and every field of six executive findings, using 137 unique approved claims. Complete first reading of revision 001; personal reread of all four changed revision 002 blocks and exact-object proof that the remaining 72 paragraphs, all six findings and metadata are unchanged. All 173 approved assertions and receipts, exclusion rules and 191 source pins independently checked.",
+      "rationale": "EA-001 now binds preference and evaluation deliverables to approved Toloka capability evidence. EA-002 restores the condition for infrequently changing datasets. Both revised licensing blocks explicitly name the pinned RewardBench 1 card. No unsupported entity, supply or performance upgrade or held claim enters the synthesis. Factual descriptions preserve source, period, currency, denominator, human and model provenance, artifact identity and license qualifications. Analytical judgments remain limited to the sample and distinguish proposed buyer procedures from observed results.",
+      "limitations": [
+        "Actual AI evidence audit, not human expert peer review, empirical replication or operational certification.",
+        "This exact-content pass does not satisfy launch coverage, frozen core, real 200-assertion or 200-record audits, source cutoff, DOI or archive requirements; the report remains prelaunch."
+      ],
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null,
+        "cost": null,
+        "reason": "Provider telemetry is absent; usage/cost unknown."
+      }
+    },
+    {
+      "schema_version": "1.0.0",
+      "fixture": false,
+      "role": "adversarial",
+      "decision": "pass",
+      "method": "report_content_review",
+      "reviewer_type": "ai",
+      "reviewer": "gpt-6.1-sol /root/report_adversarial",
+      "invocation_id": "sts-report-adversarial-rereview-9fe9a193-f7ee-4617-a190-9e2d524f5d32",
+      "reviewed_on": "2026-11-10T06:19:18.632098+00:00",
+      "report_sha256": "e318aa4294fa87a62cece18d742a48f5482eda9b115d79c62a54511e39f6c549",
+      "graph_sha256": "1df0dd903cdee2c2bc1e2e1ac6cf681eefcc134edcce58082fa378a7848e08fd",
+      "scope": "Final exact-content review of all 12 chapters, 76 paragraphs, six executive findings and their buyer implications: personally reread the four changed blocks and independently checked their approved claim/source bindings; confirmed all other 72 previously personally read paragraphs, all six findings and all report/section metadata are identical to the preserved original. Source-first pass and prior revise receipt preserved.",
+      "rationale": "The two required RewardBench 1 license-scope corrections are resolved. The additional Toloka binding and conditional Datasheets wording are supported by the approved assertions and independently reread pinned source text. Findings and buyer recommendations remain sample-limited, evidence-bound and explicit about unknowns, historical dates, AI review and unmet launch gates. Pass is only for report content; it does not approve launch, source assertions, author role, human peer review, research accuracy audits, DOI registration, archive publication or deployment.",
+      "supersedes_receipt_path": "report-review-receipt.rev1.json",
+      "resolved_correction_ids": [
+        "R1",
+        "R2"
+      ],
+      "usage_telemetry": null
+    }
+  ]
+}

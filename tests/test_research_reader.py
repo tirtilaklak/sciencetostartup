@@ -1,4 +1,4 @@
-"""Reader contracts use synthetic findings only; production findings stay empty."""
+"""Reader contracts use synthetic findings, never synthetic research evidence."""
 import copy
 import html
 import json
@@ -72,6 +72,19 @@ class ReaderTests(unittest.TestCase):
             self.assertNotIn('<img src=x', text)
             self.assertNotIn('<a id="finding-forged">', text)
 
+    def test_finding_contacts_are_removed_before_markdown_escaping(self):
+        self.finding.update(text='Contact privacy-fixture@example.org.',
+                            buyer_implication='Contact private+buyer@example.org.')
+        for value in (citations.report_markdown(self.context), citations.offline_html(self.context).decode()):
+            self.assertNotIn('example.org', value)
+            self.assertIn('contact removed', value)
+
+    def test_finding_prose_cannot_be_mistaken_for_generated_evidence_links(self):
+        self.finding['text'] = 'Approved evidence: this synthetic fixture remains limited to one task'
+        offline = citations.offline_html(self.context).decode()
+        self.assertIn(self.finding['text'], offline)
+        self.assertIn('https://sciencetostartup.com' + pages._evidence_url('assertion', self.claim['id']), Facts(offline).links)
+
     @unittest.skipUnless(importlib.util.find_spec('reportlab') and importlib.util.find_spec('pypdf'), 'Optional PDF preparation dependencies')
     def test_prepared_pdf_retains_same_supported_finding_and_readable_identifier(self):
         from research_pdf import render_report_pdf
@@ -84,6 +97,16 @@ class ReaderTests(unittest.TestCase):
         self.finding.update(text='FORBIDDEN-PDF', claim_ids=['missing'])
         text = '\n'.join(page.extract_text() for page in PdfReader(io.BytesIO(render_report_pdf(self.context))).pages)
         self.assertNotIn('FORBIDDEN-PDF', text)
+
+    @unittest.skipUnless(importlib.util.find_spec('reportlab') and importlib.util.find_spec('pypdf'), 'Optional PDF preparation dependencies')
+    def test_prepared_pdf_removes_contacts_from_all_finding_fields(self):
+        from research_pdf import render_report_pdf
+        from pypdf import PdfReader
+        for key in ('text', 'buyer_implication', 'limitations', 'confidence', 'reasoning', 'what_would_change'):
+            self.finding[key] = 'Contact privacy-fixture@example.org.'
+        text = '\n'.join(page.extract_text() for page in PdfReader(io.BytesIO(render_report_pdf(self.context))).pages)
+        self.assertNotIn('privacy-fixture', text)
+        self.assertIn('[contact removed]', text)
 
     def test_table_contains_native_records_and_only_metadata_for_enhancement(self):
         candidate = copy.deepcopy(self.claim)

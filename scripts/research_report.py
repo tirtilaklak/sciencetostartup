@@ -187,7 +187,10 @@ def _launch_content(report, graph):
             errors.append("Executive findings require their evidence, implications and limitations.")
         if not all(field_text(finding.get(key)) for key in ('confidence', 'reasoning', 'what_would_change')):
             errors.append('Executive findings require confidence, reasoning and evidence that would change the assessment.')
-        if any(assertions.get(cid, {}).get("status") != "approved" for cid in finding.get("claim_ids", [])):
+        claim_ids = finding.get("claim_ids")
+        if (not isinstance(claim_ids, list) or not claim_ids
+                or any(not isinstance(cid, str) or assertions.get(cid, {}).get("status") != "approved"
+                       for cid in claim_ids)):
             errors.append("Executive findings must use approved current assertions.")
     for section in report.get("sections", []):
         if section.get("id") in {"weekly-developments", "methods-and-appendices"}:

@@ -89,11 +89,12 @@ def render_report_pdf(context):
         if not section.get("paragraphs"):
             story.append(heading)
         if section.get('id') == 'executive-assessment':
-            findings, withheld = executive_findings(context)
+            findings, withheld = executive_findings({**context, 'report': report, 'graph': graph})
             for finding in findings:
-                story.append(Paragraph('<a name="' + finding_anchor(finding) + '"/><b>Analytical judgment: '
-                                       + escape(finding['id']) + '</b>', styles['BodyText']))
-                story.append(Paragraph(escape(field_text(finding['text'])), styles['BodyText']))
+                story.append(KeepTogether([
+                    Paragraph('<a name="' + finding_anchor(finding) + '"/><b>Analytical judgment: '
+                              + escape(finding['id']) + '</b>', styles['BodyText']),
+                    Paragraph(escape(field_text(finding['text'])), styles['BodyText'])]))
                 for key, label in JUDGMENT_FIELDS:
                     if field_text(finding.get(key)):
                         story.append(Paragraph('<b>' + label + ':</b> ' + escape(field_text(finding[key])), styles['BodyText']))
@@ -106,10 +107,10 @@ def render_report_pdf(context):
         label = "[" + str(source_numbers[sid]) + "] " + source.get("title", sid)
         details = "; ".join(str(value) for value in (source.get("publisher"), source.get("version"), source.get("published_on")) if value)
         url = source.get("url", "")
-        story.append(Paragraph(escape(label) + ". " + escape(details) + ("<br/><link href=" + xml.sax.saxutils.quoteattr(url) + ">" + escape(url) + "</link>" if url else ""), styles["Evidence"]))
-    story.extend([Paragraph("Evidence and reproduction", styles["Heading2"]),
+        story.append(KeepTogether([Paragraph(escape(label) + ". " + escape(details) + ("<br/><link href=" + xml.sax.saxutils.quoteattr(url) + ">" + escape(url) + "</link>" if url else ""), styles["Evidence"])]))
+    story.append(KeepTogether([Paragraph("Evidence and reproduction", styles["Heading2"]),
         Paragraph("The complete public evidence graph accompanies this report in the offline archive. Paragraph evidence IDs refer to that graph. The JSON, CSV and SQLite contain equivalent privacy-filtered projection " + metadata["projection_version"] + ". Canonical dataset 2.5.0 remains unchanged outside this archive. Raw source text and personal contact details are excluded.", styles["BodyText"]),
-        Paragraph("Verify the archive with MANIFEST.json. Reproduce with the source repository's scripts/build_public_snapshot.py. Owned research and text use CC BY 4.0; third-party material retains its rights. Review scope and research gaps remain explicit. This PDF's status does not establish website or external mirror publication.", styles["BodyText"])])
+        Paragraph("Verify the archive with MANIFEST.json. Reproduce with the source repository's scripts/build_public_snapshot.py. Owned research and text use CC BY 4.0; third-party material retains its rights. Review scope and research gaps remain explicit. This PDF's status does not establish website or external mirror publication.", styles["BodyText"])]))
     stream = io.BytesIO()
     document = SimpleDocTemplate(stream, pagesize=(612, 792), rightMargin=54, leftMargin=54,
                                  topMargin=51, bottomMargin=54, title=report["title"], author=metadata["author"], allowSplitting=1)

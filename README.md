@@ -13,12 +13,20 @@ and `/review/` accepts source-backed corrections, section review and reuse.
 Essential content and downloads work without JavaScript. Both site search
 implementations link directly to native research and organization pages.
 
-The comprehensive weekly series is **prelaunch**. The initial approved evidence
-is a small, separately AI-reviewed baseline, including abstract-level paper
-records; these do not count as full-source paper reviews. Historical field-guide
-evidence retains its dates and labels. No published edition, completed launch
-audit, human peer review or DOI is claimed. Coverage is computed from the graph,
-and code enforces the declared launch floors and substantive-report gates.
+The comprehensive weekly series is **prelaunch**. Its reviewed baseline contains
+173 approved assertions, 12 substantive chapters and six evidence-bound executive
+findings. Source assertions received separate author, source-verifier and
+adversarial AI reviews; the exact report then received separate evidence-auditor
+and adversarial synthesis reviews. Coverage is eight qualifying suppliers, eight
+full-source paper works, eight dataset families, five benchmark families and eight
+of the 39 existing organization inclusion audits. Scoped evidence records (194)
+represent 75 distinct pinned document versions. Eight disputed assertions remain
+quarantined. Historical field-guide evidence retains its dates and labels.
+
+This is not a comprehensive market census. The frozen core and both real
+200-record launch audits are still outstanding. No published edition, human peer
+review or DOI is claimed. Coverage is computed from approved records; code enforces
+the declared launch floors, exact synthesis review and substantive-report gates.
 
 New research is versioned under `data/research/`, independently of canonical
 v2.5.0. The public projection excludes private fields and personal contact data.

@@ -22,6 +22,22 @@ artifact digest, record URL and confirmation date. A real publication date is
 emitted only when supplied by the archive; a source or verification date is never
 substituted for it. The publisher comes from `data/public-identity.json`.
 
+## Separate report synthesis review
+
+Approved source assertions do not by themselves approve an analytical synthesis.
+`data/research/report-reviews.json` records actual evidence-auditor and adversarial
+report reviews, from distinct invocations, against the exact report-content and
+approved-graph digests. These are separate AI reviews, not human peer review.
+`schema/report-review.schema.json` documents the registry and accompanies the
+archive. The review registry also travels with the source-context policy.
+
+The synthesis digest excludes only lifecycle status, the edition ledger and archive
+outcomes, avoiding a circular dependency on publication receipts. Changing report
+wording, finding bindings or the graph invalidates review readiness. Unreviewed
+executive findings are withheld. Passing synthesis review cannot substitute for
+coverage floors, frozen-core disposition, the two real 200-record audits, source
+cutoff rules or actual archival publication.
+
 ## Public projection and equivalence
 
 Canonical dataset 2.5.0 and its legacy downloads remain byte-identical. The new

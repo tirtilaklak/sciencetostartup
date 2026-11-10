@@ -147,7 +147,12 @@ class CompanyEventsBuildTests(unittest.TestCase):
         for name in ("web", "docs", "schema", "scripts", "design-system", "release-assets"): (root / name).symlink_to(ROOT / name)
         (root / "deployment.json").symlink_to(ROOT / "deployment.json")
         for path in (ROOT / "data").iterdir():
-            if path.name != "company-events.json": (root / "data" / path.name).symlink_to(path)
+            if path.name == 'research':
+                # Approved partitions intentionally refuse symlinked inputs.
+                import shutil
+                shutil.copytree(path, root / 'data' / path.name)
+            elif path.name != "company-events.json":
+                (root / "data" / path.name).symlink_to(path)
         (root / "data/company-events.json").write_text(json.dumps(sample()))
         with mock.patch.object(observatory, "ROOT", root): build(cls.data, cls.dist)
 
