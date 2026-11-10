@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "as_of": "2026-11-09",
+  "status": "not_collected",
+  "metrics": {
+    "verified_external_citations": null,
+    "verified_reuses": null,
+    "consented_external_reviews": null,
+    "research_pageviews": null,
+    "dataset_downloads": null,
+    "agent_citations": null
+  },
+  "notes": "Null means not collected. No growth or adoption baseline is inferred from visits, stars, downloads, or an empty search."
+}
