@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-11-10T15:04:51.459441Z",
+  "as_of": "2026-11-10T15:43:44.306571Z",
   "assertions": [
     {
       "as_of": "2026-11-10",
@@ -2064,7 +2064,8 @@
       "Coverage method 1.1.0 rolls reviewed manifestations into their explicitly reviewed work/family once; it never infers supplier edges. This is an incomplete selected baseline, not a frozen market inventory or passing launch audit.",
       "Dataset-family counting correction: FineWeb-Edu is an educationally filtered FineWeb subset, not an additional family. Its readable records and exact approved assertions are preserved. Source: creator paper 2406.17557v2, physical page 8; separate integration audit recorded the correction. No floor is reduced.",
       "Sixteen original evidence bindings are quarantined after separate source-verifier and adversarial reference-panel review. Previously passing receipts and scientific text remain preserved; new candidate replacements require fresh three-role approval. No audit accuracy or completed publication is claimed.",
-      "Ten additional original evidence bindings are quarantined after actual source-verifier and adversarial reference-panel review plus independent tie-breaker reconciliation of their initial context-boundary disagreements. These are citation/documentation repairs, not allegations of false scientific content. Previously passing receipts and scientific text remain preserved; new candidate replacements require fresh three-role approval. No audit accuracy or completed publication is claimed."
+      "Ten additional original evidence bindings are quarantined after actual source-verifier and adversarial reference-panel review plus independent tie-breaker reconciliation of their initial context-boundary disagreements. These are citation/documentation repairs, not allegations of false scientific content. Previously passing receipts and scientific text remain preserved; new candidate replacements require fresh three-role approval. No audit accuracy or completed publication is claimed.",
+      "Sixteen withheld source bindings now have new-ID replacements after fresh author, source-verifier and adversarial review. Original candidate IDs, scientific text, source versions and old positive/negative reviews remain preserved; report remapping and exact synthesis review remain separate."
     ],
     "quality_audit": null,
     "screening_audit": null
@@ -2925,7 +2926,8 @@
         "cohort4.dataset.claim.webshop.human-trajectories",
         "cohort4.dataset.claim.webshop.license",
         "cohort4.dataset.claim.webshop.observations",
-        "identity.claim.benchmark.webshop"
+        "identity.claim.benchmark.webshop",
+        "repair.binding.v1.cohort4.dataset.claim.webshop.license"
       ],
       "disposition": "included",
       "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
@@ -6413,7 +6415,8 @@
         "cohort4.dataset.claim.xp3.license",
         "cohort4.dataset.claim.xp3.schema",
         "cohort4.dataset.claim.xp3.scope",
-        "cohort4.dataset.claim.xp3.translated-variant"
+        "cohort4.dataset.claim.xp3.translated-variant",
+        "repair.binding.v1.cohort4.dataset.claim.xp3.scope"
       ],
       "disposition": "included",
       "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
@@ -6727,7 +6730,8 @@
         "candidate.cohort3.dataset.chatbotarena.02",
         "candidate.cohort3.dataset.chatbotarena.03",
         "candidate.cohort3.dataset.chatbotarena.04",
-        "candidate.cohort3.dataset.chatbotarena.05"
+        "candidate.cohort3.dataset.chatbotarena.05",
+        "repair.binding.v1.candidate.cohort3.dataset.chatbotarena.05"
       ],
       "disposition": "pending",
       "disposition_reason": "The scoped creator-document observations have approved three-role evidence, but independence from LMSYS-Chat-1M is unresolved. Captured Arena lines119-128 and LMSYS lines99-107 describe overlapping collection services/time windows without establishing subset identity or disjointness. This record remains visible but adds no separate dataset family to launch coverage; no derived-from relationship is inferred.",
@@ -9198,7 +9202,8 @@
         "candidate.cohort3.dataset.videofeedback.02",
         "candidate.cohort3.dataset.videofeedback.03",
         "candidate.cohort3.dataset.videofeedback.04",
-        "candidate.cohort3.dataset.videofeedback.05"
+        "candidate.cohort3.dataset.videofeedback.05",
+        "repair.binding.v1.candidate.cohort3.dataset.videofeedback.05"
       ],
       "disposition": "included",
       "disposition_reason": "Creator-maintained documentation received separate bounded AI source-content reviews of construction, human/model roles, formats, licensing/access statements and limitations. Exact source revisions remain bound to every observation. Per-role full/partial/unread scopes differ and are recorded separately. This is no corpus download/recount, verification of every data file, model evaluation or assurance that another release shares these properties.",
@@ -9771,7 +9776,8 @@
         "candidate.cohort5.apto.harbest-platform",
         "candidate.cohort5.apto.modalities",
         "candidate.cohort5.apto.ready-made-datasets",
-        "legacy.apto.description"
+        "legacy.apto.description",
+        "repair.binding.v1.candidate.cohort5.apto.company-identity"
       ],
       "disposition": "included",
       "disposition_reason": "Current official sources offer scoped training/evaluation data, verified expert inputs, or task/environment creation. Qualification describes the advertised supplier category; named customer delivery, operational outcomes, pay and revenue require their own evidence. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
@@ -9907,7 +9913,8 @@
         "candidate.cohort6.benchflow.run-output-records",
         "candidate.cohort6.benchflow.sandbox-backends",
         "candidate.cohort6.benchflow.training-export-interface",
-        "legacy.benchflow.description"
+        "legacy.benchflow.description",
+        "repair.binding.v1.candidate.cohort4.benchflow.version-boundary"
       ],
       "disposition": "pending",
       "disposition_reason": "Current provider documentation received separate author, source-verifier and adversarial AI content reviews for the exact imported observations. Fresh immutable repository commit a61a26f4db4d566de16928565ea58abf3dbaf064 documents public evaluation/RL runtime software. README says0.10; the separately captured website docs and old approved0.9.2 assertion remain source/version-specific. No old claim or review digest is retargeted. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
@@ -11131,7 +11138,8 @@
         "candidate.cohort2.labelbox.privacy-partners",
         "candidate.cohort2.labelbox.quality-calibration",
         "candidate.cohort2.labelbox.speech-delivery",
-        "legacy.labelbox.description"
+        "legacy.labelbox.description",
+        "repair.binding.v1.candidate.cohort2.labelbox.privacy-partners"
       ],
       "disposition": "included",
       "disposition_reason": "Supplier inclusion audited from the pinned official offering and scoped delivery/governance documentation, with separate source-verifier and adversarial AI review. Offerings, documented cases, worker-pool denominators and unknowns remain assertion-specific; this is no provider performance, ownership or operational compliance endorsement.",
@@ -11552,7 +11560,8 @@
         "candidate.cohort4.prime_intellect.nvidia-verified-tasks",
         "candidate.cohort4.prime_intellect.outcome-checks",
         "candidate.cohort4.prime_intellect.professional-service-separation",
-        "legacy.prime_intellect.description"
+        "legacy.prime_intellect.description",
+        "repair.binding.v1.candidate.cohort4.prime_intellect.gpu-billing-basis"
       ],
       "disposition": "included",
       "disposition_reason": "Current official material offers data, expert-data operations or task/environment creation for training or evaluation. Qualification is bounded to the advertised service and does not itself prove paid delivery, market share or any unnamed downstream artifact contribution. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
@@ -11632,7 +11641,8 @@
         "candidate.cohort4.proximal.frontierswe-collaboration",
         "candidate.cohort4.proximal.subcontractor-responsibility",
         "candidate.cohort4.proximal.targeted-posttraining-data",
-        "legacy.proximal.description"
+        "legacy.proximal.description",
+        "repair.binding.v1.candidate.cohort4.proximal.annualized-revenue-disclosure"
       ],
       "disposition": "included",
       "disposition_reason": "Current official material offers data, expert-data operations or task/environment creation for training or evaluation. Qualification is bounded to the advertised service and does not itself prove paid delivery, market share or any unnamed downstream artifact contribution. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
@@ -11669,7 +11679,8 @@
         "candidate.cohort4.quesma.public-benchmarks",
         "candidate.cohort4.quesma.trajectory-audit-method",
         "candidate.cohort4.quesma.website-operator",
-        "legacy.quesma.description"
+        "legacy.quesma.description",
+        "repair.binding.v1.candidate.cohort4.quesma.public-benchmarks"
       ],
       "disposition": "excluded",
       "disposition_reason": "Current pages market coding-agent spend analytics and open evaluations. A contracted Blitzy audit is evidenced; the undated past-tense training-environment statement does not establish a current training-data supply offering. Exclusion is from this supplier scope, not an assertion that private or historical data work never existed. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
@@ -14476,7 +14487,9 @@
       "assertion_ids": [
         "candidate.paperfull.truthfulqa.blinded-human-evaluation",
         "candidate.paperfull.truthfulqa.external-validation-sample",
-        "candidate.paperfull.truthfulqa.gptjudge-training-labels"
+        "candidate.paperfull.truthfulqa.gptjudge-training-labels",
+        "repair.binding.v1.candidate.paperfull.truthfulqa.blinded-human-evaluation",
+        "repair.binding.v1.candidate.paperfull.truthfulqa.external-validation-sample"
       ],
       "disposition": "included",
       "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
@@ -18608,7 +18621,8 @@
         "cohort8.claim.gptpipeline.interface",
         "cohort8.claim.gptpipeline.label-scheme",
         "cohort8.claim.gptpipeline.sample-window",
-        "identity.claim.paper.arxiv.2402.16795"
+        "identity.claim.paper.arxiv.2402.16795",
+        "repair.binding.v1.cohort8.claim.gptpipeline.interface"
       ],
       "disposition": "included",
       "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
@@ -18836,7 +18850,8 @@
         "cohort4.claim.jailbreakbench.author-license-statement",
         "cohort4.claim.jailbreakbench.expert-judge-calibration",
         "cohort4.claim.jailbreakbench.paired-behaviors",
-        "identity.claim.paper.arxiv.2404.01318"
+        "identity.claim.paper.arxiv.2404.01318",
+        "repair.binding.v1.cohort4.claim.jailbreakbench.paired-behaviors"
       ],
       "disposition": "included",
       "disposition_reason": "Pinned paper methods, results, limitations and assertion-relevant appendix passages received separate AI source-content review. Per-role page scopes remain explicitly partial; this is neither exhaustive reading nor benchmark execution, experiment reproduction, raw-data audit or human peer review. Benchmark-family and supplier records are not automatically promoted from this paper review.",
@@ -20921,7 +20936,8 @@
         "cohort6.claim.agentcompany.curation-labor",
         "cohort6.claim.agentcompany.full-score",
         "cohort6.claim.agentcompany.human-baseline-limit",
-        "identity.claim.paper.arxiv.2412.14161"
+        "identity.claim.paper.arxiv.2412.14161",
+        "repair.binding.v1.cohort6.claim.agentcompany.human-baseline-limit"
       ],
       "disposition": "included",
       "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
@@ -22384,7 +22400,8 @@
         "cohort8.claim.vapo.length-adaptive",
         "cohort8.claim.vapo.positive-example-loss",
         "cohort8.claim.vapo.value-pretraining",
-        "identity.claim.paper.arxiv.2504.05118"
+        "identity.claim.paper.arxiv.2504.05118",
+        "repair.binding.v1.cohort8.claim.vapo.decoupled-gae"
       ],
       "disposition": "included",
       "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",

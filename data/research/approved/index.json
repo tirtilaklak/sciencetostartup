@@ -83,6 +83,10 @@
     {
       "path": "21-identity-bridges-2026-11-10.json",
       "sha256": "6213cb9c1eb7046749c5d25eebf5fe255b177ba6dc273c6eb9701762dc609285"
+    },
+    {
+      "path": "22-reviewed-binding-repairs-2026-11-10.json",
+      "sha256": "d8966c7d2b596eed7382f75fb540ebbcabcfd964775f7727a9491fa0c11ebd6c"
     }
   ],
   "schema_version": "1.0.0"
