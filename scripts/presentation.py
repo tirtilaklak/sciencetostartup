@@ -269,6 +269,22 @@ def work_search_text(route, companies):
     return search_fold(" ".join(str(value) for value in values if value))
 
 
+EDITORIAL_RUNTIME_FIELDS = frozenset({'company_id', 'summary', 'primary_offering',
+                                     'capability_tags', 'product_media'})
+
+
+def compact_editorial(editorial):
+    """Initial UI fields only; retain the complete downloadable authoring input.
+
+    Preserve root schema/version/provenance metadata and entry order. Nested
+    media and tags remain complete values; this is a projection, not a codec.
+    """
+    result = copy.deepcopy(editorial)
+    result['entries'] = [{key: value for key, value in entry.items() if key in EDITORIAL_RUNTIME_FIELDS}
+                         for entry in result['entries']]
+    return result
+
+
 def compact_work(work, research=None):
     result = copy.deepcopy(work)
     for route in result.get("routes", []):

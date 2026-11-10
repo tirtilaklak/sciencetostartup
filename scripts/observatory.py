@@ -844,8 +844,8 @@ def build(data, destination):
         original_summary.unlink()
     bootstrap = json.dumps(summary["bootstrap"], ensure_ascii=False, separators=(",", ":"), sort_keys=True, allow_nan=False).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
     html = html.replace(embedded, bootstrap)
-    from presentation import health_skeleton, source_updates_context, rooted_assets
-    compact_sidecars = rooted_assets({**sidecars, "WORK_ROUTES": summary["work"], "PROFILE_CONTENT": {"entries": []}, "SOURCE_UPDATES": source_updates_context(source_updates), "COMPANY_EVENTS": {"version": company_events["version"], "events": []}, "LOGOS": {"logos": [{k: v for k, v in logo.items() if k in ("company_id", "local_path", "background")} for logo in logo_data["logos"]]}, "BUSINESS_HEALTH": health_skeleton(health)})
+    from presentation import compact_editorial, health_skeleton, source_updates_context, rooted_assets
+    compact_sidecars = rooted_assets({**sidecars, "EDITORIAL": compact_editorial(editorial), "WORK_ROUTES": summary["work"], "PROFILE_CONTENT": {"entries": []}, "SOURCE_UPDATES": source_updates_context(source_updates), "COMPANY_EVENTS": {"version": company_events["version"], "events": []}, "LOGOS": {"logos": [{k: v for k, v in logo.items() if k in ("company_id", "local_path", "background")} for logo in logo_data["logos"]]}, "BUSINESS_HEALTH": health_skeleton(health)})
     compact_sidecars.pop("RESEARCH_SEARCH", None)
     public_summary = {key: value for key, value in summary.items() if key not in ("bootstrap", "companies", "work")}
     public_summary["asset"] = summary_asset
