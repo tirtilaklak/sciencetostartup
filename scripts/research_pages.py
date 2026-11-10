@@ -421,9 +421,8 @@ def _assertion(context, assertion):
         body += '<p>Candidate wording is withheld from findings while source verification and adversarial review are pending.</p>'
     body += f'<p class="r-record-id">{_link(_evidence_url("assertion", aid), aid)}</p>'
     if assertion.get("qualifications") and status in {"approved", "historical"}:
-        author_stage = 'Author-only candidate; no independent source-verifier or adversarial approval exists in this batch.'
         body += '<ul class="r-qualifications">' + "".join(
-            '<li>' + ('<strong>Original author-stage note:</strong> ' if q == author_stage else '') + sp.escape(q) + '</li>'
+            '<li>' + ('<strong>Original author-stage note:</strong> ' if q.startswith('Author-only candidate') else '') + sp.escape(q) + '</li>'
             for q in assertion["qualifications"]) + "</ul>"
     body += _source_evidence(context, assertion)
     reviews = {row["id"]: row for row in context["graph"].get("reviews", [])}

@@ -59,6 +59,14 @@
     {
       "path": "15-suppliers-cohort5-2026-11-10.json",
       "sha256": "d9025204728ce63748aa9ff8f52b86a335ee448a3496ea017899264ea06cd297"
+    },
+    {
+      "path": "16-datasets-cohort5-2026-11-10.json",
+      "sha256": "5079296216c5f4096422d1f87fc26e4bf96335595addbc0928960122f274dee6"
+    },
+    {
+      "path": "17-papers-cohort7-2026-11-10.json",
+      "sha256": "9c4fc7a6add2d999cd6dea8630ac7a6ec1bf10efd412cb98a39ff0a89cd99e32"
     }
   ],
   "schema_version": "1.0.0"

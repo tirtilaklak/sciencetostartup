@@ -5,15 +5,27 @@ its JSON, its SQLite database, or their dates.
 
 ## Reviewed integration checkpoint
 
-The 10 November 2026 integration checkpoint at commit `5b414bd` retains 39 historical organization
-descriptions and 959 approved assertions. Computed coverage is 43 qualifying
-suppliers, 72 reviewed paper works, 45 dataset families, 21 benchmark families and
-25 of 39 legacy inclusion dispositions. Its 991 scoped source records represent
-334 distinct captured document versions. These counts exclude pending candidates,
-versions and unresolved family boundaries. Each approval has exact-content,
+The 10 November 2026 integration checkpoint selected by approved partitions
+`16-datasets-cohort5-2026-11-10.json` and `17-papers-cohort7-2026-11-10.json`
+retains 39 historical organization descriptions and 1,297 approved assertions.
+Computed coverage is 53 qualifying suppliers, 112 reviewed paper works,
+63 dataset families, 21 benchmark families and 38 of 39 legacy inclusion
+dispositions. Its 1,338 scoped source records include 1,337 captured records
+representing 432 distinct captured document versions. These counts exclude pending
+candidates, versions and unresolved family boundaries. Each approval has exact-content,
 separate author, source-verifier and adversarial AI receipts. Source reading depth
 is retained per invocation; a scoped methods/results/limitations review does not
 claim every appendix page, proof, corpus row or experimental result was reproduced.
+
+The cohort 7 depth decision uses the existing methods/results/limitations rule:
+each of its 20 dossiers has separately reviewed source spans for all three.
+A truthful `full_document_read: false` does not turn those bounded content reads
+into abstract-only review. The FHIBE institutional manuscript copy remains distinct
+from the publisher PDF; original incorrect copy metadata is quarantined rather
+than rewritten in the frozen author packet. MuSiQue counts once as a new human-composed
+question family; its seed datasets, answerability configurations and serializations
+do not add families. Restrictive or unresolved corpus licenses are catalogue
+findings and do not imply permission to redistribute underlying third-party data.
 
 The eligible core and both actual 200-record audits remain unfinished. The expanded
 report and matching package are not yet prepared. Prior synthesis receipts and
