@@ -33,6 +33,11 @@ def context_fixture():
 
 
 class ProjectionTests(unittest.TestCase):
+    def test_repository_citation_matches_release_metadata(self):
+        from research_report import build_context
+        expected = citations.citation_formats(citations.publication_metadata(build_context(ROOT)))['CITATION.cff']
+        self.assertEqual((ROOT / 'CITATION.cff').read_bytes(), expected)
+
     def test_clean_projection_removes_legacy_email_without_changing_canonical(self):
         path = ROOT / "data/canonical.json"
         before = path.read_bytes()
