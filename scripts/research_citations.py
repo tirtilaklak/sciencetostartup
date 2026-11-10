@@ -152,6 +152,9 @@ def publication_metadata(context):
                 "license": "CC-BY-4.0", "projection_version": PROJECTION_VERSION,
                 "note": "Published archived edition." if published else
                         "Preparation snapshot; not a published research edition. No DOI has been registered for this snapshot."}
+    publisher = identity.get("publisher", {})
+    if (publisher.get("type") == "Person" and publisher.get("given_names") and publisher.get("family_names")):
+        metadata["author_person"] = {"given": publisher["given_names"], "family": publisher["family_names"]}
     if published:
         metadata.update(doi=archive["doi"], url=archive["record_url"])
         if archive.get("published_on"):
@@ -166,24 +169,35 @@ def _bib(value):
 
 def citation_formats(metadata):
     m = metadata
-    fields = [("title", m["title"]), ("author", "{" + m["author"] + "}"),
+    person = m.get("author_person")
+    if person and person.get("given") and person.get("family"):
+        bib_author = _bib(person["given"]) + " " + _bib(person["family"])
+        ris_author = person["family"] + ", " + person["given"]
+        csl_author = {"given": person["given"], "family": person["family"]}
+        cff_author = {"given-names": person["given"], "family-names": person["family"]}
+    else:
+        bib_author = "{" + _bib(m["author"]) + "}"
+        ris_author = m["author"]
+        csl_author = {"literal": m["author"]}
+        cff_author = {"name": m["author"]}
+    fields = [("title", m["title"]), ("author", m["author"]),
               ("version", m["version"]), ("url", m["url"]), ("note", m["note"])]
     if m.get("doi"):
         fields.append(("doi", m["doi"]))
         if m.get("published_on"):
             fields.append(("year", m["published_on"][:4]))
     bibtex = "@misc{sciencetostartup_" + re.sub(r"[^a-zA-Z0-9]", "_", m["version"]) + ",\n"
-    bibtex += ",\n".join("  " + key + " = {" + (_bib(value) if key != "author" else "{" + _bib(m["author"]) + "}") + "}" for key, value in fields) + "\n}\n"
-    ris = ["TY  - RPRT", "TI  - " + m["title"], "AU  - " + m["author"], "UR  - " + m["url"], "N1  - " + m["note"], "ET  - " + m["version"]]
+    bibtex += ",\n".join("  " + key + " = {" + (_bib(value) if key != "author" else bib_author) + "}" for key, value in fields) + "\n}\n"
+    ris = ["TY  - RPRT", "TI  - " + m["title"], "AU  - " + ris_author, "UR  - " + m["url"], "N1  - " + m["note"], "ET  - " + m["version"]]
     if m.get("doi"):
         ris.append("DO  - " + m["doi"])
         if m.get("published_on"):
             ris.append("PY  - " + m["published_on"][:4])
     ris.extend(["ER  - ", ""])
     csl = {"id": "sciencetostartup-" + m["version"], "type": "report", "title": m["title"],
-           "author": [{"literal": m["author"]}], "URL": m["url"], "version": m["version"], "note": m["note"]}
+           "author": [csl_author], "URL": m["url"], "version": m["version"], "note": m["note"]}
     cff = {"cff-version": "1.2.0", "message": m["note"], "title": m["title"], "type": "dataset",
-           "authors": [{"name": m["author"]}], "url": m["url"], "version": m["version"], "license": m["license"]}
+           "authors": [cff_author], "url": m["url"], "version": m["version"], "license": m["license"]}
     if m.get("doi"):
         csl["DOI"], cff["doi"] = m["doi"], m["doi"]
         if m.get("published_on"):
@@ -275,6 +289,14 @@ def write_publication_assets(context, output):
         if (root / name).is_file():
             files[name] = (root / name).read_bytes()
     files["README.md"] = ("# ScienceToStartup publication preparation\n\n" + metadata["note"] + "\n\nOpen report.html for the full offline report. Citation files reflect archive status. The privacy-filtered JSON, CSV and SQLite are equivalent; they are projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Source quotes and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party material retains its rights.\n\nVerify all bytes using MANIFEST.json. Reproduce with python3 scripts/build_public_snapshot.py --output <empty-directory> from the source repository. A PDF is included only when its prepared receipt matches this exact context. No remote publication occurs during the build.\n").encode()
+    # These files are sent to external services, so they belong to the same
+    # immutable manifest and archive as the report and dataset.
+    zenodo = {"metadata": {"title": metadata["title"], "upload_type": "publication", "publication_type": "report",
+                            "description": metadata["note"], "creators": [{"name": metadata["author"]}],
+                            "version": metadata["version"], "access_right": "open", "license": "cc-by-4.0",
+                            "keywords": ["AI data", "research", "ScienceToStartup"]}}
+    files["zenodo-metadata.json"] = json_bytes(zenodo)
+    files["huggingface-README.md"] = ("---\nlicense: cc-by-4.0\nlanguage:\n- en\n---\n\n# " + metadata["title"] + "\n\n" + metadata["note"] + "\n\nPublic projection " + PROJECTION_VERSION + ". Read report.html and README.md before reuse. No third-party source text or personal contacts are licensed for reuse.\n").encode()
     manifest = {"schema_version": 1, "release_id": metadata["version"], "context_sha256": context_digest(context),
                 "files": {name: {"sha256": sha256(blob), "bytes": len(blob)} for name, blob in sorted(files.items())}}
     files["MANIFEST.json"] = json_bytes(manifest)
@@ -287,11 +309,4 @@ def write_publication_assets(context, output):
         (publication / name).write_bytes(blob)
     (publication / "package-status.json").write_bytes(json_bytes(state))
     (publication / "research-archive.zip").write_bytes(deterministic_zip(files))
-    # Ready-to-use upload metadata contains no invented DOI or account identifier.
-    zenodo = {"metadata": {"title": metadata["title"], "upload_type": "publication", "publication_type": "report",
-                            "description": metadata["note"], "creators": [{"name": metadata["author"]}],
-                            "version": metadata["version"], "access_right": "open", "license": "cc-by-4.0",
-                            "keywords": ["AI data", "research", "ScienceToStartup"]}}
-    (publication / "zenodo-metadata.json").write_bytes(json_bytes(zenodo))
-    (publication / "huggingface-README.md").write_text("---\nlicense: cc-by-4.0\nlanguage:\n- en\n---\n\n# " + metadata["title"] + "\n\n" + metadata["note"] + "\n\nPublic projection " + PROJECTION_VERSION + ". Read report.html and README.md before reuse. No third-party source text or personal contacts are licensed for reuse.\n", encoding="utf-8")
-    return ["publication/" + name for name in sorted(list(files) + ["package-status.json", "research-archive.zip", "zenodo-metadata.json", "huggingface-README.md"])]
+    return ["publication/" + name for name in sorted(list(files) + ["package-status.json", "research-archive.zip"])]

@@ -31,9 +31,10 @@ def partitions(config, at):
         result.append({"id": "hf-" + query, "adapter": "huggingface", "query": query, "limit": size})
     for collection in config["acl_collections"]:
         result.append({"id": "acl-" + collection, "adapter": "acl", "query": collection, "limit": size})
-    # A new dated OAI partition catches replacements to old arXiv works.
+    # The rolling OAI query catches replacements to old arXiv works. Its stable
+    # partition ID lets an unfinished run retain the original query and token.
     since = (at - timedelta(days=14)).date().isoformat()
-    result.insert(0, {"id": "oai-updates-" + at.date().isoformat(), "adapter": "oai", "query": since, "limit": size})
+    result.insert(0, {"id": "oai-updates", "adapter": "oai", "query": since, "limit": size})
     if len({row["id"] for row in result}) != len(result):
         raise ValueError("Discovery partition IDs must be distinct")
     return result
@@ -45,6 +46,16 @@ def select_partitions(rows, previous, limit):
         raise ValueError("A run may attempt 1..20 partitions")
     order = {row["id"]: index for index, row in enumerate(rows)}
     return sorted(rows, key=lambda row: (previous.get(row["id"], {}).get("attempted_at", ""), order[row["id"]]))[:limit]
+
+
+def partition_digest(row):
+    return hashlib.sha256(json.dumps(row, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def configuration_digest(row):
+    # A rolling query date is a run input, not a configuration change. Freeze
+    # that date until pagination finishes; the next run refreshes its lookback.
+    return partition_digest({**row, "query": "rolling-14-days-v1"} if row["adapter"] == "oai" else row)
 
 
 def run(root, state, at, max_partitions=4):
@@ -62,17 +73,29 @@ def run(root, state, at, max_partitions=4):
     stamp = at.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     outcomes = []
     for row in selected:
+        previous = ledger["partitions"].get(row["id"], {})
+        configuration = configuration_digest(row)
+        resume = (previous.get("configuration_sha256") == configuration
+                  and previous.get("discovery_window")
+                  and (not previous.get("complete") or previous.get("attempted_at", "")[:10] == stamp[:10]))
+        if resume:
+            row = previous["partition"]
+            if partition_digest(row) != previous.get("partition_sha256"):
+                raise ValueError("Stored discovery partition changed during pagination")
+        binding = partition_digest(row)
+        generation = previous.get("discovery_generation", 0) + (0 if resume else 1)
+        window = previous["discovery_window"] if resume else stamp[:10] + ":" + str(generation)
+        run_identity = {"partition_sha256": binding, "configuration_sha256": configuration,
+                        "partition": row, "discovery_window": window, "discovery_generation": generation}
+        # Persist the query identity before a page can reach its checkpoint. A
+        # process interruption must not replace a partially consumed dated run.
+        ledger["partitions"][row["id"]] = {"attempted_at": stamp, "complete": False,
+                                           "approved": False, **run_identity}
+        write_json(ledger_path, ledger)
         checkpoint = state / "checkpoints" / (row["id"] + ".json")
         client = PublicClient(state / "cache", checkpoint, ADAPTER_HOSTS[row["adapter"]])
-        previous = ledger["partitions"].get(row["id"], {})
-        if previous.get("complete") and previous.get("attempted_at", "")[:10] != stamp[:10]:
-            # Refresh finished metadata searches rather than treating a previous
-            # successful pagination pass as proof that no new records can exist.
-            for progress in client.state.get("cursors", {}).values():
-                progress["complete"], progress["next"] = False, None
-            client.save()
         try:
-            result = discover(client, row["adapter"], row["query"], limit=row["limit"], pages=1)
+            result = discover(client, row["adapter"], row["query"], limit=row["limit"], pages=1, window=window)
             path = state / "candidates" / (row["id"] + ".json")
             write_json(path, result)
             summary = {"attempted_at": stamp, "complete": bool(result["complete"]),
@@ -81,6 +104,7 @@ def run(root, state, at, max_partitions=4):
             # Every failed partition remains explicit and eligible for later retry.
             summary = {"attempted_at": stamp, "complete": False, "approved": False,
                        "error_type": type(error).__name__, "error": str(error)[:300]}
+        summary.update(run_identity)
         ledger["partitions"][row["id"]] = summary
         write_json(ledger_path, ledger)
         outcomes.append({"id": row["id"], **summary})
@@ -91,7 +115,9 @@ def run(root, state, at, max_partitions=4):
     return {"status": "candidates_only", "facts_modified": False, "approved": False,
             "scope_id": config["scope_id"], "scope_sha256": hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest(),
             "declared_partitions": len(rows), "attempted": outcomes,
-            "completed_partitions": sum(bool(ledger["partitions"].get(row["id"], {}).get("complete")) for row in rows),
+            "completed_partitions": sum(bool(ledger["partitions"].get(row["id"], {}).get("complete"))
+                                        and ledger["partitions"][row["id"]].get("configuration_sha256") == configuration_digest(row)
+                                        for row in rows),
             "limitations": config["limitations"]}
 
 

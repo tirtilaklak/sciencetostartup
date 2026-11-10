@@ -135,8 +135,12 @@ def serialized(service):
 class Release:
     def __init__(self, context, package, journal_path):
         self.context, self.package = context, Path(package)
-        self.manifest = json.loads((self.package / "MANIFEST.json").read_text())
-        self.package_sha256 = sha256((self.package / "MANIFEST.json").read_bytes())
+        manifest_bytes = (self.package / "MANIFEST.json").read_bytes()
+        self.manifest = json.loads(manifest_bytes)
+        self.manifest_sha256 = sha256(manifest_bytes)
+        # ZIP envelope bytes also matter: a recompressed or annotated archive
+        # must never reuse another artifact's reconciliation marker or journal.
+        self.package_sha256 = sha256((self.package / "research-archive.zip").read_bytes())
         self.journal = Journal(journal_path, context["report"]["release_id"], self.package_sha256)
 
     def verify(self):
@@ -150,18 +154,25 @@ class Release:
             raise PublicationBlocked("Publication policy is prepare_only; prepare packages until accounts are connected.")
         if not gate.get("archival_ready", gate.get("ready")) or not self.context.get("gate", {}).get("archival_ready", self.context.get("gate", {}).get("ready")):
             raise PublicationBlocked("Research archival-readiness gate has not passed.")
+        manifest_bytes = (self.package / "MANIFEST.json").read_bytes()
+        if sha256(manifest_bytes) != self.manifest_sha256 or json.loads(manifest_bytes) != self.manifest:
+            raise PublicationBlocked("Package manifest changed.")
+        if (self.manifest.get("schema_version") != 1
+                or self.manifest.get("release_id") != self.context["report"]["release_id"]):
+            raise PublicationBlocked("Package manifest identity differs.")
         if self.manifest.get("context_sha256") != context_digest(self.context):
             raise PublicationBlocked("Package context is stale.")
-        if sha256((self.package / "MANIFEST.json").read_bytes()) != self.package_sha256:
-            raise PublicationBlocked("Package manifest changed.")
+        required = {"report.pdf", "metadata.json", "clean-dataset.json", "zenodo-metadata.json", "huggingface-README.md"}
+        if not required <= set(self.manifest["files"]):
+            raise PublicationBlocked("Prepare a verified PDF and all publication payloads in the manifest.")
         for name, descriptor in self.manifest["files"].items():
             if Path(name).is_absolute() or ".." in Path(name).parts:
                 raise PublicationBlocked("Unsafe package member")
             blob = (self.package / name).read_bytes()
             if sha256(blob) != descriptor["sha256"] or len(blob) != descriptor["bytes"]:
                 raise PublicationBlocked("Prepared package file changed: " + name)
-        if "report.pdf" not in self.manifest["files"]:
-            raise PublicationBlocked("Prepare a verified PDF before archival publication.")
+        if sha256((self.package / "research-archive.zip").read_bytes()) != self.package_sha256:
+            raise PublicationBlocked("Prepared archive bytes changed.")
         expected = set(self.manifest["files"]) | {"MANIFEST.json"}
         with zipfile.ZipFile(self.package / "research-archive.zip") as archive:
             if len(archive.namelist()) != len(expected) or set(archive.namelist()) != expected:
@@ -183,8 +194,9 @@ class Release:
     def require_archive(self):
         self.verify()
         receipt = self.journal.state["zenodo"]
-        if receipt.get("status") != "published" or receipt.get("verified") is not True:
-            raise PublicationBlocked("Mirrors require a remotely verified published archive.")
+        if (receipt.get("status") != "published" or receipt.get("verified") is not True
+                or receipt.get("api_origin") != "https://zenodo.org" or receipt.get("environment") != "production"):
+            raise PublicationBlocked("Mirrors require a remotely verified published archive on production Zenodo.")
         return receipt
 
 
@@ -197,8 +209,22 @@ def _checksum_matches(remote, blob):
 class Zenodo:
     def __init__(self, release, token=None, transport=None, sandbox=False):
         self.release = release
-        self.http = transport or HTTP(token, "https://sandbox.zenodo.org" if sandbox else "https://zenodo.org")
+        self.api_origin = "https://sandbox.zenodo.org" if sandbox else "https://zenodo.org"
+        self.environment = "sandbox" if sandbox else "production"
+        self.http = transport or HTTP(token, self.api_origin)
         self.state = release.journal.state["zenodo"]
+
+    def _bind_environment(self):
+        if getattr(self.http, "origin", self.api_origin).rstrip("/") != self.api_origin:
+            raise PublicationBlocked("Zenodo transport origin differs from the selected environment")
+        origin = self.state.get("api_origin")
+        if origin is None:
+            if self.state.get("id") or self.state.get("status") not in {None, "prepared"}:
+                raise PublicationBlocked("Existing Zenodo journal lacks a verified API origin; inspect it before recovery")
+            self.state.update(api_origin=self.api_origin, environment=self.environment)
+            self.release.journal.save("zenodo-environment-bound", api_origin=self.api_origin, environment=self.environment)
+        elif origin != self.api_origin or self.state.get("environment") != self.environment:
+            raise PublicationBlocked("Zenodo journal belongs to a different API environment")
 
     def _request(self, method, path, **kwargs):
         return self.http.request(method, path, **kwargs)
@@ -237,6 +263,7 @@ class Zenodo:
     @serialized("zenodo")
     def draft(self, previous_id=None):
         self.release.verify()
+        self._bind_environment()
         if self.state.get("id"):
             deposit = self._deposit(self.state["id"])
             if deposit.get("submitted"):
@@ -291,6 +318,7 @@ class Zenodo:
     @serialized("zenodo")
     def upload(self):
         self.release.verify()
+        self._bind_environment()
         if self.state.get("status") == "published":
             raise PublicationBlocked("Published archive cannot be overwritten")
         deposit = self.draft()
@@ -323,6 +351,7 @@ class Zenodo:
     @serialized("zenodo")
     def reconcile(self):
         self.release.verify()
+        self._bind_environment()
         if not self.state.get("id"):
             return self.draft(self.state.get("previous_id"))
         deposit = self._deposit(self.state["id"])
@@ -343,6 +372,7 @@ class Zenodo:
     @serialized("zenodo")
     def publish(self):
         self.release.verify()
+        self._bind_environment()
         if not self.state.get("id"):
             raise PublicationBlocked("Create and upload the archive draft first")
         deposit = self._deposit(self.state["id"])

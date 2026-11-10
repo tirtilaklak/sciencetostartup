@@ -70,6 +70,26 @@ class ProjectionTests(unittest.TestCase):
 
 
 class CitationTests(unittest.TestCase):
+    def test_person_names_preserve_the_disclosed_individual_in_citation_formats(self):
+        context = context_fixture()
+        context["identity"]["publisher"].update(type="Person", given_names="Musa", family_names="Ozdem")
+        metadata = citations.publication_metadata(context)
+        self.assertEqual(metadata["author_person"], {"given": "Musa", "family": "Ozdem"})
+        formats = citations.citation_formats(metadata)
+        self.assertEqual(json.loads(formats["CITATION.cff"])["authors"], [{"given-names": "Musa", "family-names": "Ozdem"}])
+        self.assertEqual(json.loads(formats["citation.csl.json"])["author"], [{"given": "Musa", "family": "Ozdem"}])
+        self.assertIn(b"author = {Musa Ozdem}", formats["citation.bib"])
+        self.assertNotIn(b"author = {{", formats["citation.bib"])
+        self.assertIn(b"AU  - Ozdem, Musa", formats["citation.ris"])
+
+    def test_organization_fallback_retains_literal_citation_names(self):
+        context = context_fixture()
+        context["identity"]["publisher"] = {"name": "ScienceToStartup", "type": "Organization"}
+        formats = citations.citation_formats(citations.publication_metadata(context))
+        self.assertEqual(json.loads(formats["CITATION.cff"])["authors"], [{"name": "ScienceToStartup"}])
+        self.assertEqual(json.loads(formats["citation.csl.json"])["author"], [{"literal": "ScienceToStartup"}])
+        self.assertIn(b"author = {{ScienceToStartup}}", formats["citation.bib"])
+
     def test_prelaunch_and_reserved_doi_never_become_published_citations(self):
         context = context_fixture()
         context["report"]["archive"] = {"status": "reserved", "doi": "10.1234/reserved", "record_url": "https://example.org/draft", "confirmed_on": "2026-11-09"}
@@ -117,6 +137,7 @@ class CitationTests(unittest.TestCase):
                 self.assertEqual((Path(first) / name).read_bytes(), (Path(second) / name).read_bytes(), name)
             package = Path(first) / "publication"
             manifest = json.loads((package / "MANIFEST.json").read_text())
+            self.assertTrue({"zenodo-metadata.json", "huggingface-README.md"} <= set(manifest["files"]))
             with zipfile.ZipFile(package / "research-archive.zip") as archive:
                 self.assertEqual(set(archive.namelist()), set(manifest["files"]) | {"MANIFEST.json"})
                 for name, descriptor in manifest["files"].items():

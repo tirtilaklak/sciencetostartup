@@ -7,6 +7,7 @@ import sys
 import tempfile
 import types
 import unittest
+import zipfile
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -132,6 +133,63 @@ class PublicationTests(unittest.TestCase):
         (self.package / "report.md").write_text("changed")
         with self.assertRaisesRegex(publish.PublicationBlocked, "changed"):
             self.zenodo.draft()
+        self.assertEqual(self.remote.calls, [])
+
+    def test_external_metadata_changes_are_blocked_before_any_remote_request(self):
+        for name in ("zenodo-metadata.json", "huggingface-README.md"):
+            with self.subTest(name=name):
+                path = self.package / name
+                original = path.read_bytes()
+                path.write_bytes(b"unreviewed upload content")
+                with self.assertRaisesRegex(publish.PublicationBlocked, "changed"):
+                    self.zenodo.draft()
+                self.assertEqual(self.remote.calls, [])
+                path.write_bytes(original)
+
+    def test_archive_envelope_bytes_bind_the_journal_and_marker(self):
+        archive = self.package / "research-archive.zip"
+        original_digest = self.release.package_sha256
+        with zipfile.ZipFile(archive, "a") as stream:
+            stream.comment = b"fixture changed envelope, identical members"
+        with self.assertRaisesRegex(publish.PublicationBlocked, "archive bytes changed"):
+            self.zenodo.draft()
+        self.assertEqual(self.remote.calls, [])
+        with self.assertRaisesRegex(publish.PublicationBlocked, "different release/package"):
+            self.release.journal.save("fixture-existing-journal")
+            publish.Release(self.context, self.package, self.directory / "journal.json")
+        replacement = publish.Release(self.context, self.package, self.directory / "replacement-journal.json")
+        self.assertNotEqual(replacement.package_sha256, original_digest)
+
+    def test_mutated_in_memory_manifest_cannot_weaken_verification(self):
+        self.release.manifest["files"].pop("zenodo-metadata.json")
+        with self.assertRaisesRegex(publish.PublicationBlocked, "manifest changed"):
+            self.zenodo.draft()
+        self.assertEqual(self.remote.calls, [])
+
+    def test_sandbox_publication_cannot_authorize_a_production_mirror_or_journal(self):
+        sandbox = publish.Zenodo(self.release, transport=self.remote, sandbox=True)
+        sandbox.upload()
+        receipt = sandbox.publish()
+        self.assertEqual(receipt["environment"], "sandbox")
+        self.assertEqual(receipt["api_origin"], "https://sandbox.zenodo.org")
+        with self.assertRaisesRegex(publish.PublicationBlocked, "production Zenodo"):
+            self.release.require_archive()
+        before = len(self.remote.calls)
+        with self.assertRaisesRegex(publish.PublicationBlocked, "different API environment"):
+            self.zenodo.reconcile()
+        self.assertEqual(len(self.remote.calls), before)
+
+    def test_transport_origin_and_unattributed_old_receipts_fail_closed(self):
+        self.remote.origin = "https://sandbox.zenodo.org"
+        with self.assertRaisesRegex(publish.PublicationBlocked, "transport origin"):
+            self.zenodo.draft()
+        del self.remote.origin
+        self.zenodo.state.update(id=123, status="published", verified=True)
+        self.release.journal.save("fixture-originless-receipt")
+        with self.assertRaisesRegex(publish.PublicationBlocked, "production Zenodo"):
+            self.release.require_archive()
+        with self.assertRaisesRegex(publish.PublicationBlocked, "lacks a verified API origin"):
+            self.zenodo.reconcile()
         self.assertEqual(self.remote.calls, [])
 
     def test_no_credential_request_happens_implicitly(self):
