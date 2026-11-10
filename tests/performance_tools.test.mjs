@@ -42,11 +42,12 @@ async function fixture(t) {
   return {directory, files, save};
 }
 
-test('fixed gates retain the approved limits and require all five routes', () => {
+test('fixed gates retain the approved limits across field-guide and research routes', () => {
   assert.equal(policy.performance.lighthouseVersion, '13.6.0');
   assert.equal(policy.performance.playwrightVersion, '1.65.0');
   assert.equal(policy.performance.minimumRunsPerRoute, 3);
-  assert.deepEqual(policy.performance.routes, ['/', '/explore/#companies', '/explore/#work', '/explore/#company/mercor/work', '/work/']);
+  assert.deepEqual(policy.performance.routes, ['/', '/explore/#companies', '/explore/#work', '/explore/#company/mercor/work', '/work/',
+    '/research/', '/research/state-of-ai-data-labs/', '/research/data/', '/review/']);
   assert.deepEqual(Object.values(policy.performance.medianLimits).map(limit => limit.maximum), [2500, 200, 0.05]);
   assert.equal(policy.payload.bootstrap.maximumBrotliBytes, 300 * 1024);
   assert.equal(policy.payload.bootstrap.maximumGzipBytes, 360 * 1024);
