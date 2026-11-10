@@ -12,6 +12,7 @@ from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from email.utils import format_datetime
 import hashlib
+import json
 import re
 from types import SimpleNamespace
 from urllib.parse import quote, urlsplit
@@ -19,6 +20,7 @@ from zoneinfo import ZoneInfo
 import xml.etree.ElementTree as ET
 
 import static_pages as sp
+from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = "/research/state-of-ai-data-labs/"
@@ -45,6 +47,8 @@ KIND_LABELS = {"method": "Method", "analysis": "Analysis", "research_gap": "Rese
                "sourced_fact": "Source-backed finding"}
 STATUS_LABELS = {"approved": "Approved evidence", "candidate": "Candidate · review pending",
                  "historical": "Historical record", "excluded": "Excluded from scope"}
+INDEX_FACETS = ("domain", "modality", "workflow", "expertise", "origin", "labels", "oversight",
+                "delivery_model", "data_purpose")
 
 
 def _token(value):
@@ -79,7 +83,7 @@ def _safe_url(value):
 
 def _link(url, label, css=""):
     url = str(url or "")
-    if not (url.startswith("/") and not url.startswith("//")) and not _safe_url(url):
+    if not (url.startswith("/") and not url.startswith("//")) and not url.startswith('#') and not _safe_url(url):
         return sp.escape(label)
     return f'<a href="{sp.escape(url)}"' + (f' class="{sp.escape(css)}"' if css else "") + f'>{sp.escape(label)}</a>'
 
@@ -203,6 +207,8 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
              '<link rel="alternate" type="application/atom+xml" title="Published research editions" href="/research/atom.xml">\n'
              '<link rel="alternate" type="application/rss+xml" title="Research corrections" href="/research/corrections/feed.xml">\n'
              '<link rel="alternate" type="application/atom+xml" title="Research corrections" href="/research/corrections/atom.xml">\n')
+    if 'data-research-index' in body:
+        extra += '<script src="/research-index.js" defer></script>\n'
     return text.replace("</head>", extra + "</head>", 1)
 
 
@@ -351,12 +357,32 @@ def _paragraph(context, paragraph):
             f'<span class="r-paragraph-kind">{label}</span><p>{sp.escape(paragraph.get("text"))}</p>{links}</div>')
 
 
+def _findings(context):
+    findings, withheld = executive_findings(context)
+    body = ''
+    for finding in findings:
+        body += (f'<article class="r-finding" id="{sp.escape(finding_anchor(finding))}">'
+                 '<p class="r-kicker">Analytical judgment</p><h3>'
+                 + _link('#' + finding_anchor(finding), finding['id']) + '</h3>'
+                 + '<p>' + sp.escape(field_text(finding['text'])) + '</p><dl class="r-finding-fields">')
+        for key, label in JUDGMENT_FIELDS:
+            value = field_text(finding.get(key))
+            if value:
+                body += f'<dt>{label}</dt><dd>{sp.escape(value)}</dd>'
+        body += '</dl><p class="r-paragraph-citations">Approved evidence: ' + ', '.join(
+            _link(_evidence_url('assertion', cid), cid) for cid in finding['claim_ids']) + '</p></article>'
+    if withheld:
+        body += '<p class="r-callout">' + WITHHELD + '</p>'
+    return body
+
+
 def _report(context, edition=False):
     report = context["report"]
     # In-page fragment links are generated here, never accepted from source data.
     contents = "".join(f'<li><a href="#{_token(s["id"])}">{sp.escape(s["title"])}</a></li>' for s in report["sections"])
     chapters = "".join(f'<section class="r-chapter" id="{sp.escape(s["id"])}"><h2>{sp.escape(s["title"])}</h2>'
-                       + "".join(_paragraph(context, p) for p in s.get("paragraphs", [])) + "</section>" for s in report["sections"])
+                       + "".join(_paragraph(context, p) for p in s.get("paragraphs", []))
+                       + (_findings(context) if s['id'] == 'executive-assessment' else '') + "</section>" for s in report["sections"])
     state = "Published edition" if edition else _status(context)
     return (f'<header class="r-page-head"><p class="r-kicker">{sp.escape(state)}</p><h1>{sp.escape(report["title"])}</h1>'
             f'<p class="r-lede">{sp.escape(report.get("subtitle"))}</p>{_meta(context)}'
@@ -448,6 +474,52 @@ def _entity_card(context, entity):
             f'{_link(entity_url(entity, context), "Inspect record →", "r-text-link")}</li>')
 
 
+def _index_values(entity):
+    taxonomy = entity.get('taxonomy', {})
+    values = {'status': [entity.get('status', 'unknown')], 'type': [entity.get('kind', 'unknown')]}
+    for facet in INDEX_FACETS:
+        items = taxonomy.get(facet, [])
+        values[facet] = sorted({value for value in items if isinstance(value, str)}) if isinstance(items, list) else []
+    return values
+
+
+def _evidence_table(context, entities):
+    """Metadata-only enhancement payload; assertions remain on native pages."""
+    values = [_index_values(entity) for entity in entities]
+    controls = '<form class="r-index-controls" data-index-controls hidden role="search" aria-label="Filter research records"><label>Search records<input name="q" type="search" autocomplete="off" placeholder="Title or identifier"></label>'
+    for key in ('status', 'type') + INDEX_FACETS:
+        options = sorted({value for row in values for value in row[key]}, key=str.casefold)
+        if not options and key in {'delivery_model', 'data_purpose'}:
+            continue
+        label = {'status': 'Review status', 'type': 'Record type'}.get(key, key.replace('_', ' ').capitalize())
+        controls += f'<label>{label}<select name="{key}"><option value="">All</option>' + ''.join(
+            f'<option value="{sp.escape(value)}">{sp.escape(value.replace("_", " "))}</option>' for value in options)
+        if any(not row[key] for row in values):
+            controls += '<option value="__not_recorded__">Not recorded</option>'
+        controls += '</select></label>'
+    controls += '<button type="reset">Clear filters</button></form>'
+    rows = []
+    for entity, filters in zip(entities, values):
+        claims = _assertions(context, entity)
+        search = ' '.join([entity['name'], entity['id']] + entity.get('aliases', [])
+                          + [str(value) for value in entity.get('identifiers', {}).values()])
+        taxonomy = '; '.join(key.replace('_', ' ') + ': ' + ', '.join(filters[key]) for key in INDEX_FACETS if filters[key])
+        rows.append('<tr data-index-row data-search="' + sp.escape(search.lower()) + '" data-filters="'
+                    + sp.escape(json.dumps(filters, ensure_ascii=False, separators=(',', ':'))) + '">'
+                    + '<th scope="row">' + _link(entity_url(entity, context), entity['name'])
+                    + '<span class="r-record-id">' + sp.escape(entity['id']) + '</span></th>'
+                    + '<td data-label="Review">' + sp.escape(_label(entity)) + '<span class="r-table-note">'
+                    + sp.escape(entity.get('review_depth', '').replace('_', ' ')) + '</span></td>'
+                    + '<td data-label="Type">' + sp.escape(entity['kind'].replace('_', ' ')) + '</td>'
+                    + '<td data-label="Taxonomy">' + sp.escape(taxonomy or 'Not recorded') + '</td>'
+                    + '<td data-label="Evidence">' + _link(entity_url(entity, context) + '#approved-findings', f'{len(claims)} approved assertions') + '</td></tr>')
+    return ('<section data-research-index>' + controls
+            + f'<p class="r-meta" data-index-count role="status" aria-live="polite" aria-atomic="true">{len(entities)} records</p>'
+            + '<div class="r-table-wrap"><table class="r-evidence-table"><caption>Evidence records. Taxonomy on candidate records is provisional.</caption>'
+            + '<thead><tr><th scope="col">Record</th><th scope="col">Review</th><th scope="col">Type</th><th scope="col">Taxonomy</th><th scope="col">Evidence</th></tr></thead><tbody>'
+            + ''.join(rows) + '</tbody></table></div><p data-index-empty class="r-callout" hidden>No records match these filters. Clear filters to see all records.</p></section>')
+
+
 def _index(context, category):
     slug, title, kinds, description = category
     entities = sorted((e for e in context["graph"]["entities"] if e.get("kind") in kinds),
@@ -458,7 +530,7 @@ def _index(context, category):
             f'{sum(e.get("status") == "candidate" for e in entities)} candidate records</p>' + _meta(context) + '</header>'
             '<p class="r-callout">Candidate records help readers inspect the research queue. They are not reviewed findings, '
             'endorsements, or proof of a supplier contribution.</p>'
-            + ('<ul class="r-entity-list">' + "".join(_entity_card(context, e) for e in entities) + '</ul>' if entities else
+            + (_evidence_table(context, entities) if entities else
                '<section class="r-section"><h2>How this index will be built</h2><p>No records have entered this index yet. '
                'A workflow must identify its inputs, work stages, output artifact, qualifications, and version-specific source evidence. '
                'Separate source verification and adversarial review precede approval.</p>'
@@ -479,7 +551,7 @@ def _detail(context, entity):
             '<div class="r-detail-layout"><div><section class="r-section"><h2>Evidence & scope</h2>'
             f'<p>{sp.escape(entity.get("disposition_reason"))}</p><dl class="r-facts"><dt>Review depth</dt>'
             f'<dd>{sp.escape(entity.get("review_depth", "").replace("_", " "))}</dd><dt>Disposition</dt><dd>{sp.escape(entity.get("disposition"))}</dd>'
-            + identifiers + '</dl></section><section class="r-section"><h2>Approved findings</h2>'
+            + identifiers + '</dl></section><section class="r-section" id="approved-findings"><h2>Approved findings</h2>'
             + ("".join(_assertion(context, a) for a in approved) if approved else
                '<p class="r-callout">No approved assertions are available for this record. Source metadata and candidate proposals do not establish a finding.</p>')
             + '</section>'
@@ -717,6 +789,65 @@ def _correction_feeds(output, context, rows):
         (directory / name).write_bytes(ET.tostring(tree, encoding='utf-8', xml_declaration=True) + b'\n')
 
 
+def write_company_supplements(output, context):
+    """Append dated approved evidence to existing legacy company canonicals.
+
+    Call after static_pages writes original company HTML. Return only changed
+    company sitemap records; merge these by path into the existing sitemap.
+    Historical prose, figures, source dates and organization metadata are retained.
+    """
+    output = Path(output)
+    records = []
+    for entity in sorted(context['graph']['entities'], key=lambda row: row['id']):
+        legacy = entity.get('legacy_id')
+        assertions = _assertions(context, entity)
+        if not legacy or not assertions:
+            continue
+        path = entity_url(entity, context)
+        target = output / path.strip('/') / 'index.html'
+        if not target.is_file():
+            continue
+        original = target.read_text(encoding='utf-8')
+        canonical = sp.ORIGIN + path
+        if f'<link rel="canonical" href="{sp.escape(canonical)}">' not in original or '</main>' not in original:
+            raise ValueError('Legacy company supplement requires its existing canonical and main: ' + path)
+        modified = max(_day(context['graph']['as_of']), context['report']['updated_on'],
+                       *(_day(row.get('as_of')) for row in assertions))
+        def update_page_date(match):
+            nonlocal modified
+            node = json.loads(match.group(2))
+            def update(value):
+                nonlocal modified
+                if isinstance(value, dict):
+                    if value.get('@id') == canonical and value.get('@type') in {'WebPage', 'ProfilePage'}:
+                        modified = max(modified, _day(value.get('dateModified')))
+                        value['dateModified'] = modified
+                    for child in value.values():
+                        update(child)
+                elif isinstance(value, list):
+                    for child in value:
+                        update(child)
+            update(node)
+            return match.group(1) + sp.json_ld(node) + match.group(3)
+        text = re.sub(r'(<script\b[^>]*type="application/ld\+json"[^>]*>)(.*?)(</script>)', update_page_date, original, flags=re.S)
+        section = ('<!-- research-supplement:start --><section class="research r-company-supplement" id="new-research-evidence">'
+                   '<h2>New research evidence</h2><p class="r-meta">Research evidence snapshot '
+                   + _date(context['graph']['as_of']) + ' · Added assessment ' + _date(context['report']['updated_on']) + '</p>'
+                   '<p>These approved assertions supplement the historical profile. Each retains its own evidence date, scope and qualifications. '
+                   'They do not establish commercial quality or an unstated supplier contribution.</p>'
+                   + ''.join(_assertion(context, assertion) for assertion in assertions)
+                   + '</section><!-- research-supplement:end -->')
+        text = re.sub(r'<!-- research-supplement:start -->.*?<!-- research-supplement:end -->', '', text, flags=re.S)
+        text = text.replace('</main>', section + '</main>', 1)
+        if '<link rel="stylesheet" href="/research.css">' not in text:
+            text = text.replace('</head>', '<link rel="stylesheet" href="/research.css">\n</head>', 1)
+        target.write_text(text, encoding='utf-8')
+        records.append({'path': path, 'lastmod': modified})
+    if records:
+        (output / 'research.css').write_bytes((ROOT / 'web/research.css').read_bytes())
+    return records
+
+
 def write_research_pages(output, context):
     """Write static research HTML, its stylesheet and publication-only feeds.
 
@@ -769,6 +900,7 @@ def write_research_pages(output, context):
                                                ledger_path, _data(snapshot), 'CollectionPage')), encoding='utf-8')
         records.append({"path": ledger_path, "lastmod": snapshot['report']['updated_on']})
     (output / 'research.css').write_bytes((ROOT / 'web/research.css').read_bytes())
+    (output / 'research-index.js').write_bytes((ROOT / 'web/research-index.js').read_bytes())
     _feeds(output, context, editions)
     _correction_feeds(output, context, corrections)
     return records

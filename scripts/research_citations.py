@@ -18,6 +18,12 @@ import sqlite3
 import shutil
 import tempfile
 import zipfile
+from urllib.parse import quote
+
+try:
+    from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
+except ImportError:
+    from scripts.research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECTION_VERSION = "1.0.0"
@@ -232,6 +238,22 @@ def report_markdown(context):
             lines.extend(["[" + paragraph.get("kind", "analysis") + "] " + paragraph["text"], ""])
             if paragraph.get("claim_ids"):
                 lines.extend(["Evidence IDs: " + ", ".join(paragraph["claim_ids"]), ""])
+        if section.get('id') == 'executive-assessment':
+            findings, withheld = executive_findings(context)
+            def safe(value):
+                text = html.escape(' '.join(field_text(value).splitlines()), quote=False)
+                return re.sub(r'([\\`*_{}\[\]()#+.!>~|])', r'\\\1', text)
+            for finding in findings:
+                lines.extend(['<a id="' + finding_anchor(finding) + '"></a>',
+                              '### Analytical judgment: ' + finding['id'], '', safe(finding['text']), ''])
+                for key, label in JUDGMENT_FIELDS:
+                    if field_text(finding.get(key)):
+                        lines.extend([label + ': ' + safe(finding[key]), ''])
+                lines.extend(['Approved evidence: ' + ', '.join(
+                    '[' + cid + '](https://sciencetostartup.com/research/data/#' + quote('assertion-' + cid, safe='._-') + ')'
+                    for cid in finding['claim_ids']), ''])
+            if withheld:
+                lines.extend([WITHHELD, ''])
     lines.extend(["## Evidence and reproduction", "", "The accompanying clean-dataset.json, CSV and SQLite contain the same versioned public projection. Canonical dataset 2.5.0 remains unchanged outside this archive. Contact details and raw source text are excluded from this projection. Review receipts describe actual review scope; a candidate is not a deeply reviewed record.", "",
                   "Use MANIFEST.json to verify each file's SHA-256. The archive is self-contained and makes no network requests. Source URLs and identifiers are retained in the accompanying public graph.", ""])
     return privacy_filter("\n".join(lines))
@@ -240,12 +262,24 @@ def report_markdown(context):
 def offline_html(context):
     # Preserve every paragraph as text without interpreting embedded HTML.
     body = []
+    in_finding = False
     for line in report_markdown(context).splitlines():
-        if line.startswith("# "):
+        if re.fullmatch(r'<a id="finding-[A-Za-z0-9][A-Za-z0-9._:-]{0,199}"></a>', line):
+            body.append(line)
+            in_finding = True
+        elif line.startswith('### '):
+            body.append('<h3>' + html.escape(line[4:]) + '</h3>')
+        elif line.startswith('Approved evidence: '):
+            links = re.findall(r'\[([^\]]+)\]\((https://sciencetostartup.com/research/data/#[A-Za-z0-9%._-]+)\)', line)
+            body.append('<p>Approved evidence: ' + ', '.join('<a href="' + html.escape(url, quote=True) + '">' + html.escape(label) + '</a>' for label, url in links) + '</p>')
+        elif line.startswith("# "):
             body.append("<h1>" + html.escape(line[2:]) + "</h1>")
         elif line.startswith("## "):
             body.append("<h2>" + html.escape(line[3:]) + "</h2>")
+            in_finding = False
         elif line:
+            if in_finding:
+                line = html.unescape(re.sub(r'\\([\\`*_{}\[\]()#+.!>~|])', r'\1', line))
             body.append("<p>" + html.escape(line) + "</p>")
     return ('<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>'
             + html.escape(context["report"]["title"]) + '</title><style>body{max-width:72ch;margin:3rem auto;padding:0 1rem;font:18px/1.6 system-ui;color:#18312c}h1,h2{line-height:1.2}p{overflow-wrap:anywhere}h2{margin-top:2.5rem}@media print{body{font-size:11pt}}</style><main>'

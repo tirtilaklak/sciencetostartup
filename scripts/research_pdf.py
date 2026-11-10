@@ -9,6 +9,10 @@ import argparse
 import io
 from pathlib import Path
 import xml.sax.saxutils
+try:
+    from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
+except ImportError:
+    from scripts.research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
 
 try:
     from research_citations import ROOT, context_digest, json_bytes, privacy_filter, publication_metadata, sha256
@@ -84,6 +88,18 @@ def render_report_pdf(context):
             story.append(KeepTogether(group))
         if not section.get("paragraphs"):
             story.append(heading)
+        if section.get('id') == 'executive-assessment':
+            findings, withheld = executive_findings(context)
+            for finding in findings:
+                story.append(Paragraph('<a name="' + finding_anchor(finding) + '"/><b>Analytical judgment: '
+                                       + escape(finding['id']) + '</b>', styles['BodyText']))
+                story.append(Paragraph(escape(field_text(finding['text'])), styles['BodyText']))
+                for key, label in JUDGMENT_FIELDS:
+                    if field_text(finding.get(key)):
+                        story.append(Paragraph('<b>' + label + ':</b> ' + escape(field_text(finding[key])), styles['BodyText']))
+                story.append(Paragraph('Approved evidence IDs: ' + escape(', '.join(finding['claim_ids'])), styles['Evidence']))
+            if withheld:
+                story.append(Paragraph(WITHHELD, styles['BodyText']))
     story.append(Paragraph("Bibliography and source versions", styles["Heading2"]))
     for sid in sorted(sources):
         source = sources[sid]
