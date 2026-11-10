@@ -61,6 +61,8 @@ function ensureHealthModule(){
     if(module?.buildId!==window.APP_BUILD_ID||typeof module.initialize!=='function')throw new Error('Stale financial module');
     module.initialize();
     if(!['refreshBundle','render','valueText','latestFigures'].every(key=>typeof window.BusinessHealth?.[key]==='function'))throw new Error('Invalid financial module');
+    const profiles=window.ScienceProfileDetails;
+    if(profiles?.buildId!==window.APP_BUILD_ID||!['profileProductGrid','profileCase','profileRelationshipGrid','profileRisks','profilePeople','profileCapital','profileTraction','profileArchive'].every(key=>typeof profiles[key]==='function'))throw new Error('Invalid profile module');
     window.APP_HEALTH_READY=window.APP_BUILD_ID;finish();
    }catch(error){finish(error);}
   };

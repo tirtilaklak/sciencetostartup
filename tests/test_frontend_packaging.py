@@ -105,7 +105,7 @@ process.stdout.write(JSON.stringify({build:window.SCIENCE_HEALTH_MODULE.buildId,
             self.assertEqual(json.loads(result.stdout), {'build': 'factory-test', 'initialize': 'function', 'health': 'undefined', 'extraGlobals': []})
 
     def test_build_packages_the_initial_and_deferred_sources_with_provenance(self):
-        initial = tuple(name for name in PRESENTATION_JS if name != 'business-health.js')
+        initial = tuple(name for name in PRESENTATION_JS if name not in {'profile-details.js', 'business-health.js'})
         self.assertEqual(INITIAL_PRESENTATION_JS, initial)
         self.assertEqual(PRESENTATION_JS[-1], 'business-health.js')
         with tempfile.TemporaryDirectory() as temporary:
@@ -117,6 +117,7 @@ process.stdout.write(JSON.stringify({build:window.SCIENCE_HEALTH_MODULE.buildId,
             content = (folder / descriptor['href'].lstrip('/')).read_bytes()
             self.assertEqual(manifest['sha256'][descriptor['href'].lstrip('/')], hashlib.sha256(content).hexdigest())
             self.assertEqual(manifest['source_sha256']['web/business-health.js'], hashlib.sha256((ROOT / 'web/business-health.js').read_bytes()).hexdigest())
+            self.assertEqual(manifest['source_sha256']['web/profile-details.js'], hashlib.sha256((ROOT / 'web/profile-details.js').read_bytes()).hexdigest())
             html = (folder / 'explore/index.html').read_text()
             app_href = re.search(r'href="(/js/app\.[^"]+\.js)"', html).group(1)
             template = (ROOT / 'web/index.html').read_text()
