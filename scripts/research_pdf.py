@@ -20,6 +20,20 @@ except ImportError:
     from scripts.research_citations import ROOT, CONTEXT_CONTRACT_VERSION, context_digest, json_bytes, privacy_filter, publication_metadata, sha256
 
 
+def bibliography_documents(sources):
+    """Number pinned documents once while preserving every scoped source ID."""
+    groups = {}
+    for sid in sorted(sources):
+        source = sources[sid]
+        body = source.get('response_sha256')
+        key = (source.get('url'), source.get('version'), body, None if body else sid)
+        group = groups.setdefault(key, {'source': source, 'source_ids': []})
+        group['source_ids'].append(sid)
+    documents = list(groups.values())
+    numbers = {sid: number for number, group in enumerate(documents, 1) for sid in group['source_ids']}
+    return documents, numbers
+
+
 def render_report_pdf(context):
     try:
         import reportlab
@@ -55,7 +69,7 @@ def render_report_pdf(context):
     graph = privacy_filter(context["graph"])
     sources = {row["id"]: row for row in graph.get("sources", [])}
     assertions = {row["id"]: row for row in graph.get("assertions", [])}
-    source_numbers = {sid: index + 1 for index, sid in enumerate(sorted(sources))}
+    documents, source_numbers = bibliography_documents(sources)
     story = [Paragraph(escape(report["title"]), styles["Title"]), Spacer(1, 12),
              Paragraph(escape(metadata["status"].upper() + " | " + report["release_id"] + " | Updated " + report["updated_on"]), styles["Evidence"]),
              Paragraph(escape(metadata["note"]), styles["BodyText"]),
@@ -104,12 +118,15 @@ def render_report_pdf(context):
             if withheld:
                 story.append(Paragraph(WITHHELD, styles['BodyText']))
     story.append(Paragraph("Bibliography and source versions", styles["Heading2"]))
-    for sid in sorted(sources):
-        source = sources[sid]
-        label = "[" + str(source_numbers[sid]) + "] " + source.get("title", sid)
+    story.append(Paragraph("References group identical URL, version and response digest. Multiple evidence bindings to the same pinned document share a reference number; all source IDs, precise locators and review receipts remain separate in evidence.html and the dataset.", styles["Evidence"]))
+    for number, group in enumerate(documents, 1):
+        source = group['source']
+        label = "[" + str(number) + "] " + source.get("title", group['source_ids'][0])
         details = "; ".join(str(value) for value in (source.get("publisher"), source.get("version"), source.get("published_on")) if value)
         url = source.get("url", "")
-        story.append(KeepTogether([Paragraph(escape(label) + ". " + escape(details) + ("<br/><link href=" + xml.sax.saxutils.quoteattr(url) + ">" + escape(url) + "</link>" if url else ""), styles["Evidence"])]))
+        pin = ('<br/>Response SHA-256: ' + escape(source['response_sha256'])) if source.get('response_sha256') else '<br/>No captured response digest; retrieval status: ' + escape(source.get('status', 'unknown'))
+        count = '<br/>Scoped evidence bindings: ' + str(len(group['source_ids']))
+        story.append(KeepTogether([Paragraph(escape(label) + ". " + escape(details) + ("<br/><link href=" + xml.sax.saxutils.quoteattr(url) + ">" + escape(url) + "</link>" if url else "") + pin + count, styles["Evidence"])]))
     story.append(KeepTogether([Paragraph("Evidence and reproduction", styles["Heading2"]),
         Paragraph("The complete public evidence graph accompanies this report in the offline archive. Paragraph evidence IDs refer to that graph. The JSON, CSV and SQLite contain equivalent privacy-filtered projection " + metadata["projection_version"] + ". Canonical dataset 2.5.0 remains unchanged outside this archive. Raw source text and personal contact details are excluded.", styles["BodyText"]),
         Paragraph("Verify MANIFEST.json, then run python3 reproduce.py --write-tables reproduced in the extracted archive. LOCATORS.md documents evidence coordinates. Owned research and text use CC BY 4.0; third-party material retains its rights. Review scope and research gaps remain explicit. This PDF's status does not establish website or external mirror publication.", styles["BodyText"])]))

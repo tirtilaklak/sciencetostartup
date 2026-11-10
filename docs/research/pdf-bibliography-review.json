@@ -1,0 +1,30 @@
+{
+  "reviewed_on": "2026-11-10T16:35:11.578614+00:00",
+  "scope": "Separate technical review of uncommitted PDF bibliography grouping code only; not part of report synthesis decision or a new primary-source review.",
+  "decision": "pass",
+  "source_records": 1790,
+  "document_references": 504,
+  "all_scoped_source_ids_retained_in_mapping": true,
+  "all_evidence_references_mapped": true,
+  "distinct_url_version_hash_never_merged": true,
+  "unhashed_records_kept_distinct_by_source_id": true,
+  "source_graph_and_report_unchanged": true,
+  "report_file_sha256": "51cd1e60bca86a5be2c6b0e93dc44ad24a2a10932af160153fa4af97840f89e4",
+  "report_review_digest": "2447254fb2e308e1056c164c1ab94e0b8083a35e666e3366e20d38451c2abc4f",
+  "graph_sha256": "044a17dc52ae6e70d684e18fbf9dc6273be657aa6b80c1074a963f33513160d8",
+  "metadata_variability": {
+    "title": 1,
+    "publisher": 0,
+    "published_on": 0,
+    "license": 0,
+    "version": 0,
+    "url": 0,
+    "response_sha256": 0
+  },
+  "rationale": "The diff is limited to document grouping, numbered citations and bibliography display. Every source ID maps exactly once; URL/version/response identity differences are kept separate. The representative title is selected deterministically from sorted scoped IDs. Source-level locators, excerpts, licenses, qualifications and review receipts remain in the graph/evidence archive. Paragraph prose and finding fields are not rewritten by this change. Identical document pins can have multiple scope titles, intentionally represented by one bibliography entry plus binding count and explicit evidence-archive note.",
+  "validation": "Independently executed all four dedicated bibliography tests with bundled ReportLab and pypdf: passed, no skips. Also checked full current graph: 1790 source IDs map to 504 references and no assertion evidence source is missing. Root separately owns full-PDF geometry and visual inspection.",
+  "files": [
+    "scripts/research_pdf.py",
+    "tests/test_research_pdf_documents.py"
+  ]
+}
