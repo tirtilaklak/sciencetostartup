@@ -147,7 +147,9 @@ class StaticPageTests(unittest.TestCase):
     def tearDownClass(cls): cls.temp.cleanup()
 
     def public_files(self):
-        return sorted(self.dist.glob("company/*/index.html")) + [self.dist / name for name in ("companies/index.html", "work/index.html", "method/index.html", "404.html", "sitemap.xml")]
+        # These checks pin the historical 39-company field-guide semantics.
+        # Additive research routes have their own renderer and acceptance suite.
+        return [self.dist / "company" / cid / "index.html" for cid in sorted(self.companies)] + [self.dist / name for name in ("companies/index.html", "work/index.html", "method/index.html", "404.html", "sitemap.xml")]
 
     def html_files(self):
         return [path for path in self.public_files() if path.suffix == ".html"]
@@ -158,7 +160,7 @@ class StaticPageTests(unittest.TestCase):
     def figures(self, cid):
         """(metric id, html) for each Key figures row, each Not confirmed item and each Other reported figures item."""
         section = self.pages[cid].split('<h2 id="figures">', 1)[1].split('<h2 id="facts"', 1)[0]
-        rows = re.findall(r'<tr data-metric="([^"]+)">(.*?)</tr>', section, re.S)
+        rows = re.findall(r'<tr\b[^>]*\bdata-metric="([^"]+)"[^>]*>(.*?)</tr>', section, re.S)
         lists = {key: re.findall(r'<li data-metric="([^"]+)">(.*?)</li>', section.split(f'<h3 id="{key}">', 1)[1].split("</ul>", 1)[0], re.S) if f'<h3 id="{key}">' in section else [] for key in ("unconfirmed", "other-figures")}
         return rows, lists["unconfirmed"], lists["other-figures"]
 
@@ -169,7 +171,11 @@ class StaticPageTests(unittest.TestCase):
 
     def test_every_company_gets_a_crawlable_page(self):
         self.assertEqual(len(self.companies), 39)
-        self.assertEqual(sorted(p.name for p in (self.dist / "company").iterdir()), sorted(self.companies))
+        from research_report import build_context
+        from research_pages import _new_company, _path_token
+        context = build_context(ROOT)
+        additive = {_path_token(e['id']) for e in context['graph']['entities'] if _new_company(context, e)}
+        self.assertEqual({p.name for p in (self.dist / "company").iterdir()}, set(self.companies) | additive)
         for cid in self.companies: self.assertTrue((self.dist / "company" / cid / "index.html").is_file(), cid)
 
     def test_pages_declare_canonical_url_title_and_heading(self):
@@ -232,12 +238,16 @@ class StaticPageTests(unittest.TestCase):
         root = ET.parse(self.dist / "sitemap.xml").getroot()
         self.assertEqual(root.tag, NAMESPACE + "urlset")
         urls = root.findall(NAMESPACE + "url")
-        self.assertEqual(len(urls), 4 + len(self.companies))
         locs = [u.find(NAMESPACE + "loc").text for u in urls]
-        self.assertEqual(locs[:2] + locs[-2:], [ORIGIN + "/", ORIGIN + "/companies/", ORIGIN + "/work/", ORIGIN + "/method/"])
-        self.assertEqual(sorted(locs[2:-2]), sorted(f"{ORIGIN}/company/{cid}/" for cid in self.companies))
+        legacy = {ORIGIN + p for p in ('/', '/companies/', '/work/', '/method/')} | {f"{ORIGIN}/company/{cid}/" for cid in self.companies}
+        self.assertTrue(legacy <= set(locs))
+        self.assertEqual(len(locs), len(set(locs)))
+        self.assertIn(ORIGIN + '/research/', locs)
         reviewed = self.events["reviewed_on"]
         newest = max(sp.SITE_REVISED, self.data["meta"]["as_of"], reviewed, *(e.get("reviewed_on") or "" for e in self.editorial.values()), *(d for r in self.routes for d in sp.route_dates(r) if d))
+        from research_report import build_context
+        context = build_context(ROOT)
+        newest = max(newest, context['report']['updated_on'], context['graph']['as_of'][:10])
         lastmods = {}
         for url in urls:
             loc, lastmod = url.find(NAMESPACE + "loc").text, url.find(NAMESPACE + "lastmod").text
@@ -287,7 +297,7 @@ class StaticPageTests(unittest.TestCase):
             self.assertEqual(sorted(re.findall(r'/company/([^/]+)/"', related)), sorted(peers), cid)
 
     def test_header_footer_and_icons_are_shared_by_every_page(self):
-        expected_nav = [f"{ORIGIN}/companies/", f"{ORIGIN}/work/", f"{ORIGIN}/explore/#about"]
+        expected_nav = [f"{ORIGIN}/research/", f"{ORIGIN}/companies/", f"{ORIGIN}/work/", f"{ORIGIN}/method/#about"]
         for path in self.html_files():
             text, label = path.read_text(), str(path.relative_to(self.dist))
             facts = PageFacts(text)
@@ -409,7 +419,7 @@ class StaticPageTests(unittest.TestCase):
     def test_manifest_covers_the_static_pages(self):
         manifest = json.loads((self.dist / "manifest.json").read_text())["sha256"]
         for name in ("sitemap.xml", "companies/index.html", "company/mercor/index.html", "work/index.html", "method/index.html", "404.html", "favicon.ico", "assets/favicon.svg", "assets/favicon-48.png", "assets/apple-touch-icon.png", "assets/share/sciencetostartup-1200x630.png"): self.assertIn(name, manifest)
-        self.assertEqual(sum(1 for n in manifest if n.startswith("company/") and n.endswith("/index.html")), 39)
+        self.assertEqual(sum(1 for n in manifest if n.startswith("company/") and n.endswith("/index.html")), len(list((self.dist / 'company').glob('*/index.html'))))
 
     def test_static_pages_are_reproducible(self):
         with tempfile.TemporaryDirectory(prefix="static-pages-again-") as temp:

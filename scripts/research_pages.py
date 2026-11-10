@@ -142,7 +142,8 @@ def _meta(context):
     report, graph = context["report"], context["graph"]
     return (f'<p class="r-meta">Prepared {_date(report.get("updated_on"))} '
             f'<span aria-hidden="true">·</span> Evidence snapshot {_date(graph.get("as_of"))} '
-            f'<span aria-hidden="true">·</span> {sp.escape(graph.get("release_id"))}</p>')
+            f'<span aria-hidden="true">·</span> Report {sp.escape(report.get("release_id"))}'
+            + (f' <span aria-hidden="true">·</span> Evidence {sp.escape(graph.get("release_id"))}' if graph.get('release_id') != report.get('release_id') else '') + '</p>')
 
 
 def _status(context):

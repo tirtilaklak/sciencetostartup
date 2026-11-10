@@ -911,7 +911,7 @@ def site_footer(research, note=""):
     """The site map, then who publishes the guide with the About disclosure, then the research date and dataset version."""
     groups = (("Explore", (("Overview", "/"), ("Companies", "/companies/"), ("Paid work", "/work/"), ("Compare", "/explore/#compare"))),
               ("Research", (("Research hub", "/research/"), ("Research data", "/research/data/"), ("Method", "/method/"), ("What the labels mean", "/method/#labels"), ("Download the data", "/method/#downloads"))),
-              ("About", (("About the publisher", "/method/#about"), ("Review and corrections", "/review/"), ("The publisher’s proposed AI lab", "/explore/#venture"))))
+              ("About", (("About the publisher", "/method/#about"), ("Review and corrections", "/review/"), ("Request a correction", "/explore/#corrections"), ("The publisher’s proposed AI lab", "/explore/#venture"))))
     columns = "".join(f"<div><h2>{heading}</h2><ul>" + "".join(f'<li><a href="{ORIGIN}{path}">{label}</a></li>' for label, path in links) + "</ul></div>" for heading, links in groups)
     line = " · ".join(part for part in (f"Research compiled {format_date(research.as_of)}" if research.as_of else "", f"Dataset v{research.data.get('dataset_version')}" if research.data.get("dataset_version") else "") if part)
     return (f'<footer class="site-footer"><nav aria-label="Site map">{columns}</nav><p>{SITE_NAME} is published by {PUBLISHER_NAME}. {disclosure_html()}</p>'

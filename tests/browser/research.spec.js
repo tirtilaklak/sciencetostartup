@@ -85,7 +85,7 @@ test.describe('research without JavaScript', () => {
       ['BibTeX', '/publication/citation.bib', /@\w+\s*\{/],
       ['RIS', '/publication/citation.ris', /^TY\s+-/m],
       ['CSL JSON', '/publication/citation.csl.json', /"title"\s*:/],
-      ['CITATION.cff', '/publication/CITATION.cff', /cff-version:/],
+      ['CITATION.cff', '/publication/CITATION.cff', /["']?cff-version["']?\s*:/],
     ];
     for (const [name, href, format] of formats) {
       await expect(page.locator('#citation').getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
