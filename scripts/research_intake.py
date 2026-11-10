@@ -72,6 +72,9 @@ def run(root, state, at, max_partitions=4):
     selected = select_partitions(rows, ledger["partitions"], max_partitions)
     stamp = at.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     outcomes = []
+    # Each partition keeps its own durable pagination checkpoint, but requests
+    # to the same host must share throttling across those separate clients.
+    request_times = {}
     for row in selected:
         previous = ledger["partitions"].get(row["id"], {})
         configuration = configuration_digest(row)
@@ -94,6 +97,7 @@ def run(root, state, at, max_partitions=4):
         write_json(ledger_path, ledger)
         checkpoint = state / "checkpoints" / (row["id"] + ".json")
         client = PublicClient(state / "cache", checkpoint, ADAPTER_HOSTS[row["adapter"]])
+        client.last_request = request_times
         try:
             result = discover(client, row["adapter"], row["query"], limit=row["limit"], pages=1, window=window)
             path = state / "candidates" / (row["id"] + ".json")
