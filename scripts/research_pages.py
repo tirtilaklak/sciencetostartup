@@ -291,12 +291,98 @@ def _hub(context, editions=()):
             + archive_links)
 
 
+def _structured_claim_value(assertion):
+    """Recognize the reviewed statement wrapper without altering stored bytes."""
+    value = assertion.get('value')
+    if not isinstance(value, dict) or value.get('type') != 'text' or not isinstance(value.get('value'), str):
+        return None
+    try:
+        parsed = json.loads(value['value'])
+    except (ValueError, RecursionError):
+        return None
+    if isinstance(parsed, dict) and isinstance(parsed.get('statement'), str) and parsed['statement'].strip():
+        return parsed
+    return None
+
+
+def _scope_value(value):
+    """Readable structured scope, preserving explicit unknowns and qualifiers."""
+    if value is None:
+        return 'Not stated in the source'
+    if isinstance(value, bool):
+        return 'Yes' if value else 'No'
+    if isinstance(value, (int, float)):
+        return sp.escape(format(value, ','))
+    if isinstance(value, list):
+        return '<ul>' + ''.join('<li>' + _scope_value(item) + '</li>' for item in value) + '</ul>'
+    if isinstance(value, dict):
+        return '<ul>' + ''.join('<li><strong>' + sp.escape(key.replace('_', ' ').capitalize()) + ':</strong> '
+                               + _scope_value(item) + '</li>' for key, item in value.items()
+                               if key not in {'claim_class', 'company_entity_id', 'type', 'scope_kind'}) + '</ul>'
+    label = {'company_reported': 'Reported by the company',
+             'reported_audited_financial_statements': 'Reported in audited financial statements',
+             'not_explicit_in_bound_pricing_FAQ': 'Not explicit in the cited pricing FAQ'}.get(str(value))
+    if label is None:
+        label = str(value).replace('_', ' ') if re.fullmatch(r'[A-Za-z0-9]+(?:_[A-Za-z0-9]+)+', str(value)) else str(value)
+    return sp.escape(label)
+
+
+def _claim_scope(assertion):
+    value = _structured_claim_value(assertion)
+    if not value or assertion.get('status') not in {'approved', 'historical'}:
+        return ''
+    scope_labels = {'company': 'Entity', 'includes': 'Included entities', 'product': 'Product',
+                    'service': 'Service', 'segments': 'Business segments', 'supplier_relevant_segment': 'Supplier segment',
+                    'adjacent_segment': 'Adjacent segment', 'geographic_scope': 'Geographic scope',
+                    'activities': 'Activities', 'modes': 'Delivery modes', 'not_isolated': 'Not separately reported',
+                    'historical_software_context': 'Historical product context', 'provenance_scope': 'Evidence scope'}
+    basis_labels = {'amount': 'Amount', 'currency': 'Currency', 'currency_symbol': 'Currency symbol',
+                    'currency_note': 'Currency qualification', 'period_start': 'Period start', 'period_end': 'Period end',
+                    'period_label': 'Reporting period', 'reported_or_estimated': 'Reported or estimated',
+                    'annualized': 'Annualized amount', 'active_window': 'Activity window', 'scope': 'Reported entity or segment scope',
+                    'is_revenue': 'Revenue measure', 'is_human_data_segment_revenue': 'Isolated human-data segment revenue',
+                    'metric': 'Measure', 'unit': 'Unit', 'qualifier': 'Value qualifier', 'values': 'Reported values',
+                    'waitlist': 'Separate waitlist', 'percentage_denominator': 'Percentage denominator',
+                    'denominator_status': 'Denominator qualification', 'conditions': 'Source conditions', 'statement': 'Basis statement'}
+    scope_kinds = {'company_reported_business_segments': 'Company-described business segments',
+                   'described_business_activities_not_financial_reporting_segments': 'Described business activities; financial reporting segments are not established',
+                   'geographic_operating_segments': 'Geographic operating segments',
+                   'nonexclusive_data_product_line': 'Nonexclusive data product line',
+                   'expert_access_product': 'Expert access product', 'expert_data_service': 'Expert data service',
+                   'legal_operator_and_statement_group': 'Legal operator and entities covered by the statement',
+                   'separate_product_delivery_modes': 'Separate product and delivery modes', 'product_capability': 'Product capability'}
+    rows = []
+    for field, labels in (('scope', scope_labels), ('reported_value_and_basis', basis_labels)):
+        details = value.get(field)
+        if not isinstance(details, dict):
+            continue
+        for key, item in details.items():
+            if key in {'claim_class', 'company_entity_id', 'type'}:
+                continue
+            if key == 'scope_kind':
+                if not isinstance(item, str) or item not in scope_kinds:
+                    continue
+                label, shown = 'Scope', sp.escape(scope_kinds[item])
+            else:
+                label = labels.get(key, key.replace('_', ' ').capitalize())
+                shown = 'Not defined in the source' if key == 'active_window' and item is None else _scope_value(item)
+            rows.append('<dt>' + sp.escape(label) + '</dt><dd>' + shown + '</dd>')
+    return ('<details class="r-receipts"><summary>Scope and reported basis</summary><dl class="r-facts">'
+            + ''.join(rows) + '</dl></details>') if rows else ''
+
+
 def _claim_text(context, assertion):
     entities = _entities(context)
     subject = entities.get(assertion.get("subject_id"), {})
     obj = entities.get(assertion.get("object_id"), {})
     subject_html = _link(entity_url(subject, context), subject.get("name", "Unknown subject")) if subject else "Unknown subject"
     if assertion.get("value") is not None:
+        structured = _structured_claim_value(assertion)
+        if structured:
+            statement = structured['statement']
+            name = subject.get('name')
+            match = re.search(r'(?<!\w)' + re.escape(name) + r'(?!\w)', statement) if name else None
+            return (sp.escape(statement[:match.start()]) + subject_html + sp.escape(statement[match.end():])) if match else sp.escape(statement)
         value = assertion["value"]
         if isinstance(value, dict):
             value = value.get("value", "")
@@ -330,6 +416,7 @@ def _assertion(context, assertion):
     body = f'<p class="r-kicker">{sp.escape(STATUS_LABELS.get(status, status))} · As of {_date(assertion.get("as_of"))}</p>'
     if status in {"approved", "historical"}:
         body += '<p class="r-assertion-text">' + _claim_text(context, assertion) + "</p>"
+        body += _claim_scope(assertion)
     else:
         body += '<p>Candidate wording is withheld from findings while source verification and adversarial review are pending.</p>'
     body += f'<p class="r-record-id">{_link(_evidence_url("assertion", aid), aid)}</p>'
