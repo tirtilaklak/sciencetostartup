@@ -58,6 +58,20 @@ class FontInputTests(unittest.TestCase):
 
 @unittest.skipUnless(importlib.util.find_spec('reportlab') and importlib.util.find_spec('pypdf'), 'Optional PDF dependencies')
 class UnicodeRenderingTests(unittest.TestCase):
+    def test_footer_uses_embedded_cjk_font_for_unicode_release_identifier(self):
+        from pypdf import PdfReader
+        context = context_fixture()
+        context['report']['release_id'] = 'TEST-ONLY-登录'
+        reader = PdfReader(io.BytesIO(pdf.render_report_pdf(context)))
+        runs = []
+        for page in reader.pages:
+            def observe(text, cm, tm, font, size):
+                if '登录' in text and tm[5] < 45:
+                    runs.append(str((font or {}).get('/BaseFont', '')))
+            page.extract_text(visitor_text=observe)
+        self.assertTrue(runs, 'The Unicode footer must be extractable at its page position')
+        self.assertTrue(all('CJK' in name for name in runs), runs)
+
     def test_exact_letters_survive_regular_bold_source_bibliography_and_repeat_render(self):
         from pypdf import PdfReader
         context = context_fixture()

@@ -1,0 +1,78 @@
+{
+  "verdict": "PASS",
+  "reviewed_commit": "b0a2fab76219bd0b75b89557975d99db93b7efe0",
+  "reviewed_research_pdf_sha256": "e928edfbdfc144b503ebf55db65dc74d6716e8b754ca5db09f46fd59484497cf",
+  "tests": {
+    "test_research_pdf_unicode.py": {
+      "run": 6,
+      "passed": 6,
+      "rerun_after_footer_fix": true
+    },
+    "test_publication_context.py": {
+      "run": 12,
+      "passed": 12
+    },
+    "test_research_reader.py": {
+      "run": 13,
+      "passed": 13
+    },
+    "test_research_publish.py": {
+      "run": 27,
+      "passed": 27
+    },
+    "test_research_citations.py": {
+      "run": 15,
+      "passed": 15
+    }
+  },
+  "coverage_evidence": "glyph-and-provenance.json",
+  "current_report_and_bibliography_coverage": "108 distinct nonwhitespace codepoints across 9504 strings covered by regular and bold fonts plus CJK fallback",
+  "upstream_cjk_cache_hashes": {
+    "NotoSansSC[wght].ttf": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+    "OFL.txt": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9"
+  },
+  "licensing_checks": [
+    "DejaVu fonts and license exactly match official 2.37 archive whose SHA256 is published on official Download.html.",
+    "Google Fonts commit-specific upstream CJK font and license hashes match recorded provenance; vendored CJK license equals cached upstream bytes.",
+    "CJK subset renamed ScienceToStartup CJK Subset; public license text and package README state third-party license exclusion.",
+    "CJK subset recipe is disclosed with FontTools preparation-only requirement; ordinary builds and ReportLab renderer do not import FontTools."
+  ],
+  "official_sources": [
+    "https://dejavu-fonts.github.io/Download.html",
+    "https://raw.githubusercontent.com/google/fonts/2894aab31764f10f29c421bdfd2340d3b382d384/ofl/notosanssc/OFL.txt"
+  ],
+  "visual_scope": "Viewed author synthetic glyph-proof.png and independently rendered a TEST ONLY footer edge PDF. Did not inspect all 244 pages of actual report.",
+  "tracked_changes_made_by_reviewer": false,
+  "initial_verdict": "REVISE",
+  "resolved_findings": [
+    {
+      "priority": 2,
+      "path": "scripts/research_pdf.py",
+      "line": 191,
+      "title": "Footer bypasses CJK fallback after accepting its characters",
+      "trigger": "Schema-valid report.release_id = TEST-ONLY-登录",
+      "observed": "The same release ID renders correctly in the Paragraph header, but its two CJK characters render as .notdef boxes in the footer. checked_text accepts them because CJK fallback has the glyphs; Canvas drawString is set only to DejaVu.",
+      "smallest_fix": "Use the same font-run fallback for the footer, or explicitly reject footer characters unavailable in its actual font. Add a focused regression assertion for footer font selection.",
+      "impact": "Current ASCII release ID unaffected; valid future input silently produces missing glyphs.",
+      "evidence": [
+        "footer-edge.json",
+        "footer-edge.png",
+        "test-only-cjk-release-footer.pdf"
+      ]
+    }
+  ],
+  "findings": [],
+  "reviewed_unicode_test_sha256": "eecea1d21bdce5dc9510b6effdb39bec8eece1429d3e6e371f2c7fcac40169e8",
+  "footer_recheck": {
+    "focused_tests": 6,
+    "passed": 6,
+    "elapsed_seconds": 4.093,
+    "independent_footer_font_check": "Both pages draw 登录 at baseline 31 using /AAAAAA+ScienceToStartupCJKSubset-Regular.",
+    "visual_check": "Rendered page 1 independently; footer now visibly preserves 登录 without missing-glyph boxes.",
+    "proof_json": "footer-fixed.json",
+    "proof_png": "footer-fixed.png",
+    "proof_pdf": "test-only-cjk-release-footer-fixed.pdf",
+    "unchanged_earlier_test_evidence": "The earlier 72 passes remain recorded; this recheck reran only the six Unicode tests."
+  },
+  "total_tests_passed_before_footer_fix": 72
+}

@@ -188,7 +188,12 @@ def render_report_pdf(context):
         canvas.saveState()
         canvas.setFont(family, 8)
         canvas.setFillColor(colors.HexColor("#52665e"))
-        canvas.drawString(54, 31, checked_text("ScienceToStartup | " + metadata["status"] + " | " + report["release_id"]))
+        footer_text = canvas.beginText(54, 31)
+        for fallback, characters in groupby(checked_text("ScienceToStartup | " + metadata["status"] + " | " + report["release_id"]), key=needs_cjk):
+            footer_text.setFont(cjk_name if fallback else family, 8)
+            footer_text.textOut("".join(characters))
+        canvas.drawText(footer_text)
+        canvas.setFont(family, 8)
         canvas.drawRightString(558, 31, str(doc.page))
         canvas.restoreState()
     def deterministic_canvas(*args, **kwargs):

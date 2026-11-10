@@ -1,0 +1,47 @@
+{
+  "actual26_public_records_unchanged": true,
+  "baseline_before_fixes": "283c89de6db8cdc348a48042d55f2773f087f496",
+  "chronology_probes": [
+    {
+      "accepted": false,
+      "case": "before",
+      "error": "Research correction cannot predate its replacement approval"
+    },
+    {
+      "accepted": true,
+      "case": "at"
+    },
+    {
+      "accepted": true,
+      "case": "after"
+    },
+    {
+      "accepted": true,
+      "case": "equal_offset"
+    }
+  ],
+  "elapsed_seconds": 17.435,
+  "existing26_live_targets_unique": true,
+  "fix_file_sha256": {
+    "scripts/research_corrections.py": "b3b1062a23cd1c0300701cf8e6af0037b026faaa66c66f48683f56fd847f2776",
+    "scripts/research_pages.py": "ec169baad46d7c097337003b739ad062bff7b93025928230b31978c825d411bf",
+    "tests/test_research_corrections.py": "a8cfe56a6707705a8f0b0782d3b4846b568ab25ea17655e2e61f954e7de83238"
+  },
+  "focused_tests": {
+    "elapsed_seconds": 13.53,
+    "log_sha256": "7e0573bfc4b22f1fdacb968be619dfa07c5ce7a4be0a2771ebd455d9331524ad",
+    "passed": 6
+  },
+  "graph_compact_sha256": "044a17dc52ae6e70d684e18fbf9dc6273be657aa6b80c1074a963f33513160d8",
+  "head_commit_at_receipt": "b0a2fab76219bd0b75b89557975d99db93b7efe0",
+  "legacy_space_timestamp_compatible_normalized": true,
+  "missing_legacy_ids_unique": true,
+  "pending_stubs_excluded": true,
+  "public_corrections_sha256": "013f5cde38a26b1aa318ae4237c5d3cce2cea3d441fac054163d241a90fae75e",
+  "raw_record_input_unmutated": true,
+  "registry_sha256": "a31fb7082269dd884b3c205a426e515e56af28c76fc07ad23466855583ccc054",
+  "safe_url_projection_idempotent": 3,
+  "scope": "Focused recheck of three fixes only; previous exact-proposal archive/privacy audit remains separately bound. No PDF or font input assessment.",
+  "unsafe_url_probes_rejected": 16,
+  "verdict": "PASS"
+}

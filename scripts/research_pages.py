@@ -516,6 +516,19 @@ def _data(context):
     approved = _assertions(context)
     historical = _assertions(context, statuses=("historical",))
     candidates = _assertions(context, statuses=("candidate",))
+    present = {row['id'] for row in graph['assertions']}
+    correction_stubs = {}
+    for row in _correction_records(context):
+        if row['claim_id'] not in present:
+            correction_stubs.setdefault(row['claim_id'], row)
+    retained_corrections = ''.join(
+        '<article class="r-assertion" id="' + sp.escape(_anchor('assertion', aid)) + '"><h3>'
+        + sp.escape(aid) + '</h3><p>This historical identifier is retained as correction metadata. '
+        'Its earlier finding text is outside this current evidence snapshot.</p><p>'
+        + _link(_correction_url(row), 'Read the correction and supporting evidence')
+        + (' · ' + _link(_evidence_url('assertion', row['replacement_claim_id']), 'Read the approved replacement')
+           if row.get('replacement_claim_id') else '') + '</p></article>'
+        for aid, row in sorted(correction_stubs.items()))
     rows = [("Privacy-filtered research JSON", "/publication/clean-dataset.json"), ("CSV", "/publication/clean-dataset.csv"),
             ("SQLite", "/publication/clean-dataset.sqlite"), ("Full evidence graph JSON · explicit statuses", "/research/exports/research-graph.json"),
             ("Evidence graph SQLite", "/research/exports/research-graph.sqlite"), ("Export checksums", "/research/exports/research-exports-manifest.json")]
@@ -563,6 +576,7 @@ def _data(context):
             + '</section><section class="r-section" aria-labelledby="candidates"><h2 id="candidates">Candidate review queue</h2>'
             '<p>Captured sources and author proposals are inspectable preparation work. Separate source verification and '
             'adversarial review have not established these as findings.</p>' + "".join(_assertion(context, a) for a in candidates)
+            + ('</section><section class="r-section"><h2>Retained correction identifiers</h2>' + retained_corrections if retained_corrections else '')
             + '</section><section class="r-section" aria-labelledby="sources"><h2 id="sources">Source records</h2>'
             + "".join(_source(source) for source in sorted(graph["sources"], key=lambda s: s["id"]))
             + '</section><section class="r-section" aria-labelledby="organizations"><h2 id="organizations">Organizations & other entities</h2>'

@@ -89,6 +89,38 @@ class PublicCorrectionTests(unittest.TestCase):
         ids = Links(offline_appendix(synthetic, corrections=rows).decode()).ids
         self.assertEqual(ids.count('assertion-' + old['id']), 1)
 
+    def test_legacy_live_claim_links_have_one_metadata_target_without_old_wording(self):
+        context = copy.deepcopy(self.context)
+        row = copy.deepcopy(context['corrections'][0])
+        row.pop('replacement_claim_id')
+        row['claim_id'] = 'historical.no-longer-present'
+        context['corrections'] = [row]
+        text = pages._data(context)
+        parsed = Links(text)
+        self.assertEqual(parsed.ids.count('assertion-' + row['claim_id']), 1)
+        self.assertIn(pages._correction_url(row), parsed.hrefs)
+        self.assertIn('historical identifier is retained as correction metadata', text)
+
+    def test_replacement_correction_cannot_predate_passing_approval(self):
+        row = {**self.context['corrections'][0], 'corrected_on': '2000-01-01T00:00:00Z'}
+        with self.assertRaisesRegex(ValueError, 'predate'):
+            public_corrections({**self.context, 'corrections': [row]})
+        # Legacy representations normalize to interoperable RFC3339 output
+        # without changing the historical instant or the private input bytes.
+        original = copy.deepcopy(self.context['corrections'][0])
+        original['corrected_on'] = original['corrected_on'].replace('T', ' ')
+        exported = public_corrections({**self.context, 'corrections': [original]})[0]
+        self.assertIn('T', exported['corrected_on'])
+        self.assertIn(' ', original['corrected_on'])
+
+    def test_contact_or_credential_evidence_urls_are_rejected_without_url_redaction(self):
+        for url in ('https://example.org/person@example.org', 'https://example.org/person%40example.org',
+                    'https://example.org:invalid/', 'https://example.org/?token=private',
+                    'https://example.org/sk-proj-ABCDEFGHIJKLMNOPQRSTUV'):
+            row = {**self.context['corrections'][0], 'evidence_urls': [url]}
+            with self.subTest(url=url), self.assertRaisesRegex(ValueError, 'safe HTTPS'):
+                public_corrections({**self.context, 'corrections': [row]})
+
     def test_proposals_and_contacts_never_enter_live_or_archive_representations(self):
         context = copy.deepcopy(self.context)
         for status in ('pending', 'rejected'):
