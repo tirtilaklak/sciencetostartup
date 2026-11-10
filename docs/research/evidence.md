@@ -268,12 +268,24 @@ assertion; suppliers additionally require an approved capability assertion. Vers
 aliases, candidate matches, historical descriptions, and duplicate releases do not
 inflate coverage.
 
-Coverage method 1.1.0 rolls an explicit, approved, full-source paper version or
-release up to its approved, full-source, included parent work or family. It counts
+Coverage method 1.2.0 rolls an explicit, approved, full-source paper version or
+release up to its approved, full-source, included parent work or family. The same
+reviewed-parent proof applies to the frozen core's disposition counter, without
+copying version claims onto the parent. Candidate, abstract-only or pending
+parents or manifestations cannot supply that proof. Frozen core units are
+organization, paper-work and dataset/benchmark-family identities; versions,
+releases, model rows and workflow labels cannot inflate its denominator. It counts
 each parent once. This identity rollup creates no supplier relationship and never
 turns a metadata-only parent into a reviewed work. Suppliers still need direct
 approved capability evidence. Source-record totals count scoped evidence records;
 `captured_source_versions` deduplicates their exact version and response digest.
+
+Core inclusion counts require the same approved substantive review. A documented
+exclusion or historical-only disposition requires a full-source review and its
+own approved source-bound evidence; a candidate, abstract-only screen or failed
+retrieval cannot satisfy the 90% gate. Historical calculation behavior remains
+in each edition's exact checksummed validator/reproducer, rather than being
+rewritten when the current coverage method changes.
 
 The initial eligible core is explicitly **not frozen**. Both the source-anchored
 200-assertion quality holdout and separate 200-record screening audit are null.

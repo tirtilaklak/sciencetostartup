@@ -230,6 +230,52 @@ class ResearchGraphTests(unittest.TestCase):
         graph["coverage"]["frozen_core"]["sha256"] = "a" * 64
         self.assert_invalid(graph, "core hash mismatch")
 
+    def test_core_work_disposition_uses_reviewed_exact_version_without_copying_claims(self):
+        graph = fixture()
+        graph['entities'][0].update(kind='paper_work', assertion_ids=[], eligible_core=True)
+        graph['entities'].append(entity('paper.v1', kind='paper_version', parent_id='paper',
+                                        identifiers={'arxiv': '2203.02155v1'}))
+        graph['assertions'][0]['subject_id'] = 'paper.v1'
+        for review in graph['reviews']:
+            review['assertion_sha256'] = {'claim': rg.assertion_digest(graph['assertions'][0])}
+        graph['coverage']['frozen_core'] = {'entity_ids': ['paper'], 'frozen_on': '2026-11-08T00:00:00Z',
+            'source_cutoff': '2026-11-07T17:00:00Z', 'sha256': rg.digest(rg.stable_json(['paper']))}
+        self.assertEqual(rg.coverage_summary(graph)['core_disposition_rate'], 1.0)
+        self.assertEqual(graph['entities'][0]['assertion_ids'], [])
+        baseline = copy.deepcopy(graph)
+        for entity_index in (0, 1):
+            for field, value in (('review_depth', 'abstract'), ('status', 'candidate'), ('disposition', 'pending')):
+                altered = copy.deepcopy(baseline)
+                altered['entities'][entity_index][field] = value
+                self.assertEqual(rg.coverage_summary(altered)['core_dispositioned'], 0, (entity_index, field))
+        graph['assertions'][0]['status'] = 'candidate'
+        self.assertEqual(rg.coverage_summary(graph)['core_dispositioned'], 0)
+
+    def test_frozen_core_cannot_inflate_units_with_paper_versions(self):
+        graph = fixture()
+        graph['entities'].append(entity('paper.v2', kind='paper_version', identifiers={'arxiv':'2203.02155v2'},
+                                        parent_id='paper', assertion_ids=[], eligible_core=True))
+        graph['coverage']['frozen_core'] = {'entity_ids': ['paper.v2'], 'frozen_on': '2026-11-08T00:00:00Z',
+            'source_cutoff': '2026-11-07T17:00:00Z', 'sha256': rg.digest(rg.stable_json(['paper.v2']))}
+        self.assert_invalid(graph, 'versions and releases cannot inflate disposition')
+
+    def test_core_disposition_requires_substantive_review_and_preserves_supported_exclusions(self):
+        graph = fixture()
+        graph['entities'][0]['eligible_core'] = True
+        graph['coverage']['frozen_core'] = {'entity_ids': ['paper'], 'frozen_on': '2026-11-08T00:00:00Z',
+            'source_cutoff': '2026-11-07T17:00:00Z', 'sha256': rg.digest(rg.stable_json(['paper']))}
+        baseline = copy.deepcopy(graph)
+        for field, value in (('review_depth', 'abstract'), ('status', 'candidate'), ('disposition', 'pending')):
+            altered = copy.deepcopy(baseline)
+            altered['entities'][0][field] = value
+            self.assertEqual(rg.coverage_summary(altered)['core_dispositioned'], 0, field)
+        graph['entities'][0].update(status='excluded', disposition='excluded')
+        summary = rg.coverage_summary(graph)
+        self.assertEqual(summary['core_dispositioned'], 1)
+        self.assertEqual(summary['reviewed_papers'], 0)
+        graph['assertions'][0]['status'] = 'candidate'
+        self.assertEqual(rg.coverage_summary(graph)['core_dispositioned'], 0)
+
     def test_private_extensions_are_removed_and_free_text_email_redacted(self):
         graph = fixture()
         graph["entities"][0]["private_email"] = "person@example.org"

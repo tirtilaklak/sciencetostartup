@@ -39,6 +39,7 @@ PREDICATES = {"legacy_description", "has_capability", "supplies_data_for", "publ
 FACETS = {"domain", "modality", "workflow", "expertise", "origin", "labels", "oversight"}
 OPTIONAL_FACETS = {"delivery_model", "data_purpose"}
 PAPER_IDENTIFIERS = {"doi", "arxiv", "acl", "pmlr"}
+CORE_KINDS = {"organization", "supplier", "paper", "paper_work", "dataset", "dataset_family", "benchmark", "benchmark_family"}
 REVIEW_ROLES = {"author", "source_verifier", "adversarial"}
 EMAIL = re.compile(r"[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.I)
 SECRET = re.compile(r"(?:sk-(?:proj-)?[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)")
@@ -532,6 +533,9 @@ def _validate_graph(graph, canonical=None):
             if strings(frozen.get("entity_ids"), "$/coverage/frozen_core/entity_ids"):
                 for eid in frozen["entity_ids"]:
                     require(eid in entities, "$/coverage/frozen_core/entity_ids", "unknown core entity")
+                    if eid in entities:
+                        require(entities[eid].get('kind') in CORE_KINDS, "$/coverage/frozen_core/entity_ids",
+                                "core units must be organization, paper-work or dataset/benchmark-family identities; versions and releases cannot inflate disposition")
                 declared = {eid for eid, ent in entities.items() if ent.get("eligible_core") is True}
                 require(declared == set(frozen["entity_ids"]), "$/coverage/frozen_core", "eligible core must exactly match frozen identities")
                 if frozen["entity_ids"]:
@@ -594,8 +598,20 @@ def coverage_summary(graph):
     legacy = [e for e in graph["entities"] if e["legacy_id"] is not None]
     disposed = lambda e: e["disposition"] in {"included", "excluded", "historical_only"} and any(aid in assertions for aid in e["assertion_ids"])
     core_ids = set(graph["coverage"]["frozen_core"]["entity_ids"])
-    core_disposed = sum(disposed(e) for e in graph["entities"] if e["id"] in core_ids)
-    counts = {"coverage_method_version": "1.1.0", "legacy_organizations": len(legacy), "legacy_dispositions": sum(disposed(e) for e in legacy),
+    # A deeply reviewed work/family has an explicit disposition even when its
+    # approved observations correctly attach to the exact inspected version.
+    # This uses the same reviewed-parent proof as coverage, never copied claims
+    # or a transitive supplier relationship. Candidate/abstract parents or
+    # manifestations cannot supply this proof.
+    qualifying_ids = {e['id'] for e in qualifying}
+    def core_dispositioned(e):
+        if e['disposition'] == 'included':
+            return e['id'] in qualifying_ids
+        return (e['disposition'] in {'excluded', 'historical_only'}
+                and e['status'] != 'candidate' and e['review_depth'] == 'full_source'
+                and any(aid in assertions for aid in e['assertion_ids']))
+    core_disposed = sum(core_dispositioned(e) for e in graph["entities"] if e["id"] in core_ids)
+    counts = {"coverage_method_version": "1.2.0", "legacy_organizations": len(legacy), "legacy_dispositions": sum(disposed(e) for e in legacy),
               "qualifying_suppliers": len(suppliers), "reviewed_papers": sum(e["kind"] in {"paper", "paper_work"} for e in qualifying),
               "dataset_families": len({e["family_id"] for e in qualifying if e["kind"] in {"dataset", "dataset_family"}}),
               "benchmark_families": len({e["family_id"] for e in qualifying if e["kind"] in {"benchmark", "benchmark_family"}}),
