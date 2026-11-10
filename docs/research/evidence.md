@@ -5,7 +5,7 @@ its JSON, its SQLite database, or their dates.
 
 ## Reviewed integration checkpoint
 
-The 10 November 2026 integration checkpoint retains 39 historical organization
+The 10 November 2026 integration checkpoint at commit `5b414bd` retains 39 historical organization
 descriptions and 959 approved assertions. Computed coverage is 43 qualifying
 suppliers, 72 reviewed paper works, 45 dataset families, 21 benchmark families and
 25 of 39 legacy inclusion dispositions. Its 991 scoped source records represent

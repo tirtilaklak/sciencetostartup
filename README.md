@@ -13,8 +13,8 @@ and `/review/` accepts source-backed corrections, section review and reuse.
 Essential content and downloads work without JavaScript. Both site search
 implementations link directly to native research and organization pages.
 
-The comprehensive weekly series is **prelaunch**. The reviewed integration
-checkpoint contains 959 approved assertions: 43 qualifying suppliers, 72 reviewed
+The comprehensive weekly series is **prelaunch**. The recorded integration
+checkpoint at commit `5b414bd` contains 959 approved assertions: 43 qualifying suppliers, 72 reviewed
 paper works, 45 dataset families, 21 benchmark families and 25 of the 39 existing
 organization inclusion dispositions. Its 991 scoped evidence records represent
 334 distinct captured document versions. Every approved assertion has separate

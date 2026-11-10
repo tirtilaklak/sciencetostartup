@@ -1,4 +1,4 @@
-# State of Human Data for AI
+# State of AI Data Labs and Human Feedback
 
 `data/research/report.json` is the separately versioned, 12-chapter report. It
 currently says **prelaunch**. It contains a methodology, practical decision
