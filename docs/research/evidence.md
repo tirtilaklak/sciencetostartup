@@ -330,8 +330,10 @@ approved capability evidence. Source-record totals count scoped evidence records
 Core inclusion counts require the same approved substantive review. A documented
 exclusion or historical-only disposition requires a full-source review and its
 own subject-bound approved evidence; being the object of a supplier relationship
-does not certify an artifact dossier. Existing-organization inclusion-audit
-counts use the same substantive-disposition requirement. A candidate,
+does not certify an artifact dossier. Conclusive `legacy_dispositions` counts use
+the same substantive-disposition requirement. Completed `legacy_inclusion_audits`
+use the separate full-source, approved subject-owned evidence rule above;
+pending commercial qualification adds no supplier or disposed core coverage. A candidate,
 abstract-only screen or failed
 retrieval cannot satisfy the 90% gate. Historical calculation behavior remains
 in each edition's exact checksummed validator/reproducer, rather than being
