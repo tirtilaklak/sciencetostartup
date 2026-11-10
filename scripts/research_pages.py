@@ -124,9 +124,14 @@ def _entities(context):
 
 
 def _assertions(context, entity=None, statuses=("approved",)):
+    scope = {entity['id']} if entity is not None else set()
+    if entity is not None and entity.get('kind') in {'paper', 'paper_work', 'dataset', 'dataset_family', 'benchmark', 'benchmark_family'}:
+        # A family view shows its explicit releases; each assertion still names
+        # its actual subject/version. Organization views never infer supply.
+        scope.update(e['id'] for e in context['graph']['entities'] if e.get('parent_id') == entity['id'])
     return sorted((row for row in context["graph"]["assertions"]
                    if row.get("status") in statuses and (entity is None or
-                   entity["id"] in {row.get("subject_id"), row.get("object_id")})),
+                   scope & {row.get("subject_id"), row.get("object_id")})),
                   key=lambda row: row["id"])
 
 
@@ -329,7 +334,10 @@ def _assertion(context, assertion):
         body += '<p>Candidate wording is withheld from findings while source verification and adversarial review are pending.</p>'
     body += f'<p class="r-record-id">{_link(_evidence_url("assertion", aid), aid)}</p>'
     if assertion.get("qualifications") and status in {"approved", "historical"}:
-        body += '<ul class="r-qualifications">' + "".join(f'<li>{sp.escape(q)}</li>' for q in assertion["qualifications"]) + "</ul>"
+        author_stage = 'Author-only candidate; no independent source-verifier or adversarial approval exists in this batch.'
+        body += '<ul class="r-qualifications">' + "".join(
+            '<li>' + ('<strong>Original author-stage note:</strong> ' if q == author_stage else '') + sp.escape(q) + '</li>'
+            for q in assertion["qualifications"]) + "</ul>"
     body += _source_evidence(context, assertion)
     reviews = {row["id"]: row for row in context["graph"].get("reviews", [])}
     receipts = [reviews[rid] for rid in assertion.get("review_ids", []) if rid in reviews]

@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-11-10T04:10:40Z",
+  "as_of": "2026-11-10T05:48:00Z",
   "assertions": [
     {
       "as_of": "2026-10-15",
@@ -1250,160 +1250,32 @@
     "notes": [
       "This is an additive prelaunch evidence graph. Candidate source reads do not count as approved coverage.",
       "All 39 canonical organizations retain historical descriptions and pending new research dispositions. No independent reviews or 200-record audit results are invented.",
-      "Eligible core is not frozen. Actual reviewed paper, supplier, dataset and benchmark coverage remains below the user-approved launch floors."
+      "Eligible core is not frozen. Actual reviewed paper, supplier, dataset and benchmark coverage remains below the user-approved launch floors.",
+      "Coverage method 1.1.0 rolls reviewed manifestations into their explicitly reviewed work/family once; it never infers supplier edges. This is an incomplete selected baseline, not a frozen market inventory or passing launch audit."
     ],
     "quality_audit": null,
     "screening_audit": null
   },
   "entities": [
     {
-      "aliases": [
-        "Mercor.io Corporation"
-      ],
+      "aliases": [],
       "assertion_ids": [
-        "legacy.mercor.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.mercor",
-      "identifiers": {
-        "website": "https://www.mercor.com/"
-      },
-      "kind": "organization",
-      "legacy_id": "mercor",
-      "name": "Mercor",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [
-        "Snorkel AI, Inc."
-      ],
-      "assertion_ids": [
-        "legacy.snorkel_ai.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.snorkel_ai",
-      "identifiers": {
-        "website": "https://snorkel.ai/"
-      },
-      "kind": "organization",
-      "legacy_id": "snorkel_ai",
-      "name": "Snorkel AI",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [
-        "Handshake",
-        "Stryder Corp. d/b/a Handshake"
-      ],
-      "assertion_ids": [
-        "legacy.handshake_ai.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.handshake_ai",
-      "identifiers": {
-        "website": "https://joinhandshake.com/ai/"
-      },
-      "kind": "organization",
-      "legacy_id": "handshake_ai",
-      "name": "Handshake AI",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [
-        "micro1, Inc."
-      ],
-      "assertion_ids": [
-        "legacy.micro1.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.micro1",
-      "identifiers": {
-        "website": "https://www.micro1.ai/"
-      },
-      "kind": "organization",
-      "legacy_id": "micro1",
-      "name": "micro1",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [
-        "Scale AI, Inc.",
-        "Outlier (contributor brand)",
-        "Remotasks (contributor brand)",
-        "Human Frontier Collective (contributor platform)"
-      ],
-      "assertion_ids": [
-        "legacy.scale_ai.description",
-        "claim.helpsteer3.scale-annotation"
+        "next.claim.hhh_alignment.authorship",
+        "next.claim.hhh_alignment.task"
       ],
       "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
       "eligible_core": false,
-      "family_id": null,
-      "id": "org.scale_ai",
+      "family_id": "hhh_alignment",
+      "id": "benchmark-version.hhh_alignment.092b196",
       "identifiers": {
-        "website": "https://scale.com/"
+        "artifact": "https://raw.githubusercontent.com/google/BIG-bench/092b196c1f8f14a54bbc62f24759d43bde46dd3b/bigbench/benchmark_tasks/hhh_alignment/README.md",
+        "source_version": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
       },
-      "kind": "supplier",
-      "legacy_id": "scale_ai",
-      "name": "Scale AI",
-      "parent_id": null,
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "HHH alignment task at pinned BIG-bench commit",
+      "parent_id": "benchmark.hhh_alignment",
       "review_depth": "full_source",
       "status": "approved",
       "taxonomy": {
@@ -1417,28 +1289,25 @@
       }
     },
     {
-      "aliases": [
-        "Turing Enterprises, Inc.",
-        "Turing.com",
-        "Turing Frontier"
-      ],
+      "aliases": [],
       "assertion_ids": [
-        "legacy.turing.description"
+        "next.claim.mmlu.tasks"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
       "eligible_core": false,
-      "family_id": null,
-      "id": "org.turing",
+      "family_id": "mmlu",
+      "id": "benchmark-version.mmlu.c30699e",
       "identifiers": {
-        "website": "https://www.turing.com/"
+        "artifact": "https://huggingface.co/datasets/cais/mmlu/resolve/c30699e8356da336a370243923dbaf21066bb9fe/README.md",
+        "source_version": "c30699e8356da336a370243923dbaf21066bb9fe"
       },
-      "kind": "organization",
-      "legacy_id": "turing",
-      "name": "Turing",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "MMLU pinned HF distribution",
+      "parent_id": "benchmark.mmlu",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -1450,27 +1319,26 @@
       }
     },
     {
-      "aliases": [
-        "Labelbox, Inc.",
-        "Alignerr (expert-network brand)"
-      ],
+      "aliases": [],
       "assertion_ids": [
-        "legacy.labelbox.description"
+        "next.claim.rewardbench.terms",
+        "next.claim.rewardbench.v1.scoring"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
       "eligible_core": false,
-      "family_id": null,
-      "id": "org.labelbox",
+      "family_id": "rewardbench",
+      "id": "benchmark-version.rewardbench.168d848",
       "identifiers": {
-        "website": "https://labelbox.com/"
+        "artifact": "https://huggingface.co/datasets/allenai/reward-bench/resolve/168d848cdbbea9764fae4a544dc9ca1e6cca4931/README.md",
+        "source_version": "168d848cdbbea9764fae4a544dc9ca1e6cca4931"
       },
-      "kind": "organization",
-      "legacy_id": "labelbox",
-      "name": "Labelbox",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "RewardBench 1 filtered/raw datasets",
+      "parent_id": "benchmark.rewardbench",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -1482,23 +1350,1115 @@
       }
     },
     {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.rewardbench.v2.scoring"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "rewardbench",
+      "id": "benchmark-version.rewardbench2.7ff0885",
+      "identifiers": {
+        "artifact": "https://huggingface.co/datasets/allenai/reward-bench-2/resolve/7ff08853b0d5686e79b13fda8677024f566a104a/README.md",
+        "source_version": "7ff08853b0d5686e79b13fda8677024f566a104a"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "RewardBench 2",
+      "parent_id": "benchmark.rewardbench",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.swebench.construction"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "swebench",
+      "id": "benchmark-version.swebench.e48e2bd",
+      "identifiers": {
+        "artifact": "https://huggingface.co/datasets/princeton-nlp/SWE-bench/resolve/e48e2bd1e9fecd5bbd641e9414ac59da9f2e69f6/README.md",
+        "source_version": "e48e2bd1e9fecd5bbd641e9414ac59da9f2e69f6"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "Original SWE-bench pinned dataset",
+      "parent_id": "benchmark.swebench",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.truthfulqa.legacy_configs"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "truthfulqa",
+      "id": "benchmark-version.truthfulqa.741b827",
+      "identifiers": {
+        "artifact": "https://huggingface.co/datasets/truthfulqa/truthful_qa/resolve/741b8276f2d1982aa3d5b832d3ee81ed3b896490/README.md",
+        "source_version": "741b8276f2d1982aa3d5b832d3ee81ed3b896490"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "TruthfulQA pinned HF generation and MC1/MC2 distribution",
+      "parent_id": "benchmark.truthfulqa",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.truthfulqa.binary_revision",
+        "next.claim.truthfulqa.metrics",
+        "next.claim.truthfulqa.revalidation_gap"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "truthfulqa",
+      "id": "benchmark-version.truthfulqa.d71c110",
+      "identifiers": {
+        "artifact": "https://raw.githubusercontent.com/sylinrl/TruthfulQA/d71c110897f5d31c5d7f309e7bc316c152f6f031/README.md",
+        "source_version": "d71c110897f5d31c5d7f309e7bc316c152f6f031"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "TruthfulQA creator repository after January 2025 changes",
+      "parent_id": "benchmark.truthfulqa",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "pending",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved. The supplier case establishes only the explicitly bound identity/contribution, not a complete dataset or benchmark dossier.",
+      "eligible_core": false,
+      "family_id": "family.apex-agents",
+      "id": "benchmark.apex-agents",
+      "identifiers": {},
+      "kind": "benchmark",
+      "legacy_id": null,
+      "name": "APEX-Agents",
+      "parent_id": null,
+      "review_depth": "metadata",
+      "status": "candidate",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.supplier.mercor.apex11-release"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved. The supplier case establishes only the explicitly bound identity/contribution, not a complete dataset or benchmark dossier.",
+      "eligible_core": false,
+      "family_id": "family.apex-agents",
+      "id": "benchmark.apex-agents.1-1",
+      "identifiers": {},
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "APEX-Agents 1.1",
+      "parent_id": "benchmark.apex-agents",
+      "review_depth": "metadata",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained family documentation and its pinned release/study distinctions received separate full-source AI reviews. Approved child-release assertions retain their exact version scope; unknowns and quarantines are not generalized to the family.",
+      "eligible_core": false,
+      "family_id": "hhh_alignment",
+      "id": "benchmark.hhh_alignment",
+      "identifiers": {
+        "primary_source": "https://raw.githubusercontent.com/google/BIG-bench/092b196c1f8f14a54bbc62f24759d43bde46dd3b/bigbench/benchmark_tasks/hhh_alignment/README.md"
+      },
+      "kind": "benchmark_family",
+      "legacy_id": null,
+      "name": "Helpful, Honest & Harmless alignment evaluation",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.mmlu.task-coverage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained family documentation and its pinned release/study distinctions received separate full-source AI reviews. Approved child-release assertions retain their exact version scope; unknowns and quarantines are not generalized to the family.",
+      "eligible_core": false,
+      "family_id": "mmlu",
+      "id": "benchmark.mmlu",
+      "identifiers": {},
+      "kind": "benchmark",
+      "legacy_id": null,
+      "name": "MMLU",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
       "aliases": [
-        "Prime Intellect, Inc."
+        "benchmark-version.mmlu.paper.2009.03300v3"
       ],
       "assertion_ids": [
-        "legacy.prime_intellect.description"
+        "candidate.paperfull.mmlu.student-question-collection",
+        "candidate.paperfull.mmlu.text-only-scope"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "mmlu",
+      "id": "benchmark.mmlu.paper-2009.03300v3",
+      "identifiers": {
+        "paper_version": "2009.03300v3"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "MMLU benchmark as described in 2009.03300v3",
+      "parent_id": "benchmark.mmlu",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained family documentation and its pinned release/study distinctions received separate full-source AI reviews. Approved child-release assertions retain their exact version scope; unknowns and quarantines are not generalized to the family.",
+      "eligible_core": false,
+      "family_id": "rewardbench",
+      "id": "benchmark.rewardbench",
+      "identifiers": {
+        "primary_source": "https://huggingface.co/datasets/allenai/reward-bench/resolve/168d848cdbbea9764fae4a544dc9ca1e6cca4931/README.md"
+      },
+      "kind": "benchmark_family",
+      "legacy_id": null,
+      "name": "RewardBench (additional family)",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "pending",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved. The supplier case establishes only the explicitly bound identity/contribution, not a complete dataset or benchmark dossier.",
+      "eligible_core": false,
+      "family_id": "family.snorkel.finance-reasoning",
+      "id": "benchmark.snorkel.finance-reasoning",
+      "identifiers": {},
+      "kind": "benchmark",
+      "legacy_id": null,
+      "name": "Snorkel Finance Reasoning",
+      "parent_id": null,
+      "review_depth": "metadata",
+      "status": "candidate",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.supplier.snorkel_ai.finance-benchmark"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved. The supplier case establishes only the explicitly bound identity/contribution, not a complete dataset or benchmark dossier.",
+      "eligible_core": false,
+      "family_id": "family.snorkel.finance-reasoning",
+      "id": "benchmark.snorkel.finance-reasoning.capture-2026-11",
+      "identifiers": {},
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "Snorkel Finance Reasoning captured page",
+      "parent_id": "benchmark.snorkel.finance-reasoning",
+      "review_depth": "metadata",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.swebench.task-construction",
+        "next.claim.swebench.verified_scope"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained family documentation and its pinned release/study distinctions received separate full-source AI reviews. Approved child-release assertions retain their exact version scope; unknowns and quarantines are not generalized to the family.",
+      "eligible_core": false,
+      "family_id": "swebench",
+      "id": "benchmark.swebench",
+      "identifiers": {},
+      "kind": "benchmark",
+      "legacy_id": null,
+      "name": "SWE-bench",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.swebench.execution-filter",
+        "candidate.paperfull.swebench.original-full-construction",
+        "candidate.paperfull.swebench.python-scope",
+        "candidate.paperfull.swebench.regression-test-scoring"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "swebench",
+      "id": "benchmark.swebench.paper-2310.06770v3",
+      "identifiers": {
+        "paper_version": "2310.06770v3"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "Original full SWE-bench as described in 2310.06770v3",
+      "parent_id": "benchmark.swebench",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.truthfulqa.question-coverage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained family documentation and its pinned release/study distinctions received separate full-source AI reviews. Approved child-release assertions retain their exact version scope; unknowns and quarantines are not generalized to the family.",
+      "eligible_core": false,
+      "family_id": "truthfulqa",
+      "id": "benchmark.truthfulqa",
+      "identifiers": {},
+      "kind": "benchmark",
+      "legacy_id": null,
+      "name": "TruthfulQA",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.truthfulqa.authored-questions",
+        "candidate.paperfull.truthfulqa.deployment-generalization-limit",
+        "candidate.paperfull.truthfulqa.filtered-unfiltered-construction"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "truthfulqa",
+      "id": "benchmark.truthfulqa.paper-2109.07958v2",
+      "identifiers": {
+        "paper_version": "2109.07958v2"
+      },
+      "kind": "benchmark_version",
+      "legacy_id": null,
+      "name": "TruthfulQA benchmark as described in 2109.07958v2",
+      "parent_id": "benchmark.truthfulqa",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "pending",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved. The supplier case establishes only the explicitly bound identity/contribution, not a complete dataset or benchmark dossier.",
+      "eligible_core": false,
+      "family_id": "family.u-math",
+      "id": "benchmark.u-math",
+      "identifiers": {},
+      "kind": "benchmark",
+      "legacy_id": null,
+      "name": "U-MATH",
+      "parent_id": null,
+      "review_depth": "metadata",
+      "status": "candidate",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.helpsteer2.attributes",
+        "next.claim.helpsteer2.qa",
+        "next.claim.helpsteer2.scale",
+        "next.claim.helpsteer2.source_mix"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "helpsteer2",
+      "id": "dataset-release.helpsteer2.990b271",
+      "identifiers": {
+        "artifact": "https://huggingface.co/datasets/nvidia/HelpSteer2/resolve/990b2711a36180dd19d9c94b8627844866f8982a/README.md",
+        "source_version": "990b2711a36180dd19d9c94b8627844866f8982a"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "HelpSteer2 pinned collection",
+      "parent_id": "dataset.helpsteer2",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.helpsteer3.configurations",
+        "next.claim.helpsteer3.preference",
+        "next.claim.helpsteer3.scale",
+        "next.claim.helpsteer3.translated"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "helpsteer3",
+      "id": "dataset-release.helpsteer3.f6d1457",
+      "identifiers": {
+        "artifact": "https://huggingface.co/datasets/nvidia/HelpSteer3/resolve/f6d145777bcbde96137596340fab89793acd1031/README.md",
+        "source_version": "f6d145777bcbde96137596340fab89793acd1031"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "HelpSteer3 pinned collection",
+      "parent_id": "dataset.helpsteer3",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.hh_rlhf.format",
+        "next.claim.hh_rlhf.purpose",
+        "next.claim.hh_rlhf.quality_limits",
+        "next.claim.hh_rlhf.recruitment"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "hh_rlhf",
+      "id": "dataset-release.hh_rlhf.09be8c5",
+      "identifiers": {
+        "artifact": "https://huggingface.co/datasets/Anthropic/hh-rlhf/resolve/09be8c5bbc57cb3887f3a9732ad6aa7ec602a1fa/README.md",
+        "source_version": "09be8c5bbc57cb3887f3a9732ad6aa7ec602a1fa"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "HH-RLHF pinned preference and red-team artifacts",
+      "parent_id": "dataset.hh_rlhf",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.oasst1.exports",
+        "next.claim.oasst1.guidelines",
+        "next.claim.oasst1.volunteer_corpus"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "oasst1",
+      "id": "dataset-release.oasst1.fdf72ae",
+      "identifiers": {
+        "artifact": "https://huggingface.co/datasets/OpenAssistant/oasst1/resolve/fdf72ae0827c1cda404aff25b6603abec9e3399b/README.md",
+        "source_version": "fdf72ae0827c1cda404aff25b6603abec9e3399b"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "OASST1 2023-04-12 collection snapshot",
+      "parent_id": "dataset.oasst1",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.shp.collective_preferences",
+        "next.claim.shp.license",
+        "next.claim.shp.split"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "shp",
+      "id": "dataset-release.shp.e94b5f3",
+      "identifiers": {
+        "artifact": "https://huggingface.co/datasets/stanfordnlp/SHP/resolve/e94b5f32602712d78ed494fe79105b1959396686/README.md",
+        "source_version": "e94b5f32602712d78ed494fe79105b1959396686"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "SHP pinned Reddit preference release",
+      "parent_id": "dataset.shp",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.ultrafeedback.correction",
+        "next.claim.ultrafeedback.model_feedback",
+        "next.claim.ultrafeedback.sources"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "ultrafeedback",
+      "id": "dataset-release.ultrafeedback.40b4365",
+      "identifiers": {
+        "artifact": "https://huggingface.co/datasets/openbmb/UltraFeedback/resolve/40b436560ca83a8dba36114c22ab3c66e43f6d5e/README.md",
+        "source_version": "40b436560ca83a8dba36114c22ab3c66e43f6d5e"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "UltraFeedback pinned release",
+      "parent_id": "dataset.ultrafeedback",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.fineweb.crawl-lineage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Reviewed within the pinned creator paper, with separate AI source and adversarial review of collection, filtering and generated-label scope. Access/rights beyond inspected documentation remain unknown.",
+      "eligible_core": false,
+      "family_id": "fineweb",
+      "id": "dataset.fineweb",
+      "identifiers": {},
+      "kind": "dataset",
+      "legacy_id": null,
+      "name": "FineWeb",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Reviewed within the pinned creator paper, with separate AI source and adversarial review of collection, filtering and generated-label scope. Access/rights beyond inspected documentation remain unknown.",
+      "eligible_core": false,
+      "family_id": "fineweb-edu",
+      "id": "dataset.fineweb-edu",
+      "identifiers": {},
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "FineWeb-Edu",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [
+          "synthetic_educational_quality"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "web",
+          "model",
+          "mixed"
+        ],
+        "oversight": [],
+        "workflow": [
+          "pretraining",
+          "educational_filtering"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.fineweb.synthetic-classifier-groundtruth",
+        "candidate.paperfull.fineweb.synthetic-educational-labels"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "fineweb-edu",
+      "id": "dataset.fineweb-edu.paper-2406.17557v2",
+      "identifiers": {
+        "paper_version": "2406.17557v2"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "FineWeb-Edu as described in 2406.17557v2",
+      "parent_id": "dataset.fineweb-edu",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [
+          "synthetic_educational_quality"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "web",
+          "model",
+          "mixed"
+        ],
+        "oversight": [],
+        "workflow": [
+          "pretraining",
+          "educational_filtering"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.fineweb.crawl-release-lineage",
+        "candidate.paperfull.fineweb.harmful-content-remains",
+        "candidate.paperfull.fineweb.per-crawl-deduplication"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "fineweb",
+      "id": "dataset.fineweb.paper-2406.17557v2",
+      "identifiers": {
+        "paper_version": "2406.17557v2"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "FineWeb as described in 2406.17557v2",
+      "parent_id": "dataset.fineweb",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.supplier.surge_ai.gsm8k-contribution"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved. The supplier case establishes only the explicitly bound identity/contribution, not a complete dataset or benchmark dossier.",
+      "eligible_core": false,
+      "family_id": "family.gsm8k",
+      "id": "dataset.gsm8k",
+      "identifiers": {},
+      "kind": "dataset",
+      "legacy_id": null,
+      "name": "GSM8K",
+      "parent_id": null,
+      "review_depth": "metadata",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained family documentation and its pinned release/study distinctions received separate full-source AI reviews. Approved child-release assertions retain their exact version scope; unknowns and quarantines are not generalized to the family.",
+      "eligible_core": false,
+      "family_id": "helpsteer2",
+      "id": "dataset.helpsteer2",
+      "identifiers": {
+        "primary_source": "https://huggingface.co/datasets/nvidia/HelpSteer2/resolve/990b2711a36180dd19d9c94b8627844866f8982a/README.md"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "HelpSteer2",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.supplier.scale_ai.helpsteer3-contribution",
+        "claim.helpsteer3.preference-dataset",
+        "claim.helpsteer3.scale-annotation",
+        "claim.helpsteer3.translated-annotation"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained family documentation and its pinned release/study distinctions received separate full-source AI reviews. Approved child-release assertions retain their exact version scope; unknowns and quarantines are not generalized to the family.",
+      "eligible_core": false,
+      "family_id": "helpsteer3",
+      "id": "dataset.helpsteer3",
+      "identifiers": {},
+      "kind": "dataset",
+      "legacy_id": null,
+      "name": "HelpSteer3",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "general",
+          "stem",
+          "code",
+          "multilingual"
+        ],
+        "expertise": [],
+        "labels": [
+          "pairwise_preference",
+          "human_feedback",
+          "model_generated_principles"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "human",
+          "model",
+          "mixed"
+        ],
+        "oversight": [
+          "multiple_annotators",
+          "vendor_qa",
+          "research_team_qa"
+        ],
+        "workflow": [
+          "preference_annotation",
+          "feedback",
+          "editing",
+          "principle_generation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.helpsteer3.independent-human-labels",
+        "candidate.paperfull.helpsteer3.missing-domain-intersections",
+        "candidate.paperfull.helpsteer3.postfilter-consensus"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": "helpsteer3",
+      "id": "dataset.helpsteer3.preference-paper-2505.11475v2",
+      "identifiers": {
+        "paper_version": "2505.11475v2"
+      },
+      "kind": "dataset_release",
+      "legacy_id": null,
+      "name": "HelpSteer3-Preference as described in 2505.11475v2",
+      "parent_id": "dataset.helpsteer3",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained family documentation and its pinned release/study distinctions received separate full-source AI reviews. Approved child-release assertions retain their exact version scope; unknowns and quarantines are not generalized to the family.",
+      "eligible_core": false,
+      "family_id": "hh_rlhf",
+      "id": "dataset.hh_rlhf",
+      "identifiers": {
+        "primary_source": "https://huggingface.co/datasets/Anthropic/hh-rlhf/resolve/09be8c5bbc57cb3887f3a9732ad6aa7ec602a1fa/README.md"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "HH-RLHF",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained family documentation and its pinned release/study distinctions received separate full-source AI reviews. Approved child-release assertions retain their exact version scope; unknowns and quarantines are not generalized to the family.",
+      "eligible_core": false,
+      "family_id": "oasst1",
+      "id": "dataset.oasst1",
+      "identifiers": {
+        "primary_source": "https://huggingface.co/datasets/OpenAssistant/oasst1/resolve/fdf72ae0827c1cda404aff25b6603abec9e3399b/README.md"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "OpenAssistant Conversations (OASST1 reviewed release)",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained family documentation and its pinned release/study distinctions received separate full-source AI reviews. Approved child-release assertions retain their exact version scope; unknowns and quarantines are not generalized to the family.",
+      "eligible_core": false,
+      "family_id": "shp",
+      "id": "dataset.shp",
+      "identifiers": {
+        "primary_source": "https://huggingface.co/datasets/stanfordnlp/SHP/resolve/e94b5f32602712d78ed494fe79105b1959396686/README.md"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "Stanford Human Preferences (SHP)",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Creator-maintained family documentation and its pinned release/study distinctions received separate full-source AI reviews. Approved child-release assertions retain their exact version scope; unknowns and quarantines are not generalized to the family.",
+      "eligible_core": false,
+      "family_id": "ultrafeedback",
+      "id": "dataset.ultrafeedback",
+      "identifiers": {
+        "primary_source": "https://huggingface.co/datasets/openbmb/UltraFeedback/resolve/40b436560ca83a8dba36114c22ab3c66e43f6d5e/README.md"
+      },
+      "kind": "dataset_family",
+      "legacy_id": null,
+      "name": "UltraFeedback",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "ATeams Inc.",
+        "A•Team"
+      ],
+      "assertion_ids": [
+        "legacy.a-team.description"
       ],
       "disposition": "pending",
       "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "org.prime_intellect",
+      "id": "org.a-team",
       "identifiers": {
-        "website": "https://www.primeintellect.ai/"
+        "website": "https://www.a.team/"
       },
       "kind": "organization",
-      "legacy_id": "prime_intellect",
-      "name": "Prime Intellect",
+      "legacy_id": "a-team",
+      "name": "A.Team",
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
@@ -1575,6 +2535,177 @@
     },
     {
       "aliases": [
+        "AIXI"
+      ],
+      "assertion_ids": [
+        "legacy.aixi.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.aixi",
+      "identifiers": {
+        "website": "https://www.aixi.uk/"
+      },
+      "kind": "organization",
+      "legacy_id": "aixi",
+      "name": "AIXI Labs",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Alinia"
+      ],
+      "assertion_ids": [
+        "legacy.alinia.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.alinia",
+      "identifiers": {
+        "website": "https://www.alinia.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "alinia",
+      "name": "Alinia AI",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Appen Limited",
+        "CrowdGen (contributor platform)",
+        "ASX: APX"
+      ],
+      "assertion_ids": [
+        "candidate.supplier.appen.adjudication",
+        "candidate.supplier.appen.coding",
+        "candidate.supplier.appen.crowd-network",
+        "candidate.supplier.appen.entity",
+        "candidate.supplier.appen.evaluation-separation",
+        "candidate.supplier.appen.offering",
+        "candidate.supplier.appen.privacy-subcontractors",
+        "candidate.supplier.appen.provenance",
+        "candidate.supplier.appen.revenue-fy2025",
+        "candidate.supplier.appen.security",
+        "candidate.supplier.appen.segments-fy2025",
+        "legacy.appen.description"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Inclusion audited from the bounded supplier dossier and separately verified primary sources. Capability, contribution, commercial scope, workforce denominators and unknowns remain assertion-specific; no performance endorsement is made.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.appen",
+      "identifiers": {
+        "website": "https://www.appen.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": "appen",
+      "name": "Appen",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "株式会社APTO",
+        "harBest",
+        "harBest Expert"
+      ],
+      "assertion_ids": [
+        "legacy.apto.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.apto",
+      "identifiers": {
+        "website": "https://apto.co.jp/en/"
+      },
+      "kind": "organization",
+      "legacy_id": "apto",
+      "name": "APTO",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "BenchFlow Inc.",
+        "Benchmarkthing (database alias)"
+      ],
+      "assertion_ids": [
+        "legacy.benchflow.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.benchflow",
+      "identifiers": {
+        "website": "https://www.benchflow.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "benchflow",
+      "name": "BenchFlow",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
         "BespokeLabs.AI, Inc."
       ],
       "assertion_ids": [
@@ -1591,191 +2722,6 @@
       "kind": "organization",
       "legacy_id": "bespoke_labs",
       "name": "Bespoke Labs",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [
-        "Polymath AI Labs"
-      ],
-      "assertion_ids": [
-        "legacy.polymath_ai_labs.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.polymath_ai_labs",
-      "identifiers": {
-        "website": "https://polymathlabs.ai/"
-      },
-      "kind": "organization",
-      "legacy_id": "polymath_ai_labs",
-      "name": "Polymath",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [
-        "FrontierSWE (benchmark, not separate company)"
-      ],
-      "assertion_ids": [
-        "legacy.proximal.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.proximal",
-      "identifiers": {
-        "website": "https://www.proximal.ai/"
-      },
-      "kind": "organization",
-      "legacy_id": "proximal",
-      "name": "Proximal",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [],
-      "assertion_ids": [
-        "legacy.trajectory_labs_pbc.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.trajectory_labs_pbc",
-      "identifiers": {
-        "website": "https://www.trajectorylabs.com/"
-      },
-      "kind": "organization",
-      "legacy_id": "trajectory_labs_pbc",
-      "name": "Trajectory Labs, PBC",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [
-        "Operative (historical database alias; not primary-verified)"
-      ],
-      "assertion_ids": [
-        "legacy.refresh.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.refresh",
-      "identifiers": {
-        "website": "https://refresh.dev/"
-      },
-      "kind": "organization",
-      "legacy_id": "refresh",
-      "name": "Refresh",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [
-        "Surge Labs Inc. (reported legal entity)",
-        "DataAnnotation (contributor platform)"
-      ],
-      "assertion_ids": [
-        "legacy.surge_ai.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.surge_ai",
-      "identifiers": {
-        "website": "https://surgehq.ai/"
-      },
-      "kind": "organization",
-      "legacy_id": "surge_ai",
-      "name": "Surge AI",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [
-        "RefactorDB (former name)"
-      ],
-      "assertion_ids": [
-        "legacy.quesma.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.quesma",
-      "identifiers": {
-        "website": "https://quesma.com/"
-      },
-      "kind": "organization",
-      "legacy_id": "quesma",
-      "name": "Quesma",
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
@@ -1823,23 +2769,23 @@
     },
     {
       "aliases": [
-        "BenchFlow Inc.",
-        "Benchmarkthing (database alias)"
+        "Elorian AI",
+        "Elorian AI Inc."
       ],
       "assertion_ids": [
-        "legacy.benchflow.description"
+        "legacy.elorian.description"
       ],
       "disposition": "pending",
       "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "org.benchflow",
+      "id": "org.elorian",
       "identifiers": {
-        "website": "https://www.benchflow.ai/"
+        "website": "https://elorian.ai/"
       },
       "kind": "organization",
-      "legacy_id": "benchflow",
-      "name": "BenchFlow",
+      "legacy_id": "elorian",
+      "name": "Elorian",
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
@@ -1888,23 +2834,23 @@
     },
     {
       "aliases": [
-        "ATeams Inc.",
-        "A•Team"
+        "Giskard AI",
+        "Giskard AI SAS"
       ],
       "assertion_ids": [
-        "legacy.a-team.description"
+        "legacy.giskard.description"
       ],
       "disposition": "pending",
       "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "org.a-team",
+      "id": "org.giskard",
       "identifiers": {
-        "website": "https://www.a.team/"
+        "website": "https://www.giskard.ai/"
       },
       "kind": "organization",
-      "legacy_id": "a-team",
-      "name": "A.Team",
+      "legacy_id": "giskard",
+      "name": "Giskard",
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
@@ -1957,25 +2903,52 @@
     },
     {
       "aliases": [
-        "Pareto Inc.",
-        "Pareto",
-        "Hello Pareto",
-        "Forte (expert platform)"
+        "Handshake",
+        "Stryder Corp. d/b/a Handshake"
       ],
       "assertion_ids": [
-        "legacy.pareto.description"
+        "legacy.handshake_ai.description"
       ],
       "disposition": "pending",
       "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "org.pareto",
+      "id": "org.handshake_ai",
       "identifiers": {
-        "website": "https://pareto.ai/"
+        "website": "https://joinhandshake.com/ai/"
       },
       "kind": "organization",
-      "legacy_id": "pareto",
-      "name": "Pareto AI",
+      "legacy_id": "handshake_ai",
+      "name": "Handshake AI",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "legacy.imerit.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.imerit",
+      "identifiers": {
+        "website": "https://imerit.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "imerit",
+      "name": "iMerit / EXL",
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
@@ -1991,24 +2964,23 @@
     },
     {
       "aliases": [
-        "Ooak",
-        "Ooak Data Inc.",
-        "Ooak Data SAS"
+        "Invisible",
+        "Meridial (expert marketplace brand)"
       ],
       "assertion_ids": [
-        "legacy.ooak.description"
+        "legacy.invisible.description"
       ],
       "disposition": "pending",
       "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "org.ooak",
+      "id": "org.invisible",
       "identifiers": {
-        "website": "https://ooakdata.com/"
+        "website": "https://invisibletech.ai/"
       },
       "kind": "organization",
-      "legacy_id": "ooak",
-      "name": "Ooak Data",
+      "legacy_id": "invisible",
+      "name": "Invisible Technologies",
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
@@ -2024,55 +2996,23 @@
     },
     {
       "aliases": [
-        "Elorian AI",
-        "Elorian AI Inc."
+        "Labelbox, Inc.",
+        "Alignerr (expert-network brand)"
       ],
       "assertion_ids": [
-        "legacy.elorian.description"
+        "legacy.labelbox.description"
       ],
       "disposition": "pending",
       "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "org.elorian",
+      "id": "org.labelbox",
       "identifiers": {
-        "website": "https://elorian.ai/"
+        "website": "https://labelbox.com/"
       },
       "kind": "organization",
-      "legacy_id": "elorian",
-      "name": "Elorian",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [
-        "Terac Inc.",
-        "terac.ai (legacy domain)"
-      ],
-      "assertion_ids": [
-        "legacy.terac.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.terac",
-      "identifiers": {
-        "website": "https://terac.com/"
-      },
-      "kind": "organization",
-      "legacy_id": "terac",
-      "name": "Terac",
+      "legacy_id": "labelbox",
+      "name": "Labelbox",
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
@@ -2121,23 +3061,63 @@
     },
     {
       "aliases": [
-        "Invisible",
-        "Meridial (expert marketplace brand)"
+        "Mercor.io Corporation"
       ],
       "assertion_ids": [
-        "legacy.invisible.description"
+        "candidate.supplier.mercor.apex11-release",
+        "candidate.supplier.mercor.catalog",
+        "candidate.supplier.mercor.custom",
+        "candidate.supplier.mercor.entity",
+        "candidate.supplier.mercor.expert-pool",
+        "candidate.supplier.mercor.grader-tradeoff",
+        "candidate.supplier.mercor.incident",
+        "candidate.supplier.mercor.peer-review",
+        "candidate.supplier.mercor.privacy-scope",
+        "candidate.supplier.mercor.task-construction",
+        "legacy.mercor.description"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Inclusion audited from the bounded supplier dossier and separately verified primary sources. Capability, contribution, commercial scope, workforce denominators and unknowns remain assertion-specific; no performance endorsement is made.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.mercor",
+      "identifiers": {
+        "website": "https://www.mercor.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": "mercor",
+      "name": "Mercor",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "micro1, Inc."
+      ],
+      "assertion_ids": [
+        "legacy.micro1.description"
       ],
       "disposition": "pending",
       "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "org.invisible",
+      "id": "org.micro1",
       "identifiers": {
-        "website": "https://invisibletech.ai/"
+        "website": "https://www.micro1.ai/"
       },
       "kind": "organization",
-      "legacy_id": "invisible",
-      "name": "Invisible Technologies",
+      "legacy_id": "micro1",
+      "name": "micro1",
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
@@ -2153,23 +3133,120 @@
     },
     {
       "aliases": [
-        "Toloka AI BV",
-        "Mindrift (expert community brand)"
+        "Ooak",
+        "Ooak Data Inc.",
+        "Ooak Data SAS"
       ],
       "assertion_ids": [
-        "legacy.toloka.description"
+        "legacy.ooak.description"
       ],
       "disposition": "pending",
       "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "org.toloka",
+      "id": "org.ooak",
       "identifiers": {
-        "website": "https://toloka.ai/"
+        "website": "https://ooakdata.com/"
       },
       "kind": "organization",
-      "legacy_id": "toloka",
-      "name": "Toloka",
+      "legacy_id": "ooak",
+      "name": "Ooak Data",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Pareto Inc.",
+        "Pareto",
+        "Hello Pareto",
+        "Forte (expert platform)"
+      ],
+      "assertion_ids": [
+        "legacy.pareto.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.pareto",
+      "identifiers": {
+        "website": "https://pareto.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "pareto",
+      "name": "Pareto AI",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Polymath AI Labs"
+      ],
+      "assertion_ids": [
+        "legacy.polymath_ai_labs.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.polymath_ai_labs",
+      "identifiers": {
+        "website": "https://polymathlabs.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "polymath_ai_labs",
+      "name": "Polymath",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Prime Intellect, Inc."
+      ],
+      "assertion_ids": [
+        "legacy.prime_intellect.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.prime_intellect",
+      "identifiers": {
+        "website": "https://www.primeintellect.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "prime_intellect",
+      "name": "Prime Intellect",
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
@@ -2188,22 +3265,33 @@
         "Prolific Academic Ltd"
       ],
       "assertion_ids": [
+        "candidate.supplier.prolific.active-pool",
+        "candidate.supplier.prolific.ai-taskers",
+        "candidate.supplier.prolific.cohere-recruitment",
+        "candidate.supplier.prolific.fees",
+        "candidate.supplier.prolific.minimum-rewards",
+        "candidate.supplier.prolific.modalities",
+        "candidate.supplier.prolific.participation-rules",
+        "candidate.supplier.prolific.platform-managed",
+        "candidate.supplier.prolific.quality",
+        "candidate.supplier.prolific.security",
+        "candidate.supplier.prolific.study-selection",
         "legacy.prolific.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Inclusion audited from the bounded supplier dossier and separately verified primary sources. Capability, contribution, commercial scope, workforce denominators and unknowns remain assertion-specific; no performance endorsement is made.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.prolific",
       "identifiers": {
         "website": "https://www.prolific.com/"
       },
-      "kind": "organization",
+      "kind": "supplier",
       "legacy_id": "prolific",
       "name": "Prolific",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -2216,22 +3304,22 @@
     },
     {
       "aliases": [
-        "AIXI"
+        "FrontierSWE (benchmark, not separate company)"
       ],
       "assertion_ids": [
-        "legacy.aixi.description"
+        "legacy.proximal.description"
       ],
       "disposition": "pending",
       "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "org.aixi",
+      "id": "org.proximal",
       "identifiers": {
-        "website": "https://www.aixi.uk/"
+        "website": "https://www.proximal.ai/"
       },
       "kind": "organization",
-      "legacy_id": "aixi",
-      "name": "AIXI Labs",
+      "legacy_id": "proximal",
+      "name": "Proximal",
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
@@ -2247,24 +3335,22 @@
     },
     {
       "aliases": [
-        "Appen Limited",
-        "CrowdGen (contributor platform)",
-        "ASX: APX"
+        "RefactorDB (former name)"
       ],
       "assertion_ids": [
-        "legacy.appen.description"
+        "legacy.quesma.description"
       ],
       "disposition": "pending",
       "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "org.appen",
+      "id": "org.quesma",
       "identifiers": {
-        "website": "https://www.appen.com/"
+        "website": "https://quesma.com/"
       },
       "kind": "organization",
-      "legacy_id": "appen",
-      "name": "Appen",
+      "legacy_id": "quesma",
+      "name": "Quesma",
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
@@ -2280,87 +3366,22 @@
     },
     {
       "aliases": [
-        "Giskard AI",
-        "Giskard AI SAS"
+        "Operative (historical database alias; not primary-verified)"
       ],
       "assertion_ids": [
-        "legacy.giskard.description"
+        "legacy.refresh.description"
       ],
       "disposition": "pending",
       "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "org.giskard",
+      "id": "org.refresh",
       "identifiers": {
-        "website": "https://www.giskard.ai/"
+        "website": "https://refresh.dev/"
       },
       "kind": "organization",
-      "legacy_id": "giskard",
-      "name": "Giskard",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [
-        "Alinia"
-      ],
-      "assertion_ids": [
-        "legacy.alinia.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.alinia",
-      "identifiers": {
-        "website": "https://www.alinia.ai/"
-      },
-      "kind": "organization",
-      "legacy_id": "alinia",
-      "name": "Alinia AI",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [
-        "株式会社APTO",
-        "harBest",
-        "harBest Expert"
-      ],
-      "assertion_ids": [
-        "legacy.apto.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.apto",
-      "identifiers": {
-        "website": "https://apto.co.jp/en/"
-      },
-      "kind": "organization",
-      "legacy_id": "apto",
-      "name": "APTO",
+      "legacy_id": "refresh",
+      "name": "Refresh",
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
@@ -2410,35 +3431,6 @@
     {
       "aliases": [],
       "assertion_ids": [
-        "legacy.imerit.description"
-      ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "org.imerit",
-      "identifiers": {
-        "website": "https://imerit.ai/"
-      },
-      "kind": "organization",
-      "legacy_id": "imerit",
-      "name": "iMerit / EXL",
-      "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [],
-      "assertion_ids": [
         "legacy.sama.description"
       ],
       "disposition": "pending",
@@ -2455,6 +3447,138 @@
       "parent_id": null,
       "review_depth": "historical",
       "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Scale AI, Inc.",
+        "Outlier (contributor brand)",
+        "Remotasks (contributor brand)",
+        "Human Frontier Collective (contributor platform)"
+      ],
+      "assertion_ids": [
+        "candidate.paperfull.helpsteer3.scale-subset-recruitment",
+        "candidate.paperfull.instructgpt.scale-recruitment-channel",
+        "candidate.supplier.scale_ai.cumulative-payout",
+        "candidate.supplier.scale_ai.data-engine",
+        "candidate.supplier.scale_ai.entity",
+        "candidate.supplier.scale_ai.evaluation",
+        "candidate.supplier.scale_ai.helpsteer3-contribution",
+        "candidate.supplier.scale_ai.matching",
+        "candidate.supplier.scale_ai.quality",
+        "candidate.supplier.scale_ai.security-disclosure",
+        "candidate.supplier.scale_ai.segments",
+        "candidate.supplier.scale_ai.sensitive-content",
+        "candidate.supplier.scale_ai.subcontractors",
+        "claim.helpsteer3.scale-annotation",
+        "legacy.scale_ai.description",
+        "next.claim.helpsteer2.scale",
+        "next.claim.helpsteer3.scale"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Inclusion audited from the bounded supplier dossier and separately verified primary sources. Capability, contribution, commercial scope, workforce denominators and unknowns remain assertion-specific; no performance endorsement is made.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.scale_ai",
+      "identifiers": {
+        "website": "https://scale.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": "scale_ai",
+      "name": "Scale AI",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Snorkel AI, Inc."
+      ],
+      "assertion_ids": [
+        "candidate.supplier.snorkel_ai.data-series",
+        "candidate.supplier.snorkel_ai.entity",
+        "candidate.supplier.snorkel_ai.expert-review",
+        "candidate.supplier.snorkel_ai.finance-benchmark",
+        "candidate.supplier.snorkel_ai.multimodal",
+        "candidate.supplier.snorkel_ai.onboarding",
+        "candidate.supplier.snorkel_ai.payment-and-choice",
+        "candidate.supplier.snorkel_ai.quality-controls",
+        "candidate.supplier.snorkel_ai.security-scope",
+        "candidate.supplier.snorkel_ai.workforce-partners",
+        "legacy.snorkel_ai.description"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Inclusion audited from the bounded supplier dossier and separately verified primary sources. Capability, contribution, commercial scope, workforce denominators and unknowns remain assertion-specific; no performance endorsement is made.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.snorkel_ai",
+      "identifiers": {
+        "website": "https://snorkel.ai/"
+      },
+      "kind": "supplier",
+      "legacy_id": "snorkel_ai",
+      "name": "Snorkel AI",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Surge Labs Inc. (reported legal entity)",
+        "DataAnnotation (contributor platform)"
+      ],
+      "assertion_ids": [
+        "candidate.supplier.surge_ai.entity",
+        "candidate.supplier.surge_ai.gsm8k-contribution",
+        "candidate.supplier.surge_ai.gsm8k-quality",
+        "candidate.supplier.surge_ai.human-feedback",
+        "candidate.supplier.surge_ai.modalities",
+        "candidate.supplier.surge_ai.ots",
+        "candidate.supplier.surge_ai.privacy-subprocessors",
+        "candidate.supplier.surge_ai.rl-environments",
+        "candidate.supplier.surge_ai.user-data-license",
+        "legacy.surge_ai.description"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Inclusion audited from the bounded supplier dossier and separately verified primary sources. Capability, contribution, commercial scope, workforce denominators and unknowns remain assertion-specific; no performance endorsement is made.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.surge_ai",
+      "identifiers": {
+        "website": "https://surgehq.ai/"
+      },
+      "kind": "supplier",
+      "legacy_id": "surge_ai",
+      "name": "Surge AI",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -2495,117 +3619,76 @@
       }
     },
     {
-      "aliases": [],
-      "assertion_ids": [
-        "claim.helpsteer3.preference-dataset"
+      "aliases": [
+        "Terac Inc.",
+        "terac.ai (legacy domain)"
       ],
-      "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "assertion_ids": [
+        "legacy.terac.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "paper.arxiv.2505.11475",
+      "id": "org.terac",
       "identifiers": {
-        "arxiv": "2505.11475",
-        "doi": "10.48550/arXiv.2505.11475"
+        "website": "https://terac.com/"
       },
-      "kind": "paper",
-      "legacy_id": null,
-      "name": "HelpSteer3-Preference: Open Human-Annotated Preference Data across Diverse Tasks and Languages",
+      "kind": "organization",
+      "legacy_id": "terac",
+      "name": "Terac",
       "parent_id": null,
-      "review_depth": "abstract",
-      "status": "approved",
+      "review_depth": "historical",
+      "status": "historical",
       "taxonomy": {
         "domain": [],
         "expertise": [],
         "labels": [],
-        "modality": [
-          "text"
-        ],
+        "modality": [],
         "origin": [],
         "oversight": [],
         "workflow": []
       }
     },
     {
-      "aliases": [],
+      "aliases": [
+        "Toloka AI BV",
+        "Mindrift (expert community brand)"
+      ],
       "assertion_ids": [
-        "claim.helpsteer3.preference-dataset",
-        "claim.helpsteer3.scale-annotation",
-        "claim.helpsteer3.translated-annotation"
+        "candidate.supplier.toloka.automated-appeal",
+        "candidate.supplier.toloka.biometric-consent",
+        "candidate.supplier.toloka.client-code-metadata",
+        "candidate.supplier.toloka.entity",
+        "candidate.supplier.toloka.experts",
+        "candidate.supplier.toloka.hybrid-offering",
+        "candidate.supplier.toloka.pii-rules",
+        "candidate.supplier.toloka.self-serve",
+        "candidate.supplier.toloka.sensitive-content",
+        "candidate.supplier.toloka.taxonomy-quality",
+        "candidate.supplier.toloka.umath-validation",
+        "candidate.supplier.toloka.workforce-tiering",
+        "legacy.toloka.description"
       ],
       "disposition": "included",
-      "disposition_reason": "Collection-level provenance is mixed; source-backed supplier edges apply only to the explicitly qualified Preference domains. Full family review remains pending.",
-      "eligible_core": false,
-      "family_id": "helpsteer3",
-      "id": "dataset.helpsteer3",
-      "identifiers": {},
-      "kind": "dataset",
-      "legacy_id": null,
-      "name": "HelpSteer3",
-      "parent_id": null,
-      "review_depth": "abstract",
-      "status": "approved",
-      "taxonomy": {
-        "domain": [
-          "general",
-          "stem",
-          "code",
-          "multilingual"
-        ],
-        "expertise": [],
-        "labels": [
-          "pairwise_preference",
-          "human_feedback",
-          "model_generated_principles"
-        ],
-        "modality": [
-          "text"
-        ],
-        "origin": [
-          "human",
-          "model",
-          "mixed"
-        ],
-        "oversight": [
-          "multiple_annotators",
-          "vendor_qa",
-          "research_team_qa"
-        ],
-        "workflow": [
-          "preference_annotation",
-          "feedback",
-          "editing",
-          "principle_generation"
-        ]
-      }
-    },
-    {
-      "aliases": [],
-      "assertion_ids": [
-        "claim.instructgpt.human-rankings"
-      ],
-      "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "disposition_reason": "Inclusion audited from the bounded supplier dossier and separately verified primary sources. Capability, contribution, commercial scope, workforce denominators and unknowns remain assertion-specific; no performance endorsement is made.",
       "eligible_core": false,
       "family_id": null,
-      "id": "paper.arxiv.2203.02155",
+      "id": "org.toloka",
       "identifiers": {
-        "arxiv": "2203.02155",
-        "doi": "10.48550/arXiv.2203.02155"
+        "website": "https://toloka.ai/"
       },
-      "kind": "paper",
-      "legacy_id": null,
-      "name": "Training language models to follow instructions with human feedback",
+      "kind": "supplier",
+      "legacy_id": "toloka",
+      "name": "Toloka",
       "parent_id": null,
-      "review_depth": "abstract",
+      "review_depth": "full_source",
       "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
         "labels": [],
-        "modality": [
-          "text"
-        ],
+        "modality": [],
         "origin": [],
         "oversight": [],
         "workflow": []
@@ -2614,30 +3697,27 @@
     {
       "aliases": [],
       "assertion_ids": [
-        "claim.dpo.classification-objective"
+        "legacy.trajectory_labs_pbc.description"
       ],
-      "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
       "eligible_core": false,
       "family_id": null,
-      "id": "paper.arxiv.2305.18290",
+      "id": "org.trajectory_labs_pbc",
       "identifiers": {
-        "arxiv": "2305.18290",
-        "doi": "10.48550/arXiv.2305.18290"
+        "website": "https://www.trajectorylabs.com/"
       },
-      "kind": "paper",
-      "legacy_id": null,
-      "name": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+      "kind": "organization",
+      "legacy_id": "trajectory_labs_pbc",
+      "name": "Trajectory Labs, PBC",
       "parent_id": null,
-      "review_depth": "abstract",
-      "status": "approved",
+      "review_depth": "historical",
+      "status": "historical",
       "taxonomy": {
         "domain": [],
         "expertise": [],
         "labels": [],
-        "modality": [
-          "text"
-        ],
+        "modality": [],
         "origin": [],
         "oversight": [],
         "workflow": []
@@ -2646,283 +3726,9 @@
     {
       "aliases": [],
       "assertion_ids": [
-        "claim.datasheets.documentation"
-      ],
-      "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "paper.arxiv.1803.09010",
-      "identifiers": {
-        "arxiv": "1803.09010",
-        "doi": "10.48550/arXiv.1803.09010"
-      },
-      "kind": "paper",
-      "legacy_id": null,
-      "name": "Datasheets for Datasets",
-      "parent_id": null,
-      "review_depth": "abstract",
-      "status": "approved",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [
-          "text"
-        ],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [],
-      "assertion_ids": [
-        "claim.fineweb.crawl-lineage"
-      ],
-      "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "paper.arxiv.2406.17557",
-      "identifiers": {
-        "arxiv": "2406.17557",
-        "doi": "10.48550/arXiv.2406.17557"
-      },
-      "kind": "paper",
-      "legacy_id": null,
-      "name": "The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale",
-      "parent_id": null,
-      "review_depth": "abstract",
-      "status": "approved",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [
-          "text"
-        ],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [],
-      "assertion_ids": [
-        "claim.fineweb.crawl-lineage"
-      ],
-      "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
-      "eligible_core": false,
-      "family_id": "fineweb",
-      "id": "dataset.fineweb",
-      "identifiers": {},
-      "kind": "dataset",
-      "legacy_id": null,
-      "name": "FineWeb",
-      "parent_id": null,
-      "review_depth": "abstract",
-      "status": "approved",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [
-          "text"
-        ],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [],
-      "assertion_ids": [
-        "claim.swebench.task-construction"
-      ],
-      "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "paper.arxiv.2310.06770",
-      "identifiers": {
-        "arxiv": "2310.06770",
-        "doi": "10.48550/arXiv.2310.06770"
-      },
-      "kind": "paper",
-      "legacy_id": null,
-      "name": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
-      "parent_id": null,
-      "review_depth": "abstract",
-      "status": "approved",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [
-          "text"
-        ],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [],
-      "assertion_ids": [
-        "claim.swebench.task-construction"
-      ],
-      "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
-      "eligible_core": false,
-      "family_id": "swebench",
-      "id": "benchmark.swebench",
-      "identifiers": {},
-      "kind": "benchmark",
-      "legacy_id": null,
-      "name": "SWE-bench",
-      "parent_id": null,
-      "review_depth": "abstract",
-      "status": "approved",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [
-          "text"
-        ],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [],
-      "assertion_ids": [
-        "claim.truthfulqa.question-coverage"
-      ],
-      "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "paper.arxiv.2109.07958",
-      "identifiers": {
-        "arxiv": "2109.07958",
-        "doi": "10.48550/arXiv.2109.07958"
-      },
-      "kind": "paper",
-      "legacy_id": null,
-      "name": "TruthfulQA: Measuring How Models Mimic Human Falsehoods",
-      "parent_id": null,
-      "review_depth": "abstract",
-      "status": "approved",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [
-          "text"
-        ],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [],
-      "assertion_ids": [
-        "claim.truthfulqa.question-coverage"
-      ],
-      "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
-      "eligible_core": false,
-      "family_id": "truthfulqa",
-      "id": "benchmark.truthfulqa",
-      "identifiers": {},
-      "kind": "benchmark",
-      "legacy_id": null,
-      "name": "TruthfulQA",
-      "parent_id": null,
-      "review_depth": "abstract",
-      "status": "approved",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [
-          "text"
-        ],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [],
-      "assertion_ids": [
-        "claim.mmlu.task-coverage"
-      ],
-      "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
-      "eligible_core": false,
-      "family_id": null,
-      "id": "paper.arxiv.2009.03300",
-      "identifiers": {
-        "arxiv": "2009.03300",
-        "doi": "10.48550/arXiv.2009.03300"
-      },
-      "kind": "paper",
-      "legacy_id": null,
-      "name": "Measuring Massive Multitask Language Understanding",
-      "parent_id": null,
-      "review_depth": "abstract",
-      "status": "approved",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [
-          "text"
-        ],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [],
-      "assertion_ids": [
-        "claim.mmlu.task-coverage"
-      ],
-      "disposition": "included",
-      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
-      "eligible_core": false,
-      "family_id": "mmlu",
-      "id": "benchmark.mmlu",
-      "identifiers": {},
-      "kind": "benchmark",
-      "legacy_id": null,
-      "name": "MMLU",
-      "parent_id": null,
-      "review_depth": "abstract",
-      "status": "approved",
-      "taxonomy": {
-        "domain": [],
-        "expertise": [],
-        "labels": [],
-        "modality": [
-          "text"
-        ],
-        "origin": [],
-        "oversight": [],
-        "workflow": []
-      }
-    },
-    {
-      "aliases": [],
-      "assertion_ids": [
-        "claim.helpsteer3.translated-annotation"
+        "candidate.paperfull.helpsteer3.translated-subset-recruitment",
+        "claim.helpsteer3.translated-annotation",
+        "next.claim.helpsteer3.translated"
       ],
       "disposition": "included",
       "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
@@ -2945,9 +3751,889 @@
         "oversight": [],
         "workflow": []
       }
+    },
+    {
+      "aliases": [
+        "Turing Enterprises, Inc.",
+        "Turing.com",
+        "Turing Frontier"
+      ],
+      "assertion_ids": [
+        "candidate.supplier.turing.business-separation",
+        "candidate.supplier.turing.entity",
+        "candidate.supplier.turing.expert-pool",
+        "candidate.supplier.turing.frontier-product",
+        "candidate.supplier.turing.incentive-optin",
+        "candidate.supplier.turing.personal-data-ai-use",
+        "candidate.supplier.turing.preference-delivery",
+        "candidate.supplier.turing.sandbox-capture",
+        "candidate.supplier.turing.verification",
+        "legacy.turing.description"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Inclusion audited from the bounded supplier dossier and separately verified primary sources. Capability, contribution, commercial scope, workforce denominators and unknowns remain assertion-specific; no performance endorsement is made.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.turing",
+      "identifiers": {
+        "website": "https://www.turing.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": "turing",
+      "name": "Turing",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.instructgpt.upwork-recruitment-channel"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.upwork",
+      "identifiers": {
+        "website": "https://www.upwork.com/"
+      },
+      "kind": "organization",
+      "legacy_id": null,
+      "name": "Upwork",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.datasheets.documentation"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Substantive methods, results and limitations in the pinned full paper received separate author, source-verifier and adversarial reads. Only individually passing assertions are imported; quarantined conclusions remain excluded.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.1803.09010",
+      "identifiers": {
+        "arxiv": "1803.09010",
+        "doi": "10.48550/arXiv.1803.09010"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "Datasheets for Datasets",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.datasheets.development-process",
+        "candidate.paperfull.datasheets.documentation-mitigation-limit",
+        "candidate.paperfull.datasheets.nonautomated-reflection",
+        "candidate.paperfull.datasheets.updated-version-docs",
+        "candidate.paperfull.datasheets.worker-compensation-disclosure"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.1803.09010v8",
+      "identifiers": {
+        "arxiv_version": "1803.09010v8"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Datasheets for Datasets (arXiv 1803.09010v8)",
+      "parent_id": "paper.arxiv.1803.09010",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": [
+          "research_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.mmlu.task-coverage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Substantive methods, results and limitations in the pinned full paper received separate author, source-verifier and adversarial reads. Only individually passing assertions are imported; quarantined conclusions remain excluded.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2009.03300",
+      "identifiers": {
+        "arxiv": "2009.03300",
+        "doi": "10.48550/arXiv.2009.03300"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "Measuring Massive Multitask Language Understanding",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.mmlu.estimated-expert-baseline",
+        "candidate.paperfull.mmlu.multiplechoice-scoring",
+        "candidate.paperfull.mmlu.unspecialized-human-baseline"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2009.03300v3",
+      "identifiers": {
+        "arxiv_version": "2009.03300v3"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Measuring Massive Multitask Language Understanding (arXiv 2009.03300v3)",
+      "parent_id": "paper.arxiv.2009.03300",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": [
+          "research"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.truthfulqa.question-coverage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Substantive methods, results and limitations in the pinned full paper received separate author, source-verifier and adversarial reads. Only individually passing assertions are imported; quarantined conclusions remain excluded.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2109.07958",
+      "identifiers": {
+        "arxiv": "2109.07958",
+        "doi": "10.48550/arXiv.2109.07958"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "TruthfulQA: Measuring How Models Mimic Human Falsehoods",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.truthfulqa.blinded-human-evaluation",
+        "candidate.paperfull.truthfulqa.external-validation-sample",
+        "candidate.paperfull.truthfulqa.gptjudge-training-labels"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2109.07958v2",
+      "identifiers": {
+        "arxiv_version": "2109.07958v2"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "TruthfulQA: Measuring How Models Mimic Human Falsehoods (arXiv 2109.07958v2)",
+      "parent_id": "paper.arxiv.2109.07958",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": [
+          "research"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.instructgpt.human-rankings"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Substantive methods, results and limitations in the pinned full paper received separate author, source-verifier and adversarial reads. Only individually passing assertions are imported; quarantined conclusions remain excluded.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2203.02155",
+      "identifiers": {
+        "arxiv": "2203.02155",
+        "doi": "10.48550/arXiv.2203.02155"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "Training language models to follow instructions with human feedback",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.instructgpt.human-ranking-sets",
+        "candidate.paperfull.instructgpt.playground-prompts",
+        "candidate.paperfull.instructgpt.single-contractor-comparisons",
+        "candidate.paperfull.instructgpt.unlabelled-ppo-inputs"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2203.02155v1",
+      "identifiers": {
+        "arxiv_version": "2203.02155v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Training language models to follow instructions with human feedback (arXiv 2203.02155v1)",
+      "parent_id": "paper.arxiv.2203.02155",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": [
+          "research"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.dpo.classification-objective"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Substantive methods, results and limitations in the pinned full paper received separate author, source-verifier and adversarial reads. Only individually passing assertions are imported; quarantined conclusions remain excluded.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2305.18290",
+      "identifiers": {
+        "arxiv": "2305.18290",
+        "doi": "10.48550/arXiv.2305.18290"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.dpo.direct-policy-objective",
+        "candidate.paperfull.dpo.reused-human-summary-preferences",
+        "candidate.paperfull.dpo.synthetic-imdb-preferences",
+        "candidate.paperfull.dpo.tested-model-scale-limit",
+        "candidate.paperfull.dpo.volunteer-human-validation"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2305.18290v3",
+      "identifiers": {
+        "arxiv_version": "2305.18290v3"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model (arXiv 2305.18290v3)",
+      "parent_id": "paper.arxiv.2305.18290",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": [
+          "research"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.supplier.prolific.cohere-recruitment"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved. The supplier case establishes only the explicitly bound identity/contribution, not a complete dataset or benchmark dossier.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2309.16349",
+      "identifiers": {
+        "arxiv": "2309.16349"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "Human Feedback is not Gold Standard",
+      "parent_id": null,
+      "review_depth": "metadata",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.swebench.task-construction"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Substantive methods, results and limitations in the pinned full paper received separate author, source-verifier and adversarial reads. Only individually passing assertions are imported; quarantined conclusions remain excluded.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2310.06770",
+      "identifiers": {
+        "arxiv": "2310.06770",
+        "doi": "10.48550/arXiv.2310.06770"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.swebench.manual-execution-contexts",
+        "candidate.paperfull.swebench.no-recruited-task-workers"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2310.06770v3",
+      "identifiers": {
+        "arxiv_version": "2310.06770v3"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues? (arXiv 2310.06770v3)",
+      "parent_id": "paper.arxiv.2310.06770",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": [
+          "research"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.fineweb.crawl-lineage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Substantive methods, results and limitations in the pinned full paper received separate author, source-verifier and adversarial reads. Only individually passing assertions are imported; quarantined conclusions remain excluded.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2406.17557",
+      "identifiers": {
+        "arxiv": "2406.17557",
+        "doi": "10.48550/arXiv.2406.17557"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.fineweb.ablation-scale"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2406.17557v2",
+      "identifiers": {
+        "arxiv_version": "2406.17557v2"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale (arXiv 2406.17557v2)",
+      "parent_id": "paper.arxiv.2406.17557",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": [
+          "research"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.helpsteer3.preference-dataset"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Substantive methods, results and limitations in the pinned full paper received separate author, source-verifier and adversarial reads. Only individually passing assertions are imported; quarantined conclusions remain excluded.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2505.11475",
+      "identifiers": {
+        "arxiv": "2505.11475",
+        "doi": "10.48550/arXiv.2505.11475"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "HelpSteer3-Preference: Open Human-Annotated Preference Data across Diverse Tasks and Languages",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "pending",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2505.11475v2",
+      "identifiers": {
+        "arxiv_version": "2505.11475v2"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "HelpSteer3-Preference: Open Human-Annotated Preference Data across Diverse Tasks and Languages (arXiv 2505.11475v2)",
+      "parent_id": "paper.arxiv.2505.11475",
+      "review_depth": "full_source",
+      "status": "candidate",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": [
+          "research"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.helpsteer3.scale-subset-recruitment"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "workflow.helpsteer3.preference-general-stem-code.2505.11475v2",
+      "identifiers": {},
+      "kind": "workflow",
+      "legacy_id": null,
+      "name": "HelpSteer3-Preference General/STEM/Code annotator sourcing and management (2505.11475v2)",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "general",
+          "stem",
+          "code"
+        ],
+        "expertise": [],
+        "labels": [
+          "pairwise_preference"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "human"
+        ],
+        "oversight": [
+          "vendor_management",
+          "multiple_annotators",
+          "post_annotation_filtering"
+        ],
+        "workflow": [
+          "recruitment",
+          "preference_annotation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.helpsteer3.translated-subset-recruitment"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "workflow.helpsteer3.preference-multilingual.2505.11475v2",
+      "identifiers": {},
+      "kind": "workflow",
+      "legacy_id": null,
+      "name": "HelpSteer3-Preference Multilingual annotator sourcing and management (2505.11475v2)",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "multilingual"
+        ],
+        "expertise": [],
+        "labels": [
+          "pairwise_preference"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "human"
+        ],
+        "oversight": [
+          "vendor_management",
+          "multiple_annotators",
+          "post_annotation_filtering"
+        ],
+        "workflow": [
+          "recruitment",
+          "preference_annotation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "candidate.paperfull.instructgpt.scale-recruitment-channel",
+        "candidate.paperfull.instructgpt.upwork-recruitment-channel"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "workflow.instructgpt.2203.02155v1",
+      "identifiers": {},
+      "kind": "workflow",
+      "legacy_id": null,
+      "name": "InstructGPT demonstration, ranking and evaluation contractor workflow (2203.02155v1)",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [
+          "demonstration",
+          "ranking"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "human",
+          "model",
+          "mixed"
+        ],
+        "oversight": [
+          "researcher_screening",
+          "guidelines",
+          "research_team_qa"
+        ],
+        "workflow": [
+          "demonstration_annotation",
+          "preference_annotation",
+          "human_evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.mmlu.evaluation"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "workflow.mmlu.evaluate.4450500",
+      "identifiers": {
+        "artifact": "https://raw.githubusercontent.com/hendrycks/test/4450500f923c49f1fb1dd3d99108a0bd9717b660/evaluate.py",
+        "repository_commit": "4450500f923c49f1fb1dd3d99108a0bd9717b660"
+      },
+      "kind": "workflow",
+      "legacy_id": null,
+      "name": "MMLU evaluate.py workflow at creator repository commit 4450500",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.swebench.collection"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "workflow.swebench.collection.02e7a74",
+      "identifiers": {
+        "artifact": "https://raw.githubusercontent.com/SWE-bench/SWE-bench/02e7a74ffd0b707aab73d203fe87bdc7c76afc8e/swebench/collect/README.md",
+        "repository_commit": "02e7a74ffd0b707aab73d203fe87bdc7c76afc8e"
+      },
+      "kind": "workflow",
+      "legacy_id": null,
+      "name": "SWE-bench collection procedure at repository commit 02e7a74",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "next.claim.swebench.evaluation"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "workflow.swebench.harness.02e7a74",
+      "identifiers": {
+        "artifact": "https://raw.githubusercontent.com/SWE-bench/SWE-bench/02e7a74ffd0b707aab73d203fe87bdc7c76afc8e/docs/guides/evaluation.md",
+        "repository_commit": "02e7a74ffd0b707aab73d203fe87bdc7c76afc8e"
+      },
+      "kind": "workflow",
+      "legacy_id": null,
+      "name": "SWE-bench evaluation workflow at repository commit 02e7a74",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "pending",
+      "disposition_reason": "Source-version metadata and scoped assertions; only the unchanged assertions with three separate passing AI reviews are approved.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "workflow.turing.anonymous-agent-data-2026",
+      "identifiers": {},
+      "kind": "workflow",
+      "legacy_id": null,
+      "name": "Turing unnamed lab agent-trajectory/preference workflow",
+      "parent_id": null,
+      "review_depth": "metadata",
+      "status": "candidate",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
     }
   ],
-  "release_id": "research-2026-11-09.prelaunch.2",
+  "release_id": "research-2026-11-09.prelaunch.3",
   "reviews": [
     {
       "assertion_ids": [

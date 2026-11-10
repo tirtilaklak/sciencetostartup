@@ -43,6 +43,40 @@ def canonical_hash(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
 
 
+def report_review_digest(report):
+    """Bind synthesis review without a cycle through publication receipts."""
+    return canonical_hash({key: value for key, value in report.items()
+                           if key not in {'archive', 'status', 'editions'}})
+
+
+def report_review_errors(graph, report, receipts):
+    """Executive synthesis needs actual separate reviews of this exact content."""
+    if not report.get('executive_findings'):
+        return []
+    expected_report, expected_graph = report_review_digest(report), canonical_hash(graph)
+    accepted = []
+    for receipt in receipts if isinstance(receipts, list) else []:
+        if not isinstance(receipt, dict):
+            continue
+        try:
+            reviewed = _timestamp(receipt.get('reviewed_on'))
+            latest_input = max((_timestamp(r['reviewed_on']) for r in graph.get('reviews', [])), default=reviewed)
+        except (KeyError, TypeError, ValueError):
+            continue
+        if (receipt.get('fixture') is False and receipt.get('decision') == 'pass'
+                and receipt.get('method') == 'report_content_review'
+                and receipt.get('reviewer_type') in {'ai', 'human'}
+                and receipt.get('reviewer') and receipt.get('invocation_id')
+                and receipt.get('report_sha256') == expected_report
+                and receipt.get('graph_sha256') == expected_graph and reviewed >= latest_input):
+            accepted.append(receipt)
+    roles = {'evidence_auditor', 'adversarial'}
+    passing = [r for r in accepted if r.get('role') in roles]
+    if {r.get('role') for r in passing} != roles or len({r['invocation_id'] for r in passing}) < 2:
+        return ['Executive synthesis requires separate actual evidence-auditor and adversarial reviews bound to the exact report and approved graph.']
+    return []
+
+
 def load_report(root=ROOT):
     return json.loads((Path(root) / "data/research/report.json").read_text())
 
@@ -142,9 +176,17 @@ def _launch_content(report, graph):
     if not isinstance(findings, list) or len(findings) < 5:
         errors.append("The full report needs at least five evidence-backed executive findings.")
         findings = findings if isinstance(findings, list) else []
+    from research_findings import executive_findings, field_text
+    _, withheld = executive_findings({'report': report, 'graph': graph})
+    if withheld:
+        errors.append('Executive finding identifiers, required fields and approved evidence must be valid and unique.')
     for finding in findings:
+        if not isinstance(finding, dict):
+            continue
         if not all(finding.get(key) for key in ("id", "text", "buyer_implication", "limitations", "claim_ids")):
             errors.append("Executive findings require their evidence, implications and limitations.")
+        if not all(field_text(finding.get(key)) for key in ('confidence', 'reasoning', 'what_would_change')):
+            errors.append('Executive findings require confidence, reasoning and evidence that would change the assessment.')
         if any(assertions.get(cid, {}).get("status") != "approved" for cid in finding.get("claim_ids", [])):
             errors.append("Executive findings must use approved current assertions.")
     for section in report.get("sections", []):
@@ -352,6 +394,8 @@ def publication_gate(graph, report, policy=None):
     screening_ids = {item.get("id") for item in (audits.get("screening") or {}).get("items", [])}
     if reference_ids & screening_ids:
         reasons.append("Reference and screening holdouts must be separate samples.")
+    synthesis_errors = report_review_errors(graph, report, policy.get('report_reviews', []))
+    reasons.extend(synthesis_errors)
     reasons = list(dict.fromkeys(reasons))
     archival_ready = not reasons
     archive_reasons = []
@@ -377,7 +421,8 @@ def publication_gate(graph, report, policy=None):
     return {"ready": not reasons, "status": "ready" if not reasons else "prelaunch",
             "reasons": reasons, "coverage": coverage, "audit_metrics": metrics,
             "thresholds": thresholds, "source_cutoff": report.get("source_cutoff"),
-            "archival_ready": archival_ready, "archive_reasons": archive_reasons}
+            "archival_ready": archival_ready, "archive_reasons": archive_reasons,
+            "report_review_ready": not synthesis_errors}
 
 
 def build_context(root=ROOT):
@@ -392,6 +437,12 @@ def build_context(root=ROOT):
         path = root / f"data/research/{kind}-audit.json"
         if path.is_file():
             policy["audits"][kind] = json.loads(path.read_text())
+    report_reviews_path = root / 'data/research/report-reviews.json'
+    if report_reviews_path.is_file():
+        registry = json.loads(report_reviews_path.read_text())
+        if registry.get('schema_version') != '1.0.0' or not isinstance(registry.get('reviews'), list):
+            raise ValueError('Unsupported report review registry')
+        policy['report_reviews'] = registry['reviews']
     correction_path = root / 'data/research/corrections.json'
     correction_registry = json.loads(correction_path.read_text()) if correction_path.is_file() else {'schema_version': '1.0.0', 'corrections': []}
     if correction_registry.get('schema_version') != '1.0.0' or not isinstance(correction_registry.get('corrections'), list):

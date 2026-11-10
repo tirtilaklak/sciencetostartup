@@ -87,6 +87,23 @@ class ResearchGraphTests(unittest.TestCase):
         graph["entities"][0]["review_depth"] = "abstract"
         self.assertEqual(rg.coverage_summary(graph)["reviewed_papers"], 0)
 
+    def test_family_rollup_counts_reviewed_manifestations_once_with_reviewed_parent(self):
+        graph = fixture()
+        graph['entities'] = [entity('family', kind='dataset_family', identifiers={}, family_id='test-family', assertion_ids=[]),
+                             entity('release', kind='dataset_release', identifiers={}, family_id='test-family', parent_id='family')]
+        graph['assertions'][0]['subject_id'] = 'release'
+        for review in graph['reviews']:
+            review['assertion_sha256'] = {'claim': rg.assertion_digest(graph['assertions'][0])}
+        self.assertEqual(rg.coverage_summary(graph)['dataset_families'], 1)
+        graph['entities'].append(entity('second-release', kind='dataset_release', identifiers={}, family_id='test-family',
+                                        parent_id='family', assertion_ids=[]))
+        self.assertEqual(rg.coverage_summary(graph)['dataset_families'], 1)
+        graph['entities'][0]['review_depth'] = 'abstract'
+        self.assertEqual(rg.coverage_summary(graph)['dataset_families'], 0)
+        graph['entities'][0]['review_depth'] = 'full_source'
+        graph['entities'][1]['status'] = 'candidate'
+        self.assertEqual(rg.coverage_summary(graph)['dataset_families'], 0)
+
     def test_candidate_never_counts_even_with_three_test_receipts(self):
         graph = fixture()
         graph["assertions"][0]["status"] = "candidate"

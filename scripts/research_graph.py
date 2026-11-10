@@ -569,8 +569,15 @@ def coverage_summary(graph):
     """Compute counts from records; candidates, aliases and versions do not inflate them."""
     validate_graph(graph)
     assertions = {a["id"]: a for a in graph["assertions"] if a["status"] == "approved"}
-    qualifying = [e for e in graph["entities"] if e["status"] == "approved" and e["disposition"] == "included" and e["review_depth"] == "full_source"
-                  and any(aid in assertions for aid in e["assertion_ids"])]
+    reviewed = {e['id']: e for e in graph['entities'] if e['status'] == 'approved'
+                and e['disposition'] == 'included' and e['review_depth'] == 'full_source'}
+    direct = {eid for eid, e in reviewed.items() if any(aid in assertions for aid in e['assertion_ids'])}
+    # Count a reviewed work/family once when its explicitly linked, reviewed
+    # manifestation has approved evidence. This is coverage roll-up only: no
+    # supplier relationship or other factual edge is inferred through a parent.
+    supported_parents = {e['parent_id'] for eid, e in reviewed.items()
+                         if eid in direct and e.get('parent_id') in reviewed}
+    qualifying = [e for eid, e in reviewed.items() if eid in direct | supported_parents]
     suppliers = [e for e in qualifying if e["kind"] == "supplier" and any(
         assertions[aid]["subject_id"] == e["id"] and assertions[aid]["predicate"] == "has_capability"
         for aid in e["assertion_ids"] if aid in assertions)]
@@ -578,7 +585,7 @@ def coverage_summary(graph):
     disposed = lambda e: e["disposition"] in {"included", "excluded", "historical_only"} and any(aid in assertions for aid in e["assertion_ids"])
     core_ids = set(graph["coverage"]["frozen_core"]["entity_ids"])
     core_disposed = sum(disposed(e) for e in graph["entities"] if e["id"] in core_ids)
-    counts = {"legacy_organizations": len(legacy), "legacy_dispositions": sum(disposed(e) for e in legacy),
+    counts = {"coverage_method_version": "1.1.0", "legacy_organizations": len(legacy), "legacy_dispositions": sum(disposed(e) for e in legacy),
               "qualifying_suppliers": len(suppliers), "reviewed_papers": sum(e["kind"] in {"paper", "paper_work"} for e in qualifying),
               "dataset_families": len({e["family_id"] for e in qualifying if e["kind"] in {"dataset", "dataset_family"}}),
               "benchmark_families": len({e["family_id"] for e in qualifying if e["kind"] in {"benchmark", "benchmark_family"}}),
@@ -587,6 +594,7 @@ def coverage_summary(graph):
               "candidate_entities": sum(e["status"] == "candidate" for e in graph["entities"]),
               "abstract_reviewed_entities": sum(e["review_depth"] == "abstract" for e in graph["entities"]),
               "captured_sources": sum(s["status"] == "captured" for s in graph["sources"]),
+              "captured_source_versions": len({(s['version'], s['response_sha256']) for s in graph['sources'] if s['status'] == 'captured'}),
               "core_eligible": len(core_ids), "core_dispositioned": core_disposed,
               "core_disposition_rate": core_disposed / len(core_ids) if core_ids else 0.0}
     counts["launch_floors"] = dict(LAUNCH_FLOORS)

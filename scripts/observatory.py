@@ -892,15 +892,18 @@ def build(data, destination):
     if research_context is not None:
         from research_graph import write_exports
         from research_citations import write_publication_assets
-        from research_pages import write_research_pages
+        from research_pages import write_research_pages, write_company_supplements
         write_exports(research_context["graph"], destination / "research/exports")
         research_context["publication_assets"] = write_publication_assets(research_context, destination)
         research_entries = write_research_pages(destination, research_context)
+        company_updates = {"https://sciencetostartup.com" + row['path']: row['lastmod']
+                           for row in write_company_supplements(destination, research_context)}
         import xml.etree.ElementTree as ET
         from static_pages import render_sitemap
         namespace = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
         sitemap = ET.parse(destination / "sitemap.xml").getroot()
         entries = [(node.findtext(namespace + "loc"), node.findtext(namespace + "lastmod")) for node in sitemap]
+        entries = [(url, max(modified, company_updates.get(url, modified))) for url, modified in entries]
         entries += [("https://sciencetostartup.com" + entry["path"], entry["lastmod"]) for entry in research_entries]
         if len({entry[0] for entry in entries}) != len(entries):
             raise ValueError("Duplicate canonical URL in research sitemap")

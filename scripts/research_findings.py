@@ -30,6 +30,8 @@ def executive_findings(context):
     rows = context["report"].get("executive_findings", [])
     if not isinstance(rows, list):
         return [], 1
+    if context.get('gate', {}).get('report_review_ready') is False:
+        return [], len(rows)
     counts = Counter(row.get("id") for row in rows if isinstance(row, dict) and isinstance(row.get("id"), str))
     claims = {row["id"]: row for row in context["graph"].get("assertions", [])}
     approved = []
