@@ -144,6 +144,17 @@ function loadingProfile(id){
  const target=$('profile-view');target.hidden=false;target.setAttribute('aria-busy','true');
  target.innerHTML=`<div class="profile-v2" data-profile-company="${attr(id)}" data-profile-loading>${profileIntroductionHTML(id)}<div data-profile-loading-content role="status"><p>Loading the sourced profile…</p><p><a href="/company/${encodeURIComponent(id)}/">Read the plain company page</a></p></div></div>`;
 }
+function afterProfileIntroductionPaint(){
+ // Let the sourced introduction paint before installing the larger evidence
+ // context. Background tabs still complete without waiting for animation frames.
+ if(typeof requestAnimationFrame!=='function'||document.visibilityState==='hidden')return Promise.resolve();
+ return new Promise(resolve=>{
+  let frame=0,timer=0;
+  const done=()=>{clearTimeout(timer);if(frame&&typeof cancelAnimationFrame==='function')cancelAnimationFrame(frame);resolve();};
+  timer=setTimeout(done,100);
+  frame=requestAnimationFrame(()=>{frame=requestAnimationFrame(done);});
+ });
+}
 function failedProfile(id,error){
  const target=$('profile-view');target.removeAttribute('aria-busy');
  target.innerHTML=`<section class="availability-notice" role="alert"><h1>This company’s evidence could not load.</h1><p>Your connection or an older cached file may be responsible. The record has not been removed.</p><p><button type="button" data-retry-company>Try again</button> <a href="/company/${encodeURIComponent(id)}/">Read the plain company page</a> <a href="#companies">Browse companies</a></p></section>`;
@@ -174,6 +185,7 @@ route=function(event){
  if(company)loadingProfile(company);
  if(needsSearch){if(view==='work')applyWorkCriteria(workCriteriaFromHash(hash));pendingSearchRoute(view);}
  const complete=async()=>{
+  if(company){await afterProfileIntroductionPaint();if(generation!==navigationGeneration||location.hash!==hash||controller.signal.aborted)return;}
   if(needsSearch)await window.ensureSearchContext();
   let payloads=[];
   if(cacheKey){const [payload]=await Promise.all([fetchPresentation(archive?presentationIdentity.archive:presentationIdentity.overview,null,controller.signal),ensureHealthModule()]);payloads=[payload];}
