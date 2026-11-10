@@ -110,6 +110,21 @@
 .r-downloads li{margin:0}
 .r-downloads a{display:inline-flex;align-items:center;min-height:44px;font-size:13px}
 .r-assertion,.r-source{max-width:900px;padding:24px 0;margin:0;border-bottom:1px solid var(--r-rule)}
+/* Every ledger record stays in the native document, including citations and
+   disclosures. Let the browser skip offscreen layout, while fragment targets,
+   find-in-page, keyboard focus and assistive technology can reveal any record. */
+@supports(content-visibility:auto){
+ @media screen{
+  .r-assertion,.r-source{content-visibility:auto;contain-intrinsic-block-size:auto 36rem}
+  .r-source{contain-intrinsic-block-size:auto 28rem}
+  /* Resolve every preceding height before a native fragment or keyboard jump.
+     This also preserves native Back/Forward positions across browser engines. */
+  .research:has(:target) :is(.r-assertion,.r-source),.research:has(.r-assertion:focus-within,.r-source:focus-within) :is(.r-assertion,.r-source){content-visibility:visible;contain-intrinsic-size:none}
+ }
+ @media print{
+  .r-assertion,.r-source{content-visibility:visible;contain:none;contain-intrinsic-size:none}
+ }
+}
 .r-assertion .r-kicker{margin-bottom:10px;font-size:10px}
 .r-assertion-text{font-size:16px;line-height:1.75}
 .r-record-id{font:11px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--r-quiet);overflow-wrap:anywhere;word-break:break-word}
