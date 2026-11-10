@@ -168,6 +168,7 @@ It reproduces an approved snapshot; it does not attest to a new research release
 CI runs the same checks on pushes to `main` and on pull requests:
 
 ```sh
+python3 -m pip install -r requirements-qa.txt
 python3 -m unittest discover -s tests -p 'test_*.py'
 python3 scripts/build_public_snapshot.py --verify
 python3 tests/js_logic.py

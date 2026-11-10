@@ -1445,7 +1445,7 @@ def render_method(research, sizes, modified):
 
 def render_not_found(research):
     count = len(research.companies)
-    pages = (("Overview", "/", "what the guide covers"), ("Companies", "/companies/", f"profiles of all {plural(count, 'company', 'companies')}" if count else "company profiles"), ("Paid work", "/work/", "public listings with pay and location"), ("Method", "/method/", "how we check figures and how to request a correction"), ("About the publisher", "/#about", "who publishes the guide and how to get in touch"), ("Search", "/?search", "find a company, product or listing"))
+    pages = (("Overview", "/", "what the guide covers"), ("Companies", "/companies/", f"profiles of all {plural(count, 'company', 'companies')}" if count else "company profiles"), ("Paid work", "/work/", "public listings with pay and location"), ("Method", "/method/", "how we check figures and how to request a correction"), ("About the publisher", "/method/#about", "who publishes the guide and how to get in touch"), ("Search", "/?search", "find a company, product or listing"))
     items = "".join(f'<li><a href="{ORIGIN}{path}">{label}</a>: {text}</li>' for label, path, text in pages)
     body = f'<p class="eyebrow">Page not found</p>\n<h1>We could not find that page.</h1>\n<p class="lede">The link may be old or mistyped. Start again from one of these pages:</p>\n<ul>{items}</ul>\n'
     return document(research, f"Page not found{SUFFIX}", "The page you asked for does not exist on ScienceToStartup.", "", body, robots="noindex")
