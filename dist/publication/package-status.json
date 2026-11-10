@@ -1,6 +1,6 @@
 {
   "archive": "not-published",
-  "archive_sha256": "b0c94b53ea2cf42158931c187bd5331745fee28a535c88a4cd89c114dbc0ed0a",
+  "archive_sha256": "ff20c90bdd3aae6d6db20c6d8397c22c5a558d87c8e36938041de26fd6199ad5",
   "blocked_reasons": [
     "The full report needs at least five evidence-backed executive findings.",
     "Full report chapter technical-landscape still lacks reviewed findings.",
@@ -34,7 +34,7 @@
   ],
   "github": "prepared",
   "huggingface": "prepared",
-  "manifest_sha256": "4f4cf675d0ec81318666a760a232e2d7f7ab8f80d88fb86fbd46ef10f174ff39",
+  "manifest_sha256": "2c82c1db839ab81702fefecf0316848eb0e875344bee3788b7e35aa639996dea",
   "pdf": "prepared",
   "pdf_sha256": "6747d2111268a0b3b9d8b2a6d9cd6deed713f5644df3124fe23dda19edc9dc5b",
   "publication_ready": false,

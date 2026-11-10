@@ -558,6 +558,12 @@ def write_exports(graph, output):
                 connection.execute("INSERT INTO assertion_reviews VALUES (?,?)", (assertion["id"], rid))
         connection.commit()
         connection.execute("VACUUM")
+    connection.close()
+    # Match the canonical exporter: informational writer-version bytes must not
+    # make identical research differ across supported SQLite library versions.
+    with database.open('r+b') as handle:
+        handle.seek(96)
+        handle.write(b'\x00' * 4)
     manifest = {"schema_version": SCHEMA_VERSION, "release_id": graph["release_id"],
                 "projection": "privacy-filtered-research-graph", "files": {
                     name: digest((output / name).read_bytes()) for name in sorted(paths)}}
