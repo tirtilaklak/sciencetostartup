@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-11-10T12:47:20.363023Z",
+  "as_of": "2026-11-10T13:20:39.432001Z",
   "assertions": [
     {
       "as_of": "2026-10-15",
@@ -11721,6 +11721,83 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.1805.03677",
+      "identifiers": {
+        "arxiv": "1805.03677"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "The Dataset Nutrition Label: A Framework To Drive Higher Data Quality Standards",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "data_documentation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.nutrition.comparator-limits",
+        "cohort8.claim.nutrition.modularity",
+        "cohort8.claim.nutrition.prototype-modules",
+        "cohort8.claim.nutrition.prototype-scope"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.1805.03677v1",
+      "identifiers": {
+        "arxiv_version": "1805.03677v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "The Dataset Nutrition Label: A Framework To Drive Higher Data Quality Standards (1805.03677v1)",
+      "parent_id": "paper.arxiv.1805.03677",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "data_documentation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "The exact inspected paper version has separate author, source-verifier and adversarial AI reviews. Each dossier separately examines methods, main results or worked examples, and limitations, with explicit source spans and unknowns. Full-source depth means that bounded source-content examination, not whole-document, appendix, proof, model-run, corpus, legal or operational verification. Each distinct work contributes at most once; version children and related artifact mentions add no extra paper, dataset or benchmark coverage.",
       "eligible_core": false,
       "family_id": null,
@@ -12000,6 +12077,83 @@
       "taxonomy": {
         "domain": [
           "privacy"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2104.08758",
+      "identifiers": {
+        "arxiv": "2104.08758"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Documenting Large Webtext Corpora: A Case Study on the Colossal Clean Crawled Corpus",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "data_provenance"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.documentingc4.exact-matching",
+        "cohort8.claim.documentingc4.future-audit",
+        "cohort8.claim.documentingc4.snapshot-filter",
+        "cohort8.claim.documentingc4.three-views"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2104.08758v2",
+      "identifiers": {
+        "arxiv_version": "2104.08758v2"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Documenting Large Webtext Corpora: A Case Study on the Colossal Clean Crawled Corpus (2104.08758v2)",
+      "parent_id": "paper.arxiv.2104.08758",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "data_provenance"
         ],
         "expertise": [],
         "labels": [],
@@ -12439,6 +12593,83 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2204.01075",
+      "identifiers": {
+        "arxiv": "2204.01075"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Data Cards: Purposeful and Transparent Dataset Documentation for Responsible AI",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "data_documentation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.datacards.lifecycle",
+        "cohort8.claim.datacards.modular",
+        "cohort8.claim.datacards.participatory",
+        "cohort8.claim.datacards.template-limits"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2204.01075v1",
+      "identifiers": {
+        "arxiv_version": "2204.01075v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Data Cards: Purposeful and Transparent Dataset Documentation for Responsible AI (2204.01075v1)",
+      "parent_id": "paper.arxiv.2204.01075",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "data_documentation"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "Pinned paper methods, results, limitations and assertion-relevant appendix passages received separate AI source-content review. The disclosed page ledgers retain partial and unread material; full_source means substantive source review beyond metadata, not exhaustive reading, proof certification, reproduction or an audit of underlying records. Dataset and supplier identities are not promoted from paper mentions.",
       "eligible_core": false,
       "family_id": null,
@@ -12740,6 +12971,83 @@
         "oversight": [],
         "workflow": [
           "benchmark_evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2206.08931",
+      "identifiers": {
+        "arxiv": "2206.08931"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "CrowdWorkSheets: Accounting for Individual and Collective Identities Underlying Crowdsourced Dataset Annotation",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "worker_governance"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.crowdworksheets.hypothetical-example",
+        "cohort8.claim.crowdworksheets.maintenance",
+        "cohort8.claim.crowdworksheets.pipeline-framework",
+        "cohort8.claim.crowdworksheets.selection-rationale"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2206.08931v1",
+      "identifiers": {
+        "arxiv_version": "2206.08931v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "CrowdWorkSheets: Accounting for Individual and Collective Identities Underlying Crowdsourced Dataset Annotation (2206.08931v1)",
+      "parent_id": "paper.arxiv.2206.08931",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "worker_governance"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
         ]
       }
     },
@@ -15685,6 +15993,83 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2402.16795",
+      "identifiers": {
+        "arxiv": "2402.16795"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "If in a Crowdsourced Data Annotation Pipeline, a GPT-4",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "annotation_operations"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.gptpipeline.hybrid-aggregation",
+        "cohort8.claim.gptpipeline.interface",
+        "cohort8.claim.gptpipeline.label-scheme",
+        "cohort8.claim.gptpipeline.sample-window"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2402.16795v2",
+      "identifiers": {
+        "arxiv_version": "2402.16795v2"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "If in a Crowdsourced Data Annotation Pipeline, a GPT-4 (2402.16795v2)",
+      "parent_id": "paper.arxiv.2402.16795",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "annotation_operations"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "Pinned paper methods, results, limitations and essential appendix passages received separate source-content AI reviews. This is bounded substantive review, not cover-to-cover reading, proof certification, experiment reproduction or a raw-data audit. Exact per-role page scopes remain in the review provenance.",
       "eligible_core": false,
       "family_id": null,
@@ -16052,6 +16437,83 @@
           "post_training",
           "preference_learning",
           "evaluation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2405.11143",
+      "identifiers": {
+        "arxiv": "2405.11143"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "OpenRLHF: An Easy-to-use, Scalable and High-performance RLHF Framework",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "rl_infrastructure"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.openrlhf.language-scope",
+        "cohort8.claim.openrlhf.ray-roles",
+        "cohort8.claim.openrlhf.ring-attention",
+        "cohort8.claim.openrlhf.vllm-deepspeed"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2405.11143v6",
+      "identifiers": {
+        "arxiv_version": "2405.11143v6"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "OpenRLHF: An Easy-to-use, Scalable and High-performance RLHF Framework (2405.11143v6)",
+      "parent_id": "paper.arxiv.2405.11143",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "rl_infrastructure"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
         ]
       }
     },
@@ -16902,6 +17364,83 @@
       "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
       "eligible_core": false,
       "family_id": null,
+      "id": "paper.arxiv.2408.11667",
+      "identifiers": {
+        "arxiv": "2408.11667"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "The Problems with Proxies: Making Data Work Visible through Requester Practices",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "worker_governance"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.proxies.proxy-types",
+        "cohort8.claim.proxies.requester-sample",
+        "cohort8.claim.proxies.self-report-limit",
+        "cohort8.claim.proxies.walkthrough"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2408.11667v1",
+      "identifiers": {
+        "arxiv_version": "2408.11667v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "The Problems with Proxies: Making Data Work Visible through Requester Practices (2408.11667v1)",
+      "parent_id": "paper.arxiv.2408.11667",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "worker_governance"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
       "id": "paper.arxiv.2409.02813",
       "identifiers": {
         "arxiv": "2409.02813"
@@ -16971,6 +17510,83 @@
           "evaluation",
           "data_curation",
           "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2409.19256",
+      "identifiers": {
+        "arxiv": "2409.19256"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "HybridFlow: A Flexible and Efficient RLHF Framework",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "rl_infrastructure"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.hybridflow.data-futures",
+        "cohort8.claim.hybridflow.general-sequential",
+        "cohort8.claim.hybridflow.resource-pool",
+        "cohort8.claim.hybridflow.transfer-protocols"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2409.19256v2",
+      "identifiers": {
+        "arxiv_version": "2409.19256v2"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "HybridFlow: A Flexible and Efficient RLHF Framework (2409.19256v2)",
+      "parent_id": "paper.arxiv.2409.19256",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "rl_infrastructure"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
         ]
       }
     },
@@ -17540,6 +18156,83 @@
       "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
       "eligible_core": false,
       "family_id": null,
+      "id": "paper.arxiv.2501.03262",
+      "identifiers": {
+        "arxiv": "2501.03262"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "REINFORCE++: Stabilizing Critic-Free Policy Optimization with Global Advantage Normalization",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "reasoning_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.reinforce.global-normalization",
+        "cohort8.claim.reinforce.group-baseline",
+        "cohort8.claim.reinforce.separate-kl",
+        "cohort8.claim.reinforce.task-conditions"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2501.03262v9",
+      "identifiers": {
+        "arxiv_version": "2501.03262v9"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "REINFORCE++: Stabilizing Critic-Free Policy Optimization with Global Advantage Normalization (2501.03262v9)",
+      "parent_id": "paper.arxiv.2501.03262",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "reasoning_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
       "id": "paper.arxiv.2501.12948",
       "identifiers": {
         "arxiv": "2501.12948"
@@ -17854,6 +18547,160 @@
       "aliases": [],
       "assertion_ids": [],
       "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2502.01456",
+      "identifiers": {
+        "arxiv": "2502.01456"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Process Reinforcement through Implicit Rewards",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "reasoning_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.prime.online-filter",
+        "cohort8.claim.prime.online-prm",
+        "cohort8.claim.prime.separate-returns",
+        "cohort8.claim.prime.token-reward"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2502.01456v2",
+      "identifiers": {
+        "arxiv_version": "2502.01456v2"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Process Reinforcement through Implicit Rewards (2502.01456v2)",
+      "parent_id": "paper.arxiv.2502.01456",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "reasoning_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2502.06317",
+      "identifiers": {
+        "arxiv": "2502.06317"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "The digital labour of artificial intelligence in Latin America: a comparison of Argentina, Brazil, and Venezuela",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "worker_governance"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.latinlabour.coding",
+        "cohort8.claim.latinlabour.paid-platform",
+        "cohort8.claim.latinlabour.representativeness",
+        "cohort8.claim.latinlabour.twin-studies"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2502.06317v1",
+      "identifiers": {
+        "arxiv_version": "2502.06317v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "The digital labour of artificial intelligence in Latin America: a comparison of Argentina, Brazil, and Venezuela (2502.06317v1)",
+      "parent_id": "paper.arxiv.2502.06317",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "worker_governance"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
       "disposition_reason": "The exact inspected paper version has separate author, source-verifier and adversarial AI reviews. Each dossier separately examines methods, main results or worked examples, and limitations, with explicit source spans and unknowns. Full-source depth means that bounded source-content examination, not whole-document, appendix, proof, model-run, corpus, legal or operational verification. Each distinct work contributes at most once; version children and related artifact mentions add no extra paper, dataset or benchmark coverage.",
       "eligible_core": false,
       "family_id": null,
@@ -18068,6 +18915,160 @@
       "taxonomy": {
         "domain": [
           "agent_verification"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2503.14476",
+      "identifiers": {
+        "arxiv": "2503.14476"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "DAPO: An Open-Source LLM Reinforcement Learning System at Scale",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "reasoning_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.dapo.clip-higher",
+        "cohort8.claim.dapo.dynamic-sampling",
+        "cohort8.claim.dapo.overlong-shaping",
+        "cohort8.claim.dapo.token-loss"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2503.14476v2",
+      "identifiers": {
+        "arxiv_version": "2503.14476v2"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "DAPO: An Open-Source LLM Reinforcement Learning System at Scale (2503.14476v2)",
+      "parent_id": "paper.arxiv.2503.14476",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "reasoning_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2503.20783",
+      "identifiers": {
+        "arxiv": "2503.20783"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Understanding R1-Zero-Like Training: A Critical Perspective",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "reasoning_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.drgrpo.constant-reduction",
+        "cohort8.claim.drgrpo.difficulty-bias",
+        "cohort8.claim.drgrpo.length-bias",
+        "cohort8.claim.drgrpo.verifier-protocol"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2503.20783v2",
+      "identifiers": {
+        "arxiv_version": "2503.20783v2"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Understanding R1-Zero-Like Training: A Critical Perspective (2503.20783v2)",
+      "parent_id": "paper.arxiv.2503.20783",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "reasoning_rl"
         ],
         "expertise": [],
         "labels": [],
@@ -18325,6 +19326,160 @@
       "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
       "eligible_core": false,
       "family_id": null,
+      "id": "paper.arxiv.2504.05118",
+      "identifiers": {
+        "arxiv": "2504.05118"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "VAPO: Efficient and Reliable Reinforcement Learning for Advanced Reasoning Tasks",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "reasoning_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.vapo.decoupled-gae",
+        "cohort8.claim.vapo.length-adaptive",
+        "cohort8.claim.vapo.positive-example-loss",
+        "cohort8.claim.vapo.value-pretraining"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2504.05118v3",
+      "identifiers": {
+        "arxiv_version": "2504.05118v3"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "VAPO: Efficient and Reliable Reinforcement Learning for Advanced Reasoning Tasks (2504.05118v3)",
+      "parent_id": "paper.arxiv.2504.05118",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "reasoning_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2504.09341",
+      "identifiers": {
+        "arxiv": "2504.09341"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Minority Reports: Balancing Cost and Quality in Ground Truth Data Annotation",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "annotation_operations"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.minority.cold-start-retain",
+        "cohort8.claim.minority.evaluation-reference",
+        "cohort8.claim.minority.minority-definition",
+        "cohort8.claim.minority.rlhf-boundary"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2504.09341v1",
+      "identifiers": {
+        "arxiv_version": "2504.09341v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Minority Reports: Balancing Cost and Quality in Ground Truth Data Annotation (2504.09341v1)",
+      "parent_id": "paper.arxiv.2504.09341",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "annotation_operations"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
       "id": "paper.arxiv.2504.12516",
       "identifiers": {
         "arxiv": "2504.12516"
@@ -18394,6 +19549,160 @@
           "evaluation",
           "data_curation",
           "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2504.13416",
+      "identifiers": {
+        "arxiv": "2504.13416"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "STAMP Your Content: Proving Dataset Membership via Watermarked Rephrasings",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "data_provenance"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.stamp.access-timing",
+        "cohort8.claim.stamp.one-sided-test",
+        "cohort8.claim.stamp.paired-design",
+        "cohort8.claim.stamp.private-keys"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2504.13416v2",
+      "identifiers": {
+        "arxiv_version": "2504.13416v2"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "STAMP Your Content: Proving Dataset Membership via Watermarked Rephrasings (2504.13416v2)",
+      "parent_id": "paper.arxiv.2504.13416",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "data_provenance"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2504.16084",
+      "identifiers": {
+        "arxiv": "2504.16084"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "TTRL: Test-Time Reinforcement Learning",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "test_time_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.ttrl.binary-vote",
+        "cohort8.claim.ttrl.consensus-reward",
+        "cohort8.claim.ttrl.test-adaptation",
+        "cohort8.claim.ttrl.vote-then-sample"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2504.16084v3",
+      "identifiers": {
+        "arxiv_version": "2504.16084v3"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "TTRL: Test-Time Reinforcement Learning (2504.16084v3)",
+      "parent_id": "paper.arxiv.2504.16084",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "test_time_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
         ]
       }
     },
@@ -18694,6 +20003,83 @@
           "evaluation",
           "data_curation",
           "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2507.18071",
+      "identifiers": {
+        "arxiv": "2507.18071"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "Group Sequence Policy Optimization",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "reasoning_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.gspo.engine-possibility",
+        "cohort8.claim.gspo.experiment-scope",
+        "cohort8.claim.gspo.sequence-clip",
+        "cohort8.claim.gspo.sequence-ratio"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2507.18071v2",
+      "identifiers": {
+        "arxiv_version": "2507.18071v2"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "Group Sequence Policy Optimization (2507.18071v2)",
+      "parent_id": "paper.arxiv.2507.18071",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "reasoning_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
         ]
       }
     },
@@ -19326,6 +20712,160 @@
           "evaluation",
           "data_curation",
           "agent_workflows"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2610.16104",
+      "identifiers": {
+        "arxiv": "2610.16104"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "SelectTTRL: Representation-Guided Data Selection for Efficient Test-Time Reinforcement Learning",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "test_time_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.selectttrl.all-evaluated",
+        "cohort8.claim.selectttrl.calibration",
+        "cohort8.claim.selectttrl.controlled-rule",
+        "cohort8.claim.selectttrl.subset-budget"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2610.16104v1",
+      "identifiers": {
+        "arxiv_version": "2610.16104v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "SelectTTRL: Representation-Guided Data Selection for Efficient Test-Time Reinforcement Learning (2610.16104v1)",
+      "parent_id": "paper.arxiv.2610.16104",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "test_time_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2611.09872",
+      "identifiers": {
+        "arxiv": "2611.09872"
+      },
+      "kind": "paper_work",
+      "legacy_id": null,
+      "name": "On the Reliability of Majority-Vote Pseudo-Labels in Test-Time Reinforcement Learning",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "test_time_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "cohort8.claim.reliablettrl.cache-replay",
+        "cohort8.claim.reliablettrl.conditional-temperature",
+        "cohort8.claim.reliablettrl.error-types",
+        "cohort8.claim.reliablettrl.final-checkpoint"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Scoped methods, data-collection or experiment claims were read from the exact pinned preprint version by separate author, source-verifier and adversarial AI invocations. The full cited contexts, including conditions and model/table identities, are bound to approved observations; actual partial/full/unread scopes are retained in review records. This is not a complete-paper, latest-version, corpus, proof, labor, supplier-performance or experiment-reproduction audit. Work and version remain distinct and contribute at most one reviewed paper work.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2611.09872v1",
+      "identifiers": {
+        "arxiv_version": "2611.09872v1"
+      },
+      "kind": "paper_version",
+      "legacy_id": null,
+      "name": "On the Reliability of Majority-Vote Pseudo-Labels in Test-Time Reinforcement Learning (2611.09872v1)",
+      "parent_id": "paper.arxiv.2611.09872",
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "test_time_rl"
+        ],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "public_primary_source"
+        ],
+        "oversight": [],
+        "workflow": [
+          "research_evaluation",
+          "data_documentation"
         ]
       }
     },

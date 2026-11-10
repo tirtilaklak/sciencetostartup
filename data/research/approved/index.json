@@ -67,6 +67,10 @@
     {
       "path": "17-papers-cohort7-2026-11-10.json",
       "sha256": "9c4fc7a6add2d999cd6dea8630ac7a6ec1bf10efd412cb98a39ff0a89cd99e32"
+    },
+    {
+      "path": "18-papers-cohort8-2026-11-10.json",
+      "sha256": "4d9ed6057cc27069a29c7085deb0fd27f31aafc567fd09cfdd4d8829785fed02"
     }
   ],
   "schema_version": "1.0.0"
