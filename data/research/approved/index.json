@@ -11,6 +11,38 @@
     {
       "path": "03-datasets-2026-11-09.json",
       "sha256": "4ed93150c187956883997a5c3e5aa6cbc42b195fcd813d3ffd3aa506be8e0231"
+    },
+    {
+      "path": "04-papers-cohort2-2026-11-10.json",
+      "sha256": "f5d90ab8f21dd0d524f94ac6b853c956053145f6c23638ad6a9c027f8410422d"
+    },
+    {
+      "path": "05-suppliers-cohort2-2026-11-10.json",
+      "sha256": "4cc7c30a85f4d7fb8e31a73b1367dda8f21676c9d3ad752710b6e3975fdbdb53"
+    },
+    {
+      "path": "06-datasets-cohort2-2026-11-10.json",
+      "sha256": "949616c3347900914db01142b0e5fd1564e8940e2c07b9bc17acdf6e674d2c3a"
+    },
+    {
+      "path": "07-papers-cohort3-2026-11-10.json",
+      "sha256": "9e95991bc56fa9e21f4030b1f2bc7b7194107a823585706e0c6e9d5a33325d85"
+    },
+    {
+      "path": "08-papers-cohort4-2026-11-10.json",
+      "sha256": "61f15145e2ca64455db11057db69334de0376124d91ca3800c1e650b132188df"
+    },
+    {
+      "path": "09-suppliers-cohort3-2026-11-10.json",
+      "sha256": "1e075d1ff297c016bda39f3d3cb20c296e8719459b5168b8ddff5916e0cc7b9d"
+    },
+    {
+      "path": "10-datasets-cohort3-2026-11-10.json",
+      "sha256": "6274c25b91e562e58329796c74ad14a303bc7955332506b9e79a139ad9ce9860"
+    },
+    {
+      "path": "11-suppliers-cohort4-2026-11-10.json",
+      "sha256": "46ae2820f439477c2713454e9c261a864c3fb3aad69748c49652d821eaaf0cdb"
     }
   ],
   "schema_version": "1.0.0"
