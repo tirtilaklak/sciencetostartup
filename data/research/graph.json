@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-11-10T11:46:30.333851Z",
+  "as_of": "2026-11-10T11:55:08.991676Z",
   "assertions": [
     {
       "as_of": "2026-10-15",
@@ -6792,22 +6792,27 @@
         "A•Team"
       ],
       "assertion_ids": [
+        "candidate.cohort5.a-team.delivery-model",
+        "candidate.cohort5.a-team.graders-harnesses",
+        "candidate.cohort5.a-team.posttraining-pipelines",
+        "candidate.cohort5.a-team.rl-engineering-offer",
+        "candidate.cohort5.a-team.security-perimeter",
         "legacy.a-team.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Proposed within embedded task/environment engineering: a current explicit post-training service staffs builders and a delivery lead for environments, graders, task suites and data pipelines. It is not a bulk annotation marketplace and no named customer artifact is attributed. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.a-team",
       "identifiers": {
         "website": "https://www.a.team/"
       },
-      "kind": "organization",
+      "kind": "supplier",
       "legacy_id": "a-team",
       "name": "A.Team",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -6896,10 +6901,15 @@
         "AIXI"
       ],
       "assertion_ids": [
+        "candidate.cohort5.aixi.fiscal-sponsorship",
+        "candidate.cohort5.aixi.open-research-value",
+        "candidate.cohort5.aixi.safety-foundations",
+        "candidate.cohort5.aixi.translation-goal",
+        "candidate.cohort5.aixi.variants-method",
         "legacy.aixi.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "excluded",
+      "disposition_reason": "Current official source scope is theoretical AI safety research and a fiscally sponsored project. This pass found no specific commercial data, environment or evaluation-delivery service. This is a bounded scope decision, not a claim that private or future supply work is impossible. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.aixi",
@@ -6910,8 +6920,8 @@
       "legacy_id": "aixi",
       "name": "AIXI Labs",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "excluded",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -6972,22 +6982,27 @@
         "Alinia"
       ],
       "assertion_ids": [
+        "candidate.cohort5.alinia.adversarial-evaluation",
+        "candidate.cohort5.alinia.expert-validation",
+        "candidate.cohort5.alinia.forward-deployed-model",
+        "candidate.cohort5.alinia.policy-judge-service",
+        "candidate.cohort5.alinia.privacy-entity",
         "legacy.alinia.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Proposed within the evaluation-tooling and forward-deployed policy-judge category: customized judges, adversarial tests and expert comparison are explicitly offered to customers. This does not count a human-data marketplace or imply a general training-data-delivery business. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.alinia",
       "identifiers": {
         "website": "https://www.alinia.ai/"
       },
-      "kind": "organization",
+      "kind": "supplier",
       "legacy_id": "alinia",
       "name": "Alinia AI",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -6995,7 +7010,9 @@
         "modality": [],
         "origin": [],
         "oversight": [],
-        "workflow": []
+        "workflow": [
+          "evaluation"
+        ]
       }
     },
     {
@@ -7049,22 +7066,27 @@
         "harBest Expert"
       ],
       "assertion_ids": [
+        "candidate.cohort5.apto.commissioned-solutions",
+        "candidate.cohort5.apto.company-identity",
+        "candidate.cohort5.apto.harbest-platform",
+        "candidate.cohort5.apto.modalities",
+        "candidate.cohort5.apto.ready-made-datasets",
         "legacy.apto.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Current official sources offer scoped training/evaluation data, verified expert inputs, or task/environment creation. Qualification describes the advertised supplier category; named customer delivery, operational outcomes, pay and revenue require their own evidence. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.apto",
       "identifiers": {
         "website": "https://apto.co.jp/en/"
       },
-      "kind": "organization",
+      "kind": "supplier",
       "legacy_id": "apto",
       "name": "APTO",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -7211,22 +7233,27 @@
         "BespokeLabs.AI, Inc."
       ],
       "assertion_ids": [
+        "candidate.cohort5.bespoke_labs.agent-optimization",
+        "candidate.cohort5.bespoke_labs.environment-supply",
+        "candidate.cohort5.bespoke_labs.expert-intake",
+        "candidate.cohort5.bespoke_labs.separate-agreements",
+        "candidate.cohort5.bespoke_labs.simulation-scope",
         "legacy.bespoke_labs.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Current official sources offer scoped training/evaluation data, verified expert inputs, or task/environment creation. Qualification describes the advertised supplier category; named customer delivery, operational outcomes, pay and revenue require their own evidence. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.bespoke_labs",
       "identifiers": {
         "website": "https://bespokelabs.ai/"
       },
-      "kind": "organization",
+      "kind": "supplier",
       "legacy_id": "bespoke_labs",
       "name": "Bespoke Labs",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -7489,10 +7516,15 @@
         "Elorian AI Inc."
       ],
       "assertion_ids": [
+        "candidate.cohort5.elorian.input-training-defaults",
+        "candidate.cohort5.elorian.model-api-release",
+        "candidate.cohort5.elorian.multimodal-tools",
+        "candidate.cohort5.elorian.robotics-label-example",
+        "candidate.cohort5.elorian.visual-model-business",
         "legacy.elorian.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "excluded",
+      "disposition_reason": "Current source scope is visual foundation-model/API access. Robotics annotation is a worked model-use example; this pass does not establish a separately scoped data/evaluation supply service or completed customer data delivery. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.elorian",
@@ -7503,8 +7535,8 @@
       "legacy_id": "elorian",
       "name": "Elorian",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "excluded",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -7612,22 +7644,27 @@
         "Giskard AI SAS"
       ],
       "assertion_ids": [
+        "candidate.cohort5.giskard.adaptive-redteaming",
+        "candidate.cohort5.giskard.evaluation-data-tooling",
+        "candidate.cohort5.giskard.expert-test-authoring",
+        "candidate.cohort5.giskard.golden-dataset-enrichment",
+        "candidate.cohort5.giskard.managed-assessment",
         "legacy.giskard.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Proposed within evaluation-data tooling and managed agent assessment: current product explicitly builds/enriches evaluation datasets, supports expert test authoring and generates contextual attacks. This does not establish a paid annotation workforce or downstream model-training contribution. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.giskard",
       "identifiers": {
         "website": "https://www.giskard.ai/"
       },
-      "kind": "organization",
+      "kind": "supplier",
       "legacy_id": "giskard",
       "name": "Giskard",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -7635,7 +7672,9 @@
         "modality": [],
         "origin": [],
         "oversight": [],
-        "workflow": []
+        "workflow": [
+          "evaluation"
+        ]
       }
     },
     {
@@ -7649,22 +7688,27 @@
         "HackerRank"
       ],
       "assertion_ids": [
+        "candidate.cohort5.hackerrank.community-data-boundary",
+        "candidate.cohort5.hackerrank.handwritten-behavior-verifiers",
+        "candidate.cohort5.hackerrank.private-benchmarking",
+        "candidate.cohort5.hackerrank.rl-package",
+        "candidate.cohort5.hackerrank.service-identity",
         "legacy.hackerrank.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Current official sources offer scoped training/evaluation data, verified expert inputs, or task/environment creation. Qualification describes the advertised supplier category; named customer delivery, operational outcomes, pay and revenue require their own evidence. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.hackerrank",
       "identifiers": {
         "website": "https://www.hackerrank.com/bench"
       },
-      "kind": "organization",
+      "kind": "supplier",
       "legacy_id": "hackerrank",
       "name": "HackerRank Bench",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -8104,10 +8148,15 @@
         "Terminal Bench"
       ],
       "assertion_ids": [
+        "candidate.cohort5.laude.individual-funding",
+        "candidate.cohort5.laude.open-research",
+        "candidate.cohort5.laude.operator-identity",
+        "candidate.cohort5.laude.research-support",
+        "candidate.cohort5.laude.website-service-scope",
         "legacy.laude.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "excluded",
+      "disposition_reason": "Current official offering is research support, grantmaking, competitions and an impact index. Research artifact association is not commercial data supply. Terms identify a PBC, so adjacent status is based on the offering rather than assumed nonprofit form. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.laude",
@@ -8118,8 +8167,8 @@
       "legacy_id": "laude",
       "name": "Laude Institute / Terminal-Bench",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "excluded",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -8316,22 +8365,27 @@
         "Ooak Data SAS"
       ],
       "assertion_ids": [
+        "candidate.cohort5.ooak.digital-twin-pipeline",
+        "candidate.cohort5.ooak.enterprise-environments",
+        "candidate.cohort5.ooak.human-qa-release",
+        "candidate.cohort5.ooak.legal-entities",
+        "candidate.cohort5.ooak.partnership-contract-scope",
         "legacy.ooak.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Current official sources offer scoped training/evaluation data, verified expert inputs, or task/environment creation. Qualification describes the advertised supplier category; named customer delivery, operational outcomes, pay and revenue require their own evidence. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.ooak",
       "identifiers": {
         "website": "https://ooakdata.com/"
       },
-      "kind": "organization",
+      "kind": "supplier",
       "legacy_id": "ooak",
       "name": "Ooak Data",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -8617,22 +8671,27 @@
         "AIM: RWS"
       ],
       "assertion_ids": [
+        "candidate.cohort5.rws_trainai.annotation-offer",
+        "candidate.cohort5.rws_trainai.annotation-qa",
+        "candidate.cohort5.rws_trainai.brand-parent",
+        "candidate.cohort5.rws_trainai.member-screening",
+        "candidate.cohort5.rws_trainai.validation-offer",
         "legacy.rws_trainai.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Current official sources offer scoped training/evaluation data, verified expert inputs, or task/environment creation. Qualification describes the advertised supplier category; named customer delivery, operational outcomes, pay and revenue require their own evidence. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.rws_trainai",
       "identifiers": {
         "website": "https://www.rws.com/artificial-intelligence/train-ai-data-services/"
       },
-      "kind": "organization",
+      "kind": "supplier",
       "legacy_id": "rws_trainai",
       "name": "RWS / TrainAI",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -9035,22 +9094,27 @@
         "terac.ai (legacy domain)"
       ],
       "assertion_ids": [
+        "candidate.cohort5.terac.buyer-billing-model",
+        "candidate.cohort5.terac.expert-supply-offer",
+        "candidate.cohort5.terac.partner-payment-basis",
+        "candidate.cohort5.terac.screening-process",
+        "candidate.cohort5.terac.workflow-data-partnership",
         "legacy.terac.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Current official sources offer scoped training/evaluation data, verified expert inputs, or task/environment creation. Qualification describes the advertised supplier category; named customer delivery, operational outcomes, pay and revenue require their own evidence. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.terac",
       "identifiers": {
         "website": "https://terac.com/"
       },
-      "kind": "organization",
+      "kind": "supplier",
       "legacy_id": "terac",
       "name": "Terac",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -9108,22 +9172,27 @@
     {
       "aliases": [],
       "assertion_ids": [
+        "candidate.cohort5.trajectory_labs_pbc.expert-projects",
+        "candidate.cohort5.trajectory_labs_pbc.privacy-operator-scope",
+        "candidate.cohort5.trajectory_labs_pbc.safety-data-offer",
+        "candidate.cohort5.trajectory_labs_pbc.safety-evaluation-method",
+        "candidate.cohort5.trajectory_labs_pbc.training-evaluation-workflows",
         "legacy.trajectory_labs_pbc.description"
       ],
-      "disposition": "pending",
-      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "disposition": "included",
+      "disposition_reason": "Current official sources offer scoped training/evaluation data, verified expert inputs, or task/environment creation. Qualification describes the advertised supplier category; named customer delivery, operational outcomes, pay and revenue require their own evidence. Separate author, source-verifier and adversarial AI source-content reviews are complete for the exact imported observations. Actual full/partial/unread source scopes are retained; no operational audit, commercial quality endorsement or automatic review of mentioned benchmarks is implied.",
       "eligible_core": false,
       "family_id": null,
       "id": "org.trajectory_labs_pbc",
       "identifiers": {
         "website": "https://www.trajectorylabs.com/"
       },
-      "kind": "organization",
+      "kind": "supplier",
       "legacy_id": "trajectory_labs_pbc",
       "name": "Trajectory Labs, PBC",
       "parent_id": null,
-      "review_depth": "historical",
-      "status": "historical",
+      "review_depth": "full_source",
+      "status": "approved",
       "taxonomy": {
         "domain": [],
         "expertise": [],
@@ -9131,7 +9200,9 @@
         "modality": [],
         "origin": [],
         "oversight": [],
-        "workflow": []
+        "workflow": [
+          "evaluation"
+        ]
       }
     },
     {
