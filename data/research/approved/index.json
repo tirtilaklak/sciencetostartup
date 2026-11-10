@@ -75,6 +75,14 @@
     {
       "path": "19-suppliers-cohort6-2026-11-10.json",
       "sha256": "bc997d461d1358785a98f2bb404101941a20e086b6d60a9704025c3125964857"
+    },
+    {
+      "path": "20-papers-cohort9-2026-11-10.json",
+      "sha256": "2be1072a90b4a207613f26989a143738ab14682fe3ab41abd0213b426c1fe56e"
+    },
+    {
+      "path": "21-identity-bridges-2026-11-10.json",
+      "sha256": "6213cb9c1eb7046749c5d25eebf5fe255b177ba6dc273c6eb9701762dc609285"
     }
   ],
   "schema_version": "1.0.0"

@@ -5,27 +5,33 @@ its JSON, its SQLite database, or their dates.
 
 ## Reviewed integration checkpoint
 
-The 10 November 2026 integration checkpoint selected by approved partitions
-`16-datasets-cohort5-2026-11-10.json` and `17-papers-cohort7-2026-11-10.json`
-retains 39 historical organization descriptions and 1,297 approved assertions.
-Computed coverage is 53 qualifying suppliers, 112 reviewed paper works,
-63 dataset families, 21 benchmark families and 38 of 39 legacy inclusion
-dispositions. Its 1,338 scoped source records include 1,337 captured records
-representing 432 distinct captured document versions. These counts exclude pending
-candidates, versions and unresolved family boundaries. Each approval has exact-content,
-separate author, source-verifier and adversarial AI receipts. Source reading depth
-is retained per invocation; a scoped methods/results/limitations review does not
-claim every appendix page, proof, corpus row or experimental result was reproduced.
+The 10 November 2026 integration checkpoint selected through approved partitions
+`20-papers-cohort9-2026-11-10.json` and `21-identity-bridges-2026-11-10.json`
+retains 39 historical organization descriptions and 1,713 approved assertions.
+Computed coverage is 65 qualifying suppliers, 152 reviewed paper works,
+63 dataset families and 21 benchmark families. All 39 legacy organizations have
+completed source inclusion audits; 38 have conclusive commercial dispositions.
+BenchFlow remains commercially unresolved and contributes no qualifying supplier
+or disposed frozen-core unit. Coverage method 1.3 keeps these measures distinct.
 
-The cohort 7 depth decision uses the existing methods/results/limitations rule:
-each of its 20 dossiers has separately reviewed source spans for all three.
-A truthful `full_document_read: false` does not turn those bounded content reads
-into abstract-only review. The FHIBE institutional manuscript copy remains distinct
-from the publisher PDF; original incorrect copy metadata is quarantined rather
-than rewritten in the frozen author packet. MuSiQue counts once as a new human-composed
-question family; its seed datasets, answerability configurations and serializations
-do not add families. Restrictive or unresolved corpus licenses are catalogue
-findings and do not imply permission to redistribute underlying third-party data.
+Its 1,754 scoped source records include 1,753 captured records representing
+501 distinct captured document versions. The 187 new identity edges connect
+124 paper versions to works and 63 documentation manifestations to families.
+Documentation pins do not establish underlying corpus-byte releases. Source
+versions, aliases and mirrored releases do not inflate the object counts.
+
+Each approved assertion has exact-content, separate author, source-verifier and
+adversarial AI receipts. Seven cohort 9 locator gaps were repaired with fresh
+three-role receipts for the new digests; 21 superseded receipts, including seven
+negative records, remain preserved separately. All 73 unaffected triples retain
+their original records. A scoped methods/results/limitations review does not claim
+every appendix, proof, corpus row or experimental result was reproduced.
+
+The FHIBE institutional manuscript copy remains distinct from the publisher PDF.
+MuSiQue counts once as a human-composed question family; seed datasets,
+answerability configurations and serializations do not add families. Restrictive
+or unresolved corpus licenses are catalogue findings and imply no permission to
+redistribute underlying third-party data.
 
 The eligible core and both actual 200-record audits remain unfinished. The expanded
 report and matching package are not yet prepared. Prior synthesis receipts and
