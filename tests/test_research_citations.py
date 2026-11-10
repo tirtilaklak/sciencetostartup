@@ -159,7 +159,7 @@ class CitationTests(unittest.TestCase):
                 self.assertEqual((Path(first) / name).read_bytes(), (Path(second) / name).read_bytes(), name)
             package = Path(first) / "publication"
             manifest = json.loads((package / "MANIFEST.json").read_text())
-            self.assertTrue({"zenodo-metadata.json", "huggingface-README.md"} <= set(manifest["files"]))
+            self.assertTrue({"zenodo-metadata.json", "huggingface-README.md", "executive-brief.html", "executive-brief.md"} <= set(manifest["files"]))
             with zipfile.ZipFile(package / "research-archive.zip") as archive:
                 self.assertEqual(set(archive.namelist()), set(manifest["files"]) | {"MANIFEST.json"})
                 for name, descriptor in manifest["files"].items():

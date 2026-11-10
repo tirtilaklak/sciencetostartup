@@ -20,7 +20,7 @@ from zoneinfo import ZoneInfo
 import xml.etree.ElementTree as ET
 
 import static_pages as sp
-from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
+from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD, paragraph_supported, WITHHELD_PARAGRAPH
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = "/research/state-of-ai-data-labs/"
@@ -439,12 +439,9 @@ def _assertion(context, assertion):
 
 def _paragraph(context, paragraph):
     ids = paragraph.get("claim_ids", [])
-    claims = {a["id"]: a for a in context["graph"]["assertions"]}
     kind = paragraph.get("kind")
-    valid = all(cid in claims and (claims[cid].get("status") == "approved" or
-                (claims[cid].get("status") == "historical" and paragraph.get("historical") is True)) for cid in ids)
-    if (kind == "sourced_fact" and (not ids or not valid)) or (ids and not valid):
-        return '<div class="r-paragraph is-gap"><span class="r-paragraph-kind">Research gap</span><p>A proposed finding is withheld because its evidence is not approved for publication.</p></div>'
+    if not paragraph_supported(context, paragraph):
+        return '<div class="r-paragraph is-gap"><span class="r-paragraph-kind">Research gap</span><p>' + WITHHELD_PARAGRAPH + '</p></div>'
     label = "Historical example" if paragraph.get("historical") else KIND_LABELS.get(kind, "Research note")
     links = ('<p class="r-paragraph-citations">Evidence: ' + ", ".join(_link(_evidence_url("assertion", cid), cid) for cid in ids) + "</p>") if ids else ""
     return (f'<div class="r-paragraph' + (' is-gap' if kind == "research_gap" else '') + '">'
@@ -513,6 +510,8 @@ def _data(context):
             ("Evidence graph SQLite", "/research/exports/research-graph.sqlite"), ("Export checksums", "/research/exports/research-exports-manifest.json")]
     if 'publication/report.pdf' in context.get('publication_assets', []):
         rows.insert(0, ('Read the report preparation PDF', '/publication/report.pdf'))
+    if 'publication/executive-brief.html' in context.get('publication_assets', []):
+        rows.insert(0, ('Read the executive brief', '/publication/executive-brief.html'))
     links = "".join('<li>' + _link(url, label) + '</li>' for label, url in rows)
     citation_prefix = 'current-' if gate.get('ready') and report.get('archive', {}).get('status') == 'published' else ''
     cite = "".join('<li>' + _link('/publication/' + citation_prefix + name, label) + '</li>' for name, label in

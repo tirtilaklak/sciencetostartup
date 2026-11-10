@@ -219,8 +219,9 @@ roots copy the same required owned inputs instead of bypassing this rule. Symlin
 inputs or parent components are rejected. Local source paths and file bodies do
 not enter the descriptors. A schema correction, reproducer fix or license change
 invalidates an unpublished v2 freeze even when its assertions and report wording are unchanged.
-Fresh PDF preparation writes a v2 receipt; an old source PDF receipt cannot be
-silently promoted into a new v2 bundle.
+Fresh PDF preparation now writes a v3 receipt; older source PDF receipts cannot
+be silently promoted into a new bundle. The v2 rules below describe preserved
+historical packages.
 
 The finalized v2 normalization identifies `graph_projection` as
 `approved-historical-v1`. Its public source context contains exactly that public
@@ -252,9 +253,9 @@ schema/code/license bytes. Published legacy builds use the frozen PDF directly;
 they do not reread or rewrite its old source PDF receipt. Existing v1 release
 journals retain their exact ZIP markers, and existing v1 reservation journals
 retain their original source marker for retry reconciliation. New reservation
-journals bind v2. A reservation and frozen package must use the same context
+journals bind the current v3 contract. A reservation and frozen package must use the same context
 contract; a legacy reservation without a legacy freeze needs explicit operator
-review before a new v2 transaction.
+review before a transaction using a newer contract.
 
 `freeze_publication_package(context, package_directory, archive_compression="stored")`
 creates the package once; `archive_compression="deflate"` opts into level-9 ZIP
@@ -330,7 +331,7 @@ return context
 ```
 
 Ordinary builds select strictly. Explicit preparation obtains the
-source context with selection disabled, prepares/reviews the v2 PDF, then calls
+source context with selection disabled, prepares/reviews the current-contract PDF, then calls
 `freeze_publication_package(..., archive_compression="deflate")` on the intended
 edition path even before that path exists. Only after the freeze verifies should
 the coordinator add/update that release's registry entry using its actual
@@ -365,6 +366,27 @@ PDF. Without a PDF, local packages are still prepared and explicitly report the
 missing step; archival publication is blocked.
 
 ## Explicit external adapters
+
+New packages use source-context contract 3. Live report pages, offline HTML,
+Markdown and the PDF apply the same approved-evidence rule to every report block.
+The machine-readable source context also replaces held paragraphs with an explicit
+gap and omits draft executive judgments pending separate synthesis review. Its
+input commitments retain hashes of the original graph and normalized authoring
+report, so changing withheld draft content still invalidates an unpublished freeze.
+The report commitment excludes publication lifecycle outcomes and retains the
+reserved version identity; publishing an existing archive cannot create a digest
+cycle.
+
+The package includes `LOCATORS.md` with extraction conventions and the short
+`executive-brief.html` and `executive-brief.md`. Brief findings use the same review
+gate, qualifications and local evidence anchors as the complete report. Essential
+content and navigation need no JavaScript.
+
+Contracts 1 and 2 remain readable. Contract 2 retains its original reproduction
+allowlist; the new locator guide is not retroactively required in older archives.
+Confirmed production archives replay their exact pinned recipe and bytes. Pending
+packages and uploads still require current matching inputs. Reservation journals
+retain their original contract and marker across interruption and recovery.
 
 `scripts/research_publish.py` provides `PublicationPlan`, `Release`, `Journal`, `Zenodo`,
 `GitHubMirror` and `HuggingFaceMirror`. These are deliberately separate from

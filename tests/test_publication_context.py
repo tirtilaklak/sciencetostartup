@@ -34,7 +34,7 @@ def prepare_fixture(directory, *, committed_path=False, publish_enabled=False):
     pdf_root.mkdir(parents=True)
     (pdf_root / 'report.pdf').write_bytes(pdf)
     (pdf_root / 'report-pdf.json').write_bytes(citations.json_bytes({
-        'schema_version': 1, 'context_contract_version': 2, 'sha256': citations.sha256(pdf),
+        'schema_version': 1, 'context_contract_version': citations.CONTEXT_CONTRACT_VERSION, 'sha256': citations.sha256(pdf),
         'context_sha256': citations.context_digest(context)}))
     target = root / 'data/research/releases/test.1/publication' if committed_path else directory / 'frozen'
     projection = citations.public_projection(context, {'dataset_version': '2.5.0', 'companies': []})
@@ -43,20 +43,29 @@ def prepare_fixture(directory, *, committed_path=False, publish_enabled=False):
     return context, target
 
 
-def legacy_fixture(context, package):
-    """Recreate the exact original v1 envelope format in a TEST-ONLY package."""
+def legacy_fixture(context, package, version=1):
+    """Recreate a previous envelope format in a TEST-ONLY package."""
     files = citations.read_prepared_package(context, package)
     files = {name: blob for name, blob in files.items() if name not in {'PREPARED.json', 'research-archive.zip', 'MANIFEST.json'}}
-    files['source-context.json'] = citations.json_bytes(citations.source_context(context, version=1))
+    if version == 2:
+        files.pop('LOCATORS.md', None)
+    files['source-context.json'] = citations.json_bytes(citations.source_context(context, version=version))
     manifest = {'schema_version': 1, 'release_id': context['report']['release_id'],
-                'context_sha256': citations.context_digest(context, version=1),
+                'context_sha256': citations.context_digest(context, version=version),
                 'files': {name: {'sha256': citations.sha256(blob), 'bytes': len(blob)} for name, blob in sorted(files.items())}}
+    if version == 2:
+        manifest['context_contract_version'] = version
     files['MANIFEST.json'] = citations.json_bytes(manifest)
     archive = citations.deterministic_zip(files)
     contract = {'schema_version': 1, 'release_id': manifest['release_id'], 'context_sha256': manifest['context_sha256'],
                 'manifest_sha256': citations.sha256(files['MANIFEST.json']), 'archive_sha256': citations.sha256(archive),
                 'archive_bytes': len(archive), 'pdf_sha256': citations.sha256(files['report.pdf']), 'pdf_bytes': len(files['report.pdf'])}
+    if version == 2:
+        contract['context_contract_version'] = version
     files.update({'research-archive.zip': archive, 'PREPARED.json': citations.json_bytes(contract)})
+    for path in package.iterdir():
+        if path.name not in files:
+            path.unlink()
     for name, blob in files.items():
         (package / name).write_bytes(blob)
     return files
@@ -73,12 +82,22 @@ def write_registry(context, package):
 
 
 class ContextContractTests(unittest.TestCase):
+    def test_previous_v2_allowlist_is_not_retroactively_extended_with_locator_doc(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            context, package = prepare_fixture(Path(temporary))
+            legacy_fixture(context, package, version=2)
+            frozen = citations.read_prepared_package(context, package)
+            self.assertNotIn('LOCATORS.md', frozen)
+            (Path(context['root']) / 'docs/research/locators.md').unlink()
+            self.assertEqual(citations.read_prepared_package(context, package), frozen)
+            self.assertEqual(json.loads(frozen['source-context.json'])['package_context']['context_contract_version'], 2)
+
     def test_v2_binds_every_archived_schema_reproducer_and_license_by_target_name(self):
         with tempfile.TemporaryDirectory() as temporary:
             context, package = prepare_fixture(Path(temporary))
             source = json.loads((package / 'source-context.json').read_text())
             contract = json.loads((package / 'PREPARED.json').read_text())
-            self.assertEqual(contract['context_contract_version'], 2)
+            self.assertEqual(contract['context_contract_version'], citations.CONTEXT_CONTRACT_VERSION)
             bindings = source['package_context']['reproduction_inputs']
             manifest = json.loads((package / 'MANIFEST.json').read_text())
             self.assertEqual(set(bindings), set(citations.REPRODUCTION_INPUTS))
@@ -155,7 +174,7 @@ class ContextContractTests(unittest.TestCase):
             context, package = prepare_fixture(Path(temporary))
             path = package / 'PREPARED.json'
             original = json.loads(path.read_text())
-            for version in (3, True, 2.0, '2'):
+            for version in (citations.CONTEXT_CONTRACT_VERSION + 1, True, 2.0, '2'):
                 path.write_bytes(citations.json_bytes({**original, 'context_contract_version': version}))
                 with self.subTest(version=version), self.assertRaisesRegex(ValueError, 'context contract version'):
                     citations.read_prepared_package(context, package)
@@ -169,7 +188,7 @@ class ContextContractTests(unittest.TestCase):
             output = Path(context['root']) / 'data/research'
             with patch('research_pdf.render_report_pdf', return_value=b'TEST-ONLY rendered PDF bytes'):
                 receipt = prepare_report_pdf(context, output)
-            self.assertEqual(receipt['context_contract_version'], 2)
+            self.assertEqual(receipt['context_contract_version'], citations.CONTEXT_CONTRACT_VERSION)
             self.assertEqual(citations.verified_pdf(context), b'TEST-ONLY rendered PDF bytes')
             receipt.pop('context_contract_version')
             receipt['context_sha256'] = citations.context_digest(context, version=1)
@@ -202,14 +221,16 @@ class ContextContractTests(unittest.TestCase):
             self.assertEqual((package / 'research-archive.zip').read_bytes(), frozen['research-archive.zip'])
 
     def test_reservation_journal_restart_preserves_legacy_and_v2_lost_create_markers(self):
-        for version in (1, 2):
+        for version in (1, 2, citations.CONTEXT_CONTRACT_VERSION):
             with self.subTest(version=version), tempfile.TemporaryDirectory() as temporary:
                 directory = Path(temporary)
                 context, package = prepare_fixture(directory, publish_enabled=True)
                 journal = directory / 'TEST-ONLY-reservation.json'
-                if version == 1:
-                    digest = citations.sha256(citations.json_bytes(citations.source_context(context, reservation=False, version=1)))
+                if version < citations.CONTEXT_CONTRACT_VERSION:
+                    digest = citations.sha256(citations.json_bytes(citations.source_context(context, reservation=False, version=version)))
                     old = publish.Journal(journal, context['report']['release_id'], context_sha256=digest)
+                    if version != 1:
+                        old.state['context_contract_version'] = version
                     old.save('TEST-ONLY legacy reservation journal fixture')
                 gate = types.SimpleNamespace(publication_gate=lambda *args: context['gate'])
                 remote = FakeZenodo()

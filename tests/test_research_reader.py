@@ -26,6 +26,9 @@ class ReaderTests(unittest.TestCase):
 
     def setUp(self):
         self.context = copy.deepcopy(self.baseline)
+        # Reader fixtures exercise synthetic, accepted findings independently of
+        # the real report's deliberately pending synthesis review.
+        self.context['gate']['report_review_ready'] = True
         self.claim = next(row for row in self.context['graph']['assertions'] if row['status'] == 'approved')
         self.finding = {'id': 'assessment-1', 'text': 'Evidence <scope> & limits.',
                         'buyer_implication': 'Inspect the task.', 'limitations': ['Narrow evidence.', 'No quality audit.'],

@@ -7,15 +7,25 @@ its JSON, its SQLite database, or their dates.
 
 The 10 November 2026 integration checkpoint selected through approved partitions
 `20-papers-cohort9-2026-11-10.json` and `21-identity-bridges-2026-11-10.json`
-retains 39 historical organization descriptions and 1,713 approved assertions.
+initially retained 39 historical organization descriptions and 1,713 approved
+assertions. The subsequent independent reference-panel review quarantined 26
+original citation bindings. All 26 now have separately reviewed new-ID replacements,
+bringing the current graph to 1,713 approved assertions and 26 retained candidates.
+These holds concern complete source spans and reproducible extraction details;
+they do not assert that the underlying scientific statements are false. Original
+values, qualifications, scientific digests, passing receipts and original partition
+files remain unchanged. Derived partition selections remove the held assertions;
+the central registry retains them alongside 52 actual follow-up review receipts.
+Partitions 22 and 23 add the replacements and 78 fresh author, verifier and
+adversarial receipts. No old review was retargeted to a changed digest.
 Computed coverage is 65 qualifying suppliers, 152 reviewed paper works,
 63 dataset families and 21 benchmark families. All 39 legacy organizations have
 completed source inclusion audits; 38 have conclusive commercial dispositions.
 BenchFlow remains commercially unresolved and contributes no qualifying supplier
 or disposed frozen-core unit. Coverage method 1.3 keeps these measures distinct.
 
-Its 1,754 scoped source records include 1,753 captured records representing
-501 distinct captured document versions. The 187 new identity edges connect
+Its 1,790 scoped source records include 1,789 captured records representing
+503 distinct captured document versions. The 187 identity edges connect
 124 paper versions to works and 63 documentation manifestations to families.
 Documentation pins do not establish underlying corpus-byte releases. Source
 versions, aliases and mirrored releases do not inflate the object counts.
@@ -33,9 +43,19 @@ answerability configurations and serializations do not add families. Restrictive
 or unresolved corpus licenses are catalogue findings and imply no permission to
 redistribute underlying third-party data.
 
-The eligible core and both actual 200-record audits remain unfinished. The expanded
-report and matching package are not yet prepared. Prior synthesis receipts and
-frozen archive bytes remain bound to their original graph.
+The eligible core and both formal launch audits remain unfinished. A separate,
+frozen 250-case diagnostic reference challenge measured 184 true positives,
+3 false positives, 2 false negatives and 61 true negatives: 98.4% precision and
+98.9% recall. This constructed challenge over the previously approved corpus
+does not measure production-wide accuracy or discovery recall. Two independent
+AI source adjudications and a third tie-breaker preceded outcome comparison;
+the locator/context boundary was clarified during adjudication. All cases and
+prior keys are retained, including sensitivity to three disputed labels. Its
+passing numerical thresholds do not complete the launch audit.
+
+The expanded provisional report and offline executive-brief renderer are prepared;
+fresh synthesis review and a matching expanded PDF/archive remain pending. Prior
+synthesis receipts and frozen archive bytes remain bound to their original graph.
 
 ## Historical initial baseline
 

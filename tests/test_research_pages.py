@@ -107,7 +107,10 @@ class ResearchPageTests(unittest.TestCase):
             self.assertIn(section['id'], facts.ids)
             self.assertIn(escape(section['title']), report)
             for paragraph in section['paragraphs']:
-                self.assertIn(escape(paragraph['text'][:45]), report)
+                if rp.paragraph_supported(self.context, paragraph):
+                    self.assertIn(escape(paragraph['text'][:45]), report)
+                else:
+                    self.assertIn(rp.WITHHELD_PARAGRAPH, report)
         self.assertEqual(len(self.context['report']['sections']), 12)
         self.assertTrue(all(s.get('type') == 'application/ld+json' for s in facts.scripts))
         self.assertNotIn('type="module"', report)

@@ -10,9 +10,9 @@ import io
 from pathlib import Path
 import xml.sax.saxutils
 try:
-    from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
+    from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD, paragraph_supported, WITHHELD_PARAGRAPH
 except ImportError:
-    from scripts.research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
+    from scripts.research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD, paragraph_supported, WITHHELD_PARAGRAPH
 
 try:
     from research_citations import ROOT, CONTEXT_CONTRACT_VERSION, context_digest, json_bytes, privacy_filter, publication_metadata, sha256
@@ -78,6 +78,8 @@ def render_report_pdf(context):
     for section in report.get("sections", []):
         heading = Paragraph(escape(section["title"]), styles["Heading2"])
         for index, paragraph in enumerate(section.get("paragraphs", [])):
+            if not paragraph_supported(context, paragraph):
+                paragraph = {"kind": "research_gap", "text": WITHHELD_PARAGRAPH, "claim_ids": []}
             label = {"method": "Method", "sourced_fact": "Historical evidence" if paragraph.get('historical') else "Evidence",
                      "analysis": "Analysis", "research_gap": "Research gap"}.get(paragraph.get('kind'), 'Analysis')
             group = ([heading] if index == 0 else []) + [Paragraph("<b>" + label + ":</b> " + escape(paragraph["text"]), styles["BodyText"])]
@@ -110,7 +112,7 @@ def render_report_pdf(context):
         story.append(KeepTogether([Paragraph(escape(label) + ". " + escape(details) + ("<br/><link href=" + xml.sax.saxutils.quoteattr(url) + ">" + escape(url) + "</link>" if url else ""), styles["Evidence"])]))
     story.append(KeepTogether([Paragraph("Evidence and reproduction", styles["Heading2"]),
         Paragraph("The complete public evidence graph accompanies this report in the offline archive. Paragraph evidence IDs refer to that graph. The JSON, CSV and SQLite contain equivalent privacy-filtered projection " + metadata["projection_version"] + ". Canonical dataset 2.5.0 remains unchanged outside this archive. Raw source text and personal contact details are excluded.", styles["BodyText"]),
-        Paragraph("Verify the archive with MANIFEST.json. Reproduce with the source repository's scripts/build_public_snapshot.py. Owned research and text use CC BY 4.0; third-party material retains its rights. Review scope and research gaps remain explicit. This PDF's status does not establish website or external mirror publication.", styles["BodyText"])]))
+        Paragraph("Verify MANIFEST.json, then run python3 reproduce.py --write-tables reproduced in the extracted archive. LOCATORS.md documents evidence coordinates. Owned research and text use CC BY 4.0; third-party material retains its rights. Review scope and research gaps remain explicit. This PDF's status does not establish website or external mirror publication.", styles["BodyText"])]))
     stream = io.BytesIO()
     document = SimpleDocTemplate(stream, pagesize=(612, 792), rightMargin=54, leftMargin=54,
                                  topMargin=51, bottomMargin=54, title=report["title"], author=metadata["author"], allowSplitting=1)

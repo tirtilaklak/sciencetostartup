@@ -17,13 +17,14 @@ import re
 import sqlite3
 import shutil
 import tempfile
+from urllib.parse import quote
 import zipfile
 
 try:
-    from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
+    from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD, paragraph_supported, WITHHELD_PARAGRAPH
     from research_offline import evidence_href, offline_appendix
 except ImportError:
-    from scripts.research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
+    from scripts.research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD, paragraph_supported, WITHHELD_PARAGRAPH
     from scripts.research_offline import evidence_href, offline_appendix
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,12 +43,13 @@ STATIC_ASSET_LIMIT_BYTES = 25 * 1024 * 1024
 ARCHIVE_COMPRESSION = {"stored": zipfile.ZIP_STORED, "deflate": zipfile.ZIP_DEFLATED}
 LIVE_PACKAGE_FILES = {"package-status.json", "current-metadata.json", "current-CITATION.cff",
                       "current-citation.bib", "current-citation.ris", "current-citation.csl.json"}
-CONTEXT_CONTRACT_VERSION = 2
-REPRODUCTION_INPUTS = {name: "schema/" + name for name in (
+CONTEXT_CONTRACT_VERSION = 3
+REPRODUCTION_INPUTS_V2 = {name: "schema/" + name for name in (
     "research-graph.schema.json", "report.schema.json", "report-review.schema.json",
     "report-audit.schema.json", "publication-projection.schema.json", "publication-metadata.schema.json")}
-REPRODUCTION_INPUTS.update({"research_graph.py": "scripts/research_graph.py",
+REPRODUCTION_INPUTS_V2.update({"research_graph.py": "scripts/research_graph.py",
     "reproduce.py": "scripts/reproduce_research_package.py", "LICENSE": "LICENSE", "LICENSE-DATA.md": "LICENSE-DATA.md"})
+REPRODUCTION_INPUTS = {**REPRODUCTION_INPUTS_V2, "LOCATORS.md": "docs/research/locators.md"}
 PREPARED_REGISTRY = "data/research/prepared-packages.json"
 
 
@@ -249,6 +251,9 @@ def report_markdown(context):
     for section in report.get("sections", []):
         lines.extend(["## " + section["title"], ""])
         for paragraph in section.get("paragraphs", []):
+            if not paragraph_supported(context, paragraph):
+                lines.extend(["[research_gap] " + WITHHELD_PARAGRAPH, ""])
+                continue
             lines.extend(["[" + paragraph.get("kind", "analysis") + "] " + paragraph["text"], ""])
             if paragraph.get("claim_ids"):
                 lines.extend(["Evidence IDs: " + ", ".join('[' + cid + '](' + evidence_href('assertion', cid) + ')' for cid in paragraph["claim_ids"]), ""])
@@ -274,32 +279,69 @@ def report_markdown(context):
 
 
 def offline_html(context):
-    # Preserve every paragraph as text without interpreting embedded HTML.
-    body = []
-    in_finding = False
-    evidence_link = r'\[[^\]]+\]\(evidence\.html#[A-Za-z0-9%._-]+\)'
-    for line in report_markdown(context).splitlines():
-        if re.fullmatch(r'<a id="finding-[A-Za-z0-9][A-Za-z0-9._:-]{0,199}"></a>', line):
-            body.append(line)
-            in_finding = True
-        elif line.startswith('### '):
-            body.append('<h3>' + html.escape(line[4:]) + '</h3>')
-        elif (line.startswith(('Approved evidence: ', 'Evidence IDs: '))
-              and re.fullmatch(evidence_link + r'(?:, ' + evidence_link + r')*', line.split(': ', 1)[1])):
-            links = re.findall(r'\[([^\]]+)\]\((evidence\.html#[A-Za-z0-9%._-]+)\)', line)
-            body.append('<p>' + line.split(': ', 1)[0] + ': ' + ', '.join('<a href="' + html.escape(url, quote=True) + '">' + html.escape(label) + '</a>' for label, url in links) + '</p>')
-        elif line.startswith("# "):
-            body.append("<h1>" + html.escape(line[2:]) + "</h1>")
-        elif line.startswith("## "):
-            body.append("<h2>" + html.escape(line[3:]) + "</h2>")
-            in_finding = False
-        elif line:
-            if in_finding:
-                line = html.unescape(re.sub(r'\\([\\`*_{}\[\]()#+.!>~|])', r'\1', line))
-            body.append("<p>" + html.escape(line) + "</p>")
-    return ('<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>'
-            + html.escape(context["report"]["title"]) + '</title><style>body{max-width:72ch;margin:3rem auto;padding:0 1rem;font:18px/1.6 system-ui;color:#18312c}h1,h2{line-height:1.2}p{overflow-wrap:anywhere}h2{margin-top:2.5rem}@media print{body{font-size:11pt}}</style><main>'
-            + '<nav aria-label="Offline edition"><a href="evidence.html">Evidence appendix and recorded scope comparison</a></nav>' + "\n".join(body) + "</main></html>\n").encode()
+    # Render owned structured blocks directly. Source text is never parsed as
+    # Markdown or HTML, and privacy applies to titles as well as body content.
+    clean = privacy_filter({"report": context["report"], "gate": context["gate"]})
+    context = {**context, **clean}
+    report, gate = clean["report"], clean["gate"]
+    escape = lambda value: html.escape(str(value), quote=True)
+    sections = report.get("sections", [])
+    ids = [section.get("id") for section in sections]
+    def chapter_anchor(section):
+        identifier = section.get("id")
+        return ("chapter-" + identifier if isinstance(identifier, str)
+                and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:-]{0,199}', identifier)
+                and ids.count(identifier) == 1 else None)
+    def evidence(ids):
+        return '<p>Evidence IDs: ' + ', '.join('<a href="' + escape(evidence_href('assertion', cid))
+            + '">' + escape(cid) + '</a>' for cid in ids) + '</p>'
+    body = ['<h1>' + escape(report['title']) + '</h1>',
+            '<p>Release: ' + escape(report['release_id']) + '<br>Updated: ' + escape(report['updated_on'])
+            + '<br>Status: ' + escape(publication_metadata(context)['status']) + '</p>',
+            '<nav aria-label="Offline edition"><a href="executive-brief.html">Executive brief</a> · '
+            '<a href="evidence.html">Evidence appendix and recorded scope comparison</a></nav>',
+            '<nav aria-label="Report chapters"><ol>' + ''.join(
+                '<li><a href="#' + quote(chapter_anchor(section), safe='') + '">' + escape(section['title']) + '</a></li>'
+                for section in sections if chapter_anchor(section)) + '</ol></nav>',
+            '<section><h2>Readiness and limitations</h2>']
+    body.extend('<p>' + escape(reason) + '</p>' for reason in gate.get('reasons', []))
+    body.extend(['<pre>' + escape(json.dumps(gate.get('coverage', {}), sort_keys=True, indent=2)) + '</pre></section>'])
+    for section in sections:
+        anchor = chapter_anchor(section)
+        body.append('<section' + (' id="' + escape(anchor) + '"' if anchor else '') + '><h2>' + escape(section['title']) + '</h2>')
+        for paragraph in section.get('paragraphs', []):
+            if not paragraph_supported(context, paragraph):
+                body.append('<p>[research_gap] ' + WITHHELD_PARAGRAPH + '</p>')
+                continue
+            body.append('<p>[' + escape(paragraph.get('kind', 'analysis')) + '] '
+                        + ('Historical example: ' if paragraph.get('historical') else '') + escape(paragraph['text']) + '</p>')
+            if paragraph.get('claim_ids'):
+                body.append(evidence(paragraph['claim_ids']))
+        if section.get('id') == 'executive-assessment':
+            findings, withheld = executive_findings(context)
+            for finding in findings:
+                body.extend(['<article id="' + escape(finding_anchor(finding)) + '"><h3>Analytical judgment: '
+                             + escape(finding['id']) + '</h3>', '<p>' + escape(field_text(finding['text'])) + '</p>'])
+                for key, label in JUDGMENT_FIELDS:
+                    if field_text(finding.get(key)):
+                        body.append('<p><strong>' + label + ':</strong> ' + escape(field_text(finding[key])) + '</p>')
+                body.extend([evidence(finding['claim_ids']), '</article>'])
+            if withheld:
+                body.append('<p>' + WITHHELD + '</p>')
+        body.append('</section>')
+    body.extend(['<section><h2>Evidence and reproduction</h2>',
+        '<p>The accompanying clean-dataset.json, CSV and SQLite contain the same versioned public projection. '
+        'Canonical dataset 2.5.0 remains unchanged outside this archive. Contact details and raw source text are excluded. '
+        'Candidate assertions and metadata-only discoveries are excluded from approved evidence. Historical records retain their real dates.</p>',
+        '<p>Open evidence.html for offline entity dossiers, comparisons, assertions, source bindings and actual review receipts. '
+        'Verify MANIFEST.json, then run <code>python3 reproduce.py --write-tables reproduced</code> to reproduce tables without the live site or network. '
+        'LOCATORS.md explains source coordinates and extraction conventions.</p></section>'])
+    return ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>'
+            + escape(report['title']) + '</title><style>body{max-width:72ch;margin:3rem auto;padding:0 1rem;font:18px/1.6 system-ui;'
+            'color:#18312c;overflow-wrap:anywhere}h1,h2,h3{line-height:1.2}h2{margin-top:2.5rem}pre{white-space:pre-wrap;'
+            'font-size:.8em}nav ol{columns:2;padding-left:1.4rem}nav li{break-inside:avoid;margin-bottom:.4rem}'
+            'a{color:#125b4b}@media(max-width:540px){nav ol{columns:1}}@media print{body{font-size:11pt;margin:0}h2,h3{break-after:avoid}}</style>'
+            '</head><body><main>' + '\n'.join(body) + '</main></body></html>\n').encode()
 
 
 def _source_path(root, relative):
@@ -314,15 +356,16 @@ def _source_path(root, relative):
     return path
 
 
-def reproduction_files(context):
+def reproduction_files(context, *, version=CONTEXT_CONTRACT_VERSION):
     """Owned scientific inputs, keyed by their exact archive member names.
 
-    V2 requires the complete allowlist for every read and write. Local paths
+    V2 and V3 require their complete versioned allowlists. Local paths
     and source file bodies never enter the context descriptors.
     """
     root = Path(context.get("root", ROOT))
     files = {}
-    for name, relative in sorted(REPRODUCTION_INPUTS.items()):
+    inputs = REPRODUCTION_INPUTS_V2 if version == 2 else REPRODUCTION_INPUTS
+    for name, relative in sorted(inputs.items()):
         path = _source_path(root, relative)
         if not path.is_file():
             raise ValueError("Missing or unsafe owned reproduction input: " + name)
@@ -331,7 +374,7 @@ def reproduction_files(context):
 
 
 def _contract_version(version):
-    if type(version) is not int or version not in {1, CONTEXT_CONTRACT_VERSION}:
+    if type(version) is not int or version not in {1, 2, CONTEXT_CONTRACT_VERSION}:
         raise ValueError("Unsupported package context contract version")
     return version
 
@@ -355,22 +398,36 @@ def _research_source_context(context, *, reservation=True, version=CONTEXT_CONTR
     gate["reasons"] = [reason for reason in gate.get("reasons", []) if reason not in archive_reasons]
     gate.pop("ready", None)
     gate.pop("status", None)
-    if version == 2:
+    if version >= 2:
         value["graph"] = _public_graph(context["graph"])
         # Preserve exact private input identity without redistributing draft
         # assertions, rejected wording or private extensions in any public graph.
         value["input_commitments"] = {"graph_sha256": sha256(json_bytes(context["graph"]))}
+    if version >= 3:
+        # Commit to the original authoring input without redistributing held
+        # paragraphs or unreviewed synthesis through this machine-readable file.
+        value["input_commitments"]["report_input_sha256"] = sha256(json_bytes(report))
+        held = 0
+        for section in report.get("sections", []):
+            for index, paragraph in enumerate(section.get("paragraphs", [])):
+                if not paragraph_supported(context, paragraph):
+                    section["paragraphs"][index] = {"kind": "research_gap", "text": WITHHELD_PARAGRAPH, "claim_ids": []}
+                    held += 1
+        findings, withheld = executive_findings(context)
+        if "executive_findings" in report:
+            report["executive_findings"] = findings
+        value["publication_withholds"] = {"paragraphs": held, "executive_findings": withheld}
     return privacy_filter(value)
 
 
 def source_context(context, *, reservation=True, version=CONTEXT_CONTRACT_VERSION):
     value = _research_source_context(context, reservation=reservation, version=version)
-    if version == 2:
-        files = reproduction_files(context)
+    if version >= 2:
+        files = reproduction_files(context, version=version)
         value["package_context"] = {"context_contract_version": version,
-            "graph_projection": "approved-historical-v1", "reproduction_inputs": {
+            "graph_projection": "approved-historical-report-v1" if version >= 3 else "approved-historical-v1", "reproduction_inputs": {
                 name: {"sha256": sha256(files[name]), "bytes": len(files[name])}
-                for name in sorted(REPRODUCTION_INPUTS)}}
+                for name in sorted(files)}}
     return value
 
 
@@ -525,15 +582,15 @@ def read_prepared_package(context, package, *, expected_archive_sha256=None):
     source_blob = files.get("source-context.json")
     if source_blob is None or sha256(source_blob) != contract.get("context_sha256"):
         raise ValueError("Frozen source context differs from its context digest")
-    if version == 2:
+    if version >= 2:
         pinned_source = json.loads(source_blob)
         recipe = pinned_source.get("package_context") if isinstance(pinned_source, dict) else None
         if (not isinstance(recipe, dict) or set(recipe) != {"context_contract_version", "graph_projection", "reproduction_inputs"}
-                or type(recipe["context_contract_version"]) is not int or recipe["context_contract_version"] != 2
-                or recipe["graph_projection"] != "approved-historical-v1"
+                or type(recipe["context_contract_version"]) is not int or recipe["context_contract_version"] != version
+                or recipe["graph_projection"] != ("approved-historical-report-v1" if version >= 3 else "approved-historical-v1")
                 or not isinstance(recipe["reproduction_inputs"], dict)
-                or set(recipe["reproduction_inputs"]) != set(REPRODUCTION_INPUTS)):
-            raise ValueError("Frozen reproduction input allowlist differs from the v2 contract")
+                or set(recipe["reproduction_inputs"]) != set(REPRODUCTION_INPUTS if version >= 3 else REPRODUCTION_INPUTS_V2)):
+            raise ValueError("Frozen reproduction input allowlist differs from its versioned contract")
         for name, descriptor in recipe["reproduction_inputs"].items():
             if (not isinstance(descriptor, dict) or set(descriptor) != {"sha256", "bytes"}
                     or not isinstance(descriptor["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", descriptor["sha256"])
@@ -664,14 +721,19 @@ def write_publication_assets(context, output, *, archive_compression="stored"):
                   "report.html": offline_html(context), "evidence.html": offline_appendix(projection),
                   "readiness.json": json_bytes(privacy_filter(context["gate"])),
                   "source-context.json": json_bytes(source_context(context))})
+    try:
+        from research_brief import executive_brief_assets
+    except ImportError:
+        from scripts.research_brief import executive_brief_assets
+    files.update(executive_brief_assets(context, metadata))
     pdf = verified_pdf(context)
     if pdf:
         files["report.pdf"] = pdf
     files.update(reproduction_files(context))
     files["source-manifest.json"] = json_bytes(projection["graph"]["sources"])
-    files["METHODS.md"] = privacy_filter("# Research methods\n\n" + "\n\n".join(paragraph["text"] for section in context["report"].get("sections", [])
+    files["METHODS.md"] = privacy_filter("# Research methods\n\n" + "\n\n".join(paragraph["text"] if paragraph_supported(context, paragraph) else WITHHELD_PARAGRAPH for section in context["report"].get("sections", [])
                                            if section["id"] == "methods-and-appendices" for paragraph in section.get("paragraphs", []))).encode()
-    files["README.md"] = ("# ScienceToStartup research package\n\n" + metadata["note"] + "\n\nOpen report.html for the full offline report, then evidence.html for entity dossiers, a recorded-scope comparison, assertions, source metadata and review receipts. Evidence links resolve within the extracted edition without the live site. Citation files reflect archive status. JSON, CSV and SQLite are equivalent privacy-filtered projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Full source text and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party evidence retains its rights.\n\nRun `python3 reproduce.py --write-tables reproduced` inside this extracted package to verify MANIFEST.json, compare all three exports, validate the graph and reproduce coverage and approved-assertion tables. This needs only Python's standard library and no network. Schemas, methods and a source manifest are included. The PDF is accepted only when its receipt binds this exact context. No remote publication occurs during the build.\n").encode()
+    files["README.md"] = ("# ScienceToStartup research package\n\n" + metadata["note"] + "\n\nStart with executive-brief.html for the short briefing, report.html for the full offline report, then evidence.html for entity dossiers, a recorded-scope comparison, assertions, source metadata and review receipts. Evidence links resolve within the extracted edition without the live site. Citation files reflect archive status. JSON, CSV and SQLite are equivalent privacy-filtered projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Full source text and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party evidence retains its rights.\n\nRun `python3 reproduce.py --write-tables reproduced` inside this extracted package to verify MANIFEST.json, compare all three exports, validate the graph and reproduce coverage and approved-assertion tables. This needs only Python's standard library and no network. Schemas, methods and a source manifest are included. The PDF is accepted only when its receipt binds this exact context. No remote publication occurs during the build.\n").encode()
     # These files are sent to external services, so they belong to the same
     # immutable manifest and archive as the report and dataset.
     files["zenodo-metadata.json"] = json_bytes(zenodo_metadata(metadata))

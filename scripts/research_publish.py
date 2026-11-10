@@ -159,7 +159,8 @@ class PublicationPlan:
     def __init__(self, context, journal_path):
         self.context = context
         # Resume the exact existing reservation marker, including legacy v1.
-        # A new journal always binds the owned scientific inputs through v2.
+        # New journals use the current contract; existing v1/v2 markers retain
+        # their original input identity and cannot create a duplicate DOI.
         prior = json.loads(Path(journal_path).read_text()) if Path(journal_path).exists() else None
         self.context_contract_version = prior.get("context_contract_version", 1) if prior is not None else CONTEXT_CONTRACT_VERSION
         self.source_sha256 = sha256(json_bytes(source_context(context, reservation=False, version=self.context_contract_version)))
