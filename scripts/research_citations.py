@@ -131,6 +131,12 @@ def write_projection(projection, output):
         database.execute("PRAGMA user_version=1")
         database.commit()
         observed = database.execute("SELECT collection, position, kind, value_json FROM projection_rows ORDER BY collection, position").fetchall()
+    database.close()
+    # The SQLite writer version is informational; normalize it exactly as the
+    # existing canonical exporter does for byte-identical cross-runtime builds.
+    with target.open('r+b') as stream:
+        stream.seek(96)
+        stream.write(b'\x00' * 4)
     with (output / "clean-dataset.csv").open(encoding="utf-8", newline="") as stream:
         csv_rows = list(csv.reader(stream))[1:]
     if projection_from_rows(observed) != projection or projection_from_rows(csv_rows) != projection:
