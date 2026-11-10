@@ -7,7 +7,7 @@ on:
 jobs:
   browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,7 +28,7 @@ jobs:
           retention-days: 14
   performance:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -55,7 +55,7 @@ jobs:
                   if attempt == 49: raise
                   time.sleep(.2)
           PY
-      - name: Three pinned mobile audits on five representative routes
+      - name: Three pinned mobile audits on field-guide and research routes
         run: node scripts/performance_audit.mjs --base-url http://127.0.0.1:18770 --dist dist --runs 3
       - uses: actions/upload-artifact@v4
         if: always()

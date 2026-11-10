@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "policyId": "field-guide-initial-budgets-2026-11-08",
+  "policyId": "field-guide-research-budgets-2026-11-09",
   "performance": {
     "lighthouseVersion": "13.6.0",
     "playwrightVersion": "1.65.0",
@@ -12,7 +12,11 @@
       "/explore/#companies",
       "/explore/#work",
       "/explore/#company/mercor/work",
-      "/work/"
+      "/work/",
+      "/research/",
+      "/research/state-of-ai-data-labs/",
+      "/research/data/",
+      "/review/"
     ],
     "medianLimits": {
       "largest-contentful-paint": { "maximum": 2500, "unit": "ms" },
