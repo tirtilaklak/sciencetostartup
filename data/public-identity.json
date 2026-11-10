@@ -22,9 +22,24 @@
     "issues": "https://github.com/tirtilaklak/sciencetostartup/issues/new/choose"
   },
   "products": [
-    {"id": "companies", "title": "AI data company field guide", "path": "/companies/", "status": "public"},
-    {"id": "work", "title": "Public AI training work routes", "path": "/work/", "status": "public"},
-    {"id": "research", "title": "AI data labs and human feedback research", "path": "/research/", "status": "prelaunch"}
+    {
+      "id": "companies",
+      "title": "AI data company field guide",
+      "path": "/companies/",
+      "status": "public"
+    },
+    {
+      "id": "work",
+      "title": "Public AI training work routes",
+      "path": "/work/",
+      "status": "public"
+    },
+    {
+      "id": "research",
+      "title": "AI data labs and human feedback research",
+      "path": "/research/",
+      "status": "prelaunch"
+    }
   ],
   "disclosures": [
     "No profiled company has paid for coverage, and none is a customer, investor or affiliate of the publisher.",
@@ -39,8 +54,20 @@
     "outreach_status": "drafts_only"
   },
   "external_profiles": [
-    {"service": "GitHub", "url": "https://github.com/tirtilaklak/sciencetostartup", "status": "update_pending"},
-    {"service": "LinkedIn", "url": "https://www.linkedin.com/company/sciencetostartup", "status": "owner_access_required"},
-    {"service": "Legacy MCP registry", "url": "https://registry.modelcontextprotocol.io/v0/servers/io.github.musa8026%2Fsciencetostartup/versions/latest", "status": "namespace_owner_access_required"}
+    {
+      "service": "GitHub",
+      "url": "https://github.com/tirtilaklak/sciencetostartup",
+      "status": "verified_current"
+    },
+    {
+      "service": "LinkedIn",
+      "url": "https://www.linkedin.com/company/sciencetostartup",
+      "status": "owner_access_required"
+    },
+    {
+      "service": "Legacy MCP registry",
+      "url": "https://registry.modelcontextprotocol.io/v0/servers/io.github.musa8026%2Fsciencetostartup/versions/latest",
+      "status": "namespace_owner_access_required"
+    }
   ]
 }

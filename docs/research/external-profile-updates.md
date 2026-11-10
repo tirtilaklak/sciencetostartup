@@ -1,8 +1,9 @@
 # Public identity reconciliation
 
-Status: onsite/repository implementation is authorized; LinkedIn administration
+Status: GitHub description, homepage and topics were updated and re-read through
+GitHub on 9 November 2026 Pacific time. LinkedIn administration
 and legacy MCP namespace authentication have not been established. This checklist
-must not be labeled complete until the remote state has been inspected again.
+must not be labeled complete while external owner access is pending.
 
 ## GitHub
 
