@@ -27,7 +27,7 @@ function packageFrontend(request) {
     // existing top-level declarations and the ordered presentation overrides.
     result.javascript[name] = esbuild.transformSync(source, {
       loader: 'js', target: 'es2022', minifyWhitespace: true,
-      minifySyntax: true, minifyIdentifiers: true, keepNames: true,
+      minifySyntax: true, minifyIdentifiers: true,
       treeShaking: false, legalComments: 'inline',
     }).code;
   }
