@@ -155,7 +155,11 @@ test('public pages retain keyboard skip navigation into the main content', async
   for (const path of publicPages) {
     await page.goto(path);
     await page.keyboard.press(nextLink);
-    const skip = page.getByRole('link', { name: 'Skip to content', exact: true });
+    // Inspect the focused native skip link itself; a page-wide role query walks
+    // the complete evidence ledger before it can assert this one header link.
+    const skip = page.locator('body > a.skip[href="#main"]');
+    await expect(skip, path).toHaveRole('link');
+    await expect(skip, path).toHaveAccessibleName('Skip to content');
     await expect(skip, path).toBeFocused();
     await expect(skip, path).toBeInViewport();
     await page.keyboard.press('Enter');
@@ -205,9 +209,16 @@ test('at 320 pixels the public header, navigation and page fit without horizonta
 });
 
 for (const path of publicPages) {
-  test('no serious or critical accessibility violations on ' + path, async ({ page }) => {
+  test('no serious or critical accessibility violations on ' + path, async ({ page }, info) => {
+    const started = Date.now();
     await page.goto(path);
+    const nodes = await page.locator('*').count();
+    const analyzing = Date.now();
     const result = await new AxeBuilder({ page }).analyze();
+    await info.attach('axe-scan-metrics.json', { body: Buffer.from(JSON.stringify({ path, nodes,
+      navigationMs: analyzing - started, analysisMs: Date.now() - analyzing,
+      testBudgetMs: 30_000,
+      fullPage: true, ruleExclusions: [] })), contentType: 'application/json' });
     expect(result.violations.filter(violation => ['serious', 'critical'].includes(violation.impact))).toEqual([]);
   });
 }
