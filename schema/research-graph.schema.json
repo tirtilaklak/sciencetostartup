@@ -1,0 +1,738 @@
+{
+  "$comment": "Structural schema only. scripts/research_graph.py performs cross-reference, hash, type/value agreement, provenance, independent-review, privacy, family/version and canonical-byte validation. Publication audit policy belongs to research_report.py.",
+  "$id": "urn:sciencetostartup:research-graph:1.0.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "as_of": {
+      "minLength": 1,
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "type": "string"
+    },
+    "assertions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of": {
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "excerpt_sha256": {
+                  "minLength": 1,
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "locator": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "source_id": {
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "source_id",
+                "locator",
+                "excerpt_sha256"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "id": {
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+            "type": "string"
+          },
+          "object_id": {
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "predicate": {
+            "enum": [
+              "access_terms",
+              "adjudicated",
+              "adjudicated_for",
+              "annotated",
+              "annotated_for",
+              "benchmark_task",
+              "creates",
+              "dataset_size",
+              "derived_from",
+              "documents",
+              "evaluates",
+              "evaluates_on",
+              "filtered",
+              "filtered_for",
+              "generated",
+              "generated_for",
+              "has_capability",
+              "has_stage",
+              "human_annotation",
+              "labeled",
+              "labeled_for",
+              "legacy_description",
+              "licenses",
+              "paper_method",
+              "publishes",
+              "recruited",
+              "recruited_for",
+              "release_of",
+              "supplies_data_for",
+              "trained_on",
+              "uses_training",
+              "version_of"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "provenance_kind": {
+            "enum": [
+              "first_party",
+              "historical",
+              "independent",
+              "mixed"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "qualifications": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "review_ids": {
+            "items": {
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "status": {
+            "enum": [
+              "approved",
+              "candidate",
+              "historical",
+              "rejected"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "subject_id": {
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+            "type": "string"
+          },
+          "value": {
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "enum": [
+                  "boolean",
+                  "date",
+                  "number",
+                  "text"
+                ],
+                "minLength": 1,
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            "required": [
+              "type",
+              "value"
+            ],
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "subject_id",
+          "predicate",
+          "object_id",
+          "value",
+          "evidence",
+          "qualifications",
+          "status",
+          "review_ids",
+          "as_of",
+          "provenance_kind"
+        ],
+        "type": "object"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "canonical_dataset_version": {
+      "enum": [
+        "2.5.0"
+      ],
+      "minLength": 1,
+      "type": "string"
+    },
+    "canonical_sha256": {
+      "minLength": 1,
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "frozen_core": {
+          "additionalProperties": false,
+          "properties": {
+            "entity_ids": {
+              "items": {
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "frozen_on": {
+              "minLength": 1,
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "minLength": 1,
+              "pattern": "^[0-9a-f]{64}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "source_cutoff": {
+              "minLength": 1,
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "entity_ids",
+            "frozen_on",
+            "source_cutoff",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "notes": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "quality_audit": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "screening_audit": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "frozen_core",
+        "quality_audit",
+        "screening_audit",
+        "notes"
+      ],
+      "type": "object"
+    },
+    "entities": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "aliases": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "assertion_ids": {
+            "items": {
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "disposition": {
+            "enum": [
+              "excluded",
+              "historical_only",
+              "included",
+              "pending",
+              "unclear"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "disposition_reason": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "eligible_core": {
+            "type": "boolean"
+          },
+          "family_id": {
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+            "type": "string"
+          },
+          "identifiers": {
+            "additionalProperties": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "kind": {
+            "enum": [
+              "benchmark",
+              "benchmark_family",
+              "benchmark_version",
+              "dataset",
+              "dataset_family",
+              "dataset_release",
+              "institution",
+              "model",
+              "organization",
+              "paper",
+              "paper_version",
+              "paper_work",
+              "supplier",
+              "workflow"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "legacy_id": {
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "parent_id": {
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "review_depth": {
+            "enum": [
+              "abstract",
+              "full_source",
+              "historical",
+              "metadata"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "approved",
+              "candidate",
+              "excluded",
+              "historical"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "taxonomy": {
+            "additionalProperties": false,
+            "properties": {
+              "domain": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "expertise": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "labels": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "modality": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "origin": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "oversight": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "workflow": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "domain",
+              "expertise",
+              "labels",
+              "modality",
+              "origin",
+              "oversight",
+              "workflow"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "status",
+          "identifiers",
+          "aliases",
+          "legacy_id",
+          "family_id",
+          "parent_id",
+          "taxonomy",
+          "review_depth",
+          "disposition",
+          "disposition_reason",
+          "assertion_ids",
+          "eligible_core"
+        ],
+        "type": "object"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "release_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reviews": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "assertion_ids": {
+            "items": {
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "id": {
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+            "type": "string"
+          },
+          "invocation_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "historical_import",
+              "metadata_review",
+              "source_content_review"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "note": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "reviewed_on": {
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+            "type": "string"
+          },
+          "reviewer": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "reviewer_type": {
+            "enum": [
+              "ai",
+              "human"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "adversarial",
+              "author",
+              "source_verifier"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "source_ids": {
+            "items": {
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "verdict": {
+            "enum": [
+              "pass",
+              "reject",
+              "revise"
+            ],
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "assertion_ids",
+          "role",
+          "reviewer",
+          "reviewer_type",
+          "invocation_id",
+          "reviewed_on",
+          "verdict",
+          "method",
+          "source_ids",
+          "note"
+        ],
+        "type": "object"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema_version": {
+      "enum": [
+        "1.0.0"
+      ],
+      "minLength": 1,
+      "type": "string"
+    },
+    "sources": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "captured_on": {
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "excerpt": {
+            "type": "string"
+          },
+          "excerpt_sha256": {
+            "minLength": 1,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
+            "type": "string"
+          },
+          "license": {
+            "minLength": 1,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "locator": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "published_on": {
+            "minLength": 1,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "publisher": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "response_sha256": {
+            "minLength": 1,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_type": {
+            "enum": [
+              "dataset_card",
+              "legacy",
+              "metadata",
+              "paper",
+              "provider_documentation",
+              "repository"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "captured",
+              "historical_reference",
+              "metadata_only"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "url": {
+            "minLength": 1,
+            "pattern": "^https://",
+            "type": "string"
+          },
+          "version": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "title",
+          "publisher",
+          "source_type",
+          "version",
+          "published_on",
+          "captured_on",
+          "status",
+          "response_sha256",
+          "excerpt",
+          "excerpt_sha256",
+          "locator",
+          "license"
+        ],
+        "type": "object"
+      },
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "release_id",
+    "as_of",
+    "canonical_dataset_version",
+    "canonical_sha256",
+    "entities",
+    "sources",
+    "assertions",
+    "reviews",
+    "coverage"
+  ],
+  "title": "ScienceToStartup independently versioned research graph",
+  "type": "object"
+}
