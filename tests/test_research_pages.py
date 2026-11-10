@@ -252,7 +252,7 @@ class ResearchPageTests(unittest.TestCase):
         self.assertEqual(url.count('/'), 4)
         self.assertTrue((self.output / url.strip('/') / 'index.html').is_file())
         self.assertEqual(len({row['path'] for row in first}), len(first))
-        self.assertTrue(all(re.fullmatch(r'\d{4}-\d{2}-\d{2}', row['lastmod']) for row in first))
+        self.assertTrue(all(re.fullmatch(r'\d{4}-\d{2}-\d{2}', row['lastmod']) for row in first if 'lastmod' in row))
 
     def test_search_records_are_compact_unique_and_match_generated_routes(self):
         paths = {row['path'] for row in self.build()}

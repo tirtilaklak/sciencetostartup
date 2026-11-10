@@ -1454,7 +1454,9 @@ def render_not_found(research):
 # Sitemap and the build entry point
 
 def render_sitemap(entries):
-    urls = "".join(f"  <url>\n    <loc>{escape(loc)}</loc>\n    <lastmod>{escape(lastmod)}</lastmod>\n  </url>\n" for loc, lastmod in entries)
+    urls = "".join(f"  <url>\n    <loc>{escape(loc)}</loc>\n"
+                   + (f"    <lastmod>{escape(lastmod)}</lastmod>\n" if lastmod else "")
+                   + "  </url>\n" for loc, lastmod in entries)
     return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + "</urlset>\n"
 
 

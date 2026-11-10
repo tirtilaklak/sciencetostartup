@@ -903,15 +903,15 @@ def build(data, destination):
                              + ', '.join(sorted(inventory['oversized']))
                              + '. Prepare a compressed frozen package; keep every research record and export.')
         research_entries = write_research_pages(destination, research_context)
-        company_updates = {"https://sciencetostartup.com" + row['path']: row['lastmod']
+        company_updates = {"https://sciencetostartup.com" + row['path']: row.get('lastmod')
                            for row in write_company_supplements(destination, research_context)}
         import xml.etree.ElementTree as ET
         from static_pages import render_sitemap
         namespace = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
         sitemap = ET.parse(destination / "sitemap.xml").getroot()
         entries = [(node.findtext(namespace + "loc"), node.findtext(namespace + "lastmod")) for node in sitemap]
-        entries = [(url, max(modified, company_updates.get(url, modified))) for url, modified in entries]
-        entries += [("https://sciencetostartup.com" + entry["path"], entry["lastmod"]) for entry in research_entries]
+        entries = [(url, max(filter(None, [modified, company_updates.get(url)]), default=None)) for url, modified in entries]
+        entries += [("https://sciencetostartup.com" + entry["path"], entry.get("lastmod")) for entry in research_entries]
         if len({entry[0] for entry in entries}) != len(entries):
             raise ValueError("Duplicate canonical URL in research sitemap")
         (destination / "sitemap.xml").write_text(render_sitemap(entries), encoding="utf-8")

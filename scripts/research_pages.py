@@ -117,6 +117,87 @@ def _date(value):
     return sp.format_date(_day(value)) if value else "Not recorded"
 
 
+def _revision_dates(context):
+    """Dates of this page's substantive inputs, never the build/snapshot clock.
+
+    A claim review contributes only to the exact assertion it actually binds.
+    Entity metadata has no revision timestamp in the graph schema; a metadata
+    only page therefore has an unknown revision date rather than an invented one.
+    """
+    from research_graph import assertion_digest
+    from research_report import canonical_hash, report_review_digest
+
+    def latest(values):
+        days = [_day(value) for value in values if value]
+        return max((day for day in days if re.fullmatch(r'\d{4}-\d{2}-\d{2}', day)), default=None)
+
+    graph = context['graph']
+    reviews = {row['id']: row for row in graph.get('reviews', [])}
+    claims, source_reviews = {}, {}
+    for assertion in graph['assertions']:
+        aid = assertion['id']
+        bound = [reviews[rid] for rid in assertion.get('review_ids', []) if rid in reviews
+                 and aid in reviews[rid].get('assertion_ids', [])
+                 and reviews[rid].get('assertion_sha256', {}).get(aid) == assertion_digest(assertion)]
+        claims[aid] = latest([assertion.get('as_of')] + [row.get('reviewed_on') for row in bound])
+        for evidence in assertion.get('evidence', []):
+            source_reviews.setdefault(evidence['source_id'], []).extend(row.get('reviewed_on') for row in bound)
+    dates = {}
+    for entity in graph['entities']:
+        dates[entity_url(entity, context)] = latest(claims[row['id']] for row in _assertions(context, entity))
+    for slug, _, kinds, _ in CATEGORIES:
+        dates['/research/' + slug + '/'] = latest(dates.get(entity_url(entity, context))
+                                                for entity in graph['entities'] if entity.get('kind') in kinds)
+    corrections = context.get('_render_corrections')
+    if corrections is None:
+        corrections = _correction_records(context)
+    corrected = {}
+    for row in corrections:
+        corrected.setdefault(row['claim_id'], []).append(row['corrected_on'])
+    assertions, stubs, sources = _ledger_records(context)
+    for kind, records in (('assertion', {**assertions, **{aid: {'id': aid} for aid in stubs}}),
+                          ('source', sources)):
+        for bucket in LEDGER_BUCKETS:
+            values = []
+            for row in records.values():
+                if _ledger_bucket(row['id']) != bucket:
+                    continue
+                if kind == 'assertion':
+                    values.extend([claims.get(row['id']), *corrected.get(row['id'], [])])
+                else:
+                    values.extend([row.get('captured_on'), *source_reviews.get(row['id'], [])])
+            dates[_ledger_path(kind, bucket)] = latest(values)
+    report_hash, graph_hash = report_review_digest(context['report']), canonical_hash(graph)
+    report_reviews = [row.get('reviewed_on') for row in context.get('policy', {}).get('report_reviews', [])
+                      if row.get('fixture') is False and row.get('method') == 'report_content_review'
+                      and row.get('report_sha256') == report_hash and row.get('graph_sha256') == graph_hash
+                      and row.get('reviewer') and row.get('invocation_id')]
+    report_date = latest([context['report'].get('updated_on'), *report_reviews])
+    dates[REPORT_PATH] = report_date
+    dates[CORRECTIONS_PATH] = latest(row['corrected_on'] for row in corrections)
+    corpus_date = latest(dates.values())
+    for path in ('/research/', '/research/data/', '/review/'):
+        dates[path] = latest([report_date, corpus_date])
+    return dates
+
+
+def _page_revision(context, path):
+    dates = context.get('_page_revisions')
+    if dates is None:
+        dates = _revision_dates(context)
+    # Immutable editions use their own snapshot's map, never today's inputs.
+    if re.fullmatch(r'/research/editions/[^/]+/', path):
+        path = REPORT_PATH
+    else:
+        path = re.sub(r'^/research/editions/[^/]+/data/', '/research/data/', path)
+    return dates.get(path)
+
+
+def _sitemap_record(context, path):
+    modified = _page_revision(context, path)
+    return {'path': path, **({'lastmod': modified} if modified else {})}
+
+
 def _category(entity):
     return next((row for row in CATEGORIES if entity.get("kind") in row[2]), None)
 
@@ -202,7 +283,9 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
     publisher = {"@type": person.get("type", "Person"), "@id": person.get("id", sp.ORIGIN + "/#publisher"),
                  "name": person.get("name", sp.PUBLISHER_NAME), "url": person.get("url", sp.ORIGIN + "/method/#about")}
     structured = sp.page_node(page_type, title, description, sp.ORIGIN + path,
-                              context["report"]["updated_on"], crumbs, publisher=publisher)
+                              _page_revision(context, path), crumbs, publisher=publisher)
+    if not structured['dateModified']:
+        structured.pop('dateModified')
     if page_type == "TechArticle":
         structured.update({"author": publisher, "creativeWorkStatus": _status(context),
                            "version": context["report"]["release_id"],
@@ -950,6 +1033,7 @@ def write_company_supplements(output, context):
     Historical prose, figures, source dates and organization metadata are retained.
     """
     output = Path(output)
+    context = {**context, '_page_revisions': _revision_dates(context)}
     records = []
     for entity in sorted(context['graph']['entities'], key=lambda row: row['id']):
         legacy = entity.get('legacy_id')
@@ -964,8 +1048,7 @@ def write_company_supplements(output, context):
         canonical = sp.ORIGIN + path
         if f'<link rel="canonical" href="{sp.escape(canonical)}">' not in original or '</main>' not in original:
             raise ValueError('Legacy company supplement requires its existing canonical and main: ' + path)
-        modified = max(_day(context['graph']['as_of']), context['report']['updated_on'],
-                       *(_day(row.get('as_of')) for row in assertions))
+        modified = _page_revision(context, path)
         def update_page_date(match):
             nonlocal modified
             node = json.loads(match.group(2))
@@ -973,8 +1056,11 @@ def write_company_supplements(output, context):
                 nonlocal modified
                 if isinstance(value, dict):
                     if value.get('@id') == canonical and value.get('@type') in {'WebPage', 'ProfilePage'}:
-                        modified = max(modified, _day(value.get('dateModified')))
-                        value['dateModified'] = modified
+                        modified = max(filter(None, [modified, _day(value.get('dateModified'))]), default=None)
+                        if modified:
+                            value['dateModified'] = modified
+                        else:
+                            value.pop('dateModified', None)
                     for child in value.values():
                         update(child)
                 elif isinstance(value, list):
@@ -995,7 +1081,7 @@ def write_company_supplements(output, context):
         if '<link rel="stylesheet" href="/research.css">' not in text:
             text = text.replace('</head>', '<link rel="stylesheet" href="/research.css">\n</head>', 1)
         target.write_text(text, encoding='utf-8')
-        records.append({'path': path, 'lastmod': modified})
+        records.append({'path': path, **({'lastmod': modified} if modified else {})})
     if records:
         (output / 'research.css').write_bytes((ROOT / 'web/research.css').read_bytes())
     return records
@@ -1008,10 +1094,10 @@ def write_research_pages(output, context):
     site-relative and begin with '/'. Existing legacy company HTML is untouched.
     """
     output = Path(output)
-    modified = max(context["report"]["updated_on"], _day(context["graph"]["as_of"]))
     editions = _published_editions(context)
     corrections = _correction_records(context)
     context = {**context, '_render_corrections': corrections}
+    context['_page_revisions'] = _revision_dates(context)
     pages = [("/research/", "Human data research", "Public-source research connecting AI data suppliers, papers, datasets, benchmarks, and workflows, with visible evidence and coverage.", _hub(context, editions), "CollectionPage", None),
              (REPORT_PATH, context["report"]["title"], context["report"].get("summary", "Research methods and findings."), _report(context), "TechArticle", None),
              ("/research/data/", "Research data & evidence", "Versioned research data, source and assertion permalinks, publication progress, citations, and reproducible downloads.", _data(context), "CollectionPage", None),
@@ -1033,8 +1119,9 @@ def write_research_pages(output, context):
         target = output / path.lstrip('/') / 'index.html'
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(_render(context, title, description, path, body, page_type, parent), encoding='utf-8')
-        records.append({"path": path, "lastmod": modified})
+        records.append(_sitemap_record(context, path))
     for path, snapshot in editions:
+        snapshot = {**snapshot, '_page_revisions': _revision_dates(snapshot)}
         target = output / path.lstrip('/') / 'index.html'
         target.parent.mkdir(parents=True, exist_ok=True)
         def edition_links(text):
@@ -1054,19 +1141,19 @@ def write_research_pages(output, context):
             return text
         target.write_text(edition_links(_render(snapshot, snapshot['report']['title'], snapshot['report'].get('summary', ''), path,
                                   _report(snapshot, edition=True), 'TechArticle')), encoding='utf-8')
-        records.append({"path": path, "lastmod": snapshot['report']['updated_on']})
+        records.append(_sitemap_record(snapshot, path))
         ledger_path = path + 'data/'
         ledger = output / ledger_path.lstrip('/') / 'index.html'
         ledger.parent.mkdir(parents=True, exist_ok=True)
         ledger.write_text(edition_links(_render(snapshot, 'Edition evidence and sources', 'Frozen assertion and source records for this exact archived edition.',
                                                ledger_path, _data(snapshot), 'CollectionPage')), encoding='utf-8')
-        records.append({"path": ledger_path, "lastmod": snapshot['report']['updated_on']})
+        records.append(_sitemap_record(snapshot, ledger_path))
         for live_path, title, description, body, page_type, parent in _ledger_pages(snapshot):
             bucket_path = ledger_path + live_path.removeprefix('/research/data/')
             bucket = output / bucket_path.lstrip('/') / 'index.html'
             bucket.parent.mkdir(parents=True, exist_ok=True)
             bucket.write_text(edition_links(_render(snapshot, title, description, bucket_path, body, page_type, parent)), encoding='utf-8')
-            records.append({"path": bucket_path, "lastmod": snapshot['report']['updated_on']})
+            records.append(_sitemap_record(snapshot, bucket_path))
     (output / 'research.css').write_bytes((ROOT / 'web/research.css').read_bytes())
     (output / 'research-index.js').write_bytes((ROOT / 'web/research-index.js').read_bytes())
     _feeds(output, context, editions)
