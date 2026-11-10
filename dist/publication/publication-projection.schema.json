@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sciencetostartup.com/schema/publication-projection.schema.json",
+  "title": "Versioned privacy-filtered public research projection",
+  "type": "object",
+  "required": ["schema_version", "projection_version", "release_id", "as_of", "canonical_dataset_version", "privacy", "canonical", "graph"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "projection_version": {"const": "1.0.0"},
+    "release_id": {"type": "string", "minLength": 1},
+    "as_of": {"type": "string"},
+    "canonical_dataset_version": {"type": "string"},
+    "privacy": {"type": "object", "required": ["contact_details", "raw_source_text", "canonical_unchanged"], "properties": {"contact_details": {"const": "removed"}, "raw_source_text": {"const": "excluded"}, "canonical_unchanged": {"const": true}}, "additionalProperties": false},
+    "canonical": {"type": "object"},
+    "graph": {"type": "object"}
+  },
+  "additionalProperties": false
+}

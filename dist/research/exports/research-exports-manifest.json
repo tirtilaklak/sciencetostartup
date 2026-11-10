@@ -1,0 +1,13 @@
+{
+  "files": {
+    "research-assertions.csv": "e44bfe75786726a3c0e5f3eccfd5ae6c0f32195f23508dc0ae0d2407ccc80f8a",
+    "research-entities.csv": "8eb9bb2ffcaa9917e9ad7b4b4514a2a99152d8c6ca59da3145dbecdce76e684d",
+    "research-graph.json": "f36014d5c8da20330a102a2283c79f654f27f7ff545e97b914086ffa5f6a9479",
+    "research-graph.sqlite": "14d8efa52174a5b6c5a4b1b45ebffa5f100c4ecf22989756362ef36be587dbbe",
+    "research-reviews.csv": "7e417808e7b286639d3f8ad87fbfe4db6e8e9470e9a7b9d1aff573a066098899",
+    "research-sources.csv": "5d17d6d69cad7072b519cb290728c43748e9ce80133e29dfb2cedf7f0bb304b4"
+  },
+  "projection": "privacy-filtered-research-graph",
+  "release_id": "research-2026-11-09.prelaunch.2",
+  "schema_version": "1.0.0"
+}
