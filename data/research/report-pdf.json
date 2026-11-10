@@ -1,0 +1,8 @@
+{
+  "context_sha256": "7e1e370671d8b1b76b9dbf4c12132676cc69a56ee0e0df3fa06d8c6145d4efa4",
+  "release_id": "research-2026-11-09.prelaunch.1",
+  "renderer": "ReportLab with embedded Bitstream Vera",
+  "schema_version": 1,
+  "sha256": "a700e1f9bc4d2bf8ba584331b1c3eb68c3de0da8088677ffb3650678ef6143a4",
+  "verification": "Rendering and text inspection are required before archival publication."
+}

@@ -12,6 +12,7 @@ import math
 import re
 from datetime import date, datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 FLOORS = {
@@ -161,6 +162,7 @@ def _audit(audit, kind, graph, thresholds):
     sources = {item.get("id"): item for item in graph.get("sources", [])}
     reviews = {item.get("id"): item for item in graph.get("reviews", [])}
     assertions = {item.get("id"): item for item in graph.get("assertions", [])}
+    entities = {item.get("id"): item for item in graph.get("entities", [])}
     for row in rows:
         row_id = row.get("id")
         if not row_id or row_id in ids:
@@ -175,6 +177,22 @@ def _audit(audit, kind, graph, thresholds):
                     or item.get("excerpt_sha256") != source.get("excerpt_sha256")):
                 errors.append(f"{kind} holdout {row_id} has unbound source evidence.")
         receipts = [reviews.get(rid, {}) for rid in row.get("review_ids", [])]
+        if any(receipt.get("verdict") != "pass" for receipt in receipts):
+            errors.append(f"{kind} holdout {row_id} includes missing or negative review receipts.")
+        bound_assertions = ([row.get("assertion_id")] if kind == "reference"
+                            else row.get("adjudication_assertion_ids", []))
+        if not bound_assertions or any(aid not in assertions for aid in bound_assertions):
+            errors.append(f"{kind} holdout {row_id} has no source-bound adjudication assertions.")
+        if kind == "screening":
+            record_id = row.get("record_id")
+            if record_id not in entities or any(record_id not in {
+                    assertions.get(aid, {}).get("subject_id"), assertions.get(aid, {}).get("object_id")}
+                    for aid in bound_assertions):
+                errors.append(f"Screening holdout {row_id} adjudication does not bind its actual record.")
+        for aid in bound_assertions:
+            allowed_evidence = assertions.get(aid, {}).get("evidence", [])
+            if any(item not in allowed_evidence for item in evidence):
+                errors.append(f"{kind} holdout {row_id} evidence differs from its adjudicated assertion.")
         passing = [receipt for receipt in receipts if receipt.get("verdict") == "pass"
                    and receipt.get("invocation_id") and receipt.get("reviewer")
                    and receipt.get("method") == "source_content_review"]
@@ -183,11 +201,16 @@ def _audit(audit, kind, graph, thresholds):
         if not {"source_verifier", "adversarial"} <= roles or len(invocations) < 2:
             errors.append(f"{kind} holdout {row_id} lacks separate actual adjudication receipts.")
         for receipt in passing:
+            if not set(bound_assertions) <= set(receipt.get("assertion_ids", [])):
+                errors.append(f"{kind} holdout {row_id} review does not bind its exact assertions.")
             if not {item.get("source_id") for item in evidence} <= set(receipt.get("source_ids", [])):
                 errors.append(f"{kind} holdout {row_id} review does not bind its sources.")
             try:
-                if frozen_on and _timestamp(receipt.get("reviewed_on")) < frozen_on:
+                reviewed_on = _timestamp(receipt.get("reviewed_on"))
+                if frozen_on and reviewed_on < frozen_on:
                     errors.append(f"{kind} holdout {row_id} was adjudicated before freeze.")
+                if completed_on and reviewed_on > completed_on:
+                    errors.append(f"{kind} holdout {row_id} review postdates audit completion.")
             except (ValueError, TypeError):
                 errors.append(f"{kind} holdout {row_id} review lacks a timestamp.")
         if not isinstance(row.get("expected_positive"), bool) or not isinstance(row.get("observed_positive"), bool):
@@ -269,6 +292,11 @@ def publication_gate(graph, report, policy=None):
         reasons.append("Eligible core denominator has not been frozen with its cutoff and date.")
     try:
         cutoff = _timestamp(report.get("source_cutoff"))
+        local_cutoff = cutoff.astimezone(ZoneInfo("America/Los_Angeles"))
+        if (local_cutoff.weekday(), local_cutoff.hour, local_cutoff.minute, local_cutoff.second) != (4, 17, 0, 0):
+            reasons.append("The edition cutoff must be Friday 17:00 America/Los_Angeles.")
+        if cutoff > _timestamp(graph.get("as_of")):
+            reasons.append("The edition cutoff is in the future relative to the actual evidence snapshot.")
         sources = {item.get("id"): item for item in graph.get("sources", [])}
         for assertion in graph.get("assertions", []):
             if assertion.get("status") != "approved":

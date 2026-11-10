@@ -115,8 +115,15 @@ class PublicPrivacyTests(unittest.TestCase):
                       "source-updates.json", "link-health.json", "manifest.json", "robots.txt", "_headers"):
             self.assertTrue(self.places.get(place), place)
         companies = json.loads((ROOT / "data/canonical.json").read_text())["companies"]
+        import sys
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from research_report import build_context
+        from research_pages import _new_company, entity_url
+        context = build_context(ROOT)
+        added = {entity_url(entity, context).strip('/') + '/index.html'
+                 for entity in context['graph']['entities'] if _new_company(context, entity)}
         self.assertEqual({p for p in self.places if p.startswith("company/")},
-                         {f"company/{c['id']}/index.html" for c in companies})
+                         {f"company/{c['id']}/index.html" for c in companies} | added)
 
     def test_only_allowlisted_email_addresses_ship(self):
         found = {(address.lower(), place) for place, text in self.places.items() for address in EMAIL.findall(text)}

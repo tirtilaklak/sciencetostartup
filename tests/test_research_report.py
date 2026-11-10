@@ -59,10 +59,39 @@ def approved_graph(captured_on="2026-11-06T20:00:00Z", reviewed_on="2026-11-09T2
                          "reviewer_type": "ai", "invocation_id": f"test-only-{role}", "reviewed_on": reviewed_on,
                          "verdict": "pass", "method": "source_content_review", "source_ids": ["fixture-source"],
                          "note": "Test fixture only, never research evidence."} for role in roles]
+    from research_graph import assertion_digest
+    for review in graph["reviews"]:
+        review["assertion_sha256"] = {"fixture-claim": assertion_digest(graph["assertions"][0])}
     return graph
 
 
 class ReportGateTests(unittest.TestCase):
+    def test_audit_cannot_borrow_receipts_from_another_assertion_on_same_source(self):
+        graph = approved_graph()
+        graph["assertions"].append({**copy.deepcopy(graph["assertions"][0]), "id": "other-claim"})
+        row = {"id": "holdout-1", "assertion_id": "other-claim", "evidence": graph["assertions"][0]["evidence"],
+               "review_ids": ["source_verifier", "adversarial"], "expected_positive": True,
+               "observed_positive": True, "critical_false_attribution": False, "stratum": "supplier",
+               "adjudication": "Explicitly synthetic wrong-assertion fixture."}
+        audit = {"kind": "reference", "status": "completed", "fixture": False,
+                 "release_id": graph["release_id"], "graph_sha256": canonical_hash(graph),
+                 "frozen_on": "2026-11-09T00:00:00Z", "completed_on": "2026-11-09T23:00:00Z",
+                 "items": [row], "holdout_ids_sha256": canonical_hash(["holdout-1"])}
+        errors, _ = _audit(audit, "reference", graph, {**FLOORS, "reference_sample_size": 1})
+        self.assertTrue(any("exact assertions" in error for error in errors))
+        row["assertion_id"] = "fixture-claim"
+        audit["completed_on"] = "2026-11-09T19:00:00Z"
+        errors, _ = _audit(audit, "reference", graph, {**FLOORS, "reference_sample_size": 1})
+        self.assertTrue(any("postdates audit completion" in error for error in errors))
+
+    def test_empty_report_and_unbound_launch_analysis_are_blocked(self):
+        report = load_report(ROOT)
+        report["sections"][0]["paragraphs"] = []
+        self.assertTrue(any("no substantive content" in reason for reason in publication_gate(empty_graph(), report)["reasons"]))
+        report["status"] = "archive_pending"
+        report["sections"][0]["paragraphs"] = [{"kind": "analysis", "text": "Unbound conclusion", "claim_ids": []}]
+        self.assertTrue(any("bind its research inputs" in reason for reason in publication_gate(empty_graph(), report)["reasons"]))
+
     def test_empty_graph_is_prelaunch(self):
         result = publication_gate(empty_graph(), test_report())
         self.assertFalse(result["ready"])

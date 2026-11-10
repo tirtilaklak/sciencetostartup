@@ -38,11 +38,14 @@ def fixture():
                 "reviewer_type": "ai", "invocation_id": "test-only-invocation-" + role,
                 "reviewed_on": "2026-11-08T13:00:00Z", "verdict": "pass", "method": "source_content_review",
                 "source_ids": ["source"], "note": "Synthetic test fixture only."} for role in sorted(rg.REVIEW_ROLES)]
-    return {"schema_version": "1.0.0", "release_id": "test-only", "as_of": "2026-11-09T00:00:00Z",
+    graph = {"schema_version": "1.0.0", "release_id": "test-only", "as_of": "2026-11-09T00:00:00Z",
             "canonical_dataset_version": "2.5.0", "canonical_sha256": "a" * 64,
             "entities": [entity("paper")], "sources": [source], "assertions": [claim], "reviews": reviews,
             "coverage": {"frozen_core": {"entity_ids": [], "frozen_on": None, "source_cutoff": None, "sha256": None},
                          "quality_audit": None, "screening_audit": None, "notes": []}}
+    for review in graph["reviews"]:
+        review["assertion_sha256"] = {"claim": rg.assertion_digest(claim)}
+    return graph
 
 
 class ResearchGraphTests(unittest.TestCase):
@@ -175,7 +178,14 @@ class ResearchGraphTests(unittest.TestCase):
         graph["entities"][0]["kind"] = "supplier"
         self.assertEqual(rg.coverage_summary(graph)["qualifying_suppliers"], 0)
         graph["assertions"][0]["predicate"] = "has_capability"
+        for review in graph["reviews"]:
+            review["assertion_sha256"] = {"claim": rg.assertion_digest(graph["assertions"][0])}
         self.assertEqual(rg.coverage_summary(graph)["qualifying_suppliers"], 1)
+
+    def test_review_receipts_cannot_be_reused_after_assertion_wording_changes(self):
+        graph = fixture()
+        graph["assertions"][0]["value"]["value"] = "A different unsupported observation."
+        self.assert_invalid(graph, "reviewed assertion content changed")
 
     def test_frozen_core_requires_exact_hash_and_identities(self):
         graph = fixture()

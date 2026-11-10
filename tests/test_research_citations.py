@@ -129,6 +129,7 @@ class CitationTests(unittest.TestCase):
         context = context_fixture()
         projection = citations.public_projection(context, {"dataset_version": "2.5.0", "companies": []})
         with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
+            context["root"] = first  # This synthetic publication has no prepared real-report PDF.
             with patch.object(citations, "public_projection", return_value=projection), patch("urllib.request.urlopen", side_effect=AssertionError("network in build")):
                 a = citations.write_publication_assets(context, first)
                 b = citations.write_publication_assets(context, second)

@@ -385,7 +385,7 @@
         {
           "kind": "research_gap",
           "claim_ids": [],
-          "text": "This edition does not include completed source-anchored quality holdouts or a named external human review. Their absence is an explicit publication blocker. A test fixture or a generated summary of accuracy cannot substitute for adjudicated records and review receipts."
+          "text": "This preparation snapshot does not include completed source-anchored quality holdouts or a named external human review. The required quality holdouts remain a publication blocker. External human participation is voluntary and is not required for release. A test fixture or a generated summary of accuracy cannot substitute for actual adjudicated records and separate AI review receipts."
         },
         {
           "kind": "method",

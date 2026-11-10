@@ -54,7 +54,8 @@ def approved_new_org(context):
             'reviewer': 'Synthetic test-only reviewer', 'reviewer_type': 'ai',
             'invocation_id': 'test-only-distinct-' + role, 'reviewed_on': context['graph']['as_of'],
             'verdict': 'pass', 'method': 'source_content_review',
-            'source_ids': [e['source_id'] for e in assertion['evidence']], 'note': 'Test fixture only.'})
+            'source_ids': [e['source_id'] for e in assertion['evidence']], 'note': 'Test fixture only.',
+            'assertion_sha256': {assertion['id']: rg.assertion_digest(assertion)}})
     rg.validate_graph(context['graph'])
     return assertion
 
@@ -84,10 +85,13 @@ class ResearchPageTests(unittest.TestCase):
                      '/research/papers/', '/research/datasets/', '/research/benchmarks/', '/research/workflows/'):
             self.assertIn(path, paths)
         self.assertFalse(any('/editions/' in path for path in paths))
-        self.assertFalse(any(path.startswith('/company/') for path in paths))
+        expected_companies = {rp.entity_url(entity, self.context) for entity in self.context['graph']['entities'] if rp._new_company(self.context, entity)}
+        self.assertEqual({path for path in paths if path.startswith('/company/')}, expected_companies)
         self.assertIn('Prelaunch', self.page('/research/'))
-        self.assertIn('0 approved assertions', self.page('/research/data/'))
-        self.assertIn('No new assertions have completed', self.page('/research/data/'))
+        approved = sum(a['status'] == 'approved' for a in self.context['graph']['assertions'])
+        self.assertIn(f'{approved} approved assertions', self.page('/research/data/'))
+        if not approved:
+            self.assertIn('No new assertions have completed', self.page('/research/data/'))
         self.assertEqual(ET.parse(self.output / 'research/feed.xml').findall('./channel/item'), [])
         self.assertEqual(ET.parse(self.output / 'research/atom.xml').findall('{http://www.w3.org/2005/Atom}entry'), [])
 
@@ -105,9 +109,11 @@ class ResearchPageTests(unittest.TestCase):
         self.assertNotIn('type="module"', report)
 
     def test_candidate_assertion_wording_is_withheld_from_pages_and_search(self):
-        candidate = next(a for a in self.context['graph']['assertions'] if a['status'] == 'candidate')
-        candidate.update(object_id=None, value={'type': 'text', 'value': 'FORBIDDEN-CANDIDATE-FINDING'})
+        candidate = copy.deepcopy(next(a for a in self.context['graph']['assertions'] if a['status'] == 'approved'))
+        candidate.update(id='fixture.unreviewed-candidate', status='candidate', review_ids=[], object_id=None, value={'type': 'text', 'value': 'FORBIDDEN-CANDIDATE-FINDING'})
         candidate['qualifications'] = ['FORBIDDEN-CANDIDATE-QUALIFICATION']
+        self.context['graph']['assertions'].append(candidate)
+        next(e for e in self.context['graph']['entities'] if e['id'] == candidate['subject_id'])['assertion_ids'].append(candidate['id'])
         self.context['report']['sections'][0]['paragraphs'].append({
             'kind': 'sourced_fact', 'claim_ids': [candidate['id']], 'text': 'FORBIDDEN-CANDIDATE-PARAGRAPH'})
         self.build()

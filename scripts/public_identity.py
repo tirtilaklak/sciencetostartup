@@ -25,8 +25,10 @@ def validate_identity(identity):
     if identity["origin"] != "https://sciencetostartup.com":
         raise ValueError("public identity: canonical origin changed")
     publisher = identity["publisher"]
-    if set(publisher) != {"id", "name", "url", "website", "type"} or publisher["type"] != "Person":
+    if set(publisher) != {"id", "name", "given_names", "family_names", "url", "website", "type"} or publisher["type"] != "Person":
         raise ValueError("public identity: publisher must be the disclosed person")
+    if publisher["name"] != publisher["given_names"] + " " + publisher["family_names"]:
+        raise ValueError("public identity: citation author names disagree with the disclosed byline")
     if publisher["id"] != identity["origin"] + "/#publisher" or publisher["url"] != identity["origin"] + "/method/#about":
         raise ValueError("public identity: publisher identifiers drifted")
     if not publisher["name"].strip() or not all(_https(publisher[k]) for k in ("id", "url", "website")):

@@ -578,6 +578,13 @@
             ],
             "minLength": 1,
             "type": "string"
+          },
+          "assertion_sha256": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
           }
         },
         "required": [
@@ -591,7 +598,8 @@
           "verdict",
           "method",
           "source_ids",
-          "note"
+          "note",
+          "assertion_sha256"
         ],
         "type": "object"
       },

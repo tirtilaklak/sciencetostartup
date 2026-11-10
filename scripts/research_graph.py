@@ -51,7 +51,7 @@ SOURCE_FIELDS = {"id", "url", "title", "publisher", "source_type", "version", "p
 ASSERTION_FIELDS = {"id", "subject_id", "predicate", "object_id", "value", "evidence",
                     "qualifications", "status", "review_ids", "as_of", "provenance_kind"}
 REVIEW_FIELDS = {"id", "assertion_ids", "role", "reviewer", "reviewer_type", "invocation_id",
-                 "reviewed_on", "verdict", "method", "source_ids", "note"}
+                 "reviewed_on", "verdict", "method", "source_ids", "note", "assertion_sha256"}
 
 
 class GraphValidationError(ValueError):
@@ -68,6 +68,12 @@ def stable_json(value):
 
 def digest(value):
     return hashlib.sha256(value if isinstance(value, bytes) else value.encode("utf-8")).hexdigest()
+
+
+def assertion_digest(assertion):
+    """Bind reviews to exact wording, evidence, scope and values; status may advance."""
+    content = {key: value for key, value in assertion.items() if key not in {"status", "review_ids"}}
+    return digest(json.dumps(content, sort_keys=True, separators=(",", ":"), ensure_ascii=False))
 
 
 def _timestamp(value):
@@ -303,10 +309,15 @@ def _validate_graph(graph, canonical=None):
             require(reviewed <= as_of, p + "/reviewed_on", "review cannot follow graph as_of")
         if strings(review.get("assertion_ids"), p + "/assertion_ids"):
             require(bool(review["assertion_ids"]), p + "/assertion_ids", "empty review scope")
+            bindings = review.get("assertion_sha256")
+            require(isinstance(bindings, dict) and set(bindings) == set(review["assertion_ids"]),
+                    p + "/assertion_sha256", "review must bind every exact assertion")
             for aid in review["assertion_ids"]:
                 require(aid in assertions, p + "/assertion_ids", "unknown assertion")
                 if aid in assertions:
                     require(rid in assertions[aid].get("review_ids", []), p, "review/assertion references must be reciprocal")
+                    require(isinstance(bindings, dict) and bindings.get(aid) == assertion_digest(assertions[aid]),
+                            p + "/assertion_sha256", "reviewed assertion content changed; a new actual review is required")
         if strings(review.get("source_ids"), p + "/source_ids"):
             for sid in review["source_ids"]:
                 require(sid in sources, p + "/source_ids", "unknown source")

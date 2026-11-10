@@ -9,7 +9,9 @@
     "name": "Musa Ozdem",
     "url": "https://sciencetostartup.com/method/#about",
     "website": "https://musaeminozdem.com",
-    "type": "Person"
+    "type": "Person",
+    "given_names": "Musa",
+    "family_names": "Ozdem"
   },
   "repository": {
     "url": "https://github.com/tirtilaklak/sciencetostartup",
