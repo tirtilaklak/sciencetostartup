@@ -82,6 +82,37 @@ class ResearchGraphTests(unittest.TestCase):
         rg.validate_graph(graph)
         self.assertEqual(rg.coverage_summary(graph)["reviewed_papers"], 1)
 
+    def test_completed_legacy_audit_preserves_unresolved_commercial_status(self):
+        graph = fixture()
+        org = graph['entities'][0]
+        org.update(kind='organization', identifiers={}, legacy_id='test_only_legacy',
+                   status='candidate', disposition='pending')
+        graph['assertions'][0]['predicate'] = 'documents'
+        for review in graph['reviews']:
+            review['assertion_sha256'] = {'claim': rg.assertion_digest(graph['assertions'][0])}
+        counts = rg.coverage_summary(graph)
+        self.assertEqual(counts['legacy_inclusion_audits'], 1)
+        self.assertEqual(counts['legacy_dispositions'], 0)
+        self.assertEqual(counts['qualifying_suppliers'], 0)
+        self.assertEqual(counts['launch_floors']['legacy_inclusion_audits'], 39)
+        self.assertEqual(org['disposition'], 'pending')
+        self.assertFalse(counts['coverage_floors_met'])
+
+    def test_legacy_audit_requires_deep_owned_approved_evidence_and_three_roles(self):
+        graph = fixture()
+        graph['entities'][0].update(kind='organization', identifiers={}, legacy_id='test_only_legacy',
+                                    status='candidate', disposition='pending', review_depth='metadata')
+        graph['assertions'][0]['predicate'] = 'documents'
+        for review in graph['reviews']:
+            review['assertion_sha256'] = {'claim': rg.assertion_digest(graph['assertions'][0])}
+        self.assertEqual(rg.coverage_summary(graph)['legacy_inclusion_audits'], 0)
+        graph['entities'][0]['review_depth'] = 'full_source'
+        graph['assertions'][0]['status'] = 'candidate'
+        self.assertEqual(rg.coverage_summary(graph)['legacy_inclusion_audits'], 0)
+        graph['assertions'][0]['status'] = 'approved'
+        graph['assertions'][0]['review_ids'].remove('adversarial')
+        self.assert_invalid(graph)
+
     def test_abstracts_do_not_count_as_deeply_reviewed_papers(self):
         graph = fixture()
         graph["entities"][0]["review_depth"] = "abstract"

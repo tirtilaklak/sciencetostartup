@@ -23,7 +23,7 @@ from urllib.parse import urlsplit, parse_qsl
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_VERSION = "1.0.0"
-LAUNCH_FLOORS = {"legacy_dispositions": 39, "qualifying_suppliers": 60,
+LAUNCH_FLOORS = {"legacy_inclusion_audits": 39, "qualifying_suppliers": 60,
                  "reviewed_papers": 150, "dataset_families": 60,
                  "benchmark_families": 20, "core_disposition_rate": 0.9}
 KINDS = {"organization", "supplier", "paper", "paper_work", "paper_version", "dataset",
@@ -612,7 +612,13 @@ def coverage_summary(graph):
                 and e['status'] != 'candidate' and e['review_depth'] == 'full_source'
                 and own_evidence(e))
     core_disposed = sum(core_dispositioned(e) for e in graph["entities"] if e["id"] in core_ids)
-    counts = {"coverage_method_version": "1.2.0", "legacy_organizations": len(legacy), "legacy_dispositions": sum(core_dispositioned(e) for e in legacy),
+    # A completed inclusion audit may leave commercial qualification unresolved.
+    # Its bounded source-content review still needs approved, subject-owned
+    # evidence with all three actual roles. It does not disposition that record
+    # for the separate frozen-core gate or turn it into a qualifying supplier.
+    legacy_audits = sum(e['review_depth'] == 'full_source' and own_evidence(e) for e in legacy)
+    counts = {"coverage_method_version": "1.3.0", "legacy_organizations": len(legacy),
+              "legacy_inclusion_audits": legacy_audits, "legacy_dispositions": sum(core_dispositioned(e) for e in legacy),
               "qualifying_suppliers": len(suppliers), "reviewed_papers": sum(e["kind"] in {"paper", "paper_work"} for e in qualifying),
               "dataset_families": len({e["family_id"] for e in qualifying if e["kind"] in {"dataset", "dataset_family"}}),
               "benchmark_families": len({e["family_id"] for e in qualifying if e["kind"] in {"benchmark", "benchmark_family"}}),

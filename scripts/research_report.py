@@ -17,7 +17,7 @@ from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 FLOORS = {
-    "legacy_dispositions": 39,
+    "legacy_inclusion_audits": 39,
     "qualifying_suppliers": 60,
     "reviewed_papers": 150,
     "dataset_families": 60,
@@ -363,7 +363,7 @@ def publication_gate(graph, report, policy=None):
         coverage = {}
     reasons.extend(_validate_report(report, graph))
     reasons.extend(_launch_content(report, graph))
-    for key in ("legacy_dispositions", "qualifying_suppliers", "reviewed_papers", "dataset_families", "benchmark_families", "core_disposition_rate"):
+    for key in ("legacy_inclusion_audits", "qualifying_suppliers", "reviewed_papers", "dataset_families", "benchmark_families", "core_disposition_rate"):
         observed = coverage.get(key, 0)
         if not isinstance(observed, (int, float)) or observed < thresholds[key]:
             reasons.append(f"Coverage {key}: {observed} / {thresholds[key]} required.")

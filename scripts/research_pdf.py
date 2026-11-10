@@ -65,7 +65,7 @@ def render_report_pdf(context):
     coverage = context["gate"].get("coverage", {})
     floors = context["gate"].get("thresholds", {})
     rows = [["Reviewed research", "Current", "Launch minimum"]]
-    for key, label in (("legacy_dispositions", "Existing organization inclusion audits"),
+    for key, label in (("legacy_inclusion_audits", "Existing organization inclusion audits"),
                        ("qualifying_suppliers", "Qualifying suppliers"), ("reviewed_papers", "Full-source paper reviews"),
                        ("dataset_families", "Dataset families"), ("benchmark_families", "Benchmark families")):
         rows.append([label, str(coverage.get(key, 0)), str(floors.get(key, "Not established"))])

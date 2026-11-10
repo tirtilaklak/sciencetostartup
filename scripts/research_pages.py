@@ -36,7 +36,7 @@ CATEGORIES = (
      "Connect the work to its evidence: recruitment, annotation, adjudication, filtering, and evaluation."),
 )
 PROGRESS = (
-    ("legacy_dispositions", "Legacy organizations reviewed", 39),
+    ("legacy_inclusion_audits", "Legacy inclusion audits", 39),
     ("qualifying_suppliers", "Qualifying suppliers", 60),
     ("reviewed_papers", "Distinct reviewed papers", 150),
     ("dataset_families", "Dataset families", 60),
