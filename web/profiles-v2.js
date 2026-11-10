@@ -209,17 +209,29 @@ function profileAtAGlance(id){
  const financial=preferredFinancial(id),research=companies[id].entity_type==='adjacent_research',offering=profileProducts(id).find(p=>p.name),metric=financial?(typeof financialSummaryHTML==='function'?financialSummaryHTML(id):compactSignal(id)):`<span class="profile-main-offering">${esc(offering?.name||(research?'Public AI research':'AI data services'))}</span><p class="profile-revenue-note">${research?'Nonprofit research organization':'Revenue not disclosed in the reviewed sources.'}</p>`;
  return `<div class="profile-at-a-glance"><div class="profile-glance-metric"><span class="eyebrow">${financial?'Latest financial evidence':research?'Research focus':'Main offering'}</span>${metric}</div><div class="profile-glance-work"><span class="eyebrow">Work routes</span><p>${esc(workType(id))}</p><a href="#company/${attr(id)}/work">View listings & requirements ${iconHTML('right')}</a></div></div>`;
 }
-function profileHTML(id,{deferArchive=false}={}){
- const c=companies[id],config=profileContent(id),target=profileTarget(id),active=target==='observations'?'traction':profileTabFor(target),archiveOpen=PROFILE_ARCHIVE_SECTIONS.includes(target);
- const notes=(config.notes||[]).map(n=>typeof n==='string'?`<p>${esc(n)}</p>`:`<p>${esc(n.text)} ${profileReferences(n.claim_ids)}</p>`).join('');
- const group=modelGroup(id),category=`<p class="profile-category">${esc(groupLabel(group))}</p>`;
- const background=config.summary&&config.summary!==modelFor(id)?`<details class="profile-background"><summary>About the business</summary><p>${esc(config.summary)}</p></details>`:'';
- const panes={business:`${background}<div class="profile-business-layout ${config.featured_case?'has-case':''}">${profileSection('products',config.product_heading||'Products and services',profileProductGrid(id))}${profileCase(id)}</div>${typeof productMediaHTML==='function'?productMediaHTML(id):''}${profileSection('customers','Who it works with',profileRelationshipGrid(id))}${profileRisks(id)}`,
- traction:profileSection('traction',profileFiguresHeading(id),`${config.activity?`<div class="profile-activity"><h3>${esc(config.activity.title)}</h3><p>${esc(config.activity.description)}</p>${profileReferences(config.activity.claim_ids)}</div>`:''}${profileTraction(id)}`),
- people:`<div class="profile-people-layout">${profileSection('finance',c.entity_type==='adjacent_research'?'Research support':'Funding and valuation',profileCapital(id))}${profileSection('people','Founders and leadership',profilePeople(id))}</div>`+(notes?profileDisclosure('Further context',notes):''),
- work:profileSection('work','Paid work at '+c.name,workSummary(id))};
+function profileIntroductionHTML(id){
+ const c=companies[id],group=modelGroup(id);
+ return `<a class="profile-back" href="#companies">${iconHTML('left')} Companies</a><header class="profile-top profile-hero"><div class="profile-introduction"><div class="profile-title-row">${profileLogoHTML(id,'profile-brand')}<h1>${esc(c.name)}</h1></div><p class="profile-summary">${esc(modelFor(id))}</p><a class="profile-group-link" href="#companies/${attr(groupSlug(group))}" data-category-jump="${attr(group)}">${esc(groupLabel(group))} ${iconHTML('right')}</a><div class="profile-links">${external(c.website,'Website')}<a href="#company/${attr(id)}/work">Paid work ${iconHTML('right')}</a><a href="#company/${attr(id)}/sources">Sources ${iconHTML('right')}</a></div></div></header>`;
+}
+// Build a pane when it is read; populate another pane before its tab or anchor activates.
+function profilePaneHTML(id,key){
+ const c=companies[id],config=profileContent(id);
+ if(key==='business'){
+  const background=config.summary&&config.summary!==modelFor(id)?`<details class="profile-background"><summary>About the business</summary><p>${esc(config.summary)}</p></details>`:'';
+  return `${background}<div class="profile-business-layout ${config.featured_case?'has-case':''}">${profileSection('products',config.product_heading||'Products and services',profileProductGrid(id))}${profileCase(id)}</div>${typeof productMediaHTML==='function'?productMediaHTML(id):''}${profileSection('customers','Who it works with',profileRelationshipGrid(id))}${profileRisks(id)}`;
+ }
+ if(key==='traction')return profileSection('traction',profileFiguresHeading(id),`${config.activity?`<div class="profile-activity"><h3>${esc(config.activity.title)}</h3><p>${esc(config.activity.description)}</p>${profileReferences(config.activity.claim_ids)}</div>`:''}${profileTraction(id)}`);
+ if(key==='people'){
+  const notes=(config.notes||[]).map(n=>typeof n==='string'?`<p>${esc(n)}</p>`:`<p>${esc(n.text)} ${profileReferences(n.claim_ids)}</p>`).join('');
+  return `<div class="profile-people-layout">${profileSection('finance',c.entity_type==='adjacent_research'?'Research support':'Funding and valuation',profileCapital(id))}${profileSection('people','Founders and leadership',profilePeople(id))}</div>`+(notes?profileDisclosure('Further context',notes):'');
+ }
+ if(key==='work')return profileSection('work','Paid work at '+c.name,workSummary(id));
+ return '';
+}
+function profileHTML(id,{deferArchive=false,deferPanes=false,omitIntroduction=false}={}){
+ const c=companies[id],target=profileTarget(id),active=target==='observations'?'traction':profileTabFor(target),archiveOpen=PROFILE_ARCHIVE_SECTIONS.includes(target);
  const tabs=[['business','Business'],['traction','Figures'],['people','Funding & people'],['work','Paid work']];
- return `<div class="profile-v2" data-profile-company="${attr(id)}"><a class="profile-back" href="#companies">${iconHTML('left')} Companies</a><header class="profile-top profile-hero"><div class="profile-introduction"><div class="profile-title-row">${profileLogoHTML(id,'profile-brand')}<h1>${esc(c.name)}</h1></div><p class="profile-summary">${esc(modelFor(id))}</p><a class="profile-group-link" href="#companies/${attr(groupSlug(group))}" data-category-jump="${attr(group)}">${esc(groupLabel(group))} ${iconHTML('right')}</a><div class="profile-links">${external(c.website,'Website')}<a href="#company/${attr(id)}/work">Paid work ${iconHTML('right')}</a><a href="#company/${attr(id)}/sources">Sources ${iconHTML('right')}</a></div></div></header><nav class="profile-tabs" role="tablist" aria-label="${attr(c.name)} details">${tabs.map(([key,label])=>`<button type="button" role="tab" id="profile-tab-${key}" data-profile-tab="${key}" aria-controls="profile-pane-${key}" aria-selected="${active===key}" tabindex="${active===key?0:-1}">${esc(label)}</button>`).join('')}</nav><div class="profile-panes">${tabs.map(([key])=>`<section id="profile-pane-${key}" role="tabpanel" aria-labelledby="profile-tab-${key}" tabindex="-1" data-profile-pane="${key}"${active===key?'':' hidden'}>${panes[key]}</section>`).join('')}</div><details class="profile-evidence"${archiveOpen?' open':''}><summary><span class="archive-summary-label">Sources and review <i aria-hidden="true">+</i></span><span>${companyClaims(id).length} claims · ${companySources(id).length} sources</span></summary>${deferArchive&&!archiveOpen?'':profileArchive(id)}</details><p class="profile-correction">Something wrong here? <a href="#corrections">Request a correction ${iconHTML('right')}</a></p>${profilePeersHTML(id)}</div>`;
+ return `<div class="profile-v2" data-profile-company="${attr(id)}">${omitIntroduction?'':profileIntroductionHTML(id)}<nav class="profile-tabs" role="tablist" aria-label="${attr(c.name)} details">${tabs.map(([key,label])=>`<button type="button" role="tab" id="profile-tab-${key}" data-profile-tab="${key}" aria-controls="profile-pane-${key}" aria-selected="${active===key}" tabindex="${active===key?0:-1}">${esc(label)}</button>`).join('')}</nav><div class="profile-panes">${tabs.map(([key])=>`<section id="profile-pane-${key}" role="tabpanel" aria-labelledby="profile-tab-${key}" tabindex="-1" data-profile-pane="${key}"${deferPanes&&active!==key?' data-profile-pending':''}${active===key?'':' hidden'}>${deferPanes&&active!==key?'':profilePaneHTML(id,key)}</section>`).join('')}</div><details class="profile-evidence"${archiveOpen?' open':''}><summary><span class="archive-summary-label">Sources and review <i aria-hidden="true">+</i></span><span>${companyClaims(id).length} claims · ${companySources(id).length} sources</span></summary>${deferArchive&&!archiveOpen?'':profileArchive(id)}</details><p class="profile-correction">Something wrong here? <a href="#corrections">Request a correction ${iconHTML('right')}</a></p>${profilePeersHTML(id)}</div>`;
 }
 
 function ensureProfileArchive(root){
@@ -234,8 +246,17 @@ function ensureProfileArchive(root){
 
 function renderCompanyProfile(id){
  const container=$('profile-view'),existing=container.querySelector?.('.profile-v2');
- const render=()=>{container.innerHTML=profileHTML(id,{deferArchive:typeof container.querySelector==='function'});};
- if(!existing||existing.dataset.profileCompany!==id){render();return;}
+ const render=()=>{
+  const dom=typeof container.querySelector==='function',retainIntroduction=existing?.dataset.profileCompany===id&&existing.hasAttribute('data-profile-loading');
+  const html=profileHTML(id,{deferArchive:dom,deferPanes:dom,omitIntroduction:retainIntroduction});
+  if(retainIntroduction){
+   // Keep the sourced introduction attached while the validated evidence fills in below it.
+   const template=document.createElement('template');template.innerHTML=html;
+   const content=[...template.content.firstElementChild.children].filter(node=>!node.matches('.profile-back,.profile-top'));
+   existing.querySelector('[data-profile-loading-content]').replaceWith(...content);existing.removeAttribute('data-profile-loading');
+  }else container.innerHTML=html;
+ };
+ if(!existing||existing.dataset.profileCompany!==id||existing.hasAttribute('data-profile-loading')){render();return;}
  const target=profileTarget(id);
  // With no operating figures, the archive has a placeholder only on the
  // observations route. Preserve that existing conditional presentation.
@@ -245,7 +266,12 @@ function renderCompanyProfile(id){
  }
  if(PROFILE_ARCHIVE_SECTIONS.includes(target)||existing.querySelector('.profile-evidence')?.open)ensureProfileArchive(existing);
  const active=target==='observations'?'traction':profileTabFor(target);
- existing.querySelectorAll('[data-profile-pane]').forEach(pane=>{pane.hidden=pane.dataset.profilePane!==active;});
+ existing.querySelectorAll('[data-profile-pane]').forEach(pane=>{
+  if(pane.dataset.profilePane===active&&pane.hasAttribute('data-profile-pending')){
+   pane.innerHTML=profilePaneHTML(id,active);pane.removeAttribute('data-profile-pending');
+  }
+  pane.hidden=pane.dataset.profilePane!==active;
+ });
  existing.querySelectorAll('[data-profile-tab]').forEach(tab=>{
   const selected=tab.dataset.profileTab===active;
   tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1;

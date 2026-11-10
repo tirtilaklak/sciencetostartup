@@ -9,7 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from research_report import FLOORS, _audit, canonical_hash, load_report, load_edition_snapshots, publication_gate
+from research_report import (FLOORS, _audit, canonical_hash, load_report, load_edition_snapshots,
+                             publication_gate, report_review_digest, report_review_errors)
 
 
 def empty_graph():
@@ -67,6 +68,41 @@ def approved_graph(captured_on="2026-11-06T20:00:00Z", reviewed_on="2026-11-09T2
 
 
 class ReportGateTests(unittest.TestCase):
+    def test_malformed_finding_bindings_hold_publication_without_crashing(self):
+        graph, report = approved_graph(), test_report()
+        for malformed in (None, {'bad': 'shape'}, [{'unhashable': 'binding'}], ['fixture-claim', None]):
+            with self.subTest(malformed=malformed):
+                report['executive_findings'] = [{'id': 'test-only', 'text': 'Synthetic fixture only',
+                    'buyer_implication': 'Fixture', 'limitations': 'Fixture', 'claim_ids': malformed}]
+                gate = publication_gate(graph, report)
+                self.assertFalse(gate['ready'])
+                self.assertFalse(gate['report_review_ready'])
+
+    def test_synthesis_reviews_bind_actual_report_and_graph_without_publication_cycle(self):
+        graph, report = empty_graph(), test_report()
+        report['executive_findings'] = [{'id': 'test-only', 'text': 'Synthetic fixture only.'}]
+        def receipt(role):
+            return {'fixture': False, 'decision': 'pass', 'role': role, 'method': 'report_content_review',
+                    'reviewer_type': 'ai', 'reviewer': 'Synthetic test fixture, never publication evidence',
+                    'invocation_id': 'test-only-' + role, 'reviewed_on': '2026-11-10T01:00:00Z',
+                    'report_sha256': report_review_digest(report), 'graph_sha256': canonical_hash(graph)}
+        reviews = [receipt('evidence_auditor'), receipt('adversarial')]
+        self.assertEqual(report_review_errors(graph, report, reviews), [])
+        original = report_review_digest(report)
+        report.update(status='published', archive={'status': 'published', 'doi': 'test-only'}, editions=[{'id': 'test-only'}])
+        self.assertEqual(report_review_digest(report), original)
+        report['executive_findings'][0]['text'] = 'Changed finding invalidates review.'
+        self.assertTrue(report_review_errors(graph, report, reviews))
+        report['executive_findings'][0]['text'] = 'Synthetic fixture only.'
+        reviews[1]['invocation_id'] = reviews[0]['invocation_id']
+        self.assertTrue(report_review_errors(graph, report, reviews))
+        reviews[1]['invocation_id'] = 'test-only-adversarial'
+        reviews[1]['fixture'] = True
+        self.assertTrue(report_review_errors(graph, report, reviews))
+        reviews[1]['fixture'] = False
+        graph['as_of'] = '2026-11-11T00:00:00Z'
+        self.assertTrue(report_review_errors(graph, report, reviews))
+
     def test_committed_edition_snapshot_binds_path_identity_and_exact_bytes(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

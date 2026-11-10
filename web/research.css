@@ -1,4 +1,25 @@
 /* Research is readable, inspectable HTML before any enhancement runs. */
+[data-research-index] [hidden]{display:none!important}
+.r-index-controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin:28px 0 16px}
+.r-index-controls label{display:grid;gap:6px;flex:1 1 140px;min-width:0;font-size:12px;color:var(--r-quiet)}
+.r-index-controls label:first-child{flex-basis:230px}
+.r-index-controls :is(input,select,button){box-sizing:border-box;max-width:100%;min-width:0;min-height:44px;padding:9px;border:1px solid var(--r-rule);border-radius:3px;background:#fff;color:var(--ink);font:inherit}
+.r-index-controls button{font-size:13px;cursor:pointer}
+.r-index-controls :is(input,select,button):focus-visible{outline:3px solid var(--r-accent);outline-offset:2px}
+.r-table-wrap{max-width:100%}
+.r-evidence-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:12px;line-height:1.65}
+.r-evidence-table caption{text-align:left;color:var(--r-quiet);padding:12px 0}
+.r-evidence-table :is(th,td){vertical-align:top;padding:16px 12px;border-bottom:1px solid var(--r-rule);overflow-wrap:anywhere}
+.r-evidence-table thead th{color:var(--r-quiet);font-weight:500;text-align:left;border-top:1px solid var(--r-rule)}
+.r-evidence-table th:first-child{width:30%}
+.r-evidence-table tbody th{font-size:14px;font-weight:500;text-align:left}
+.r-evidence-table .r-record-id,.r-table-note{display:block;margin-top:6px;font-size:11px;font-weight:400;color:var(--r-quiet)}
+.r-finding{padding:24px 0;border-top:1px solid var(--r-rule)}
+.r-finding h3{font-family:ui-monospace,SFMono-Regular,monospace;font-size:17px}
+.r-finding-fields{font-size:14px;line-height:1.75}
+.r-finding-fields dt{font-weight:600;margin-top:14px}
+.r-finding-fields dd{margin:4px 0 0}
+@media(max-width:700px){.r-evidence-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.r-evidence-table,.r-evidence-table tbody,.r-evidence-table tr,.r-evidence-table :is(td,th){display:block;width:auto!important;max-width:100%}.r-evidence-table tr{padding:14px 0;border-bottom:1px solid var(--r-rule)}.r-evidence-table :is(td,th){border:0;padding:4px 0}.r-evidence-table td::before{content:attr(data-label) ': ';font-weight:600}.r-index-controls label{flex-basis:120px}}
 .research{--r-paper:#f0f2eb;--r-rule:#cbd4c7;--r-accent:#285b46;--r-quiet:#58645b;--r-warm:#79551f;padding-bottom:24px;overflow-wrap:anywhere}
 .research a{scroll-margin-top:24px}
 .research :is(section,article)[id]{scroll-margin-top:24px}

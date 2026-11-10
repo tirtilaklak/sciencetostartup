@@ -30,7 +30,7 @@
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/appen/</loc>
-    <lastmod>2026-11-09</lastmod>
+    <lastmod>2026-11-10</lastmod>
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/apto/</loc>
@@ -86,7 +86,7 @@
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/mercor/</loc>
-    <lastmod>2026-11-09</lastmod>
+    <lastmod>2026-11-10</lastmod>
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/micro1/</loc>
@@ -110,7 +110,7 @@
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/prolific/</loc>
-    <lastmod>2026-11-09</lastmod>
+    <lastmod>2026-11-10</lastmod>
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/proximal/</loc>
@@ -134,15 +134,15 @@
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/scale_ai/</loc>
-    <lastmod>2026-11-09</lastmod>
+    <lastmod>2026-11-10</lastmod>
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/snorkel_ai/</loc>
-    <lastmod>2026-11-09</lastmod>
+    <lastmod>2026-11-10</lastmod>
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/surge_ai/</loc>
-    <lastmod>2026-11-09</lastmod>
+    <lastmod>2026-11-10</lastmod>
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/taskus/</loc>
@@ -154,7 +154,7 @@
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/toloka/</loc>
-    <lastmod>2026-11-09</lastmod>
+    <lastmod>2026-11-10</lastmod>
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/trajectory_labs_pbc/</loc>
@@ -162,7 +162,7 @@
   </url>
   <url>
     <loc>https://sciencetostartup.com/company/turing/</loc>
-    <lastmod>2026-11-09</lastmod>
+    <lastmod>2026-11-10</lastmod>
   </url>
   <url>
     <loc>https://sciencetostartup.com/work/</loc>
@@ -201,7 +201,15 @@
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
+    <loc>https://sciencetostartup.com/research/papers/paper.arxiv.1803.09010v8/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
     <loc>https://sciencetostartup.com/research/papers/paper.arxiv.2009.03300/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/papers/paper.arxiv.2009.03300v3/</loc>
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
@@ -209,7 +217,15 @@
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
+    <loc>https://sciencetostartup.com/research/papers/paper.arxiv.2109.07958v2/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
     <loc>https://sciencetostartup.com/research/papers/paper.arxiv.2203.02155/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/papers/paper.arxiv.2203.02155v1/</loc>
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
@@ -217,7 +233,19 @@
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
+    <loc>https://sciencetostartup.com/research/papers/paper.arxiv.2305.18290v3/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/papers/paper.arxiv.2309.16349/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
     <loc>https://sciencetostartup.com/research/papers/paper.arxiv.2310.06770/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/papers/paper.arxiv.2310.06770v3/</loc>
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
@@ -225,7 +253,15 @@
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
+    <loc>https://sciencetostartup.com/research/papers/paper.arxiv.2406.17557v2/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
     <loc>https://sciencetostartup.com/research/papers/paper.arxiv.2505.11475/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/papers/paper.arxiv.2505.11475v2/</loc>
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
@@ -233,7 +269,51 @@
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset-release.helpsteer2.990b271/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset-release.helpsteer3.f6d1457/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset-release.hh_rlhf.09be8c5/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset-release.oasst1.fdf72ae/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset-release.shp.e94b5f3/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset-release.ultrafeedback.40b4365/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
     <loc>https://sciencetostartup.com/research/datasets/dataset.fineweb/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset.fineweb-edu/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset.fineweb-edu.paper-2406.17557v2/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset.fineweb.paper-2406.17557v2/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset.gsm8k/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset.helpsteer2/</loc>
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
@@ -241,7 +321,67 @@
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset.helpsteer3.preference-paper-2505.11475v2/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset.hh_rlhf/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset.oasst1/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset.shp/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/datasets/dataset.ultrafeedback/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
     <loc>https://sciencetostartup.com/research/benchmarks/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark-version.hhh_alignment.092b196/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark-version.mmlu.c30699e/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark-version.rewardbench.168d848/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark-version.rewardbench2.7ff0885/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark-version.swebench.e48e2bd/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark-version.truthfulqa.741b827/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark-version.truthfulqa.d71c110/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark.apex-agents/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark.apex-agents.1-1/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark.hhh_alignment/</loc>
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
@@ -249,7 +389,27 @@
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark.mmlu.paper-2009.03300v3/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark.rewardbench/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark.snorkel.finance-reasoning/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark.snorkel.finance-reasoning.capture-2026-11/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
     <loc>https://sciencetostartup.com/research/benchmarks/benchmark.swebench/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark.swebench.paper-2310.06770v3/</loc>
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
@@ -257,11 +417,51 @@
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark.truthfulqa.paper-2109.07958v2/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/benchmarks/benchmark.u-math/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
     <loc>https://sciencetostartup.com/research/workflows/</loc>
     <lastmod>2026-11-09</lastmod>
   </url>
   <url>
+    <loc>https://sciencetostartup.com/research/workflows/workflow.helpsteer3.preference-general-stem-code.2505.11475v2/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/workflows/workflow.helpsteer3.preference-multilingual.2505.11475v2/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/workflows/workflow.instructgpt.2203.02155v1/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/workflows/workflow.mmlu.evaluate.4450500/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/workflows/workflow.swebench.collection.02e7a74/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/workflows/workflow.swebench.harness.02e7a74/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/research/workflows/workflow.turing.anonymous-agent-data-2026/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
     <loc>https://sciencetostartup.com/company/org.translated/</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://sciencetostartup.com/company/org.upwork/</loc>
     <lastmod>2026-11-09</lastmod>
   </url>
 </urlset>

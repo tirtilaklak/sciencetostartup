@@ -75,6 +75,7 @@ window.ensureSearchContext=function(){
  searchContextPromise=fetchPresentation(presentationIdentity.fullSearch).then(payload=>{
   for(const key of ['companySearch','profileProducts','workSearch'])if(!payload[key]||typeof payload[key]!=='object')throw new Error('Invalid search index');
   if(!Array.isArray(payload.editorialReadouts))throw new Error('Invalid export readouts');
+  if(!Array.isArray(payload.researchSearchEntries))throw new Error('Invalid research search index');
   const readoutCompanies=new Set(payload.editorialReadouts.filter(row=>typeof row?.readout==='string').map(row=>row.company_id));
   for(const company of DATA.companies)if(typeof payload.companySearch[company.id]!=='string'||!Array.isArray(payload.profileProducts[company.id]))throw new Error('Incomplete company search index');
   for(const company of DATA.companies)if(!readoutCompanies.has(company.id))throw new Error('Incomplete export readouts');
@@ -136,7 +137,7 @@ function loadingProfile(id){
  document.documentElement.removeAttribute('data-route');
  for(const view of document.querySelectorAll('main>.view'))view.hidden=view.id!=='profile-view';
  const target=$('profile-view');target.hidden=false;target.setAttribute('aria-busy','true');
- target.innerHTML=`<div class="page-heading" role="status"><p class="eyebrow">Company evidence</p><h1>${attr(companies[id]?.name||'Loading research')}</h1><p>Loading the sourced profile…</p><p><a href="/company/${encodeURIComponent(id)}/">Read the plain company page</a></p></div>`;
+ target.innerHTML=`<div class="profile-v2" data-profile-company="${attr(id)}" data-profile-loading>${profileIntroductionHTML(id)}<div data-profile-loading-content role="status"><p>Loading the sourced profile…</p><p><a href="/company/${encodeURIComponent(id)}/">Read the plain company page</a></p></div></div>`;
 }
 function failedProfile(id,error){
  const target=$('profile-view');target.removeAttribute('aria-busy');

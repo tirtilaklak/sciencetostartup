@@ -15,6 +15,26 @@ from research_intake import partitions, select_partitions
 
 
 class ResearchIntakeTests(unittest.TestCase):
+    def test_same_host_throttle_survives_partition_client_changes(self):
+        from test_research_sources import Opener, Response
+        elapsed, sleeps = [0.0], []
+        def sleep(seconds):
+            sleeps.append(seconds)
+            elapsed[0] += seconds
+        opener = Opener([Response(b'fixture', url='https://export.arxiv.org/api/query') for _ in range(2)])
+        def client(cache, checkpoint, hosts):
+            return checker.PublicClient(cache, checkpoint, hosts, interval=3.1, opener=opener,
+                sleep=sleep, clock=lambda: elapsed[0], url_checker=lambda url, hosts: 'export.arxiv.org')
+        rows = [{'id': 'fixture-' + str(i), 'adapter': 'arxiv', 'query': 'fixture-' + str(i), 'limit': 2}
+                for i in range(2)]
+        with tempfile.TemporaryDirectory() as temporary, patch.object(intake, 'partitions', return_value=rows), \
+                patch.object(intake, 'PublicClient', side_effect=client), \
+                patch.object(checker, 'parse_arxiv', return_value=([], None)):
+            result = intake.run(ROOT, temporary, datetime(2026, 11, 10, tzinfo=timezone.utc), 2)
+        self.assertEqual(result['completed_partitions'], 2)
+        self.assertEqual(len(opener.requests), 2)
+        self.assertEqual(sleeps, [3.1])
+
     def test_scope_includes_old_years_and_replacements(self):
         config = json.loads((ROOT / "data/research/intake.json").read_text())
         rows = partitions(config, datetime(2026, 11, 9, tzinfo=timezone.utc))

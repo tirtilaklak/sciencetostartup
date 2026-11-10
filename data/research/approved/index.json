@@ -1,0 +1,17 @@
+{
+  "partitions": [
+    {
+      "path": "01-papers-2026-11-09.json",
+      "sha256": "41b85f81b52746fc265e73732c8f3af194a81b32ffc7dfc1d2fefcd1f0a25b9a"
+    },
+    {
+      "path": "02-suppliers-2026-11-09.json",
+      "sha256": "72cf587e2e18f0fc1d41f9b8ba337da14e35542937ff50da4ff5ae5e54e1a431"
+    },
+    {
+      "path": "03-datasets-2026-11-09.json",
+      "sha256": "4ed93150c187956883997a5c3e5aa6cbc42b195fcd813d3ffd3aa506be8e0231"
+    }
+  ],
+  "schema_version": "1.0.0"
+}

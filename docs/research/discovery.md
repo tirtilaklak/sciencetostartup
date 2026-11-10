@@ -52,24 +52,56 @@ or an object-only mention does not create a profile.
 
 An edition entry must have `status: published` and a stable `release_id`. For the
 current release it can reference the current context. An older immutable edition
-provides its `graph`, `report`, and `policy` snapshots, plus optional `identity`.
+provides complete `graph`, `report`, `policy`, and `identity` snapshots. Compact
+entries bind a committed `data/research/editions/` JSON file through
+`snapshot_path` and its exact-file `snapshot_sha256`. Missing or altered historical
+inputs fail the build; local scheduler caches are not publication history.
 The snapshot's report must have the same release ID and published/superseded
 status. The renderer recomputes `publication_gate()` against that snapshot.
 An asserted `ready` flag in edition metadata has no authority.
 
 Only an actually passing published entry creates an edition HTML route at
-`/research/state-of-ai-data-labs/editions/<release-id>/` or an RSS/Atom item.
+`/research/editions/YYYY-MM-DD/` or an RSS/Atom item. Corrections to an edition
+use a new revision URL such as `YYYY-MM-DD.r2/`, preserving the original.
 `/research/feed.xml` and `/research/atom.xml` are valid empty feeds while there is
 no published edition. A prelaunch framework does not become a fake announcement.
 
 ## Assets and reuse
 
-The data page links to `research_graph.write_exports()` output at the site root
-and the citation owner's `/publication/` assets. Approved-record JSON/CSV/SQLite
-exports and the all-status evidence graph have distinct labels. The prepared
+The data page links to `research_graph.write_exports()` output at `/research/exports/`
+and the citation owner's `/publication/` assets. Public-projection and graph JSON/CSV/SQLite
+exports retain explicit approved and historical states; proposed assertion
+wording is excluded. The prepared
 reproduction ZIP is described as preparation, with package-status and SHA-256
 inventory links. An optional PDF is not assumed to exist. The citation owner and
 coordinator write those assets; the renderer never invents an archive or DOI.
+
+Actual accepted corrections have their own readable archive at
+`/research/corrections/` and RSS/Atom feeds under that path. The registry starts
+empty; pending submissions do not become published corrections or reviews.
+
+## Verified public HTTP access
+
+The research infrastructure release is Cloudflare version 15, build
+`2bee3851885cc35983a0`, from the reviewed source in PR #11. Its immutable preview
+and production manifests match. Canonical v2.5.0 JSON and SQLite are unchanged.
+The comprehensive research edition remains held; this is an infrastructure and
+preparation release, with no registered research DOI.
+
+The zone's Browser Integrity Check rejects default Python HTTP clients. A
+configuration rule disables that header heuristic only for GET/HEAD requests to
+the public research pages, profiles and exports. Existing WAF and DDoS controls
+remain active. Ruleset `13b1723e38fc47f88b17880e5d40a696`, rule
+`5b57752520f3472db081585b61f7bfa7`, reference `public_research_http_clients`, records
+the setting. Default Python `urllib` successfully read eight public research and
+download URLs after the change. Six named search/agent user agents also received
+usable research HTML. These checks do not establish actual engine indexing or
+answer citations; those measurements remain unknown.
+
+Cloudflare's managed `workers.dev` preview host still requires an application
+user agent. Use a descriptive value such as
+`ScienceToStartup-ReleaseVerification/1.0 (+https://sciencetostartup.com/method/)`
+for preview checks. No browser impersonation is needed.
 
 ## Verification
 

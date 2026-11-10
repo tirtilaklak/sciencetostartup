@@ -1,11 +1,17 @@
 # Research evidence graph
 
 This additive graph is **prelaunch**. It does not replace canonical dataset 2.5.0,
-its JSON, its SQLite database, or their dates. The first graph imports 39 historical
-organization descriptions without new review receipts. It includes eight actual
-version-specific paper-abstract reads and an NVIDIA HelpSteer3 dataset-card read.
-Those reads yield ten author-reviewed **candidate** assertions. They are not a
-150-paper deep review, an independent supplier census, or a completed audit.
+its JSON, its SQLite database, or their dates. The current baseline retains 39
+historical organization descriptions and 173 approved assertions. The latest batch
+contributes 163 assertions after separate author, source-verifier and adversarial
+AI review of pinned primary sources. Eight disputed assertions remain quarantined;
+one redundant MMLU assertion was omitted rather than counting a study twice.
+
+Coverage is eight existing organization inclusion audits, eight qualifying
+suppliers, eight full-source paper works, eight dataset families and five benchmark
+families. The 194 scoped evidence records represent 75 distinct captured document
+versions, not 194 independent documents. These are reviewed baseline observations,
+not a comprehensive market census or completed launch audit.
 
 The graph retains the actual UTC capture and review times. Captures on 9 November
 in Los Angeles occur on 10 November UTC; they do not retroactively satisfy the
@@ -17,8 +23,14 @@ versions later, but cannot move a source capture into an earlier release window.
 `scripts/research_graph.py` uses only the standard library. Ordinary builds never
 retrieve sources or require credentials.
 
-- `load_graph(root=ROOT)` loads `data/research/graph.json`, validates references and
+- `load_graph(root=ROOT)` loads `data/research/graph.json`, appends any explicitly
+  pinned approved partitions, validates the complete graph's references and
   provenance, and verifies the exact canonical dataset bytes and version.
+- `load_partition_records(root=ROOT)` reads the optional approved index and returns
+  only `entities`, `sources`, `assertions`, and `reviews` arrays. It verifies input
+  shape, byte hashes, paths, ordering, and approved assertion status. Cross-record
+  references and actual approval receipts are validated only after merging by
+  `load_graph`; calling this helper alone does not establish a valid graph.
 - `validate_graph(graph, canonical=None)` returns the graph or raises
   `GraphValidationError` with paths. Pass bytes or a path to bind the canonical
   hash; a parsed canonical object can verify identities and version only.
@@ -45,6 +57,81 @@ database construction, and file digests are deterministic. The database is creat
 from scratch with secure deletion, so prior database pages cannot retain private
 values.
 
+## Approved source partitions
+
+The existing monolithic source remains valid. If
+`data/research/approved/index.json` is absent, loading and export behavior are
+unchanged. An empty index is also valid. Builds never scan directories for research
+or read intake records from `output/`; only exact files named by the index enter
+the graph.
+
+```text
+data/research/graph.json             # root metadata and central entity registry
+data/research/approved/index.json    # explicit ordered list of pinned batches
+data/research/approved/<batch>.json  # reviewed records, not candidate intake
+output/research-candidates/          # untracked candidate/discovery output
+```
+
+The index has exactly `schema_version` and `partitions`. Its schema version is the
+same string as the graph's, currently `"1.0.0"`. Every entry has exactly `path` and
+`sha256`; paths are relative to `data/research/approved/`, use canonical POSIX
+spelling, and appear in strictly increasing lexical order. Duplicate entries,
+absolute paths, `.`/`..` segments, backslashes, and symlinks are refused. Symlinks
+in the index path, approved directory, or partition parent directories are refused
+too. Each digest is 64 lowercase hexadecimal characters binding the complete file
+bytes, including whitespace and final newline. A missing file or digest mismatch
+stops the build. Generate a digest locally with `hashlib.sha256(path.read_bytes())`;
+no source retrieval is part of aggregation.
+
+An empty index is:
+
+```json
+{"schema_version": "1.0.0", "partitions": []}
+```
+
+A partition has required `schema_version: "1.0.0"` and any of the optional
+`entities`, `sources`, `assertions`, and `reviews` arrays. Omitted arrays mean empty
+arrays. No other root properties are allowed: `graph.json` alone owns release ID,
+as-of time, canonical binding, coverage scope, and audit manifests. Every supplied
+record retains the existing graph schema, with no extensions. Within each supplied
+array, stable IDs must be strictly increasing. IDs must be unique across tables,
+partitions, and the base graph; a partition cannot patch or replace an existing row.
+Duplicate JSON keys and non-finite JSON numbers also fail loading.
+
+The base graph's array order remains intact. Arrays from each partition append in
+index order, retaining their declared row order. All partitions merge before the
+existing graph validator runs, so assertions, entities, evidence, and reviews may
+refer to records in earlier or later partitions or the base graph. Unknown
+references still fail. Each partition assertion must already be `approved` and
+must pass the unchanged full source-content, exact-assertion-hash, three-role,
+distinct-invocation, chronology, and reciprocal-reference checks. Candidate,
+quarantined, rejected, and historical assertions cannot enter approved partitions.
+A file hash proves input identity; it creates no source read or review receipt.
+
+Keep entity identity and its current review-depth/disposition metadata in the
+central `graph.json` registry when practical. Its `assertion_ids` may point into
+approved partitions. Partitions may introduce new entities, but must not duplicate
+registry IDs; approved evidence records can live entirely outside the registry.
+Registry status and review depth do not themselves approve an assertion or bypass
+coverage and publication gates. The graph's as-of time must still cover all actual
+source captures and reviews.
+
+Carry forward every previously accepted partition and its pin in each subsequent
+index, then add separately reviewed batches in lexical order. An index replacement
+does not inherit omitted records. Changes to a batch require an intentional new
+pin; changed assertion content additionally requires new actual reviews bound to
+that content. Preserve source versions, capture times, and original review times
+when carrying evidence forward. Keep new discovery and candidate research in
+untracked `output/` until its actual independent reviews finish. Existing historical
+and candidate records in the monolithic graph retain their original handling.
+
+Exports aggregate the merged graph into the existing privacy-filtered JSON, CSV,
+and SQLite projections. The exported graph includes all retained entities,
+sources, assertions, and reviews directly; it requires no partition files or index
+to validate or reproduce the public graph offline. Its canonical byte binding and
+publication gates remain unchanged. Repeated builds from the same base and pinned
+partitions produce identical export bytes.
+
 ## What a record means
 
 Entities distinguish paper works from paper versions; dataset families from
@@ -54,7 +141,11 @@ work or family. Duplicate work identifiers and duplicate family records fail
 validation. `review_depth` is `metadata`, `abstract`, `full_source`, or `historical`.
 An abstract read never counts as a deeply reviewed paper. Each entity carries
 independent domain, modality, workflow, expertise, origin, labels, and oversight
-facets. Empty arrays mean unclassified, not absence of a capability.
+facets. Those seven arrays remain required. Optional `delivery_model` and
+`data_purpose` arrays record independent delivery and data-use classifications;
+existing records need no migration. All present facets require unique, nonempty
+strings, and unknown facet names fail validation. Omitted optional facets and empty
+arrays mean unclassified, not absence of a capability.
 
 Assertions have a stable subject, a nontransitive typed predicate, exactly one
 object or typed value, precise source locators, excerpt hashes, qualifications,
@@ -80,6 +171,12 @@ human reviewer, and cannot precede source capture or follow graph as-of time. A
 metadata review, unresolved negative review, invented reviewer, or automated
 retrieval cannot supply an approval. The validator enforces the structural and
 chronological receipts; editors remain responsible for their truthfulness.
+
+Some approved assertions retain an original qualification beginning “Author-only
+candidate”. This is an unchanged record of their original author stage. The reader
+labels it “Original author-stage note”; current approval is established separately
+by the exact-content, three-role review receipts. Changing that stored assertion
+text would require new reviews, so promotion never silently rewrites it.
 
 The initial author invocation records only its own work. It creates no independent
 source-verifier or adversarial receipt. Abstract-method claims remain candidates
@@ -166,6 +263,13 @@ entities require an included disposition, full-source review depth, and an appro
 assertion; suppliers additionally require an approved capability assertion. Versions,
 aliases, candidate matches, historical descriptions, and duplicate releases do not
 inflate coverage.
+
+Coverage method 1.1.0 rolls an explicit, approved, full-source paper version or
+release up to its approved, full-source, included parent work or family. It counts
+each parent once. This identity rollup creates no supplier relationship and never
+turns a metadata-only parent into a reviewed work. Suppliers still need direct
+approved capability evidence. Source-record totals count scoped evidence records;
+`captured_source_versions` deduplicates their exact version and response digest.
 
 The initial eligible core is explicitly **not frozen**. Both the source-anchored
 200-assertion quality holdout and separate 200-record screening audit are null.

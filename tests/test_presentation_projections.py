@@ -273,6 +273,16 @@ context.INITIALIZE_RUNTIME=()=>{
         self.assertEqual(set(search["profileProducts"]), set(self.summaries))
         self.assertEqual(search["profileProducts"], self.full_js["profileProducts"])
 
+    def test_research_pages_only_ship_in_the_deferred_search_context(self):
+        entries = [{"url": "/research/fixture/", "title": "Human feedback research", "summary": "Sourced research", "keywords": ["evidence", "feedback"], "kind": "Report"}]
+        sidecars = {**self.sidecars, "RESEARCH_SEARCH": entries}
+        summary, _ = build_presentation(self.data, self.destination, ROOT, sidecars, {})
+        self.assertNotIn("researchSearchEntries", summary)
+        search = json.loads((self.destination / summary["fullSearch"]["href"].lstrip('/')).read_text())
+        self.assertEqual(search["researchSearchEntries"], entries)
+        home = json.loads((self.destination / summary["homeSearch"]["href"].lstrip('/')).read_text())
+        self.assertEqual(next(row for row in home["entries"] if row["href"] == entries[0]["url"])["name"], entries[0]["title"])
+
     def test_thin_routes_preserve_decision_facts_and_explicit_field_states(self):
         original = {route["id"]: route for route in self.sidecars["WORK_ROUTES"]["routes"]}
         fields = ("pay_terms", "arrangements", "requirements", "assessment", "hours", "duration", "availability_note", "pay_context", "pay_observations", "pay_policy", "pay_indicator", "historical_pay_context")

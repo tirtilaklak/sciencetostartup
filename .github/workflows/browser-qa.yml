@@ -6,7 +6,8 @@ on:
   pull_request:
 jobs:
   browser:
-    runs-on: ubuntu-latest
+    # Keep the browser/performance host stable across ubuntu-latest migrations.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +28,8 @@ jobs:
           path: output/browser-qa/
           retention-days: 14
   performance:
-    runs-on: ubuntu-latest
+    # Keep the browser/performance host stable across ubuntu-latest migrations.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
