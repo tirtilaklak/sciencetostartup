@@ -390,7 +390,8 @@ def _data(context):
     if 'publication/report.pdf' in context.get('publication_assets', []):
         rows.insert(0, ('Read the report preparation PDF', '/publication/report.pdf'))
     links = "".join('<li>' + _link(url, label) + '</li>' for label, url in rows)
-    cite = "".join('<li>' + _link('/publication/' + name, label) + '</li>' for name, label in
+    citation_prefix = 'current-' if gate.get('ready') and report.get('archive', {}).get('status') == 'published' else ''
+    cite = "".join('<li>' + _link('/publication/' + citation_prefix + name, label) + '</li>' for name, label in
                    (("citation.bib", "BibTeX"), ("citation.ris", "RIS"), ("citation.csl.json", "CSL JSON"), ("CITATION.cff", "CITATION.cff")))
     other = [e for e in graph["entities"] if not _category(e)]
     entity_rows = "".join(f'<li id="{sp.escape(_anchor("entity", e["id"]))}">{_link(entity_url(e, context), e["name"])} '
@@ -536,7 +537,8 @@ def _published_editions(context):
         rid = entry.get("release_id")
         if not rid or rid in seen:
             continue
-        snapshot = {key: entry.get(key, context[key]) for key in ("graph", "report", "policy", "identity")}
+        persisted = context.get('edition_snapshots', {}).get(rid, {})
+        snapshot = {key: persisted.get(key, entry.get(key, context[key])) for key in ("graph", "report", "policy", "identity")}
         if snapshot["report"].get("release_id") != rid or snapshot["report"].get("status") not in {"published", "superseded"}:
             continue
         try:

@@ -47,6 +47,35 @@ def load_report(root=ROOT):
     return json.loads((Path(root) / "data/research/report.json").read_text())
 
 
+def load_edition_snapshots(root, report):
+    """Resolve committed immutable edition inputs, never a machine-local cache.
+
+    Compact publication ledger entries bind the exact JSON source file digest.
+    Missing or altered history fails the build instead of silently disappearing.
+    """
+    base = (Path(root) / 'data/research').resolve()
+    edition_dir = (base / 'editions').resolve()
+    snapshots = {}
+    for entry in report.get('editions', []):
+        if not isinstance(entry, dict) or not entry.get('snapshot_path'):
+            continue
+        relative = Path(entry['snapshot_path'])
+        path = (base / relative).resolve()
+        if relative.is_absolute() or edition_dir not in path.parents or not path.is_file():
+            raise ValueError('Edition snapshot must be a committed file under data/research/editions')
+        blob = path.read_bytes()
+        if hashlib.sha256(blob).hexdigest() != entry.get('snapshot_sha256'):
+            raise ValueError('Immutable edition snapshot digest differs')
+        snapshot = json.loads(blob)
+        if any(key not in snapshot for key in ('graph', 'report', 'policy', 'identity')):
+            raise ValueError('Edition snapshot lacks complete public inputs')
+        rid = entry.get('release_id')
+        if not rid or snapshot['report'].get('release_id') != rid or rid in snapshots:
+            raise ValueError('Immutable edition identity differs or is duplicated')
+        snapshots[rid] = snapshot
+    return snapshots
+
+
 def _timestamp(value):
     """Require a timezone and a time; a calendar date cannot prove an hourly cutoff."""
     if not isinstance(value, str) or "T" not in value:
@@ -359,7 +388,8 @@ def build_context(root=ROOT):
         if path.is_file():
             policy["audits"][kind] = json.loads(path.read_text())
     return {"graph": graph, "report": report, "gate": publication_gate(graph, report, policy),
-            "identity": load_identity(root), "policy": policy}
+            "identity": load_identity(root), "policy": policy,
+            "edition_snapshots": load_edition_snapshots(root, report)}
 
 
 if __name__ == "__main__":

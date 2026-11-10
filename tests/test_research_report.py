@@ -3,12 +3,13 @@ import copy
 import hashlib
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from research_report import FLOORS, _audit, canonical_hash, load_report, publication_gate
+from research_report import FLOORS, _audit, canonical_hash, load_report, load_edition_snapshots, publication_gate
 
 
 def empty_graph():
@@ -66,6 +67,23 @@ def approved_graph(captured_on="2026-11-06T20:00:00Z", reviewed_on="2026-11-09T2
 
 
 class ReportGateTests(unittest.TestCase):
+    def test_committed_edition_snapshot_binds_path_identity_and_exact_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / 'data/research/editions/2026-11-09.json'
+            path.parent.mkdir(parents=True)
+            snapshot = {'graph': empty_graph(), 'report': test_report(), 'policy': {}, 'identity': {}}
+            path.write_text(json.dumps(snapshot))
+            entry = {'release_id': 'test-fixture', 'snapshot_path': 'editions/2026-11-09.json',
+                     'snapshot_sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+            self.assertEqual(load_edition_snapshots(root, {'editions': [entry]})['test-fixture'], snapshot)
+            path.write_text(json.dumps({**snapshot, 'identity': {'name': 'altered'}}))
+            with self.assertRaisesRegex(ValueError, 'digest'):
+                load_edition_snapshots(root, {'editions': [entry]})
+            entry['snapshot_path'] = '../../../outside.json'
+            with self.assertRaisesRegex(ValueError, 'under data/research/editions'):
+                load_edition_snapshots(root, {'editions': [entry]})
+
     def test_final_archive_gate_requires_verified_production_zenodo_receipt(self):
         report = test_report()
         receipt = {"status": "published", "doi": "10.5281/zenodo.12345", "record_url": "https://zenodo.org/records/12345",
