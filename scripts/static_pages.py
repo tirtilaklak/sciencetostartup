@@ -31,14 +31,16 @@ ROOT = Path(__file__).resolve().parents[1]
 ORIGIN = "https://sciencetostartup.com"
 SITE_NAME = "ScienceToStartup"
 SUFFIX = f" · {SITE_NAME}"
-PUBLISHER_NAME = "Musa Ozdem"
+from public_identity import load_identity, publisher_node
+PUBLIC_IDENTITY = load_identity()
+PUBLISHER_NAME = PUBLIC_IDENTITY["publisher"]["name"]
 DESCRIPTION_LIMIT = 155
 # Search results show about 60 characters of a title, so every title stays under 60.
 TITLE_LIMIT = 59
 METRIC_LIMIT = 8
 PRODUCT_LIMIT = 6
 # Bump by hand when page links, layout, copy or structured data change; it feeds sitemap <lastmod>.
-SITE_REVISED = "2026-11-08"
+SITE_REVISED = "2026-11-09"
 COMPANY_ID = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 ISO_DAY = re.compile(r"\b([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])\b")
 ISO_MONTH = re.compile(r"\b([0-9]{4})-(0[1-9]|1[0-2])\b")
@@ -49,7 +51,7 @@ SHARE_IMAGE = f"{ORIGIN}/assets/share/sciencetostartup-1200x630.png"
 SHARE_ALT = "ScienceToStartup, the AI data field guide: the businesses behind AI data. Company profiles and paid work listings, with every figure linked to its source."
 # The icon set web/index.html links: an SVG, a 48 px PNG and an opaque 180 px Apple touch icon. /favicon.ico sits at the root.
 ICON_LINKS = '<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">\n<link rel="icon" href="/assets/favicon-48.png" sizes="48x48" type="image/png">\n<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">\n'
-PUBLISHER = {"@type": "Person", "@id": f"{ORIGIN}/#publisher", "name": PUBLISHER_NAME, "url": f"{ORIGIN}/method/#about"}
+PUBLISHER = publisher_node(PUBLIC_IDENTITY)
 WEBSITE = {"@type": "WebSite", "@id": f"{ORIGIN}/#website", "name": SITE_NAME, "url": f"{ORIGIN}/", "publisher": {"@id": PUBLISHER["@id"]}}
 # One dataset identity: the home page's Dataset node (web/index.html). /method/ describes the same node, so it shares the @id and name.
 DATASET_ID = f"{ORIGIN}/#dataset"
@@ -871,7 +873,7 @@ STYLE = (
     "@media(forced-colors:active){.ext::after{background:LinkText}}"
 )
 RIGHT_ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg>'
-NAV = (("companies", "Companies", "/companies/"), ("work", "Paid work", "/work/"), ("about", "About", "/explore/#about"))
+NAV = (("research", "Research", "/research/"), ("companies", "Companies", "/companies/"), ("work", "Paid work", "/work/"), ("about", "About", "/method/#about"))
 
 
 def json_ld(payload):
@@ -908,8 +910,8 @@ def disclosure_html():
 def site_footer(research, note=""):
     """The site map, then who publishes the guide with the About disclosure, then the research date and dataset version."""
     groups = (("Explore", (("Overview", "/"), ("Companies", "/companies/"), ("Paid work", "/work/"), ("Compare", "/explore/#compare"))),
-              ("Research", (("Method", "/method/"), ("What the labels mean", "/method/#labels"), ("Download the data", "/method/#downloads"))),
-              ("About", (("About the publisher", "/method/#about"), ("Request a correction", "/explore/#corrections"), ("The publisher’s proposed AI lab", "/explore/#venture"))))
+              ("Research", (("Research hub", "/research/"), ("Research data", "/research/data/"), ("Method", "/method/"), ("What the labels mean", "/method/#labels"), ("Download the data", "/method/#downloads"))),
+              ("About", (("About the publisher", "/method/#about"), ("Review and corrections", "/review/"), ("The publisher’s proposed AI lab", "/explore/#venture"))))
     columns = "".join(f"<div><h2>{heading}</h2><ul>" + "".join(f'<li><a href="{ORIGIN}{path}">{label}</a></li>' for label, path in links) + "</ul></div>" for heading, links in groups)
     line = " · ".join(part for part in (f"Research compiled {format_date(research.as_of)}" if research.as_of else "", f"Dataset v{research.data.get('dataset_version')}" if research.data.get("dataset_version") else "") if part)
     return (f'<footer class="site-footer"><nav aria-label="Site map">{columns}</nav><p>{SITE_NAME} is published by {PUBLISHER_NAME}. {disclosure_html()}</p>'
@@ -956,7 +958,7 @@ def figure_row(research, metric, context=None):
     value = f'<td class="value" data-label="Value">{escape(value_text(metric))}' + (' <span class="tag">Estimate</span>' if metric.get("reported_vs_estimated") == "estimated" else "") + "</td>"
     when = metric_period(research, metric)
     period = f'<td data-label="Date">{escape("Not stated" if when == "Date not stated" else when)}' + (' <span class="tag">Historical</span>' if research.historical_year(metric) else "") + "</td>"
-    return f'<tr data-metric="{escape(metric["id"])}">{head}{value}{period}<td data-label="Grade">{escape(research.grade(metric) or "Not graded")}</td><td class="wide-cell" data-label="Source">{source_html(research, metric)}</td></tr>'
+    return f'<tr id="metric-{escape(metric["id"])}" data-metric="{escape(metric["id"])}">{head}{value}{period}<td data-label="Grade">{escape(research.grade(metric) or "Not graded")}</td><td class="wide-cell" data-label="Source">{source_html(research, metric)}</td></tr>'
 
 
 SOURCE_CHECKS = {"checked": "Checked {}", "summary_only": "Summary only, page not reviewed · recorded {}", "unverified": "Not checked again · recorded {}"}

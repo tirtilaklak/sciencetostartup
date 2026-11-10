@@ -20,7 +20,7 @@ def source_identity(root):
     paths = []
     for directory in ("web", "scripts", "schema", "design-system", "release-assets"):
         paths.extend(p for p in (root / directory).rglob("*") if p.is_file() and "__pycache__" not in p.parts and p.suffix != ".pyc")
-    paths.extend(p for p in (root / "data").glob("*.json") if p.is_file())
+    paths.extend(p for p in (root / "data").rglob("*.json") if p.is_file())
     paths.append(root / "docs/research-id-crosswalk.json")
     for name in ("deployment.json", "package.json", "package-lock.json", "quality-budgets.json"):
         if (root / name).exists():
@@ -349,7 +349,10 @@ def build_presentation(data, destination, root, sidecars, release):
     for company in data["companies"]:
         entry = next((e for e in sidecars["EDITORIAL"]["entries"] if e["company_id"] == company["id"]), {})
         products = next((e.get("products", []) for e in sidecars["PROFILE_CONTENT"]["entries"] if e["company_id"] == company["id"]), [])
-        search_rows.append({"id": company["id"], "name": company["name"], "summary": entry.get("summary", company.get("description", "")), "group": entry.get("primary_offering", ""), "products": [p["name"] for p in products], "href": "/explore/#company/" + company["id"]})
+        search_rows.append({"id": company["id"], "name": company["name"], "summary": entry.get("summary", company.get("description", "")), "group": entry.get("primary_offering", ""), "products": [p["name"] for p in products], "href": "/company/" + company["id"] + "/"})
+    for entry in sidecars.get("RESEARCH_SEARCH", []):
+        search_rows.append({"id": entry["url"], "name": entry["title"], "summary": entry["summary"], "group": entry["kind"], "products": entry.get("keywords", []), "href": entry["url"]})
+    summary["researchSearchEntries"] = sidecars.get("RESEARCH_SEARCH", [])
     summary["homeSearch"] = write_asset(destination, "search", dict(identity, entries=search_rows))
     company_map = {company["id"]: company for company in data["companies"]}
     editorial_map = {entry["company_id"]: entry for entry in sidecars["EDITORIAL"]["entries"]}

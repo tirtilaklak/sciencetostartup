@@ -23,7 +23,7 @@
   const work='/explore/#work'+(raw?'?'+new URLSearchParams({q:raw}):'');
   results.innerHTML=matches.map((row,i)=>`<a id="home-result-${i}" class="site-search-option" role="option" aria-selected="false" href="${escape(row.href)}"><strong>${escape(row.name)}</strong><span>${escape(row.summary)}</span></a>`).join('')+`<a class="site-search-option" role="option" aria-selected="false" href="${escape(work)}"><strong>${escape(raw?'Find paid work matching “'+raw+'”':'Browse paid work')}</strong><span>Public listings, expert networks and requirements</span></a>`;
   results.hidden=false;active=-1;input.removeAttribute('aria-activedescendant');input.setAttribute('aria-expanded','true');
-  message.textContent=raw?(matches.length?matches.length+' company matches. Paid work uses its own listing filters.':'No recorded company matches. You can search paid work or browse all companies.'):'Search companies, their offerings, or continue to paid work.';
+  message.textContent=raw?(matches.length?matches.length+' matches. Paid work uses its own listing filters.':'No recorded research or company matches. You can search paid work or browse all companies.'):'Search research, companies and their offerings, or continue to paid work.';
   $('home-search-status').textContent=message.textContent;
  }
  window.openHomeSearch=async()=>{if(!dialog.open)dialog.showModal();$('home-search-open').setAttribute('aria-expanded','true');input.focus();try{await load();render();}catch(error){message.innerHTML='Search could not load. <button type="button" data-home-search-retry>Try again</button> <a href="/companies/">Browse companies</a> or <a href="/work/">browse paid work</a>.';}};
