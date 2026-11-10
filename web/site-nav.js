@@ -22,7 +22,9 @@ function siteSearchPages(){
   ['corrections','Request a correction','Tell us when a figure or listing is wrong','corrections error mistake wrong fix report'],
   ['downloads','Download the data','JSON, CSV and SQLite files','downloads csv json sqlite dataset export license reuse'],
   ['venture','The publisher’s proposed AI lab','The publisher’s proposal, separate from the research','venture neolab investor pitch proposal']
- ].map(([id,name,meta,keys])=>({type:'page',id,name,meta,keys:keys.split(' '),href:'#'+id}));
+ ].map(([id,name,meta,keys])=>({type:'page',id,name,meta,keys:keys.split(' '),href:'#'+id})).concat(
+  ((typeof window!=='undefined'&&window.SUMMARY_INDEX?.researchSearchEntries)||[]).map(entry=>({type:'page',id:entry.url,name:entry.title,meta:entry.summary,keys:entry.keywords||[],href:entry.url}))
+ );
 }
 function siteSearchIndex(){
  if(typeof window.ensureSearchContext==='function'&&!window.SEARCH_INDEX)throw new Error('Global search context is not ready');
@@ -101,7 +103,7 @@ function siteSearchAnnounce(text){clearTimeout(siteSearchStatusTimer);siteSearch
 function siteSearchRender(){
  const input=$('site-search-input'),list=$('site-search-results'),query=input.value.trim(),tokens=siteSearchWords(query),groups=siteSearchView(query);
  siteSearchItems=groups.flatMap(g=>g.items);siteSearchActive=-1;let index=0;
- list.innerHTML=groups.map(g=>`<div class="site-search-group" role="group" aria-label="${attr(g.label)}"><div class="site-search-group-label" aria-hidden="true">${esc(g.label)}</div>${g.items.map(item=>{const i=index++;return `<div class="site-search-option${i||!tokens.length?'':' is-first'}" id="site-search-option-${i}" role="option" aria-selected="false" data-site-search-index="${i}"><span class="site-search-name">${siteSearchMark(item.name,item.type==='action'?[]:tokens)}${item.badge?` <span class="site-search-badge">${esc(item.badge)}</span>`:''}</span>${item.meta?`<span class="site-search-meta">${siteSearchMark(item.meta,item.type==='action'?[]:tokens)}</span>`:''}<kbd class="site-search-enter" aria-hidden="true">Enter</kbd></div>`;}).join('')}</div>`).join('');
+ list.innerHTML=groups.map(g=>`<div class="site-search-group" role="group" aria-label="${attr(g.label)}"><div class="site-search-group-label" aria-hidden="true">${esc(g.label)}</div>${g.items.map(item=>{const i=index++;const native=typeof item.href==='string'&&item.href.startsWith('/')&&!item.href.startsWith('//'),tag=native?'a':'div';return `<${tag}${native?' href="'+attr(item.href)+'"':''} class="site-search-option${i||!tokens.length?'':' is-first'}" id="site-search-option-${i}" role="option" aria-selected="false" data-site-search-index="${i}"><span class="site-search-name">${siteSearchMark(item.name,item.type==='action'?[]:tokens)}${item.badge?` <span class="site-search-badge">${esc(item.badge)}</span>`:''}</span>${item.meta?`<span class="site-search-meta">${siteSearchMark(item.meta,item.type==='action'?[]:tokens)}</span>`:''}<kbd class="site-search-enter" aria-hidden="true">Enter</kbd></${tag}>`;}).join('')}</div>`).join('');
  list.hidden=!siteSearchItems.length;input.setAttribute('aria-expanded',String(siteSearchItems.length>0));input.removeAttribute('aria-activedescendant');
  const results=siteSearchItems.filter(i=>i.rank!==undefined).length,exact=siteSearchItems.some(i=>i.rank<6);
  $('site-search-message').textContent=!tokens.length?'Type a name or a role. Press Enter to open the first result.':!results?`No match for “${query}”.`:exact?'':`No exact match for “${query}”. Showing close matches.`;
@@ -144,6 +146,7 @@ function siteSearchChoose(item){
  if(item.action==='work'){preparePage('work');applyWorkCriteria({q:item.query||''});item={...item,href:workHashFor({q:item.query||''})};renderWork();}
  if(item.action==='companies'){preparePage('companies');reset();}
  $('site-search').close();
+ if(typeof item.href==='string'&&item.href.startsWith('/')&&!item.href.startsWith('//')){location.assign(item.href);return;}
  const reveal=item.type==='product'||item.type==='work'?()=>queueMicrotask(()=>{const pending=window.APP_ROUTE_READY;Promise.resolve(pending).then(()=>{if(location.hash===item.href&&pending===window.APP_ROUTE_READY)siteSearchReveal(item);}).catch(()=>{});}):null;
  if(location.hash===item.href){route({type:'hashchange'});reveal?.();return;}
  if(reveal)window.addEventListener('hashchange',reveal,{once:true});
@@ -180,8 +183,8 @@ function initSiteNav(){
  input.addEventListener('input',siteSearchRequestRender);
  input.addEventListener('keydown',siteSearchKey);
  // Options keep focus in the field; a click chooses one.
- list.addEventListener('mousedown',event=>event.preventDefault());
- list.addEventListener('click',event=>{const option=event.target.closest?.('[role=option]');if(option)siteSearchChoose(siteSearchItems[Number(option.dataset.siteSearchIndex)]);});
+ list.addEventListener('mousedown',event=>{if(!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&event.button===0)event.preventDefault();});
+ list.addEventListener('click',event=>{const option=event.target.closest?.('[role=option]');if(!option)return;const item=siteSearchItems[Number(option.dataset.siteSearchIndex)];if(event.ctrlKey||event.metaKey||event.shiftKey||event.button>0)return;if(item?.href?.startsWith('/'))event.preventDefault();siteSearchChoose(item);});
  dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});
  // Focus returns to the opener. When search opened with nothing focused (on load, or "/" on the page), it goes to the button.
  dialog.addEventListener('close',()=>{siteSearchGeneration++;dialog.removeAttribute('aria-busy');button.setAttribute('aria-expanded','false');$('site-search-status').textContent='';const active=document.activeElement;if(!active||active===document.body||dialog.contains(active))button.focus();});

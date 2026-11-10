@@ -1,0 +1,3 @@
+# PDF text, metadata and annotation inspection in the public privacy scan.
+# Ordinary builds use only the Python standard library.
+pypdf==6.10.0

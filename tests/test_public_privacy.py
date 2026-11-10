@@ -2,15 +2,20 @@
 Every file in dist/ is read: text files whole, the SQLite database cell by cell, and images and icons as the
 printable text inside them (metadata such as EXIF, XMP or PNG text chunks can carry an address)."""
 import contextlib
+import io
 import json
 import re
 import sqlite3
+import tempfile
 import unittest
+import zipfile
 from pathlib import Path
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import TextStringObject, IndirectObject
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TEXT = {".html", ".json", ".csv", ".xml", ".txt", ".js", ".svg", ".css", ".md"}
+TEXT = {".html", ".json", ".csv", ".xml", ".txt", ".js", ".svg", ".css", ".md", ".cff", ".bib", ".ris", ".py"}
 # Host config files such as _headers and _redirects have no suffix and are text.
 BINARY = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".ico", ".avif", ".pdf", ".woff", ".woff2"}
 PRINTABLE = re.compile(rb"[\x20-\x7e]{6,}")
@@ -57,11 +62,65 @@ def printable_text(path):
     return "\n".join(run.decode("ascii") for run in PRINTABLE.findall(path.read_bytes()))
 
 
+def pdf_text(content):
+    """Inspect decoded PDF text and strings, rather than compressed/font bytes.
+
+    Binary font data and drawing coordinates are not personal contact text.
+    Text extraction includes compressed page streams; object traversal covers
+    metadata, annotations, actions and other PDF strings. Attachments are not
+    permitted in this research PDF.
+    """
+    reader = PdfReader(io.BytesIO(content), strict=True)
+    if reader.attachments:
+        raise AssertionError('Public report PDF must not contain attachments')
+    strings = [page.extract_text() or '' for page in reader.pages]
+    visited = set()
+    def walk(value):
+        if isinstance(value, IndirectObject):
+            key = (value.idnum, value.generation)
+            if key in visited:
+                return
+            visited.add(key)
+            walk(value.get_object())
+        elif isinstance(value, TextStringObject):
+            strings.append(str(value))
+        elif isinstance(value, dict):
+            for item in value.values():
+                walk(item)
+        elif isinstance(value, (list, tuple)):
+            for item in value:
+                walk(item)
+    walk(reader.trailer)
+    return '\n'.join(strings)
+
+
 def places(dist):
     for path in sorted(p for p in dist.rglob("*") if p.is_file()):
         name = stable_name(path.relative_to(dist).as_posix())
         if path.suffix == ".sqlite":
             yield name, "\n".join(sqlite_text(path))
+        elif path.suffix == ".zip":
+            collected = []
+            with zipfile.ZipFile(path) as archive:
+                for member in archive.infolist():
+                    content = archive.read(member)
+                    suffix = Path(member.filename).suffix.lower()
+                    if suffix == ".sqlite":
+                        with tempfile.NamedTemporaryFile(suffix=".sqlite") as extracted:
+                            extracted.write(content)
+                            extracted.flush()
+                            collected.extend(sqlite_text(Path(extracted.name)))
+                    elif suffix in TEXT or not suffix:
+                        collected.append(content.decode("utf-8"))
+                    elif suffix == '.pdf':
+                        collected.append(pdf_text(content))
+                    elif suffix in BINARY:
+                        collected.append("\n".join(run.decode("ascii") for run in PRINTABLE.findall(content)))
+                    else:
+                        raise AssertionError("Unscanned archive member: " + member.filename)
+            yield name, "\n".join(collected)
+        elif path.suffix == '.pdf':
+            yield name, pdf_text(path.read_bytes())
         elif path.suffix in BINARY:
             yield name, printable_text(path)
         elif path.suffix in TEXT or not path.suffix:
@@ -74,6 +133,21 @@ def places(dist):
 
 
 class PublicPrivacyTests(unittest.TestCase):
+    def test_pdf_scan_reads_decoded_metadata_and_rejects_attachments(self):
+        writer = PdfWriter()
+        writer.add_blank_page(width=612, height=792)
+        writer.add_metadata({'/Title': 'Private name@example.org +1 415-555-0123'})
+        stream = io.BytesIO()
+        writer.write(stream)
+        text = pdf_text(stream.getvalue())
+        self.assertRegex(text, EMAIL)
+        self.assertRegex(text, PHONE)
+        writer.add_attachment('private.txt', b'name@example.org')
+        stream = io.BytesIO()
+        writer.write(stream)
+        with self.assertRaisesRegex(AssertionError, 'attachments'):
+            pdf_text(stream.getvalue())
+
     @classmethod
     def setUpClass(cls):
         cls.places = {}
@@ -95,8 +169,15 @@ class PublicPrivacyTests(unittest.TestCase):
                       "source-updates.json", "link-health.json", "manifest.json", "robots.txt", "_headers"):
             self.assertTrue(self.places.get(place), place)
         companies = json.loads((ROOT / "data/canonical.json").read_text())["companies"]
+        import sys
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from research_report import build_context
+        from research_pages import _new_company, entity_url
+        context = build_context(ROOT)
+        added = {entity_url(entity, context).strip('/') + '/index.html'
+                 for entity in context['graph']['entities'] if _new_company(context, entity)}
         self.assertEqual({p for p in self.places if p.startswith("company/")},
-                         {f"company/{c['id']}/index.html" for c in companies})
+                         {f"company/{c['id']}/index.html" for c in companies} | added)
 
     def test_only_allowlisted_email_addresses_ship(self):
         found = {(address.lower(), place) for place, text in self.places.items() for address in EMAIL.findall(text)}

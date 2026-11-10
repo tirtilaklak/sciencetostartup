@@ -1,0 +1,31 @@
+name: Show research reuse
+description: Share a public citation, reproduction or integration.
+title: "[Reuse] "
+labels: ["research-reuse"]
+body:
+  - type: input
+    id: edition
+    attributes:
+      label: Research edition or dataset version
+    validations:
+      required: true
+  - type: input
+    id: public_url
+    attributes:
+      label: Public reuse URL
+      description: Link to the publication, repository, course material or integration.
+    validations:
+      required: true
+  - type: textarea
+    id: use
+    attributes:
+      label: How the research was used
+      description: Describe the specific contribution and any transformations or limitations.
+    validations:
+      required: true
+  - type: checkboxes
+    id: credit
+    attributes:
+      label: Optional acknowledgement
+      options:
+        - label: I consent to linking this public reuse from the research site.

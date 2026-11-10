@@ -3,6 +3,48 @@
 ScienceToStartup is a static, evidence-linked field guide to AI data organizations.
 The current public site is https://sciencetostartup.com.
 
+## Research publication
+
+The new `/research/` hub connects readable paper, dataset, benchmark and workflow
+records with claim-level evidence, original source versions and reusable exports.
+`/research/state-of-ai-data-labs/` is the complete living report route;
+`/research/data/` contains the evidence ledger, citations and prepared archive,
+and `/review/` accepts source-backed corrections, section review and reuse.
+Essential content and downloads work without JavaScript. Both site search
+implementations link directly to native research and organization pages.
+
+The comprehensive weekly series is **prelaunch**. The initial approved evidence
+is a small, separately AI-reviewed baseline, including abstract-level paper
+records; these do not count as full-source paper reviews. Historical field-guide
+evidence retains its dates and labels. No published edition, completed launch
+audit, human peer review or DOI is claimed. Coverage is computed from the graph,
+and code enforces the declared launch floors and substantive-report gates.
+
+New research is versioned under `data/research/`, independently of canonical
+v2.5.0. The public projection excludes private fields and personal contact data.
+One release manifest generates citations, Zenodo/GitHub/Hugging Face metadata,
+schemas, JSON/CSV/SQLite exports, checksums and a standalone reproduction package.
+The optional PDF preparation uses ReportLab; ordinary builds only verify and
+copy its prepared bytes and require no network, credentials or extra Python
+packages. Independent source review is identified as **Separate AI review**.
+
+Daily preparation targets 16:00 Pacific; the sole weekly release check targets
+Monday 09:00, with the preceding Friday 17:00 captured-source cutoff. Native
+Codex automations in the implementation chat run on the available local host;
+missed runs are handled as delayed catch-up, never backdated publications.
+Zenodo and Hugging Face remain in **prepare-only** mode until accounts connect.
+The report stays held until coverage, real holdout audits, evidence, privacy and
+technical checks pass. Archive publication, website activation and mirror status
+are recorded separately, using a locked, recoverable journal.
+
+See [the shared contract](docs/research/CONTRACT.md),
+[operations](docs/research/operations.md),
+[archival publication](docs/research/publication.md),
+[evidence methods](docs/research/evidence.md),
+[external identity updates](docs/research/external-profile-updates.md) and
+[contribution policy](CONTRIBUTING.md). No reviewer invitations are sent by the
+implementation or daily preparation.
+
 The homepage introduces two equal journeys: understand AI data companies and find
 paid AI training work. Its portrait collage preserves all three faces in responsive
 WebP derivatives. Two examples show an offer-led company and a recently reviewed
@@ -126,6 +168,7 @@ It reproduces an approved snapshot; it does not attest to a new research release
 CI runs the same checks on pushes to `main` and on pull requests:
 
 ```sh
+python3 -m pip install -r requirements-qa.txt
 python3 -m unittest discover -s tests -p 'test_*.py'
 python3 scripts/build_public_snapshot.py --verify
 python3 tests/js_logic.py
@@ -139,7 +182,7 @@ python3 tests/reliability_failure_state_logic.py
 python3 tests/risk_section_logic.py
 ```
 
-The 158 unit tests cover the pipeline, the build, the design system tokens
+The unit tests cover the pipeline, the build, the design system tokens
 (the same check as `python3 scripts/design_system.py --check`), download sizes,
 static pages, company events, the business health data, Work routes, the Paid
 work page, site search, link health and a privacy scan of every file in `dist/`.

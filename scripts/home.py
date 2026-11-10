@@ -56,7 +56,7 @@ def render_home(html, data, sidecars, release, summary):
         reviewed = entry.get("reviewed_on", "2026-10-14")
         company = ('<article class="example-card company-example"><p class="example-kind">Example company</p><h3 class="example-title">Snorkel AI</h3>'
                    '<p class="example-summary">' + escape(entry["summary"]) + '</p><p class="example-meta">Summary reviewed <time datetime="' + reviewed + '">' + label_date(reviewed) + '</time></p>'
-                   '<p class="example-source">Company descriptions and financial figures keep their own sources and review dates.</p><div class="example-actions"><a class="example-action" href="/explore/#company/snorkel_ai">Explore company →</a></div></article>')
+                   '<p class="example-source">Company descriptions and financial figures keep their own sources and review dates.</p><div class="example-actions"><a class="example-action" href="/company/snorkel_ai/">Explore company →</a></div></article>')
     else:
         company = '<article class="example-card company-example"><h3>Understand AI data companies.</h3><p><a href="/companies/">Browse sourced company profiles →</a></p></article>'
     fallback = '<article class="example-card work-example home-work-fallback"><p class="example-kind">Paid AI training work</p><h3 class="example-title">Find a route that fits your expertise.</h3><p class="example-summary">Compare public listings and expert networks, with pay conditions and requirements beside the source.</p><div class="example-actions"><a class="example-action" href="/work/">Browse paid work →</a></div></article>'

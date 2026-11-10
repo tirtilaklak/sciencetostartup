@@ -1,0 +1,30 @@
+name: Review a research section
+description: Offer an evidence-backed review of a specific edition and section.
+title: "[Section review] "
+labels: ["research-review"]
+body:
+  - type: input
+    id: scope
+    attributes:
+      label: Edition and section
+      description: Include the exact edition URL and section identifier.
+    validations:
+      required: true
+  - type: textarea
+    id: review
+    attributes:
+      label: Findings and evidence
+      description: Include corrections, missing alternatives, methodological concerns and exact public source locators.
+    validations:
+      required: true
+  - type: textarea
+    id: expertise
+    attributes:
+      label: Subject expertise and conflicts
+      description: Explain your relevant experience and interests. Affiliation is not organizational endorsement.
+  - type: checkboxes
+    id: credit
+    attributes:
+      label: Optional credit
+      options:
+        - label: I consent to public credit for this section and edition only.

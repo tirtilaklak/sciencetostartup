@@ -23,7 +23,7 @@
   const work='/explore/#work'+(raw?'?'+new URLSearchParams({q:raw}):'');
   results.innerHTML=matches.map((row,i)=>`<a id="home-result-${i}" class="site-search-option" role="option" aria-selected="false" href="${escape(row.href)}"><strong>${escape(row.name)}</strong><span>${escape(row.summary)}</span></a>`).join('')+`<a class="site-search-option" role="option" aria-selected="false" href="${escape(work)}"><strong>${escape(raw?'Find paid work matching “'+raw+'”':'Browse paid work')}</strong><span>Public listings, expert networks and requirements</span></a>`;
   results.hidden=false;active=-1;input.removeAttribute('aria-activedescendant');input.setAttribute('aria-expanded','true');
-  message.textContent=raw?(matches.length?matches.length+' company matches. Paid work uses its own listing filters.':'No recorded company matches. You can search paid work or browse all companies.'):'Search companies, their offerings, or continue to paid work.';
+  message.textContent=raw?(matches.length?matches.length+' matches. Paid work uses its own listing filters.':'No recorded research or company matches. You can search paid work or browse all companies.'):'Search research, companies and their offerings, or continue to paid work.';
   $('home-search-status').textContent=message.textContent;
  }
  window.openHomeSearch=async()=>{if(!dialog.open)dialog.showModal();$('home-search-open').setAttribute('aria-expanded','true');input.focus();try{await load();render();}catch(error){message.innerHTML='Search could not load. <button type="button" data-home-search-retry>Try again</button> <a href="/companies/">Browse companies</a> or <a href="/work/">browse paid work</a>.';}};
@@ -31,6 +31,7 @@
  $('home-search-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});dialog.addEventListener('close',()=>{$('home-search-open').setAttribute('aria-expanded','false');$('home-search-open').focus();});
  input.addEventListener('input',()=>{if(entries)render();});
  input.addEventListener('keydown',event=>{
+  if(event.key==='Escape'){event.preventDefault();dialog.close();return;}
   const options=[...results.querySelectorAll('[role=option]')];if(!options.length)return;
   if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){event.preventDefault();active=event.key==='Home'?0:event.key==='End'?options.length-1:(active+(event.key==='ArrowDown'?1:options.length-1))%options.length;options.forEach((node,i)=>{node.id='home-result-'+i;node.setAttribute('aria-selected',String(i===active));});input.setAttribute('aria-activedescendant',options[active].id);options[active].scrollIntoView({block:'nearest'});}
   if(event.key==='Enter'){event.preventDefault();options[Math.max(active,0)].click();}

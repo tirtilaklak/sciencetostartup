@@ -1,0 +1,16 @@
+{
+  "author": "Musa Ozdem",
+  "author_person": {
+    "family": "Ozdem",
+    "given": "Musa"
+  },
+  "license": "CC-BY-4.0",
+  "note": "Preparation snapshot; not a published research edition. No DOI has been registered for this snapshot.",
+  "projection_version": "1.0.0",
+  "schema_version": 1,
+  "status": "prelaunch",
+  "title": "State of AI Data Labs and Human Feedback",
+  "updated_on": "2026-11-09",
+  "url": "https://sciencetostartup.com/research/state-of-ai-data-labs/",
+  "version": "research-2026-11-09.prelaunch.2"
+}

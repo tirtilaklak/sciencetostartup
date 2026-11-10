@@ -1,0 +1,33 @@
+name: Correct a research claim
+description: Submit source-backed corrections to a specific finding.
+title: "[Correction] "
+labels: ["research-correction"]
+body:
+  - type: markdown
+    attributes:
+      value: "Submissions are public. Include evidence, not private contact details or confidential documents. We review correction requests within seven days."
+  - type: input
+    id: target
+    attributes:
+      label: Edition, page and claim ID
+      description: Link to the exact finding or source anchor.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Correction and supporting public evidence
+      description: Explain the change; include source URLs, versions, pages or sections and important qualifications.
+    validations:
+      required: true
+  - type: textarea
+    id: conflicts
+    attributes:
+      label: Relevant affiliation or conflicts
+      description: State relevant interests; do not include private contact information.
+  - type: checkboxes
+    id: credit
+    attributes:
+      label: Optional public credit
+      options:
+        - label: I consent to credit under my public GitHub username for this specific contribution.

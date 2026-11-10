@@ -1,5 +1,6 @@
 name: CI
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -15,7 +16,9 @@ jobs:
         with:
           node-version: "22"
       - name: Install the pinned QA tools
-        run: npm ci
+        run: |
+          npm ci
+          python3 -m pip install -r requirements-qa.txt
       - name: Unit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py'
       - name: Performance tool contracts

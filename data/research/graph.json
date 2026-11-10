@@ -1,0 +1,3716 @@
+{
+  "as_of": "2026-11-10T04:10:40Z",
+  "assertions": [
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/0/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.mercor.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.mercor",
+      "value": {
+        "type": "text",
+        "value": "Turns professional expertise into training data, evaluations, enterprise agents and licensed datasets."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/1/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.snorkel_ai.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.snorkel_ai",
+      "value": {
+        "type": "text",
+        "value": "Develops specialized datasets, evaluation systems, and executable environments that advance frontier AI."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/2/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.handshake_ai.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.handshake_ai",
+      "value": {
+        "type": "text",
+        "value": "Mobilizes professional experts to create training data, evaluations, and environments for AI."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/3/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.micro1.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.micro1",
+      "value": {
+        "type": "text",
+        "value": "Builds expert human datasets, realistic training environments, and contextual evaluations for agents."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/4/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.scale_ai.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.scale_ai",
+      "value": {
+        "type": "text",
+        "value": "Supplies expert training data, evaluations, and deployed AI for enterprises and governments."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/5/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.turing.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.turing",
+      "value": {
+        "type": "text",
+        "value": "Supplies expert datasets and environments while deploying enterprise AI across complex workflows."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/6/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.labelbox.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.labelbox",
+      "value": {
+        "type": "text",
+        "value": "Builds enterprise agents, reinforcement-learning environments, robotics data and expert training signals."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/7/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.prime_intellect.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.prime_intellect",
+      "value": {
+        "type": "text",
+        "value": "Provides compute, training, inference, and environments for teams building their own models"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/8/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.abundant_ai.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.abundant_ai",
+      "value": {
+        "type": "text",
+        "value": "Builds simulation environments and datasets that train safer, more capable AI agents."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/9/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.afterquery.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.afterquery",
+      "value": {
+        "type": "text",
+        "value": "AfterQuery builds expert-generated datasets and environments for frontier-model training. Its enterprise team also develops custom evaluations and deploys systems on a company’s own data."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/10/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.bespoke_labs.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.bespoke_labs",
+      "value": {
+        "type": "text",
+        "value": "Builds realistic training environments and optimization infrastructure for reliable autonomous AI agents."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/11/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.polymath_ai_labs.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.polymath_ai_labs",
+      "value": {
+        "type": "text",
+        "value": "Builds realistic software worlds to train autonomous agents across long engineering workflows."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/12/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.proximal.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.proximal",
+      "value": {
+        "type": "text",
+        "value": "Builds research-driven data systems and demanding benchmarks for autonomous technical AI agents."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/13/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.trajectory_labs_pbc.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.trajectory_labs_pbc",
+      "value": {
+        "type": "text",
+        "value": "Builds safety evaluations, adversarial tests, and training environments for frontier AI systems."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/14/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.refresh.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.refresh",
+      "value": {
+        "type": "text",
+        "value": "Creates simulated software worlds and Blender tasks with verifiable rewards for agents."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/15/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.surge_ai.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.surge_ai",
+      "value": {
+        "type": "text",
+        "value": "Creates expert human data, feedback, evaluations, and environments for frontier AI training."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/16/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.quesma.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.quesma",
+      "value": {
+        "type": "text",
+        "value": "Analyzes coding-agent sessions to explain costs, expose failures, and improve engineering outcomes."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/17/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.datacurve.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.datacurve",
+      "value": {
+        "type": "text",
+        "value": "Recruits expert developers to create challenging training datasets and evaluate coding agents."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/18/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.benchflow.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.benchflow",
+      "value": {
+        "type": "text",
+        "value": "Builds stateful environments, benchmarks, and runtime infrastructure for training capable AI agents."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/19/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.g2i.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.g2i",
+      "value": {
+        "type": "text",
+        "value": "Supplies senior engineers building RL environments, evaluations, and high quality training data"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/20/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.a-team.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.a-team",
+      "value": {
+        "type": "text",
+        "value": "Embeds senior engineering teams to build and operate enterprise agentic AI systems"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/21/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.hackerrank.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.hackerrank",
+      "value": {
+        "type": "text",
+        "value": "Sells developer assessments alongside coding datasets, private evaluations, and reinforcement learning environments"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/22/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.pareto.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.pareto",
+      "value": {
+        "type": "text",
+        "value": "Turns specialist human judgment into training data and evaluations for frontier models."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/23/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.ooak.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.ooak",
+      "value": {
+        "type": "text",
+        "value": "Turns authentic company workflows into anonymized environments for training enterprise AI agents."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/24/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.elorian.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.elorian",
+      "value": {
+        "type": "text",
+        "value": "Develops foundation models that reason visually about space, physics, and creative problems."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/25/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.terac.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.terac",
+      "value": {
+        "type": "text",
+        "value": "Matches verified domain experts with paid research, evaluation, and AI training projects"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/26/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.laude.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.laude",
+      "value": {
+        "type": "text",
+        "value": "Funds open computing research and develops benchmarks evaluating realistic terminal agent capabilities"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/27/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.invisible.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.invisible",
+      "value": {
+        "type": "text",
+        "value": "Combines expert data, evaluations, and configurable AI platforms to automate enterprise operations."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/28/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.toloka.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.toloka",
+      "value": {
+        "type": "text",
+        "value": "Provides expert human data, evaluations, and environments for training reliable AI systems"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/29/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.prolific.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.prolific",
+      "value": {
+        "type": "text",
+        "value": "Connects researchers and AI teams with verified participants supplying paid human feedback"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/30/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.aixi.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.aixi",
+      "value": {
+        "type": "text",
+        "value": "Researches mathematical foundations of powerful agents and practical mitigations for AI risk"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/31/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.appen.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.appen",
+      "value": {
+        "type": "text",
+        "value": "Delivers human-validated datasets for frontier models, agents, speech, and embodied AI systems."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/32/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.giskard.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.giskard",
+      "value": {
+        "type": "text",
+        "value": "Tests enterprise AI agents for security failures, hallucinations, and other reliability risks"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/33/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.alinia.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.alinia",
+      "value": {
+        "type": "text",
+        "value": "Builds policy judges that monitor, test, and control regulated enterprise AI agents"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/34/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.apto.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.apto",
+      "value": {
+        "type": "text",
+        "value": "Creates multimodal training data through expert annotation services and proprietary harBest software"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/35/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.rws_trainai.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.rws_trainai",
+      "value": {
+        "type": "text",
+        "value": "Delivers multilingual training data, annotation, validation, and expert feedback for enterprise AI"
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/36/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.imerit.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.imerit",
+      "value": {
+        "type": "text",
+        "value": "Combines specialist annotators and software for multimodal training data and model evaluation."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/37/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.sama.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.sama",
+      "value": {
+        "type": "text",
+        "value": "Provides human-verified annotation, validation, and evaluation for scalable production-ready multimodal AI systems."
+      }
+    },
+    {
+      "as_of": "2026-10-15",
+      "evidence": [
+        {
+          "excerpt_sha256": null,
+          "locator": "/companies/38/description",
+          "source_id": "legacy.canonical.2-5-0"
+        }
+      ],
+      "id": "legacy.taskus.description",
+      "object_id": null,
+      "predicate": "legacy_description",
+      "provenance_kind": "historical",
+      "qualifications": [
+        "Historical canonical 2.5.0 description, imported without a fresh source review.",
+        "The 2026-10-15 date is the snapshot as-of date, not a new review date. Original source access and claim dates remain in the canonical dataset."
+      ],
+      "review_ids": [],
+      "status": "historical",
+      "subject_id": "org.taskus",
+      "value": {
+        "type": "text",
+        "value": "Provides outsourced customer operations, trust and safety, and specialized AI data services."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "33d75c554af982f3c804278afe6378fd37e453382ac699315491dbd9c1a2ff56",
+          "locator": "Abstract, sentence 3",
+          "source_id": "source.arxiv.2505.11475v2"
+        }
+      ],
+      "id": "claim.helpsteer3.preference-dataset",
+      "object_id": "dataset.helpsteer3",
+      "predicate": "documents",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-reported method or dataset description from the version-specific abstract; not an independent replication."
+      ],
+      "review_ids": [
+        "review.author.claim.helpsteer3.preference-dataset",
+        "review.source_verifier.claim.helpsteer3.preference-dataset",
+        "review.adversarial.claim.helpsteer3.preference-dataset"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2505.11475",
+      "value": null
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "7f1dc8b48abda8913b0f92fd34a89a84a42dd168f976ce234756022d1f53cc97",
+          "locator": "Abstract, human ranking stage",
+          "source_id": "source.arxiv.2203.02155v1"
+        }
+      ],
+      "id": "claim.instructgpt.human-rankings",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-reported method or dataset description from the version-specific abstract; not an independent replication."
+      ],
+      "review_ids": [
+        "review.author.claim.instructgpt.human-rankings",
+        "review.source_verifier.claim.instructgpt.human-rankings",
+        "review.adversarial.claim.instructgpt.human-rankings"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2203.02155",
+      "value": {
+        "type": "text",
+        "value": "The authors describe collecting human rankings of model outputs as part of their instruction-following training method."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "f792352bd232c16a5a8546bd20be2d8d3a66c6ed6af89e25d38d2103f9b782a1",
+          "locator": "Abstract, proposed objective",
+          "source_id": "source.arxiv.2305.18290v3"
+        }
+      ],
+      "id": "claim.dpo.classification-objective",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-reported method or dataset description from the version-specific abstract; not an independent replication."
+      ],
+      "review_ids": [
+        "review.author.claim.dpo.classification-objective",
+        "review.source_verifier.claim.dpo.classification-objective",
+        "review.adversarial.claim.dpo.classification-objective"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2305.18290",
+      "value": {
+        "type": "text",
+        "value": "The authors derive a classification objective for learning from preferences."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "92cb199925d0f04406faf393ae9b2fd9a379713dba1b439b6644edb3c4babe43",
+          "locator": "Abstract, dataset documentation proposal",
+          "source_id": "source.arxiv.1803.09010v8"
+        }
+      ],
+      "id": "claim.datasheets.documentation",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-reported method or dataset description from the version-specific abstract; not an independent replication."
+      ],
+      "review_ids": [
+        "review.author.claim.datasheets.documentation",
+        "review.source_verifier.claim.datasheets.documentation",
+        "review.adversarial.claim.datasheets.documentation"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.1803.09010",
+      "value": {
+        "type": "text",
+        "value": "The authors propose documenting a dataset’s motivation, composition, collection process and recommended uses."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "4f030da38adc6122f3eecde4f5d0947692c124536dd212b51146dea6e42801e9",
+          "locator": "Abstract, FineWeb description",
+          "source_id": "source.arxiv.2406.17557v2"
+        }
+      ],
+      "id": "claim.fineweb.crawl-lineage",
+      "object_id": "dataset.fineweb",
+      "predicate": "documents",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-reported method or dataset description from the version-specific abstract; not an independent replication."
+      ],
+      "review_ids": [
+        "review.author.claim.fineweb.crawl-lineage",
+        "review.source_verifier.claim.fineweb.crawl-lineage",
+        "review.adversarial.claim.fineweb.crawl-lineage"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2406.17557",
+      "value": null
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "f3839b986794c32415277ede8de83fc20eb92e6c38038c71ae614376993d6c73",
+          "locator": "Abstract, benchmark construction",
+          "source_id": "source.arxiv.2310.06770v3"
+        }
+      ],
+      "id": "claim.swebench.task-construction",
+      "object_id": "benchmark.swebench",
+      "predicate": "documents",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-reported method or dataset description from the version-specific abstract; not an independent replication."
+      ],
+      "review_ids": [
+        "review.author.claim.swebench.task-construction",
+        "review.source_verifier.claim.swebench.task-construction",
+        "review.adversarial.claim.swebench.task-construction"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2310.06770",
+      "value": null
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "0f765c6a4b5e0a306b723337017b644c641ba7230f4065f0507ff4a27c821828",
+          "locator": "Abstract, benchmark coverage",
+          "source_id": "source.arxiv.2109.07958v2"
+        }
+      ],
+      "id": "claim.truthfulqa.question-coverage",
+      "object_id": "benchmark.truthfulqa",
+      "predicate": "documents",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-reported method or dataset description from the version-specific abstract; not an independent replication."
+      ],
+      "review_ids": [
+        "review.author.claim.truthfulqa.question-coverage",
+        "review.source_verifier.claim.truthfulqa.question-coverage",
+        "review.adversarial.claim.truthfulqa.question-coverage"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2109.07958",
+      "value": null
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "8fac4183e07df38cd6c13bb9d45da5f8e57cbb06f366c13be60d6561b4b14344",
+          "locator": "Abstract, task coverage",
+          "source_id": "source.arxiv.2009.03300v3"
+        }
+      ],
+      "id": "claim.mmlu.task-coverage",
+      "object_id": "benchmark.mmlu",
+      "predicate": "documents",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-reported method or dataset description from the version-specific abstract; not an independent replication."
+      ],
+      "review_ids": [
+        "review.author.claim.mmlu.task-coverage",
+        "review.source_verifier.claim.mmlu.task-coverage",
+        "review.adversarial.claim.mmlu.task-coverage"
+      ],
+      "status": "approved",
+      "subject_id": "paper.arxiv.2009.03300",
+      "value": null
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "546696fc6add700a90528413d9125d22a51a0c51ad6e8aeccf690df78e58ff39",
+          "locator": "Dataset card / Preference / Domain",
+          "source_id": "source.hf.nvidia-helpsteer3.2026-11-09"
+        }
+      ],
+      "id": "claim.helpsteer3.scale-annotation",
+      "object_id": "dataset.helpsteer3",
+      "predicate": "supplies_data_for",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "NVIDIA dataset-card attribution, limited to General, STEM and Code domains of HelpSteer3-Preference.",
+        "The dataset card does not establish contract value, payment terms, an exhaustive supplier list, or contributions to other datasets."
+      ],
+      "review_ids": [
+        "review.author.claim.helpsteer3.scale-annotation",
+        "review.source_verifier.claim.helpsteer3.scale-annotation",
+        "review.adversarial.claim.helpsteer3.scale-annotation"
+      ],
+      "status": "approved",
+      "subject_id": "org.scale_ai",
+      "value": null
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "546696fc6add700a90528413d9125d22a51a0c51ad6e8aeccf690df78e58ff39",
+          "locator": "Dataset card / Preference / Domain",
+          "source_id": "source.hf.nvidia-helpsteer3.2026-11-09"
+        }
+      ],
+      "id": "claim.helpsteer3.translated-annotation",
+      "object_id": "dataset.helpsteer3",
+      "predicate": "supplies_data_for",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "NVIDIA dataset-card attribution, limited to Multilingual domain of HelpSteer3-Preference.",
+        "The dataset card does not establish contract value, payment terms, an exhaustive supplier list, or contributions to other datasets."
+      ],
+      "review_ids": [
+        "review.author.claim.helpsteer3.translated-annotation",
+        "review.source_verifier.claim.helpsteer3.translated-annotation",
+        "review.adversarial.claim.helpsteer3.translated-annotation"
+      ],
+      "status": "approved",
+      "subject_id": "org.translated",
+      "value": null
+    }
+  ],
+  "canonical_dataset_version": "2.5.0",
+  "canonical_sha256": "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061",
+  "coverage": {
+    "frozen_core": {
+      "entity_ids": [],
+      "frozen_on": null,
+      "sha256": null,
+      "source_cutoff": null
+    },
+    "notes": [
+      "This is an additive prelaunch evidence graph. Candidate source reads do not count as approved coverage.",
+      "All 39 canonical organizations retain historical descriptions and pending new research dispositions. No independent reviews or 200-record audit results are invented.",
+      "Eligible core is not frozen. Actual reviewed paper, supplier, dataset and benchmark coverage remains below the user-approved launch floors."
+    ],
+    "quality_audit": null,
+    "screening_audit": null
+  },
+  "entities": [
+    {
+      "aliases": [
+        "Mercor.io Corporation"
+      ],
+      "assertion_ids": [
+        "legacy.mercor.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.mercor",
+      "identifiers": {
+        "website": "https://www.mercor.com/"
+      },
+      "kind": "organization",
+      "legacy_id": "mercor",
+      "name": "Mercor",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Snorkel AI, Inc."
+      ],
+      "assertion_ids": [
+        "legacy.snorkel_ai.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.snorkel_ai",
+      "identifiers": {
+        "website": "https://snorkel.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "snorkel_ai",
+      "name": "Snorkel AI",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Handshake",
+        "Stryder Corp. d/b/a Handshake"
+      ],
+      "assertion_ids": [
+        "legacy.handshake_ai.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.handshake_ai",
+      "identifiers": {
+        "website": "https://joinhandshake.com/ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "handshake_ai",
+      "name": "Handshake AI",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "micro1, Inc."
+      ],
+      "assertion_ids": [
+        "legacy.micro1.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.micro1",
+      "identifiers": {
+        "website": "https://www.micro1.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "micro1",
+      "name": "micro1",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Scale AI, Inc.",
+        "Outlier (contributor brand)",
+        "Remotasks (contributor brand)",
+        "Human Frontier Collective (contributor platform)"
+      ],
+      "assertion_ids": [
+        "legacy.scale_ai.description",
+        "claim.helpsteer3.scale-annotation"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.scale_ai",
+      "identifiers": {
+        "website": "https://scale.com/"
+      },
+      "kind": "supplier",
+      "legacy_id": "scale_ai",
+      "name": "Scale AI",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Turing Enterprises, Inc.",
+        "Turing.com",
+        "Turing Frontier"
+      ],
+      "assertion_ids": [
+        "legacy.turing.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.turing",
+      "identifiers": {
+        "website": "https://www.turing.com/"
+      },
+      "kind": "organization",
+      "legacy_id": "turing",
+      "name": "Turing",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Labelbox, Inc.",
+        "Alignerr (expert-network brand)"
+      ],
+      "assertion_ids": [
+        "legacy.labelbox.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.labelbox",
+      "identifiers": {
+        "website": "https://labelbox.com/"
+      },
+      "kind": "organization",
+      "legacy_id": "labelbox",
+      "name": "Labelbox",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Prime Intellect, Inc."
+      ],
+      "assertion_ids": [
+        "legacy.prime_intellect.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.prime_intellect",
+      "identifiers": {
+        "website": "https://www.primeintellect.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "prime_intellect",
+      "name": "Prime Intellect",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Abundant AI",
+        "Abundant, Inc."
+      ],
+      "assertion_ids": [
+        "legacy.abundant_ai.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.abundant_ai",
+      "identifiers": {
+        "website": "https://www.abundant.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "abundant_ai",
+      "name": "Abundant",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "legacy.afterquery.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.afterquery",
+      "identifiers": {
+        "website": "https://www.afterquery.com/"
+      },
+      "kind": "organization",
+      "legacy_id": "afterquery",
+      "name": "AfterQuery",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "BespokeLabs.AI, Inc."
+      ],
+      "assertion_ids": [
+        "legacy.bespoke_labs.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.bespoke_labs",
+      "identifiers": {
+        "website": "https://bespokelabs.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "bespoke_labs",
+      "name": "Bespoke Labs",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Polymath AI Labs"
+      ],
+      "assertion_ids": [
+        "legacy.polymath_ai_labs.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.polymath_ai_labs",
+      "identifiers": {
+        "website": "https://polymathlabs.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "polymath_ai_labs",
+      "name": "Polymath",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "FrontierSWE (benchmark, not separate company)"
+      ],
+      "assertion_ids": [
+        "legacy.proximal.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.proximal",
+      "identifiers": {
+        "website": "https://www.proximal.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "proximal",
+      "name": "Proximal",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "legacy.trajectory_labs_pbc.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.trajectory_labs_pbc",
+      "identifiers": {
+        "website": "https://www.trajectorylabs.com/"
+      },
+      "kind": "organization",
+      "legacy_id": "trajectory_labs_pbc",
+      "name": "Trajectory Labs, PBC",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Operative (historical database alias; not primary-verified)"
+      ],
+      "assertion_ids": [
+        "legacy.refresh.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.refresh",
+      "identifiers": {
+        "website": "https://refresh.dev/"
+      },
+      "kind": "organization",
+      "legacy_id": "refresh",
+      "name": "Refresh",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Surge Labs Inc. (reported legal entity)",
+        "DataAnnotation (contributor platform)"
+      ],
+      "assertion_ids": [
+        "legacy.surge_ai.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.surge_ai",
+      "identifiers": {
+        "website": "https://surgehq.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "surge_ai",
+      "name": "Surge AI",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "RefactorDB (former name)"
+      ],
+      "assertion_ids": [
+        "legacy.quesma.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.quesma",
+      "identifiers": {
+        "website": "https://quesma.com/"
+      },
+      "kind": "organization",
+      "legacy_id": "quesma",
+      "name": "Quesma",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Datacurve AI, Inc.",
+        "Shipd (contributor platform)"
+      ],
+      "assertion_ids": [
+        "legacy.datacurve.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.datacurve",
+      "identifiers": {
+        "website": "https://datacurve.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "datacurve",
+      "name": "Datacurve",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "BenchFlow Inc.",
+        "Benchmarkthing (database alias)"
+      ],
+      "assertion_ids": [
+        "legacy.benchflow.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.benchflow",
+      "identifiers": {
+        "website": "https://www.benchflow.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "benchflow",
+      "name": "BenchFlow",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "G2i Inc.",
+        "g2i.ai",
+        "g2i.co"
+      ],
+      "assertion_ids": [
+        "legacy.g2i.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.g2i",
+      "identifiers": {
+        "website": "https://www.g2i.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "g2i",
+      "name": "G2i",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "ATeams Inc.",
+        "A•Team"
+      ],
+      "assertion_ids": [
+        "legacy.a-team.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.a-team",
+      "identifiers": {
+        "website": "https://www.a.team/"
+      },
+      "kind": "organization",
+      "legacy_id": "a-team",
+      "name": "A.Team",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "HackerRank Astra",
+        "ASTRA",
+        "HackerRank-Bench",
+        "InterviewStreet",
+        "HackerRank / Astra",
+        "Astra",
+        "HackerRank"
+      ],
+      "assertion_ids": [
+        "legacy.hackerrank.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.hackerrank",
+      "identifiers": {
+        "website": "https://www.hackerrank.com/bench"
+      },
+      "kind": "organization",
+      "legacy_id": "hackerrank",
+      "name": "HackerRank Bench",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Pareto Inc.",
+        "Pareto",
+        "Hello Pareto",
+        "Forte (expert platform)"
+      ],
+      "assertion_ids": [
+        "legacy.pareto.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.pareto",
+      "identifiers": {
+        "website": "https://pareto.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "pareto",
+      "name": "Pareto AI",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Ooak",
+        "Ooak Data Inc.",
+        "Ooak Data SAS"
+      ],
+      "assertion_ids": [
+        "legacy.ooak.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.ooak",
+      "identifiers": {
+        "website": "https://ooakdata.com/"
+      },
+      "kind": "organization",
+      "legacy_id": "ooak",
+      "name": "Ooak Data",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Elorian AI",
+        "Elorian AI Inc."
+      ],
+      "assertion_ids": [
+        "legacy.elorian.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.elorian",
+      "identifiers": {
+        "website": "https://elorian.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "elorian",
+      "name": "Elorian",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Terac Inc.",
+        "terac.ai (legacy domain)"
+      ],
+      "assertion_ids": [
+        "legacy.terac.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.terac",
+      "identifiers": {
+        "website": "https://terac.com/"
+      },
+      "kind": "organization",
+      "legacy_id": "terac",
+      "name": "Terac",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Laude Institute",
+        "Terminal-Bench",
+        "Terminal Bench"
+      ],
+      "assertion_ids": [
+        "legacy.laude.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.laude",
+      "identifiers": {
+        "website": "https://www.laude.org/"
+      },
+      "kind": "organization",
+      "legacy_id": "laude",
+      "name": "Laude Institute / Terminal-Bench",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Invisible",
+        "Meridial (expert marketplace brand)"
+      ],
+      "assertion_ids": [
+        "legacy.invisible.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.invisible",
+      "identifiers": {
+        "website": "https://invisibletech.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "invisible",
+      "name": "Invisible Technologies",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Toloka AI BV",
+        "Mindrift (expert community brand)"
+      ],
+      "assertion_ids": [
+        "legacy.toloka.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.toloka",
+      "identifiers": {
+        "website": "https://toloka.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "toloka",
+      "name": "Toloka",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Prolific Academic Ltd"
+      ],
+      "assertion_ids": [
+        "legacy.prolific.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.prolific",
+      "identifiers": {
+        "website": "https://www.prolific.com/"
+      },
+      "kind": "organization",
+      "legacy_id": "prolific",
+      "name": "Prolific",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "AIXI"
+      ],
+      "assertion_ids": [
+        "legacy.aixi.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.aixi",
+      "identifiers": {
+        "website": "https://www.aixi.uk/"
+      },
+      "kind": "organization",
+      "legacy_id": "aixi",
+      "name": "AIXI Labs",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Appen Limited",
+        "CrowdGen (contributor platform)",
+        "ASX: APX"
+      ],
+      "assertion_ids": [
+        "legacy.appen.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.appen",
+      "identifiers": {
+        "website": "https://www.appen.com/"
+      },
+      "kind": "organization",
+      "legacy_id": "appen",
+      "name": "Appen",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Giskard AI",
+        "Giskard AI SAS"
+      ],
+      "assertion_ids": [
+        "legacy.giskard.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.giskard",
+      "identifiers": {
+        "website": "https://www.giskard.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "giskard",
+      "name": "Giskard",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "Alinia"
+      ],
+      "assertion_ids": [
+        "legacy.alinia.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.alinia",
+      "identifiers": {
+        "website": "https://www.alinia.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "alinia",
+      "name": "Alinia AI",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "株式会社APTO",
+        "harBest",
+        "harBest Expert"
+      ],
+      "assertion_ids": [
+        "legacy.apto.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.apto",
+      "identifiers": {
+        "website": "https://apto.co.jp/en/"
+      },
+      "kind": "organization",
+      "legacy_id": "apto",
+      "name": "APTO",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [
+        "RWS Holdings plc",
+        "TrainAI by RWS",
+        "AIM: RWS"
+      ],
+      "assertion_ids": [
+        "legacy.rws_trainai.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.rws_trainai",
+      "identifiers": {
+        "website": "https://www.rws.com/artificial-intelligence/train-ai-data-services/"
+      },
+      "kind": "organization",
+      "legacy_id": "rws_trainai",
+      "name": "RWS / TrainAI",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "legacy.imerit.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.imerit",
+      "identifiers": {
+        "website": "https://imerit.ai/"
+      },
+      "kind": "organization",
+      "legacy_id": "imerit",
+      "name": "iMerit / EXL",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "legacy.sama.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.sama",
+      "identifiers": {
+        "website": "https://www.sama.com/"
+      },
+      "kind": "organization",
+      "legacy_id": "sama",
+      "name": "Sama",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "legacy.taskus.description"
+      ],
+      "disposition": "pending",
+      "disposition_reason": "Imported historical identity only; its new research disposition has not been reviewed.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.taskus",
+      "identifiers": {
+        "website": "https://www.taskus.com/"
+      },
+      "kind": "organization",
+      "legacy_id": "taskus",
+      "name": "TaskUs",
+      "parent_id": null,
+      "review_depth": "historical",
+      "status": "historical",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.helpsteer3.preference-dataset"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2505.11475",
+      "identifiers": {
+        "arxiv": "2505.11475",
+        "doi": "10.48550/arXiv.2505.11475"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "HelpSteer3-Preference: Open Human-Annotated Preference Data across Diverse Tasks and Languages",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.helpsteer3.preference-dataset",
+        "claim.helpsteer3.scale-annotation",
+        "claim.helpsteer3.translated-annotation"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Collection-level provenance is mixed; source-backed supplier edges apply only to the explicitly qualified Preference domains. Full family review remains pending.",
+      "eligible_core": false,
+      "family_id": "helpsteer3",
+      "id": "dataset.helpsteer3",
+      "identifiers": {},
+      "kind": "dataset",
+      "legacy_id": null,
+      "name": "HelpSteer3",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [
+          "general",
+          "stem",
+          "code",
+          "multilingual"
+        ],
+        "expertise": [],
+        "labels": [
+          "pairwise_preference",
+          "human_feedback",
+          "model_generated_principles"
+        ],
+        "modality": [
+          "text"
+        ],
+        "origin": [
+          "human",
+          "model",
+          "mixed"
+        ],
+        "oversight": [
+          "multiple_annotators",
+          "vendor_qa",
+          "research_team_qa"
+        ],
+        "workflow": [
+          "preference_annotation",
+          "feedback",
+          "editing",
+          "principle_generation"
+        ]
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.instructgpt.human-rankings"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2203.02155",
+      "identifiers": {
+        "arxiv": "2203.02155",
+        "doi": "10.48550/arXiv.2203.02155"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "Training language models to follow instructions with human feedback",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.dpo.classification-objective"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2305.18290",
+      "identifiers": {
+        "arxiv": "2305.18290",
+        "doi": "10.48550/arXiv.2305.18290"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.datasheets.documentation"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.1803.09010",
+      "identifiers": {
+        "arxiv": "1803.09010",
+        "doi": "10.48550/arXiv.1803.09010"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "Datasheets for Datasets",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.fineweb.crawl-lineage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2406.17557",
+      "identifiers": {
+        "arxiv": "2406.17557",
+        "doi": "10.48550/arXiv.2406.17557"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.fineweb.crawl-lineage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": "fineweb",
+      "id": "dataset.fineweb",
+      "identifiers": {},
+      "kind": "dataset",
+      "legacy_id": null,
+      "name": "FineWeb",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.swebench.task-construction"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2310.06770",
+      "identifiers": {
+        "arxiv": "2310.06770",
+        "doi": "10.48550/arXiv.2310.06770"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.swebench.task-construction"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": "swebench",
+      "id": "benchmark.swebench",
+      "identifiers": {},
+      "kind": "benchmark",
+      "legacy_id": null,
+      "name": "SWE-bench",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.truthfulqa.question-coverage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2109.07958",
+      "identifiers": {
+        "arxiv": "2109.07958",
+        "doi": "10.48550/arXiv.2109.07958"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "TruthfulQA: Measuring How Models Mimic Human Falsehoods",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.truthfulqa.question-coverage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": "truthfulqa",
+      "id": "benchmark.truthfulqa",
+      "identifiers": {},
+      "kind": "benchmark",
+      "legacy_id": null,
+      "name": "TruthfulQA",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.mmlu.task-coverage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "paper.arxiv.2009.03300",
+      "identifiers": {
+        "arxiv": "2009.03300",
+        "doi": "10.48550/arXiv.2009.03300"
+      },
+      "kind": "paper",
+      "legacy_id": null,
+      "name": "Measuring Massive Multitask Language Understanding",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.mmlu.task-coverage"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": "mmlu",
+      "id": "benchmark.mmlu",
+      "identifiers": {},
+      "kind": "benchmark",
+      "legacy_id": null,
+      "name": "MMLU",
+      "parent_id": null,
+      "review_depth": "abstract",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [
+          "text"
+        ],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    },
+    {
+      "aliases": [],
+      "assertion_ids": [
+        "claim.helpsteer3.translated-annotation"
+      ],
+      "disposition": "included",
+      "disposition_reason": "Included for its separately AI-reviewed scoped assertions. The recorded review depth limits what counts toward comprehensive coverage.",
+      "eligible_core": false,
+      "family_id": null,
+      "id": "org.translated",
+      "identifiers": {},
+      "kind": "supplier",
+      "legacy_id": null,
+      "name": "Translated",
+      "parent_id": null,
+      "review_depth": "full_source",
+      "status": "approved",
+      "taxonomy": {
+        "domain": [],
+        "expertise": [],
+        "labels": [],
+        "modality": [],
+        "origin": [],
+        "oversight": [],
+        "workflow": []
+      }
+    }
+  ],
+  "release_id": "research-2026-11-09.prelaunch.2",
+  "reviews": [
+    {
+      "assertion_ids": [
+        "claim.helpsteer3.preference-dataset"
+      ],
+      "assertion_sha256": {
+        "claim.helpsteer3.preference-dataset": "2863291a980c977384efa276e0285b4f3ec8d772aa14241787903bdb970bd3a5"
+      },
+      "id": "review.author.claim.helpsteer3.preference-dataset",
+      "invocation_id": "codex-research-evidence-author-2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the captured version-specific abstract and matched the concise source excerpt to this scoped candidate. This is one author invocation, not independent verification or adversarial review.",
+      "reviewed_on": "2026-11-10T03:53:28Z",
+      "reviewer": "Codex evidence author (AI)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "source.arxiv.2505.11475v2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.instructgpt.human-rankings"
+      ],
+      "assertion_sha256": {
+        "claim.instructgpt.human-rankings": "6703c128c934af421646a702ff7358d051e4d32a57d0f6cc089062048b812623"
+      },
+      "id": "review.author.claim.instructgpt.human-rankings",
+      "invocation_id": "codex-research-evidence-author-2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the captured version-specific abstract and matched the concise source excerpt to this scoped candidate. This is one author invocation, not independent verification or adversarial review.",
+      "reviewed_on": "2026-11-10T03:53:31Z",
+      "reviewer": "Codex evidence author (AI)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "source.arxiv.2203.02155v1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.dpo.classification-objective"
+      ],
+      "assertion_sha256": {
+        "claim.dpo.classification-objective": "886bad7e1aae58f1ab9a0b3b0c0903cfdc2a8205ed6e1901c1113dedd2a4f89d"
+      },
+      "id": "review.author.claim.dpo.classification-objective",
+      "invocation_id": "codex-research-evidence-author-2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the captured version-specific abstract and matched the concise source excerpt to this scoped candidate. This is one author invocation, not independent verification or adversarial review.",
+      "reviewed_on": "2026-11-10T03:53:34Z",
+      "reviewer": "Codex evidence author (AI)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "source.arxiv.2305.18290v3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.datasheets.documentation"
+      ],
+      "assertion_sha256": {
+        "claim.datasheets.documentation": "5e6f9dd4bf3fd692d70e139fcba30f1f33d024ba6343bd00528ed37cbb41295e"
+      },
+      "id": "review.author.claim.datasheets.documentation",
+      "invocation_id": "codex-research-evidence-author-2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the captured version-specific abstract and matched the concise source excerpt to this scoped candidate. This is one author invocation, not independent verification or adversarial review.",
+      "reviewed_on": "2026-11-10T03:53:37Z",
+      "reviewer": "Codex evidence author (AI)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "source.arxiv.1803.09010v8"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.fineweb.crawl-lineage"
+      ],
+      "assertion_sha256": {
+        "claim.fineweb.crawl-lineage": "68afd74da79bf075bcb5cfe1517fed36fdc3842a2867043915f6790dd62372ed"
+      },
+      "id": "review.author.claim.fineweb.crawl-lineage",
+      "invocation_id": "codex-research-evidence-author-2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the captured version-specific abstract and matched the concise source excerpt to this scoped candidate. This is one author invocation, not independent verification or adversarial review.",
+      "reviewed_on": "2026-11-10T03:53:40Z",
+      "reviewer": "Codex evidence author (AI)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "source.arxiv.2406.17557v2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.swebench.task-construction"
+      ],
+      "assertion_sha256": {
+        "claim.swebench.task-construction": "cd6464b0a3b0c498d846a0b9e86a1d5cd9d4a9dc61316d93112a44fa4139e251"
+      },
+      "id": "review.author.claim.swebench.task-construction",
+      "invocation_id": "codex-research-evidence-author-2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the captured version-specific abstract and matched the concise source excerpt to this scoped candidate. This is one author invocation, not independent verification or adversarial review.",
+      "reviewed_on": "2026-11-10T03:53:43Z",
+      "reviewer": "Codex evidence author (AI)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "source.arxiv.2310.06770v3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.truthfulqa.question-coverage"
+      ],
+      "assertion_sha256": {
+        "claim.truthfulqa.question-coverage": "2677fb2d9baa319e4315005d4c0031108a7e2bcc214534c6aab19454bdab93fc"
+      },
+      "id": "review.author.claim.truthfulqa.question-coverage",
+      "invocation_id": "codex-research-evidence-author-2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the captured version-specific abstract and matched the concise source excerpt to this scoped candidate. This is one author invocation, not independent verification or adversarial review.",
+      "reviewed_on": "2026-11-10T03:53:47Z",
+      "reviewer": "Codex evidence author (AI)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "source.arxiv.2109.07958v2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.mmlu.task-coverage"
+      ],
+      "assertion_sha256": {
+        "claim.mmlu.task-coverage": "61c3ef45e10bb008a5384904cb0066c8e48fcae67226a1067bb0990b135b0bb1"
+      },
+      "id": "review.author.claim.mmlu.task-coverage",
+      "invocation_id": "codex-research-evidence-author-2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the captured version-specific abstract and matched the concise source excerpt to this scoped candidate. This is one author invocation, not independent verification or adversarial review.",
+      "reviewed_on": "2026-11-10T03:53:50Z",
+      "reviewer": "Codex evidence author (AI)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "source.arxiv.2009.03300v3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.helpsteer3.scale-annotation"
+      ],
+      "assertion_sha256": {
+        "claim.helpsteer3.scale-annotation": "71bde2e4a1c2af11a70a7d3649a4c101d7082465952afb77f6b292ab47284602"
+      },
+      "id": "review.author.claim.helpsteer3.scale-annotation",
+      "invocation_id": "codex-research-evidence-author-2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the Preference Domain section, resolving first three domains against the immediately preceding General/STEM/Code/Multilingual list. Record a limited NVIDIA attribution; do not infer a commercial relationship beyond that wording.",
+      "reviewed_on": "2026-11-10T03:53:50Z",
+      "reviewer": "Codex evidence author (AI)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "source.hf.nvidia-helpsteer3.2026-11-09"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.helpsteer3.translated-annotation"
+      ],
+      "assertion_sha256": {
+        "claim.helpsteer3.translated-annotation": "f58cf9a7828b9d19f4e61ba7c12ec52171340685c08bc2bf8e0bd25cce4eb206"
+      },
+      "id": "review.author.claim.helpsteer3.translated-annotation",
+      "invocation_id": "codex-research-evidence-author-2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the Preference Domain section, resolving first three domains against the immediately preceding General/STEM/Code/Multilingual list. Record a limited NVIDIA attribution; do not infer a commercial relationship beyond that wording.",
+      "reviewed_on": "2026-11-10T03:53:50Z",
+      "reviewer": "Codex evidence author (AI)",
+      "reviewer_type": "ai",
+      "role": "author",
+      "source_ids": [
+        "source.hf.nvidia-helpsteer3.2026-11-09"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.helpsteer3.preference-dataset"
+      ],
+      "assertion_sha256": {
+        "claim.helpsteer3.preference-dataset": "2863291a980c977384efa276e0285b4f3ec8d772aa14241787903bdb970bd3a5"
+      },
+      "id": "review.source_verifier.claim.helpsteer3.preference-dataset",
+      "invocation_id": "/root/source_verifier:2026-11-09",
+      "method": "source_content_review",
+      "note": "PASS for paper.arxiv.2505.11475 documents dataset.helpsteer3, with null value and the existing abstract-only, author-reported qualifications. Independently read the cached arXiv 2505.11475v2 abstract before assertions: sentence 3 introduces HelpSteer3-Preference as a human-annotated preference dataset with over 40,000 samples. This supports the paper-to-dataset documentation relation. Exact locator Abstract, sentence 3 matches; response SHA-256, excerpt SHA-256, excerpt presence, and assertion/source binding were verified. Scope is the versioned abstract and metadata, not a full-paper review, dataset validation, supplier attribution, or independent replication.",
+      "reviewed_on": "2026-11-10T04:04:31Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "source.arxiv.2505.11475v2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.instructgpt.human-rankings"
+      ],
+      "assertion_sha256": {
+        "claim.instructgpt.human-rankings": "6703c128c934af421646a702ff7358d051e4d32a57d0f6cc089062048b812623"
+      },
+      "id": "review.source_verifier.claim.instructgpt.human-rankings",
+      "invocation_id": "/root/source_verifier:2026-11-09",
+      "method": "source_content_review",
+      "note": "PASS for paper.arxiv.2203.02155 paper_method with exact text value The authors describe collecting human rankings of model outputs as part of their instruction-following training method. Independently read the cached v1 abstract before assertions: in the human-feedback method it describes labeler demonstrations followed by collecting rankings of model outputs for RLHF fine-tuning. The human-ranking description is supported by this context and the existing author-reported abstract qualifications. Abstract, human ranking stage matches the passage; response hash, excerpt hash, excerpt presence, and assertion/source binding verified. No full-paper, ranking-protocol, supplier, or replication review was performed.",
+      "reviewed_on": "2026-11-10T04:04:31Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "source.arxiv.2203.02155v1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.dpo.classification-objective"
+      ],
+      "assertion_sha256": {
+        "claim.dpo.classification-objective": "886bad7e1aae58f1ab9a0b3b0c0903cfdc2a8205ed6e1901c1113dedd2a4f89d"
+      },
+      "id": "review.source_verifier.claim.dpo.classification-objective",
+      "invocation_id": "/root/source_verifier:2026-11-09",
+      "method": "source_content_review",
+      "note": "PASS for paper.arxiv.2305.18290 paper_method with exact text value The authors derive a classification objective for learning from preferences, under the existing author-reported abstract qualifications. Independently read the cached v3 abstract before assertions: the authors describe a reward-model parameterization with a closed-form corresponding optimal policy allowing the standard RLHF problem to be solved with a simple classification loss. This entails the concise method description as an author claim; the derivation itself was not checked. Abstract, proposed objective matches; response hash, excerpt hash, excerpt presence, and assertion/source binding verified. Abstract and metadata only, not full-paper or mathematical verification.",
+      "reviewed_on": "2026-11-10T04:04:31Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "source.arxiv.2305.18290v3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.datasheets.documentation"
+      ],
+      "assertion_sha256": {
+        "claim.datasheets.documentation": "5e6f9dd4bf3fd692d70e139fcba30f1f33d024ba6343bd00528ed37cbb41295e"
+      },
+      "id": "review.source_verifier.claim.datasheets.documentation",
+      "invocation_id": "/root/source_verifier:2026-11-09",
+      "method": "source_content_review",
+      "note": "PASS for paper.arxiv.1803.09010 paper_method with the exact text value proposing documentation of dataset motivation, composition, collection process and recommended uses, under the existing author-reported abstract qualifications. Independently read the cached v8 abstract before assertions: the dataset-datasheet proposal explicitly enumerates these four items. Abstract, dataset documentation proposal matches; response hash, excerpt hash, excerpt presence, and assertion/source binding verified. Abstract and metadata only; this does not certify implementation of a datasheet, compliance with a standard, or a full-paper review.",
+      "reviewed_on": "2026-11-10T04:04:31Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "source.arxiv.1803.09010v8"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.fineweb.crawl-lineage"
+      ],
+      "assertion_sha256": {
+        "claim.fineweb.crawl-lineage": "68afd74da79bf075bcb5cfe1517fed36fdc3842a2867043915f6790dd62372ed"
+      },
+      "id": "review.source_verifier.claim.fineweb.crawl-lineage",
+      "invocation_id": "/root/source_verifier:2026-11-09",
+      "method": "source_content_review",
+      "note": "PASS for paper.arxiv.2406.17557 documents dataset.fineweb, with null value and the existing abstract-only, author-reported qualifications. Independently read the cached v2 abstract before assertions: it introduces FineWeb as a 15-trillion-token dataset derived from 96 Common Crawl snapshots. This supports the exact paper-to-dataset documentation relation; it does not turn the claim identifier into a separately verified lineage audit. Abstract, FineWeb description matches; response hash, excerpt hash, excerpt presence, and assertion/source binding verified. Abstract and metadata only, not full-paper, corpus, curation-code, or current-release verification.",
+      "reviewed_on": "2026-11-10T04:04:31Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "source.arxiv.2406.17557v2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.swebench.task-construction"
+      ],
+      "assertion_sha256": {
+        "claim.swebench.task-construction": "cd6464b0a3b0c498d846a0b9e86a1d5cd9d4a9dc61316d93112a44fa4139e251"
+      },
+      "id": "review.source_verifier.claim.swebench.task-construction",
+      "invocation_id": "/root/source_verifier:2026-11-09",
+      "method": "source_content_review",
+      "note": "PASS for paper.arxiv.2310.06770 documents benchmark.swebench, with null value and the existing abstract-only, author-reported qualifications. Independently read the cached v3 abstract before assertions: it introduces SWE-bench as an evaluation framework built from 2,294 software-engineering problems from GitHub issues and corresponding pull requests across 12 Python repositories. This supports the exact paper-to-benchmark documentation relation. Abstract, benchmark construction matches; response hash, excerpt hash, excerpt presence, and assertion/source binding verified. Abstract and metadata only, not full-paper, individual-issue, benchmark-file, or test-harness validation.",
+      "reviewed_on": "2026-11-10T04:04:31Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "source.arxiv.2310.06770v3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.truthfulqa.question-coverage"
+      ],
+      "assertion_sha256": {
+        "claim.truthfulqa.question-coverage": "2677fb2d9baa319e4315005d4c0031108a7e2bcc214534c6aab19454bdab93fc"
+      },
+      "id": "review.source_verifier.claim.truthfulqa.question-coverage",
+      "invocation_id": "/root/source_verifier:2026-11-09",
+      "method": "source_content_review",
+      "note": "PASS for paper.arxiv.2109.07958 documents benchmark.truthfulqa, with null value and the existing abstract-only, author-reported qualifications. Independently read the cached v2 abstract before assertions: the proposed truthfulness benchmark has 817 questions across 38 categories, including health, law, finance and politics. This supports the exact paper-to-benchmark documentation relation. Abstract, benchmark coverage matches; response hash, excerpt hash, excerpt presence, and assertion/source binding verified. Abstract and metadata only, not full-paper, question-file, current-variant, or model-truthfulness verification.",
+      "reviewed_on": "2026-11-10T04:04:31Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "source.arxiv.2109.07958v2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.mmlu.task-coverage"
+      ],
+      "assertion_sha256": {
+        "claim.mmlu.task-coverage": "61c3ef45e10bb008a5384904cb0066c8e48fcae67226a1067bb0990b135b0bb1"
+      },
+      "id": "review.source_verifier.claim.mmlu.task-coverage",
+      "invocation_id": "/root/source_verifier:2026-11-09",
+      "method": "source_content_review",
+      "note": "PASS for paper.arxiv.2009.03300 documents benchmark.mmlu, with null value and the existing abstract-only, author-reported qualifications. Independently read the cached v3 abstract before assertions: the multitask test covers 57 tasks, including mathematics, US history, computer science and law. The page title and benchmark entity name resolve the MMLU identity, supporting the exact paper-to-benchmark documentation relation. Abstract, task coverage matches; response hash, excerpt hash, excerpt presence, and assertion/source binding verified. Abstract and metadata only, not full-paper, task-file, current-variant, or model-competence verification.",
+      "reviewed_on": "2026-11-10T04:04:31Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "source.arxiv.2009.03300v3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.helpsteer3.scale-annotation"
+      ],
+      "assertion_sha256": {
+        "claim.helpsteer3.scale-annotation": "71bde2e4a1c2af11a70a7d3649a4c101d7082465952afb77f6b292ab47284602"
+      },
+      "id": "review.source_verifier.claim.helpsteer3.scale-annotation",
+      "invocation_id": "/root/source_verifier:2026-11-09",
+      "method": "source_content_review",
+      "note": "PASS for org.scale_ai supplies_data_for dataset.helpsteer3, with null value, only with the exact existing qualification limiting NVIDIA dataset-card attribution to General, STEM and Code domains of HelpSteer3-Preference. Independently read the cached card before assertions: under Preference, Domain lists General, STEM, Code and Multilingual, then attributes the first three domains to Scale AI and the last to Translated. The surrounding ordered list resolves first three precisely. Dataset card / Preference / Domain is a matching human-readable locator; response hash, excerpt hash, excerpt presence, and assertion/source binding verified. No contract value, payment terms, exclusivity, exhaustive supplier list, other subsets/datasets, or continuing relationship is established. Publisher attribution was reviewed, not underlying annotation records or full papers.",
+      "reviewed_on": "2026-11-10T04:04:31Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "source.hf.nvidia-helpsteer3.2026-11-09"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.helpsteer3.translated-annotation"
+      ],
+      "assertion_sha256": {
+        "claim.helpsteer3.translated-annotation": "f58cf9a7828b9d19f4e61ba7c12ec52171340685c08bc2bf8e0bd25cce4eb206"
+      },
+      "id": "review.source_verifier.claim.helpsteer3.translated-annotation",
+      "invocation_id": "/root/source_verifier:2026-11-09",
+      "method": "source_content_review",
+      "note": "PASS for org.translated supplies_data_for dataset.helpsteer3, with null value, only with the exact existing qualification limiting NVIDIA dataset-card attribution to the Multilingual domain of HelpSteer3-Preference. Independently read the cached card before assertions: under Preference, Domain lists General, STEM, Code and Multilingual, then attributes the last domain to Translated. The surrounding ordered list resolves last domain as Multilingual. Dataset card / Preference / Domain is a matching human-readable locator; response hash, excerpt hash, excerpt presence, and assertion/source binding verified. No contract value, payment terms, exclusivity, exhaustive supplier list, other subsets/datasets, or continuing relationship is established. Publisher attribution was reviewed, not underlying annotation records or full papers.",
+      "reviewed_on": "2026-11-10T04:04:31Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "source.hf.nvidia-helpsteer3.2026-11-09"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.helpsteer3.preference-dataset"
+      ],
+      "assertion_sha256": {
+        "claim.helpsteer3.preference-dataset": "2863291a980c977384efa276e0285b4f3ec8d772aa14241787903bdb970bd3a5"
+      },
+      "id": "review.adversarial.claim.helpsteer3.preference-dataset",
+      "invocation_id": "/root/adversarial_evidence:2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the pinned v2 abstract, its exact cached response, version header and linked dataset identity; independently opened the primary arXiv page. The third abstract sentence supports this narrow paper-documents-HelpSteer3-Preference relationship and reports more than 40,000 human-annotated preference samples. This is an author report, not verified annotation quality, an independently audited count or a full-paper review. Current direct HTTP response is byte-identical to the pinned response. Required downstream correction: the object named HelpSteer3 is a broader collection; do not export its origin=[human] as if responses or every subset were human-generated. The pinned NVIDIA card explicitly describes LLM-generated responses and a model-generated Principle subset. Scope taxonomy to Preference or represent mixed provenance.",
+      "reviewed_on": "2026-11-10T04:06:50Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "source.arxiv.2505.11475v2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.instructgpt.human-rankings"
+      ],
+      "assertion_sha256": {
+        "claim.instructgpt.human-rankings": "6703c128c934af421646a702ff7358d051e4d32a57d0f6cc089062048b812623"
+      },
+      "id": "review.adversarial.claim.instructgpt.human-rankings",
+      "invocation_id": "/root/adversarial_evidence:2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the entire pinned v1 abstract and surrounding human-feedback context, checked its version header and exact cached response, and independently opened the primary page. The authors describe demonstrations followed by collecting model-output rankings for reinforcement learning from human feedback; human ranking is supported by the surrounding abstract, rather than the excerpt alone. This passes only as an author-reported instruction-following method. It establishes no annotation supplier, contract, full dataset specification or independently replicated result. Current direct HTTP response is byte-identical. Abstract review only.",
+      "reviewed_on": "2026-11-10T04:06:50Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "source.arxiv.2203.02155v1"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.dpo.classification-objective"
+      ],
+      "assertion_sha256": {
+        "claim.dpo.classification-objective": "886bad7e1aae58f1ab9a0b3b0c0903cfdc2a8205ed6e1901c1113dedd2a4f89d"
+      },
+      "id": "review.adversarial.claim.dpo.classification-objective",
+      "invocation_id": "/root/adversarial_evidence:2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the pinned v3 abstract, checked the version header and exact cached response, and independently opened the primary page. The abstract connects preference learning to an alternative reward-model parameterization and a classification loss, supporting the stated derived objective. The claim does not assert that new human feedback was collected, name a supplier or generalize empirical superiority to all tasks. Current direct HTTP response is byte-identical. Abstract review only; no derivation or experiment in the full paper was audited.",
+      "reviewed_on": "2026-11-10T04:06:50Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "source.arxiv.2305.18290v3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.datasheets.documentation"
+      ],
+      "assertion_sha256": {
+        "claim.datasheets.documentation": "5e6f9dd4bf3fd692d70e139fcba30f1f33d024ba6343bd00528ed37cbb41295e"
+      },
+      "id": "review.adversarial.claim.datasheets.documentation",
+      "invocation_id": "/root/adversarial_evidence:2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the pinned v8 abstract, checked its version header and exact cached response, and independently opened the primary page. It explicitly proposes dataset documentation covering motivation, composition, collection and recommended uses. This is a proposal, not evidence of universal adoption, an existing standard or enforced compliance. Current direct HTTP response is byte-identical. Abstract review only.",
+      "reviewed_on": "2026-11-10T04:06:50Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "source.arxiv.1803.09010v8"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.fineweb.crawl-lineage"
+      ],
+      "assertion_sha256": {
+        "claim.fineweb.crawl-lineage": "68afd74da79bf075bcb5cfe1517fed36fdc3842a2867043915f6790dd62372ed"
+      },
+      "id": "review.adversarial.claim.fineweb.crawl-lineage",
+      "invocation_id": "/root/adversarial_evidence:2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the pinned v2 abstract, checked its version header and exact cached response, and independently opened the primary page. FineWeb is introduced with Common Crawl lineage; the abstract reports 15 trillion tokens from 96 snapshots. The generic documents edge is supported. Those counts are version-specific author reports, not a fresh count, proof of licensing or a supplier contribution; FineWeb-Edu is separately described and must not inherit the base dataset count. Current direct HTTP response is byte-identical. Abstract review only.",
+      "reviewed_on": "2026-11-10T04:06:50Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "source.arxiv.2406.17557v2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.swebench.task-construction"
+      ],
+      "assertion_sha256": {
+        "claim.swebench.task-construction": "cd6464b0a3b0c498d846a0b9e86a1d5cd9d4a9dc61316d93112a44fa4139e251"
+      },
+      "id": "review.adversarial.claim.swebench.task-construction",
+      "invocation_id": "/root/adversarial_evidence:2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the pinned v3 abstract, checked its version header and exact cached response, and independently opened the primary page. It documents the benchmark as problems originating in real GitHub issues paired with pull requests across 12 Python repositories, with 2,294 problems in this abstract. The generic documents edge passes; no Verified/Lite variant, current score, human annotation supplier or full dataset audit is implied. Current direct HTTP response is byte-identical. Abstract review only.",
+      "reviewed_on": "2026-11-10T04:06:50Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "source.arxiv.2310.06770v3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.truthfulqa.question-coverage"
+      ],
+      "assertion_sha256": {
+        "claim.truthfulqa.question-coverage": "2677fb2d9baa319e4315005d4c0031108a7e2bcc214534c6aab19454bdab93fc"
+      },
+      "id": "review.adversarial.claim.truthfulqa.question-coverage",
+      "invocation_id": "/root/adversarial_evidence:2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the pinned v2 abstract, checked its version header and exact cached response, and independently opened the primary page. It documents TruthfulQA with 817 questions in 38 categories, crafted around false beliefs and misconceptions. The generic documents edge passes. Category coverage is not balanced coverage of all truthfulness risks, and historic model findings in the abstract are not current performance results. Current direct HTTP response is byte-identical. Abstract review only.",
+      "reviewed_on": "2026-11-10T04:06:50Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "source.arxiv.2109.07958v2"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.mmlu.task-coverage"
+      ],
+      "assertion_sha256": {
+        "claim.mmlu.task-coverage": "61c3ef45e10bb008a5384904cb0066c8e48fcae67226a1067bb0990b135b0bb1"
+      },
+      "id": "review.adversarial.claim.mmlu.task-coverage",
+      "invocation_id": "/root/adversarial_evidence:2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the pinned v3 abstract, checked its version header and exact cached response, and independently opened the primary page. It explicitly describes a text-model multitask test covering 57 tasks with academic and professional subject examples. The generic documents edge passes; these are 57 tasks, not 57 benchmarks or human suppliers, and the abstract does not validate current performance. Current direct HTTP response is byte-identical. Abstract review only.",
+      "reviewed_on": "2026-11-10T04:06:50Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "source.arxiv.2009.03300v3"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.helpsteer3.scale-annotation"
+      ],
+      "assertion_sha256": {
+        "claim.helpsteer3.scale-annotation": "71bde2e4a1c2af11a70a7d3649a4c101d7082465952afb77f6b292ab47284602"
+      },
+      "id": "review.adversarial.claim.helpsteer3.scale-annotation",
+      "invocation_id": "/root/adversarial_evidence:2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the pinned NVIDIA dataset-card body, particularly Preference / Domain and the later data-source, annotation-methodology and ethics sections; independently opened the primary card. The preceding ordered list resolves the first-three-domains reference to General, STEM and Code, and the card attributes actual annotation through Scale AI rather than merely advertising a capability. The current qualifications correctly restrict this to HelpSteer3-Preference and exclude commercial conclusions. Cached body SHA256 matches the source record exactly. Current live page SHA256 differs (0133934cdc3ebbc079c63afbc40db00fc58841a5f61a8117ecb90aa4c2d7a1fd), while the full domain-attribution paragraph remains identical. This is a full dataset-card content review, not a full-paper review, verification of labor conditions or proof that model responses were human-generated.",
+      "reviewed_on": "2026-11-10T04:06:50Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "source.hf.nvidia-helpsteer3.2026-11-09"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "claim.helpsteer3.translated-annotation"
+      ],
+      "assertion_sha256": {
+        "claim.helpsteer3.translated-annotation": "f58cf9a7828b9d19f4e61ba7c12ec52171340685c08bc2bf8e0bd25cce4eb206"
+      },
+      "id": "review.adversarial.claim.helpsteer3.translated-annotation",
+      "invocation_id": "/root/adversarial_evidence:2026-11-09",
+      "method": "source_content_review",
+      "note": "Read the pinned NVIDIA dataset-card body, particularly Preference / Domain and the later data-source, annotation-methodology and ethics sections; independently opened the primary card. The ordered domain list identifies Multilingual as the final domain and attributes its annotation through Translated, supporting an actual scoped contribution rather than a capability inference. The current qualifications correctly exclude other datasets and commercial conclusions. Cached body SHA256 matches the source record exactly. Current live page SHA256 differs (0133934cdc3ebbc079c63afbc40db00fc58841a5f61a8117ecb90aa4c2d7a1fd), while the full domain-attribution paragraph remains identical. This is a full dataset-card content review, not a full-paper review or independent verification of vendor assertions about working conditions.",
+      "reviewed_on": "2026-11-10T04:06:50Z",
+      "reviewer": "gpt-6.1-sol, ultra",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "source.hf.nvidia-helpsteer3.2026-11-09"
+      ],
+      "verdict": "pass"
+    }
+  ],
+  "schema_version": "1.0.0",
+  "sources": [
+    {
+      "captured_on": null,
+      "excerpt": "",
+      "excerpt_sha256": null,
+      "id": "legacy.canonical.2-5-0",
+      "license": null,
+      "locator": "data/canonical.json; original source dates remain in the canonical source ledger",
+      "published_on": null,
+      "publisher": "ScienceToStartup",
+      "response_sha256": "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061",
+      "source_type": "legacy",
+      "status": "historical_reference",
+      "title": "ScienceToStartup canonical dataset 2.5.0 (historical local snapshot)",
+      "url": "https://sciencetostartup.com/research.json",
+      "version": "2.5.0 sha256:948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061"
+    },
+    {
+      "captured_on": "2026-11-10T03:53:28Z",
+      "excerpt": "a permissively licensed (CC-BY-4.0), high-quality, human-annotated preference dataset comprising of over 40,000 samples.",
+      "excerpt_sha256": "33d75c554af982f3c804278afe6378fd37e453382ac699315491dbd9c1a2ff56",
+      "id": "source.arxiv.2505.11475v2",
+      "license": null,
+      "locator": "Abstract, sentence 3",
+      "published_on": null,
+      "publisher": "arXiv / paper authors",
+      "response_sha256": "68b5071fdac5cd44109bfcbc9dc03d22c15881b22e336ab74c70d5844311a957",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "HelpSteer3-Preference: Open Human-Annotated Preference Data across Diverse Tasks and Languages",
+      "url": "https://arxiv.org/abs/2505.11475v2",
+      "version": "2505.11475v2"
+    },
+    {
+      "captured_on": "2026-11-10T03:53:31Z",
+      "excerpt": "We then collect a dataset of rankings of model outputs",
+      "excerpt_sha256": "7f1dc8b48abda8913b0f92fd34a89a84a42dd168f976ce234756022d1f53cc97",
+      "id": "source.arxiv.2203.02155v1",
+      "license": null,
+      "locator": "Abstract, human ranking stage",
+      "published_on": null,
+      "publisher": "arXiv / paper authors",
+      "response_sha256": "350f6cfe6cd4047f95c8c598839df74f9a13d5441bd75115fd87bd23d9a8174a",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "Training language models to follow instructions with human feedback",
+      "url": "https://arxiv.org/abs/2203.02155v1",
+      "version": "2203.02155v1"
+    },
+    {
+      "captured_on": "2026-11-10T03:53:34Z",
+      "excerpt": "allowing us to solve the standard RLHF problem with only a simple classification loss.",
+      "excerpt_sha256": "f792352bd232c16a5a8546bd20be2d8d3a66c6ed6af89e25d38d2103f9b782a1",
+      "id": "source.arxiv.2305.18290v3",
+      "license": null,
+      "locator": "Abstract, proposed objective",
+      "published_on": null,
+      "publisher": "arXiv / paper authors",
+      "response_sha256": "08edfdec10277f58ef5b670abe5d4c12772011b485501756e09527c895948d2b",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+      "url": "https://arxiv.org/abs/2305.18290v3",
+      "version": "2305.18290v3"
+    },
+    {
+      "captured_on": "2026-11-10T03:53:37Z",
+      "excerpt": "a datasheet that documents its motivation, composition, collection process, recommended uses, and so on.",
+      "excerpt_sha256": "92cb199925d0f04406faf393ae9b2fd9a379713dba1b439b6644edb3c4babe43",
+      "id": "source.arxiv.1803.09010v8",
+      "license": null,
+      "locator": "Abstract, dataset documentation proposal",
+      "published_on": null,
+      "publisher": "arXiv / paper authors",
+      "response_sha256": "6ff49b1a436386614b2172e351b60d45e01d5a48c678f8731c2b6c0cdd3947a1",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "Datasheets for Datasets",
+      "url": "https://arxiv.org/abs/1803.09010v8",
+      "version": "1803.09010v8"
+    },
+    {
+      "captured_on": "2026-11-10T03:53:40Z",
+      "excerpt": "a 15-trillion token dataset derived from 96 Common Crawl snapshots",
+      "excerpt_sha256": "4f030da38adc6122f3eecde4f5d0947692c124536dd212b51146dea6e42801e9",
+      "id": "source.arxiv.2406.17557v2",
+      "license": null,
+      "locator": "Abstract, FineWeb description",
+      "published_on": null,
+      "publisher": "arXiv / paper authors",
+      "response_sha256": "8b45f0e0560aeba3d03908a052037b79dadc400dd94d9561f64b226826a3909e",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale",
+      "url": "https://arxiv.org/abs/2406.17557v2",
+      "version": "2406.17557v2"
+    },
+    {
+      "captured_on": "2026-11-10T03:53:43Z",
+      "excerpt": "software engineering problems drawn from real GitHub issues and corresponding pull requests",
+      "excerpt_sha256": "f3839b986794c32415277ede8de83fc20eb92e6c38038c71ae614376993d6c73",
+      "id": "source.arxiv.2310.06770v3",
+      "license": null,
+      "locator": "Abstract, benchmark construction",
+      "published_on": null,
+      "publisher": "arXiv / paper authors",
+      "response_sha256": "55b7b98eefc6bcc924cd4c4978ba276469e321f521400c345e46abd37f19f5a9",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
+      "url": "https://arxiv.org/abs/2310.06770v3",
+      "version": "2310.06770v3"
+    },
+    {
+      "captured_on": "2026-11-10T03:53:47Z",
+      "excerpt": "The benchmark comprises 817 questions that span 38 categories, including health, law, finance and politics.",
+      "excerpt_sha256": "0f765c6a4b5e0a306b723337017b644c641ba7230f4065f0507ff4a27c821828",
+      "id": "source.arxiv.2109.07958v2",
+      "license": null,
+      "locator": "Abstract, benchmark coverage",
+      "published_on": null,
+      "publisher": "arXiv / paper authors",
+      "response_sha256": "f6076f5fb265c258f41325aa571f25d65ed8c73744c654f60bd9095228141c32",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "TruthfulQA: Measuring How Models Mimic Human Falsehoods",
+      "url": "https://arxiv.org/abs/2109.07958v2",
+      "version": "2109.07958v2"
+    },
+    {
+      "captured_on": "2026-11-10T03:53:50Z",
+      "excerpt": "The test covers 57 tasks including elementary mathematics, US history, computer science, law, and more.",
+      "excerpt_sha256": "8fac4183e07df38cd6c13bb9d45da5f8e57cbb06f366c13be60d6561b4b14344",
+      "id": "source.arxiv.2009.03300v3",
+      "license": null,
+      "locator": "Abstract, task coverage",
+      "published_on": null,
+      "publisher": "arXiv / paper authors",
+      "response_sha256": "c2f09edccaea2fa2d18edf4c88ebaaa2531d6b6fb4509ef5deb9bf0b55071f93",
+      "source_type": "paper",
+      "status": "captured",
+      "title": "Measuring Massive Multitask Language Understanding",
+      "url": "https://arxiv.org/abs/2009.03300v3",
+      "version": "2009.03300v3"
+    },
+    {
+      "captured_on": "2026-11-10T03:53:50Z",
+      "excerpt": "The first three domains were annotated by Scale AI while the last domain was annotated by Translated.",
+      "excerpt_sha256": "546696fc6add700a90528413d9125d22a51a0c51ad6e8aeccf690df78e58ff39",
+      "id": "source.hf.nvidia-helpsteer3.2026-11-09",
+      "license": "CC-BY-4.0 (dataset card statement; underlying source rights require scoped review)",
+      "locator": "Dataset card / Preference / Domain",
+      "published_on": null,
+      "publisher": "NVIDIA",
+      "response_sha256": "827e51e12a2537403f516e7e5299455c9de36994b621deab2b9a7524e01b29b7",
+      "source_type": "dataset_card",
+      "status": "captured",
+      "title": "NVIDIA HelpSteer3 dataset card",
+      "url": "https://huggingface.co/datasets/nvidia/HelpSteer3",
+      "version": "HF dataset card response sha256:827e51e12a2537403f516e7e5299455c9de36994b621deab2b9a7524e01b29b7"
+    }
+  ]
+}

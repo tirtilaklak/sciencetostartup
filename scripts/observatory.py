@@ -820,6 +820,14 @@ def build(data, destination):
     sidecars = dict(EDITORIAL=editorial, RESEARCH_ALIASES=aliases, LOGOS=logo_data,
                     WORK_ROUTES=work_data, PROFILE_CONTENT=profile_content, COMPANY_EVENTS=company_events,
                     SOURCE_UPDATES=source_updates, BUSINESS_HEALTH=health)
+    # Additive research belongs only to the actual public canonical input. Pipeline
+    # fixtures must not accidentally inherit unrelated live research or coverage.
+    research_context = None
+    if data == json.loads((ROOT / "data/canonical.json").read_text()):
+        from research_report import build_context
+        from research_pages import research_search_entries
+        research_context = build_context(ROOT)
+        sidecars["RESEARCH_SEARCH"] = research_search_entries(research_context)
     release_path = ROOT / "data/editorial-release.json"
     release = json.loads(release_path.read_text()) if release_path.exists() else {"editorial_release_id": "baseline-2026-10-28", "publication_as_of": "2026-11-08T20:30:00Z"}
     if release_path.exists() and data["dataset_version"] == SIDECAR_DATASET_VERSION:
@@ -881,6 +889,24 @@ def build(data, destination):
     landing = render_home(landing, data, sidecars, release, summary)
     (destination / "index.html").write_text(landing)
     from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health, business_health=health)
+    if research_context is not None:
+        from research_graph import write_exports
+        from research_citations import write_publication_assets
+        from research_pages import write_research_pages
+        write_exports(research_context["graph"], destination / "research/exports")
+        research_context["publication_assets"] = write_publication_assets(research_context, destination)
+        research_entries = write_research_pages(destination, research_context)
+        import xml.etree.ElementTree as ET
+        from static_pages import render_sitemap
+        namespace = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+        sitemap = ET.parse(destination / "sitemap.xml").getroot()
+        entries = [(node.findtext(namespace + "loc"), node.findtext(namespace + "lastmod")) for node in sitemap]
+        entries += [("https://sciencetostartup.com" + entry["path"], entry["lastmod"]) for entry in research_entries]
+        if len({entry[0] for entry in entries}) != len(entries):
+            raise ValueError("Duplicate canonical URL in research sitemap")
+        (destination / "sitemap.xml").write_text(render_sitemap(entries), encoding="utf-8")
+        (destination / "public-identity.json").write_text(json.dumps(research_context["identity"], indent=2, ensure_ascii=False) + "\n")
+        (destination / "CITATION.cff").write_bytes((destination / "publication/CITATION.cff").read_bytes())
     from presentation import retain_runtime_generations
     retain_runtime_generations(ROOT, destination)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}

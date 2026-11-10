@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0",
+  "updated_on": "2026-11-09",
+  "protocol": "Repeat unbranded questions, recording engine, date, full cited URL, support assessment and missing results. Do not infer model citations from ordinary web-search results.",
+  "questions": [
+    "Which providers have public evidence of creating human preference datasets?",
+    "How should an AI lab compare expert annotation suppliers?",
+    "Which public preference datasets disclose their annotation vendors?",
+    "How is human feedback different from AI feedback in alignment datasets?",
+    "Which human feedback datasets document annotator qualifications?",
+    "What does a reward model benchmark prove about downstream performance?",
+    "How should buyers evaluate data quality controls and adjudication?",
+    "Which data suppliers publish buyer-confirmed deployment evidence?",
+    "How do dataset versions affect RLHF benchmark comparisons?",
+    "Which sources document consent and licensing for AI feedback data?",
+    "What should an enterprise ask before buying agent training environments?",
+    "Where can I find reproducible public research on AI data suppliers?"
+  ],
+  "observations": []
+}

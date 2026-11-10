@@ -1,0 +1,224 @@
+{
+  "as_of": "2026-11-09",
+  "facets": {
+    "domain": [
+      "general",
+      "stem",
+      "mathematics",
+      "code",
+      "multilingual",
+      "health",
+      "law",
+      "finance",
+      "robotics",
+      "safety",
+      "education",
+      "creative"
+    ],
+    "expertise": [
+      "generalist",
+      "professional",
+      "domain_expert",
+      "researcher",
+      "native_language",
+      "software_engineering",
+      "unknown"
+    ],
+    "labels": [
+      "demonstration",
+      "pairwise_preference",
+      "scalar_rating",
+      "rubric_score",
+      "reasoning",
+      "edit",
+      "classification",
+      "span",
+      "bounding_box",
+      "segmentation",
+      "trajectory",
+      "verifiable_reward",
+      "unknown"
+    ],
+    "modality": [
+      "text",
+      "image",
+      "audio",
+      "video",
+      "3d",
+      "sensor",
+      "multimodal"
+    ],
+    "origin": [
+      "human",
+      "synthetic",
+      "hybrid",
+      "web",
+      "licensed",
+      "first_party",
+      "unknown"
+    ],
+    "oversight": [
+      "single_annotator",
+      "multiple_annotators",
+      "expert_adjudication",
+      "vendor_qa",
+      "research_team_qa",
+      "automated_checks",
+      "unknown"
+    ],
+    "workflow": [
+      "collection",
+      "recruitment",
+      "demonstration",
+      "preference_annotation",
+      "rubric_design",
+      "labeling",
+      "adjudication",
+      "quality_assurance",
+      "synthetic_generation",
+      "filtering",
+      "deduplication",
+      "evaluation",
+      "red_teaming",
+      "licensing",
+      "delivery"
+    ]
+  },
+  "notes": [
+    "Facets are independent; a domain does not establish expertise, modality, rights, compensation, quality or contribution.",
+    "Unknown facets remain empty arrays. Membership is a research classification, never source approval.",
+    "Workflow edges describe only the explicitly cited stage; no edge is transitive and no capability establishes a particular contribution."
+  ],
+  "predicates": {
+    "access_terms": {
+      "meaning": "Source-bound access terms relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "adjudicated": {
+      "meaning": "Supplier performed the cited disagreement-resolution stage.",
+      "transitive": false
+    },
+    "adjudicated_for": {
+      "meaning": "Source-bound adjudicated for relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "annotated": {
+      "meaning": "Supplier performed the cited annotation stage.",
+      "transitive": false
+    },
+    "annotated_for": {
+      "meaning": "Source-bound annotated for relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "benchmark_task": {
+      "meaning": "Source-bound benchmark task relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "creates": {
+      "meaning": "Source-bound creates relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "dataset_size": {
+      "meaning": "Source-bound dataset size relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "derived_from": {
+      "meaning": "Source-bound derived from relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "documents": {
+      "meaning": "Source-bound documents relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "evaluates": {
+      "meaning": "Source-bound evaluates relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "evaluates_on": {
+      "meaning": "The named model or workflow is evaluated on this specific benchmark version.",
+      "transitive": false
+    },
+    "filtered": {
+      "meaning": "Supplier or process filtered the cited source under its stated rule.",
+      "transitive": false
+    },
+    "filtered_for": {
+      "meaning": "Source-bound filtered for relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "generated": {
+      "meaning": "Supplier or model generated the cited synthetic stage outputs.",
+      "transitive": false
+    },
+    "generated_for": {
+      "meaning": "Source-bound generated for relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "has_capability": {
+      "meaning": "The source documents an offering or capability; never implies contribution to a named artifact.",
+      "transitive": false
+    },
+    "has_stage": {
+      "meaning": "Source-bound has stage relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "human_annotation": {
+      "meaning": "Source-bound human annotation relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "labeled": {
+      "meaning": "Supplier applied the cited labels to the cited artifact.",
+      "transitive": false
+    },
+    "labeled_for": {
+      "meaning": "Source-bound labeled for relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "legacy_description": {
+      "meaning": "Source-bound legacy description relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "licenses": {
+      "meaning": "Source-bound licenses relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "paper_method": {
+      "meaning": "Source-bound paper method relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "publishes": {
+      "meaning": "Source-bound publishes relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "recruited": {
+      "meaning": "Supplier recruited participants for the cited workflow stage.",
+      "transitive": false
+    },
+    "recruited_for": {
+      "meaning": "Source-bound recruited for relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "release_of": {
+      "meaning": "A particular released manifestation of a dataset family.",
+      "transitive": false
+    },
+    "supplies_data_for": {
+      "meaning": "A source explicitly attributes this supplier contribution to this particular artifact or workflow; does not establish contract value, rights or other contributions.",
+      "transitive": false
+    },
+    "trained_on": {
+      "meaning": "Source-bound trained on relationship or typed observation; preserve its explicit qualifications.",
+      "transitive": false
+    },
+    "uses_training": {
+      "meaning": "The named model or workflow uses this training source under the stated version and scope.",
+      "transitive": false
+    },
+    "version_of": {
+      "meaning": "A particular manifestation of a paper work or benchmark family.",
+      "transitive": false
+    }
+  },
+  "schema_version": "1.0.0",
+  "status": "editorial_controlled_vocabulary"
+}

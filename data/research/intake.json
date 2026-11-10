@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0.0",
+  "scope_id": "human-data-and-evaluation-2020-onward-v1",
+  "start_year": 2020,
+  "default_page_size": 50,
+  "arxiv_categories": ["cs.AI", "cs.CL", "cs.LG", "cs.CV", "cs.RO", "cs.SD", "stat.ML"],
+  "arxiv_topics": [
+    {"id": "human-feedback", "query": "all:\"human feedback\" OR all:RLHF OR all:\"human preference\""},
+    {"id": "annotation-and-expertise", "query": "all:\"data annotation\" OR all:\"expert annotation\" OR all:\"annotator disagreement\""},
+    {"id": "preference-and-reward", "query": "all:\"preference dataset\" OR all:\"reward model\" OR all:\"preference optimization\""},
+    {"id": "synthetic-feedback", "query": "all:RLAIF OR all:\"AI feedback\" OR all:\"synthetic data\""},
+    {"id": "agent-environments", "query": "all:\"agent benchmark\" OR all:\"training environments\" OR all:\"verifiable rewards\""},
+    {"id": "quality-and-provenance", "query": "all:\"dataset provenance\" OR all:\"data quality\" OR all:\"evaluation dataset\""}
+  ],
+  "huggingface_queries": ["human-feedback", "preference", "rlhf", "reward-bench", "expert", "agent"],
+  "acl_collections": ["2026.emnlp", "2026.acl", "2025.acl", "2025.emnlp", "2024.acl", "2024.emnlp"],
+  "additional_provider_candidates": [
+    {"name": "TELUS Digital", "url": "https://www.telusdigital.com/"},
+    {"name": "CloudFactory", "url": "https://www.cloudfactory.com/"},
+    {"name": "SuperAnnotate", "url": "https://www.superannotate.com/"},
+    {"name": "Encord", "url": "https://encord.com/"},
+    {"name": "Defined.ai", "url": "https://www.defined.ai/"},
+    {"name": "LXT", "url": "https://www.lxt.ai/"},
+    {"name": "Welocalize", "url": "https://www.welocalize.com/"},
+    {"name": "DataForce by TransPerfect", "url": "https://www.transperfect.com/dataforce"},
+    {"name": "Translated", "url": "https://translated.com/"},
+    {"name": "Clickworker", "url": "https://www.clickworker.com/"},
+    {"name": "Centific", "url": "https://www.centific.com/"},
+    {"name": "Hive", "url": "https://thehive.ai/"},
+    {"name": "V7", "url": "https://www.v7labs.com/"},
+    {"name": "Dataloop", "url": "https://dataloop.ai/"},
+    {"name": "Kili Technology", "url": "https://kili-technology.com/"},
+    {"name": "Label Your Data", "url": "https://labelyourdata.com/"},
+    {"name": "Keymakr", "url": "https://keymakr.com/"},
+    {"name": "Isahit", "url": "https://www.isahit.com/"},
+    {"name": "Alegion", "url": "https://www.alegion.com/"},
+    {"name": "BasicAI", "url": "https://www.basic.ai/"},
+    {"name": "Datasaur", "url": "https://datasaur.ai/"},
+    {"name": "Shaip", "url": "https://www.shaip.com/"},
+    {"name": "e2f", "url": "https://www.e2f.com/"}
+  ],
+  "limitations": [
+    "Provider entries are unscreened discovery leads. Current offerings, ownership and independence require source review before inclusion.",
+    "The indexed universe is bounded by these explicit queries and collections. It is not a claim of complete global literature coverage.",
+    "Metadata discovery and source retrieval never approve a paper, supplier, dataset, benchmark, or relationship."
+  ]
+}

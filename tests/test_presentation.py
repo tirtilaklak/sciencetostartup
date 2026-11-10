@@ -15,6 +15,16 @@ from presentation import company_graph, retain_runtime_generations
 
 
 class PresentationTests(unittest.TestCase):
+    def test_home_search_research_rows_meet_browser_index_contract(self):
+        manifest = json.loads((ROOT / "dist/manifest.json").read_text())
+        summary = json.loads((ROOT / "dist" / manifest["summary"]["href"].lstrip('/')).read_text())
+        search = json.loads((ROOT / "dist" / summary["homeSearch"]["href"].lstrip('/')).read_text())
+        research = [row for row in search["entries"] if row["href"].startswith('/research/')]
+        self.assertTrue(research)
+        for row in search["entries"]:
+            self.assertIsInstance(row["products"], list, row["href"])
+            self.assertTrue(all(isinstance(word, str) for word in row["products"]))
+
     def test_overview_carries_complete_claims_for_its_evidence_dialog(self):
         manifest = json.loads((ROOT / "dist/manifest.json").read_text())
         summary = json.loads((ROOT / "dist" / manifest["summary"]["href"].lstrip('/')).read_text())

@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "updated_on": "2026-11-09",
+  "brand": "ScienceToStartup",
+  "origin": "https://sciencetostartup.com",
+  "description": "Independent public-source research on AI data organizations, human feedback and evaluations. Source-linked profiles, research methods and reusable evidence.",
+  "publisher": {
+    "id": "https://sciencetostartup.com/#publisher",
+    "name": "Musa Ozdem",
+    "url": "https://sciencetostartup.com/method/#about",
+    "website": "https://musaeminozdem.com",
+    "type": "Person",
+    "given_names": "Musa",
+    "family_names": "Ozdem"
+  },
+  "repository": {
+    "url": "https://github.com/tirtilaklak/sciencetostartup",
+    "owner": "tirtilaklak",
+    "name": "sciencetostartup"
+  },
+  "contacts": {
+    "corrections": "https://sciencetostartup.com/explore/#corrections",
+    "review": "https://sciencetostartup.com/review/",
+    "issues": "https://github.com/tirtilaklak/sciencetostartup/issues/new/choose"
+  },
+  "products": [
+    {
+      "id": "companies",
+      "title": "AI data company field guide",
+      "path": "/companies/",
+      "status": "public"
+    },
+    {
+      "id": "work",
+      "title": "Public AI training work routes",
+      "path": "/work/",
+      "status": "public"
+    },
+    {
+      "id": "research",
+      "title": "AI data labs and human feedback research",
+      "path": "/research/",
+      "status": "prelaunch"
+    }
+  ],
+  "disclosures": [
+    "No profiled company has paid for coverage, and none is a customer, investor or affiliate of the publisher.",
+    "The publisher has applied for paid work at some profiled companies and is a member of A.Team's talent network.",
+    "The publisher is also proposing an AI research lab. That proposal is separate from this research, which applies the same rules to every company."
+  ],
+  "review_policy": {
+    "automated_review_label": "Separate AI review",
+    "external_credit_requires_consent": true,
+    "external_participation_required_for_release": false,
+    "correction_review_days": 7,
+    "outreach_status": "drafts_only"
+  },
+  "external_profiles": [
+    {
+      "service": "GitHub",
+      "url": "https://github.com/tirtilaklak/sciencetostartup",
+      "status": "verified_current"
+    },
+    {
+      "service": "LinkedIn",
+      "url": "https://www.linkedin.com/company/sciencetostartup",
+      "status": "owner_access_required"
+    },
+    {
+      "service": "Legacy MCP registry",
+      "url": "https://registry.modelcontextprotocol.io/v0/servers/io.github.musa8026%2Fsciencetostartup/versions/latest",
+      "status": "namespace_owner_access_required"
+    }
+  ]
+}
