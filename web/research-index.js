@@ -38,7 +38,9 @@
     }
     form.addEventListener('submit', event => { event.preventDefault(); update(false); });
     form.addEventListener('input', event => { if (event.target.name === 'q') update(true); });
-    form.addEventListener('change', () => update(false));
+    // A traversal can blur live search before popstate restores the controls.
+    // Its delayed change event must not push stale facet values back over Back.
+    form.addEventListener('change', event => { if (event.target.name !== 'q') update(false); });
     form.addEventListener('reset', event => {
       event.preventDefault();
       controls.forEach(control => { control.value = ''; });
