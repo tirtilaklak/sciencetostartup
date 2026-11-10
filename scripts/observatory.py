@@ -892,10 +892,15 @@ def build(data, destination):
     from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health, business_health=health)
     if research_context is not None:
         from research_graph import write_exports
-        from research_citations import write_publication_assets
+        from research_citations import write_publication_assets, publication_asset_inventory
         from research_pages import write_research_pages, write_company_supplements
         write_exports(research_context["graph"], destination / "research/exports")
         research_context["publication_assets"] = write_publication_assets(research_context, destination)
+        inventory = publication_asset_inventory(destination / 'publication')
+        if inventory['oversized']:
+            raise ValueError('Publication files exceed the static asset limit: '
+                             + ', '.join(sorted(inventory['oversized']))
+                             + '. Prepare a compressed frozen package; keep every research record and export.')
         research_entries = write_research_pages(destination, research_context)
         company_updates = {"https://sciencetostartup.com" + row['path']: row['lastmod']
                            for row in write_company_supplements(destination, research_context)}

@@ -38,6 +38,7 @@ PREDICATES = {"legacy_description", "has_capability", "supplies_data_for", "publ
               "adjudicated_for", "generated_for", "labeled_for", "filtered_for"}
 FACETS = {"domain", "modality", "workflow", "expertise", "origin", "labels", "oversight"}
 OPTIONAL_FACETS = {"delivery_model", "data_purpose"}
+PAPER_IDENTIFIERS = {"doi", "arxiv", "acl", "pmlr"}
 REVIEW_ROLES = {"author", "source_verifier", "adversarial"}
 EMAIL = re.compile(r"[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.I)
 SECRET = re.compile(r"(?:sk-(?:proj-)?[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)")
@@ -372,11 +373,14 @@ def _validate_graph(graph, canonical=None):
             for facet in facets:
                 strings(taxonomy.get(facet), p + "/taxonomy/" + facet)
         if isinstance(identifiers, dict) and entity.get("kind") in {"paper", "paper_work"}:
-            require(bool(set(identifiers) & {"doi", "arxiv", "acl"}), p + "/identifiers", "paper needs DOI, arXiv or ACL work identifier")
-            for scheme in ("doi", "arxiv", "acl"):
+            require(bool(set(identifiers) & PAPER_IDENTIFIERS), p + "/identifiers", "paper needs DOI, arXiv, ACL or PMLR work identifier")
+            for scheme in sorted(PAPER_IDENTIFIERS):
                 identifier = identifiers.get(scheme)
                 if identifier:
                     key = (scheme, normalize_identifier(scheme, identifier))
+                    if scheme == 'pmlr':
+                        require(bool(re.fullmatch(r'v\d+/[a-z0-9][a-z0-9_-]*', key[1])),
+                                p + '/identifiers/pmlr', 'expected PMLR volume/publication key')
                     require(key not in paper_ids, p + "/identifiers", "duplicate paper work; versions are not separate works")
                     paper_ids[key] = eid
         if entity.get("kind") in {"dataset", "dataset_family", "dataset_release", "benchmark", "benchmark_family", "benchmark_version"}:
@@ -562,6 +566,12 @@ def normalize_identifier(scheme, identifier):
     if scheme == "arxiv":
         value = re.sub(r"^(?:https?://arxiv\.org/(?:abs|pdf)/|arxiv:)", "", value)
         return re.sub(r"v\d+(?:\.pdf)?$|\.pdf$", "", value)
+    if scheme == 'pmlr':
+        value = re.sub(r'^https?://proceedings\.mlr\.press/', '', value).rstrip('/')
+        parts = value.split('/')
+        if len(parts) == 3 and parts[2] == parts[1] + '.pdf':
+            return '/'.join(parts[:2])
+        return re.sub(r'\.html$', '', value)
     return value.rstrip("/")
 
 
@@ -622,10 +632,10 @@ def public_graph(graph):
     for key, fields in (("entities", ENTITY_FIELDS), ("sources", SOURCE_FIELDS),
                         ("assertions", ASSERTION_FIELDS), ("reviews", REVIEW_FIELDS)):
         projection[key] = [{k: row[k] for k in fields if k in row} for row in projection.get(key, [])]
-    # Unreviewed draft wording stays in the private intake/review queue. Public
+    # Candidate and rejected draft wording stays in the private intake/review queue. Public
     # metadata may describe a coverage gap, but exports must not leak its proposed
     # factual claim merely because the row has a candidate label.
-    projection["assertions"] = [row for row in projection["assertions"] if row.get("status") != "candidate"]
+    projection["assertions"] = [row for row in projection["assertions"] if row.get("status") in {"approved", "historical"}]
     kept = {row["id"] for row in projection["assertions"]}
     for entity in projection["entities"]:
         entity["assertion_ids"] = [aid for aid in entity.get("assertion_ids", []) if aid in kept]

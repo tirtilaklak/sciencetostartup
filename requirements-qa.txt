@@ -1,3 +1,6 @@
 # PDF text, metadata and annotation inspection in the public privacy scan.
 # Ordinary builds use only the Python standard library.
 pypdf==6.10.0
+
+# Validate delivered graph and citation data against their advertised JSON Schemas.
+jsonschema==4.25.1

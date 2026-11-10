@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sciencetostartup.com/schema/publication-metadata.schema.json",
+  "title": "ScienceToStartup citation metadata",
+  "type": "object",
+  "required": ["schema_version", "title", "version", "author", "url", "updated_on", "status", "license", "projection_version", "note"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "title": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "minLength": 1},
+    "author": {"type": "string", "minLength": 1},
+    "author_person": {
+      "type": "object",
+      "required": ["given", "family"],
+      "properties": {
+        "given": {"type": "string", "minLength": 1},
+        "family": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "url": {"type": "string", "format": "uri"},
+    "updated_on": {"type": "string", "format": "date"},
+    "status": {"enum": ["prelaunch", "ready-for-archive", "published"]},
+    "license": {"const": "CC-BY-4.0"},
+    "projection_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "note": {"type": "string", "minLength": 1},
+    "doi": {"type": "string", "pattern": "^10\\.[0-9]{4,9}/\\S+$"},
+    "published_on": {"type": "string", "format": "date"}
+  },
+  "allOf": [
+    {"if": {"properties": {"status": {"const": "published"}}}, "then": {"required": ["doi"]}, "else": {"not": {"anyOf": [{"required": ["doi"]}, {"required": ["published_on"]}]}}}
+  ],
+  "additionalProperties": false
+}

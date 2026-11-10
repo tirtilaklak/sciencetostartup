@@ -428,7 +428,7 @@ def publication_gate(graph, report, policy=None):
             "report_review_ready": not synthesis_errors}
 
 
-def build_context(root=ROOT):
+def build_context(root=ROOT, *, select_prepared=True):
     from research_graph import load_graph
     from public_identity import load_identity
 
@@ -450,10 +450,14 @@ def build_context(root=ROOT):
     correction_registry = json.loads(correction_path.read_text()) if correction_path.is_file() else {'schema_version': '1.0.0', 'corrections': []}
     if correction_registry.get('schema_version') != '1.0.0' or not isinstance(correction_registry.get('corrections'), list):
         raise ValueError('Unsupported corrections registry')
-    return {"graph": graph, "report": report, "gate": publication_gate(graph, report, policy),
+    context = {"root": root, "graph": graph, "report": report, "gate": publication_gate(graph, report, policy),
             "identity": load_identity(root), "policy": policy,
             "edition_snapshots": load_edition_snapshots(root, report),
             "corrections": correction_registry['corrections']}
+    if select_prepared:
+        from research_citations import prepared_package_selection
+        context.update(prepared_package_selection(context, root))
+    return context
 
 
 if __name__ == "__main__":

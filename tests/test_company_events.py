@@ -144,12 +144,17 @@ class CompanyEventsBuildTests(unittest.TestCase):
         cls.temp = tempfile.TemporaryDirectory(prefix="company-events-")
         root, cls.dist = Path(cls.temp.name) / "root", Path(cls.temp.name) / "dist"
         (root / "data").mkdir(parents=True)
-        for name in ("web", "docs", "schema", "scripts", "design-system", "release-assets"): (root / name).symlink_to(ROOT / name)
+        for name in ("web", "docs", "design-system", "release-assets"): (root / name).symlink_to(ROOT / name)
+        import shutil
+        for name in ('schema', 'scripts'):
+            shutil.copytree(ROOT / name, root / name,
+                            ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+        from publication_fixtures import populate_owned_inputs
+        populate_owned_inputs(root)
         (root / "deployment.json").symlink_to(ROOT / "deployment.json")
         for path in (ROOT / "data").iterdir():
             if path.name == 'research':
                 # Approved partitions intentionally refuse symlinked inputs.
-                import shutil
                 shutil.copytree(path, root / 'data' / path.name)
             elif path.name != "company-events.json":
                 (root / "data" / path.name).symlink_to(path)

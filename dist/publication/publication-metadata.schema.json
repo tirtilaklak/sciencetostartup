@@ -9,6 +9,15 @@
     "title": {"type": "string", "minLength": 1},
     "version": {"type": "string", "minLength": 1},
     "author": {"type": "string", "minLength": 1},
+    "author_person": {
+      "type": "object",
+      "required": ["given", "family"],
+      "properties": {
+        "given": {"type": "string", "minLength": 1},
+        "family": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
     "url": {"type": "string", "format": "uri"},
     "updated_on": {"type": "string", "format": "date"},
     "status": {"enum": ["prelaunch", "ready-for-archive", "published"]},

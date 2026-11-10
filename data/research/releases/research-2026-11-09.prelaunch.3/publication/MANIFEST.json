@@ -1,0 +1,124 @@
+{
+  "context_contract_version": 2,
+  "context_sha256": "6db6ffbff199f374ad834bba7833695bfa919a5ae5d7fb1c6b4b11e94e172537",
+  "files": {
+    "CITATION.cff": {
+      "bytes": 461,
+      "sha256": "e79b39d5b12adf3c3382772cca8f9ab7a8d4bdbd01566c9657c3784b811d6fc2"
+    },
+    "LICENSE": {
+      "bytes": 1068,
+      "sha256": "926dadbac2507caa52f16b54c092122bfbb4c2a3ef237fa1266d26ede1690a1f"
+    },
+    "LICENSE-DATA.md": {
+      "bytes": 3356,
+      "sha256": "c9e15cdf9ad9bfb01c74229f462811bb42e577bd9a08a2f4e9a09ed25d0a38c6"
+    },
+    "METHODS.md": {
+      "bytes": 4112,
+      "sha256": "9ce32b9d2cf251a395cfbae14dbddb7c2ed99d27726d029e16446fb9cff95828"
+    },
+    "README.md": {
+      "bytes": 1102,
+      "sha256": "4d355825381dc2e8ed96d796e79422e330a233de41539492d4a2fc8c8f826580"
+    },
+    "citation.bib": {
+      "bytes": 369,
+      "sha256": "35764729869e03ba79184101753099cf77da099aee6c4a6c588a8ff71406bab4"
+    },
+    "citation.csl.json": {
+      "bytes": 452,
+      "sha256": "3146edf57368b51be44cb01ee491c5f2b8196f347c2b9a2b98c21eb12cc7f73f"
+    },
+    "citation.ris": {
+      "bytes": 296,
+      "sha256": "16137893c090dec83248fa0eac15bc23610137b2816d5f576dd4f7ea701d50fd"
+    },
+    "clean-dataset.csv": {
+      "bytes": 4106686,
+      "sha256": "f58fb3f2c84c74705e780d5d89da92cc8262361f4a630ce10d94e0992ce89d91"
+    },
+    "clean-dataset.json": {
+      "bytes": 4565945,
+      "sha256": "f706d656a96367064cfd7e3d6a8d234fcae90bc77c94831927ce212fb1095974"
+    },
+    "clean-dataset.sqlite": {
+      "bytes": 4521984,
+      "sha256": "9ab3b91b103eec809da965e573c9dace3a830e3a13e28442f9e2a14fa39337a9"
+    },
+    "evidence.html": {
+      "bytes": 1420665,
+      "sha256": "527e340e61fdfa0c581d58c559929ae1ad7723a61717b4e0c933dc188e9b592f"
+    },
+    "huggingface-README.md": {
+      "bytes": 332,
+      "sha256": "deb4594a075f3c7a3c067eea644fc00bc9a62b92a65059ebafb54570de6779e7"
+    },
+    "metadata.json": {
+      "bytes": 526,
+      "sha256": "ad7aba8fe7f41b53daffbeb40b1da87c31f82b1ce67278e3e7407c0b1ddb3a3d"
+    },
+    "publication-metadata.schema.json": {
+      "bytes": 1531,
+      "sha256": "d74db01b43f2a757380cb42951c90b379b47baa0bc8962fc01bd0747d837bbc2"
+    },
+    "publication-projection.schema.json": {
+      "bytes": 1003,
+      "sha256": "51013f710b452561867abfbe349d392131d41e351d1a3917493371e9ad054c34"
+    },
+    "readiness.json": {
+      "bytes": 22545,
+      "sha256": "98ab800a50b11950e38e35853f35631608c4a31c4ab683d0431a59a0a151563b"
+    },
+    "report-audit.schema.json": {
+      "bytes": 2110,
+      "sha256": "ff43465063a984bc7a207127ded82e2530eacbd3872a063849ec35404c4ecdaa"
+    },
+    "report-review.schema.json": {
+      "bytes": 1258,
+      "sha256": "8e2acebaf0ea17b3c3ffd3d9a2f208ca1147f15f0940a2cb643146121a5cf5f4"
+    },
+    "report.html": {
+      "bytes": 100632,
+      "sha256": "d959802c85818a4396b5ea56dbb6e8e788db962f17d9a8051040e6082629ad28"
+    },
+    "report.md": {
+      "bytes": 94784,
+      "sha256": "c78ddcea9337231bd561c8a383ffd18d18ce88368bb8baee6f68d9a50853b6f7"
+    },
+    "report.pdf": {
+      "bytes": 161189,
+      "sha256": "ad2a76d373c6cdfd73322b55f7c3a3d2286b1303dd26ac3c9eb9ab4efe3e3202"
+    },
+    "report.schema.json": {
+      "bytes": 1876,
+      "sha256": "ccfec5b77ecf90166f5cce6c4d3facf4beb75d79769d22874447ea49d26e74cf"
+    },
+    "reproduce.py": {
+      "bytes": 4027,
+      "sha256": "355a72b650ce30cb1cdcf8a6f3227277aec6cb01ced856a8fae91d8c213c96e8"
+    },
+    "research-graph.schema.json": {
+      "bytes": 19467,
+      "sha256": "2b333daf47b8e7c65132b57f09790f8962ef73f627c43be160e983fa03dbbbe2"
+    },
+    "research_graph.py": {
+      "bytes": 47324,
+      "sha256": "13a8637833e62082da6afbe9a377061dbcd228f63f863262c34e474efa895a76"
+    },
+    "source-context.json": {
+      "bytes": 1334160,
+      "sha256": "6db6ffbff199f374ad834bba7833695bfa919a5ae5d7fb1c6b4b11e94e172537"
+    },
+    "source-manifest.json": {
+      "bytes": 157717,
+      "sha256": "03642a614bcb521677ba0d8781dfc41580e5a9ca8813f11005de120cd23db306"
+    },
+    "zenodo-metadata.json": {
+      "bytes": 533,
+      "sha256": "cdf01b7bb272006efa5e53aca8c3793155b95eae1a2cefa7e6fa4ffd84468f69"
+    }
+  },
+  "release_id": "research-2026-11-09.prelaunch.3",
+  "schema_version": 1
+}

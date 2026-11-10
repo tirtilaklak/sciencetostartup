@@ -1,6 +1,6 @@
 {
   "archive": "not-published",
-  "archive_sha256": "b3d7dd46937a517f97b59dd306224663edfbb5ac958578114a0bbc46bb058d30",
+  "archive_sha256": "a1d4934b4f16ec97849b1af4a4ab789afb71a52d336249797cb6c6e3d34f6b83",
   "blocked_reasons": [
     "Coverage legacy_dispositions: 8 / 39 required.",
     "Coverage qualifying_suppliers: 8 / 60 required.",
@@ -188,7 +188,7 @@
   ],
   "github": "prepared",
   "huggingface": "prepared",
-  "manifest_sha256": "a9fd4c0158be9aebd023ed0c186d2aa6e0b29cb8cc40914daf5d14c88ee9eecf",
+  "manifest_sha256": "a3bd04d69bbe1c6a73989109c21b5d8b0e8bdc32bb5feb0534091af1182ef87b",
   "pdf": "prepared",
   "pdf_sha256": "ad2a76d373c6cdfd73322b55f7c3a3d2286b1303dd26ac3c9eb9ab4efe3e3202",
   "publication_ready": false,

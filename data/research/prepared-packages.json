@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "packages": [
+    {
+      "release_id": "research-2026-11-09.prelaunch.3",
+      "path": "data/research/releases/research-2026-11-09.prelaunch.3/publication",
+      "context_contract_version": 2,
+      "context_sha256": "6db6ffbff199f374ad834bba7833695bfa919a5ae5d7fb1c6b4b11e94e172537",
+      "manifest_sha256": "a3bd04d69bbe1c6a73989109c21b5d8b0e8bdc32bb5feb0534091af1182ef87b",
+      "archive_sha256": "a1d4934b4f16ec97849b1af4a4ab789afb71a52d336249797cb6c6e3d34f6b83"
+    }
+  ]
+}

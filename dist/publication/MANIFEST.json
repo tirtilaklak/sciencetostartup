@@ -1,5 +1,6 @@
 {
-  "context_sha256": "ca5ad0779bad654c45c72bad9d219aff6a0e84d7401964c75b095dcc0f1d106b",
+  "context_contract_version": 2,
+  "context_sha256": "6db6ffbff199f374ad834bba7833695bfa919a5ae5d7fb1c6b4b11e94e172537",
   "files": {
     "CITATION.cff": {
       "bytes": 461,
@@ -18,8 +19,8 @@
       "sha256": "9ce32b9d2cf251a395cfbae14dbddb7c2ed99d27726d029e16446fb9cff95828"
     },
     "README.md": {
-      "bytes": 909,
-      "sha256": "fa644bccb773141aaefbdd8dead4224cc613d17d2af3031c7c175a0d00be48d1"
+      "bytes": 1102,
+      "sha256": "4d355825381dc2e8ed96d796e79422e330a233de41539492d4a2fc8c8f826580"
     },
     "citation.bib": {
       "bytes": 369,
@@ -45,6 +46,10 @@
       "bytes": 4521984,
       "sha256": "9ab3b91b103eec809da965e573c9dace3a830e3a13e28442f9e2a14fa39337a9"
     },
+    "evidence.html": {
+      "bytes": 1420665,
+      "sha256": "527e340e61fdfa0c581d58c559929ae1ad7723a61717b4e0c933dc188e9b592f"
+    },
     "huggingface-README.md": {
       "bytes": 332,
       "sha256": "deb4594a075f3c7a3c067eea644fc00bc9a62b92a65059ebafb54570de6779e7"
@@ -54,8 +59,8 @@
       "sha256": "ad7aba8fe7f41b53daffbeb40b1da87c31f82b1ce67278e3e7407c0b1ddb3a3d"
     },
     "publication-metadata.schema.json": {
-      "bytes": 1265,
-      "sha256": "da377e7543ae9f0ee918d799875cbcc79ed14a30696696d36e1c8e954cfa9364"
+      "bytes": 1531,
+      "sha256": "d74db01b43f2a757380cb42951c90b379b47baa0bc8962fc01bd0747d837bbc2"
     },
     "publication-projection.schema.json": {
       "bytes": 1003,
@@ -74,12 +79,12 @@
       "sha256": "8e2acebaf0ea17b3c3ffd3d9a2f208ca1147f15f0940a2cb643146121a5cf5f4"
     },
     "report.html": {
-      "bytes": 85365,
-      "sha256": "09ec3d5bd5a85685f77299d307374b5b479b0ea4eec406b829ef76d1246eb83e"
+      "bytes": 100632,
+      "sha256": "d959802c85818a4396b5ea56dbb6e8e788db962f17d9a8051040e6082629ad28"
     },
     "report.md": {
-      "bytes": 81766,
-      "sha256": "1f63b5d283886da83e0ab9db2710367bed31e2b155a693aa8ed23f6779af3062"
+      "bytes": 94784,
+      "sha256": "c78ddcea9337231bd561c8a383ffd18d18ce88368bb8baee6f68d9a50853b6f7"
     },
     "report.pdf": {
       "bytes": 161189,
@@ -94,20 +99,20 @@
       "sha256": "355a72b650ce30cb1cdcf8a6f3227277aec6cb01ced856a8fae91d8c213c96e8"
     },
     "research-graph.schema.json": {
-      "bytes": 19407,
-      "sha256": "8e93fb97a238b7b9aaf466645ab76e97e236aa73914886292f8cbbee310847ba"
+      "bytes": 19467,
+      "sha256": "2b333daf47b8e7c65132b57f09790f8962ef73f627c43be160e983fa03dbbbe2"
     },
     "research_graph.py": {
-      "bytes": 46727,
-      "sha256": "97bdd44818e3bdffcbb78b51427af4e3e3e51f8e2dca795c66233f9e31e8f884"
+      "bytes": 47324,
+      "sha256": "13a8637833e62082da6afbe9a377061dbcd228f63f863262c34e474efa895a76"
     },
     "source-context.json": {
-      "bytes": 1332394,
-      "sha256": "ca5ad0779bad654c45c72bad9d219aff6a0e84d7401964c75b095dcc0f1d106b"
+      "bytes": 1334160,
+      "sha256": "6db6ffbff199f374ad834bba7833695bfa919a5ae5d7fb1c6b4b11e94e172537"
     },
     "source-manifest.json": {
       "bytes": 157717,
-      "sha256": "e82a41555e15482bf60934a55fafd7ca3fd72d513e49bd0c60c29bca88d31ee8"
+      "sha256": "03642a614bcb521677ba0d8781dfc41580e5a9ca8813f11005de120cd23db306"
     },
     "zenodo-metadata.json": {
       "bytes": 533,

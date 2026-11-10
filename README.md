@@ -36,6 +36,13 @@ The optional PDF preparation uses ReportLab; ordinary builds only verify and
 copy its prepared bytes and require no network, credentials or extra Python
 packages. Independent source review is identified as **Separate AI review**.
 
+The committed prepared-package registry selects a frozen compressed archive,
+including a readable offline evidence appendix. New packages bind every owned
+schema, validator, reproducer and license; verified published editions retain
+their exact pinned recipe for historical replay. Builders verify and copy frozen
+bytes, without regenerating their PDF, SQLite projection or ZIP. Publication and
+website preparation reject any file above Cloudflare's 25 MiB static asset limit.
+
 Daily preparation targets 16:00 Pacific; the sole weekly release check targets
 Monday 09:00, with the preceding Friday 17:00 captured-source cutoff. Native
 Codex automations in the implementation chat run on the available local host;

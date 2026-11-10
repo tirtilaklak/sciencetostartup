@@ -178,6 +178,19 @@ class ResearchGraphTests(unittest.TestCase):
         graph["entities"].append(duplicate)
         self.assert_invalid(graph, "duplicate paper work")
 
+    def test_pmlr_published_work_needs_no_invented_arxiv_or_doi_and_deduplicates_urls(self):
+        graph = fixture()
+        graph['entities'][0]['identifiers'] = {'pmlr': 'v70/shi17a'}
+        rg.validate_graph(graph)
+        self.assertEqual(rg.coverage_summary(graph)['reviewed_papers'], 1)
+        for identifier in ('https://proceedings.mlr.press/v70/shi17a.html',
+                           'https://proceedings.mlr.press/v70/shi17a/shi17a.pdf'):
+            with self.subTest(identifier=identifier):
+                duplicate = entity('paper.duplicate', identifiers={'pmlr': identifier}, assertion_ids=[])
+                self.assert_invalid({**graph, 'entities': graph['entities'] + [duplicate]}, 'duplicate paper work')
+        graph['entities'][0]['identifiers']['pmlr'] = 'v70/../unverified'
+        self.assert_invalid(graph, 'PMLR volume/publication key')
+
     def test_dataset_versions_do_not_inflate_family_counts(self):
         graph = fixture()
         graph["entities"] = [entity("paper", "dataset", family_id="family", identifiers={})]

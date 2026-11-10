@@ -317,9 +317,8 @@ unpublished preparation, or the typed-receipt-gated historical recipe above. An 
 or unmatched release selects nothing. A selected missing, partial or stale bundle
 fails closed; it is never silently regenerated.
 
-Coordinator integration belongs in `build_context`: preserve `root` in the
-constructed context, then apply the selector after graph, report, gate and policy
-are complete. Keep an explicit preparation option that skips selection:
+`build_context` preserves `root` and applies the selector after graph, report,
+gate and policy are complete. Its explicit preparation option skips selection:
 
 ```python
 # At the end of build_context(root, *, select_prepared=True):
@@ -330,8 +329,7 @@ if select_prepared:
 return context
 ```
 
-This hook is an integration instruction; the package helper does not modify the
-coordinator. Ordinary builds select strictly. Explicit preparation obtains the
+Ordinary builds select strictly. Explicit preparation obtains the
 source context with selection disabled, prepares/reviews the v2 PDF, then calls
 `freeze_publication_package(..., archive_compression="deflate")` on the intended
 edition path even before that path exists. Only after the freeze verifies should

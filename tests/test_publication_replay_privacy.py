@@ -194,7 +194,7 @@ class HistoricalV2Tests(unittest.TestCase):
 
 class DraftPrivacyTests(unittest.TestCase):
     def test_actual_graph_fixture_drafts_are_absent_from_every_archive_representation_and_remain_hash_bound(self):
-        context = build_context(ROOT)
+        context = build_context(ROOT, select_prepared=False)
         context['root'] = ROOT
         before = {row['id']: assertion_digest(row) for row in context['graph']['assertions'] if row['status'] == 'approved'}
         marker = 'TEST-ONLY-PRIVATE-UNAPPROVED-DRAFT-NEVER-PUBLISH'

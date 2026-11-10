@@ -147,7 +147,7 @@ def main():
     parser.add_argument("--output", type=Path, default=ROOT / "data/research")
     args = parser.parse_args()
     from research_report import build_context
-    receipt = prepare_report_pdf(build_context(), args.output)
+    receipt = prepare_report_pdf(build_context(select_prepared=False), args.output)
     print("Prepared PDF " + receipt["sha256"] + "; render and inspect before publication.")
 
 

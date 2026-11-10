@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
@@ -12,6 +13,26 @@ from release_artifact import prepare, secret_file, upload
 
 
 class ReleaseArtifactTests(unittest.TestCase):
+    def test_asset_limit_accepts_boundary_and_rejects_oversize_before_preparation(self):
+        for size in (1024, 1025):
+            with self.subTest(size=size), tempfile.TemporaryDirectory() as temporary:
+                folder = Path(temporary)
+                artifact, prepared = folder / 'artifact', folder / 'prepared'
+                artifact.mkdir()
+                self.fixture(artifact)
+                content = b'x' * size
+                (artifact / 'research-archive.zip').write_bytes(content)
+                manifest = json.loads((artifact / 'manifest.json').read_text())
+                manifest['sha256']['research-archive.zip'] = hashlib.sha256(content).hexdigest()
+                (artifact / 'manifest.json').write_text(json.dumps(manifest))
+                with patch('release_artifact.STATIC_ASSET_LIMIT_BYTES', 1024):
+                    if size == 1024:
+                        prepare(artifact, prepared, 'a' * 40)
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'hosting limit: research-archive.zip'):
+                            prepare(artifact, prepared, 'a' * 40)
+                        self.assertFalse(prepared.exists())
+
     def fixture(self, directory):
         files = {'index.html': b'<h1>Guide</h1>', '_headers': b'/*\n  X-Content-Type-Options: nosniff\n', '_redirects': b'https://www.example.com/* https://example.com/:splat 301!\n'}
         for name, content in files.items():

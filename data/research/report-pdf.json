@@ -1,5 +1,6 @@
 {
-  "context_sha256": "ca5ad0779bad654c45c72bad9d219aff6a0e84d7401964c75b095dcc0f1d106b",
+  "context_contract_version": 2,
+  "context_sha256": "6db6ffbff199f374ad834bba7833695bfa919a5ae5d7fb1c6b4b11e94e172537",
   "release_id": "research-2026-11-09.prelaunch.3",
   "renderer": "ReportLab with embedded Bitstream Vera",
   "schema_version": 1,
