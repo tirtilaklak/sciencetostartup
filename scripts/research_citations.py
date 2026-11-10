@@ -23,9 +23,11 @@ import zipfile
 try:
     from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD, paragraph_supported, WITHHELD_PARAGRAPH
     from research_offline import evidence_href, offline_appendix
+    from research_corrections import public_corrections
 except ImportError:
     from scripts.research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD, paragraph_supported, WITHHELD_PARAGRAPH
     from scripts.research_offline import evidence_href, offline_appendix
+    from scripts.research_corrections import public_corrections
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECTION_VERSION = "1.0.0"
@@ -49,7 +51,9 @@ REPRODUCTION_INPUTS_V2 = {name: "schema/" + name for name in (
     "report-audit.schema.json", "publication-projection.schema.json", "publication-metadata.schema.json")}
 REPRODUCTION_INPUTS_V2.update({"research_graph.py": "scripts/research_graph.py",
     "reproduce.py": "scripts/reproduce_research_package.py", "LICENSE": "LICENSE", "LICENSE-DATA.md": "LICENSE-DATA.md"})
-REPRODUCTION_INPUTS = {**REPRODUCTION_INPUTS_V2, "LOCATORS.md": "docs/research/locators.md"}
+REPRODUCTION_INPUTS = {**REPRODUCTION_INPUTS_V2, "LOCATORS.md": "docs/research/locators.md",
+    "research_corrections.py": "scripts/research_corrections.py",
+    "research-corrections.schema.json": "schema/research-corrections.schema.json"}
 PREPARED_REGISTRY = "data/research/prepared-packages.json"
 
 
@@ -273,7 +277,7 @@ def report_markdown(context):
                     for cid in finding['claim_ids']), ''])
             if withheld:
                 lines.extend([WITHHELD, ''])
-    lines.extend(["## Evidence and reproduction", "", "The accompanying clean-dataset.json, CSV and SQLite contain the same versioned public projection. Canonical dataset 2.5.0 remains unchanged outside this archive. Contact details and raw source text are excluded from this projection. Review receipts describe actual scope. Candidate assertions and metadata-only discoveries are excluded from approved evidence; completed inclusion audits may leave commercial qualification unresolved.", "",
+    lines.extend(["## Evidence and reproduction", "", "The accompanying clean-dataset.json, CSV and SQLite contain the same versioned public projection. Canonical dataset 2.5.0 remains unchanged outside this archive. Contact details and raw source text are excluded from this projection. Review receipts describe actual scope. corrections.json records accepted correction metadata and approved replacements; evidence.html preserves superseded IDs without unapproved wording. Candidate assertions and metadata-only discoveries are excluded from approved evidence; completed inclusion audits may leave commercial qualification unresolved.", "",
                   "Open evidence.html for offline entity dossiers, a recorded-scope comparison table, assertions, source bindings and review receipts. Use MANIFEST.json to verify each file's SHA-256. The archive is self-contained and makes no network requests. Source URLs and identifiers are retained in the accompanying public graph.", ""])
     return privacy_filter("\n".join(lines))
 
@@ -404,6 +408,8 @@ def _research_source_context(context, *, reservation=True, version=CONTEXT_CONTR
         # assertions, rejected wording or private extensions in any public graph.
         value["input_commitments"] = {"graph_sha256": sha256(json_bytes(context["graph"]))}
     if version >= 3:
+        value["corrections"] = public_corrections(context)
+        value["input_commitments"]["corrections_input_sha256"] = sha256(json_bytes(context.get("corrections", [])))
         # Commit to the original authoring input without redistributing held
         # paragraphs or unreviewed synthesis through this machine-readable file.
         value["input_commitments"]["report_input_sha256"] = sha256(json_bytes(report))
@@ -718,7 +724,8 @@ def write_publication_assets(context, output, *, archive_compression="stored"):
     files = {name: (publication / name).read_bytes() for name in paths}
     files.update(citation_formats(metadata))
     files.update({"metadata.json": json_bytes(metadata), "report.md": report_markdown(context).encode(),
-                  "report.html": offline_html(context), "evidence.html": offline_appendix(projection),
+                  "report.html": offline_html(context), "evidence.html": offline_appendix(projection, corrections=public_corrections(context)),
+                  "corrections.json": json_bytes({"schema_version": "1.0.0", "corrections": public_corrections(context)}),
                   "readiness.json": json_bytes(privacy_filter(context["gate"])),
                   "source-context.json": json_bytes(source_context(context))})
     try:
@@ -732,8 +739,8 @@ def write_publication_assets(context, output, *, archive_compression="stored"):
     files.update(reproduction_files(context))
     files["source-manifest.json"] = json_bytes(projection["graph"]["sources"])
     files["METHODS.md"] = privacy_filter("# Research methods\n\n" + "\n\n".join(paragraph["text"] if paragraph_supported(context, paragraph) else WITHHELD_PARAGRAPH for section in context["report"].get("sections", [])
-                                           if section["id"] == "methods-and-appendices" for paragraph in section.get("paragraphs", []))).encode()
-    files["README.md"] = ("# ScienceToStartup research package\n\n" + metadata["note"] + "\n\nStart with executive-brief.html for the short briefing, report.html for the full offline report, then evidence.html for entity dossiers, a recorded-scope comparison, assertions, source metadata and review receipts. Evidence links resolve within the extracted edition without the live site. Citation files reflect archive status. JSON, CSV and SQLite are equivalent privacy-filtered projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Full source text and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party evidence retains its rights.\n\nRun `python3 reproduce.py --write-tables reproduced` inside this extracted package to verify MANIFEST.json, compare all three exports, validate the graph and reproduce coverage and approved-assertion tables. This needs only Python's standard library and no network. Schemas, methods and a source manifest are included. The PDF is accepted only when its receipt binds this exact context. No remote publication occurs during the build.\n").encode()
+                                           if section["id"] == "methods-and-appendices" for paragraph in section.get("paragraphs", [])) + "\n\nAccepted correction metadata is preserved in corrections.json and the offline evidence appendix. Superseded identifiers link to approved replacements without restoring unapproved wording. Pending and rejected proposals remain private. Context contract V3 binds the public records and an opaque raw-input commitment; the manifest covers the correction export, validator and schema.\n").encode()
+    files["README.md"] = ("# ScienceToStartup research package\n\n" + metadata["note"] + "\n\nStart with executive-brief.html for the short briefing, report.html for the full offline report, then evidence.html for entity dossiers, a recorded-scope comparison, assertions, source metadata and review receipts. corrections.json contains accepted correction metadata; the appendix retains superseded IDs as metadata-only links to approved replacements. Evidence links resolve within the extracted edition without the live site. Citation files reflect archive status. JSON, CSV and SQLite are equivalent privacy-filtered projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Full source text and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party evidence retains its rights.\n\nRun `python3 reproduce.py --write-tables reproduced` inside this extracted package to verify MANIFEST.json, compare all three exports, validate the graph and reproduce coverage and approved-assertion tables. This needs only Python's standard library and no network. Schemas, methods and a source manifest are included. The PDF is accepted only when its receipt binds this exact context. No remote publication occurs during the build.\n").encode()
     # These files are sent to external services, so they belong to the same
     # immutable manifest and archive as the report and dataset.
     files["zenodo-metadata.json"] = json_bytes(zenodo_metadata(metadata))

@@ -246,18 +246,20 @@ class ResearchPageTests(unittest.TestCase):
                 'status': 'accepted', 'corrected_on': '2026-11-09T09:30:00-08:00',
                 'evidence_urls': ['https://example.org/evidence?version=1&part=2'], **changes}
 
-    def test_actual_corrections_registry_and_feeds_are_truthfully_empty(self):
+    def test_actual_corrections_registry_and_feeds_preserve_26_accepted_repairs(self):
         import json
         registry = json.loads((ROOT / 'data/research/corrections.json').read_text())
-        self.assertEqual(registry, {'schema_version': '1.0.0', 'corrections': []})
+        self.assertEqual(registry['schema_version'], '1.0.0')
+        self.assertEqual(len(registry['corrections']), 26)
+        self.assertTrue(all(row['status'] == 'accepted' for row in registry['corrections']))
         self.context['corrections'] = registry['corrections']
         paths = {row['path'] for row in self.build()}
         self.assertIn(rp.CORRECTIONS_PATH, paths)
-        self.assertIn('No accepted or published research corrections are recorded.', self.page(rp.CORRECTIONS_PATH))
+        self.assertNotIn('No accepted or published research corrections are recorded.', self.page(rp.CORRECTIONS_PATH))
         rss = ET.parse(self.output / 'research/corrections/feed.xml')
         atom = ET.parse(self.output / 'research/corrections/atom.xml')
-        self.assertEqual(rss.findall('./channel/item'), [])
-        self.assertEqual(atom.findall('{http://www.w3.org/2005/Atom}entry'), [])
+        self.assertEqual(len(rss.findall('./channel/item')), 26)
+        self.assertEqual(len(atom.findall('{http://www.w3.org/2005/Atom}entry')), 26)
         for path in ('/research/', '/review/'):
             text = self.page(path)
             self.assertIn('href="/research/corrections/feed.xml"', text)

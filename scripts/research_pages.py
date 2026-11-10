@@ -20,6 +20,7 @@ from zoneinfo import ZoneInfo
 import xml.etree.ElementTree as ET
 
 import static_pages as sp
+from research_corrections import correction_records as _correction_records
 from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD, paragraph_supported, WITHHELD_PARAGRAPH
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -413,12 +414,22 @@ def _source_evidence(context, assertion):
 def _assertion(context, assertion):
     status = assertion.get("status")
     aid = assertion["id"]
+    public_rows = context.get('_render_corrections')
+    if public_rows is None:
+        public_rows = _correction_records(context)
+    corrections = [row for row in public_rows if row['claim_id'] == aid]
     body = f'<p class="r-kicker">{sp.escape(STATUS_LABELS.get(status, status))} · As of {_date(assertion.get("as_of"))}</p>'
     if status in {"approved", "historical"}:
         body += '<p class="r-assertion-text">' + _claim_text(context, assertion) + "</p>"
         body += _claim_scope(assertion)
     else:
-        body += '<p>Candidate wording is withheld from findings while source verification and adversarial review are pending.</p>'
+        body += ('<p>Superseded candidate wording is withheld. Follow the correction record and approved replacement below.</p>'
+                 if any(row.get('replacement_claim_id') for row in corrections) else
+                 '<p>Candidate wording is withheld from findings while source verification and adversarial review are pending.</p>')
+    for correction in corrections:
+        body += '<p>Correction: ' + _link(_correction_url(correction), correction['summary']) + '</p>'
+        if correction.get('replacement_claim_id'):
+            body += '<p>Approved replacement: ' + _link(_evidence_url('assertion', correction['replacement_claim_id']), correction['replacement_claim_id']) + '</p>'
     body += f'<p class="r-record-id">{_link(_evidence_url("assertion", aid), aid)}</p>'
     if assertion.get("qualifications") and status in {"approved", "historical"}:
         body += '<ul class="r-qualifications">' + "".join(
@@ -778,42 +789,6 @@ def _feeds(output, context, editions):
         (output / 'research' / name).write_bytes(ET.tostring(tree, encoding='utf-8', xml_declaration=True) + b'\n')
 
 
-def _correction_records(context):
-    """Validate committed records; requests and rejected proposals stay private."""
-    rows = context.get('corrections', [])
-    if not isinstance(rows, list):
-        raise ValueError('Research corrections must be a list')
-    required = {'id', 'edition_id', 'claim_id', 'status', 'summary', 'corrected_on', 'evidence_urls'}
-    accepted, seen = [], set()
-    for row in rows:
-        if not isinstance(row, dict) or set(row) != required:
-            raise ValueError('Research correction has unexpected or missing fields')
-        for key in ('id', 'edition_id', 'claim_id'):
-            if not isinstance(row[key], str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:-]*', row[key]):
-                raise ValueError('Research correction requires stable record identifiers')
-        if row['id'] in seen:
-            raise ValueError('Research correction IDs must be unique')
-        seen.add(row['id'])
-        if not isinstance(row['status'], str) or row['status'] not in {'accepted', 'published', 'pending', 'rejected'}:
-            raise ValueError('Research correction has an unknown status')
-        if not isinstance(row['summary'], str) or not row['summary'].strip():
-            raise ValueError('Research correction requires a summary')
-        try:
-            instant = datetime.fromisoformat(row['corrected_on'].replace('Z', '+00:00'))
-            if instant.utcoffset() is None:
-                raise ValueError('Timezone required')
-        except (AttributeError, TypeError, ValueError) as error:
-            raise ValueError('Research correction requires a timezone-aware corrected_on timestamp') from error
-        evidence = row['evidence_urls']
-        if (not isinstance(evidence, list) or not evidence or
-                any(not isinstance(url, str) or not _safe_url(url) or re.search(r'[\x00-\x20\\]', url) for url in evidence) or
-                len(evidence) != len(set(evidence))):
-            raise ValueError('Research correction requires distinct safe HTTPS evidence URLs')
-        if row['status'] in {'accepted', 'published'}:
-            accepted.append({**row, 'instant': instant.astimezone(timezone.utc)})
-    return sorted(accepted, key=lambda row: (-row['instant'].timestamp(), row['id']))
-
-
 def _correction_url(row):
     return CORRECTIONS_PATH + '#' + _token('correction-' + row['id'])
 
@@ -829,10 +804,11 @@ def _corrections_page(context, rows):
     for row in rows:
         stamp = row['instant'].isoformat().replace('+00:00', 'Z')
         body += (f'<article class="r-source" id="{sp.escape("correction-" + row["id"])}"><h2>'
-                 + _link(_correction_url(row), row['summary']) + '</h2><dl class="r-facts">'
+                 + _link(_correction_url(row), 'Correction for ' + row['claim_id']) + '</h2><p>' + sp.escape(row['summary']) + '</p><dl class="r-facts">'
                  f'<dt>Status</dt><dd>{sp.escape(row["status"].capitalize())}</dd>'
                  f'<dt>Edition</dt><dd>{sp.escape(row["edition_id"])}</dd>'
-                 f'<dt>Claim</dt><dd>{sp.escape(row["claim_id"])}</dd>'
+                 '<dt>Claim</dt><dd>' + _link(_evidence_url('assertion', row['claim_id']), row['claim_id']) + '</dd>'
+                 + ('<dt>Approved replacement</dt><dd>' + _link(_evidence_url('assertion', row['replacement_claim_id']), row['replacement_claim_id']) + '</dd>' if row.get('replacement_claim_id') else '') +
                  f'<dt>Corrected</dt><dd><time datetime="{stamp}">{stamp}</time></dd></dl>'
                  '<h3>Supporting evidence</h3><ul>'
                  + ''.join('<li>' + _link(url, url) + '</li>' for url in row['evidence_urls']) + '</ul></article>')
@@ -862,7 +838,7 @@ def _correction_feeds(output, context, rows):
     for row in rows:
         permalink = sp.ORIGIN + _correction_url(row)
         description = (f'Edition: {row["edition_id"]}. Claim: {row["claim_id"]}. '
-                       f'Status: {row["status"]}. {row["summary"]} Evidence: ' + ' '.join(row['evidence_urls']))
+                       f'Status: {row["status"]}. ' + (f'Approved replacement: {row["replacement_claim_id"]}. ' if row.get('replacement_claim_id') else '') + f'{row["summary"]} Evidence: ' + ' '.join(row['evidence_urls']))
         item = ET.SubElement(channel, 'item')
         for key, value in (('title', row['summary']), ('link', permalink), ('description', description),
                            ('pubDate', format_datetime(row['instant'], usegmt=True))):
@@ -951,6 +927,7 @@ def write_research_pages(output, context):
     modified = max(context["report"]["updated_on"], _day(context["graph"]["as_of"]))
     editions = _published_editions(context)
     corrections = _correction_records(context)
+    context = {**context, '_render_corrections': corrections}
     pages = [("/research/", "Human data research", "Public-source research connecting AI data suppliers, papers, datasets, benchmarks, and workflows, with visible evidence and coverage.", _hub(context, editions), "CollectionPage", None),
              (REPORT_PATH, context["report"]["title"], context["report"].get("summary", "Research methods and findings."), _report(context), "TechArticle", None),
              ("/research/data/", "Research data & evidence", "Versioned research data, source and assertion permalinks, publication progress, citations, and reproducible downloads.", _data(context), "CollectionPage", None),

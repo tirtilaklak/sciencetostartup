@@ -10,6 +10,11 @@ import html
 import json
 from urllib.parse import quote, urlsplit
 
+try:
+    from research_corrections import correction_records
+except ImportError:
+    from scripts.research_corrections import correction_records
+
 
 def evidence_href(kind, stable_id):
     return "evidence.html#" + quote(kind + "-" + str(stable_id), safe="._-")
@@ -77,11 +82,12 @@ def _source_url(value):
     return _escape(value)
 
 
-def offline_appendix(projection):
+def offline_appendix(projection, *, corrections=None):
     """Use only the already privacy-filtered public projection, without synthesis."""
     graph = projection['graph']
     entities = {row['id']: row for row in graph['entities']}
     assertions = sorted(graph['assertions'], key=lambda row: row['id'])
+    correction_rows = correction_records({'graph': graph, 'corrections': [] if corrections is None else corrections})
     by_entity = {eid: [] for eid in entities}
     for assertion in assertions:
         if assertion.get('status') in {'approved', 'historical'}:
@@ -110,6 +116,27 @@ def offline_appendix(projection):
         approved_or_historical = assertion.get('status') in {'approved', 'historical'}
         content = _statement(assertion, entities) + '<h4>Qualifications</h4>' + _qualifications(assertion) if approved_or_historical else '<p>Unapproved wording is withheld from findings.</p>'
         body.append(_article('assertion', assertion['id'], assertion['id'], '<p><strong>' + _escape(assertion['status'].capitalize()) + '</strong> · As of ' + _escape(assertion.get('as_of', 'Not recorded')) + ' · Provenance: ' + _escape(assertion.get('provenance_kind', 'Not recorded')) + '</p>' + content + '<h4>Source bindings</h4>' + evidence + '<p>Review receipts: ' + reviews + '</p>'))
+    body.append('</section><section id="corrections"><h2>Accepted corrections and superseded identifiers</h2><p>Accepted records preserve affected identifiers, explanations and dates. Acceptance does not claim external publication. Superseded identifiers retain metadata-only targets; unapproved wording and source excerpts are withheld.</p>')
+    assertion_ids = {row['id'] for row in assertions}
+    by_assertion = {row['id']: row for row in assertions}
+    retained = set()
+    for correction in correction_rows:
+        old = correction['claim_id']
+        replacement = correction.get('replacement_claim_id')
+        details = ('<p>Edition: ' + _escape(correction['edition_id']) + ' · Status: ' + _escape(correction['status'])
+                   + ' · Corrected: <time datetime="' + _escape(correction['corrected_on']) + '">' + _escape(correction['corrected_on']) + '</time></p>'
+                   + '<p>' + _escape(correction['summary']) + '</p><p>Affected identifier: ' + _link('assertion', old) + '</p>')
+        if replacement:
+            reviews = by_assertion[replacement].get('review_ids', [])
+            details += '<p>Approved replacement: ' + _link('assertion', replacement) + '. Its recorded approval review receipts: ' + ', '.join(_link('review', rid) for rid in reviews) + '.</p>'
+        details += '<p>Supporting evidence: ' + ', '.join(_source_url(url) for url in correction['evidence_urls']) + '</p>'
+        if old not in assertion_ids and old not in retained:
+            placeholder = '<p>Superseded identifier; metadata only. ' + _link('correction', correction['id'], 'Correction explanation') + '.</p>'
+            if replacement:
+                placeholder += '<p>Approved replacement: ' + _link('assertion', replacement) + '.</p>'
+            details += _article('assertion', old, old, placeholder)
+            retained.add(old)
+        body.append(_article('correction', correction['id'], correction['id'], details))
     body.append('</section><section id="sources"><h2>Source metadata</h2><p>URLs are citations for optional consultation. Reading this appendix needs no connection; source bodies and excerpts are not reproduced here.</p>')
     for source in sorted(graph['sources'], key=lambda row: row['id']):
         details = {key: source.get(key) for key in ('publisher', 'source_type', 'status', 'version', 'published_on', 'captured_on', 'locator', 'response_sha256', 'excerpt_sha256', 'license')}
