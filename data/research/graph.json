@@ -68,6 +68,102 @@
       "as_of": "2026-11-10",
       "evidence": [
         {
+          "excerpt_sha256": "347b2b5251b75479fd966a1179e518f28be79674afa91fca3ec8860e2345eb7d",
+          "locator": "report/numina_dataset.pdf; pypdf extracted text lines 524-531; revision 712e1abbcbcf870dccf4c6a3e7837e2967bd7d7f",
+          "source_id": "cohort3.dataset-source.numinamath.05"
+        }
+      ],
+      "id": "candidate.cohort3.dataset.numinamath.05",
+      "object_id": null,
+      "predicate": "access_terms",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party creator-document statement, not an independent corpus audit.",
+        "Reviewed scope: Full pinned CoT card; partial textual read of pinned 16-page creator report (pages1-8 and12). Remaining experiment pages, references and visuals are not claimed fully reviewed.",
+        "Report page12, limitations; no independent correctness audit performed."
+      ],
+      "review_ids": [
+        "reference.adversarial.cead009f-2fb0-40c4-b353-158e80072c93",
+        "review.adversarial.cohort3.dataset.numinamath.05",
+        "review.author.cohort3.dataset.numinamath",
+        "review.reference-holdout-v1.source-verifier.4fd0d6585d316035e4f3",
+        "review.source_verifier.cohort3.dataset.numinamath.05"
+      ],
+      "status": "candidate",
+      "subject_id": "dataset.numinamath",
+      "value": {
+        "type": "text",
+        "value": "NuminaMath acknowledges challenges validating synthetic problem correctness and incomplete CoT detail on hard problems."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "2fbc465c6be35dae48e14222b43979f81ab6b8644410a9752f4b23cfd07ee4eb",
+          "locator": "paper.pdf; pypdf extracted text lines 40-48; revision NeurIPS2023-73aacd8b3b05b4b503d58310b523553c-Paper-Conference",
+          "source_id": "cohort3.dataset-source.pickapic.01"
+        }
+      ],
+      "id": "candidate.cohort3.dataset.pickapic.01",
+      "object_id": null,
+      "predicate": "human_annotation",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party creator-document statement, not an independent corpus audit.",
+        "Reviewed scope: Full pinned creator family card, PickScore README and code LICENSE; partial textual read of NeurIPS2023paper pages1–6and10. Dataset v1 API endpoint returned401; v1/v2 data access is not established.",
+        "NeurIPS2023paper page2; v1-study scope rather than a present corpus inspection."
+      ],
+      "review_ids": [
+        "reference.adversarial.9a0f319a-b3a0-4809-b18c-a45b2c0e3717",
+        "review.adversarial.cohort3.dataset.pickapic.01",
+        "review.author.cohort3.dataset.pickapic",
+        "review.reference-holdout-v1.source-verifier.5d42bd15403e980ed75d",
+        "review.source_verifier.cohort3.dataset.pickapic.01"
+      ],
+      "status": "candidate",
+      "subject_id": "dataset.pick-a-pic",
+      "value": {
+        "type": "text",
+        "value": "Pick-a-Pic collects real users’ prompts and preferences over two generated images, allowing a tie."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "67a0fa68956bab0bb9143b223600d2ecd291deb659473158e9280dabd42a6717",
+          "locator": "paper.pdf; pypdf extracted text lines 91-102; revision NeurIPS2023-73aacd8b3b05b4b503d58310b523553c-Paper-Conference",
+          "source_id": "cohort3.dataset-source.pickapic.02"
+        }
+      ],
+      "id": "candidate.cohort3.dataset.pickapic.02",
+      "object_id": null,
+      "predicate": "generated",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party creator-document statement, not an independent corpus audit.",
+        "Reviewed scope: Full pinned creator family card, PickScore README and code LICENSE; partial textual read of NeurIPS2023paper pages1–6and10. Dataset v1 API endpoint returned401; v1/v2 data access is not established.",
+        "NeurIPS2023paper page3; not exhaustive for later versions."
+      ],
+      "review_ids": [
+        "reference.adversarial.609b195f-2d10-4739-be6c-f7c78274367a",
+        "review.adversarial.cohort3.dataset.pickapic.02",
+        "review.author.cohort3.dataset.pickapic",
+        "review.reference-holdout-v1.source-verifier.3295b5578875debe1e88",
+        "review.source_verifier.cohort3.dataset.pickapic.02"
+      ],
+      "status": "candidate",
+      "subject_id": "dataset.pick-a-pic",
+      "value": {
+        "type": "text",
+        "value": "Pick-a-Pic paper identifies Stable Diffusion2.1, Dreamlike Photoreal2.0 and Stable Diffusion XL variants as image generators."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
           "excerpt_sha256": "f3cae36c4cdc3eb2e8a8d88ad4f1462364f750a68b490ba70821491d55f8de9e",
           "locator": "README.md; lines 1-4; revision 4557cb71595098e68790bb35253225c2fe797dcf",
           "source_id": "cohort3.dataset-source.videofeedback.05"
@@ -131,6 +227,34 @@
       "as_of": "2026-11-10",
       "evidence": [
         {
+          "excerpt_sha256": "b5c37cf14237e8d0d8bcc32f30a2ae507516caa30354be81a7715d4bf0f1c1d3",
+          "locator": "text/polymath_ai_labs-21.txt:L65-L65; extracted-text UTF-8 character offsets [1260,1311); literal excerpt",
+          "source_id": "cohort4.source.polymath_ai_labs.horizon-swe"
+        }
+      ],
+      "id": "candidate.cohort4.polymath_ai_labs.horizon-swe",
+      "object_id": "cohort4.benchmark.horizon-swe",
+      "predicate": "creates",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party disclosure supports the stated source-specific scope; operational execution and outcomes were not independently audited.",
+        "Self-published benchmark methods are distinct from customer deployments or downstream model-training supply."
+      ],
+      "review_ids": [
+        "reference.adversarial.7ee6b287-4e4a-4da4-a2d5-3118816cbfec",
+        "review.adversarial.cohort4.polymath_ai_labs.horizon-swe",
+        "review.author.cohort4.polymath_ai_labs",
+        "review.reference-holdout-v1.source-verifier.9ac4bf78cf1af8699a5d",
+        "review.source_verifier.cohort4.polymath_ai_labs.pass"
+      ],
+      "status": "candidate",
+      "subject_id": "org.polymath_ai_labs",
+      "value": null
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
           "excerpt_sha256": "969296aec40d5d84c9f351d9cf8be9f535904367e071c9bdf4a60a94e5b730de",
           "locator": "text/prime_intellect-12.txt:L78-L78; extracted-text UTF-8 character offsets [11525,11597); literal excerpt",
           "source_id": "cohort4.source.prime_intellect.gpu-billing-basis"
@@ -188,6 +312,34 @@
         "type": "text",
         "value": "{\"scope\":{\"actual_annual_revenue\":false,\"business_scope\":\"Proximal company overall; segment split unspecified\",\"claim_class\":\"commercial_observation\",\"currency_code\":\"not specified\",\"currency_symbol\":\"$\",\"disclosure_date\":\"2026-09-29\",\"execution_independently_audited\":false,\"gross_vs_net\":\"unspecified\",\"legacy_id\":\"proximal\",\"period_basis\":\"annualized run rate\",\"provenance\":\"first-party public disclosure\",\"reported_amount\":200000000},\"statement\":\"In its September 29, 2026 announcement, Proximal reports scaling to $200M in annualized revenue.\"}"
       }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "e5920facf4c21fa18c34b8b54956e4bef35a8bf4821c86382aef6c1e9e0e3cb3",
+          "locator": "text/proximal-14.txt:L35-L35; extracted-text UTF-8 character offsets [1986,2029); literal excerpt",
+          "source_id": "cohort4.source.proximal.frontierswe-collaboration"
+        }
+      ],
+      "id": "candidate.cohort4.proximal.frontierswe-collaboration",
+      "object_id": "cohort4.benchmark.frontierswe",
+      "predicate": "creates",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "First-party disclosure supports the stated source-specific scope; operational execution and outcomes were not independently audited.",
+        "An owned benchmark with named curation collaborators; it is not a customer list or proof of training-data supply to those collaborators."
+      ],
+      "review_ids": [
+        "reference.adversarial.ef191b36-f586-495a-aadc-7d5ba7528d8b",
+        "review.adversarial.cohort4.proximal.frontierswe-collaboration",
+        "review.author.cohort4.proximal",
+        "review.reference-holdout-v1.source-verifier.0b36ebecf53d4c4ee11a",
+        "review.source_verifier.cohort4.proximal.pass"
+      ],
+      "status": "candidate",
+      "subject_id": "org.proximal",
+      "value": null
     },
     {
       "as_of": "2026-11-10",
@@ -578,6 +730,38 @@
       "as_of": "2026-11-10",
       "evidence": [
         {
+          "excerpt_sha256": "d8af3246fed150b4b91b3eac02142513f55d3e8249e1567b2cf58e35ca44613e",
+          "locator": "Physical PDF pp11-12, section5 and Table9; excerpt at physical p11, pdftotext-layout line 21 (1-based).",
+          "source_id": "cohort3.source.dclm.final-model-mixture"
+        }
+      ],
+      "id": "cohort3.claim.dclm.final-model-mixture",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "This assertion originated as an author proposal; separate review receipts determine its current status.",
+        "Version-specific author-reported study; experiments, raw dataset records and formal proofs were not independently reproduced or verified.",
+        "The result is not attributable to raw Common Crawl or the baseline filter alone. The paper’s headline64% is rounded."
+      ],
+      "review_ids": [
+        "cohort3.review.adversarial.e1890b0d-4b5e-49ec-8263-e1f5192f147c",
+        "cohort3.review.author.dclm.final-model-mixture",
+        "cohort3.review.source_verifier.dclm.final-model-mixture",
+        "reference.adversarial.7e0085b7-0ac8-4213-8d57-e8d202b0df3e",
+        "review.reference-holdout-v1.source-verifier.54f308b381b70799e603"
+      ],
+      "status": "candidate",
+      "subject_id": "paper.arxiv.2406.11794v1",
+      "value": {
+        "type": "text",
+        "value": "For the reported 2.6T-token 7B model, the authors augment DCLM-Baseline with StarCoder and ProofPile2, use a math-enriched annealing phase and extend context; Table 9 reports 63.7% MMLU."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
           "excerpt_sha256": "ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
           "locator": "Physical PDF p4 lines34-51 section3.1; p22 lines17-22 data card; anchor physical p4, pdftotext-layout line 44 (1-based); full paper response SHA-256 78c2f251cc101bce36e3dd3138fc0c89f7b73c599099f79ec55318165fe4a981.",
           "source_id": "cohort4.source.jailbreakbench.paired-behaviors"
@@ -603,6 +787,37 @@
       "value": {
         "type": "text",
         "value": "JBB-Behaviors contains 100 harmful behaviors and 100 corresponding topic-matched benign behaviors used to assess excessive refusal."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "0a9e4d8a0ac324cc0803536a5850c53625dde3673db65e6ac0782aa883973da1",
+          "locator": "raw UTF-8 text; lines 120-120 inclusive; README.md",
+          "source_id": "cohort4.dataset.source.no-robots.splits"
+        }
+      ],
+      "id": "cohort4.dataset.claim.no-robots.splits",
+      "object_id": null,
+      "predicate": "dataset_size",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Pinned creator documentation statement; source commit identifies documentation, not verified corpus bytes. Metadata counts, not independent recount; no new benchmark family is proposed.",
+        "This assertion originated as an author proposal; review receipts determine its evidentiary disposition."
+      ],
+      "review_ids": [
+        "cohort4.dataset.review.adversarial.no-robots.splits",
+        "cohort4.dataset.review.author.no-robots.splits",
+        "cohort4.dataset.review.source-verifier.no-robots.splits",
+        "reference.adversarial.dfb2e0be-5ede-41af-accb-de0010f24eb2",
+        "review.reference-holdout-v1.source-verifier.d73c1264fb532759721a"
+      ],
+      "status": "candidate",
+      "subject_id": "dataset-release.no-robots.e6f9a4ac5c37",
+      "value": {
+        "type": "text",
+        "value": "The No Robots card lists 9,500 training and 500 test examples."
       }
     },
     {
@@ -671,6 +886,37 @@
       "as_of": "2026-11-10",
       "evidence": [
         {
+          "excerpt_sha256": "643ccc7c88f0bec44043fcc610100f92d5e865f43be44ddf99017b874d4fa1f6",
+          "locator": "Physical PDF p8 AppendixC continuation lines1-10; anchor physical p8, pdftotext-layout line 9 (1-based). Full pinned PDF response SHA-256 7f0316658554df7a538ca89a6e44438c36cf31c9bc76b0246964b42f4824ee0d.",
+          "source_id": "cohort5.source.languagefeedback.main-evaluator"
+        }
+      ],
+      "id": "cohort5.claim.languagefeedback.main-evaluator",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "This assertion originated as an author proposal; separate review receipts determine its current status.",
+        "Version-specific reported method or result; no experiment, proof, raw-corpus record or labor audit was independently reproduced."
+      ],
+      "review_ids": [
+        "cohort5.review.adversarial.088ed3ad-f0df-4764-b314-9f35d2e44160.languagefeedback.main-evaluator",
+        "cohort5.review.author.languagefeedback.main-evaluator",
+        "cohort5.review.source_verifier.languagefeedback.main-evaluator",
+        "reference.adversarial.4400ab34-201f-4641-984a-104adce0abcf",
+        "review.reference-holdout-v1.source-verifier.8200f69d48f7e8bbb667"
+      ],
+      "status": "candidate",
+      "subject_id": "paper.arxiv.2204.14146v1",
+      "value": {
+        "type": "text",
+        "value": "One author conducted the human evaluation for the fine-tuned-model comparisons in Figures 2 and 5."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
           "excerpt_sha256": "23346386f0044a4eb36dcd876efed4301a48525b7ad1baa07d31c825ee787faf",
           "locator": "Physical PDF p14 section8 continuation lines6-9; anchor physical p14, pdftotext-layout line 6 (1-based). Full pinned PDF response SHA-256 3fd93217ad441ee1dbd3f7195d012093751c6feae50b2547c2891643255b4d15.",
           "source_id": "cohort6.source.agentcompany.human-baseline-limit"
@@ -696,6 +942,38 @@
       "value": {
         "type": "text",
         "value": "The authors state that resource limits prevented a human-professional performance comparison in this iteration."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "5c99008b4bce6f58c38afcbc628f7861f9507043def018de0a7770dcac66ffaa",
+          "locator": "Pinned primary PDF 2407.14933v1; physical p3 pdftotext-layout lines47-50 (1-based). Literal anchor p3 line47. PDF SHA-256 890f0591edfaf9938f9e72046b1d7fe2c476c94a9911712921bde59b5dd9cf38; extracted-text SHA-256 0f8ecb955236597a3a4539dda7b9e6eb7ad0fde6971271ead5af2e618cd02140.",
+          "source_id": "cohort7.source.consentcrisis.head"
+        }
+      ],
+      "id": "cohort7.claim.consentcrisis.head",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-only candidate: separate source-verifier and adversarial source-content reviews remain pending.",
+        "Version-specific primary-source report; experiments, raw datasets, consent forms, labor records and formal derivations were not independently reproduced or audited.",
+        "HeadAll is a union across the three corpora; some analyses instead use only HeadC4. Token-ranking design differs from uniform domain sampling."
+      ],
+      "review_ids": [
+        "cohort7.review.adversarial.consentcrisis.head",
+        "cohort7.review.author.consentcrisis.head",
+        "cohort7.review.source-verifier.consentcrisis.head",
+        "reference.adversarial.ee2ea57e-8a3f-468e-a17a-7abf43afc164",
+        "review.reference-holdout-v1.source-verifier.24b3d284a503f1c96c9f"
+      ],
+      "status": "candidate",
+      "subject_id": "paper.arxiv.2407.14933v1",
+      "value": {
+        "type": "text",
+        "value": "The head sample unions the top 2,000 domains by token count from each corpus into 3,950 domains."
       }
     },
     {
@@ -728,6 +1006,38 @@
       "value": {
         "type": "text",
         "value": "The advanced crowd interface includes visual click feedback, a color-coded overview and a time lock, while the basic interface emphasizes task simplicity."
+      }
+    },
+    {
+      "as_of": "2026-11-10",
+      "evidence": [
+        {
+          "excerpt_sha256": "a07bf7035110ba8d8b1843899009efcfd40c524b146e5dea6af714b4258998f1",
+          "locator": "Pinned primary arXiv PDF 2504.16084v3; section 3.1 Implementation Details; physical p7 pdftotext-layout lines 6–15 (1-based). Literal anchor p7 line 10. PDF SHA-256 3828cc886a0133749fe857dc12fff190f76c17dd7421dccfca01c96ec1dd5882; extracted-text SHA-256 6da0d8e63dcc33ca0ca03c3e2d37d11c2948d3b6cb553643575e2afc00687b69.",
+          "source_id": "cohort8.source.ttrl.vote-then-sample"
+        }
+      ],
+      "id": "cohort8.claim.ttrl.vote-then-sample",
+      "object_id": null,
+      "predicate": "paper_method",
+      "provenance_kind": "first_party",
+      "qualifications": [
+        "Author-only candidate: separate source-verifier and adversarial source-content reviews remain pending.",
+        "Version-specific primary-source report. Proofs, model experiments, underlying data, consent/pay records and supplier participation have not been independently reproduced or audited.",
+        "Reported training uses GRPO, AdamW and 8 A100 80 GB GPUs; generation temperature and token budgets vary by model class, and evaluation sampling has separate counts."
+      ],
+      "review_ids": [
+        "cohort8.review.adversarial.ttrl.vote-then-sample",
+        "cohort8.review.author.ttrl.vote-then-sample",
+        "cohort8.review.source-verifier.ttrl.vote-then-sample",
+        "reference.adversarial.31be775e-556b-4bd8-91a6-e248ea12621f",
+        "review.reference-holdout-v1.source-verifier.386fa3a60290d1455cc9"
+      ],
+      "status": "candidate",
+      "subject_id": "paper.arxiv.2504.16084v3",
+      "value": {
+        "type": "text",
+        "value": "The implementation samples 64 responses for voting and downsamples 32 per prompt for policy training."
       }
     },
     {
@@ -1753,7 +2063,8 @@
       "Eligible core is not frozen. Actual reviewed paper, supplier, dataset and benchmark coverage remains below the user-approved launch floors.",
       "Coverage method 1.1.0 rolls reviewed manifestations into their explicitly reviewed work/family once; it never infers supplier edges. This is an incomplete selected baseline, not a frozen market inventory or passing launch audit.",
       "Dataset-family counting correction: FineWeb-Edu is an educationally filtered FineWeb subset, not an additional family. Its readable records and exact approved assertions are preserved. Source: creator paper 2406.17557v2, physical page 8; separate integration audit recorded the correction. No floor is reduced.",
-      "Sixteen original evidence bindings are quarantined after separate source-verifier and adversarial reference-panel review. Previously passing receipts and scientific text remain preserved; new candidate replacements require fresh three-role approval. No audit accuracy or completed publication is claimed."
+      "Sixteen original evidence bindings are quarantined after separate source-verifier and adversarial reference-panel review. Previously passing receipts and scientific text remain preserved; new candidate replacements require fresh three-role approval. No audit accuracy or completed publication is claimed.",
+      "Ten additional original evidence bindings are quarantined after actual source-verifier and adversarial reference-panel review plus independent tie-breaker reconciliation of their initial context-boundary disagreements. These are citation/documentation repairs, not allegations of false scientific content. Previously passing receipts and scientific text remain preserved; new candidate replacements require fresh three-role approval. No audit accuracy or completed publication is claimed."
     ],
     "quality_audit": null,
     "screening_audit": null
@@ -24461,6 +24772,26 @@
   "reviews": [
     {
       "assertion_ids": [
+        "cohort8.claim.ttrl.vote-then-sample"
+      ],
+      "assertion_sha256": {
+        "cohort8.claim.ttrl.vote-then-sample": "dd5ea60570f88eb8ccf9554b3fec40a659d80d4f6f8177b3717b69682974eb91"
+      },
+      "id": "reference.adversarial.31be775e-556b-4bd8-91a6-e248ea12621f",
+      "invocation_id": "7248172b-28e9-457e-97fd-bb9aece1aec5",
+      "method": "source_content_review",
+      "note": "{\"case_id\": \"reference.b2aaa4ea41596e994205\", \"actual_review_scope\": \"complete declared cited contexts; not full underlying work\", \"observations_ref\": \"source-observations.frozen.json\", \"source_checks_ref\": \"source-checks.complete.json\", \"source_first_observation_id\": \"cdc9dbad-c8c2-4953-b10f-c1d0a1fa5dbe\", \"raw_sha256_verified\": true, \"actual_scopes\": [{\"source_id\": \"cohort8.source.ttrl.vote-then-sample\", \"locator\": \"Pinned primary arXiv PDF 2504.16084v3; section 3.1 Implementation Details; physical p7 pdftotext-layout lines 6–15 (1-based). Literal anchor p7 line 10. PDF SHA-256 3828cc886a0133749fe857dc12fff190f76c17dd7421dccfca01c96ec1dd5882; extracted-text SHA-256 6da0d8e63dcc33ca0ca03c3e2d37d11c2948d3b6cb553643575e2afc00687b69.\", \"response_sha256\": \"3828cc886a0133749fe857dc12fff190f76c17dd7421dccfca01c96ec1dd5882\", \"read_scopes\": [\"physical PDF page 7, pdftotext-layout lines 6-15\"]}], \"own_source_content_paraphrase\": \"TTRL uses GRPO separately for each benchmark, samples 64 responses for voting labels then downsamples 32 per prompt for training; temperature 0.6, or 1.0 for Qwen2.5-Math/LRMs. LRMs have 32768-token limits, others 3072.\", \"original_full_binding_reason\": \"The declared training-recipe span does not establish the separate evaluation-sampling-count qualification. The actual 64/32 training counts are supported.\", \"proposed_correction_only\": \"Delete the clause about separate evaluation sampling counts, retaining GRPO, AdamW, GPU, temperature and token-limit facts explicitly in p7 lines6-15; any added evaluation protocol needs separately declared evidence and a new review.\", \"identity_disclosure\": \"Requested gpt-6.1-sol/ultra; actual backend configuration not separately attested.\", \"independence\": \"No evaluated predictions, other truth reviews, construction truth tags or previous publication status used.\", \"publication_action\": \"No graph/source edits, promotions, retargeted receipts or outreach performed.\"}",
+      "reviewed_on": "2026-11-10T15:04:51.459441Z",
+      "reviewer": "Independent Codex adversarial adjudicator; requested gpt-6.1-sol/ultra, runtime not separately attested",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "cohort8.source.ttrl.vote-then-sample"
+      ],
+      "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
         "candidate.cohort4.proximal.annualized-revenue-disclosure"
       ],
       "assertion_sha256": {
@@ -24561,6 +24892,26 @@
     },
     {
       "assertion_ids": [
+        "cohort5.claim.languagefeedback.main-evaluator"
+      ],
+      "assertion_sha256": {
+        "cohort5.claim.languagefeedback.main-evaluator": "a8ae66186dc7ff6683a09e102a2f432334152ec2c4fc231ab461131a9f02a698"
+      },
+      "id": "reference.adversarial.4400ab34-201f-4641-984a-104adce0abcf",
+      "invocation_id": "7248172b-28e9-457e-97fd-bb9aece1aec5",
+      "method": "source_content_review",
+      "note": "{\"case_id\": \"reference.97e13af1d58fff398c88\", \"actual_review_scope\": \"complete declared cited contexts; not full underlying work\", \"observations_ref\": \"source-observations.frozen.json\", \"source_checks_ref\": \"source-checks.complete.json\", \"source_first_observation_id\": \"7caa6fb8-0640-42d0-98e7-4559f47f21d1\", \"raw_sha256_verified\": true, \"actual_scopes\": [{\"source_id\": \"cohort5.source.languagefeedback.main-evaluator\", \"locator\": \"Physical PDF p8 AppendixC continuation lines1-10; anchor physical p8, pdftotext-layout line 9 (1-based). Full pinned PDF response SHA-256 7f0316658554df7a538ca89a6e44438c36cf31c9bc76b0246964b42f4824ee0d.\", \"response_sha256\": \"7f0316658554df7a538ca89a6e44438c36cf31c9bc76b0246964b42f4824ee0d\", \"read_scopes\": [\"physical PDF page 8, pdftotext-layout lines 1-10\"]}], \"own_source_content_paraphrase\": \"Language-feedback refinement evaluation has two authors uninvolved in feedback annotation judge generated refinements for Fig3left,4,6. One author conducts human evaluation for Figs2,5. Evaluators see title/post/summaries, roles differ by figure; cannot call all evaluation independently external or all one-rater.\", \"original_full_binding_reason\": \"Declared AppendixC confirms one author judged Figures2and5, but does not identify those comparisons as fine-tuned-model comparisons.\", \"proposed_correction_only\": \"Narrow wording to one author conducting human evaluation for Figures2and5, or separately declare the relevant figure/model-design evidence.\", \"identity_disclosure\": \"Requested gpt-6.1-sol/ultra; actual backend configuration not separately attested.\", \"independence\": \"No evaluated predictions, other truth reviews, construction truth tags or previous publication status used.\", \"publication_action\": \"No graph/source edits, promotions, retargeted receipts or outreach performed.\"}",
+      "reviewed_on": "2026-11-10T15:04:51.459441Z",
+      "reviewer": "Independent Codex adversarial adjudicator; requested gpt-6.1-sol/ultra, runtime not separately attested",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "cohort5.source.languagefeedback.main-evaluator"
+      ],
+      "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
         "cohort4.dataset.claim.xp3.scope"
       ],
       "assertion_sha256": {
@@ -24576,6 +24927,26 @@
       "role": "adversarial",
       "source_ids": [
         "cohort4.dataset.source.xp3.scope"
+      ],
+      "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
+        "candidate.cohort3.dataset.pickapic.02"
+      ],
+      "assertion_sha256": {
+        "candidate.cohort3.dataset.pickapic.02": "4a6cfe3c47d193e0d6b7940538d5634347306d5ebb22508feaa68c3620e23148"
+      },
+      "id": "reference.adversarial.609b195f-2d10-4739-be6c-f7c78274367a",
+      "invocation_id": "7248172b-28e9-457e-97fd-bb9aece1aec5",
+      "method": "source_content_review",
+      "note": "{\"case_id\": \"reference.d69c37bd228ede674298\", \"actual_review_scope\": \"complete declared cited contexts; not full underlying work\", \"observations_ref\": \"supplemental-source-observations.v2.frozen.json\", \"source_checks_ref\": \"source-checks.complete.json\", \"source_first_observation_id\": \"e1674176-1924-4f12-9f40-d68e6a88cc3f\", \"raw_sha256_verified\": true, \"actual_scopes\": [{\"source_id\": \"cohort3.dataset-source.pickapic.02\", \"locator\": \"paper.pdf; pypdf extracted text lines 91-102; revision NeurIPS2023-73aacd8b3b05b4b503d58310b523553c-Paper-Conference\", \"response_sha256\": \"b83f0f8b9bc43413a8a9d2a3e2d511a7ef13bd847e7d735f961f8caa79562b9a\", \"read_scopes\": [\"pypdf whole-document lines 91-102\"]}], \"own_source_content_paraphrase\": \"Correct marker-bearing lines91-102 contain actual-user collection, >500k examples,35k prompts,preference/tie schema and three named image-generator families. Generator hypothesis remains supported.\", \"original_full_binding_reason\": \"Generator families are supported in exact recovered pypdf lines91-102, but original global-line locator omits page-marker construction recipe.\", \"proposed_correction_only\": \"Publish pypdf6.10.0 marker-bearing extraction recipe and text SHA25609f3e1271f5636690eace950ebf4752c62e06995ceedd1a6ce156a9485c24db3 so global coordinates are self-contained. Scientific conclusion stays supported; method-clarity review remains revise.\", \"identity_disclosure\": \"Requested gpt-6.1-sol/ultra; actual backend configuration not separately attested.\", \"independence\": \"No evaluated predictions, other truth reviews, construction truth tags or previous publication status used.\", \"publication_action\": \"No graph/source edits, promotions, retargeted receipts or outreach performed.\", \"supplemental_method_ref\": \"supplemental-pypdf-method-checks.json\", \"read_scopes_corrected_by_explicit_supplement\": true}",
+      "reviewed_on": "2026-11-10T15:04:51.459441Z",
+      "reviewer": "Independent Codex adversarial adjudicator; requested gpt-6.1-sol/ultra, runtime not separately attested",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "cohort3.dataset-source.pickapic.02"
       ],
       "verdict": "revise"
     },
@@ -24621,6 +24992,26 @@
     },
     {
       "assertion_ids": [
+        "cohort3.claim.dclm.final-model-mixture"
+      ],
+      "assertion_sha256": {
+        "cohort3.claim.dclm.final-model-mixture": "3a0bd9e62f5ba674094605c674a68511f4658755278fd764c3024acc04908edc"
+      },
+      "id": "reference.adversarial.7e0085b7-0ac8-4213-8d57-e8d202b0df3e",
+      "invocation_id": "7248172b-28e9-457e-97fd-bb9aece1aec5",
+      "method": "source_content_review",
+      "note": "{\"case_id\": \"reference.eb714f4714df2adebb5a\", \"actual_review_scope\": \"complete declared cited contexts; not full underlying work\", \"observations_ref\": \"source-observations.frozen.json\", \"source_checks_ref\": \"source-checks.complete.json\", \"source_first_observation_id\": \"d1c3814b-b953-465b-ae8a-2b2c52915553\", \"raw_sha256_verified\": true, \"actual_scopes\": [{\"source_id\": \"cohort3.source.dclm.final-model-mixture\", \"locator\": \"Physical PDF pp11-12, section5 and Table9; excerpt at physical p11, pdftotext-layout line 21 (1-based).\", \"response_sha256\": \"f19ea7fda1bf30fd9fe877ef6996c2dbc7f84538d813903b66a7bb7ff8f38bc0\", \"read_scopes\": [\"physical PDF page 11, pdftotext-layout lines 1-54\", \"physical PDF page 12, pdftotext-layout lines 1-54\"]}], \"own_source_content_paraphrase\": \"DCLM final7Btraining mixes3.8TbaselinewithStarCoder/ProofPile2into4.1Tcorpus,2.5Ttrainingplus100Bcontext-extension;annealing70%tighterfilteredbaseline30%math. Table92.6Tmodel63.7MMLU57.1core; cannotattributeentiremixedmodelresulttopurebaseline. Limits7B,onecommontokenizer,fewrandomseeds,nofairness/multilingual/safetyevaluation.\", \"original_full_binding_reason\": \"Declared mixture/table context supports2.6T7B and63.7MMLU, but not the claim about a headline rounded64percent elsewhere.\", \"proposed_correction_only\": \"Remove the headline64percent sentence from the qualification; keep the exact63.7 table result and mixed-data attribution caveat, or separately declare the headline if needed.\", \"identity_disclosure\": \"Requested gpt-6.1-sol/ultra; actual backend configuration not separately attested.\", \"independence\": \"No evaluated predictions, other truth reviews, construction truth tags or previous publication status used.\", \"publication_action\": \"No graph/source edits, promotions, retargeted receipts or outreach performed.\"}",
+      "reviewed_on": "2026-11-10T15:04:51.459441Z",
+      "reviewer": "Independent Codex adversarial adjudicator; requested gpt-6.1-sol/ultra, runtime not separately attested",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "cohort3.source.dclm.final-model-mixture"
+      ],
+      "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
         "cohort4.claim.jailbreakbench.paired-behaviors"
       ],
       "assertion_sha256": {
@@ -24636,6 +25027,26 @@
       "role": "adversarial",
       "source_ids": [
         "cohort4.source.jailbreakbench.paired-behaviors"
+      ],
+      "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
+        "candidate.cohort4.polymath_ai_labs.horizon-swe"
+      ],
+      "assertion_sha256": {
+        "candidate.cohort4.polymath_ai_labs.horizon-swe": "199c248957da853c3da0d981782793ca5d68f40d54742750b16eb4ce3e91cdd0"
+      },
+      "id": "reference.adversarial.7ee6b287-4e4a-4da4-a2d5-3118816cbfec",
+      "invocation_id": "7248172b-28e9-457e-97fd-bb9aece1aec5",
+      "method": "source_content_review",
+      "note": "{\"case_id\": \"reference.4a9a1c68b62418d22ce3\", \"actual_review_scope\": \"complete declared cited contexts; not full underlying work\", \"observations_ref\": \"source-observations.frozen.json\", \"source_checks_ref\": \"source-checks.complete.json\", \"source_first_observation_id\": \"eebd31f1-5658-4255-818b-f00a4fbd30d0\", \"raw_sha256_verified\": true, \"actual_scopes\": [{\"source_id\": \"cohort4.source.polymath_ai_labs.horizon-swe\", \"locator\": \"text/polymath_ai_labs-21.txt:L65-L65; extracted-text UTF-8 character offsets [1260,1311); literal excerpt\", \"response_sha256\": \"6bee82d9f5b2ed107faa27dc2c26fec39fe768835a299eff04ac154da47c85c7\", \"read_scopes\": [\"declared text lines 65-65\"]}], \"own_source_content_paraphrase\": \"Only a fragment describing long-horizon tasks in production-grade environments appears at physical textline65. It contains no subject, product name, pricing, result, or explicit software-engineering binding; neighboring context could disambiguate but is outside the declared one-line span.\", \"original_full_binding_reason\": \"One isolated source phrase about long-horizon tasks does not establish Polymath creation/ownership of Horizon-SWE or benchmark methods.\", \"proposed_correction_only\": \"Keep the creates edge quarantined; remove it from any approval proposal until a declared source span explicitly binds Polymath, Horizon-SWE and creation. No retargeted passing receipt is supplied.\", \"identity_disclosure\": \"Requested gpt-6.1-sol/ultra; actual backend configuration not separately attested.\", \"independence\": \"No evaluated predictions, other truth reviews, construction truth tags or previous publication status used.\", \"publication_action\": \"No graph/source edits, promotions, retargeted receipts or outreach performed.\"}",
+      "reviewed_on": "2026-11-10T15:04:51.459441Z",
+      "reviewer": "Independent Codex adversarial adjudicator; requested gpt-6.1-sol/ultra, runtime not separately attested",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "cohort4.source.polymath_ai_labs.horizon-swe"
       ],
       "verdict": "revise"
     },
@@ -24701,6 +25112,26 @@
     },
     {
       "assertion_ids": [
+        "candidate.cohort3.dataset.pickapic.01"
+      ],
+      "assertion_sha256": {
+        "candidate.cohort3.dataset.pickapic.01": "1d39b3f7e77be224d60717966a05bd188311afae6389eca758cdb528ed975e40"
+      },
+      "id": "reference.adversarial.9a0f319a-b3a0-4809-b18c-a45b2c0e3717",
+      "invocation_id": "7248172b-28e9-457e-97fd-bb9aece1aec5",
+      "method": "source_content_review",
+      "note": "{\"case_id\": \"reference.43b0a5f0a2174c8ada08\", \"actual_review_scope\": \"complete declared cited contexts; not full underlying work\", \"observations_ref\": \"supplemental-source-observations.v2.frozen.json\", \"source_checks_ref\": \"source-checks.complete.json\", \"source_first_observation_id\": \"c285334f-4b3c-4585-a0f4-0cc456b6520f\", \"raw_sha256_verified\": true, \"actual_scopes\": [{\"source_id\": \"cohort3.dataset-source.pickapic.01\", \"locator\": \"paper.pdf; pypdf extracted text lines 40-48; revision NeurIPS2023-73aacd8b3b05b4b503d58310b523553c-Paper-Conference\", \"response_sha256\": \"b83f0f8b9bc43413a8a9d2a3e2d511a7ef13bd847e7d735f961f8caa79562b9a\", \"read_scopes\": [\"pypdf whole-document lines 40-48\"]}], \"own_source_content_paraphrase\": \"Correct marker-bearing lines40-48 contain actual-user prompt/preference collection, image pairs,ties and user motivation versus crowdworker distinction. Human-preference hypothesis remains supported.\", \"original_full_binding_reason\": \"Real-user preference/tie claim is supported in exact recovered pypdf lines40-48, but the original global-line locator omits page-marker recipe.\", \"proposed_correction_only\": \"Publish pypdf6.10.0 marker-bearing extraction recipe and text SHA25609f3e1271f5636690eace950ebf4752c62e06995ceedd1a6ce156a9485c24db3 before method-clear approval. Scientific statement needs no correction.\", \"identity_disclosure\": \"Requested gpt-6.1-sol/ultra; actual backend configuration not separately attested.\", \"independence\": \"No evaluated predictions, other truth reviews, construction truth tags or previous publication status used.\", \"publication_action\": \"No graph/source edits, promotions, retargeted receipts or outreach performed.\", \"supplemental_method_ref\": \"supplemental-pypdf-method-checks.json\", \"read_scopes_corrected_by_explicit_supplement\": true}",
+      "reviewed_on": "2026-11-10T15:04:51.459441Z",
+      "reviewer": "Independent Codex adversarial adjudicator; requested gpt-6.1-sol/ultra, runtime not separately attested",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "cohort3.dataset-source.pickapic.01"
+      ],
+      "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
         "candidate.cohort3.dataset.chatbotarena.05"
       ],
       "assertion_sha256": {
@@ -24716,6 +25147,26 @@
       "role": "adversarial",
       "source_ids": [
         "cohort3.dataset-source.chatbotarena.05"
+      ],
+      "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
+        "candidate.cohort3.dataset.numinamath.05"
+      ],
+      "assertion_sha256": {
+        "candidate.cohort3.dataset.numinamath.05": "c7efb40be36b5e880b8d8bdcc08f33ea2a8f97aca32c5f89f8b1781bf610d20c"
+      },
+      "id": "reference.adversarial.cead009f-2fb0-40c4-b353-158e80072c93",
+      "invocation_id": "7248172b-28e9-457e-97fd-bb9aece1aec5",
+      "method": "source_content_review",
+      "note": "{\"case_id\": \"reference.e8a84d04a80815fc123c\", \"actual_review_scope\": \"complete declared cited contexts; not full underlying work\", \"observations_ref\": \"supplemental-source-observations.v2.frozen.json\", \"source_checks_ref\": \"source-checks.complete.json\", \"source_first_observation_id\": \"b33f571f-fe31-4f2c-8864-349ae0cd7f9b\", \"raw_sha256_verified\": true, \"actual_scopes\": [{\"source_id\": \"cohort3.dataset-source.numinamath.05\", \"locator\": \"report/numina_dataset.pdf; pypdf extracted text lines 524-531; revision 712e1abbcbcf870dccf4c6a3e7837e2967bd7d7f\", \"response_sha256\": \"613b93a38d0fdc24bc2bf4866a9b78a1eaab3855956d273253b461982054c4f6\", \"read_scopes\": [\"pypdf whole-document lines 524-531\"]}], \"own_source_content_paraphrase\": \"Correct marker-bearing lines 524-531 discuss difficulty validating single-stage GPT-4o synthetic problems and insufficiently detailed CoT for hard problems. The original scientific statement is supported at these coordinates under this exact recovered recipe.\", \"original_full_binding_reason\": \"The scientific statement is supported by exact recovered marker-bearing pypdf lines524-531, but the original locator omits the page-marker text construction needed to reproduce those coordinates. V1 misread was caused by an unmarked recipe.\", \"proposed_correction_only\": \"Publish pypdf6.10.0 and exact marker-bearing recipe plus text SHA2561eafde410e61dd6e20921dad861c42fb81a36e2edd02629678f9bef0bb4c6e4e; preserve declared524-531 scientific coordinates, create a newly bound review only after method clarity is fixed. No science wording correction required.\", \"identity_disclosure\": \"Requested gpt-6.1-sol/ultra; actual backend configuration not separately attested.\", \"independence\": \"No evaluated predictions, other truth reviews, construction truth tags or previous publication status used.\", \"publication_action\": \"No graph/source edits, promotions, retargeted receipts or outreach performed.\", \"supplemental_method_ref\": \"supplemental-pypdf-method-checks.json\", \"read_scopes_corrected_by_explicit_supplement\": true}",
+      "reviewed_on": "2026-11-10T15:04:51.459441Z",
+      "reviewer": "Independent Codex adversarial adjudicator; requested gpt-6.1-sol/ultra, runtime not separately attested",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "cohort3.dataset-source.numinamath.05"
       ],
       "verdict": "revise"
     },
@@ -24741,6 +25192,26 @@
     },
     {
       "assertion_ids": [
+        "cohort4.dataset.claim.no-robots.splits"
+      ],
+      "assertion_sha256": {
+        "cohort4.dataset.claim.no-robots.splits": "35cd69a0454642d497c0dde27865089424545e725e23fbe2b638774ebcc2088c"
+      },
+      "id": "reference.adversarial.dfb2e0be-5ede-41af-accb-de0010f24eb2",
+      "invocation_id": "7248172b-28e9-457e-97fd-bb9aece1aec5",
+      "method": "source_content_review",
+      "note": "{\"case_id\": \"reference.b17ddc412991bab6528e\", \"actual_review_scope\": \"complete declared cited contexts; not full underlying work\", \"observations_ref\": \"source-observations.frozen.json\", \"source_checks_ref\": \"source-checks.complete.json\", \"source_first_observation_id\": \"e76eea7b-5934-4726-944f-c5e5ab58c205\", \"raw_sha256_verified\": true, \"actual_scopes\": [{\"source_id\": \"cohort4.dataset.source.no-robots.splits\", \"locator\": \"raw UTF-8 text; lines 120-120 inclusive; README.md\", \"response_sha256\": \"22b642520e082ba1a6c4a93047bd5946aeca099763c6f2d11b59d91e61e79186\", \"read_scopes\": [\"declared text lines 120-120\"]}], \"own_source_content_paraphrase\": \"NoRobots declared line contains row values no_robots9500and500 without column headers; cannot establish which is train/test solely from the row. Neighboring table headers must be separately cited for full split binding.\", \"original_full_binding_reason\": \"Declared NoRobots row gives9500/500 but excludes train_sft/test_sft headers, so split identity is not self-contained.\", \"proposed_correction_only\": \"For a future new binding, declare rawUTF8 lines118-120, independently inspected as repair-only context, to include train_sft/test_sft headers. Existing old-digest receipt remains revise.\", \"identity_disclosure\": \"Requested gpt-6.1-sol/ultra; actual backend configuration not separately attested.\", \"independence\": \"No evaluated predictions, other truth reviews, construction truth tags or previous publication status used.\", \"publication_action\": \"No graph/source edits, promotions, retargeted receipts or outreach performed.\"}",
+      "reviewed_on": "2026-11-10T15:04:51.459441Z",
+      "reviewer": "Independent Codex adversarial adjudicator; requested gpt-6.1-sol/ultra, runtime not separately attested",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "cohort4.dataset.source.no-robots.splits"
+      ],
+      "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
         "candidate.cohort3.dataset.videofeedback.05"
       ],
       "assertion_sha256": {
@@ -24756,6 +25227,46 @@
       "role": "adversarial",
       "source_ids": [
         "cohort3.dataset-source.videofeedback.05"
+      ],
+      "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
+        "cohort7.claim.consentcrisis.head"
+      ],
+      "assertion_sha256": {
+        "cohort7.claim.consentcrisis.head": "d3ee8ba2ca3ffa2bb1b1e857d5d96ec1077cc4d5e77ac1bb9f4d14b82d771b1a"
+      },
+      "id": "reference.adversarial.ee2ea57e-8a3f-468e-a17a-7abf43afc164",
+      "invocation_id": "7248172b-28e9-457e-97fd-bb9aece1aec5",
+      "method": "source_content_review",
+      "note": "{\"case_id\": \"reference.9349b5ebd59d8bbce603\", \"actual_review_scope\": \"complete declared cited contexts; not full underlying work\", \"observations_ref\": \"source-observations.frozen.json\", \"source_checks_ref\": \"source-checks.complete.json\", \"source_first_observation_id\": \"70f47971-fc06-49c9-81dd-fe21680b4083\", \"raw_sha256_verified\": true, \"actual_scopes\": [{\"source_id\": \"cohort7.source.consentcrisis.head\", \"locator\": \"Pinned primary PDF 2407.14933v1; physical p3 pdftotext-layout lines47-50 (1-based). Literal anchor p3 line47. PDF SHA-256 890f0591edfaf9938f9e72046b1d7fe2c476c94a9911712921bde59b5dd9cf38; extracted-text SHA-256 0f8ecb955236597a3a4539dda7b9e6eb7ad0fde6971271ead5af2e618cd02140.\", \"response_sha256\": \"890f0591edfaf9938f9e72046b1d7fe2c476c94a9911712921bde59b5dd9cf38\", \"read_scopes\": [\"physical PDF page 3, pdftotext-layout lines 47-50\"]}], \"own_source_content_paraphrase\": \"Consent Crisis HEADAll is union3.95k domains from top2000 token-ranked domains per source; prominent maintained domains, not random all-web sample. HEADC4 subset used for some analyses.\", \"original_full_binding_reason\": \"Declared lines support top2000 per source,3950 union andHeadC4, but not the qualification that precisely three corpora contribute.\", \"proposed_correction_only\": \"Remove the uncited three-corpora number from the qualification or add a separately declared source-context span naming all three; retain top2000,3950 andHeadC4 facts.\", \"identity_disclosure\": \"Requested gpt-6.1-sol/ultra; actual backend configuration not separately attested.\", \"independence\": \"No evaluated predictions, other truth reviews, construction truth tags or previous publication status used.\", \"publication_action\": \"No graph/source edits, promotions, retargeted receipts or outreach performed.\"}",
+      "reviewed_on": "2026-11-10T15:04:51.459441Z",
+      "reviewer": "Independent Codex adversarial adjudicator; requested gpt-6.1-sol/ultra, runtime not separately attested",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "cohort7.source.consentcrisis.head"
+      ],
+      "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
+        "candidate.cohort4.proximal.frontierswe-collaboration"
+      ],
+      "assertion_sha256": {
+        "candidate.cohort4.proximal.frontierswe-collaboration": "d9d27c20e2acf17b5cdd6d0cb0f7967fc122309a8ef1c3387b0c85d6a5245022"
+      },
+      "id": "reference.adversarial.ef191b36-f586-495a-aadc-7d5ba7528d8b",
+      "invocation_id": "7248172b-28e9-457e-97fd-bb9aece1aec5",
+      "method": "source_content_review",
+      "note": "{\"case_id\": \"reference.35516a4362cb81887478\", \"actual_review_scope\": \"complete declared cited contexts; not full underlying work\", \"observations_ref\": \"source-observations.frozen.json\", \"source_checks_ref\": \"source-checks.complete.json\", \"source_first_observation_id\": \"379fd11f-73c3-491c-aa31-461e397620a7\", \"raw_sha256_verified\": true, \"actual_scopes\": [{\"source_id\": \"cohort4.source.proximal.frontierswe-collaboration\", \"locator\": \"text/proximal-14.txt:L35-L35; extracted-text UTF-8 character offsets [1986,2029); literal excerpt\", \"response_sha256\": \"95a6ba12041abf59c10f87d7d1d4482ecac94eda371be4d37eabed37f956f8ba\", \"read_scopes\": [\"declared text lines 35-35\"]}], \"own_source_content_paraphrase\": \"Proximaldeclaredline35onlylistsModular,PrimeIntellect,ThoughtfulLab; nosentencepredicateorproduct/rolebindingthere. Broadercollaborationclaimneedsadditionaldeclaredcontext.\", \"original_full_binding_reason\": \"Declared source line only lists Modular,PrimeIntellect,ThoughtfulLab. It does not bind FrontierSWE creation/ownership or curation roles.\", \"proposed_correction_only\": \"Keep the creates edge quarantined; require a complete declared subject-product-predicate source span and actual collaborator roles before a new approval proposal. No receipt retargeting is performed.\", \"identity_disclosure\": \"Requested gpt-6.1-sol/ultra; actual backend configuration not separately attested.\", \"independence\": \"No evaluated predictions, other truth reviews, construction truth tags or previous publication status used.\", \"publication_action\": \"No graph/source edits, promotions, retargeted receipts or outreach performed.\"}",
+      "reviewed_on": "2026-11-10T15:04:51.459441Z",
+      "reviewer": "Independent Codex adversarial adjudicator; requested gpt-6.1-sol/ultra, runtime not separately attested",
+      "reviewer_type": "ai",
+      "role": "adversarial",
+      "source_ids": [
+        "cohort4.source.proximal.frontierswe-collaboration"
       ],
       "verdict": "revise"
     },
@@ -25181,6 +25692,46 @@
     },
     {
       "assertion_ids": [
+        "candidate.cohort4.proximal.frontierswe-collaboration"
+      ],
+      "assertion_sha256": {
+        "candidate.cohort4.proximal.frontierswe-collaboration": "d9d27c20e2acf17b5cdd6d0cb0f7967fc122309a8ef1c3387b0c85d6a5245022"
+      },
+      "id": "review.reference-holdout-v1.source-verifier.0b36ebecf53d4c4ee11a",
+      "invocation_id": "f2c8edf0-d267-4c26-abe9-84c141502b01",
+      "method": "source_content_review",
+      "note": "Independent source-content review of the original frozen assertion and its complete current evidence binding, after source-first observations were frozen. Raw response and excerpt SHA256 verified. Partial source-document scope: declared locators and interpretation context only; no full-document or experiment reproduction claim. FrontierSWE source names Modular, Prime Intellect and Thoughtful Lab as partners in curating difficult problems known to experts beyond Proximal; claim of collaboration is vendor-reported, not proof of endorsement of every task. Researcher review-status/process disclosures were treated as metadata, not third-party source assertions. No verifier predictions, other adjudications, construction tags or reference label values consulted.",
+      "reviewed_on": "2026-11-10T15:01:41.667817Z",
+      "reviewer": "Codex independent source adjudicator; requested gpt-6.1-sol / ultra; served-model identity not independently exposed",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "cohort4.source.proximal.frontierswe-collaboration"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "cohort7.claim.consentcrisis.head"
+      ],
+      "assertion_sha256": {
+        "cohort7.claim.consentcrisis.head": "d3ee8ba2ca3ffa2bb1b1e857d5d96ec1077cc4d5e77ac1bb9f4d14b82d771b1a"
+      },
+      "id": "review.reference-holdout-v1.source-verifier.24b3d284a503f1c96c9f",
+      "invocation_id": "f2c8edf0-d267-4c26-abe9-84c141502b01",
+      "method": "source_content_review",
+      "note": "Independent source-content review of the original frozen assertion and its complete current evidence binding, after source-first observations were frozen. Raw response and excerpt SHA256 verified. Partial source-document scope: declared locators and interpretation context only; no full-document or experiment reproduction claim. Consent Crisis head sample unions each corpus's top2K token-contributing domains into3.95K domains; this targets large maintained hosts rather than a uniformly random web sample. A separate random domain sample serves other analyses. Researcher review-status/process disclosures were treated as metadata, not third-party source assertions. No verifier predictions, other adjudications, construction tags or reference label values consulted.",
+      "reviewed_on": "2026-11-10T15:01:41.667817Z",
+      "reviewer": "Codex independent source adjudicator; requested gpt-6.1-sol / ultra; served-model identity not independently exposed",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "cohort7.source.consentcrisis.head"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
         "cohort4.dataset.claim.webshop.license"
       ],
       "assertion_sha256": {
@@ -25218,6 +25769,46 @@
         "cohort4.source.jailbreakbench.paired-behaviors"
       ],
       "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
+        "candidate.cohort3.dataset.pickapic.02"
+      ],
+      "assertion_sha256": {
+        "candidate.cohort3.dataset.pickapic.02": "4a6cfe3c47d193e0d6b7940538d5634347306d5ebb22508feaa68c3620e23148"
+      },
+      "id": "review.reference-holdout-v1.source-verifier.3295b5578875debe1e88",
+      "invocation_id": "f2c8edf0-d267-4c26-abe9-84c141502b01",
+      "method": "source_content_review",
+      "note": "Independent source-content review of the original frozen assertion and its complete current evidence binding, after source-first observations were frozen. Raw response and excerpt SHA256 verified. Partial source-document scope: declared locators and interpretation context only; no full-document or experiment reproduction claim. Pick-a-Pic paper pypdf lines91-102 report over500K paired-image preference examples and35K distinct prompts logged from the web app, allow ties, and describe generated images from multiple diffusion backbones. Counts are examples/prompts, not unique annotators; app permits user prompt entry and pair selection. Researcher review-status/process disclosures were treated as metadata, not third-party source assertions. No verifier predictions, other adjudications, construction tags or reference label values consulted.",
+      "reviewed_on": "2026-11-10T15:01:41.667817Z",
+      "reviewer": "Codex independent source adjudicator; requested gpt-6.1-sol / ultra; served-model identity not independently exposed",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "cohort3.dataset-source.pickapic.02"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "cohort8.claim.ttrl.vote-then-sample"
+      ],
+      "assertion_sha256": {
+        "cohort8.claim.ttrl.vote-then-sample": "dd5ea60570f88eb8ccf9554b3fec40a659d80d4f6f8177b3717b69682974eb91"
+      },
+      "id": "review.reference-holdout-v1.source-verifier.386fa3a60290d1455cc9",
+      "invocation_id": "f2c8edf0-d267-4c26-abe9-84c141502b01",
+      "method": "source_content_review",
+      "note": "Independent source-content review of the original frozen assertion and its complete current evidence binding, after source-first observations were frozen. Raw response and excerpt SHA256 verified. Partial source-document scope: declared locators and interpretation context only; no full-document or experiment reproduction claim. TTRL implementation samples 64 responses for voting-derived labels, then downsamples 32 per prompt for training; temperature varies by model, and experiments use eight A100 80GB devices. Researcher review-status/process disclosures were treated as metadata, not third-party source assertions. No verifier predictions, other adjudications, construction tags or reference label values consulted.",
+      "reviewed_on": "2026-11-10T15:01:41.667817Z",
+      "reviewer": "Codex independent source adjudicator; requested gpt-6.1-sol / ultra; served-model identity not independently exposed",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "cohort8.source.ttrl.vote-then-sample"
+      ],
+      "verdict": "pass"
     },
     {
       "assertion_ids": [
@@ -25261,6 +25852,46 @@
     },
     {
       "assertion_ids": [
+        "candidate.cohort3.dataset.numinamath.05"
+      ],
+      "assertion_sha256": {
+        "candidate.cohort3.dataset.numinamath.05": "c7efb40be36b5e880b8d8bdcc08f33ea2a8f97aca32c5f89f8b1781bf610d20c"
+      },
+      "id": "review.reference-holdout-v1.source-verifier.4fd0d6585d316035e4f3",
+      "invocation_id": "f2c8edf0-d267-4c26-abe9-84c141502b01",
+      "method": "source_content_review",
+      "note": "Independent source-content review of the original frozen assertion and its complete current evidence binding, after source-first observations were frozen. Raw response and excerpt SHA256 verified. Partial source-document scope: declared locators and interpretation context only; no full-document or experiment reproduction claim. Original pypdf6.10.0 text was exactly reconstructed with explicit physical-page marker lines, one-newline piece joining and final newline; text SHA1eafde410e61dd6e20921dad861c42fb81a36e2edd02629678f9bef0bb4c6e4e matches the original extraction. Declared global lines524-531 support synthetic-correctness validation difficulty and incomplete hard-problem CoT detail. Public locator omitted the derivation recipe; the technical recovery leaves original locator and assertion unchanged. Researcher review-status/process disclosures were treated as metadata, not third-party source assertions. No verifier predictions, other adjudications, construction tags or reference label values consulted.",
+      "reviewed_on": "2026-11-10T15:01:41.667817Z",
+      "reviewer": "Codex independent source adjudicator; requested gpt-6.1-sol / ultra; served-model identity not independently exposed",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "cohort3.dataset-source.numinamath.05"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
+        "cohort3.claim.dclm.final-model-mixture"
+      ],
+      "assertion_sha256": {
+        "cohort3.claim.dclm.final-model-mixture": "3a0bd9e62f5ba674094605c674a68511f4658755278fd764c3024acc04908edc"
+      },
+      "id": "review.reference-holdout-v1.source-verifier.54f308b381b70799e603",
+      "invocation_id": "f2c8edf0-d267-4c26-abe9-84c141502b01",
+      "method": "source_content_review",
+      "note": "Independent source-content review of the original frozen assertion and its complete current evidence binding, after source-first observations were frozen. Raw response and excerpt SHA256 verified. Partial source-document scope: declared locators and interpretation context only; no full-document or experiment reproduction claim. DCLM final7B experiment mixes3.8T baseline data with StarCoder and ProofPile2 into4.1T available tokens; training2.5T plus100B context extension totals2.6T seen, including a modified annealing mixture. MMLU63.7 applies to that model/protocol; not a baseline-only web dataset result. Researcher review-status/process disclosures were treated as metadata, not third-party source assertions. No verifier predictions, other adjudications, construction tags or reference label values consulted.",
+      "reviewed_on": "2026-11-10T15:01:41.667817Z",
+      "reviewer": "Codex independent source adjudicator; requested gpt-6.1-sol / ultra; served-model identity not independently exposed",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "cohort3.source.dclm.final-model-mixture"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
         "candidate.cohort4.prime_intellect.gpu-billing-basis"
       ],
       "assertion_sha256": {
@@ -25278,6 +25909,26 @@
         "cohort4.source.prime_intellect.gpu-billing-basis"
       ],
       "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
+        "candidate.cohort3.dataset.pickapic.01"
+      ],
+      "assertion_sha256": {
+        "candidate.cohort3.dataset.pickapic.01": "1d39b3f7e77be224d60717966a05bd188311afae6389eca758cdb528ed975e40"
+      },
+      "id": "review.reference-holdout-v1.source-verifier.5d42bd15403e980ed75d",
+      "invocation_id": "f2c8edf0-d267-4c26-abe9-84c141502b01",
+      "method": "source_content_review",
+      "note": "Independent source-content review of the original frozen assertion and its complete current evidence binding, after source-first observations were frozen. Raw response and excerpt SHA256 verified. Partial source-document scope: declared locators and interpretation context only; no full-document or experiment reproduction claim. Pick-a-Pic collects explicit-consent prompts and preferences from interested image-generation users rather than paid crowdworker tasks; each example has prompt, two generated images and preference or tie. Human signal is comparative preference over synthetic images. Researcher review-status/process disclosures were treated as metadata, not third-party source assertions. No verifier predictions, other adjudications, construction tags or reference label values consulted.",
+      "reviewed_on": "2026-11-10T15:01:41.667817Z",
+      "reviewer": "Codex independent source adjudicator; requested gpt-6.1-sol / ultra; served-model identity not independently exposed",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "cohort3.dataset-source.pickapic.01"
+      ],
+      "verdict": "pass"
     },
     {
       "assertion_ids": [
@@ -25341,6 +25992,26 @@
     },
     {
       "assertion_ids": [
+        "cohort5.claim.languagefeedback.main-evaluator"
+      ],
+      "assertion_sha256": {
+        "cohort5.claim.languagefeedback.main-evaluator": "a8ae66186dc7ff6683a09e102a2f432334152ec2c4fc231ab461131a9f02a698"
+      },
+      "id": "review.reference-holdout-v1.source-verifier.8200f69d48f7e8bbb667",
+      "invocation_id": "f2c8edf0-d267-4c26-abe9-84c141502b01",
+      "method": "source_content_review",
+      "note": "Independent source-content review of the original frozen assertion and its complete current evidence binding, after source-first observations were frozen. Raw response and excerpt SHA256 verified. Partial source-document scope: declared locators and interpretation context only; no full-document or experiment reproduction claim. Language-feedback study's principal human refinement evaluation uses two authors not involved in feedback annotation for specified figures, while one author evaluates figures2/5. Annotator independence is bounded within the research team. Researcher review-status/process disclosures were treated as metadata, not third-party source assertions. No verifier predictions, other adjudications, construction tags or reference label values consulted.",
+      "reviewed_on": "2026-11-10T15:01:41.667817Z",
+      "reviewer": "Codex independent source adjudicator; requested gpt-6.1-sol / ultra; served-model identity not independently exposed",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "cohort5.source.languagefeedback.main-evaluator"
+      ],
+      "verdict": "pass"
+    },
+    {
+      "assertion_ids": [
         "candidate.paperfull.truthfulqa.external-validation-sample"
       ],
       "assertion_sha256": {
@@ -25378,6 +26049,26 @@
         "cohort2.source.labelbox.privacy.ec49b5a855.dafba6c5"
       ],
       "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
+        "candidate.cohort4.polymath_ai_labs.horizon-swe"
+      ],
+      "assertion_sha256": {
+        "candidate.cohort4.polymath_ai_labs.horizon-swe": "199c248957da853c3da0d981782793ca5d68f40d54742750b16eb4ce3e91cdd0"
+      },
+      "id": "review.reference-holdout-v1.source-verifier.9ac4bf78cf1af8699a5d",
+      "invocation_id": "f2c8edf0-d267-4c26-abe9-84c141502b01",
+      "method": "source_content_review",
+      "note": "Independent source-content review of the original frozen assertion and its complete current evidence binding, after source-first observations were frozen. Raw response and excerpt SHA256 verified. Partial source-document scope: declared locators and interpretation context only; no full-document or experiment reproduction claim. Polymath page positions Horizon-SWE as long-horizon agent evaluation in production-grade software environments with services/tools; the narrow cited line is a continuation whose benchmark name is in immediate neighboring lines. Researcher review-status/process disclosures were treated as metadata, not third-party source assertions. No verifier predictions, other adjudications, construction tags or reference label values consulted.",
+      "reviewed_on": "2026-11-10T15:01:41.667817Z",
+      "reviewer": "Codex independent source adjudicator; requested gpt-6.1-sol / ultra; served-model identity not independently exposed",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "cohort4.source.polymath_ai_labs.horizon-swe"
+      ],
+      "verdict": "pass"
     },
     {
       "assertion_ids": [
@@ -25478,6 +26169,26 @@
         "cohort4.source.proximal.annualized-revenue-disclosure"
       ],
       "verdict": "revise"
+    },
+    {
+      "assertion_ids": [
+        "cohort4.dataset.claim.no-robots.splits"
+      ],
+      "assertion_sha256": {
+        "cohort4.dataset.claim.no-robots.splits": "35cd69a0454642d497c0dde27865089424545e725e23fbe2b638774ebcc2088c"
+      },
+      "id": "review.reference-holdout-v1.source-verifier.d73c1264fb532759721a",
+      "invocation_id": "f2c8edf0-d267-4c26-abe9-84c141502b01",
+      "method": "source_content_review",
+      "note": "Independent source-content review of the original frozen assertion and its complete current evidence binding, after source-first observations were frozen. Raw response and excerpt SHA256 verified. Partial source-document scope: declared locators and interpretation context only; no full-document or experiment reproduction claim. No Robots split table has9,500 training and500 testing SFT examples. Researcher review-status/process disclosures were treated as metadata, not third-party source assertions. No verifier predictions, other adjudications, construction tags or reference label values consulted.",
+      "reviewed_on": "2026-11-10T15:01:41.667817Z",
+      "reviewer": "Codex independent source adjudicator; requested gpt-6.1-sol / ultra; served-model identity not independently exposed",
+      "reviewer_type": "ai",
+      "role": "source_verifier",
+      "source_ids": [
+        "cohort4.dataset.source.no-robots.splits"
+      ],
+      "verdict": "pass"
     },
     {
       "assertion_ids": [
