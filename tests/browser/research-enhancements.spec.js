@@ -317,11 +317,11 @@ test('imported executive judgments retain stable anchors and approved evidence i
   expect(archiveResponse.ok()).toBeTruthy();
   const archive = await archiveResponse.body();
   // Use only Python's standard-library ZIP reader, with the actual downloaded bytes.
-  const extraction = spawnSync('python3', ['-c', 'import io,json,sys,zipfile\nz=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read()))\nprint(json.dumps({name:z.read(name).decode() for name in ["report.html","report.md","MANIFEST.json","source-context.json"]}))'], { input: archive, maxBuffer: 20 * 1024 * 1024 });
+  const extraction = spawnSync('python3', ['-c', 'import io,json,sys,zipfile\nz=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read()))\nprint(json.dumps({name:z.read(name).decode() for name in ["report.html","report.md","evidence.html","MANIFEST.json","source-context.json"]}))'], { input: archive, maxBuffer: 20 * 1024 * 1024 });
   expect(extraction.status, extraction.stderr?.toString()).toBe(0);
   const packaged = JSON.parse(extraction.stdout.toString());
   const inventory = JSON.parse(packaged['MANIFEST.json']);
-  for (const name of ['report.html', 'report.md', 'source-context.json']) {
+  for (const name of ['report.html', 'report.md', 'evidence.html', 'source-context.json']) {
     expect(createHash('sha256').update(packaged[name]).digest('hex'), name).toBe(inventory.files[name].sha256);
   }
   expect(packaged['report.html']).toBe(await htmlResponse.text());
@@ -333,8 +333,20 @@ test('imported executive judgments retain stable anchors and approved evidence i
   await expect(page.locator('.r-finding')).toHaveCount(findings.length);
   const offlineContext = await browser.newContext({ javaScriptEnabled: false, offline: true });
   try {
+    const offlineOrigin = 'https://research-archive.invalid';
+    const unexpectedRequests = [];
+    // Resolve pages from the downloaded archive only; no live-site fallback.
+    await offlineContext.route('**/*', route => {
+      const url = new URL(route.request().url());
+      const name = url.pathname.slice(1);
+      if (url.origin === offlineOrigin && ['report.html', 'evidence.html'].includes(name)) {
+        return route.fulfill({ status: 200, contentType: 'text/html', body: packaged[name] });
+      }
+      unexpectedRequests.push(url.href);
+      return route.abort();
+    });
     const offline = await offlineContext.newPage();
-    await offline.setContent(packaged['report.html']);
+    await offline.goto(offlineOrigin + '/report.html');
     for (const finding of findings) {
       const id = 'finding-' + finding.id;
       const article = page.locator(selector(id));
@@ -355,14 +367,22 @@ test('imported executive judgments retain stable anchors and approved evidence i
         await expect(article.locator('.r-paragraph-citations').getByRole('link', { name: cid, exact: true })).toHaveAttribute('href', new URL(href).pathname + new URL(href).hash);
         const offlineLinks = offline.getByRole('link', { name: cid, exact: true });
         expect(await offlineLinks.count(), cid).toBeGreaterThan(0);
-        for (const link of await offlineLinks.all()) await expect(link).toHaveAttribute('href', href);
-        expect(packaged['report.md']).toContain('[' + cid + '](' + href + ')');
+        const localHref = 'evidence.html#' + encodeURIComponent('assertion-' + cid);
+        for (const link of await offlineLinks.all()) await expect(link).toHaveAttribute('href', localHref);
+        expect(packaged['report.md']).toContain('[' + cid + '](' + localHref + ')');
       }
       await article.getByRole('heading', { level: 3 }).getByRole('link').click();
       expect(decodeURIComponent(new URL(page.url()).hash)).toBe('#' + id);
       await page.reload();
       await expect(page.locator(selector(id))).toBeInViewport();
     }
+    const citedClaims = [...new Set(findings.flatMap(finding => finding.claim_ids))];
+    await offline.getByRole('link', { name: citedClaims[0], exact: true }).first().click();
+    await expect(offline).toHaveURL(offlineOrigin + '/evidence.html#' + encodeURIComponent('assertion-' + citedClaims[0]));
+    for (const cid of citedClaims) {
+      await expect(offline.locator(selector('assertion-' + cid))).toHaveCount(1);
+    }
+    expect(unexpectedRequests, 'Archived report and evidence must require no external requests').toEqual([]);
     await page.goto('/research/data/');
     for (const cid of new Set(findings.flatMap(finding => finding.claim_ids))) {
       const assertion = page.locator(selector('assertion-' + cid));
