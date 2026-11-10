@@ -199,6 +199,8 @@ class ResearchPageTests(unittest.TestCase):
             paths = [row['path'] for row in self.build()]
         gate.assert_called_once()
         edition = next(path for path in paths if '/editions/' in path)
+        self.assertEqual(edition, '/research/editions/2026-11-09/')
+        self.assertIn(edition + 'data/', paths)
         self.assertIn('Published edition', self.page(edition))
         self.assertEqual(len(ET.parse(self.output / 'research/feed.xml').findall('./channel/item')), 1)
         self.assertEqual(len(ET.parse(self.output / 'research/atom.xml').findall('{http://www.w3.org/2005/Atom}entry')), 1)
@@ -211,7 +213,11 @@ class ResearchPageTests(unittest.TestCase):
         second = self.build()
         self.assertEqual(first, second)
         self.assertEqual(content, {str(p.relative_to(self.output)): p.read_bytes() for p in self.output.rglob('*') if p.is_file()})
-        self.assertIn('paper.example%2F..%2F..%2Fversion%3A1', rp.entity_url(entity))
+        url = rp.entity_url(entity)
+        self.assertNotIn('%2F', url)
+        self.assertNotIn('..%2F', url)
+        self.assertEqual(url.count('/'), 4)
+        self.assertTrue((self.output / url.strip('/') / 'index.html').is_file())
         self.assertEqual(len({row['path'] for row in first}), len(first))
         self.assertTrue(all(re.fullmatch(r'\d{4}-\d{2}-\d{2}', row['lastmod']) for row in first))
 

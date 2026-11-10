@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import sqlite3
 import sys
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -70,6 +71,17 @@ class ProjectionTests(unittest.TestCase):
 
 
 class CitationTests(unittest.TestCase):
+    def test_extracted_package_reproduces_tables_without_repository_or_network(self):
+        context = context_fixture()
+        projection = citations.public_projection(context, {"dataset_version": "2.5.0", "companies": []})
+        with tempfile.TemporaryDirectory() as temporary:
+            with patch.object(citations, "public_projection", return_value=projection), patch.object(citations, "verified_pdf", return_value=None):
+                citations.write_publication_assets(context, temporary)
+            package = Path(temporary) / "publication"
+            result = subprocess.run([sys.executable, str(package / "reproduce.py"), "--directory", str(package)], capture_output=True, text=True, check=True)
+            self.assertTrue(json.loads(result.stdout)["exports_equivalent"])
+            self.assertIn("Original private raw inputs are not revalidated", result.stdout)
+
     def test_person_names_preserve_the_disclosed_individual_in_citation_formats(self):
         context = context_fixture()
         context["identity"]["publisher"].update(type="Person", given_names="Musa", family_names="Ozdem")

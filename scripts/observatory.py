@@ -894,7 +894,7 @@ def build(data, destination):
         from research_citations import write_publication_assets
         from research_pages import write_research_pages
         write_exports(research_context["graph"], destination / "research/exports")
-        write_publication_assets(research_context, destination)
+        research_context["publication_assets"] = write_publication_assets(research_context, destination)
         research_entries = write_research_pages(destination, research_context)
         import xml.etree.ElementTree as ET
         from static_pages import render_sitemap

@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TEXT = {".html", ".json", ".csv", ".xml", ".txt", ".js", ".svg", ".css", ".md", ".cff", ".bib", ".ris"}
+TEXT = {".html", ".json", ".csv", ".xml", ".txt", ".js", ".svg", ".css", ".md", ".cff", ".bib", ".ris", ".py"}
 # Host config files such as _headers and _redirects have no suffix and are text.
 BINARY = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".ico", ".avif", ".pdf", ".woff", ".woff2"}
 PRINTABLE = re.compile(rb"[\x20-\x7e]{6,}")

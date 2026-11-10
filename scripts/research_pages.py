@@ -9,8 +9,12 @@ coordinator calls these two public functions from the ordinary static build.
 from __future__ import annotations
 
 from pathlib import Path
+from datetime import datetime, timedelta
+import hashlib
+import re
 from types import SimpleNamespace
 from urllib.parse import quote, urlsplit
+from zoneinfo import ZoneInfo
 import xml.etree.ElementTree as ET
 
 import static_pages as sp
@@ -46,6 +50,15 @@ def _token(value):
     return quote(str(value), safe="._-")
 
 
+def _path_token(value):
+    """Filesystem-safe stable slugs also work after a web server URL-decodes paths."""
+    value = str(value)
+    if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", value):
+        return value
+    readable = re.sub(r"[^A-Za-z0-9._-]+", "-", value).strip(".-")[:80] or "record"
+    return readable + "-" + hashlib.sha256(value.encode()).hexdigest()[:12]
+
+
 def _anchor(kind, stable_id):
     return f"{kind}-{stable_id}"
 
@@ -70,6 +83,13 @@ def _link(url, label, css=""):
 
 
 def _day(value):
+    if isinstance(value, str) and "T" in value:
+        try:
+            instant = datetime.fromisoformat(value.replace("Z", "+00:00"))
+            if instant.tzinfo is not None:
+                return instant.astimezone(ZoneInfo("America/Los_Angeles")).date().isoformat()
+        except ValueError:
+            pass
     return str(value or "")[:10]
 
 
@@ -84,12 +104,12 @@ def _category(entity):
 def entity_url(entity, context=None):
     """Use existing company canonicals; create new organization pages only on approval."""
     if entity.get("legacy_id"):
-        return "/company/" + _token(entity["legacy_id"]) + "/"
+        return "/company/" + _path_token(entity["legacy_id"]) + "/"
     category = _category(entity)
     if category:
-        return "/research/" + category[0] + "/" + _token(entity["id"]) + "/"
+        return "/research/" + category[0] + "/" + _path_token(entity["id"]) + "/"
     if context is not None and _new_company(context, entity):
-        return "/company/" + _token(entity["id"]) + "/"
+        return "/company/" + _path_token(entity["id"]) + "/"
     return _evidence_url("entity", entity["id"])
 
 
@@ -161,6 +181,15 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
         structured.update({"author": publisher, "creativeWorkStatus": _status(context),
                            "version": context["report"]["release_id"],
                            "license": sp.DATA_LICENSE})
+    if path == '/research/data/':
+        dataset = {"@type": "Dataset", "@id": sp.ORIGIN + '/research/data/#dataset',
+                   "name": "ScienceToStartup public research projection", "url": sp.ORIGIN + path,
+                   "description": "A separately versioned public research projection with explicit claim status, source evidence and historical provenance.",
+                   "version": context['report']['release_id'], "creator": publisher, "license": sp.DATA_LICENSE,
+                   "isBasedOn": {"@id": sp.DATASET_ID}, "distribution": [
+                       {"@type": "DataDownload", "encodingFormat": mime, "contentUrl": sp.ORIGIN + '/publication/' + name}
+                       for name, mime in (("clean-dataset.json", "application/json"), ("clean-dataset.csv", "text/csv"), ("clean-dataset.sqlite", "application/vnd.sqlite3"))]}
+        structured = {"@context": "https://schema.org", "@graph": [structured, dataset]}
     research = SimpleNamespace(as_of=_day(context["graph"]["as_of"]),
                                data={"dataset_version": context["graph"].get("canonical_dataset_version")})
     text = sp.document(research, sp.truncate(title + sp.SUFFIX, sp.TITLE_LIMIT), sp.truncate(description),
@@ -354,9 +383,11 @@ def _data(context):
     approved = _assertions(context)
     historical = _assertions(context, statuses=("historical",))
     candidates = _assertions(context, statuses=("candidate",))
-    rows = [("Approved-record JSON", "/publication/clean-dataset.json"), ("CSV", "/publication/clean-dataset.csv"),
-            ("SQLite", "/publication/clean-dataset.sqlite"), ("Full evidence graph JSON · all statuses", "/research-graph.json"),
-            ("Evidence graph SQLite", "/research-graph.sqlite"), ("Export checksums", "/research-exports-manifest.json")]
+    rows = [("Privacy-filtered research JSON", "/publication/clean-dataset.json"), ("CSV", "/publication/clean-dataset.csv"),
+            ("SQLite", "/publication/clean-dataset.sqlite"), ("Full evidence graph JSON · explicit statuses", "/research/exports/research-graph.json"),
+            ("Evidence graph SQLite", "/research/exports/research-graph.sqlite"), ("Export checksums", "/research/exports/research-exports-manifest.json")]
+    if 'publication/report.pdf' in context.get('publication_assets', []):
+        rows.insert(0, ('Read the report preparation PDF', '/publication/report.pdf'))
     links = "".join('<li>' + _link(url, label) + '</li>' for label, url in rows)
     cite = "".join('<li>' + _link('/publication/' + name, label) + '</li>' for name, label in
                    (("citation.bib", "BibTeX"), ("citation.ris", "RIS"), ("citation.csl.json", "CSL JSON"), ("CITATION.cff", "CITATION.cff")))
@@ -373,8 +404,8 @@ def _data(context):
             '98% precision and 95% recall, with no critical false attribution. The screening audit must recover at least 190 records '
             'and reach 90% recall in each major stratum.</p>' + _holds(context) + '</section>'
             '<section class="r-section" aria-labelledby="downloads"><h2 id="downloads">Download the research</h2>'
-            '<p>Approved-record exports contain only approved evidence. The full evidence graph also preserves explicitly '
-            'labeled candidates and historical records. The original canonical dataset stays at version '
+            '<p>The privacy-filtered projection retains explicit research status and historical qualifications. '
+            'Historical records are not fresh verification. Source retrieval is not claim approval. The original canonical dataset stays at version '
             f'{sp.escape(graph.get("canonical_dataset_version"))}, with its existing identity and downloads.</p>'
             f'<ul class="r-downloads">{links}</ul><p class="r-meta">Research release: {sp.escape(graph["release_id"])}.</p></section>'
             '<section class="r-section" id="citation"><h2>Cite and reproduce</h2>'
@@ -514,7 +545,24 @@ def _published_editions(context):
         if not gate.get("ready"):
             continue
         snapshot["gate"] = gate
-        path = REPORT_PATH + 'editions/' + _token(rid) + '/'
+        edition_date = snapshot['report'].get('edition_date')
+        if not edition_date:
+            try:
+                cutoff = datetime.fromisoformat(snapshot['report']['source_cutoff'].replace('Z', '+00:00'))
+                edition_date = (cutoff.astimezone(ZoneInfo('America/Los_Angeles')).date() + timedelta(days=3)).isoformat()
+            except (ValueError, KeyError, TypeError):
+                continue
+        try:
+            if datetime.fromisoformat(edition_date).weekday() != 0:
+                continue
+        except (ValueError, TypeError):
+            continue
+        revision = entry.get('revision', 1)
+        if type(revision) is not int or revision < 1:
+            continue
+        path = '/research/editions/' + edition_date + ('.r' + str(revision) if revision > 1 else '') + '/'
+        if any(existing == path for existing, _ in editions):
+            raise ValueError('Published editions cannot share an immutable URL')
         editions.append((path, snapshot))
         seen.add(rid)
     return sorted(editions, key=lambda row: (row[1]["report"]["updated_on"], row[0]), reverse=True)
@@ -586,9 +634,23 @@ def write_research_pages(output, context):
     for path, snapshot in editions:
         target = output / path.lstrip('/') / 'index.html'
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(_render(snapshot, snapshot['report']['title'], snapshot['report'].get('summary', ''), path,
-                                  _report(snapshot, edition=True), 'TechArticle'), encoding='utf-8')
+        def edition_links(text):
+            # Evidence on an immutable edition must not silently resolve to this
+            # week's changed assertions or downloads.
+            text = text.replace('/research/data/#', path + 'data/#')
+            archive = _safe_url(snapshot['report'].get('archive', {}).get('record_url'))
+            if archive:
+                text = re.sub(r'href="/(?:publication|research/exports)/[^\"]+"', 'href="' + sp.escape(archive) + '"', text)
+            return text
+        target.write_text(edition_links(_render(snapshot, snapshot['report']['title'], snapshot['report'].get('summary', ''), path,
+                                  _report(snapshot, edition=True), 'TechArticle')), encoding='utf-8')
         records.append({"path": path, "lastmod": snapshot['report']['updated_on']})
+        ledger_path = path + 'data/'
+        ledger = output / ledger_path.lstrip('/') / 'index.html'
+        ledger.parent.mkdir(parents=True, exist_ok=True)
+        ledger.write_text(edition_links(_render(snapshot, 'Edition evidence and sources', 'Frozen assertion and source records for this exact archived edition.',
+                                               ledger_path, _data(snapshot), 'CollectionPage')), encoding='utf-8')
+        records.append({"path": ledger_path, "lastmod": snapshot['report']['updated_on']})
     (output / 'research.css').write_bytes((ROOT / 'web/research.css').read_bytes())
     _feeds(output, context, editions)
     return records

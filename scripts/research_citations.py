@@ -285,10 +285,21 @@ def write_publication_assets(context, output):
     if pdf:
         files["report.pdf"] = pdf
     root = Path(context.get("root", ROOT))
+    for schema_name in ("research-graph.schema.json", "report.schema.json", "report-audit.schema.json", "publication-projection.schema.json", "publication-metadata.schema.json"):
+        path = root / "schema" / schema_name
+        if path.is_file():
+            files[schema_name] = path.read_bytes()
+    for source_name, target_name in (("research_graph.py", "research_graph.py"), ("reproduce_research_package.py", "reproduce.py")):
+        path = root / "scripts" / source_name
+        if path.is_file():
+            files[target_name] = path.read_bytes()
+    files["source-manifest.json"] = json_bytes(privacy_filter(context["graph"]["sources"]))
+    files["METHODS.md"] = ("# Research methods\n\n" + "\n\n".join(paragraph["text"] for section in context["report"].get("sections", [])
+                                           if section["id"] == "methods-and-appendices" for paragraph in section.get("paragraphs", []))).encode()
     for name in ("LICENSE-DATA.md", "LICENSE"):
         if (root / name).is_file():
             files[name] = (root / name).read_bytes()
-    files["README.md"] = ("# ScienceToStartup publication preparation\n\n" + metadata["note"] + "\n\nOpen report.html for the full offline report. Citation files reflect archive status. The privacy-filtered JSON, CSV and SQLite are equivalent; they are projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Source quotes and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party material retains its rights.\n\nVerify all bytes using MANIFEST.json. Reproduce with python3 scripts/build_public_snapshot.py --output <empty-directory> from the source repository. A PDF is included only when its prepared receipt matches this exact context. No remote publication occurs during the build.\n").encode()
+    files["README.md"] = ("# ScienceToStartup research package\n\n" + metadata["note"] + "\n\nOpen report.html for the full offline report. Citation files reflect archive status. JSON, CSV and SQLite are equivalent privacy-filtered projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Full source text and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party evidence retains its rights.\n\nRun `python3 reproduce.py --write-tables reproduced` inside this extracted package to verify MANIFEST.json, compare all three exports, validate the graph and reproduce coverage and approved-assertion tables. This needs only Python's standard library and no network. Schemas, methods and a source manifest are included. The PDF is accepted only when its receipt binds this exact context. No remote publication occurs during the build.\n").encode()
     # These files are sent to external services, so they belong to the same
     # immutable manifest and archive as the report and dataset.
     zenodo = {"metadata": {"title": metadata["title"], "upload_type": "publication", "publication_type": "report",
