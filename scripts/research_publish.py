@@ -6,6 +6,8 @@ reconciled remotely and never blindly retried. Journals contain no credentials.
 from __future__ import annotations
 
 import hashlib
+import copy
+from datetime import datetime, timezone
 import io
 import json
 from contextlib import contextmanager
@@ -17,9 +19,9 @@ import urllib.request
 import zipfile
 
 try:
-    from research_citations import ROOT, context_digest, json_bytes, sha256
+    from research_citations import ROOT, DOI, RESERVATION_FIELDS, context_digest, json_bytes, sha256, source_context, publication_metadata, zenodo_metadata, read_prepared_package
 except ImportError:
-    from scripts.research_citations import ROOT, context_digest, json_bytes, sha256
+    from scripts.research_citations import ROOT, DOI, RESERVATION_FIELDS, context_digest, json_bytes, sha256, source_context, publication_metadata, zenodo_metadata, read_prepared_package
 
 
 class PublicationBlocked(ValueError):
@@ -71,16 +73,18 @@ class HTTP:
 
 
 class Journal:
-    def __init__(self, path, release_id, package_sha256):
+    def __init__(self, path, release_id, package_sha256=None, *, context_sha256=None):
         self.path = Path(path).resolve()
         # The journal is local operational state, never a source/public file.
         if self.path.is_relative_to(ROOT):
             raise PublicationBlocked("Keep publication journals outside the source checkout.")
+        self.identity = {"release_id": release_id, "package_sha256": package_sha256} if package_sha256 else {
+            "release_id": release_id, "reservation_context_sha256": context_sha256}
         self.state = json.loads(self.path.read_text()) if self.path.exists() else {
-            "schema_version": 1, "release_id": release_id, "package_sha256": package_sha256,
+            "schema_version": 1, **self.identity,
             "zenodo": {"status": "prepared"}, "github": {"status": "prepared"},
             "huggingface": {"status": "prepared"}, "events": []}
-        if self.state["release_id"] != release_id or self.state["package_sha256"] != package_sha256:
+        if any(self.state.get(key) != value for key, value in self.identity.items()):
             raise PublicationBlocked("The journal is bound to different release/package bytes.")
         self._lock_depth = 0
 
@@ -104,7 +108,7 @@ class Journal:
             try:
                 if self.path.exists():
                     observed = json.loads(self.path.read_text())
-                    if observed["release_id"] != self.state["release_id"] or observed["package_sha256"] != self.state["package_sha256"]:
+                    if any(observed.get(key) != value for key, value in self.identity.items()):
                         raise PublicationBlocked("Journal identity changed")
                     self.state = observed
                 self._lock_depth = 1
@@ -132,8 +136,60 @@ def serialized(service):
     return decorate
 
 
+def archival_gate(context):
+    """Always run the report owner's gate; this API cannot supply a weaker one."""
+    try:
+        from research_report import publication_gate as evaluator
+    except ImportError:
+        from scripts.research_report import publication_gate as evaluator
+    gate = evaluator(context["graph"], context["report"], context.get("policy"))
+    if context.get("policy", {}).get("mode") != "publish_enabled":
+        raise PublicationBlocked("Publication policy is prepare_only; prepare packages until accounts are connected.")
+    if not gate.get("archival_ready", gate.get("ready")) or not context.get("gate", {}).get("archival_ready", context.get("gate", {}).get("ready")):
+        raise PublicationBlocked("Research archival-readiness gate has not passed.")
+    return gate
+
+
+class PublicationPlan:
+    """Reserve a version DOI before rendering; no upload/publish without a bundle.
+
+    The reservation journal is bound to research inputs excluding reservation
+    outcomes. The separate Release journal is later bound to exact ZIP bytes.
+    """
+    def __init__(self, context, journal_path):
+        self.context = context
+        self.source_sha256 = sha256(json_bytes(source_context(context, reservation=False)))
+        self.journal = Journal(journal_path, context["report"]["release_id"], context_sha256=self.source_sha256)
+
+    def verify(self):
+        gate = archival_gate(self.context)
+        if sha256(json_bytes(source_context(self.context, reservation=False))) != self.source_sha256:
+            raise PublicationBlocked("Research inputs changed after DOI reservation planning")
+        return gate
+
+    @property
+    def marker(self):
+        return "sciencetostartup-reservation:" + self.source_sha256
+
+    @property
+    def metadata(self):
+        return zenodo_metadata(publication_metadata(self.context))
+
+    @property
+    def uploads(self):
+        raise PublicationBlocked("Freeze and verify the PDF/package before uploading or publishing")
+
+    def reservation(self):
+        with self.journal.lock():
+            state = self.journal.state["zenodo"]
+            if not DOI.fullmatch(state.get("reserved_doi") or "") or not state.get("id"):
+                raise PublicationBlocked("Reserve the version DOI before freezing the package")
+            return {"status": "reserved", "reserved_doi": state["reserved_doi"], "deposition_id": state["id"],
+                    "api_origin": state["api_origin"], "environment": state["environment"]}
+
+
 class Release:
-    def __init__(self, context, package, journal_path):
+    def __init__(self, context, package, journal_path, *, reservation=None):
         self.context, self.package = context, Path(package)
         manifest_bytes = (self.package / "MANIFEST.json").read_bytes()
         self.manifest = json.loads(manifest_bytes)
@@ -142,18 +198,23 @@ class Release:
         # must never reuse another artifact's reconciliation marker or journal.
         self.package_sha256 = sha256((self.package / "research-archive.zip").read_bytes())
         self.journal = Journal(journal_path, context["report"]["release_id"], self.package_sha256)
+        if reservation is not None:
+            reservation.verify()
+            reserved = reservation.reservation()
+            archive = context["report"].get("archive", {})
+            if (reservation.context["report"]["release_id"] != context["report"]["release_id"]
+                    or sha256(json_bytes(source_context(context, reservation=False))) != reservation.source_sha256
+                    or any(archive.get(key) != reserved[key] for key in RESERVATION_FIELDS)):
+                raise PublicationBlocked("Frozen context differs from the DOI reservation")
+            with self.journal.lock():
+                if not self.journal.state["events"]:
+                    self.journal.state["zenodo"] = copy.deepcopy(reservation.journal.state["zenodo"])
+                    self.journal.state["zenodo"].update(pending="metadata", reservation_marker=reservation.marker)
+                    self.journal.save("zenodo-reservation-adopted", id=reserved["deposition_id"])
 
     def verify(self):
         """Recompute the authoritative gate and verify exact prepared bytes."""
-        try:
-            from research_report import publication_gate as evaluator
-        except ImportError:
-            from scripts.research_report import publication_gate as evaluator
-        gate = evaluator(self.context["graph"], self.context["report"], self.context.get("policy"))
-        if self.context.get("policy", {}).get("mode") != "publish_enabled":
-            raise PublicationBlocked("Publication policy is prepare_only; prepare packages until accounts are connected.")
-        if not gate.get("archival_ready", gate.get("ready")) or not self.context.get("gate", {}).get("archival_ready", self.context.get("gate", {}).get("ready")):
-            raise PublicationBlocked("Research archival-readiness gate has not passed.")
+        gate = archival_gate(self.context)
         manifest_bytes = (self.package / "MANIFEST.json").read_bytes()
         if sha256(manifest_bytes) != self.manifest_sha256 or json.loads(manifest_bytes) != self.manifest:
             raise PublicationBlocked("Package manifest changed.")
@@ -180,6 +241,10 @@ class Release:
             for name in expected:
                 if archive.read(name) != (self.package / name).read_bytes():
                     raise PublicationBlocked("Archive differs from prepared file: " + name)
+        try:
+            read_prepared_package(self.context, self.package, expected_archive_sha256=self.package_sha256)
+        except ValueError as error:
+            raise PublicationBlocked(str(error)) from None
         return gate
 
     @property
@@ -191,13 +256,35 @@ class Release:
     def marker(self):
         return "sciencetostartup-package:" + self.package_sha256
 
+    @property
+    def metadata(self):
+        return json.loads((self.package / "zenodo-metadata.json").read_text())
+
     def require_archive(self):
         self.verify()
         receipt = self.journal.state["zenodo"]
         if (receipt.get("status") != "published" or receipt.get("verified") is not True
                 or receipt.get("api_origin") != "https://zenodo.org" or receipt.get("environment") != "production"):
             raise PublicationBlocked("Mirrors require a remotely verified published archive on production Zenodo.")
+        if receipt.get("artifact_sha256") != self.package_sha256:
+            raise PublicationBlocked("Published archive receipt differs from this exact package")
         return receipt
+
+    def archive_receipt(self):
+        """Export verified publication outcomes for the report/website context."""
+        with self.journal.lock():
+            receipt = self.require_archive()
+            value = {key: receipt[key] for key in ("status", "verified", "api_origin", "environment", "doi", "concept_doi",
+                     "record_id", "record_url", "confirmed_on", "artifact_sha256")}
+            value.update(release_id=self.context["report"]["release_id"], bundle_path=str(self.package.resolve()))
+            for key in RESERVATION_FIELDS:
+                if key in self.context["report"].get("archive", {}):
+                    value[key] = self.context["report"]["archive"][key]
+            if receipt.get("published_on"):
+                value["published_on"] = receipt["published_on"]
+            if self.context["report"].get("edition_date"):
+                value["edition_date"] = self.context["report"]["edition_date"]
+            return value
 
 
 def _checksum_matches(remote, blob):
@@ -248,15 +335,23 @@ class Zenodo:
     def _remember(self, deposit):
         if self.release.marker not in deposit.get("metadata", {}).get("notes", ""):
             raise PublicationBlocked("Remote deposit is not bound to this package")
+        reservation = deposit.get("metadata", {}).get("prereserve_doi")
+        reserved = reservation.get("doi") if isinstance(reservation, dict) else None
+        if not isinstance(reserved, str) or not DOI.fullmatch(reserved):
+            raise PublicationBlocked("Zenodo did not return one reserved version DOI")
+        if self.state.get("reserved_doi") not in (None, reserved):
+            raise PublicationBlocked("Reserved version DOI changed")
         pending = "publish" if self.state.get("pending") == "publish" else None
         self.state.update(id=deposit["id"], status="draft", pending=pending,
-                          reserved_doi=deposit.get("metadata", {}).get("prereserve_doi", {}).get("doi"))
+                          reserved_doi=reserved)
         self.release.journal.save("zenodo-draft-reconciled", id=deposit["id"])
         return deposit
 
     def _metadata(self):
-        metadata = json.loads((self.release.package / "zenodo-metadata.json").read_text())
+        metadata = self.release.metadata
         metadata["metadata"]["notes"] = self.release.marker
+        if self.state.get("reservation_marker"):
+            metadata["metadata"]["notes"] += "\n" + self.state["reservation_marker"]
         metadata["metadata"]["prereserve_doi"] = True
         return metadata
 
@@ -264,6 +359,8 @@ class Zenodo:
     def draft(self, previous_id=None):
         self.release.verify()
         self._bind_environment()
+        if previous_id is not None and (type(previous_id) is not int or previous_id <= 0):
+            raise PublicationBlocked("A new version requires an integer version-record ID, never a concept DOI")
         if self.state.get("id"):
             deposit = self._deposit(self.state["id"])
             if deposit.get("submitted"):
@@ -283,6 +380,10 @@ class Zenodo:
         metadata = self._metadata()
         if previous_id:
             previous = self._deposit(previous_id)
+            if (not previous.get("submitted") or previous.get("state") != "done"
+                    or previous.get("record_id", previous_id) != previous_id
+                    or str(previous.get("conceptrecid")) == str(previous_id)):
+                raise PublicationBlocked("Previous ID must identify a published version record, never a concept record")
             latest = previous.get("links", {}).get("latest_draft")
             if latest:
                 candidate = self._request("GET", latest)
@@ -361,10 +462,25 @@ class Zenodo:
             return self._remember(deposit)
         self._verify_files(deposit)
         record = self._request("GET", "/api/records/" + str(deposit.get("record_id", deposit["id"])))
-        doi = record.get("doi", record.get("metadata", {}).get("doi"))
-        if not doi or record.get("id") != deposit.get("record_id", deposit["id"]):
+        doi, concept_doi = record.get("doi"), record.get("conceptdoi")
+        if (not isinstance(doi, str) or not DOI.fullmatch(doi)
+                or not isinstance(concept_doi, str) or not DOI.fullmatch(concept_doi)
+                or doi == concept_doi or doi != self.state.get("reserved_doi")
+                or type(record.get("id")) is not int
+                or record.get("id") != deposit.get("record_id", deposit["id"])
+                or doi != ("10.5072" if self.environment == "sandbox" else "10.5281") + "/zenodo." + str(record.get("id"))):
             raise PublicationBlocked("Archive publication is not verified by the public record")
-        self.state.update(status="published", verified=True, doi=doi, pending=None,
+        public_files = record.get("files", [])
+        by_name = {item.get("key", item.get("filename")): item for item in public_files}
+        if len(by_name) != len(public_files) or set(by_name) != set(self.release.uploads):
+            raise PublicationBlocked("Public record file set differs from the frozen archive")
+        for name, blob in self.release.uploads.items():
+            if not _checksum_matches(by_name[name], blob):
+                raise PublicationBlocked("Public record archive bytes differ: " + name)
+        self.state.update(status="published", verified=True, doi=doi, concept_doi=concept_doi, pending=None,
+                          artifact_sha256=self.release.package_sha256, record_id=record["id"],
+                          record_url=self.api_origin + "/records/" + str(record["id"]),
+                          confirmed_on=datetime.now(timezone.utc).isoformat(),
                           url="https://doi.org/" + doi, published_on=record.get("metadata", {}).get("publication_date"))
         self.release.journal.save("zenodo-publication-verified", id=deposit["id"], doi=doi)
         return self.state

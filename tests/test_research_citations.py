@@ -119,8 +119,10 @@ class CitationTests(unittest.TestCase):
     def test_only_gate_confirmed_archive_can_supply_doi_and_actual_publication_date(self):
         context = context_fixture()
         context["gate"]["ready"] = True
-        context["report"]["archive"] = {"status": "published", "doi": "10.1234/actual", "record_url": "https://example.org/record",
-            "confirmed_on": "2026-11-12", "published_on": "2026-11-10", "artifact_sha256": "a" * 64, "release_id": "test.1"}
+        context["report"]["archive"] = {"status": "published", "doi": "10.5281/zenodo.123", "record_url": "https://example.org/record",
+            "confirmed_on": "2026-11-12T10:00:00Z", "published_on": "2026-11-10", "artifact_sha256": "a" * 64, "release_id": "test.1"}
+        context["report"]["archive"].update(verified=True, api_origin="https://zenodo.org", environment="production",
+            record_id=123, record_url="https://zenodo.org/records/123", concept_doi="10.1234/concept")
         metadata = citations.publication_metadata(context)
         self.assertEqual(metadata["status"], "published")
         formats = citations.citation_formats(metadata)
@@ -171,6 +173,47 @@ class CitationTests(unittest.TestCase):
             (output / "report-pdf.json").write_bytes(citations.json_bytes({"sha256": citations.sha256(b"unit-test-bytes"), "context_sha256": "stale"}))
             with self.assertRaisesRegex(ValueError, "does not match"):
                 citations.verified_pdf(context)
+
+    def test_reserved_identifier_is_labelled_in_notes_without_a_registered_doi_field(self):
+        context = context_fixture()
+        context["report"]["archive"] = {"status": "reserved", "reserved_doi": "10.1234/reserved"}
+        metadata = citations.publication_metadata(context)
+        for name, blob in citations.citation_formats(metadata).items():
+            with self.subTest(name=name):
+                self.assertIn(b"10.1234/reserved", blob)
+                self.assertIn(b"not registered", blob)
+        self.assertNotIn("doi", metadata)
+        self.assertNotIn("DOI", json.loads(citations.citation_formats(metadata)["citation.csl.json"]))
+        self.assertNotIn("doi", json.loads(citations.citation_formats(metadata)["CITATION.cff"]))
+        self.assertNotIn(b"DO  -", citations.citation_formats(metadata)["citation.ris"])
+
+    def test_prepared_paths_disallow_traversal_checkout_files_and_symlinks(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            context = context_fixture()
+            context["root"] = temporary
+            root = Path(temporary)
+            safe = root / "data/research/releases/test.1/publication"
+            safe.mkdir(parents=True)
+            self.assertEqual(citations.prepared_package_path(context), safe.resolve())
+            for value in ("../publication", str(root / "unrelated"), str(safe / "..")):
+                with self.subTest(path=value), self.assertRaises(ValueError):
+                    citations.prepared_package_path({**context, "prepared_package": value})
+            symlink = root / "publication-alias"
+            symlink.symlink_to(safe, target_is_directory=True)
+            with self.assertRaises(ValueError):
+                citations.prepared_package_path({**context, "prepared_package": str(symlink)})
+
+    def test_source_digest_keeps_research_content_audits_and_reservation_bound(self):
+        context = context_fixture()
+        baseline = citations.context_digest(context)
+        for modify in (
+                lambda c: c["report"]["sections"][0]["paragraphs"][0].update(text="Changed research"),
+                lambda c: c["policy"].update(audits={"reference": {"actual_review": "changed"}}),
+                lambda c: c["gate"].update(archival_ready=True),
+                lambda c: c["report"].update(archive={"status": "reserved", "reserved_doi": "10.1234/new"})):
+            changed = copy.deepcopy(context)
+            modify(changed)
+            self.assertNotEqual(citations.context_digest(changed), baseline)
 
 
 if __name__ == "__main__":

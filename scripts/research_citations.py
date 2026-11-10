@@ -6,6 +6,8 @@ their own projection version and remove legacy contact/privacy exceptions.
 from __future__ import annotations
 
 import csv
+import copy
+from datetime import datetime
 import hashlib
 import html
 import io
@@ -13,6 +15,8 @@ import json
 from pathlib import Path
 import re
 import sqlite3
+import shutil
+import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,6 +27,8 @@ SECRET = re.compile(r"(?:sk-(?:proj-)?[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{2
 PRIVATE_KEYS = {"email", "personal_email", "contact_email", "phone", "telephone",
                 "raw_inputs", "raw_cache", "raw_response", "response_body", "source_quote",
                 "full_text", "credentials", "access_token", "api_key"}
+DOI = re.compile(r"10\.\d{4,9}/\S+")
+RESERVATION_FIELDS = ("reserved_doi", "deposition_id", "api_origin", "environment")
 
 
 def json_bytes(value):
@@ -136,18 +142,15 @@ def publication_metadata(context):
     report, gate = context["report"], context["gate"]
     identity = context.get("identity", {})
     archive = report.get("archive", {})
-    # A reserved identifier is not registered and must never appear as a DOI in
-    # citation formats. Only an explicit verified published archive can supply it.
-    published = bool(gate.get("ready") and archive.get("status") == "published"
-                     and archive.get("confirmed_on") and archive.get("artifact_sha256")
-                     and archive.get("release_id") == report["release_id"]
-                     and archive.get("doi") and archive.get("record_url"))
+    # Reservation belongs in a clearly labelled note, never a registered-DOI
+    # field. Actual publication is a separate receipt outside the frozen bundle.
+    published = bool(gate.get("ready") and published_archive(context))
     status = "published" if published else ("ready-for-archive" if gate.get("archival_ready", gate.get("ready")) else "prelaunch")
     author = identity.get("publisher", {}).get("name") or identity.get("display_name") or identity.get("name") or "ScienceToStartup"
     if isinstance(author, dict):
         author = author.get("name", "ScienceToStartup")
     metadata = {"schema_version": 1, "title": report["title"], "version": report["release_id"],
-                "author": str(author), "url": "https://sciencetostartup.com/research/",
+                "author": str(author), "url": "https://sciencetostartup.com/research/state-of-ai-data-labs/",
                 "updated_on": report["updated_on"], "status": status,
                 "license": "CC-BY-4.0", "projection_version": PROJECTION_VERSION,
                 "note": "Published archived edition." if published else
@@ -159,6 +162,8 @@ def publication_metadata(context):
         metadata.update(doi=archive["doi"], url=archive["record_url"])
         if archive.get("published_on"):
             metadata["published_on"] = archive["published_on"]
+    elif DOI.fullmatch(archive.get("reserved_doi") or ""):
+        metadata["note"] += " Reserved version DOI (not registered): " + archive["reserved_doi"] + "."
     return privacy_filter(metadata)
 
 
@@ -241,8 +246,142 @@ def offline_html(context):
             + "\n".join(body) + "</main></html>\n").encode()
 
 
+def source_context(context, *, reservation=True):
+    """Research/PDF inputs, without publication outcomes that depend on them.
+
+    Keep every research gate metric/blocker and the reserved version identifier.
+    Only lifecycle status, final archive blockers and actual receipts are omitted.
+    This is also the canonical input to the frozen-package context contract.
+    """
+    value = copy.deepcopy({key: context[key] for key in ("graph", "report", "gate", "identity", "policy", "roles") if key in context})
+    report, gate = value["report"], value["gate"]
+    report.pop("status", None)
+    report.pop("editions", None)  # Publication ledger, not report/PDF content.
+    archive = report.pop("archive", {})
+    report["archive"] = {key: archive[key] for key in RESERVATION_FIELDS
+                         if reservation and archive.get("reserved_doi") and archive.get(key) is not None}
+    archive_reasons = gate.pop("archive_reasons", [])
+    gate["reasons"] = [reason for reason in gate.get("reasons", []) if reason not in archive_reasons]
+    gate.pop("ready", None)
+    gate.pop("status", None)
+    return privacy_filter(value)
+
+
 def context_digest(context):
-    return sha256(json_bytes(privacy_filter({key: context[key] for key in ("graph", "report", "gate", "identity", "policy") if key in context})))
+    return sha256(json_bytes(source_context(context)))
+
+
+def published_archive(context):
+    """A typed production receipt, never a sandbox result or a reserved DOI."""
+    archive = context["report"].get("archive", {})
+    try:
+        confirmation = datetime.fromisoformat(archive.get("confirmed_on", "").replace("Z", "+00:00"))
+    except (TypeError, ValueError, AttributeError):
+        return False
+    record_id = archive.get("record_id")
+    return bool(archive.get("status") == "published" and archive.get("verified") is True
+                and archive.get("api_origin") == "https://zenodo.org" and archive.get("environment") == "production"
+                and confirmation.tzinfo is not None and confirmation.utcoffset() is not None
+                and re.fullmatch(r"[0-9a-f]{64}", archive.get("artifact_sha256") or "")
+                and archive.get("release_id") == context["report"]["release_id"]
+                and type(record_id) is int and record_id > 0
+                and archive.get("doi") == "10.5281/zenodo." + str(record_id)
+                and isinstance(archive.get("concept_doi"), str) and DOI.fullmatch(archive["concept_doi"])
+                and archive.get("doi") != archive.get("concept_doi")
+                and (not archive.get("reserved_doi") or archive["reserved_doi"] == archive["doi"])
+                and archive.get("record_url") == "https://zenodo.org/records/" + str(archive.get("record_id")))
+
+
+def prepared_package_path(context):
+    """Select only the edition's release directory or an explicit external path."""
+    root = Path(context.get("root", ROOT)).resolve()
+    release_id = context["report"]["release_id"]
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", release_id):
+        raise ValueError("Unsafe prepared release identifier")
+    default = root / "data/research/releases" / release_id / "publication"
+    supplied = context.get("prepared_package") or context["report"].get("archive", {}).get("bundle_path")
+    path = Path(supplied) if supplied is not None else default
+    if ".." in path.parts or (supplied is not None and not path.is_absolute()):
+        raise ValueError("Prepared package path must be absolute and cannot traverse directories")
+    resolved = path.resolve()
+    allowed = {default, default.parent}
+    if (resolved.is_relative_to(root) or path.is_relative_to(root)) and resolved not in allowed:
+        raise ValueError("Prepared package must be inside this edition's release directory or explicitly outside the checkout")
+    if path.is_symlink():
+        raise ValueError("Prepared package path cannot contain symlinks")
+    return resolved
+
+
+def read_prepared_package(context, package, *, expected_archive_sha256=None):
+    """Read and verify a frozen bundle without regenerating its PDF or ZIP."""
+    package = Path(package).resolve()
+    def read(name):
+        if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name):
+            raise ValueError("Unsafe package member")
+        path = package / name
+        if path.is_symlink() or not path.is_file():
+            raise ValueError("Missing or unsafe prepared file: " + name)
+        return path.read_bytes()
+    contract_blob, manifest_blob = read("PREPARED.json"), read("MANIFEST.json")
+    contract, manifest = json.loads(contract_blob), json.loads(manifest_blob)
+    if (contract.get("schema_version") != 1 or manifest.get("schema_version") != 1
+            or contract.get("release_id") != context["report"]["release_id"]
+            or manifest.get("release_id") != contract["release_id"]
+            or contract.get("context_sha256") != context_digest(context)
+            or manifest.get("context_sha256") != contract["context_sha256"]):
+        raise ValueError("Frozen package context or release identity does not match")
+    if sha256(manifest_blob) != contract.get("manifest_sha256"):
+        raise ValueError("Frozen package manifest changed")
+    files = {"MANIFEST.json": manifest_blob}
+    for name, descriptor in manifest["files"].items():
+        if name in {"MANIFEST.json", "PREPARED.json", "research-archive.zip", "package-status.json"}:
+            raise ValueError("A frozen manifest cannot contain its own receipt or archive")
+        blob = read(name)
+        if sha256(blob) != descriptor.get("sha256") or len(blob) != descriptor.get("bytes"):
+            raise ValueError("Prepared package file changed: " + name)
+        files[name] = blob
+    if files.get("source-context.json") != json_bytes(source_context(context)):
+        raise ValueError("Frozen source context differs from the current research inputs")
+    archive = read("research-archive.zip")
+    if (sha256(archive) != contract.get("archive_sha256") or len(archive) != contract.get("archive_bytes")
+            or (expected_archive_sha256 is not None and sha256(archive) != expected_archive_sha256)):
+        raise ValueError("Frozen archive bytes changed or do not match the publication receipt")
+    pdf = files.get("report.pdf")
+    if (contract.get("pdf_sha256") != (sha256(pdf) if pdf else None)
+            or contract.get("pdf_bytes") != (len(pdf) if pdf else None)):
+        raise ValueError("Frozen PDF differs from its preparation contract")
+    with zipfile.ZipFile(io.BytesIO(archive)) as zipped:
+        if len(zipped.namelist()) != len(files) or set(zipped.namelist()) != set(files):
+            raise ValueError("Frozen archive members differ from its manifest")
+        for name, blob in files.items():
+            if zipped.read(name) != blob:
+                raise ValueError("Frozen archive differs from prepared file: " + name)
+    return {**files, "PREPARED.json": contract_blob, "research-archive.zip": archive}
+
+
+def freeze_publication_package(context, package):
+    """Create an immutable edition package, or verify an identical prior freeze.
+
+    An existing target is never regenerated or overwritten. Missing/incomplete
+    prior packages fail closed for operator inspection after an interrupted run.
+    """
+    target = prepared_package_path({**context, "prepared_package": str(Path(package).absolute())})
+    target.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        target.mkdir()
+    except FileExistsError:
+        read_prepared_package(context, target)
+        return target
+    with tempfile.TemporaryDirectory(prefix="research-freeze-", dir=target.parent) as temporary:
+        write_publication_assets(context, temporary)
+        prepared = Path(temporary) / "publication"
+        read_prepared_package(context, prepared)
+        for source in prepared.iterdir():
+            if not source.is_file() or source.is_symlink():
+                raise ValueError("Unexpected prepared package member")
+            shutil.copyfile(source, target / source.name)
+    read_prepared_package(context, target)
+    return target
 
 
 def verified_pdf(context):
@@ -275,12 +414,22 @@ def write_publication_assets(context, output):
     output = Path(output)
     publication = output / "publication"
     publication.mkdir(parents=True, exist_ok=True)
+    archive_receipt = context["report"].get("archive", {})
+    if archive_receipt.get("status") == "published" or context.get("prepared_package"):
+        if archive_receipt.get("status") == "published" and not published_archive(context):
+            raise ValueError("Published website assets require a verified production archive receipt")
+        frozen = read_prepared_package(context, prepared_package_path(context),
+            expected_archive_sha256=archive_receipt.get("artifact_sha256") if archive_receipt.get("status") == "published" else None)
+        for name, blob in frozen.items():
+            (publication / name).write_bytes(blob)
+        return write_package_status(context, publication, frozen)
     paths = write_projection(public_projection(context), publication)
     metadata = publication_metadata(context)
     files = {name: (publication / name).read_bytes() for name in paths}
     files.update(citation_formats(metadata))
     files.update({"metadata.json": json_bytes(metadata), "report.md": report_markdown(context).encode(),
-                  "report.html": offline_html(context), "readiness.json": json_bytes(privacy_filter(context["gate"]))})
+                  "report.html": offline_html(context), "readiness.json": json_bytes(privacy_filter(context["gate"])),
+                  "source-context.json": json_bytes(source_context(context))})
     pdf = verified_pdf(context)
     if pdf:
         files["report.pdf"] = pdf
@@ -302,22 +451,45 @@ def write_publication_assets(context, output):
     files["README.md"] = ("# ScienceToStartup research package\n\n" + metadata["note"] + "\n\nOpen report.html for the full offline report. Citation files reflect archive status. JSON, CSV and SQLite are equivalent privacy-filtered projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Full source text and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party evidence retains its rights.\n\nRun `python3 reproduce.py --write-tables reproduced` inside this extracted package to verify MANIFEST.json, compare all three exports, validate the graph and reproduce coverage and approved-assertion tables. This needs only Python's standard library and no network. Schemas, methods and a source manifest are included. The PDF is accepted only when its receipt binds this exact context. No remote publication occurs during the build.\n").encode()
     # These files are sent to external services, so they belong to the same
     # immutable manifest and archive as the report and dataset.
-    zenodo = {"metadata": {"title": metadata["title"], "upload_type": "publication", "publication_type": "report",
-                            "description": metadata["note"], "creators": [{"name": metadata["author"]}],
-                            "version": metadata["version"], "access_right": "open", "license": "cc-by-4.0",
-                            "keywords": ["AI data", "research", "ScienceToStartup"]}}
-    files["zenodo-metadata.json"] = json_bytes(zenodo)
+    files["zenodo-metadata.json"] = json_bytes(zenodo_metadata(metadata))
     files["huggingface-README.md"] = ("---\nlicense: cc-by-4.0\nlanguage:\n- en\n---\n\n# " + metadata["title"] + "\n\n" + metadata["note"] + "\n\nPublic projection " + PROJECTION_VERSION + ". Read report.html and README.md before reuse. No third-party source text or personal contacts are licensed for reuse.\n").encode()
     manifest = {"schema_version": 1, "release_id": metadata["version"], "context_sha256": context_digest(context),
                 "files": {name: {"sha256": sha256(blob), "bytes": len(blob)} for name, blob in sorted(files.items())}}
     files["MANIFEST.json"] = json_bytes(manifest)
-    state = {"schema_version": 1, "release_id": metadata["version"], "status": "prepared",
-             "publication_ready": bool(context["gate"].get("archival_ready", context["gate"].get("ready")) and pdf),
-             "archive": "not-published", "website": "independent", "github": "prepared", "huggingface": "prepared",
-             "pdf": "prepared" if pdf else "requires-preparation", "manifest_sha256": sha256(files["MANIFEST.json"]),
-             "blocked_reasons": list(context["gate"].get("reasons", [])) + ([] if pdf else ["Prepare and verify the PDF before archival publication."])}
+    files["research-archive.zip"] = deterministic_zip(files)
+    # Receipts contain the ZIP digest and therefore cannot be ZIP members.
+    files["PREPARED.json"] = json_bytes({"schema_version": 1, "release_id": metadata["version"],
+        "context_sha256": context_digest(context), "manifest_sha256": sha256(files["MANIFEST.json"]),
+        "archive_sha256": sha256(files["research-archive.zip"]), "archive_bytes": len(files["research-archive.zip"]),
+        "pdf_sha256": sha256(pdf) if pdf else None, "pdf_bytes": len(pdf) if pdf else None})
     for name, blob in files.items():
         (publication / name).write_bytes(blob)
-    (publication / "package-status.json").write_bytes(json_bytes(state))
-    (publication / "research-archive.zip").write_bytes(deterministic_zip(files))
-    return ["publication/" + name for name in sorted(list(files) + ["package-status.json", "research-archive.zip"])]
+    return write_package_status(context, publication, files)
+
+
+def zenodo_metadata(metadata):
+    return {"metadata": {"title": metadata["title"], "upload_type": "publication", "publication_type": "report",
+                         "description": metadata["note"], "creators": [{"name": metadata["author"]}],
+                         "version": metadata["version"], "access_right": "open", "license": "cc-by-4.0",
+                         "keywords": ["AI data", "research", "ScienceToStartup"]}}
+
+
+def write_package_status(context, publication, frozen):
+    """Live receipt/citations are siblings of, never replacements for, frozen files."""
+    receipt = context["report"].get("archive", {})
+    archived, pdf = published_archive(context), frozen.get("report.pdf")
+    live = {"current-" + name: blob for name, blob in citation_formats(publication_metadata(context)).items()}
+    live["current-metadata.json"] = json_bytes(publication_metadata(context))
+    state = {"schema_version": 1, "release_id": context["report"]["release_id"],
+             "status": "archived" if archived else "prepared",
+             "publication_ready": bool(context["gate"].get("archival_ready", context["gate"].get("ready")) and pdf),
+             "archive": "published" if archived else "not-published", "website": "independent", "github": "prepared", "huggingface": "prepared",
+             "pdf": "prepared" if pdf else "requires-preparation", "manifest_sha256": sha256(frozen["MANIFEST.json"]),
+             "archive_sha256": sha256(frozen["research-archive.zip"]), "pdf_sha256": sha256(pdf) if pdf else None,
+             "blocked_reasons": list(context["gate"].get("reasons", [])) + ([] if pdf else ["Prepare and verify the PDF before archival publication."])}
+    if archived:
+        state["archive_receipt"] = privacy_filter(receipt)
+    live["package-status.json"] = json_bytes(state)
+    for name, blob in live.items():
+        (publication / name).write_bytes(blob)
+    return ["publication/" + name for name in sorted(set(frozen) | set(live))]

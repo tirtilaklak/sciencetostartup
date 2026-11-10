@@ -20,6 +20,7 @@ from test_research_citations import context_fixture
 class FakeZenodo:
     def __init__(self):
         self.deposits, self.files, self.calls, self.lose = {}, {}, [], None
+        self.doi_prefix = "10.5281/zenodo."
 
     def request(self, method, path, payload=None, data=None, **kwargs):
         self.calls.append((method, path))
@@ -29,7 +30,7 @@ class FakeZenodo:
         if method == "POST" and path == "/api/deposit/depositions":
             number = len(self.deposits) + 1
             metadata = copy.deepcopy(payload["metadata"])
-            metadata["prereserve_doi"] = {"doi": "10.1234/reserved-" + str(number)}
+            metadata["prereserve_doi"] = {"doi": self.doi_prefix + str(number)}
             result = {"id": number, "metadata": metadata, "submitted": False, "state": "unsubmitted",
                       "links": {"bucket": "/api/files/" + str(number)}, "record_id": number}
             self.deposits[number], self.files[number] = result, {}
@@ -47,7 +48,9 @@ class FakeZenodo:
         if path.startswith("/api/records/") and method == "GET":
             number = int(parts[-1])
             if self.deposits[number]["submitted"]:
-                return {"id": number, "doi": "10.1234/published-" + str(number), "metadata": {"publication_date": "2026-11-09"}}
+                return {"id": number, "doi": self.doi_prefix + str(number), "conceptdoi": self.doi_prefix + "99999",
+                        "files": copy.deepcopy(list(self.files[number].values())),
+                        "metadata": {"publication_date": "2026-11-09"}}
             raise RuntimeError("not published")
         if parts[-1] == "files" and method == "GET":
             return copy.deepcopy(list(self.files[int(parts[-2])].values()))
@@ -75,7 +78,7 @@ class FakeZenodo:
                 return copy.deepcopy(self.deposits[number])
             if method == "PUT":
                 metadata = copy.deepcopy(payload["metadata"])
-                metadata["prereserve_doi"] = {"doi": "10.1234/reserved-" + str(number)}
+                metadata["prereserve_doi"] = {"doi": self.doi_prefix + str(number)}
                 self.deposits[number]["metadata"] = metadata
                 if self.lose == "metadata":
                     self.lose = None
@@ -167,6 +170,7 @@ class PublicationTests(unittest.TestCase):
         self.assertEqual(self.remote.calls, [])
 
     def test_sandbox_publication_cannot_authorize_a_production_mirror_or_journal(self):
+        self.remote.doi_prefix = "10.5072/zenodo."
         sandbox = publish.Zenodo(self.release, transport=self.remote, sandbox=True)
         sandbox.upload()
         receipt = sandbox.publish()
@@ -266,7 +270,8 @@ class PublicationTests(unittest.TestCase):
             self.zenodo.publish()
         receipt = self.zenodo.publish()
         self.assertEqual(receipt["status"], "published")
-        self.assertEqual(receipt["doi"], "10.1234/published-1")
+        self.assertEqual(receipt["doi"], "10.5281/zenodo.1")
+        self.assertEqual(receipt["concept_doi"], "10.5281/zenodo.99999")
         self.assertTrue(receipt["verified"])
         self.assertEqual(sum(path.endswith("/actions/publish") for _, path in self.remote.calls), 1)
 
@@ -310,6 +315,142 @@ class PublicationTests(unittest.TestCase):
         request = urllib.request.Request("https://zenodo.org/api/deposit/depositions", headers={"Authorization": "Bearer unit-test-token"})
         with self.assertRaisesRegex(publish.PublicationBlocked, "redirected"):
             publish.SameOriginRedirect().redirect_request(request, None, 302, "Found", {}, "https://attacker.invalid/")
+
+    def test_reserve_freeze_publish_and_website_reuse_exact_pdf_and_archive(self):
+        """Synthetic transaction only: no gate/audit/publication evidence is created."""
+        reason = "SYNTHETIC TRANSACTION FIXTURE: production archive receipt required"
+        def fixture_gate(graph, report, policy):
+            ready = citations.published_archive({"report": report})
+            return {"ready": ready, "archival_ready": True, "status": "ready" if ready else "prelaunch",
+                    "reasons": [] if ready else [reason], "archive_reasons": [] if ready else [reason], "coverage": {"papers": 0}}
+        self.fake_gate.publication_gate = fixture_gate
+        context = context_fixture()
+        context["policy"]["mode"] = "publish_enabled"
+        context["root"] = str(self.directory / "synthetic-input")
+        context["gate"] = fixture_gate(context["graph"], context["report"], context["policy"])
+        reservation_path = self.directory / "reservation-journal.json"
+        plan = publish.PublicationPlan(context, reservation_path)
+        remote = FakeZenodo()
+        reserver = publish.Zenodo(plan, transport=remote)
+        remote.lose = "create"
+        with self.assertRaises(TimeoutError):
+            reserver.draft()
+        reserver.draft()
+        self.assertEqual(len(remote.deposits), 1)
+        context["report"]["archive"] = plan.reservation()
+        self.assertEqual(context["report"]["archive"]["status"], "reserved")
+        with self.assertRaisesRegex(publish.PublicationBlocked, "Freeze"):
+            reserver.upload()
+
+        # A real receipt check is used, with clearly synthetic PDF bytes. The
+        # context digest is written before publication and never refreshed.
+        pdf = b"UNIT TEST PDF FIXTURE - not an actual research publication"
+        pdf_directory = Path(context["root"]) / "data/research"
+        pdf_directory.mkdir(parents=True)
+        (pdf_directory / "report.pdf").write_bytes(pdf)
+        frozen_digest = citations.context_digest(context)
+        (pdf_directory / "report-pdf.json").write_bytes(citations.json_bytes({"sha256": citations.sha256(pdf), "context_sha256": frozen_digest}))
+        projection = citations.public_projection(context, {"dataset_version": "2.5.0", "companies": []})
+        prepared = self.directory / "frozen-edition"
+        with patch.object(citations, "public_projection", return_value=projection):
+            citations.freeze_publication_package(context, prepared / "publication")
+        package = prepared / "publication"
+        archive = (package / "research-archive.zip").read_bytes()
+        with patch.object(citations, "write_publication_assets", side_effect=AssertionError("Never regenerate an existing freeze")):
+            self.assertEqual(citations.freeze_publication_package(context, package), package.resolve())
+        changed = copy.deepcopy(context)
+        changed["report"]["sections"][0]["paragraphs"][0]["text"] = "Changed frozen research content"
+        with self.assertRaisesRegex(ValueError, "context"):
+            citations.freeze_publication_package(changed, package)
+        self.assertEqual((package / "research-archive.zip").read_bytes(), archive)
+        manifest = json.loads((package / "MANIFEST.json").read_text())
+        self.assertNotIn("research-archive.zip", manifest["files"])
+        self.assertNotIn("PREPARED.json", manifest["files"])
+        self.assertNotIn("package-status.json", manifest["files"])
+        frozen_metadata = json.loads((package / "metadata.json").read_text())
+        self.assertNotIn("doi", frozen_metadata)
+        self.assertIn("not registered", frozen_metadata["note"])
+        self.assertIn("10.5281/zenodo.1", frozen_metadata["note"])
+
+        release = publish.Release(context, package, self.directory / "frozen-journal.json", reservation=plan)
+        publisher = publish.Zenodo(release, transport=remote)
+        publisher.upload()
+        remote.lose = "publish"
+        with self.assertRaises(TimeoutError):
+            publisher.publish()
+        publisher.publish()
+        context["report"]["archive"] = release.archive_receipt()
+        context["report"]["status"] = "published"
+        context["report"]["editions"] = [{"release_id": context["report"]["release_id"], "archive": context["report"]["archive"]}]
+        context["gate"] = fixture_gate(context["graph"], context["report"], context["policy"])
+        self.assertTrue(context["gate"]["ready"])
+        self.assertEqual(citations.context_digest(context), frozen_digest)
+        self.assertEqual(citations.verified_pdf(context), pdf)
+        context["prepared_package"] = str(package)
+        website = self.directory / "website"
+        with patch.object(citations, "public_projection", side_effect=AssertionError("Must reuse frozen projection")), \
+                patch.object(citations, "verified_pdf", side_effect=AssertionError("Must reuse frozen PDF")), \
+                patch.object(citations, "deterministic_zip", side_effect=AssertionError("Must reuse frozen ZIP")):
+            citations.write_publication_assets(context, website)
+        self.assertEqual((website / "publication/research-archive.zip").read_bytes(), archive)
+        self.assertEqual((website / "publication/report.pdf").read_bytes(), pdf)
+        self.assertEqual((website / "publication/metadata.json").read_bytes(), (package / "metadata.json").read_bytes())
+        live = json.loads((website / "publication/current-metadata.json").read_text())
+        self.assertEqual(live["status"], "published")
+        self.assertEqual(live["doi"], "10.5281/zenodo.1")
+        status = json.loads((website / "publication/package-status.json").read_text())
+        self.assertEqual(status["archive"], "published")
+        self.assertEqual(status["archive_sha256"], citations.sha256(archive))
+        self.assertEqual(status["pdf_sha256"], citations.sha256(pdf))
+        self.assertEqual(status["archive_receipt"]["artifact_sha256"], citations.sha256(archive))
+        self.assertEqual(status["archive_receipt"]["concept_doi"], "10.5281/zenodo.99999")
+        self.assertEqual(len(remote.deposits), 1)
+        self.assertEqual(sum(path.endswith("/actions/publish") for _, path in remote.calls), 1)
+        # Website deployment remains a separate receipt.
+        self.assertEqual(status["website"], "independent")
+        for key, value in (("api_origin", "https://sandbox.zenodo.org"), ("environment", "sandbox"),
+                           ("verified", False), ("record_id", 2), ("confirmed_on", "2026-11-09")):
+            invalid = copy.deepcopy(context)
+            invalid["report"]["archive"][key] = value
+            with self.subTest(invalid_receipt_field=key), self.assertRaisesRegex(ValueError, "production archive receipt"):
+                citations.write_publication_assets(invalid, self.directory / "blocked-website")
+
+    def test_public_record_requires_distinct_typed_concept_and_reserved_version_dois(self):
+        self.zenodo.upload()
+        self.remote.deposits[1].update(submitted=True, state="done")
+        original = self.remote.request
+        for patch_record in ({"doi": "10.5281/zenodo.2"}, {"doi": ["10.5281/zenodo.1"]},
+                             {"conceptdoi": ["10.5281/zenodo.99999"]}, {"conceptdoi": "10.5281/zenodo.1"}, {"files": []}):
+            def request(method, path, **kwargs):
+                result = original(method, path, **kwargs)
+                if path.startswith("/api/records/"):
+                    result.update(patch_record)
+                return result
+            with self.subTest(patch=patch_record), patch.object(self.remote, "request", side_effect=request):
+                with self.assertRaises(publish.PublicationBlocked):
+                    self.zenodo.reconcile()
+        self.assertNotEqual(self.zenodo.state.get("status"), "published")
+
+    def test_prepared_without_reservation_can_reuse_bundle_after_actual_receipt(self):
+        before = citations.context_digest(self.context)
+        self.zenodo.upload()
+        self.zenodo.publish()
+        self.context["report"]["archive"] = self.release.archive_receipt()
+        self.assertEqual(citations.context_digest(self.context), before)
+        output = self.directory / "legacy-transaction-site"
+        citations.write_publication_assets(self.context, output)
+        self.assertEqual((output / "publication/research-archive.zip").read_bytes(), (self.package / "research-archive.zip").read_bytes())
+
+    def test_reservation_rejects_concept_identifier_and_changed_research_before_remote_calls(self):
+        with self.assertRaisesRegex(publish.PublicationBlocked, "integer version-record"):
+            self.zenodo.draft(previous_id="10.5281/zenodo.99999")
+        plan = publish.PublicationPlan(self.context, self.directory / "plan-journal.json")
+        self.context["report"]["sections"][0]["paragraphs"][0]["text"] = "Changed inputs after planning"
+        reserver = publish.Zenodo(plan, transport=self.remote)
+        before = len(self.remote.calls)
+        with self.assertRaisesRegex(publish.PublicationBlocked, "inputs changed"):
+            reserver.draft()
+        self.assertEqual(len(self.remote.calls), before)
 
 
 if __name__ == "__main__":
