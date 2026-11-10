@@ -34,7 +34,7 @@ test('without JavaScript the homepage offers evergreen work and company links', 
   await page.goto('/');
   await expect(page.locator('#home-work-example [data-home-route]')).toHaveCount(0);
   await expect(page.locator('#home-work-example').getByRole('link', { name: 'Browse paid work' })).toHaveAttribute('href', '/work/');
-  await expect(page.getByRole('link', { name: 'Explore companies' })).toHaveAttribute('href', '/explore/#companies');
+  await expect(page.getByRole('link', { name: 'Explore companies' })).toHaveAttribute('href', '/companies/');
   await expect(page.locator('.example-grid article')).toHaveCount(2);
   await context.close();
 });

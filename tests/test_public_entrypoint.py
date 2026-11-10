@@ -76,7 +76,10 @@ class PublicEntrypointTests(unittest.TestCase):
         companies = json.loads((ROOT / "data/canonical.json").read_text())["companies"]
         self.assertEqual(locs[0], ORIGIN + "/", "The app document stays first")
         for page in ("/companies/", "/work/", "/method/"): self.assertIn(ORIGIN + page, locs)
-        self.assertEqual(len(locs), 4 + len(companies), "One static page per company plus the company list, paid work and method pages")
+        self.assertEqual(len(locs), len(set(locs)), "Every canonical URL appears once")
+        research_locs = [loc for loc in locs if "/research/" in loc or loc.endswith("/review/")]
+        self.assertGreaterEqual(len(research_locs), 4, "Research hub, report framework, data and review routes are discoverable")
+        self.assertEqual(len(locs), 4 + len(companies) + len(research_locs), "Historical pages and substantive research routes have distinct canonical URLs")
         for company in companies:
             self.assertIn(ORIGIN + "/company/" + company["id"] + "/", locs)
             self.assertTrue((self.dist / "company" / company["id"] / "index.html").is_file(), company["id"])

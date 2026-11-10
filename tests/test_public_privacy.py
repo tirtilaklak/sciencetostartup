@@ -5,12 +5,14 @@ import contextlib
 import json
 import re
 import sqlite3
+import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TEXT = {".html", ".json", ".csv", ".xml", ".txt", ".js", ".svg", ".css", ".md"}
+TEXT = {".html", ".json", ".csv", ".xml", ".txt", ".js", ".svg", ".css", ".md", ".cff", ".bib", ".ris"}
 # Host config files such as _headers and _redirects have no suffix and are text.
 BINARY = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".ico", ".avif", ".pdf", ".woff", ".woff2"}
 PRINTABLE = re.compile(rb"[\x20-\x7e]{6,}")
@@ -62,6 +64,24 @@ def places(dist):
         name = stable_name(path.relative_to(dist).as_posix())
         if path.suffix == ".sqlite":
             yield name, "\n".join(sqlite_text(path))
+        elif path.suffix == ".zip":
+            collected = []
+            with zipfile.ZipFile(path) as archive:
+                for member in archive.infolist():
+                    content = archive.read(member)
+                    suffix = Path(member.filename).suffix.lower()
+                    if suffix == ".sqlite":
+                        with tempfile.NamedTemporaryFile(suffix=".sqlite") as extracted:
+                            extracted.write(content)
+                            extracted.flush()
+                            collected.extend(sqlite_text(Path(extracted.name)))
+                    elif suffix in TEXT or not suffix:
+                        collected.append(content.decode("utf-8"))
+                    elif suffix in BINARY:
+                        collected.append("\n".join(run.decode("ascii") for run in PRINTABLE.findall(content)))
+                    else:
+                        raise AssertionError("Unscanned archive member: " + member.filename)
+            yield name, "\n".join(collected)
         elif path.suffix in BINARY:
             yield name, printable_text(path)
         elif path.suffix in TEXT or not path.suffix:
