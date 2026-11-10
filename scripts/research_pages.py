@@ -9,7 +9,8 @@ coordinator calls these two public functions from the ordinary static build.
 from __future__ import annotations
 
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from email.utils import format_datetime
 import hashlib
 import re
 from types import SimpleNamespace
@@ -21,6 +22,7 @@ import static_pages as sp
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = "/research/state-of-ai-data-labs/"
+CORRECTIONS_PATH = "/research/corrections/"
 CATEGORIES = (
     ("papers", "Papers", {"paper", "paper_work", "paper_version"},
      "Read the source, distinguish versions, and trace what an operational finding actually supports."),
@@ -198,7 +200,9 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
                        structured=structured, current="research")
     extra = ('<link rel="stylesheet" href="/research.css">\n'
              '<link rel="alternate" type="application/rss+xml" title="Published research editions" href="/research/feed.xml">\n'
-             '<link rel="alternate" type="application/atom+xml" title="Published research editions" href="/research/atom.xml">\n')
+             '<link rel="alternate" type="application/atom+xml" title="Published research editions" href="/research/atom.xml">\n'
+             '<link rel="alternate" type="application/rss+xml" title="Research corrections" href="/research/corrections/feed.xml">\n'
+             '<link rel="alternate" type="application/atom+xml" title="Research corrections" href="/research/corrections/atom.xml">\n')
     return text.replace("</head>", extra + "</head>", 1)
 
 
@@ -516,6 +520,10 @@ def _review(context):
             'and contribution. We do not infer affiliation or employer endorsement from a contribution. No external review '
             'is claimed without an actual receipt.</p><p>External participation is not a release requirement. The same evidence, '
             'coverage, and quality requirements apply to every record.</p></section>'
+            '<section class="r-section r-prose"><h2>Accepted corrections</h2><p>'
+            + _link(CORRECTIONS_PATH, 'Inspect the correction log') + ' or subscribe with '
+            + _link(CORRECTIONS_PATH + 'feed.xml', 'RSS') + ' or '
+            + _link(CORRECTIONS_PATH + 'atom.xml', 'Atom') + '.</p></section>'
             '<section class="r-section r-prose"><h2>Publisher & interests</h2><p>Published by '
             + _link(identity.get("publisher", {}).get("url"), identity.get("publisher", {}).get("name", sp.PUBLISHER_NAME)) + '.</p>'
             + "".join(f'<p>{sp.escape(line)}</p>' for line in identity.get("disclosures", [])) + '</section>')
@@ -605,6 +613,110 @@ def _feeds(output, context, editions):
         (output / 'research' / name).write_bytes(ET.tostring(tree, encoding='utf-8', xml_declaration=True) + b'\n')
 
 
+def _correction_records(context):
+    """Validate committed records; requests and rejected proposals stay private."""
+    rows = context.get('corrections', [])
+    if not isinstance(rows, list):
+        raise ValueError('Research corrections must be a list')
+    required = {'id', 'edition_id', 'claim_id', 'status', 'summary', 'corrected_on', 'evidence_urls'}
+    accepted, seen = [], set()
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != required:
+            raise ValueError('Research correction has unexpected or missing fields')
+        for key in ('id', 'edition_id', 'claim_id'):
+            if not isinstance(row[key], str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:-]*', row[key]):
+                raise ValueError('Research correction requires stable record identifiers')
+        if row['id'] in seen:
+            raise ValueError('Research correction IDs must be unique')
+        seen.add(row['id'])
+        if not isinstance(row['status'], str) or row['status'] not in {'accepted', 'published', 'pending', 'rejected'}:
+            raise ValueError('Research correction has an unknown status')
+        if not isinstance(row['summary'], str) or not row['summary'].strip():
+            raise ValueError('Research correction requires a summary')
+        try:
+            instant = datetime.fromisoformat(row['corrected_on'].replace('Z', '+00:00'))
+            if instant.utcoffset() is None:
+                raise ValueError('Timezone required')
+        except (AttributeError, TypeError, ValueError) as error:
+            raise ValueError('Research correction requires a timezone-aware corrected_on timestamp') from error
+        evidence = row['evidence_urls']
+        if (not isinstance(evidence, list) or not evidence or
+                any(not isinstance(url, str) or not _safe_url(url) or re.search(r'[\x00-\x20\\]', url) for url in evidence) or
+                len(evidence) != len(set(evidence))):
+            raise ValueError('Research correction requires distinct safe HTTPS evidence URLs')
+        if row['status'] in {'accepted', 'published'}:
+            accepted.append({**row, 'instant': instant.astimezone(timezone.utc)})
+    return sorted(accepted, key=lambda row: (-row['instant'].timestamp(), row['id']))
+
+
+def _correction_url(row):
+    return CORRECTIONS_PATH + '#' + _token('correction-' + row['id'])
+
+
+def _corrections_page(context, rows):
+    body = ('<header class="r-page-head"><p class="r-kicker">Research correction log</p><h1>Corrections</h1>'
+            '<p class="r-lede">Accepted corrections identify the affected edition and claim, preserve the correction date, '
+            'and link to supporting evidence.</p>' + _meta(context) + '</header>'
+            '<p>' + _link(CORRECTIONS_PATH + 'feed.xml', 'Subscribe with RSS') + ' · '
+            + _link(CORRECTIONS_PATH + 'atom.xml', 'Subscribe with Atom') + '</p>')
+    if not rows:
+        return body + '<section class="r-section"><h2>No corrections recorded</h2><p>No accepted or published research corrections are recorded.</p></section>'
+    for row in rows:
+        stamp = row['instant'].isoformat().replace('+00:00', 'Z')
+        body += (f'<article class="r-source" id="{sp.escape("correction-" + row["id"])}"><h2>'
+                 + _link(_correction_url(row), row['summary']) + '</h2><dl class="r-facts">'
+                 f'<dt>Status</dt><dd>{sp.escape(row["status"].capitalize())}</dd>'
+                 f'<dt>Edition</dt><dd>{sp.escape(row["edition_id"])}</dd>'
+                 f'<dt>Claim</dt><dd>{sp.escape(row["claim_id"])}</dd>'
+                 f'<dt>Corrected</dt><dd><time datetime="{stamp}">{stamp}</time></dd></dl>'
+                 '<h3>Supporting evidence</h3><ul>'
+                 + ''.join('<li>' + _link(url, url) + '</li>' for url in row['evidence_urls']) + '</ul></article>')
+    return body
+
+
+def _correction_feeds(output, context, rows):
+    """Separate correction subscriptions never contain ordinary edition updates."""
+    canonical = sp.ORIGIN + CORRECTIONS_PATH
+    rss = ET.Element('rss', {'version': '2.0'})
+    channel = ET.SubElement(rss, 'channel')
+    for key, text in (('title', 'ScienceToStartup research corrections'), ('link', canonical),
+                      ('description', 'Accepted research corrections with edition, claim, correction date and evidence.')):
+        ET.SubElement(channel, key).text = text
+    ns = 'http://www.w3.org/2005/Atom'
+    ET.register_namespace('', ns)
+    atom = ET.Element('{' + ns + '}feed')
+    ET.SubElement(atom, '{' + ns + '}title').text = 'ScienceToStartup research corrections'
+    ET.SubElement(atom, '{' + ns + '}id').text = canonical
+    ET.SubElement(atom, '{' + ns + '}link', {'href': canonical + 'atom.xml', 'rel': 'self'})
+    ET.SubElement(atom, '{' + ns + '}link', {'href': canonical, 'rel': 'alternate'})
+    author = ET.SubElement(atom, '{' + ns + '}author')
+    ET.SubElement(author, '{' + ns + '}name').text = context['identity']['publisher']['name']
+    ET.SubElement(author, '{' + ns + '}uri').text = context['identity']['publisher']['url']
+    newest = rows[0]['instant'].isoformat().replace('+00:00', 'Z') if rows else context['report']['updated_on'] + 'T00:00:00Z'
+    ET.SubElement(atom, '{' + ns + '}updated').text = newest
+    for row in rows:
+        permalink = sp.ORIGIN + _correction_url(row)
+        description = (f'Edition: {row["edition_id"]}. Claim: {row["claim_id"]}. '
+                       f'Status: {row["status"]}. {row["summary"]} Evidence: ' + ' '.join(row['evidence_urls']))
+        item = ET.SubElement(channel, 'item')
+        for key, value in (('title', row['summary']), ('link', permalink), ('description', description),
+                           ('pubDate', format_datetime(row['instant'], usegmt=True))):
+            ET.SubElement(item, key).text = value
+        ET.SubElement(item, 'guid', {'isPermaLink': 'true'}).text = permalink
+        entry = ET.SubElement(atom, '{' + ns + '}entry')
+        for key, value in (('title', row['summary']), ('id', permalink), ('summary', description),
+                           ('updated', row['instant'].isoformat().replace('+00:00', 'Z'))):
+            ET.SubElement(entry, '{' + ns + '}' + key).text = value
+        ET.SubElement(entry, '{' + ns + '}link', {'href': permalink, 'rel': 'alternate'})
+        ET.SubElement(entry, '{' + ns + '}category', {'term': row['status']})
+        for url in row['evidence_urls']:
+            ET.SubElement(entry, '{' + ns + '}link', {'href': url, 'rel': 'related'})
+    directory = output / CORRECTIONS_PATH.strip('/')
+    directory.mkdir(parents=True, exist_ok=True)
+    for name, tree in (('feed.xml', rss), ('atom.xml', atom)):
+        (directory / name).write_bytes(ET.tostring(tree, encoding='utf-8', xml_declaration=True) + b'\n')
+
+
 def write_research_pages(output, context):
     """Write static research HTML, its stylesheet and publication-only feeds.
 
@@ -614,10 +726,12 @@ def write_research_pages(output, context):
     output = Path(output)
     modified = max(context["report"]["updated_on"], _day(context["graph"]["as_of"]))
     editions = _published_editions(context)
+    corrections = _correction_records(context)
     pages = [("/research/", "Human data research", "Public-source research connecting AI data suppliers, papers, datasets, benchmarks, and workflows, with visible evidence and coverage.", _hub(context, editions), "CollectionPage", None),
              (REPORT_PATH, context["report"]["title"], context["report"].get("summary", "Research methods and findings."), _report(context), "TechArticle", None),
              ("/research/data/", "Research data & evidence", "Versioned research data, source and assertion permalinks, publication progress, citations, and reproducible downloads.", _data(context), "CollectionPage", None),
-             ("/review/", "Review & correct the research", "Contribute a source-backed correction, scoped review, or public reuse of ScienceToStartup research.", _review(context), "WebPage", None)]
+             ("/review/", "Review & correct the research", "Contribute a source-backed correction, scoped review, or public reuse of ScienceToStartup research.", _review(context), "WebPage", None),
+             (CORRECTIONS_PATH, "Research corrections", "Accepted research corrections, with affected editions, claims, correction dates and supporting evidence.", _corrections_page(context, corrections), "CollectionPage", None)]
     for category in CATEGORIES:
         slug, label, kinds, description = category
         pages.append(("/research/" + slug + "/", label, description, _index(context, category), "CollectionPage", None))
@@ -656,6 +770,7 @@ def write_research_pages(output, context):
         records.append({"path": ledger_path, "lastmod": snapshot['report']['updated_on']})
     (output / 'research.css').write_bytes((ROOT / 'web/research.css').read_bytes())
     _feeds(output, context, editions)
+    _correction_feeds(output, context, corrections)
     return records
 
 
@@ -666,6 +781,7 @@ def research_search_entries(context):
         {"title": context["report"]["title"], "summary": _status(context) + ". Twelve chapters of methods, historical examples, and research gaps.", "url": REPORT_PATH, "kind": "report", "keywords": "human feedback RLHF annotation suppliers methods"},
         {"title": "Research data & evidence", "summary": "Coverage, assertion and source records, citations, and versioned downloads.", "url": "/research/data/", "kind": "data", "keywords": "JSON CSV SQLite citation sources provenance"},
         {"title": "Review & correct the research", "summary": "Submit a source-backed correction, scoped review, or public reuse.", "url": "/review/", "kind": "review", "keywords": "correction contribute review reuse"},
+        {"title": "Research corrections", "summary": "Accepted corrections with affected editions, claims, correction dates and source evidence.", "url": CORRECTIONS_PATH, "kind": "review", "keywords": "corrections errata RSS Atom evidence"},
     ]
     for slug, title, kinds, description in CATEGORIES:
         entries.append({"title": title, "summary": description, "url": '/research/' + slug + '/', "kind": "research", "keywords": title.lower()})

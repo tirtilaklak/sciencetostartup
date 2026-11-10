@@ -231,6 +231,88 @@ class ResearchPageTests(unittest.TestCase):
             self.assertLess(len(entry['summary']), 220)
         self.assertEqual((self.output / 'research.css').read_bytes(), (ROOT / 'web/research.css').read_bytes())
 
+    def correction(self, **changes):
+        return {'id': 'fixture.correction.1', 'edition_id': 'research.fixture.1',
+                'claim_id': 'claim.fixture.1', 'summary': 'Synthetic correction <with markup> & qualification.',
+                'status': 'accepted', 'corrected_on': '2026-11-09T09:30:00-08:00',
+                'evidence_urls': ['https://example.org/evidence?version=1&part=2'], **changes}
+
+    def test_actual_corrections_registry_and_feeds_are_truthfully_empty(self):
+        import json
+        registry = json.loads((ROOT / 'data/research/corrections.json').read_text())
+        self.assertEqual(registry, {'schema_version': '1.0.0', 'corrections': []})
+        self.context['corrections'] = registry['corrections']
+        paths = {row['path'] for row in self.build()}
+        self.assertIn(rp.CORRECTIONS_PATH, paths)
+        self.assertIn('No accepted or published research corrections are recorded.', self.page(rp.CORRECTIONS_PATH))
+        rss = ET.parse(self.output / 'research/corrections/feed.xml')
+        atom = ET.parse(self.output / 'research/corrections/atom.xml')
+        self.assertEqual(rss.findall('./channel/item'), [])
+        self.assertEqual(atom.findall('{http://www.w3.org/2005/Atom}entry'), [])
+        for path in ('/research/', '/review/'):
+            text = self.page(path)
+            self.assertIn('href="/research/corrections/feed.xml"', text)
+            self.assertIn('href="/research/corrections/atom.xml"', text)
+        self.assertIn('href="/research/corrections/"', self.page('/review/'))
+
+    def test_only_actual_accepted_corrections_have_stable_page_and_feed_entries(self):
+        accepted = self.correction()
+        published = self.correction(id='fixture.correction.2', status='published', corrected_on='2026-11-10T01:00:00Z')
+        pending = self.correction(id='fixture.pending', status='pending', summary='PRIVATE-PENDING-PROPOSAL')
+        rejected = self.correction(id='fixture.rejected', status='rejected', summary='PRIVATE-REJECTED-PROPOSAL')
+        self.context['corrections'] = [pending, accepted, rejected, published]
+        self.build()
+        page = self.page(rp.CORRECTIONS_PATH)
+        self.assertIn('Synthetic correction &lt;with markup&gt; &amp; qualification.', page)
+        self.assertNotIn('<with markup>', page)
+        for row in (accepted, published):
+            self.assertIn('correction-' + row['id'], Facts(page).ids)
+            self.assertIn(row['edition_id'], page)
+            self.assertIn(row['claim_id'], page)
+        rss = ET.parse(self.output / 'research/corrections/feed.xml')
+        atom = ET.parse(self.output / 'research/corrections/atom.xml')
+        items, entries = rss.findall('./channel/item'), atom.findall('{http://www.w3.org/2005/Atom}entry')
+        self.assertEqual(len(items), 2)
+        self.assertEqual(len(entries), 2)
+        expected = [rp.sp.ORIGIN + rp._correction_url(row) for row in (published, accepted)]
+        self.assertEqual([item.findtext('guid') for item in items], expected)
+        self.assertEqual([entry.findtext('{http://www.w3.org/2005/Atom}id') for entry in entries], expected)
+        self.assertEqual(items[1].findtext('pubDate'), 'Mon, 09 Nov 2026 17:30:00 GMT')
+        self.assertEqual(entries[1].findtext('{http://www.w3.org/2005/Atom}updated'), '2026-11-09T17:30:00Z')
+        for item in items:
+            self.assertIn('claim.fixture.1', item.findtext('description'))
+            self.assertIn(accepted['evidence_urls'][0], item.findtext('description'))
+        for path in self.output.rglob('*'):
+            if path.is_file():
+                self.assertNotIn(b'PRIVATE-PENDING-PROPOSAL', path.read_bytes())
+                self.assertNotIn(b'PRIVATE-REJECTED-PROPOSAL', path.read_bytes())
+        first = {str(p.relative_to(self.output)): p.read_bytes() for p in self.output.rglob('*') if p.is_file()}
+        self.context['corrections'].reverse()
+        self.build()
+        self.assertEqual(first, {str(p.relative_to(self.output)): p.read_bytes() for p in self.output.rglob('*') if p.is_file()})
+
+    def test_malformed_or_unsafe_correction_records_fail_closed(self):
+        cases = [self.correction(corrected_on='2026-11-09'),
+                 self.correction(corrected_on='2026-11-09T12:00:00'),
+                 self.correction(corrected_on='not-a-date'),
+                 self.correction(id='../unsafe'), self.correction(edition_id=''),
+                 self.correction(claim_id=''), self.correction(summary=' '),
+                 self.correction(status='unconfirmed'), self.correction(status={}),
+                 self.correction(evidence_urls=[]), self.correction(evidence_urls=['javascript:alert(1)']),
+                 self.correction(evidence_urls=['https://user:secret@example.org/']),
+                 self.correction(evidence_urls=['https://example.org/\nunsafe']),
+                 self.correction(evidence_urls=['https://example.org/', 'https://example.org/'])]
+        missing = self.correction()
+        missing.pop('claim_id')
+        cases.append(missing)
+        for row in cases:
+            with self.subTest(row=row), self.assertRaises(ValueError):
+                self.context['corrections'] = [row]
+                self.build()
+        self.context['corrections'] = [self.correction(), self.correction()]
+        with self.assertRaisesRegex(ValueError, 'unique'):
+            self.build()
+
 
 if __name__ == '__main__':
     unittest.main()
