@@ -12,7 +12,7 @@ import hashlib
 import html
 import io
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import sqlite3
 import shutil
@@ -42,6 +42,13 @@ STATIC_ASSET_LIMIT_BYTES = 25 * 1024 * 1024
 ARCHIVE_COMPRESSION = {"stored": zipfile.ZIP_STORED, "deflate": zipfile.ZIP_DEFLATED}
 LIVE_PACKAGE_FILES = {"package-status.json", "current-metadata.json", "current-CITATION.cff",
                       "current-citation.bib", "current-citation.ris", "current-citation.csl.json"}
+CONTEXT_CONTRACT_VERSION = 2
+REPRODUCTION_INPUTS = {name: "schema/" + name for name in (
+    "research-graph.schema.json", "report.schema.json", "report-review.schema.json",
+    "report-audit.schema.json", "publication-projection.schema.json", "publication-metadata.schema.json")}
+REPRODUCTION_INPUTS.update({"research_graph.py": "scripts/research_graph.py",
+    "reproduce.py": "scripts/reproduce_research_package.py", "LICENSE": "LICENSE", "LICENSE-DATA.md": "LICENSE-DATA.md"})
+PREPARED_REGISTRY = "data/research/prepared-packages.json"
 
 
 def json_bytes(value):
@@ -297,13 +304,48 @@ def offline_html(context):
             + '<nav aria-label="Offline edition"><a href="evidence.html">Evidence appendix and recorded scope comparison</a></nav>' + "\n".join(body) + "</main></html>\n").encode()
 
 
-def source_context(context, *, reservation=True):
+def _source_path(root, relative):
+    """Refuse symlinks in any source-selected path component below the root."""
+    path = Path(root)
+    if path.is_symlink():
+        raise ValueError("Source paths cannot contain symlinks")
+    for part in PurePosixPath(relative).parts:
+        path = path / part
+        if path.is_symlink():
+            raise ValueError("Source paths cannot contain symlinks")
+    return path
+
+
+def reproduction_files(context):
+    """Owned scientific inputs, keyed by their exact archive member names.
+
+    V2 requires the complete allowlist for every read and write. Local paths
+    and source file bodies never enter the context descriptors.
+    """
+    root = Path(context.get("root", ROOT))
+    files = {}
+    for name, relative in sorted(REPRODUCTION_INPUTS.items()):
+        path = _source_path(root, relative)
+        if not path.is_file():
+            raise ValueError("Missing or unsafe owned reproduction input: " + name)
+        files[name] = path.read_bytes()
+    return files
+
+
+def _contract_version(version):
+    if type(version) is not int or version not in {1, CONTEXT_CONTRACT_VERSION}:
+        raise ValueError("Unsupported package context contract version")
+    return version
+
+
+def source_context(context, *, reservation=True, version=CONTEXT_CONTRACT_VERSION):
     """Research/PDF inputs, without publication outcomes that depend on them.
 
     Keep every research gate metric/blocker and the reserved version identifier.
     Only lifecycle status, final archive blockers and actual receipts are omitted.
     This is also the canonical input to the frozen-package context contract.
     """
+    _contract_version(version)
     value = copy.deepcopy({key: context[key] for key in ("graph", "report", "gate", "identity", "policy", "roles") if key in context})
     report, gate = value["report"], value["gate"]
     report.pop("status", None)
@@ -315,11 +357,16 @@ def source_context(context, *, reservation=True):
     gate["reasons"] = [reason for reason in gate.get("reasons", []) if reason not in archive_reasons]
     gate.pop("ready", None)
     gate.pop("status", None)
+    if version == 2:
+        files = reproduction_files(context)
+        value["package_context"] = {"context_contract_version": version, "reproduction_inputs": {
+            name: {"sha256": sha256(files[name]), "bytes": len(files[name])}
+            for name in sorted(REPRODUCTION_INPUTS)}}
     return privacy_filter(value)
 
 
-def context_digest(context):
-    return sha256(json_bytes(source_context(context)))
+def context_digest(context, *, version=CONTEXT_CONTRACT_VERSION):
+    return sha256(json_bytes(source_context(context, version=version)))
 
 
 def published_archive(context):
@@ -363,6 +410,59 @@ def prepared_package_path(context):
     return resolved
 
 
+def prepared_package_selection(context, root=None):
+    """Return an optional committed-source selection overlay, verified before use.
+
+    The registry is a pointer written only after a successful explicit freeze.
+    It is never an input to its own context digest. An absent registry or absent
+    release entry selects nothing; a selected missing/stale bundle fails closed.
+    The coordinator can apply this overlay when constructing the build context.
+    """
+    root = Path(root if root is not None else context.get("root", ROOT)).absolute()
+    registry = _source_path(root, PREPARED_REGISTRY)
+    if not registry.exists():
+        return {}
+    if not registry.is_file():
+        raise ValueError("Prepared package registry must be a regular file")
+    def unique_pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError("Duplicate prepared registry field")
+            result[key] = value
+        return result
+    value = json.loads(registry.read_bytes(), object_pairs_hook=unique_pairs)
+    if (not isinstance(value, dict) or set(value) != {"schema_version", "packages"}
+            or type(value["schema_version"]) is not int or value["schema_version"] != 1
+            or not isinstance(value["packages"], list)):
+        raise ValueError("Invalid prepared package registry")
+    selected, seen = None, set()
+    fields = {"release_id", "path", "context_contract_version", "context_sha256", "manifest_sha256", "archive_sha256"}
+    for entry in value["packages"]:
+        if not isinstance(entry, dict) or set(entry) != fields:
+            raise ValueError("Invalid prepared package registry entry")
+        release_id, relative = entry["release_id"], entry["path"]
+        if (not isinstance(release_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", release_id)
+                or release_id in seen):
+            raise ValueError("Unsafe or duplicate prepared release identifier")
+        seen.add(release_id)
+        _contract_version(entry["context_contract_version"])
+        if any(not isinstance(entry[key], str) or not re.fullmatch(r"[0-9a-f]{64}", entry[key])
+               for key in ("context_sha256", "manifest_sha256", "archive_sha256")):
+            raise ValueError("Prepared registry requires exact SHA-256 bindings")
+        allowed = {"data/research/releases/" + release_id,
+                   "data/research/releases/" + release_id + "/publication"}
+        if not isinstance(relative, str) or relative not in allowed:
+            raise ValueError("Prepared registry path must name its committed edition directory")
+        path = _source_path(root, relative)
+        if release_id == context["report"]["release_id"]:
+            selected = {"prepared_package": str(path.absolute()), "prepared_package_expected": {
+                key: entry[key] for key in fields - {"release_id", "path"}}}
+    if selected is not None:
+        read_prepared_package({**context, "root": root, **selected}, selected["prepared_package"])
+    return selected or {}
+
+
 def read_prepared_package(context, package, *, expected_archive_sha256=None):
     """Read and verify a frozen bundle without regenerating its PDF or ZIP."""
     package = Path(package).resolve()
@@ -375,12 +475,21 @@ def read_prepared_package(context, package, *, expected_archive_sha256=None):
         return path.read_bytes()
     contract_blob, manifest_blob = read("PREPARED.json"), read("MANIFEST.json")
     contract, manifest = json.loads(contract_blob), json.loads(manifest_blob)
+    version = _contract_version(contract.get("context_contract_version", 1))
+    expected = context.get("prepared_package_expected", {})
+    if expected and (not isinstance(expected, dict) or set(expected) != {
+            "context_contract_version", "context_sha256", "manifest_sha256", "archive_sha256"}):
+        raise ValueError("Invalid source-selected registry bindings")
     if (contract.get("schema_version") != 1 or manifest.get("schema_version") != 1
+            or _contract_version(manifest.get("context_contract_version", 1)) != version
             or contract.get("release_id") != context["report"]["release_id"]
             or manifest.get("release_id") != contract["release_id"]
-            or contract.get("context_sha256") != context_digest(context)
+            or contract.get("context_sha256") != context_digest(context, version=version)
             or manifest.get("context_sha256") != contract["context_sha256"]):
         raise ValueError("Frozen package context or release identity does not match")
+    if expected and any(contract.get(key, 1 if key == "context_contract_version" else None) != expected[key]
+                        for key in ("context_contract_version", "context_sha256", "manifest_sha256", "archive_sha256")):
+        raise ValueError("Frozen package differs from the source-selected registry bindings")
     if sha256(manifest_blob) != contract.get("manifest_sha256"):
         raise ValueError("Frozen package manifest changed")
     files = {"MANIFEST.json": manifest_blob}
@@ -395,8 +504,13 @@ def read_prepared_package(context, package, *, expected_archive_sha256=None):
     if any(path.name not in expected | LIVE_PACKAGE_FILES or path.is_symlink() or not path.is_file()
            for path in package.iterdir()):
         raise ValueError("Unexpected or unsafe prepared package inventory")
-    if files.get("source-context.json") != json_bytes(source_context(context)):
+    if files.get("source-context.json") != json_bytes(source_context(context, version=version)):
         raise ValueError("Frozen source context differs from the current research inputs")
+    if version == 2:
+        inputs = source_context(context, version=version)["package_context"]["reproduction_inputs"]
+        if any(not isinstance(descriptor, dict) or manifest["files"].get(name) != descriptor
+               for name, descriptor in inputs.items()):
+            raise ValueError("Frozen reproduction inputs differ from their context bindings")
     archive = read("research-archive.zip")
     if (sha256(archive) != contract.get("archive_sha256") or len(archive) != contract.get("archive_bytes")
             or (expected_archive_sha256 is not None and sha256(archive) != expected_archive_sha256)):
@@ -422,6 +536,9 @@ def freeze_publication_package(context, package, *, archive_compression="stored"
     An existing target is never regenerated or overwritten. Missing/incomplete
     prior packages fail closed for operator inspection after an interrupted run.
     """
+    # A build selection points to an existing bundle; it is not a request to
+    # reuse that bundle while explicitly preparing a different new target.
+    context = {key: value for key, value in context.items() if key not in {"prepared_package", "prepared_package_expected"}}
     target = prepared_package_path({**context, "prepared_package": str(Path(package).absolute())})
     target.parent.mkdir(parents=True, exist_ok=True)
     try:
@@ -450,7 +567,9 @@ def verified_pdf(context):
         return None
     receipt = json.loads(receipt_path.read_text())
     blob = path.read_bytes()
-    if receipt.get("sha256") != sha256(blob) or receipt.get("context_sha256") != context_digest(context):
+    if (type(receipt.get("context_contract_version", 1)) is not int
+            or receipt.get("context_contract_version", 1) != CONTEXT_CONTRACT_VERSION
+            or receipt.get("sha256") != sha256(blob) or receipt.get("context_sha256") != context_digest(context)):
         raise ValueError("Prepared report PDF does not match the publication context")
     return blob
 
@@ -508,32 +627,22 @@ def write_publication_assets(context, output, *, archive_compression="stored"):
     pdf = verified_pdf(context)
     if pdf:
         files["report.pdf"] = pdf
-    root = Path(context.get("root", ROOT))
-    for schema_name in ("research-graph.schema.json", "report.schema.json", "report-review.schema.json", "report-audit.schema.json", "publication-projection.schema.json", "publication-metadata.schema.json"):
-        path = root / "schema" / schema_name
-        if path.is_file():
-            files[schema_name] = path.read_bytes()
-    for source_name, target_name in (("research_graph.py", "research_graph.py"), ("reproduce_research_package.py", "reproduce.py")):
-        path = root / "scripts" / source_name
-        if path.is_file():
-            files[target_name] = path.read_bytes()
+    files.update(reproduction_files(context))
     files["source-manifest.json"] = json_bytes(privacy_filter(context["graph"]["sources"]))
     files["METHODS.md"] = privacy_filter("# Research methods\n\n" + "\n\n".join(paragraph["text"] for section in context["report"].get("sections", [])
                                            if section["id"] == "methods-and-appendices" for paragraph in section.get("paragraphs", []))).encode()
-    for name in ("LICENSE-DATA.md", "LICENSE"):
-        if (root / name).is_file():
-            files[name] = (root / name).read_bytes()
     files["README.md"] = ("# ScienceToStartup research package\n\n" + metadata["note"] + "\n\nOpen report.html for the full offline report, then evidence.html for entity dossiers, a recorded-scope comparison, assertions, source metadata and review receipts. Evidence links resolve within the extracted edition without the live site. Citation files reflect archive status. JSON, CSV and SQLite are equivalent privacy-filtered projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Full source text and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party evidence retains its rights.\n\nRun `python3 reproduce.py --write-tables reproduced` inside this extracted package to verify MANIFEST.json, compare all three exports, validate the graph and reproduce coverage and approved-assertion tables. This needs only Python's standard library and no network. Schemas, methods and a source manifest are included. The PDF is accepted only when its receipt binds this exact context. No remote publication occurs during the build.\n").encode()
     # These files are sent to external services, so they belong to the same
     # immutable manifest and archive as the report and dataset.
     files["zenodo-metadata.json"] = json_bytes(zenodo_metadata(metadata))
     files["huggingface-README.md"] = ("---\nlicense: cc-by-4.0\nlanguage:\n- en\n---\n\n# " + metadata["title"] + "\n\n" + metadata["note"] + "\n\nPublic projection " + PROJECTION_VERSION + ". Read report.html and README.md before reuse. No third-party source text or personal contacts are licensed for reuse.\n").encode()
-    manifest = {"schema_version": 1, "release_id": metadata["version"], "context_sha256": context_digest(context),
+    manifest = {"schema_version": 1, "context_contract_version": CONTEXT_CONTRACT_VERSION,
+                "release_id": metadata["version"], "context_sha256": context_digest(context),
                 "files": {name: {"sha256": sha256(blob), "bytes": len(blob)} for name, blob in sorted(files.items())}}
     files["MANIFEST.json"] = json_bytes(manifest)
     files["research-archive.zip"] = deterministic_zip(files, compression=archive_compression)
     # Receipts contain the ZIP digest and therefore cannot be ZIP members.
-    files["PREPARED.json"] = json_bytes({"schema_version": 1, "release_id": metadata["version"],
+    files["PREPARED.json"] = json_bytes({"schema_version": 1, "context_contract_version": CONTEXT_CONTRACT_VERSION, "release_id": metadata["version"],
         "context_sha256": context_digest(context), "manifest_sha256": sha256(files["MANIFEST.json"]),
         "archive_sha256": sha256(files["research-archive.zip"]), "archive_bytes": len(files["research-archive.zip"]),
         "pdf_sha256": sha256(pdf) if pdf else None, "pdf_bytes": len(pdf) if pdf else None})

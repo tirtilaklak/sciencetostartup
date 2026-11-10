@@ -15,9 +15,9 @@ except ImportError:
     from scripts.research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD
 
 try:
-    from research_citations import ROOT, context_digest, json_bytes, privacy_filter, publication_metadata, sha256
+    from research_citations import ROOT, CONTEXT_CONTRACT_VERSION, context_digest, json_bytes, privacy_filter, publication_metadata, sha256
 except ImportError:
-    from scripts.research_citations import ROOT, context_digest, json_bytes, privacy_filter, publication_metadata, sha256
+    from scripts.research_citations import ROOT, CONTEXT_CONTRACT_VERSION, context_digest, json_bytes, privacy_filter, publication_metadata, sha256
 
 
 def render_report_pdf(context):
@@ -134,7 +134,8 @@ def prepare_report_pdf(context, output):
     output.mkdir(parents=True, exist_ok=True)
     blob = render_report_pdf(context)
     (output / "report.pdf").write_bytes(blob)
-    receipt = {"schema_version": 1, "context_sha256": context_digest(context), "sha256": sha256(blob),
+    receipt = {"schema_version": 1, "context_contract_version": CONTEXT_CONTRACT_VERSION,
+               "context_sha256": context_digest(context), "sha256": sha256(blob),
                "release_id": context["report"]["release_id"], "renderer": "ReportLab with embedded Bitstream Vera",
                "verification": "Rendering and text inspection are required before archival publication."}
     (output / "report-pdf.json").write_bytes(json_bytes(receipt))

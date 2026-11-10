@@ -15,6 +15,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import research_citations as citations
+from publication_fixtures import populate_owned_inputs
 
 
 def context_fixture():
@@ -149,6 +150,7 @@ class CitationTests(unittest.TestCase):
         projection = citations.public_projection(context, {"dataset_version": "2.5.0", "companies": []})
         with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
             context["root"] = first  # This synthetic publication has no prepared real-report PDF.
+            populate_owned_inputs(first)
             with patch.object(citations, "public_projection", return_value=projection), patch("urllib.request.urlopen", side_effect=AssertionError("network in build")):
                 a = citations.write_publication_assets(context, first)
                 b = citations.write_publication_assets(context, second)

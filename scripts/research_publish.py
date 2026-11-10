@@ -19,9 +19,9 @@ import urllib.request
 import zipfile
 
 try:
-    from research_citations import ROOT, DOI, RESERVATION_FIELDS, context_digest, json_bytes, sha256, source_context, publication_metadata, zenodo_metadata, read_prepared_package
+    from research_citations import ROOT, DOI, CONTEXT_CONTRACT_VERSION, RESERVATION_FIELDS, context_digest, json_bytes, sha256, source_context, publication_metadata, zenodo_metadata, read_prepared_package
 except ImportError:
-    from scripts.research_citations import ROOT, DOI, RESERVATION_FIELDS, context_digest, json_bytes, sha256, source_context, publication_metadata, zenodo_metadata, read_prepared_package
+    from scripts.research_citations import ROOT, DOI, CONTEXT_CONTRACT_VERSION, RESERVATION_FIELDS, context_digest, json_bytes, sha256, source_context, publication_metadata, zenodo_metadata, read_prepared_package
 
 
 class PublicationBlocked(ValueError):
@@ -158,12 +158,17 @@ class PublicationPlan:
     """
     def __init__(self, context, journal_path):
         self.context = context
-        self.source_sha256 = sha256(json_bytes(source_context(context, reservation=False)))
+        # Resume the exact existing reservation marker, including legacy v1.
+        # A new journal always binds the owned scientific inputs through v2.
+        prior = json.loads(Path(journal_path).read_text()) if Path(journal_path).exists() else None
+        self.context_contract_version = prior.get("context_contract_version", 1) if prior is not None else CONTEXT_CONTRACT_VERSION
+        self.source_sha256 = sha256(json_bytes(source_context(context, reservation=False, version=self.context_contract_version)))
         self.journal = Journal(journal_path, context["report"]["release_id"], context_sha256=self.source_sha256)
+        self.journal.state["context_contract_version"] = self.context_contract_version
 
     def verify(self):
         gate = archival_gate(self.context)
-        if sha256(json_bytes(source_context(self.context, reservation=False))) != self.source_sha256:
+        if sha256(json_bytes(source_context(self.context, reservation=False, version=self.context_contract_version))) != self.source_sha256:
             raise PublicationBlocked("Research inputs changed after DOI reservation planning")
         return gate
 
@@ -203,7 +208,8 @@ class Release:
             reserved = reservation.reservation()
             archive = context["report"].get("archive", {})
             if (reservation.context["report"]["release_id"] != context["report"]["release_id"]
-                    or sha256(json_bytes(source_context(context, reservation=False))) != reservation.source_sha256
+                    or self.manifest.get("context_contract_version", 1) != reservation.context_contract_version
+                    or sha256(json_bytes(source_context(context, reservation=False, version=reservation.context_contract_version))) != reservation.source_sha256
                     or any(archive.get(key) != reserved[key] for key in RESERVATION_FIELDS)):
                 raise PublicationBlocked("Frozen context differs from the DOI reservation")
             with self.journal.lock():
@@ -221,7 +227,7 @@ class Release:
         if (self.manifest.get("schema_version") != 1
                 or self.manifest.get("release_id") != self.context["report"]["release_id"]):
             raise PublicationBlocked("Package manifest identity differs.")
-        if self.manifest.get("context_sha256") != context_digest(self.context):
+        if self.manifest.get("context_sha256") != context_digest(self.context, version=self.manifest.get("context_contract_version", 1)):
             raise PublicationBlocked("Package context is stale.")
         required = {"report.pdf", "metadata.json", "clean-dataset.json", "zenodo-metadata.json", "huggingface-README.md"}
         if not required <= set(self.manifest["files"]):

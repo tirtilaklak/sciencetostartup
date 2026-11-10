@@ -156,12 +156,12 @@ Measured on Python 3.9.6 / SQLite 3.54.0 / zlib 1.2.12:
 
 | Asset | Bytes |
 | --- | ---: |
-| Deflated archive, including all exports and offline appendix | 9,219,145 |
+| Deflated v2 archive, including all exports and offline appendix | 9,219,812 |
 | JSON | 17,267,042 |
 | CSV | 15,355,890 |
 | SQLite | 17,047,552 |
 | Offline evidence appendix | 16,447,720 |
-| Source context | 14,441,012 |
+| Source context | 14,442,611 |
 | PDF byte allowance | 1,048,626 |
 
 Every fixture asset fits the actual limit. These are measured workload bounds,
@@ -169,13 +169,16 @@ not a guarantee for arbitrarily long future records, appendices or PDF files.
 Inspect each real edition's inventory; a larger edition must fail deployment
 inspection until a complete hosting arrangement fits the constraints.
 
-The current actual edition was also explicitly frozen with deflate and reused
+Before the v2 context upgrade, the actual edition was explicitly frozen with deflate and reused
 under Python 3.9.6 / SQLite 3.54.0, Python 3.11.15 / SQLite 3.53.0, and Python
 3.13.12 / SQLite 3.53.0. All 38 output file hashes matched, with SQLite writing,
 PDF preparation, ZIP generation and HTTP access patched to fail if called.
 All three installed runtimes used zlib 1.2.12; different zlib versions were not
 executed in this check. Frozen reuse does not invoke zlib generation. The current
 actual deflated archive with the appendix was 2,222,797 bytes in that check.
+The v2 contract was separately exercised with a source-registry-selected
+**TEST-ONLY** frozen fixture on those same three runtimes. All 38 output hashes
+matched with SQLite, PDF and ZIP writers and HTTP access patched to fail.
 
 ## Frozen package transaction
 
@@ -191,6 +194,40 @@ actual archive receipts and the final archive-only gate blockers. Changing
 research text, audits, coverage, policy or reservation still invalidates the PDF
 and frozen bundle. A registered version DOI must equal the reserved version DOI;
 the concept DOI is a separate field and is never used as a version identifier.
+
+New preparation uses **package context contract v2**. `MANIFEST.json`,
+`PREPARED.json` and new PDF receipts explicitly carry `context_contract_version: 2`;
+their existing envelope `schema_version` remains 1. In `source-context.json`,
+`package_context.reproduction_inputs` binds the byte count and SHA-256 of these
+owned scientific inputs, using exactly their archive member names:
+
+- `research-graph.schema.json`, `report.schema.json`, `report-review.schema.json`,
+  `report-audit.schema.json`, `publication-projection.schema.json`, and
+  `publication-metadata.schema.json`;
+- `research_graph.py` and `reproduce.py` (the latter comes from
+  `scripts/reproduce_research_package.py`);
+- `LICENSE` and `LICENSE-DATA.md`.
+
+The package writer uses the same allowlist for the archived bytes. All ten inputs
+must exist for every v2 read and write; missing inputs hold the edition. Test-only
+source roots copy the same required owned inputs instead of bypassing this rule. Symlinked
+inputs or parent components are rejected. Local source paths and file bodies do
+not enter the descriptors. A schema correction, reproducer fix or license change
+invalidates a v2 freeze even when its assertions and report wording are unchanged.
+Fresh PDF preparation writes a v2 receipt; an old source PDF receipt cannot be
+silently promoted into a new v2 bundle.
+
+A frozen package without the explicit context version is **legacy v1**. Its
+original research-only digest is checked using `context_digest(context,
+version=1)` and its exact original `source-context.json`, manifest, PDF and ZIP
+remain byte-verified. It is never regenerated, rewritten or retrofitted with new
+schema/code/license bytes. Published legacy builds use the frozen PDF directly;
+they do not reread or rewrite its old source PDF receipt. Existing v1 release
+journals retain their exact ZIP markers, and existing v1 reservation journals
+retain their original source marker for retry reconciliation. New reservation
+journals bind v2. A reservation and frozen package must use the same context
+contract; a legacy reservation without a legacy freeze needs explicit operator
+review before a new v2 transaction.
 
 `freeze_publication_package(context, package_directory, archive_compression="stored")`
 creates the package once; `archive_compression="deflate"` opts into level-9 ZIP
@@ -219,6 +256,65 @@ prepublication files, including the reservation note. Live
 `package-status.json` are outside the ZIP and reflect the actual production
 archive receipt. The public website should link those current citation files.
 Website deployment and mirrors remain separate states.
+
+## Source-selected prepared bundle
+
+`prepared_package_selection(context, root)` optionally reads
+`data/research/prepared-packages.json` and returns a context overlay. This is a
+small committed source registry, not a machine-local cache or environment
+variable. Its shape is:
+
+```json
+{
+  "schema_version": 1,
+  "packages": [
+    {
+      "release_id": "research-YYYY-MM-DD.1",
+      "path": "data/research/releases/research-YYYY-MM-DD.1/publication",
+      "context_contract_version": 2,
+      "context_sha256": "<64 lowercase hex characters from PREPARED.json>",
+      "manifest_sha256": "<64 lowercase hex characters from PREPARED.json>",
+      "archive_sha256": "<64 lowercase hex characters from PREPARED.json>"
+    }
+  ]
+}
+```
+
+Replace the illustrative hash placeholders with the actual completed contract
+values. Each release ID is unique. Paths must be exactly the named release's
+committed directory or its `publication` child; absolute paths, traversal,
+unrelated paths, symlinks in any component, duplicate JSON keys and unknown fields
+are rejected. The selector verifies the selected bundle against all three pinned
+hashes, its context version and the current source contract. An absent registry
+or unmatched release selects nothing. A selected missing, partial or stale bundle
+fails closed; it is never silently regenerated.
+
+Coordinator integration belongs in `build_context`: preserve `root` in the
+constructed context, then apply the selector after graph, report, gate and policy
+are complete. Keep an explicit preparation option that skips selection:
+
+```python
+# At the end of build_context(root, *, select_prepared=True):
+context["root"] = Path(root)
+if select_prepared:
+    from research_citations import prepared_package_selection
+    context.update(prepared_package_selection(context, root))
+return context
+```
+
+This hook is an integration instruction; the package helper does not modify the
+coordinator. Ordinary builds select strictly. Explicit preparation obtains the
+source context with selection disabled, prepares/reviews the v2 PDF, then calls
+`freeze_publication_package(..., archive_compression="deflate")` on the intended
+edition path even before that path exists. Only after the freeze verifies should
+the coordinator add/update that release's registry entry using its actual
+`PREPARED.json` hashes, preserving entries for other releases. A prelaunch bundle
+may be selected too; selecting it establishes no publication readiness or DOI.
+
+The explicit freeze function strips any inherited build-selection overlay before
+generating a different new target. Registry pointers, absolute local paths and
+expected-hash overlays are excluded from both context contracts, so committing a
+selection after preparation cannot create a self-referential digest cycle.
 
 ## Prepared PDF
 

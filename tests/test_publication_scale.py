@@ -19,6 +19,7 @@ from research_offline import offline_appendix, evidence_href
 from test_research_citations import context_fixture
 from test_research_report import approved_graph
 from publication_scale_fixture import COUNTS, scale_context, scale_pdf_allowance
+from publication_fixtures import populate_owned_inputs
 
 
 class Links(HTMLParser):
@@ -39,6 +40,7 @@ class FrozenCompressionTests(unittest.TestCase):
     def prepare(self, root, *, compression='deflate'):
         context = context_fixture()
         context['root'] = str(root / 'source')
+        populate_owned_inputs(context['root'])
         projection = citations.public_projection(context, {'dataset_version': '2.5.0', 'companies': []})
         with patch.object(citations, 'public_projection', return_value=projection), patch.object(citations, 'verified_pdf', return_value=b'TEST-ONLY PDF fixture'):
             target = citations.freeze_publication_package(context, root / 'frozen', archive_compression=compression)
