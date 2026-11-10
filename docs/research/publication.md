@@ -47,6 +47,10 @@ inputs/caches/full-text fields, source quote fields and structured contact field
 Email patterns are redacted throughout nested text, including the known legacy
 personal email. This is a broad safeguard, not an allowlist for other addresses.
 The archive does not redistribute company imagery, logos or scraped source bodies.
+The graph projection publishes only approved assertions and explicitly historical
+descriptions. Candidate and rejected assertion wording and their exclusive review
+receipts remain private. Entity/source metadata can still describe coverage gaps.
+The source manifest uses this same public allowlist.
 
 `clean-dataset.json` is the authoritative structured projection. CSV and SQLite
 share the lossless `projection_rows` representation:
@@ -156,12 +160,12 @@ Measured on Python 3.9.6 / SQLite 3.54.0 / zlib 1.2.12:
 
 | Asset | Bytes |
 | --- | ---: |
-| Deflated v2 archive, including all exports and offline appendix | 9,219,812 |
+| Deflated v2 archive, including all exports and offline appendix | 9,216,679 |
 | JSON | 17,267,042 |
 | CSV | 15,355,890 |
 | SQLite | 17,047,552 |
 | Offline evidence appendix | 16,447,720 |
-| Source context | 14,442,611 |
+| Source context | 14,442,778 |
 | PDF byte allowance | 1,048,626 |
 
 Every fixture asset fits the actual limit. These are measured workload bounds,
@@ -209,13 +213,36 @@ owned scientific inputs, using exactly their archive member names:
 - `LICENSE` and `LICENSE-DATA.md`.
 
 The package writer uses the same allowlist for the archived bytes. All ten inputs
-must exist for every v2 read and write; missing inputs hold the edition. Test-only
-source roots copy the same required owned inputs instead of bypassing this rule. Symlinked
+must exist in every v2 package. Fresh preparation and unpublished reuse require
+every current owned input too; missing inputs hold that edition. Test-only source
+roots copy the same required owned inputs instead of bypassing this rule. Symlinked
 inputs or parent components are rejected. Local source paths and file bodies do
 not enter the descriptors. A schema correction, reproducer fix or license change
-invalidates a v2 freeze even when its assertions and report wording are unchanged.
+invalidates an unpublished v2 freeze even when its assertions and report wording are unchanged.
 Fresh PDF preparation writes a v2 receipt; an old source PDF receipt cannot be
 silently promoted into a new v2 bundle.
+
+The finalized v2 normalization identifies `graph_projection` as
+`approved-historical-v1`. Its public source context contains exactly that public
+graph projection, plus `input_commitments.graph_sha256`, an opaque hash of the
+complete original input graph. Candidate/rejected wording and private graph/row
+extensions cannot escape through `source-context.json`; changing an omitted draft
+still changes the bound context. Approved assertion digests and actual receipts
+are preserved. This finalization precedes any v2 publication; earlier unpublished
+v2 preparations need a fresh context receipt and freeze.
+
+A **typed, verified production archive receipt with the exact ZIP SHA-256**
+permits historical v2 reuse. After verifying every frozen file and the ZIP, the
+reader validates the pinned `package_context`: the exact ten-member allowlist,
+non-null descriptors, hashes, byte counts and equality with `MANIFEST.json`.
+It then compares the current canonical research core, including the original
+graph commitment, with that frozen recipe. Current schema/reproducer/license
+files may have changed or disappeared; they are never read for this replay.
+The frozen recipe, source context, PDF and ZIP remain immutable. A sandbox receipt,
+wrong artifact hash, bare `published` flag or caller option cannot select this
+path. Changed research inputs still invalidate historical replay.
+Historical replay cannot create a fresh freeze at a new target; prepare a new
+edition from its prepublication source context instead.
 
 A frozen package without the explicit context version is **legacy v1**. Its
 original research-only digest is checked using `context_digest(context,
@@ -285,7 +312,8 @@ values. Each release ID is unique. Paths must be exactly the named release's
 committed directory or its `publication` child; absolute paths, traversal,
 unrelated paths, symlinks in any component, duplicate JSON keys and unknown fields
 are rejected. The selector verifies the selected bundle against all three pinned
-hashes, its context version and the current source contract. An absent registry
+hashes, its context version and its applicable source contract: current inputs for
+unpublished preparation, or the typed-receipt-gated historical recipe above. An absent registry
 or unmatched release selects nothing. A selected missing, partial or stale bundle
 fails closed; it is never silently regenerated.
 
@@ -407,6 +435,13 @@ public record state; a pending publish is not blindly repeated. Only a public
 record with one matching version DOI, a distinct typed concept DOI, consistent
 version record ID, and verified exact public files marks the archive published.
 A reserved DOI remains `reserved_doi`, never `doi`, in draft journal state.
+A fully verified production publication journal can authorize the same exact
+historical recipe replay for mirror and reconciliation retries. An unconfirmed
+lost-publish response stays current-input strict; source changes block it until
+the original inputs are restored or a verified production receipt is available.
+If a typed published source receipt survives a lost local journal, recovery only
+reconciles its named existing record. Upload and new-version creation are blocked;
+recovery cannot fall through to creating another DOI.
 `archive_receipt()` exports a production-only receipt containing API origin,
 environment, verification flag, aware UTC confirmation timestamp, version record
 URL/ID, release identity, exact artifact digest, separate concept/version DOI

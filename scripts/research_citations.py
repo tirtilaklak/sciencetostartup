@@ -79,24 +79,22 @@ def public_projection(context, canonical=None):
     root = Path(context.get("root", ROOT))
     canonical = canonical if canonical is not None else json.loads((root / "data/canonical.json").read_text())
     graph = context["graph"]
-    # The graph owner chooses public records; do not accidentally export internal
-    # review prompts/caches just because a future graph contains them.
-    try:
-        from research_graph import public_graph
-    except ImportError:
-        try:
-            from scripts.research_graph import public_graph
-        except ImportError:
-            public_graph = lambda g: {key: g[key] for key in (
-                "schema_version", "release_id", "as_of", "canonical_dataset_version",
-                "canonical_sha256", "entities", "sources", "assertions", "reviews", "coverage") if key in g}
     return privacy_filter({"schema_version": 1, "projection_version": PROJECTION_VERSION,
                            "release_id": context["report"]["release_id"],
                            "as_of": graph["as_of"],
                            "canonical_dataset_version": canonical["dataset_version"],
                            "privacy": {"contact_details": "removed", "raw_source_text": "excluded",
                                        "canonical_unchanged": True},
-                           "canonical": canonical, "graph": public_graph(graph)})
+                           "canonical": canonical, "graph": _public_graph(graph)})
+
+
+def _public_graph(graph):
+    # The graph owner chooses public records; missing validation must fail closed.
+    try:
+        from research_graph import public_graph
+    except ImportError:
+        from scripts.research_graph import public_graph
+    return public_graph(graph)
 
 
 def projection_rows(projection):
@@ -338,7 +336,7 @@ def _contract_version(version):
     return version
 
 
-def source_context(context, *, reservation=True, version=CONTEXT_CONTRACT_VERSION):
+def _research_source_context(context, *, reservation=True, version=CONTEXT_CONTRACT_VERSION):
     """Research/PDF inputs, without publication outcomes that depend on them.
 
     Keep every research gate metric/blocker and the reserved version identifier.
@@ -358,11 +356,22 @@ def source_context(context, *, reservation=True, version=CONTEXT_CONTRACT_VERSIO
     gate.pop("ready", None)
     gate.pop("status", None)
     if version == 2:
-        files = reproduction_files(context)
-        value["package_context"] = {"context_contract_version": version, "reproduction_inputs": {
-            name: {"sha256": sha256(files[name]), "bytes": len(files[name])}
-            for name in sorted(REPRODUCTION_INPUTS)}}
+        value["graph"] = _public_graph(context["graph"])
+        # Preserve exact private input identity without redistributing draft
+        # assertions, rejected wording or private extensions in any public graph.
+        value["input_commitments"] = {"graph_sha256": sha256(json_bytes(context["graph"]))}
     return privacy_filter(value)
+
+
+def source_context(context, *, reservation=True, version=CONTEXT_CONTRACT_VERSION):
+    value = _research_source_context(context, reservation=reservation, version=version)
+    if version == 2:
+        files = reproduction_files(context)
+        value["package_context"] = {"context_contract_version": version,
+            "graph_projection": "approved-historical-v1", "reproduction_inputs": {
+                name: {"sha256": sha256(files[name]), "bytes": len(files[name])}
+                for name in sorted(REPRODUCTION_INPUTS)}}
+    return value
 
 
 def context_digest(context, *, version=CONTEXT_CONTRACT_VERSION):
@@ -484,7 +493,6 @@ def read_prepared_package(context, package, *, expected_archive_sha256=None):
             or _contract_version(manifest.get("context_contract_version", 1)) != version
             or contract.get("release_id") != context["report"]["release_id"]
             or manifest.get("release_id") != contract["release_id"]
-            or contract.get("context_sha256") != context_digest(context, version=version)
             or manifest.get("context_sha256") != contract["context_sha256"]):
         raise ValueError("Frozen package context or release identity does not match")
     if expected and any(contract.get(key, 1 if key == "context_contract_version" else None) != expected[key]
@@ -504,17 +512,47 @@ def read_prepared_package(context, package, *, expected_archive_sha256=None):
     if any(path.name not in expected | LIVE_PACKAGE_FILES or path.is_symlink() or not path.is_file()
            for path in package.iterdir()):
         raise ValueError("Unexpected or unsafe prepared package inventory")
-    if files.get("source-context.json") != json_bytes(source_context(context, version=version)):
-        raise ValueError("Frozen source context differs from the current research inputs")
-    if version == 2:
-        inputs = source_context(context, version=version)["package_context"]["reproduction_inputs"]
-        if any(not isinstance(descriptor, dict) or manifest["files"].get(name) != descriptor
-               for name, descriptor in inputs.items()):
-            raise ValueError("Frozen reproduction inputs differ from their context bindings")
     archive = read("research-archive.zip")
     if (sha256(archive) != contract.get("archive_sha256") or len(archive) != contract.get("archive_bytes")
             or (expected_archive_sha256 is not None and sha256(archive) != expected_archive_sha256)):
         raise ValueError("Frozen archive bytes changed or do not match the publication receipt")
+    published = published_archive(context)
+    receipt = context["report"].get("archive", {})
+    if receipt.get("status") == "published" and not published:
+        raise ValueError("Published frozen reuse requires a verified production archive receipt")
+    if published and sha256(archive) != receipt["artifact_sha256"]:
+        raise ValueError("Frozen archive does not match the exact published artifact receipt")
+    source_blob = files.get("source-context.json")
+    if source_blob is None or sha256(source_blob) != contract.get("context_sha256"):
+        raise ValueError("Frozen source context differs from its context digest")
+    if version == 2:
+        pinned_source = json.loads(source_blob)
+        recipe = pinned_source.get("package_context") if isinstance(pinned_source, dict) else None
+        if (not isinstance(recipe, dict) or set(recipe) != {"context_contract_version", "graph_projection", "reproduction_inputs"}
+                or type(recipe["context_contract_version"]) is not int or recipe["context_contract_version"] != 2
+                or recipe["graph_projection"] != "approved-historical-v1"
+                or not isinstance(recipe["reproduction_inputs"], dict)
+                or set(recipe["reproduction_inputs"]) != set(REPRODUCTION_INPUTS)):
+            raise ValueError("Frozen reproduction input allowlist differs from the v2 contract")
+        for name, descriptor in recipe["reproduction_inputs"].items():
+            if (not isinstance(descriptor, dict) or set(descriptor) != {"sha256", "bytes"}
+                    or not isinstance(descriptor["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", descriptor["sha256"])
+                    or type(descriptor["bytes"]) is not int or descriptor["bytes"] < 0
+                    or manifest["files"].get(name) != descriptor or name not in files
+                    or sha256(files[name]) != descriptor["sha256"] or len(files[name]) != descriptor["bytes"]):
+                raise ValueError("Frozen reproduction inputs differ from their context bindings")
+        if published:
+            # Only the typed production receipt plus its verified exact archive
+            # permits historical recipe replay. The research core stays current
+            # and exact; caller flags cannot select this path.
+            expected_source = _research_source_context(context, version=version)
+            expected_source["package_context"] = recipe
+        else:
+            expected_source = source_context(context, version=version)
+    else:
+        expected_source = source_context(context, version=version)
+    if source_blob != json_bytes(expected_source):
+        raise ValueError("Frozen source context differs from the current research inputs")
     pdf = files.get("report.pdf")
     if (contract.get("pdf_sha256") != (sha256(pdf) if pdf else None)
             or contract.get("pdf_bytes") != (len(pdf) if pdf else None)):
@@ -540,6 +578,8 @@ def freeze_publication_package(context, package, *, archive_compression="stored"
     # reuse that bundle while explicitly preparing a different new target.
     context = {key: value for key, value in context.items() if key not in {"prepared_package", "prepared_package_expected"}}
     target = prepared_package_path({**context, "prepared_package": str(Path(package).absolute())})
+    if context["report"].get("archive", {}).get("status") == "published" and not target.exists():
+        raise ValueError("New frozen packages require prepublication source context; reuse the existing published bundle")
     target.parent.mkdir(parents=True, exist_ok=True)
     try:
         target.mkdir()
@@ -628,7 +668,7 @@ def write_publication_assets(context, output, *, archive_compression="stored"):
     if pdf:
         files["report.pdf"] = pdf
     files.update(reproduction_files(context))
-    files["source-manifest.json"] = json_bytes(privacy_filter(context["graph"]["sources"]))
+    files["source-manifest.json"] = json_bytes(projection["graph"]["sources"])
     files["METHODS.md"] = privacy_filter("# Research methods\n\n" + "\n\n".join(paragraph["text"] for section in context["report"].get("sections", [])
                                            if section["id"] == "methods-and-appendices" for paragraph in section.get("paragraphs", []))).encode()
     files["README.md"] = ("# ScienceToStartup research package\n\n" + metadata["note"] + "\n\nOpen report.html for the full offline report, then evidence.html for entity dossiers, a recorded-scope comparison, assertions, source metadata and review receipts. Evidence links resolve within the extracted edition without the live site. Citation files reflect archive status. JSON, CSV and SQLite are equivalent privacy-filtered projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Full source text and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party evidence retains its rights.\n\nRun `python3 reproduce.py --write-tables reproduced` inside this extracted package to verify MANIFEST.json, compare all three exports, validate the graph and reproduce coverage and approved-assertion tables. This needs only Python's standard library and no network. Schemas, methods and a source manifest are included. The PDF is accepted only when its receipt binds this exact context. No remote publication occurs during the build.\n").encode()
