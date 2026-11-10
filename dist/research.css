@@ -97,6 +97,19 @@
 .r-report-body{max-width:780px;min-width:0}
 .r-chapter{padding-top:26px;margin-bottom:56px;border-top:1px solid var(--r-rule)}
 .r-chapter h2{font-family:var(--serif);font-size:31px;font-weight:400;letter-spacing:-.7px;line-height:1.25;margin-bottom:24px}
+/* Retain the complete native report while postponing offscreen chapter layout. */
+@supports(content-visibility:auto){
+ @media screen{
+  .r-report-body>.r-chapter{content-visibility:auto;contain-intrinsic-block-size:auto 64rem}
+  /* Resolve every preceding chapter before native fragment positioning. A
+     finding is a nested article, so revealing only chapter :target is not
+     sufficient on reload or when restoring browser history. */
+  .r-report-body:has(:target)>.r-chapter{content-visibility:visible;contain-intrinsic-size:none}
+ }
+ @media print{
+  .r-report-body>.r-chapter{content-visibility:visible;contain:none;contain-intrinsic-size:none}
+ }
+}
 .r-paragraph{margin-bottom:26px}
 .r-paragraph-kind{display:block;color:var(--r-quiet);font-size:10px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:7px;font-weight:600}
 .r-paragraph>p{font-size:16px;line-height:1.85;margin-bottom:10px}
@@ -109,7 +122,29 @@
 .r-downloads{display:flex;flex-wrap:wrap;list-style:none;gap:4px 24px;padding:0;margin:20px 0}
 .r-downloads li{margin:0}
 .r-downloads a{display:inline-flex;align-items:center;min-height:44px;font-size:13px}
+.r-ledger-parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));list-style:none;gap:6px 24px;padding:0;margin:20px 0}
+.r-ledger-parts a{display:block;min-height:44px;padding:10px 0;border-bottom:1px solid var(--r-rule);font-size:14px}
+.r-ledger-parts a[aria-current="page"]{font-weight:600;color:var(--r-ink)}
+.r-ledger-parts .r-meta{display:block;font-weight:400}
+.r-ledger-nav{margin:24px 0}
+.r-legacy-ledger-target{display:none}
+.r-legacy-ledger-target:target{display:block;max-width:900px;min-height:44px;margin:24px 0;padding:20px;border-left:2px solid var(--r-accent);overflow-wrap:anywhere}
 .r-assertion,.r-source{max-width:900px;padding:24px 0;margin:0;border-bottom:1px solid var(--r-rule)}
+/* Every ledger record stays in the native document, including citations and
+   disclosures. Let the browser skip offscreen layout, while fragment targets,
+   find-in-page, keyboard focus and assistive technology can reveal any record. */
+@supports(content-visibility:auto){
+ @media screen{
+  .research:not(.r-company-supplement) .r-assertion,.research:not(.r-company-supplement) .r-source{content-visibility:auto;contain-intrinsic-block-size:auto 36rem}
+  .research:not(.r-company-supplement) .r-source{contain-intrinsic-block-size:auto 28rem}
+  /* Resolve every preceding height before a native fragment or keyboard jump.
+     This also preserves native Back/Forward positions across browser engines. */
+  .research:has(:target) :is(.r-assertion,.r-source),.research:has(.r-assertion:focus-within,.r-source:focus-within) :is(.r-assertion,.r-source){content-visibility:visible;contain-intrinsic-size:none}
+ }
+ @media print{
+  .r-assertion,.r-source{content-visibility:visible;contain:none;contain-intrinsic-size:none}
+ }
+}
 .r-assertion .r-kicker{margin-bottom:10px;font-size:10px}
 .r-assertion-text{font-size:16px;line-height:1.75}
 .r-record-id{font:11px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--r-quiet);overflow-wrap:anywhere;word-break:break-word}

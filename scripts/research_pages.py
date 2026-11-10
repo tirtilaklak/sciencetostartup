@@ -759,7 +759,7 @@ def _evidence_table(context, entities):
     values = [_index_values(entity) for entity in entities]
     controls = '<form class="r-index-controls" data-index-controls hidden role="search" aria-label="Filter research records"><label>Search records<input name="q" type="search" autocomplete="off" placeholder="Title or identifier"></label>'
     for key in ('status', 'type') + INDEX_FACETS:
-        options = sorted({value for row in values for value in row[key]}, key=str.casefold)
+        options = sorted({value for row in values for value in row[key]}, key=lambda value: (value.casefold(), value))
         if not options and key in {'delivery_model', 'data_purpose'}:
             continue
         label = {'status': 'Review status', 'type': 'Record type'}.get(key, key.replace('_', ' ').capitalize())

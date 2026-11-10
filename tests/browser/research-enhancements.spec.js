@@ -393,7 +393,11 @@ test('imported executive judgments retain complete content and approved evidence
 
 test('imported executive judgments retain stable native anchors after reload', async ({ page, request }) => {
   const { findings } = await importedFindings(request);
-  await page.goto(reportPath);
+  // A direct native fragment must position correctly before any script or
+  // test-triggered scrolling; then every finding also survives reload.
+  const firstId = 'finding-' + findings[0].id;
+  await page.goto(reportPath + '#' + firstId);
+  await expect(page.locator(selector(firstId))).toBeInViewport();
   await expect(page.locator('.r-finding')).toHaveCount(findings.length);
   for (const finding of findings) {
     const id = 'finding-' + finding.id;

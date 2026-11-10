@@ -101,7 +101,10 @@
 @supports(content-visibility:auto){
  @media screen{
   .r-report-body>.r-chapter{content-visibility:auto;contain-intrinsic-block-size:auto 64rem}
-  .r-report-body>.r-chapter:target{content-visibility:visible;contain-intrinsic-size:none}
+  /* Resolve every preceding chapter before native fragment positioning. A
+     finding is a nested article, so revealing only chapter :target is not
+     sufficient on reload or when restoring browser history. */
+  .r-report-body:has(:target)>.r-chapter{content-visibility:visible;contain-intrinsic-size:none}
  }
  @media print{
   .r-report-body>.r-chapter{content-visibility:visible;contain:none;contain-intrinsic-size:none}

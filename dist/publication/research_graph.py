@@ -23,7 +23,7 @@ from urllib.parse import urlsplit, parse_qsl
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_VERSION = "1.0.0"
-LAUNCH_FLOORS = {"legacy_dispositions": 39, "qualifying_suppliers": 60,
+LAUNCH_FLOORS = {"legacy_inclusion_audits": 39, "qualifying_suppliers": 60,
                  "reviewed_papers": 150, "dataset_families": 60,
                  "benchmark_families": 20, "core_disposition_rate": 0.9}
 KINDS = {"organization", "supplier", "paper", "paper_work", "paper_version", "dataset",
@@ -39,6 +39,7 @@ PREDICATES = {"legacy_description", "has_capability", "supplies_data_for", "publ
 FACETS = {"domain", "modality", "workflow", "expertise", "origin", "labels", "oversight"}
 OPTIONAL_FACETS = {"delivery_model", "data_purpose"}
 PAPER_IDENTIFIERS = {"doi", "arxiv", "acl", "pmlr"}
+CORE_KINDS = {"organization", "supplier", "paper", "paper_work", "dataset", "dataset_family", "benchmark", "benchmark_family"}
 REVIEW_ROLES = {"author", "source_verifier", "adversarial"}
 EMAIL = re.compile(r"[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.I)
 SECRET = re.compile(r"(?:sk-(?:proj-)?[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)")
@@ -532,6 +533,9 @@ def _validate_graph(graph, canonical=None):
             if strings(frozen.get("entity_ids"), "$/coverage/frozen_core/entity_ids"):
                 for eid in frozen["entity_ids"]:
                     require(eid in entities, "$/coverage/frozen_core/entity_ids", "unknown core entity")
+                    if eid in entities:
+                        require(entities[eid].get('kind') in CORE_KINDS, "$/coverage/frozen_core/entity_ids",
+                                "core units must be organization, paper-work or dataset/benchmark-family identities; versions and releases cannot inflate disposition")
                 declared = {eid for eid, ent in entities.items() if ent.get("eligible_core") is True}
                 require(declared == set(frozen["entity_ids"]), "$/coverage/frozen_core", "eligible core must exactly match frozen identities")
                 if frozen["entity_ids"]:
@@ -576,12 +580,14 @@ def normalize_identifier(scheme, identifier):
 
 
 def coverage_summary(graph):
-    """Compute counts from records; candidates, aliases and versions do not inflate them."""
+    """Compute coverage from records; candidate assertions, aliases and versions add no approved coverage."""
     validate_graph(graph)
     assertions = {a["id"]: a for a in graph["assertions"] if a["status"] == "approved"}
     reviewed = {e['id']: e for e in graph['entities'] if e['status'] == 'approved'
                 and e['disposition'] == 'included' and e['review_depth'] == 'full_source'}
-    direct = {eid for eid, e in reviewed.items() if any(aid in assertions for aid in e['assertion_ids'])}
+    def own_evidence(e):
+        return any(aid in assertions and assertions[aid]['subject_id'] == e['id'] for aid in e['assertion_ids'])
+    direct = {eid for eid, e in reviewed.items() if own_evidence(e)}
     # Count a reviewed work/family once when its explicitly linked, reviewed
     # manifestation has approved evidence. This is coverage roll-up only: no
     # supplier relationship or other factual edge is inferred through a parent.
@@ -592,10 +598,27 @@ def coverage_summary(graph):
         assertions[aid]["subject_id"] == e["id"] and assertions[aid]["predicate"] == "has_capability"
         for aid in e["assertion_ids"] if aid in assertions)]
     legacy = [e for e in graph["entities"] if e["legacy_id"] is not None]
-    disposed = lambda e: e["disposition"] in {"included", "excluded", "historical_only"} and any(aid in assertions for aid in e["assertion_ids"])
     core_ids = set(graph["coverage"]["frozen_core"]["entity_ids"])
-    core_disposed = sum(disposed(e) for e in graph["entities"] if e["id"] in core_ids)
-    counts = {"coverage_method_version": "1.1.0", "legacy_organizations": len(legacy), "legacy_dispositions": sum(disposed(e) for e in legacy),
+    # A deeply reviewed work/family has an explicit disposition even when its
+    # approved observations correctly attach to the exact inspected version.
+    # This uses the same reviewed-parent proof as coverage, never copied claims
+    # or a transitive supplier relationship. Candidate/abstract parents or
+    # manifestations cannot supply this proof.
+    qualifying_ids = {e['id'] for e in qualifying}
+    def core_dispositioned(e):
+        if e['disposition'] == 'included':
+            return e['id'] in qualifying_ids
+        return (e['disposition'] in {'excluded', 'historical_only'}
+                and e['status'] != 'candidate' and e['review_depth'] == 'full_source'
+                and own_evidence(e))
+    core_disposed = sum(core_dispositioned(e) for e in graph["entities"] if e["id"] in core_ids)
+    # A completed inclusion audit may leave commercial qualification unresolved.
+    # Its bounded source-content review still needs approved, subject-owned
+    # evidence with all three actual roles. It does not disposition that record
+    # for the separate frozen-core gate or turn it into a qualifying supplier.
+    legacy_audits = sum(e['review_depth'] == 'full_source' and own_evidence(e) for e in legacy)
+    counts = {"coverage_method_version": "1.3.0", "legacy_organizations": len(legacy),
+              "legacy_inclusion_audits": legacy_audits, "legacy_dispositions": sum(core_dispositioned(e) for e in legacy),
               "qualifying_suppliers": len(suppliers), "reviewed_papers": sum(e["kind"] in {"paper", "paper_work"} for e in qualifying),
               "dataset_families": len({e["family_id"] for e in qualifying if e["kind"] in {"dataset", "dataset_family"}}),
               "benchmark_families": len({e["family_id"] for e in qualifying if e["kind"] in {"benchmark", "benchmark_family"}}),
@@ -615,11 +638,18 @@ def coverage_summary(graph):
     return counts
 
 
-def _redact(value):
+def _redact(value, path=()):
     if isinstance(value, dict):
-        return {k: _redact(v) for k, v in value.items() if not re.search(r"email|phone|secret|token|cache_path|raw_body|credential", k, re.I)}
+        # This typed map is keyed by assertion IDs, not by metadata field names.
+        # For example, a scientific "token-format" ID must retain its review
+        # binding. Validation still checks every ID, digest and exact assertion;
+        # all values still pass through credential/contact redaction below.
+        bindings = (len(path) == 3 and path[0] == 'reviews'
+                    and isinstance(path[1], int) and path[2] == 'assertion_sha256')
+        return {k: _redact(v, path + (k,)) for k, v in value.items()
+                if bindings or not re.search(r"email|phone|secret|token|cache_path|raw_body|credential", k, re.I)}
     if isinstance(value, list):
-        return [_redact(v) for v in value]
+        return [_redact(v, path + (i,)) for i, v in enumerate(value)]
     if isinstance(value, str):
         return SECRET.sub("[redacted credential]", EMAIL.sub("[redacted email]", value))
     return value
