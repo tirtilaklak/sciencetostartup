@@ -378,6 +378,48 @@ test('profile tabs keep keyboard focus visible after narrow reflow', async ({ pa
   await expect(page.locator('#profile-pane-business')).not.toBeVisible();
 });
 
+test('profile panes render on first activation and preserve anchors, evidence and history', async ({ page }) => {
+  await ready(page, '#company/mercor/work');
+  await expect(page.locator('#profile-pane-work [data-work-route]').first()).toBeVisible();
+  for (const key of ['business', 'traction', 'people']) {
+    await expect(page.locator('#profile-pane-' + key)).toBeEmpty();
+    await expect(page.locator('#profile-pane-' + key)).toHaveAttribute('data-profile-pending');
+  }
+  await page.evaluate(() => { location.hash = '#company/mercor/products'; });
+  await expect(page.locator('#profile-products')).toBeVisible();
+  await expect(page.locator('#profile-pane-business')).not.toHaveAttribute('data-profile-pending');
+  await expect(page.locator('[data-profile-product="Human data & evals"]')).toBeVisible();
+  const more = page.locator('#profile-pane-business details.profile-disclosure').first();
+  await more.locator('summary').click();
+  await expect(more).toHaveAttribute('open');
+  await page.locator('#profile-tab-traction').click();
+  await expect(page.locator('#profile-traction')).toBeVisible();
+  await expect(page.locator('#profile-pane-traction')).not.toHaveAttribute('data-profile-pending');
+  await expect(page.locator('#profile-pane-traction')).toContainText('Annualized pace');
+  const source = page.locator('#profile-traction [data-claim]').first();
+  await source.click();
+  await expect(page.locator('#evidence-dialog')).toBeVisible();
+  await expect(page.locator('#evidence-content .sources-list a').first()).toHaveAttribute('href', /^https:\/\//);
+  await page.locator('#close-evidence').click();
+  await page.locator('#profile-tab-people').click();
+  await expect(page.locator('#profile-people')).toBeVisible();
+  await expect(page.locator('#profile-pane-people')).toContainText('Brendan Foody');
+  // Tabs replace the current address; explicit section links create Back/Forward entries.
+  await page.evaluate(() => { location.hash = '#company/mercor/traction'; });
+  await expect(page.locator('#profile-traction')).toBeVisible();
+  await page.evaluate(() => { location.hash = '#company/mercor/people'; });
+  await expect(page.locator('#profile-people')).toBeVisible();
+  await page.goBack();
+  await expect(page.locator('#profile-tab-traction')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#profile-traction')).toBeVisible();
+  await page.goForward();
+  await expect(page.locator('#profile-tab-people')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#profile-people')).toBeVisible();
+  await page.evaluate(() => { location.hash = '#company/mercor/products'; });
+  await expect(page.locator('#profile-products')).toBeVisible();
+  await expect(more).toHaveAttribute('open');
+});
+
 test('a pending profile keeps its sourced introduction while withholding evidence and retains it after validation', async ({ page }) => {
   await ready(page);
   let releaseMercor;
