@@ -693,10 +693,10 @@ def load_work_routes(path, data):
 REDESIGN_CSS = ("profiles-v2.css", "work-v4.css", "investor.css", "edition.css", "business-health.css", "site-nav.css", "overview.css", "directory.css", "profiles-v3.css", "work-v5.css", "method.css", "refresh.css", "field-guide.css")
 # Scripts concatenated after work-v3.js and before initialize(); later declarations replace earlier ones.
 # business-health.js runs as soon as it loads and reads app.js constants, so it comes last, after every declaration.
-PRESENTATION_JS = ("work-v4.js", "profiles-v2.js", "source-updates.js", "site-nav.js", "profile-details.js", "business-health.js")
+PRESENTATION_JS = ("work-v4.js", "profiles-v2.js", "source-updates.js", "site-nav.js", "detail-views.js", "source-update-details.js", "profile-details.js", "business-health.js")
 # Keep the logical source order above for full-context/VM checks. The overview
 # workbench is registered separately and initialized only by the route loader.
-INITIAL_PRESENTATION_JS = tuple(name for name in PRESENTATION_JS if name not in {"profile-details.js", "business-health.js"})
+INITIAL_PRESENTATION_JS = tuple(name for name in PRESENTATION_JS if name not in {"detail-views.js", "source-update-details.js", "profile-details.js", "business-health.js"})
 # Presentation data ships as JSON text that is parsed on first read. JSON parses much faster than the
 # same data compiled as a JavaScript object, and a page that never reads a dataset never parses it.
 LAZY_DATA = "(()=>{const lazy=(name,text)=>{let value,ready=false;Object.defineProperty(window,name,{configurable:true,enumerable:true,get(){if(!ready){ready=true;value=JSON.parse(text);text=null;}return value;},set(next){ready=true;value=next;text=null;}});};"
@@ -713,7 +713,7 @@ def lazy_data(name, value):
 
 def write_business_health_module(destination, build_id):
     """Emit a classic factory without running the workbench or touching the DOM."""
-    deferred = "\n".join((ROOT / 'web' / name).read_text() for name in ('profile-details.js', 'business-health.js'))
+    deferred = "\n".join((ROOT / 'web' / name).read_text() for name in ('detail-views.js', 'source-update-details.js', 'profile-details.js', 'business-health.js'))
     source = "window.SCIENCE_HEALTH_MODULE={buildId:" + json.dumps(build_id) + ",initialize:function(){\n" + deferred + "\n}};"
     transformed = package_frontend(javascript={"health": source})["javascript"]["health"]
     # Independent classic transforms can generate similarly named helpers.

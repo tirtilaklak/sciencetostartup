@@ -115,8 +115,8 @@
    find-in-page, keyboard focus and assistive technology can reveal any record. */
 @supports(content-visibility:auto){
  @media screen{
-  .r-assertion,.r-source{content-visibility:auto;contain-intrinsic-block-size:auto 36rem}
-  .r-source{contain-intrinsic-block-size:auto 28rem}
+  .research:not(.r-company-supplement) .r-assertion,.research:not(.r-company-supplement) .r-source{content-visibility:auto;contain-intrinsic-block-size:auto 36rem}
+  .research:not(.r-company-supplement) .r-source{contain-intrinsic-block-size:auto 28rem}
   /* Resolve every preceding height before a native fragment or keyboard jump.
      This also preserves native Back/Forward positions across browser engines. */
   .research:has(:target) :is(.r-assertion,.r-source),.research:has(.r-assertion:focus-within,.r-source:focus-within) :is(.r-assertion,.r-source){content-visibility:visible;contain-intrinsic-size:none}

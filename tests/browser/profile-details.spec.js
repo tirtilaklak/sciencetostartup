@@ -12,6 +12,7 @@ test('company and work browsing keep the detailed renderer factory unloaded', as
   await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
   await expect(page.locator('[data-company-card]')).toHaveCount(39);
   expect(await page.evaluate(() => window.ScienceProfileDetails)).toBeUndefined();
+  expect(await page.evaluate(() => window.ScienceDetailViews)).toBeUndefined();
   await page.locator('.topbar a[data-nav="work"]').click();
   await expect(page.locator('#work-cards')).toContainText('Named listings');
   await page.locator('#work-search').fill('Python');
@@ -19,6 +20,7 @@ test('company and work browsing keep the detailed renderer factory unloaded', as
   await expect(page.locator('#work-cards')).toContainText(/Python/i);
   expect(moduleRequests).toEqual([]);
   expect(await page.evaluate(() => window.ScienceProfileDetails)).toBeUndefined();
+  expect(await page.evaluate(() => window.ScienceDetailViews)).toBeUndefined();
 });
 
 test('the sourced introduction survives a pending factory and all profile panes use its renderers', async ({ page }) => {
@@ -60,11 +62,11 @@ test('the sourced introduction survives a pending factory and all profile panes 
   await expect(page.locator('#profile-questions [data-claim-record]').first()).toBeVisible();
 });
 
-for (const mode of ['missing', 'stale']) {
-  test(`a ${mode} renderer registration fails visibly and recovers through the existing retry`, async ({ page }) => {
+for (const registry of ['ScienceProfileDetails', 'ScienceDetailViews']) for (const mode of ['missing', 'stale']) {
+  test(`a ${mode} ${registry} registration fails visibly and recovers through the existing retry`, async ({ page }) => {
     // The actual SRI-checked factory still loads. Inject only the post-initialization
     // registration fault so the loader's registry validation is exercised directly.
-    await page.addInitScript(fault => {
+    await page.addInitScript(({fault, registry}) => {
       window.testRendererFault = fault;
       let factory;
       Object.defineProperty(window, 'SCIENCE_HEALTH_MODULE', {
@@ -74,13 +76,13 @@ for (const mode of ['missing', 'stale']) {
           const initialize = value.initialize;
           value.initialize = function () {
             initialize.call(this);
-            if (window.testRendererFault === 'missing') delete window.ScienceProfileDetails;
-            if (window.testRendererFault === 'stale') window.ScienceProfileDetails = { ...window.ScienceProfileDetails, buildId: 'older-profile-release' };
+            if (window.testRendererFault === 'missing') delete window[registry];
+            if (window.testRendererFault === 'stale') window[registry] = { ...window[registry], buildId: 'older-profile-release' };
           };
           factory = value;
         },
       });
-    }, mode);
+    }, {fault: mode, registry});
     await page.goto('/explore/#company/mercor/work');
     await expect(page.locator('html')).toHaveAttribute('data-view-state', 'failed');
     await expect(page.getByRole('heading', { name: 'This company’s evidence could not load.' })).toBeVisible();

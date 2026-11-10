@@ -30,7 +30,7 @@ class CaptureURL extends URL {static createObjectURL(blob){downloadedBlob=blob;r
 const context=vm.createContext({document,window,history,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,URLSearchParams,Blob,queueMicrotask,setTimeout:()=>{},clearTimeout:()=>{},console});
 // The icon script runs first. This stub's window is separate from its global.
 // Combining the remaining modules matches declaration hoisting in the build.
-const modules=['web/icons.js','web/app.js','web/editorial.js','web/work-v3.js','web/work-v4.js','web/profiles-v2.js','web/source-updates.js','web/site-nav.js','web/profile-details.js','web/business-health.js'];
+const modules=['web/icons.js','web/app.js','web/editorial.js','web/work-v3.js','web/work-v4.js','web/profiles-v2.js','web/source-updates.js','web/site-nav.js','web/detail-views.js','web/source-update-details.js','web/profile-details.js','web/business-health.js'];
 vm.runInContext(fs.readFileSync(path.join(root,modules[0]),'utf8'),context);
 context.iconHTML=window.iconHTML;
 assert.equal(typeof context.iconHTML,'function');
