@@ -5,11 +5,97 @@ import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
 import {gzipSync} from 'node:zlib';
+import {spawnSync} from 'node:child_process';
 import {archiveLeak, checkPayloadBudgets, compressedSizes, extractBootstrapScripts,
   loadArtifactManifest, readBudgets, resourceReferences, sha256, stableJSON} from '../scripts/payload_budgets.mjs';
 import {median, mobileHeroRequests, summarizeRoutes, verifyServedArtifact} from '../scripts/performance_audit.mjs';
 
 const {policy, sha256: policySha256} = await readBudgets();
+
+const repositoryRoot = path.resolve(import.meta.dirname, '..');
+const browserWorkflow = await readFile(path.join(repositoryRoot, '.github/workflows/browser-qa.yml'), 'utf8');
+
+function browserJob(name) {
+  const lines = browserWorkflow.split('\n');
+  const start = lines.indexOf('  ' + name + ':');
+  assert(start >= 0, 'Missing browser job: ' + name);
+  const end = lines.findIndex((line, index) => index > start && /^  [\w-]+:$/.test(line));
+  return lines.slice(start + 1, end < 0 ? undefined : end).join('\n');
+}
+
+function browserSelection(name) {
+  const command = browserJob(name).match(/^      - run: npm run test:browser -- (.+)$/m);
+  assert(command, 'Missing browser command: ' + name);
+  const selection = command[1].match(/^(--grep(?:-invert)?) '([^']+)'( --workers=1)?$/);
+  assert(selection, 'Unexpected browser command: ' + command[1]);
+  return [selection[1], selection[2], ...(selection[3] ? ['--workers=1'] : [])];
+}
+
+function listBrowserTests(args = []) {
+  const listed = spawnSync(process.execPath, ['node_modules/@playwright/test/cli.js', 'test',
+    '--list', '--reporter=json', ...args], {cwd: repositoryRoot, encoding: 'utf8',
+    env: {...process.env, CI: '1', PLAYWRIGHT_JSON_OUTPUT_FILE: '', PLAYWRIGHT_JSON_OUTPUT_NAME: '', PLAYWRIGHT_JSON_OUTPUT_DIR: ''}});
+  assert.equal(listed.status, 0, listed.stderr || listed.error?.message);
+  const report = JSON.parse(listed.stdout);
+  assert.deepEqual(report.errors, []);
+  const entries = [];
+  function visit(suites) {
+    for (const suite of suites) {
+      for (const spec of suite.specs || []) {
+        for (const check of spec.tests) entries.push({key: check.projectName + '\0' + spec.id,
+          project: check.projectName, file: spec.file, title: spec.title, timeout: check.timeout});
+      }
+      visit(suite.suites || []);
+    }
+  }
+  visit(report.suites);
+  assert.equal(new Set(entries.map(entry => entry.key)).size, entries.length, 'Duplicate test identity');
+  return {entries, config: report.config};
+}
+
+test('browser CI partitions preserve every Playwright test and isolate all five full-report scans', () => {
+  const coreArgs = browserSelection('browser-core');
+  const reportArgs = browserSelection('report-accessibility');
+  const reportTitle = 'no serious or critical accessibility violations on /research/state-of-ai-data-labs/';
+  assert.deepEqual(coreArgs, ['--grep-invert', reportTitle + '$']);
+  assert.deepEqual(reportArgs, ['--grep', reportTitle + '$', '--workers=1']);
+  const all = listBrowserTests();
+  const core = listBrowserTests(coreArgs);
+  const report = listBrowserTests(reportArgs);
+  const keys = inventory => inventory.entries.map(entry => entry.key).sort();
+  const coreKeys = new Set(keys(core));
+  assert(report.entries.every(entry => !coreKeys.has(entry.key)), 'CI partitions overlap');
+  assert.deepEqual([...keys(core), ...keys(report)].sort(), keys(all), 'CI must execute exactly the complete inventory');
+  assert.equal(all.entries.length, 575);
+  assert.equal(core.entries.length, 570);
+  assert.equal(report.entries.length, 5);
+  assert.deepEqual(report.entries.map(entry => entry.project).sort(),
+    ['chromium', 'firefox', 'mobile-chromium', 'mobile-webkit', 'webkit']);
+  for (const entry of report.entries) {
+    assert.equal(entry.file, 'research.spec.js');
+    assert.equal(entry.title, reportTitle);
+    assert.equal(entry.timeout, 30_000);
+  }
+  assert.equal(core.config.workers, 2);
+  assert.equal(report.config.workers, 1);
+});
+
+test('required browser check fails unless both CI partitions succeed', () => {
+  const job = browserJob('browser');
+  assert.match(job, /^    if: \$\{\{ always\(\) \}\}$/m);
+  assert.match(job, /^    needs: \[browser-core, report-accessibility\]$/m);
+  assert.match(job, /^          CORE_RESULT: \$\{\{ needs\.browser-core\.result \}\}$/m);
+  assert.match(job, /^          REPORT_RESULT: \$\{\{ needs\.report-accessibility\.result \}\}$/m);
+  const script = job.split('        run: |\n')[1];
+  assert(script, 'Missing required-check script');
+  for (const core of ['success', 'failure', 'cancelled', 'skipped']) {
+    for (const report of ['success', 'failure', 'cancelled', 'skipped']) {
+      const result = spawnSync('bash', ['-e', '-o', 'pipefail', '-c', script], {
+        env: {...process.env, CORE_RESULT: core, REPORT_RESULT: report}, encoding: 'utf8'});
+      assert.equal(result.status === 0, core === 'success' && report === 'success', core + '/' + report);
+    }
+  }
+});
 
 async function fixture(t) {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'field-guide-budget-'));

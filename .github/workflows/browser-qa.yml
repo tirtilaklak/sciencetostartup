@@ -5,7 +5,7 @@ on:
     branches: [main]
   pull_request:
 jobs:
-  browser:
+  browser-core:
     # Keep the browser/performance host stable across ubuntu-latest migrations.
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -20,13 +20,48 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:browser:install
-      - run: npm run test:browser
+      - run: npm run test:browser -- --grep-invert 'no serious or critical accessibility violations on /research/state-of-ai-data-labs/$'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: browser-qa
+          name: browser-core-qa
           path: output/browser-qa/
           retention-days: 14
+  report-accessibility:
+    # Give the complete report DOM a dedicated runner without changing its scan.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:browser:install
+      - run: npm run test:browser -- --grep 'no serious or critical accessibility violations on /research/state-of-ai-data-labs/$' --workers=1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-accessibility-qa
+          path: output/browser-qa/
+          retention-days: 14
+  browser:
+    # Preserve the required check, including failures, cancellations and skips.
+    if: ${{ always() }}
+    needs: [browser-core, report-accessibility]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require both browser partitions to pass
+        env:
+          CORE_RESULT: ${{ needs.browser-core.result }}
+          REPORT_RESULT: ${{ needs.report-accessibility.result }}
+        run: |
+          test "$CORE_RESULT" = success
+          test "$REPORT_RESULT" = success
   performance:
     # Keep the browser/performance host stable across ubuntu-latest migrations.
     runs-on: ubuntu-24.04
