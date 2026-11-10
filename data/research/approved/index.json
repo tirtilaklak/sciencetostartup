@@ -1,8 +1,8 @@
 {
   "partitions": [
     {
-      "path": "01-papers-2026-11-09.json",
-      "sha256": "41b85f81b52746fc265e73732c8f3af194a81b32ffc7dfc1d2fefcd1f0a25b9a"
+      "path": "01-papers-2026-11-09.reference-quarantine-v1.json",
+      "sha256": "561079f4c0501dbf97fea935960af7860b95a55133d85a686bd72d0d203bce75"
     },
     {
       "path": "02-suppliers-2026-11-09.json",
@@ -17,8 +17,8 @@
       "sha256": "f5d90ab8f21dd0d524f94ac6b853c956053145f6c23638ad6a9c027f8410422d"
     },
     {
-      "path": "05-suppliers-cohort2-2026-11-10.json",
-      "sha256": "4cc7c30a85f4d7fb8e31a73b1367dda8f21676c9d3ad752710b6e3975fdbdb53"
+      "path": "05-suppliers-cohort2-2026-11-10.reference-quarantine-v1.json",
+      "sha256": "c177726f26be9b3282a85250b470df56a044184d0b79f5f86d08c4a5dd2834c6"
     },
     {
       "path": "06-datasets-cohort2-2026-11-10.json",
@@ -29,36 +29,36 @@
       "sha256": "9e95991bc56fa9e21f4030b1f2bc7b7194107a823585706e0c6e9d5a33325d85"
     },
     {
-      "path": "08-papers-cohort4-2026-11-10.json",
-      "sha256": "61f15145e2ca64455db11057db69334de0376124d91ca3800c1e650b132188df"
+      "path": "08-papers-cohort4-2026-11-10.reference-quarantine-v1.json",
+      "sha256": "770880e1efa3c3f7cd793ae6c8e6f3eb76054207ffc39a7dfdafe344406d2a59"
     },
     {
       "path": "09-suppliers-cohort3-2026-11-10.json",
       "sha256": "1e075d1ff297c016bda39f3d3cb20c296e8719459b5168b8ddff5916e0cc7b9d"
     },
     {
-      "path": "10-datasets-cohort3-2026-11-10.json",
-      "sha256": "6274c25b91e562e58329796c74ad14a303bc7955332506b9e79a139ad9ce9860"
+      "path": "10-datasets-cohort3-2026-11-10.reference-quarantine-v1.json",
+      "sha256": "9fa1bf2e4eac5865c1d3e17a47e802c208f2dd43bd9dfa33ad226ac45a37893f"
     },
     {
-      "path": "11-suppliers-cohort4-2026-11-10.json",
-      "sha256": "46ae2820f439477c2713454e9c261a864c3fb3aad69748c49652d821eaaf0cdb"
+      "path": "11-suppliers-cohort4-2026-11-10.reference-quarantine-v1.json",
+      "sha256": "b96be8226badc317dfe9b23700098ac556b3c79bdcb293f48a50671135569449"
     },
     {
-      "path": "12-datasets-cohort4-2026-11-10.json",
-      "sha256": "9bbff9e1b7fe59eb980bc7af1562a4a3e86a4dc79931473b051ac9f3f41be7af"
+      "path": "12-datasets-cohort4-2026-11-10.reference-quarantine-v1.json",
+      "sha256": "9ddd4321f2032f41a5da36523f53c6085f7faf52de340bd938c9bb96bc8e2569"
     },
     {
       "path": "13-papers-cohort5-2026-11-10.json",
       "sha256": "754053c91dd9e3f725ed3767ab567a141e1ee990617adc381f71a91f74ca7571"
     },
     {
-      "path": "14-papers-cohort6-2026-11-10.json",
-      "sha256": "93e9500fa2af1a04b309a196e764d8fe7c8570544aa626347d7def32320c91c0"
+      "path": "14-papers-cohort6-2026-11-10.reference-quarantine-v1.json",
+      "sha256": "1b509e5b02b550b28295c0acc3a4408d3179f804f9055e27b346c33832cd000c"
     },
     {
-      "path": "15-suppliers-cohort5-2026-11-10.json",
-      "sha256": "d9025204728ce63748aa9ff8f52b86a335ee448a3496ea017899264ea06cd297"
+      "path": "15-suppliers-cohort5-2026-11-10.reference-quarantine-v1.json",
+      "sha256": "15d316e66ed5cfe856c1d5cde7f6e6720627d24279828177dbec453315d29f59"
     },
     {
       "path": "16-datasets-cohort5-2026-11-10.json",
@@ -69,8 +69,8 @@
       "sha256": "9c4fc7a6add2d999cd6dea8630ac7a6ec1bf10efd412cb98a39ff0a89cd99e32"
     },
     {
-      "path": "18-papers-cohort8-2026-11-10.json",
-      "sha256": "4d9ed6057cc27069a29c7085deb0fd27f31aafc567fd09cfdd4d8829785fed02"
+      "path": "18-papers-cohort8-2026-11-10.reference-quarantine-v1.json",
+      "sha256": "d3672435a7d2be24fba930971353050f9a9647b4e4749188b9894193103d28e7"
     },
     {
       "path": "19-suppliers-cohort6-2026-11-10.json",
