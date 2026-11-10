@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -201,7 +202,7 @@ def publication_gate(graph, report, policy=None):
     supplied = policy.get("launch_floors", {})
     for key, floor in FLOORS.items():
         value = supplied.get(key, floor)
-        if isinstance(value, bool) or not isinstance(value, (float, int)) or value < floor:
+        if isinstance(value, bool) or not isinstance(value, (float, int)) or not math.isfinite(value) or value < floor:
             reasons.append(f"Policy cannot lower the {key} launch floor below {floor}.")
         else:
             thresholds[key] = value
@@ -244,20 +245,25 @@ def publication_gate(graph, report, policy=None):
         errors, metrics[kind] = _audit(audits.get(kind), kind, graph, thresholds)
         reasons.extend(errors)
     # A reference-quality audit and a screening-recall audit are separate samples.
-    reference_ids = {item.get("id") for item in audits.get("reference", {}).get("items", [])}
-    screening_ids = {item.get("id") for item in audits.get("screening", {}).get("items", [])}
+    reference_ids = {item.get("id") for item in (audits.get("reference") or {}).get("items", [])}
+    screening_ids = {item.get("id") for item in (audits.get("screening") or {}).get("items", [])}
     if reference_ids & screening_ids:
         reasons.append("Reference and screening holdouts must be separate samples.")
+    reasons = list(dict.fromkeys(reasons))
+    archival_ready = not reasons
+    archive_reasons = []
     archive = report.get("archive", {})
-    if not (archive.get("status") == "published" and re.fullmatch(r"10\.\d{4,9}/\S+", archive.get("doi", ""))
+    if not (archive.get("status") == "published" and re.fullmatch(r"10\.\d{4,9}/\S+", archive.get("doi") or "")
             and str(archive.get("record_url", "")).startswith("https://")
-            and re.fullmatch(r"[0-9a-f]{64}", archive.get("artifact_sha256", ""))
+            and re.fullmatch(r"[0-9a-f]{64}", archive.get("artifact_sha256") or "")
             and archive.get("release_id") == report.get("release_id") and archive.get("confirmed_on")):
-        reasons.append("An actual public versioned archive receipt with DOI and exact artifact digest is required; a prepared package is not publication.")
+        archive_reasons.append("An actual public versioned archive receipt with DOI and exact artifact digest is required; a prepared package is not publication.")
+    reasons.extend(archive_reasons)
     reasons = list(dict.fromkeys(reasons))
     return {"ready": not reasons, "status": "ready" if not reasons else "prelaunch",
             "reasons": reasons, "coverage": coverage, "audit_metrics": metrics,
-            "thresholds": thresholds, "source_cutoff": report.get("source_cutoff")}
+            "thresholds": thresholds, "source_cutoff": report.get("source_cutoff"),
+            "archival_ready": archival_ready, "archive_reasons": archive_reasons}
 
 
 def build_context(root=ROOT):

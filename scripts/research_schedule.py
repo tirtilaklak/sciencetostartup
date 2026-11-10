@@ -234,6 +234,7 @@ def activate_candidate(directory, candidate_id, now):
         events = read_journal(directory)
         activated = [event for event in events if event["kind"] == "activated"]
         if activated and activated[-1]["payload"].get("candidate_sha256") == candidate_id:
+            _atomic_json(Path(directory) / "active.json", activated[-1]["payload"])
             return {"status": "already_active", "candidate_sha256": candidate_id}
         edition = candidate["identity"]["edition_id"]
         if activated and edition <= activated[-1]["payload"]["edition_id"]:
