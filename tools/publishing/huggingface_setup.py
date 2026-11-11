@@ -58,16 +58,30 @@ does not prove permission to create or modify an organization repository.
     fine = token.get("fineGrained", {})
     fine = fine if isinstance(fine, dict) else {}
     scoped = fine.get("scoped", [])
+    owner_id = identity.get("id")
+    owner_id_known = isinstance(owner_id, str) and bool(OBJECT_ID.fullmatch(owner_id))
+    # Hub includes a zero-permission owner descriptor beside the dataset grant.
+    # It is metadata only when both identifiers bind the authenticated owner.
+    def empty_owner_descriptor(entry):
+        if not isinstance(entry, dict) or set(entry) != {"entity", "permissions"}:
+            return False
+        entity = entry["entity"]
+        return (owner_id_known and entry["permissions"] == [] and isinstance(entity, dict)
+                and set(entity) == {"type", "_id", "name"}
+                and entity["type"] == "user" and entity["_id"] == owner_id
+                and entity["name"] == safe_name)
+    resources = ([entry for entry in scoped if not empty_owner_descriptor(entry)]
+                 if isinstance(scoped, list) else [])
     target_only = False
     write = False
     content_only = False
     repo_id = dataset.get("id")
     dataset_matches = repo_id == repository
     if (token.get("role") == "fineGrained" and dataset_matches
-            and isinstance(scoped, list) and len(scoped) == 1
+            and isinstance(scoped, list) and 1 <= len(scoped) <= 2 and len(resources) == 1
             and not (set(fine) - {"scoped", "global", "canReadGatedRepos"})
             and fine.get("global", []) == [] and fine.get("canReadGatedRepos", False) is False):
-        entry = scoped[0]
+        entry = resources[0]
         entry = entry if isinstance(entry, dict) else {}
         entity = entry.get("entity", {})
         entity = entity if isinstance(entity, dict) else {}
@@ -76,8 +90,12 @@ does not prove permission to create or modify an organization repository.
                       and entity.get("_id") == object_id)
         name_matches = entity.get("name") == repository and object_id is None
         permissions = entry.get("permissions", [])
+        author_matches = ("authorId" not in entity or
+                          (owner_id_known and entity["authorId"] == owner_id))
+        name_consistent = "name" not in entity or entity["name"] == repository
         if (not (set(entry) - {"entity", "permissions"})
-                and not (set(entity) - {"type", "_id", "name"})
+                and not (set(entity) - {"type", "_id", "name", "authorId"})
+                and author_matches and name_consistent
                 and entity.get("type") == "dataset" and (id_matches or name_matches)
                 and isinstance(permissions, list) and all(isinstance(item, str) for item in permissions)):
             rights = set(permissions)

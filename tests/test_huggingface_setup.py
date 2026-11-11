@@ -52,6 +52,28 @@ class ScopeTests(unittest.TestCase):
         scope[1]["entity"]["_id"] = "b" * 24
         self.assertFalse(self.evidence(identity, dataset)["target_only_scope_evidence"])
 
+    def test_owner_descriptor_and_dataset_author_are_not_extra_grants(self):
+        identity, dataset = fixture()
+        identity["id"] = "c" * 24
+        scope = identity["auth"]["accessToken"]["fineGrained"]["scoped"]
+        scope[0]["entity"].update(name="test-owner/test-dataset", authorId=identity["id"])
+        scope.append({"entity": {"type": "user", "_id": identity["id"], "name": identity["name"]},
+                      "permissions": []})
+        result = self.evidence(identity, dataset)
+        self.assertTrue(result["target_only_scope_evidence"])
+        self.assertTrue(result["target_write_scope_evidence"])
+        self.assertFalse(result["remote_write_verified"])
+        for change in ("owner_name", "owner_id", "owner_grant", "dataset_author", "dataset_name"):
+            with self.subTest(change=change):
+                altered = copy.deepcopy(identity)
+                rows = altered["auth"]["accessToken"]["fineGrained"]["scoped"]
+                if change == "owner_name": rows[1]["entity"]["name"] = "someone-else"
+                if change == "owner_id": rows[1]["entity"]["_id"] = "d" * 24
+                if change == "owner_grant": rows[1]["permissions"] = ["repo.write"]
+                if change == "dataset_author": rows[0]["entity"]["authorId"] = "d" * 24
+                if change == "dataset_name": rows[0]["entity"]["name"] = "test-owner/other"
+                self.assertFalse(self.evidence(altered, dataset)["target_only_scope_evidence"])
+
     def test_namespace_scope_is_rejected(self):
         identity, dataset = fixture()
         identity["auth"]["accessToken"]["fineGrained"]["scoped"][0]["entity"]["type"] = "user"
