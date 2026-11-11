@@ -214,7 +214,10 @@ def run(root, state, at, max_partitions=4, oai_pages=20):
             path = state / "candidates" / (row["id"] + ".json")
             write_json(path, result)
             summary = {"attempted_at": stamp, "complete": bool(result["complete"]),
-                       "candidates": len(result["candidates"]), "result_path": str(path), "approved": False}
+                       "candidates": len(result["candidates"]), "result_path": str(path), "approved": False,
+                       "requests_made": result.get("requests_made", 0),
+                       "retry_reason": result.get("retry_reason"),
+                       "token_restarts": result.get("token_restarts", 0)}
         except Exception as error:
             # Every failed partition remains explicit and eligible for later retry.
             summary = {"attempted_at": stamp, "complete": False, "approved": False,

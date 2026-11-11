@@ -13,21 +13,27 @@ and `/review/` accepts source-backed corrections, section review and reuse.
 Essential content and downloads work without JavaScript. Both site search
 implementations link directly to native research and organization pages.
 
-The comprehensive weekly series is **prelaunch**. The recorded integration
-checkpoint at commit `5b414bd` contains 959 approved assertions: 43 qualifying suppliers, 72 reviewed
-paper works, 45 dataset families, 21 benchmark families and 25 of the 39 existing
-organization inclusion dispositions. Its 991 scoped evidence records represent
-334 distinct captured document versions. Every approved assertion has separate
+The comprehensive weekly series is **prelaunch**. The live research checkpoint,
+merged in PR #13 and retained at commit `fc94a92`, contains 1,713 approved
+assertions: 65 qualifying suppliers, 152 reviewed paper works, 63 dataset families,
+21 benchmark families and inclusion audits of all 39 existing organizations.
+Commercial qualification remains unresolved for one of those organizations;
+an inclusion audit does not establish supplier qualification. Its 1,789 captured
+scoped source records represent 503 distinct document versions. Every approved assertion has separate
 author, source-verifier and adversarial AI source-content reviews at its exact
 digest. Reading scopes remain explicit; this does not imply cover-to-cover paper
 reading, experiment reproduction or an operational supplier audit.
 
-The expanded report synthesis, its independent content reviews and its matching
-PDF/archive are unfinished. The earlier frozen 173-assertion report has 12 chapters,
-six executive findings and its own synthesis reviews; those receipts and prepared
-bytes cannot approve this expanded graph. Historical field-guide evidence retains
-its real dates and labels. Unresolved dataset-family boundaries remain pending and
-do not inflate coverage.
+The live report contains 12 chapters, 65 supplier dossiers, 152 paper records,
+10 buyer pilot guides and nine executive findings. Its exact synthesis passed
+separate evidence and adversarial AI reviews. The matching prepared archive,
+`research-2026-11-10.prelaunch.1`, includes the complete offline report, evidence
+appendix, exports, citations, reproduction instructions and a 244-page PDF.
+This prepared archive is downloadable; it has no registered DOI and is not a
+published weekly edition. Earlier snapshots retain their own frozen bytes and
+review bindings. Historical field-guide evidence retains its real dates and
+labels. Unresolved dataset-family boundaries remain pending and do not inflate
+coverage.
 
 This is not a comprehensive market census. The frozen core and both real
 200-record launch audits are still outstanding. No published edition, human peer
