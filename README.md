@@ -59,7 +59,12 @@ Daily preparation targets 16:00 Pacific; the sole weekly release check targets
 Monday 09:00, with the preceding Friday 17:00 captured-source cutoff. Native
 Codex automations in the implementation chat run on the available local host;
 missed runs are handled as delayed catch-up, never backdated publications.
-Zenodo and Hugging Face remain in **prepare-only** mode until accounts connect.
+Zenodo production, Zenodo Sandbox and Hugging Face authenticated successfully on
+2026-11-10. Their credentials stay in private user configuration outside this
+repository. The setup dataset, `muse26/sciencetostartup-research`, remains private
+and contains no uploaded research. Successful read checks do not establish a
+completed remote write or a publication. Publication remains **prepare-only**
+while research quality gates are held.
 The report stays held until coverage, real holdout audits, evidence, privacy and
 technical checks pass. Archive publication, website activation and mirror status
 are recorded separately, using a locked, recoverable journal.

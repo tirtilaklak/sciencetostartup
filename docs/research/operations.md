@@ -2,8 +2,11 @@
 
 All scheduler actions are offline. They write only a separate state directory;
 they never change canonical data, `web/`, `dist/`, external accounts, or the
-production website. Current policy is `prepare_only` because Zenodo and Hugging
-Face are not connected. A prepared package, reserved DOI, published archive,
+production website. Current policy is `prepare_only` while the research coverage,
+source-cutoff and independent audit gates remain held. Zenodo production,
+Zenodo Sandbox and Hugging Face passed read-only authentication on 2026-11-10;
+the setup Hub repository remains private, without uploaded research.
+A prepared package, reserved DOI, published archive,
 mirror sync, and website deployment are distinct states.
 
 ## Local calendar
@@ -224,6 +227,10 @@ the original journal and inspect the interrupted tail before recovery. Do not
 silently truncate history, delete approvals, or advance activation to make a job
 green. No journal state can stand in for external publication receipts.
 
-Ordinary builds and scheduling need no credentials. When external accounts are
-connected later, keep their credentials outside the repository and implement
-network mutations only through the separately reviewed release adapters.
+Ordinary builds and scheduling need no credentials. The connected accounts use
+private user configuration outside the repository, loaded explicitly with
+`tools/publishing/configure_accounts.py`. Its GET-only checks do not publish,
+reserve a DOI or prove a successful remote write. Use network mutations only
+through the separately reviewed release adapters after the applicable gates pass.
+See [Zenodo account setup](zenodo-account-setup.md) and
+[Hugging Face account setup](huggingface-account-setup.md).

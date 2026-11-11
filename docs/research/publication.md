@@ -3,8 +3,11 @@
 Ordinary builds call `write_publication_assets(context, output)` from
 `scripts/research_citations.py`. This is an offline standard-library operation:
 no login, credential discovery, HTTP request, external account creation or
-publication occurs. The current policy is `prepare_only`. The user has elected
-to prepare inspectable packages until external accounts are connected.
+publication occurs. The current policy is `prepare_only` while research quality
+gates remain held. Zenodo production, Zenodo Sandbox and Hugging Face passed
+read-only authentication on 2026-11-10. Credentials are stored outside the
+repository, and the Hub setup dataset remains private without uploaded research.
+Account connection does not satisfy the evidence, cutoff or release gates.
 
 The generated `publication/` directory contains a full text report, standalone
 offline HTML and evidence appendix, citations in BibTeX, RIS, CSL JSON and Citation File Format, metadata,
