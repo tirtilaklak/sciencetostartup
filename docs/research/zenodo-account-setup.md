@@ -23,7 +23,11 @@ For each token, select **`deposit:write`** and **`deposit:actions`**. The former
 allows deposit edits; the latter allows publishing and edit/discard actions. The
 local checker performs only GET requests. Its successful read check cannot prove
 either scope, so keep the two selected scope names as nonsecret configuration
-evidence. The owner should create and copy the token themselves: the one-time
+evidence. Reuse an existing retained token with both required scopes when
+available; do not create duplicate tokens merely to test connection. A token's
+display name is not its secret value. Blank input preserves an already stored
+local value, but cannot recover a token from its name in the account settings.
+The owner should create and copy any necessary new token themselves: the one-time
 plaintext token must not appear in a chat, screenshot, screen recording, shell
 argument, URL, repository file, or publication artifact.
 
