@@ -201,7 +201,7 @@ def get_json(url, token):
             if response.status != 200 or len(raw) > 1048576:
                 return {"status": "unexpected_response"}
             try:
-                return {"status": "ok", "data": json.loads(raw)}
+                return {"status": "ok", "data": json.loads(raw, object_pairs_hook=_unique_object)}
             except (ValueError, UnicodeError):
                 return {"status": "invalid_json"}
     except urllib.error.HTTPError as error:

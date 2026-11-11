@@ -44,6 +44,11 @@ the authority for current permission fields. `scope_evidence()` interprets the
 response conservatively and returns only non-secret status. It accepts a single
 matching dataset scope and reports a remote write as unverified. A schema change,
 extra resource, extra global access or broad namespace scope cannot silently pass.
+The validated response requires coherent authenticated-user and dataset object
+identities. Unknown fields in the authorization containers, missing identifiers,
+contradictory owner/dataset metadata and duplicate response JSON keys are holds.
+The Hub's empty own-user descriptor is metadata only when its exact user ID and
+name match the authenticated user and its permission list is empty.
 
 ## Prepare inspectable files locally
 
@@ -56,7 +61,11 @@ python3 tools/publishing/huggingface_setup.py --output /absolute/private/path/hf
 The destination must be new and outside the scientific checkout. The tool reads
 the source-selected frozen package using the existing scientific verifier; it
 does not rebuild, rewrite or recompress any scientific bytes. It makes no network
-calls and does not read credentials.
+calls and does not read credentials. Parent aliases are canonically resolved
+before no-follow directory descriptors anchor the destination. The final output
+is created exclusively after package verification; a path that appears or changes
+during staging is refused. Existing directories are never replaced, including
+empty ones. Failure cleanup is confined to the newly created anchored objects.
 
 `mirror-staging/` contains exactly the four payload names used by the existing
 `HuggingFaceMirror` adapter: `README.md`, `research-archive.zip`,

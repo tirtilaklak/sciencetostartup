@@ -80,7 +80,8 @@ python3 tools/publishing/configure_accounts.py --service zenodo --check-only
 each configured Zenodo environment's `/api/deposit/depositions?size=1`, sends the
 token only in the HTTPS `Authorization: Bearer` header, and discards deposit
 details. Every redirect is blocked and ambient proxy variables are ignored.
-Certificate verification remains enabled. No credentials means no request.
+Certificate verification remains enabled. Duplicate JSON response keys are
+rejected as an invalid response. No credentials means no request.
 
 Exit status `0` means the selected service checks passed (or presence-only status
 completed); `2` means at least one account/repository is unconfigured or its read

@@ -233,5 +233,23 @@ class TransportTests(unittest.TestCase):
             self.assertEqual(setup.collect_changes("all"), {})
 
 
+class ResponseSchemaTests(unittest.TestCase):
+    def test_duplicate_server_json_keys_are_sanitized_and_rejected(self):
+        for raw in (b'{"global":["user.tokens.write"],"global":[]}',
+                    b'{"name":"wrong","name":"fixture"}'):
+            with self.subTest(raw=raw):
+                class Response:
+                    status = 200
+                    def __enter__(self): return self
+                    def __exit__(self, *args): return False
+                    def read(self, count): return raw
+                opener = unittest.mock.Mock()
+                opener.open.return_value = Response()
+                with patch.object(setup.urllib.request, "build_opener", return_value=opener):
+                    result = setup.get_json("https://huggingface.co/api/whoami-v2", SYNTHETIC)
+                self.assertEqual(result, {"status": "invalid_json"})
+                self.assertNotIn(SYNTHETIC, json.dumps(result))
+
+
 if __name__ == "__main__":
     unittest.main()
