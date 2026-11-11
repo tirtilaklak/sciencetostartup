@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import re
+import stat
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -144,28 +145,30 @@ def _descriptor(blob):
 
 
 def _open_directory_chain(path, forbidden_identity):
-    """Open/create a canonical directory using anchored, no-follow operations."""
+    """Anchor an existing private parent through protected canonical ancestors.
+
+    The operator must trust processes running as this user. Mode checks do not
+    protect against a hostile same-user process, root, or filesystem ACL grants.
+    """
     descriptor = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     try:
-        opened = os.fstat(descriptor)
-        if (opened.st_dev, opened.st_ino) == forbidden_identity:
-            raise ValueError("Keep local staging outside the scientific source checkout")
-        for part in path.parts[1:]:
-            try:
+        for part in (None, *path.parts[1:]):
+            if part is not None:
                 child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
                                 dir_fd=descriptor)
-            except FileNotFoundError:
-                try:
-                    os.mkdir(part, mode=0o700, dir_fd=descriptor)
-                except FileExistsError:
-                    pass
-                child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
-                                dir_fd=descriptor)
-            os.close(descriptor)
-            descriptor = child
+                os.close(descriptor)
+                descriptor = child
             opened = os.fstat(descriptor)
             if (opened.st_dev, opened.st_ino) == forbidden_identity:
                 raise ValueError("Keep local staging outside the scientific source checkout")
+            # A root-owned sticky system temporary ancestor is acceptable:
+            # its sticky bit protects this user's private child from others.
+            sticky_system = opened.st_uid == 0 and bool(opened.st_mode & stat.S_ISVTX)
+            if (opened.st_uid not in {0, os.getuid()}
+                    or (opened.st_mode & 0o022 and not sticky_system)):
+                raise ValueError("Staging ancestors must be protected from other users")
+        if opened.st_uid != os.getuid() or stat.S_IMODE(opened.st_mode) != 0o700:
+            raise ValueError("Staging parent must already be user-owned with mode 0700")
         return descriptor
     except BaseException:
         os.close(descriptor)
@@ -183,59 +186,36 @@ def _same_entry(directory_fd, name, identity):
     return (info.st_dev, info.st_ino) == identity
 
 
+def _create_private_directory(parent_fd, name):
+    """Exclusively create, then reject a changed mkdir/open handoff."""
+    os.mkdir(name, mode=0o700, dir_fd=parent_fd)
+    created = os.stat(name, dir_fd=parent_fd, follow_symlinks=False)
+    descriptor = os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                         dir_fd=parent_fd)
+    opened = os.fstat(descriptor)
+    if ((opened.st_dev, opened.st_ino) != (created.st_dev, created.st_ino)
+            or opened.st_uid != os.getuid() or stat.S_IMODE(opened.st_mode) != 0o700):
+        os.close(descriptor)
+        raise ValueError("Staging directory changed while opening; retained without writing")
+    return descriptor
+
+
 def _write_new_file(directory_fd, name, blob):
     descriptor = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
                          0o600, dir_fd=directory_fd)
     owned = os.fstat(descriptor)
-    try:
-        with os.fdopen(descriptor, "wb") as stream:
-            os.fchmod(stream.fileno(), 0o600)
-            stream.write(blob)
-            stream.flush()
-            os.fsync(stream.fileno())
-        return (owned.st_dev, owned.st_ino)
-    except BaseException:
-        try:
-            current = os.stat(name, dir_fd=directory_fd, follow_symlinks=False)
-            if (current.st_dev, current.st_ino) == (owned.st_dev, owned.st_ino):
-                os.unlink(name, dir_fd=directory_fd)
-        except OSError:
-            pass
-        raise
-
-
-def _cleanup_created_destination(parent_fd, name, destination_fd, folders, files):
-    """Remove only our anchored objects; never follow a replacement path."""
-    try:
-        info = os.stat(name, dir_fd=parent_fd, follow_symlinks=False)
-        owned = os.fstat(destination_fd)
-        if (info.st_dev, info.st_ino) != (owned.st_dev, owned.st_ino):
-            return
-        for folder, folder_fd in folders.items():
-            for filename, identity in files.get(folder, {}).items():
-                try:
-                    if _same_entry(folder_fd, filename, identity):
-                        os.unlink(filename, dir_fd=folder_fd)
-                except FileNotFoundError:
-                    pass
-            info = os.stat(folder, dir_fd=destination_fd, follow_symlinks=False)
-            owned = os.fstat(folder_fd)
-            if (info.st_dev, info.st_ino) == (owned.st_dev, owned.st_ino):
-                os.rmdir(folder, dir_fd=destination_fd)
-        for filename, identity in files.get("", {}).items():
-            try:
-                if _same_entry(destination_fd, filename, identity):
-                    os.unlink(filename, dir_fd=destination_fd)
-            except FileNotFoundError:
-                pass
-        os.rmdir(name, dir_fd=parent_fd)
-    except OSError:
-        # An unexpected/replaced entry is left intact, rather than deleted.
-        pass
+    # Partial files are deliberately retained on failure. A pathname identity
+    # check followed by unlink cannot safely remove a concurrently replaced file.
+    with os.fdopen(descriptor, "wb") as stream:
+        os.fchmod(stream.fileno(), 0o600)
+        stream.write(blob)
+        stream.flush()
+        os.fsync(stream.fileno())
+    return (owned.st_dev, owned.st_ino)
 
 
 def stage(source_root, output):
-    """Verify the source-selected package and exclusively create local output."""
+    """Stage under a trusted private parent; retain incomplete trees on failure."""
     source_root = Path(source_root).resolve()
     requested = Path(output).absolute()
     if requested.is_symlink() or requested.exists():
@@ -248,7 +228,6 @@ def stage(source_root, output):
     parent_fd = _open_directory_chain(output.parent, (source_info.st_dev, source_info.st_ino))
     destination_fd = None
     folders, files = {}, {}
-    completed = False
     try:
         sys.path.insert(0, str(source_root / "scripts"))
         from research_report import build_context
@@ -265,17 +244,13 @@ def stage(source_root, output):
             raise ValueError("Staging parent changed during verification")
         # mkdir is exclusive: a destination that appeared while verifying fails.
         try:
-            os.mkdir(output.name, mode=0o700, dir_fd=parent_fd)
+            destination_fd = _create_private_directory(parent_fd, output.name)
         except FileExistsError:
             raise ValueError("Staging destination appeared during verification; it was not replaced") from None
-        destination_fd = os.open(output.name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
-                                 dir_fd=parent_fd)
         inventory = {}
         for folder, mapping in (("mirror-staging", MIRROR_FILES),
                                 ("citation-projection", {name: name for name in CITATION_FILES})):
-            os.mkdir(folder, mode=0o700, dir_fd=destination_fd)
-            folder_fd = os.open(folder, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
-                                dir_fd=destination_fd)
+            folder_fd = _create_private_directory(destination_fd, folder)
             folders[folder] = folder_fd
             files[folder] = {}
             for destination, source in mapping.items():
@@ -321,11 +296,9 @@ def stage(source_root, output):
             directory_fd = folders[folder] if folder else destination_fd
             if not all(_same_entry(directory_fd, name, identity) for name, identity in entries.items()):
                 raise ValueError("Staging file changed while writing; replacement was not modified")
-        completed = True
         return status
     finally:
-        if destination_fd is not None and not completed:
-            _cleanup_created_destination(parent_fd, output.name, destination_fd, folders, files)
+        # No automatic unlink/rmdir: retain failed output for operator inspection.
         for descriptor in folders.values():
             os.close(descriptor)
         if destination_fd is not None:
@@ -341,7 +314,7 @@ def main():
     try:
         result = stage(args.source_root, args.output)
     except (ValueError, OSError) as error:
-        parser.exit(2, f"Offline staging stopped: {error}\n")
+        parser.exit(2, f"Offline staging stopped: {error}\nAny created staging files were retained; inspect them before deliberate removal.\n")
     print(json.dumps({key: result[key] for key in ("operation", "release_id", "archive_sha256", "archive_bytes", "frozen_package_verified", "publication_authorized", "network_operations")}, indent=2))
 
 

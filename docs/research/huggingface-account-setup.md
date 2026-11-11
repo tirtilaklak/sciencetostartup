@@ -52,20 +52,34 @@ name match the authenticated user and its permission list is empty.
 
 ## Prepare inspectable files locally
 
-From the source checkout, run:
+Create an owner-only staging parent outside the scientific checkout, then run
+from the source checkout. The parent must already exist, be owned by the current
+user and have mode `0700`:
 
 ```sh
-python3 tools/publishing/huggingface_setup.py --output /absolute/private/path/hf-staging
+mkdir -m 700 /absolute/private/staging-parent
+python3 tools/publishing/huggingface_setup.py --output /absolute/private/staging-parent/hf-staging
 ```
 
 The destination must be new and outside the scientific checkout. The tool reads
 the source-selected frozen package using the existing scientific verifier; it
 does not rebuild, rewrite or recompress any scientific bytes. It makes no network
 calls and does not read credentials. Parent aliases are canonically resolved
-before no-follow directory descriptors anchor the destination. The final output
-is created exclusively after package verification; a path that appears or changes
-during staging is refused. Existing directories are never replaced, including
-empty ones. Failure cleanup is confined to the newly created anchored objects.
+before no-follow directory descriptors anchor the existing parent. Ancestors
+must be owned by this user or root and exclude group/other writes; root-owned
+sticky system temporary ancestors are permitted. The final output is created
+exclusively after package verification, and the mkdir/open handoff is checked
+before files are copied. Existing directories are never replaced, including
+empty ones. Detected path changes stop staging.
+
+This boundary requires a trusted private parent, protected ACLs, and trusted
+processes running as the same user. Permission and identity checks do not provide
+immunity to a hostile same-user process, root, or an administrator changing the
+filesystem. Failed or interrupted staging trees, including partial files, are
+retained without any automatic unlink or directory removal. Inspect retained
+output and deliberately remove it, or choose a fresh destination before retrying.
+Only a successful invocation establishes completion; a retained status file
+alone does not. No failed tree is automatically reused or replaced.
 
 `mirror-staging/` contains exactly the four payload names used by the existing
 `HuggingFaceMirror` adapter: `README.md`, `research-archive.zip`,

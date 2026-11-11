@@ -2,6 +2,7 @@
 import copy
 import importlib.util
 import json
+import os
 from pathlib import Path
 import tempfile
 import types
@@ -234,7 +235,7 @@ class AnchoredStagingTests(unittest.TestCase):
         self.source = self.base / "source"
         self.source.mkdir()
         self.parent = self.base / "outside"
-        self.parent.mkdir()
+        self.parent.mkdir(mode=0o700)
         self.output = self.parent / "staging"
         self.package = synthetic_package()
         self.report = types.ModuleType("research_report")
@@ -304,10 +305,12 @@ class AnchoredStagingTests(unittest.TestCase):
             hf.stage(self.source, self.source / "would-write")
         self.assertEqual(list(self.source.iterdir()), [])
 
-    def test_copy_failure_cleans_only_the_exclusively_created_destination(self):
+    def test_copy_failure_retains_incomplete_tree_and_refuses_automatic_reuse(self):
         del self.package["clean-dataset.json"]
         with self.assertRaises(KeyError): hf.stage(self.source, self.output)
-        self.assertFalse(self.output.exists())
+        self.assertTrue((self.output / "mirror-staging/README.md").is_file())
+        self.assertFalse((self.output / "staging-status.json").exists())
+        with self.assertRaises(ValueError): hf.stage(self.source, self.output)
         self.assertEqual(list(self.source.iterdir()), [])
 
     def test_destination_replaced_while_copying_is_not_modified_or_reported_success(self):
@@ -326,7 +329,7 @@ class AnchoredStagingTests(unittest.TestCase):
         self.assertEqual(list(self.source.iterdir()), [])
 
 
-    def test_replaced_file_is_not_deleted_during_failure_cleanup(self):
+    def test_replaced_file_is_retained_after_copy_failure(self):
         write = hf._write_new_file
         replacement = self.base / "replacement"
         replacement.write_text("unrelated")
@@ -339,6 +342,83 @@ class AnchoredStagingTests(unittest.TestCase):
             hf.stage(self.source, self.output)
         self.assertEqual((self.output / "mirror-staging/README.md").read_text(), "unrelated")
         self.assertEqual(list(self.source.iterdir()), [])
+
+    def test_staging_parent_must_already_exist_and_be_private(self):
+        for mode in (0o755, 0o770, 0o777):
+            with self.subTest(mode=oct(mode)):
+                self.parent.chmod(mode)
+                with self.assertRaises(ValueError): hf.stage(self.source, self.output)
+                self.assertFalse(self.output.exists())
+        self.parent.chmod(0o700)
+        with self.assertRaises(FileNotFoundError):
+            hf.stage(self.source, self.base / "missing-parent/staging")
+        self.assertFalse((self.base / "missing-parent").exists())
+
+    def test_staging_parent_must_be_owned_by_current_user(self):
+        with patch.object(hf.os, "getuid", return_value=os.getuid() + 1), self.assertRaises(ValueError):
+            hf.stage(self.source, self.output)
+        self.assertFalse(self.output.exists())
+
+    def test_real_directory_replacement_between_mkdir_and_open_is_not_populated(self):
+        victim = self.parent / "preexisting-unrelated"
+        victim.mkdir(mode=0o700)
+        (victim / "keep.txt").write_text("unrelated")
+        victim_identity = (victim.stat().st_dev, victim.stat().st_ino)
+        original_open = os.open
+        fired = False
+        def interleave(name, flags, *args, **kwargs):
+            nonlocal fired
+            if not fired and name == self.output.name and flags & os.O_DIRECTORY and "dir_fd" in kwargs:
+                fired = True
+                self.output.rename(self.parent / "owned-orphan")
+                victim.rename(self.output)
+            return original_open(name, flags, *args, **kwargs)
+        with patch.object(hf.os, "open", side_effect=interleave), self.assertRaises(ValueError):
+            hf.stage(self.source, self.output)
+        self.assertTrue(fired)
+        self.assertEqual((self.output.stat().st_dev, self.output.stat().st_ino), victim_identity)
+        self.assertEqual(list(self.output.iterdir()), [self.output / "keep.txt"])
+        self.assertEqual((self.output / "keep.txt").read_text(), "unrelated")
+        self.assertEqual(list(self.source.iterdir()), [])
+
+    def test_failed_copy_has_no_cleanup_identity_check_or_destructive_call(self):
+        # The independent post-check/pre-unlink injection point is removed.
+        victim = self.parent / "preexisting-unrelated-file"
+        victim.write_text("unrelated")
+        del self.package["clean-dataset.json"]
+        original_same = hf._same_entry
+        fired = False
+        def interleave(fd, name, identity):
+            nonlocal fired
+            same = original_same(fd, name, identity)
+            if name == "README.md" and same:
+                fired = True
+                victim.replace(self.output / "mirror-staging/README.md")
+            return same
+        with patch.object(hf, "_same_entry", side_effect=interleave), \
+             patch.object(hf.os, "unlink", side_effect=AssertionError("cleanup unlink forbidden")), \
+             patch.object(hf.os, "rmdir", side_effect=AssertionError("cleanup rmdir forbidden")), \
+             self.assertRaises(KeyError):
+            hf.stage(self.source, self.output)
+        self.assertFalse(fired)
+        self.assertEqual(victim.read_text(), "unrelated")
+        self.assertEqual((self.output / "mirror-staging/README.md").read_bytes(), self.package["huggingface-README.md"])
+
+    def test_file_write_error_retains_replacement_without_unlink(self):
+        victim = self.parent / "preexisting-unrelated-file"
+        victim.write_text("unrelated")
+        descriptor = os.open(self.parent, os.O_RDONLY | os.O_DIRECTORY)
+        def fail_sync(_):
+            victim.replace(self.parent / "partial.txt")
+            raise OSError("synthetic sync failure")
+        try:
+            with patch.object(hf.os, "fsync", side_effect=fail_sync), \
+                 patch.object(hf.os, "unlink", side_effect=AssertionError("cleanup unlink forbidden")), \
+                 self.assertRaises(OSError):
+                hf._write_new_file(descriptor, "partial.txt", b"SYNTHETIC")
+        finally:
+            os.close(descriptor)
+        self.assertEqual((self.parent / "partial.txt").read_text(), "unrelated")
 
     def test_child_directory_replacement_is_not_reported_as_success(self):
         write = hf._write_new_file
