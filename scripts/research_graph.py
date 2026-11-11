@@ -19,6 +19,7 @@ import math
 from pathlib import Path, PurePosixPath
 import re
 import sqlite3
+import unicodedata
 from urllib.parse import urlsplit, parse_qsl
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,7 +39,11 @@ PREDICATES = {"legacy_description", "has_capability", "supplies_data_for", "publ
               "adjudicated_for", "generated_for", "labeled_for", "filtered_for"}
 FACETS = {"domain", "modality", "workflow", "expertise", "origin", "labels", "oversight"}
 OPTIONAL_FACETS = {"delivery_model", "data_purpose"}
-PAPER_IDENTIFIERS = {"doi", "arxiv", "acl", "pmlr"}
+PAPER_IDENTIFIERS = {"doi", "arxiv", "acl", "pmlr", "ceur", "bibliographic"}
+BIBLIOGRAPHIC_FIELDS = {"authority", "key", "title", "creators", "venue", "year", "volume", "issue",
+                        "identity_status", "authority_basis", "creator", "institution", "authority_source_id", "authority_locator",
+                        "qualifications", "identifier_aliases", "provenance"}
+IDENTITY_PROVENANCE_FIELDS = {"source_id", "version_entity_id", "response_sha256", "source_version", "locator"}
 CORE_KINDS = {"organization", "supplier", "paper", "paper_work", "dataset", "dataset_family", "benchmark", "benchmark_family"}
 REVIEW_ROLES = {"author", "source_verifier", "adversarial"}
 EMAIL = re.compile(r"[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.I)
@@ -49,6 +54,7 @@ ROOT_FIELDS = {"schema_version", "release_id", "as_of", "canonical_dataset_versi
                "canonical_sha256", "entities", "sources", "assertions", "reviews", "coverage"}
 ENTITY_FIELDS = {"id", "kind", "name", "status", "identifiers", "aliases", "legacy_id",
                  "family_id", "parent_id", "taxonomy", "review_depth", "disposition", "disposition_reason", "assertion_ids", "eligible_core"}
+ENTITY_OPTIONAL_FIELDS = {"bibliographic_identity"}
 SOURCE_FIELDS = {"id", "url", "title", "publisher", "source_type", "version", "published_on",
                  "captured_on", "status", "response_sha256", "excerpt", "excerpt_sha256", "locator", "license"}
 ASSERTION_FIELDS = {"id", "subject_id", "predicate", "object_id", "value", "evidence",
@@ -210,7 +216,7 @@ def load_partition_records(root=ROOT):
             prior_id = None
             for offset, row in enumerate(rows):
                 row_label = f"{part_label}/{table}/{offset}"
-                if not isinstance(row, dict) or set(row) != fields:
+                if not isinstance(row, dict) or not (fields <= set(row) <= fields | (ENTITY_OPTIONAL_FIELDS if table == "entities" else set())):
                     raise GraphValidationError([f"{row_label}: fields must be exactly {', '.join(sorted(fields))}"])
                 identifier = row.get("id") if isinstance(row, dict) else None
                 if not isinstance(identifier, str) or not ID.fullmatch(identifier):
@@ -273,7 +279,7 @@ def _validate_graph(graph, canonical=None):
         if not isinstance(row, dict):
             require(False, path, "expected object")
             return False
-        require(set(row) == fields, path, f"fields must be exactly {', '.join(sorted(fields))}")
+        require(fields <= set(row) <= fields | (ENTITY_OPTIONAL_FIELDS if fields == ENTITY_FIELDS else set()), path, f"fields must be exactly {', '.join(sorted(fields))}")
         return True
 
     def strings(value, path, unique=True):
@@ -374,7 +380,9 @@ def _validate_graph(graph, canonical=None):
             for facet in facets:
                 strings(taxonomy.get(facet), p + "/taxonomy/" + facet)
         if isinstance(identifiers, dict) and entity.get("kind") in {"paper", "paper_work"}:
-            require(bool(set(identifiers) & PAPER_IDENTIFIERS), p + "/identifiers", "paper needs DOI, arXiv, ACL or PMLR work identifier")
+            require(bool(set(identifiers) & PAPER_IDENTIFIERS), p + "/identifiers", "paper needs DOI, arXiv, ACL, PMLR or source-bound bibliographic work identifier")
+            if set(identifiers) & {"ceur", "bibliographic"}:
+                require("bibliographic_identity" in entity, p + "/bibliographic_identity", "non-registry identifiers require source-bound identity provenance")
             for scheme in sorted(PAPER_IDENTIFIERS):
                 identifier = identifiers.get(scheme)
                 if identifier:
@@ -382,6 +390,10 @@ def _validate_graph(graph, canonical=None):
                     if scheme == 'pmlr':
                         require(bool(re.fullmatch(r'v\d+/[a-z0-9][a-z0-9_-]*', key[1])),
                                 p + '/identifiers/pmlr', 'expected PMLR volume/publication key')
+                    if scheme == "ceur":
+                        require(bool(re.fullmatch(r"vol-[1-9][0-9]*/[a-z0-9][a-z0-9_-]*", key[1])), p + "/identifiers/ceur", "expected CEUR volume/article key")
+                    if scheme == "bibliographic":
+                        require(bool(re.fullmatch(r"sha256:[0-9a-f]{64}", key[1])), p + "/identifiers/bibliographic", "expected derived bibliographic key")
                     require(key not in paper_ids, p + "/identifiers", "duplicate paper work; versions are not separate works")
                     paper_ids[key] = eid
         if entity.get("kind") in {"dataset", "dataset_family", "dataset_release", "benchmark", "benchmark_family", "benchmark_version"}:
@@ -435,6 +447,8 @@ def _validate_graph(graph, canonical=None):
             require(source.get("captured_on") is None, p + "/captured_on", "import cannot invent retrieval date")
         else:
             require(source.get("source_type") == "metadata", p + "/source_type", "metadata-only is discovery, not source evidence")
+
+    _validate_bibliographic_identities(entities, sources, assertions, paper_ids, require)
 
     invocation_roles = {}
     for rid, review in reviews.items():
@@ -563,6 +577,124 @@ def validate_graph(graph, canonical=None):
         raise GraphValidationError(["$: malformed field type or value (" + type(error).__name__ + ")"]) from error
 
 
+def _bibliographic_text(value):
+    """Punctuation/spacing/case differences do not create another work identity."""
+    return "".join(c for c in unicodedata.normalize("NFKC", value).casefold() if c.isalnum())
+
+
+def bibliographic_key(title, creators):
+    """Local work key, not a DOI, registry accession or document-version hash."""
+    content = [_bibliographic_text(title), [_bibliographic_text(c) for c in creators]]
+    return "sha256:" + digest(json.dumps(content, ensure_ascii=False, separators=(",", ":")))
+
+
+def _validate_bibliographic_identities(entities, sources, assertions, paper_ids, require):
+    """Validate the optional authority contract without granting a source review."""
+    if not any("bibliographic_identity" in entity for entity in entities.values()):
+        return
+    content_owners = {}
+    bibliography_owners = {}
+    # A new work cannot reuse an existing work's subject-owned full paper capture.
+    for claim in assertions.values():
+        owner = entities.get(claim.get("subject_id"), {})
+        owner_id = owner.get("parent_id") if owner.get("kind") == "paper_version" else owner.get("id")
+        if entities.get(owner_id, {}).get("kind") not in {"paper", "paper_work"}:
+            continue
+        for evidence in claim.get("evidence", []):
+            source = sources.get(evidence.get("source_id"), {})
+            if source.get("source_type") == "paper" and source.get("status") == "captured":
+                content_owners.setdefault(source.get("response_sha256"), set()).add(owner_id)
+    for eid, entity in entities.items():
+        if "bibliographic_identity" not in entity:
+            continue
+        p = "$/entities/" + eid + "/bibliographic_identity"
+        identity = entity["bibliographic_identity"]
+        require(entity.get("kind") in {"paper", "paper_work"}, p, "identity belongs to a paper work, never a mirror/version")
+        if not isinstance(identity, dict) or set(identity) != BIBLIOGRAPHIC_FIELDS:
+            require(False, p, "identity fields must match the bibliographic authority contract")
+            continue
+        authority = identity.get("authority")
+        require(authority in {"ceur", "creator_hosted_journal"}, p + "/authority", "unknown bibliographic authority profile")
+        for field in ("key", "title", "venue", "authority_basis"):
+            require(isinstance(identity.get(field), str) and bool(identity[field].strip()), p + "/" + field, "required identity/provenance text")
+        creators = identity.get("creators")
+        creators_valid = isinstance(creators, list) and bool(creators) and all(isinstance(c, str) and bool(_bibliographic_text(c)) for c in creators)
+        require(creators_valid, p + "/creators", "ordered named creators required")
+        if creators_valid:
+            require(len(set(map(_bibliographic_text, creators))) == len(creators), p + "/creators", "duplicate creator")
+        require(type(identity.get("year")) is int and 1500 <= identity["year"] <= 9999, p + "/year", "bibliographic year required")
+        for field in ("volume", "issue"):
+            require(identity.get(field) is None or isinstance(identity[field], str) and bool(identity[field].strip()), p + "/" + field, "expected publication text or null")
+        qualifications = identity.get("qualifications")
+        require(isinstance(qualifications, list) and bool(qualifications) and all(isinstance(q, str) and q.strip() for q in qualifications), p + "/qualifications", "identity limits/conflicts must be explicit")
+        identifiers = entity.get("identifiers", {})
+        authority_source = sources.get(identity.get("authority_source_id"), {})
+        if authority == "creator_hosted_journal":
+            require(creators_valid and identity.get("creator") in creators, p + "/creator", "hosting creator must be a named paper creator")
+            for field in ("institution", "authority_locator"):
+                require(isinstance(identity.get(field), str) and bool(identity[field].strip()), p + "/" + field, "creator hosting provenance required")
+            require(authority_source.get("status") == "captured" and authority_source.get("source_type") != "metadata", p + "/authority_source_id", "captured creator/institution provenance required")
+            require(isinstance(identity.get("creator"), str) and _bibliographic_text(identity["creator"]) in _bibliographic_text(authority_source.get("excerpt", "")), p + "/authority_source_id", "creator provenance excerpt must name the creator")
+        else:
+            require(all(identity.get(field) is None for field in ("creator", "institution", "authority_source_id", "authority_locator")), p, "CEUR publisher profile does not use creator-host provenance")
+        if authority == "ceur":
+            key = normalize_identifier("ceur", identity.get("key", ""))
+            require(bool(re.fullmatch(r"vol-[1-9][0-9]*/[a-z0-9][a-z0-9_-]*", key)), p + "/key", "expected CEUR volume/article key")
+            require(normalize_identifier("ceur", identifiers.get("ceur", "")) == key, p + "/key", "identity must retain the CEUR work identifier")
+            require(identity.get("volume") == key.split("/")[0].removeprefix("vol-"), p + "/volume", "CEUR bibliography volume must agree with publication key")
+            require(identity.get("identity_status") == "publisher_item", p + "/identity_status", "CEUR identity denotes publisher item, not arbitrary URL")
+        elif authority == "creator_hosted_journal":
+            key = bibliographic_key(identity["title"], creators) if creators_valid and isinstance(identity.get("title"), str) else None
+            require(identity.get("key") == key and identifiers.get("bibliographic") == key, p + "/key", "bibliographic key must derive from title and ordered creators")
+            require(identity.get("identity_status") == "provisional_creator_copy", p + "/identity_status", "creator copy must remain provisional; no final version of record asserted")
+            require(isinstance(identity.get("volume"), str) and isinstance(identity.get("issue"), str), p, "creator-hosted journal citation needs volume and issue")
+        if creators_valid and isinstance(identity.get("title"), str):
+            fingerprint = bibliographic_key(identity["title"], creators)
+            require(fingerprint not in bibliography_owners, p, "duplicate paper work bibliography; aliases/copies do not create works")
+            bibliography_owners[fingerprint] = eid
+        aliases = identity.get("identifier_aliases")
+        require(isinstance(aliases, dict) and set(aliases) <= PAPER_IDENTIFIERS and all(isinstance(v, str) and v.strip() for v in aliases.values()), p + "/identifier_aliases", "expected explicit known-scheme identifier aliases")
+        if isinstance(aliases, dict):
+            for scheme, value in aliases.items():
+                alias = (scheme, normalize_identifier(scheme, value))
+                if scheme == "ceur":
+                    require(bool(re.fullmatch(r"vol-[1-9][0-9]*/[a-z0-9][a-z0-9_-]*", alias[1])), p + "/identifier_aliases", "expected CEUR volume/article alias")
+                if scheme == "bibliographic":
+                    require(bool(re.fullmatch(r"sha256:[0-9a-f]{64}", alias[1])), p + "/identifier_aliases", "expected derived bibliographic alias")
+                require(alias not in paper_ids or paper_ids[alias] == eid, p + "/identifier_aliases", "identifier alias collides with another paper work")
+                paper_ids[alias] = eid
+        provenance = identity.get("provenance")
+        require(isinstance(provenance, list) and bool(provenance), p + "/provenance", "captured primary identity provenance required")
+        seen_versions, seen_content = set(), set()
+        for index, proof in enumerate(provenance if isinstance(provenance, list) else []):
+            q = p + "/provenance/" + str(index)
+            if not isinstance(proof, dict) or set(proof) != IDENTITY_PROVENANCE_FIELDS:
+                require(False, q, "exact source/version/locator binding required")
+                continue
+            source = sources.get(proof.get("source_id"), {})
+            version = entities.get(proof.get("version_entity_id"), {})
+            require(source.get("source_type") == "paper" and source.get("status") == "captured", q, "identity requires captured primary paper, never metadata")
+            require(version.get("kind") == "paper_version" and version.get("parent_id") == eid, q, "identity version must belong to this work")
+            for proof_field, source_field in (("response_sha256", "response_sha256"), ("source_version", "version")):
+                require(isinstance(proof.get(proof_field), str) and bool(proof[proof_field].strip()) and proof.get(proof_field) == source.get(source_field), q + "/" + proof_field, "must bind exact captured source")
+            require(version.get("identifiers", {}).get("response_sha256") == proof.get("response_sha256") and version.get("identifiers", {}).get("source_version") == proof.get("source_version"), q, "paper version identifiers must bind exact source digest and version")
+            require(isinstance(proof.get("locator"), str) and bool(proof["locator"].strip()), q + "/locator", "bibliographic identity locator required")
+            if authority == "creator_hosted_journal":
+                creator_url = urlsplit(authority_source.get("url", ""))
+                paper_url = urlsplit(source.get("url", ""))
+                directory = creator_url.path.rsplit("/", 1)[0] + "/"
+                require(creator_url.hostname == paper_url.hostname and directory != "/" and paper_url.path.startswith(directory), q, "paper must be within the captured creator institutional directory")
+            if authority == "ceur":
+                require(source.get("url", "").endswith(".pdf"), q, "CEUR publisher item must bind the primary PDF")
+                require(normalize_identifier("ceur", source.get("url", "")) == key and urlsplit(source.get("url", "")).hostname in {"ceur-ws.org", "www.ceur-ws.org"}, q, "CEUR identity must bind official publisher volume/article PDF")
+            require(proof.get("version_entity_id") not in seen_versions and proof.get("response_sha256") not in seen_content, q, "mirrors/relabeled copies cannot inflate versions")
+            require(not (content_owners.get(proof.get("response_sha256"), set()) - {eid}), q, "captured paper already belongs to another work")
+            content_owners.setdefault(proof.get("response_sha256"), set()).add(eid)
+            seen_versions.add(proof.get("version_entity_id")); seen_content.add(proof.get("response_sha256"))
+        children = {vid for vid, row in entities.items() if row.get("kind") == "paper_version" and row.get("parent_id") == eid}
+        require(children == seen_versions, p + "/provenance", "every manifestation needs exactly one source/version identity binding")
+
+
 def normalize_identifier(scheme, identifier):
     value = str(identifier).strip().lower()
     if scheme == "doi":
@@ -570,6 +702,9 @@ def normalize_identifier(scheme, identifier):
     if scheme == "arxiv":
         value = re.sub(r"^(?:https?://arxiv\.org/(?:abs|pdf)/|arxiv:)", "", value)
         return re.sub(r"v\d+(?:\.pdf)?$|\.pdf$", "", value)
+    if scheme == "ceur":
+        value = re.sub(r"^https?://(?:www\.)?ceur-ws\.org/", "", value)
+        return re.sub(r"\.pdf$", "", value).rstrip("/")
     if scheme == 'pmlr':
         value = re.sub(r'^https?://proceedings\.mlr\.press/', '', value).rstrip('/')
         parts = value.split('/')
@@ -661,7 +796,7 @@ def public_graph(graph):
     projection = {k: copy.deepcopy(graph[k]) for k in ROOT_FIELDS if k in graph}
     for key, fields in (("entities", ENTITY_FIELDS), ("sources", SOURCE_FIELDS),
                         ("assertions", ASSERTION_FIELDS), ("reviews", REVIEW_FIELDS)):
-        projection[key] = [{k: row[k] for k in fields if k in row} for row in projection.get(key, [])]
+        projection[key] = [{k: row[k] for k in fields | (ENTITY_OPTIONAL_FIELDS if key == "entities" else set()) if k in row} for row in projection.get(key, [])]
     # Candidate and rejected draft wording stays in the private intake/review queue. Public
     # metadata may describe a coverage gap, but exports must not leak its proposed
     # factual claim merely because the row has a candidate label.
@@ -709,6 +844,7 @@ def write_exports(graph, output):
         file.write(stable_json(projected))
     tables = (("entities", ENTITY_FIELDS), ("sources", SOURCE_FIELDS),
               ("assertions", ASSERTION_FIELDS), ("reviews", REVIEW_FIELDS))
+    tables = tuple((table, fields | (ENTITY_OPTIONAL_FIELDS if table == "entities" and any("bibliographic_identity" in row for row in projected[table]) else set())) for table, fields in tables)
     for table, fields in tables:
         name = "research-" + table + ".csv"
         paths.append(name)
@@ -716,7 +852,7 @@ def write_exports(graph, output):
             writer = csv.writer(file, lineterminator="\n")
             columns = ["id"] + sorted(fields - {"id"})
             writer.writerow(columns)
-            writer.writerows([_csv_cell(row[key]) for key in columns] for row in projected[table])
+            writer.writerows([_csv_cell(row.get(key)) for key in columns] for row in projected[table])
     database = output / "research-graph.sqlite"
     database.unlink(missing_ok=True)
     with sqlite3.connect(database) as connection:
@@ -732,7 +868,7 @@ def write_exports(graph, output):
             connection.execute(f'CREATE TABLE "{table}" ({declaration})')
             placeholders = ",".join("?" for _ in columns)
             for row in projected[table]:
-                values = [json.dumps(row[k], ensure_ascii=False, sort_keys=True, separators=(",", ":")) if isinstance(row[k], (dict, list)) else str(row[k]).lower() if type(row[k]) is bool else row[k] for k in columns]
+                values = [json.dumps(row[k], ensure_ascii=False, sort_keys=True, separators=(",", ":")) if isinstance(row.get(k), (dict, list)) else str(row[k]).lower() if type(row.get(k)) is bool else row.get(k) for k in columns]
                 connection.execute(f'INSERT INTO "{table}" VALUES ({placeholders})', values)
         connection.execute("CREATE TABLE assertion_evidence (assertion_id TEXT NOT NULL REFERENCES assertions(id), source_id TEXT NOT NULL REFERENCES sources(id), locator TEXT NOT NULL, excerpt_sha256 TEXT, PRIMARY KEY(assertion_id, source_id, locator))")
         connection.execute("CREATE TABLE assertion_reviews (assertion_id TEXT NOT NULL REFERENCES assertions(id), review_id TEXT NOT NULL REFERENCES reviews(id), PRIMARY KEY(assertion_id, review_id))")

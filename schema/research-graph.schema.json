@@ -285,6 +285,50 @@
     "entities": {
       "items": {
         "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "identifiers": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "ceur"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "bibliographic"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "bibliographic_identity"
+              ]
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "bibliographic_identity"
+              ]
+            },
+            "then": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "paper",
+                    "paper_work"
+                  ]
+                }
+              }
+            }
+          }
+        ],
         "properties": {
           "aliases": {
             "items": {
@@ -302,6 +346,253 @@
             },
             "type": "array",
             "uniqueItems": true
+          },
+          "bibliographic_identity": {
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "else": {
+                  "properties": {
+                    "authority_locator": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "authority_source_id": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "creator": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "identity_status": {
+                      "const": "provisional_creator_copy"
+                    },
+                    "institution": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "issue": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "volume": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  }
+                },
+                "if": {
+                  "properties": {
+                    "authority": {
+                      "const": "ceur"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "authority_locator": {
+                      "type": "null"
+                    },
+                    "authority_source_id": {
+                      "type": "null"
+                    },
+                    "creator": {
+                      "type": "null"
+                    },
+                    "identity_status": {
+                      "const": "publisher_item"
+                    },
+                    "institution": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "authority": {
+                "enum": [
+                  "ceur",
+                  "creator_hosted_journal"
+                ]
+              },
+              "authority_basis": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "authority_locator": {
+                "minLength": 1,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "authority_source_id": {
+                "minLength": 1,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "creator": {
+                "minLength": 1,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "creators": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "identifier_aliases": {
+                "additionalProperties": false,
+                "properties": {
+                  "acl": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "arxiv": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "bibliographic": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "ceur": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "doi": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "pmlr": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "identity_status": {
+                "enum": [
+                  "publisher_item",
+                  "provisional_creator_copy"
+                ]
+              },
+              "institution": {
+                "minLength": 1,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "issue": {
+                "minLength": 1,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "key": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "provenance": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "locator": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "response_sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "source_id": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "source_version": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "version_entity_id": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "source_id",
+                    "version_entity_id",
+                    "response_sha256",
+                    "source_version",
+                    "locator"
+                  ],
+                  "type": "object"
+                },
+                "minItems": 1,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "qualifications": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "title": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "venue": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "volume": {
+                "minLength": 1,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "year": {
+                "maximum": 9999,
+                "minimum": 1500,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "key",
+              "title",
+              "venue",
+              "authority_basis",
+              "volume",
+              "issue",
+              "creator",
+              "institution",
+              "authority_source_id",
+              "authority_locator",
+              "authority",
+              "identity_status",
+              "creators",
+              "year",
+              "qualifications",
+              "identifier_aliases",
+              "provenance"
+            ],
+            "type": "object"
           },
           "disposition": {
             "enum": [
@@ -529,6 +820,13 @@
             "type": "array",
             "uniqueItems": true
           },
+          "assertion_sha256": {
+            "additionalProperties": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "type": "object"
+          },
           "id": {
             "minLength": 1,
             "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$",
@@ -594,13 +892,6 @@
             ],
             "minLength": 1,
             "type": "string"
-          },
-          "assertion_sha256": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string",
-              "pattern": "^[0-9a-f]{64}$"
-            }
           }
         },
         "required": [
