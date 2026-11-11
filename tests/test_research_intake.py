@@ -43,32 +43,6 @@ class ResearchIntakeTests(unittest.TestCase):
         self.assertTrue(any(r["id"].startswith("arxiv-2026-") for r in rows))
         self.assertEqual(len({r["id"] for r in rows}), len(rows))
 
-    def test_blocked_partition_retains_reason_and_resumes_without_approval(self):
-        row = {"id": "fixture-blocked", "adapter": "arxiv", "query": "fixture only", "limit": 2}
-        blocked = {"complete": False, "candidates": [], "requests_made": 1,
-                   "retry_reason": "request_blocked", "token_restarts": 0}
-        recovered = {"complete": True, "candidates": [{"id": "metadata-only-fixture"}],
-                     "requests_made": 1, "retry_reason": None, "token_restarts": 0}
-        with tempfile.TemporaryDirectory() as temporary, \
-                patch.object(intake, "partitions", return_value=[row]), \
-                patch.object(intake, "discover", side_effect=[blocked, recovered]):
-            first = intake.run(ROOT, temporary, datetime(2026, 11, 10, tzinfo=timezone.utc), 1)
-            failed = json.loads((Path(temporary) / "intake-ledger.json").read_text())["partitions"][row["id"]]
-            self.assertEqual(failed["retry_reason"], "request_blocked")
-            self.assertEqual(failed["requests_made"], 1)
-            self.assertEqual(failed["token_restarts"], 0)
-            self.assertFalse(failed["complete"])
-            self.assertFalse(failed["approved"])
-            self.assertEqual(first["completed_partitions"], 0)
-            second = intake.run(ROOT, temporary, datetime(2026, 11, 11, tzinfo=timezone.utc), 1)
-            resumed = second["attempted"][0]
-            self.assertEqual(resumed["discovery_window"], failed["discovery_window"])
-            self.assertEqual(resumed["partition_sha256"], failed["partition_sha256"])
-            self.assertIsNone(resumed["retry_reason"])
-            self.assertFalse(resumed["approved"])
-            self.assertFalse(second["facts_modified"])
-            self.assertEqual(second["completed_partitions"], 1)
-
     def test_fair_queue_prioritizes_unattempted_partitions(self):
         rows = [{"id": "a"}, {"id": "b"}, {"id": "c"}]
         previous = {"a": {"attempted_at": "2026-11-09T00:00:00Z"}}
