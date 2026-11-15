@@ -15,11 +15,12 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import research_citations as citations
-from publication_fixtures import populate_owned_inputs
+from publication_fixtures import populate_owned_inputs, isolated_owned_input_root
 
 
 def context_fixture():
-    return {"graph": {"schema_version": "1.0.0", "release_id": "test.1", "as_of": "2026-11-09T00:00:00Z",
+    return {"root": isolated_owned_input_root(),
+            "graph": {"schema_version": "1.0.0", "release_id": "test.1", "as_of": "2026-11-09T00:00:00Z",
                        "canonical_dataset_version": "2.5.0", "canonical_sha256": "a" * 64,
                        "entities": [], "sources": [], "assertions": [], "reviews": [],
                        "coverage": {"frozen_core": {"entity_ids": [], "frozen_on": None, "source_cutoff": None, "sha256": None},
@@ -224,7 +225,22 @@ class CitationTests(unittest.TestCase):
                 citations.prepared_package_path({**context, "prepared_package": str(symlink)})
 
     def test_source_digest_keeps_research_content_audits_and_reservation_bound(self):
-        context = context_fixture()
+        original_read = Path.read_bytes
+        excluded = {ROOT / "data/research/audit-admissions.json",
+                    ROOT / "data/research/source-manifestations.json"}
+        def no_private_sidecar_read(path):
+            if path in excluded:
+                raise AssertionError("Synthetic fixture must not read private authoring sidecars")
+            return original_read(path)
+        with patch.object(Path, "read_bytes", no_private_sidecar_read):
+            context = context_fixture()
+            self.assertNotEqual(Path(context["root"]).resolve(), ROOT)
+            self.assertEqual(json.loads((Path(context["root"]) / "data/research/audit-admissions.json").read_bytes()),
+                             {"schema_version": "1.0.0", "admissions": {}})
+            manifestations = json.loads((Path(context["root"]) / "data/research/source-manifestations.json").read_bytes())
+            self.assertEqual(manifestations["sources"], [])
+            self.assertEqual(manifestations["assertion_bindings"], [])
+            self.assertTrue(manifestations["extraction_is_not_source_review"])
         baseline = citations.context_digest(context)
         for modify in (
                 lambda c: c["report"]["sections"][0]["paragraphs"][0].update(text="Changed research"),

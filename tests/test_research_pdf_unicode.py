@@ -125,9 +125,12 @@ class UnicodeRenderingTests(unittest.TestCase):
                         for group in documents]
         characters = {ord(char) for value in strings([context['report'], bibliography])
                       for char in pdf.normalized_pdf_text(value) if not char.isspace()}
-        fallback = TTFont('TEST-CJK', io.BytesIO(pdf.pdf_font_assets(context)[pdf.PDF_CJK_FONT]))
+        # Inspect the real report characters against isolated, manifest-pinned
+        # public fonts, not the excluded private authoring recipe at ROOT.
+        font_assets = pdf.pdf_font_assets(context_fixture())
+        fallback = TTFont('TEST-CJK', io.BytesIO(font_assets[pdf.PDF_CJK_FONT]))
         for name in pdf.PDF_FONT_FILES:
-            font = TTFont('TEST-' + name, io.BytesIO(pdf.pdf_font_assets(context)[name]))
+            font = TTFont('TEST-' + name, io.BytesIO(font_assets[name]))
             missing = sorted(code for code in characters
                              if not (font.face.charToGlyph.get(code) or fallback.face.charToGlyph.get(code)))
             self.assertEqual(missing, [], name)

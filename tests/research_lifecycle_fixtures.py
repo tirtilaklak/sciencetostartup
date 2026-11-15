@@ -56,9 +56,12 @@ def isolated_render_preparation(baseline, *, canonical_bytes):
         # Mutable data/font inputs come only from the verified public capsule.
         # Required static code/schema/docs/licenses must also match the current
         # reviewed recipe; archived Python is compared as bytes, never executed.
+        # REUSE.md is a non-executed historical guide with a current erratum.
+        # Keep its authenticated frozen bytes below instead of substituting it.
         if not relative.startswith('data/'):
             current = current_root / relative
-            if not current.is_file() or current.read_bytes() != files[name]:
+            if (not current.is_file()
+                    or (name != 'REUSE.md' and current.read_bytes() != files[name])):
                 raise ValueError('Incompatible current public owned input: ' + name)
     if not isinstance(canonical_bytes, bytes):
         raise ValueError('Exact already-public canonical bytes are required')

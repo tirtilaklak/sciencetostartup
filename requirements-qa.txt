@@ -1,6 +1,10 @@
 # PDF text, metadata and annotation inspection in the public privacy scan.
 # Ordinary builds use only the Python standard library.
-pypdf==6.10.0
+pypdf==6.21.4
+
+# Run PDF creation and Unicode/font checks rather than skipping them in CI.
+reportlab==4.4.9
+pillow==13.0.0
 
 # Validate delivered graph and citation data against their advertised JSON Schemas.
 jsonschema==4.25.1

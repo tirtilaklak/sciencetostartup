@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { createHash } = require('node:crypto');
 const AxeBuilder = require('@axe-core/playwright').default;
 const { evidenceURL } = require('./research-ledger');
 
@@ -101,19 +102,61 @@ test.describe('research without JavaScript', () => {
       if (href.endsWith('.sqlite')) expect(body.subarray(0, 16).toString()).toBe('SQLite format 3\u0000');
       else expect(() => JSON.parse(body.toString()), href).not.toThrow();
     }
+    const statusResponse = await request.get('/publication/package-status.json');
+    expect(statusResponse.ok()).toBeTruthy();
+    const status = await statusResponse.json();
+    const published = status.archive === 'published';
+    const metadataResponse = await request.get('/publication/current-metadata.json');
+    expect(metadataResponse.ok()).toBeTruthy();
+    const metadata = await metadataResponse.json();
+    expect(metadata.version).toBe(status.release_id);
+    let doi;
+    if (published) {
+      const receipt = status.archive_receipt;
+      expect(receipt).toMatchObject({ status: 'published', verified: true, anonymous_verified: true,
+        api_origin: 'https://zenodo.org', environment: 'production', release_id: status.release_id,
+        artifact_sha256: status.archive_sha256 });
+      expect(Number.isSafeInteger(receipt.record_id) && receipt.record_id > 0).toBe(true);
+      doi = '10.5281/zenodo.' + receipt.record_id;
+      expect(receipt.doi).toBe(doi);
+      expect(receipt.reserved_doi).toBe(doi);
+      expect(receipt.deposition_id).toBe(receipt.record_id);
+      expect(receipt.concept_doi).toMatch(/^10\.5281\/zenodo\.[1-9][0-9]*$/);
+      expect(receipt.concept_doi).not.toBe(doi);
+      expect(receipt.record_url).toBe('https://zenodo.org/records/' + receipt.record_id);
+      expect(metadata).toMatchObject({ status: 'published', doi, url: receipt.record_url });
+      if (status.release_id === 'research-2026-11-12.1') expect(doi).toBe('10.5281/zenodo.24249277');
+    } else {
+      expect(metadata.doi).toBeUndefined();
+    }
+    const manifestResponse = await request.get('/publication/MANIFEST.json');
+    expect(manifestResponse.ok()).toBeTruthy();
+    const manifestBody = await manifestResponse.body();
+    expect(createHash('sha256').update(manifestBody).digest('hex')).toBe(status.manifest_sha256);
+    const frozenManifest = JSON.parse(manifestBody.toString());
     const formats = [
-      ['BibTeX', '/publication/citation.bib', /@\w+\s*\{/],
-      ['RIS', '/publication/citation.ris', /^TY\s+-/m],
-      ['CSL JSON', '/publication/citation.csl.json', /"title"\s*:/],
-      ['CITATION.cff', '/publication/CITATION.cff', /["']?cff-version["']?\s*:/],
+      ['BibTeX', 'citation.bib', /@\w+\s*\{/, text => text.match(/^\s*doi\s*=\s*[{\"]([^}\"]+)[}\"]/mi)?.[1]],
+      ['RIS', 'citation.ris', /^TY\s+-/m, text => text.match(/^DO\s+-\s*(\S+)/m)?.[1]],
+      ['CSL JSON', 'citation.csl.json', /"title"\s*:/, text => JSON.parse(text).DOI],
+      ['CITATION.cff', 'CITATION.cff', /["']?cff-version["']?\s*:/, text => JSON.parse(text).doi],
     ];
-    for (const [name, href, format] of formats) {
+    for (const [name, filename, format, registeredDOI] of formats) {
+      const href = '/publication/' + (published ? 'current-' : '') + filename;
       await expect(page.locator('#citation').getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
       const response = await request.get(href);
       expect(response.ok(), name).toBeTruthy();
       const content = await response.text();
       expect(content, name).toMatch(format);
       expect(content, name).toContain('State of AI Data Labs and Human Feedback');
+      expect(registeredDOI(content), name + ' registered DOI').toBe(doi);
+      // Frozen preparation citations retain their original bytes and reserved
+      // DOI note; they never acquire a registered DOI field after publication.
+      const frozenResponse = await request.get('/publication/' + filename);
+      expect(frozenResponse.ok(), name + ' frozen file').toBeTruthy();
+      const frozen = await frozenResponse.body();
+      expect(frozen.length).toBe(frozenManifest.files[filename].bytes);
+      expect(createHash('sha256').update(frozen).digest('hex')).toBe(frozenManifest.files[filename].sha256);
+      expect(registeredDOI(frozen.toString()), name + ' frozen registered DOI').toBeUndefined();
     }
     await expect(page.locator('#sources')).toBeVisible();
     const sourceParts = page.locator('section[aria-labelledby="sources"] .r-ledger-parts a');

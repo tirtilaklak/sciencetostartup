@@ -353,6 +353,10 @@ class PublishedEditionReplayControls(unittest.TestCase):
             copy_public_site_inputs(root)
             frozen = replay.load_published_edition(root, descriptor)
             original = (package / 'CITATION.cff').read_bytes()
+            original_guide = (package / 'REUSE.md').read_bytes()
+            original_zip = (package / 'research-archive.zip').read_bytes()
+            corrected_guide = b'# SYNTHETIC current guide\nUse the subject_id field.\n'
+            (root / 'docs/research/reuse.md').write_bytes(corrected_guide)
             self.assertNotIn('doi', json.loads(original))
             destination = Path(temporary) / 'site'
             # The entire research publication is the explicitly synthetic frozen
@@ -364,6 +368,12 @@ class PublishedEditionReplayControls(unittest.TestCase):
             self.assertEqual(json.loads(current)['doi'], descriptor['archive_receipt']['doi'])
             self.assertEqual((destination / 'publication/CITATION.cff').read_bytes(), original)
             self.assertEqual((package / 'CITATION.cff').read_bytes(), original)
+            self.assertEqual((destination / 'publication/current-REUSE.md').read_bytes(), corrected_guide)
+            self.assertEqual((destination / 'publication/REUSE.md').read_bytes(), original_guide)
+            self.assertEqual((package / 'research-archive.zip').read_bytes(), original_zip)
+            hub = (destination / 'research/data/index.html').read_text()
+            self.assertIn('href="/publication/current-REUSE.md"', hub)
+            self.assertIn('href="/publication/REUSE.md"', hub)
 
     def test_mutable_render_fixture_discards_published_receipt_history_and_package_pins(self):
         from research_lifecycle_fixtures import isolated_render_context

@@ -144,6 +144,8 @@ class ReaderTests(unittest.TestCase):
         self.assertIn('[contact removed]', text)
 
     def test_table_contains_native_records_and_only_metadata_for_enhancement(self):
+        qualification = 'TEST ONLY qualification must remain outside the index metadata.'
+        self.claim['qualifications'] = [qualification]
         candidate = copy.deepcopy(self.claim)
         candidate.update(id='candidate.secret', status='candidate', value={'value': 'FORBIDDEN-CLAIM'})
         self.context['graph']['assertions'].append(candidate)
@@ -159,7 +161,7 @@ class ReaderTests(unittest.TestCase):
             self.assertIn('name="' + facet + '"', text)
         self.assertIn(pages.entity_url(paper, self.context), Facts(text).links)
         self.assertNotIn('FORBIDDEN-CLAIM', text)
-        self.assertNotIn(self.claim.get('qualifications', [''])[0], text)
+        self.assertNotIn(qualification, text)
 
     def test_existing_company_supplement_preserves_history_identity_and_nested_dates(self):
         legacy = next(row for row in self.context['graph']['entities'] if row.get('legacy_id'))

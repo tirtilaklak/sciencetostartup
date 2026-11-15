@@ -15,6 +15,12 @@ reproduced` inside it. This verifies the manifest and reproduces the included
 tables without network access. The JSON, CSV and SQLite files are three
 representations of the same public projection.
 
+For edition `research-2026-11-12.1` ([version DOI](https://doi.org/10.5281/zenodo.24249277)),
+the archived `REUSE.md` JSON example uses `claim["subject"]`; the schema's field is
+`claim["subject_id"]`. The corrected example follows. The archived exports,
+checksums and `reproduce.py` remain unchanged. The next archival version will
+include this documentation correction.
+
 Load the archived JSON and follow an approved assertion to its original source:
 
 ```python
@@ -27,7 +33,7 @@ sources = {source["id"]: source for source in graph["sources"]}
 approved = [claim for claim in graph["assertions"] if claim["status"] == "approved"]
 print(data["release_id"], len(approved), "approved assertions")
 for claim in approved[:1]:
-    print(claim["id"], claim["subject"], claim["predicate"], claim["value"])
+    print(claim["id"], claim["subject_id"], claim["predicate"], claim["value"])
     for evidence in claim["evidence"]:
         print(sources[evidence["source_id"]]["url"], evidence["locator"])
 ```

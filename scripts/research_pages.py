@@ -862,7 +862,10 @@ def _data(context):
         rows.insert(0, ('Read the report PDF', '/publication/report.pdf'))
     if 'publication/executive-brief.html' in context.get('publication_assets', []):
         rows.insert(0, ('Read the executive brief', '/publication/executive-brief.html'))
-    if 'publication/REUSE.md' in context.get('publication_assets', []):
+    if 'publication/current-REUSE.md' in context.get('publication_assets', []):
+        rows.append(('Working JSON and SQLite examples', '/publication/current-REUSE.md'))
+        rows.append(('Original archived reuse guide', '/publication/REUSE.md'))
+    elif 'publication/REUSE.md' in context.get('publication_assets', []):
         rows.append(('Working JSON and SQLite examples', '/publication/REUSE.md'))
     links = "".join('<li>' + _link(url, label) + '</li>' for label, url in rows)
     citation_prefix = 'current-' if gate.get('ready') and report.get('archive', {}).get('status') == 'published' else ''

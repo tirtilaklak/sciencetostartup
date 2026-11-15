@@ -48,7 +48,8 @@ RESERVATION_FIELDS = ("reserved_doi", "deposition_id", "api_origin", "environmen
 STATIC_ASSET_LIMIT_BYTES = 25 * 1024 * 1024
 ARCHIVE_COMPRESSION = {"stored": zipfile.ZIP_STORED, "deflate": zipfile.ZIP_DEFLATED}
 LIVE_PACKAGE_FILES = {"package-status.json", "current-metadata.json", "current-CITATION.cff",
-                      "current-citation.bib", "current-citation.ris", "current-citation.csl.json"}
+                      "current-citation.bib", "current-citation.ris", "current-citation.csl.json",
+                      "current-REUSE.md"}
 CONTEXT_CONTRACT_VERSION = 6
 REPRODUCTION_INPUTS_V2 = {name: "schema/" + name for name in (
     "research-graph.schema.json", "report.schema.json", "report-review.schema.json",
@@ -911,6 +912,12 @@ def write_package_status(context, publication, frozen):
     archived, pdf = published_archive(context), frozen.get("report.pdf")
     live = {"current-" + name: blob for name, blob in citation_formats(publication_metadata(context)).items()}
     live["current-metadata.json"] = json_bytes(publication_metadata(context))
+    # A corrected current guide is separate from the immutable archived guide.
+    # Historical capsules need no current source tree to replay their bytes.
+    if archived and 'REUSE.md' in frozen:
+        guide = _source_path(Path(context.get('root', ROOT)), REPRODUCTION_INPUTS['REUSE.md'])
+        if guide.is_file():
+            live['current-REUSE.md'] = guide.read_bytes()
     state = {"schema_version": 1, "release_id": context["report"]["release_id"],
              "status": "archived" if archived else "prepared",
              "publication_ready": bool(context["gate"].get("archival_ready", context["gate"].get("ready")) and pdf),

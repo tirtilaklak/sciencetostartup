@@ -156,6 +156,9 @@ class CompanyEventsBuildTests(unittest.TestCase):
             if path.name == 'research':
                 # Approved partitions intentionally refuse symlinked inputs.
                 shutil.copytree(path, root / 'data' / path.name, dirs_exist_ok=True)
+            elif path.name == 'research-source-anchors.json':
+                # The current-only public identifier sidecar is also source-owned.
+                shutil.copyfile(path, root / 'data' / path.name)
             elif path.name != "company-events.json":
                 (root / "data" / path.name).symlink_to(path)
         (root / "data/company-events.json").write_text(json.dumps(sample()))
