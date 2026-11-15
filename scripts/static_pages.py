@@ -944,7 +944,7 @@ def document(research, title, description, canonical, body, structured=None, cur
         head.append(f'<meta property="og:type" content="website">\n<meta property="og:title" content="{escape(title)}">\n<meta property="og:description" content="{escape(description)}">\n<meta property="og:url" content="{escape(canonical)}">\n<meta property="og:site_name" content="{SITE_NAME}">\n<meta property="og:locale" content="en_US">\n'
                     f'<meta property="og:image" content="{SHARE_IMAGE}">\n<meta property="og:image:type" content="image/png">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta property="og:image:alt" content="{escape(SHARE_ALT)}">\n'
                     f'<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:title" content="{escape(title)}">\n<meta name="twitter:description" content="{escape(description)}">\n<meta name="twitter:image:alt" content="{escape(SHARE_ALT)}">\n')
-    head.append('<link rel="stylesheet" href="/static-pages.css">\n<link rel="stylesheet" href="/field-guide.css">\n')
+    head.append('<link rel="stylesheet" href="/static-pages.css">\n<link rel="stylesheet" href="/field-guide.css">\n<link rel="stylesheet" href="/page-layout.css">\n')
     if structured: head.append(f'<script type="application/ld+json">{json_ld(structured)}</script>\n')
     return "".join(head) + "</head>\n<body class=\"static-page\">\n" + site_header(current, state) + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + "</body>\n</html>\n"
 
@@ -1327,31 +1327,49 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
     order = group_order(groups)
     nonprofit = len(groups.get("Nonprofit research", []))
     compiled = f" · research compiled {format_date(research.as_of)}" if research.as_of else ""
-    body = [crumb_nav(crumbs), f'<p class="eyebrow">Companies{escape(compiled)}</p>\n<h1>AI data companies</h1>\n',
-            f'<p class="lede">Profiles of {count} AI data companies. Each figure links to its source and shows when we checked or recorded it. Each profile lists any paid work we found.' + (f" {count_word(nonprofit)} of the {count} are nonprofit research groups." if nonprofit else "") + "</p>\n",
-            f'<p class="muted">{COVERAGE} Firms not yet profiled include {escape(join_words(list(NOT_YET_PROFILED)))}.</p>\n',
-            f'<p class="actions">{cta(ORIGIN + "/explore/#companies", "Open the interactive list")}' + (f'<a href="{ORIGIN}/work/">See {plural(work_count, "paid work route")}</a>' if work_count else "") + "</p>\n",
-            '<nav aria-label="Business groups"><ul class="chips">' + "".join(f'<li><a href="#{group_slug(g)}">{escape(labels.get(g, g))} ({len(groups[g])})</a></li>' for g in order) + "</ul></nav>\n"]
+    logos = {row['company_id']: row for row in json.loads((ROOT / 'data/logo-provenance.json').read_text()).get('logos', []) if row.get('status') == 'verified' and row.get('local_path')}
+    body = ['<link rel="stylesheet" href="/companies-page.css">', crumb_nav(crumbs),
+            '<header class="directory-intro"><p class="eyebrow">The company guide</p><h1>AI data companies</h1>',
+            '<p class="lede">Who makes AI training data, what they offer, and where the evidence comes from.</p>',
+            f'<p class="directory-meta">{count} profiles · {len(groups)} business groups{escape(compiled)}</p></header>',
+            '<form class="directory-filters" id="company-filters" role="search" hidden><label>Search companies<input type="search" id="company-query" name="q" placeholder="Name, offering, or specialty" autocomplete="off"></label><label>Business group<select id="company-group" name="group"><option value="">All groups</option>' + ''.join(f'<option value="{group_slug(g)}">{escape(labels.get(g, g))}</option>' for g in order) + '</select></label><button type="reset">Clear</button></form>',
+            f'<p class="directory-result" id="company-count" role="status" aria-live="polite">{count} companies</p>',
+            '<p id="company-empty" class="directory-empty" hidden>No companies match. Try a name or a broader search.</p>',
+            '<nav class="directory-groups" aria-label="Business groups"><ul class="chips">' + "".join(f'<li><a href="#{group_slug(g)}">{escape(labels.get(g, g))} <span>{len(groups[g])}</span></a></li>' for g in order) + "</ul></nav>\n"]
     for g in order:
-        items = "".join(f'<li><a href="{ORIGIN}/company/{escape(c["id"])}/">{escape(clean(c["name"]))}</a><span class="sub">{escape(clean((editorial_by_id.get(c["id"]) or {}).get("summary")) or shown_text(research, c.get("description")))}</span>{business_observation_html(research, business_health, c["id"], inline=True)}</li>' for c in groups[g])
-        body.append(f'<h2 id="{group_slug(g)}">{escape(labels.get(g, g))}</h2>\n<p class="muted">{plural(len(groups[g]), "company", "companies")} · <a href="{ORIGIN}/explore/#companies/{group_slug(g)}">Open this group in the interactive list</a></p>\n<ul class="index-list">{items}</ul>\n')
+        items = []
+        for c in groups[g]:
+            cid, name = c['id'], clean(c['name'])
+            summary = clean((editorial_by_id.get(cid) or {}).get('summary')) or shown_text(research, c.get('description'))
+            logo = logos.get(cid)
+            brand = (f'<span class="directory-logo {"on-dark" if logo.get("background") == "dark" else ""}"><img src="/{escape(logo["local_path"])}" alt="" width="40" height="40" loading="lazy"></span>' if logo else '')
+            items.append(f'<li class="directory-company" data-company="{escape(cid)}" data-search="{escape(name + " " + summary)}"><div class="directory-company-heading">{brand}<a href="{ORIGIN}/company/{escape(cid)}/">{escape(name)}<span aria-hidden="true"> →</span></a></div><p>{escape(summary)}</p>{business_observation_html(research, business_health, cid, inline=True)}</li>')
+        body.append(f'<section class="directory-section" data-group="{group_slug(g)}"><div class="directory-section-heading"><h2 id="{group_slug(g)}">{escape(labels.get(g, g))}</h2><span>{plural(len(groups[g]), "company", "companies")}</span></div><ul class="index-list directory-grid">{"".join(items)}</ul></section>\n')
+    body.append(f'<details class="directory-scope"><summary>Coverage and sources</summary><p>{COVERAGE} Firms not yet profiled include {escape(join_words(list(NOT_YET_PROFILED)))}.</p><p>Each figure keeps its reporting date, business scope and source. Each profile lists any paid work we found.' + (f' {count_word(nonprofit)} of the {count} are nonprofit research groups.' if nonprofit else '') + f'</p><a href="{ORIGIN}/method/">How we check the research</a></details><p class="actions directory-next"><a href="{ORIGIN}/explore/#companies">Compare companies in the full guide</a>' + (f'<a href="{ORIGIN}/work/">See {plural(work_count, "paid work route")}</a>' if work_count else '') + '</p><script src="/companies-page.js" defer></script>')
     structured = page_node("CollectionPage", title, description, canonical, modified, crumbs, mainEntity={"@type": "ItemList", "numberOfItems": count, "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": clean(c["name"]), "url": f"{ORIGIN}/company/{c['id']}/"} for i, c in enumerate(companies)]})
     return document(research, title, description, canonical, "".join(body), structured, current="companies", note=f"<p>{LOGO_NOTE}</p>")
 
 
 def work_table(research, rows, names, key):
-    columns = {"boards": ("Company", "Where", "Review", "Action"), "closed": ("Company", "Status", "Review", "Action")}.get(key, ("Company", "Pay", "Where", "Review", "Action"))
-    head = '<tr><th scope="col">Listing</th>' + "".join(f'<th scope="col">{c}</th>' for c in columns) + "</tr>"
+    """Native listing cards retain all conditions and evidence without JavaScript."""
     out = []
     for r in rows:
         cid, status = r.get("company_id"), work_status(r)
         company = names.get(cid, cid)
         destination, action = work_destination(r, research)
-        cells = {"Company": f'<a href="{ORIGIN}/company/{escape(cid)}/#work">{escape(company)}</a>', "Pay": escape(work_pay(r)) + work_pay_notes(r), "Where": escape(work_location(r)), "Status": escape(status or "Other record"), "Review": escape(work_review_label(research, r)), "Action": external_link(destination, action, clean(r.get("role")) + ", " + company) + availability(destination, research.health)}
         role = clean(r.get("role")) or "Listing"
-        tag = f' <span class="tag">{escape(status)}</span>' if status and key != "closed" else ""
-        out.append(f'<tr data-work-route="{escape(r.get("id"))}"><th scope="row">{escape(role)}{tag}{work_conditions(r)}{work_terms_html(research, r)}</th>' + "".join(f'<td data-label="{c}">{cells[c]}</td>' for c in columns) + "</tr>")
-    return f'<table class="wide"><thead>{head}</thead><tbody>{"".join(out)}</tbody></table>\n'
+        tag = f'<span class="work-status">{escape(status)}</span>' if status else ""
+        arrangements = " ".join(r.get("arrangements") or [])
+        pay = f'<p class="work-pay"><strong>{escape(work_pay(r))}</strong>{work_pay_notes(r)}</p>' if key not in ("boards", "closed") else ""
+        place = f'<p class="work-place">{escape(work_location(r))}</p>' if key != "closed" else ""
+        out.append(f'<li class="work-listing" data-work-route="{escape(r.get("id"))}" data-arrangements="{escape(arrangements)}">'
+                   f'<div class="work-heading"><a class="work-company" href="{ORIGIN}/company/{escape(cid)}/#work">{escape(company)}</a>{tag}'
+                   f'<h3>{escape(role)}</h3></div><div class="work-offer">{pay}{place}</div>'
+                   f'<div class="work-listing-conditions">{work_conditions(r)}</div>'
+                   f'<p class="work-reviewed">{escape(work_review_label(research, r))}</p>'
+                   f'<div class="work-listing-evidence">{work_terms_html(research, r)}</div>'
+                   f'<p class="work-listing-action">{external_link(destination, action, role + ", " + company)}{availability(destination, research.health)}</p></li>')
+    return f'<ul class="work-listings">{"".join(out)}</ul>\n'
 
 
 def render_work(research, routes, names, modified):
@@ -1367,12 +1385,29 @@ def render_work(research, routes, names, modified):
     description = truncate(f"{plural(named_count, 'named listing')} and {plural(program_count, 'expert network or program', 'expert networks and programs')} at {plural(open_companies, 'AI data company', 'AI data companies')}, with published pay, requirements, sources and separate review dates.")
     crumbs = [("Overview", f"{ORIGIN}/"), ("Paid work", canonical)]
     buckets = {key: sort_routes([r for r in rows if work_display_bucket(r) == key], names) for key, _, _ in WORK_DISPLAY_BUCKETS}
-    body = [crumb_nav(crumbs), f'<p class="eyebrow">Paid work' + (f" · links checked up to {escape(format_date(checked))}" if checked else "") + "</p>\n<h1>Paid AI training work</h1>\n",
-            f'<p class="lede">{plural(open_count, "sourced work route")}: {plural(named_count, "named listing")} and {plural(program_count, "network or program", "networks and programs")} at {plural(open_companies, "AI data company", "AI data companies")}. All {count} records at {plural(companies, "company", "companies")} remain browsable below, including career pages and past records. Pay is quoted as each company published it and may be out of date. Apply on the company\'s own page.</p>\n',
-            safety_note(), f'<p class="actions">{cta(ORIGIN + "/explore/#work", "Filter listings in the full guide")}</p>\n',
-            '<nav aria-label="Listing groups"><ul class="chips">' + "".join(f'<li><a href="#{key}">{label} ({len(buckets[key])})</a></li>' for key, label, _ in WORK_DISPLAY_BUCKETS if buckets[key]) + "</ul></nav>\n"]
+    body = ['<link rel="stylesheet" href="/work-page.css">\n', crumb_nav(crumbs),
+            '<header class="work-page-heading"><p class="eyebrow">Paid work</p><h1>Find work in AI training.</h1>\n',
+            '<p class="lede">Roles, projects and expert networks, with published pay and original sources.</p>\n',
+            f'<p class="work-page-counts">{plural(named_count, "named listing")} <span>·</span> {plural(program_count, "network or program", "networks and programs")} <span>·</span> {plural(open_companies, "company", "companies")}</p></header>\n',
+            '<p class="work-page-note">Pay and availability may have changed. Check the company’s page before applying.' + (f' Links checked up to {escape(format_date(checked))}.' if checked else '') + '</p>\n',
+            safety_note(),
+            '<form class="work-page-filters" data-work-filters hidden role="search" aria-label="Find paid work">'
+            '<label class="work-page-search">Search listings<input name="q" type="search" placeholder="Role, skill or company" maxlength="256" autocomplete="off"></label>'
+            '<label>Listing type<select name="kind"><option value="">All records</option><option value="named">Named listings</option><option value="programs">Networks and programs</option><option value="boards">Career pages</option><option value="outside">Other company jobs</option><option value="closed">Past and other records</option></select></label>'
+            '<label>Work arrangement<select name="arrangement"><option value="">Any arrangement</option><option value="remote">Remote possible</option><option value="onsite">On-site or hybrid</option><option value="varies">Varies or not stated</option></select></label>'
+            '<button type="reset" class="work-page-clear">Clear</button></form>'
+            f'<p class="work-page-results" data-work-count aria-live="polite" aria-atomic="true">{count} records at {plural(companies, "company", "companies")}. Career pages and past records are grouped below.</p>'
+            '<div class="work-page-empty" data-work-empty hidden><p>No listings match. Try another word or clear the filters.</p><button type="button" data-work-clear>Clear search and filters</button></div>\n',
+            '<nav class="work-page-groups" aria-label="Listing groups"><ul class="chips">' + "".join(f'<li><a href="#{key}">{label} ({len(buckets[key])})</a></li>' for key, label, _ in WORK_DISPLAY_BUCKETS if buckets[key]) + "</ul></nav>\n",
+            '<div class="work-page-list">']
     for key, label, note in WORK_DISPLAY_BUCKETS:
-        if buckets[key]: body.append(f'<h2 id="{key}">{label}</h2>\n<p class="muted">{note}</p>\n' + work_table(research, buckets[key], names, key))
+        if not buckets[key]: continue
+        contents = f'<h2 id="{key}">{label}</h2>\n<p class="muted">{note}</p>\n' + work_table(research, buckets[key], names, key)
+        if key in ("named", "programs"):
+            body.append(f'<section class="work-page-group" data-work-group="{key}">{contents}</section>\n')
+        else:
+            body.append(f'<details class="work-page-group work-page-secondary" data-work-group="{key}"><summary>{label} <span>{len(buckets[key])}</span></summary>{contents}</details>\n')
+    body.append('</div><p class="work-page-more"><a href="/explore/#work">Compare pay and download results</a></p><script src="/work-page.js" defer></script>')
     structured = page_node("CollectionPage", title, description, canonical, modified, crumbs)
     return document(research, title, description, canonical, "".join(body), structured, current="work")
 
@@ -1386,49 +1421,73 @@ GRADES = (("A", "Independent or buyer-side evidence, such as a filing or a custo
 
 def render_method(research, sizes, modified):
     data, canonical = research.data, f"{ORIGIN}/method/"
-    title = f"Method: how the research is checked{SUFFIX}"
+    title = f"About the research{SUFFIX}"
     description = f"How {SITE_NAME} grades each claim and how to request a correction. Published by {PUBLISHER_NAME}. The research data is free to download."
-    crumbs = [("Overview", f"{ORIGIN}/"), ("Method", canonical)]
+    crumbs = [("Overview", f"{ORIGIN}/"), ("About", canonical)]
     year = re.match(r"[0-9]{4}", research.as_of)
     claims = data.get("claims", [])
     doubtful = sum(1 for c in claims if c.get("status") in ("unverified", "contested"))
     compiled = f" · research compiled {format_date(research.as_of)}" if research.as_of else ""
-    body = [crumb_nav(crumbs), f'<p class="eyebrow">Method{escape(compiled)}</p>\n<h1>How the research is checked.</h1>\n<p class="lede">Each claim links to its evidence. Financial figures keep their dates and the part of the business they cover.</p>\n',
-            f'<p class="actions">{cta(ORIGIN + "/explore/#method", "Open the full method page")}</p>\n',
-            '<h2 id="about">About and corrections</h2>\n'
-            f"<p>{SITE_NAME} is published by {PUBLISHER_NAME}. It is a public-source research guide to the companies that produce AI training data. No profiled company has paid for coverage, and none is a customer, investor or affiliate of the publisher. {escape(WORK_DISCLOSURE)}</p>\n"
-            f"<p><strong>Disclosure.</strong> {disclosure_html()}</p>\n"
-            f'<p><strong>Corrections.</strong> If a figure or a listing is wrong, <a href="{ORIGIN}/explore/#corrections">request a correction</a> with the company name and the source. We review each request within seven days.</p>\n'
-            "<p><strong>Personal data and removal.</strong> Company profiles name founders and executives from public company sources only. Profiles do not show personal contact details. If you are named here and want a record corrected or removed, send a correction request. "
-            f"{VISITS_NOTE}</p>\n",
-            '<h2 id="figures">How figures are shown</h2>\n<ul>'
-            "<li>Each figure keeps its own date and the part of the business it covers, such as the whole company or one business segment.</li>"
-            "<li>Key figures come only from supported claims about reported results. The interactive guide uses the same rule.</li>"
-            "<li>Figures from talks, unverified reports or conflicting sources appear only in a separate list marked Not confirmed, with their status in words.</li>"
-            + (f"<li>Historical marks figures from {int(year.group(0)) - 2} or earlier.</li>" if year else "")
-            + "<li>Annualized pace is recent revenue projected across a full year. We say whether revenue is gross or net when the source says so.</li>"
-            "<li>Estimates are labeled. Forecasts, targets and older or partial figures go in a separate list of other reported figures. They never count as key figures.</li>"
-            "<li>Later source corrections appear next to the figure they correct. The original records stay in the downloads.</li></ul>\n",
-            '<h2 id="grades">Confidence grades</h2>\n<p>Each claim carries a confidence grade that says how strong its sources are.</p>\n<dl class="grades">' + "".join(f"<div><dt>{g}</dt><dd>{escape(text)}</dd></div>" for g, text in GRADES) + "</dl>\n"]
+    body = ['<link rel="stylesheet" href="/method-page.css">\n<div class="method-page">\n', crumb_nav(crumbs),
+            '<header class="method-hero"><p class="eyebrow">About ScienceToStartup</p>\n<h1>About the research.</h1>\n'
+            '<p class="lede">A guide to the companies and human work behind AI, built from public sources.</p>\n'
+            '<nav class="method-jumps" aria-label="On this page"><a href="#about">Publisher</a><a href="#figures">Method</a><a href="#grades">Evidence grades</a><a href="#downloads">Downloads</a></nav></header>\n',
+            '<div class="method-about-grid"><article class="method-publisher"><h2 id="about">Who publishes this?</h2>\n'
+            f'<p class="publisher-name">{escape(PUBLISHER_NAME)}</p><p>{SITE_NAME} is a public-source research guide to the companies that produce AI training data.</p>\n'
+            '<p>No profiled company has paid for coverage, and none is a customer, investor or affiliate of the publisher.</p>\n'
+            f'<p>{escape(WORK_DISCLOSURE)}</p>\n'
+            f'<p class="method-disclosure"><strong>Disclosure.</strong> {disclosure_html()}</p>\n'
+            '<p><strong>Personal data and removal.</strong> Company profiles name founders and executives from public company sources only. Profiles do not show personal contact details. If you are named here and want a record corrected or removed, <a href="#corrections">send a correction request</a>. '
+            f'{VISITS_NOTE}</p></article>\n'
+            '<aside class="method-corrections" id="corrections" aria-labelledby="corrections-title"><p class="eyebrow">Help keep this accurate</p><h2 id="corrections-title">Found something wrong?</h2>\n'
+            '<p>Send the company name, what needs changing, and a link to the source. We review each request within seven days.</p>\n'
+            f'<p class="actions">{cta("mailto:musaeminozdem@gmail.com?subject=ScienceToStartup%20correction&body=Company%3A%20%0D%0AWhat%20is%20wrong%3A%20%0D%0ALink%20to%20a%20source%20with%20the%20right%20value%3A%20%0D%0A", "Request a correction")}</p>\n'
+            '<p class="method-contact-address">musaeminozdem@gmail.com</p>\n'
+            '</aside></div>\n',
+            '<section class="method-section" aria-labelledby="figures"><p class="eyebrow">The method</p><h2 id="figures">Sources, dates, and limits.</h2>\n'
+            '<div class="method-principle-grid"><article><span>01</span><h3>Follow the source</h3><p>Each claim links to its evidence. Company statements, filings, and independent reports carry different grades.</p></article>'
+            '<article><span>02</span><h3>Keep the date</h3><p>A figure keeps its reporting period. Checking a link today does not make an older number current.</p></article>'
+            '<article><span>03</span><h3>Compare like with like</h3><p>Whole-company revenue, a division’s sales, and annualized pace measure different things. Missing figures stay unknown.</p></article></div>\n'
+            '<details class="method-detail"><summary>How financial figures are shown</summary><ul>'
+            '<li>Each figure keeps its date and business scope: the whole company or one segment.</li>'
+            '<li>Key figures use supported claims about reported results. The interactive guide follows the same rule.</li>'
+            '<li>Talks, unverified reports, and conflicting sources appear separately as Not confirmed, with their status in words.</li>'
+            + (f'<li>Historical marks figures from {int(year.group(0)) - 2} or earlier.</li>' if year else '')
+            + '<li>Annualized pace projects recent revenue across a full year. Gross or net revenue is stated when the source specifies it.</li>'
+            '<li>Estimates are labeled. Forecasts, targets, and older or partial figures appear under other reported figures, never as key figures.</li>'
+            '<li>Later corrections appear beside the figure. The original records remain in the downloads.</li></ul></details></section>\n',
+            '<section class="method-section" aria-labelledby="grades"><h2 id="grades">Confidence grades</h2>\n<p>A grade describes the strength of a claim’s sources.</p>\n<dl class="grades method-grades">' + "".join(f'<div><dt>{g}</dt><dd>{escape(text)}</dd></div>' for g, text in GRADES) + '</dl>\n']
     dimensions = (data.get("rubric") or {}).get("dimensions") or []
     if dimensions:
         rows = "".join(f'<tr><th scope="row">{escape(d.get("id"))} · {escape(clean(d.get("label")))}</th>' + "".join(f'<td data-label="Level {n}">{escape(clean((d.get("levels") or {}).get(n)))}</td>' for n in ("1", "2", "3")) + "</tr>" for d in dimensions)
-        body.append('<h2 id="labels">What the labels mean</h2>\n<p>Each company also gets a delivery evidence level (public proof that it sells and delivers its offer). The level comes from four measures, each rated from level 1 to level 3, and covers one part of the business, such as the whole company or its AI data work. Funding and valuations do not count toward it.</p>\n'
-                    f'<table class="wide"><thead><tr><th scope="col">Measure</th><th scope="col">Level 1</th><th scope="col">Level 2</th><th scope="col">Level 3</th></tr></thead><tbody>{rows}</tbody></table>\n')
+        body.append('<div class="method-delivery"><h2 id="labels">Delivery evidence</h2>\n<p>This level describes public proof that a company sells and delivers its offer. Four measures, rated 1–3, cover a specific business scope. Funding and valuations do not count toward it.</p>\n'
+                    '<details class="method-detail"><summary>Read the delivery assessment rules</summary>'
+                    f'<table class="wide"><thead><tr><th scope="col">Measure</th><th scope="col">Level 1</th><th scope="col">Level 2</th><th scope="col">Level 3</th></tr></thead><tbody>{rows}</tbody></table></details></div>\n')
+    body.append('</section>\n')
     # Some companies hold two ratings (one per business scope), so count the companies rated, as the app's method page does.
     rated = {row.get("company_id") for row in data.get("assessments", [])} & set(research.companies)
     unrated = [c for cid, c in research.companies.items() if cid not in rated]
     unrated_note = (f" The {count_word(len(unrated)).lower()} nonprofit research {'group gets' if len(unrated) == 1 else 'groups get'} no level." if unrated and all(c.get("entity_type") == "adjacent_research" for c in unrated)
                     else f" {plural(len(unrated), 'company has', 'companies have')} no level yet." if unrated else "")
-    body.append(f'<h2 id="coverage">Research coverage</h2>\n<p>{plural(len(research.companies), "company profile")} · {plural(len(rated), "company", "companies")} with a delivery evidence level · {plural(len(data.get("sources", [])), "source record")}.{unrated_note}</p>\n'
-                f"<p>{plural(doubtful, 'claim is', 'claims are')} unverified or disputed. Each one is labeled. The guide is a selected study of the market. It does not list every company.</p>\n")
+    body.append('<section class="method-section method-coverage" aria-labelledby="coverage"><h2 id="coverage">Research coverage</h2>\n'
+                f'<p class="method-snapshot">Dataset v{escape(data.get("dataset_version", ""))}{escape(compiled)}</p>\n'
+                f'<p>{plural(len(research.companies), "company profile")} · {plural(len(rated), "company", "companies")} with a delivery evidence level · {plural(len(data.get("sources", [])), "source record")}.{unrated_note}</p>\n'
+                f"<p>{plural(doubtful, 'claim is', 'claims are')} unverified or disputed. Each one is labeled. The guide is a selected study of the market. It does not list every company.</p></section>\n")
     files = [(name, kind, mime, text) for name, kind, mime, text in DOWNLOADS if name in sizes] + [(name, "CSV", "text/csv", f"The {name[:-4].replace('_', ' ')} table") for name in sorted(n for n in sizes if n.endswith(".csv"))]
     if files:
-        rows = "".join(f'<tr><th scope="row"><a href="{ORIGIN}/{escape(name)}" download>{escape(name)}</a></th><td data-label="Format">{kind}</td><td data-label="Size">{escape(sizes[name])}</td><td data-label="Contents">{escape(text)}</td></tr>' for name, kind, mime, text in files)
+        main_names = {"research.json": "Research data", "observatory.sqlite": "Research database", "work-routes.json": "Paid work listings"}
+        main_files = [item for item in files if item[0] in main_names]
+        supporting_files = [item for item in files if item[0] not in main_names]
+        cards = "".join(f'<li><p class="method-file-kind">{kind} · {escape(sizes[name])}</p><h3><a href="{ORIGIN}/{escape(name)}" download>{main_names[name]}</a></h3><p>{escape(text)}.</p><span class="method-file-name">{escape(name)}</span></li>' for name, kind, mime, text in main_files)
+        rows = "".join(f'<tr><th scope="row"><a href="{ORIGIN}/{escape(name)}" download>{escape(name)}</a></th><td data-label="Format">{kind}</td><td data-label="Size">{escape(sizes[name])}</td><td data-label="Contents">{escape(text)}</td></tr>' for name, kind, mime, text in supporting_files)
         version = data.get("dataset_version", "")
-        body.append(f'<h2 id="downloads">Download the data</h2>\n<p>Dataset version {escape(version)}{escape(compiled.replace(" · research", ", research"))}. The research data files keep every claim that later research replaced.</p>\n'
+        body.append(f'<section class="method-section" aria-labelledby="downloads"><h2 id="downloads">Download the data</h2>\n<p>Dataset version {escape(version)}{escape(compiled.replace(" · research", ", research"))}. The research data files keep every claim that later research replaced.</p>\n'
+                    f'<ul class="method-files">{cards}</ul>\n'
+                    + (f'<details class="method-detail method-supporting"><summary>Supporting files and CSV tables ({len(supporting_files)})</summary><table class="wide"><thead><tr><th scope="col">File</th><th scope="col">Format</th><th scope="col">Size</th><th scope="col">Contents</th></tr></thead><tbody>{rows}</tbody></table></details>\n' if supporting_files else '')
+                    +
                     f'<p>{SITE_NAME} licenses this data under the <a class="ext" rel="license" href="{DATA_LICENSE}">CC BY 4.0 license</a> (any use is allowed if you credit us). Cite {SITE_NAME} and the original sources. Company names and logos belong to their owners. The license does not cover them. It also leaves out product images, photos of people, text quoted from sources and personal contact details.</p>\n'
-                    f'<table class="wide"><thead><tr><th scope="col">File</th><th scope="col">Format</th><th scope="col">Size</th><th scope="col">Contents</th></tr></thead><tbody>{rows}</tbody></table>\n')
+                    '</section>\n')
+    body.append('</div>\n')
     counts = {key: len(data.get(key, [])) for key in ("companies", "claims", "sources", "metrics", "funding_rounds", "products")}
     counts["current_claims"] = sum(1 for claim in data.get("claims", []) if claim.get("status") != "superseded")
     measured = sorted({KIND_LABELS.get(m.get("kind"), "") for m in data.get("metrics", [])} - {"", KIND_LABELS["other"]})
