@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -26,7 +26,7 @@ jobs:
           npm ci
           python3 -m pip install -r requirements-qa.txt
       - name: Run complete unittest modules
-        run: python3 -B tests/unittest_shards.py run --count 4 --index ${{ matrix.shard }} --receipt output/unit-shard-${{ matrix.shard }}.json
+        run: python3 -B tests/unittest_shards.py run --count 8 --index ${{ matrix.shard }} --receipt output/unit-shard-${{ matrix.shard }}.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -86,4 +86,4 @@ jobs:
           path: output/unit-shards
           merge-multiple: true
       - name: Verify every discovered test ran exactly once
-        run: python3 -B tests/unittest_shards.py verify --count 4 --directory output/unit-shards
+        run: python3 -B tests/unittest_shards.py verify --count 8 --directory output/unit-shards
