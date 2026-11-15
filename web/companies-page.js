@@ -43,6 +43,7 @@
   form.addEventListener('reset',()=>{query.value='';group.value='';filter();});
   window.addEventListener('popstate',()=>{read();filter(false);});
   read();filter(false);form.hidden=false;
+  document.documentElement.removeAttribute('data-page-enhancement');
   const jumps=document.querySelector('.directory-groups');
   if(jumps)jumps.hidden=true;
 })();

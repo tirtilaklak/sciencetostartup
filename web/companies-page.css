@@ -3,6 +3,8 @@
 .directory-intro .lede{margin-bottom:18px}
 .directory-meta,.directory-result{font-size:.8125rem;color:var(--muted)}
 .directory-filters{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,.45fr) auto;align-items:end;gap:14px;padding:22px;background:#f0f3ed;border:1px solid var(--border);border-radius:10px}
+html[data-page-enhancement="pending"] .static-page .directory-filters[hidden]{display:grid!important;visibility:hidden}
+html[data-page-enhancement="pending"] .directory-groups{display:none}
 .directory-filters label{display:grid;gap:8px;font-size:.8125rem;font-weight:500}
 .directory-filters input,.directory-filters select{width:100%}
 .directory-filters button{min-height:48px;border:0;padding:10px 14px;background:transparent;color:var(--green);cursor:pointer}

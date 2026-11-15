@@ -3,6 +3,7 @@
   const form = document.querySelector('[data-work-filters]');
   if (!form) return;
   const count = document.querySelector('[data-work-count]');
+  const initialCount = count.textContent;
   const empty = document.querySelector('[data-work-empty]');
   const groupLinks = document.querySelector('.work-page-groups');
   const groups = [...document.querySelectorAll('[data-work-group]')];
@@ -45,7 +46,7 @@
       }
     }
     filtering = active;
-    count.textContent = active ? `${matches} matching ${matches === 1 ? 'record' : 'records'}` : `${records.length} records. Career pages and past records are grouped below.`;
+    count.textContent = active ? `${matches} matching ${matches === 1 ? 'record' : 'records'}` : initialCount;
     empty.hidden = matches !== 0;
     if (groupLinks) groupLinks.hidden = active;
     if (updateURL) {
@@ -77,4 +78,5 @@
   window.addEventListener('hashchange', () => revealGroup(location.hash));
   window.addEventListener('popstate', () => { readURL(); render(false); });
   readURL(); render(false); revealGroup(location.hash); form.hidden = false;
+  document.documentElement.removeAttribute('data-page-enhancement');
 })();

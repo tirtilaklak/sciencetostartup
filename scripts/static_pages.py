@@ -939,6 +939,8 @@ def document(research, title, description, canonical, body, structured=None, cur
             f"<title>{escape(title)}</title>\n<meta name=\"description\" content=\"{escape(description)}\">\n"]
     if robots: head.append(f'<meta name="robots" content="{escape(robots)}">\n')
     if canonical: head.append(f'<link rel="canonical" href="{escape(canonical)}">\n')
+    if canonical in (ORIGIN + '/work/', ORIGIN + '/companies/'):
+        head.append('<script>document.documentElement.setAttribute("data-page-enhancement","pending");addEventListener("error",function(event){if(event.error||event.target.hasAttribute&&event.target.hasAttribute("data-page-enhancement-script"))document.documentElement.removeAttribute("data-page-enhancement")},true)</script>\n')
     head.append(ICON_LINKS)
     if canonical:
         head.append(f'<meta property="og:type" content="website">\n<meta property="og:title" content="{escape(title)}">\n<meta property="og:description" content="{escape(description)}">\n<meta property="og:url" content="{escape(canonical)}">\n<meta property="og:site_name" content="{SITE_NAME}">\n<meta property="og:locale" content="en_US">\n'
@@ -1345,7 +1347,7 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
             brand = (f'<span class="directory-logo {"on-dark" if logo.get("background") == "dark" else ""}"><img src="/{escape(logo["local_path"])}" alt="" width="40" height="40" loading="lazy"></span>' if logo else '')
             items.append(f'<li class="directory-company" data-company="{escape(cid)}" data-search="{escape(name + " " + summary)}"><div class="directory-company-heading">{brand}<a href="{ORIGIN}/company/{escape(cid)}/">{escape(name)}<span aria-hidden="true"> →</span></a></div><p>{escape(summary)}</p>{business_observation_html(research, business_health, cid, inline=True)}</li>')
         body.append(f'<section class="directory-section" data-group="{group_slug(g)}"><div class="directory-section-heading"><h2 id="{group_slug(g)}">{escape(labels.get(g, g))}</h2><span>{plural(len(groups[g]), "company", "companies")}</span></div><ul class="index-list directory-grid">{"".join(items)}</ul></section>\n')
-    body.append(f'<details class="directory-scope"><summary>Coverage and sources</summary><p>{COVERAGE} Firms not yet profiled include {escape(join_words(list(NOT_YET_PROFILED)))}.</p><p>Each figure keeps its reporting date, business scope and source. Each profile lists any paid work we found.' + (f' {count_word(nonprofit)} of the {count} are nonprofit research groups.' if nonprofit else '') + f'</p><a href="{ORIGIN}/method/">How we check the research</a></details><p class="actions directory-next"><a href="{ORIGIN}/explore/#companies">Compare companies in the full guide</a>' + (f'<a href="{ORIGIN}/work/">See {plural(work_count, "paid work route")}</a>' if work_count else '') + '</p><script src="/companies-page.js" defer></script>')
+    body.append(f'<details class="directory-scope"><summary>Coverage and sources</summary><p>{COVERAGE} Firms not yet profiled include {escape(join_words(list(NOT_YET_PROFILED)))}.</p><p>Each figure keeps its reporting date, business scope and source. Each profile lists any paid work we found.' + (f' {count_word(nonprofit)} of the {count} are nonprofit research groups.' if nonprofit else '') + f'</p><a href="{ORIGIN}/method/">How we check the research</a></details><p class="actions directory-next"><a href="{ORIGIN}/explore/#companies">Compare companies in the full guide</a>' + (f'<a href="{ORIGIN}/work/">See {plural(work_count, "paid work route")}</a>' if work_count else '') + '</p><script src="/companies-page.js" data-page-enhancement-script defer></script>')
     structured = page_node("CollectionPage", title, description, canonical, modified, crumbs, mainEntity={"@type": "ItemList", "numberOfItems": count, "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": clean(c["name"]), "url": f"{ORIGIN}/company/{c['id']}/"} for i, c in enumerate(companies)]})
     return document(research, title, description, canonical, "".join(body), structured, current="companies", note=f"<p>{LOGO_NOTE}</p>")
 
@@ -1407,7 +1409,7 @@ def render_work(research, routes, names, modified):
             body.append(f'<section class="work-page-group" data-work-group="{key}">{contents}</section>\n')
         else:
             body.append(f'<details class="work-page-group work-page-secondary" data-work-group="{key}"><summary>{label} <span>{len(buckets[key])}</span></summary>{contents}</details>\n')
-    body.append('</div><p class="work-page-more"><a href="/explore/#work">Compare pay and download results</a></p><script src="/work-page.js" defer></script>')
+    body.append('</div><p class="work-page-more"><a href="/explore/#work">Compare pay and download results</a></p><script src="/work-page.js" data-page-enhancement-script defer></script>')
     structured = page_node("CollectionPage", title, description, canonical, modified, crumbs)
     return document(research, title, description, canonical, "".join(body), structured, current="work")
 
