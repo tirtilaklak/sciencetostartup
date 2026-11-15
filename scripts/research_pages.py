@@ -28,6 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = "/research/state-of-ai-data-labs/"
 CORRECTIONS_PATH = "/research/corrections/"
 LEDGER_BUCKETS = "0123456789abcdef"
+SOURCE_ANCHORS = "data/research-source-anchors.json"
 CATEGORIES = (
     ("papers", "Papers", {"paper", "paper_work", "paper_version"},
      "Read the source, distinguish versions, and trace what an operational finding actually supports."),
@@ -707,6 +708,12 @@ def _reader_chapter(context, section, base=REPORT_PATH, edition=False):
 
 
 def _source(source):
+    if source.get('_compatibility'):
+        return (f'<article class="r-source-stub" data-evidence-status="withheld" id="{sp.escape(_anchor("source", source["id"]))}">'
+                '<h3>Earlier public source identifier</h3><p class="r-record-id">'
+                + sp.escape(source['id']) + '</p><p>This earlier public link is retained for traceability. '
+                'It has no source metadata or evidence binding in the current approved or historical findings. '
+                'This placeholder adds no source record, assertion or coverage.</p></article>')
     if source.get('_withheld'):
         return (f'<article class="r-source-stub" data-evidence-status="withheld" id="{sp.escape(_anchor("source", source["id"]))}">'
                 '<h3>Source metadata withheld</h3><p class="r-record-id">'
@@ -724,6 +731,40 @@ def _source(source):
             '<p class="r-meta">A source capture records retrieval. Assertion-specific review is recorded separately.</p></article>')
 
 
+def _source_anchor_ids(root):
+    """Read website-only public compatibility IDs, outside frozen research."""
+    path = Path(root) / SOURCE_ANCHORS
+    if path.is_symlink() or path.parent.is_symlink():
+        raise ValueError('Public source anchor sidecar cannot be a symlink')
+    if not path.exists():
+        return []
+    if not path.is_file():
+        raise ValueError('Public source anchor sidecar must be a regular JSON file')
+    def unique(pairs):
+        value = {}
+        for key, item in pairs:
+            if key in value:
+                raise ValueError('Duplicate public source anchor sidecar key')
+            value[key] = item
+        return value
+    value = json.loads(path.read_bytes(), object_pairs_hook=unique)
+    if (not isinstance(value, dict) or set(value) != {'schema_version', 'provenance', 'source_ids', 'source_ids_sha256'}
+            or value['schema_version'] != 'public-source-anchor-compatibility-v1'):
+        raise ValueError('Invalid public source anchor sidecar')
+    origin, ids = value['provenance'], value['source_ids']
+    if (not isinstance(origin, dict) or set(origin) != {'source_commit', 'source_path', 'source_html_sha256'}
+            or not re.fullmatch(r'[0-9a-f]{40}', str(origin.get('source_commit', '')))
+            or origin.get('source_path') != 'dist/research/data/index.html'
+            or not re.fullmatch(r'[0-9a-f]{64}', str(origin.get('source_html_sha256', '')))
+            or not isinstance(ids, list) or any(not isinstance(sid, str)
+                or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:-]{0,255}', sid) for sid in ids)
+            or ids != sorted(set(ids))
+            or value['source_ids_sha256'] != hashlib.sha256(
+                (json.dumps(ids, ensure_ascii=False, separators=(',', ':')) + '\n').encode()).hexdigest()):
+        raise ValueError('Invalid public source anchor provenance or identifiers')
+    return ids
+
+
 def _ledger_records(context):
     """Full record membership, including metadata-only retained corrections."""
     assertions = {row['id']: row for row in context['graph']['assertions']}
@@ -736,6 +777,8 @@ def _ledger_records(context):
                            for pin in row.get('evidence', [])}
     sources = {row['id']: row if row['id'] in retained_source_ids else {'id': row['id'], '_withheld': True}
                for row in context['graph']['sources']}
+    for sid in context.get('_render_source_anchor_ids', []):
+        sources.setdefault(sid, {'id': sid, '_withheld': True, '_compatibility': True})
     return assertions, stubs, sources
 
 
@@ -775,6 +818,11 @@ def _ledger_pages(context):
             membership = (str(len(selected)) + ' retained identifiers: ' + str(len(selected) - withheld)
                           + ' source records and ' + str(withheld) + ' withheld metadata placeholders. '
                           if withheld else str(len(selected)) + ' records. ')
+            compatibility = sum(bool(sources[sid].get('_compatibility')) for sid in selected) if kind == 'source' else 0
+            if compatibility:
+                membership = (str(len(selected)) + ' retained identifiers: ' + str(len(selected) - withheld)
+                              + ' source records, ' + str(withheld - compatibility) + ' withheld metadata placeholders and '
+                              + str(compatibility) + ' earlier public identifiers. ')
             body = ('<header class="r-page-head"><p class="r-kicker">' + _status(context) + '</p><h1>'
                     + title + '</h1><p class="r-lede">' + membership +
                     'Read source bindings and review scope, use find in page, or print this complete part.</p>'
@@ -826,7 +874,7 @@ def _data(context):
                           for e in sorted(other, key=lambda e: (e["name"].casefold(), e["id"])))
     return (f'<header class="r-page-head"><p class="r-kicker">{_status(context)}</p><h1>Open data.<br>Visible evidence.</h1>'
             '<p class="r-lede">Inspect what is supported, what is inherited, and what still needs review. '
-            'Every count comes from the versioned evidence graph.</p>' + _meta(context) + '</header>'
+            'Research counts come from the versioned evidence graph; earlier public identifiers are labeled separately.</p>' + _meta(context) + '</header>'
             + operating_status_notice(context) +
             '<section class="r-section" aria-labelledby="coverage"><h2 id="coverage">Progress toward publication</h2>'
             + _progress(context) + f'<p>{sp.escape(_counts(context))}.</p>'
@@ -857,6 +905,10 @@ def _data(context):
             + _ledger_parts('assertion', sorted(set(assertions) | set(stubs)))
             + '</section><section class="r-section" aria-labelledby="sources"><h2 id="sources">Source records</h2>'
             '<p>A source capture records retrieval. Assertion-specific review is recorded separately.</p>'
+            + ('<p>' + str(sum(not row.get('_withheld') for row in sources.values()))
+               + ' source records and ' + str(sum(bool(row.get('_compatibility')) for row in sources.values()))
+               + ' earlier public identifiers retained without source metadata. These placeholders add no evidence or coverage.</p>'
+               if any(row.get('_compatibility') for row in sources.values()) else '')
             + _ledger_parts('source', sources)
             + '</section><section class="r-section" aria-labelledby="organizations"><h2 id="organizations">Organizations & other entities</h2>'
             + f'<ul class="r-entity-register">{entity_rows}</ul></section>'
@@ -1235,7 +1287,8 @@ def write_research_pages(output, context):
     corrections = _correction_records(context)
     # Keep current operational notices outside immutable publication contexts.
     context = with_operating_status(context, now=datetime.now(timezone.utc))
-    context = {**context, '_render_corrections': corrections}
+    context = {**context, '_render_corrections': corrections,
+               '_render_source_anchor_ids': _source_anchor_ids(context['root']) if context.get('root') is not None else []}
     context['_page_revisions'] = _revision_dates(context)
     status = context.get('operating_status')
     if status is not None:

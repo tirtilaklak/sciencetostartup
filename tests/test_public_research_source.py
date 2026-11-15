@@ -114,6 +114,83 @@ class PublicResearchSourceControls(unittest.TestCase):
                     report_module.build_context(Path(temporary))
                 load.assert_called_once()
 
+    def test_public_source_anchor_sidecar_restores_only_current_metadata_targets(self):
+        import research_pages as pages
+        from test_research_pages import Facts
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.copy_source(temporary)
+            ids = ['SYNTHETIC.earlier:source', 'source']
+            sidecar = {'schema_version': 'public-source-anchor-compatibility-v1',
+                'provenance': {'source_commit': 'a' * 40, 'source_path': 'dist/research/data/index.html',
+                               'source_html_sha256': 'b' * 64}, 'source_ids': ids,
+                'source_ids_sha256': citations.sha256((json.dumps(ids, separators=(',', ':')) + '\n').encode())}
+            (root / pages.SOURCE_ANCHORS).write_bytes(citations.json_bytes(sidecar))
+            frozen = {str(p.relative_to(root)): p.read_bytes()
+                      for p in (root / 'data/research/releases').rglob('*') if p.is_file()}
+            graph, report, gate = self.forbid_private()
+            with graph, report, gate, patch('urllib.request.urlopen', side_effect=AssertionError('No network')):
+                context = report_module.build_context(root)
+                original_graph = copy.deepcopy(context['graph'])
+                output = Path(temporary) / 'site'
+                pages.write_research_pages(output, context)
+            self.assertEqual(context['graph'], original_graph)
+            self.assertEqual(frozen, {str(p.relative_to(root)): p.read_bytes()
+                for p in (root / 'data/research/releases').rglob('*') if p.is_file()})
+            hub = Facts((output / 'research/data/index.html').read_text())
+            target = pages._evidence_url('source', ids[0])
+            self.assertEqual(hub.aliases['source-' + ids[0]], target)
+            self.assertEqual(hub.ids.count('source-' + ids[0]), 1)
+            records = {}
+            for bucket in pages.LEDGER_BUCKETS:
+                facts = Facts((output / ('research/data/sources/' + bucket + '/index.html')).read_text())
+                self.assertEqual(len(facts.ids), len(set(facts.ids)))
+                self.assertFalse(set(records) & set(facts.records))
+                records.update(facts.records)
+            self.assertEqual(set(records), {'source-source', 'source-' + ids[0]})
+            self.assertEqual(records['source-' + ids[0]]['class'], 'r-source-stub')
+            self.assertEqual(records['source-source']['class'], 'r-source')
+            body = (output / target.split('#')[0].lstrip('/') / 'index.html').read_text()
+            self.assertIn('Earlier public source identifier', body)
+            self.assertIn('This placeholder adds no source record, assertion or coverage.', body)
+            self.assertEqual(len(context['graph']['sources']), 1)
+            # Compatibility belongs to the live website, never an immutable edition.
+            for edition in (output / 'research/editions').glob('*/data/index.html'):
+                self.assertNotIn('source-' + ids[0], Facts(edition.read_text()).ids)
+
+    def test_public_source_anchor_sidecar_rejects_untrusted_shape_and_ids(self):
+        import research_pages as pages
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / 'data').mkdir()
+            path = root / pages.SOURCE_ANCHORS
+            def document(ids):
+                return {'schema_version': 'public-source-anchor-compatibility-v1',
+                    'provenance': {'source_commit': 'a' * 40, 'source_path': 'dist/research/data/index.html',
+                                   'source_html_sha256': 'b' * 64}, 'source_ids': ids,
+                    'source_ids_sha256': citations.sha256((json.dumps(ids, separators=(',', ':')) + '\n').encode())}
+            valid = document(['SYNTHETIC.source'])
+            bad = [None, [], {**valid, 'title': 'Do not publish source wording'},
+                   {**valid, 'schema_version': 1}, document(['SYNTHETIC.source'] * 2),
+                   document(['z', 'a']), document(['https://example.invalid/source']),
+                   document(['../private']), document(['contact@example.invalid']), document([True]),
+                   {**valid, 'source_ids_sha256': '0' * 64},
+                   {**valid, 'provenance': {**valid['provenance'], 'source_path': 'data/research/graph.json'}}]
+            for value in bad:
+                path.write_bytes(citations.json_bytes(value))
+                with self.subTest(value=value), self.assertRaises(ValueError):
+                    pages._source_anchor_ids(root)
+            path.write_bytes(citations.json_bytes(valid))
+            self.assertEqual(pages._source_anchor_ids(root), ['SYNTHETIC.source'])
+            path.write_text('{"schema_version":1,"schema_version":2}')
+            with self.assertRaisesRegex(ValueError, 'Duplicate'):
+                pages._source_anchor_ids(root)
+            path.unlink()
+            path.symlink_to(root / 'missing.json')
+            with self.assertRaisesRegex(ValueError, 'symlink'):
+                pages._source_anchor_ids(root)
+
     def test_selector_shape_identity_duplicate_and_inline_override_controls(self):
         cases = [None, [], {}, {**self.selector, "schema_version": 1},
                  {**self.selector, "current_release_id": "SYNTHETIC.missing"},
