@@ -2,12 +2,27 @@
 
 All scheduler actions are offline. They write only a separate state directory;
 they never change canonical data, `web/`, `dist/`, external accounts, or the
-production website. Current policy is `prepare_only` while the research coverage,
-source-cutoff and independent audit gates remain held. Zenodo production,
-Zenodo Sandbox and Hugging Face passed read-only authentication on 2026-11-10;
-the setup Hub repository remains private, without uploaded research.
-A prepared package, reserved DOI, published archive,
-mirror sync, and website deployment are distinct states.
+production website. The legacy authoring policy retained in
+`data/research/policy.json` remains `prepare_only`. The authorized first launch
+uses a separate private `publish_enabled` policy; release operations still
+recheck their applicable gates. After verified publication, public builds use
+the authenticated `data/research/published-source.json` selector to replay the
+frozen edition in `replay_only` mode, without new publication authority.
+The accepted first-launch scientific checkpoint includes coverage, the finite
+reference panel, the known-reference screening repeat and matching report
+synthesis. Its [screening admission](first-edition-screening-review.md) retains
+the operational deviations and evidence limits; it does not claim an unseen
+holdout or pristine access-mode compliance. Privacy and exact-artifact technical
+checks remain mandatory for the actual release.
+
+A prepared package, reserved DOI, verified production archive, mirror sync and
+website deployment are distinct states. Consult the served `/research/` hub,
+`/publication/package-status.json` and `/publication/current-metadata.json` for
+that edition's identity, archive status and citation, and each destination's
+verified release receipt for its outcome. Account authentication and a successful
+draft write do not establish public publication or a mirror write. Sandbox state
+cannot authorize production activation. Credentials and operational journals
+stay outside the public checkout.
 
 ## Local calendar
 
@@ -106,20 +121,30 @@ preparation metadata so a changed timestamp is detected too.
 An older edition must resolve its stored inputs, never fall back to the current
 report. The coordinator can use `load_edition(state, "2026-11-09", candidate_id)`
 or `resolve_edition_reference(state, entry)` from `research_schedule`. The latter
-accepts a `candidate_sha256` and/or `snapshot_sha256` compact reference and checks
-its release binding. To feed the existing renderer, hydrate each reference as
+accepts a scheduler `candidate_sha256` and/or canonical `snapshot_sha256` compact
+reference and checks its release binding. To feed a legacy full-input renderer, hydrate each reference as
 `{**entry, **resolve_edition_reference(state, entry)}` before rendering. Recompute
 its publication gate and require its actual archive receipt; a stored preparation
 or an entry labelled published does not establish publication. Without a candidate
 digest, `load_edition` selects that Monday's latest journaled preparation.
+Committed `snapshot_path` references have different semantics: their digest is the
+exact source file's byte hash. Resolve them with
+`research_report.load_edition_snapshots(source_root, report)`. Staging the next
+week preserves those paths and raw digests unchanged; it must not replace them
+with a machine-local scheduler snapshot's canonical digest.
 
 Older embedded snapshots in `report.editions` are externalized to compact digest
 references when staging. Nested edition histories are externalized as well, so
 freezing another weekly report does not embed every prior report inside itself.
-Current canonical `report.editions` is empty: this storage does not invent a
-published history, public edition URL, or feed item.
+An empty `report.editions` invents no published history, public edition URL or
+feed item. Only verified source-owned edition records can establish that history.
 
-## Committable edition source snapshots
+## Legacy full-input edition exports
+
+The legacy export below requires inputs that are already wholly public. Keep an
+audited private graph unchanged when that check fails. Redacting it to force a
+legacy export would invalidate its scientific input binding. New published
+editions use the archive-backed descriptor workflow below instead.
 
 Scheduler state defaults to `output/research-state`, outside disposable `build/`
 artifacts. Preserve that directory and its journal across local runs. State files
@@ -168,6 +193,44 @@ dates remain unchanged. Published rendering also needs the exact frozen package,
 tracked `data/research/releases/<release-id>/publication` bundle. This source
 export and its SHA receipt do not substitute for those verified archive bytes.
 
+## Public archive-backed edition history
+
+After actual production archival publication and anonymous file verification,
+retain the exact public package under the source-selected
+`data/research/releases/<release-id>/publication` directory and record its exact
+context, manifest and ZIP pins in `data/research/prepared-packages.json`. Export
+the compact public descriptor using the actual adapter receipt:
+
+```sh
+python3 scripts/research_edition_replay.py export --root CHECKOUT \
+  --release research-2026-11-12.1 \
+  --archive-receipt /absolute/private/path/actual-archive-receipt.json \
+  --output CHECKOUT/data/research/editions/research-2026-11-12.1.json
+```
+
+Add the verified descriptor's path, exact-file `snapshot_sha256`, release ID and
+actual published status to `report.editions`. The descriptor contains the public
+registry selection and typed production receipt. The private `bundle_path`
+operational pointer is omitted; the independently selected public package path
+replaces it. No private original graph, credentials or caches enter the public
+file. An export does not create an archive or establish its publication.
+
+The historical reader verifies the exact archive, matching public exports,
+frozen accepted audits and original report review commitments. It preserves the
+original private graph's opaque byte commitment and the separate scientific
+graph commitments without pretending to reconstruct private inputs from their
+public projection. It reuses authenticated historical acceptance, rather than
+claiming a new source review. A descriptor cannot authorize fresh preparation,
+DOI reservation, upload or publication. A matching already verified production
+journal permits existing-archive read-only reconciliation and mirror recovery.
+
+For the authorized first launch, keep the exact reviewed release, recorded
+non-Monday edition date, source cutoff and one-time authorization. Use the direct
+current-input publication flow, then export this descriptor. Do not call weekly
+`prepare_candidate` to retarget that launch to Monday. Subsequent weekly
+preparation uses the normal Monday calendar and preserves every committed
+historical descriptor's original byte digest.
+
 ## Coordinator review and local activation
 
 An actual coordinator review receipt can be imported with:
@@ -196,10 +259,10 @@ receipt in a transient context and rechecks the final gate. It cannot edit the
 candidate's science identity or frozen inputs. Activation journals that receipt's
 digest, release, exact artifact digest, and actual confirmation time; it refuses
 a future confirmation or a different receipt on retry. It does not publish to
-external services. Present policy therefore holds every activation attempt. A production release adapter must additionally
-verify actual account connections, archive and mirror receipts, exact-artifact
-preview tests, and serialized website promotion. Changing JSON policy is not
-evidence of an external publication.
+external services. A production website release additionally requires a verified
+production archive receipt, exact-artifact preview tests and serialized website
+promotion. Mirror operations verify their own account capabilities and receipts.
+Changing JSON policy is not evidence of an external publication.
 
 Activation dates advance monotonically. A delayed old job cannot replace a newer
 edition. Retrying the active candidate returns `already_active` and restores the
@@ -234,3 +297,14 @@ reserve a DOI or prove a successful remote write. Use network mutations only
 through the separately reviewed release adapters after the applicable gates pass.
 See [Zenodo account setup](zenodo-account-setup.md) and
 [Hugging Face account setup](huggingface-account-setup.md).
+
+## One-time initial launch timing
+
+On November 11, 2026 the user authorized publishing the first edition as soon as
+all research and technical gates pass. Its actual source cutoff and release ID
+are bound to a one-time authorization in the release policy. This exception changes
+only the initial calendar: coverage, source capture, independent review, audit,
+privacy, archive and exact-artifact requirements still apply. Capture and publication
+times are never backdated. After the first edition, Friday 17:00 Pacific source
+cutoffs and Monday 09:00 Pacific publication targets remain in force. Weekly
+preparation explicitly clears the exception and stages a weekly edition.

@@ -7,7 +7,12 @@ const { evidenceURL } = require('./research-ledger');
 test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
 
 const reportPath = '/research/state-of-ai-data-labs/';
-const publicPages = ['/', '/research/', reportPath, '/research/data/', '/review/', '/company/scale_ai/'];
+const chapterIds = ['executive-assessment', 'weekly-developments', 'market-structure',
+  'technical-landscape', 'provider-dossiers', 'datasets-and-benchmarks',
+  'human-expertise-and-operations', 'commercial-evidence', 'governance',
+  'buyer-decision-guides', 'research-outlook', 'methods-and-appendices'];
+const readingPages = chapterIds.map((id, index) => index ? reportPath + 'chapters/' + id + '/' : reportPath);
+const publicPages = ['/', '/research/', ...readingPages, '/research/data/', '/review/', '/company/scale_ai/'];
 
 test.beforeEach(async ({ page, request }, info) => {
   const response = await request.get('/manifest.json');
@@ -29,24 +34,31 @@ test.afterEach(async ({}, info) => {
 test.describe('research without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
-  test('hub opens a complete twelve-chapter report with working chapter links', async ({ page }) => {
+  test('hub opens all twelve complete native chapters without JavaScript', async ({ page }) => {
     await page.goto('/research/');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('human work');
     await expect(page.locator('.r-chapter-list a')).toHaveCount(12);
     await page.getByRole('link', { name: 'Read the research →', exact: true }).click();
     await expect(page).toHaveURL(new RegExp(reportPath + '$'));
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('State of AI Data Labs and Human Feedback');
-    await expect(page.locator('.r-report-body > .r-chapter:not(#cite)')).toHaveCount(12);
+    await expect(page.locator('.r-report-body > .r-chapter:not(#cite)')).toHaveCount(1);
     const chapters = await page.locator('.r-toc ol a').evaluateAll(links => links.map(link => ({ href: link.getAttribute('href'), title: link.textContent })));
     expect(chapters).toHaveLength(12);
-    for (const chapter of chapters) {
-      const section = page.locator('[id=' + JSON.stringify(chapter.href.slice(1)) + ']');
-      await expect(section.getByRole('heading', { level: 2 })).toHaveText(chapter.title);
-      expect(await section.locator('.r-paragraph p').count(), chapter.title).toBeGreaterThan(0);
+    expect(chapters.map(chapter => chapter.href)).toEqual(readingPages);
+    for (const [index, chapter] of chapters.entries()) {
+      await page.goto(chapter.href);
+      await expect(page.locator('[id=' + JSON.stringify(chapterIds[index]) + ']')).toBeVisible();
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sciencetostartup.com' + chapter.href);
+      expect(await page.locator('.r-report-body .r-paragraph p').count(), chapter.title).toBeGreaterThan(0);
+      await expect(page.getByRole('navigation', { name: 'Report chapters' }).locator('[aria-current="page"]')).toHaveAttribute('href', chapter.href);
+      if (index) await expect(page.locator('.r-reader-pagination [rel="prev"]')).toHaveAttribute('href', readingPages[index - 1]);
+      if (index + 1 < chapters.length) await expect(page.locator('.r-reader-pagination [rel="next"]')).toHaveAttribute('href', readingPages[index + 1]);
     }
+    await page.goto(reportPath + '#methods-and-appendices');
+    await expect(page.locator('#methods-and-appendices')).toBeInViewport();
     await page.locator('.r-toc ol a').last().click();
-    await expect(page).toHaveURL(/#methods-and-appendices$/);
-    await expect(page.locator('#methods-and-appendices > h2')).toBeInViewport();
+    await expect(page).toHaveURL(new RegExp(readingPages.at(-1) + '$'));
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Methods');
   });
 
   test('report evidence opens the assertion and its source ledger entry', async ({ page }) => {
@@ -155,6 +167,34 @@ test('global search offers a native research link and respects opening it in a n
   await result.click();
   await expect(page).toHaveURL(new RegExp(reportPath + '$'));
 });
+
+for (const surface of ['home', 'site']) {
+  test(surface + ' search opens a complete chapter with native new-tab, Enter and history behavior', async ({ page, context }) => {
+    const start = surface === 'home' ? '/' : '/explore/#companies';
+    const chapter = readingPages[3];
+    await page.goto(start);
+    if (surface === 'site') await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    await page.locator('#' + surface + '-search-open').click();
+    await page.locator('#' + surface + '-search-input').fill('technical landscape');
+    const result = page.locator('#' + surface + '-search-results a[href=' + JSON.stringify(chapter) + ']');
+    await expect(result).toContainText('Technical landscape');
+    const opened = context.waitForEvent('page');
+    await result.click({ modifiers: ['ControlOrMeta'] });
+    const tab = await opened;
+    await tab.waitForLoadState();
+    expect(new URL(tab.url()).pathname).toBe(chapter);
+    await expect(tab.getByRole('heading', { level: 1 })).toContainText('Technical landscape');
+    await tab.close();
+    expect(new URL(page.url()).pathname + new URL(page.url()).hash).toBe(start);
+    await result.focus();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(new RegExp(chapter + '$'));
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Technical landscape');
+    expect(await page.locator('.r-report-body .r-paragraph').count()).toBeGreaterThan(0);
+    await page.goBack();
+    expect(new URL(page.url()).pathname + new URL(page.url()).hash).toBe(start);
+  });
+}
 
 test('public pages retain keyboard skip navigation into the main content', async ({ page, browserName }) => {
   // Safari's default keyboard setting visits links with Option-Tab.

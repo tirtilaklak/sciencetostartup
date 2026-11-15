@@ -1,0 +1,162 @@
+{
+  "archival_ready": true,
+  "archive_reasons": [
+    "An actual public versioned archive receipt with DOI and exact artifact digest is required; a prepared package is not publication."
+  ],
+  "audit_metrics": {
+    "reference": {
+      "all_supported_panel_recall_if_all_withheld_supported": 0.925,
+      "completion_authorized": true,
+      "critical_false_attributions": 0,
+      "evaluation_kind": "source_bound_initial_hypothesis_disposition_holdout",
+      "execution_admitted": true,
+      "false_negative": 7,
+      "false_positive": 0,
+      "integrity_valid": true,
+      "numerical_thresholds_met": true,
+      "observed_included": 185,
+      "observed_withheld": 15,
+      "precision": 1.0,
+      "precision_denominator": 185,
+      "publication_eligible": true,
+      "recall": 0.9635416666666666,
+      "recall_denominator": 192,
+      "sample_size": 200,
+      "supported_withheld": 7,
+      "thresholds": {
+        "reference_precision": 0.98,
+        "reference_recall": 0.95,
+        "reference_sample_size": 200
+      },
+      "true_negative": 8,
+      "true_positive": 185,
+      "unknown": 0,
+      "unresolved_critical_attributions": 0,
+      "unsupported_withheld": 8
+    },
+    "screening": {
+      "completion_authorized": true,
+      "critical_false_attributions": 0,
+      "evaluation_kind": "frozen_reference_post_remediation_repeat",
+      "execution_admitted": true,
+      "frame_critical_false_attributions": 0,
+      "frame_eligible_predictions_by_truth_state": {
+        "eligible": 244,
+        "excluded": 0,
+        "not_logical_unit": 0,
+        "unknown": 9
+      },
+      "frame_size": 269,
+      "frame_truth_states": {
+        "eligible": 248,
+        "excluded": 0,
+        "not_logical_unit": 0,
+        "unknown": 21
+      },
+      "frame_unresolved_conclusive_attributions": 0,
+      "integrity_valid": true,
+      "numerical_thresholds_met": true,
+      "original200_sensitivity": {
+        "completes_contract": false,
+        "current_blind_truth_states": {
+          "eligible": 192,
+          "excluded": 0,
+          "not_logical_unit": 0,
+          "unknown": 8
+        },
+        "current_distinct_eligible_logical_units": 192,
+        "current_source_supported_recovered_records": 189,
+        "fixed_record_count": 200,
+        "preserved_original_eligibility": {
+          "false": 0,
+          "true": 187,
+          "unknown": 13
+        },
+        "raw_retained_original_positive_records": 182
+      },
+      "publication_eligible": true,
+      "recovered": 197,
+      "sample_size": 200,
+      "strata": {
+        "benchmark": {
+          "eligible": 25,
+          "recall": 1.0,
+          "recovered": 25
+        },
+        "dataset": {
+          "eligible": 60,
+          "recall": 0.95,
+          "recovered": 57
+        },
+        "paper": {
+          "eligible": 65,
+          "recall": 1.0,
+          "recovered": 65
+        },
+        "supplier": {
+          "eligible": 50,
+          "recall": 1.0,
+          "recovered": 50
+        }
+      },
+      "thresholds": {
+        "screening_recovered": 190,
+        "screening_sample_size": 200,
+        "screening_stratum_recall": 0.9
+      },
+      "unresolved_critical_attributions": 0
+    }
+  },
+  "coverage": {
+    "abstract_reviewed_entities": 0,
+    "approved_assertions": 2548,
+    "benchmark_families": 87,
+    "candidate_assertions": 195,
+    "candidate_entities": 88,
+    "captured_source_versions": 783,
+    "captured_sources": 3260,
+    "core_disposition_rate": 0.9350961538461539,
+    "core_dispositioned": 389,
+    "core_eligible": 416,
+    "coverage_floors_met": true,
+    "coverage_method_version": "1.3.0",
+    "dataset_families": 85,
+    "historical_assertions": 39,
+    "launch_floors": {
+      "benchmark_families": 20,
+      "core_disposition_rate": 0.9,
+      "dataset_families": 60,
+      "legacy_inclusion_audits": 39,
+      "qualifying_suppliers": 60,
+      "reviewed_papers": 150
+    },
+    "legacy_dispositions": 38,
+    "legacy_inclusion_audits": 39,
+    "legacy_organizations": 39,
+    "qualifying_suppliers": 73,
+    "quality_audit_recorded": true,
+    "reviewed_papers": 225,
+    "screening_audit_recorded": false
+  },
+  "ready": false,
+  "reasons": [
+    "An actual public versioned archive receipt with DOI and exact artifact digest is required; a prepared package is not publication."
+  ],
+  "report_review_ready": true,
+  "source_cutoff": "2026-11-12T17:32:13.289438Z",
+  "status": "prelaunch",
+  "thresholds": {
+    "benchmark_families": 20,
+    "core_disposition_rate": 0.9,
+    "dataset_families": 60,
+    "legacy_inclusion_audits": 39,
+    "qualifying_suppliers": 60,
+    "reference_precision": 0.98,
+    "reference_recall": 0.95,
+    "reference_sample_size": 200,
+    "reviewed_papers": 150,
+    "screening_recovered": 190,
+    "screening_sample_size": 200,
+    "screening_stratum_recall": 0.9
+  }
+}

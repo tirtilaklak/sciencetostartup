@@ -212,6 +212,22 @@ def _edition_references(entries, directory, current_snapshot):
             raise ValueError("Edition references must be objects.")
         reference = {key: copy.deepcopy(value) for key, value in entry.items()
                      if key not in {*snapshot_keys, "snapshot", "gate"}}
+        if entry.get('snapshot_path') is not None:
+            # Committed source files use their raw-file SHA, not a scheduler
+            # snapshot's canonical JSON digest. They are already externalized.
+            relative = entry['snapshot_path']
+            if (not isinstance(relative, str) or not relative
+                    or Path(relative).as_posix() != relative or '\\' in relative
+                    or Path(relative).is_absolute() or len(Path(relative).parts) < 2
+                    or Path(relative).parts[0] != 'editions'
+                    or any(part in {'.', '..'} for part in relative.split('/'))
+                    or Path(relative).suffix != '.json'
+                    or not isinstance(entry.get('snapshot_sha256'), str)
+                    or not re.fullmatch(r'[0-9a-f]{64}', entry['snapshot_sha256'])
+                    or not isinstance(entry.get('release_id'), str) or not entry['release_id']):
+                raise ValueError('Committed edition reference requires a safe source path and exact raw-file digest.')
+            references.append(reference)
+            continue
         embedded = entry.get("snapshot")
         if not isinstance(embedded, dict) and all(key in entry for key in snapshot_keys[:4]):
             embedded = {key: entry.get(key, {}) for key in snapshot_keys}
@@ -269,6 +285,8 @@ def load_edition(directory, monday, candidate_id=None):
 
 def resolve_edition_reference(directory, reference):
     """Hydrate a compact archive entry; this does not establish publication."""
+    if reference.get('snapshot_path') is not None:
+        raise ValueError('Committed edition references require the source-checkout edition loader, not scheduler state.')
     if reference.get("candidate_sha256"):
         candidate = _read_candidate(directory, reference["candidate_sha256"])
         snapshot = candidate["snapshot"]
@@ -381,6 +399,9 @@ def prepare_candidate(context, directory, monday, now):
     """Stage an edition copy; stable inputs resume without changing canonical data."""
     from research_report import publication_gate
 
+    if (context.get('published_edition_replay') is not None
+            or context.get('policy', {}).get('mode') == 'replay_only'):
+        raise ValueError('Historical public replay cannot stage a fresh edition.')
     directory = Path(directory)
     window = edition_window(monday)
     prepared_on = _iso(_aware(now))
@@ -399,7 +420,10 @@ def prepare_candidate(context, directory, monday, now):
         new_edition = report.get("release_id") != release_id or report.get("edition_date") != window["edition_id"]
         report.update({"edition_date": window["edition_id"], "release_id": release_id,
                        "source_cutoff": window["source_cutoff"], "publish_at": window["publish_at"],
-                       "status": "prepared"})
+                       "status": "prepared", "edition_kind": "weekly"})
+        # The user's first-launch exception never grants scheduled editions a
+        # floating cutoff or permission to bypass their normal Monday window.
+        snapshot["policy"].pop("initial_launch_authorization", None)
         if new_edition:
             # A previous DOI or reserved deposition does not belong to this issue.
             report["archive"] = {"status": "not_published", "doi": None, "record_url": None}
@@ -477,6 +501,7 @@ def _publication_snapshot(candidate, archive_receipt=None):
         if archive_receipt.get("release_id") != candidate["identity"]["release_id"]:
             raise ValueError("Archive receipt does not bind the exact candidate release.")
         if (archive_receipt.get("status") != "published" or archive_receipt.get("verified") is not True
+                or archive_receipt.get('anonymous_verified') is not True
                 or archive_receipt.get("api_origin") != "https://zenodo.org"
                 or archive_receipt.get("environment") != "production"
                 or not re.fullmatch(r"[0-9a-f]{64}", archive_receipt.get("artifact_sha256") or "")):

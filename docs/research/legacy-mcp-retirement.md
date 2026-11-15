@@ -17,6 +17,11 @@ https://github.com/modelcontextprotocol/registry/blob/main/docs/reference/cli/co
 
 Target server: `io.github.musa8026/sciencetostartup`.
 Observed historical version: `2.2.0`.
+The official latest-version endpoint was rechecked with a read-only request on
+15 November 2026 UTC: version `2.2.0` still reports registry status `active`, with
+its recorded update date of 29 April 2026. This is a stale external listing, not
+evidence that the retired endpoint operates. Owner-authenticated retirement has
+not been performed.
 Retirement message: "Legacy paper-commercialization service retired. Current
 ScienceToStartup public research: https://sciencetostartup.com/research/"
 

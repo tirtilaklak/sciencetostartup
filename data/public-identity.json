@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "updated_on": "2026-11-09",
+  "updated_on": "2026-11-15",
   "brand": "ScienceToStartup",
   "origin": "https://sciencetostartup.com",
   "description": "Independent public-source research on AI data organizations, human feedback and evaluations. Source-linked profiles, research methods and reusable evidence.",
@@ -40,7 +40,7 @@
       "id": "research",
       "title": "AI data labs and human feedback research",
       "path": "/research/",
-      "status": "prelaunch"
+      "status": "public"
     }
   ],
   "disclosures": [
@@ -64,7 +64,7 @@
     {
       "service": "LinkedIn",
       "url": "https://www.linkedin.com/company/sciencetostartup",
-      "status": "owner_access_required"
+      "status": "update_pending"
     },
     {
       "service": "Legacy MCP registry",

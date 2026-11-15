@@ -3,10 +3,10 @@
     "access_right": "open",
     "creators": [
       {
-        "name": "Musa Ozdem"
+        "name": "Ozdem, Musa"
       }
     ],
-    "description": "Preparation snapshot; not a published research edition. No DOI has been registered for this snapshot.",
+    "description": "ScienceToStartup research edition research-2026-11-12.1: complete report, source-bound evidence, methods, citations and reproducible public exports. Separate AI review is identified by its actual scope; it is not human peer review. Third-party sources retain their rights. Publication and DOI status are established by this archival record.",
     "keywords": [
       "AI data",
       "research",
@@ -16,6 +16,6 @@
     "publication_type": "report",
     "title": "State of AI Data Labs and Human Feedback",
     "upload_type": "publication",
-    "version": "research-2026-11-10.prelaunch.1"
+    "version": "research-2026-11-12.1"
   }
 }

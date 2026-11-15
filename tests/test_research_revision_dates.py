@@ -28,7 +28,12 @@ class RevisionDateTests(unittest.TestCase):
                                      {'id': 'claim.b', 'subject_id': 'paper.b', 'status': 'approved',
                                       'as_of': '2026-10-03T12:00:00Z', 'review_ids': [], 'evidence': []}],
                       'reviews': []},
-            'report': {'updated_on': '2026-11-10', 'release_id': 'fixture'},
+            'report': {'updated_on': '2026-11-10', 'release_id': 'fixture',
+                       'sections': [{'id': chapter, 'title': 'Synthetic ' + chapter, 'paragraphs': []}
+                                    for chapter in ('executive-assessment', 'weekly-developments', 'market-structure',
+                                                    'technical-landscape', 'provider-dossiers', 'datasets-and-benchmarks',
+                                                    'human-expertise-and-operations', 'commercial-evidence', 'governance',
+                                                    'buyer-decision-guides', 'research-outlook', 'methods-and-appendices')]},
             'policy': {}, 'identity': {}, 'gate': {}, 'corrections': []}
         self.review = {'id': 'review.a', 'assertion_ids': ['claim.a'],
                        'assertion_sha256': {'claim.a': rg.assertion_digest(self.context['graph']['assertions'][0])},
@@ -88,6 +93,24 @@ class RevisionDateTests(unittest.TestCase):
         html = rp._render(self.context, 'A', 'Fixture.', self.a, '<h1>A</h1>')
         node = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)[1])
         self.assertEqual(node['dateModified'], rp._sitemap_record(self.context, self.a)['lastmod'])
+
+    def test_chapters_share_bound_report_revision_without_redating_evidence(self):
+        import research_report
+        baseline = rp._revision_dates(self.context)
+        receipt = {'fixture': False, 'method': 'report_content_review', 'reviewer': 'Synthetic reviewer',
+                   'invocation_id': 'SYNTHETIC.review.only', 'reviewed_on': '2026-11-12T12:00:00Z',
+                   'report_sha256': research_report.report_review_digest(self.context['report']),
+                   'graph_sha256': research_report.canonical_hash(self.context['graph'])}
+        self.context['policy']['report_reviews'] = [receipt]
+        revised = rp._revision_dates(self.context)
+        for section in self.context['report']['sections']:
+            path = rp._reader_path(section)
+            self.assertEqual(revised[path], '2026-11-12')
+            self.assertEqual(rp._page_revision(self.context, '/research/editions/2026-11-09.r2/'
+                                              + path.removeprefix(rp.REPORT_PATH)), revised[path])
+        self.assertEqual(revised[self.a], baseline[self.a])
+        receipt['report_sha256'] = '0' * 64
+        self.assertEqual(rp._revision_dates(self.context)[rp.REPORT_PATH], '2026-11-10')
 
     def test_frozen_edition_uses_snapshot_dates_and_version_bounded_paths(self):
         frozen = copy.deepcopy(self.context)

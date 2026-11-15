@@ -22,6 +22,7 @@ import xml.etree.ElementTree as ET
 import static_pages as sp
 from research_corrections import correction_records as _correction_records
 from research_findings import executive_findings, finding_anchor, field_text, JUDGMENT_FIELDS, WITHHELD, paragraph_supported, WITHHELD_PARAGRAPH
+from research_operating_status import with_operating_status, operating_status_notice
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = "/research/state-of-ai-data-labs/"
@@ -174,6 +175,8 @@ def _revision_dates(context):
                       and row.get('reviewer') and row.get('invocation_id')]
     report_date = latest([context['report'].get('updated_on'), *report_reviews])
     dates[REPORT_PATH] = report_date
+    for section in context["report"]["sections"][1:]:
+        dates[_reader_path(section)] = report_date
     dates[CORRECTIONS_PATH] = latest(row['corrected_on'] for row in corrections)
     corpus_date = latest(dates.values())
     for path in ('/research/', '/research/data/', '/review/'):
@@ -188,6 +191,8 @@ def _page_revision(context, path):
     # Immutable editions use their own snapshot's map, never today's inputs.
     if re.fullmatch(r'/research/editions/[^/]+/', path):
         path = REPORT_PATH
+    elif re.fullmatch(r'/research/editions/[^/]+/chapters/[^/]+/', path):
+        path = REPORT_PATH + path.split('/', 4)[4]
     else:
         path = re.sub(r'^/research/editions/[^/]+/data/', '/research/data/', path)
     return dates.get(path)
@@ -270,7 +275,10 @@ def _nav(current=""):
 def _crumbs(label, path, parent=None):
     crumbs = [("Home", sp.ORIGIN + "/"), ("Research", sp.ORIGIN + "/research/")]
     if parent:
-        crumbs.append((parent[1], sp.ORIGIN + "/research/" + parent[0] + "/"))
+        if parent[0].startswith("/"):
+            crumbs.append((parent[1], sp.ORIGIN + parent[0]))
+        else:
+            crumbs.append((parent[1], sp.ORIGIN + "/research/" + parent[0] + "/"))
     if path != "/research/":
         crumbs.append((label, sp.ORIGIN + path))
     return sp.crumb_nav(crumbs), crumbs
@@ -286,10 +294,25 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
                               _page_revision(context, path), crumbs, publisher=publisher)
     if not structured['dateModified']:
         structured.pop('dateModified')
-    if page_type == "TechArticle":
+    if page_type in {"TechArticle", "Book", "Chapter"}:
         structured.update({"author": publisher, "creativeWorkStatus": _status(context),
                            "version": context["report"]["release_id"],
                            "license": sp.DATA_LICENSE})
+    if page_type in {"Book", "Chapter"}:
+        base = path.split('chapters/', 1)[0] if page_type == "Chapter" else path
+        parts = [{"@type": "Chapter", "@id": sp.ORIGIN + _reader_path(section, base)
+                  + ('#' + _token(section['id']) if section['id'] == 'executive-assessment' else ''),
+                  "url": sp.ORIGIN + _reader_path(section, base)
+                  + ('#' + _token(section['id']) if section['id'] == 'executive-assessment' else ''),
+                  "name": section['title'], "position": index + 1}
+                 for index, section in enumerate(context['report']['sections'])]
+        if page_type == "Book":
+            structured['hasPart'] = parts
+        else:
+            section = next(section for section in context['report']['sections'] if _reader_path(section, base) == path)
+            structured['isPartOf'] = {"@type": "Book", "@id": sp.ORIGIN + base,
+                                      "name": context['report']['title'], "version": context['report']['release_id']}
+            structured['position'] = next(index + 1 for index, item in enumerate(context['report']['sections']) if item['id'] == section['id'])
     if path == '/research/data/':
         dataset = {"@type": "Dataset", "@id": sp.ORIGIN + '/research/data/#dataset',
                    "name": "ScienceToStartup public research projection", "url": sp.ORIGIN + path,
@@ -309,6 +332,12 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
              '<link rel="alternate" type="application/atom+xml" title="Published research editions" href="/research/atom.xml">\n'
              '<link rel="alternate" type="application/rss+xml" title="Research corrections" href="/research/corrections/feed.xml">\n'
              '<link rel="alternate" type="application/atom+xml" title="Research corrections" href="/research/corrections/atom.xml">\n')
+    if page_type in {"Book", "Chapter"}:
+        base = path.split('chapters/', 1)[0] if page_type == 'Chapter' else path
+        current = next(index for index, section in enumerate(context['report']['sections']) if _reader_path(section, base) == path)
+        for relation, index in (('prev', current - 1), ('next', current + 1)):
+            if 0 <= index < len(context['report']['sections']):
+                extra += '<link rel="' + relation + '" href="' + sp.escape(_reader_path(context['report']['sections'][index], base)) + '">\n'
     if 'data-research-index' in body:
         extra += '<script src="/research-index.js" defer></script>\n'
     return text.replace("</head>", extra + "</head>", 1)
@@ -360,7 +389,7 @@ def _browse(context):
 
 def _hub(context, editions=()):
     report = context["report"]
-    chapters = "".join(f'<li>{_link(REPORT_PATH + "#" + _token(section["id"]), section["title"])}</li>'
+    chapters = "".join(f'<li>{_link(_reader_path(section), section["title"])}</li>'
                        for section in report["sections"])
     archive_links = ('<section class="r-section"><h2>Published editions</h2><ul class="r-entity-list">'
                      + ''.join(f'<li>{_link(path, snapshot["report"]["release_id"])} · {_date(snapshot["report"]["updated_on"])}</li>'
@@ -373,6 +402,7 @@ def _hub(context, editions=()):
             f'<h2>{_link(REPORT_PATH, report["title"])}</h2><p>12 chapters. Source-level evidence. Clear limits.</p>'
             '<div class="r-report-rule" aria-hidden="true"><span></span><span></span><span></span><span></span></div>'
             f'<p>{sp.escape(report.get("summary"))}</p>{_link(REPORT_PATH, "Read the research →", "r-button")}</aside></header>'
+            + operating_status_notice(context) +
             '<section class="r-section" aria-labelledby="coverage"><div class="r-section-head"><div><p class="r-kicker">Progress you can inspect</p>'
             '<h2 id="coverage">Evidence before conclusions.</h2></div>'
             f'{_link("/research/data/", "Coverage, sources & downloads →", "r-text-link")}</div>'
@@ -494,6 +524,8 @@ def _claim_text(context, assertion):
 
 
 def _source_evidence(context, assertion):
+    if assertion.get("status") not in {"approved", "historical"}:
+        return ''
     sources = {s["id"]: s for s in context["graph"]["sources"]}
     rows = []
     for evidence in assertion.get("evidence", []):
@@ -529,7 +561,7 @@ def _assertion(context, assertion, *, compact=False):
     body += f'<p class="r-record-id">{_link(_evidence_url("assertion", aid), aid)}</p>'
     if assertion.get("qualifications") and status in {"approved", "historical"}:
         body += '<ul class="r-qualifications">' + "".join(
-            '<li>' + ('<strong>Original author-stage note:</strong> ' if q.startswith('Author-only candidate') else '') + sp.escape(q) + '</li>'
+            '<li>' + ('<strong>Original author-stage note:</strong> ' if q.startswith(('Author-only candidate', 'Actual new author-only source-content proposal.')) else '') + sp.escape(q) + '</li>'
             for q in assertion["qualifications"]) + "</ul>"
     if compact:
         body += '<p class="r-meta">' + _link(_evidence_url("assertion", aid),
@@ -578,28 +610,109 @@ def _findings(context):
     return body
 
 
-def _report(context, edition=False):
-    report = context["report"]
-    # In-page fragment links are generated here, never accepted from source data.
-    contents = "".join(f'<li><a href="#{_token(s["id"])}">{sp.escape(s["title"])}</a></li>' for s in report["sections"])
-    chapters = "".join(f'<section class="r-chapter" id="{sp.escape(s["id"])}"><h2>{sp.escape(s["title"])}</h2>'
-                       + "".join(_paragraph(context, p) for p in s.get("paragraphs", []))
-                       + (_findings(context) if s['id'] == 'executive-assessment' else '') + "</section>" for s in report["sections"])
-    state = "Published edition" if edition else _status(context)
-    return (f'<header class="r-page-head"><p class="r-kicker">{sp.escape(state)}</p><h1>{sp.escape(report["title"])}</h1>'
-            f'<p class="r-lede">{sp.escape(report.get("subtitle"))}</p>{_meta(context)}'
-            f'<p class="r-callout">{sp.escape(report.get("summary"))}</p>'
-            f'<p class="r-meta">{sp.escape(report.get("review_statement"))}</p></header>'
-            '<div class="r-report-layout"><aside class="r-toc"><h2>In this report</h2><ol>' + contents + '</ol>'
-            + _link("/research/data/", "Inspect coverage & evidence →", "r-text-link") + '</aside><div class="r-report-body">'
-            + chapters + '<section class="r-chapter" id="cite"><h2>Cite this work</h2>'
-            f'<p>{sp.escape(context["identity"].get("publisher", {}).get("name", sp.PUBLISHER_NAME))}. '
-            f'<cite>{sp.escape(report["title"])}</cite>. {sp.escape(report["release_id"])}. {_date(report["updated_on"])}.</p>'
-            + ('' if edition or (context["gate"].get("ready") and report.get("status") == "published") else '<p>This is a prepublication research snapshot. No published research edition or DOI is claimed.</p>')
-            + _link("/research/data/#citation", "Citation formats & reuse →", "r-text-link") + '</section></div></div>')
+def _reader_path(section, base=REPORT_PATH):
+    if section['id'] == 'executive-assessment':
+        return base
+    return base + 'chapters/' + _path_token(section['id']) + '/'
+
+
+def _reader_toc(context, current, base=REPORT_PATH, legacy_targets=False):
+    rows = []
+    for section in context['report']['sections']:
+        sid = section['id']
+        target = (' id="' + sp.escape(sid) + '"') if legacy_targets and sid != 'executive-assessment' else ''
+        active = ' aria-current="page"' if sid == current else ''
+        rows.append('<li' + target + '><a href="' + sp.escape(_reader_path(section, base)) + '"'
+                    + active + '>' + sp.escape(section['title']) + '</a></li>')
+    return ('<nav class="r-toc r-reader-toc" aria-label="Report chapters"><h2 id="contents">In this report</h2>'
+            '<ol>' + ''.join(rows) + '</ol>'
+            + _link('/research/data/', 'Inspect coverage & evidence →', 'r-text-link') + '</nav>')
+
+
+def _reader_downloads(context, base=REPORT_PATH, edition=False):
+    archive = _safe_url(context['report'].get('archive', {}).get('record_url'))
+    if edition and archive:
+        links = _link(archive, 'Complete archived report & downloads')
+    else:
+        available = context.get('publication_assets', [])
+        downloads = []
+        for filename, label in (('report.html', 'Complete HTML report'), ('report.pdf', 'Full report PDF')):
+            if 'publication/' + filename in available:
+                downloads.append(_link('/publication/' + filename, label))
+        links = ' · '.join(downloads)
+    return '<p class="r-reader-downloads">Read offline: ' + links + '</p>' if links else ''
+
+
+def _reader_navigation(context, section_id, base=REPORT_PATH):
+    sections = context['report']['sections']
+    index = next(i for i, section in enumerate(sections) if section['id'] == section_id)
+    links = []
+    if index:
+        previous = sections[index - 1]
+        links.append('<a rel="prev" href="' + sp.escape(_reader_path(previous, base)) + '">← Previous: '
+                     + sp.escape(previous['title']) + '</a>')
+    links.append(_link(base + '#contents', 'All twelve chapters'))
+    if index + 1 < len(sections):
+        following = sections[index + 1]
+        links.append('<a rel="next" href="' + sp.escape(_reader_path(following, base)) + '">Next: '
+                     + sp.escape(following['title']) + ' →</a>')
+    return '<nav class="r-reader-pagination" aria-label="Continue reading">' + ''.join(links) + '</nav>'
+
+
+def _reader_citation(context, edition=False):
+    report = context['report']
+    return ('<section class="r-chapter" id="cite"><h2>Cite this work</h2><p>'
+            + sp.escape(context['identity'].get('publisher', {}).get('name', sp.PUBLISHER_NAME)) + '. '
+            '<cite>' + sp.escape(report['title']) + '</cite>. ' + sp.escape(report['release_id']) + '. '
+            + _date(report['updated_on']) + '.</p>'
+            + ('' if edition or (context['gate'].get('ready') and report.get('status') == 'published')
+               else '<p>This is a prepublication research snapshot. No published research edition or DOI is claimed.</p>')
+            + _link('/research/data/#citation', 'Citation formats & reuse →', 'r-text-link') + '</section>')
+
+
+def _report(context, edition=False, base=REPORT_PATH):
+    report = context['report']
+    section = report['sections'][0]
+    state = 'Published edition' if edition else _status(context)
+    header = (f'<header class="r-page-head"><p class="r-kicker">{sp.escape(state)}</p>'
+              f'<h1>{sp.escape(report["title"])}</h1><p class="r-lede">{sp.escape(report.get("subtitle"))}</p>'
+              + _meta(context) + '<p class="r-callout">' + sp.escape(report.get('summary')) + '</p>'
+              + '<p class="r-meta">' + sp.escape(report.get('review_statement')) + '</p>'
+              + _reader_downloads(context, base, edition) + '</header>')
+    body = ('<section class="r-chapter" id="' + sp.escape(section['id']) + '"><h2>'
+            + sp.escape(section['title']) + '</h2>'
+            + ''.join(_paragraph(context, paragraph) for paragraph in section['paragraphs'])
+            + _findings(context) + '</section>'
+            + _reader_navigation(context, section['id'], base) + _reader_citation(context, edition))
+    return (header + ('' if edition else operating_status_notice(context))
+            + '<div class="r-report-layout r-book-reader">'
+            + _reader_toc(context, section['id'], base, legacy_targets=True)
+            + '<div class="r-report-body">' + body + '</div></div>')
+
+
+def _reader_chapter(context, section, base=REPORT_PATH, edition=False):
+    report = context['report']
+    index = next(i for i, item in enumerate(report['sections']) if item['id'] == section['id'])
+    header = ('<header class="r-page-head"><p class="r-kicker">Chapter ' + str(index + 1) + ' of '
+              + str(len(report['sections'])) + ' · ' + sp.escape(_status(context)) + '</p>'
+              + '<p class="r-reader-book-title">' + _link(base, report['title']) + '</p>'
+              + '<h1 id="' + sp.escape(section['id']) + '">' + sp.escape(section['title']) + '</h1>'
+              + _meta(context) + _reader_downloads(context, base, edition) + '</header>')
+    body = ('<section class="r-chapter r-reader-chapter-content" aria-labelledby="' + sp.escape(section['id']) + '">'
+            + ''.join(_paragraph(context, paragraph) for paragraph in section['paragraphs']) + '</section>'
+            + _reader_navigation(context, section['id'], base) + _reader_citation(context, edition))
+    return (header + '<div class="r-report-layout r-book-reader">'
+            + _reader_toc(context, section['id'], base)
+            + '<div class="r-report-body">' + body + '</div></div>')
 
 
 def _source(source):
+    if source.get('_withheld'):
+        return (f'<article class="r-source-stub" data-evidence-status="withheld" id="{sp.escape(_anchor("source", source["id"]))}">'
+                '<h3>Source metadata withheld</h3><p class="r-record-id">'
+                + sp.escape(source['id']) + '</p><p>This stable identifier is retained for traceability. '
+                'It has no evidence binding in the current approved or historical findings. '
+                'Draft-only citation metadata is withheld while its source identity and support are reviewed.</p></article>')
     return (f'<article class="r-source" id="{sp.escape(_anchor("source", source["id"]))}">'
             f'<h3>{_link(source.get("url"), source.get("title", source["id"]))}</h3>'
             f'<p class="r-record-id">{_link(_evidence_url("source", source["id"]), source["id"])}</p>'
@@ -618,7 +731,12 @@ def _ledger_records(context):
     for row in _correction_records(context):
         if row['claim_id'] not in assertions:
             stubs.setdefault(row['claim_id'], row)
-    return assertions, stubs, {row['id']: row for row in context['graph']['sources']}
+    retained_source_ids = {pin['source_id'] for row in assertions.values()
+                           if row.get('status') in {'approved', 'historical'}
+                           for pin in row.get('evidence', [])}
+    sources = {row['id']: row if row['id'] in retained_source_ids else {'id': row['id'], '_withheld': True}
+               for row in context['graph']['sources']}
+    return assertions, stubs, sources
 
 
 def _correction_stub(aid, row):
@@ -637,7 +755,8 @@ def _ledger_parts(kind, ids, current=None):
     return '<ol class="r-ledger-parts">' + ''.join(
         '<li><a href="' + _ledger_path(kind, bucket) + '"'
         + (' aria-current="page"' if current == bucket else '') + '>Part '
-        + str(index + 1).zfill(2) + '<span class="r-meta"> · ' + str(counts[bucket]) + ' records</span></a></li>'
+        + str(index + 1).zfill(2) + '<span class="r-meta"> · ' + str(counts[bucket])
+        + (' identifiers' if kind == 'source' else ' records') + '</span></a></li>'
         for index, bucket in enumerate(LEDGER_BUCKETS)) + '</ol>'
 
 
@@ -650,9 +769,14 @@ def _ledger_pages(context):
         for index, bucket in enumerate(LEDGER_BUCKETS):
             selected = [stable_id for stable_id in ids if _ledger_bucket(stable_id) == bucket]
             title = label + " ledger · Part " + str(index + 1).zfill(2)
-            description = "Complete " + label.lower() + " records, precise evidence bindings and original review scope for this part of the versioned ledger."
+            description = ("Source records and retained traceability identifiers for this part of the versioned ledger."
+                           if kind == 'source' else "Complete assertion records, precise evidence bindings and original review scope for this part of the versioned ledger.")
+            withheld = sum(bool(sources[stable_id].get('_withheld')) for stable_id in selected) if kind == 'source' else 0
+            membership = (str(len(selected)) + ' retained identifiers: ' + str(len(selected) - withheld)
+                          + ' source records and ' + str(withheld) + ' withheld metadata placeholders. '
+                          if withheld else str(len(selected)) + ' records. ')
             body = ('<header class="r-page-head"><p class="r-kicker">' + _status(context) + '</p><h1>'
-                    + title + '</h1><p class="r-lede">' + str(len(selected)) + ' records. '
+                    + title + '</h1><p class="r-lede">' + membership +
                     'Read source bindings and review scope, use find in page, or print this complete part.</p>'
                     + _meta(context) + '<p>' + _link('/research/data/', 'All ledger parts, downloads & citations →') + '</p></header>'
                     '<nav class="r-ledger-nav" aria-label="' + label + ' ledger parts">'
@@ -687,9 +811,11 @@ def _data(context):
             ("SQLite", "/publication/clean-dataset.sqlite"), ("Full evidence graph JSON · explicit statuses", "/research/exports/research-graph.json"),
             ("Evidence graph SQLite", "/research/exports/research-graph.sqlite"), ("Export checksums", "/research/exports/research-exports-manifest.json")]
     if 'publication/report.pdf' in context.get('publication_assets', []):
-        rows.insert(0, ('Read the report preparation PDF', '/publication/report.pdf'))
+        rows.insert(0, ('Read the report PDF', '/publication/report.pdf'))
     if 'publication/executive-brief.html' in context.get('publication_assets', []):
         rows.insert(0, ('Read the executive brief', '/publication/executive-brief.html'))
+    if 'publication/REUSE.md' in context.get('publication_assets', []):
+        rows.append(('Working JSON and SQLite examples', '/publication/REUSE.md'))
     links = "".join('<li>' + _link(url, label) + '</li>' for label, url in rows)
     citation_prefix = 'current-' if gate.get('ready') and report.get('archive', {}).get('status') == 'published' else ''
     cite = "".join('<li>' + _link('/publication/' + citation_prefix + name, label) + '</li>' for name, label in
@@ -701,6 +827,7 @@ def _data(context):
     return (f'<header class="r-page-head"><p class="r-kicker">{_status(context)}</p><h1>Open data.<br>Visible evidence.</h1>'
             '<p class="r-lede">Inspect what is supported, what is inherited, and what still needs review. '
             'Every count comes from the versioned evidence graph.</p>' + _meta(context) + '</header>'
+            + operating_status_notice(context) +
             '<section class="r-section" aria-labelledby="coverage"><h2 id="coverage">Progress toward publication</h2>'
             + _progress(context) + f'<p>{sp.escape(_counts(context))}.</p>'
             '<p>The frozen eligible core and two separate 200-record quality audits must also pass. The reference audit requires '
@@ -718,7 +845,7 @@ def _data(context):
             + f'<ul class="r-downloads">{cite}</ul><p>Reuse owned research under '
             + _link(sp.DATA_LICENSE, "CC BY 4.0") + '. Credit the publisher, release ID, original sources, and your changes. '
             'Source material retains its own rights and qualifications.</p>'
-            f'<ul class="r-downloads"><li>{_link("/publication/research-archive.zip", "Inspect the prepared reproduction package")}</li>'
+            f'<ul class="r-downloads"><li>{_link("/publication/research-archive.zip", "Download the reproduction package")}</li>'
             f'<li>{_link("/publication/MANIFEST.json", "Package SHA-256 inventory")}</li>'
             f'<li>{_link("/publication/package-status.json", "Archive & mirror status")}</li></ul></section>'
             '<section class="r-section" aria-labelledby="assertions"><h2 id="assertions">Assertion records</h2>'
@@ -811,7 +938,7 @@ def _index(context, category):
 def _detail(context, entity):
     approved, historical = _assertions(context, entity), _assertions(context, entity, ("historical",))
     linked = [a for a in context["graph"]["assertions"] if entity["id"] in {a.get("subject_id"), a.get("object_id")}]
-    sources = {s["id"]: s for s in context["graph"]["sources"]}
+    _, _, sources = _ledger_records(context)
     source_ids = sorted({item["source_id"] for a in linked for item in a.get("evidence", [])})
     identifiers = "".join(f'<dt>{sp.escape(key)}</dt><dd>{sp.escape(value)}</dd>' for key, value in sorted(entity.get("identifiers", {}).items()))
     taxonomy = "".join(f'<dt>{sp.escape(key.replace("_", " ").capitalize())}</dt><dd>{sp.escape(", ".join(values))}</dd>'
@@ -828,7 +955,7 @@ def _detail(context, entity):
             + '</section>'
             + ('<section class="r-section"><h2>Historical evidence</h2>' + "".join(_assertion(context, a) for a in historical) + '</section>' if historical else '')
             + '<section class="r-section"><h2>Connected evidence</h2>'
-            + ('<ul class="r-evidence-links">' + "".join('<li>' + _link(_evidence_url("source", sid), sources.get(sid, {}).get("title", sid)) + '</li>' for sid in source_ids) + '</ul>'
+            + ('<ul class="r-evidence-links">' + "".join('<li>' + _link(_evidence_url("source", sid), ("Source metadata withheld · " + sid) if sources.get(sid, {}).get("_withheld") else sources.get(sid, {}).get("title", sid)) + '</li>' for sid in source_ids) + '</ul>'
                if source_ids else '<p>No source records are attached yet.</p>')
             + '</section></div><aside class="r-detail-aside"><h2>Read this record carefully</h2>'
             '<p>Approval applies to a specific assertion and its qualifications. It does not imply provider endorsement, '
@@ -880,9 +1007,10 @@ def _published_editions(context):
     current context. No route or feed item is created for an incomplete record.
     """
     from research_report import publication_gate
+    from research_edition_replay import edition_entries
 
     editions, seen = [], set()
-    for entry in context["report"].get("editions", []):
+    for entry in edition_entries(context):
         if not isinstance(entry, dict) or entry.get("status") != "published":
             continue
         rid = entry.get("release_id")
@@ -890,11 +1018,19 @@ def _published_editions(context):
             continue
         persisted = context.get('edition_snapshots', {}).get(rid, {})
         snapshot = {key: persisted.get(key, entry.get(key, context[key])) for key in ("graph", "report", "policy", "identity")}
+        if persisted.get('published_edition_replay') is not None:
+            from research_edition_replay import read_replay_package
+            # This separate reader rechecks trusted source pins and the actual
+            # receipt. A projected graph never runs a fake fresh-input gate.
+            read_replay_package(persisted)
+            snapshot = dict(persisted)
+            gate = snapshot['gate']
+        else:
+            try:
+                gate = publication_gate(snapshot["graph"], snapshot["report"], snapshot["policy"])
+            except (ValueError, KeyError, TypeError):
+                continue
         if snapshot["report"].get("release_id") != rid or snapshot["report"].get("status") not in {"published", "superseded"}:
-            continue
-        try:
-            gate = publication_gate(snapshot["graph"], snapshot["report"], snapshot["policy"])
-        except (ValueError, KeyError, TypeError):
             continue
         if not gate.get("ready"):
             continue
@@ -907,7 +1043,8 @@ def _published_editions(context):
             except (ValueError, KeyError, TypeError):
                 continue
         try:
-            if datetime.fromisoformat(edition_date).weekday() != 0:
+            if (datetime.fromisoformat(edition_date).weekday() != 0
+                    and snapshot['report'].get('edition_kind', 'weekly') != 'launch'):
                 continue
         except (ValueError, TypeError):
             continue
@@ -1096,13 +1233,25 @@ def write_research_pages(output, context):
     output = Path(output)
     editions = _published_editions(context)
     corrections = _correction_records(context)
+    # Keep current operational notices outside immutable publication contexts.
+    context = with_operating_status(context, now=datetime.now(timezone.utc))
     context = {**context, '_render_corrections': corrections}
     context['_page_revisions'] = _revision_dates(context)
+    status = context.get('operating_status')
+    if status is not None:
+        observed_day = _day(status.observed_on.isoformat())
+        for path in ('/research/', REPORT_PATH, '/research/data/'):
+            context['_page_revisions'][path] = max(
+                context['_page_revisions'].get(path) or observed_day, observed_day)
     pages = [("/research/", "Human data research", "Public-source research connecting AI data suppliers, papers, datasets, benchmarks, and workflows, with visible evidence and coverage.", _hub(context, editions), "CollectionPage", None),
-             (REPORT_PATH, context["report"]["title"], context["report"].get("summary", "Research methods and findings."), _report(context), "TechArticle", None),
+             (REPORT_PATH, context["report"]["title"], context["report"].get("summary", "Research methods and findings."), _report(context), "Book", None),
              ("/research/data/", "Research data & evidence", "Versioned research data, source and assertion permalinks, publication progress, citations, and reproducible downloads.", _data(context), "CollectionPage", None),
              ("/review/", "Review & correct the research", "Contribute a source-backed correction, scoped review, or public reuse of ScienceToStartup research.", _review(context), "WebPage", None),
              (CORRECTIONS_PATH, "Research corrections", "Accepted research corrections, with affected editions, claims, correction dates and supporting evidence.", _corrections_page(context, corrections), "CollectionPage", None)]
+    pages.extend((_reader_path(section), section['title'],
+                  section['title'] + '. A chapter of ' + context['report']['title'] + ' with complete source-linked text.',
+                  _reader_chapter(context, section), "Chapter", (REPORT_PATH, context['report']['title']))
+                 for section in context['report']['sections'][1:])
     pages.extend(_ledger_pages(context))
     for category in CATEGORIES:
         slug, label, kinds, description = category
@@ -1140,8 +1289,15 @@ def write_research_pages(output, context):
                 text = re.sub(r'href="/(?:publication|research/exports)/[^\"]+"', 'href="' + sp.escape(archive) + '"', text)
             return text
         target.write_text(edition_links(_render(snapshot, snapshot['report']['title'], snapshot['report'].get('summary', ''), path,
-                                  _report(snapshot, edition=True), 'TechArticle')), encoding='utf-8')
+                                  _report(snapshot, edition=True, base=path), 'Book')), encoding='utf-8')
         records.append(_sitemap_record(snapshot, path))
+        for section in snapshot['report']['sections'][1:]:
+            chapter_path = _reader_path(section, path)
+            chapter_target = output / chapter_path.lstrip('/') / 'index.html'
+            chapter_target.parent.mkdir(parents=True, exist_ok=True)
+            chapter_target.write_text(edition_links(_render(snapshot, section['title'], section['title'] + '. Complete archived chapter.',
+                chapter_path, _reader_chapter(snapshot, section, path, edition=True), 'Chapter', (path, snapshot['report']['title']))), encoding='utf-8')
+            records.append(_sitemap_record(snapshot, chapter_path))
         ledger_path = path + 'data/'
         ledger = output / ledger_path.lstrip('/') / 'index.html'
         ledger.parent.mkdir(parents=True, exist_ok=True)
@@ -1170,6 +1326,9 @@ def research_search_entries(context):
         {"title": "Review & correct the research", "summary": "Submit a source-backed correction, scoped review, or public reuse.", "url": "/review/", "kind": "review", "keywords": "correction contribute review reuse"},
         {"title": "Research corrections", "summary": "Accepted corrections with affected editions, claims, correction dates and source evidence.", "url": CORRECTIONS_PATH, "kind": "review", "keywords": "corrections errata RSS Atom evidence"},
     ]
+    for index, section in enumerate(context['report']['sections'][1:], 2):
+        entries.append({"title": section['title'], "summary": _status(context) + '. Chapter ' + str(index) + ' of ' + context['report']['title'] + '.',
+                        "url": _reader_path(section), "kind": "report", "keywords": section['id'].replace('-', ' ')})
     for slug, title, kinds, description in CATEGORIES:
         entries.append({"title": title, "summary": description, "url": '/research/' + slug + '/', "kind": "research", "keywords": title.lower()})
     for entity in sorted(context['graph']['entities'], key=lambda row: row['id']):

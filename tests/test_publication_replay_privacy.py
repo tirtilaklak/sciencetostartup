@@ -1,6 +1,7 @@
 """TEST-ONLY published replay and draft privacy; no real publication is claimed."""
 import copy
 import json
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -16,6 +17,7 @@ import research_citations as citations
 import research_publish as publish
 from research_graph import assertion_digest
 from research_report import build_context
+from research_lifecycle_fixtures import isolated_render_context, isolated_render_preparation
 from test_publication_context import prepare_fixture, write_registry
 from test_research_publish import FakeZenodo
 
@@ -23,7 +25,7 @@ from test_research_publish import FakeZenodo
 def published_context(context, package):
     value = copy.deepcopy(context)
     value['report'].update(status='published', archive={
-        'status': 'published', 'verified': True, 'api_origin': 'https://zenodo.org', 'environment': 'production',
+        'status': 'published', 'verified': True, 'anonymous_verified': True, 'api_origin': 'https://zenodo.org', 'environment': 'production',
         'record_id': 123, 'doi': '10.5281/zenodo.123', 'concept_doi': '10.5281/zenodo.999',
         'record_url': 'https://zenodo.org/records/123', 'confirmed_on': '2026-11-09T00:00:00Z',
         'release_id': context['report']['release_id'],
@@ -131,7 +133,7 @@ class HistoricalV2Tests(unittest.TestCase):
             original = source.read_bytes()
             with patch.dict(sys.modules, {'research_report': gate}):
                 release = publish.Release(context, package, journal)
-                adapter = publish.Zenodo(release, transport=remote)
+                adapter = publish.Zenodo(release, transport=remote, public_reader=remote.public_read)
                 source.write_bytes(original + b'\nTEST-ONLY premature change\n')
                 with self.assertRaises(publish.PublicationBlocked):
                     adapter.upload()
@@ -151,7 +153,7 @@ class HistoricalV2Tests(unittest.TestCase):
                 self.assertTrue(release.require_archive()['verified'])
                 source.unlink()
                 retry = publish.Release(context, package, journal)
-                adapter = publish.Zenodo(retry, transport=remote)
+                adapter = publish.Zenodo(retry, transport=remote, public_reader=remote.public_read)
                 with patch.object(citations, 'reproduction_files', side_effect=AssertionError('No current recipe reads')):
                     self.assertTrue(retry.require_archive()['verified'])
                     adapter.publish()
@@ -172,13 +174,13 @@ class HistoricalV2Tests(unittest.TestCase):
             gate = types.SimpleNamespace(publication_gate=lambda *args: context['gate'])
             with patch.dict(sys.modules, {'research_report': gate}):
                 release = publish.Release(context, package, directory / 'TEST-ONLY-first.json')
-                first = publish.Zenodo(release, transport=remote)
+                first = publish.Zenodo(release, transport=remote, public_reader=remote.public_read)
                 first.upload()
                 first.publish()
                 published = copy.deepcopy(context)
                 published['report']['archive'] = release.archive_receipt()
                 (Path(context['root']) / 'LICENSE').unlink()
-                recovered = publish.Zenodo(publish.Release(published, package, directory / 'TEST-ONLY-lost-journal.json'), transport=remote)
+                recovered = publish.Zenodo(publish.Release(published, package, directory / 'TEST-ONLY-lost-journal.json'), transport=remote, public_reader=remote.public_read)
                 start = len(remote.calls)
                 with self.assertRaises(publish.PublicationBlocked):
                     recovered.upload()
@@ -193,9 +195,145 @@ class HistoricalV2Tests(unittest.TestCase):
 
 
 class DraftPrivacyTests(unittest.TestCase):
+    def test_verified_synthetic_public_replay_can_only_become_a_held_mutable_fixture(self):
+        import research_edition_replay as replay
+        from test_research_edition_replay import fixture
+
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            root, package, descriptor, _ = fixture(directory)
+            baseline = replay.load_published_edition(root, descriptor)
+            frozen = replay.read_replay_package(baseline)
+            baseline_before = copy.deepcopy(baseline)
+            capsule_before = {path.name: path.read_bytes() for path in package.iterdir() if path.is_file()}
+            self.assertTrue(baseline['gate']['ready'])
+            self.assertFalse(baseline['gate']['archival_ready'])
+            self.assertEqual(baseline['policy']['mode'], 'replay_only')
+            # Unmodified verified replay never acquires fresh preparation or
+            # adapter authority. These controls do not patch a gate or reader.
+            with self.assertRaisesRegex(ValueError, 'Historical public replay'):
+                citations.freeze_publication_package(baseline, directory / 'forbidden-freeze')
+            with self.assertRaisesRegex(ValueError, 'Historical public replay'):
+                publish.PublicationPlan(baseline, directory / 'forbidden-plan.json')
+            with self.assertRaises(publish.PublicationBlocked):
+                publish.archival_gate(baseline)
+
+            enriched = copy.deepcopy(baseline)
+            # Explicit TEST-ONLY sentinels check removal of the newer selector
+            # keys; they are not assertions of an authenticated source selector.
+            enriched['published_source_selection'] = {'TEST-ONLY': 'selector sentinel'}
+            enriched['public_edition_ledger'] = [{'TEST-ONLY': 'ledger sentinel'}]
+            enriched['edition_snapshots'] = {descriptor['release_id']: copy.deepcopy(baseline)}
+            before = copy.deepcopy(enriched)
+            stripped = isolated_render_context(enriched)
+            self.assertEqual(enriched, before)
+            self.assertNotIn('published_source_selection', stripped)
+            self.assertNotIn('public_edition_ledger', stripped)
+            # A minimal public source tree has capsules, not private authoring
+            # or current mutable owned-data inputs beside them.
+            for path in (root / 'data/research').iterdir():
+                if path.name not in {'releases', 'prepared-packages.json'}:
+                    shutil.rmtree(path) if path.is_dir() else path.unlink()
+            for name in ('graph.json', 'report.json', 'policy.json', 'audit-admissions.json',
+                         'source-manifestations.json', 'fonts'):
+                self.assertFalse((root / 'data/research' / name).exists(), name)
+            canonical_bytes = (ROOT / 'data/canonical.json').read_bytes()
+            with patch('urllib.request.urlopen', side_effect=AssertionError('No network')), \
+                    patch('socket.create_connection', side_effect=AssertionError('No network connection')), \
+                    patch('subprocess.run', side_effect=AssertionError('No subprocess')), \
+                    patch('runpy.run_path', side_effect=AssertionError('No archived Python execution')), \
+                    patch('importlib.util.spec_from_file_location', side_effect=AssertionError('No archived Python import')), \
+                    isolated_render_preparation(baseline, canonical_bytes=canonical_bytes) as context:
+                self.assertNotEqual(context['root'], root)
+                self.assertEqual((context['root'] / 'data/canonical.json').read_bytes(), canonical_bytes)
+                self.assertEqual(json.loads((context['root'] / 'data/research/audit-admissions.json').read_bytes()),
+                                 {'schema_version': '1.0.0', 'admissions': {}})
+                for name in ('graph.json', 'report.json', 'policy.json'):
+                    self.assertFalse((context['root'] / 'data/research' / name).exists(), name)
+                self.assertEqual(context['policy']['mode'], 'prepare_only')
+                self.assertEqual(context['report']['status'], 'prelaunch')
+                self.assertEqual(context['report']['archive'], {'status': 'not_published', 'doi': None})
+                self.assertEqual(context['report']['editions'], [])
+                self.assertEqual(context['edition_snapshots'], {})
+                for key in ('prepared_package', 'prepared_package_expected', 'published_edition_replay',
+                            'replay_verification', 'published_source_selection', 'public_edition_ledger'):
+                    self.assertNotIn(key, context)
+                for key in ('audits', 'audit_inputs', 'audit_admissions', 'initial_launch_authorization'):
+                    self.assertNotIn(key, context['policy'])
+                self.assertFalse(context['gate']['ready'])
+                self.assertFalse(context['gate']['archival_ready'])
+                self.assertTrue(context['gate']['archive_reasons'])
+
+                marker = 'TEST-ONLY-MUTABLE-DRAFT-NOT-PUBLISHED'
+                draft = copy.deepcopy(next(row for row in context['graph']['assertions']
+                                           if row['status'] == 'approved'))
+                draft.update(id='TEST-ONLY.mutable-draft', status='candidate', review_ids=[],
+                             value={'type': 'text', 'value': marker})
+                context['graph']['assertions'].append(draft)
+                projection = citations.public_projection(context, json.loads(canonical_bytes))
+                with patch.object(citations, 'public_projection', return_value=projection), \
+                        patch.object(citations, 'verified_pdf', return_value=None):
+                    held = citations.freeze_publication_package(context, directory / 'TEST-ONLY-held-preparation',
+                                                                archive_compression='deflate')
+                    files = citations.read_prepared_package(context, held)
+                self.assertNotIn(marker.encode(), files['source-context.json'])
+                source = json.loads(files['source-context.json'])
+                self.assertEqual(source['input_commitments']['graph_sha256'],
+                                 citations.sha256(citations.json_bytes(context['graph'])))
+                self.assertNotEqual(source['input_commitments']['graph_sha256'],
+                                    baseline['replay_verification']['input_commitments']['graph_sha256'])
+                status = json.loads((held / 'package-status.json').read_bytes())
+                self.assertEqual(status['archive'], 'not-published')
+                self.assertFalse(status['publication_ready'])
+                with self.assertRaises(publish.PublicationBlocked):
+                    publish.PublicationPlan(context, directory / 'held-plan.json').verify()
+            self.assertEqual(replay.read_replay_package(baseline), frozen)
+            self.assertEqual(baseline, baseline_before)
+            self.assertFalse(context['root'].exists(), 'Temporary owned recipe must be cleaned up')
+            self.assertEqual({path.name: path.read_bytes() for path in package.iterdir() if path.is_file()},
+                             capsule_before)
+            self.assertEqual((package / 'research-archive.zip').read_bytes(), frozen['research-archive.zip'])
+
+    def test_public_owned_recipe_must_match_current_owned_bytes_without_fallback(self):
+        import research_edition_replay as replay
+        from test_research_edition_replay import fixture, reseal
+
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            root, package, descriptor, _ = fixture(directory / 'original')
+            baseline = replay.load_published_edition(root, descriptor)
+            frozen = replay.read_replay_package(baseline)
+            changed_root = directory / 'TEST-ONLY-changed-public-recipe'
+            shutil.copytree(root, changed_root)
+            changed_package = changed_root / package.relative_to(root)
+            changed_descriptor = copy.deepcopy(descriptor)
+
+            def incompatible_owned_license(source, files):
+                name = 'LICENSE'
+                files[name] += b'\nTEST-ONLY later public license fixture, not a license change.\n'
+                source['package_context']['reproduction_inputs'][name] = {
+                    'bytes': len(files[name]), 'sha256': citations.sha256(files[name])}
+
+            # A coherently pinned, wholly synthetic historical recipe can be
+            # read as bytes. It cannot seed a fresh current-recipe test fixture.
+            reseal(changed_root, changed_package, changed_descriptor, incompatible_owned_license)
+            changed = replay.load_published_edition(changed_root, changed_descriptor)
+            with patch('urllib.request.urlopen', side_effect=AssertionError('No network')), \
+                    patch('socket.create_connection', side_effect=AssertionError('No network connection')), \
+                    patch('runpy.run_path', side_effect=AssertionError('No archived Python execution')), \
+                    patch('importlib.util.spec_from_file_location', side_effect=AssertionError('No archived Python import')):
+                with self.assertRaisesRegex(ValueError, 'Incompatible current public owned input: LICENSE'):
+                    with isolated_render_preparation(changed,
+                            canonical_bytes=(ROOT / 'data/canonical.json').read_bytes()):
+                        self.fail('Incompatible owned bytes must not seed a preparation')
+            self.assertEqual(replay.read_replay_package(baseline), frozen)
+
     def test_actual_graph_fixture_drafts_are_absent_from_every_archive_representation_and_remain_hash_bound(self):
-        context = build_context(ROOT, select_prepared=False)
-        context['root'] = ROOT
+        baseline = build_context(ROOT, select_prepared=False)
+        with isolated_render_preparation(baseline, canonical_bytes=(ROOT / 'data/canonical.json').read_bytes()) as context:
+            self.assert_drafts_are_private_and_hash_bound(context)
+
+    def assert_drafts_are_private_and_hash_bound(self, context):
         before = {row['id']: assertion_digest(row) for row in context['graph']['assertions'] if row['status'] == 'approved'}
         marker = 'TEST-ONLY-PRIVATE-UNAPPROVED-DRAFT-NEVER-PUBLISH'
         original = next(row for row in context['graph']['assertions'] if row['status'] == 'approved')

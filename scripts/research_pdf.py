@@ -70,7 +70,8 @@ def render_report_pdf(context):
         from reportlab.pdfbase import pdfmetrics
         from reportlab.pdfbase.ttfonts import TTFont
         from reportlab.pdfgen.canvas import Canvas
-        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, KeepTogether, Table, TableStyle
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, KeepTogether, Table, TableStyle, PageBreak
+        from reportlab.platypus.tableofcontents import TableOfContents
     except ImportError:
         raise RuntimeError("PDF preparation requires the optional ReportLab dependency; ordinary static builds do not.") from None
     report = privacy_filter(context["report"])
@@ -111,6 +112,9 @@ def render_report_pdf(context):
     styles["Heading2"].keepWithNext = True
     styles.add(ParagraphStyle("Evidence", fontName=family, fontSize=8, leading=12,
                               textColor=colors.HexColor("#52665e"), spaceAfter=12))
+    styles.add(ParagraphStyle("ResearchContents", fontName=family, fontSize=10, leading=16,
+                              textColor=colors.HexColor("#18312c"), spaceBefore=6,
+                              leftIndent=0, firstLineIndent=0, rightIndent=24))
     def escape(value):
         fragments = []
         for fallback, characters in groupby(checked_text(value), key=needs_cjk):
@@ -118,14 +122,16 @@ def render_report_pdf(context):
             fragments.append('<font name="' + cjk_name + '">' + text + '</font>' if fallback else text)
         return "".join(fragments)
     graph = privacy_filter(context["graph"])
-    sources = {row["id"]: row for row in graph.get("sources", [])}
-    assertions = {row["id"]: row for row in graph.get("assertions", [])}
+    assertions = {row["id"]: row for row in graph.get("assertions", [])
+                  if row.get("status") in {"approved", "historical"}}
+    public_source_ids = {pin["source_id"] for row in assertions.values() for pin in row.get("evidence", [])}
+    sources = {row["id"]: row for row in graph.get("sources", []) if row["id"] in public_source_ids}
     documents, source_numbers = bibliography_documents(sources)
     story = [Paragraph(escape(report["title"]), styles["Title"]), Spacer(1, 12),
              Paragraph(escape(metadata["status"].upper() + " | " + report["release_id"] + " | Updated " + report["updated_on"]), styles["Evidence"]),
              Paragraph(escape(metadata["note"]), styles["BodyText"]),
              Paragraph("Coverage and publication status", styles["Heading2"])]
-    if not context["gate"].get("ready"):
+    if metadata["status"] == "prelaunch":
         story.append(Paragraph("The comprehensive weekly series is in preparation. Historical examples and the research method are available; candidate discoveries do not count as reviewed research. The complete readiness record accompanies this PDF as readiness.json.", styles["BodyText"]))
     coverage = context["gate"].get("coverage", {})
     floors = context["gate"].get("thresholds", {})
@@ -139,9 +145,12 @@ def render_report_pdf(context):
                                ("LINEBELOW", (0, 0), (-1, 0), 0.6, colors.HexColor("#9fb4a9")),
                                ("LINEBELOW", (0, 1), (-1, -1), 0.3, colors.HexColor("#d8e2dc")),
                                ("LEFTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 7)]))
-    story.extend([table, Spacer(1, 16)])
+    contents = TableOfContents()
+    contents.levelStyles = [styles["ResearchContents"]]
+    story.extend([table, PageBreak(), Paragraph("Contents", styles["Heading2"]), contents, PageBreak()])
     for section in report.get("sections", []):
         heading = Paragraph(escape(section["title"]), styles["Heading2"])
+        heading.research_navigation = (section["title"], "chapter-" + sha256(section["id"].encode("utf-8")), 0, True)
         for index, paragraph in enumerate(section.get("paragraphs", [])):
             if not paragraph_supported(context, paragraph):
                 paragraph = {"kind": "research_gap", "text": WITHHELD_PARAGRAPH, "claim_ids": []}
@@ -158,9 +167,11 @@ def render_report_pdf(context):
         if section.get('id') == 'executive-assessment':
             findings, withheld = executive_findings({**context, 'report': report, 'graph': graph})
             for finding in findings:
+                finding_heading = Paragraph('<a name="' + finding_anchor(finding) + '"/><b>Analytical judgment: '
+                                            + escape(finding['id']) + '</b>', styles['BodyText'])
+                finding_heading.research_navigation = (finding['id'], finding_anchor(finding), 1, False)
                 story.append(KeepTogether([
-                    Paragraph('<a name="' + finding_anchor(finding) + '"/><b>Analytical judgment: '
-                              + escape(finding['id']) + '</b>', styles['BodyText']),
+                    finding_heading,
                     Paragraph(escape(field_text(finding['text'])), styles['BodyText'])]))
                 for key, label in JUDGMENT_FIELDS:
                     if field_text(finding.get(key)):
@@ -168,7 +179,9 @@ def render_report_pdf(context):
                 story.append(Paragraph('Approved evidence IDs: ' + escape(', '.join(finding['claim_ids'])), styles['Evidence']))
             if withheld:
                 story.append(Paragraph(WITHHELD, styles['BodyText']))
-    story.append(Paragraph("Bibliography and source versions", styles["Heading2"]))
+    bibliography_heading = Paragraph("Bibliography and source versions", styles["Heading2"])
+    bibliography_heading.research_navigation = ("Bibliography and source versions", "research-bibliography", 0, True)
+    story.append(bibliography_heading)
     story.append(Paragraph("References group identical URL, version and response digest. Multiple evidence bindings to the same pinned document share a reference number; all source IDs, precise locators and review receipts remain separate in evidence.html and the dataset.", styles["Evidence"]))
     for number, group in enumerate(documents, 1):
         source = group['source']
@@ -178,11 +191,23 @@ def render_report_pdf(context):
         pin = ('<br/>Response SHA-256: ' + escape(source['response_sha256'])) if source.get('response_sha256') else '<br/>No captured response digest; retrieval status: ' + escape(source.get('status', 'unknown'))
         count = '<br/>Scoped evidence bindings: ' + str(len(group['source_ids']))
         story.append(KeepTogether([Paragraph(escape(label) + ". " + escape(details) + ("<br/><link href=" + xml.sax.saxutils.quoteattr(url) + ">" + escape(url) + "</link>" if url else "") + pin + count, styles["Evidence"])]))
-    story.append(KeepTogether([Paragraph("Evidence and reproduction", styles["Heading2"]),
+    reproduction_heading = Paragraph("Evidence and reproduction", styles["Heading2"])
+    reproduction_heading.research_navigation = ("Evidence and reproduction", "research-reproduction", 0, True)
+    story.append(KeepTogether([reproduction_heading,
         Paragraph("The complete public evidence graph accompanies this report in the offline archive. Paragraph evidence IDs refer to that graph. The JSON, CSV and SQLite contain equivalent privacy-filtered projection " + metadata["projection_version"] + ". Canonical dataset 2.5.0 remains unchanged outside this archive. Raw source text and personal contact details are excluded.", styles["BodyText"]),
         Paragraph("Verify MANIFEST.json, then run python3 reproduce.py --write-tables reproduced in the extracted archive. LOCATORS.md documents evidence coordinates. Owned research and text use CC BY 4.0; third-party material retains its rights. Embedded DejaVu fonts and the Noto Sans SC derived CJK subset retain their upstream terms in DejaVu-LICENSE.txt and CJK-OFL.txt and are excluded from the project's CC BY 4.0 and MIT licenses. Review scope and research gaps remain explicit. This PDF's status does not establish website or external mirror publication.", styles["BodyText"])]))
     stream = io.BytesIO()
-    document = SimpleDocTemplate(stream, pagesize=(612, 792), rightMargin=54, leftMargin=54,
+    class ResearchDocument(SimpleDocTemplate):
+        def afterFlowable(self, flowable):
+            navigation = getattr(flowable, "research_navigation", None)
+            if navigation:
+                title, key, level, include_in_contents = navigation
+                self.canv.bookmarkPage(key)
+                self.canv.addOutlineEntry(checked_text(title), key, level=level, closed=False)
+                if include_in_contents:
+                    self.notify("TOCEntry", (0, escape(title), self.page, key))
+
+    document = ResearchDocument(stream, pagesize=(612, 792), rightMargin=54, leftMargin=54,
                                  topMargin=51, bottomMargin=54, title=report["title"], author=metadata["author"], allowSplitting=1)
     def footer(canvas, doc):
         canvas.saveState()
@@ -200,7 +225,7 @@ def render_report_pdf(context):
         kwargs["invariant"] = 1
         kwargs["pageCompression"] = 1
         return Canvas(*args, **kwargs)
-    document.build(story, onFirstPage=footer, onLaterPages=footer, canvasmaker=deterministic_canvas)
+    document.multiBuild(story, onFirstPage=footer, onLaterPages=footer, canvasmaker=deterministic_canvas)
     return stream.getvalue()
 
 

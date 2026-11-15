@@ -5,6 +5,7 @@ their own projection version and remove legacy contact/privacy exceptions.
 """
 from __future__ import annotations
 
+import ast
 import csv
 import copy
 from datetime import datetime
@@ -30,11 +31,13 @@ except ImportError:
     from scripts.research_corrections import public_corrections
 
 ROOT = Path(__file__).resolve().parents[1]
-PROJECTION_VERSION = "1.0.0"
+PROJECTION_VERSION = "1.2.0"
 EMAIL = re.compile(r"[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9.-]*[A-Z0-9])?\.[A-Z]{2,}", re.I)
+_EMAIL_RUN_START = re.compile(r"(?<![A-Z0-9.!#$%&'*+/=?^_`{|}~-])" + EMAIL.pattern, EMAIL.flags)
 PRIVATE_KEY = re.compile(r"(?:^|_)(?:email|phone|secret|token|raw_body|cache_path|credential)(?:$|_)", re.I)
 LOCAL_PATH = re.compile(r"^(?:file://|/(?:Users|home|private|tmp|var/folders)/|[A-Za-z]:[\\/]|\\\\)", re.I)
-SECRET = re.compile(r"(?:sk-(?:proj-)?[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)")
+LEGACY_SECRET = re.compile(r"(?:sk-(?:proj-)?[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)")
+SECRET = re.compile(r"(?<![A-Za-z0-9_-])" + LEGACY_SECRET.pattern)
 PRIVATE_KEYS = {"email", "personal_email", "contact_email", "phone", "telephone",
                 "raw_inputs", "raw_cache", "raw_response", "response_body", "source_quote",
                 "full_text", "credentials", "access_token", "api_key"}
@@ -46,13 +49,13 @@ STATIC_ASSET_LIMIT_BYTES = 25 * 1024 * 1024
 ARCHIVE_COMPRESSION = {"stored": zipfile.ZIP_STORED, "deflate": zipfile.ZIP_DEFLATED}
 LIVE_PACKAGE_FILES = {"package-status.json", "current-metadata.json", "current-CITATION.cff",
                       "current-citation.bib", "current-citation.ris", "current-citation.csl.json"}
-CONTEXT_CONTRACT_VERSION = 3
+CONTEXT_CONTRACT_VERSION = 6
 REPRODUCTION_INPUTS_V2 = {name: "schema/" + name for name in (
     "research-graph.schema.json", "report.schema.json", "report-review.schema.json",
     "report-audit.schema.json", "publication-projection.schema.json", "publication-metadata.schema.json")}
 REPRODUCTION_INPUTS_V2.update({"research_graph.py": "scripts/research_graph.py",
     "reproduce.py": "scripts/reproduce_research_package.py", "LICENSE": "LICENSE", "LICENSE-DATA.md": "LICENSE-DATA.md"})
-REPRODUCTION_INPUTS = {**REPRODUCTION_INPUTS_V2, "LOCATORS.md": "docs/research/locators.md",
+REPRODUCTION_INPUTS_V3 = {**REPRODUCTION_INPUTS_V2, "LOCATORS.md": "docs/research/locators.md",
     "research_corrections.py": "scripts/research_corrections.py",
     "research-corrections.schema.json": "schema/research-corrections.schema.json",
     "DejaVuSans.ttf": "data/research/fonts/DejaVuSans.ttf",
@@ -62,6 +65,22 @@ REPRODUCTION_INPUTS = {**REPRODUCTION_INPUTS_V2, "LOCATORS.md": "docs/research/l
     "ScienceToStartupCJKSubset.ttf": "data/research/fonts/ScienceToStartupCJKSubset.ttf",
     "CJK-OFL.txt": "data/research/fonts/CJK-OFL.txt",
     "CJK-PROVENANCE.json": "data/research/fonts/cjk-provenance.json"}
+REPRODUCTION_INPUTS_V4 = {**REPRODUCTION_INPUTS_V3,
+    "research_manifestations.py": "scripts/research_manifestations.py",
+    "source-manifestations.json": "data/research/source-manifestations.json",
+    "SOURCE-MANIFESTATIONS.md": "docs/research/source-manifestations.md",
+    "screening_audit_v2.py": "scripts/screening_audit_v2.py",
+    "screening-audit.v2.schema.json": "schema/screening-audit.v2.schema.json",
+    "reference_audit_v3.py": "scripts/reference_audit_v3.py",
+    "reference-audit.v3.schema.json": "schema/reference-audit.v3.schema.json",
+    "research_audit_dispatch.py": "scripts/research_audit_dispatch.py",
+    "audit-admissions.json": "data/research/audit-admissions.json"}
+REPRODUCTION_INPUTS_V5 = {**REPRODUCTION_INPUTS_V4,
+    "screening_audit_v3.py": "scripts/screening_audit_v3.py",
+    "screening-audit.v3.schema.json": "schema/screening-audit.v3.schema.json",
+    "reference_audit_v4.py": "scripts/reference_audit_v4.py",
+    "reference-audit.v4.schema.json": "schema/reference-audit.v4.schema.json"}
+REPRODUCTION_INPUTS = {**REPRODUCTION_INPUTS_V5, "REUSE.md": "docs/research/reuse.md"}
 PREPARED_REGISTRY = "data/research/prepared-packages.json"
 
 
@@ -73,21 +92,39 @@ def sha256(value):
     return hashlib.sha256(value).hexdigest()
 
 
-def privacy_filter(value):
+def _redact_contacts(value):
+    """Apply EMAIL's nonoverlapping substitutions without rescanning local runs."""
+    if "@" not in value:
+        return value
+    parts, position = [], 0
+    while True:
+        # After a match, re.sub can start another match inside the same local
+        # character run (for example a@b.com1a@d.ef). Preserve that exact start.
+        match = EMAIL.match(value, position) or _EMAIL_RUN_START.search(value, position)
+        if match is None:
+            if not parts:
+                return value
+            parts.append(value[position:])
+            return "".join(parts)
+        parts.extend((value[position:match.start()], "[contact removed]"))
+        position = match.end()
+
+
+def privacy_filter(value, *, legacy=False):
     """Copy public structured data; omit raw text/contact fields and redact emails.
 
     Redaction is intentionally broader than the one known legacy exception. No
     exception list can silently allow new personal contact details into archives.
     """
     if isinstance(value, dict):
-        return {key: privacy_filter(item) for key, item in sorted(value.items())
+        return {key: privacy_filter(item, legacy=legacy) for key, item in sorted(value.items())
                 if key.lower() not in PRIVATE_KEYS and not PRIVATE_KEY.search(key)
                 and not (isinstance(item, str) and (key.lower() == "path" or key.lower().endswith("_path"))
                          and LOCAL_PATH.match(item))}
     if isinstance(value, list):
-        return [privacy_filter(item) for item in value]
+        return [privacy_filter(item, legacy=legacy) for item in value]
     if isinstance(value, str):
-        return SECRET.sub("[credential removed]", EMAIL.sub("[contact removed]", value))
+        return (LEGACY_SECRET if legacy else SECRET).sub("[credential removed]", _redact_contacts(value))
     return value
 
 
@@ -194,7 +231,9 @@ def publication_metadata(context):
                 "updated_on": report["updated_on"], "status": status,
                 "license": "CC-BY-4.0", "projection_version": PROJECTION_VERSION,
                 "note": "Published archived edition." if published else
-                        "Preparation snapshot; not a published research edition. No DOI has been registered for this snapshot."}
+                        ("Complete research package frozen before archival publication. Check the release record for current DOI registration and publication status."
+                         if status == 'ready-for-archive' else
+                         "Preparation snapshot; not a published research edition. No DOI has been registered for this snapshot.")}
     publisher = identity.get("publisher", {})
     if (publisher.get("type") == "Person" and publisher.get("given_names") and publisher.get("family_names")):
         metadata["author_person"] = {"given": publisher["given_names"], "family": publisher["family_names"]}
@@ -378,7 +417,7 @@ def reproduction_files(context, *, version=CONTEXT_CONTRACT_VERSION):
     """
     root = Path(context.get("root", ROOT))
     files = {}
-    inputs = REPRODUCTION_INPUTS_V2 if version == 2 else REPRODUCTION_INPUTS
+    inputs = _reproduction_inputs(version)
     for name, relative in sorted(inputs.items()):
         path = _source_path(root, relative)
         if not path.is_file():
@@ -388,12 +427,39 @@ def reproduction_files(context, *, version=CONTEXT_CONTRACT_VERSION):
 
 
 def _contract_version(version):
-    if type(version) is not int or version not in {1, 2, CONTEXT_CONTRACT_VERSION}:
+    if type(version) is not int or version not in {1, 2, 3, 4, 5, CONTEXT_CONTRACT_VERSION}:
         raise ValueError("Unsupported package context contract version")
     return version
 
 
-def _research_source_context(context, *, reservation=True, version=CONTEXT_CONTRACT_VERSION):
+def _reproduction_inputs(version):
+    _contract_version(version)
+    return (REPRODUCTION_INPUTS if version >= 6 else REPRODUCTION_INPUTS_V5 if version == 5 else REPRODUCTION_INPUTS_V4 if version == 4
+            else REPRODUCTION_INPUTS_V3 if version == 3 else REPRODUCTION_INPUTS_V2)
+
+
+def _frozen_graph_projection_version(files):
+    """Only call after archive/member/owned-recipe descriptor hashes are verified.
+
+    Older actual1.0 owned recipes have no graph version constant. Their verified
+    paired publication schema provides the explicit version binding instead.
+    No Python from a package is executed and no version is inferred from age or
+    context-contract number.
+    """
+    tree = ast.parse(files["research_graph.py"].decode("utf-8"))
+    values = []
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "PUBLIC_PROJECTION_VERSION" for t in node.targets):
+            values.append(ast.literal_eval(node.value))
+    if len(values) > 1:
+        raise ValueError("Ambiguous frozen graph projection version")
+    version = values[0] if values else json.loads(files["publication-projection.schema.json"])["properties"]["projection_version"]["const"]
+    if version not in {"1.0.0", "1.1.0", "1.2.0"}:
+        raise ValueError("Unsupported frozen graph projection recipe")
+    return version
+
+
+def _research_source_context(context, *, reservation=True, version=CONTEXT_CONTRACT_VERSION, frozen_graph_version=None):
     """Research/PDF inputs, without publication outcomes that depend on them.
 
     Keep every research gate metric/blocker and the reserved version identifier.
@@ -413,7 +479,16 @@ def _research_source_context(context, *, reservation=True, version=CONTEXT_CONTR
     gate.pop("ready", None)
     gate.pop("status", None)
     if version >= 2:
-        value["graph"] = _public_graph(context["graph"])
+        if version < 5:
+            if frozen_graph_version not in {"1.0.0", "1.1.0"}:
+                raise ValueError("Legacy source-context comparison requires its verified frozen owned recipe")
+            try:
+                from research_graph import _public_graph_for_version
+            except ImportError:
+                from scripts.research_graph import _public_graph_for_version
+            value["graph"] = _public_graph_for_version(context["graph"], frozen_graph_version)
+        else:
+            value["graph"] = _public_graph(context["graph"])
         # Preserve exact private input identity without redistributing draft
         # assertions, rejected wording or private extensions in any public graph.
         value["input_commitments"] = {"graph_sha256": sha256(json_bytes(context["graph"]))}
@@ -433,22 +508,49 @@ def _research_source_context(context, *, reservation=True, version=CONTEXT_CONTR
         if "executive_findings" in report:
             report["executive_findings"] = findings
         value["publication_withholds"] = {"paragraphs": held, "executive_findings": withheld}
-    return privacy_filter(value)
+    return privacy_filter(value, legacy=version < 5)
 
 
-def source_context(context, *, reservation=True, version=CONTEXT_CONTRACT_VERSION):
+def _versioned_source_context(context, *, reservation=True, version=CONTEXT_CONTRACT_VERSION):
+    """Construct an exact versioned recipe; historical use is verification only."""
     value = _research_source_context(context, reservation=reservation, version=version)
     if version >= 2:
         files = reproduction_files(context, version=version)
         value["package_context"] = {"context_contract_version": version,
-            "graph_projection": "approved-historical-report-v1" if version >= 3 else "approved-historical-v1", "reproduction_inputs": {
+            "graph_projection": "approved-historical-report-v2", "graph_projection_version": PROJECTION_VERSION, "reproduction_inputs": {
                 name: {"sha256": sha256(files[name]), "bytes": len(files[name])}
                 for name in sorted(files)}}
     return value
 
 
+def source_context(context, *, reservation=True, version=CONTEXT_CONTRACT_VERSION):
+    if (context.get('published_edition_replay') is not None
+            or context.get('policy', {}).get('mode') == 'replay_only'):
+        raise ValueError('Historical public replay cannot authorize fresh preparation')
+    if version != CONTEXT_CONTRACT_VERSION:
+        raise ValueError("Fresh source contexts require the current contract; legacy recipes are replay-only")
+    return _versioned_source_context(context, reservation=reservation, version=version)
+
+
+def _context_json_bytes(value, version):
+    """Contract 6 removes whitespace, without changing any JSON value.
+
+    The encoding is sorted UTF-8 JSON with one trailing LF and no NaN. Contracts
+    1–5 retain their original indented encoding for exact frozen replay.
+    """
+    _contract_version(version)
+    if version < 6:
+        return json_bytes(value)
+    return (json.dumps(value, ensure_ascii=False, sort_keys=True,
+                       separators=(",", ":"), allow_nan=False) + "\n").encode("utf-8")
+
+
+def source_context_bytes(context, *, reservation=True, version=CONTEXT_CONTRACT_VERSION):
+    return _context_json_bytes(source_context(context, reservation=reservation, version=version), version)
+
+
 def context_digest(context, *, version=CONTEXT_CONTRACT_VERSION):
-    return sha256(json_bytes(source_context(context, version=version)))
+    return sha256(source_context_bytes(context, version=version))
 
 
 def published_archive(context):
@@ -460,6 +562,7 @@ def published_archive(context):
         return False
     record_id = archive.get("record_id")
     return bool(archive.get("status") == "published" and archive.get("verified") is True
+                and archive.get('anonymous_verified') is True
                 and archive.get("api_origin") == "https://zenodo.org" and archive.get("environment") == "production"
                 and confirmation.tzinfo is not None and confirmation.utcoffset() is not None
                 and re.fullmatch(r"[0-9a-f]{64}", archive.get("artifact_sha256") or "")
@@ -547,6 +650,11 @@ def prepared_package_selection(context, root=None):
 
 def read_prepared_package(context, package, *, expected_archive_sha256=None):
     """Read and verify a frozen bundle without regenerating its PDF or ZIP."""
+    if context.get('published_edition_replay') is not None:
+        from research_edition_replay import read_replay_package
+        if expected_archive_sha256 is not None and expected_archive_sha256 != context['published_edition_replay']['archive_sha256']:
+            raise ValueError('Historical archive differs from the requested exact digest')
+        return read_replay_package(context, package)
     package = Path(package).resolve()
     def read(name):
         if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name):
@@ -601,11 +709,12 @@ def read_prepared_package(context, package, *, expected_archive_sha256=None):
     if version >= 2:
         pinned_source = json.loads(source_blob)
         recipe = pinned_source.get("package_context") if isinstance(pinned_source, dict) else None
-        if (not isinstance(recipe, dict) or set(recipe) != {"context_contract_version", "graph_projection", "reproduction_inputs"}
+        if (not isinstance(recipe, dict) or set(recipe) != ({"context_contract_version", "graph_projection", "reproduction_inputs", "graph_projection_version"} if version >= 5 else {"context_contract_version", "graph_projection", "reproduction_inputs"})
                 or type(recipe["context_contract_version"]) is not int or recipe["context_contract_version"] != version
-                or recipe["graph_projection"] != ("approved-historical-report-v1" if version >= 3 else "approved-historical-v1")
+                or recipe["graph_projection"] != ("approved-historical-report-v2" if version >= 5 else "approved-historical-report-v1" if version >= 3 else "approved-historical-v1")
+                or (version >= 5 and recipe.get("graph_projection_version") != "1.2.0")
                 or not isinstance(recipe["reproduction_inputs"], dict)
-                or set(recipe["reproduction_inputs"]) != set(REPRODUCTION_INPUTS if version >= 3 else REPRODUCTION_INPUTS_V2)):
+                or set(recipe["reproduction_inputs"]) != set(_reproduction_inputs(version))):
             raise ValueError("Frozen reproduction input allowlist differs from its versioned contract")
         for name, descriptor in recipe["reproduction_inputs"].items():
             if (not isinstance(descriptor, dict) or set(descriptor) != {"sha256", "bytes"}
@@ -614,17 +723,23 @@ def read_prepared_package(context, package, *, expected_archive_sha256=None):
                     or manifest["files"].get(name) != descriptor or name not in files
                     or sha256(files[name]) != descriptor["sha256"] or len(files[name]) != descriptor["bytes"]):
                 raise ValueError("Frozen reproduction inputs differ from their context bindings")
-        if published:
-            # Only the typed production receipt plus its verified exact archive
-            # permits historical recipe replay. The research core stays current
-            # and exact; caller flags cannot select this path.
+        frozen_graph_version = _frozen_graph_projection_version(files)
+        if version < 5:
+            # Both published and unpublished legacy bundles use their actual
+            # verified owned recipe; no current bytes or caller-selected version.
+            expected_source = _research_source_context(context, version=version,
+                                                       frozen_graph_version=frozen_graph_version)
+            expected_source["package_context"] = recipe
+        elif published:
+            if frozen_graph_version != "1.2.0":
+                raise ValueError("Current contract requires graph projection1.2")
             expected_source = _research_source_context(context, version=version)
             expected_source["package_context"] = recipe
         else:
-            expected_source = source_context(context, version=version)
+            expected_source = _versioned_source_context(context, version=version)
     else:
-        expected_source = source_context(context, version=version)
-    if source_blob != json_bytes(expected_source):
+        expected_source = _research_source_context(context, version=version)
+    if source_blob != _context_json_bytes(expected_source, version):
         raise ValueError("Frozen source context differs from the current research inputs")
     pdf = files.get("report.pdf")
     if (contract.get("pdf_sha256") != (sha256(pdf) if pdf else None)
@@ -647,6 +762,9 @@ def freeze_publication_package(context, package, *, archive_compression="stored"
     An existing target is never regenerated or overwritten. Missing/incomplete
     prior packages fail closed for operator inspection after an interrupted run.
     """
+    if (context.get('published_edition_replay') is not None
+            or context.get('policy', {}).get('mode') == 'replay_only'):
+        raise ValueError('Historical public replay cannot create a new frozen package')
     # A build selection points to an existing bundle; it is not a request to
     # reuse that bundle while explicitly preparing a different new target.
     context = {key: value for key, value in context.items() if key not in {"prepared_package", "prepared_package_expected"}}
@@ -737,7 +855,7 @@ def write_publication_assets(context, output, *, archive_compression="stored"):
                   "report.html": offline_html(context), "evidence.html": offline_appendix(projection, corrections=public_corrections(context)),
                   "corrections.json": json_bytes({"schema_version": "1.0.0", "corrections": public_corrections(context)}),
                   "readiness.json": json_bytes(privacy_filter(context["gate"])),
-                  "source-context.json": json_bytes(source_context(context))})
+                  "source-context.json": source_context_bytes(context)})
     try:
         from research_brief import executive_brief_assets
     except ImportError:
@@ -749,8 +867,8 @@ def write_publication_assets(context, output, *, archive_compression="stored"):
     files.update(reproduction_files(context))
     files["source-manifest.json"] = json_bytes(projection["graph"]["sources"])
     files["METHODS.md"] = privacy_filter("# Research methods\n\n" + "\n\n".join(paragraph["text"] if paragraph_supported(context, paragraph) else WITHHELD_PARAGRAPH for section in context["report"].get("sections", [])
-                                           if section["id"] == "methods-and-appendices" for paragraph in section.get("paragraphs", [])) + "\n\nAccepted correction metadata is preserved in corrections.json and the offline evidence appendix. Superseded identifiers link to approved replacements without restoring unapproved wording. Pending and rejected proposals remain private. Context contract V3 binds the public records and an opaque raw-input commitment; the manifest covers the correction export, validator and schema.\n").encode()
-    files["README.md"] = ("# ScienceToStartup research package\n\n" + metadata["note"] + "\n\nStart with executive-brief.html for the short briefing, report.html for the full offline report, then evidence.html for entity dossiers, a recorded-scope comparison, assertions, source metadata and review receipts. corrections.json contains accepted correction metadata; the appendix retains superseded IDs as metadata-only links to approved replacements. Evidence links resolve within the extracted edition without the live site. Citation files reflect archive status. JSON, CSV and SQLite are equivalent privacy-filtered projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Full source text and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party evidence retains its rights. The DejaVu fonts and Noto Sans SC derived CJK subset are excluded from the project CC BY 4.0 and MIT licenses. Their unmodified upstream terms are in DejaVu-LICENSE.txt and CJK-OFL.txt; DejaVu-PROVENANCE.json and CJK-PROVENANCE.json record source hashes and the subset recipe.\n\nRun `python3 reproduce.py --write-tables reproduced` inside this extracted package to verify MANIFEST.json, compare all three exports, validate the graph and reproduce coverage and approved-assertion tables. This needs only Python's standard library and no network. Schemas, methods and a source manifest are included. The PDF is accepted only when its receipt binds this exact context. No remote publication occurs during the build.\n").encode()
+                                           if section["id"] == "methods-and-appendices" for paragraph in section.get("paragraphs", [])) + "\n\nAccepted correction metadata is preserved in corrections.json and the offline evidence appendix. Superseded identifiers link to approved replacements without restoring unapproved wording. Pending and rejected proposals remain private. Context contract V4 preserves the V3 public-record and opaque-input commitments and additionally binds evidence-coordinate reproduction, versioned audit readers/schemas and the separately reviewed admission registry.\n").encode()
+    files["README.md"] = ("# ScienceToStartup research package\n\n" + metadata["note"] + "\n\nStart with executive-brief.html for the short briefing, report.html for the full offline report, then evidence.html for entity dossiers, a recorded-scope comparison, assertions, source metadata and review receipts. corrections.json contains accepted correction metadata; the appendix retains superseded IDs as metadata-only links to approved replacements. Evidence links resolve within the extracted edition without the live site. Citation files reflect archive status. JSON, CSV and SQLite are equivalent privacy-filtered projection " + PROJECTION_VERSION + ", not replacements for canonical dataset 2.5.0. Full source text and personal contacts are excluded. CC BY 4.0 covers owned research/text; third-party evidence retains its rights. The DejaVu fonts and Noto Sans SC derived CJK subset are excluded from the project CC BY 4.0 and MIT licenses. Their unmodified upstream terms are in DejaVu-LICENSE.txt and CJK-OFL.txt; DejaVu-PROVENANCE.json and CJK-PROVENANCE.json record source hashes and the subset recipe.\n\nRun `python3 reproduce.py --write-tables reproduced` inside this extracted package to verify MANIFEST.json, compare all three exports, validate the graph and reproduce coverage and approved-assertion tables. This needs only Python's standard library and no network. Schemas, methods and a source manifest are included. Versioned audit calculations and exact admitted frozen receipts are checked when supplied; this does not revalidate private withheld wording or raw third-party sources against a mutable current input. source-manifestations.json and SOURCE-MANIFESTATIONS.md explain how to reproduce repaired evidence coordinates from independently obtained matching source bytes; source bodies are not redistributed. The PDF is accepted only when its receipt binds this exact context. No remote publication occurs during the build.\n").encode()
     # These files are sent to external services, so they belong to the same
     # immutable manifest and archive as the report and dataset.
     files["zenodo-metadata.json"] = json_bytes(zenodo_metadata(metadata))
@@ -771,8 +889,18 @@ def write_publication_assets(context, output, *, archive_compression="stored"):
 
 
 def zenodo_metadata(metadata):
+    person = metadata.get('author_person', {})
+    creator = (person['family'] + ', ' + person['given']
+               if person.get('family') and person.get('given') else metadata['author'])
     return {"metadata": {"title": metadata["title"], "upload_type": "publication", "publication_type": "report",
-                         "description": metadata["note"], "creators": [{"name": metadata["author"]}],
+                         # The remote record describes its own current state;
+                         # an immutable prepublication snapshot note must not
+                         # become a false 'not published' description after DOI registration.
+                         "description": ("ScienceToStartup research edition " + metadata["version"]
+                             + ": complete report, source-bound evidence, methods, citations and reproducible public exports. "
+                             + "Separate AI review is identified by its actual scope; it is not human peer review. "
+                             + "Third-party sources retain their rights. Publication and DOI status are established by this archival record."),
+                         "creators": [{"name": creator}],
                          "version": metadata["version"], "access_right": "open", "license": "cc-by-4.0",
                          "keywords": ["AI data", "research", "ScienceToStartup"]}}
 

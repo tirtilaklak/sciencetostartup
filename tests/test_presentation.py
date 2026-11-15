@@ -11,10 +11,32 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from build_public_snapshot import validate_output_path
 from home import promotion_candidates
-from presentation import company_graph, retain_runtime_generations
+from presentation import company_graph, contact_safe_research, public_logo_provenance, retain_runtime_generations
 
 
 class PresentationTests(unittest.TestCase):
+    def test_public_research_views_remove_nested_contacts_without_mutating_input(self):
+        original = {"dataset_version": "2.5.0", "claims": [{"id": "claim-1", "source_ids": ["source-1"],
+                    "statement": "Synthetic contact person@example.invalid; reported USD 12 million."}],
+                    "metrics": [{"id": "metric-1", "value": 12000000, "claim_id": "claim-1"}]}
+        before = copy.deepcopy(original)
+        projected = contact_safe_research(original)
+        self.assertEqual(original, before)
+        self.assertNotIn("person@example.invalid", json.dumps(projected))
+        self.assertIn("[contact removed]", projected["claims"][0]["statement"])
+        self.assertEqual(projected["metrics"], before["metrics"])
+        self.assertEqual(projected["claims"][0]["source_ids"], ["source-1"])
+        self.assertEqual(projected["dataset_version"], "2.5.0")
+
+    def test_public_logo_provenance_keeps_attribution_without_local_qa_path(self):
+        original = {"logos": [{"company_id": "example", "source_url": "https://example.invalid/logo.svg"}],
+                    "verification": {"visual_review_file": "/tmp/synthetic-private-review.png", "reviewed_on": "2026-11-15"}}
+        before = copy.deepcopy(original)
+        projected = public_logo_provenance(original)
+        self.assertEqual(original, before)
+        self.assertEqual(projected["logos"], before["logos"])
+        self.assertEqual(projected["verification"], {"reviewed_on": "2026-11-15"})
+
     def test_home_search_research_rows_meet_browser_index_contract(self):
         manifest = json.loads((ROOT / "dist/manifest.json").read_text())
         summary = json.loads((ROOT / "dist" / manifest["summary"]["href"].lstrip('/')).read_text())

@@ -9,6 +9,31 @@ from pathlib import Path
 
 
 SCHEMA_VERSION = "1.0.0"
+PRIVACY_PROJECTION_VERSION = "1.0.0"
+
+
+def contact_safe_research(data):
+    """Derive browser views without changing the versioned canonical download."""
+    from research_citations import EMAIL
+
+    def project(value):
+        if isinstance(value, dict):
+            return {key: project(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [project(item) for item in value]
+        if isinstance(value, str):
+            return EMAIL.sub("[contact removed]", value)
+        return value
+
+    return project(data)
+
+
+def public_logo_provenance(provenance):
+    """Keep public attribution while excluding the operator's local QA file."""
+    result = copy.deepcopy(provenance)
+    if isinstance(result.get("verification"), dict):
+        result["verification"].pop("visual_review_file", None)
+    return result
 
 
 def encoded(value):
@@ -324,7 +349,9 @@ def compact_work(work, research=None):
 
 
 def build_presentation(data, destination, root, sidecars, release):
+    data = contact_safe_research(data)
     identity = {"schemaVersion": SCHEMA_VERSION, "buildId": source_identity(root),
+                "privacyProjectionVersion": PRIVACY_PROJECTION_VERSION,
                 "datasetVersion": data["dataset_version"],
                 "editorialReleaseId": release.get("editorial_release_id", release.get("release_id", "baseline-2026-10-28"))}
     summaries, current_products, research = company_summaries(data, sidecars, root)

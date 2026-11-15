@@ -1,5 +1,6 @@
 """Public correction provenance, offline targets and private proposal isolation."""
 import copy
+from datetime import datetime
 import hashlib
 from html.parser import HTMLParser
 import json
@@ -14,10 +15,12 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import research_citations as citations
+import research_graph as graph
 from research_corrections import correction_records, public_corrections
 from research_offline import offline_appendix, evidence_href
 import research_pages as pages
 from research_report import build_context
+from research_lifecycle_fixtures import isolated_render_context, isolated_render_preparation
 
 
 class Links(HTMLParser):
@@ -39,22 +42,92 @@ class PublicCorrectionTests(unittest.TestCase):
     def setUpClass(cls):
         cls.context = build_context(ROOT, select_prepared=False)
 
-    def test_actual_26_records_preserve_ids_dates_and_real_review_relationships(self):
+    def test_actual_corrections_preserve_history_and_real_review_relationships(self):
         rows = public_corrections(self.context)
-        self.assertEqual(len(rows), 26)
-        assertions = {row['id']: row for row in self.context['graph']['assertions']}
-        reviews = {row['id']: row for row in self.context['graph']['reviews']}
+        self.assertGreaterEqual(len(rows), 151)
+        self.assertEqual(len(rows), 170)
+        # Preserve the complete original history, including wording and dates.
+        original = sorted((row for row in self.context['corrections']
+                           if row['id'].startswith('correction.binding.')), key=lambda row: row['id'])
+        self.assertEqual(len(original), 26)
+        self.assertEqual(hashlib.sha256(json.dumps(original, sort_keys=True, separators=(',', ':'),
+            ensure_ascii=False).encode()).hexdigest(),
+            '29d0b1d76e75afbdc4b93737050e034140faaefa84d66dcbaf5e01da7f5ff613')
+        previous = sorted((row for row in self.context['corrections']
+                           if row['id'].startswith(('correction.binding.',
+                                                    'correction.complete-binding.20261111.'))),
+                          key=lambda row: row['id'])
+        self.assertEqual(len(previous), 65)
+        self.assertEqual(hashlib.sha256(json.dumps(previous, sort_keys=True, separators=(',', ':'),
+            ensure_ascii=False).encode()).hexdigest(),
+            'd6492cd8eb09a707401bb073bac64a7e9f8e5111e78a6d81219880b801b3d6aa')
+        prior_151 = sorted((row for row in self.context['corrections']
+                            if row['id'].startswith(('correction.binding.',
+                                'correction.complete-binding.20261111.',
+                                'correction.qualbinding.20261111.'))), key=lambda row: row['id'])
+        self.assertEqual(len(prior_151), 151)
+        self.assertEqual(hashlib.sha256(json.dumps(prior_151, sort_keys=True,
+            separators=(',', ':'), ensure_ascii=False).encode()).hexdigest(),
+            'd378a7538fa89cb90abce783a5b5fd0ceb61151ad57f90986d281633fc776e19')
+        self.assert_correction_review_relationships(self.context, rows,
+            public_replay=self.context.get('published_edition_replay') is not None)
+
+    def assert_correction_review_relationships(self, context, rows, *, public_replay):
+        assertions = {row['id']: row for row in context['graph']['assertions']}
+        reviews = {row['id']: row for row in context['graph']['reviews']}
+        if public_replay:
+            self.assertTrue(all(row['status'] in {'approved', 'historical'}
+                                for row in assertions.values()))
         for row in rows:
-            old, new = assertions[row['claim_id']], assertions[row['replacement_claim_id']]
-            self.assertEqual((old['status'], new['status']), ('candidate', 'approved'))
+            new = assertions[row['replacement_claim_id']]
+            if public_replay:
+                # The frozen public projection retains correction metadata,
+                # never the private original hypothesis or its exclusive reviews.
+                self.assertNotIn(row['claim_id'], assertions)
+                self.assertTrue(all(row['claim_id'] not in review['assertion_ids']
+                                    for review in reviews.values()))
+                self.assertEqual(new['status'], 'approved')
+            else:
+                old = assertions[row['claim_id']]
+                self.assertEqual((old['status'], new['status']), ('candidate', 'approved'))
+                if row['id'].startswith(('correction.binding.', 'correction.complete-binding.20261111.')):
+                    self.assertEqual(old['value'], new['value'])
+                if row['id'].startswith('correction.normal12.'):
+                    self.assertTrue(any(reviews[rid]['verdict'] == 'revise'
+                                        for rid in old['review_ids']))
             self.assertEqual(row['status'], 'accepted')
-            self.assertEqual(old['value'], new['value'])
             receipts = [reviews[rid] for rid in new['review_ids']]
             self.assertEqual({r['verdict'] for r in receipts}, {'pass'})
+            self.assertEqual({r['role'] for r in receipts}, {'author', 'source_verifier', 'adversarial'})
             self.assertEqual(len({r['invocation_id'] for r in receipts}), 3)
-            self.assertEqual(row['corrected_on'], max(r['reviewed_on'] for r in receipts))
+            latest_review = max(datetime.fromisoformat(r['reviewed_on'].replace('Z', '+00:00')) for r in receipts)
+            self.assertGreaterEqual(datetime.fromisoformat(row['corrected_on'].replace('Z', '+00:00')), latest_review)
             for receipt in receipts:
-                self.assertIn(receipt['id'], row['summary'])
+                self.assertEqual(receipt['assertion_sha256'][new['id']], graph.assertion_digest(new))
+                if row['id'].startswith('correction.binding.'):
+                    self.assertIn(receipt['id'], row['summary'])
+
+    def test_synthetic_public_projection_keeps_correction_bindings_without_private_hypothesis(self):
+        from test_research_graph import fixture
+        private = fixture()
+        original = copy.deepcopy(private['assertions'][0])
+        sentinel = 'TEST-ONLY-PRIVATE-ORIGINAL-HYPOTHESIS'
+        original.update(id='TEST-ONLY.original', status='candidate', review_ids=[],
+                        value={'type': 'text', 'value': sentinel})
+        private['assertions'].append(original)
+        correction = {'id': 'TEST-ONLY.correction', 'edition_id': 'test-only',
+                      'claim_id': original['id'], 'replacement_claim_id': 'claim',
+                      'status': 'accepted', 'summary': 'TEST-ONLY correction metadata.',
+                      'corrected_on': '2026-11-08T14:00:00Z',
+                      'evidence_urls': ['https://example.org/paper/v1']}
+        # This tests the public projection contract, not a publication receipt.
+        # The fixture's original synthetic approved reviews are unchanged.
+        public = {'graph': graph.public_graph(private), 'corrections': [correction]}
+        rows = public_corrections(public)
+        self.assertEqual(rows, [correction])
+        self.assertNotIn(sentinel.encode(), citations.json_bytes(public))
+        self.assertIn(sentinel.encode(), citations.json_bytes(private))
+        self.assert_correction_review_relationships(public, rows, public_replay=True)
 
     def test_legacy_record_and_invalid_replacements_fail_closed(self):
         row = copy.deepcopy(self.context['corrections'][0])
@@ -90,7 +163,7 @@ class PublicCorrectionTests(unittest.TestCase):
         self.assertEqual(ids.count('assertion-' + old['id']), 1)
 
     def test_legacy_live_claim_links_have_one_metadata_target_without_old_wording(self):
-        context = copy.deepcopy(self.context)
+        context = isolated_render_context(self.context)
         row = copy.deepcopy(context['corrections'][0])
         row.pop('replacement_claim_id')
         row['claim_id'] = 'historical.no-longer-present'
@@ -128,13 +201,24 @@ class PublicCorrectionTests(unittest.TestCase):
                 public_corrections({**self.context, 'corrections': [row]})
 
     def test_proposals_and_contacts_never_enter_live_or_archive_representations(self):
-        context = copy.deepcopy(self.context)
+        with isolated_render_preparation(self.context, canonical_bytes=(ROOT / 'data/canonical.json').read_bytes()) as context:
+            self.assert_proposals_and_contacts_are_private(context)
+
+    def assert_proposals_and_contacts_are_private(self, context):
         for status in ('pending', 'rejected'):
             row = {**context['corrections'][0], 'id': 'fixture.' + status, 'status': status,
                    'summary': 'PRIVATE-' + status.upper() + '-SENTINEL private@example.org'}
             context['corrections'].append(row)
         context['corrections'][0]['summary'] += ' Contact private@example.org.'
-        affected = next(a for a in context['graph']['assertions'] if a['id'] == context['corrections'][0]['claim_id'])
+        affected = next((a for a in context['graph']['assertions']
+                         if a['id'] == context['corrections'][0]['claim_id']), None)
+        if affected is None:
+            # Public replay has no original hypothesis to mutate. Add an
+            # unrelated, explicitly synthetic draft rather than reconstruct it.
+            affected = copy.deepcopy(next(a for a in context['graph']['assertions']
+                                          if a['status'] == 'approved'))
+            affected.update(id='TEST-ONLY.private-candidate', status='candidate', review_ids=[])
+            context['graph']['assertions'].append(affected)
         affected['value'] = {'type': 'text', 'value': 'PRIVATE-CANDIDATE-WORDING'}
         source = copy.deepcopy(next(s for s in context['graph']['sources'] if s['id'] == affected['evidence'][0]['source_id']))
         source.update(id='fixture.private-old-source', excerpt='PRIVATE-BAD-EXCERPT', cache_path='PRIVATE-INPUT-PATH')
@@ -163,24 +247,58 @@ class PublicCorrectionTests(unittest.TestCase):
                     if member.endswith('.html'):
                         self.assertNotIn(b'PRIVATE-BAD-EXCERPT', archive.read(member), member)
             exported = json.loads((output / 'publication/corrections.json').read_text())['corrections']
-            self.assertEqual(len(exported), 26)
+            self.assertEqual(len(exported), len(public_corrections(self.context)))
             self.assertTrue(all(row['status'] == 'accepted' for row in exported))
             source = json.loads((output / 'publication/source-context.json').read_text())
             self.assertEqual(source['corrections'], exported)
             for row in exported:
-                article = pages._assertion(context, next(a for a in context['graph']['assertions'] if a['id'] == row['claim_id']))
+                old = next((a for a in context['graph']['assertions'] if a['id'] == row['claim_id']), None)
+                if old is not None:
+                    article = pages._assertion(context, old)
+                else:
+                    destination = pages._evidence_url('assertion', row['claim_id'])
+                    article = next(body for path, _, _, body, _, _ in pages._ledger_pages(context)
+                                   if path == destination.split('#')[0])
                 self.assertIn(pages._correction_url(row), article)
                 self.assertIn(pages._evidence_url('assertion', row['replacement_claim_id']), article)
 
-    def test_only_v3_binds_correction_input_and_invalidates_unpublished_context(self):
-        context = copy.deepcopy(self.context)
-        before = {v: citations.json_bytes(citations.source_context(context, version=v)) for v in (1, 2, 3)}
+    def test_corrections_bind_current_and_historical_v3_plus_comparison_inputs(self):
+        from test_research_citations import context_fixture
+        with isolated_render_preparation(self.context, canonical_bytes=(ROOT / 'data/canonical.json').read_bytes()) as owner:
+            context = context_fixture()
+            context['root'] = owner['root']
+            self.assert_correction_comparison_inputs(context)
+
+    def assert_correction_comparison_inputs(self, context):
+        # Historical recipes must use inputs compatible with their own grammar,
+        # rather than retrofitting later task identifiers into an old redactor.
+        legacy_correction = {**self.context['corrections'][0],
+                             'id': 'fixture.legacy-correction',
+                             'claim_id': 'fixture.historical-claim'}
+        legacy_correction.pop('replacement_claim_id', None)
+        context['corrections'] = [legacy_correction]
+
+        def comparison_inputs(value):
+            # Historical normalization is replay-only. Full owned-recipe
+            # verification is exercised by the frozen-context regression tests;
+            # this test isolates when correction commitments were introduced.
+            historical = {v: citations.json_bytes(citations._research_source_context(
+                value, version=v, frozen_graph_version='1.0.0' if v >= 2 else None))
+                for v in (1, 2, 3, 4)}
+            return {**historical, citations.CONTEXT_CONTRACT_VERSION:
+                    citations.json_bytes(citations.source_context(value))}
+
+        before = comparison_inputs(context)
         context['corrections'].append({**context['corrections'][0], 'id': 'fixture.private-pending', 'status': 'pending', 'summary': 'PRIVATE-CHANGED'})
-        after = {v: citations.json_bytes(citations.source_context(context, version=v)) for v in (1, 2, 3)}
+        after = comparison_inputs(context)
         self.assertEqual(before[1], after[1])
         self.assertEqual(before[2], after[2])
-        self.assertNotEqual(before[3], after[3])
-        self.assertNotIn(b'PRIVATE-CHANGED', after[3])
+        for version in (3, 4, citations.CONTEXT_CONTRACT_VERSION):
+            self.assertNotEqual(before[version], after[version])
+            self.assertNotIn(b'PRIVATE-CHANGED', after[version])
+        for version in (1, 2, 3, 4):
+            with self.assertRaisesRegex(ValueError, 'replay-only'):
+                citations.source_context(context, version=version)
         self.assertNotIn('corrections.json', citations.REPRODUCTION_INPUTS)
 
 

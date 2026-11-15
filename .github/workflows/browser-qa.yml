@@ -20,7 +20,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:browser:install
-      - run: npm run test:browser -- --grep-invert 'no serious or critical accessibility violations on /research/state-of-ai-data-labs/$'
+      - run: npm run test:browser -- --grep-invert 'no serious or critical accessibility violations on /research/state-of-ai-data-labs/($|chapters/)'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -28,7 +28,7 @@ jobs:
           path: output/browser-qa/
           retention-days: 14
   report-accessibility:
-    # Give the complete report DOM a dedicated runner without changing its scan.
+    # Give every complete report chapter a dedicated runner and unchanged scans.
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -42,7 +42,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:browser:install
-      - run: npm run test:browser -- --grep 'no serious or critical accessibility violations on /research/state-of-ai-data-labs/$' --workers=1
+      - run: npm run test:browser -- --grep 'no serious or critical accessibility violations on /research/state-of-ai-data-labs/($|chapters/)' --workers=1
       - uses: actions/upload-artifact@v4
         if: always()
         with:

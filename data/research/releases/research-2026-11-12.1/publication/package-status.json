@@ -1,0 +1,17 @@
+{
+  "archive": "not-published",
+  "archive_sha256": "fdd231690c9bf9ed57339502a9e52b96eb59461afb6771191eb1337b69a85917",
+  "blocked_reasons": [
+    "An actual public versioned archive receipt with DOI and exact artifact digest is required; a prepared package is not publication."
+  ],
+  "github": "prepared",
+  "huggingface": "prepared",
+  "manifest_sha256": "8371f4ade74111fd0fc3cc5f00d7d26b69e1709235a50cb719f72f7bef205dce",
+  "pdf": "prepared",
+  "pdf_sha256": "6fd998aea77d165d7b0a559bd6a514d81ead7aecebeb551603a44116ca8b4ae1",
+  "publication_ready": true,
+  "release_id": "research-2026-11-12.1",
+  "schema_version": 1,
+  "status": "prepared",
+  "website": "independent"
+}

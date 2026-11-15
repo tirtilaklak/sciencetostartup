@@ -26,6 +26,22 @@ def context():
 
 
 class ScheduleTests(unittest.TestCase):
+    def test_committed_source_references_reject_unsafe_paths_and_non_string_raw_pins(self):
+        from research_schedule import _edition_references
+        entry = {'release_id': 'SYNTHETIC-only', 'status': 'published',
+            'snapshot_path': 'editions/SYNTHETIC.json', 'snapshot_sha256': 'a' * 64}
+        bad_paths = ['.', 'editions', '../SYNTHETIC.json', '/tmp/SYNTHETIC.json',
+            'editions/../SYNTHETIC.json', 'editions\\SYNTHETIC.json',
+            'editions//SYNTHETIC.json', 'editions/SYNTHETIC.txt']
+        with tempfile.TemporaryDirectory() as temporary:
+            for value in bad_paths:
+                with self.subTest(path=value), self.assertRaises(ValueError):
+                    _edition_references([{**entry, 'snapshot_path': value}], temporary, context())
+            for value in (int('1' * 64), None, 'A' * 64, 'a' * 63):
+                with self.subTest(digest=value), self.assertRaises(ValueError):
+                    _edition_references([{**entry, 'snapshot_sha256': value}], temporary, context())
+            self.assertEqual(list(Path(temporary).iterdir()), [])
+
     def test_pacific_summer_and_winter_hours(self):
         self.assertEqual(edition_window("2026-07-06")["publish_at"], "2026-07-06T16:00:00Z")
         self.assertEqual(edition_window("2026-11-09")["publish_at"], "2026-11-09T17:00:00Z")
@@ -155,6 +171,7 @@ class ScheduleTests(unittest.TestCase):
             self.assertNotEqual(first["candidate_sha256"], second["candidate_sha256"])
             self.assertEqual(first["snapshot"]["graph"], second["snapshot"]["graph"])
             self.assertEqual(first["snapshot"]["report"]["sections"], second["snapshot"]["report"]["sections"])
+
             supplied["report"]["title"] = "Live report changed after freezing"
             self.assertEqual(load_edition(temporary, "2026-11-09"), first["snapshot"])
             manifest = Path(temporary) / "editions" / "2026-11-09" / f"{first['candidate_sha256']}.json"
@@ -163,6 +180,18 @@ class ScheduleTests(unittest.TestCase):
             self.assertEqual(reference["publication"], "not_published")
             with self.assertRaises(ValueError):
                 load_edition(temporary, "2026-11-16", first["candidate_sha256"])
+
+    def test_weekly_preparation_cannot_reuse_initial_launch_exception(self):
+        supplied = context()
+        supplied['report']['edition_kind'] = 'launch'
+        supplied['policy']['initial_launch_authorization'] = {'one_time': True, 'release_id': 'fixture-only'}
+        original = copy.deepcopy(supplied)
+        with tempfile.TemporaryDirectory() as temporary:
+            candidate = prepare_candidate(supplied, temporary, '2026-11-16', '2026-11-15T20:00:00Z')
+        self.assertEqual(candidate['snapshot']['report']['edition_kind'], 'weekly')
+        self.assertNotIn('initial_launch_authorization', candidate['snapshot']['policy'])
+        self.assertEqual(candidate['snapshot']['report']['source_cutoff'], '2026-11-14T01:00:00Z')
+        self.assertEqual(supplied, original)
 
     def test_nested_archives_become_compact_verified_snapshot_references(self):
         supplied = context()
@@ -291,7 +320,7 @@ class ScheduleTests(unittest.TestCase):
                         "role": "coordinator", "invocation_id": "test-only-coordinator", "method": "final_quality_review",
                         "fixture": False, "rationale": "Test fixture only", "approved_on": "2026-11-08T21:00:00Z"}
             record_approval(temporary, candidate["candidate_sha256"], approval, "2026-11-08T22:00:00Z")
-            archive = {"status": "published", "verified": True, "api_origin": "https://zenodo.org", "environment": "production",
+            archive = {"status": "published", "verified": True, "anonymous_verified": True, "api_origin": "https://zenodo.org", "environment": "production",
                        "release_id": candidate["identity"]["release_id"], "doi": "10.1234/test-fixture-only",
                        "record_url": "https://zenodo.org/records/1234", "artifact_sha256": "a" * 64,
                        "confirmed_on": "2026-11-11T18:00:00Z"}
@@ -321,10 +350,11 @@ class ScheduleTests(unittest.TestCase):
     def test_archive_overlay_rejects_wrong_release_sandbox_early_and_failed_gates(self):
         with tempfile.TemporaryDirectory() as temporary:
             candidate = prepare_candidate(context(), temporary, "2026-11-09", "2026-11-08T20:00:00Z")
-            archive = {"status": "published", "verified": True, "api_origin": "https://zenodo.org", "environment": "production",
+            archive = {"status": "published", "verified": True, "anonymous_verified": True, "api_origin": "https://zenodo.org", "environment": "production",
                        "release_id": candidate["identity"]["release_id"], "artifact_sha256": "a" * 64,
                        "confirmed_on": "2026-11-11T18:00:00Z"}
             for changed in ({"release_id": "wrong-fixture"}, {"environment": "sandbox"}, {"verified": False},
+                            {"anonymous_verified": False}, {"anonymous_verified": None},
                             {"api_origin": "https://sandbox.zenodo.org"}, {"confirmed_on": "2026-11-09T16:59:59Z"}, {}):
                 output = Path(temporary) / "held.json"
                 with self.assertRaises(ValueError):
@@ -341,7 +371,7 @@ class ScheduleTests(unittest.TestCase):
                                                "deposition_id": 1234, "api_origin": "https://zenodo.org", "environment": "production"}})
         with tempfile.TemporaryDirectory() as temporary:
             candidate = prepare_candidate(supplied, temporary, "2026-11-09", "2026-11-08T20:00:00Z")
-            archive = {"status": "published", "verified": True, "api_origin": "https://zenodo.org", "environment": "production",
+            archive = {"status": "published", "verified": True, "anonymous_verified": True, "api_origin": "https://zenodo.org", "environment": "production",
                        "release_id": candidate["identity"]["release_id"], "artifact_sha256": "a" * 64,
                        "reserved_doi": "10.1234/different-fixture", "deposition_id": 1234,
                        "confirmed_on": "2026-11-11T18:00:00Z"}

@@ -1,6 +1,7 @@
 """Remote state machines use test fixtures only; no review/publication is claimed."""
 import copy
 import hashlib
+import io
 import json
 from pathlib import Path
 import sys
@@ -21,7 +22,25 @@ from publication_fixtures import populate_owned_inputs
 class FakeZenodo:
     def __init__(self):
         self.deposits, self.files, self.calls, self.lose = {}, {}, [], None
+        self.pids = {}
         self.doi_prefix = "10.5281/zenodo."
+        self.bodies, self.public_calls = {}, []
+        self.public_failure = self.public_corruption = None
+        self.public_access = 'open'
+
+    def public_read(self, origin, path, limit):
+        """Explicitly synthetic anonymous transport; never makes a network call."""
+        self.public_calls.append((origin, path, limit))
+        parts = path.split('/')
+        number = int(parts[3])
+        if len(parts) == 4:
+            record = self.request('GET', path)
+            record['metadata']['access_right'] = self.public_access
+            return json.dumps(record).encode()
+        name = parts[5]
+        if name == self.public_failure:
+            raise publish.PublicationBlocked('SYNTHETIC anonymous archive failure')
+        return b'SYNTHETIC wrong public bytes' if name == self.public_corruption else self.bodies[number][name]
 
     def request(self, method, path, payload=None, data=None, **kwargs):
         self.calls.append((method, path))
@@ -31,10 +50,13 @@ class FakeZenodo:
         if method == "POST" and path == "/api/deposit/depositions":
             number = len(self.deposits) + 1
             metadata = copy.deepcopy(payload["metadata"])
-            metadata["prereserve_doi"] = {"doi": self.doi_prefix + str(number)}
+            # Match Zenodo's legacy serializer bug; native PID starts absent.
+            metadata["prereserve_doi"] = {"doi": "10.5281/zenodo." + str(number)}
             result = {"id": number, "metadata": metadata, "submitted": False, "state": "unsubmitted",
                       "links": {"bucket": "/api/files/" + str(number)}, "record_id": number}
             self.deposits[number], self.files[number] = result, {}
+            self.bodies[number] = {}
+            self.pids[number] = {}
             if self.lose == "create":
                 self.lose = None
                 raise TimeoutError("test lost create response")
@@ -42,10 +64,32 @@ class FakeZenodo:
         if "/api/files/" in path and method == "PUT":
             number, name = int(parts[-2]), parts[-1]
             self.files[number][name] = {"filename": name, "filesize": len(data), "checksum": hashlib.md5(data).hexdigest()}
+            self.bodies[number][name] = data
             if self.lose == "upload":
                 self.lose = None
                 raise TimeoutError("test lost upload response")
             return self.files[number][name]
+        if path.startswith("https://"):
+            path = publish.urllib.parse.urlsplit(path).path
+            parts = path.rstrip("/").split("/")
+        if path.startswith("/api/records/") and parts[-1] == "draft" and method == "GET":
+            assert kwargs.get("accept") == "application/vnd.inveniordm.v1+json"
+            return self.native_draft(int(parts[-2]))
+        if path.startswith("/api/records/") and parts[-2:] == ["pids", "doi"] and method == "POST":
+            assert kwargs.get("accept") == "application/vnd.inveniordm.v1+json"
+            assert payload is None and data is None
+            number = int(parts[-4])
+            if self.lose == "reserve_doi_before":
+                self.lose = None
+                raise TimeoutError("test lost reservation request before commit")
+            if self.pids[number]:
+                raise RuntimeError("SYNTHETIC duplicate DOI reservation HTTP 400")
+            self.pids[number] = {"doi": {"identifier": self.doi_prefix + str(number),
+                                       "provider": "datacite", "client": "datacite"}}
+            if self.lose == "reserve_doi":
+                self.lose = None
+                raise TimeoutError("test lost DOI reservation response")
+            return self.native_draft(number)
         if path.startswith("/api/records/") and method == "GET":
             number = int(parts[-1])
             if self.deposits[number]["submitted"]:
@@ -68,6 +112,8 @@ class FakeZenodo:
             draft = copy.deepcopy(self.deposits[previous])
             draft.update(id=number, record_id=number, submitted=False, state="unsubmitted", links={"bucket": "/api/files/" + str(number)})
             self.deposits[number], self.files[number] = draft, copy.deepcopy(self.files[previous])
+            self.bodies[number] = copy.deepcopy(self.bodies[previous])
+            self.pids[number] = {}
             self.deposits[previous]["links"]["latest_draft"] = "/api/deposit/depositions/" + str(number)
             if self.lose == "newversion":
                 self.lose = None
@@ -79,13 +125,19 @@ class FakeZenodo:
                 return copy.deepcopy(self.deposits[number])
             if method == "PUT":
                 metadata = copy.deepcopy(payload["metadata"])
-                metadata["prereserve_doi"] = {"doi": self.doi_prefix + str(number)}
+                metadata["prereserve_doi"] = {"doi": "10.5281/zenodo." + str(number)}
                 self.deposits[number]["metadata"] = metadata
                 if self.lose == "metadata":
                     self.lose = None
                     raise TimeoutError("test lost metadata response")
                 return copy.deepcopy(self.deposits[number])
         raise AssertionError((method, path))
+
+    def native_draft(self, number):
+        """Synthetic native shape modeled after observed Zenodo responses."""
+        return {"id": str(number), "is_draft": True, "is_published": False,
+                "pids": copy.deepcopy(self.pids[number]), "revision_id": 5,
+                "links": {"reserve_doi": "/api/records/" + str(number) + "/draft/pids/doi"}}
 
 
 class PublicationTests(unittest.TestCase):
@@ -105,7 +157,7 @@ class PublicationTests(unittest.TestCase):
         self.addCleanup(self.patch_gate.stop)
         self.release = publish.Release(self.context, self.package, self.directory / "journal.json")
         self.remote = FakeZenodo()
-        self.zenodo = publish.Zenodo(self.release, transport=self.remote)
+        self.zenodo = publish.Zenodo(self.release, transport=self.remote, public_reader=self.remote.public_read)
 
     def rebuild(self):
         projection = citations.public_projection(self.context, {"dataset_version": "2.5.0", "companies": []})
@@ -130,7 +182,7 @@ class PublicationTests(unittest.TestCase):
         self.context["gate"]["reasons"] = ["Public archive receipt still required."]
         self.rebuild()
         self.release = publish.Release(self.context, self.package, self.directory / "archive-ready-journal.json")
-        adapter = publish.Zenodo(self.release, transport=self.remote)
+        adapter = publish.Zenodo(self.release, transport=self.remote, public_reader=self.remote.public_read)
         self.assertEqual(adapter.draft()["id"], 1)
 
     def test_changed_package_and_missing_pdf_are_blocked(self):
@@ -172,7 +224,7 @@ class PublicationTests(unittest.TestCase):
 
     def test_sandbox_publication_cannot_authorize_a_production_mirror_or_journal(self):
         self.remote.doi_prefix = "10.5072/zenodo."
-        sandbox = publish.Zenodo(self.release, transport=self.remote, sandbox=True)
+        sandbox = publish.Zenodo(self.release, transport=self.remote, public_reader=self.remote.public_read, sandbox=True)
         sandbox.upload()
         receipt = sandbox.publish()
         self.assertEqual(receipt["environment"], "sandbox")
@@ -291,8 +343,88 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(publish.PublicationBlocked, "file set differs"):
             self.zenodo.publish()
 
+    def test_anonymous_file_failure_holds_same_record_and_retry_never_republishes(self):
+        self.zenodo.upload()
+        for name in self.release.uploads:
+            with self.subTest(name=name):
+                self.remote.public_failure = name
+                with self.assertRaisesRegex(publish.PublicationBlocked, 'anonymous archive failure'):
+                    self.zenodo.publish()
+                state = self.release.journal.state['zenodo']
+                self.assertEqual(state['status'], 'published_unverified')
+                self.assertFalse(state['verified'])
+                self.assertFalse(state['anonymous_verified'])
+                self.assertEqual(state['pending'], 'public-verification')
+                with self.assertRaises(publish.PublicationBlocked):
+                    self.release.require_archive()
+                self.remote.public_failure = None
+                self.assertTrue(self.zenodo.reconcile()['anonymous_verified'])
+        self.assertEqual(len(self.remote.deposits), 1)
+        self.assertEqual(sum(method == 'POST' and path.endswith('/actions/publish')
+                             for method, path in self.remote.calls), 1)
+        self.assertTrue(self.release.archive_receipt()['anonymous_verified'])
+
+    def test_public_checksums_do_not_substitute_for_actual_anonymous_bytes(self):
+        self.zenodo.upload()
+        self.remote.public_corruption = 'report.pdf'
+        with self.assertRaisesRegex(publish.PublicationBlocked, 'Anonymous archive bytes differ'):
+            self.zenodo.publish()
+        self.assertFalse(self.zenodo.state['verified'])
+        self.remote.public_corruption = None
+        self.assertTrue(self.zenodo.reconcile()['verified'])
+
+    def test_old_verified_receipt_without_anonymous_proof_cannot_authorize_mirrors_or_metadata(self):
+        self.zenodo.upload()
+        self.zenodo.publish()
+        receipt = self.release.archive_receipt()
+        for flag in (None, False):
+            with self.subTest(flag=flag):
+                if flag is None:
+                    self.release.journal.state['zenodo'].pop('anonymous_verified', None)
+                else:
+                    self.release.journal.state['zenodo']['anonymous_verified'] = flag
+                self.release.journal.save('SYNTHETIC legacy receipt without anonymous proof')
+                with self.assertRaises(publish.PublicationBlocked):
+                    self.release.require_archive()
+                old = {k: v for k, v in receipt.items() if k != 'anonymous_verified'}
+                if flag is not None:
+                    old['anonymous_verified'] = flag
+                self.assertFalse(citations.published_archive({'report': {**self.context['report'], 'archive': old}}))
+        self.assertTrue(self.zenodo.reconcile()['anonymous_verified'])
+        self.assertTrue(self.release.archive_receipt()['anonymous_verified'])
+
+    def test_public_record_must_be_open_before_file_verification(self):
+        self.zenodo.upload()
+        self.remote.public_access = 'restricted'
+        with self.assertRaisesRegex(publish.PublicationBlocked, 'not publicly open'):
+            self.zenodo.publish()
+        self.assertFalse(self.zenodo.state['verified'])
+        self.assertFalse(any('/files/' in path for _, path, _ in self.remote.public_calls))
+        self.remote.public_access = 'open'
+        self.assertTrue(self.zenodo.reconcile()['verified'])
+
+    def test_anonymous_reader_sends_no_credentials_and_bounds_response(self):
+        calls = []
+        def opened(request, **kwargs):
+            calls.append(request)
+            return io.BytesIO(b'abc')
+        opener = types.SimpleNamespace(open=opened)
+        path = '/api/records/123/files/report.pdf/content'
+        with patch.object(publish.urllib.request, 'build_opener', return_value=opener):
+            self.assertEqual(publish.anonymous_zenodo_get('https://zenodo.org', path, 3), b'abc')
+            with self.assertRaisesRegex(publish.PublicationBlocked, 'expected size'):
+                publish.anonymous_zenodo_get('https://zenodo.org', path, 2)
+            for origin, unsafe in [('https://evil.example', path), ('https://zenodo.org', '/api/deposit/depositions'),
+                                   ('https://zenodo.org', path + '?access_token=fixture')]:
+                with self.assertRaises(publish.PublicationBlocked):
+                    publish.anonymous_zenodo_get(origin, unsafe, 3)
+        self.assertEqual(len(calls), 2)
+        self.assertTrue(all(r.get_header('Accept') == '*/*' for r in calls))
+        self.assertTrue(all('authorization' not in {k.lower() for k, _ in r.header_items()} for r in calls))
+        self.assertTrue(all('cookie' not in {k.lower() for k, _ in r.header_items()} for r in calls))
+
     def test_mirrors_require_a_verified_published_archive(self):
-        mirror = publish.GitHubMirror(self.release, "owner/repo", transport=self.remote, upload_transport=self.remote)
+        mirror = publish.GitHubMirror(self.release, "owner/repo", source_commit="a" * 40, transport=self.remote, upload_transport=self.remote)
         with self.assertRaisesRegex(publish.PublicationBlocked, "published archive"):
             mirror.publish()
         self.assertEqual(self.remote.calls, [])
@@ -310,6 +442,22 @@ class PublicationTests(unittest.TestCase):
         with patch("urllib.request.urlopen", side_effect=AssertionError("must not request")):
             with self.assertRaisesRegex(publish.PublicationBlocked, "origin"):
                 transport.request("GET", "https://attacker.invalid/steal")
+
+    def test_http_preserves_default_accept_and_allows_bodyless_native_reservation(self):
+        requests = []
+        def opened(request, **kwargs):
+            requests.append(request)
+            return io.BytesIO(b'{}')
+        transport = publish.HTTP("unit-test-token", "https://zenodo.org")
+        opener = types.SimpleNamespace(open=opened)
+        with patch.object(publish.urllib.request, 'build_opener', return_value=opener):
+            transport.request("GET", "/api/deposit/depositions/1")
+            transport.request("POST", "/api/records/1/draft/pids/doi", accept="application/vnd.inveniordm.v1+json")
+        self.assertEqual(requests[0].get_header("Accept"), "application/json")
+        self.assertEqual(requests[1].get_header("Accept"), "application/vnd.inveniordm.v1+json")
+        self.assertEqual(requests[1].get_method(), "POST")
+        self.assertIsNone(requests[1].data)
+        self.assertIsNone(requests[1].get_header("Content-type"))
 
     def test_redirect_cannot_forward_bearer_credentials_to_another_origin(self):
         import urllib.request
@@ -333,7 +481,7 @@ class PublicationTests(unittest.TestCase):
         reservation_path = self.directory / "reservation-journal.json"
         plan = publish.PublicationPlan(context, reservation_path)
         remote = FakeZenodo()
-        reserver = publish.Zenodo(plan, transport=remote)
+        reserver = publish.Zenodo(plan, transport=remote, public_reader=remote.public_read)
         remote.lose = "create"
         with self.assertRaises(TimeoutError):
             reserver.draft()
@@ -375,7 +523,7 @@ class PublicationTests(unittest.TestCase):
         self.assertIn("10.5281/zenodo.1", frozen_metadata["note"])
 
         release = publish.Release(context, package, self.directory / "frozen-journal.json", reservation=plan)
-        publisher = publish.Zenodo(release, transport=remote)
+        publisher = publish.Zenodo(release, transport=remote, public_reader=remote.public_read)
         publisher.upload()
         remote.lose = "publish"
         with self.assertRaises(TimeoutError):
@@ -448,7 +596,7 @@ class PublicationTests(unittest.TestCase):
             self.zenodo.draft(previous_id="10.5281/zenodo.99999")
         plan = publish.PublicationPlan(self.context, self.directory / "plan-journal.json")
         self.context["report"]["sections"][0]["paragraphs"][0]["text"] = "Changed inputs after planning"
-        reserver = publish.Zenodo(plan, transport=self.remote)
+        reserver = publish.Zenodo(plan, transport=self.remote, public_reader=self.remote.public_read)
         before = len(self.remote.calls)
         with self.assertRaisesRegex(publish.PublicationBlocked, "inputs changed"):
             reserver.draft()

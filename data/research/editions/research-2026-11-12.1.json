@@ -1,0 +1,27 @@
+{
+  "archive_receipt": {
+    "anonymous_verified": true,
+    "api_origin": "https://zenodo.org",
+    "artifact_sha256": "fdd231690c9bf9ed57339502a9e52b96eb59461afb6771191eb1337b69a85917",
+    "concept_doi": "10.5281/zenodo.24249276",
+    "confirmed_on": "2026-11-15T18:03:48.277124+00:00",
+    "deposition_id": 24249277,
+    "doi": "10.5281/zenodo.24249277",
+    "edition_date": "2026-11-12",
+    "environment": "production",
+    "published_on": "2026-11-15",
+    "record_id": 24249277,
+    "record_url": "https://zenodo.org/records/24249277",
+    "release_id": "research-2026-11-12.1",
+    "reserved_doi": "10.5281/zenodo.24249277",
+    "status": "published",
+    "verified": true
+  },
+  "archive_sha256": "fdd231690c9bf9ed57339502a9e52b96eb59461afb6771191eb1337b69a85917",
+  "context_contract_version": 6,
+  "context_sha256": "7380ef219fc53ac3eede975da8722ab022a84571878802466ff5010e71c21a83",
+  "manifest_sha256": "8371f4ade74111fd0fc3cc5f00d7d26b69e1709235a50cb719f72f7bef205dce",
+  "package_path": "data/research/releases/research-2026-11-12.1/publication",
+  "release_id": "research-2026-11-12.1",
+  "schema_version": "published-edition-replay-v1"
+}
