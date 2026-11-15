@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sciencetostartup.com/schema/report-audit.schema.json",
+  "title": "Actual source-anchored research holdout audit",
+  "type": "object",
+  "required": ["kind", "status", "fixture", "release_id", "graph_sha256", "frozen_on", "completed_on", "holdout_ids_sha256", "items"],
+  "properties": {
+    "kind": {"enum": ["reference", "screening"]},
+    "status": {"const": "completed"},
+    "fixture": {"const": false},
+    "release_id": {"type": "string", "minLength": 1},
+    "graph_sha256": {"$ref": "#/$defs/digest"},
+    "holdout_ids_sha256": {"$ref": "#/$defs/digest"},
+    "frozen_on": {"type": "string", "format": "date-time"},
+    "completed_on": {"type": "string", "format": "date-time"},
+    "major_strata": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "items": {
+      "type": "array", "minItems": 200,
+      "items": {
+        "type": "object",
+        "required": ["id", "evidence", "review_ids", "stratum", "adjudication", "expected_positive", "observed_positive", "critical_false_attribution"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "assertion_id": {"type": "string", "minLength": 1},
+          "record_id": {"type": "string", "minLength": 1},
+          "stratum": {"type": "string", "minLength": 1},
+          "adjudication": {"type": "string", "minLength": 1},
+          "expected_positive": {"type": "boolean"},
+          "observed_positive": {"type": "boolean"},
+          "critical_false_attribution": {"const": false},
+          "review_ids": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string"}},
+          "evidence": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["source_id", "locator", "excerpt_sha256"], "properties": {"source_id": {"type": "string"}, "locator": {"type": "string", "minLength": 1}, "excerpt_sha256": {"$ref": "#/$defs/digest"}}, "additionalProperties": false}}
+        }
+      }
+    }
+  },
+  "$defs": {"digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+}

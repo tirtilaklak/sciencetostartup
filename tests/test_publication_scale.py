@@ -188,6 +188,9 @@ class WeeklyScaleTests(unittest.TestCase):
         self.assertEqual(len(context['graph']['reviews']), 8700)
         self.assertFalse(context['gate']['ready'])
         with tempfile.TemporaryDirectory() as temporary, patch.object(citations, 'verified_pdf', return_value=scale_pdf_allowance()), patch('urllib.request.urlopen', side_effect=AssertionError('No network in fixture build')):
+            context['root'] = str(Path(temporary) / 'source')
+            populate_owned_inputs(context['root'])
+            (Path(context['root']) / 'data/canonical.json').write_bytes((ROOT / 'data/canonical.json').read_bytes())
             citations.write_publication_assets(context, temporary, archive_compression='deflate')
             package = Path(temporary) / 'publication'
             inventory = citations.publication_asset_inventory(package)

@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import research_citations as citations
 import research_pdf as pdf
-from publication_fixtures import populate_owned_inputs
+from publication_fixtures import populate_owned_inputs, legacy_context_fixture
 from test_research_citations import context_fixture
 
 
@@ -23,7 +23,7 @@ class FontInputTests(unittest.TestCase):
         expected = {'DejaVuSans.ttf': '7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954',
                     'DejaVuSans-Bold.ttf': 'e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724',
                     'DejaVu-LICENSE.txt': '7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93',
-                    'ScienceToStartupCJKSubset.ttf': '37f8f1a6db368902ee4a7f09cbb2ad7c9dd4c8ab61763ec6de431450f0811b16',
+                    'ScienceToStartupCJKSubset.ttf': '01c1e6d9a0a1dce1f5f153fdfef26f4c5a4ccb75a6db3fbad562f859253ab2cf',
                     'CJK-OFL.txt': '1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9'}
         for name, digest in expected.items():
             self.assertEqual(citations.sha256(assets[name]), digest)
@@ -36,13 +36,13 @@ class FontInputTests(unittest.TestCase):
             context = {**context_fixture(), 'root': temporary}
             populate_owned_inputs(temporary)
             current = citations.context_digest(context)
-            legacy = citations.context_digest(context, version=2)
+            legacy = citations.sha256(citations.json_bytes(legacy_context_fixture(context, 2)))
             for name in pdf.pdf_font_assets(context):
                 path = Path(temporary) / citations.REPRODUCTION_INPUTS[name]
                 original = path.read_bytes()
                 path.write_bytes(original + b'\nTEST-ONLY mutation')
                 self.assertNotEqual(citations.context_digest(context), current)
-                self.assertEqual(citations.context_digest(context, version=2), legacy)
+                self.assertEqual(citations.sha256(citations.json_bytes(legacy_context_fixture(context, 2))), legacy)
                 if name not in {'DejaVu-PROVENANCE.json', 'CJK-PROVENANCE.json'}:
                     with self.assertRaisesRegex(ValueError, 'provenance hash'):
                         pdf.pdf_font_assets(context)
@@ -79,6 +79,8 @@ class UnicodeRenderingTests(unittest.TestCase):
         context['report']['title'] = 'TEST ONLY ' + sample
         context['report']['sections'][0]['paragraphs'][0]['text'] = 'TEST ONLY ' + sample
         context['graph']['sources'] = [{'id': 'test-only', 'title': 'TEST ONLY bibliography ' + sample}]
+        context['graph']['assertions'] = [{'id': 'test-only-unicode', 'status': 'historical',
+                                           'evidence': [{'source_id': 'test-only'}]}]
         original = copy.deepcopy(context)
         with tempfile.TemporaryDirectory() as temporary:
             context['root'] = temporary
@@ -93,6 +95,7 @@ class UnicodeRenderingTests(unittest.TestCase):
             self.assertEqual(context['report'], original['report'])
             self.assertEqual(context['graph'], original['graph'])
             context['graph']['sources'] = []  # Receipt binding uses a schema-valid empty synthetic graph.
+            context['graph']['assertions'] = []
             receipt = pdf.prepare_report_pdf(context, Path(temporary) / 'prepared')
             self.assertIn('DejaVu Sans 2.37', receipt['renderer'])
             for name, metadata in receipt['font_assets'].items():
@@ -122,9 +125,12 @@ class UnicodeRenderingTests(unittest.TestCase):
                         for group in documents]
         characters = {ord(char) for value in strings([context['report'], bibliography])
                       for char in pdf.normalized_pdf_text(value) if not char.isspace()}
-        fallback = TTFont('TEST-CJK', io.BytesIO(pdf.pdf_font_assets(context)[pdf.PDF_CJK_FONT]))
+        # Inspect the real report characters against isolated, manifest-pinned
+        # public fonts, not the excluded private authoring recipe at ROOT.
+        font_assets = pdf.pdf_font_assets(context_fixture())
+        fallback = TTFont('TEST-CJK', io.BytesIO(font_assets[pdf.PDF_CJK_FONT]))
         for name in pdf.PDF_FONT_FILES:
-            font = TTFont('TEST-' + name, io.BytesIO(pdf.pdf_font_assets(context)[name]))
+            font = TTFont('TEST-' + name, io.BytesIO(font_assets[name]))
             missing = sorted(code for code in characters
                              if not (font.face.charToGlyph.get(code) or fallback.face.charToGlyph.get(code)))
             self.assertEqual(missing, [], name)

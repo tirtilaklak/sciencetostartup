@@ -77,3 +77,16 @@ Five workstream owners use gpt-6.1-sol with ultra reasoning. Only three workers
 plus coordinator run at once. Separate author, source-verifier and adversarial
 review invocations are recorded honestly. No outreach is sent. Each owner commits
 only its files on its own branch; coordinator cherry-picks and integrates.
+
+## One-time initial launch timing
+
+On November 11, 2026 the user authorized publishing the first edition as soon as
+all research and technical gates pass. Its actual source cutoff and release ID
+are bound to a one-time authorization in the release policy. This exception changes
+only the initial calendar: coverage, source capture, independent review, audit,
+privacy, archive and exact-artifact requirements still apply. Capture and publication
+times are never backdated. After the first edition, Friday 17:00 Pacific source
+cutoffs and Monday 09:00 Pacific publication targets remain in force. Weekly
+preparation explicitly clears the exception and stages a weekly edition.
+
+Paper-work identity also supports native `ceur` volume/publication keys and a `primary_work_url` for creator/publisher-hosted research with no verified native identifier. The latter must be a stable public HTTPS work URL, with no credentials, version query, fragment, encoded host or traversal. Known native repositories require their native identifiers. Deep admission requires approved subject-owned evidence from the exact primary URL; URL metadata alone grants no research credit. Different mirrors and version filenames still require explicit source-based reconciliation. Paper versions remain children, with inspected response/revision identity stored separately in sources.

@@ -6,7 +6,7 @@
   "required": ["schema_version", "projection_version", "release_id", "as_of", "canonical_dataset_version", "privacy", "canonical", "graph"],
   "properties": {
     "schema_version": {"const": 1},
-    "projection_version": {"const": "1.0.0"},
+    "projection_version": {"const": "1.2.0"},
     "release_id": {"type": "string", "minLength": 1},
     "as_of": {"type": "string"},
     "canonical_dataset_version": {"type": "string"},

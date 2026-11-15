@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "policyId": "field-guide-research-budgets-2026-11-09",
+  "policyId": "field-guide-research-book-budgets-2026-11-14",
   "performance": {
     "lighthouseVersion": "13.6.0",
     "playwrightVersion": "1.65.0",
@@ -15,6 +15,17 @@
       "/work/",
       "/research/",
       "/research/state-of-ai-data-labs/",
+      "/research/state-of-ai-data-labs/chapters/weekly-developments/",
+      "/research/state-of-ai-data-labs/chapters/market-structure/",
+      "/research/state-of-ai-data-labs/chapters/technical-landscape/",
+      "/research/state-of-ai-data-labs/chapters/provider-dossiers/",
+      "/research/state-of-ai-data-labs/chapters/datasets-and-benchmarks/",
+      "/research/state-of-ai-data-labs/chapters/human-expertise-and-operations/",
+      "/research/state-of-ai-data-labs/chapters/commercial-evidence/",
+      "/research/state-of-ai-data-labs/chapters/governance/",
+      "/research/state-of-ai-data-labs/chapters/buyer-decision-guides/",
+      "/research/state-of-ai-data-labs/chapters/research-outlook/",
+      "/research/state-of-ai-data-labs/chapters/methods-and-appendices/",
       "/research/data/",
       "/review/"
     ],

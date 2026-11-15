@@ -19,10 +19,11 @@ import math
 from pathlib import Path, PurePosixPath
 import re
 import sqlite3
-from urllib.parse import urlsplit, parse_qsl
+from urllib.parse import urlsplit, parse_qsl, unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_VERSION = "1.0.0"
+PUBLIC_PROJECTION_VERSION = "1.2.0"
 LAUNCH_FLOORS = {"legacy_inclusion_audits": 39, "qualifying_suppliers": 60,
                  "reviewed_papers": 150, "dataset_families": 60,
                  "benchmark_families": 20, "core_disposition_rate": 0.9}
@@ -38,13 +39,18 @@ PREDICATES = {"legacy_description", "has_capability", "supplies_data_for", "publ
               "adjudicated_for", "generated_for", "labeled_for", "filtered_for"}
 FACETS = {"domain", "modality", "workflow", "expertise", "origin", "labels", "oversight"}
 OPTIONAL_FACETS = {"delivery_model", "data_purpose"}
-PAPER_IDENTIFIERS = {"doi", "arxiv", "acl", "pmlr"}
+PAPER_IDENTIFIERS = {"doi", "arxiv", "acl", "pmlr", "ceur", "primary_work_url"}
 CORE_KINDS = {"organization", "supplier", "paper", "paper_work", "dataset", "dataset_family", "benchmark", "benchmark_family"}
 REVIEW_ROLES = {"author", "source_verifier", "adversarial"}
 EMAIL = re.compile(r"[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.I)
-SECRET = re.compile(r"(?:sk-(?:proj-)?[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)")
+LEGACY_SECRET = re.compile(r"(?:sk-(?:proj-)?[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)")
+SECRET = re.compile(r"(?<![A-Za-z0-9_-])" + LEGACY_SECRET.pattern)
 SHA = re.compile(r"^[0-9a-f]{64}$")
 ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$")
+PRIVATE_REVIEW_PATH = re.compile(
+    r"(?<![\w/])(?:file://)?/(?:Users|home|private|tmp|var/folders)/"
+    r"[^\r\n<>]*?\.(?:jsonl?|txt|pdf|html?|csv|sqlite|py|md)(?=[\s,;:)\]]|$)", re.I)
+PRIVATE_REVIEW_PREFIX = re.compile(r"(?<![\w/])(?:file://)?/(?:Users|home|private|tmp|var/folders)/", re.I)
 ROOT_FIELDS = {"schema_version", "release_id", "as_of", "canonical_dataset_version",
                "canonical_sha256", "entities", "sources", "assertions", "reviews", "coverage"}
 ENTITY_FIELDS = {"id", "kind", "name", "status", "identifiers", "aliases", "legacy_id",
@@ -374,7 +380,7 @@ def _validate_graph(graph, canonical=None):
             for facet in facets:
                 strings(taxonomy.get(facet), p + "/taxonomy/" + facet)
         if isinstance(identifiers, dict) and entity.get("kind") in {"paper", "paper_work"}:
-            require(bool(set(identifiers) & PAPER_IDENTIFIERS), p + "/identifiers", "paper needs DOI, arXiv, ACL or PMLR work identifier")
+            require(bool(set(identifiers) & PAPER_IDENTIFIERS), p + "/identifiers", "paper needs a supported native or primary work identifier")
             for scheme in sorted(PAPER_IDENTIFIERS):
                 identifier = identifiers.get(scheme)
                 if identifier:
@@ -382,6 +388,36 @@ def _validate_graph(graph, canonical=None):
                     if scheme == 'pmlr':
                         require(bool(re.fullmatch(r'v\d+/[a-z0-9][a-z0-9_-]*', key[1])),
                                 p + '/identifiers/pmlr', 'expected PMLR volume/publication key')
+                    if scheme == 'ceur':
+                        require(bool(re.fullmatch(r'vol-[1-9][0-9]*/[a-z0-9][a-z0-9_-]*', key[1])),
+                                p + '/identifiers/ceur', 'expected CEUR volume/publication key')
+                    if scheme == 'primary_work_url':
+                        parsed = urlsplit(identifier)
+                        require(entity.get('kind') == 'paper_work' and _public_url(identifier)
+                                and bool(parsed.path.strip('/')) and not parsed.query and not parsed.fragment
+                                and not any(c.isspace() for c in identifier)
+                                and not (parsed.hostname or '').endswith('.')
+                                and '%' not in (parsed.hostname or '')
+                                and not any(part in {'.', '..'} for part in unquote(parsed.path).split('/')),
+                                p + '/identifiers/primary_work_url', 'expected public stable credential-free primary work URL, not a version/query/fragment')
+                        require((parsed.hostname or '').lower().removeprefix('www.') not in {
+                                'arxiv.org', 'export.arxiv.org', 'doi.org', 'dx.doi.org', 'aclanthology.org',
+                                'proceedings.mlr.press', 'ceur-ws.org'},
+                                p + '/identifiers/primary_work_url', 'use the available native work identifier')
+                        if entity.get('status') == 'approved' and entity.get('disposition') == 'included' and entity.get('review_depth') == 'full_source':
+                            owners = {eid} | {child_id for child_id, child in entities.items()
+                                                if child.get('kind') == 'paper_version' and child.get('parent_id') == eid
+                                                and child.get('status') == 'approved' and child.get('review_depth') == 'full_source'
+                                                and child.get('disposition') == 'included'}
+                            bound = any(a.get('status') == 'approved' and a.get('subject_id') in owners
+                                and any(pin.get('source_id') in sources
+                                    and not urlsplit(sources[pin['source_id']].get('url', '')).query
+                                    and not urlsplit(sources[pin['source_id']].get('url', '')).fragment
+                                    and not (urlsplit(sources[pin['source_id']].get('url', '')).hostname or '').endswith('.')
+                                    and normalize_identifier('primary_work_url', sources[pin['source_id']].get('url', '')) == key[1]
+                                    for pin in a.get('evidence', [])) for a in assertions.values())
+                            require(bound, p + '/identifiers/primary_work_url',
+                                    'deep work URL needs approved subject-owned evidence from that exact primary URL')
                     require(key not in paper_ids, p + "/identifiers", "duplicate paper work; versions are not separate works")
                     paper_ids[key] = eid
         if entity.get("kind") in {"dataset", "dataset_family", "dataset_release", "benchmark", "benchmark_family", "benchmark_version"}:
@@ -564,7 +600,17 @@ def validate_graph(graph, canonical=None):
 
 
 def normalize_identifier(scheme, identifier):
-    value = str(identifier).strip().lower()
+    raw = str(identifier).strip()
+    if scheme == 'primary_work_url':
+        parsed = urlsplit(raw)
+        host = parsed.hostname or ''
+        # Preserve path case. URL mirrors or differently named versions still
+        # require explicit identity adjudication; no fuzzy URL/work merge.
+        return 'https://' + host.lower() + parsed.path
+    value = raw.lower()
+    if scheme == 'ceur':
+        value = re.sub(r'^https?://(?:www\.)?ceur-ws\.org/', '', value)
+        return re.sub(r'\.pdf$', '', value)
     if scheme == "doi":
         return re.sub(r"^(?:https?://(?:dx\.)?doi\.org/|doi:)", "", value)
     if scheme == "arxiv":
@@ -638,7 +684,7 @@ def coverage_summary(graph):
     return counts
 
 
-def _redact(value, path=()):
+def _redact(value, path=(), *, legacy=False):
     if isinstance(value, dict):
         # This typed map is keyed by assertion IDs, not by metadata field names.
         # For example, a scientific "token-format" ID must retain its review
@@ -646,17 +692,24 @@ def _redact(value, path=()):
         # all values still pass through credential/contact redaction below.
         bindings = (len(path) == 3 and path[0] == 'reviews'
                     and isinstance(path[1], int) and path[2] == 'assertion_sha256')
-        return {k: _redact(v, path + (k,)) for k, v in value.items()
+        return {k: _redact(v, path + (k,), legacy=legacy) for k, v in value.items()
                 if bindings or not re.search(r"email|phone|secret|token|cache_path|raw_body|credential", k, re.I)}
     if isinstance(value, list):
-        return [_redact(v, path + (i,)) for i, v in enumerate(value)]
+        return [_redact(v, path + (i,), legacy=legacy) for i, v in enumerate(value)]
     if isinstance(value, str):
-        return SECRET.sub("[redacted credential]", EMAIL.sub("[redacted email]", value))
+        return (LEGACY_SECRET if legacy else SECRET).sub("[redacted credential]", EMAIL.sub("[redacted email]", value))
     return value
 
 
 def public_graph(graph):
-    """Return an explicit, privacy-filtered versioned projection; no canonical people."""
+    """Current public exports always use projection1.2; no legacy export switch."""
+    return _public_graph_for_version(graph, PUBLIC_PROJECTION_VERSION)
+
+
+def _public_graph_for_version(graph, version):
+    """Legacy modes are only for verified frozen-owned recipe comparison."""
+    if version not in {"1.0.0", "1.1.0", "1.2.0"}:
+        raise ValueError("Unsupported graph projection version")
     # Allowlist before validation strips private extension fields at every graph row.
     projection = {k: copy.deepcopy(graph[k]) for k in ROOT_FIELDS if k in graph}
     for key, fields in (("entities", ENTITY_FIELDS), ("sources", SOURCE_FIELDS),
@@ -667,16 +720,42 @@ def public_graph(graph):
     # factual claim merely because the row has a candidate label.
     projection["assertions"] = [row for row in projection["assertions"] if row.get("status") in {"approved", "historical"}]
     kept = {row["id"] for row in projection["assertions"]}
+    # Draft-only source records can contain superseded citation identities. They
+    # remain in the private intake, rather than becoming public evidence merely
+    # because another hypothesis was approved in the same review invocation.
+    evidence_sources = {row["id"]: {pin["source_id"] for pin in row["evidence"]}
+                        for row in projection["assertions"]}
+    retained_sources = set().union(*evidence_sources.values()) if evidence_sources else set()
+    if version == "1.2.0":
+        projection["sources"] = [row for row in projection["sources"] if row["id"] in retained_sources]
     for entity in projection["entities"]:
         entity["assertion_ids"] = [aid for aid in entity.get("assertion_ids", []) if aid in kept]
     retained_reviews = []
     for review in projection["reviews"]:
+        original_assertion_ids = list(review.get("assertion_ids", []))
+        original_source_ids = list(review.get("source_ids", []))
         review["assertion_ids"] = [aid for aid in review.get("assertion_ids", []) if aid in kept]
         if review["assertion_ids"]:
             review["assertion_sha256"] = {aid: review["assertion_sha256"][aid] for aid in review["assertion_ids"]}
+            # This public projection narrows grouped review membership without
+            # rewriting its actual retained scientific bindings or original time.
+            scoped_sources = set().union(*(evidence_sources[aid] for aid in review["assertion_ids"]))
+            if version == "1.2.0":
+                review["source_ids"] = [sid for sid in review["source_ids"] if sid in scoped_sources]
+                if (review["assertion_ids"] != original_assertion_ids
+                        or review["source_ids"] != original_source_ids):
+                    review["note"] = ("Public projection notice: this original review covered additional private "
+                                      "drafts or source records. Its full free-form note remains private. "
+                                      "Retained exact assertion bindings, identity, verdict and actual time are unchanged.")
+            # Reading-ledger locations are private review metadata, not evidence
+            # locators. Preserve the scope, verdict, times and scientific bindings.
+            if version != "1.0.0":
+                review["note"] = PRIVATE_REVIEW_PATH.sub("[private reading-ledger path omitted]", review["note"])
+                if PRIVATE_REVIEW_PREFIX.search(review["note"]):
+                    raise ValueError("Unrecognized private local path in public review note")
             retained_reviews.append(review)
     projection["reviews"] = retained_reviews
-    projection = _redact(projection)
+    projection = _redact(projection, legacy=version != "1.2.0")
     validate_graph(projection)
     for key in ("entities", "sources", "assertions", "reviews"):
         projection[key].sort(key=lambda row: row["id"])
@@ -749,7 +828,7 @@ def write_exports(graph, output):
     with database.open('r+b') as handle:
         handle.seek(96)
         handle.write(b'\x00' * 4)
-    manifest = {"schema_version": SCHEMA_VERSION, "release_id": graph["release_id"],
+    manifest = {"schema_version": SCHEMA_VERSION, "projection_version": PUBLIC_PROJECTION_VERSION, "release_id": graph["release_id"],
                 "projection": "privacy-filtered-research-graph", "files": {
                     name: digest((output / name).read_bytes()) for name in sorted(paths)}}
     (output / "research-exports-manifest.json").write_text(stable_json(manifest), encoding="utf-8")

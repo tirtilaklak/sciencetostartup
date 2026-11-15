@@ -13,8 +13,6 @@
   Cache-Control: public, max-age=0, must-revalidate
 /assets/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
-/*.json
-  Cache-Control: public, max-age=3600
 /*.csv
   Cache-Control: public, max-age=3600
 /*.sqlite

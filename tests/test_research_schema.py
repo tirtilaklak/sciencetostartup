@@ -9,7 +9,7 @@ from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
-from research_graph import load_graph, public_graph
+from research_graph import public_graph
 from research_citations import publication_metadata
 from research_report import build_context
 
@@ -22,7 +22,7 @@ class ResearchSchemaTests(unittest.TestCase):
         cls.validator = Draft202012Validator(cls.schema)
 
     def test_approved_source_and_public_graph_conform_without_rewriting_review_times(self):
-        graph = load_graph(ROOT)
+        graph = build_context(ROOT)['graph']
         for instance in (graph, public_graph(graph)):
             errors = list(self.validator.iter_errors(instance))
             self.assertEqual([(list(error.absolute_path), error.message) for error in errors], [])

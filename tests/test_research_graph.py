@@ -11,6 +11,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import research_graph as rg
+from research_report import build_context
 
 
 def entity(identifier, kind="paper", **overrides):
@@ -55,11 +56,13 @@ class ResearchGraphTests(unittest.TestCase):
         if message:
             self.assertIn(message, str(caught.exception))
 
-    def test_actual_graph_is_canonical_bound_and_honestly_prelaunch(self):
-        graph = rg.load_graph(ROOT)
+    def test_actual_graph_is_canonical_bound_and_meets_coverage_floors(self):
+        graph = build_context(ROOT)['graph']
         summary = rg.coverage_summary(graph)
         self.assertEqual(summary["legacy_organizations"], 39)
-        self.assertFalse(summary["coverage_floors_met"])
+        self.assertTrue(summary["coverage_floors_met"])
+        self.assertGreaterEqual(summary["core_eligible"], 416)
+        self.assertGreaterEqual(summary["core_disposition_rate"], .9)
         self.assertEqual(summary["launch_floors"]["reviewed_papers"], 150)
         self.assertEqual(summary["launch_floors"]["qualifying_suppliers"], 60)
         self.assertEqual(summary["launch_floors"]["dataset_families"], 60)
@@ -67,12 +70,12 @@ class ResearchGraphTests(unittest.TestCase):
         self.assertGreaterEqual(summary["captured_sources"], 9)
 
     def test_canonical_byte_drift_fails(self):
-        graph = rg.load_graph(ROOT)
+        graph = build_context(ROOT)['graph']
         with self.assertRaisesRegex(rg.GraphValidationError, "canonical bytes"):
             rg.validate_graph(graph, (ROOT / "data/canonical.json").read_bytes() + b"\n")
 
     def test_duplicate_or_missing_legacy_organization_fails(self):
-        graph = rg.load_graph(ROOT)
+        graph = build_context(ROOT)['graph']
         graph["entities"] = [e for e in graph["entities"] if e["legacy_id"] != "mercor"]
         with self.assertRaisesRegex(rg.GraphValidationError, "canonical 39"):
             rg.validate_graph(graph, (ROOT / "data/canonical.json").read_bytes())
@@ -145,6 +148,52 @@ class ResearchGraphTests(unittest.TestCase):
         self.assertEqual(exported["assertions"], [])
         self.assertEqual(exported["reviews"], [])
         self.assertNotIn("Synthetic test observation", rg.stable_json(exported))
+
+    def test_draft_only_source_metadata_and_grouped_review_sources_stay_private(self):
+        graph = fixture()
+        draft = copy.deepcopy(graph['assertions'][0])
+        draft.update(id='draft', status='candidate', review_ids=[])
+        draft['evidence'][0]['source_id'] = 'draft-source'
+        source = copy.deepcopy(graph['sources'][0])
+        source.update(id='draft-source', version='SYNTHETIC-OBSOLETE-DRAFT-VERSION')
+        graph['assertions'].append(draft)
+        graph['sources'].append(source)
+        for review in graph['reviews']:
+            review['source_ids'].append('draft-source')
+        original = copy.deepcopy(graph)
+        projected = rg.public_graph(graph)
+        self.assertEqual([row['id'] for row in projected['sources']], ['source'])
+        self.assertTrue(all(row['source_ids'] == ['source'] for row in projected['reviews']))
+        self.assertEqual(graph, original)
+        self.assertNotIn('SYNTHETIC-OBSOLETE-DRAFT-VERSION', rg.stable_json(projected))
+
+    def test_withheld_source_keeps_web_anchor_without_unapproved_metadata(self):
+        import research_pages as pages
+        graph = fixture()
+        graph['assertions'][0]['status'] = 'candidate'
+        graph['sources'][0]['version'] = 'SYNTHETIC-UNAPPROVED-VERSION'
+        context = {'graph': graph, 'corrections': []}
+        _, _, sources = pages._ledger_records(context)
+        rendered = pages._source(sources['source'])
+        self.assertIn('id="source-source"', rendered)
+        self.assertIn('Source metadata withheld', rendered)
+        self.assertIn('class="r-source-stub"', rendered)
+        self.assertNotIn('class="r-source"', rendered)
+        self.assertNotIn('SYNTHETIC-UNAPPROVED-VERSION', rendered)
+        self.assertEqual(pages._source_evidence(context, graph['assertions'][0]), '')
+
+    def test_current_privacy_preserves_hyphen_identifiers_and_removes_unicode_prefixed_keys(self):
+        import research_citations as citations
+        import screening_audit_v3 as repeat
+        identifier = 'record-sk-abcdefghijklmnop'
+        raw = json.dumps({'record_id': identifier})
+        self.assertEqual(rg._redact(identifier), identifier)
+        self.assertEqual(citations.privacy_filter({'audit_json': raw})['audit_json'], raw)
+        self.assertEqual(repeat._safe_public(identifier), [])
+        dummy_key = '文sk-' + 'a' * 20
+        self.assertNotIn('sk-', rg._redact(dummy_key))
+        self.assertNotIn('sk-', citations.privacy_filter(dummy_key))
+        self.assertTrue(repeat._safe_public(dummy_key))
 
     def test_scientific_token_identifier_keeps_exact_public_review_bindings(self):
         graph = fixture()
@@ -368,6 +417,29 @@ class ResearchGraphTests(unittest.TestCase):
             graph = fixture()
             graph["coverage"]["notes"] = [value]
             self.assert_invalid(graph)
+
+    def test_private_review_locations_are_removed_without_changing_scientific_bindings(self):
+        graph = fixture()
+        note = ('Actual bounded source review; receipt SHA256 ' + 'a' * 64 +
+                '; scopes /Users/private person/My Project/source notes.v2.json ordinal1. '
+                'Keep src/private/suite.json and AI /root/evidence_auditor. No experiment replay.')
+        graph['reviews'][0]['note'] = note
+        before = copy.deepcopy(graph)
+        projected = rg.public_graph(graph)
+        self.assertEqual(graph, before)
+        review = next(r for r in projected['reviews'] if r['id'] == graph['reviews'][0]['id'])
+        self.assertNotIn('/Users/', review['note'])
+        self.assertIn('receipt SHA256 ' + 'a' * 64, review['note'])
+        self.assertIn('src/private/suite.json', review['note'])
+        self.assertIn('/root/evidence_auditor', review['note'])
+        self.assertIn('No experiment replay.', review['note'])
+        self.assertEqual(review['assertion_sha256'], graph['reviews'][0]['assertion_sha256'])
+
+    def test_unrecognized_private_review_location_holds_export(self):
+        graph = fixture()
+        graph['reviews'][0]['note'] = 'See /Users/private person/unfinished folder'
+        with self.assertRaisesRegex(ValueError, 'private local path'):
+            rg.public_graph(graph)
 
     def test_credential_bearing_source_url_rejected(self):
         graph = fixture()

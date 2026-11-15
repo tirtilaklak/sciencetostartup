@@ -1,4 +1,4 @@
-"""Public crawler exports, lossless embedded data and the deployed-dist release check."""
+"""Public crawler exports, contact-safe views and preserved canonical downloads."""
 import contextlib
 import hashlib
 import io
@@ -19,6 +19,8 @@ from build_public_snapshot import verify
 from observatory import build
 
 ORIGIN = "https://sciencetostartup.com"
+# Independent test contract: do not use the production projection as its oracle.
+CONTACT_EMAIL = re.compile(r"[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9.-]*[A-Z0-9])?\.[A-Z]{2,}", re.I)
 
 
 class HeadLinks(HTMLParser):
@@ -42,24 +44,59 @@ class PublicEntrypointTests(unittest.TestCase):
 
     def test_summary_matches_its_full_preserved_archive_and_downloads(self):
         manifest = json.loads((self.dist / "manifest.json").read_text())
-        summary = json.loads((self.dist / manifest["summary"]["href"].lstrip("/")).read_text())
+        summary_bytes = (self.dist / manifest["summary"]["href"].lstrip("/")).read_bytes()
+        self.assertEqual(hashlib.sha256(summary_bytes).hexdigest(), manifest["summary"]["sha256"])
+        summary = json.loads(summary_bytes)
         for element in ("research-data",):
             match = re.search(r'<script\b[^>]*\bid="' + element +
                               r'"[^>]*>(.*?)</script>', self.app_html, re.S)
             self.assertIsNotNone(match, element)
             self.assertEqual(json.loads(match.group(1)), summary["bootstrap"], element)
-        archive = json.loads((self.dist / summary["archive"]["href"].lstrip("/")).read_text())
-        self.assertEqual(archive["data"], json.loads((ROOT / "data/canonical.json").read_text()))
+        archive_bytes = (self.dist / summary["archive"]["href"].lstrip("/")).read_bytes()
+        self.assertEqual(hashlib.sha256(archive_bytes).hexdigest(), summary["archive"]["sha256"])
+        archive = json.loads(archive_bytes)
+        canonical_bytes = (ROOT / "data/canonical.json").read_bytes()
+        canonical = json.loads(canonical_bytes)
+        self.assertEqual(summary["privacyProjectionVersion"], "1.0.0")
+        self.assertEqual(archive["privacyProjectionVersion"], "1.0.0")
+
+        def assert_contact_safe_pair(original, presented, path="$", counts=None):
+            # Pairwise traversal preserves types (including bool versus int),
+            # keys, list length/order and every value except email substrings.
+            self.assertIs(type(presented), type(original), path + ": JSON type changed")
+            if isinstance(original, dict):
+                self.assertTrue(original.keys() == presented.keys(), path + ": object keys changed")
+                for index, key in enumerate(original):
+                    self.assertTrue(CONTACT_EMAIL.search(key) is None, path + ": email in object key")
+                    assert_contact_safe_pair(original[key], presented[key], f"{path}/key[{index}]", counts)
+            elif isinstance(original, list):
+                self.assertEqual(len(presented), len(original), path + ": list length changed")
+                for index, (left, right) in enumerate(zip(original, presented)):
+                    assert_contact_safe_pair(left, right, f"{path}/[{index}]", counts)
+            elif isinstance(original, str):
+                expected, removed = CONTACT_EMAIL.subn("[contact removed]", original)
+                self.assertTrue(presented == expected, path + ": exact contact projection differs")
+                self.assertTrue(CONTACT_EMAIL.search(presented) is None, path + ": email survived")
+                counts["redactions"] += removed
+            else:
+                self.assertTrue(presented == original, path + ": scalar value changed")
+
+        counts = {"redactions": 0}
+        assert_contact_safe_pair(canonical, archive["data"], counts=counts)
+        self.assertGreater(counts["redactions"], 0, "Exercise the retained canonical contact fixture")
+        self.assertTrue(CONTACT_EMAIL.search(json.dumps(archive)) is None, "Current archive contains an email")
         self.assertEqual(summary["buildId"], manifest["build_id"])
         self.assertEqual(summary["datasetVersion"], "2.5.0")
-        self.assertEqual(summary["exports"]["research"]["sha256"], hashlib.sha256((ROOT / "data/canonical.json").read_bytes()).hexdigest())
+        canonical_sha256 = hashlib.sha256(canonical_bytes).hexdigest()
+        self.assertEqual(summary["exports"]["research"]["sha256"], canonical_sha256)
+        self.assertEqual(manifest["sha256"]["research.json"], canonical_sha256)
         self.assertNotIn('id="research-data"', self.html, "The homepage must not load research")
         self.assertNotIn('id="outreach-data"', self.html,
                          "The alumni directory must not ship in the public page")
         self.assertNotIn("mailto:", self.html.split("<footer>")[0].split('id="method-view"')[0],
                          "No personal mailto links outside the About panel")
         self.assertEqual((self.dist / "research.json").read_bytes(),
-                         (ROOT / "data/canonical.json").read_bytes())
+                         canonical_bytes)
         self.assertLess(len(self.html.encode("utf-8")), 4 * 1024 * 1024,
                         "Entrypoint exceeds the observed 4 MiB web-fetch limit")
 
@@ -86,8 +123,8 @@ class PublicEntrypointTests(unittest.TestCase):
             self.assertIn(ORIGIN + "/company/" + company["id"] + "/", locs)
             self.assertTrue((self.dist / "company" / company["id"] / "index.html").is_file(), company["id"])
         from artifact_verification import verify_undated_research_metadata
-        from research_graph import load_graph
-        graph = load_graph(ROOT)
+        from research_report import build_context
+        graph = build_context(ROOT)['graph']
         for entry in root:
             loc = entry.findtext(namespace + "loc")
             modified = entry.findtext(namespace + "lastmod")

@@ -1,0 +1,40 @@
+{
+  "admissions": {
+    "reference": {
+      "admitted_on": "2026-11-12T13:48:56.004096+00:00",
+      "audit_sha256": "e7465aa7a00da888f84c4582b3849554954db9d37d0f9cabfdd17b14f80509d9",
+      "completion_authorized": true,
+      "exposure_review_sha256": "c0d99d89de5066b68b22ee11cbd5be9936fa6deea517e3998daf0fb56d53e6a7",
+      "independent_review_invocation_id": "/root/reference_v4_actual_admission_review/actual-2026-11-12T11:55:36Z",
+      "independent_review_sha256": "46f7b65aedefe1fed571f2ba9a16924ee2bf6eb741d11ef3481c83721d91b99e",
+      "independent_reviewer": "Independent actual admission reviewer /root/reference_v4_actual_admission_review",
+      "lineage_manifest_sha256": "4a109a61881f8f48acf689f1796f8158ea530a864d32994395898159a92a95d8",
+      "metadata_adaptations_sha256": "48fb7d3658b68bc8b392074dcd85049884679f3987034492d9870c7f4a17acb3",
+      "method_adoption_sha256": "92994b57ab71bfd1fab75da4e4da9b40d80c70cb365662e8f806ac79f78c9a04",
+      "population_review_sha256": "23cf38c0274b5229c5b6850921634f0f04f5c3aa0328fd4a09a42b4c1b817199",
+      "population_rule": "first_peer_submitted_substantive_hypothesis_per_semantic_lineage",
+      "receipt_sha256": "fe458df3c0242252ab88a771f13a9e34cbf9cd4968feb161dc3e331510e268af",
+      "reviewed_on": "2026-11-12T13:48:55.978699+00:00",
+      "schema_version": "reference-audit-admission-v4",
+      "status": "accepted",
+      "validation_invocation_id": "reference-v4-metadata-integrity-validation-6711d0d2b1c64b348c1b79477a96259d",
+      "validator_capsule_sha256": "bd6b70ccf9bd83a4963c83cb6dbaf021776e8bc7a0501db6e083b495079d6cac"
+    },
+    "screening": {
+      "admitted_on": "2026-11-15T15:15:55.804255+00:00",
+      "audit_sha256": "2748d91f731e83247f0c08a8d43eded3df9c7846596b782a44c883ea7a64d369",
+      "completion_authorized": true,
+      "independent_review_invocation_id": "screening7-distinct-actual-admission-befe785f9c1d4ed99c9cbdd240cb2db3",
+      "independent_review_sha256": "48b8add02531ebc7caef892050cf7e2230bc37ada1dab88d0da854753a5c4da1",
+      "independent_reviewer": "/root/screening7_actual_admission_review",
+      "method_adoption_sha256": "7fb1f1e105134795a40e0c44e34728a16c17dcddf852bc0c2f0e675ad9cd4b20",
+      "receipt_sha256": "1a9324e9b7e1d2fdefb5d0a64dd4e52e3afb6253689d961a85d101607b354ac6",
+      "reviewed_on": "2026-11-15T15:07:40.587912+00:00",
+      "schema_version": "screening-audit-admission-v2",
+      "status": "accepted",
+      "validation_invocation_id": "screening7-distinct-actual-private-validation-c3ffdac546e94e8bbe8a7a98fb3923d9",
+      "validator_capsule_sha256": "d080ad8fee5dc15e7d59e0913fafc08f27e4780cc37ca35cf33d2426f96bdf79"
+    }
+  },
+  "schema_version": "1.0.0"
+}

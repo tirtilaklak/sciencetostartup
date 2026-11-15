@@ -129,20 +129,20 @@
 .r-ledger-nav{margin:24px 0}
 .r-legacy-ledger-target{display:none}
 .r-legacy-ledger-target:target{display:block;max-width:900px;min-height:44px;margin:24px 0;padding:20px;border-left:2px solid var(--r-accent);overflow-wrap:anywhere}
-.r-assertion,.r-source{max-width:900px;padding:24px 0;margin:0;border-bottom:1px solid var(--r-rule)}
+.r-assertion,.r-source,.r-source-stub{max-width:900px;padding:24px 0;margin:0;border-bottom:1px solid var(--r-rule)}
 /* Every ledger record stays in the native document, including citations and
    disclosures. Let the browser skip offscreen layout, while fragment targets,
    find-in-page, keyboard focus and assistive technology can reveal any record. */
 @supports(content-visibility:auto){
  @media screen{
-  .research:not(.r-company-supplement) .r-assertion,.research:not(.r-company-supplement) .r-source{content-visibility:auto;contain-intrinsic-block-size:auto 36rem}
-  .research:not(.r-company-supplement) .r-source{contain-intrinsic-block-size:auto 28rem}
+  .research:not(.r-company-supplement) .r-assertion,.research:not(.r-company-supplement) .r-source,.research:not(.r-company-supplement) .r-source-stub{content-visibility:auto;contain-intrinsic-block-size:auto 36rem}
+  .research:not(.r-company-supplement) .r-source,.research:not(.r-company-supplement) .r-source-stub{contain-intrinsic-block-size:auto 28rem}
   /* Resolve every preceding height before a native fragment or keyboard jump.
      This also preserves native Back/Forward positions across browser engines. */
-  .research:has(:target) :is(.r-assertion,.r-source),.research:has(.r-assertion:focus-within,.r-source:focus-within) :is(.r-assertion,.r-source){content-visibility:visible;contain-intrinsic-size:none}
+  .research:has(:target) :is(.r-assertion,.r-source,.r-source-stub),.research:has(.r-assertion:focus-within,.r-source:focus-within,.r-source-stub:focus-within) :is(.r-assertion,.r-source,.r-source-stub){content-visibility:visible;contain-intrinsic-size:none}
  }
  @media print{
-  .r-assertion,.r-source{content-visibility:visible;contain:none;contain-intrinsic-size:none}
+  .r-assertion,.r-source,.r-source-stub{content-visibility:visible;contain:none;contain-intrinsic-size:none}
  }
 }
 .r-assertion .r-kicker{margin-bottom:10px;font-size:10px}
@@ -157,7 +157,7 @@
 .r-evidence-excerpt p{margin:0}
 .r-receipts{margin-top:12px}
 .r-receipts ul{font-size:12px;line-height:1.7;color:var(--r-quiet)}
-.r-source h3{font-size:18px;margin-bottom:10px;line-height:1.4}
+.r-source h3,.r-source-stub h3{font-size:18px;margin-bottom:10px;line-height:1.4}
 .r-facts{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px 24px;margin:20px 0;font-size:13px;line-height:1.7}
 .r-facts dt{color:var(--r-quiet)}
 .r-facts dd{margin:0;min-width:0;overflow-wrap:anywhere}
@@ -235,3 +235,15 @@
 @media(max-width:380px){.r-browse-grid{grid-template-columns:minmax(0,1fr)}.r-chapter-list,.r-toc ol{columns:1}.research h1{font-size:46px}.r-page-head h1.r-record-title{font-size:36px}.r-progress{gap:20px 16px}.r-progress-item:last-child strong{font-size:23px}.r-meta{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.research{scroll-behavior:auto}}
 @media(forced-colors:active){.r-status,.r-report-card,.r-detail-aside{border-color:CanvasText}.r-meter{border:1px solid CanvasText}.r-meter span{background:CanvasText}.r-status::before{background:CanvasText}}
+
+.r-reader-book-title{max-width:46rem;font-size:17px;margin-bottom:14px}
+.r-reader-downloads{font-size:13px!important;margin-top:22px}
+.r-reader-toc li{scroll-margin-top:28px}
+.r-reader-toc li:target{outline:2px solid var(--r-accent);outline-offset:7px}
+.r-reader-toc [aria-current="page"]{font-weight:600;color:var(--ink)}
+.r-reader-pagination{display:flex;gap:18px;flex-wrap:wrap;justify-content:space-between;margin:36px 0;padding:22px 0;border-block:1px solid var(--r-rule)}
+.r-reader-pagination a{display:block;min-height:44px;max-width:45%;font-size:14px;line-height:1.6}
+.r-reader-chapter-content{border-top:0;padding-top:0}
+@media(max-width:720px){.r-reader-pagination{display:block}.r-reader-pagination a{max-width:none;margin:14px 0}.r-reader-toc{position:static}}
+
+.r-book-reader .r-chapter{content-visibility:visible;contain:none;contain-intrinsic-size:none}

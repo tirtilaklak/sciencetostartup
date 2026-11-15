@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { createHash } = require('node:crypto');
 const AxeBuilder = require('@axe-core/playwright').default;
 const { evidenceURL } = require('./research-ledger');
 
@@ -7,7 +8,12 @@ const { evidenceURL } = require('./research-ledger');
 test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
 
 const reportPath = '/research/state-of-ai-data-labs/';
-const publicPages = ['/', '/research/', reportPath, '/research/data/', '/review/', '/company/scale_ai/'];
+const chapterIds = ['executive-assessment', 'weekly-developments', 'market-structure',
+  'technical-landscape', 'provider-dossiers', 'datasets-and-benchmarks',
+  'human-expertise-and-operations', 'commercial-evidence', 'governance',
+  'buyer-decision-guides', 'research-outlook', 'methods-and-appendices'];
+const readingPages = chapterIds.map((id, index) => index ? reportPath + 'chapters/' + id + '/' : reportPath);
+const publicPages = ['/', '/research/', ...readingPages, '/research/data/', '/review/', '/company/scale_ai/'];
 
 test.beforeEach(async ({ page, request }, info) => {
   const response = await request.get('/manifest.json');
@@ -29,24 +35,31 @@ test.afterEach(async ({}, info) => {
 test.describe('research without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
-  test('hub opens a complete twelve-chapter report with working chapter links', async ({ page }) => {
+  test('hub opens all twelve complete native chapters without JavaScript', async ({ page }) => {
     await page.goto('/research/');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('human work');
     await expect(page.locator('.r-chapter-list a')).toHaveCount(12);
     await page.getByRole('link', { name: 'Read the research →', exact: true }).click();
     await expect(page).toHaveURL(new RegExp(reportPath + '$'));
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('State of AI Data Labs and Human Feedback');
-    await expect(page.locator('.r-report-body > .r-chapter:not(#cite)')).toHaveCount(12);
+    await expect(page.locator('.r-report-body > .r-chapter:not(#cite)')).toHaveCount(1);
     const chapters = await page.locator('.r-toc ol a').evaluateAll(links => links.map(link => ({ href: link.getAttribute('href'), title: link.textContent })));
     expect(chapters).toHaveLength(12);
-    for (const chapter of chapters) {
-      const section = page.locator('[id=' + JSON.stringify(chapter.href.slice(1)) + ']');
-      await expect(section.getByRole('heading', { level: 2 })).toHaveText(chapter.title);
-      expect(await section.locator('.r-paragraph p').count(), chapter.title).toBeGreaterThan(0);
+    expect(chapters.map(chapter => chapter.href)).toEqual(readingPages);
+    for (const [index, chapter] of chapters.entries()) {
+      await page.goto(chapter.href);
+      await expect(page.locator('[id=' + JSON.stringify(chapterIds[index]) + ']')).toBeVisible();
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sciencetostartup.com' + chapter.href);
+      expect(await page.locator('.r-report-body .r-paragraph p').count(), chapter.title).toBeGreaterThan(0);
+      await expect(page.getByRole('navigation', { name: 'Report chapters' }).locator('[aria-current="page"]')).toHaveAttribute('href', chapter.href);
+      if (index) await expect(page.locator('.r-reader-pagination [rel="prev"]')).toHaveAttribute('href', readingPages[index - 1]);
+      if (index + 1 < chapters.length) await expect(page.locator('.r-reader-pagination [rel="next"]')).toHaveAttribute('href', readingPages[index + 1]);
     }
+    await page.goto(reportPath + '#methods-and-appendices');
+    await expect(page.locator('#methods-and-appendices')).toBeInViewport();
     await page.locator('.r-toc ol a').last().click();
-    await expect(page).toHaveURL(/#methods-and-appendices$/);
-    await expect(page.locator('#methods-and-appendices > h2')).toBeInViewport();
+    await expect(page).toHaveURL(new RegExp(readingPages.at(-1) + '$'));
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Methods');
   });
 
   test('report evidence opens the assertion and its source ledger entry', async ({ page }) => {
@@ -89,19 +102,61 @@ test.describe('research without JavaScript', () => {
       if (href.endsWith('.sqlite')) expect(body.subarray(0, 16).toString()).toBe('SQLite format 3\u0000');
       else expect(() => JSON.parse(body.toString()), href).not.toThrow();
     }
+    const statusResponse = await request.get('/publication/package-status.json');
+    expect(statusResponse.ok()).toBeTruthy();
+    const status = await statusResponse.json();
+    const published = status.archive === 'published';
+    const metadataResponse = await request.get('/publication/current-metadata.json');
+    expect(metadataResponse.ok()).toBeTruthy();
+    const metadata = await metadataResponse.json();
+    expect(metadata.version).toBe(status.release_id);
+    let doi;
+    if (published) {
+      const receipt = status.archive_receipt;
+      expect(receipt).toMatchObject({ status: 'published', verified: true, anonymous_verified: true,
+        api_origin: 'https://zenodo.org', environment: 'production', release_id: status.release_id,
+        artifact_sha256: status.archive_sha256 });
+      expect(Number.isSafeInteger(receipt.record_id) && receipt.record_id > 0).toBe(true);
+      doi = '10.5281/zenodo.' + receipt.record_id;
+      expect(receipt.doi).toBe(doi);
+      expect(receipt.reserved_doi).toBe(doi);
+      expect(receipt.deposition_id).toBe(receipt.record_id);
+      expect(receipt.concept_doi).toMatch(/^10\.5281\/zenodo\.[1-9][0-9]*$/);
+      expect(receipt.concept_doi).not.toBe(doi);
+      expect(receipt.record_url).toBe('https://zenodo.org/records/' + receipt.record_id);
+      expect(metadata).toMatchObject({ status: 'published', doi, url: receipt.record_url });
+      if (status.release_id === 'research-2026-11-12.1') expect(doi).toBe('10.5281/zenodo.24249277');
+    } else {
+      expect(metadata.doi).toBeUndefined();
+    }
+    const manifestResponse = await request.get('/publication/MANIFEST.json');
+    expect(manifestResponse.ok()).toBeTruthy();
+    const manifestBody = await manifestResponse.body();
+    expect(createHash('sha256').update(manifestBody).digest('hex')).toBe(status.manifest_sha256);
+    const frozenManifest = JSON.parse(manifestBody.toString());
     const formats = [
-      ['BibTeX', '/publication/citation.bib', /@\w+\s*\{/],
-      ['RIS', '/publication/citation.ris', /^TY\s+-/m],
-      ['CSL JSON', '/publication/citation.csl.json', /"title"\s*:/],
-      ['CITATION.cff', '/publication/CITATION.cff', /["']?cff-version["']?\s*:/],
+      ['BibTeX', 'citation.bib', /@\w+\s*\{/, text => text.match(/^\s*doi\s*=\s*[{\"]([^}\"]+)[}\"]/mi)?.[1]],
+      ['RIS', 'citation.ris', /^TY\s+-/m, text => text.match(/^DO\s+-\s*(\S+)/m)?.[1]],
+      ['CSL JSON', 'citation.csl.json', /"title"\s*:/, text => JSON.parse(text).DOI],
+      ['CITATION.cff', 'CITATION.cff', /["']?cff-version["']?\s*:/, text => JSON.parse(text).doi],
     ];
-    for (const [name, href, format] of formats) {
+    for (const [name, filename, format, registeredDOI] of formats) {
+      const href = '/publication/' + (published ? 'current-' : '') + filename;
       await expect(page.locator('#citation').getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
       const response = await request.get(href);
       expect(response.ok(), name).toBeTruthy();
       const content = await response.text();
       expect(content, name).toMatch(format);
       expect(content, name).toContain('State of AI Data Labs and Human Feedback');
+      expect(registeredDOI(content), name + ' registered DOI').toBe(doi);
+      // Frozen preparation citations retain their original bytes and reserved
+      // DOI note; they never acquire a registered DOI field after publication.
+      const frozenResponse = await request.get('/publication/' + filename);
+      expect(frozenResponse.ok(), name + ' frozen file').toBeTruthy();
+      const frozen = await frozenResponse.body();
+      expect(frozen.length).toBe(frozenManifest.files[filename].bytes);
+      expect(createHash('sha256').update(frozen).digest('hex')).toBe(frozenManifest.files[filename].sha256);
+      expect(registeredDOI(frozen.toString()), name + ' frozen registered DOI').toBeUndefined();
     }
     await expect(page.locator('#sources')).toBeVisible();
     const sourceParts = page.locator('section[aria-labelledby="sources"] .r-ledger-parts a');
@@ -155,6 +210,34 @@ test('global search offers a native research link and respects opening it in a n
   await result.click();
   await expect(page).toHaveURL(new RegExp(reportPath + '$'));
 });
+
+for (const surface of ['home', 'site']) {
+  test(surface + ' search opens a complete chapter with native new-tab, Enter and history behavior', async ({ page, context }) => {
+    const start = surface === 'home' ? '/' : '/explore/#companies';
+    const chapter = readingPages[3];
+    await page.goto(start);
+    if (surface === 'site') await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    await page.locator('#' + surface + '-search-open').click();
+    await page.locator('#' + surface + '-search-input').fill('technical landscape');
+    const result = page.locator('#' + surface + '-search-results a[href=' + JSON.stringify(chapter) + ']');
+    await expect(result).toContainText('Technical landscape');
+    const opened = context.waitForEvent('page');
+    await result.click({ modifiers: ['ControlOrMeta'] });
+    const tab = await opened;
+    await tab.waitForLoadState();
+    expect(new URL(tab.url()).pathname).toBe(chapter);
+    await expect(tab.getByRole('heading', { level: 1 })).toContainText('Technical landscape');
+    await tab.close();
+    expect(new URL(page.url()).pathname + new URL(page.url()).hash).toBe(start);
+    await result.focus();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(new RegExp(chapter + '$'));
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Technical landscape');
+    expect(await page.locator('.r-report-body .r-paragraph').count()).toBeGreaterThan(0);
+    await page.goBack();
+    expect(new URL(page.url()).pathname + new URL(page.url()).hash).toBe(start);
+  });
+}
 
 test('public pages retain keyboard skip navigation into the main content', async ({ page, browserName }) => {
   // Safari's default keyboard setting visits links with Option-Tab.

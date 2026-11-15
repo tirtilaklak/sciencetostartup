@@ -601,7 +601,6 @@
     "site_icon_count": 13,
     "sha256_validated": 39,
     "xml_or_raster_decoded": 39,
-    "visual_review": "All 39 inspected in a single macOS Quick Look contact sheet; backgrounds adjusted for contrast. Image tiles should set color-scheme: light because some original icons contain responsive SVG styles.",
-    "visual_review_file": "/tmp/official-logos/contact-sheet.svg.png"
+    "visual_review": "All 39 inspected in a single macOS Quick Look contact sheet; backgrounds adjusted for contrast. Image tiles should set color-scheme: light because some original icons contain responsive SVG styles."
   }
 }

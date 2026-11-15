@@ -5,12 +5,12 @@
     "given": "Musa"
   },
   "license": "CC-BY-4.0",
-  "note": "Preparation snapshot; not a published research edition. No DOI has been registered for this snapshot.",
-  "projection_version": "1.0.0",
+  "note": "Complete research package frozen before archival publication. Check the release record for current DOI registration and publication status. Reserved version DOI (not registered): 10.5281/zenodo.24249277.",
+  "projection_version": "1.2.0",
   "schema_version": 1,
-  "status": "prelaunch",
+  "status": "ready-for-archive",
   "title": "State of AI Data Labs and Human Feedback",
-  "updated_on": "2026-11-10",
+  "updated_on": "2026-11-15",
   "url": "https://sciencetostartup.com/research/state-of-ai-data-labs/",
-  "version": "research-2026-11-10.prelaunch.1"
+  "version": "research-2026-11-12.1"
 }

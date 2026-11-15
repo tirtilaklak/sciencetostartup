@@ -12,7 +12,6 @@ import math
 import re
 from datetime import date, datetime, timezone
 from pathlib import Path
-from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -106,6 +105,9 @@ def load_edition_snapshots(root, report):
         if hashlib.sha256(blob).hexdigest() != entry.get('snapshot_sha256'):
             raise ValueError('Immutable edition snapshot digest differs')
         snapshot = json.loads(blob)
+        if isinstance(snapshot, dict) and snapshot.get('schema_version') == 'published-edition-replay-v1':
+            from research_edition_replay import resolve_edition_entry
+            snapshot = resolve_edition_entry(root, entry)
         if any(key not in snapshot for key in ('graph', 'report', 'policy', 'identity')):
             raise ValueError('Edition snapshot lacks complete public inputs')
         rid = entry.get('release_id')
@@ -335,6 +337,31 @@ def _audit(audit, kind, graph, thresholds):
     return errors, metrics
 
 
+def _evaluate_audit(kind, graph, thresholds, policy):
+    """Versioned audits require exact bytes and separately loaded trust records."""
+    audit = policy.get('audits', {}).get(kind)
+    if not isinstance(audit, dict) or 'schema_version' not in audit:
+        return _audit(audit, kind, graph, thresholds)
+    inputs = policy.get('audit_inputs', {}).get(kind, {})
+    raw = inputs.get('audit_json') if isinstance(inputs, dict) else None
+    receipt = inputs.get('validation_receipt_json') if isinstance(inputs, dict) else None
+    if not isinstance(raw, str) or not isinstance(receipt, str):
+        return [f'Exact public {kind} audit and separate private-validation receipt bytes are required.'], {}
+    try:
+        from screening_audit_v2 import load_exact
+        if load_exact(raw.encode('utf-8')) != audit:
+            return [f'Parsed {kind} audit differs from its authoritative exact bytes.'], {}
+        from research_audit_dispatch import validate_audit
+        errors, metrics = validate_audit(kind, raw.encode('utf-8'), graph, thresholds,
+            validation_receipt_bytes=receipt.encode('utf-8'),
+            trusted_admission=policy.get('audit_admissions', {}).get(kind), legacy_reader=_audit)
+        if metrics.get('publication_eligible') is not True:
+            errors.append(f'The actual {kind} execution has not passed independent admission and completion requirements.')
+        return errors, metrics
+    except (ValueError, TypeError, KeyError, UnicodeError) as error:
+        return [f'Invalid exact {kind} audit inputs: {error}'], {}
+
+
 def publication_gate(graph, report, policy=None):
     from research_graph import coverage_summary, validate_graph
 
@@ -373,7 +400,28 @@ def publication_gate(graph, report, policy=None):
     try:
         cutoff = _timestamp(report.get("source_cutoff"))
         local_cutoff = cutoff.astimezone(ZoneInfo("America/Los_Angeles"))
-        if (local_cutoff.weekday(), local_cutoff.hour, local_cutoff.minute, local_cutoff.second) != (4, 17, 0, 0):
+        if report.get('edition_kind', 'weekly') == 'launch':
+            authorization = policy.get('initial_launch_authorization', {})
+            try:
+                recorded = _timestamp(authorization.get('recorded_on'))
+                authorized_cutoff = _timestamp(authorization.get('source_cutoff'))
+                authorized = (authorization.get('authorization_id') == 'user-2026-11-11-initial-launch-as-ready'
+                    and authorization.get('one_time') is True
+                    and authorization.get('release_id') == report.get('release_id')
+                    and authorized_cutoff == cutoff
+                    and recorded.astimezone(ZoneInfo('America/Los_Angeles')).date() >= date(2026, 11, 11)
+                    and recorded <= _timestamp(graph.get('as_of'))
+                    and recorded <= datetime.now(timezone.utc)
+                    and not any(e.get('status') == 'published'
+                        and e.get('release_id') != report.get('release_id')
+                        for e in report.get('editions', [])))
+            except (TypeError, ValueError, AttributeError):
+                authorized = False
+            if not authorized:
+                reasons.append('An initial launch requires the recorded one-time user authorization bound to its exact release and actual cutoff; it cannot authorize later editions.')
+        elif report.get('edition_kind', 'weekly') != 'weekly':
+            reasons.append('Unknown edition kind; use weekly or an explicitly authorized initial launch.')
+        elif (local_cutoff.weekday(), local_cutoff.hour, local_cutoff.minute, local_cutoff.second) != (4, 17, 0, 0):
             reasons.append("The edition cutoff must be Friday 17:00 America/Los_Angeles.")
         if cutoff > _timestamp(graph.get("as_of")):
             reasons.append("The edition cutoff is in the future relative to the actual evidence snapshot.")
@@ -390,34 +438,31 @@ def publication_gate(graph, report, policy=None):
     audits = policy.get("audits", {})
     metrics = {}
     for kind in ("reference", "screening"):
-        errors, metrics[kind] = _audit(audits.get(kind), kind, graph, thresholds)
+        errors, metrics[kind] = _evaluate_audit(kind, graph, thresholds, policy)
         reasons.extend(errors)
     # A reference-quality audit and a screening-recall audit are separate samples.
     reference_ids = {item.get("id") for item in (audits.get("reference") or {}).get("items", [])}
     screening_ids = {item.get("id") for item in (audits.get("screening") or {}).get("items", [])}
     if reference_ids & screening_ids:
         reasons.append("Reference and screening holdouts must be separate samples.")
+    # Versioned audit units differ (assertions versus logical records), and can
+    # share public sources. Reusing one actual evaluated run under two names
+    # cannot establish the two independent acceptance requirements.
+    def sut_invocations(kind):
+        audit = audits.get(kind) or {}
+        runs = audit.get('runs', []) if isinstance(audit, dict) else []
+        return {run.get('invocation_id') for run in (runs if isinstance(runs, list) else [])
+                if isinstance(run, dict) and run.get('role') == 'sut' and run.get('invocation_id')}
+    if sut_invocations('reference') & sut_invocations('screening'):
+        reasons.append('Reference and screening audits must evaluate separate actual SUT executions.')
     synthesis_errors = report_review_errors(graph, report, policy.get('report_reviews', []))
     reasons.extend(synthesis_errors)
     reasons = list(dict.fromkeys(reasons))
     archival_ready = not reasons
     archive_reasons = []
     archive = report.get("archive", {})
-    record_url = urlparse(str(archive.get("record_url", "")))
-    try:
-        _timestamp(archive.get("confirmed_on"))
-        confirmation_valid = True
-    except (TypeError, ValueError):
-        confirmation_valid = False
-    if not (archive.get("status") == "published" and re.fullmatch(r"10\.5281/zenodo\.\d+", archive.get("doi") or "")
-            and archive.get("api_origin") == "https://zenodo.org"
-            and archive.get("environment") == "production" and archive.get("verified") is True
-            and record_url.scheme == "https" and record_url.netloc == "zenodo.org"
-            and re.fullmatch(r"/records/\d+/?", record_url.path)
-            and not record_url.query and not record_url.fragment
-            and (archive.get("doi") or "").rsplit(".", 1)[-1] == record_url.path.strip("/").split("/")[-1]
-            and re.fullmatch(r"[0-9a-f]{64}", archive.get("artifact_sha256") or "")
-            and archive.get("release_id") == report.get("release_id") and confirmation_valid):
+    from research_citations import published_archive
+    if not published_archive({'report': report}):
         archive_reasons.append("An actual public versioned archive receipt with DOI and exact artifact digest is required; a prepared package is not publication.")
     reasons.extend(archive_reasons)
     reasons = list(dict.fromkeys(reasons))
@@ -429,17 +474,43 @@ def publication_gate(graph, report, policy=None):
 
 
 def build_context(root=ROOT, *, select_prepared=True):
+    root = Path(root)
+    from research_edition_replay import load_published_source
+
+    # A committed public source selection is a separate historical reader. It
+    # must resolve before any private authoring input or fresh gate is opened;
+    # select_prepared=False is not authority to bypass that source selection.
+    published = load_published_source(root)
+    if published is not None:
+        return published
+
     from research_graph import load_graph
     from public_identity import load_identity
 
-    root = Path(root)
     graph, report = load_graph(root), load_report(root)
     policy = json.loads((root / "data/research/policy.json").read_text())
     policy["audits"] = {}
+    policy['audit_inputs'] = {}
+    # The trust slot comes from a separate, reviewed repository registry. Audit
+    # and validation documents cannot nominate their own trusted admission.
+    policy['audit_admissions'] = {}
+    admissions_path = root / 'data/research/audit-admissions.json'
+    if admissions_path.is_file():
+        registry = json.loads(admissions_path.read_text())
+        if (set(registry) != {'schema_version', 'admissions'} or registry['schema_version'] != '1.0.0'
+                or not isinstance(registry['admissions'], dict)
+                or set(registry['admissions']) - {'reference', 'screening'}):
+            raise ValueError('Unsupported independent audit admission registry')
+        policy['audit_admissions'] = registry['admissions']
     for kind in ("reference", "screening"):
         path = root / f"data/research/{kind}-audit.json"
         if path.is_file():
-            policy["audits"][kind] = json.loads(path.read_text())
+            audit_text = path.read_bytes().decode('utf-8')
+            policy["audits"][kind] = json.loads(audit_text)
+            receipt_path = root / f'data/research/{kind}-validation-receipt.json'
+            if receipt_path.is_file():
+                policy['audit_inputs'][kind] = {'audit_json': audit_text,
+                    'validation_receipt_json': receipt_path.read_bytes().decode('utf-8')}
     report_reviews_path = root / 'data/research/report-reviews.json'
     if report_reviews_path.is_file():
         registry = json.loads(report_reviews_path.read_text())
