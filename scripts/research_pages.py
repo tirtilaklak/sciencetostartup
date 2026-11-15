@@ -31,13 +31,13 @@ LEDGER_BUCKETS = "0123456789abcdef"
 SOURCE_ANCHORS = "data/research-source-anchors.json"
 CATEGORIES = (
     ("papers", "Papers", {"paper", "paper_work", "paper_version"},
-     "Read the source, distinguish versions, and trace what an operational finding actually supports."),
+     "Papers, source versions and the findings they support."),
     ("datasets", "Datasets", {"dataset", "dataset_family", "dataset_release"},
-     "Follow dataset families, annotation formats, provenance, access terms, and documented limitations."),
+     "Dataset families, provenance, access and limits."),
     ("benchmarks", "Benchmarks", {"benchmark", "benchmark_family", "benchmark_version"},
-     "Keep benchmark versions, tasks, populations, and test conditions attached to every comparison."),
+     "Benchmark tasks, versions and test conditions."),
     ("workflows", "Workflows", {"workflow"},
-     "Connect the work to its evidence: recruitment, annotation, adjudication, filtering, and evaluation."),
+     "Recruitment, labeling, review and evaluation."),
 )
 PROGRESS = (
     ("legacy_inclusion_audits", "Legacy inclusion audits", 39),
@@ -326,7 +326,8 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
     research = SimpleNamespace(as_of=_day(context["graph"]["as_of"]),
                                data={"dataset_version": context["graph"].get("canonical_dataset_version")})
     text = sp.document(research, sp.truncate(title + sp.SUFFIX, sp.TITLE_LIMIT), sp.truncate(description),
-                       sp.ORIGIN + path, '<div class="research wide">' + crumbs_html + _nav(path) + body + "</div>",
+                       sp.ORIGIN + path, '<div class="research wide">' + crumbs_html
+                       + (_nav(path) if path != "/research/" else "") + body + "</div>",
                        structured=structured, current="research")
     extra = ('<link rel="stylesheet" href="/research.css">\n'
              '<link rel="alternate" type="application/rss+xml" title="Published research editions" href="/research/feed.xml">\n'
@@ -378,13 +379,22 @@ def _counts(context):
 
 def _browse(context):
     cards = []
+    icons = {
+        "papers": '<path d="M7 3h7l4 4v14H7zM14 3v5h4M10 12h5M10 16h5"/>',
+        "datasets": '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0"/>',
+        "benchmarks": '<path d="M4 20V10h4v10M10 20V4h4v16M16 20v-7h4v7M3 20h18"/>',
+        "workflows": '<rect x="3" y="8" width="6" height="8" rx="1"/><rect x="15" y="8" width="6" height="8" rx="1"/><path d="M9 12h6m-3-3 3 3-3 3"/>',
+    }
     for slug, title, kinds, description in CATEGORIES:
         rows = [e for e in context["graph"]["entities"] if e.get("kind") in kinds]
         approved = sum(_approved_entity(context, e) for e in rows)
         candidate = sum(e.get("status") == "candidate" for e in rows)
-        cards.append(f'<article class="r-browse-card"><p class="r-kicker">{approved} approved · {candidate} candidates</p>'
-                     f'<h3>{_link("/research/" + slug + "/", title)}</h3><p>{sp.escape(description)}</p>'
-                     f'{_link("/research/" + slug + "/", "Explore " + title.lower() + " →", "r-text-link")}</article>')
+        candidate_label = "candidate" if candidate == 1 else "candidates"
+        cards.append(f'<article class="r-browse-card"><a class="r-browse-link" href="/research/{slug}/">'
+                     f'<svg class="r-browse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" '
+                     f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{icons[slug]}</svg>'
+                     f'<h3>{sp.escape(title)} <span aria-hidden="true">→</span></h3><p>{sp.escape(description)}</p>'
+                     f'<span class="r-record-count">{approved} approved records · {candidate} {candidate_label}</span></a></article>')
     return '<div class="r-browse-grid">' + "".join(cards) + "</div>"
 
 
@@ -395,27 +405,33 @@ def _hub(context, editions=()):
     archive_links = ('<section class="r-section"><h2>Published editions</h2><ul class="r-entity-list">'
                      + ''.join(f'<li>{_link(path, snapshot["report"]["release_id"])} · {_date(snapshot["report"]["updated_on"])}</li>'
                                for path, snapshot in editions) + '</ul></section>') if editions else ''
-    return ('<header class="r-hero"><div><p class="r-kicker">Independent public-source research</p>'
-            '<h1>The human work<br>behind AI.</h1><p class="r-lede">Follow the evidence connecting AI data suppliers, '
-            'papers, datasets, benchmarks, and the work that brings them together.</p>'
-            f'<p class="r-status">{_status(context)}</p>{_meta(context)}</div>'
-            '<aside class="r-report-card" aria-label="Current research report"><p class="r-kicker">The research report</p>'
-            f'<h2>{_link(REPORT_PATH, report["title"])}</h2><p>12 chapters. Source-level evidence. Clear limits.</p>'
-            '<div class="r-report-rule" aria-hidden="true"><span></span><span></span><span></span><span></span></div>'
-            f'<p>{sp.escape(report.get("summary"))}</p>{_link(REPORT_PATH, "Read the research →", "r-button")}</aside></header>'
+    return ('<header class="r-hero"><div><p class="r-kicker">Research</p>'
+            '<h1>Research on<br>AI data.</h1><p class="r-lede">A guide to the suppliers, papers and datasets behind AI training. '
+            'Every finding links to its sources.</p>'
+            f'<p class="r-status">{_status(context)}</p>'
+            f'<p class="r-meta">Evidence snapshot {_date(context["graph"].get("as_of"))}</p></div>'
+            '<aside class="r-report-card" aria-label="Current research report"><p class="r-kicker">Current report</p>'
+            f'<h2>{_link(REPORT_PATH, report["title"])}</h2>'
+            f'<p>{len(report["sections"])} chapters on suppliers, human feedback, research methods and paid pilots.</p>'
+            f'{_link(REPORT_PATH, "Read the report →", "r-button")}</aside></header>'
             + operating_status_notice(context) +
-            '<section class="r-section" aria-labelledby="coverage"><div class="r-section-head"><div><p class="r-kicker">Progress you can inspect</p>'
-            '<h2 id="coverage">Evidence before conclusions.</h2></div>'
-            f'{_link("/research/data/", "Coverage, sources & downloads →", "r-text-link")}</div>'
-            '<p class="r-section-intro">Launch requirements count approved, source-reviewed records. A candidate, a captured page, '
-            'or an inherited description does not meet that standard.</p>' + _progress(context, compact=True)
-            + f'<p class="r-meta">{sp.escape(_counts(context))}</p></section>'
-            '<section class="r-section" aria-labelledby="browse"><div class="r-section-head"><div><p class="r-kicker">Explore the evidence</p>'
-            '<h2 id="browse">Start with a question.</h2></div></div>' + _browse(context) + "</section>"
-            '<section class="r-section r-chapter-preview" aria-labelledby="chapters"><div><p class="r-kicker">Evidence and buyer decisions</p>'
-            '<h2 id="chapters">From source to decision.</h2><p>Read the reviewed baseline, methods, and buyer decision guides while coverage expands. '
-            'Historical examples carry their original dates; unresolved questions stay visible.</p>'
-            f'{_link("/review/", "Help review a specific claim →", "r-text-link")}</div><ol class="r-chapter-list">{chapters}</ol></section>'
+            '<section class="r-section" aria-labelledby="browse"><div class="r-section-head">'
+            '<h2 id="browse">Browse the research</h2>'
+            f'{_link("/research/data/", "Sources & downloads →", "r-text-link")}</div>' + _browse(context) + '</section>'
+            '<section class="r-section r-hub-details" aria-label="Report details">'
+            '<details class="r-disclosure" id="chapters">'
+            f'<summary>Report contents <span>{len(report["sections"])} chapters</span></summary>'
+            f'<ol class="r-chapter-list">{chapters}</ol></details>'
+            '<details class="r-disclosure" id="coverage"><summary>Publication status and coverage</summary>'
+            f'<p class="r-status">{_status(context)}</p>{_meta(context)}'
+            f'<p class="r-section-intro">{sp.escape(report.get("summary"))}</p>'
+            '<p class="r-section-intro">Publication totals count suppliers, distinct paper works and dataset or benchmark families. '
+            'Browse counts also include individual versions. '
+            'Only approved, source-reviewed records meet the publication requirements.</p>' + _progress(context, compact=True)
+            + f'<p class="r-meta">{sp.escape(_counts(context))}</p>'
+            f'{_link("/research/data/", "Coverage, sources & downloads →", "r-text-link")}</details>'
+            '<p class="r-review-link">Found something to correct? '
+            f'{_link("/review/", "Review a claim or suggest a source →")}</p></section>'
             + archive_links)
 
 

@@ -30,38 +30,38 @@ function environment({hash='#company/mercor/work',body=bytes(payload()),head=tru
 const results={};
 (async()=>{
  {
-  const e=environment();assert.equal(e.calls.length,1);assert.equal(e.links.length,1);assert.equal(e.links[0].integrity,'sha256-test');
+  const e=environment({hash:'#downloads'});assert.equal(e.calls.length,1);assert.equal(e.links.length,1);assert.equal(e.links[0].integrity,'sha256-test');
   assert.equal(e.window.BusinessHealth,undefined);assert.equal(e.window.PRESENTATION_PRELOAD_CONFIG,undefined);
-  const out=await e.fetch(e.d,'mercor');assert.equal(out.buildId,'release-a');assert.equal(e.calls.length,1);assert.equal(e.window.PRESENTATION_PREFETCH,undefined);results.matching_reuse=true;
+  const out=await e.fetch(e.identity.archive);assert.equal(out.buildId,'release-a');assert.equal(e.calls.length,1);assert.equal(e.window.PRESENTATION_PREFETCH,undefined);results.matching_reuse=true;
  }
  {
   for(const key of ['href','sha256','buildId']){
-   const e=environment();e.window.PRESENTATION_PREFETCH[key]+='-wrong';
-   await e.fetch(e.d,'mercor');assert.equal(e.calls.length,2,key+' mismatch must use the ordinary verified fetch');
+   const e=environment({hash:'#downloads'});e.window.PRESENTATION_PREFETCH[key]+='-wrong';
+   await e.fetch(e.identity.archive);assert.equal(e.calls.length,2,key+' mismatch must use the ordinary verified fetch');
   }
   results.descriptor_build_bypass=true;
  }
  {
-  const e=environment({transport:()=>Promise.resolve(response(new ArrayBuffer(0),404))});
+  const e=environment({hash:'#downloads',transport:()=>Promise.resolve(response(new ArrayBuffer(0),404))});
   const early=await e.window.PRESENTATION_PREFETCH.promise;assert.equal(early.error.message,'Evidence request failed (404)');assert.equal(early.bytes,undefined);
-  await assert.rejects(e.fetch(e.d,'mercor'),/Evidence request failed \(404\)/);assert.equal(e.calls.length,1);results.failed_prefetch_distinct=true;
+  await assert.rejects(e.fetch(e.identity.archive),/Evidence request failed \(404\)/);assert.equal(e.calls.length,1);results.failed_prefetch_distinct=true;
  }
  {
-  const e=environment({transport:(url,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true}))});
+  const e=environment({hash:'#downloads',transport:(url,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true}))});
   [...e.timers.values()][0]();const early=await e.window.PRESENTATION_PREFETCH.promise;
-  assert.equal(early.error.message,'Evidence request timed out');await assert.rejects(e.fetch(e.d,'mercor'),/Evidence request timed out/);results.deadline_error=true;
+  assert.equal(early.error.message,'Evidence request timed out');await assert.rejects(e.fetch(e.identity.archive),/Evidence request timed out/);results.deadline_error=true;
  }
  {
-  const e=environment({transport:(url,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true}))});
+  const e=environment({hash:'#downloads',transport:(url,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true}))});
   const early=e.window.PRESENTATION_PREFETCH,navigation=new AbortController();let installed=false;
-  const pending=e.fetch(e.d,'mercor',navigation.signal).then(()=>{installed=true;});navigation.abort();
+  const pending=e.fetch(e.identity.archive,null,navigation.signal).then(()=>{installed=true;});navigation.abort();
   await assert.rejects(pending,error=>error.name==='AbortError');assert.equal(early.controller.signal.aborted,true);assert.equal(installed,false);results.abort_no_install=true;
  }
  {
-  const e=environment();e.window.PRESENTATION_PREFETCH.promise=Promise.resolve({bytes:bytes(payload({buildId:'tampered'}))});
-  await assert.rejects(e.fetch(e.d,'mercor'),/Evidence integrity mismatch/);
-  const stale=environment({body:bytes(payload({buildId:'old-release'}))});
-  await assert.rejects(stale.fetch(stale.d,'mercor'),/Stale presentation buildId/);results.digest_and_identity=true;
+  const e=environment({hash:'#downloads'});e.window.PRESENTATION_PREFETCH.promise=Promise.resolve({bytes:bytes(payload({buildId:'tampered'}))});
+  await assert.rejects(e.fetch(e.identity.archive),/Evidence integrity mismatch/);
+  const stale=environment({hash:'#downloads',body:bytes(payload({buildId:'old-release'}))});
+  await assert.rejects(stale.fetch(stale.identity.archive),/Stale presentation buildId/);results.digest_and_identity=true;
  }
  {
   for(const hash of ['#company/unknown','#company/__proto__','#company/constructor','#company/%','#companies','#work','#compare']){
@@ -70,10 +70,28 @@ const results={};
   results.unknown_prototype_no_fetch=true;
  }
  {
-  const head=environment({hash:'#company/alias/work'});assert.equal(head.calls[0].url,head.d.href);await head.fetch(head.d,'mercor');
-  const fallback=environment({head:false});assert.equal(fallback.calls[0].url,fallback.d.href);await fallback.fetch(fallback.d,'mercor');
-  for(const [hash,expected]of [['#downloads','archive'],['#market','overview']]){const e=environment({hash});assert.equal(e.calls[0].url,e.identity[expected].href);}
+  for(const head of [true,false])for(const hash of ['#company/mercor/work','#company/alias/work']){
+   const e=environment({hash,head});assert.equal(e.calls.length,0,'Company head must leave bootstrap requests unopposed');assert.equal(e.links.length,0);assert.equal(e.window.PRESENTATION_PREFETCH,undefined);
+   const out=await e.fetch(e.d,'mercor');assert.equal(out.companyId,'mercor');assert.equal(e.calls.length,1);assert.equal(e.calls[0].url,e.d.href);assert.equal(e.calls[0].options.cache,'no-cache');
+  }
+  results.company_owner_fetch=true;
+  for(const head of [true,false])for(const [hash,expected]of [['#downloads','archive'],['#market','overview']]){
+   const e=environment({hash,head});assert.equal(e.calls[0].url,e.identity[expected].href);await e.fetch(e.identity[expected]);assert.equal(e.calls.length,1,'Supported hints must still be reused');
+  }
   results.head_config_alias_and_fallback=true;
+ }
+ {
+  const failed=environment({transport:()=>Promise.resolve(response(new ArrayBuffer(0),404))});
+  assert.equal(failed.calls.length,0);await assert.rejects(failed.fetch(failed.d,'mercor'),/Evidence request failed \(404\)/);assert.equal(failed.calls.length,1);
+  const pending=environment({transport:(url,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true}))});
+  const navigation=new AbortController();let installed=false;
+  const request=pending.fetch(pending.d,'mercor',navigation.signal).then(()=>{installed=true;});navigation.abort();
+  await assert.rejects(request,error=>error.name==='AbortError');assert.equal(pending.calls.length,1);assert.equal(pending.calls[0].options.signal.aborted,true);assert.equal(installed,false);
+  const tampered=environment({transport:()=>Promise.resolve(response(bytes(payload({buildId:'tampered'}))))});
+  await assert.rejects(tampered.fetch(tampered.d,'mercor'),/Evidence integrity mismatch/);
+  const stale=environment({body:bytes(payload({buildId:'old-release'}))});await assert.rejects(stale.fetch(stale.d,'mercor'),/Stale presentation buildId/);
+  const wrong=environment({body:bytes(payload({companyId:'another-company'}))});await assert.rejects(wrong.fetch(wrong.d,'mercor'),/Wrong company response/);
+  results.company_owner_failures=true;
  }
  process.stdout.write(JSON.stringify(results));
 })().catch(error=>{console.error(error);process.exitCode=1;});
@@ -109,6 +127,10 @@ class PresentationPrefetchTests(unittest.TestCase):
 
     def test_compact_head_registry_aliases_and_summary_fallback(self):
         self.assertTrue(self.results["head_config_alias_and_fallback"])
+
+    def test_company_routes_defer_to_the_real_verified_owner_fetch(self):
+        self.assertTrue(self.results["company_owner_fetch"])
+        self.assertTrue(self.results["company_owner_failures"])
 
 
 if __name__ == "__main__":

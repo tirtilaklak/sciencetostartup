@@ -67,7 +67,7 @@
 #work-cards .w4-commitment{font-size:13px;line-height:1.6;margin-top:8px;color:var(--muted)}
 #work-cards .w4-schedule-note{font-size:12px;line-height:1.6;margin-top:8px}
 #work-cards .w4-location{font-size:13px;line-height:1.6;margin:2px 0 0;color:var(--muted)}
-#work-cards .w4-conditions-column .w4-requirements{display:none}
+#work-cards .w4-conditions-column .w4-requirements{display:block;font-size:13px;line-height:1.65;margin:8px 0 0}
 #work-cards .w4-action-column{justify-self:end;align-self:start;margin:0}
 #work-cards .w4-open{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;font-size:13px;line-height:1.4;border:1px solid var(--border);border-radius:5px;padding:10px 12px;background:var(--green);color:#fff;white-space:nowrap;border-color:var(--green)}
 #work-cards .w4-open:hover{background:#193f2f;border-color:#193f2f}

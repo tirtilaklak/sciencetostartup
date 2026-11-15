@@ -37,9 +37,9 @@ test.describe('research without JavaScript', () => {
 
   test('hub opens all twelve complete native chapters without JavaScript', async ({ page }) => {
     await page.goto('/research/');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('human work');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Research on');
     await expect(page.locator('.r-chapter-list a')).toHaveCount(12);
-    await page.getByRole('link', { name: 'Read the research →', exact: true }).click();
+    await page.getByRole('link', { name: 'Read the report →', exact: true }).click();
     await expect(page).toHaveURL(new RegExp(reportPath + '$'));
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('State of AI Data Labs and Human Feedback');
     await expect(page.locator('.r-report-body > .r-chapter:not(#cite)')).toHaveCount(1);

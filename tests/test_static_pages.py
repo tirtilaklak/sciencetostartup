@@ -20,7 +20,7 @@ import static_pages as sp
 
 ORIGIN = "https://sciencetostartup.com"
 NAMESPACE = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
-EMAIL = re.compile(r"@[A-Za-z0-9-]+\.[A-Za-z]{2,}")
+EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
 PAGE_LIMIT = 120_000
 REVENUE_KINDS = ("revenue", "annualized_revenue_run_rate", "arr")
 ICONS = [("icon", "/assets/favicon.svg"), ("icon", "/assets/favicon-48.png"), ("apple-touch-icon", "/assets/apple-touch-icon.png")]
@@ -279,7 +279,7 @@ class StaticPageTests(unittest.TestCase):
             slug = re.sub(r"[^a-z0-9]+", "-", group.lower()).strip("-")
             self.assertIn(slug, facts.ids, group)
             self.assertIn(f'<h2 id="{slug}">{labels.get(group, group).replace("&", "&amp;")}</h2>', text)
-            self.assertIn(f'href="{ORIGIN}/explore/#companies/{slug}"', text)
+            self.assertIn(f'<section class="directory-section" data-group="{slug}">', text)
         nonprofits = sum(1 for e in self.editorial.values() if e["primary_offering"] == "Nonprofit research")
         self.assertIn(f"{sp.count_word(nonprofits)} of the {len(self.companies)} are nonprofit research groups.", text)
 
@@ -421,9 +421,18 @@ class StaticPageTests(unittest.TestCase):
                 if key in node: self.assertEqual(node[key]["@id"], sp.PUBLISHER["@id"], (node.get("@type"), key))
         self.assertNotIn("dated source", json.dumps(nodes), "each figure links to its source; not every source is dated")
 
-    def test_no_email_addresses_leak_into_public_pages(self):
+    def test_only_publisher_correction_contact_appears_on_native_pages(self):
         for path in self.public_files():
-            self.assertIsNone(EMAIL.search(path.read_text()), str(path.relative_to(self.dist)))
+            text = path.read_text()
+            if path.relative_to(self.dist).as_posix() == "method/index.html":
+                pattern = r'<aside\b[^>]*\bid="corrections"[^>]*>.*?</aside>'
+                contact = re.search(pattern, text, re.S).group(0)
+                self.assertEqual(set(EMAIL.findall(contact)), {"musaeminozdem@gmail.com"})
+                self.assertNotIn("hidden", contact.split(">", 1)[0])
+                hrefs = [anchor.get("href") for anchor in PageFacts(contact).anchors]
+                self.assertIn("mailto:musaeminozdem@gmail.com?subject=ScienceToStartup%20correction&body=Company%3A%20%0D%0AWhat%20is%20wrong%3A%20%0D%0ALink%20to%20a%20source%20with%20the%20right%20value%3A%20%0D%0A", hrefs)
+                text = re.sub(pattern, "", text, flags=re.S)
+            self.assertIsNone(EMAIL.search(text), str(path.relative_to(self.dist)))
 
     def test_manifest_covers_the_static_pages(self):
         manifest = json.loads((self.dist / "manifest.json").read_text())["sha256"]
@@ -701,7 +710,7 @@ class StaticPageTests(unittest.TestCase):
 
     def test_work_page_lists_every_listing_once_in_worker_groups(self):
         text = (self.dist / "work/index.html").read_text()
-        listed = re.findall(r'<tr data-work-route="([^"]+)">', text)
+        listed = re.findall(r'<li class="work-listing" data-work-route="([^"]+)"', text)
         self.assertEqual(sorted(listed), sorted(r["id"] for r in self.routes))
         order = [key for key, _, _ in sp.WORK_DISPLAY_BUCKETS if any(sp.work_display_bucket(r) == key for r in self.routes)]
         self.assertEqual(re.findall(r'<h2 id="([a-z]+)">', text), order)
@@ -751,10 +760,12 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(facts.title, f"Paid AI training work: {len(paid)} sourced routes{sp.SUFFIX}")
         self.assertTrue(facts.meta["description"].startswith(f"{named} named listings and {programs} expert networks and programs at {paid_companies} AI data companies,"), facts.meta["description"])
         lede = plain(re.search(r'<p class="lede">.*?</p>', work).group(0))
-        self.assertTrue(lede.startswith(f"{len(paid)} sourced work routes: {named} named listings and {programs} networks and programs at {paid_companies} AI data companies. All {len(self.routes)} records at {all_companies} companies"), lede)
+        self.assertEqual(lede, "Roles, projects and expert networks, with published pay and original sources.")
+        self.assertIn(f'{named} named listings <span>·</span> {programs} networks and programs <span>·</span> {paid_companies} companies', work)
+        self.assertIn(f'{len(self.routes)} records at {all_companies} companies.', work)
         self.assertIn(f"See {len(paid)} paid work routes</a>", (self.dist / "companies/index.html").read_text())
         checked = max(d for r in self.routes for d in (r.get("availability_checked_on"), (r.get("last_route_check") or {}).get("date")) if d)
-        self.assertIn(f"links checked up to {sp.format_date(checked)}", work)
+        self.assertIn(f"Links checked up to {sp.format_date(checked)}", work)
         for path in self.html_files():
             self.assertNotRegex(plain(path.read_text()), r"\bopen (?:paid work )?listings?\b", str(path.relative_to(self.dist)))
 

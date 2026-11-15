@@ -36,10 +36,11 @@ PHONE = re.compile(r"""tel:
 # index.html is scanned as three places: its About panel, its embedded canonical dataset and the rest.
 SECTIONS = {"about": re.compile(r'<article\b[^>]*\bid="about"[^>]*>.*?</article>', re.S),
             "research-data": re.compile(r'<script\b[^>]*\bid="research-data"[^>]*>.*?</script>', re.S)}
+METHOD_CORRECTIONS = re.compile(r'<aside\b[^>]*\bid="corrections"[^>]*>.*?</aside>', re.S)
 # Every address that may ship, and the only places it may appear.
 ALLOWED = {
-    # The publisher's own correction and contact address, shown in the About panel.
-    "musaeminozdem@gmail.com": {"explore/index.html#about"},
+    # The publisher's own address, only in the interactive About panel and native correction card.
+    "musaeminozdem@gmail.com": {"explore/index.html#about", "method/index.html#corrections"},
     # Role address Bespoke Labs publishes for domain experts on https://bespokelabs.ai/contact
     # (checked 2026-10-23); the reviewed Work route cites that page. The same
     # record's complete research now also loads through its company detail asset.
@@ -160,7 +161,28 @@ def places(dist):
                 for section, pattern in SECTIONS.items():
                     yield name + "#" + section, "\n".join(pattern.findall(text))
                     text = pattern.sub("", text)
+            elif name == "method/index.html":
+                yield name + "#corrections", "\n".join(METHOD_CORRECTIONS.findall(text))
+                text = METHOD_CORRECTIONS.sub("", text)
             yield name, text
+
+
+class PrivacySectionTests(unittest.TestCase):
+    def test_native_contact_allowlist_stays_within_the_correction_card(self):
+        """The public publisher contact must not make the rest of Method an allowed email location."""
+        address = "musaeminozdem@gmail.com"
+        with tempfile.TemporaryDirectory(prefix="privacy-sections-") as directory:
+            root = Path(directory)
+            (root / "method").mkdir()
+            card = f'<aside class="method-corrections" id="corrections"><a href="mailto:{address}">Correct this</a></aside>'
+            (root / "method/index.html").write_text(f'<main><p>{address}</p>{card}</main>')
+            scanned = dict(places(root))
+        self.assertEqual(scanned["method/index.html#corrections"], card)
+        self.assertIn(address, scanned["method/index.html"])
+        self.assertNotIn("<aside", scanned["method/index.html"])
+        self.assertIn("method/index.html#corrections", ALLOWED[address])
+        self.assertNotIn("method/index.html", ALLOWED[address])
+        self.assertNotIn("method/index.html#corrections", ALLOWED.get("someone@example.com", ()))
 
 
 class FontMetadataTests(unittest.TestCase):
@@ -211,7 +233,7 @@ class PublicPrivacyTests(unittest.TestCase):
     def test_scan_reads_every_public_text(self):
         for place in ("index.html", "explore/index.html", "explore/index.html#about", "explore/index.html#research-data", "presentation/archive.json", "presentation/company-benchflow.json", "observatory.sqlite", "js/app.js", "js/data.js",
                       "research.json", "claims.csv", "work-routes.json", "sitemap.xml", "companies/index.html",
-                      "work/index.html", "method/index.html", "404.html", "business-health.json", "company-events.json",
+                      "work/index.html", "method/index.html", "method/index.html#corrections", "404.html", "business-health.json", "company-events.json",
                       "source-updates.json", "link-health.json", "manifest.json", "robots.txt", "_headers"):
             self.assertTrue(self.places.get(place), place)
         companies = json.loads((ROOT / "data/canonical.json").read_text())["companies"]
