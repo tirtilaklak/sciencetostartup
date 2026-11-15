@@ -95,6 +95,7 @@ def approved_new_org(context):
     original = next(a for a in context['graph']['assertions'] if a['subject_id'] == 'org.translated')
     assertion = copy.deepcopy(original)
     assertion.update(id='fixture.claim.new-org', subject_id='org.fixture_translated', status='approved',
+                     predicate='supplies_data_for',
                      review_ids=[], qualifications=['Synthetic approval fixture only.'])
     entity = copy.deepcopy(next(e for e in context['graph']['entities'] if e['id'] == 'org.translated'))
     entity.update(id='org.fixture_translated', status='approved', disposition='included',
@@ -480,8 +481,10 @@ class ResearchPageTests(unittest.TestCase):
         self.assertLess(hub.nodes, len(hub.aliases) + 2500)
 
     def test_old_correction_identifier_has_only_metadata_in_its_canonical_part(self):
-        correction = self.correction(claim_id='fixture.removed-claim', corrected_on='2026-11-11T00:00:00Z', replacement_claim_id=next(
-            row['id'] for row in self.context['graph']['assertions'] if row['status'] == 'approved'))
+        replacement = approved_new_org(self.context)
+        # The explicit synthetic approval receipts are issued at graph as_of.
+        correction = self.correction(claim_id='fixture.removed-claim',
+            corrected_on=self.context['graph']['as_of'], replacement_claim_id=replacement['id'])
         self.context['corrections'] = [correction]
         self.build()
         target = rp._evidence_url('assertion', correction['claim_id'])
