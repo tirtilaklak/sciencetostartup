@@ -247,3 +247,8 @@
 @media(max-width:720px){.r-reader-pagination{display:block}.r-reader-pagination a{max-width:none;margin:14px 0}.r-reader-toc{position:static}}
 
 .r-book-reader .r-chapter{content-visibility:visible;contain:none;contain-intrinsic-size:none}
+
+/* The text-heavy technical chapter uses individual glyphs instead of optional
+   kerning and ligatures, avoiding expensive shaping during its initial layout.
+   Every paragraph remains fully laid out and exposed to native reading tools. */
+.r-reader-chapter-content[aria-labelledby="technical-landscape"]{font-kerning:none;font-variant-ligatures:none}

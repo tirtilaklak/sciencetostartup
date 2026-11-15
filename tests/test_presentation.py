@@ -3,6 +3,8 @@ import datetime as dt
 import hashlib
 import json
 from pathlib import Path
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -15,6 +17,29 @@ from presentation import company_graph, contact_safe_research, public_logo_prove
 
 
 class PresentationTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    def test_initial_hints_leave_company_evidence_to_the_route_owner(self):
+        script = r'''
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const source=fs.readFileSync(process.argv[2],'utf8');
+(async()=>{
+ for(const [hash,expected] of [['#company/mer/work',null],['#about','/archive.json'],['#market','/overview.json'],['#companies',null],['#work',null]]){
+  const calls=[],links=[],data={claims:['original']};
+  const window={DATA:data,PRESENTATION_PRELOAD_CONFIG:{buildId:'build-1',aliases:{mer:'mercor'},companyDetails:{mercor:{href:'/company.json',sha256:'company-digest'}},archive:{href:'/archive.json',sha256:'archive-digest'},overview:{href:'/overview.json',sha256:'overview-digest'},modules:{businessHealth:{href:'/health.js',integrity:'sha256-pinned'}}}};
+  const context={window,location:{hash},document:{createElement:()=>({}),head:{append:link=>links.push(link)}},AbortController,setTimeout,clearTimeout,fetch:async(url,options)=>{calls.push({url,options});return{ok:true,arrayBuffer:async()=>new Uint8Array([1,2,3]).buffer};}};
+  vm.runInNewContext(source,context);
+  assert.equal(window.DATA,data);assert.deepEqual(data.claims,['original']);
+  if(!expected){assert.equal(calls.length,0);assert.equal(links.length,0);assert.equal(window.PRESENTATION_PREFETCH,undefined);continue;}
+  assert.equal(calls.length,1);assert.equal(calls[0].url,expected);assert.equal(calls[0].options.cache,'no-cache');
+  assert.equal(links.length,1);assert.equal(links[0].href,'/health.js');assert.equal(links[0].integrity,'sha256-pinned');assert.equal(links[0].crossOrigin,'anonymous');
+  const hint=window.PRESENTATION_PREFETCH;assert.equal(hint.href,expected);assert.equal(hint.buildId,'build-1');assert.equal(hint.controller.signal,calls[0].options.signal);assert.ok(hint.sha256.endsWith('-digest'));
+  const result=await hint.promise;assert.deepEqual([...new Uint8Array(result.bytes)],[1,2,3]);assert.equal(window.DATA,data);assert.deepEqual(data.claims,['original']);
+ }
+})().catch(error=>{console.error(error);process.exitCode=1;});
+'''
+        result = subprocess.run([shutil.which("node"), "-", str(ROOT / "web/presentation-prefetch.js")], input=script, text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_public_research_views_remove_nested_contacts_without_mutating_input(self):
         original = {"dataset_version": "2.5.0", "claims": [{"id": "claim-1", "source_ids": ["source-1"],
                     "statement": "Synthetic contact person@example.invalid; reported USD 12 million."}],

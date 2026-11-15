@@ -1,5 +1,6 @@
-/* Fetch only the initial research route while the classic app is loading.
-   The route owner still verifies bytes, release identity and navigation. */
+/* Hint archive and overview requests while the classic app is loading.
+   Company routes let the compact introduction paint first; the route owner
+   then fetches and verifies their evidence, release identity and navigation. */
 (()=>{
  const summary=window.PRESENTATION_PRELOAD_CONFIG||window.SUMMARY_INDEX;delete window.PRESENTATION_PRELOAD_CONFIG;if(!summary)return;
  let parts;try{parts=location.hash.slice(1).split('?')[0].split('/').map(decodeURIComponent);}catch{return;}
@@ -8,7 +9,7 @@
  const archive=['method','about','labels','corrections','coverage','downloads'].includes(view);
  const overview=['','market','venture'].includes(view)||!['company','companies','work','compare',...['method','about','labels','corrections','coverage','downloads']].includes(view);
  const descriptor=view==='company'?(Object.hasOwn(summary.companyDetails,id)?summary.companyDetails[id]:null):archive?summary.archive:overview?summary.overview:null;
- if(!descriptor)return;
+ if(!descriptor||view==='company')return;
  const health=summary.modules?.businessHealth;
  if(health){const link=document.createElement('link');link.rel='preload';link.as='script';link.href=health.href;link.integrity=health.integrity;link.crossOrigin='anonymous';document.head.append(link);}
  const controller=new AbortController();let timedOut=false;
