@@ -12,22 +12,31 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
-from research_report import build_context
+from research_report import build_context, publication_gate
 from research_findings import executive_findings
 import research_pages as pages
 import research_citations as citations
 from test_research_pages import Facts
+from research_lifecycle_fixtures import isolated_render_context, isolated_render_preparation
 
 
 class ReaderTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.baseline = build_context(ROOT)
+        cls.render_baseline = isolated_render_context(cls.baseline)
 
     def setUp(self):
-        self.context = copy.deepcopy(self.baseline)
+        if self.baseline.get('published_edition_replay'):
+            preparation = isolated_render_preparation(
+                self.baseline, canonical_bytes=(ROOT / 'data/canonical.json').read_bytes())
+            self.context = preparation.__enter__()
+            self.addCleanup(preparation.__exit__, None, None, None)
+        else:
+            self.context = copy.deepcopy(self.render_baseline)
         # Reader fixtures exercise synthetic, accepted findings independently of
-        # the real report's deliberately pending synthesis review.
+        # the real report's current synthesis-review state. This finding-only
+        # flag does not supply publication readiness or an archive receipt.
         self.context['gate']['report_review_ready'] = True
         # These tests replace the graph with synthetic subsets; real release
         # corrections deliberately require targets in the complete graph.
@@ -38,6 +47,26 @@ class ReaderTests(unittest.TestCase):
                         'confidence': 'Limited', 'reasoning': 'Specific sources.', 'what_would_change': 'A new source.',
                         'claim_ids': [self.claim['id']]}
         self.context['report']['executive_findings'] = [self.finding]
+
+    def pdf_finding_context(self):
+        """Render one finding, without borrowing the live report or bibliography.
+
+        This incomplete rendering subset is deliberately unable to publish.
+        The observed claim and its source text retain their original contents.
+        """
+        context = copy.deepcopy(self.context)
+        context['report']['sections'] = [{'id': 'executive-assessment', 'title': 'Synthetic reader fixture',
+            'paragraphs': [{'kind': 'method', 'claim_ids': [], 'text': 'Synthetic rendering fixture only.'}]}]
+        source_ids = {item['source_id'] for item in self.claim['evidence']}
+        context['graph']['assertions'] = [copy.deepcopy(self.claim)]
+        context['graph']['sources'] = [row for row in context['graph']['sources'] if row['id'] in source_ids]
+        context['graph']['entities'] = []
+        context['graph']['reviews'] = []
+        context['graph']['coverage']['frozen_core'] = {
+            'entity_ids': [], 'frozen_on': None, 'source_cutoff': None, 'sha256': None}
+        context['gate'] = publication_gate(context['graph'], context['report'], context['policy'])
+        context['gate']['report_review_ready'] = True  # Finding-only acceptance fixture.
+        return context
 
     def test_finding_anchor_and_evidence_links_survive_heading_changes_and_archive(self):
         self.context['report']['sections'][0]['title'] = 'A changed chapter heading'
@@ -95,13 +124,13 @@ class ReaderTests(unittest.TestCase):
     def test_prepared_pdf_retains_same_supported_finding_and_readable_identifier(self):
         from research_pdf import render_report_pdf
         from pypdf import PdfReader
-        blob = render_report_pdf(self.context)
+        blob = render_report_pdf(self.pdf_finding_context())
         text = '\n'.join(page.extract_text() for page in PdfReader(io.BytesIO(blob)).pages)
         for value in ('assessment-1', 'Evidence <scope> & limits.', 'Inspect the task.', 'Narrow evidence.; No quality audit.',
                       'Limited', 'Specific sources.', 'A new source.', self.claim['id']):
             self.assertIn(value, text)
         self.finding.update(text='FORBIDDEN-PDF', claim_ids=['missing'])
-        text = '\n'.join(page.extract_text() for page in PdfReader(io.BytesIO(render_report_pdf(self.context))).pages)
+        text = '\n'.join(page.extract_text() for page in PdfReader(io.BytesIO(render_report_pdf(self.pdf_finding_context()))).pages)
         self.assertNotIn('FORBIDDEN-PDF', text)
 
     @unittest.skipUnless(importlib.util.find_spec('reportlab') and importlib.util.find_spec('pypdf'), 'Optional PDF preparation dependencies')
@@ -110,11 +139,13 @@ class ReaderTests(unittest.TestCase):
         from pypdf import PdfReader
         for key in ('text', 'buyer_implication', 'limitations', 'confidence', 'reasoning', 'what_would_change'):
             self.finding[key] = 'Contact privacy-fixture@example.org.'
-        text = '\n'.join(page.extract_text() for page in PdfReader(io.BytesIO(render_report_pdf(self.context))).pages)
+        text = '\n'.join(page.extract_text() for page in PdfReader(io.BytesIO(render_report_pdf(self.pdf_finding_context()))).pages)
         self.assertNotIn('privacy-fixture', text)
         self.assertIn('[contact removed]', text)
 
     def test_table_contains_native_records_and_only_metadata_for_enhancement(self):
+        qualification = 'TEST ONLY qualification must remain outside the index metadata.'
+        self.claim['qualifications'] = [qualification]
         candidate = copy.deepcopy(self.claim)
         candidate.update(id='candidate.secret', status='candidate', value={'value': 'FORBIDDEN-CLAIM'})
         self.context['graph']['assertions'].append(candidate)
@@ -130,7 +161,7 @@ class ReaderTests(unittest.TestCase):
             self.assertIn('name="' + facet + '"', text)
         self.assertIn(pages.entity_url(paper, self.context), Facts(text).links)
         self.assertNotIn('FORBIDDEN-CLAIM', text)
-        self.assertNotIn(self.claim.get('qualifications', [''])[0], text)
+        self.assertNotIn(qualification, text)
 
     def test_existing_company_supplement_preserves_history_identity_and_nested_dates(self):
         legacy = next(row for row in self.context['graph']['entities'] if row.get('legacy_id'))
@@ -150,7 +181,10 @@ class ReaderTests(unittest.TestCase):
             target.write_text(original)
             records = pages.write_company_supplements(output, self.context)
             text = target.read_text()
-            self.assertEqual(records, [{'path': path, 'lastmod': max(self.context['report']['updated_on'], pages._day(self.context['graph']['as_of']), pages._day(self.claim['as_of']))}])
+            # The changed fixture wording/subject invalidates old review digests.
+            # Only the claim's real date and existing page revision contribute;
+            # advancing the report/snapshot clock does not redate this evidence.
+            self.assertEqual(records, [{'path': path, 'lastmod': max('2025-01-01', pages._day(self.claim['as_of']))}])
             self.assertIn('Historical revenue: $10M (2021). Reviewed 2025-01-01.', text)
             self.assertEqual(Facts(text).canonicals, [canonical])
             self.assertIn('A limited test scope.', text)

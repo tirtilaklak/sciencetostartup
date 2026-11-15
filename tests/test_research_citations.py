@@ -15,11 +15,12 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import research_citations as citations
-from publication_fixtures import populate_owned_inputs
+from publication_fixtures import populate_owned_inputs, isolated_owned_input_root
 
 
 def context_fixture():
-    return {"graph": {"schema_version": "1.0.0", "release_id": "test.1", "as_of": "2026-11-09T00:00:00Z",
+    return {"root": isolated_owned_input_root(),
+            "graph": {"schema_version": "1.0.0", "release_id": "test.1", "as_of": "2026-11-09T00:00:00Z",
                        "canonical_dataset_version": "2.5.0", "canonical_sha256": "a" * 64,
                        "entities": [], "sources": [], "assertions": [], "reviews": [],
                        "coverage": {"frozen_core": {"entity_ids": [], "frozen_on": None, "source_cutoff": None, "sha256": None},
@@ -47,11 +48,10 @@ class ProjectionTests(unittest.TestCase):
         projection = citations.public_projection(context_fixture(), canonical)
         blob = citations.json_bytes(projection)
         self.assertIsNone(citations.EMAIL.search(blob.decode()))
-        self.assertNotIn(b"xiangyi@benchflow.ai", blob)
         self.assertNotIn("raw_inputs", projection["canonical"])
         self.assertEqual(canonical, original)
         self.assertEqual(path.read_bytes(), before)
-        self.assertEqual(projection["projection_version"], "1.0.0")
+        self.assertEqual(projection["projection_version"], "1.2.0")
 
     def test_nested_contacts_raw_text_and_quotes_are_excluded(self):
         value = {"items": [{"EMAIL": "private@example.org", "statement": "Ask name@example.org now.",
@@ -90,6 +90,8 @@ class CitationTests(unittest.TestCase):
         context = context_fixture()
         projection = citations.public_projection(context, {"dataset_version": "2.5.0", "companies": []})
         with tempfile.TemporaryDirectory() as temporary:
+            context['root'] = str(Path(temporary) / 'source')
+            populate_owned_inputs(context['root'])
             with patch.object(citations, "public_projection", return_value=projection), patch.object(citations, "verified_pdf", return_value=None):
                 citations.write_publication_assets(context, temporary)
             package = Path(temporary) / "publication"
@@ -108,6 +110,7 @@ class CitationTests(unittest.TestCase):
         self.assertIn(b"author = {Musa Ozdem}", formats["citation.bib"])
         self.assertNotIn(b"author = {{", formats["citation.bib"])
         self.assertIn(b"AU  - Ozdem, Musa", formats["citation.ris"])
+        self.assertEqual(citations.zenodo_metadata(metadata)['metadata']['creators'], [{'name': 'Ozdem, Musa'}])
 
     def test_organization_fallback_retains_literal_citation_names(self):
         context = context_fixture()
@@ -116,6 +119,8 @@ class CitationTests(unittest.TestCase):
         self.assertEqual(json.loads(formats["CITATION.cff"])["authors"], [{"name": "ScienceToStartup"}])
         self.assertEqual(json.loads(formats["citation.csl.json"])["author"], [{"literal": "ScienceToStartup"}])
         self.assertIn(b"author = {{ScienceToStartup}}", formats["citation.bib"])
+        self.assertEqual(citations.zenodo_metadata(citations.publication_metadata(context))['metadata']['creators'],
+                         [{'name': 'ScienceToStartup'}])
 
     def test_prelaunch_and_reserved_doi_never_become_published_citations(self):
         context = context_fixture()
@@ -136,7 +141,7 @@ class CitationTests(unittest.TestCase):
         context["gate"]["ready"] = True
         context["report"]["archive"] = {"status": "published", "doi": "10.5281/zenodo.123", "record_url": "https://example.org/record",
             "confirmed_on": "2026-11-12T10:00:00Z", "published_on": "2026-11-10", "artifact_sha256": "a" * 64, "release_id": "test.1"}
-        context["report"]["archive"].update(verified=True, api_origin="https://zenodo.org", environment="production",
+        context["report"]["archive"].update(verified=True, anonymous_verified=True, api_origin="https://zenodo.org", environment="production",
             record_id=123, record_url="https://zenodo.org/records/123", concept_doi="10.1234/concept")
         metadata = citations.publication_metadata(context)
         self.assertEqual(metadata["status"], "published")
@@ -220,7 +225,22 @@ class CitationTests(unittest.TestCase):
                 citations.prepared_package_path({**context, "prepared_package": str(symlink)})
 
     def test_source_digest_keeps_research_content_audits_and_reservation_bound(self):
-        context = context_fixture()
+        original_read = Path.read_bytes
+        excluded = {ROOT / "data/research/audit-admissions.json",
+                    ROOT / "data/research/source-manifestations.json"}
+        def no_private_sidecar_read(path):
+            if path in excluded:
+                raise AssertionError("Synthetic fixture must not read private authoring sidecars")
+            return original_read(path)
+        with patch.object(Path, "read_bytes", no_private_sidecar_read):
+            context = context_fixture()
+            self.assertNotEqual(Path(context["root"]).resolve(), ROOT)
+            self.assertEqual(json.loads((Path(context["root"]) / "data/research/audit-admissions.json").read_bytes()),
+                             {"schema_version": "1.0.0", "admissions": {}})
+            manifestations = json.loads((Path(context["root"]) / "data/research/source-manifestations.json").read_bytes())
+            self.assertEqual(manifestations["sources"], [])
+            self.assertEqual(manifestations["assertion_bindings"], [])
+            self.assertTrue(manifestations["extraction_is_not_source_review"])
         baseline = citations.context_digest(context)
         for modify in (
                 lambda c: c["report"]["sections"][0]["paragraphs"][0].update(text="Changed research"),

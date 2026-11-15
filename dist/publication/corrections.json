@@ -1,6 +1,1745 @@
 {
   "corrections": [
     {
+      "claim_id": "candidate.add17.chartography.construction.v2",
+      "corrected_on": "2026-11-12T17:50:15.040816Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2608.10677v1"
+      ],
+      "id": "correction.final28.32ce812b35c39109816a",
+      "replacement_claim_id": "candidate.add17.chartography.construction.v3",
+      "status": "accepted",
+      "summary": "Separate AI source-verifier and adversarial reviews held an unpublished initial hypothesis. The append-only successor preserves the exact source versions and narrows the workflow condition or qualifier, with a new actual author review and both exact independent peer approvals. Every original scientific record, negative verdict and review time remains retained. No published weekly erratum or human peer review is implied."
+    },
+    {
+      "claim_id": "candidate.third11.harvey-lab.criteria.v2",
+      "corrected_on": "2026-11-12T17:50:15.040816Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://github.com/harveyai/harvey-labs/blob/main/docs/eval-strategies.md"
+      ],
+      "id": "correction.final28.8555a2059cfd41d38615",
+      "replacement_claim_id": "candidate.third11.harvey-lab.criteria.v3",
+      "status": "accepted",
+      "summary": "Separate AI source-verifier and adversarial reviews held an unpublished initial hypothesis. The append-only successor preserves the exact source versions and narrows the workflow condition or qualifier, with a new actual author review and both exact independent peer approvals. Every original scientific record, negative verdict and review time remains retained. No published weekly erratum or human peer review is implied."
+    },
+    {
+      "claim_id": "candidate.third11.redlinebench.agent-workflow.v2",
+      "corrected_on": "2026-11-12T17:50:15.040816Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://github.com/crosbylegal/redline-bench/blob/main/README.md",
+        "https://huggingface.co/datasets/crosbylegal/RedlineBench/resolve/eee1b6790982ed1279e86bec7616b662a61993e6/README.md"
+      ],
+      "id": "correction.final28.a9df306377c5b83f7f2a",
+      "replacement_claim_id": "candidate.third11.redlinebench.agent-workflow.v3",
+      "status": "accepted",
+      "summary": "Separate AI source-verifier and adversarial reviews held an unpublished initial hypothesis. The append-only successor preserves the exact source versions and narrows the workflow condition or qualifier, with a new actual author review and both exact independent peer approvals. Every original scientific record, negative verdict and review time remains retained. No published weekly erratum or human peer review is implied."
+    },
+    {
+      "claim_id": "candidate.next12.decoycount.release-units.v2",
+      "corrected_on": "2026-11-12T17:32:13.289438Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://api.github.com/repos/elorian-ai/decoycount/contents/RELEASE.md",
+        "https://api.github.com/repos/elorian-ai/decoycount/readme",
+        "https://elorian.ai/blog/decoycount"
+      ],
+      "id": "correction.next12.5b7aca3f36e57112bf00",
+      "replacement_claim_id": "candidate.next12.decoycount.release-units.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An append-only successor now has exact author, source-verifier and adversarial approvals with corrected qualification or complete supporting citations. Original hypotheses, source versions, positive and negative judgments remain preserved; this is not human peer review or a correction to a published weekly edition."
+    },
+    {
+      "claim_id": "candidate.next12.decoycount.paired-prompts.v2",
+      "corrected_on": "2026-11-12T17:32:13.289438Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://api.github.com/repos/elorian-ai/decoycount/readme",
+        "https://elorian.ai/blog/decoycount"
+      ],
+      "id": "correction.next12.61fc2c887a84c715a9c9",
+      "replacement_claim_id": "candidate.next12.decoycount.paired-prompts.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An append-only successor now has exact author, source-verifier and adversarial approvals with corrected qualification or complete supporting citations. Original hypotheses, source versions, positive and negative judgments remain preserved; this is not human peer review or a correction to a published weekly edition."
+    },
+    {
+      "claim_id": "candidate.next12.swe-marathon.task-format.v2",
+      "corrected_on": "2026-11-12T17:32:13.289438Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2606.07682v1"
+      ],
+      "id": "correction.next12.73d3424f74721a78dbdd",
+      "replacement_claim_id": "candidate.next12.swe-marathon.task-format.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An append-only successor now has exact author, source-verifier and adversarial approvals with corrected qualification or complete supporting citations. Original hypotheses, source versions, positive and negative judgments remain preserved; this is not human peer review or a correction to a published weekly edition."
+    },
+    {
+      "claim_id": "candidate.next12.sciencevision.access-conditions.v2",
+      "corrected_on": "2026-11-12T17:32:13.289438Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://elorian.ai/blog/sciencevision"
+      ],
+      "id": "correction.next12.983e26b6e622ed3d6bc4",
+      "replacement_claim_id": "candidate.next12.sciencevision.access-conditions.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An append-only successor now has exact author, source-verifier and adversarial approvals with corrected qualification or complete supporting citations. Original hypotheses, source versions, positive and negative judgments remain preserved; this is not human peer review or a correction to a published weekly edition."
+    },
+    {
+      "claim_id": "candidate.next12.brickvision.construction.v2",
+      "corrected_on": "2026-11-12T17:32:13.289438Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://elorian.ai/blog/why-grounding",
+        "https://huggingface.co/datasets/elorian-ai/BrickVision/resolve/ccedb16baadb1c7f2a85c0af04c168d953fa8b75/README.md"
+      ],
+      "id": "correction.next12.9f5aae1eae7da8701c70",
+      "replacement_claim_id": "candidate.next12.brickvision.construction.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An append-only successor now has exact author, source-verifier and adversarial approvals with corrected qualification or complete supporting citations. Original hypotheses, source versions, positive and negative judgments remain preserved; this is not human peer review or a correction to a published weekly edition."
+    },
+    {
+      "claim_id": "candidate.next12.babaisbench.documented-arms.v2",
+      "corrected_on": "2026-11-12T17:32:13.289438Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://api.github.com/repos/stared/baba-is-harbor/readme",
+        "https://quesma.com/benchmarks/babaisbench/"
+      ],
+      "id": "correction.next12.a8f00e19a5cf6f4fc88f",
+      "replacement_claim_id": "candidate.next12.babaisbench.documented-arms.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An append-only successor now has exact author, source-verifier and adversarial approvals with corrected qualification or complete supporting citations. Original hypotheses, source versions, positive and negative judgments remain preserved; this is not human peer review or a correction to a published weekly edition."
+    },
+    {
+      "claim_id": "candidate.next12.otelbench.task-scope.v2",
+      "corrected_on": "2026-11-12T17:32:13.289438Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://api.github.com/repos/QuesmaOrg/otel-bench/readme",
+        "https://quesma.com/blog/introducing-otel-bench/"
+      ],
+      "id": "correction.next12.d44397485d79ae4de743",
+      "replacement_claim_id": "candidate.next12.otelbench.task-scope.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An append-only successor now has exact author, source-verifier and adversarial approvals with corrected qualification or complete supporting citations. Original hypotheses, source versions, positive and negative judgments remain preserved; this is not human peer review or a correction to a published weekly edition."
+    },
+    {
+      "claim_id": "candidate.next12.decoycount.metrics.v2",
+      "corrected_on": "2026-11-12T17:32:13.289438Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://api.github.com/repos/elorian-ai/decoycount/contents/DATASET.md"
+      ],
+      "id": "correction.next12.d6efef6461029c0ec097",
+      "replacement_claim_id": "candidate.next12.decoycount.metrics.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An append-only successor now has exact author, source-verifier and adversarial approvals with corrected qualification or complete supporting citations. Original hypotheses, source versions, positive and negative judgments remain preserved; this is not human peer review or a correction to a published weekly edition."
+    },
+    {
+      "claim_id": "candidate.normal12.terminal-bench.verification.v2",
+      "corrected_on": "2026-11-12T14:24:11.616939Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2601.11868v1"
+      ],
+      "id": "correction.normal12.0b99ed2bce68275a1ada",
+      "replacement_claim_id": "candidate.normal12.terminal-bench.verification.v4",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An explicitly versioned successor now has exact author, source-verifier and adversarial approval with corrected wording or complete supporting citation contexts. Original hypotheses, source versions and genuine positive/negative review histories remain preserved. No past public edition or human peer review is implied."
+    },
+    {
+      "claim_id": "candidate.normal12.gdpval.release-units.v2",
+      "corrected_on": "2026-11-12T14:24:11.616939Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2510.04374v1"
+      ],
+      "id": "correction.normal12.4354544d1228a168b096",
+      "replacement_claim_id": "candidate.normal12.gdpval.release-units.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An explicitly versioned successor now has exact author, source-verifier and adversarial approval with corrected wording or complete supporting citation contexts. Original hypotheses, source versions and genuine positive/negative review histories remain preserved. No past public edition or human peer review is implied."
+    },
+    {
+      "claim_id": "candidate.normal12.terminal-bench.verification.v3",
+      "corrected_on": "2026-11-12T14:24:11.616939Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2601.11868v1"
+      ],
+      "id": "correction.normal12.76622fba69b8eba4e470",
+      "replacement_claim_id": "candidate.normal12.terminal-bench.verification.v4",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An explicitly versioned successor now has exact author, source-verifier and adversarial approval with corrected wording or complete supporting citation contexts. Original hypotheses, source versions and genuine positive/negative review histories remain preserved. No past public edition or human peer review is implied."
+    },
+    {
+      "claim_id": "candidate.normal12.mu-math.sampling-limit.v2",
+      "corrected_on": "2026-11-12T14:24:11.616939Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2412.03205v4"
+      ],
+      "id": "correction.normal12.b574ceebe515d720c714",
+      "replacement_claim_id": "candidate.normal12.mu-math.sampling-limit.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An explicitly versioned successor now has exact author, source-verifier and adversarial approval with corrected wording or complete supporting citation contexts. Original hypotheses, source versions and genuine positive/negative review histories remain preserved. No past public edition or human peer review is implied."
+    },
+    {
+      "claim_id": "candidate.normal12.mu-math.distinct-units.v2",
+      "corrected_on": "2026-11-12T14:24:11.616939Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2412.03205v4",
+        "https://huggingface.co/datasets/toloka/mu-math/resolve/c3d791bc7be33bf73a1ae5d8c3084a820cb580c4/README.md"
+      ],
+      "id": "correction.normal12.bd14ca60b6ac0e34beae",
+      "replacement_claim_id": "candidate.normal12.mu-math.distinct-units.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An explicitly versioned successor now has exact author, source-verifier and adversarial approval with corrected wording or complete supporting citation contexts. Original hypotheses, source versions and genuine positive/negative review histories remain preserved. No past public edition or human peer review is implied."
+    },
+    {
+      "claim_id": "candidate.normal12.gdp-xlsx.rubric.v2",
+      "corrected_on": "2026-11-12T14:24:11.616939Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/surgeai/GDP.xlsx/resolve/7cdb5406bb7bd12cf73cbaaabb0edcf449a473e9/README.md"
+      ],
+      "id": "correction.normal12.c95ee42cd1231cea4523",
+      "replacement_claim_id": "candidate.normal12.gdp-xlsx.rubric.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An explicitly versioned successor now has exact author, source-verifier and adversarial approval with corrected wording or complete supporting citation contexts. Original hypotheses, source versions and genuine positive/negative review histories remain preserved. No past public edition or human peer review is implied."
+    },
+    {
+      "claim_id": "candidate.normal12.gdpval.pairwise-evaluation.v2",
+      "corrected_on": "2026-11-12T14:24:11.616939Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2510.04374v1"
+      ],
+      "id": "correction.normal12.daa3c7928b05dddde8e9",
+      "replacement_claim_id": "candidate.normal12.gdpval.pairwise-evaluation.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An explicitly versioned successor now has exact author, source-verifier and adversarial approval with corrected wording or complete supporting citation contexts. Original hypotheses, source versions and genuine positive/negative review histories remain preserved. No past public edition or human peer review is implied."
+    },
+    {
+      "claim_id": "candidate.normal12.multi-swe-bench.dual-review.v2",
+      "corrected_on": "2026-11-12T14:24:11.616939Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2504.02605v1"
+      ],
+      "id": "correction.normal12.f65bf02d270308edf1e3",
+      "replacement_claim_id": "candidate.normal12.multi-swe-bench.dual-review.v3",
+      "status": "accepted",
+      "summary": "An unpublished initial hypothesis was held in actual separate AI source review. An explicitly versioned successor now has exact author, source-verifier and adversarial approval with corrected wording or complete supporting citation contexts. Original hypotheses, source versions and genuine positive/negative review histories remain preserved. No past public edition or human peer review is implied."
+    },
+    {
+      "claim_id": "cohort5.dataset.claim.wildjailbreak.units",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/allenai/wildjailbreak/blob/5ddc12a7894f842b0619b8e1c7ee496b198af009/README.md"
+      ],
+      "id": "correction.qualbinding.20261111.016fc89e9b14a7802ce0",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.cohort5.dataset.claim.wildjailbreak.units",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2606.05405.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2606.05405v4"
+      ],
+      "id": "correction.qualbinding.20261111.03a68204ca15fea8f5ef",
+      "replacement_claim_id": "repair.qualbinding.20261111.v2.mandatory3.claim.arxiv.2606.05405.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory2.claim.arxiv.2602.16729.provenance",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2602.16729v3"
+      ],
+      "id": "correction.qualbinding.20261111.03ec0d6a29dd8e37c5d3",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory2.claim.arxiv.2602.16729.provenance",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2607.27189.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2607.27189v2"
+      ],
+      "id": "correction.qualbinding.20261111.08b55d4580ed015841df",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2607.27189.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.supplier.snorkel_ai.quality-controls",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://snorkel.ai/frequently-asked-questions/"
+      ],
+      "id": "correction.qualbinding.20261111.08e929a840c3415f8380",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.supplier.snorkel_ai.quality-controls",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory2.claim.revision001.arxiv.2411.04032.provenance-average-pay",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2411.04032v3"
+      ],
+      "id": "correction.qualbinding.20261111.0bfa4e709196226a6384",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory2.claim.arxiv.2411.04032.provenance",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.cohort6.e2f.expert-supervised-data",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.trustscale.ai/assets/index-CUMNnpew.js"
+      ],
+      "id": "correction.qualbinding.20261111.114dec8db1c824e069d7",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.expert-supervised-data",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2610.01306.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2610.01306v1"
+      ],
+      "id": "correction.qualbinding.20261111.123963839c3be44529a9",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2610.01306.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "cohort5.dataset.claim.wildjailbreak.evaluation-scope",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/allenai/wildjailbreak/blob/5ddc12a7894f842b0619b8e1c7ee496b198af009/README.md"
+      ],
+      "id": "correction.qualbinding.20261111.147438bd98462cb55a0c",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.cohort5.dataset.claim.wildjailbreak.evaluation-scope",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2610.30537.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2610.30537v2"
+      ],
+      "id": "correction.qualbinding.20261111.19aaa09941e635e9f9e9",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2610.30537.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.cohort6.e2f.golden-and-review-qa",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.trustscale.ai/assets/index-CUMNnpew.js"
+      ],
+      "id": "correction.qualbinding.20261111.1a4e0cce7794d6353186",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.golden-and-review-qa",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2608.10677.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2608.10677v1"
+      ],
+      "id": "correction.qualbinding.20261111.2084a454aa36448078be",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2608.10677.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.cohort6.e2f.independence-disclosure",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.trustscale.ai/assets/index-CUMNnpew.js"
+      ],
+      "id": "correction.qualbinding.20261111.21f4624fdc533732bcb4",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.independence-disclosure",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2604.06802.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2604.06802v3"
+      ],
+      "id": "correction.qualbinding.20261111.22271ba410e4be9f713d",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2604.06802.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2605.21739.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2605.21739v2"
+      ],
+      "id": "correction.qualbinding.20261111.233d16daa433bfff32c3",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2605.21739.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2608.10677.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2608.10677v1"
+      ],
+      "id": "correction.qualbinding.20261111.26cc7dec103cb6550f4b",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2608.10677.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.supplier.mercor.peer-review",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.mercor.com/apex/off-the-shelf-data/"
+      ],
+      "id": "correction.qualbinding.20261111.275ec3a0b57d90dcd571",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.supplier.mercor.peer-review",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.supplier.mercor.expert-pool",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.mercor.com/apex/off-the-shelf-data/"
+      ],
+      "id": "correction.qualbinding.20261111.2c32aa2fe9554846302d",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.supplier.mercor.expert-pool",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory2.claim.arxiv.2411.04032.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2411.04032v3"
+      ],
+      "id": "correction.qualbinding.20261111.30e579add663e3b49e26",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory2.claim.arxiv.2411.04032.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2604.05172.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2604.05172v2"
+      ],
+      "id": "correction.qualbinding.20261111.34002be3f83bba051d40",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2604.05172.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.cohort4.abundant_ai.oddish-validation-loop",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.abundant.ai/blog/env-creation-loop/"
+      ],
+      "id": "correction.qualbinding.20261111.3c09ebef909ae1f091fb",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.cohort4.abundant_ai.oddish-validation-loop",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.supplier.snorkel_ai.payment-and-choice",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://snorkel.ai/expert-community/"
+      ],
+      "id": "correction.qualbinding.20261111.3d9b2620353ec46f907d",
+      "replacement_claim_id": "repair.qualbinding.20261111.v2.candidate.supplier.snorkel_ai.payment-and-choice",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.supplier.mercor.task-construction",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.mercor.com/apex/off-the-shelf-data/"
+      ],
+      "id": "correction.qualbinding.20261111.49bb6dfae3bba0b9ac0d",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.supplier.mercor.task-construction",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2608.01604.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2608.00181v1",
+        "https://arxiv.org/pdf/2608.01604v1"
+      ],
+      "id": "correction.qualbinding.20261111.4bb124d5652f92a81c92",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2608.01604.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.supplier.mercor.custom",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.mercor.com/apex/off-the-shelf-data/"
+      ],
+      "id": "correction.qualbinding.20261111.4d010d7fe5c0a130d490",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.supplier.mercor.custom",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2604.18381.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2604.18381v1"
+      ],
+      "id": "correction.qualbinding.20261111.52ebd1a91cdc3f384cbf",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2604.18381.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2604.05172.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2604.05172v2"
+      ],
+      "id": "correction.qualbinding.20261111.56153c11be8f29317b73",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2604.05172.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2610.01306.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2610.01306v1"
+      ],
+      "id": "correction.qualbinding.20261111.588265bcd4aba70a5eb5",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2610.01306.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2608.10677.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2608.10677v1"
+      ],
+      "id": "correction.qualbinding.20261111.594825c1d65c1861a6e1",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2608.10677.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2604.05172.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2604.05172v2"
+      ],
+      "id": "correction.qualbinding.20261111.59979bcc8c511f4d785a",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2604.05172.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2604.06802.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2604.06802v3"
+      ],
+      "id": "correction.qualbinding.20261111.5f55a57736aab2dc6b41",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2604.06802.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2610.30537.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2610.30537v2"
+      ],
+      "id": "correction.qualbinding.20261111.65f84c326f2107161eba",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2610.30537.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2610.00890.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2610.00890v1"
+      ],
+      "id": "correction.qualbinding.20261111.6a763180291d6a97adf6",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2610.00890.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2606.05405.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2606.05405v4"
+      ],
+      "id": "correction.qualbinding.20261111.6b94a1af3786919e978d",
+      "replacement_claim_id": "repair.qualbinding.20261111.v2.mandatory3.claim.arxiv.2606.05405.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2606.09118.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2606.09118v3"
+      ],
+      "id": "correction.qualbinding.20261111.6c0870539378edf19076",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2606.09118.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2608.00181.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2608.00181v1"
+      ],
+      "id": "correction.qualbinding.20261111.736cf28025a4787eb21d",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2608.00181.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory2.claim.arxiv.2411.04032.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2411.04032v3"
+      ],
+      "id": "correction.qualbinding.20261111.75c7ebe7eb34ac01f1ec",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory2.claim.arxiv.2411.04032.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.supplier.snorkel_ai.expert-review",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://snorkel.ai/expert-community/"
+      ],
+      "id": "correction.qualbinding.20261111.7b15619759f126502409",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.supplier.snorkel_ai.expert-review",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2607.25398.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2607.25398v3"
+      ],
+      "id": "correction.qualbinding.20261111.7d0815ff3ac8609d1bda",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2607.25398.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory2.claim.arxiv.2411.04032.provenance",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2411.04032v3"
+      ],
+      "id": "correction.qualbinding.20261111.85a0ab8e5e8d5bb5f8f5",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory2.claim.arxiv.2411.04032.provenance",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2610.00890.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2610.00890v1"
+      ],
+      "id": "correction.qualbinding.20261111.862125c7bfa834e6c071",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2610.00890.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.cohort4.prime_intellect.managed-training-platform",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.primeintellect.ai/"
+      ],
+      "id": "correction.qualbinding.20261111.89843470b7186179d320",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.cohort4.prime_intellect.managed-training-platform",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "cohort5.dataset.claim.wildjailbreak.adversarial-origin",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/allenai/wildjailbreak/blob/5ddc12a7894f842b0619b8e1c7ee496b198af009/README.md"
+      ],
+      "id": "correction.qualbinding.20261111.89ebfac2c782b12cc560",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.cohort5.dataset.claim.wildjailbreak.adversarial-origin",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.cohort6.e2f.current-rebrand",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.trustscale.ai/assets/index-CUMNnpew.js"
+      ],
+      "id": "correction.qualbinding.20261111.92d76de33ef874b0611b",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.current-rebrand",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "cohort4.dataset.claim.gaia.schema",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/gaia-benchmark/GAIA/blob/682dd723ee1e1697e00360edccf2366dc8418dd9/README.md"
+      ],
+      "id": "correction.qualbinding.20261111.95f36e993bec6ecb3c9d",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.cohort4.dataset.claim.gaia.schema",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2608.01604.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2608.00181v1",
+        "https://arxiv.org/pdf/2608.01604v1"
+      ],
+      "id": "correction.qualbinding.20261111.974a1d7b72db4480a8d2",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2608.01604.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "cohort5.dataset.claim.wildjailbreak.vanilla-origin",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/allenai/wildjailbreak/blob/5ddc12a7894f842b0619b8e1c7ee496b198af009/README.md"
+      ],
+      "id": "correction.qualbinding.20261111.9764a467f3f4466ce96c",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.cohort5.dataset.claim.wildjailbreak.vanilla-origin",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "cohort5.dataset.claim.wildjailbreak.terms-access",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/allenai/wildjailbreak/blob/5ddc12a7894f842b0619b8e1c7ee496b198af009/README.md"
+      ],
+      "id": "correction.qualbinding.20261111.982449a5916a388769e3",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.cohort5.dataset.claim.wildjailbreak.terms-access",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2610.30537.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2610.30537v2"
+      ],
+      "id": "correction.qualbinding.20261111.9d248c6c28c83bc821e8",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2610.30537.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2604.18381.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2604.18381v1"
+      ],
+      "id": "correction.qualbinding.20261111.9d6c7ebf13e2cc3f9040",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2604.18381.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2606.05405.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2606.05405v4"
+      ],
+      "id": "correction.qualbinding.20261111.9dd30dc3c0c54744e29c",
+      "replacement_claim_id": "repair.qualbinding.20261111.v2.mandatory3.claim.arxiv.2606.05405.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "cohort4.dataset.claim.gaia.gate",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/gaia-benchmark/GAIA/blob/682dd723ee1e1697e00360edccf2366dc8418dd9/README.md"
+      ],
+      "id": "correction.qualbinding.20261111.a40b26c0557990bed3f7",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.cohort4.dataset.claim.gaia.gate",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "cohort4.dataset.claim.gaia.format-version",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/gaia-benchmark/GAIA/blob/682dd723ee1e1697e00360edccf2366dc8418dd9/README.md"
+      ],
+      "id": "correction.qualbinding.20261111.a46de98588af7c58b7be",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.cohort4.dataset.claim.gaia.format-version",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory2.claim.arxiv.2602.16729.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2602.16729v3"
+      ],
+      "id": "correction.qualbinding.20261111.a677a607493422201503",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory2.claim.arxiv.2602.16729.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory2.claim.arxiv.2602.16729.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2602.16729v3"
+      ],
+      "id": "correction.qualbinding.20261111.a74370afa6a54fa53533",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory2.claim.arxiv.2602.16729.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory2.claim.arxiv.2411.04032.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2411.04032v3"
+      ],
+      "id": "correction.qualbinding.20261111.add0f3835f1909b1a2b8",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory2.claim.arxiv.2411.04032.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2606.09118.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2606.09118v3"
+      ],
+      "id": "correction.qualbinding.20261111.b24dd78188115fd5f7f7",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2606.09118.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2610.01306.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2610.01306v1"
+      ],
+      "id": "correction.qualbinding.20261111.b7a9bc92442e42a0e235",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2610.01306.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2608.00181.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2608.00181v1"
+      ],
+      "id": "correction.qualbinding.20261111.ba65328cf659b0656c2d",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2608.00181.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2607.11192.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2607.11192v3"
+      ],
+      "id": "correction.qualbinding.20261111.c0899362a3909cea1716",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2607.11192.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2607.11192.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2607.11192v3"
+      ],
+      "id": "correction.qualbinding.20261111.c40564635d486bca3fea",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2607.11192.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2605.10442.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2605.10442v2"
+      ],
+      "id": "correction.qualbinding.20261111.c4f97575771c969d3725",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2605.10442.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2604.18381.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2604.18381v1"
+      ],
+      "id": "correction.qualbinding.20261111.c5275a26524b3aac7614",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2604.18381.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.supplier.snorkel_ai.security-scope",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://snorkel.ai/frequently-asked-questions/"
+      ],
+      "id": "correction.qualbinding.20261111.c735d673ccb8ce109101",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.supplier.snorkel_ai.security-scope",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2604.06802.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2604.06802v3"
+      ],
+      "id": "correction.qualbinding.20261111.cb25b764da3512753c72",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2604.06802.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2606.09118.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2606.09118v3"
+      ],
+      "id": "correction.qualbinding.20261111.d59135146a105a7b61da",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2606.09118.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2605.10442.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2605.10442v2"
+      ],
+      "id": "correction.qualbinding.20261111.d595b6f98879dbcd5a79",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2605.10442.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2608.00181.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2608.00181v1"
+      ],
+      "id": "correction.qualbinding.20261111.d613acc62bc90c9f4c15",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2608.00181.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.supplier.snorkel_ai.onboarding",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://snorkel.ai/expert-community/"
+      ],
+      "id": "correction.qualbinding.20261111.d662ca9e1c17cd080c98",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.supplier.snorkel_ai.onboarding",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2607.27189.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2607.27189v2"
+      ],
+      "id": "correction.qualbinding.20261111.d813c9218863554ac831",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2607.27189.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2605.21739.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2605.21739v2"
+      ],
+      "id": "correction.qualbinding.20261111.dac204440d0b63be42bd",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2605.21739.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.supplier.snorkel_ai.data-series",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://snorkel.ai/frequently-asked-questions/"
+      ],
+      "id": "correction.qualbinding.20261111.e37217df0b31bafb6582",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.supplier.snorkel_ai.data-series",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "cohort4.dataset.claim.gaia.levels-private",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/gaia-benchmark/GAIA/blob/682dd723ee1e1697e00360edccf2366dc8418dd9/README.md"
+      ],
+      "id": "correction.qualbinding.20261111.e4eee9bfe24760a3ff1a",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.cohort4.dataset.claim.gaia.levels-private",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2605.10442.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2605.10442v2"
+      ],
+      "id": "correction.qualbinding.20261111.e6c1693a7fd697765113",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2605.10442.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2607.25398.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2607.25398v3"
+      ],
+      "id": "correction.qualbinding.20261111.e75f071d813250522546",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2607.25398.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2607.27189.method",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2607.27189v2"
+      ],
+      "id": "correction.qualbinding.20261111.e9052b28f4a1139664ba",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2607.27189.method",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2605.21739.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2605.21739v2"
+      ],
+      "id": "correction.qualbinding.20261111.e966062861bc47466576",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2605.21739.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.cohort6.e2f.annotation-modalities",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.trustscale.ai/assets/index-CUMNnpew.js"
+      ],
+      "id": "correction.qualbinding.20261111.ea0a16f4f4db73568670",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.annotation-modalities",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2607.25398.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2607.25398v3"
+      ],
+      "id": "correction.qualbinding.20261111.ea5360e53d36ad5d21d7",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2607.25398.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory2.claim.arxiv.2602.16729.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2602.16729v3"
+      ],
+      "id": "correction.qualbinding.20261111.efd5b08bb855da253dbd",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory2.claim.arxiv.2602.16729.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2610.00890.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2610.00890v1"
+      ],
+      "id": "correction.qualbinding.20261111.f35f6e34954b47490442",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2610.00890.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2607.11192.limitation",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2607.11192v3"
+      ],
+      "id": "correction.qualbinding.20261111.f4eef8691815fc74f5e3",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2607.11192.limitation",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "mandatory3.claim.arxiv.2608.01604.result",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2608.00181v1",
+        "https://arxiv.org/pdf/2608.01604v1"
+      ],
+      "id": "correction.qualbinding.20261111.f784e41b43a43c4d45b0",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.mandatory3.claim.arxiv.2608.01604.result",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.supplier.mercor.catalog",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.mercor.com/apex/off-the-shelf-data/"
+      ],
+      "id": "correction.qualbinding.20261111.fae13815646e0e321817",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.supplier.mercor.catalog",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.cohort6.e2f.human-preference-data",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.trustscale.ai/assets/index-CUMNnpew.js"
+      ],
+      "id": "correction.qualbinding.20261111.fbfdd864e07b7484aee5",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.human-preference-data",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "candidate.cohort6.e2f.organization-processor-role",
+      "corrected_on": "2026-11-12T00:03:24.870492Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.trustscale.ai/assets/index-CUMNnpew.js"
+      ],
+      "id": "correction.qualbinding.20261111.fcbd884f18d8762e7600",
+      "replacement_claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.organization-processor-role",
+      "status": "accepted",
+      "summary": "The retained original binding is quarantined. A separately authored, source-verified and adversarially reviewed replacement explicitly cites the complete source contexts for its main statement and factual qualifications. Whole-page reading digests are identified as page contexts rather than literal line digests. Pay, task counts, source discrepancies, origin and measurement limits remain qualified; unsupported inference is not carried forward. Exact original facts, source pins and positive/negative review history remain preserved. This records separate AI review, not human peer review or reproduced experiments."
+    },
+    {
+      "claim_id": "identity.claim.dataset.oasst1",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/OpenAssistant/oasst1/resolve/fdf72ae0827c1cda404aff25b6603abec9e3399b/README.md"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-018",
+      "replacement_claim_id": "repair20261111.claim.current-reference018",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.supplier.turing.frontier-product",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.turing.com/press/turing-announces-turing-frontier"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-023",
+      "replacement_claim_id": "repair20261111.claim.current-reference023",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort3.shaip.delivery-formats",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.shaip.com/generative-ai/rlhf-solutions/"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-026",
+      "replacement_claim_id": "repair20261111.claim.current-reference026",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort2.invisible.rlhf-delivery",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.invisible.co/case-studies/launching-a-leading-llm-6-months-faster"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-027",
+      "replacement_claim_id": "repair20261111.claim.current-reference027",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "cohort4.dataset.claim.humaneval.metric",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://raw.githubusercontent.com/openai/human-eval/b9453e8f1865df0a0057a1383767caa400acfbcf/human_eval/evaluation.py"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-028",
+      "replacement_claim_id": "repair20261111.claim.current-reference028",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "cohort5.dataset.claim.wildjailbreak.schema",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/allenai/wildjailbreak/blob/5ddc12a7894f842b0619b8e1c7ee496b198af009/README.md"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-035",
+      "replacement_claim_id": "repair20261111.claim.current-reference035",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "cohort4.dataset.claim.gaia.task",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/gaia-benchmark/GAIA/blob/682dd723ee1e1697e00360edccf2366dc8418dd9/README.md"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-043",
+      "replacement_claim_id": "repair20261111.claim.current-reference043",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "cohort9.claim.gigo.source-disclosure",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/1912.08320v1"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-045",
+      "replacement_claim_id": "repair20261111.claim.current-reference045",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort3.basicai.specialist-teams",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.basic.ai/"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-055",
+      "replacement_claim_id": "repair20261111.claim.current-reference055",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort3.humans_in_the_loop.policy-scope",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://humansintheloop.org/impact/fair-work-policy/"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-056",
+      "replacement_claim_id": "repair20261111.claim.current-reference056",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort3.label_your_data.notice-identity",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://labelyourdata.com/data-privacy-framework-notice"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-065",
+      "replacement_claim_id": "repair20261111.claim.current-reference065",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.supplier.appen.security",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.appen.com/data-security"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-078",
+      "replacement_claim_id": "repair20261111.claim.current-reference078",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort4.g2i.dual-and-senior-review",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.g2i.ai/research/multi-swe-bench-typescript"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-080",
+      "replacement_claim_id": "repair20261111.claim.current-reference080",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort2.telus_digital.programmatic-qa",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://assets.ctfassets.net/3viuren4us1n/7Is3KTyGYuK6wG4BYlfa9C/08840fef56e4eb58b47562b1106dbb62/TELUS_Digital_AI_Data_Solutions_Brochure_2025.pdf"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-086",
+      "replacement_claim_id": "repair20261111.claim.current-reference086",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort2.sama.project-access",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.sama.com/data-security-and-trust"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-094",
+      "replacement_claim_id": "repair20261111.claim.current-reference094",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.supplier.snorkel_ai.multimodal",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://snorkel.ai/frequently-asked-questions/"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-095",
+      "replacement_claim_id": "repair20261111.claim.current-reference095",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "cohort8.claim.nutrition.prototype-modules",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/1805.03677v1"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-107",
+      "replacement_claim_id": "repair20261111.claim.current-reference107",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.supplier.prolific.modalities",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://researcher-help.prolific.com/en/articles/445229-participants-skilled-at-ai-tasks"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-111",
+      "replacement_claim_id": "repair20261111.claim.current-reference111",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "cohort5.dataset.claim.image-reward-db.subsets",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/THUDM/ImageRewardDB/raw/c493721e19e296eb615420036f2a2eed08412bb4/README.md"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-118",
+      "replacement_claim_id": "repair20261111.claim.current-reference118",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.supplier.scale_ai.subcontractors",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://scale.com/legal/modern-slavery-statement"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-119",
+      "replacement_claim_id": "repair20261111.claim.current-reference119",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort4.g2i.security-controls",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.g2i.ai/"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-124",
+      "replacement_claim_id": "repair20261111.claim.current-reference124",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "cohort9.claim.snow.redundancy",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://aclanthology.org/D08-1027.pdf"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-125",
+      "replacement_claim_id": "repair20261111.claim.current-reference125",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.paperfull.mmlu.text-only-scope",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2009.03300v3"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-133",
+      "replacement_claim_id": "repair20261111.claim.current-reference133",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "cohort2.dataset.claim.alpacaeval.human-preferences",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://raw.githubusercontent.com/tatsu-lab/alpaca_eval/cd543a149df89434d8a54582c0151c0b945c3d20/README.md"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-134",
+      "replacement_claim_id": "repair20261111.claim.current-reference134",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort3.label_your_data.processor-instructions",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://labelyourdata.com/data-privacy-framework-notice"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-138",
+      "replacement_claim_id": "repair20261111.claim.current-reference138",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "identity.claim.benchmark.webarena",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2307.13854v1"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-140",
+      "replacement_claim_id": "repair20261111.claim.current-reference140",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.paperfull.helpsteer3.missing-domain-intersections",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/2505.11475v2"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-145",
+      "replacement_claim_id": "repair20261111.claim.current-reference145",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort4.quesma.blitzy-contracted-audit",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://quesma.com/blog/verifying-blitzy-swe-bench-pro/"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-146",
+      "replacement_claim_id": "repair20261111.claim.current-reference146",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "cohort4.claim.miniwobpp.sparse-reward-condition",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://arxiv.org/pdf/1802.08802v1"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-157",
+      "replacement_claim_id": "repair20261111.claim.current-reference157",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort3.aya_data.cydar-delivery",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.ayadata.ai/case-study/precision-medical-labeling-a-cydar-success-story/"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-158",
+      "replacement_claim_id": "repair20261111.claim.current-reference158",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort3.dataset.openorca.01",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/Open-Orca/OpenOrca/resolve/e9c87b4abb2609913751f9b26553fdb9c061796c/README.md"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-164",
+      "replacement_claim_id": "repair20261111.claim.current-reference164",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort2.telus_digital.workforce-modes",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://assets.ctfassets.net/3viuren4us1n/7Is3KTyGYuK6wG4BYlfa9C/08840fef56e4eb58b47562b1106dbb62/TELUS_Digital_AI_Data_Solutions_Brochure_2025.pdf"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-176",
+      "replacement_claim_id": "repair20261111.claim.current-reference176",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort2.welocalize.mobilized-workers",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.welocalize.com/insights/case-study-accelerating-llm-development-fine-tuning/"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-181",
+      "replacement_claim_id": "repair20261111.claim.current-reference181",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort4.g2i.contracting-scope-limit",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.g2i.ai/human-data-terms-of-service"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-192",
+      "replacement_claim_id": "repair20261111.claim.current-reference192",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.supplier.toloka.self-serve",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://toloka.ai/blog/introducing-the-new-toloka-platform/"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-195",
+      "replacement_claim_id": "repair20261111.claim.current-reference195",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort4.datacurve.deepswe-task-origin",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://deepswe.datacurve.ai/"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-205",
+      "replacement_claim_id": "repair20261111.claim.current-reference205",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort3.dataset.capybara.04",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://huggingface.co/datasets/LDJnr/Capybara/resolve/c2bc39ac72f24748f60f5fb55b77e08fb0660ba6/README.md"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-214",
+      "replacement_claim_id": "repair20261111.claim.current-reference214",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.cohort4.afterquery.nvidia-office-contribution",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.afterquery.com/blog/how-afterquery-helped-nvidia-hill-climb-gdpval"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-217",
+      "replacement_claim_id": "repair20261111.claim.current-reference217",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
+      "claim_id": "candidate.supplier.prolific.active-pool",
+      "corrected_on": "2026-11-11T18:01:25.441876Z",
+      "edition_id": "research-2026-11-11.candidate.1",
+      "evidence_urls": [
+        "https://www.prolific.com/pricing"
+      ],
+      "id": "correction.complete-binding.20261111.current-reference-221",
+      "replacement_claim_id": "repair20261111.claim.current-reference221",
+      "status": "accepted",
+      "summary": "The original binding is quarantined. A new separately authored, source-verified and adversarially reviewed assertion supplies complete pinned source spans and extraction identities; qualifications are narrowed when unbound clauses could not be supported. Original values, evidence and review history remain retained. This does not establish new provider performance or independent corpus/rights validation."
+    },
+    {
       "claim_id": "candidate.cohort4.proximal.frontierswe-collaboration",
       "corrected_on": "2026-11-10T15:54:37.977556Z",
       "edition_id": "research-2026-11-10.prelaunch.1",

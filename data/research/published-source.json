@@ -1,0 +1,13 @@
+{
+  "current_release_id": "research-2026-11-12.1",
+  "editions": [
+    {
+      "release_id": "research-2026-11-12.1",
+      "revision": 1,
+      "snapshot_path": "editions/research-2026-11-12.1.json",
+      "snapshot_sha256": "b8f0e843afb9b33e5dcac75ce66e0e0184f89ef9e7b69b714748c12e11f7ba7c",
+      "status": "published"
+    }
+  ],
+  "schema_version": "published-research-source-v1"
+}

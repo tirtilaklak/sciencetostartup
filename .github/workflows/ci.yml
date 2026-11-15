@@ -5,7 +5,35 @@ on:
     branches: [main]
   pull_request:
 jobs:
-  test:
+  unit:
+    name: Python shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install the pinned QA tools
+        run: |
+          npm ci
+          python3 -m pip install -r requirements-qa.txt
+      - name: Run complete unittest modules
+        run: python3 -B tests/unittest_shards.py run --count 8 --index ${{ matrix.shard }} --receipt output/unit-shard-${{ matrix.shard }}.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-shard-${{ matrix.shard }}
+          path: output/unit-shard-${{ matrix.shard }}.json
+          if-no-files-found: error
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,8 +47,6 @@ jobs:
         run: |
           npm ci
           python3 -m pip install -r requirements-qa.txt
-      - name: Unit tests
-        run: python3 -m unittest discover -s tests -p 'test_*.py'
       - name: Performance tool contracts
         run: node --test tests/performance_tools.test.mjs
       - name: Hero and bootstrap payload budgets
@@ -38,3 +64,26 @@ jobs:
           python3 tests/reliability_copy_context_logic.py
           python3 tests/reliability_failure_state_logic.py
           python3 tests/risk_section_logic.py
+  test:
+    if: always()
+    needs: [unit, checks]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every check and shard to pass
+        env:
+          UNIT_RESULT: ${{ needs.unit.result }}
+          CHECKS_RESULT: ${{ needs.checks.result }}
+        run: test "$UNIT_RESULT" = success && test "$CHECKS_RESULT" = success
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python discovery dependencies
+        run: python3 -m pip install -r requirements-qa.txt
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: unit-shard-*
+          path: output/unit-shards
+          merge-multiple: true
+      - name: Verify every discovered test ran exactly once
+        run: python3 -B tests/unittest_shards.py verify --count 8 --directory output/unit-shards

@@ -824,17 +824,21 @@ def build(data, destination):
     # Additive research belongs only to the actual public canonical input. Pipeline
     # fixtures must not accidentally inherit unrelated live research or coverage.
     research_context = None
-    if data == json.loads((ROOT / "data/canonical.json").read_text()):
+    public_canonical_bytes = (ROOT / "data/canonical.json").read_bytes()
+    if data == json.loads(public_canonical_bytes):
         from research_report import build_context
         from research_pages import research_search_entries
         research_context = build_context(ROOT)
+        if (research_context["graph"].get("canonical_sha256") != hashlib.sha256(public_canonical_bytes).hexdigest()
+                or research_context["graph"].get("canonical_dataset_version") != data["dataset_version"]):
+            raise ValueError("Research graph canonical bytes or dataset version differ from the public build input")
         sidecars["RESEARCH_SEARCH"] = research_search_entries(research_context)
     release_path = ROOT / "data/editorial-release.json"
     release = json.loads(release_path.read_text()) if release_path.exists() else {"editorial_release_id": "baseline-2026-10-28", "publication_as_of": "2026-11-08T20:30:00Z"}
     if release_path.exists() and data["dataset_version"] == SIDECAR_DATASET_VERSION:
         from editorial_work import load_editorial_release
         release = load_editorial_release(release_path, work_data, data)
-    from presentation import build_presentation, write_asset
+    from presentation import build_presentation, public_logo_provenance, write_asset
     summary, summary_asset = build_presentation(data, destination, ROOT, sidecars, release)
     original_summary = destination / summary_asset["href"].lstrip("/")
     summary["modules"] = {"businessHealth": write_business_health_module(destination, summary["buildId"])}
@@ -869,7 +873,11 @@ def build(data, destination):
     for name in ("robots.txt", "sitemap.xml", "_headers", "_redirects", "favicon.ico"):
         shutil.copy2(ROOT / "web" / name, destination / name)
     for source in [ROOT / "data/editorial.json", ROOT / "data/portrait-provenance.json", logo_path, work_path, link_health_path, events_path, source_updates_path, release_path]:
-        if source.exists(): shutil.copy2(source, destination / source.name)
+        if source.exists():
+            if source == logo_path:
+                (destination / source.name).write_text(json.dumps(public_logo_provenance(logo_data), indent=2, ensure_ascii=False) + "\n")
+            else:
+                shutil.copy2(source, destination / source.name)
     if health is not None:
         (destination / "business-health.json").write_text(json.dumps(health, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
     (destination / "profile-content.json").write_text(json.dumps(profile_content, indent=2, ensure_ascii=False) + "\n")
@@ -916,7 +924,7 @@ def build(data, destination):
             raise ValueError("Duplicate canonical URL in research sitemap")
         (destination / "sitemap.xml").write_text(render_sitemap(entries), encoding="utf-8")
         (destination / "public-identity.json").write_text(json.dumps(research_context["identity"], indent=2, ensure_ascii=False) + "\n")
-        (destination / "CITATION.cff").write_bytes((destination / "publication/CITATION.cff").read_bytes())
+        (destination / "CITATION.cff").write_bytes((destination / "publication/current-CITATION.cff").read_bytes())
     from presentation import retain_runtime_generations
     retain_runtime_generations(ROOT, destination)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}

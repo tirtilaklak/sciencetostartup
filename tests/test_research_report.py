@@ -9,8 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from research_report import (FLOORS, _audit, canonical_hash, load_report, load_edition_snapshots,
-                             publication_gate, report_review_digest, report_review_errors)
+from research_report import (FLOORS, _audit, canonical_hash, load_edition_snapshots,
+                             publication_gate, report_review_digest, report_review_errors, build_context)
 
 
 def empty_graph():
@@ -123,11 +123,13 @@ class ReportGateTests(unittest.TestCase):
     def test_final_archive_gate_requires_verified_production_zenodo_receipt(self):
         report = test_report()
         receipt = {"status": "published", "doi": "10.5281/zenodo.12345", "record_url": "https://zenodo.org/records/12345",
-                   "api_origin": "https://zenodo.org", "environment": "production", "verified": True,
+                   "api_origin": "https://zenodo.org", "environment": "production", "verified": True, "anonymous_verified": True,
+                   "record_id": 12345, "concept_doi": "10.5281/zenodo.12344",
                    "artifact_sha256": "a" * 64, "release_id": "test-fixture", "confirmed_on": "2026-11-10T01:00:00Z"}
         report["archive"] = receipt
         self.assertFalse(publication_gate(empty_graph(), report)["archive_reasons"])
         for changes in ({"api_origin": "https://sandbox.zenodo.org"}, {"environment": "sandbox"}, {"verified": False},
+                        {"anonymous_verified": False}, {"anonymous_verified": None},
                         {"record_url": "https://example.org/records/12345"}, {"doi": "10.5281/zenodo.999"},
                         {"confirmed_on": "2026-11-10"}, {"status": "prepared"}):
             report["archive"] = {**receipt, **changes}
@@ -152,7 +154,7 @@ class ReportGateTests(unittest.TestCase):
         self.assertTrue(any("postdates audit completion" in error for error in errors))
 
     def test_empty_report_and_unbound_launch_analysis_are_blocked(self):
-        report = load_report(ROOT)
+        report = test_report()
         report["sections"][0]["paragraphs"] = []
         self.assertTrue(any("no substantive content" in reason for reason in publication_gate(empty_graph(), report)["reasons"]))
         report["status"] = "archive_pending"
@@ -217,6 +219,43 @@ class ReportGateTests(unittest.TestCase):
         report["source_cutoff"] = "2026-11-06"
         self.assertTrue(any("timezone-aware" in reason for reason in publication_gate(approved_graph(), report)["reasons"]))
 
+    def test_initial_launch_exception_binds_one_release_and_actual_cutoff(self):
+        graph, report = approved_graph(), test_report()
+        graph['as_of'] = '2026-11-11T09:01:00Z'
+        report.update(edition_kind='launch', source_cutoff='2026-11-11T09:00:00Z')
+        authorization = {'authorization_id': 'user-2026-11-11-initial-launch-as-ready',
+                         'one_time': True, 'release_id': report['release_id'],
+                         'source_cutoff': report['source_cutoff'], 'recorded_on': '2026-11-11T08:30:00Z'}
+        def reasons(auth=authorization):
+            return publication_gate(graph, report, {'initial_launch_authorization': auth})['reasons']
+        self.assertFalse(any('initial launch' in s or 'Friday' in s for s in reasons()))
+        # A calendar exception cannot replace missing evidence, audits or coverage.
+        self.assertTrue(any('Actual reference audit' in s for s in reasons()))
+        self.assertFalse(publication_gate(graph, report, {'initial_launch_authorization': authorization})['archival_ready'])
+        for changes in ({'authorization_id': 'different'}, {'one_time': False},
+                        {'release_id': 'another-edition'}, {'source_cutoff': '2026-11-11T09:00:01Z'},
+                        {'recorded_on': '2026-11-10T08:00:00Z'}, {'recorded_on': '2099-11-11T08:00:00Z'},
+                        {'recorded_on': '2026-11-11'}, {'recorded_on': '2026-11-11T09:01:01Z'}):
+            with self.subTest(changes=changes):
+                self.assertTrue(any('initial launch' in s for s in reasons({**authorization, **changes})))
+        self.assertTrue(any('initial launch' in s for s in reasons({})))
+        report['editions'] = [{'release_id': 'previous-edition', 'status': 'published'}]
+        self.assertTrue(any('initial launch' in s for s in reasons()))
+
+    def test_launch_exception_keeps_capture_cutoff_and_weekly_rules(self):
+        graph, report = approved_graph(captured_on='2026-11-11T09:00:01Z'), test_report()
+        graph['as_of'] = '2026-11-11T10:00:00Z'
+        report.update(edition_kind='launch', source_cutoff='2026-11-11T09:00:00Z')
+        policy = {'initial_launch_authorization': {
+            'authorization_id': 'user-2026-11-11-initial-launch-as-ready', 'one_time': True,
+            'release_id': report['release_id'], 'source_cutoff': report['source_cutoff'],
+            'recorded_on': '2026-11-11T08:30:00Z'}}
+        self.assertTrue(any('after the edition cutoff' in s for s in publication_gate(graph, report, policy)['reasons']))
+        report['edition_kind'] = 'weekly'
+        self.assertTrue(any('Friday 17:00' in s for s in publication_gate(graph, report, policy)['reasons']))
+        report['edition_kind'] = 'anything-else'
+        self.assertTrue(any('Unknown edition kind' in s for s in publication_gate(graph, report, policy)['reasons']))
+
     def test_missing_or_candidate_fact_binding_is_rejected(self):
         report = test_report()
         report["sections"][0]["paragraphs"] = [{"kind": "sourced_fact", "text": "Unverified.", "claim_ids": []}]
@@ -224,11 +263,17 @@ class ReportGateTests(unittest.TestCase):
         report["sections"][0]["paragraphs"][0]["claim_ids"] = ["missing"]
         self.assertTrue(any("Unknown report assertion" in reason for reason in publication_gate(empty_graph(), report)["reasons"]))
 
-    def test_real_audits_are_absent_and_report_has_twelve_chapters(self):
-        self.assertEqual(len(load_report(ROOT)["sections"]), 12)
-        for kind in ("reference", "screening"):
-            self.assertFalse((ROOT / f"data/research/{kind}-audit.json").exists())
-        self.assertEqual(load_report(ROOT)["status"], "prelaunch")
+    def test_real_reference_audit_is_admitted_and_report_has_twelve_chapters(self):
+        context = build_context(ROOT, select_prepared=False)
+        self.assertEqual(len(context["report"]["sections"]), 12)
+        reference = context["gate"]["audit_metrics"]["reference"]
+        self.assertTrue(reference["publication_eligible"])
+        self.assertGreaterEqual(reference["sample_size"], FLOORS["reference_sample_size"])
+        self.assertGreaterEqual(reference["precision"], FLOORS["reference_precision"])
+        self.assertGreaterEqual(reference["recall"], FLOORS["reference_recall"])
+        self.assertEqual(reference["critical_false_attributions"], 0)
+        self.assertEqual(reference["unresolved_critical_attributions"], 0)
+        self.assertIn(context["report"]["status"], {"prelaunch", "prepared", "published"})
 
 
 if __name__ == "__main__":

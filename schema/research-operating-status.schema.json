@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sciencetostartup.com/schema/research-operating-status.schema.json",
+  "title": "Source-owned next research edition operating status",
+  "description": "Operational notice only. Does not authorize research publication or alter the current edition. Runtime additionally verifies the actual published selector, immutable package, dates and explicit aware clock.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "state", "observed_on", "published_source_sha256", "current_release_id", "current_edition_date", "next_edition_date", "reason_codes"],
+  "properties": {
+    "schema_version": {"const": "research-operating-status-v1"},
+    "state": {"enum": ["held", "preparing"]},
+    "observed_on": {"type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,6})?(Z|[+-][0-9]{2}:[0-9]{2})$"},
+    "published_source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "current_release_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"},
+    "current_edition_date": {"type": "string", "format": "date", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "next_edition_date": {"type": "string", "format": "date", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "reason_codes": {"type": "array", "uniqueItems": true, "maxItems": 4, "items": {"enum": ["publication_preparation", "research_review", "source_checks", "technical_checks"]}}
+  },
+  "allOf": [
+    {"if": {"properties": {"state": {"const": "held"}}}, "then": {"properties": {"reason_codes": {"minItems": 1}}}},
+    {"if": {"properties": {"state": {"const": "preparing"}}}, "then": {"properties": {"reason_codes": {"maxItems": 0}}}}
+  ]
+}

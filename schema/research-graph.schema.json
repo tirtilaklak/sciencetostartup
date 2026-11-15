@@ -1,5 +1,5 @@
 {
-  "$comment": "Structural schema only. scripts/research_graph.py performs cross-reference, hash, type/value agreement, provenance, independent-review, privacy, family/version and canonical-byte validation. Publication audit policy belongs to research_report.py.",
+  "$comment": "Structural schema only. Native DOI/arXiv/ACL/PMLR/CEUR and stable primary-work URL identity adapters are validated by scripts/research_graph.py. scripts/research_graph.py performs cross-reference, hash, type/value agreement, provenance, independent-review, privacy, family/version and canonical-byte validation. Publication audit policy belongs to research_report.py.",
   "$id": "urn:sciencetostartup:research-graph:1.0.0",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,

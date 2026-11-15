@@ -7,38 +7,78 @@ The current public site is https://sciencetostartup.com.
 
 The new `/research/` hub connects readable paper, dataset, benchmark and workflow
 records with claim-level evidence, original source versions and reusable exports.
-`/research/state-of-ai-data-labs/` is the complete living report route;
+`/research/state-of-ai-data-labs/` opens the living report, with twelve complete
+native chapter views and single-document HTML/PDF downloads;
 `/research/data/` contains the evidence ledger, citations and prepared archive,
 and `/review/` accepts source-backed corrections, section review and reuse.
 Essential content and downloads work without JavaScript. Both site search
 implementations link directly to native research and organization pages.
 
-The comprehensive weekly series is **prelaunch**. The live research checkpoint,
-merged in PR #13 and retained at commit `fc94a92`, contains 1,713 approved
-assertions: 65 qualifying suppliers, 152 reviewed paper works, 63 dataset families,
-21 benchmark families and inclusion audits of all 39 existing organizations.
-Commercial qualification remains unresolved for one of those organizations;
-an inclusion audit does not establish supplier qualification. Its 1,789 captured
-scoped source records represent 503 distinct document versions. Every approved assertion has separate
-author, source-verifier and adversarial AI source-content reviews at its exact
-digest. Reading scopes remain explicit; this does not imply cover-to-cover paper
-reading, experiment reproduction or an operational supplier audit.
+Research source acceptance, DOI reservation, archive publication, mirror sync and
+website activation have separate verified states. Use the served `/research/`
+hub, `/publication/package-status.json` and `/publication/current-metadata.json`
+for that edition's identity, archive status and citation. Website and mirror
+receipts establish their respective release outcomes. A prepared download, a
+reserved DOI or a passing scientific gate does not establish publication.
 
-The live report contains 12 chapters, 65 supplier dossiers, 152 paper records,
-10 buyer pilot guides and nine executive findings. Its exact synthesis passed
-separate evidence and adversarial AI reviews. The matching prepared archive,
-`research-2026-11-10.prelaunch.1`, includes the complete offline report, evidence
-appendix, exports, citations, reproduction instructions and a 244-page PDF.
-This prepared archive is downloadable; it has no registered DOI and is not a
-published weekly edition. Earlier snapshots retain their own frozen bytes and
-review bindings. Historical field-guide evidence retains its real dates and
-labels. Unresolved dataset-family boundaries remain pending and do not inflate
-coverage.
+The accepted first-launch scientific checkpoint contains 2,548 approved and 39
+historical assertions, covering 225 reviewed paper works, 73 qualifying supplier
+groups, 85 dataset families and 87 benchmark families, with inclusion audits of
+all 39 existing organizations. An inclusion audit does not establish supplier
+qualification. Each approved assertion has separate author, source-verifier and
+adversarial AI source-content reviews at its exact digest. Reading scopes remain
+explicit; this does not imply cover-to-cover paper reading, experiment
+reproduction or an operational supplier audit. These source-checkpoint counts
+must not be substituted for an older served edition's own frozen coverage.
 
-This is not a comprehensive market census. The frozen core and both real
-200-record launch audits are still outstanding. No published edition, human peer
-review or DOI is claimed. Coverage is computed from approved records; code enforces
-the declared launch floors, exact synthesis review and substantive-report gates.
+Original unsuccessful hypotheses, correction histories and earlier frozen
+packages retain their actual review bindings, bytes, dates and labels. Approved
+corrections receive their own exact review bindings. A named task collection, a
+benchmark and a composite evaluation protocol remain distinct research objects;
+internal task groups and release versions do not add families. Unresolved
+dataset-family boundaries remain pending and do not inflate coverage.
+
+The complete 532-target inventory has actual separate whole-scope AI review and
+coordinator coapproval. Its 416 source-qualified resolved units are frozen without
+narrowing for coverage; 389 have qualifying deep disposition (93.51%). All 102
+named Unknowns, 13 aliases/manifestations, one source container and the unresolved
+identity and discovery registers remain retained. Unknowns are not exclusions
+or zero cardinalities. This is a bounded declared inventory, not a world census;
+newly qualified logical units require additive expansion.
+
+The exact actual 200-assertion reference audit has separate independent AI
+admission and passes its unchanged thresholds: 185 true positives, zero false
+positives, seven false negatives and eight true negatives; precision is 100%
+and recall is 96.35%. This finite panel evaluates the disposition of original,
+source-bound hypotheses. It does not measure extraction, discovery or population
+recall, or the precision of all final corrected outputs. Fifteen inputs were
+genuinely withheld, including seven supported opportunities. Prior failed
+validation and all original truth, prediction, correction and review histories
+remain retained.
+
+The separately admitted screening7 audit is a known-reference post-remediation
+repeat: 197/200 recovered, with benchmark 25/25, paper 65/65, supplier-lead 50/50
+and dataset 57/60. Selected-panel and full-frame critical-attribution and
+unresolved-conclusive counters are zero. This is not an
+unseen-reference holdout, a population precision/recall estimate, discovery
+recall or final supplier qualification. The original200 sensitivity contract
+remains false; the original thirteen Unknown cases are not all declared resolved,
+and earlier held runs remain retained. Acceptance discloses prior coordinator
+byte hashing and Source1's execute-only/helper access violation. Strict access-mode
+compliance, global blindness, complete historical transcripts and independent
+engine attestation are not claimed. See the
+[first-edition screening review](docs/research/first-edition-screening-review.md)
+for the admission's operational deviations, scope and evidence limits.
+
+The first-launch scientific checkpoint passed the declared coverage, frozen-core,
+reference, screening and exact report-synthesis gates. The matching twelve-chapter
+report received separate evidence-auditor and adversarial AI synthesis approvals;
+prior holds and superseded reviews remain retained. These are separate AI reviews,
+not human peer review, and the research is a bounded declared inventory rather
+than a comprehensive market census. Each release still requires matching PDF,
+archive, privacy, exact-build, browser and deployment checks. The PDF renderer
+provides linked printed contents and stable chapter/finding bookmarks; an older
+PDF or passing diagnostic run cannot certify a different final artifact.
 
 New research is versioned under `data/research/`, independently of canonical
 v2.5.0. The public projection excludes private fields and personal contact data.
@@ -55,19 +95,23 @@ their exact pinned recipe for historical replay. Builders verify and copy frozen
 bytes, without regenerating their PDF, SQLite projection or ZIP. Publication and
 website preparation reject any file above Cloudflare's 25 MiB static asset limit.
 
-Daily preparation targets 16:00 Pacific; the sole weekly release check targets
+Daily preparation targets 16:00 Pacific. The authorized first launch may publish
+as soon as all research, privacy and technical gates pass, using its recorded
+release identity and actual source cutoff. Subsequent weekly release checks target
 Monday 09:00, with the preceding Friday 17:00 captured-source cutoff. Native
 Codex automations in the implementation chat run on the available local host;
 missed runs are handled as delayed catch-up, never backdated publications.
-Zenodo production, Zenodo Sandbox and Hugging Face authenticated successfully on
-2026-11-10. Their credentials stay in private user configuration outside this
-repository. The setup dataset, `muse26/sciencetostartup-research`, remains private
-and contains no uploaded research. Successful read checks do not establish a
-completed remote write or a publication. Publication remains **prepare-only**
-while research quality gates are held.
-The report stays held until coverage, real holdout audits, evidence, privacy and
-technical checks pass. Archive publication, website activation and mirror status
-are recorded separately, using a locked, recoverable journal.
+The legacy authoring policy retained in `data/research/policy.json` remains
+`prepare_only`. The authorized first launch uses a separate private
+`publish_enabled` policy, and its reviewed adapters act only after their
+applicable gates pass. After verified publication, public builds use
+`data/research/published-source.json` to select an authenticated frozen edition
+in `replay_only` mode; the retained legacy policy does not authorize publication.
+Account authentication, draft writes, public archive verification and mirror
+writes each need their own evidence. A Sandbox result never establishes a
+production publication. Credentials and account state stay in private user
+configuration outside this repository. Archive publication, website activation
+and mirror status are recorded separately, using locked, recoverable journals.
 
 See [the shared contract](docs/research/CONTRACT.md),
 [operations](docs/research/operations.md),
@@ -88,6 +132,16 @@ A compact, versioned summary powers discovery. Company evidence loads on demand,
 with release identity, integrity and navigation guards. The full research JSON and
 SQLite remain unchanged downloads. Script and evidence failures offer retry and
 plain company, work and method pages rather than misleading empty results.
+
+Current browser research views use presentation privacy projection 1.0.0, which
+redacts nested contact references in a copy of the canonical input. Public logo
+provenance excludes the local visual-review filename. Canonical download bytes
+stay unchanged. The two prior runtime generations are retained at their exact
+already-public hashes for cached-client compatibility; their historical payloads
+can retain the original canonical contact reference until normal generation
+rotation replaces them. Those preservation exceptions do not apply to current
+views or the separately filtered research archive. The publisher's existing
+correction contact and verified company role contacts remain available.
 
 ## Where this source came from
 

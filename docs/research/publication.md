@@ -3,11 +3,27 @@
 Ordinary builds call `write_publication_assets(context, output)` from
 `scripts/research_citations.py`. This is an offline standard-library operation:
 no login, credential discovery, HTTP request, external account creation or
-publication occurs. The current policy is `prepare_only` while research quality
-gates remain held. Zenodo production, Zenodo Sandbox and Hugging Face passed
-read-only authentication on 2026-11-10. Credentials are stored outside the
-repository, and the Hub setup dataset remains private without uploaded research.
-Account connection does not satisfy the evidence, cutoff or release gates.
+publication occurs. The legacy authoring policy retained in
+`data/research/policy.json` remains `prepare_only`; the authorized first launch
+uses a separate private `publish_enabled` policy whose reviewed release adapters
+act only after their applicable gates pass. After verified publication, the
+authenticated `data/research/published-source.json` selector chooses the public
+frozen edition in `replay_only` mode before private authoring inputs are opened.
+This replay grants no authority for a fresh publication. The first-launch
+scientific checkpoint has
+accepted coverage, reference and screening audits, and matching report synthesis;
+the [screening admission](first-edition-screening-review.md) explicitly retains
+the known-reference repeat, operational deviations and evidence limits. It does
+not establish an unseen holdout or pristine access-mode compliance. Privacy and
+exact-artifact technical checks remain mandatory for publication and activation.
+
+Account authentication, draft creation, production publication, anonymous public
+file verification and mirror writes are separately evidenced operations.
+Sandbox drafts and reserved DOIs do not establish a production publication.
+Credentials and operational journals stay outside the public checkout. Consult
+the served `/research/` hub, `/publication/package-status.json` and
+`/publication/current-metadata.json` for that edition's identity, archive status
+and citation; website and mirror receipts establish their respective outcomes.
 
 The generated `publication/` directory contains a full text report, standalone
 offline HTML and evidence appendix, citations in BibTeX, RIS, CSL JSON and Citation File Format, metadata,
@@ -15,6 +31,15 @@ readiness, a privacy-filtered dataset in equivalent JSON/CSV/SQLite, a determini
 ZIP archive, an internal checksummed manifest, and prepared Zenodo/Hub metadata.
 `package-status.json` keeps archive, website, GitHub and Hugging Face states
 separate. A built site or mirror does not establish permanent archival publication.
+
+Current graph projection 1.2.0 retains the privacy boundary introduced in 1.1.0,
+which omits private local reading-ledger filenames embedded in
+review notes. It retains the surrounding scope and limitations, actual review
+identity and time, verdict, source IDs and exact scientific assertion digests.
+The private original review records remain unchanged. An unrecognized local path
+holds export for inspection; relative repository locators remain usable.
+Graph export manifests record this projection version. Frozen earlier archives
+retain their original projection and reproduction recipe.
 
 Prelaunch citation files identify a preparation snapshot. They omit registered
 DOI and publication-date fields. A reserved version DOI may appear only in the
@@ -38,13 +63,14 @@ The synthesis digest excludes only lifecycle status, the edition ledger and arch
 outcomes, avoiding a circular dependency on publication receipts. Changing report
 wording, finding bindings or the graph invalidates review readiness. Unreviewed
 executive findings are withheld. Passing synthesis review cannot substitute for
-coverage floors, frozen-core disposition, the two real 200-record audits, source
-cutoff rules or actual archival publication.
+coverage floors, frozen-core disposition, the actual reference and screening
+audits under their versioned methods, source cutoff rules or actual archival
+publication.
 
 ## Public projection and equivalence
 
 Canonical dataset 2.5.0 and its legacy downloads remain byte-identical. The new
-archive contains independently versioned public projection **1.0.0**, with the
+archive contains independently versioned public projection **1.2.0**, with the
 canonical data and public supplemental graph as inputs. The projection omits raw
 inputs/caches/full-text fields, source quote fields and structured contact fields.
 Email patterns are redacted throughout nested text, including the known legacy
@@ -202,8 +228,8 @@ research text, audits, coverage, policy or reservation still invalidates the PDF
 and frozen bundle. A registered version DOI must equal the reserved version DOI;
 the concept DOI is a separate field and is never used as a version identifier.
 
-New preparation uses **package context contract v2**. `MANIFEST.json`,
-`PREPARED.json` and new PDF receipts explicitly carry `context_contract_version: 2`;
+Contract v2 introduced the owned-input recipe. Its `MANIFEST.json`,
+`PREPARED.json` and PDF receipts explicitly carry `context_contract_version: 2`;
 their existing envelope `schema_version` remains 1. In `source-context.json`,
 `package_context.reproduction_inputs` binds the byte count and SHA-256 of these
 owned scientific inputs, using exactly their archive member names:
@@ -222,7 +248,7 @@ roots copy the same required owned inputs instead of bypassing this rule. Symlin
 inputs or parent components are rejected. Local source paths and file bodies do
 not enter the descriptors. A schema correction, reproducer fix or license change
 invalidates an unpublished v2 freeze even when its assertions and report wording are unchanged.
-Fresh PDF preparation now writes a v3 receipt; older source PDF receipts cannot
+Fresh PDF preparation writes a contract6 receipt; older source PDF receipts cannot
 be silently promoted into a new bundle. The v2 rules below describe preserved
 historical packages.
 
@@ -249,16 +275,19 @@ Historical replay cannot create a fresh freeze at a new target; prepare a new
 edition from its prepublication source context instead.
 
 A frozen package without the explicit context version is **legacy v1**. Its
-original research-only digest is checked using `context_digest(context,
-version=1)` and its exact original `source-context.json`, manifest, PDF and ZIP
+original research-only digest is checked using its preserved historical
+normalization and its exact original `source-context.json`, manifest, PDF and ZIP
 remain byte-verified. It is never regenerated, rewritten or retrofitted with new
 schema/code/license bytes. Published legacy builds use the frozen PDF directly;
 they do not reread or rewrite its old source PDF receipt. Existing v1 release
-journals retain their exact ZIP markers, and existing v1 reservation journals
-retain their original source marker for retry reconciliation. New reservation
-journals bind the current v3 contract. A reservation and frozen package must use the same context
-contract; a legacy reservation without a legacy freeze needs explicit operator
-review before a transaction using a newer contract.
+journals retain their exact ZIP markers. Existing legacy reservation journals
+retain their original source marker for explicit recovery. The current writer
+preserves such a journal and stops before remote mutation when its authenticated
+original frozen context is unavailable; it never creates a replacement deposit
+by treating the current recipe as the old one. New reservation journals bind
+context contract 6. A reservation and frozen package must use the same context
+contract; a legacy reservation requires authenticated original-context recovery
+before a transaction using a newer contract.
 
 `freeze_publication_package(context, package_directory, archive_compression="stored")`
 creates the package once; `archive_compression="deflate"` opts into level-9 ZIP
@@ -370,7 +399,8 @@ missing step; archival publication is blocked.
 
 ## Explicit external adapters
 
-New packages use source-context contract 3. Live report pages, offline HTML,
+New packages use source-context contract 6. The contract 3 evidence rules remain:
+live report pages, offline HTML,
 Markdown and the PDF apply the same approved-evidence rule to every report block.
 The machine-readable source context also replaces held paragraphs with an explicit
 gap and omits draft executive judgments pending separate synthesis review. Its
@@ -406,7 +436,7 @@ Final website readiness separately requires the actual public archive receipt;
 this avoids making archive creation depend on an archive that already exists.
 The adapter cannot lower thresholds, discard blockers or trust a forged cached
 `ready` flag. Prepared PDF, exact manifest, context and ZIP member bytes must all
-match. Neither the current prelaunch dataset nor `prepare_only` policy qualifies.
+match. A scientifically held candidate or `prepare_only` policy cannot qualify.
 
 The explicit caller first constructs a `PublicationPlan` with a reservation
 journal **outside the source checkout**. `Zenodo(plan).draft()` creates/resumes
@@ -415,8 +445,8 @@ same authoritative research gate and `publish_enabled` policy check as a release
 but cannot upload or publish without a frozen bundle. The reservation journal is
 bound to source inputs, excluding reservation outcomes. After rendering and
 freezing, a separate release journal binds exact archive bytes. A concrete
-sequence, only after accounts are connected and the policy is deliberately
-enabled, is:
+sequence, only with verified account capabilities, passing gates and
+`publish_enabled` policy, is:
 
 ```python
 plan = PublicationPlan(context, outside_state / "reservation.json")
@@ -438,7 +468,7 @@ Keep the reservation and publication journals for retries, and persist the
 reservation/receipt overlays into the correct edition source context. The
 exported receipt includes `bundle_path`; a tracked release package can instead
 use the whitelisted edition path. This code is a protocol example, not a command
-to run under the current `prepare_only` policy.
+to bypass an account, scientific, privacy or exact-artifact technical gate.
 
 `upload()` reconciles and uploads exact package files, and `publish()` publishes
 only after all checks.
@@ -474,16 +504,57 @@ published website or authorize a production mirror.
 GitHub and Hub mirrors require a remotely verified published archive journal
 receipt. GitHub resumes a uniquely tagged draft release with the package marker,
 verifies uploaded asset SHA-256, then publishes and re-reads public release state.
+`GitHubMirror(..., source_commit=<approved full lowercase 40-character SHA>)`
+requires an existing lightweight `research-<release_id>` tag pointing directly to
+that exact commit. Create and verify that tag separately after committing the
+matching approved source and build; the mirror never creates or moves tags.
+The expected commit is durably bound to the mirror journal before remote access,
+and the tag is checked before release work, before publication and after the final
+public release-state read. Missing, annotated, moved or conflicting tags hold the
+mirror. Preserve the journal and commit identity on retries.
+The live source field and its one retained binding event must agree. Lost,
+malformed or conflicting history holds before any tag read or rebinding; only an
+untouched prepared mirror can establish its first binding. These local consistency
+checks cannot authenticate a journal whose entire trusted state/history was rewritten.
 An existing conflicting tag or asset blocks replacement. Hugging Face uses the
 official optional `huggingface_hub` SDK, an existing dataset repository, a pinned
-parent commit and manifest-first reconciliation. After commit, downloads at one
-immutable commit verify both archive and dataset bytes. A lost commit response
-cannot silently create duplicate commits. Mirror success never changes website
-production state.
+parent commit and manifest-first reconciliation. After commit, authenticated
+downloads at one immutable commit verify archive and dataset bytes. Separate
+anonymous downloads must then match all four payloads, including the dataset
+card and manifest, at that same commit. The default SDK client pins the official
+Hub endpoint and explicitly uses `token=False` for those public reads. Public
+repository metadata alone cannot establish access to a gated dataset. Failed
+public verification leaves a recoverable, unverified journal state; retrying
+reconciles the existing commit. A lost commit response cannot silently create
+duplicate commits. Mirror success never changes website production state.
 
-No adapter was executed against a real account during implementation. Unit tests
-use explicitly synthetic remote and gate fixtures to exercise failure recovery;
-these fixtures are not review receipts, audit evidence or publication records.
+The live Hub card is generated from the verified production archive receipt and
+contains the exact edition DOI and citation. It is a destination artifact, separate
+from the immutable preparation card inside the frozen package. A matching manifest
+with a stale destination card requires one reconciled commit; retries authenticate
+both files and anonymously verify all payloads at the resulting immutable commit.
+The frozen report, citations, card and ZIP are never rewritten after publication.
+Zenodo's remote description describes the research and rights; a preparation-time
+status sentence must not become a permanent false statement that the record is
+unpublished. The archival record supplies its actual publication status.
+
+Zenodo reconciliation separately reads the open record and all four uploaded
+payloads without credentials. Actual anonymous bytes must match the frozen files;
+authenticated checksums alone cannot establish public download access. A published
+record whose public verification fails stays `published_unverified` in the journal.
+Its DOI is retained, mirrors and website activation stay held, and retries verify
+that same record without creating or publishing another deposition.
+
+New website activation, edition export and mirror authorization require
+`anonymous_verified: true` in the production receipt. A legacy `verified` flag
+alone grants no new activation. Historical frozen research bytes remain intact;
+they never substitute for a current public-access verification outcome.
+
+Unit tests use explicitly synthetic remote and gate fixtures to exercise failure
+recovery. Actual account operations require their own scoped receipts; a passed
+fixture cannot establish a successful draft write, upload, publication or public
+download. Test fixtures are not review receipts, audit evidence or publication
+records.
 
 Official API references used for the implementation:
 
@@ -494,3 +565,134 @@ Official API references used for the implementation:
 - [Hugging Face uploads](https://huggingface.co/docs/huggingface_hub/guides/upload)
   and [Hub client reference](https://huggingface.co/docs/huggingface_hub/package_reference/hf_api)
   document commits, existing repositories, explicit credentials and parent commits.
+
+## One-time initial launch timing
+
+On November 11, 2026 the user authorized publishing the first edition as soon as
+all research and technical gates pass. Its actual source cutoff and release ID
+are bound to a one-time authorization in the release policy. This exception changes
+only the initial calendar: coverage, source capture, independent review, audit,
+privacy, archive and exact-artifact requirements still apply. Capture and publication
+times are never backdated. After the first edition, Friday 17:00 Pacific source
+cutoffs and Monday 09:00 Pacific publication targets remain in force. Weekly
+preparation explicitly clears the exception and stages a weekly edition.
+
+## Versioned actual audit inputs
+
+The authoritative publication gate dispatches versioned audit documents through
+`research_audit_dispatch.py`. Exact UTF-8 audit and separate validation-receipt
+bytes are loaded from `data/research/<kind>-audit.json` and
+`<kind>-validation-receipt.json`. Their parsed and exact views must agree. The
+independent trust records come exclusively from the separately reviewed
+`audit-admissions.json` registry. An empty registry admits no execution. A summary,
+fixture, self-nominated admission or unsupported schema version cannot clear a gate.
+
+The admitted screening-v3 execution is a known-reference post-remediation repeat
+over the exposed fixed269 workload. Its 197/200 recovery includes benchmark
+25/25, paper 65/65, supplier-lead 50/50 and dataset 57/60. Selected-panel and
+full-frame critical-attribution and unresolved-conclusive counters are zero.
+It is not an unseen-reference holdout, population precision/recall,
+discovery recall or final supplier qualification. Original200 sensitivity remains
+separate, its contract remains false, and the original thirteen Unknown cases
+are not all declared resolved. Prior held runs and original frozen inputs remain
+retained. Admission discloses prior coordinator byte hashing and Source1's
+execute-only/helper violation; it does not certify strict access-mode compliance,
+global blindness, a complete historical transcript or independent engine
+attestation. The [first-edition screening review](first-edition-screening-review.md)
+preserves the exact scope, operational deviations and evidence limits.
+
+Reference-v4 evaluates the disposition of original source-bound hypotheses in a
+finite 200-assertion panel. Precision 1.0 and recall 0.96354 describe that panel,
+not extraction, discovery or population recall, or the precision of all final
+corrected outputs. The reference and screening requirements use separate actual
+SUT runs; shared primary sources do not turn assertions and logical records into
+the same evaluation unit. Actual completed source work and independent execution
+admission remain required after prospective method review. Numerical floors are
+unchanged.
+
+Current-input reference validation requires the complete private input ledger for
+withheld assertions. An archive's filtered projection cannot reconstruct their
+mutable wording. Archival replay must identify itself as validation of the admitted
+frozen context; it must never claim current-input withheld verification.
+
+## Context contract V4 and offline audit scope
+
+New packages pin the evidence-coordinate extractor and manifestation manifest,
+versioned audit readers/schemas, dispatcher and independent admission registry.
+V2/V3 keep their original member allowlists; verified historical packages retain
+their stored recipes and bytes. No earlier PDF or archive is rewritten.
+
+The offline reproducer authenticates the archive's exact audit/receipt/admission
+and code pins, recomputes raw finite-panel calculations, and checks retained
+reference findings against their scientific bindings in the public projection.
+A passing archival context requires both actual audit documents. It reports
+`live_private_withheld_records_revalidated: false` and
+`raw_sources_revalidated: false`: those unavailable inputs are not reconstructed,
+fetched implicitly, or treated as newly verified. Current-input readiness remains
+the authoritative gate's separate responsibility with the complete private ledger.
+
+Public projection1.2.0 includes only source rows bound by approved or historical assertions. A grouped review is projected to the retained assertion IDs and their exact evidence source IDs; its actual identity, verdict, scientific digest bindings and timestamp remain unchanged. Original full reviews and draft-only source records stay in the private intake. Stable website source anchors for withheld rows remain as metadata-only notices; they do not expose an obsolete source version or unapproved locator. This projection is distinct from canonical2.5.0 and does not rewrite previously frozen packages.
+
+Contract5 introduced explicit graph projection1.2.0 in the owned recipe. Legacy projection selection reads only verified owned code/schema metadata and executes no package Python. Current credential matching preserves harmless identifier substrings while actual credential patterns remain excluded; historical redaction bytes stay unchanged for replay. The screening-v3 reader is installed separately from method adoption or actual audit completion. Its known-reference repeat requires prospective input/exposure review, fresh operational/source-check execution, exact originals, unchanged thresholds and a separately reviewed admission. Installing or testing that reader publishes nothing.
+
+## Context contract 6: compact encoding
+
+New freezes encode `source-context.json` as sorted UTF-8 JSON with compact
+separators, strict finite numbers and one trailing line feed. Every JSON value,
+audit document string, evidence binding and owned-input commitment remains
+present. Projection1.2.0 and its privacy rules are unchanged. This removes
+formatting whitespace so complete audit provenance fits static-file limits;
+the actual final inventory must still pass every size check.
+
+PDF receipts, reservation identities and archive context digests bind those
+exact compact bytes. Contracts1–5 retain their original indented encoding and
+frozen-recipe verification; fresh preparation accepts only contract6. Old
+reservation journals require their original authenticated context rather than
+silently migrating their reconciliation marker. Unpublished historical reuse
+still checks current scientific inputs and owned recipe bytes. Published replay
+continues to use its verified frozen recipe. No old package is rewritten.
+
+## Public checkout current-edition selection
+
+After the actual gates and verified production archive publication, a public
+checkout can select an immutable edition without redistributing its private
+authoring graph, working partitions, report, policy or reading ledgers. Export
+the descriptor with `research_edition_replay.py export` using the genuine archive
+receipt and source-selected prepared package. Commit its exact bytes under
+`data/research/editions/`, its registry/package pins and complete frozen public
+package. No descriptor or selector establishes a new scientific approval.
+
+`data/research/published-source.json` is an explicit source-owned selector with
+exact fields `schema_version: "published-research-source-v1"`,
+`current_release_id` and a nonempty `editions` array. Each entry has exactly
+`release_id`, `status: "published"`, `snapshot_path` under `editions/`, the raw
+descriptor's full `snapshot_sha256`, and optionally a positive integer
+`revision` (default 1). Include the current release exactly once. Each current
+and historical entry must independently resolve through the committed prepared
+registry and actual verified publication descriptor. Duplicate release IDs,
+descriptor paths or immutable edition date/revision URLs fail closed. Selection
+is explicit; ledger order and dates do not choose the current edition.
+
+`build_context` checks this selector before opening any private authoring input,
+even with `select_prepared=False`. A malformed, changed or unsafe selector never
+falls back to private files. Absence retains ordinary private authoring mode.
+The selected context remains `replay_only`/`published_frozen_replay`, with
+`archival_ready: false` and current-input/raw-source/private-withheld revalidation
+false. Original private scientific commitments are retained, not equated with
+the public projected graph or reminted as fresh acceptance.
+
+The authenticated public edition ledger and verified `edition_snapshots` are
+carried outside the exact frozen report. Renderers recheck the source selector,
+ledger and frozen contexts before creating archive routes and feeds; they do
+not mutate `report.editions`. Low-level `load_graph` and `load_report` remain
+private-authoring APIs and do not synthesize substitute scientific inputs.
+Tests of private authoring assumptions need explicit synthetic authoring
+fixtures; public source checks use the selector and capsule directly.
+
+The all-synthetic `test_public_research_source.py` fixture physically omits the
+private authoring files and runs the ordinary `build_public_snapshot.py` entry
+point in a separate public-only source checkout. It denies private input opens,
+network, fresh gates and package freeze/export writers while checking current
+and historical readers, feeds, local search, company evidence bridges, sitemap
+and live citation overlay without changing any frozen package bytes. Synthetic
+receipts in tests are never a real publication or a source-review result.

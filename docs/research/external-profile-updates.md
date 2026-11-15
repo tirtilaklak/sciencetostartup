@@ -1,9 +1,11 @@
 # Public identity reconciliation
 
 Status: GitHub description, homepage and topics were updated and re-read through
-GitHub on 9 November 2026 Pacific time. LinkedIn administration
-and legacy MCP namespace authentication have not been established. This checklist
-must not be labeled complete while external owner access is pending.
+GitHub on 9 November 2026 Pacific time. LinkedIn owner access was established on
+15 November 2026 UTC. The brand capitalization, tagline, About description,
+research URL and specialties were updated and verified after a fresh member-view
+page load. Other LinkedIn factual and legacy product fields remain pending, as
+does legacy MCP namespace authentication. This checklist is not complete.
 
 ## GitHub
 
@@ -17,14 +19,25 @@ Homepage: https://sciencetostartup.com
 Topics: ai-data, human-feedback, rlhf, datasets, evaluations, research, provenance.
 The research README must distinguish published material from prelaunch work.
 
-## LinkedIn: owner access required
+## LinkedIn: research identity updated; legacy fields pending
 
 Profile: https://www.linkedin.com/company/sciencetostartup
 
-The inspected description advertises the earlier arXiv commercialization Agent
-OS, signed viability scores, API, SDK and MCP. These products are not established
-by the current website. The owner must also inspect headcount and affiliation
-fields and correct unsupported claims without replacing them with guessed values.
+The earlier About description advertised arXiv commercialization scores, an Agent
+OS, API, SDK and MCP, with unsupported affiliation claims. It was replaced with
+the preparation-stage copy below. The public page now uses `ScienceToStartup`,
+the research tagline, the research hub URL and these specialties: AI data labs,
+human feedback, RLHF, datasets, AI evaluations and research provenance. No post,
+invitation or message was sent.
+
+The page still lists 1,001–5,000 employees, Privately Held and Founded 2025. The
+actual values have been requested from the owner; LinkedIn requires size and type,
+so these cannot be replaced with an inferred range. The member view also shows a
+legacy LMS product category, featured-customer claims and an affiliated showcase
+page. Those are unverified legacy fields, not endorsements or operating claims
+adopted by this publication. Their correction remains pending. LinkedIn associated
+members are not a verified employee count. The shared identity therefore records
+`update_pending`, rather than claiming the entire profile is verified current.
 
 Replacement headline:
 

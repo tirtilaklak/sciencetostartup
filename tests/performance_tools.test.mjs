@@ -53,12 +53,13 @@ function listBrowserTests(args = []) {
   return {entries, config: report.config};
 }
 
-test('browser CI partitions preserve every Playwright test and isolate all five full-report scans', () => {
+test('browser CI partitions preserve every test and isolate all twelve chapter scans on all five engines', () => {
   const coreArgs = browserSelection('browser-core');
   const reportArgs = browserSelection('report-accessibility');
   const reportTitle = 'no serious or critical accessibility violations on /research/state-of-ai-data-labs/';
-  assert.deepEqual(coreArgs, ['--grep-invert', reportTitle + '$']);
-  assert.deepEqual(reportArgs, ['--grep', reportTitle + '$', '--workers=1']);
+  const readingSelection = reportTitle + '($|chapters/)';
+  assert.deepEqual(coreArgs, ['--grep-invert', readingSelection]);
+  assert.deepEqual(reportArgs, ['--grep', readingSelection, '--workers=1']);
   const all = listBrowserTests();
   const core = listBrowserTests(coreArgs);
   const report = listBrowserTests(reportArgs);
@@ -66,14 +67,16 @@ test('browser CI partitions preserve every Playwright test and isolate all five 
   const coreKeys = new Set(keys(core));
   assert(report.entries.every(entry => !coreKeys.has(entry.key)), 'CI partitions overlap');
   assert.deepEqual([...keys(core), ...keys(report)].sort(), keys(all), 'CI must execute exactly the complete inventory');
-  assert.equal(all.entries.length, 575);
-  assert.equal(core.entries.length, 570);
-  assert.equal(report.entries.length, 5);
+  assert.equal(all.entries.length, 640);
+  assert.equal(core.entries.length, 580);
+  assert.equal(report.entries.length, 60);
   assert.deepEqual(report.entries.map(entry => entry.project).sort(),
-    ['chromium', 'firefox', 'mobile-chromium', 'mobile-webkit', 'webkit']);
+    ['chromium', 'firefox', 'mobile-chromium', 'mobile-webkit', 'webkit'].flatMap(name => Array(12).fill(name)).sort());
+  const readerRoutes = policy.performance.routes.filter(route => route.startsWith('/research/state-of-ai-data-labs/'));
+  assert.equal(readerRoutes.length, 12);
   for (const entry of report.entries) {
     assert.equal(entry.file, 'research.spec.js');
-    assert.equal(entry.title, reportTitle);
+    assert(readerRoutes.some(route => entry.title === 'no serious or critical accessibility violations on ' + route));
     assert.equal(entry.timeout, 30_000);
   }
   assert.equal(core.config.workers, 2);
@@ -133,7 +136,19 @@ test('fixed gates retain the approved limits across field-guide and research rou
   assert.equal(policy.performance.playwrightVersion, '1.65.0');
   assert.equal(policy.performance.minimumRunsPerRoute, 3);
   assert.deepEqual(policy.performance.routes, ['/', '/explore/#companies', '/explore/#work', '/explore/#company/mercor/work', '/work/',
-    '/research/', '/research/state-of-ai-data-labs/', '/research/data/', '/review/']);
+    '/research/', '/research/state-of-ai-data-labs/',
+    '/research/state-of-ai-data-labs/chapters/weekly-developments/',
+    '/research/state-of-ai-data-labs/chapters/market-structure/',
+    '/research/state-of-ai-data-labs/chapters/technical-landscape/',
+    '/research/state-of-ai-data-labs/chapters/provider-dossiers/',
+    '/research/state-of-ai-data-labs/chapters/datasets-and-benchmarks/',
+    '/research/state-of-ai-data-labs/chapters/human-expertise-and-operations/',
+    '/research/state-of-ai-data-labs/chapters/commercial-evidence/',
+    '/research/state-of-ai-data-labs/chapters/governance/',
+    '/research/state-of-ai-data-labs/chapters/buyer-decision-guides/',
+    '/research/state-of-ai-data-labs/chapters/research-outlook/',
+    '/research/state-of-ai-data-labs/chapters/methods-and-appendices/',
+    '/research/data/', '/review/']);
   assert.deepEqual(Object.values(policy.performance.medianLimits).map(limit => limit.maximum), [2500, 200, 0.05]);
   assert.equal(policy.payload.bootstrap.maximumBrotliBytes, 300 * 1024);
   assert.equal(policy.payload.bootstrap.maximumGzipBytes, 360 * 1024);

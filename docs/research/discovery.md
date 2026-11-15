@@ -21,8 +21,12 @@ existing static document shell and research-only styles.
 ## Routes and evidence states
 
 - `/research/`: report, calculated launch progress, evidence indexes, all chapters.
-- `/research/state-of-ai-data-labs/`: the complete current report, with each of its
-  dynamic section IDs as an anchor, paragraph-kind labels, and assertion links.
+- `/research/state-of-ai-data-labs/`: the current report's executive assessment,
+  permanent finding anchors and a complete twelve-chapter table of contents.
+- `/research/state-of-ai-data-labs/chapters/<section-id>/`: each remaining complete
+  chapter, with paragraph-kind labels, original assertion links, canonical URLs
+  and previous/next navigation. The complete single-document HTML and PDF remain
+  available for offline reading. All text is ordinary static HTML.
 - `/research/data/`: coverage and actual gate blockers, exports, citation formats,
   historical records, candidate queue, source records, and entity register.
 - `/review/`: source-backed corrections, scoped review, and public reuse forms;
@@ -38,6 +42,12 @@ label and original dates; they do not become current findings. A captured source
 does not count as source-content verification. Search summaries follow the same
 rules and do not include candidate assertion text.
 
+The report's original section fragments remain native targets in its table of
+contents, with direct links to the full chapter. Chapter pages keep the same
+section identifier on their heading. The executive finding identifiers remain
+on the report entry page. Rendering each view uses the full reviewed context;
+it never substitutes a partial report into a previously calculated gate.
+
 Source and assertion permalinks are `/research/data/#source-<stable-id>` and
 `/research/data/#assertion-<stable-id>`. The full ID is retained in the HTML `id`,
 with percent encoding in URLs as needed. A stable ID is encoded as a single path
@@ -51,20 +61,34 @@ or an object-only mention does not create a profile.
 ## Publication-only editions and feeds
 
 An edition entry must have `status: published` and a stable `release_id`. For the
-current release it can reference the current context. An older immutable edition
-provides complete `graph`, `report`, `policy`, and `identity` snapshots. Compact
+current release it can reference the current context. Legacy immutable editions
+provide complete `graph`, `report`, `policy`, and `identity` snapshots. Compact
 entries bind a committed `data/research/editions/` JSON file through
 `snapshot_path` and its exact-file `snapshot_sha256`. Missing or altered historical
 inputs fail the build; local scheduler caches are not publication history.
 The snapshot's report must have the same release ID and published/superseded
-status. The renderer recomputes `publication_gate()` against that snapshot.
-An asserted `ready` flag in edition metadata has no authority.
+status. Legacy full-input snapshots recompute `publication_gate()`.
+
+New `published-edition-replay-v1` descriptors instead select the exact committed
+public package through the prepared-package registry and retain its actual,
+verified production archive receipt. The separate reader verifies the original
+package, public exports, admitted frozen audits, report review bindings and
+coverage before hydrating a historical view. A public projection cannot recreate
+the private original graph, so this does not claim a fresh private-input audit.
+Original reference-audit graph commitments remain distinct from the later
+screening/report graph and from opaque private-byte commitments. An asserted
+`ready` flag in edition metadata has no authority. Historical views cannot reserve
+or publish another archive; narrowly verified existing-archive reconciliation and
+mirror retries retain their exact journal identity.
 
 Only an actually passing published entry creates an edition HTML route at
 `/research/editions/YYYY-MM-DD/` or an RSS/Atom item. Corrections to an edition
 use a new revision URL such as `YYYY-MM-DD.r2/`, preserving the original.
 `/research/feed.xml` and `/research/atom.xml` are valid empty feeds while there is
 no published edition. A prelaunch framework does not become a fake announcement.
+Published editions include the same complete native chapter routes beneath their
+edition URL. The authorized first launch may use its recorded non-Monday date;
+ordinary weekly editions retain the Monday rule.
 
 ## Assets and reuse
 
@@ -98,6 +122,29 @@ download URLs after the change. Six named search/agent user agents also received
 usable research HTML. These checks do not establish actual engine indexing or
 answer citations; those measurements remain unknown.
 
+Cloudflare configuration was rechecked through read-only API calls on 15 November
+2026 UTC. The public research HTTP rule remains enabled with `bic: false`,
+including native chapter routes. Bot fight mode and JS detection are off; AI
+bot, crawler, training, search, user and named-agent protections returned
+`disabled`. Managed robots is off, and the source robots file permits crawling
+and identifies the sitemap. No hosting setting was changed. These observations
+establish the inspected configuration, not verified crawler-IP traffic or
+Google/Bing indexing coverage.
+
+Google Search Console owner access was established on the same date. Its indexing
+report was last updated on 8 November, and the sitemap had last been read on
+5 November; those reports predate the current research infrastructure. The report
+URL was unknown to Google's index. A live inspection of the existing prelaunch
+report at 18:19 Pacific on 14 November returned "URL is available to Google" and
+"Page can be indexed", with one valid Breadcrumbs item. Google subsequently
+accepted an indexing request into its priority crawl queue and accepted a refresh
+of the existing `https://sciencetostartup.com/sitemap.xml` submission. These are
+accepted discovery requests, not proof of indexing, ranking or agent citations.
+Recheck the final published artifact separately; repeated requests do not improve
+the same URL's queue priority. Bing owner coverage and AI Performance remain
+unknown: a new Microsoft profile-permission consent was presented and was not
+accepted during this verification.
+
 Cloudflare's managed `workers.dev` preview host still requires an application
 user agent. Use a descriptive value such as
 `ScienceToStartup-ReleaseVerification/1.0 (+https://sciencetostartup.com/method/)`
@@ -109,7 +156,7 @@ for preview checks. No browser impersonation is needed.
 python3 -m unittest discover -s tests -p test_research_pages.py -v
 ```
 
-The tests cover truthful baseline routes, all 12 visible chapters, candidate
+The tests cover truthful baseline routes, all 12 complete native chapters, candidate
 leakage, historical dates, source/assertion anchors, approved-subject-only company
 profiles, escaping, forged edition gates, published feed routing, deterministic
 output, URL encoding, and compact search entries. Synthetic approval receipts
@@ -119,3 +166,6 @@ Browser inspection should use a scratch static build with real shared CSS and
 assets. Check desktop and 320 px widths, the report contents, candidate details,
 data/source anchors, and review links. The coordinator runs full-artifact link,
 accessibility, and shared-navigation checks after integration.
+The mobile policy covers all twelve reading views with three cold runs each.
+The report accessibility CI partition scans every chapter in all five browser
+projects, using the same default rules, severity gate and 30-second test budget.

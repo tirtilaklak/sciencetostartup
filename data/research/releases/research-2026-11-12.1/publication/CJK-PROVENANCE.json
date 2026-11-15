@@ -1,0 +1,53 @@
+{
+  "api_url": "https://api.github.com/repos/google/fonts/commits?path=ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf&per_page=1",
+  "commit": "2894aab31764f10f29c421bdfd2340d3b382d384",
+  "family": "ScienceToStartup CJK Subset",
+  "files": {
+    "NotoSansSC[wght].ttf": {
+      "bytes": 17772300,
+      "sha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+      "url": "https://raw.githubusercontent.com/google/fonts/2894aab31764f10f29c421bdfd2340d3b382d384/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf"
+    },
+    "OFL.txt": {
+      "bytes": 4388,
+      "sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9",
+      "url": "https://raw.githubusercontent.com/google/fonts/2894aab31764f10f29c421bdfd2340d3b382d384/ofl/notosanssc/OFL.txt"
+    }
+  },
+  "license": "SIL Open Font License 1.1",
+  "recipe": {
+    "command": "python3 prepare_subset.py 'NotoSansSC[wght].ttf' ScienceToStartupCJKSubset.ttf",
+    "fonttools_version": "4.60.1",
+    "network_required_for_pdf_rendering": false,
+    "preparation_only_dependency": "fonttools==4.60.1; not required for static builds or PDF rendering",
+    "python_source": "from fontTools.ttLib import TTFont\nfrom fontTools.varLib.instancer import instantiateVariableFont\nfrom fontTools import subset\nfrom pathlib import Path\nimport sys\nsource, output = map(Path, sys.argv[1:])\nfont = TTFont(source, recalcTimestamp=False)\ninstantiateVariableFont(font, {'wght': 400}, inplace=True)\noptions = subset.Options()\noptions.recalc_timestamp = False\nsubsetter = subset.Subsetter(options=options)\nsubsetter.populate(unicodes=[0x20, 0x4f1a, 0x5f0f, 0x5f55, 0x682a, 0x6982, 0x767b, 0x793e, 0x8981])\nsubsetter.subset(font)\nfor record in font['name'].names:\n    if record.nameID in {1, 2, 3, 4, 6, 16, 17}:\n        value = {1: 'ScienceToStartup CJK Subset', 2: 'Regular',\n                 3: 'ScienceToStartupCJKSubset-Regular-2',\n                 4: 'ScienceToStartup CJK Subset Regular',\n                 6: 'ScienceToStartupCJKSubset-Regular',\n                 16: 'ScienceToStartup CJK Subset', 17: 'Regular'}[record.nameID]\n        record.string = value.encode(record.getEncoding())\nfont.recalcTimestamp = False\nfont.save(output, reorderTables=True)\n",
+    "scope": "Existing login glyphs and six additional Han characters appearing in approved source titles; original source text and previous archived subset bytes unchanged.",
+    "subset_revision": 2
+  },
+  "rights": "This third-party font subset and its upstream license are excluded from ScienceToStartup CC BY 4.0 and MIT licensing. The font retains SIL OFL 1.1; the modified font family is renamed.",
+  "schema_version": 1,
+  "unicode_codepoints": [
+    "U+0020",
+    "U+4F1A",
+    "U+5F0F",
+    "U+5F55",
+    "U+682A",
+    "U+6982",
+    "U+767B",
+    "U+793E",
+    "U+8981"
+  ],
+  "upstream_family": "Noto Sans SC",
+  "vendored_files": {
+    "CJK-OFL.txt": {
+      "bytes": 4388,
+      "modified": false,
+      "sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9"
+    },
+    "ScienceToStartupCJKSubset.ttf": {
+      "bytes": 4060,
+      "modified": true,
+      "sha256": "01c1e6d9a0a1dce1f5f153fdfef26f4c5a4ccb75a6db3fbad562f859253ab2cf"
+    }
+  }
+}
