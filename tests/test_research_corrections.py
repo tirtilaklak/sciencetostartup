@@ -251,14 +251,16 @@ class PublicCorrectionTests(unittest.TestCase):
             self.assertTrue(all(row['status'] == 'accepted' for row in exported))
             source = json.loads((output / 'publication/source-context.json').read_text())
             self.assertEqual(source['corrections'], exported)
+            ledger_by_path = None
             for row in exported:
                 old = next((a for a in context['graph']['assertions'] if a['id'] == row['claim_id']), None)
                 if old is not None:
                     article = pages._assertion(context, old)
                 else:
                     destination = pages._evidence_url('assertion', row['claim_id'])
-                    article = next(body for path, _, _, body, _, _ in pages._ledger_pages(context)
-                                   if path == destination.split('#')[0])
+                    if ledger_by_path is None:
+                        ledger_by_path = {path: body for path, _, _, body, _, _ in pages._ledger_pages(context)}
+                    article = ledger_by_path[destination.split('#')[0]]
                 self.assertIn(pages._correction_url(row), article)
                 self.assertIn(pages._evidence_url('assertion', row['replacement_claim_id']), article)
 
