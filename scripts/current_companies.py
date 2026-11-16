@@ -213,7 +213,7 @@ def search_entries(entries, current_entries):
 
 
 def _link(url, label):
-    return '<a href="' + escape(url, quote=True) + '" rel="noopener noreferrer" target="_blank">' + escape(label) + '</a>'
+    return '<a class="ext" href="' + escape(url, quote=True) + '" rel="noopener noreferrer" target="_blank">' + escape(label) + '</a>'
 
 
 def current_company_html(entry, reviewed_on, compact=False):
