@@ -1,0 +1,13 @@
+{
+  "schema_version": "research-operating-status-v1",
+  "state": "held",
+  "observed_on": "2026-11-16T18:14:58Z",
+  "published_source_sha256": "87810e9745651d1370694be75b13d09f611ff748603bb00e9fa13b03591da0e3",
+  "current_release_id": "research-2026-11-12.1",
+  "current_edition_date": "2026-11-12",
+  "next_edition_date": "2026-11-16",
+  "reason_codes": [
+    "research_review",
+    "source_checks"
+  ]
+}
