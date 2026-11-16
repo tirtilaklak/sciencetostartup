@@ -194,7 +194,7 @@ class StaticPageTests(unittest.TestCase):
     def test_pages_stay_lean_without_app_script_or_dataset(self):
         for cid, text in self.pages.items():
             self.assertLess(len(text.encode()), PAGE_LIMIT, cid)
-            self.assertEqual([s.get("type") for s in PageFacts(text).scripts], ["application/ld+json"], cid)
+            self.assertEqual(PageFacts(text).scripts, [{"type": "application/ld+json"}, {"src": "/native-details.js", "defer": None}], cid)
             self.assertNotIn('id="research-data"', text, cid)
             structured = structured_data(text)
             self.assertEqual(structured["mainEntity"]["name"], self.companies[cid]["name"], cid)
@@ -214,7 +214,12 @@ class StaticPageTests(unittest.TestCase):
         for path in self.indexable_files():
             text = path.read_text()
             page = next(node for node in ld_nodes(text) if "breadcrumb" in node)
-            self.assertEqual([(i["name"], i["item"]) for i in page["breadcrumb"]["itemListElement"]], visible_crumbs(text), str(path.relative_to(self.dist)))
+            trail = [(i["name"], i["item"]) for i in page["breadcrumb"]["itemListElement"]]
+            if path.relative_to(self.dist).as_posix() == "method/index.html":
+                self.assertNotIn('<nav class="crumbs"', text)
+                self.assertEqual(trail, [("Overview", ORIGIN + "/"), ("About", ORIGIN + "/method/")])
+            else:
+                self.assertEqual(trail, visible_crumbs(text), str(path.relative_to(self.dist)))
 
     def test_legal_names_leave_out_research_notes(self):
         """schema.org legalName and the Legal entity row carry the registered name, not the notes after ';' (coordinator E7)."""
@@ -289,7 +294,9 @@ class StaticPageTests(unittest.TestCase):
         self.assertIn("The guide is a selected study of the market. It does not list every company.", (self.dist / "method/index.html").read_text())
         missing = re.search(r"Firms not yet profiled include ([^<]+)", text).group(1)
         self.assertEqual(missing, "Uber AI Solutions, TELUS Digital, CloudFactory, SuperAnnotate, Encord, Defined.ai, LXT and Welocalize.")
-        self.assertTrue(self.footer(self.dist / "companies/index.html").endswith("<p>Company names and logos belong to their owners and identify them here.</p></footer>"))
+        footer = self.footer(self.dist / "companies/index.html")
+        self.assertIn("Company names and logos belong to their owners and identify them here.", footer)
+        self.assertIn('<summary>Credits</summary>', footer)
 
     def test_company_pages_link_breadcrumbs_group_and_every_peer(self):
         labels = sp.read_js_object(ROOT / "web/editorial.js", "GROUP_LABELS")
@@ -313,7 +320,7 @@ class StaticPageTests(unittest.TestCase):
             icons = [l for l in facts.links if "icon" in str(l.get("rel"))]
             self.assertEqual([(l.get("rel"), l.get("href")) for l in icons], ICONS, label)
             self.assertEqual(icons[0].get("type"), "image/svg+xml", label)
-            self.assertIn(f'href="{ORIGIN}/explore/#corrections"', text, label)
+            self.assertIn(f'href="{ORIGIN}/method/#corrections"', text, label)
             # Publisher navigation follows the house style; exact third-party
             # source titles and scientific qualifications retain their wording.
             for chrome in re.findall(r'<(?:header|footer)\b.*?</(?:header|footer)>', text, re.S):
@@ -339,21 +346,20 @@ class StaticPageTests(unittest.TestCase):
     def test_footer_names_publisher_disclosure_and_corrections(self):
         about = re.search(r'<article[^>]*\bid="about"[^>]*>.*?</article>', (ROOT / "web/index.html").read_text(), re.S).group(0)
         disclosure = html.unescape(re.sub(r"<[^>]+>", "", re.search(r"<strong>Disclosure\.</strong>\s*(.*?)</p>", about, re.S).group(1))).replace("’", "'")
-        publisher = re.search(r"ScienceToStartup is published by [^.]+\.", about).group(0)
-        # The paid-work line is About text only, so footers carry the lab disclosure alone wherever the app places that line.
+        # Complete disclosures remain on About; every footer links directly there.
         self.assertEqual(sp.DISCLOSURE, " ".join(disclosure.replace(sp.WORK_DISCLOSURE, "").split()))
         # The owner's one-line disclosure, word for word, in both About texts (the app's About panel and /method/).
-        method_about = (self.dist / "method/index.html").read_text().split('<h2 id="about">', 1)[1].split("<h2", 1)[0]
+        method_about = re.search(r'<details[^>]*\bid="disclosures"[^>]*>.*?</details>', (self.dist / "method/index.html").read_text(), re.S).group(0)
         for label, text in (("web/index.html#about", about), ("method/index.html#about", method_about)):
             self.assertIn(sp.WORK_DISCLOSURE, " ".join(html.unescape(re.sub(r"<[^>]+>", " ", text)).replace("’", "'").split()), label)
             self.assertEqual(text.count("A.Team"), 1, label)
         for path in self.html_files():
             footer = self.footer(path)
             text = html.unescape(re.sub(r"<[^>]+>", "", footer))
-            self.assertIn(publisher, text, path)
-            self.assertIn(sp.DISCLOSURE, text, path)
-            self.assertIn(f'<a href="{ORIGIN}/explore/#venture">overview page</a>', footer, path)
-            self.assertIn(f'<a href="{ORIGIN}/explore/#corrections">Request a correction</a>', footer, path)
+            self.assertIn(sp.PUBLISHER_NAME, text, path)
+            self.assertIn(f'<a href="{ORIGIN}/method/#disclosures">Disclosures</a>', footer, path)
+            self.assertIn(f'<a href="{ORIGIN}/method/#corrections">Corrections</a>', footer, path)
+        self.assertIn(sp.DISCLOSURE, html.unescape(re.sub(r"<[^>]+>", "", method_about)))
 
     def test_head_tags_make_every_page_share_ready(self):
         for path in self.indexable_files() + [self.dist / "404.html"]:
@@ -454,12 +460,12 @@ class StaticPageTests(unittest.TestCase):
             for cell in re.findall(r"<td\b[^>]*>", path.read_text()): self.assertIn("data-label=", cell, str(path.relative_to(self.dist)))
 
     def test_visits_are_counted_only_by_cloudflare(self):
-        """Cloudflare Web Analytics counts visits at the edge. Both About texts say so in a visible sentence,
+        """Cloudflare Web Analytics counts visits at the edge. Both About disclosures say so explicitly,
         and no built file carries the GoatCounter seam it replaced."""
         about = re.search(r'<article[^>]*\bid="about"[^>]*>.*?</article>', (ROOT / "web/index.html").read_text(), re.S).group(0)
-        method_about = (self.dist / "method/index.html").read_text().split('<h2 id="about">', 1)[1].split("<h2", 1)[0]
+        method_about = re.search(r'<details\b[^>]*\bid="disclosures"[^>]*>.*?</details>', (self.dist / "method/index.html").read_text(), re.S).group(0)
         self.assertEqual(sp.VISITS_NOTE, "Visits are counted by Cloudflare Web Analytics, which sets no cookies.")
-        for label, text in (("web/index.html#about", about), ("method/index.html#about", method_about)):
+        for label, text in (("web/index.html#about", about), ("method/index.html#disclosures", method_about)):
             personal = re.search(r"<p><strong>Personal data and removal\.</strong>(.*?)</p>", text, re.S).group(1)
             self.assertEqual(plain(personal).count(sp.VISITS_NOTE), 1, label)
             self.assertNotIn("hidden", personal, label)
@@ -760,7 +766,7 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(facts.title, f"Paid AI training work: {len(paid)} sourced routes{sp.SUFFIX}")
         self.assertTrue(facts.meta["description"].startswith(f"{named} named listings and {programs} expert networks and programs at {paid_companies} AI data companies,"), facts.meta["description"])
         lede = plain(re.search(r'<p class="lede">.*?</p>', work).group(0))
-        self.assertEqual(lede, "Roles, projects and expert networks, with published pay and original sources.")
+        self.assertEqual(lede, "Roles and projects, with published pay and sources.")
         self.assertIn(f'{named} named listings <span>·</span> {programs} networks and programs <span>·</span> {paid_companies} companies', work)
         self.assertIn(f'{len(self.routes)} records at {all_companies} companies.', work)
         self.assertIn(f"See {len(paid)} paid work routes</a>", (self.dist / "companies/index.html").read_text())
@@ -786,13 +792,13 @@ class StaticPageTests(unittest.TestCase):
             # Field names are not repeated: "Pay not listed", never "Pay: Pay not listed" (coordinator E5).
             self.assertNotRegex(section, r"Pay: Pay|Where: Location not listed", cid)
             if not own: continue
-            # The count names paid work listings only, and the pay sentence appears only when there is one (B2).
+            # Availability stays explicit; the disclosure summary carries the count.
             paid = sum(1 for r in own if sp.work_primary(r))
             lead = plain(re.search(r"<p>(.*?)</p>", section).group(1))
             name = self.companies[cid]["name"]
-            if paid: self.assertTrue(lead.startswith(f"{paid} paid work route{'s' if paid != 1 else ''} at {name}. Pay is quoted"), (cid, lead))
-            else: self.assertEqual(lead, f"No confirmed paid listing for {name}. The groups below show what we found.", cid)
-        self.assertIn("No confirmed paid listing for Quesma.", self.pages["quesma"])
+            if paid: self.assertEqual(lead, "Pay and availability may have changed. Check the current terms on the company’s website.", cid)
+            else: self.assertEqual(lead, "No confirmed paid listing. Career pages and past records appear below.", cid)
+        self.assertIn("No confirmed paid listing.", self.pages["quesma"])
         self.assertIn("Pay not listed. Where:", self.pages["turing"] + self.pages["prolific"])
 
     def test_method_page_describes_the_dataset_and_its_license(self):

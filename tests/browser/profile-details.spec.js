@@ -13,7 +13,7 @@ test('company and work browsing keep the detailed renderer factory unloaded', as
   await expect(page.locator('[data-company-card]')).toHaveCount(39);
   expect(await page.evaluate(() => window.ScienceProfileDetails)).toBeUndefined();
   expect(await page.evaluate(() => window.ScienceDetailViews)).toBeUndefined();
-  await page.locator('.topbar a[data-nav="work"]').click();
+  await page.goto('/explore/#work');
   await expect(page.locator('#work-cards')).toContainText('Named listings');
   await page.locator('#work-search').fill('Python');
   await expect(page.locator('#work-count')).not.toContainText('Loading');

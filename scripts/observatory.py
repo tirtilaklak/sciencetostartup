@@ -881,7 +881,7 @@ def build(data, destination):
     if health is not None:
         (destination / "business-health.json").write_text(json.dumps(health, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
     (destination / "profile-content.json").write_text(json.dumps(profile_content, indent=2, ensure_ascii=False) + "\n")
-    for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js", "page-layout.css", "companies-page.css", "companies-page.js", "work-page.css", "work-page.js", "method-page.css"):
+    for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js", "page-layout.css", "native-details.js", "companies-page.css", "companies-page.js", "work-page.css", "work-page.js", "method-page.css", "company-profile.css"):
         path = ROOT / "web" / name
         if path.exists():
             shutil.copy2(path, destination / name)

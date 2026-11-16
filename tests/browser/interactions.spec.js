@@ -192,7 +192,9 @@ test('current company CSV uses the same financial observation as the visible car
   await expect(card).toContainText('Whole company');
   const selected = await page.evaluate(() => currentCompanyResult('taskus'));
   expect(selected).toMatchObject({ value: 615121000, period: 'H1 2026', scope: 'company' });
-  await page.locator('a[href="#downloads"]').last().click();
+  // The compact site footer opens native data; keep this export check in the advanced guide.
+  await page.goto('/explore/#downloads');
+  await expect(page.locator('#search')).toHaveValue('TaskUs');
   await expect(page.locator('#download-csv')).toBeVisible();
   const waiting = page.waitForEvent('download');
   await page.locator('#download-csv').click();
@@ -248,9 +250,9 @@ test('all work criteria survive reload and Back/Forward', async ({ page }) => {
     await expect(page.locator('#' + id)).toHaveValue(value);
   }
   await expect(page.locator('#work-count')).toHaveText(count);
-  await page.locator('nav[aria-label="Main"] a[data-nav="companies"]').click();
+  await page.goto('/explore/#companies');
   await expect(page.locator('#companies-view')).toBeVisible();
-  await page.locator('nav[aria-label="Main"] a[data-nav="work"]').click();
+  await page.goto('/explore/#work');
   await expect(page.locator('#work-search')).toHaveValue('');
   await page.goBack();
   await expect(page.locator('#companies-view')).toBeVisible();
@@ -463,9 +465,11 @@ test('slow stale company response cannot replace the new route', async ({ page }
   const gate = new Promise(resolve => { release = resolve; });
   await page.route('**/company-mercor*.json', async route => { await gate; await route.continue(); });
   await ready(page, '#work');
+  const detailRequest = page.waitForRequest('**/company-mercor*.json');
   await page.evaluate(() => { location.hash = '#company/mercor/work'; });
   await expect(page.locator('html')).toHaveAttribute('data-view-state', 'loading');
-  await page.locator('nav[aria-label="Main"] a[data-nav="companies"]').click();
+  await detailRequest;
+  await page.goto('/explore/#companies');
   release();
   await expect(page.locator('#companies-view')).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
@@ -519,7 +523,8 @@ test('a delayed financial module can finish off-route without restoring a stale 
   await ready(page, '#work');
   await page.evaluate(() => { location.hash = '#company/mercor/work'; });
   await expect(page.locator('html')).toHaveAttribute('data-view-state', 'loading');
-  await page.locator('nav[aria-label="Main"] a[data-nav="companies"]').click();
+  await expect(page.locator('script[data-presentation-module="business-health"]')).toHaveCount(1);
+  await page.goto('/explore/#companies');
   release();
   await page.waitForFunction(() => window.APP_HEALTH_READY === window.APP_BUILD_ID);
   await expect(page.locator('#companies-view')).toBeVisible();

@@ -1,0 +1,77 @@
+/* A company dossier: a short overview, then the underlying records. */
+main>.company-dossier{max-width:960px}
+main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:0}
+.company-hero{margin:0 0 28px}
+.company-name{display:flex;align-items:center;gap:24px;min-width:0}
+.company-name h1{margin:0!important;min-width:0;overflow-wrap:anywhere}
+.company-logo{display:flex;align-items:center;justify-content:center;flex:0 0 112px;width:112px;height:64px;padding:8px;border:1px solid var(--border);border-radius:4px;box-sizing:border-box;background:#fff}
+.company-logo img{display:block;max-width:100%;height:48px;object-fit:contain}
+.company-logo-dark{background:var(--ink);border-color:var(--ink)}
+.company-monogram{font-size:24px;font-weight:600;color:var(--green);background:transparent}
+.company-hero .lede{max-width:720px;margin:18px 0 10px;font-size:18px;line-height:1.6}
+.company-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;margin:0;font-size:14px}
+.company-actions a{display:inline-flex;align-items:center;gap:8px;min-height:44px;text-underline-offset:4px}
+.company-actions a>span{color:var(--muted);font-size:12px}
+.company-key-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;margin:0 0 28px;padding:24px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.company-key-fact{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
+.company-key-fact:only-child{grid-column:1/-1}
+.company-key-fact+.company-key-fact{border-left:1px solid var(--border);padding-left:32px}
+.company-fact-label{font-size:12px;line-height:1.5;color:var(--muted)}
+.company-key-fact>strong,.company-current-fact .selected-value{font-size:30px;line-height:1.2;font-weight:500;letter-spacing:-.7px;overflow-wrap:anywhere}
+.company-fact-meta,.company-fact-source,.company-current-fact .sub{font-size:12px;line-height:1.7;color:var(--muted)}
+.company-fact-status{font-size:11px;line-height:1.5;color:var(--amber,#795418)}
+.company-current-fact .selected-evidence{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin:0;padding:0;border:0}
+.company-current-fact .selected-evidence .sub{margin:0}
+.company-unreported>strong{font-size:22px;line-height:1.3;letter-spacing:-.3px}
+.company-notice{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;padding:0 0 0 14px;margin:0 0 24px;border-left:2px solid var(--amber,#795418);font-size:13px;line-height:1.6}
+.company-notice>span{color:var(--muted);font-size:12px}
+.company-record{border:0}
+.company-fold{margin:0;padding:0;border:0;border-bottom:1px solid var(--border);border-radius:0;background:transparent}
+.company-fold>summary{display:flex;align-items:center;gap:16px;min-height:64px;padding:16px 0;list-style:none;box-sizing:border-box;font-size:17px;line-height:1.4}
+.company-fold>summary::-webkit-details-marker{display:none}
+.company-fold>summary>small{margin-left:auto;font-size:12px;color:var(--muted);text-align:right;line-height:1.6}
+.company-fold>summary::after{content:'+';flex:none;font-size:22px;font-weight:400;color:var(--green)}
+.company-fold[open]>summary::after{content:'−'}
+.company-fold-body{padding:0 0 28px;min-width:0}
+.company-fold-body>h2:first-child{margin-top:4px}
+.company-fold-body :is(h2,h3){font-family:var(--sans);letter-spacing:-.02em}
+.company-fold-body h2{font-size:23px;margin:24px 0 16px}
+.company-fold-body h3{font-size:17px;margin:24px 0 12px}
+.company-fold-body>p,.company-fold-body>ul{font-size:14px;line-height:1.7}
+.company-fold-body .facts{margin:16px 0 24px;font-size:14px}
+.company-fold-body .selected-evidence{margin:8px 0 28px;padding:0 0 20px;border-top:0}
+.company-fold-body .selected-evidence h2{margin-top:0;font-size:17px}
+.company-fold-body .listings>li{font-size:14px;line-height:1.7}
+.company-fold-body .note{font-size:13px;margin:18px 0}
+.company-fold-body .note p{font-size:13px}
+.static-page .company-fold .r-assertion{content-visibility:visible;contain-intrinsic-size:none}
+.company-source-links{display:flex;flex-wrap:wrap;gap:8px 24px;list-style:none;padding:0;margin:16px 0}
+.company-source-links a,.company-record-links a{display:inline-flex;align-items:center;min-height:44px}
+.company-record-links{display:flex;flex-wrap:wrap;gap:8px 24px;margin:16px 0}
+.company-logo-source{font-size:12px!important;color:var(--muted)}
+@media(max-width:600px){
+ .company-hero{margin-bottom:24px}.company-name{gap:16px}
+ .company-logo{flex-basis:88px;width:88px;height:56px;padding:7px}.company-logo img{height:40px}
+ .company-hero .lede{font-size:16px;margin-top:16px}.company-actions{font-size:13px;gap:8px 20px}
+ .company-key-facts{gap:22px;padding:20px 0;margin-bottom:24px}
+ .company-key-fact+.company-key-fact{padding-left:20px}
+ .company-key-fact>strong,.company-current-fact .selected-value{font-size:26px}.company-unreported>strong{font-size:18px}
+ .company-fact-label,.company-fact-meta,.company-fact-source,.company-current-fact .sub{font-size:11px}
+ .company-fold>summary{min-height:64px;font-size:16px;gap:12px}.company-fold>summary>small{max-width:45%;font-size:11px}
+ .company-notice{font-size:12px}.company-fold-body h2{font-size:22px}
+}
+@media(max-width:380px){
+ .company-key-facts{grid-template-columns:1fr;gap:18px}.company-key-fact+.company-key-fact{border-left:0;border-top:1px solid var(--border);padding:18px 0 0}
+}
+
+/* Research-only companies use the same dossier, with the complete evidence inside. */
+.research-company-dossier{--r-paper:var(--soft);--r-rule:var(--border);--r-accent:var(--green);--r-quiet:var(--muted);max-width:960px;font-family:var(--sans);overflow-wrap:anywhere}
+.research-company-dossier .company-research-snapshot{margin:18px 0 4px;color:var(--muted);font-size:14px;line-height:1.6}
+.research-company-dossier .company-record{border-top:1px solid var(--border)}
+.research-company-dossier .company-fold>summary::after{margin-left:auto}
+.research-company-dossier .company-fold-body .r-record-id{font-size:12px}
+.research-company-dossier .company-fold-body .r-facts{grid-template-columns:110px minmax(0,1fr)}
+.research-company-dossier .company-fold-body :is(h2,h3){padding:0;border:0}
+.research-company-dossier .r-assertion-text{font-family:var(--sans);font-size:15px;line-height:1.7}
+.research-company-dossier .company-fold-body .r-assertion:first-of-type{padding-top:8px}
+@media(max-width:600px){.research-company-dossier .company-research-snapshot{font-size:13px}.research-company-dossier .company-fold-body .r-facts{grid-template-columns:84px minmax(0,1fr);gap:10px 16px}}

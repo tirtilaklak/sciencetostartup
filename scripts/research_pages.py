@@ -325,15 +325,18 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
         structured = {"@context": "https://schema.org", "@graph": [structured, dataset]}
     research = SimpleNamespace(as_of=_day(context["graph"]["as_of"]),
                                data={"dataset_version": context["graph"].get("canonical_dataset_version")})
+    company_page = path.startswith('/company/')
     text = sp.document(research, sp.truncate(title + sp.SUFFIX, sp.TITLE_LIMIT), sp.truncate(description),
                        sp.ORIGIN + path, '<div class="research wide">' + crumbs_html
-                       + (_nav(path) if path != "/research/" else "") + body + "</div>",
-                       structured=structured, current="research")
+                       + (_nav(path) if path != "/research/" and not company_page else "") + body + "</div>",
+                       structured=structured, current="companies" if company_page else "research")
     extra = ('<link rel="stylesheet" href="/research.css">\n'
              '<link rel="alternate" type="application/rss+xml" title="Published research editions" href="/research/feed.xml">\n'
              '<link rel="alternate" type="application/atom+xml" title="Published research editions" href="/research/atom.xml">\n'
              '<link rel="alternate" type="application/rss+xml" title="Research corrections" href="/research/corrections/feed.xml">\n'
              '<link rel="alternate" type="application/atom+xml" title="Research corrections" href="/research/corrections/atom.xml">\n')
+    if company_page:
+        extra += '<link rel="stylesheet" href="/company-profile.css">\n'
     if page_type in {"Book", "Chapter"}:
         base = path.split('chapters/', 1)[0] if page_type == 'Chapter' else path
         current = next(index for index, section in enumerate(context['report']['sections']) if _reader_path(section, base) == path)
@@ -405,7 +408,7 @@ def _hub(context, editions=()):
     archive_links = ('<section class="r-section"><h2>Published editions</h2><ul class="r-entity-list">'
                      + ''.join(f'<li>{_link(path, snapshot["report"]["release_id"])} · {_date(snapshot["report"]["updated_on"])}</li>'
                                for path, snapshot in editions) + '</ul></section>') if editions else ''
-    return ('<header class="r-hero"><div><p class="r-kicker">Research</p>'
+    return ('<header class="r-hero"><div>'
             '<h1>Research on<br>AI data.</h1><p class="r-lede">A guide to the suppliers, papers and datasets behind AI training. '
             'Every finding links to its sources.</p>'
             f'<p class="r-status">{_status(context)}</p>'
@@ -1006,7 +1009,54 @@ def _index(context, category):
                + _link(REPORT_PATH, 'Read the evidence standard →', 'r-text-link') + '</section>'))
 
 
+def _company_detail(context, entity):
+    """A compact company view over the complete, unchanged research records."""
+    approved, historical = _assertions(context, entity), _assertions(context, entity, ("historical",))
+    linked = [a for a in context["graph"]["assertions"] if entity["id"] in {a.get("subject_id"), a.get("object_id")}]
+    _, _, sources = _ledger_records(context)
+    source_ids = sorted({item["source_id"] for a in linked for item in a.get("evidence", [])})
+    identifiers = "".join(f'<dt>{sp.escape(key)}</dt><dd>{sp.escape(value)}</dd>' for key, value in sorted(entity.get("identifiers", {}).items()))
+    taxonomy = "".join(f'<dt>{sp.escape(key.replace("_", " ").capitalize())}</dt><dd>{sp.escape(", ".join(values))}</dd>'
+                       for key, values in sorted(entity.get("taxonomy", {}).items()) if values)
+    website = _safe_url(entity.get("identifiers", {}).get("website"))
+    body = ['<article class="company-dossier research-company-dossier"><header class="company-hero">'
+            '<div class="company-name"><h1>' + sp.escape(entity["name"]) + '</h1></div>'
+            '<p class="company-research-snapshot">' + sp.plural(len(approved), "approved finding")
+            + ' · ' + sp.plural(len(source_ids), "source record") + '</p>'
+            + ('<p class="company-actions">' + _link(website, 'Website') + '</p>' if website else '')
+            + '</header><div class="company-record">',
+            '<details class="company-fold" id="company-scope"><summary>Company and review scope</summary>'
+            '<div class="company-fold-body"><p class="r-kicker">' + sp.escape(_label(entity)) + '</p>'
+            '<p class="r-record-id">' + sp.escape(entity["id"]) + '</p>' + _meta(context)
+            + '<h2>Evidence & scope</h2><p>' + sp.escape(entity.get("disposition_reason"))
+            + '</p><dl class="r-facts"><dt>Review depth</dt><dd>'
+            + sp.escape(entity.get("review_depth", "").replace("_", " "))
+            + '</dd><dt>Disposition</dt><dd>' + sp.escape(entity.get("disposition")) + '</dd>'
+            + identifiers + '</dl><h2>Read this record carefully</h2>'
+            '<p>Approval applies to a specific assertion and its qualifications. It does not imply provider endorsement, '
+            'commercial quality, or a contribution to another artifact.</p>'
+            + ('<h3>Recorded taxonomy</h3><p class="r-meta">Candidate taxonomy remains provisional.</p><dl class="r-facts">' + taxonomy + '</dl>' if taxonomy else '')
+            + _link('/review/', 'Submit a source-backed correction →', 'r-text-link') + '</div></details>',
+            '<details class="company-fold" id="approved-findings"><summary>Findings</summary>'
+            '<div class="company-fold-body"><h2>Approved findings</h2>'
+            + ("".join(_assertion(context, a) for a in approved) if approved else
+               '<p class="r-callout">No approved assertions are available for this record. Source metadata and candidate proposals do not establish a finding.</p>')
+            + '</div></details>']
+    if historical:
+        body.append('<details class="company-fold" id="company-history"><summary>Historical evidence</summary>'
+                    '<div class="company-fold-body"><h2>Historical evidence</h2>'
+                    + "".join(_assertion(context, a) for a in historical) + '</div></details>')
+    body.append('<details class="company-fold" id="company-sources"><summary>Sources</summary>'
+                '<div class="company-fold-body"><h2>Connected evidence</h2>'
+                + ('<ul class="r-evidence-links">' + "".join('<li>' + _link(_evidence_url("source", sid), ("Source metadata withheld · " + sid) if sources.get(sid, {}).get("_withheld") else sources.get(sid, {}).get("title", sid)) + '</li>' for sid in source_ids) + '</ul>'
+                   if source_ids else '<p>No source records are attached yet.</p>')
+                + '</div></details></div></article>')
+    return "".join(body)
+
+
 def _detail(context, entity):
+    if not entity.get('legacy_id') and entity_url(entity, context).startswith('/company/'):
+        return _company_detail(context, entity)
     approved, historical = _assertions(context, entity), _assertions(context, entity, ("historical",))
     linked = [a for a in context["graph"]["assertions"] if entity["id"] in {a.get("subject_id"), a.get("object_id")}]
     _, _, sources = _ledger_records(context)
@@ -1277,13 +1327,14 @@ def write_company_supplements(output, context):
             update(node)
             return match.group(1) + sp.json_ld(node) + match.group(3)
         text = re.sub(r'(<script\b[^>]*type="application/ld\+json"[^>]*>)(.*?)(</script>)', update_page_date, original, flags=re.S)
-        section = ('<!-- research-supplement:start --><section class="research r-company-supplement" id="new-research-evidence">'
+        section = ('<!-- research-supplement:start --><details class="research r-company-supplement company-fold" id="new-research-evidence">'
+                   '<summary><span>Research updates</span><small>' + str(len(assertions)) + ' approved records</small></summary><div class="company-fold-body">'
                    '<h2>New research evidence</h2><p class="r-meta">Research evidence snapshot '
                    + _date(context['graph']['as_of']) + ' · Added assessment ' + _date(context['report']['updated_on']) + '</p>'
                    '<p>These approved assertions supplement the historical profile. Each retains its own evidence date, scope and qualifications. '
                    'They do not establish commercial quality or an unstated supplier contribution.</p>'
                    + ''.join(_assertion(context, assertion, compact=True) for assertion in assertions)
-                   + '</section><!-- research-supplement:end -->')
+                   + '</div></details><!-- research-supplement:end -->')
         text = re.sub(r'<!-- research-supplement:start -->.*?<!-- research-supplement:end -->', '', text, flags=re.S)
         text = text.replace('</main>', section + '</main>', 1)
         if '<link rel="stylesheet" href="/research.css">' not in text:
