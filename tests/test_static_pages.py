@@ -138,6 +138,8 @@ class StaticPageTests(unittest.TestCase):
         cls.routes = json.loads((ROOT / "data/work-routes.json").read_text())["routes"]
         cls.events = json.loads((ROOT / "data/company-events.json").read_text())
         cls.editorial = {e["company_id"]: e for e in json.loads((ROOT / "data/editorial.json").read_text())["entries"]}
+        current_path = ROOT / "data/current-companies.json"
+        cls.current_companies = json.loads(current_path.read_text()) if current_path.exists() else {"entries": []}
         profiles = json.loads((ROOT / "data/profile-content.json").read_text())["entries"]
         overlay = ROOT / "data/profile-afterquery.json"
         if overlay.exists(): profiles = [e for e in profiles if e["company_id"] != "afterquery"] + [json.loads(overlay.read_text())]
@@ -253,6 +255,7 @@ class StaticPageTests(unittest.TestCase):
         health = json.loads((ROOT / "data/business-health.json").read_text())
         selected_financial = [sp.selected_business_observation(health, cid) or {} for cid in self.companies]
         newest = max(sp.SITE_REVISED, self.data["meta"]["as_of"], reviewed,
+                     self.current_companies.get("reviewed_on") or "",
                      *(e.get("reviewed_on") or "" for e in self.editorial.values()),
                      *(d for r in self.routes for d in sp.route_dates(r) if d),
                      *((e.get("current_facts") or {}).get("reviewed_on") or "" for e in profiles),
@@ -307,14 +310,16 @@ class StaticPageTests(unittest.TestCase):
             self.assertIn(f'<h2 id="{slug}">{labels.get(group, group).replace("&", "&amp;")}</h2>', text)
             self.assertIn(f'<section class="directory-section" data-group="{slug}">', text)
         nonprofits = sum(1 for e in self.editorial.values() if e["primary_offering"] == "Nonprofit research")
-        self.assertIn(f"{sp.count_word(nonprofits)} of the {len(self.companies)} are nonprofit research groups.", text)
+        total = len(self.companies) + len(self.current_companies["entries"])
+        self.assertIn(f"{sp.count_word(nonprofits)} of the {total} are nonprofit research groups.", text)
 
     def test_index_states_coverage_limits(self):
         text = (self.dist / "companies/index.html").read_text()
         self.assertIn("The guide is a selected study of the market. It does not list every company.", text)
         self.assertIn("The guide is a selected study of the market. It does not list every company.", (self.dist / "method/index.html").read_text())
-        missing = re.search(r"Firms not yet profiled include ([^<]+)", text).group(1)
-        self.assertEqual(missing, "Uber AI Solutions, TELUS Digital, CloudFactory, SuperAnnotate, Encord, Defined.ai, LXT and Welocalize.")
+        missing = re.search(r"Firms not yet listed in this directory include ([^<]+)", text).group(1)
+        remaining = [name for name in sp.NOT_YET_PROFILED if not any(name.casefold() in entry["name"].casefold().split(" / ") for entry in self.current_companies["entries"])]
+        self.assertEqual(missing, sp.join_words(remaining) + ".")
         footer = self.footer(self.dist / "companies/index.html")
         self.assertIn("Company names and logos belong to their owners and identify them here.", footer)
         self.assertIn('<summary>Credits</summary>', footer)

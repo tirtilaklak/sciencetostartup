@@ -40,3 +40,10 @@ ul.index-list.directory-grid>li{padding:20px 0;border:0;border-top:1px solid var
 @media(max-width:700px){.directory-intro{padding-bottom:20px}.directory-filters{grid-template-columns:minmax(0,1fr) auto;padding:16px 0;gap:12px}.directory-filters label:first-child{grid-column:1/-1}.directory-groups{overflow-x:auto;padding-bottom:8px}.directory-groups ul.chips{flex-wrap:nowrap;width:max-content}.directory-groups a{white-space:nowrap}ul.index-list.directory-grid{grid-template-columns:1fr;gap:0}ul.index-list.directory-grid>li{padding:18px 0}.directory-section{margin-top:32px}.directory-section-heading h2{font-size:1.2rem}.directory-section-heading>span{font-size:.75rem}}
 
 .company-current-facts{margin:12px 0;font-size:14px}.company-current-facts>summary{cursor:pointer;min-height:44px;padding:10px 0}.current-fact-list{margin:0}.current-fact-list>div{padding:8px 0;border-top:1px solid var(--border)}.current-fact-list dt{font-weight:600}.current-fact-list dd{margin:4px 0 0;overflow-wrap:anywhere}
+.directory-company .company-current-addition{font-size:.9375rem;line-height:1.6;overflow-wrap:anywhere}
+.directory-company .company-research-snapshot,.directory-company .company-wikipedia-attribution{font-size:.75rem;line-height:1.7;color:var(--muted)}
+.directory-company .company-wikipedia-description{margin:12px 0;padding:0;border:0}
+.directory-company .company-wikipedia-description p{margin:0}
+.directory-company .company-current-addition ul{padding-left:20px;margin:8px 0}
+.directory-company .company-current-addition ul li{padding:0;border:0}
+.directory-company .company-current-facts p{font-size:.8125rem}
