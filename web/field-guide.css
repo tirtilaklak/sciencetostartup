@@ -333,3 +333,8 @@ h1,h2,h3,h4{font-family:var(--fg-sans);color:var(--ink)}
 .site-footer .footer-note>summary{min-height:44px;align-content:center;cursor:pointer;font-size:inherit}
 .site-footer .footer-note p{max-width:78ch;font-size:inherit;line-height:1.6}
 @media(max-width:700px){.site-footer .footer-line{display:block}.site-footer .footer-line nav{gap:0 16px}}
+
+/* Five destinations remain visible and wrap naturally on small screens. */
+@media(max-width:700px){.site-header nav[aria-label=Main],.static-page .site-header .site-nav,.topbar nav[aria-label=Main]{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:0 18px;height:auto;min-height:48px;overflow:visible}.site-header nav[aria-label=Main] a,.static-page .site-header .site-nav a,.topbar nav[aria-label=Main] a{font-size:13px;min-height:44px;white-space:nowrap}}
+@media(max-width:700px){.site-header nav[aria-label=Main],.static-page .site-header .site-nav,.topbar nav[aria-label=Main]{gap:0 12px}}
+@media(max-width:400px){.site-header nav[aria-label=Main],.static-page .site-header .site-nav,.topbar nav[aria-label=Main]{justify-content:space-between;gap:0 5px}.site-header nav[aria-label=Main] a,.static-page .site-header .site-nav a,.topbar nav[aria-label=Main] a{font-size:12px}}

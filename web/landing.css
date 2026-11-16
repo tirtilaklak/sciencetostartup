@@ -98,3 +98,5 @@
 }
 @media(max-width:359px){.landing-page .hero-actions{grid-template-columns:minmax(0,1fr)}.landing-page .hero h1{font-size:2.25rem}.hero .eyebrow{font-size:.6875rem}.landing-page .wordmark{font-size:19px}}
 @media(prefers-reduced-motion:reduce){.hero-actions .primary-link{transition:none}}
+@media(max-width:760px){.landing-page .site-header nav{display:flex;flex-wrap:wrap;gap:0 12px}}
+@media(max-width:400px){.landing-page .site-header nav{justify-content:space-between;gap:0 5px}.landing-page .site-header nav a{font-size:12px}}

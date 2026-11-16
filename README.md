@@ -3,6 +3,11 @@
 ScienceToStartup is a static, evidence-linked field guide to AI data organizations.
 The current public site is https://sciencetostartup.com.
 
+`/daily/` is the daily reading list for RLHF, data, evaluation and company news.
+Dated snapshots begin on 2026-11-16, with topic/type/search filters, source dates,
+expandable findings and limits, and links to original sources. The daily local
+automation targets 08:00 Pacific. See [daily scan operations](docs/daily-scan.md).
+
 ## Research publication
 
 The new `/research/` hub connects readable paper, dataset, benchmark and workflow

@@ -873,7 +873,7 @@ STYLE = (
     "@media(forced-colors:active){.ext::after{background:LinkText}}"
 )
 RIGHT_ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg>'
-NAV = (("research", "Research", "/research/"), ("companies", "Companies", "/companies/"), ("work", "Paid work", "/work/"), ("about", "About", "/method/#about"))
+NAV = (("daily", "Daily scan", "/daily/"), ("research", "Research", "/research/"), ("companies", "Companies", "/companies/"), ("work", "Paid work", "/work/"), ("about", "About", "/method/#about"))
 
 
 def json_ld(payload):

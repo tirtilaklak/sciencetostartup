@@ -881,7 +881,7 @@ def build(data, destination):
     if health is not None:
         (destination / "business-health.json").write_text(json.dumps(health, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
     (destination / "profile-content.json").write_text(json.dumps(profile_content, indent=2, ensure_ascii=False) + "\n")
-    for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js", "page-layout.css", "native-details.js", "companies-page.css", "companies-page.js", "work-page.css", "work-page.js", "method-page.css", "company-profile.css"):
+    for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js", "page-layout.css", "native-details.js", "companies-page.css", "companies-page.js", "work-page.css", "work-page.js", "method-page.css", "company-profile.css", "daily-scan.css", "daily-scan.js"):
         path = ROOT / "web" / name
         if path.exists():
             shutil.copy2(path, destination / name)
@@ -925,6 +925,8 @@ def build(data, destination):
         (destination / "sitemap.xml").write_text(render_sitemap(entries), encoding="utf-8")
         (destination / "public-identity.json").write_text(json.dumps(research_context["identity"], indent=2, ensure_ascii=False) + "\n")
         (destination / "CITATION.cff").write_bytes((destination / "publication/current-CITATION.cff").read_bytes())
+    from daily_scan import write_daily_scan
+    write_daily_scan(destination)
     from presentation import retain_runtime_generations
     retain_runtime_generations(ROOT, destination)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}

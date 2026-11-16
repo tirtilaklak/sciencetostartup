@@ -252,7 +252,8 @@ class StaticPageTests(unittest.TestCase):
         newest = max(sp.SITE_REVISED, self.data["meta"]["as_of"], reviewed, *(e.get("reviewed_on") or "" for e in self.editorial.values()), *(d for r in self.routes for d in sp.route_dates(r) if d))
         from research_report import build_context
         context = build_context(ROOT)
-        newest = max(newest, context['report']['updated_on'], context['graph']['as_of'][:10])
+        from daily_scan import load_editions
+        newest = max(newest, context['report']['updated_on'], context['graph']['as_of'][:10], *(row['date'] for row in load_editions(ROOT)))
         lastmods = {}
         for url in urls:
             loc = url.find(NAMESPACE + "loc").text

@@ -1,0 +1,490 @@
+{
+  "schema_version": "1.0.0",
+  "date": "2026-11-16",
+  "timezone": "America/Los_Angeles",
+  "compiled_at": "2026-11-16T18:47:33.890449+00:00",
+  "selection": "18 recent papers, datasets, releases and company announcements; source dates retained",
+  "workers": {
+    "requested_model": "gpt-6.1-sol",
+    "requested_reasoning_effort": "ultra",
+    "count": 3,
+    "roles": [
+      "RLHF and post-training papers",
+      "Data, datasets and evaluation",
+      "Company news"
+    ]
+  },
+  "items": [
+    {
+      "id": "port",
+      "title": "PORT: Preference Optimization via Robust Token-Level Reweighting",
+      "kind": "Paper",
+      "topics": [
+        "RLHF"
+      ],
+      "publisher": "PORT authors",
+      "published_on": "2026-11-09",
+      "focus": "Batch-CDF token reweighting; noisy preference labels",
+      "finding": "Reported robustness gains; conditional gradient-bias bound",
+      "caveat": "Small-batch sensitivity; sufficient theory assumptions; multi-turn extension untested",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.12763",
+          "label": "Paper & submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.12763v1",
+          "label": "Full paper"
+        },
+        {
+          "url": "https://github.com/osu-srml/PORT",
+          "label": "Code"
+        }
+      ],
+      "date_basis": "arXiv v1 submission (UTC)",
+      "read_scope": "Submission history, methods and limitations; code not executed; results not reproduced",
+      "source_timestamp": "2026-11-09T17:38:16Z"
+    },
+    {
+      "id": "vepo",
+      "title": "VEPO: Mitigating Multilingual Hallucinations in LVLMs via Visual Evidence-guided Preference Optimization",
+      "kind": "Paper",
+      "topics": [
+        "RLHF",
+        "Evaluation"
+      ],
+      "publisher": "VEPO authors",
+      "published_on": "2026-11-13",
+      "focus": "Visual-evidence masking; multilingual DPO; object hallucination",
+      "finding": "Reported POPE/MME improvements in Chinese, French, Hindi",
+      "caveat": "English-centric transfer; Hindi required English-pair mixing",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.18096",
+          "label": "Paper & submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.18096v1",
+          "label": "Full paper"
+        }
+      ],
+      "date_basis": "arXiv v1 submission (UTC)",
+      "read_scope": "Submission history, methods and limitations; code not executed; results not reproduced",
+      "source_timestamp": "2026-11-13T12:23:14Z"
+    },
+    {
+      "id": "privacypr",
+      "title": "PrivacyPR: Real-world privacy fixes for code-review evaluation",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "PrivacyPR authors",
+      "published_on": "2026-11-13",
+      "focus": "4,131 merged pull requests from 1,469 repositories; privacy-review evaluation",
+      "finding": "On a 200-PR subset, privacy-specific prompts raised two agents' defect detection from 42–51% to 88–91%; false positives remained 11–15%",
+      "caveat": "Small evaluation subset; both annotators endorsed 72% of automated GDPR-principle labels",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.18293",
+          "label": "Paper & submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.18293v1",
+          "label": "Full paper"
+        }
+      ],
+      "date_basis": "arXiv v1 submission (UTC)",
+      "read_scope": "Abstract and submission history; results not reproduced",
+      "source_timestamp": "2026-11-13T15:18:33Z"
+    },
+    {
+      "id": "mercor-series-d",
+      "title": "Mercor announces $750 million Series D at a $20 billion valuation",
+      "kind": "Company news",
+      "topics": [
+        "Companies"
+      ],
+      "publisher": "Mercor",
+      "published_on": "2026-11-10",
+      "focus": "Financing for human-expert data, evaluations and enterprise training environments",
+      "finding": "$750M Series D; $20B valuation; employee tender included",
+      "caveat": "Primary-versus-secondary capital split undisclosed; funding and valuation are not revenue",
+      "sources": [
+        {
+          "url": "https://www.mercor.com/blog/series-d/",
+          "label": "Mercor announcement"
+        },
+        {
+          "url": "https://www.aol.com/articles/ai-training-startup-mercor-valued-153730000.html",
+          "label": "Reuters reporting"
+        }
+      ],
+      "date_basis": "Original publication date",
+      "read_scope": "Dated company announcement; reported outcomes not independently reproduced"
+    },
+    {
+      "id": "flinkeval",
+      "title": "FlinkEval: Synthetic data for streaming-SQL evaluation",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "FlinkEval authors",
+      "published_on": "2026-11-12",
+      "focus": "3,903 question–SQL pairs across 45 domains; streaming semantics",
+      "finding": "Execution-grounded generation and repair on Confluent Cloud Flink; paired technical and business-language requests",
+      "caveat": "Single deployment; five-model study excluded 115 windowing cases affected by an engine defect; 81 background DML cases not executable, scored by judged SQL quality",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.17093",
+          "label": "Paper & submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.17093v1",
+          "label": "Full paper"
+        }
+      ],
+      "date_basis": "arXiv v1 submission (UTC)",
+      "read_scope": "Primary paper / release and stated limitations; results not reproduced",
+      "source_timestamp": "2026-11-12T16:54:35Z"
+    },
+    {
+      "id": "sg-legalclarify",
+      "title": "Scale and Singapore's IMDA introduce SG-LegalClarify",
+      "kind": "Release",
+      "topics": [
+        "Companies",
+        "Evaluation"
+      ],
+      "publisher": "Scale / IMDA",
+      "published_on": "2026-11-12",
+      "focus": "Whether models gather missing facts before applying Singapore law",
+      "finding": "19 models; 1,860 scenarios; 10 legal domains; best web-enabled model satisfied 77.8% of mandatory criteria",
+      "caveat": "Reported criterion-satisfaction scores are not overall legal accuracy; jurisdiction-specific and partly AI-judged",
+      "sources": [
+        {
+          "url": "https://scale.com/blog/scale-imda-legal-reasoning-benchmark",
+          "label": "Scale research report"
+        }
+      ],
+      "date_basis": "Original publication date",
+      "read_scope": "Dated company announcement; reported outcomes not independently reproduced"
+    },
+    {
+      "id": "gaze-reward-modeling",
+      "title": "Leveraging Psychophysical Attentional Distribution for Gaze-Augmented Reward Modeling",
+      "kind": "Paper",
+      "topics": [
+        "RLHF"
+      ],
+      "publisher": "Paper authors",
+      "published_on": "2026-11-10",
+      "focus": "Predicted gaze features; asymmetric spatial redistribution; reward modeling",
+      "finding": "Higher preference-prediction accuracy than fixation-centered baselines",
+      "caveat": "English-only experiments; synthetic gaze; no downstream policy-alignment test",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.13477",
+          "label": "Paper & submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.13477v1",
+          "label": "Full paper"
+        }
+      ],
+      "date_basis": "arXiv v1 submission (UTC)",
+      "read_scope": "Submission history, methods and limitations; code not executed; results not reproduced",
+      "source_timestamp": "2026-11-10T02:36:14Z"
+    },
+    {
+      "id": "nemotron-pii-japan",
+      "title": "Nemotron-PII-Japan: Annotated synthetic Japanese business documents",
+      "kind": "Dataset",
+      "topics": [
+        "Data"
+      ],
+      "publisher": "NVIDIA",
+      "published_on": "2026-11-09",
+      "focus": "100,000 synthetic documents; 43 document types; 56 PII categories",
+      "finding": "810,703 character-span annotations generated from predetermined values and finalized text",
+      "caveat": "Annotations are not exhaustive; no fixed public train/test split",
+      "sources": [
+        {
+          "url": "https://huggingface.co/blog/nvidia/nemotron-pii-japan",
+          "label": "Official release article"
+        },
+        {
+          "url": "https://huggingface.co/datasets/nvidia/Nemotron-PII-Japan",
+          "label": "Dataset & license"
+        }
+      ],
+      "date_basis": "Announcement 9 Nov; dataset card release date 10 Nov 2026",
+      "read_scope": "Primary paper / release and stated limitations; results not reproduced"
+    },
+    {
+      "id": "labelbox-wipro",
+      "title": "Labelbox and Wipro partner on RL environments and managed enterprise agents",
+      "kind": "Company news",
+      "topics": [
+        "Companies",
+        "RLHF"
+      ],
+      "publisher": "Labelbox / Wipro",
+      "published_on": "2026-11-10",
+      "focus": "Enterprise distribution and implementation for RL environments, reviewed agent work and ongoing evaluation",
+      "finding": "Wipro implementation support; Horizon and Recursion collaboration; Wipro Ventures participated in the recent Series E",
+      "caveat": "No named customer outcomes, deployment counts or measured production gains disclosed",
+      "sources": [
+        {
+          "url": "https://www.prnewswire.com/news-releases/labelbox-partners-with-wipro-to-scale-adoption-of-ai-agents-that-learn-from-enterprise-experience-302934232.html",
+          "label": "Original press release"
+        },
+        {
+          "url": "https://labelbox.com/blog/labelbox-wipro-partnership/",
+          "label": "Labelbox details"
+        }
+      ],
+      "date_basis": "Original publication date",
+      "read_scope": "Dated company announcement; reported outcomes not independently reproduced"
+    },
+    {
+      "id": "motiongraphicsbench",
+      "title": "MotionGraphicsBench: Programmatic checks for generated animations",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Figma research",
+      "published_on": "2026-11-07",
+      "focus": "100 expert-curated tasks; animate supplied SVG elements",
+      "finding": "Deterministic verifiers agreed with humans on 93.3% of 180 balanced held-out animations (90 approvals, 90 rejections), versus 83.3% for the VLM baseline",
+      "caveat": "Narrow SVG motion-editing task; pass/fail measures instruction compliance rather than aesthetic quality",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.10592",
+          "label": "Paper & submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.10592v1",
+          "label": "Full paper"
+        },
+        {
+          "url": "https://huggingface.co/blog/figma-ai/motion-graphics-bench",
+          "label": "Official release article"
+        }
+      ],
+      "date_basis": "arXiv v1 submission (UTC); release article 10 Nov 2026",
+      "read_scope": "Primary paper / release and stated limitations; results not reproduced",
+      "source_timestamp": "2026-11-07T08:59:49Z"
+    },
+    {
+      "id": "aero",
+      "title": "AERO: Adaptive Ensemble-Disagreement Routing for Oracle Feedback in Sample-Efficient Online RLHF",
+      "kind": "Paper",
+      "topics": [
+        "RLHF"
+      ],
+      "publisher": "AERO authors",
+      "published_on": "2026-11-07",
+      "focus": "Ensemble-disagreement routing; oracle-query efficiency; online DPO",
+      "finding": "Reported competitive alignment with fewer oracle queries in 1B-to-8B experiments",
+      "caveat": "Deterministic reward-model oracle; no real human-feedback evaluation",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.10750",
+          "label": "Paper & submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.10750v1",
+          "label": "Full paper"
+        },
+        {
+          "url": "https://github.com/Shrey-Singhal/AERO",
+          "label": "Code"
+        }
+      ],
+      "date_basis": "arXiv v1 submission (UTC)",
+      "read_scope": "Submission history, methods and limitations; code not executed; results not reproduced",
+      "source_timestamp": "2026-11-07T14:12:05Z"
+    },
+    {
+      "id": "shaping-useful-noise",
+      "title": "Shaping Useful Noise: An energy-distribution audit for synthetic images",
+      "kind": "Paper",
+      "topics": [
+        "Data"
+      ],
+      "publisher": "Paper authors",
+      "published_on": "2026-11-09",
+      "focus": "Energy-Level Distribution Distance; likelihood-profile comparison of real and synthetic images",
+      "finding": "Across nine DINO pretraining sources, downstream linear-accuracy prediction MAE was 0.82 percentage points versus 0.91 for FID",
+      "caveat": "Curation intervention reports frozen-feature proxies; matched pretraining remains future work",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.11962",
+          "label": "Paper & submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.11962v1",
+          "label": "Full paper"
+        }
+      ],
+      "date_basis": "arXiv v1 submission (UTC)",
+      "read_scope": "Primary paper / release and stated limitations; results not reproduced",
+      "source_timestamp": "2026-11-09T06:31:22Z"
+    },
+    {
+      "id": "turing-company-archives",
+      "title": "Turing describes turning connected company archives into RL benchmarks",
+      "kind": "Company news",
+      "topics": [
+        "Companies",
+        "Data"
+      ],
+      "publisher": "Turing",
+      "published_on": "2026-11-11",
+      "focus": "Connected operational records as source material for RL environments and evaluations",
+      "finding": "Three-part benchmark design: working company simulation, work-derived tasks and automated outcome checks",
+      "caveat": "Program explanation; no new customer, dataset size, benchmark score or privacy audit disclosed",
+      "sources": [
+        {
+          "url": "https://www.turing.com/blog/company-data-ai-benchmarks",
+          "label": "Turing program details"
+        }
+      ],
+      "date_basis": "Program explanation published 11 Nov; launch date unspecified",
+      "read_scope": "Dated company announcement; reported outcomes not independently reproduced"
+    },
+    {
+      "id": "omnisynth",
+      "title": "OmniSynth: Stress-testing synthetic-health-data quality metrics",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "OmniSynth authors",
+      "published_on": "2026-11-09",
+      "focus": "Meta-evaluation of fidelity, missingness, utility and privacy metrics",
+      "finding": "Two health datasets; scores generally degraded monotonically; three of four missingness metrics captured induced patterns",
+      "caveat": "Some classifier metrics were unstable; utility stress tests and fairness metrics remain incomplete",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.11888",
+          "label": "Paper & submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.11888v1",
+          "label": "Full paper"
+        }
+      ],
+      "date_basis": "arXiv v1 submission (UTC)",
+      "read_scope": "Primary paper / release and stated limitations; results not reproduced",
+      "source_timestamp": "2026-11-09T05:11:45Z"
+    },
+    {
+      "id": "surge-nemotron",
+      "title": "Surge reports targeted RL gains for NVIDIA Nemotron 3.5 Super VL",
+      "kind": "Release",
+      "topics": [
+        "Companies",
+        "RLHF"
+      ],
+      "publisher": "Surge AI",
+      "published_on": "2026-11-05",
+      "focus": "Expert-designed tasks and reward signals for specialized open-model post-training",
+      "finding": "Four separate RL checkpoints; reported improvements on all 12 evaluated benchmarks",
+      "caveat": "Company experiment; gains do not describe one combined model; published frontier-model comparisons use differing settings",
+      "sources": [
+        {
+          "url": "https://surgehq.ai/blog/nvidia-nemotron-3-5-super-training-report",
+          "label": "Surge training report"
+        }
+      ],
+      "date_basis": "Visible publication date / JSON-LD; hidden 12 Nov date excluded",
+      "read_scope": "Dated company announcement; reported outcomes not independently reproduced"
+    },
+    {
+      "id": "loco",
+      "title": "Think Less, Locally: Local Preference Learning for Reasoning Compression",
+      "kind": "Paper",
+      "topics": [
+        "RLHF"
+      ],
+      "publisher": "LoCo authors",
+      "published_on": "2026-11-03",
+      "focus": "State-conditioned DPO; shorter verified reasoning continuations",
+      "finding": "Reported completion-length reductions with maintained/improved mathematics and code accuracy",
+      "caveat": "Stronger-judge data filtering; verifiable-task evidence; release availability unverified",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.04814",
+          "label": "Paper & submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.04814v1",
+          "label": "Full paper"
+        }
+      ],
+      "date_basis": "arXiv v1 submission (UTC)",
+      "read_scope": "Submission history, methods and limitations; code not executed; results not reproduced",
+      "source_timestamp": "2026-11-03T12:44:50Z"
+    },
+    {
+      "id": "toloka-fireworks",
+      "title": "Toloka joins Fireworks' Frontier Ecosystem",
+      "kind": "Company news",
+      "topics": [
+        "Companies",
+        "Data"
+      ],
+      "publisher": "Toloka / Fireworks",
+      "published_on": "2026-11-03",
+      "focus": "Connecting expert data creation, model post-training and specialized evaluation",
+      "finding": "Frontier Ecosystem membership; Enterprise Tool-Use Leaderboard contribution to the Specialized Intelligence Index",
+      "caveat": "Integration and improvement claims are promotional; no controlled customer outcome is reported",
+      "sources": [
+        {
+          "url": "https://toloka.ai/blog/powering-production-ai-toloka-joins-the-fireworks-frontier-ecosystem/",
+          "label": "Toloka announcement"
+        },
+        {
+          "url": "https://fireworks.ai/blog/fireworks-unveils-new-products-at-forge-to-help-companies-build-specialized-intelligence",
+          "label": "Fireworks announcement"
+        }
+      ],
+      "date_basis": "Original publication date",
+      "read_scope": "Dated company announcement; reported outcomes not independently reproduced"
+    },
+    {
+      "id": "see-every-block",
+      "title": "See Every Block Once: Variance-Reduced Post-Training for Masked Diffusion Language Models",
+      "kind": "Paper",
+      "topics": [
+        "RLHF"
+      ],
+      "publisher": "Paper authors",
+      "published_on": "2026-11-13",
+      "focus": "Masked diffusion post-training; full-block likelihood estimation",
+      "finding": "Unbiased estimator; average +12.79 accuracy points against random block sampling on five benchmarks",
+      "caveat": "Adjacent post-training; PPO/DPO applications untested; one 8B architecture; parallel-memory cost",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.17754",
+          "label": "Paper & submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.17754v1",
+          "label": "Full paper"
+        }
+      ],
+      "date_basis": "arXiv v1 submission (UTC)",
+      "read_scope": "Submission history, methods and limitations; code not executed; results not reproduced",
+      "source_timestamp": "2026-11-13T05:10:56Z"
+    }
+  ]
+}
