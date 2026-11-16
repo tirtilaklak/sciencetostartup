@@ -108,7 +108,7 @@ test('thin directory renders financials without detail or search payloads and lo
   }));
   expect(bootstrap.details).toEqual([0, 0, 0, 0, 0, 0]);
   expect(bootstrap.hydrated).toBe(0);
-  await expect(page.locator('[data-company-card="taskus"]')).toContainText('H1 2026');
+  await expect(page.locator('[data-company-card="taskus"]')).toContainText('9M 2026');
   await expect(page.locator('[data-company-card="taskus"]')).toContainText('Whole company');
   expect(requests.filter(url => /\/presentation\/(company-|archive\.|overview\.|full-search\.)/.test(url))).toEqual([]);
   await page.locator('#search').fill('WorldSim');
@@ -188,10 +188,16 @@ test('current company CSV uses the same financial observation as the visible car
   await page.locator('#search').fill('TaskUs');
   await expect(page.locator('#result-count')).toHaveText('Showing 1 of 39 companies');
   const card = page.locator('[data-company-card="taskus"]');
-  await expect(card).toContainText('H1 2026');
+  await expect(card).toContainText('9M 2026');
   await expect(card).toContainText('Whole company');
   const selected = await page.evaluate(() => currentCompanyResult('taskus'));
-  expect(selected).toMatchObject({ value: 615121000, period: 'H1 2026', scope: 'company' });
+  expect(selected).toMatchObject({
+    id: 'refresh.taskus.9m-2026-group-revenue',
+    value: 929868000,
+    period: '9M 2026',
+    scope: 'company',
+    source_urls: 'https://www.taskus.com/press-release/taskus-announces-fiscal-third-quarter-2026-results/',
+  });
   // The compact site footer opens native data; keep this export check in the advanced guide.
   await page.goto('/explore/#downloads');
   await expect(page.locator('#search')).toHaveValue('TaskUs');
@@ -200,8 +206,8 @@ test('current company CSV uses the same financial observation as the visible car
   await page.locator('#download-csv').click();
   const download = await waiting;
   const csv = require('node:fs').readFileSync(await download.path(), 'utf8');
-  expect(csv).toContain('615121000');
-  expect(csv).toContain('H1 2026');
+  expect(csv).toContain('929868000');
+  expect(csv).toContain('9M 2026');
   expect(csv).toContain('Whole company');
   expect(csv).toContain(selected.source_urls);
   expect(csv).not.toContain('214218000');

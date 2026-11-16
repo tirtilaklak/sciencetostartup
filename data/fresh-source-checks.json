@@ -1,6 +1,6 @@
 {
-  "checked_on": "2026-10-28",
-  "scope": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results are scheduled for 4 November.",
+  "checked_on": "2026-11-16",
+  "scope": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results published on 4 November were separately reviewed on 16 November; the October receipts retain their original dates.",
   "entries": [
     {
       "source_id": "appen.source.audit-ap_2025",
@@ -234,6 +234,20 @@
       "status": "content_checked",
       "note": "Read official review published 16 December 2025; 380K+ studies/tasks and8M+ contribution hours refer to 2025 through publication, not a verified completed financial year or paid-only series.",
       "content_sha256": "60d0228bd550632e4e4166a9a1e2b9e28666e8e616987e3b8e5d542e46b7c327"
+    },
+    {
+      "source_id": "refresh.source.taskus-q3-2026",
+      "url": "https://www.taskus.com/press-release/taskus-announces-fiscal-third-quarter-2026-results/",
+      "checked_on": "2026-11-16",
+      "checked_at": "2026-11-16T18:58:06.546450+00:00",
+      "published_on": "2026-11-04",
+      "http_status": 200,
+      "status": "content_checked",
+      "content_sha256": "81e9aec198a936e0018551b411ce4e6570184277081dfd821c1a0a882f9dd5f2",
+      "response_bytes": 414891,
+      "reviewer": "Codex source review",
+      "approval_basis": "source_content_review",
+      "note": "Read the 4 November release: consolidated service revenue is $314.747M for Q3 2026 and $929.868M for the nine months ended 30 September. AI Services growth is 27.7% year over year and its trailing-year revenue exceeds $250M. The interim statements are unaudited."
     }
   ],
   "private_company_review": [

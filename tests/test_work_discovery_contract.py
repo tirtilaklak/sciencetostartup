@@ -81,9 +81,20 @@ assert.equal(run('state.workKind'),'');
 (async()=>{
 run('initialize()');
 const taskus=plain(run("currentCompanyResult('taskus')"));
-assert.equal(taskus.id,run("financialObservationFor('taskus').id"));
-assert.equal(taskus.value,615121000);assert.equal(taskus.period,'H1 2026');assert.equal(taskus.scope,'company');
-assert.equal(taskus.scope_label,'Whole company');assert.ok(taskus.source_urls.includes('taskus'));
+const taskusObservation=plain(run("financialObservationFor('taskus')"));
+const taskusSource='https://www.taskus.com/press-release/taskus-announces-fiscal-third-quarter-2026-results/';
+assert.equal(taskus.id,taskusObservation.id);
+assert.equal(taskus.id,'refresh.taskus.9m-2026-group-revenue');
+assert.equal(taskus.value,929868000);assert.equal(taskus.period,'9M 2026');assert.equal(taskus.scope,'company');
+assert.equal(taskus.scope_label,'Whole company');assert.equal(taskus.source_urls,taskusSource);
+assert.equal(taskus.currency,'USD');assert.equal(taskusObservation.measure,'period_revenue');
+assert.deepEqual(taskusObservation.period,{type:'year_to_date',label:'9M 2026',year:2026,start:'2026-01-01',end:'2026-09-30'});
+assert.deepEqual(taskusObservation.source_ids,['refresh.source.taskus-q3-2026']);
+const taskusH1=plain(run("window.BUSINESS_HEALTH.observations.find(row=>row.id==='refresh.taskus.h1-2026-group-revenue')"));
+assert.equal(taskusH1.value,615121000);assert.equal(taskusH1.scope,'company');
+assert.deepEqual(taskusH1.period,{type:'half_year',label:'H1 2026',year:2026,start:'2026-01-01',end:'2026-06-30'});
+assert.deepEqual(taskusH1.source_ids,['taskus.source.q22026']);
+assert.equal(taskusH1.evidence_checked_on,'2026-10-28','The new selected result preserves the separately dated H1 record');
 location.hash='#work?q=Surge&kind=named';run('syncWorkRoute()');
 const count=run('filteredWork().length');run('exportWorkCsv()');
 const csv=await downloadedBlob.text();assert.ok(count>0,'Export regression fixture must contain real rows');
@@ -92,7 +103,17 @@ assert.ok(csv.includes('terms_review_scope')&&csv.includes('original_application
 location.hash='#work?q=Sage&kind=named';run('syncWorkRoute();exportWorkCsv()');const sageCsv=await downloadedBlob.text();
 for(const value of ['Up to $15 / hour','US residence','MacBook Pro','Qualification tests and identity verification','2026-11-08','key_terms'])assert.ok(sageCsv.includes(value),value+' must remain in the Sage export');
 run('state.query="taskus";exportCsv()');const companyCsv=await downloadedBlob.text();
-assert.ok(companyCsv.includes('615121000')&&companyCsv.includes('H1 2026')&&companyCsv.includes('Whole company'));
+const companyLines=companyCsv.replace(/^\ufeff/,'').trim().split(/\r?\n/);
+assert.equal(companyLines.length,2,'The selected-company export contains exactly one TaskUs row');
+const cells=line=>[...line.matchAll(/"((?:[^"]|"")*)"(?:,|$)/g)].map(match=>match[1].replaceAll('""','"'));
+const companyHeaders=cells(companyLines[0]),companyValues=cells(companyLines[1]);
+assert.equal(companyValues.length,companyHeaders.length);
+const exported=Object.fromEntries(companyHeaders.map((name,index)=>[name,companyValues[index]]));
+assert.equal(exported.company_id,'taskus');assert.equal(exported.financial_value,'929868000');
+assert.equal(exported.metric_period,'9M 2026');assert.equal(exported.metric_scope,'company');
+assert.equal(exported.scope_label,'Whole company');assert.equal(exported.currency,'USD');
+assert.equal(exported.financial_record_id,'refresh.taskus.9m-2026-group-revenue');
+assert.equal(exported.financial_source_urls,taskusSource);
 })().catch(error=>{console.error(error);process.exitCode=1});
 ''')
         self.assertEqual(result.returncode, 0, result.stderr)

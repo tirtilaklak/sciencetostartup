@@ -180,11 +180,16 @@ function profileIntroductionHTML(id){
  return `<a class="profile-back" href="#companies">${iconHTML('left')} Companies</a><header class="profile-top profile-hero"><div class="profile-introduction"><div class="profile-title-row">${profileLogoHTML(id,'profile-brand')}<h1>${esc(c.name)}</h1></div><p class="profile-summary">${esc(modelFor(id))}</p><a class="profile-group-link" href="#companies/${attr(groupSlug(group))}" data-category-jump="${attr(group)}">${esc(groupLabel(group))} ${iconHTML('right')}</a><div class="profile-links">${external(c.website,'Website')}<a href="#company/${attr(id)}/work">Paid work ${iconHTML('right')}</a><a href="#company/${attr(id)}/sources">Sources ${iconHTML('right')}</a></div></div></header>`;
 }
 // Build a pane when it is read; populate another pane before its tab or anchor activates.
+function profileCurrentFacts(id){
+ const facts=profileContent(id).current_facts;if(!facts?.rows?.length)return '';
+ const rows=facts.rows.map(row=>`<div><dt>${esc(row.label)}</dt><dd>${esc(row.value)} ${row.source_indexes.map(i=>external(facts.sources[i].url,`[${i+1}]`).replace('<a ',`<a aria-label="${attr(facts.sources[i].title+' (opens in a new tab)')}" `)).join(' ')}</dd></div>`).join('');
+ return `<details class="company-current-facts"><summary>Updates checked ${esc(profileDate(facts.reviewed_on))}</summary><dl class="current-fact-list">${rows}</dl></details>`;
+}
 function profilePaneHTML(id,key){
  const c=companies[id],config=profileContent(id);
  if(key==='business'){
   const background=config.summary&&config.summary!==modelFor(id)?`<details class="profile-background"><summary>About the business</summary><p>${esc(config.summary)}</p></details>`:'';
-  return `${background}<div class="profile-business-layout ${config.featured_case?'has-case':''}">${profileSection('products',config.product_heading||'Products and services',profileProductGrid(id))}${profileCase(id)}</div>${typeof productMediaHTML==='function'?productMediaHTML(id):''}${profileSection('customers','Who it works with',profileRelationshipGrid(id))}${profileRisks(id)}`;
+  return `${profileCurrentFacts(id)}${background}<div class="profile-business-layout ${config.featured_case?'has-case':''}">${profileSection('products',config.product_heading||'Products and services',profileProductGrid(id))}${profileCase(id)}</div>${typeof productMediaHTML==='function'?productMediaHTML(id):''}${profileSection('customers','Who it works with',profileRelationshipGrid(id))}${profileRisks(id)}`;
  }
  if(key==='traction')return profileSection('traction',profileFiguresHeading(id),`${config.activity?`<div class="profile-activity"><h3>${esc(config.activity.title)}</h3><p>${esc(config.activity.description)}</p>${profileReferences(config.activity.claim_ids)}</div>`:''}${profileTraction(id)}`);
  if(key==='people'){

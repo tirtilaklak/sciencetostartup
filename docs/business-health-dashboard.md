@@ -16,7 +16,7 @@ available in the original research snapshot.
 ## Evidence
 
 The October 28, 2026 supplement contains 113 observations across 28 organizations
-and 67 source records. The full grid covers 39 organizations and keeps missing
+and 68 source records. The full grid covers 39 organizations and keeps missing
 values separate from zero and nonprofit entities separate from commercial vendors.
 The original canonical dataset remains v2.5.0.
 
