@@ -254,6 +254,13 @@ class StaticPageTests(unittest.TestCase):
         context = build_context(ROOT)
         from daily_scan import load_editions
         newest = max(newest, context['report']['updated_on'], context['graph']['as_of'][:10], *(row['date'] for row in load_editions(ROOT)))
+        from datetime import datetime, timezone
+        from zoneinfo import ZoneInfo
+        from research_operating_status import with_operating_status
+        operating = with_operating_status(context, now=datetime.now(timezone.utc)).get('operating_status')
+        notice_locs = {ORIGIN + path for path in (
+            '/research/', '/research/state-of-ai-data-labs/', '/research/data/')} if operating else set()
+        observed_day = operating.observed_on.astimezone(ZoneInfo('America/Los_Angeles')).date().isoformat() if operating else None
         lastmods = {}
         for url in urls:
             loc = url.find(NAMESPACE + "loc").text
@@ -266,7 +273,13 @@ class StaticPageTests(unittest.TestCase):
             self.assertRegex(lastmod, r"^\d{4}-\d{2}-\d{2}$")
             if loc in legacy:
                 self.assertGreaterEqual(lastmod, self.data["meta"]["as_of"], loc)
-            self.assertLessEqual(lastmod, newest, loc)
+            if loc in notice_locs:
+                self.assertGreaterEqual(lastmod, observed_day, loc)
+                self.assertLessEqual(lastmod, max(newest, observed_day), loc)
+                page = self.dist / loc.removeprefix(ORIGIN).lstrip('/') / 'index.html'
+                self.assertIn(f'"dateModified":"{lastmod}"', page.read_text(), loc)
+            else:
+                self.assertLessEqual(lastmod, newest, loc)
         # Events reviewed after the dataset change the pages that show them, and dateModified agrees with lastmod.
         for cid in {e["company_id"] for e in self.events["events"]} | {r for e in self.events["events"] for r in e["related_company_ids"]}:
             self.assertGreaterEqual(lastmods[f"{ORIGIN}/company/{cid}/"], reviewed, cid)
