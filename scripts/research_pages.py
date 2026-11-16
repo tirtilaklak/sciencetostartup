@@ -405,7 +405,7 @@ def _hub(context, editions=()):
     archive_links = ('<section class="r-section"><h2>Published editions</h2><ul class="r-entity-list">'
                      + ''.join(f'<li>{_link(path, snapshot["report"]["release_id"])} · {_date(snapshot["report"]["updated_on"])}</li>'
                                for path, snapshot in editions) + '</ul></section>') if editions else ''
-    return ('<header class="r-hero"><div><p class="r-kicker">Research</p>'
+    return ('<header class="r-hero"><div>'
             '<h1>Research on<br>AI data.</h1><p class="r-lede">A guide to the suppliers, papers and datasets behind AI training. '
             'Every finding links to its sources.</p>'
             f'<p class="r-status">{_status(context)}</p>'
@@ -1277,13 +1277,14 @@ def write_company_supplements(output, context):
             update(node)
             return match.group(1) + sp.json_ld(node) + match.group(3)
         text = re.sub(r'(<script\b[^>]*type="application/ld\+json"[^>]*>)(.*?)(</script>)', update_page_date, original, flags=re.S)
-        section = ('<!-- research-supplement:start --><section class="research r-company-supplement" id="new-research-evidence">'
+        section = ('<!-- research-supplement:start --><details class="research r-company-supplement company-fold" id="new-research-evidence">'
+                   '<summary><span>Research updates</span><small>' + str(len(assertions)) + ' approved records</small></summary><div class="company-fold-body">'
                    '<h2>New research evidence</h2><p class="r-meta">Research evidence snapshot '
                    + _date(context['graph']['as_of']) + ' · Added assessment ' + _date(context['report']['updated_on']) + '</p>'
                    '<p>These approved assertions supplement the historical profile. Each retains its own evidence date, scope and qualifications. '
                    'They do not establish commercial quality or an unstated supplier contribution.</p>'
                    + ''.join(_assertion(context, assertion, compact=True) for assertion in assertions)
-                   + '</section><!-- research-supplement:end -->')
+                   + '</div></details><!-- research-supplement:end -->')
         text = re.sub(r'<!-- research-supplement:start -->.*?<!-- research-supplement:end -->', '', text, flags=re.S)
         text = text.replace('</main>', section + '</main>', 1)
         if '<link rel="stylesheet" href="/research.css">' not in text:

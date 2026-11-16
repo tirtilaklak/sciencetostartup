@@ -2,7 +2,7 @@
 .profile-v2 .profile-back{margin:32px 0 28px;font-size:13px;min-height:32px}
 .profile-v2 .profile-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:center;gap:48px;max-width:none;padding:8px 0 40px;border:0}
 .profile-v2 .profile-title-row{display:flex;align-items:center;gap:20px;margin:0}
-.profile-v2 .profile-title-row h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(40px,4.5vw,56px);font-weight:400;line-height:1.12;letter-spacing:-1.5px;margin:0}
+.profile-v2 .profile-title-row h1{font-family:var(--sans);font-size:clamp(32px,4vw,48px);font-weight:600;line-height:1.1;letter-spacing:-.04em;margin:0}
 .profile-v2 .profile-brand{width:68px;flex-basis:68px;height:56px;border-radius:10px;background:var(--pale);padding:8px}
 .profile-summary{font-size:19px;line-height:1.65;max-width:840px;margin:24px 0 14px;color:var(--ink)}
 .profile-group-link{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);text-decoration:none;min-height:32px}
@@ -145,3 +145,27 @@
  #evidence-content>.evidence-metric-context .evidence-metric-value{font-size:24px}
  .profile-v2 .profile-glance-work>a,.profile-v2 .profile-back,.profile-category-link,.profile-correction a,.profile-peers-all,.evidence-correction a{min-height:44px}
 }
+
+/* Advanced profile tools use the same quiet shell as the native profiles. */
+.profile-v2 .profile-back{margin:20px 0 16px;font-size:14px;min-height:44px}
+.profile-v2 .profile-hero{grid-template-columns:minmax(0,1fr);gap:20px;padding:0 0 24px}
+.profile-v2 .profile-title-row{gap:14px}
+.profile-v2 .profile-brand{width:56px;flex-basis:56px;height:56px;border-radius:4px;padding:8px}
+.profile-v2 .profile-summary{font-size:16px;line-height:1.6;max-width:65ch;margin:12px 0 8px}
+.profile-v2 .profile-links{margin:12px 0 0;gap:8px 24px}
+.profile-v2 .profile-links a{min-height:44px;font-size:14px}
+.profile-v2 .profile-at-a-glance{gap:24px;padding:20px 0;margin:0 0 24px;border:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);border-radius:0;background:transparent}
+.profile-v2 .profile-glance-work{padding-left:24px}
+.profile-v2 .profile-tabs{gap:24px;margin-bottom:24px}
+.profile-v2 .profile-tabs [role=tab]{min-height:44px;padding:12px 2px}
+.profile-v2 .profile-section h2{font-size:24px;margin-bottom:16px}
+.profile-v2 .profile-business-layout{gap:24px}
+.profile-v2 .offering-card,.profile-v2 .relationship-card{background:transparent;border:0;border-bottom:1px solid var(--border);border-radius:0;padding:16px 0;margin:0;gap:16px}
+.profile-v2 .offering-card p,.profile-v2 .relationship-card p{font-size:15px;line-height:1.6}
+footer .footer-line{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px 24px;width:100%}
+footer .footer-line p{margin:0;font-size:14px;font-weight:600}
+footer .footer-line p span{font-weight:400;color:var(--muted)}
+footer .footer-line .site-map{display:flex;flex-wrap:wrap;gap:4px 20px}
+footer .footer-line .site-map a{min-height:44px;display:inline-flex;align-items:center;font-size:13px}
+.topbar .wordmark small{display:none}
+@media(max-width:700px){.profile-v2 .profile-at-a-glance{grid-template-columns:1fr;gap:20px}.profile-v2 .profile-glance-work{border-left:0;border-top:1px solid var(--border);padding:16px 0 0}.profile-v2 .profile-tabs{gap:16px}.profile-v2 .profile-tabs [role=tab]{font-size:13px}footer .footer-line{display:block}footer .footer-line p{margin-bottom:8px}}

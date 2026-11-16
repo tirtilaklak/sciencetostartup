@@ -313,11 +313,15 @@ test.describe('legacy evidence remains independently readable', () => {
     expect(preserved.actualMetadata, 'Historical organization metadata').toEqual(preserved.expectedMetadata);
     expect(preserved.lastMainChild).toBe('new-research-evidence');
     const supplement = page.locator('#new-research-evidence');
+    await expect(supplement).not.toHaveAttribute('open', '');
+    await supplement.locator(':scope > summary').click();
+    await expect(supplement.getByRole('heading', { level: 2 })).toBeVisible();
     await expect(supplement.getByRole('heading', { level: 2 })).toHaveText('New research evidence');
     await expect(supplement).toContainText('supplement the historical profile');
     await expect(supplement).toContainText('do not establish commercial quality or an unstated supplier contribution');
     await expect(supplement.locator('.r-assertion')).toHaveCount(approved.length);
     for (const assertion of approved) {
+      if (await supplement.getAttribute('open') === null) await supplement.locator(':scope > summary').click();
       const record = supplement.locator(selector('assertion-' + assertion.id));
       await expect(record.locator('.r-kicker')).toContainText('Approved evidence · As of');
       const date = await record.locator('.r-kicker').innerText();

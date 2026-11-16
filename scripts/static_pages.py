@@ -908,14 +908,15 @@ def disclosure_html():
 
 
 def site_footer(research, note=""):
-    """The site map, then who publishes the guide with the About disclosure, then the research date and dataset version."""
-    groups = (("Explore", (("Overview", "/"), ("Companies", "/companies/"), ("Paid work", "/work/"), ("Compare", "/explore/#compare"))),
-              ("Research", (("Research hub", "/research/"), ("Research data", "/research/data/"), ("Method", "/method/"), ("What the labels mean", "/method/#labels"), ("Download the data", "/method/#downloads"))),
-              ("About", (("About the publisher", "/method/#about"), ("Review and corrections", "/review/"), ("Request a correction", "/explore/#corrections"), ("The publisher’s proposed AI lab", "/explore/#venture"))))
-    columns = "".join(f"<div><h2>{heading}</h2><ul>" + "".join(f'<li><a href="{ORIGIN}{path}">{label}</a></li>' for label, path in links) + "</ul></div>" for heading, links in groups)
+    """A compact byline and four useful links; full policies live on About."""
+    links = (("About", "/method/#about"), ("Data", "/method/#downloads"),
+             ("Corrections", "/method/#corrections"), ("Disclosures", "/method/#disclosures"))
+    nav = "".join(f'<a href="{ORIGIN}{path}">{label}</a>' for label, path in links)
     line = " · ".join(part for part in (f"Research compiled {format_date(research.as_of)}" if research.as_of else "", f"Dataset v{research.data.get('dataset_version')}" if research.data.get("dataset_version") else "") if part)
-    return (f'<footer class="site-footer"><nav aria-label="Site map">{columns}</nav><p>{SITE_NAME} is published by {PUBLISHER_NAME}. {disclosure_html()}</p>'
-            + (f"<p>{escape(line)}</p>" if line else "") + note + "</footer>\n")
+    return (f'<footer class="site-footer"><div class="footer-line"><p>{SITE_NAME} <span>by {PUBLISHER_NAME}</span></p>'
+            f'<nav aria-label="Site map">{nav}</nav></div>'
+            + (f'<p class="site-footer-meta">{escape(line)}</p>' if line else "")
+            + (f'<details class="footer-note"><summary>Credits</summary>{note}</details>' if note else "") + "</footer>\n")
 
 
 def crumb_nav(crumbs):
@@ -948,7 +949,7 @@ def document(research, title, description, canonical, body, structured=None, cur
                     f'<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:title" content="{escape(title)}">\n<meta name="twitter:description" content="{escape(description)}">\n<meta name="twitter:image:alt" content="{escape(SHARE_ALT)}">\n')
     head.append('<link rel="stylesheet" href="/static-pages.css">\n<link rel="stylesheet" href="/field-guide.css">\n<link rel="stylesheet" href="/page-layout.css">\n')
     if structured: head.append(f'<script type="application/ld+json">{json_ld(structured)}</script>\n')
-    return "".join(head) + "</head>\n<body class=\"static-page\">\n" + site_header(current, state) + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + "</body>\n</html>\n"
+    return "".join(head) + "</head>\n<body class=\"static-page\">\n" + site_header(current, state) + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + '<script src="/native-details.js" defer></script>\n</body>\n</html>\n'
 
 # ---------------------------------------------------------------------------
 # Company pages
@@ -996,18 +997,14 @@ def figures_html(research, company, figures, pending, others, profile_entry):
         rows = "".join(figure_row(research, m, contexts.get(m["id"])) for m in figures)
         body = f'<table class="figures wide"><thead><tr><th scope="col">Figure</th><th scope="col">Value</th><th scope="col">Date</th><th scope="col">Grade</th><th scope="col">Source</th></tr></thead><tbody>{rows}</tbody></table>\n'
     else:
-        body = f'<p>{"Commercial revenue does not apply to this research organization." if company.get("entity_type") == "adjacent_research" else "No figure for " + escape(name) + " meets the rules for key figures."} The full profile lists every recorded claim.</p>\n'
+        body = f'<p>{"Commercial revenue does not apply to this research organization." if company.get("entity_type") == "adjacent_research" else "No reported figure meets the source requirements."}</p>\n'
     if pending:
-        body += f'<h3 id="unconfirmed">Not confirmed</h3>\n<p class="muted">These figures were reported, but we could not confirm them. They stay out of the key figures.</p>\n<ul class="listings">{"".join(pending_item(research, m) for m in pending)}</ul>\n'
+        body += f'<h3 id="unconfirmed">Not confirmed</h3>\n<p class="muted">Unverified or disputed figures. Excluded from headline facts.</p>\n<ul class="listings">{"".join(pending_item(research, m) for m in pending)}</ul>\n'
     if others:
-        body += f'<h3 id="other-figures">Other reported figures</h3>\n<p class="muted">These are forecasts, targets, or older or partial figures. We list them for the record. They stay out of the key figures and comparisons.</p>\n<ul class="listings">{"".join(pending_item(research, m) for m in others)}</ul>\n'
+        body += f'<h3 id="other-figures">Other reported figures</h3>\n<p class="muted">Forecasts, targets, and earlier or partial figures.</p>\n<ul class="listings">{"".join(pending_item(research, m) for m in others)}</ul>\n'
     if figures or pending or others:
-        year = re.match(r"[0-9]{4}", research.as_of)
-        notes = ["Each figure keeps its own date and the part of the business it covers."]
-        if any(m.get("kind") == "annualized_revenue_run_rate" for m in figures + pending + others): notes.append("Annualized pace is recent revenue projected across a full year.")
-        if year: notes.append(f"Historical marks figures from {int(year.group(0)) - 2} or earlier.")
-        notes.append("Estimates are labeled. Forecasts and targets never count as key figures.")
-        body += f'<p class="muted">{" ".join(notes)} Grade is our confidence in the sources, from A (a filing or independent evidence) to U (unverified). <a href="{ORIGIN}/method/#grades">How we grade</a>.</p>\n'
+        annualized = "Annualized pace projects recent revenue over a year. " if any(m.get("kind") == "annualized_revenue_run_rate" for m in figures + pending + others) else ""
+        body += f'<p class="muted">{annualized}Grades measure source confidence. <a href="{ORIGIN}/method/#grades">How we grade</a>.</p>\n'
     return '<h2 id="figures">Key figures</h2>\n' + body
 
 
@@ -1103,13 +1100,12 @@ def company_work_html(research, company, routes):
     names = {cid: name}
     # Only named listings and networks/programs count; secondary records stay separate.
     paid = sum(1 for r in routes if work_primary(r))
-    lead = (f'{plural(paid, "paid work route")} at {escape(name)}. Pay is quoted as the company published it and may be out of date. Confirm on the company\'s page before you apply.' if paid
-            else f"No confirmed paid listing for {escape(name)}. The groups below show what we found.")
+    lead = ("Pay and availability may have changed. Check the current terms on the company’s website." if paid
+            else "No confirmed paid listing. Career pages and past records appear below.")
     body = [f"<p>{lead}</p>\n", safety_note()]
     for key, label, _ in WORK_DISPLAY_BUCKETS:
         rows = sort_routes([r for r in routes if work_display_bucket(r) == key], names)
         if rows: body.append(f"<h3>{label}</h3>\n<ul class=\"listings\">" + "".join(work_item(research, r) for r in rows) + "</ul>\n")
-    body.append(f'<p><a href="{ORIGIN}/explore/#company/{escape(cid)}/work">See terms and sources in the full profile</a></p>\n')
     return heading + "".join(body)
 
 
@@ -1204,7 +1200,7 @@ def risks_html(research, company_id, events):
         rows = "".join(f'<tr data-risk="{escape(c["id"])}"><th scope="row">{escape(shown_text(research, c.get("statement")))}</th>{when(c.get("as_of"))}<td class="wide-cell" data-label="Source">{claim_source_html(research, c)}</td></tr>' for c in risks)
         parts.append(f'<h3>Risks named in the evidence</h3>\n<table class="wide risks"><thead><tr><th scope="col">Risk</th><th scope="col">As of</th><th scope="col">Source</th></tr></thead><tbody>{rows}</tbody></table>\n')
     if dated: parts.append(f'<p class="muted">{EVENTS_NOTE} {escape(statuses_checked(dated))}</p>\n')
-    parts.append(f'<p><a href="{ORIGIN}/explore/#company/{escape(company_id)}/risks">See risks and disputes in the full profile</a></p>\n')
+    parts.append(f'<p><a href="{ORIGIN}/explore/#company/{escape(company_id)}/risks">Open the event record</a></p>\n')
     return "".join(parts)
 
 
@@ -1225,7 +1221,7 @@ def selected_business_observation(health, company_id):
     return rows[0] if rows else None
 
 
-def business_observation_html(research, health, company_id, inline=False):
+def business_observation_html(research, health, company_id, inline=False, compact=False):
     """A clearly dated supplement beside the unchanged research snapshot."""
     row = selected_business_observation(health, company_id)
     if not row: return ""
@@ -1239,7 +1235,8 @@ def business_observation_html(research, health, company_id, inline=False):
     scope = row.get("scope_label") or {"company": "Whole company", "ai_data": "AI data business"}.get(row.get("scope"), row.get("scope", ""))
     kind = "Annualized pace" if row.get("measure") == "annualized_revenue" else "Revenue"
     basis = {"gross": "Gross revenue", "net": "Net revenue"}.get(row.get("accounting_basis"), "Gross/net not disclosed")
-    meta = " · ".join(str(x) for x in (kind, period, row.get("currency"), scope, basis) if x)
+    shown_period = period_text(period) if compact else period
+    meta = " · ".join(str(x) for x in (None if compact else kind, shown_period, row.get("currency"), scope, basis) if x)
     link = external_link(source.get("url"), source.get("publisher") or "Original source") if source else ""
     warning = '<span class="sub">Original citation could not be rechecked. Historical source attribution retained.</span>' if failed else ""
     content = (f'<div class="selected-evidence" data-financial-observation="{escape(row["id"])}">'
@@ -1254,6 +1251,43 @@ def business_observation_html(research, health, company_id, inline=False):
     if not end or end < "2025-10-28":
         return '<details class="selected-archive"><summary>No recent revenue figure · historical evidence</summary>' + content + '</details>'
     return content
+
+
+def company_metric_fact(research, metric, context=None):
+    """A compact reported fact; its full row and source history stay below."""
+    source, _ = latest_source(research, metric)
+    assurance = {"company": "Company-reported", "investor": "Investor-reported", "independent_reporting": "Reported by press", "filing": "Filing", "customer": "Customer-reported", "database": "Database"}.get((source or {}).get("source_type"), "Attributed source")
+    attribution = external_link(source.get("url"), clean(source.get("publisher")) or "Source") if source else "Source not recorded"
+    qualifiers = ["Estimate"] if metric.get("reported_vs_estimated") == "estimated" else []
+    if research.historical_year(metric): qualifiers.append("Historical")
+    meta = " · ".join(value for value in (metric_period(research, metric), figure_scope(research, metric, context), basis_text(research, metric)) if value)
+    return (f'<div class="company-key-fact" data-headline-metric="{escape(metric["id"])}"><span class="company-fact-label">{escape(figure_label(research, metric))}</span>'
+            f'<strong>{escape(value_text(metric))}</strong>' + (f'<span class="company-fact-status">{escape(" · ".join(qualifiers))}</span>' if qualifiers else "")
+            + f'<span class="company-fact-meta">{escape(meta)}</span><span class="company-fact-source">{attribution} · {escape(assurance)}</span></div>')
+
+
+def company_headline_facts(research, company, figures, profile_entry, business_health):
+    """At most two facts, with unknown and nonprofit states stated directly."""
+    cid = company["id"]
+    supplement = selected_business_observation(business_health, cid)
+    cards = []
+    if supplement:
+        dated = re.search(r"\d{4}(?:-\d{2}){0,2}", str(supplement.get("as_of") or ""))
+        end = supplement.get("period", {}).get("end") or (dated.group() if dated else "")
+        if end >= "2025-10-28":
+            rendered = business_observation_html(research, business_health, cid, inline=True, compact=True)
+            label = "Annualized pace" if supplement.get("measure") == "annualized_revenue" else "Revenue"
+            cards.append(f'<div class="company-key-fact company-current-fact"><span class="company-fact-label">{label}</span>{rendered}</div>')
+    contexts = (profile_entry or {}).get("metric_context") or {}
+    headline = next((metric for metric in figures if metric.get("kind") in REVENUE_KINDS and not research.historical_year(metric)), None)
+    if not cards and not supplement and headline:
+        cards.append(company_metric_fact(research, headline, contexts.get(headline["id"])))
+    if not cards:
+        label = "Research organization" if company.get("entity_type") == "adjacent_research" else "No recent revenue figure" if supplement else "No confirmed revenue figure"
+        cards.append(f'<div class="company-key-fact company-unreported"><span class="company-fact-label">Revenue</span><strong>{label}</strong><span class="company-fact-meta">' + ("Commercial revenue does not apply." if company.get("entity_type") == "adjacent_research" else "In the reviewed public sources.") + '</span></div>')
+    secondary = next((metric for kind in ("valuation", "funding_total_reported", "funding_total_calculated") for metric in figures if metric.get("kind") == kind and not research.historical_year(metric)), None)
+    if secondary: cards.append(company_metric_fact(research, secondary, contexts.get(secondary["id"])))
+    return '<section class="company-key-facts" aria-label="Reported facts">' + "".join(cards[:2]) + '</section>'
 
 
 def render_company(research, company, editorial_entry, profile_entry, routes, peers, labels, modified, events=None, business_health=None):
@@ -1273,35 +1307,61 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     description = company_description(research, name, summary, figures)
     # The structured breadcrumb follows the visible trail, business group included.
     crumbs = [("Overview", f"{ORIGIN}/"), ("Companies", f"{ORIGIN}/companies/")] + ([(group_name, f"{ORIGIN}/companies/#{group_slug(group)}")] if group else []) + [(name, canonical)]
-    compiled = f" · research compiled {format_date(research.as_of)}" if research.as_of else ""
-    work_link = (f'<a href="#work">Paid work at {escape(name)} ({plural(len(paid_open), "paid work route")})</a>' if paid_open
-                 else f'<a href="#work">Paid work at {escape(name)}</a>' if open_routes else "")
+    lead = next(iter(sentences(summary)), summary)
+    work_link = f'<a href="#work">Paid work{f" <span>{len(paid_open)}</span>" if paid_open else ""}</a>' if routes else ""
     legal = legal_name(company)
-    body = [crumb_nav(crumbs),f'<p class="eyebrow">Company profile{escape(compiled)}</p>\n<h1>{escape(name)}</h1>\n<p class="lede">{escape(summary)}</p>\n',
-            f'<p class="actions">{cta(app_url, "Open the full profile")}{work_link}</p>\n', business_observation_html(research, business_health, cid),
-            ('<details class="source-snapshot"><summary>Original research snapshot · compiled ' + escape(format_date(research.as_of)) + '</summary><p class="muted">These records retain their original dates and classifications; selected supplemental evidence appears above.</p>' if selected_business_observation(business_health, cid) else ""), figures_html(research, company, figures, pending, others, profile_entry), '</details>' if selected_business_observation(business_health, cid) else ""]
+    logos = {row["company_id"]: row for row in json.loads((ROOT / "data/logo-provenance.json").read_text()).get("logos", []) if row.get("status") == "verified" and row.get("local_path")}
+    logo = logos.get(cid)
+    brand = (f'<span class="company-logo{(" company-logo-dark" if logo.get("background") == "dark" else "")}"><img src="/{escape(logo["local_path"])}" width="112" height="48" alt=""></span>' if logo
+             else f'<span class="company-logo company-monogram" aria-hidden="true">{escape("".join(word[0] for word in name.split()[:2]))}</span>')
+    website = external_link(company["website"], "Website") if is_web_url(company.get("website")) else ""
+    body = ['<link rel="stylesheet" href="/company-profile.css">\n', crumb_nav(crumbs), '<article class="company-dossier">',
+            f'<header class="company-hero"><div class="company-name">{brand}<h1>{escape(name)}</h1></div>'
+            f'<p class="lede">{escape(lead)}</p><p class="company-actions">{website}{work_link}</p></header>',
+            company_headline_facts(research, company, figures, profile_entry, business_health)]
+    dated, risk_rows = company_events(events, cid), risk_claims(research, cid)
+    critical = next((event for event in dated if event.get("kind") in ("lawsuit", "data_incident")), None)
+    if critical:
+        checked = critical.get("status_checked_on")
+        status_date = f' · status checked {format_date(checked)}' if ISO_DAY.fullmatch(str(checked or "")) else ""
+        body.append(f'<aside class="company-notice"><a href="#risks">{escape(clean(critical.get("title")))}</a><span>{escape(month_text(critical.get("date")))} · {escape(clean(critical.get("status")) + status_date)}</span></aside>')
+    body.append('<div class="company-record">')
     facts = []
     if group: facts.append(("Business group", f'<a href="{ORIGIN}/companies/#{group_slug(group)}">{escape(group_name)}</a>'))
-    if is_web_url(company.get("website")): facts.append(("Website", external_link(company["website"], re.sub(r"^https?://(www\.)?", "", company["website"]).rstrip("/"))))
     if company.get("founded_year"): facts.append(("Founded", escape(company["founded_year"])))
     if legal and legal != name: facts.append(("Legal entity", escape(legal)))
     tags = [clean(t) for t in entry.get("capability_tags") or [] if clean(t)]
     if tags: facts.append(("Also works on", escape(", ".join(tags))))
-    if facts: body.append(f'<h2 id="facts">About {escape(name)}</h2>\n<dl class="facts">' + "".join(f"<dt>{label}</dt><dd>{value}</dd>" for label, value in facts) + "</dl>\n")
     products = research.products(cid, (profile_entry or {}).get("products"))[:PRODUCT_LIMIT]
+    body.append(f'<details class="company-fold"><summary><span>Products &amp; company</span><small>{plural(len(products), "offering") if products else "Company details"}</small></summary><div class="company-fold-body">')
+    if facts: body.append(f'<h2 id="facts">About {escape(name)}</h2>\n<dl class="facts">' + "".join(f"<dt>{label}</dt><dd>{value}</dd>" for label, value in facts) + "</dl>\n")
+    remaining_summary = " ".join(sentences(summary)[1:])
+    if remaining_summary: body.append(f'<p>{escape(remaining_summary)}</p>')
     if products:
         verb = "does" if company.get("entity_type") == "adjacent_research" else "sells"
         items = "".join(f"<li><strong>{escape(clean(p.get('name')))}</strong>" + (f": {escape(full_stop(clean(p.get('description'))))}" if clean(p.get("description")) else "") + (f' <span class="muted">{escape(full_stop(clean(p.get("status"))))}</span>' if clean(p.get("status")) else "") + "</li>" for p in products)
         body.append(f'<h2 id="offerings">What {escape(name)} {verb}</h2>\n<ul>{items}</ul>\n')
-    body.append(risks_html(research, cid, events))
-    body.append(company_work_html(research, company, routes))
+    body.append('</div></details>')
+    financial_count = len(figures) + len(pending) + len(others) + bool(selected_business_observation(business_health, cid))
+    financial_meta = plural(financial_count, "recorded figure") if financial_count else "Disclosure limits"
+    if pending: financial_meta += f' · {len(pending)} not confirmed'
+    body.append(f'<details class="company-fold" id="financial-record"><summary><span>Financial record</span><small>{financial_meta}</small></summary><div class="company-fold-body">'
+                + business_observation_html(research, business_health, cid)
+                + figures_html(research, company, figures, pending, others, profile_entry) + '</div></details>')
+    if dated or risk_rows:
+        body.append(f'<details class="company-fold"><summary><span>Risks &amp; events</span><small>{plural(len(dated), "event")} · {plural(len(risk_rows), "risk note")}</small></summary><div class="company-fold-body">' + risks_html(research, cid, events) + '</div></details>')
+    body.append(f'<details class="company-fold"><summary><span>Paid work</span><small>{plural(len(paid_open), "listing or network", "listings and networks") if paid_open else "No confirmed listing"}</small></summary><div class="company-fold-body">' + company_work_html(research, company, routes) + '</div></details>')
+    source_count = sum(source.get("company_id") == cid for source in research.data.get("sources", []))
+    claim_count = sum(claim.get("company_id") == cid for claim in research.data.get("claims", []))
+    body.append(f'<details class="company-fold"><summary><span>Sources &amp; data</span><small>{plural(source_count, "source")}</small></summary><div class="company-fold-body"><h2 id="full-profile">Sources and data</h2>'
+                f'<p>{plural(claim_count, "claim")} · {plural(source_count, "source")} · Research compiled {escape(format_date(research.as_of))}</p>'
+                f'<ul class="company-source-links"><li><a href="{app_url}/sources">Source ledger</a></li><li><a href="{app_url}/people">Funding and people</a></li><li><a href="{ORIGIN}/research.json" download>Research JSON</a></li><li><a href="{ORIGIN}/observatory.sqlite" download>SQLite database</a></li></ul>'
+                f'<p class="company-record-links"><a href="{app_url}">Interactive record</a><a href="{app_url}/traction">Figures</a><a href="{app_url}/work">Paid work</a><a href="{ORIGIN}/method/#grades">Source grades</a></p>')
+    if logo: body.append(f'<p class="company-logo-source">Company logo: {external_link(logo.get("source_page") or logo.get("asset_url"), "official source")}. {LOGO_NOTE}</p>')
     if peers:
         links = "".join(f'<li><a href="{ORIGIN}/company/{escape(p["id"])}/">{escape(clean(p["name"]))}</a></li>' for p in peers)
-        body.append(f'<h2 id="related">More in {escape(group_name)}</h2>\n<ul class="inline-list">{links}</ul>\n<p class="muted"><a href="{ORIGIN}/companies/#{group_slug(group)}">See this group on the company list</a></p>\n')
-    tabs = (("Figures", "traction"), ("Funding and people", "people"), ("Paid work", "work"), ("Sources", "sources"))
-    body.append(f'<h2 id="full-profile">In the full profile</h2>\n<p>The full profile shows each sourced claim with its confidence grade, including funding rounds and customer relationships.</p>\n<ul class="inline-list">'
-                + "".join(f'<li><a href="{app_url}/{part}">{label}</a></li>' for label, part in tabs) + f'</ul>\n<p class="actions">{cta(app_url, "Open the full profile")}</p>\n'
-                + f'<p class="muted">{SITE_NAME} is a public guide to {plural(len(research.companies), "AI data company", "AI data companies")}, published by {PUBLISHER_NAME}. Each figure links to its source. We do not confirm any company\'s current status. No profiled company has paid for coverage. <a href="{ORIGIN}/method/">How we check the research</a>.</p>\n')
+        body.append(f'<h2 id="related">More in {escape(group_name)}</h2>\n<ul class="inline-list">{links}</ul>\n')
+    body.append('</div></details></div></article>')
     organization = {"@type": "Organization", "@id": canonical + "#organization", "name": name, "description": shown_text(research, company.get("description")) or summary}
     if is_web_url(company.get("website")): organization["url"] = company["website"]
     if company.get("founded_year"): organization["foundingDate"] = str(company["founded_year"])
@@ -1331,7 +1391,7 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
     compiled = f" · research compiled {format_date(research.as_of)}" if research.as_of else ""
     logos = {row['company_id']: row for row in json.loads((ROOT / 'data/logo-provenance.json').read_text()).get('logos', []) if row.get('status') == 'verified' and row.get('local_path')}
     body = ['<link rel="stylesheet" href="/companies-page.css">', crumb_nav(crumbs),
-            '<header class="directory-intro"><p class="eyebrow">The company guide</p><h1>AI data companies</h1>',
+            '<header class="directory-intro"><h1>AI data companies</h1>',
             '<p class="lede">Who makes AI training data, what they offer, and where the evidence comes from.</p>',
             f'<p class="directory-meta">{count} profiles · {len(groups)} business groups{escape(compiled)}</p></header>',
             '<form class="directory-filters" id="company-filters" role="search" hidden><label>Search companies<input type="search" id="company-query" name="q" placeholder="Name, offering, or specialty" autocomplete="off"></label><label>Business group<select id="company-group" name="group"><option value="">All groups</option>' + ''.join(f'<option value="{group_slug(g)}">{escape(labels.get(g, g))}</option>' for g in order) + '</select></label><button type="reset">Clear</button></form>',
@@ -1388,19 +1448,18 @@ def render_work(research, routes, names, modified):
     crumbs = [("Overview", f"{ORIGIN}/"), ("Paid work", canonical)]
     buckets = {key: sort_routes([r for r in rows if work_display_bucket(r) == key], names) for key, _, _ in WORK_DISPLAY_BUCKETS}
     body = ['<link rel="stylesheet" href="/work-page.css">\n', crumb_nav(crumbs),
-            '<header class="work-page-heading"><p class="eyebrow">Paid work</p><h1>Find work in AI training.</h1>\n',
-            '<p class="lede">Roles, projects and expert networks, with published pay and original sources.</p>\n',
+            '<header class="work-page-heading"><h1>Find work in AI training.</h1>\n',
+            '<p class="lede">Roles and projects, with published pay and sources.</p>\n',
             f'<p class="work-page-counts">{plural(named_count, "named listing")} <span>·</span> {plural(program_count, "network or program", "networks and programs")} <span>·</span> {plural(open_companies, "company", "companies")}</p></header>\n',
-            '<p class="work-page-note">Pay and availability may have changed. Check the company’s page before applying.' + (f' Links checked up to {escape(format_date(checked))}.' if checked else '') + '</p>\n',
-            safety_note(),
+            '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Pay and availability may have changed. Check the company’s page before applying.' + (f' Links checked up to {escape(format_date(checked))}.' if checked else '') + '</p>\n' + safety_note() + '</details>\n',
             '<form class="work-page-filters" data-work-filters hidden role="search" aria-label="Find paid work">'
             '<label class="work-page-search">Search listings<input name="q" type="search" placeholder="Role, skill or company" maxlength="256" autocomplete="off"></label>'
+            '<details class="work-page-filter-options"><summary>Filters</summary><div class="work-page-filter-fields">'
             '<label>Listing type<select name="kind"><option value="">All records</option><option value="named">Named listings</option><option value="programs">Networks and programs</option><option value="boards">Career pages</option><option value="outside">Other company jobs</option><option value="closed">Past and other records</option></select></label>'
             '<label>Work arrangement<select name="arrangement"><option value="">Any arrangement</option><option value="remote">Remote possible</option><option value="onsite">On-site or hybrid</option><option value="varies">Varies or not stated</option></select></label>'
-            '<button type="reset" class="work-page-clear">Clear</button></form>'
+            '<button type="reset" class="work-page-clear">Clear</button></div></details></form>'
             f'<p class="work-page-results" data-work-count aria-live="polite" aria-atomic="true">{count} records at {plural(companies, "company", "companies")}. Career pages and past records are grouped below.</p>'
             '<div class="work-page-empty" data-work-empty hidden><p>No listings match. Try another word or clear the filters.</p><button type="button" data-work-clear>Clear search and filters</button></div>\n',
-            '<nav class="work-page-groups" aria-label="Listing groups"><ul class="chips">' + "".join(f'<li><a href="#{key}">{label} ({len(buckets[key])})</a></li>' for key, label, _ in WORK_DISPLAY_BUCKETS if buckets[key]) + "</ul></nav>\n",
             '<div class="work-page-list">']
     for key, label, note in WORK_DISPLAY_BUCKETS:
         if not buckets[key]: continue
@@ -1423,73 +1482,59 @@ GRADES = (("A", "Independent or buyer-side evidence, such as a filing or a custo
 
 def render_method(research, sizes, modified):
     data, canonical = research.data, f"{ORIGIN}/method/"
-    title = f"About the research{SUFFIX}"
+    title = f"About{SUFFIX}"
     description = f"How {SITE_NAME} grades each claim and how to request a correction. Published by {PUBLISHER_NAME}. The research data is free to download."
     crumbs = [("Overview", f"{ORIGIN}/"), ("About", canonical)]
     year = re.match(r"[0-9]{4}", research.as_of)
     claims = data.get("claims", [])
     doubtful = sum(1 for c in claims if c.get("status") in ("unverified", "contested"))
     compiled = f" · research compiled {format_date(research.as_of)}" if research.as_of else ""
-    body = ['<link rel="stylesheet" href="/method-page.css">\n<div class="method-page">\n', crumb_nav(crumbs),
-            '<header class="method-hero"><p class="eyebrow">About ScienceToStartup</p>\n<h1>About the research.</h1>\n'
-            '<p class="lede">A guide to the companies and human work behind AI, built from public sources.</p>\n'
-            '<nav class="method-jumps" aria-label="On this page"><a href="#about">Publisher</a><a href="#figures">Method</a><a href="#grades">Evidence grades</a><a href="#downloads">Downloads</a></nav></header>\n',
-            '<div class="method-about-grid"><article class="method-publisher"><h2 id="about">Who publishes this?</h2>\n'
-            f'<p class="publisher-name">{escape(PUBLISHER_NAME)}</p><p>{SITE_NAME} is a public-source research guide to the companies that produce AI training data.</p>\n'
+    body = ['<link rel="stylesheet" href="/method-page.css">\n<div class="method-page">\n',
+            '<header class="method-intro"><h1 id="about">About</h1>\n'
+            f'<p>A public-source guide to AI data companies and paid work, published by {escape(PUBLISHER_NAME)}.</p></header>\n',
+            '<aside class="method-contact" id="corrections" aria-label="Corrections">'
+            '<a href="mailto:musaeminozdem@gmail.com?subject=ScienceToStartup%20correction&amp;body=Company%3A%20%0D%0AWhat%20is%20wrong%3A%20%0D%0ALink%20to%20a%20source%20with%20the%20right%20value%3A%20%0D%0A">Request a correction</a>'
+            '<p>Include the company and a source. We review requests within seven days.</p></aside>\n',
+            '<div class="method-sections"><details class="method-detail" id="disclosures"><summary>Publisher and disclosures</summary><div class="method-detail-body">\n'
+            f'<p>{SITE_NAME} is published by {escape(PUBLISHER_NAME)}. It is a public-source research guide to the companies that produce AI training data.</p>\n'
             '<p>No profiled company has paid for coverage, and none is a customer, investor or affiliate of the publisher.</p>\n'
             f'<p>{escape(WORK_DISCLOSURE)}</p>\n'
-            f'<p class="method-disclosure"><strong>Disclosure.</strong> {disclosure_html()}</p>\n'
+            f'<p><strong>Disclosure.</strong> {disclosure_html()}</p>\n'
             '<p><strong>Personal data and removal.</strong> Company profiles name founders and executives from public company sources only. Profiles do not show personal contact details. If you are named here and want a record corrected or removed, <a href="#corrections">send a correction request</a>. '
-            f'{VISITS_NOTE}</p></article>\n'
-            '<aside class="method-corrections" id="corrections" aria-labelledby="corrections-title"><p class="eyebrow">Help keep this accurate</p><h2 id="corrections-title">Found something wrong?</h2>\n'
-            '<p>Send the company name, what needs changing, and a link to the source. We review each request within seven days.</p>\n'
-            f'<p class="actions">{cta("mailto:musaeminozdem@gmail.com?subject=ScienceToStartup%20correction&body=Company%3A%20%0D%0AWhat%20is%20wrong%3A%20%0D%0ALink%20to%20a%20source%20with%20the%20right%20value%3A%20%0D%0A", "Request a correction")}</p>\n'
-            '<p class="method-contact-address">musaeminozdem@gmail.com</p>\n'
-            '</aside></div>\n',
-            '<section class="method-section" aria-labelledby="figures"><p class="eyebrow">The method</p><h2 id="figures">Sources, dates, and limits.</h2>\n'
-            '<div class="method-principle-grid"><article><span>01</span><h3>Follow the source</h3><p>Each claim links to its evidence. Company statements, filings, and independent reports carry different grades.</p></article>'
-            '<article><span>02</span><h3>Keep the date</h3><p>A figure keeps its reporting period. Checking a link today does not make an older number current.</p></article>'
-            '<article><span>03</span><h3>Compare like with like</h3><p>Whole-company revenue, a division’s sales, and annualized pace measure different things. Missing figures stay unknown.</p></article></div>\n'
-            '<details class="method-detail"><summary>How financial figures are shown</summary><ul>'
+            f'{VISITS_NOTE}</p></div></details>\n',
+            '<details class="method-detail" id="method-notes"><summary>How we check figures</summary><div class="method-detail-body"><h2 id="figures">How figures are shown</h2>\n'
+            '<p>Each claim links to its evidence. A figure keeps its reporting period and business scope. Missing figures stay unknown.</p><ul>'
             '<li>Each figure keeps its date and business scope: the whole company or one segment.</li>'
             '<li>Key figures use supported claims about reported results. The interactive guide follows the same rule.</li>'
             '<li>Talks, unverified reports, and conflicting sources appear separately as Not confirmed, with their status in words.</li>'
             + (f'<li>Historical marks figures from {int(year.group(0)) - 2} or earlier.</li>' if year else '')
             + '<li>Annualized pace projects recent revenue across a full year. Gross or net revenue is stated when the source specifies it.</li>'
             '<li>Estimates are labeled. Forecasts, targets, and older or partial figures appear under other reported figures, never as key figures.</li>'
-            '<li>Later corrections appear beside the figure. The original records remain in the downloads.</li></ul></details></section>\n',
-            '<section class="method-section" aria-labelledby="grades"><h2 id="grades">Confidence grades</h2>\n<p>A grade describes the strength of a claim’s sources.</p>\n<dl class="grades method-grades">' + "".join(f'<div><dt>{g}</dt><dd>{escape(text)}</dd></div>' for g, text in GRADES) + '</dl>\n']
+            '<li>Later corrections appear beside the figure. The original records remain in the downloads.</li></ul></div></details>\n',
+            '<details class="method-detail" id="evidence-notes"><summary>Evidence grades and delivery rules</summary><div class="method-detail-body"><h2 id="grades">Confidence grades</h2>\n<p>A grade describes the strength of a claim’s sources.</p>\n<dl class="grades method-grades">' + "".join(f'<div><dt>{g}</dt><dd>{escape(text)}</dd></div>' for g, text in GRADES) + '</dl>\n']
     dimensions = (data.get("rubric") or {}).get("dimensions") or []
     if dimensions:
         rows = "".join(f'<tr><th scope="row">{escape(d.get("id"))} · {escape(clean(d.get("label")))}</th>' + "".join(f'<td data-label="Level {n}">{escape(clean((d.get("levels") or {}).get(n)))}</td>' for n in ("1", "2", "3")) + "</tr>" for d in dimensions)
-        body.append('<div class="method-delivery"><h2 id="labels">Delivery evidence</h2>\n<p>This level describes public proof that a company sells and delivers its offer. Four measures, rated 1–3, cover a specific business scope. Funding and valuations do not count toward it.</p>\n'
-                    '<details class="method-detail"><summary>Read the delivery assessment rules</summary>'
-                    f'<table class="wide"><thead><tr><th scope="col">Measure</th><th scope="col">Level 1</th><th scope="col">Level 2</th><th scope="col">Level 3</th></tr></thead><tbody>{rows}</tbody></table></details></div>\n')
-    body.append('</section>\n')
+        body.append('<h2 id="labels">Delivery evidence</h2>\n<p>This level describes public proof that a company sells and delivers its offer. Four measures, rated 1–3, cover a specific business scope. Funding and valuations do not count toward it.</p>\n'
+                    f'<table class="wide"><thead><tr><th scope="col">Measure</th><th scope="col">Level 1</th><th scope="col">Level 2</th><th scope="col">Level 3</th></tr></thead><tbody>{rows}</tbody></table>\n')
+    body.append('</div></details>\n')
     # Some companies hold two ratings (one per business scope), so count the companies rated, as the app's method page does.
     rated = {row.get("company_id") for row in data.get("assessments", [])} & set(research.companies)
     unrated = [c for cid, c in research.companies.items() if cid not in rated]
     unrated_note = (f" The {count_word(len(unrated)).lower()} nonprofit research {'group gets' if len(unrated) == 1 else 'groups get'} no level." if unrated and all(c.get("entity_type") == "adjacent_research" for c in unrated)
                     else f" {plural(len(unrated), 'company has', 'companies have')} no level yet." if unrated else "")
-    body.append('<section class="method-section method-coverage" aria-labelledby="coverage"><h2 id="coverage">Research coverage</h2>\n'
+    body.append('<details class="method-detail" id="coverage-notes"><summary>Coverage and limits</summary><div class="method-detail-body"><h2 id="coverage">Research coverage</h2>\n'
                 f'<p class="method-snapshot">Dataset v{escape(data.get("dataset_version", ""))}{escape(compiled)}</p>\n'
                 f'<p>{plural(len(research.companies), "company profile")} · {plural(len(rated), "company", "companies")} with a delivery evidence level · {plural(len(data.get("sources", [])), "source record")}.{unrated_note}</p>\n'
-                f"<p>{plural(doubtful, 'claim is', 'claims are')} unverified or disputed. Each one is labeled. The guide is a selected study of the market. It does not list every company.</p></section>\n")
+                f"<p>{plural(doubtful, 'claim is', 'claims are')} unverified or disputed. Each one is labeled. The guide is a selected study of the market. It does not list every company.</p></div></details>\n")
     files = [(name, kind, mime, text) for name, kind, mime, text in DOWNLOADS if name in sizes] + [(name, "CSV", "text/csv", f"The {name[:-4].replace('_', ' ')} table") for name in sorted(n for n in sizes if n.endswith(".csv"))]
     if files:
-        main_names = {"research.json": "Research data", "observatory.sqlite": "Research database", "work-routes.json": "Paid work listings"}
-        main_files = [item for item in files if item[0] in main_names]
-        supporting_files = [item for item in files if item[0] not in main_names]
-        cards = "".join(f'<li><p class="method-file-kind">{kind} · {escape(sizes[name])}</p><h3><a href="{ORIGIN}/{escape(name)}" download>{main_names[name]}</a></h3><p>{escape(text)}.</p><span class="method-file-name">{escape(name)}</span></li>' for name, kind, mime, text in main_files)
-        rows = "".join(f'<tr><th scope="row"><a href="{ORIGIN}/{escape(name)}" download>{escape(name)}</a></th><td data-label="Format">{kind}</td><td data-label="Size">{escape(sizes[name])}</td><td data-label="Contents">{escape(text)}</td></tr>' for name, kind, mime, text in supporting_files)
+        rows = "".join(f'<tr><th scope="row"><a href="{ORIGIN}/{escape(name)}" download>{escape(name)}</a></th><td data-label="Format">{kind}</td><td data-label="Size">{escape(sizes[name])}</td><td data-label="Contents">{escape(text)}</td></tr>' for name, kind, mime, text in files)
         version = data.get("dataset_version", "")
-        body.append(f'<section class="method-section" aria-labelledby="downloads"><h2 id="downloads">Download the data</h2>\n<p>Dataset version {escape(version)}{escape(compiled.replace(" · research", ", research"))}. The research data files keep every claim that later research replaced.</p>\n'
-                    f'<ul class="method-files">{cards}</ul>\n'
-                    + (f'<details class="method-detail method-supporting"><summary>Supporting files and CSV tables ({len(supporting_files)})</summary><table class="wide"><thead><tr><th scope="col">File</th><th scope="col">Format</th><th scope="col">Size</th><th scope="col">Contents</th></tr></thead><tbody>{rows}</tbody></table></details>\n' if supporting_files else '')
-                    +
+        body.append(f'<details class="method-detail" id="download-files"><summary>Data and license</summary><div class="method-detail-body"><h2 id="downloads">Download the data</h2>\n<p>Dataset version {escape(version)}{escape(compiled.replace(" · research", ", research"))}. The research data files keep every claim that later research replaced.</p>\n'
                     f'<p>{SITE_NAME} licenses this data under the <a class="ext" rel="license" href="{DATA_LICENSE}">CC BY 4.0 license</a> (any use is allowed if you credit us). Cite {SITE_NAME} and the original sources. Company names and logos belong to their owners. The license does not cover them. It also leaves out product images, photos of people, text quoted from sources and personal contact details.</p>\n'
-                    '</section>\n')
-    body.append('</div>\n')
+                    f'<table class="wide"><thead><tr><th scope="col">File</th><th scope="col">Format</th><th scope="col">Size</th><th scope="col">Contents</th></tr></thead><tbody>{rows}</tbody></table></div></details>\n')
+    body.append('</div></div>\n')
     counts = {key: len(data.get(key, [])) for key in ("companies", "claims", "sources", "metrics", "funding_rounds", "products")}
     counts["current_claims"] = sum(1 for claim in data.get("claims", []) if claim.get("status") != "superseded")
     measured = sorted({KIND_LABELS.get(m.get("kind"), "") for m in data.get("metrics", [])} - {"", KIND_LABELS["other"]})

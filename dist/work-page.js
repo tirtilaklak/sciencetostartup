@@ -10,6 +10,7 @@
   const query = form.elements.namedItem('q');
   const kind = form.elements.namedItem('kind');
   const arrangement = form.elements.namedItem('arrangement');
+  const filterOptions = form.querySelector('.work-page-filter-options');
   const fold = value => String(value || '').normalize('NFKD').replace(/\p{M}/gu, '').toLocaleLowerCase().replace(/\s+/g, ' ').trim();
   const records = groups.flatMap(group => [...group.querySelectorAll('[data-work-route]')].map(card => ({
     card, group,
@@ -24,6 +25,7 @@
     query.value = (params.get('q') || '').slice(0, 256);
     kind.value = validValue(kind, params.get('kind') || '');
     arrangement.value = validValue(arrangement, params.get('arrangement') || '');
+    if (filterOptions && (kind.value || arrangement.value)) filterOptions.open = true;
   }
   function render(updateURL = true) {
     const words = fold(query.value).split(' ').filter(Boolean);
@@ -59,6 +61,7 @@
   }
   function reset() {
     query.value = ''; kind.value = ''; arrangement.value = '';
+    if (filterOptions) filterOptions.open = false;
     render(); query.focus();
   }
   function revealGroup(hash) {
