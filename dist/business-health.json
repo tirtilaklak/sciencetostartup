@@ -1,6 +1,6 @@
 {
-  "version": "1.1.0",
-  "dashboard_curated_on": "2026-10-28",
+  "version": "1.2.0",
+  "dashboard_curated_on": "2026-11-16",
   "source_dataset_version": "2.5.0",
   "source_dataset_reviewed_on": "2026-10-15",
   "universe_count": 39,
@@ -64,12 +64,12 @@
     ],
     "calculations": "Calculated observations retain formula, input observation IDs and original evidence. No interpolated revenue series, invented active-worker counts or undisclosed-margin estimates are presented as facts.",
     "estimates": "No new financial estimate is invented for missing data. A defensible future estimate must carry a range, explicit assumptions, date, scope and source inputs, and be switchable independently from reported observations.",
-    "freshness": "Selected financial statements and company disclosures were read on 28 October 2026. Each source check records its outcome separately from the reporting period. Other observations retain the October 15 research review; a page retrieval does not verify every claim. A second primary-source pass added separately dated company operating statements and corrected estimate/accounting-basis classifications; unavailable revenue sources remain flagged."
+    "freshness": "Selected financial statements and company disclosures were read on 28 October 2026. Each source check records its outcome separately from the reporting period. Other observations retain the October 15 research review; a page retrieval does not verify every claim. A second primary-source pass added separately dated company operating statements and corrected estimate/accounting-basis classifications; unavailable revenue sources remain flagged. TaskUs Q3 2026 reporting was separately read on 16 November 2026; that review does not refresh other companies or earlier receipts."
   },
   "source_checks": {
-    "checked_on": "2026-10-28",
+    "checked_on": "2026-11-16",
     "status": "partial_content_refresh",
-    "notes": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results are scheduled for 4 November. Second pass reviewed private-company primary news indexes; no newer revenue is inferred from product announcements, funding, commitments or network reach.",
+    "notes": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results published on 4 November were separately reviewed on 16 November; the October receipts retain their original dates. Second pass reviewed private-company primary news indexes; no newer revenue is inferred from product announcements, funding, commitments or network reach.",
     "entries": [
       {
         "source_id": "appen.source.audit-ap_2025",
@@ -303,6 +303,20 @@
         "status": "content_checked",
         "note": "Read official review published 16 December 2025; 380K+ studies/tasks and8M+ contribution hours refer to 2025 through publication, not a verified completed financial year or paid-only series.",
         "content_sha256": "60d0228bd550632e4e4166a9a1e2b9e28666e8e616987e3b8e5d542e46b7c327"
+      },
+      {
+        "source_id": "refresh.source.taskus-q3-2026",
+        "url": "https://www.taskus.com/press-release/taskus-announces-fiscal-third-quarter-2026-results/",
+        "checked_on": "2026-11-16",
+        "checked_at": "2026-11-16T18:58:06.546450+00:00",
+        "published_on": "2026-11-04",
+        "http_status": 200,
+        "status": "content_checked",
+        "content_sha256": "81e9aec198a936e0018551b411ce4e6570184277081dfd821c1a0a882f9dd5f2",
+        "response_bytes": 414891,
+        "reviewer": "Codex source review",
+        "approval_basis": "source_content_review",
+        "note": "Read the 4 November release: consolidated service revenue is $314.747M for Q3 2026 and $929.868M for the nine months ended 30 September. AI Services growth is 27.7% year over year and its trailing-year revenue exceeds $250M. The interim statements are unaudited."
       }
     ]
   },
@@ -4826,6 +4840,169 @@
       "cohort": "2025 as reported 16 Dec; cutoff unstated · count · Whole company · not applicable",
       "cohort_label": "2025 as reported 16 Dec; cutoff unstated · count · Whole company · not applicable",
       "cohort_key": "period_completed_tasks|year_to_date|2025||count|company|not_applicable"
+    },
+    {
+      "id": "refresh.taskus.9m-2026-group-revenue",
+      "company_id": "taskus",
+      "signal": "revenue",
+      "label": "Service revenue",
+      "qualifier": "exact",
+      "as_of": "9M 2026",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.taskus.9m-2026-group-revenue.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "refresh.source.taskus-q3-2026"
+      ],
+      "basis": "Service revenue of USD 929,868,000 for the nine months ended 30 September 2026.",
+      "limitations": "Whole-company consolidated service revenue; it includes all service lines. Interim financial reporting is unaudited.",
+      "original_text": "$929,868",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "TaskUs consolidated group; all service lines",
+      "evidence_checked_on": "2026-11-16",
+      "measure": "period_revenue",
+      "value": 929868000,
+      "unit": "currency",
+      "currency": "USD",
+      "period": {
+        "type": "year_to_date",
+        "label": "9M 2026",
+        "year": 2026,
+        "start": "2026-01-01",
+        "end": "2026-09-30"
+      },
+      "scope": "company",
+      "accounting_basis": "unspecified",
+      "cohort": "9M 2026 · USD · Whole company · Gross/net undisclosed",
+      "cohort_label": "9M 2026 · USD · Whole company · Gross/net undisclosed",
+      "cohort_key": "period_revenue|year_to_date|2026|2026-09-30|USD|company|unspecified",
+      "source_locator": "Condensed consolidated statements of income; amounts in USD thousands; Service revenue row; 2026 nine-month column"
+    },
+    {
+      "id": "refresh.taskus.q3-2026-group-revenue",
+      "company_id": "taskus",
+      "signal": "revenue",
+      "label": "Service revenue",
+      "qualifier": "exact",
+      "as_of": "Q3 2026",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.taskus.q3-2026-group-revenue.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "refresh.source.taskus-q3-2026"
+      ],
+      "basis": "Service revenue of USD 314,747,000 for the three months ended 30 September 2026.",
+      "limitations": "Whole-company consolidated service revenue; it includes all service lines. Interim financial reporting is unaudited.",
+      "original_text": "Service revenue $314,747",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "TaskUs consolidated group; all service lines",
+      "evidence_checked_on": "2026-11-16",
+      "measure": "period_revenue",
+      "value": 314747000,
+      "unit": "currency",
+      "currency": "USD",
+      "period": {
+        "type": "quarter",
+        "label": "Q3 2026",
+        "year": 2026,
+        "start": "2026-07-01",
+        "end": "2026-09-30"
+      },
+      "scope": "company",
+      "accounting_basis": "unspecified",
+      "cohort": "Q3 2026 · USD · Whole company · Gross/net undisclosed",
+      "cohort_label": "Q3 2026 · USD · Whole company · Gross/net undisclosed",
+      "cohort_key": "period_revenue|quarter|2026|2026-09-30|USD|company|unspecified",
+      "source_locator": "Condensed consolidated statements of income; amounts in USD thousands; Service revenue row; 2026 three-month column"
+    },
+    {
+      "id": "refresh.taskus.q3-2026-ai-revenue-growth",
+      "company_id": "taskus",
+      "signal": "revenue",
+      "label": "AI Services revenue growth",
+      "qualifier": "exact",
+      "as_of": "Q3 2026",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.taskus.q3-2026-ai-revenue-growth.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "refresh.source.taskus-q3-2026"
+      ],
+      "basis": "AI Services revenue growth of 27.7% compared with Q3 2025.",
+      "limitations": "Issuer-reported service-line growth, separate from whole-company revenue. Interim financial reporting is unaudited.",
+      "original_text": "At 27.7%",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "AI business / service line",
+      "scope_detail": "TaskUs AI Services service line",
+      "evidence_checked_on": "2026-11-16",
+      "measure": "revenue_growth_yoy",
+      "value": 27.7,
+      "unit": "percent",
+      "period": {
+        "type": "quarter",
+        "label": "Q3 2026",
+        "year": 2026,
+        "start": "2026-07-01",
+        "end": "2026-09-30"
+      },
+      "scope": "ai_data",
+      "accounting_basis": "reported",
+      "cohort": "Q3 2026 · percent · AI business / service line · Reported",
+      "cohort_label": "Q3 2026 · percent · AI business / service line · Reported",
+      "cohort_key": "revenue_growth_yoy|quarter|2026|2026-09-30||ai_data|reported",
+      "source_locator": "Third Quarter 2026 Financial and Frontline Highlights; first AI Services bullet; year-over-year growth"
+    },
+    {
+      "id": "refresh.taskus.september-2026-ai-ttm-revenue",
+      "company_id": "taskus",
+      "signal": "revenue",
+      "label": "AI Services trailing-year revenue",
+      "qualifier": "greater_than",
+      "as_of": "TTM to 30 Sep 2026",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.taskus.september-2026-ai-ttm-revenue.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "refresh.source.taskus-q3-2026"
+      ],
+      "basis": "AI Services revenue exceeded USD 250,000,000 over the trailing twelve months ended 30 September 2026.",
+      "limitations": "Issuer-reported lower bound for the AI Services service line. The source gives no exact trailing-year amount.",
+      "original_text": "AI Services eclipsed $250 million",
+      "evidence_assurance": "Interim company reporting; unaudited",
+      "is_context": false,
+      "scope_label": "AI business / service line",
+      "scope_detail": "TaskUs AI Services service line",
+      "evidence_checked_on": "2026-11-16",
+      "measure": "period_revenue",
+      "value": 250000000,
+      "unit": "currency",
+      "currency": "USD",
+      "period": {
+        "type": "trailing_year",
+        "label": "TTM to 30 Sep 2026",
+        "year": 2026,
+        "start": "2025-10-01",
+        "end": "2026-09-30"
+      },
+      "scope": "ai_data",
+      "accounting_basis": "unspecified",
+      "cohort": "TTM to 30 Sep 2026 · USD · AI business / service line · Gross/net undisclosed",
+      "cohort_label": "TTM to 30 Sep 2026 · USD · AI business / service line · Gross/net undisclosed",
+      "cohort_key": "period_revenue|trailing_year|2026|2026-09-30|USD|ai_data|unspecified",
+      "source_locator": "Third Quarter 2026 Financial and Frontline Highlights; first AI Services bullet; trailing-twelve-month revenue"
     }
   ],
   "measure_definitions": [
@@ -5703,6 +5880,17 @@
       "published_on": "2025-12-16",
       "accessed_on": "2026-10-28",
       "retrieval_status": "checked"
+    },
+    {
+      "id": "refresh.source.taskus-q3-2026",
+      "company_id": "taskus",
+      "title": "TaskUs Announces Fiscal Third Quarter 2026 Results",
+      "url": "https://www.taskus.com/press-release/taskus-announces-fiscal-third-quarter-2026-results/",
+      "publisher": "TaskUs",
+      "source_type": "company",
+      "published_on": "2026-11-04",
+      "accessed_on": "2026-11-16",
+      "retrieval_status": "checked"
     }
   ],
   "fresh_claims": [
@@ -6070,6 +6258,133 @@
         "scope": "company",
         "accounting_basis": "not_applicable"
       }
+    },
+    {
+      "id": "refresh.taskus.9m-2026-group-revenue.claim",
+      "company_id": "taskus",
+      "status": "supported",
+      "statement": "TaskUs reported USD 929,868,000 in consolidated service revenue for the nine months ended 30 September 2026.",
+      "source_ids": [
+        "refresh.source.taskus-q3-2026"
+      ],
+      "observed_on": "2026-11-16",
+      "confidence": "B",
+      "evidence_label": "Company-reported; unaudited",
+      "excerpt": "$929,868",
+      "source_locator": "Condensed consolidated statements of income; amounts in USD thousands; Service revenue row; 2026 nine-month column",
+      "fact": {
+        "measure": "period_revenue",
+        "value": 929868000,
+        "unit": "currency",
+        "currency": "USD",
+        "period": {
+          "type": "year_to_date",
+          "label": "9M 2026",
+          "year": 2026,
+          "start": "2026-01-01",
+          "end": "2026-09-30"
+        },
+        "scope": "company",
+        "accounting_basis": "unspecified"
+      },
+      "qualifier": "exact",
+      "reviewer": "Codex source review",
+      "approval_basis": "source_content_review"
+    },
+    {
+      "id": "refresh.taskus.q3-2026-group-revenue.claim",
+      "company_id": "taskus",
+      "status": "supported",
+      "statement": "TaskUs reported USD 314,747,000 in consolidated service revenue for the three months ended 30 September 2026.",
+      "source_ids": [
+        "refresh.source.taskus-q3-2026"
+      ],
+      "observed_on": "2026-11-16",
+      "confidence": "B",
+      "evidence_label": "Company-reported; unaudited",
+      "excerpt": "Service revenue $314,747",
+      "source_locator": "Condensed consolidated statements of income; amounts in USD thousands; Service revenue row; 2026 three-month column",
+      "fact": {
+        "measure": "period_revenue",
+        "value": 314747000,
+        "unit": "currency",
+        "currency": "USD",
+        "period": {
+          "type": "quarter",
+          "label": "Q3 2026",
+          "year": 2026,
+          "start": "2026-07-01",
+          "end": "2026-09-30"
+        },
+        "scope": "company",
+        "accounting_basis": "unspecified"
+      },
+      "qualifier": "exact",
+      "reviewer": "Codex source review",
+      "approval_basis": "source_content_review"
+    },
+    {
+      "id": "refresh.taskus.q3-2026-ai-revenue-growth.claim",
+      "company_id": "taskus",
+      "status": "supported",
+      "statement": "TaskUs reported 27.7% year-over-year growth in AI Services revenue for Q3 2026.",
+      "source_ids": [
+        "refresh.source.taskus-q3-2026"
+      ],
+      "observed_on": "2026-11-16",
+      "confidence": "B",
+      "evidence_label": "Company-reported; unaudited",
+      "excerpt": "At 27.7%",
+      "source_locator": "Third Quarter 2026 Financial and Frontline Highlights; first AI Services bullet; year-over-year growth",
+      "fact": {
+        "measure": "revenue_growth_yoy",
+        "value": 27.7,
+        "unit": "percent",
+        "period": {
+          "type": "quarter",
+          "label": "Q3 2026",
+          "year": 2026,
+          "start": "2026-07-01",
+          "end": "2026-09-30"
+        },
+        "scope": "ai_data",
+        "accounting_basis": "reported"
+      },
+      "qualifier": "exact",
+      "reviewer": "Codex source review",
+      "approval_basis": "source_content_review"
+    },
+    {
+      "id": "refresh.taskus.september-2026-ai-ttm-revenue.claim",
+      "company_id": "taskus",
+      "status": "supported",
+      "statement": "TaskUs reported AI Services trailing-twelve-month revenue above USD 250,000,000 in its Q3 2026 results.",
+      "source_ids": [
+        "refresh.source.taskus-q3-2026"
+      ],
+      "observed_on": "2026-11-16",
+      "confidence": "B",
+      "evidence_label": "Company-reported; unaudited",
+      "excerpt": "AI Services eclipsed $250 million",
+      "source_locator": "Third Quarter 2026 Financial and Frontline Highlights; first AI Services bullet; trailing-twelve-month revenue",
+      "fact": {
+        "measure": "period_revenue",
+        "value": 250000000,
+        "unit": "currency",
+        "currency": "USD",
+        "period": {
+          "type": "trailing_year",
+          "label": "TTM to 30 Sep 2026",
+          "year": 2026,
+          "start": "2025-10-01",
+          "end": "2026-09-30"
+        },
+        "scope": "ai_data",
+        "accounting_basis": "unspecified"
+      },
+      "qualifier": "greater_than",
+      "reviewer": "Codex source review",
+      "approval_basis": "source_content_review"
     }
   ],
   "private_company_review": [

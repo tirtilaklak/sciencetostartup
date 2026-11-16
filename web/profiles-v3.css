@@ -169,3 +169,5 @@ footer .footer-line .site-map{display:flex;flex-wrap:wrap;gap:4px 20px}
 footer .footer-line .site-map a{min-height:44px;display:inline-flex;align-items:center;font-size:13px}
 .topbar .wordmark small{display:none}
 @media(max-width:700px){.profile-v2 .profile-at-a-glance{grid-template-columns:1fr;gap:20px}.profile-v2 .profile-glance-work{border-left:0;border-top:1px solid var(--border);padding:16px 0 0}.profile-v2 .profile-tabs{gap:16px}.profile-v2 .profile-tabs [role=tab]{font-size:13px}footer .footer-line{display:block}footer .footer-line p{margin-bottom:8px}}
+
+.company-current-facts{margin:12px 0;font-size:14px}.company-current-facts>summary{cursor:pointer;min-height:44px;padding:10px 0}.current-fact-list{margin:0}.current-fact-list>div{padding:8px 0;border-top:1px solid var(--border)}.current-fact-list dt{font-weight:600}.current-fact-list dd{margin:4px 0 0;overflow-wrap:anywhere}

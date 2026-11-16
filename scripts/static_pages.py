@@ -1291,6 +1291,18 @@ def company_headline_facts(research, company, figures, profile_entry, business_h
     return '<section class="company-key-facts" aria-label="Reported facts">' + "".join(cards[:2]) + '</section>'
 
 
+def current_facts_html(profile_entry):
+    """Structured supplemental facts; original research and narrative stay separate."""
+    facts = (profile_entry or {}).get("current_facts") or {}
+    if not facts.get("rows"): return ""
+    sources = facts["sources"]
+    rows = []
+    for row in facts["rows"]:
+        links = " ".join(external_link(sources[i]["url"], f"[{i + 1}]", sources[i]["title"]) for i in row["source_indexes"])
+        rows.append(f'<div><dt>{escape(row["label"])}</dt><dd>{escape(row["value"])} {links}</dd></div>')
+    return f'<details class="company-current-facts"><summary>Updates checked {escape(format_date(facts["reviewed_on"]))}</summary><dl class="current-fact-list">{"".join(rows)}</dl></details>'
+
+
 def render_company(research, company, editorial_entry, profile_entry, routes, peers, labels, modified, events=None, business_health=None):
     cid, name = company["id"], clean(company["name"])
     company = dict(company, name=name)
@@ -1319,7 +1331,7 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     body = ['<link rel="stylesheet" href="/company-profile.css">\n', crumb_nav(crumbs), '<article class="company-dossier">',
             f'<header class="company-hero"><div class="company-name">{brand}<h1>{escape(name)}</h1></div>'
             f'<p class="lede">{escape(lead)}</p><p class="company-actions">{website}{work_link}</p></header>',
-            company_headline_facts(research, company, figures, profile_entry, business_health)]
+            company_headline_facts(research, company, figures, profile_entry, business_health), current_facts_html(profile_entry)]
     dated, risk_rows = company_events(events, cid), risk_claims(research, cid)
     critical = next((event for event in dated if event.get("kind") in ("lawsuit", "data_incident")), None)
     if critical:
@@ -1380,7 +1392,7 @@ def group_order(groups):
     return sorted(groups, key=lambda g: (-len(groups[g]), locale_key(g)))
 
 
-def render_index(research, companies, editorial_by_id, labels, work_count, modified, business_health=None):
+def render_index(research, companies, editorial_by_id, labels, work_count, modified, business_health=None, profile_by_id=None):
     canonical, count = f"{ORIGIN}/companies/", len(companies)
     title = f"AI data companies: {count} sourced profiles{SUFFIX}"
     description = f"Profiles of {count} AI data companies, grouped by what they sell. Each figure links to its source and shows when we checked or recorded it."
@@ -1406,7 +1418,7 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
             summary = clean((editorial_by_id.get(cid) or {}).get('summary')) or shown_text(research, c.get('description'))
             logo = logos.get(cid)
             brand = (f'<span class="directory-logo {"on-dark" if logo.get("background") == "dark" else ""}"><img src="/{escape(logo["local_path"])}" alt="" width="40" height="40" loading="lazy"></span>' if logo else '')
-            items.append(f'<li class="directory-company" data-company="{escape(cid)}" data-search="{escape(name + " " + summary)}"><div class="directory-company-heading">{brand}<a href="{ORIGIN}/company/{escape(cid)}/">{escape(name)}<span aria-hidden="true"> →</span></a></div><p>{escape(summary)}</p>{business_observation_html(research, business_health, cid, inline=True)}</li>')
+            items.append(f'<li class="directory-company" data-company="{escape(cid)}" data-search="{escape(name + " " + summary)}"><div class="directory-company-heading">{brand}<a href="{ORIGIN}/company/{escape(cid)}/">{escape(name)}<span aria-hidden="true"> →</span></a></div><p>{escape(summary)}</p>{business_observation_html(research, business_health, cid, inline=True)}{current_facts_html((profile_by_id or {}).get(cid))}</li>')
         body.append(f'<section class="directory-section" data-group="{group_slug(g)}"><div class="directory-section-heading"><h2 id="{group_slug(g)}">{escape(labels.get(g, g))}</h2><span>{plural(len(groups[g]), "company", "companies")}</span></div><ul class="index-list directory-grid">{"".join(items)}</ul></section>\n')
     body.append(f'<details class="directory-scope"><summary>Coverage and sources</summary><p>{COVERAGE} Firms not yet profiled include {escape(join_words(list(NOT_YET_PROFILED)))}.</p><p>Each figure keeps its reporting date, business scope and source. Each profile lists any paid work we found.' + (f' {count_word(nonprofit)} of the {count} are nonprofit research groups.' if nonprofit else '') + f'</p><a href="{ORIGIN}/method/">How we check the research</a></details><p class="actions directory-next"><a href="{ORIGIN}/explore/#companies">Compare companies in the full guide</a>' + (f'<a href="{ORIGIN}/work/">See {plural(work_count, "paid work route")}</a>' if work_count else '') + '</p><script src="/companies-page.js" data-page-enhancement-script defer></script>')
     structured = page_node("CollectionPage", title, description, canonical, modified, crumbs, mainEntity={"@type": "ItemList", "numberOfItems": count, "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": clean(c["name"]), "url": f"{ORIGIN}/company/{c['id']}/"} for i, c in enumerate(companies)]})
@@ -1607,17 +1619,17 @@ def write_static_pages(data, destination, work_data=None, profile_content=None, 
         own = [r for r in routes if r["company_id"] == cid]
         group = (editorial_by_id.get(cid) or {}).get("primary_offering")
         peers = [c for c in by_name if c["id"] != cid and group and (editorial_by_id.get(c["id"]) or {}).get("primary_offering") == group]
-        modified = latest(research.as_of, SITE_REVISED, (editorial_by_id.get(cid) or {}).get("reviewed_on"), events_reviewed if company_events(events, cid) else "", *(d for r in own for d in route_dates(r))) or research.as_of
+        modified = latest(research.as_of, SITE_REVISED, (editorial_by_id.get(cid) or {}).get("reviewed_on"), ((profile_by_id.get(cid) or {}).get("current_facts") or {}).get("reviewed_on"), events_reviewed if company_events(events, cid) else "", *(d for r in own for d in route_dates(r))) or research.as_of
         folder = destination / "company" / cid
         folder.mkdir(parents=True, exist_ok=True)
         (folder / "index.html").write_text(render_company(research, company, editorial_by_id.get(cid), profile_by_id.get(cid), own, peers, labels, modified, events, business_health), encoding="utf-8")
         written.append(folder / "index.html")
         company_entries.append((f"{ORIGIN}/company/{cid}/", modified))
-    index_modified = latest(research.as_of, SITE_REVISED, *reviewed) or research.as_of
+    index_modified = latest(research.as_of, SITE_REVISED, *reviewed, *((e.get("current_facts") or {}).get("reviewed_on") for e in profile_by_id.values()), (business_health or {}).get("reviewed_on")) or research.as_of
     work_modified = latest(research.as_of, SITE_REVISED, *(d for r in routes for d in route_dates(r))) or research.as_of
     method_modified = latest(research.as_of, SITE_REVISED) or research.as_of
     sizes = {path.name: file_size(path.stat().st_size) for path in sorted(destination.iterdir()) if path.is_file() and (path.suffix == ".csv" or path.name in {d[0] for d in DOWNLOADS})}
-    pages = {"companies": render_index(research, by_name, editorial_by_id, labels, sum(1 for r in routes if work_primary(r)), index_modified, business_health), "work": render_work(research, routes, names, work_modified), "method": render_method(research, sizes, method_modified)}
+    pages = {"companies": render_index(research, by_name, editorial_by_id, labels, sum(1 for r in routes if work_primary(r)), index_modified, business_health, profile_by_id), "work": render_work(research, routes, names, work_modified), "method": render_method(research, sizes, method_modified)}
     for name, page in pages.items():
         (destination / name).mkdir(parents=True, exist_ok=True)
         (destination / name / "index.html").write_text(page, encoding="utf-8")
