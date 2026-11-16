@@ -48,12 +48,6 @@ These belong to their owners. Neither this license nor the MIT license in
 - Text quoted from sources, such as `source_quote` fields and pay details
   copied from job listings, and the titles of source articles. These stay with
   their authors.
-- Wikipedia descriptions in `data/current-companies.json`, its public JSON
-  copy, company cards, search results and linked profiles are by Wikipedia
-  contributors under CC BY-SA 4.0, not the site's CC BY 4.0 or MIT license.
-  Each record retains the article, permanent revision, author history, license
-  link and extraction notice. Preserve those credits and the applicable
-  share-alike terms when reusing these excerpts.
 - Personal contact details. Dataset 2.5.0 still holds one person's email
   address in its records. The next dataset release removes it. Do not reuse
   it.

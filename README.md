@@ -197,6 +197,8 @@ Their review dates do not renew older research claims. A Wikipedia response hash
 identifies the captured revision API response containing the article wikitext;
 primary-source hashes identify the stated HTTP body or saved web-tool excerpt.
 The exported `/current-companies.json` preserves this provenance and licensing.
+See [Wikipedia excerpt licensing](LICENSE-WIKIPEDIA.md); archived research license
+documents retain their original bytes.
 
 `build()` in `scripts/observatory.py` turns `web/` and the data into `dist/`.
 
