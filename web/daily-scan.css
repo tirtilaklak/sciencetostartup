@@ -8,6 +8,7 @@
 .scan-issue>span:first-child{font:11px/1.5 ui-monospace,SFMono-Regular,monospace;letter-spacing:.1em}
 .scan-issue strong{font-size:18px;color:var(--ink);font-weight:500}
 .scan-controls{display:grid;grid-template-columns:230px 1fr 140px 155px;gap:16px;padding:24px 0;border-bottom:1px solid var(--border)}
+:root[data-daily-pending] .daily-scan .scan-controls[hidden]{display:grid!important;visibility:hidden}
 .scan-controls label{display:block;font-size:11px;letter-spacing:.025em;color:var(--muted);margin-bottom:8px}
 .scan-controls input,.scan-controls select{width:100%;border-color:var(--border);background:transparent;border-radius:3px;font-size:13px;min-height:44px}
 .scan-date-control>div{display:flex;align-items:center;gap:4px}

@@ -95,7 +95,8 @@ def render(edition, editions, canonical, root=ROOT):
             f'<div class="scan-context">{contexts}</div><a href="/daily/wikipedia-context.json">Wikipedia revision & download records</a></details>'
             f'<details><summary>Snapshot archive</summary><div class="scan-archive">{archive}</div></details><a class="scan-download" href="/daily/{day}/snapshot.json" download>Download this snapshot · JSON</a></footer></div>')
     page = document(SimpleNamespace(as_of="", data={}), "Daily scan · ScienceToStartup", "Daily reading list: RLHF, data, evaluation and AI company news, with dated snapshots and original sources.", canonical, body, current="daily")
-    return page.replace('</head>', '<link rel="stylesheet" href="/daily-scan.css">\n<script src="/daily-scan.js" defer></script>\n</head>')
+    pending = '<script>document.documentElement.setAttribute("data-daily-pending","");addEventListener("error",function(event){if(event.error||event.target.hasAttribute&&event.target.hasAttribute("data-daily-script"))document.documentElement.removeAttribute("data-daily-pending")},true)</script>'
+    return page.replace('<head>', '<head>' + pending).replace('</head>', '<link rel="stylesheet" href="/daily-scan.css">\n<script src="/daily-scan.js" data-daily-script defer></script>\n</head>')
 
 
 def write_daily_scan(destination, root=ROOT):

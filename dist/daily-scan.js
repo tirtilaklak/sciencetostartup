@@ -67,5 +67,6 @@
   addEventListener('hashchange', revealHash);
   filter(false);
   root.querySelector('.scan-controls').hidden = false;
+  document.documentElement.removeAttribute('data-daily-pending');
   revealHash();
 })();
