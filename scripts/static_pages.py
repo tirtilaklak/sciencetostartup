@@ -1392,7 +1392,12 @@ def group_order(groups):
     return sorted(groups, key=lambda g: (-len(groups[g]), locale_key(g)))
 
 
-def render_index(research, companies, editorial_by_id, labels, work_count, modified, business_health=None, profile_by_id=None):
+def render_index(research, companies, editorial_by_id, labels, work_count, modified, business_health=None, profile_by_id=None, current_entries=None, current_reviewed_on=""):
+    current_entries = current_entries or []
+    current_by_id = {row["entity_id"]: row for row in current_entries}
+    historical_count = len(companies)
+    companies = sorted([*companies, *[{"id": row["entity_id"], "name": row["name"]} for row in current_entries]], key=lambda c: (locale_key(clean(c["name"])), c["id"]))
+    editorial_by_id = {**editorial_by_id, **{row["entity_id"]: {"primary_offering": row["group"], "summary": row["wikipedia"]["description"]} for row in current_entries}}
     canonical, count = f"{ORIGIN}/companies/", len(companies)
     title = f"AI data companies: {count} sourced profiles{SUFFIX}"
     description = f"Profiles of {count} AI data companies, grouped by what they sell. Each figure links to its source and shows when we checked or recorded it."
@@ -1401,12 +1406,13 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
     for c in companies: groups.setdefault((editorial_by_id.get(c["id"]) or {}).get("primary_offering") or "Other", []).append(c)
     order = group_order(groups)
     nonprofit = len(groups.get("Nonprofit research", []))
-    compiled = f" · research compiled {format_date(research.as_of)}" if research.as_of else ""
+    compiled = f" · {'historical ' if current_entries else ''}research compiled {format_date(research.as_of)}" if research.as_of else ""
+    additions = f" · {historical_count} original profiles + {len(current_entries)} current additions" if current_entries else ""
     logos = {row['company_id']: row for row in json.loads((ROOT / 'data/logo-provenance.json').read_text()).get('logos', []) if row.get('status') == 'verified' and row.get('local_path')}
     body = ['<link rel="stylesheet" href="/companies-page.css">', crumb_nav(crumbs),
             '<header class="directory-intro"><h1>AI data companies</h1>',
             '<p class="lede">Who makes AI training data, what they offer, and where the evidence comes from.</p>',
-            f'<p class="directory-meta">{count} profiles · {len(groups)} business groups{escape(compiled)}</p></header>',
+            f'<p class="directory-meta">{count} profiles · {len(groups)} business groups{additions}{escape(compiled)}</p></header>',
             '<form class="directory-filters" id="company-filters" role="search" hidden><label>Search companies<input type="search" id="company-query" name="q" placeholder="Name, offering, or specialty" autocomplete="off"></label><label>Business group<select id="company-group" name="group"><option value="">All groups</option>' + ''.join(f'<option value="{group_slug(g)}">{escape(labels.get(g, g))}</option>' for g in order) + '</select></label><button type="reset">Clear</button></form>',
             f'<p class="directory-result" id="company-count" role="status" aria-live="polite">{count} companies</p>',
             '<p id="company-empty" class="directory-empty" hidden>No companies match. Try a name or a broader search.</p>',
@@ -1418,9 +1424,20 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
             summary = clean((editorial_by_id.get(cid) or {}).get('summary')) or shown_text(research, c.get('description'))
             logo = logos.get(cid)
             brand = (f'<span class="directory-logo {"on-dark" if logo.get("background") == "dark" else ""}"><img src="/{escape(logo["local_path"])}" alt="" width="40" height="40" loading="lazy"></span>' if logo else '')
-            items.append(f'<li class="directory-company" data-company="{escape(cid)}" data-search="{escape(name + " " + summary)}"><div class="directory-company-heading">{brand}<a href="{ORIGIN}/company/{escape(cid)}/">{escape(name)}<span aria-hidden="true"> →</span></a></div><p>{escape(summary)}</p>{business_observation_html(research, business_health, cid, inline=True)}{current_facts_html((profile_by_id or {}).get(cid))}</li>')
+            current_entry = current_by_id.get(cid)
+            search_text = name + " " + summary + (" " + " ".join(row["label"] for row in current_entry["offerings"]) if current_entry else "")
+            if current_entry:
+                from current_companies import current_company_html
+                content = current_company_html(current_entry, current_reviewed_on, compact=True)
+            else:
+                content = f'<p>{escape(summary)}</p>{business_observation_html(research, business_health, cid, inline=True)}{current_facts_html((profile_by_id or {}).get(cid))}'
+            items.append(f'<li class="directory-company" data-company="{escape(cid)}" data-search="{escape(search_text)}"><div class="directory-company-heading">{brand}<a href="{ORIGIN}/company/{escape(cid)}/">{escape(name)}<span aria-hidden="true"> →</span></a></div>{content}</li>')
         body.append(f'<section class="directory-section" data-group="{group_slug(g)}"><div class="directory-section-heading"><h2 id="{group_slug(g)}">{escape(labels.get(g, g))}</h2><span>{plural(len(groups[g]), "company", "companies")}</span></div><ul class="index-list directory-grid">{"".join(items)}</ul></section>\n')
-    body.append(f'<details class="directory-scope"><summary>Coverage and sources</summary><p>{COVERAGE} Firms not yet profiled include {escape(join_words(list(NOT_YET_PROFILED)))}.</p><p>Each figure keeps its reporting date, business scope and source. Each profile lists any paid work we found.' + (f' {count_word(nonprofit)} of the {count} are nonprofit research groups.' if nonprofit else '') + f'</p><a href="{ORIGIN}/method/">How we check the research</a></details><p class="actions directory-next"><a href="{ORIGIN}/explore/#companies">Compare companies in the full guide</a>' + (f'<a href="{ORIGIN}/work/">See {plural(work_count, "paid work route")}</a>' if work_count else '') + '</p><script src="/companies-page.js" data-page-enhancement-script defer></script>')
+    missing = [name for name in NOT_YET_PROFILED if not any(name.casefold() in row["name"].casefold().split(" / ") for row in current_entries)]
+    remaining = f' Firms not yet listed in this directory include {escape(join_words(missing))}.' if missing else ''
+    scope = (f' The {len(current_entries)} current additions retain separate dated Wikipedia attribution and official-source offering checks. They do not change the {historical_count}-company historical dataset or published research coverage.' if current_entries else '')
+    compare = f'Compare {historical_count} original profiles in the full guide' if current_entries else 'Compare companies in the full guide'
+    body.append(f'<details class="directory-scope"><summary>Coverage and sources</summary><p>{COVERAGE}{remaining}{scope}</p><p>Each figure keeps its reporting date, business scope and source. Historical profiles list any paid work recorded.' + (f' {count_word(nonprofit)} of the {count} are nonprofit research groups.' if nonprofit else '') + f'</p><a href="{ORIGIN}/method/">How we check the research</a></details><p class="actions directory-next"><a href="{ORIGIN}/explore/#companies">{compare}</a>' + (f'<a href="{ORIGIN}/work/">See {plural(work_count, "paid work route")}</a>' if work_count else '') + '</p><script src="/companies-page.js" data-page-enhancement-script defer></script>')
     structured = page_node("CollectionPage", title, description, canonical, modified, crumbs, mainEntity={"@type": "ItemList", "numberOfItems": count, "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": clean(c["name"]), "url": f"{ORIGIN}/company/{c['id']}/"} for i, c in enumerate(companies)]})
     return document(research, title, description, canonical, "".join(body), structured, current="companies", note=f"<p>{LOGO_NOTE}</p>")
 
@@ -1591,7 +1608,7 @@ def read_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8")) if Path(path).is_file() else None
 
 
-def write_static_pages(data, destination, work_data=None, profile_content=None, editorial=None, events=None, link_health=None, root=ROOT, business_health=None):
+def write_static_pages(data, destination, work_data=None, profile_content=None, editorial=None, events=None, link_health=None, root=ROOT, business_health=None, current_companies=None):
     """Write /company/<id>/, /companies/, /work/, /method/, 404.html and sitemap.xml.
     `events` is the company events sidecar and `link_health` the link checks, both as the build validated them."""
     destination, root = Path(destination), Path(root)
@@ -1625,11 +1642,11 @@ def write_static_pages(data, destination, work_data=None, profile_content=None, 
         (folder / "index.html").write_text(render_company(research, company, editorial_by_id.get(cid), profile_by_id.get(cid), own, peers, labels, modified, events, business_health), encoding="utf-8")
         written.append(folder / "index.html")
         company_entries.append((f"{ORIGIN}/company/{cid}/", modified))
-    index_modified = latest(research.as_of, SITE_REVISED, *reviewed, *((e.get("current_facts") or {}).get("reviewed_on") for e in profile_by_id.values()), (business_health or {}).get("dashboard_curated_on")) or research.as_of
+    index_modified = latest(research.as_of, SITE_REVISED, *reviewed, *((e.get("current_facts") or {}).get("reviewed_on") for e in profile_by_id.values()), (business_health or {}).get("dashboard_curated_on"), (current_companies or {}).get("reviewed_on")) or research.as_of
     work_modified = latest(research.as_of, SITE_REVISED, *(d for r in routes for d in route_dates(r))) or research.as_of
     method_modified = latest(research.as_of, SITE_REVISED) or research.as_of
     sizes = {path.name: file_size(path.stat().st_size) for path in sorted(destination.iterdir()) if path.is_file() and (path.suffix == ".csv" or path.name in {d[0] for d in DOWNLOADS})}
-    pages = {"companies": render_index(research, by_name, editorial_by_id, labels, sum(1 for r in routes if work_primary(r)), index_modified, business_health, profile_by_id), "work": render_work(research, routes, names, work_modified), "method": render_method(research, sizes, method_modified)}
+    pages = {"companies": render_index(research, by_name, editorial_by_id, labels, sum(1 for r in routes if work_primary(r)), index_modified, business_health, profile_by_id, (current_companies or {}).get("entries", []), (current_companies or {}).get("reviewed_on", "")), "work": render_work(research, routes, names, work_modified), "method": render_method(research, sizes, method_modified)}
     for name, page in pages.items():
         (destination / name).mkdir(parents=True, exist_ok=True)
         (destination / name / "index.html").write_text(page, encoding="utf-8")

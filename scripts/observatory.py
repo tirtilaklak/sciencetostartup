@@ -827,6 +827,7 @@ def build(data, destination):
     # Additive research belongs only to the actual public canonical input. Pipeline
     # fixtures must not accidentally inherit unrelated live research or coverage.
     research_context = None
+    current_companies = None
     public_canonical_bytes = (ROOT / "data/canonical.json").read_bytes()
     if data == json.loads(public_canonical_bytes):
         from research_report import build_context
@@ -835,7 +836,9 @@ def build(data, destination):
         if (research_context["graph"].get("canonical_sha256") != hashlib.sha256(public_canonical_bytes).hexdigest()
                 or research_context["graph"].get("canonical_dataset_version") != data["dataset_version"]):
             raise ValueError("Research graph canonical bytes or dataset version differ from the public build input")
-        sidecars["RESEARCH_SEARCH"] = research_search_entries(research_context)
+        from current_companies import load_current_companies, search_entries
+        current_companies = load_current_companies(ROOT, data, research_context)
+        sidecars["RESEARCH_SEARCH"] = search_entries(research_search_entries(research_context), current_companies["entries"])
     release_path = ROOT / "data/editorial-release.json"
     release = json.loads(release_path.read_text()) if release_path.exists() else {"editorial_release_id": "baseline-2026-10-28", "publication_as_of": "2026-11-08T20:30:00Z"}
     if release_path.exists() and data["dataset_version"] == SIDECAR_DATASET_VERSION:
@@ -884,6 +887,8 @@ def build(data, destination):
     if health is not None:
         (destination / "business-health.json").write_text(json.dumps(health, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
     (destination / "profile-content.json").write_text(json.dumps(profile_content, indent=2, ensure_ascii=False) + "\n")
+    if current_companies and (ROOT / "data/current-companies.json").exists():
+        (destination / "current-companies.json").write_text(json.dumps(current_companies, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
     for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js", "page-layout.css", "native-details.js", "companies-page.css", "companies-page.js", "work-page.css", "work-page.js", "method-page.css", "company-profile.css", "daily-scan.css", "daily-scan.js"):
         path = ROOT / "web" / name
         if path.exists():
@@ -901,7 +906,7 @@ def build(data, destination):
     from home import render_home
     landing = render_home(landing, data, sidecars, release, summary)
     (destination / "index.html").write_text(landing)
-    from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health, business_health=health)
+    from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health, business_health=health, current_companies=current_companies)
     if research_context is not None:
         from research_graph import write_exports
         from research_citations import write_publication_assets, publication_asset_inventory
@@ -916,6 +921,9 @@ def build(data, destination):
         research_entries = write_research_pages(destination, research_context)
         company_updates = {"https://sciencetostartup.com" + row['path']: row.get('lastmod')
                            for row in write_company_supplements(destination, research_context)}
+        from current_companies import write_current_company_supplements
+        current_updates = {"https://sciencetostartup.com" + row['path']: row['lastmod']
+                           for row in write_current_company_supplements(destination, current_companies)}
         import xml.etree.ElementTree as ET
         from static_pages import render_sitemap
         namespace = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
@@ -923,6 +931,7 @@ def build(data, destination):
         entries = [(node.findtext(namespace + "loc"), node.findtext(namespace + "lastmod")) for node in sitemap]
         entries = [(url, max(filter(None, [modified, company_updates.get(url)]), default=None)) for url, modified in entries]
         entries += [("https://sciencetostartup.com" + entry["path"], entry.get("lastmod")) for entry in research_entries]
+        entries = [(url, max(filter(None, [modified, current_updates.get(url)]), default=None)) for url, modified in entries]
         if len({entry[0] for entry in entries}) != len(entries):
             raise ValueError("Duplicate canonical URL in research sitemap")
         (destination / "sitemap.xml").write_text(render_sitemap(entries), encoding="utf-8")

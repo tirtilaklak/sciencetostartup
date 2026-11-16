@@ -191,6 +191,20 @@ sanitized public deployment settings; credentials never enter the repository.
 
 ## How the page is built
 
+The current `/companies/` directory also reads `data/current-companies.json`.
+This additive registry selects existing research organization profiles without
+changing canonical v2.5.0, the published research graph or archived packages.
+Its four November 16 additions bring the directory to 43 entries; the original
+research cohort and financial coverage remain 39. Current cards and profile
+supplements retain exact Wikipedia sentences, permanent revisions, author-history
+links, CC BY-SA 4.0 attribution, and separately sourced current offering labels.
+Their review dates do not renew older research claims. A Wikipedia response hash
+identifies the captured revision API response containing the article wikitext;
+primary-source hashes identify the stated HTTP body or saved web-tool excerpt.
+The exported `/current-companies.json` preserves this provenance and licensing.
+See [Wikipedia excerpt licensing](LICENSE-WIKIPEDIA.md); archived research license
+documents retain their original bytes.
+
 `build()` in `scripts/observatory.py` turns `web/` and the data into `dist/`.
 
 - CSS is inlined into `dist/explore/index.html`: `style.css` first, then the files in
