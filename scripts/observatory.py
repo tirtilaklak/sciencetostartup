@@ -809,6 +809,9 @@ def build(data, destination):
     if afterquery_content.exists():
         entry = json.loads(afterquery_content.read_text())
         profile_content["entries"] = [e for e in profile_content["entries"] if e["company_id"] != "afterquery"] + [entry]
+    from company_updates import validate_profile_current_facts
+    if data["dataset_version"] == SIDECAR_DATASET_VERSION:
+        validate_profile_current_facts(profile_content, data)
     source_updates_path = ROOT / "data/source-updates.json"
     source_updates = json.loads(source_updates_path.read_text())
     # The actual dataset selects validation; sidecar metadata cannot disable it.

@@ -1777,14 +1777,61 @@
           ]
         }
       ],
-      "notes": [
+      "historical_notes": [
         {
           "text": "EXL completed its acquisition of iMerit on August 3, 2026.",
           "claim_ids": [
             "imerit.claim.oct14-acquisition-completed"
           ]
         }
-      ]
+      ],
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-16",
+        "rows": [
+          {
+            "label": "Legal closing",
+            "value": "31 Jul 2026",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Completion announced",
+            "value": "3 Aug 2026",
+            "source_indexes": [
+              1
+            ]
+          },
+          {
+            "label": "Acquirer",
+            "value": "EXL / Clairvoyant AI, Inc.",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://ir.exlservice.com/node/24026/html",
+            "title": "EXL Form 10-Q, quarter ended 30 September 2026",
+            "published_on": "2026-10-27",
+            "observed_on": "2026-11-16",
+            "response_sha256": "d0268d43b7f4f8aa3a93aab319f31ee1ef922bb3b9c70ba7e887cf3b9c581ed9",
+            "locator": "Note 10: Business Combinations, I Merit Inc.; retained web-tool text excerpt",
+            "content_kind": "web_tool_text_excerpt"
+          },
+          {
+            "url": "https://www.exlservice.com/about/newsroom/exl-completes-acquisition-of-imerit-accelerating-enterprise-ai-leadership",
+            "title": "EXL completes acquisition of iMerit, accelerating enterprise AI leadership",
+            "published_on": "2026-08-03",
+            "observed_on": "2026-11-16",
+            "response_sha256": "e580eadd8cae0e1163dea88bb0a30aa6f5754c10e0dce9742d82e0103f5b030b",
+            "locator": "Release dateline and opening announcement",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "company_id": "sama",
@@ -4291,7 +4338,44 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-16",
+        "rows": [
+          {
+            "label": "Acquired business",
+            "value": "Moondream",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Acquisition announced",
+            "value": "13 Oct 2026",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Continuing brand",
+            "value": "Moondream",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.primeintellect.ai/blog/moondream",
+            "title": "Moondream is joining Prime Intellect",
+            "published_on": "2026-10-13",
+            "observed_on": "2026-11-16",
+            "response_sha256": "a00b8c04d7f74e2c90cfb765d2cfb04a5a211f20af691ac770719b5b43cdc205",
+            "locator": "Article date; opening acquisition statement; closing paragraph on the continuing Moondream brand",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "company_id": "prolific",

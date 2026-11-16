@@ -116,8 +116,26 @@ class PresentationProjectionTests(unittest.TestCase):
                 self.assertTrue(financial["source"]["url"].startswith("https://"))
                 self.assertIn("limitations", financial)
                 self.assertIn("quote", financial)
-        self.assertEqual(self.summaries["taskus"]["currentCompanyResult"]["value"], 615121000)
-        self.assertEqual(self.summaries["taskus"]["financial"]["scope"], "Whole company")
+        taskus = self.summaries["taskus"]["currentCompanyResult"]
+        taskus_financial = self.summaries["taskus"]["financial"]
+        taskus_source = "https://www.taskus.com/press-release/taskus-announces-fiscal-third-quarter-2026-results/"
+        self.assertEqual((taskus["id"], taskus["value"], taskus["period"], taskus["scope"], taskus["currency"]),
+                         ("refresh.taskus.9m-2026-group-revenue", 929868000, "9M 2026", "company", "USD"))
+        self.assertEqual(taskus["source_urls"], taskus_source)
+        self.assertEqual(taskus_financial["scope"], "Whole company")
+        self.assertEqual(taskus_financial["period"], "9M 2026")
+        self.assertEqual(taskus_financial["source"]["url"], taskus_source)
+        self.assertEqual(taskus_financial["attribution"], "Interim company reporting; unaudited")
+        self.assertEqual(taskus_financial["checkedOn"], "2026-11-16")
+        historical = next(row for row in self.sidecars["BUSINESS_HEALTH"]["observations"]
+                          if row["id"] == "refresh.taskus.h1-2026-group-revenue")
+        self.assertEqual((historical["value"], historical["period"]["label"], historical["scope"]),
+                         (615121000, "H1 2026", "company"))
+        self.assertEqual(historical["source_ids"], ["taskus.source.q22026"])
+        self.assertEqual(historical["evidence_checked_on"], "2026-10-28")
+        canonical_q2 = next(row for row in self.data["metrics"] if row["id"] == "taskus.metric.expansion-7")
+        self.assertEqual((canonical_q2["value"], canonical_q2["as_of"], canonical_q2["segment_scope"]),
+                         (308855000, "three months ended 2026-06-30", "company"))
         self.assertTrue(self.summaries["turing"]["financial"]["failed"])
         self.assertEqual(self.summaries["a-team"]["financial"]["age"], "historical")
         self.assertIsNone(self.summaries["labelbox"]["financial"])
