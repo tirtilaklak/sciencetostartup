@@ -99,7 +99,7 @@ class CompanyProfileLayoutTests(unittest.TestCase):
         self.assertIn("9 Apr 2026", afterquery)
         self.assertNotIn("2026-04-09", afterquery)
         taskus = header("taskus")
-        for value in ("$615.12M", "H1 2026", "Whole company"):
+        for value in ("$929.87M", "9M 2026", "Whole company", "Interim company reporting; unaudited"):
             self.assertIn(value, taskus)
         research = [company["id"] for company in self.data["companies"] if company.get("entity_type") == "adjacent_research"]
         self.assertTrue(research)

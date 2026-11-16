@@ -1619,13 +1619,13 @@ def write_static_pages(data, destination, work_data=None, profile_content=None, 
         own = [r for r in routes if r["company_id"] == cid]
         group = (editorial_by_id.get(cid) or {}).get("primary_offering")
         peers = [c for c in by_name if c["id"] != cid and group and (editorial_by_id.get(c["id"]) or {}).get("primary_offering") == group]
-        modified = latest(research.as_of, SITE_REVISED, (editorial_by_id.get(cid) or {}).get("reviewed_on"), ((profile_by_id.get(cid) or {}).get("current_facts") or {}).get("reviewed_on"), events_reviewed if company_events(events, cid) else "", *(d for r in own for d in route_dates(r))) or research.as_of
+        modified = latest(research.as_of, SITE_REVISED, (editorial_by_id.get(cid) or {}).get("reviewed_on"), ((profile_by_id.get(cid) or {}).get("current_facts") or {}).get("reviewed_on"), (selected_business_observation(business_health, cid) or {}).get("evidence_checked_on"), events_reviewed if company_events(events, cid) else "", *(d for r in own for d in route_dates(r))) or research.as_of
         folder = destination / "company" / cid
         folder.mkdir(parents=True, exist_ok=True)
         (folder / "index.html").write_text(render_company(research, company, editorial_by_id.get(cid), profile_by_id.get(cid), own, peers, labels, modified, events, business_health), encoding="utf-8")
         written.append(folder / "index.html")
         company_entries.append((f"{ORIGIN}/company/{cid}/", modified))
-    index_modified = latest(research.as_of, SITE_REVISED, *reviewed, *((e.get("current_facts") or {}).get("reviewed_on") for e in profile_by_id.values()), (business_health or {}).get("reviewed_on")) or research.as_of
+    index_modified = latest(research.as_of, SITE_REVISED, *reviewed, *((e.get("current_facts") or {}).get("reviewed_on") for e in profile_by_id.values()), (business_health or {}).get("dashboard_curated_on")) or research.as_of
     work_modified = latest(research.as_of, SITE_REVISED, *(d for r in routes for d in route_dates(r))) or research.as_of
     method_modified = latest(research.as_of, SITE_REVISED) or research.as_of
     sizes = {path.name: file_size(path.stat().st_size) for path in sorted(destination.iterdir()) if path.is_file() and (path.suffix == ".csv" or path.name in {d[0] for d in DOWNLOADS})}

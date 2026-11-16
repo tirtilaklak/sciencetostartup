@@ -249,7 +249,15 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(len(locs), len(set(locs)))
         self.assertIn(ORIGIN + '/research/', locs)
         reviewed = self.events["reviewed_on"]
-        newest = max(sp.SITE_REVISED, self.data["meta"]["as_of"], reviewed, *(e.get("reviewed_on") or "" for e in self.editorial.values()), *(d for r in self.routes for d in sp.route_dates(r) if d))
+        profiles = json.loads((self.dist / "profile-content.json").read_text())["entries"]
+        health = json.loads((ROOT / "data/business-health.json").read_text())
+        selected_financial = [sp.selected_business_observation(health, cid) or {} for cid in self.companies]
+        newest = max(sp.SITE_REVISED, self.data["meta"]["as_of"], reviewed,
+                     *(e.get("reviewed_on") or "" for e in self.editorial.values()),
+                     *(d for r in self.routes for d in sp.route_dates(r) if d),
+                     *((e.get("current_facts") or {}).get("reviewed_on") or "" for e in profiles),
+                     *(e.get("evidence_checked_on") or "" for e in selected_financial),
+                     health.get("dashboard_curated_on") or "")
         from research_report import build_context
         context = build_context(ROOT)
         newest = max(newest, context['report']['updated_on'], context['graph']['as_of'][:10])
