@@ -311,7 +311,7 @@ class StaticPageTests(unittest.TestCase):
             self.assertEqual(sorted(re.findall(r'/company/([^/]+)/"', related)), sorted(peers), cid)
 
     def test_header_footer_and_icons_are_shared_by_every_page(self):
-        expected_nav = [f"{ORIGIN}/research/", f"{ORIGIN}/companies/", f"{ORIGIN}/work/", f"{ORIGIN}/method/#about"]
+        expected_nav = [f"{ORIGIN}/daily/", f"{ORIGIN}/research/", f"{ORIGIN}/companies/", f"{ORIGIN}/work/", f"{ORIGIN}/method/#about"]
         for path in self.html_files():
             text, label = path.read_text(), str(path.relative_to(self.dist))
             facts = PageFacts(text)
