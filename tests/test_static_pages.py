@@ -766,7 +766,7 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(facts.title, f"Paid AI training work: {len(paid)} sourced routes{sp.SUFFIX}")
         self.assertTrue(facts.meta["description"].startswith(f"{named} named listings and {programs} expert networks and programs at {paid_companies} AI data companies,"), facts.meta["description"])
         lede = plain(re.search(r'<p class="lede">.*?</p>', work).group(0))
-        self.assertEqual(lede, "Roles, projects and expert networks, with published pay and original sources.")
+        self.assertEqual(lede, "Roles and projects, with published pay and sources.")
         self.assertIn(f'{named} named listings <span>·</span> {programs} networks and programs <span>·</span> {paid_companies} companies', work)
         self.assertIn(f'{len(self.routes)} records at {all_companies} companies.', work)
         self.assertIn(f"See {len(paid)} paid work routes</a>", (self.dist / "companies/index.html").read_text())

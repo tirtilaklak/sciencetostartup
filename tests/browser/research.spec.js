@@ -296,6 +296,20 @@ test('at 320 pixels the public header, navigation and page fit without horizonta
     expect(dimensions.document, path).toBeLessThanOrEqual(dimensions.viewport + 1);
     expect(dimensions.body, path).toBeLessThanOrEqual(dimensions.viewport + 1);
   }
+  // Advanced app flows stay available by hash; the primary site nav opens the native pages.
+  for (const [name, target, heading] of [
+    ['Companies', '/companies/', 'AI data companies'],
+    ['Paid work', '/work/', 'Find work in AI training.'],
+    ['About', '/method/#about', 'About'],
+  ]) {
+    await page.goto('/explore/#companies');
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    const link = page.getByRole('navigation', { name: 'Main', exact: true }).getByRole('link', { name, exact: true });
+    await expect(link).toHaveAttribute('href', target);
+    await link.click();
+    await expect(page).toHaveURL(new URL(target, page.url()).href);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
+  }
 });
 
 for (const path of publicPages) {

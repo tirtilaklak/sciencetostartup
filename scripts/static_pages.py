@@ -949,7 +949,8 @@ def document(research, title, description, canonical, body, structured=None, cur
                     f'<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:title" content="{escape(title)}">\n<meta name="twitter:description" content="{escape(description)}">\n<meta name="twitter:image:alt" content="{escape(SHARE_ALT)}">\n')
     head.append('<link rel="stylesheet" href="/static-pages.css">\n<link rel="stylesheet" href="/field-guide.css">\n<link rel="stylesheet" href="/page-layout.css">\n')
     if structured: head.append(f'<script type="application/ld+json">{json_ld(structured)}</script>\n')
-    return "".join(head) + "</head>\n<body class=\"static-page\">\n" + site_header(current, state) + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + '<script src="/native-details.js" defer></script>\n</body>\n</html>\n'
+    details_script = '<script src="/native-details.js" defer></script>\n' if re.search(r'class="[^"]*\b(?:company-dossier|method-page)\b', body) else ""
+    return "".join(head) + "</head>\n<body class=\"static-page\">\n" + site_header(current, state) + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + details_script + '</body>\n</html>\n'
 
 # ---------------------------------------------------------------------------
 # Company pages
@@ -1324,7 +1325,7 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     if critical:
         checked = critical.get("status_checked_on")
         status_date = f' · status checked {format_date(checked)}' if ISO_DAY.fullmatch(str(checked or "")) else ""
-        body.append(f'<aside class="company-notice"><a href="#risks">{escape(clean(critical.get("title")))}</a><span>{escape(month_text(critical.get("date")))} · {escape(clean(critical.get("status")) + status_date)}</span></aside>')
+        body.append(f'<div class="company-notice" role="note"><a href="#risks">{escape(clean(critical.get("title")))}</a><span>{escape(month_text(critical.get("date")))} · {escape(clean(critical.get("status")) + status_date)}</span></div>')
     body.append('<div class="company-record">')
     facts = []
     if group: facts.append(("Business group", f'<a href="{ORIGIN}/companies/#{group_slug(group)}">{escape(group_name)}</a>'))

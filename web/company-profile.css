@@ -44,6 +44,7 @@ main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:
 .company-fold-body .listings>li{font-size:14px;line-height:1.7}
 .company-fold-body .note{font-size:13px;margin:18px 0}
 .company-fold-body .note p{font-size:13px}
+.static-page .company-fold .r-assertion{content-visibility:visible;contain-intrinsic-size:none}
 .company-source-links{display:flex;flex-wrap:wrap;gap:8px 24px;list-style:none;padding:0;margin:16px 0}
 .company-source-links a,.company-record-links a{display:inline-flex;align-items:center;min-height:44px}
 .company-record-links{display:flex;flex-wrap:wrap;gap:8px 24px;margin:16px 0}
@@ -62,3 +63,15 @@ main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:
 @media(max-width:380px){
  .company-key-facts{grid-template-columns:1fr;gap:18px}.company-key-fact+.company-key-fact{border-left:0;border-top:1px solid var(--border);padding:18px 0 0}
 }
+
+/* Research-only companies use the same dossier, with the complete evidence inside. */
+.research-company-dossier{--r-paper:var(--soft);--r-rule:var(--border);--r-accent:var(--green);--r-quiet:var(--muted);max-width:960px;font-family:var(--sans);overflow-wrap:anywhere}
+.research-company-dossier .company-research-snapshot{margin:18px 0 4px;color:var(--muted);font-size:14px;line-height:1.6}
+.research-company-dossier .company-record{border-top:1px solid var(--border)}
+.research-company-dossier .company-fold>summary::after{margin-left:auto}
+.research-company-dossier .company-fold-body .r-record-id{font-size:12px}
+.research-company-dossier .company-fold-body .r-facts{grid-template-columns:110px minmax(0,1fr)}
+.research-company-dossier .company-fold-body :is(h2,h3){padding:0;border:0}
+.research-company-dossier .r-assertion-text{font-family:var(--sans);font-size:15px;line-height:1.7}
+.research-company-dossier .company-fold-body .r-assertion:first-of-type{padding-top:8px}
+@media(max-width:600px){.research-company-dossier .company-research-snapshot{font-size:13px}.research-company-dossier .company-fold-body .r-facts{grid-template-columns:84px minmax(0,1fr);gap:10px 16px}}

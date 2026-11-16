@@ -333,7 +333,56 @@ class ResearchPageTests(unittest.TestCase):
         self.assertIn(source['excerpt'].replace("'", '&#x27;'), page)
         for role in ('author', 'source_verifier', 'adversarial'):
             self.assertIn('test-only-distinct-' + role, page)
+        tree = ReaderTree(page)
+        self.assertEqual(len(tree.with_class('research-company-dossier')), 1)
+        self.assertTrue(all('open' not in node['attrs'] for node in tree.with_class('company-fold')))
+        self.assertIn('approved-findings', Facts(page).ids)
         self.assertTrue(any(e['url'] == '/company/org.fixture_translated/' for e in rp.research_search_entries(self.context)))
+
+    def test_new_company_dossiers_preserve_full_records_inside_closed_sections(self):
+        companies = [entity for entity in self.context['graph']['entities'] if rp._new_company(self.context, entity)]
+        self.assertTrue(companies)
+        for entity in companies:
+            with self.subTest(company=entity['id']):
+                text = rp._detail(self.context, entity)
+                tree = ReaderTree(text)
+                folds = tree.with_class('company-fold')
+                approved = rp._assertions(self.context, entity)
+                historical = rp._assertions(self.context, entity, ('historical',))
+                self.assertEqual(len(folds), 4 if historical else 3)
+                self.assertTrue(all('open' not in node['attrs'] for node in folds))
+                scope = next(node for node in folds if node['attrs']['id'] == 'company-scope')
+                scope_text = ReaderTree.text(scope)
+                for value in (entity['id'], entity['disposition_reason'], entity['disposition'],
+                              entity['review_depth'].replace('_', ' '), *entity.get('identifiers', {}).values()):
+                    self.assertIn(value, scope_text)
+                self.assertIn(rp._meta(self.context), text)
+                for assertion in approved + historical:
+                    # Full records include source locators, qualifications and actual receipts.
+                    self.assertIn(rp._assertion(self.context, assertion), text)
+                linked = [a for a in self.context['graph']['assertions']
+                          if entity['id'] in {a.get('subject_id'), a.get('object_id')}]
+                source_ids = {evidence['source_id'] for assertion in linked for evidence in assertion.get('evidence', [])}
+                sources = next(node for node in folds if node['attrs']['id'] == 'company-sources')
+                for source_id in source_ids:
+                    self.assertIn(rp._evidence_url('source', source_id), ReaderTree.links(sources))
+                hero = ReaderTree.text(tree.with_class('company-hero')[0])
+                self.assertIn(f'{len(approved)} approved finding', hero)
+                self.assertNotIn(entity['disposition_reason'], hero)
+                website = rp._safe_url(entity.get('identifiers', {}).get('website'))
+                if website:
+                    self.assertIn(website, ReaderTree.links(tree.with_class('company-hero')[0]))
+                facts = Facts(text)
+                self.assertEqual(len(facts.ids), len(set(facts.ids)))
+
+    def test_company_detail_branch_does_not_change_other_research_records(self):
+        paper = next(entity for entity in self.context['graph']['entities'] if entity['kind'] in {'paper', 'paper_work'})
+        legacy = next(entity for entity in self.context['graph']['entities'] if entity.get('legacy_id'))
+        with patch.object(rp, '_company_detail', side_effect=AssertionError('Company-only renderer')):
+            for entity in (paper, legacy):
+                text = rp._detail(self.context, entity)
+                self.assertIn('class="r-page-head"', text)
+                self.assertNotIn('research-company-dossier', text)
 
     def test_object_only_approval_does_not_create_new_company_profile(self):
         claim = approved_new_org(self.context)

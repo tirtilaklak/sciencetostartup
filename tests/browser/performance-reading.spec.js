@@ -147,10 +147,10 @@ test('a direct profile initializes other view controls when their route opens', 
   await page.keyboard.press('Home');
   await expect(page.getByRole('tab', { name: 'Business', exact: true })).toBeFocused();
   await expect(page.locator('#profile-products')).toBeVisible();
-  await page.locator('.topbar a[data-nav="companies"]').click();
+  await page.goto('/explore/#companies');
   await expect(page.locator('#category option').nth(1)).toBeAttached();
   await expect(page.locator('[data-company-card]')).toHaveCount(39);
-  await page.locator('.topbar a[data-nav="work"]').click();
+  await page.goto('/explore/#work');
   await expect(page.locator('#work-safety')).toContainText('Before you apply');
   await expect(page.locator('#work-group option').nth(1)).toBeAttached();
   await expect(page.locator('#work-cards')).toContainText('Named listings');
