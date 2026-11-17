@@ -1,0 +1,537 @@
+{
+  "schema_version": "1.0.0",
+  "date": "2026-11-17",
+  "timezone": "America/Los_Angeles",
+  "compiled_at": "2026-11-17T16:31:41.159457+00:00",
+  "selection": "16 papers, evaluation tools and company updates; original source dates retained",
+  "workers": {
+    "requested_model": "gpt-6.1-sol",
+    "requested_reasoning_effort": "ultra",
+    "count": 3,
+    "roles": [
+      "RLHF and post-training papers",
+      "Data, datasets and evaluation",
+      "Company news"
+    ],
+    "configuration_evidence": "Three separate spawn_agent calls requested these model and reasoning settings. Resolved backend settings are not independently exposed by the worker runtime."
+  },
+  "items": [
+    {
+      "id": "openai-embedded-assessments",
+      "title": "OpenAI signs four assessors for internal alignment and safety reviews",
+      "kind": "Company news",
+      "topics": [
+        "Companies",
+        "Evaluation"
+      ],
+      "publisher": "OpenAI / Goodfire / Transluce",
+      "published_on": "2026-11-16",
+      "date_basis": "Original publication date; corroborated by Goodfire and Transluce announcements",
+      "explanation": [
+        "OpenAI signed agreements with Apollo Research, METR, Transluce and Goodfire to assess alignment and safeguards using internal systems and evidence.",
+        "The work includes examining a frontier reinforcement-learning run and checking the quality and coverage of post-training evaluations.",
+        "This gives evaluators access beyond public model tests, but the announcement reports plans rather than completed findings, and publication remains subject to confidentiality redactions and possible disclosure delays."
+      ],
+      "focus": "Embedded external review of model training, monitoring and post-training alignment evaluations",
+      "finding": "Four signed assessor agreements; METR's first alignment assessment focuses on one frontier RL run; Transluce reviews alignment evaluations",
+      "caveat": "Planned assessments, not completed safety findings; negotiated access and publication restrictions; Apollo and Goodfire receive non-outcome-contingent compensation",
+      "read_scope": "Official OpenAI announcement, protocol and compensation footnotes; downloaded Goodfire announcement and full Transluce pilot terms; no assessment findings or underlying models inspected",
+      "sources": [
+        {
+          "label": "OpenAI announcement and terms",
+          "url": "https://openai.com/index/our-first-phase-of-embedded-assessments/"
+        },
+        {
+          "label": "Goodfire announcement",
+          "url": "https://www.goodfire.com/blog/announcing-our-collaboration-with-openai"
+        },
+        {
+          "label": "Transluce pilot access and publication limits",
+          "url": "https://transluce.org/embedded-assessment-pilot-with-openai"
+        }
+      ]
+    },
+    {
+      "id": "human-or-synthetic",
+      "title": "Human or Synthetic? What a Fixed Budget Buys for Post-Training",
+      "kind": "Paper",
+      "topics": [
+        "RLHF",
+        "Data"
+      ],
+      "publisher": "Paper authors",
+      "published_on": "2026-11-12",
+      "date_basis": "arXiv v1 submission (UTC)",
+      "explanation": [
+        "This study asks whether a fixed annotation budget is better spent on human or AI-generated preferences.",
+        "It trains three small language-model families on helpfulness and summarization, matching estimated data costs instead of example counts.",
+        "Synthetic data performs better at shared budgets and peaks early; human data catches up only in some higher-budget tests.",
+        "The comparison uses estimated labor and serving prices and AI judges, so its dollar thresholds are specific to this setup."
+      ],
+      "focus": "Dollar-matched human versus synthetic preference data; SFT followed by DPO",
+      "finding": "Synthetic data matches or exceeds human sources at every shared tested budget; human data becomes competitive on helpfulness at the $13,000 tier in some model families",
+      "caveat": "Estimated annotation labor and proxy serving prices; 7–8B models with LoRA; AI-judged helpfulness and summarization",
+      "read_scope": "Submission history; data, cost and evaluation methods; main results; limitations and selected appendices; official code README inspected; code not executed; results not reproduced",
+      "sources": [
+        {
+          "label": "Paper & submission history",
+          "url": "https://arxiv.org/abs/2611.16895"
+        },
+        {
+          "label": "Full paper",
+          "url": "https://arxiv.org/html/2611.16895v1"
+        },
+        {
+          "label": "Official code",
+          "url": "https://github.com/shourikb/human-or-synthetic"
+        },
+        {
+          "label": "Synthetic preference data",
+          "url": "https://huggingface.co/datasets/liteshadow4/synthetic-pref-tulu3"
+        }
+      ]
+    },
+    {
+      "id": "benchleaking",
+      "title": "Benchleaking: Benchmark recall in base models",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Yiwei Qin and coauthors",
+      "published_on": "2026-11-16",
+      "date_basis": "arXiv v1 submission: 16 Nov 2026 at 16:10:16 UTC",
+      "source_timestamp": "2026-11-16T16:10:16Z",
+      "explanation": [
+        "Qin and colleagues tested whether base language models could reproduce benchmark questions and answers absent from their prompts.",
+        "They found large differences across four models and recalculated scores with recalled examples marked wrong.",
+        "This gives evaluation teams a way to check whether high scores depend on recall, although some closely related question pairs can be reconstructed without previous exposure."
+      ],
+      "focus": "Recall checks across 20 benchmarks and four public base models; scores that remove credit for detected recalled examples",
+      "finding": "Authors report that ERNIE-5.5-Flash-Base reproduced 96% of HumanEval problems with reference implementations and 85% of OpenBookQA questions with answers; its equally weighted benchmark average fell 16.6 percentage points when detected recalled examples received zero credit",
+      "caveat": "Observed matches need benchmark-specific interpretation: WinoGrande twin questions can be reconstructed without exposure. The adjusted score is a conservative scoring rule, not a causal estimate of a model's ability without contamination. Author-linked code returned 404 when checked.",
+      "read_scope": "Submission history; abstract, continuation-audit method, score construction and matching-rules appendix in HTML; no code execution or independent replication",
+      "sources": [
+        {
+          "label": "Paper and submission history",
+          "url": "https://arxiv.org/abs/2611.21315"
+        },
+        {
+          "label": "Full paper, including matching rules",
+          "url": "https://arxiv.org/html/2611.21315v1"
+        }
+      ]
+    },
+    {
+      "id": "optimistic-verifiers",
+      "title": "Optimistic Verifiers Get Hacked: Reward Hacking Under an Exact Process Oracle",
+      "kind": "Paper",
+      "topics": [
+        "RLHF",
+        "Evaluation"
+      ],
+      "publisher": "Paper authors",
+      "published_on": "2026-11-16",
+      "date_basis": "arXiv v1 submission (UTC)",
+      "explanation": [
+        "A model can earn a higher training reward while giving worse reasons for a decision.",
+        "This study creates access-control tasks whose correct reasons can be computed exactly, then trains models with deliberately imperfect checkers while measuring the true score.",
+        "Some checkers reward padding explanations with irrelevant details; others stop providing useful feedback or mainly add noise.",
+        "The patterns recur across the authors' training configurations, but the size of the damage does not, and the tasks use bounded policy abstractions."
+      ],
+      "focus": "Exact process-level oracle; controlled verifier degradation; reward hacking in explanations of authorization decisions",
+      "finding": "With the sufficiency proxy, reported proxy reward reaches 0.940 while true faithfulness falls from 0.731 to 0.667 on 96 held-out episodes",
+      "caveat": "Bounded authorization-policy testbed and abstracted public policies; damage magnitude did not replicate across the authors' configurations; artifact release not verified",
+      "read_scope": "Submission history; oracle and verifier construction; main results, replication findings, limitations and selected appendices; code availability statement inspected; results not reproduced",
+      "sources": [
+        {
+          "label": "Paper & submission history",
+          "url": "https://arxiv.org/abs/2611.21538"
+        },
+        {
+          "label": "Full paper",
+          "url": "https://arxiv.org/html/2611.21538v1"
+        }
+      ]
+    },
+    {
+      "id": "toloka-arena-failure-profiles",
+      "title": "Toloka Arena adds ten-category failure profiles for enterprise agents",
+      "kind": "Release",
+      "topics": [
+        "Companies",
+        "Evaluation"
+      ],
+      "publisher": "Toloka",
+      "published_on": "2026-11-16",
+      "date_basis": "Original publication date (article and dated HTML metadata)",
+      "explanation": [
+        "Toloka added failure profiles to its Arena, showing ten kinds of mistakes rather than only an overall score.",
+        "It reports that about half of failed attempts among the ten leading models passed a conversation assessment even though system records were wrong.",
+        "The profiles can help teams choose what to test or retrain, but these are results from Toloka's simulated workflows."
+      ],
+      "focus": "Separating conversation quality, policy compliance and final system-state errors in agent evaluation",
+      "finding": "Public per-model failure profiles across ten categories; roughly half of failures among the top ten models passed conversation assessment despite wrong system state",
+      "caveat": "Company-run simulated enterprise workflows; error categories can overlap; reported rates are shares of all attempts rather than mutually exclusive shares of failures",
+      "read_scope": "Full official product/research post and stated scoring definitions; raw trajectories and grading code not inspected; results not reproduced",
+      "sources": [
+        {
+          "label": "Toloka failure-profile release and scoring definitions",
+          "url": "https://toloka.ai/blog/what-the-scores-dont-tell-you-about-ai-agents-on-toloka-arena/"
+        }
+      ]
+    },
+    {
+      "id": "jev-as-a-reward",
+      "title": "Jev-as-a-Reward: Validating Probabilistic Safety Judges for Reinforcement Learning",
+      "kind": "Paper",
+      "topics": [
+        "RLHF",
+        "Evaluation"
+      ],
+      "publisher": "Paper authors",
+      "published_on": "2026-11-16",
+      "date_basis": "arXiv v1 submission (UTC)",
+      "explanation": [
+        "When a cheap safety checker sends only uncertain answers to a stronger judge, confidently missed harm escapes review.",
+        "This paper tests how that weakness changes during training and after the checker is updated.",
+        "Confidently missed harmful answers often become a larger share of remaining harm even when their total amount falls.",
+        "The proposed checks distinguish these trends, but evidence covers two small models and two reward judges, and human review sometimes disagrees with automated measures."
+      ],
+      "focus": "Before-, during- and after-update validation of probabilistic safety rewards; confident misses and delegation",
+      "finding": "Under Jev probability rewards, the amount of passed harm fell in all 11 primary-reference runs while remaining harm concentrated in the confident-pass blind spot",
+      "caveat": "Two 7–8B policies, one commercial judge and one open guard, mainly two seeds; limited human audit; helpfulness trade-offs vary by model",
+      "read_scope": "Submission history; validation protocol; reward conditions, experimental setup, results, limitations and human-audit appendix; code not executed; results not reproduced",
+      "sources": [
+        {
+          "label": "Paper & submission history",
+          "url": "https://arxiv.org/abs/2611.20955"
+        },
+        {
+          "label": "Full paper",
+          "url": "https://arxiv.org/html/2611.20955v1"
+        }
+      ]
+    },
+    {
+      "id": "prolific-task-builder",
+      "title": "Prolific adds a visual editor for multimodal data collection and evaluation",
+      "kind": "Release",
+      "topics": [
+        "Companies",
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Prolific",
+      "published_on": "2026-11-16",
+      "date_basis": "Original publication date; corroborated by the product-update index",
+      "explanation": [
+        "Prolific has renamed AI Task Builder to Task Builder and added a drag-and-drop editor with the same capabilities as its API.",
+        "Teams can collect or compare text, images, audio and video, including feedback tied to individual video frames.",
+        "This consolidates evaluation setup, but the announcement does not provide a controlled comparison of data quality or turnaround time."
+      ],
+      "focus": "A visual editor and API parity for human multimodal evaluation and data collection",
+      "finding": "Editor supports ratings, media comparisons, frame-specific video feedback, narration and voice recording; existing AI Task Builder renamed",
+      "caveat": "An expansion of an existing product, not a newly created participant network; no controlled quality or speed comparison",
+      "read_scope": "Full dated official release, feature descriptions and availability statement; product not executed and participant quality not independently tested",
+      "sources": [
+        {
+          "label": "Prolific Task Builder release",
+          "url": "https://www.prolific.com/resources/evaluate-and-collect-text-images-audio-and-video-with-task-builder"
+        },
+        {
+          "label": "Official product-update index",
+          "url": "https://www.prolific.com/resources?type=product-updates"
+        }
+      ]
+    },
+    {
+      "id": "gprm",
+      "title": "GPRM: Global Perspective Process Reward Model",
+      "kind": "Paper",
+      "topics": [
+        "RLHF"
+      ],
+      "publisher": "Paper authors",
+      "published_on": "2026-11-16",
+      "date_basis": "arXiv v1 submission (UTC)",
+      "explanation": [
+        "This model judges a reasoning step using earlier steps and their assessments plus the rest of the proposed solution.",
+        "It learns to check consistency, the step itself and whether the solution stays on task.",
+        "The authors report better error detection and guided mathematics search, but checking unfinished candidates requires generating their remaining steps, increasing cost.",
+        "Tests of whether this improves complete interactive agent tasks remain future work."
+      ],
+      "focus": "History-aware process scoring with future reasoning text; structured diagnosis; SFT and GRPO",
+      "finding": "GPRM-4B reports 73.9 on PRMBench and 74.3 average F1 on ProcessBench; guided-search average 55.0 versus 49.4 for R-PRM-7B-DPO",
+      "caveat": "Online search must complete candidate trajectories; cost ablation reports +71.7% tokens and +42.4% latency; interactive agent success not tested",
+      "read_scope": "Submission history; model and dataset construction; main benchmark results, test-time search, inference-cost analysis and selected appendices; code not executed; results not reproduced",
+      "sources": [
+        {
+          "label": "Paper & submission history",
+          "url": "https://arxiv.org/abs/2611.20755"
+        },
+        {
+          "label": "Full paper",
+          "url": "https://arxiv.org/html/2611.20755v1"
+        }
+      ]
+    },
+    {
+      "id": "accelerate-bench",
+      "title": "Accelerate Bench: Evaluating Agents for Application-Level Program Optimization",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Bowen Liu and coauthors",
+      "published_on": "2026-11-16",
+      "date_basis": "arXiv v1 submission: 16 Nov 2026 at 10:52:59 UTC",
+      "source_timestamp": "2026-11-16T10:52:59Z",
+      "explanation": [
+        "Liu and colleagues built 32 tasks that ask coding agents to speed up working scientific programs while keeping their outputs correct.",
+        "Agents can test changes during development, but a separate checker measures the final program.",
+        "The reported results show that build settings and interacting code changes can matter greatly; the scores describe complete agent setups on fixed CPU workloads, so they do not isolate model ability."
+      ],
+      "focus": "32 executable CPU optimization tasks; public development tests and separate final verification",
+      "finding": "Authors report benchmark-v1.1 Score@1 from 25.5% to 67.4% across 16 model-and-harness agents; the two leading setups reached at least 2x speedup on 22 or more tasks each",
+      "caveat": "Scores mix model, harness and compute choices; the main table uses one run per agent, with repeats for two. Speedups are relative to differently tuned task baselines at fixed CPU workloads; trajectory analyses use older v1.0 runs.",
+      "read_scope": "Submission history; abstract, benchmark construction, scoring protocol, main results and limitations in HTML; official project page; no code execution or independent replication",
+      "sources": [
+        {
+          "label": "Paper and submission history",
+          "url": "https://arxiv.org/abs/2611.20882"
+        },
+        {
+          "label": "Full paper, benchmark protocol and limitations",
+          "url": "https://arxiv.org/html/2611.20882v1"
+        },
+        {
+          "label": "Official project, reported results and access requirements",
+          "url": "https://acceleratebench.com/"
+        }
+      ]
+    },
+    {
+      "id": "generative-augmentation-no-external-data",
+      "title": "Generative Data Augmentation Without External Data",
+      "kind": "Paper",
+      "topics": [
+        "Data"
+      ],
+      "publisher": "Daniel Kua and Yan Song",
+      "published_on": "2026-11-16",
+      "date_basis": "arXiv v1 submission: 16 Nov 2026 at 17:47:45 UTC",
+      "source_timestamp": "2026-11-16T17:47:45Z",
+      "explanation": [
+        "Kua and Song tested whether generated images help when the image generator learns only from the same training set as the classifier.",
+        "Across six datasets, benefits were generally smaller when generated images differed more from real ones or the starting classifier was already strong.",
+        "Ordinary image transformations matched most of the largest gains under equal training steps, so generating more images was not automatically worthwhile."
+      ],
+      "focus": "Synthetic-image augmentation with generators trained only on the classifier's own data; equal-step comparison with ordinary augmentation",
+      "finding": "Across four classifier backbones, four generators and six datasets, authors report that greater estimated distribution mismatch generally accompanied smaller gains on five datasets; traditional augmentation matched most of the largest gains at the same optimizer-step budget",
+      "caveat": "The estimated mismatch is a lower bound, and the theoretical bound explains trends without predicting gain magnitude or direction; stability and dependence terms remain unquantified. Results do not test externally pretrained generators.",
+      "read_scope": "Submission history; abstract, experimental setup, theoretical-bound interpretation, equal-step augmentation comparison and conclusion in HTML; no code execution or independent replication",
+      "sources": [
+        {
+          "label": "Paper and submission history",
+          "url": "https://arxiv.org/abs/2611.21467"
+        },
+        {
+          "label": "Full paper and experiment protocol",
+          "url": "https://arxiv.org/html/2611.21467v1"
+        }
+      ]
+    },
+    {
+      "id": "polpo",
+      "title": "Policy Optimization With Multiple Verifiers via Pareto Rankings",
+      "kind": "Paper",
+      "topics": [
+        "RLHF"
+      ],
+      "publisher": "Paper authors",
+      "published_on": "2026-11-14",
+      "date_basis": "arXiv v1 submission (UTC)",
+      "explanation": [
+        "When several checks score an answer, counting passed checks can hide which requirements improved.",
+        "POLPO trains on comparisons where one answer passes every check another answer passes, plus at least one more; it leaves conflicting cases unordered.",
+        "The authors report gains in coding and following multiple instructions.",
+        "The method receives no learning signal when none of the sampled answers clearly improves on another, and some coding tests use only one training seed."
+      ],
+      "focus": "Verifier-induced partial-order supervision; joint ranking likelihood with DPO-style policy scores",
+      "finding": "Reported MBPP all-pass rises from GRPO-Rate's 42.47% to 44.73% for Qwen3-0.6B; IFM5 complete-constraint success averages 61.3% versus 57.1%",
+      "caveat": "No dominance means no comparison signal; APPS and AceCode use one training seed; benefits depend on automatic checks and small-model benchmark settings",
+      "read_scope": "Submission history; partial-order objective; coding and instruction-following result tables; conclusion, reproducibility statement and selected computation/evaluation appendices; code not executed; results not reproduced",
+      "sources": [
+        {
+          "label": "Paper & submission history",
+          "url": "https://arxiv.org/abs/2611.19064"
+        },
+        {
+          "label": "Full paper",
+          "url": "https://arxiv.org/html/2611.19064v1"
+        }
+      ]
+    },
+    {
+      "id": "saj-mtl",
+      "title": "SAJ-MTL: Modeling demographic differences in annotation",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Soumyajit Gupta, Maria De-Arteaga and Matthew Lease",
+      "published_on": "2026-11-16",
+      "date_basis": "arXiv v1 submission: 16 Nov 2026 at 17:42:54 UTC",
+      "source_timestamp": "2026-11-16T17:42:54Z",
+      "explanation": [
+        "Gupta and colleagues built a model that keeps track of which demographic groups label a post and which groups the post targets.",
+        "This preserves differences in how people judge harmful text and lets users choose how to weight those views.",
+        "The authors report better predictions on two datasets, but groups with sparse data were excluded and the method does not guarantee fair moderation."
+      ],
+      "focus": "Group-level annotation disagreement; separate modeling of annotator and target groups; adjustable weighting of viewpoints",
+      "finding": "Authors report macro-F1 of 0.65 for their Joint-AWG model versus 0.55 for text augmentation and 0.49 for target-only multi-task learning on Measuring Hate Speech with annotated targets; means cover five runs",
+      "caveat": "Experiments cover two toxicity datasets and four race groups; three Measuring Hate Speech groups were omitted because annotator-target pairs were sparse. Group attributes remain sensitive, and improved prediction does not guarantee fairness.",
+      "read_scope": "Submission history; abstract, methods overview, dataset and label protocol, results tables, discussion and ethical considerations in HTML; no code execution or independent replication",
+      "sources": [
+        {
+          "label": "Paper and submission history",
+          "url": "https://arxiv.org/abs/2611.21458"
+        },
+        {
+          "label": "Full paper and results tables",
+          "url": "https://arxiv.org/html/2611.21458v1"
+        }
+      ]
+    },
+    {
+      "id": "micro1-rollout-reliability",
+      "title": "micro1 describes fixing infrastructure errors that distorted agent evaluations",
+      "kind": "Company news",
+      "topics": [
+        "Companies",
+        "Evaluation"
+      ],
+      "publisher": "micro1",
+      "published_on": "2026-11-10",
+      "date_basis": "Original publication date; retrospective about earlier infrastructure changes",
+      "explanation": [
+        "micro1 describes changes to the system that runs and grades its AI-agent evaluations.",
+        "It now separates infrastructure failures from wrong answers, retries failed attempts and checks each model's actual output limits before a benchmark run.",
+        "The company reports that correcting one token-limit problem raised a model's score from 0.33 to 0.48, but this is an internal case study rather than independently reproduced evidence."
+      ],
+      "focus": "Reliability of RL/evaluation rollout orchestration and score validity",
+      "finding": "Reports separating failed execution from benchmark grades; correcting a harness token cap and rerunning 38 of 150 attempts raised one benchmark score from 0.33 to 0.48",
+      "caveat": "Engineering retrospective, not a new product launch; anonymous model and benchmark in cited score example; internal measurements not independently reproduced",
+      "read_scope": "Full official engineering report, especially failure handling, frozen task versions and release-day harness limits; infrastructure and score corrections not executed or independently audited",
+      "sources": [
+        {
+          "label": "micro1 engineering report",
+          "url": "https://www.micro1.ai/blog/the-only-bottleneck-should-be-the-model"
+        }
+      ]
+    },
+    {
+      "id": "ca-zodpo",
+      "title": "Contrastive Activation-Guided Zeroth-Order Preference Optimisation for Memory-Efficient LLM Alignment",
+      "kind": "Paper",
+      "topics": [
+        "RLHF"
+      ],
+      "publisher": "Paper authors",
+      "published_on": "2026-11-16",
+      "date_basis": "arXiv v1 submission (UTC)",
+      "explanation": [
+        "Preference training usually stores intermediate model activity for backpropagation, which consumes GPU memory.",
+        "This method uses differences between preferred and rejected answers to choose a small set of directions for trying weight changes without backpropagation.",
+        "The authors report similar judged answer preferences to standard training while using about 59% less peak memory at 2,048 tokens.",
+        "It needs three forward passes per update, so lower memory does not establish faster training; evidence covers one small model and dataset."
+      ],
+      "focus": "Preference-guided low-rank perturbation subspaces; backpropagation-free DPO; low-rank momentum",
+      "finding": "Peak memory 11.08 GB versus 26.94 GB for first-order DPO at length 2,048; against first-order DPO, Qwen2.5-32B-Instruct judged 34.2% wins, 32.8% ties and 33.0% losses",
+      "caveat": "One Qwen2.5-1.5B model and HH-RLHF dataset; LLM judges; three forward passes per update; no demonstrated speed advantage",
+      "read_scope": "Submission history; optimization method; experimental setup; complete pairwise and memory results; limitations and hyperparameter/evaluation appendices; code not executed; results not reproduced",
+      "sources": [
+        {
+          "label": "Paper & submission history",
+          "url": "https://arxiv.org/abs/2611.20635"
+        },
+        {
+          "label": "Full paper",
+          "url": "https://arxiv.org/html/2611.20635v1"
+        }
+      ]
+    },
+    {
+      "id": "navital-gym",
+      "title": "Navital Gym: Rule-Graded Agent Environments for Indian Workflows",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Daksh Bathla / Navital Labs",
+      "published_on": "2026-11-16",
+      "date_basis": "arXiv v1 submission: 16 Nov 2026 at 11:35:01 UTC; new paper about software first released 27 Oct 2026",
+      "source_timestamp": "2026-11-16T11:35:01Z",
+      "explanation": [
+        "Bathla built six simulated environments for Indian travel, payments, tax, forms and customer support.",
+        "Their 321 public tasks are checked by written rules that recompute results from made-up records.",
+        "This lets teams inspect why an agent passed without relying on another AI judge.",
+        "The reported tests use one run per task, and the simplified rules and partly machine-produced language examples limit what the scores show about real services."
+      ],
+      "focus": "321 public tasks across six synthetic environments; deterministic grading for Indian workflows",
+      "finding": "Bathla reports 315 of 321 tasks solved by Claude Opus 5.5, 302 by Sonnet 5.5 and 205 by Haiku 4.5, one run per task; code is Apache-2.0 and task data CC BY 4.0",
+      "caveat": "Trip scores include one format-repair retry; some results use earlier grader versions. The rules simplify practice, and the Tamil, Bengali and Marathi examples were not reviewed by native speakers. Private held-out tasks are not inspectable.",
+      "read_scope": "Submission history; abstract, environment definitions, grader protocol, reported results and limitations in HTML; official repository README and GitHub release metadata; no code execution or independent replication",
+      "sources": [
+        {
+          "label": "Paper and submission history",
+          "url": "https://arxiv.org/abs/2611.20924"
+        },
+        {
+          "label": "Full paper, grader details and limitations",
+          "url": "https://arxiv.org/html/2611.20924v1"
+        },
+        {
+          "label": "Official code, tasks and license",
+          "url": "https://github.com/Navitallabs/navital-gym"
+        },
+        {
+          "label": "Initial software release, dated 27 Oct 2026",
+          "url": "https://github.com/Navitallabs/navital-gym/releases/tag/v1.0.0"
+        }
+      ]
+    },
+    {
+      "id": "surge-sudo-l7-model-comparison",
+      "title": "Surge compares coding agents on engineering judgment",
+      "kind": "Release",
+      "topics": [
+        "Companies",
+        "Evaluation"
+      ],
+      "publisher": "Surge AI",
+      "published_on": "2026-11-13",
+      "date_basis": "Original publication date (article and publication metadata)",
+      "explanation": [
+        "Surge tested five coding agents on its sudo L7 benchmark, which evaluates engineering judgment as well as working code.",
+        "It reports that all three Claude models outscored the two GPT models, with similar functional correctness but larger differences in communication and spotting hidden risks.",
+        "These company-run results have not been independently reproduced and do not establish how the agents will perform on other workloads."
+      ],
+      "focus": "Staff-engineering judgment beyond functional correctness on the sudo L7 benchmark",
+      "finding": "Surge reports all three evaluated Claude agents outscored both evaluated GPT agents; all ran at maximum reasoning effort",
+      "caveat": "Company-run comparison; exact task count and agent software assignment are not reported in the reviewed article body; results not independently reproduced",
+      "read_scope": "Official article body, examples and current web extraction; chart scores not transcribed; exact task count and model-to-harness assignment not verified; tasks, rubrics and runs not independently audited or reproduced",
+      "sources": [
+        {
+          "label": "Surge comparison and evaluation setup",
+          "url": "https://surgehq.ai/blog/claude-vs-gpt-software-engineering"
+        }
+      ]
+    }
+  ]
+}
