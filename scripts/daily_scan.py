@@ -47,6 +47,14 @@ def load_editions(root=ROOT):
             for field in ("title", "focus", "finding", "caveat", "publisher", "read_scope", "date_basis"):
                 if not isinstance(item.get(field), str) or not item[field].strip():
                     raise ValueError("Missing daily scan field: " + field)
+            explanation = item.get("explanation")
+            if not isinstance(explanation, list) or not 2 <= len(explanation) <= 4:
+                raise ValueError("Daily scan explanations require 2–4 sentences")
+            for sentence in explanation:
+                if (not isinstance(sentence, str) or not sentence.strip()
+                        or not any(character.isalnum() for character in sentence)
+                        or not re.search(r'''[.!?]["'”’\)\]]*$''', sentence.rstrip())):
+                    raise ValueError("Daily scan explanation sentences require text and a sentence ending")
         editions.append(edition)
     return editions
 
@@ -54,13 +62,15 @@ def load_editions(root=ROOT):
 def card(item, rank):
     sources = "".join('<li><a href="' + e(s["url"]) + '">' + e(s["label"]) + ' <span aria-hidden="true">↗</span></a></li>' for s in item["sources"])
     topics = " · ".join(item["topics"])
+    explanation = " ".join(sentence.strip() for sentence in item["explanation"])
     return (f'<article class="scan-item" id="{e(item["id"])}" data-kind="{e(item["kind"])}" data-topics="{e("|".join(item["topics"]))}">'
             f'<span class="scan-rank" aria-label="Selection {rank}">{rank:02d}</span><div class="scan-item-body">'
             f'<div class="scan-meta"><span class="scan-kind">{e(item["kind"])}</span><span>{e(item["publisher"])}</span>'
             f'<span>Source <time datetime="{item["published_on"]}">{format_date(item["published_on"])}</time></span></div>'
             f'<h2><a href="{e(item["sources"][0]["url"])}">{e(item["title"])} <span class="scan-external" aria-hidden="true">↗</span></a></h2>'
-            f'<p class="scan-focus">{e(item["focus"])}</p><div class="scan-bottom"><span class="scan-topic-label">{e(topics)}</span>'
-            f'<details><summary>Details & sources</summary><dl><div><dt>Finding</dt><dd>{e(item["finding"])}</dd></div>'
+            f'<p class="scan-explanation">{e(explanation)}</p><div class="scan-bottom"><span class="scan-topic-label">{e(topics)}</span>'
+            f'<details><summary>Details & sources</summary><dl><div><dt>Focus</dt><dd>{e(item["focus"])}</dd></div>'
+            f'<div><dt>Finding</dt><dd>{e(item["finding"])}</dd></div>'
             f'<div><dt>Limits</dt><dd>{e(item["caveat"])}</dd></div>'
             f'<div><dt>Source date</dt><dd>{format_date(item["published_on"])} · {e(item.get("date_basis", "Publication date"))}</dd></div>'
             f'<div><dt>Read scope</dt><dd>{e(item["read_scope"])}</dd></div></dl><ul class="scan-sources">{sources}</ul>'
@@ -91,7 +101,7 @@ def render(edition, editions, canonical, root=ROOT):
             f'<div><label for="scan-kind">Type</label><select id="scan-kind"><option value="">All types</option>{kind_options}</select></div></div>'
             f'<div class="scan-list-heading"><p id="scan-count" role="status" aria-live="polite">{len(edition["items"])} selections</p><span>Source dates: {format_date(min(source_dates))} – {format_date(max(source_dates))}</span><button type="button" id="scan-reset" hidden>Clear filters</button></div>'
             f'<div class="scan-list">{items}</div><div id="scan-empty" class="scan-empty" hidden><h2>No matching items</h2><button type="button" id="scan-empty-reset">Clear filters</button></div>'
-            '<footer class="scan-notes"><details><summary>Dates, sources & background</summary><dl><div><dt>Snapshot</dt><dd>Selection date in America/Los_Angeles</dd></div><div><dt>Source date</dt><dd>Original publication, release or arXiv submission; updates labeled separately</dd></div><div><dt>Selection</dt><dd>Recent papers, datasets and company announcements; source-linked facts; author and company results attributed</dd></div><div><dt>Coverage</dt><dd>Selected reading list; abstracts and announcements where indicated; no independent replication</dd></div><div><dt>Writing</dt><dd>Structured source facts and titles; verbatim Wikipedia background excerpts below</dd></div></dl>'
+            '<footer class="scan-notes"><details><summary>Dates, sources & background</summary><dl><div><dt>Snapshot</dt><dd>Selection date in America/Los_Angeles</dd></div><div><dt>Source date</dt><dd>Original publication, release or arXiv submission; updates labeled separately</dd></div><div><dt>Selection</dt><dd>Recent papers, datasets and company announcements; source-linked facts; author and company results attributed</dd></div><div><dt>Coverage</dt><dd>Selected reading list; abstracts and announcements where indicated; no independent replication</dd></div><div><dt>Writing</dt><dd>Plain-language explanations paraphrase original sources; verbatim Wikipedia background excerpts below</dd></div></dl>'
             f'<div class="scan-context">{contexts}</div><a href="/daily/wikipedia-context.json">Wikipedia revision & download records</a></details>'
             f'<details><summary>Snapshot archive</summary><div class="scan-archive">{archive}</div></details><a class="scan-download" href="/daily/{day}/snapshot.json" download>Download this snapshot · JSON</a></footer></div>')
     page = document(SimpleNamespace(as_of="", data={}), "Daily scan · ScienceToStartup", "Daily reading list: RLHF, data, evaluation and AI company news, with dated snapshots and original sources.", canonical, body, current="daily")
