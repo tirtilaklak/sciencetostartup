@@ -1,7 +1,8 @@
 """Current directory additions beside the unchanged canonical and research releases.
 
-This registry selects existing reviewed organization pages. It does not add
-assertions to a published research graph or change any frozen coverage counts.
+This registry selects reviewed organization pages and source-bound current-only
+profiles. It does not add assertions to a published research graph or change
+any frozen coverage counts.
 Source-content review establishes the quotations; offline validation checks their
 entity, URL, date, attribution and evidence bindings before they can be rendered.
 """
@@ -84,24 +85,52 @@ def validate_current_companies(registry, data, context):
     entities = {row["id"]: row for row in graph.get("entities", [])}
     canonical = {row["id"] for row in data.get("companies", [])}
     subjects = {row.get("subject_id") for row in graph.get("assertions", []) if row.get("status") == "approved"}
-    seen, articles = set(), set()
+    seen, articles, admitted_names = set(), set(), {}
     for entry in registry["entries"]:
         fields = {"entity_id", "name", "group", "website", "wikipedia", "offerings", "sources"}
-        _require(isinstance(entry, dict) and fields <= set(entry) <= fields | {"parent_company"}, "entry has unsupported fields")
+        _require(isinstance(entry, dict) and fields <= set(entry) <= fields | {"parent_company", "current_identity"}, "entry has unsupported fields")
         eid = entry["entity_id"]
-        _require(isinstance(eid, str) and re.fullmatch(r"org\.[a-z0-9][a-z0-9_.-]*", eid), "entity_id must be an existing organization ID")
+        _require(isinstance(eid, str) and re.fullmatch(r"org\.[a-z0-9][a-z0-9_.-]*", eid), "entity_id must be an organization ID")
         _require(eid not in canonical, "canonical companies cannot be replaced by current additions")
         _require(eid not in seen, "duplicate entity " + eid)
         seen.add(eid)
         entity = entities.get(eid, {})
-        _require(entity.get("kind") in KINDS and entity.get("status") == "approved" and not entity.get("legacy_id") and eid in subjects, eid + " must select an existing approved organization page")
+        identity = entry.get("current_identity")
+        if entity or identity is None:
+            _require(entity.get("kind") in KINDS and entity.get("status") == "approved" and not entity.get("legacy_id") and eid in subjects, eid + " must select an existing approved organization page")
         name = _text(entry["name"], eid + ".name", 120)
         _text(entry["group"], eid + ".group", 80)
         website = _url(entry["website"], eid + ".website")
         recorded_website = entity.get("identifiers", {}).get("website")
-        _require(recorded_website and _host(entry["website"]) == _host(recorded_website), eid + " website must match the reviewed entity")
         names = [entity.get("name", ""), *entity.get("aliases", [])]
         names += [part.strip() for value in names[:] for part in value.split(" / ")]
+        if identity is None:
+            _require(recorded_website and _host(entry["website"]) == _host(recorded_website), eid + " website must match the reviewed entity")
+        else:
+            expected_scope = "website_supplement" if entity else "current_only"
+            identity_fields = {"scope", "name", "aliases", "website", "source_indexes"}
+            _require(isinstance(identity, dict) and set(identity) == identity_fields and identity["scope"] == expected_scope, eid + " requires an explicit current identity scope")
+            _require(not recorded_website, eid + " current identity cannot override a recorded official website")
+            identity_name = _text(identity["name"], eid + ".current_identity.name", 120)
+            _require(identity["website"] == entry["website"], eid + " current identity website differs")
+            aliases = identity["aliases"]
+            _require(isinstance(aliases, list) and len(aliases) <= 12, eid + " current identity aliases must be bounded")
+            for alias in aliases:
+                _text(alias, eid + ".current_identity.alias", 120)
+            identity_names = [identity_name, *aliases]
+            _require(len({_name(value) for value in identity_names}) == len(identity_names), eid + " current identity repeats an alias")
+            if entity:
+                _require(_name(identity_name) in {_name(value) for value in names}, eid + " website supplement must match its reviewed entity")
+                _require(all(_name(alias) in {_name(value) for value in names} for alias in aliases), eid + " website supplement cannot introduce unrelated aliases")
+            else:
+                other_names = [value for row in [*entities.values(), *data.get("companies", [])]
+                               if row.get("kind") in KINDS or row.get("id") in canonical
+                               for value in [row.get("name", ""), *row.get("aliases", [])]]
+                other_names += [part.strip() for value in other_names[:] for part in value.split(" / ")]
+                identity_tokens = [*identity_names, *[part.strip() for value in identity_names for part in value.split(" / ")]]
+                _require(not ({_name(value) for value in identity_tokens} & {_name(value) for value in other_names if value}), eid + " current identity duplicates an existing organization")
+            names += identity_names
+            names += [part.strip() for value in identity_names for part in value.split(" / ")]
         wiki = entry["wikipedia"]
         wf = {"title", "article_url", "revision_url", "history_url", "page_id", "revision_id", "revision_timestamp", "observed_on", "response_sha256", "content_kind", "description", "license_url", "change_note"}
         _require(isinstance(wiki, dict) and wf <= set(wiki) <= wf | {"article_scope"}, eid + ".wikipedia has unsupported fields")
@@ -123,6 +152,9 @@ def validate_current_companies(registry, data, context):
             _sha(source["response_sha256"], where + ".response_sha256")
             _require(source["content_kind"] in {"raw_http_body", "web_tool_text_excerpt"}, where + " has unsupported content_kind")
         _require(any(_host(s["url"]) == website.hostname.removeprefix("www.") or _host(s["url"]).endswith("." + website.hostname.removeprefix("www.")) for s in sources), eid + " needs a source on its reviewed official website")
+        if identity is not None:
+            _source_refs(identity["source_indexes"], sources, eid + ".current_identity")
+            _require(any(_host(sources[i]["url"]) == _host(entry["website"]) or _host(sources[i]["url"]).endswith("." + _host(entry["website"])) for i in identity["source_indexes"]), eid + " current identity needs an official identity source")
         if scope == "parent_company":
             parent = entry.get("parent_company")
             _require(eid == "org.dataforce" and isinstance(parent, dict) and set(parent) == {"name", "source_indexes"} and parent["name"] == "TransPerfect", eid + " parent article requires the reviewed DataForce–TransPerfect binding")
@@ -170,6 +202,13 @@ def validate_current_companies(registry, data, context):
             _require(label not in labels, eid + " repeats an offering label")
             labels.add(label)
             _source_refs(offering["source_indexes"], sources, eid + ".offering")
+        current_only = bool(identity and identity["scope"] == "current_only")
+        selected_names = [name, *([identity["name"], *identity["aliases"]] if identity else [])]
+        selected_names += [part.strip() for value in selected_names[:] for part in value.split(" / ")]
+        for token in {_name(value) for value in selected_names}:
+            previous = admitted_names.get(token)
+            _require(not previous or previous[0] == eid or not (current_only or previous[1]), eid + " current identity duplicates an existing organization")
+            admitted_names[token] = (eid, current_only)
     return registry
 
 
@@ -208,7 +247,13 @@ def search_entries(entries, current_entries):
             output.append({**entry, "title": current["name"], "keywords": " ".join([keywords, current["name"], *[o["label"] for o in current["offerings"]]])})
         else:
             output.append(entry)
-    _require(set(replacements) <= seen, "every current addition must have an existing research search result")
+    for url, current in replacements.items():
+        if url in seen:
+            continue
+        _require((current.get("current_identity") or {}).get("scope") == "current_only", "every current addition must have an existing research search result or explicit current-only identity")
+        labels = [o["label"] for o in current["offerings"]]
+        output.append({"url": url, "title": current["name"], "summary": " · ".join(labels), "kind": "company",
+                       "keywords": " ".join([current["name"], *labels])})
     return output
 
 
@@ -245,6 +290,23 @@ def write_current_company_supplements(output, registry):
     for entry in registry["entries"]:
         path = company_path(entry)
         target = Path(output) / path.strip('/') / 'index.html'
+        if (entry.get("current_identity") or {}).get("scope") == "current_only":
+            _require(not target.exists(), "current-only profile would overwrite an existing page: " + path)
+            from types import SimpleNamespace
+            description = entry["wikipedia"]["description"]
+            canonical = sp.ORIGIN + path
+            crumbs = [("Companies", sp.ORIGIN + "/companies/"), (entry["name"], canonical)]
+            body = ('<link rel="stylesheet" href="/company-profile.css">' + sp.crumb_nav(crumbs)
+                    + '<article class="company-dossier"><header class="company-hero"><p class="eyebrow">Current company profile</p><h1>'
+                    + escape(entry["name"]) + '</h1><p>' + _link(entry["website"], "Official website") + '</p></header><div class="company-record">'
+                    + current_company_html(entry, registry["reviewed_on"]) + '</div></article>')
+            node = sp.page_node("ProfilePage", entry["name"], description, canonical, registry["reviewed_on"], crumbs,
+                                mainEntity={"@type": "Organization", "name": entry["name"], "url": entry["website"]})
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(sp.document(SimpleNamespace(as_of=None, data={}), entry["name"] + " · " + sp.SITE_NAME,
+                                          description, canonical, body, node, current="companies", state="location"), encoding="utf-8")
+            records.append({"path": path, "lastmod": registry["reviewed_on"]})
+            continue
         _require(target.is_file(), "selected organization profile is missing: " + path)
         original = target.read_text(encoding="utf-8")
         canonical = sp.ORIGIN + path

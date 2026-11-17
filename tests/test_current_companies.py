@@ -39,6 +39,11 @@ def context():
         "assertions": [{"id": "claim.example", "subject_id": "org.example", "status": "approved"}]}}
 
 
+def current_identity(scope="current_only"):
+    return {"scope": scope, "name": "Example", "aliases": ["Example Incorporated"],
+            "website": "https://example.org/", "source_indexes": [1]}
+
+
 class Page(HTMLParser):
     def __init__(self, text):
         super().__init__()
@@ -201,6 +206,115 @@ class CurrentCompanyRenderingTests(unittest.TestCase):
         self.assertEqual(result[0], existing[0])
         with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "existing research search result"):
             cc.search_entries(existing[:1], registry["entries"])
+
+
+class CurrentOnlyCompanyTests(unittest.TestCase):
+    def test_source_bound_current_identity_does_not_add_research_entities(self):
+        registry, graph = example(), {"graph": {"entities": [], "assertions": []}}
+        registry["entries"][0]["current_identity"] = current_identity()
+        originals = copy.deepcopy((registry, graph))
+        cc.validate_current_companies(registry, {"companies": []}, graph)
+        self.assertEqual((registry, graph), originals)
+
+    def test_current_identity_cannot_bypass_approved_entities_or_known_domains(self):
+        registry = example()
+        registry["entries"][0]["current_identity"] = current_identity("website_supplement")
+        with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "cannot override"):
+            cc.validate_current_companies(registry, {"companies": []}, context())
+        graph = context()
+        graph["graph"]["entities"][0].update(status="candidate", identifiers={})
+        with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "existing approved"):
+            cc.validate_current_companies(registry, {"companies": []}, graph)
+
+    def test_current_identity_rejects_unsupported_scope_unbound_source_and_duplicates(self):
+        registry, graph = example(), {"graph": {"entities": [], "assertions": []}}
+        entry = registry["entries"][0]
+        entry["current_identity"] = current_identity()
+        entry["current_identity"]["scope"] = "approved_research"
+        with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "explicit current identity scope"):
+            cc.validate_current_companies(registry, {"companies": []}, graph)
+        entry["current_identity"] = current_identity()
+        entry["current_identity"]["source_indexes"] = [2]
+        with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "source index"):
+            cc.validate_current_companies(registry, {"companies": []}, graph)
+        entry["current_identity"] = current_identity()
+        entry["sources"][1]["url"] = "https://unrelated.org/about"
+        with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "official identity source"):
+            cc.validate_current_companies(registry, {"companies": []}, graph)
+        entry["sources"][1]["url"] = "https://example.org/about"
+        graph["graph"]["entities"] = [{"id": "org.other", "name": "Example", "kind": "supplier"}]
+        with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "duplicates an existing organization"):
+            cc.validate_current_companies(registry, {"companies": []}, graph)
+        entry["name"] = entry["current_identity"]["name"] = "Example / New Brand"
+        entry["current_identity"]["aliases"] = []
+        with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "duplicates an existing organization"):
+            cc.validate_current_companies(registry, {"companies": []}, graph)
+        graph["graph"]["entities"] = []
+        entry["name"] = entry["current_identity"]["name"] = "Example"
+        entry["current_identity"]["aliases"] = ["New Brand"]
+        duplicate = copy.deepcopy(entry)
+        duplicate["entity_id"] = "org.duplicate"
+        duplicate["wikipedia"].update(page_id=2)
+        duplicate["name"] = duplicate["current_identity"]["name"] = "New Brand"
+        duplicate["current_identity"]["aliases"] = ["Example"]
+        registry["entries"].append(duplicate)
+        with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "duplicates an existing organization"):
+            cc.validate_current_companies(registry, {"companies": []}, graph)
+        entry["current_identity"].update(name="Primary Brand", aliases=["Example"])
+        duplicate["name"] = "Primary Brand"
+        duplicate["current_identity"].update(name="Primary Brand", aliases=[])
+        duplicate["wikipedia"].update(title="Primary Brand", article_url="https://en.wikipedia.org/wiki/Primary_Brand",
+            revision_url="https://en.wikipedia.org/w/index.php?title=Primary_Brand&oldid=123",
+            history_url="https://en.wikipedia.org/w/index.php?title=Primary_Brand&action=history")
+        with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "duplicates an existing organization"):
+            cc.validate_current_companies(registry, {"companies": []}, graph)
+
+    def test_website_supplement_fills_only_the_missing_approved_organization_binding(self):
+        registry, graph = example(), context()
+        graph["graph"]["entities"][0]["identifiers"] = {}
+        registry["entries"][0]["current_identity"] = current_identity("website_supplement")
+        registry["entries"][0]["current_identity"]["aliases"] = []
+        cc.validate_current_companies(registry, {"companies": []}, graph)
+        registry["entries"][0]["current_identity"]["aliases"] = ["Unrelated"]
+        with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "unrelated aliases"):
+            cc.validate_current_companies(registry, {"companies": []}, graph)
+        registry["entries"][0]["current_identity"]["aliases"] = []
+        registry["entries"][0]["current_identity"]["name"] = "Unrelated"
+        with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "supplement must match"):
+            cc.validate_current_companies(registry, {"companies": []}, graph)
+
+    def test_current_only_search_has_one_native_result_and_no_unattributed_wikipedia_copy(self):
+        registry = example()
+        entry = registry["entries"][0]
+        entry["current_identity"] = current_identity()
+        existing = [{"url": "/research/", "title": "Research", "summary": "Frozen"}]
+        result = cc.search_entries(existing, registry["entries"])
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[-1]["url"], cc.company_path(entry))
+        self.assertEqual(result[-1]["summary"], "Data annotation")
+        self.assertNotIn(entry["wikipedia"]["description"], json.dumps(result))
+        repeated = cc.search_entries(result, registry["entries"])
+        self.assertEqual(sum(row["url"] == cc.company_path(entry) for row in repeated), 1)
+        self.assertEqual(repeated[-1]["summary"], "Data annotation")
+
+    def test_current_only_profile_is_attributed_and_cannot_overwrite_an_existing_page(self):
+        registry = example()
+        entry = registry["entries"][0]
+        entry["current_identity"] = current_identity()
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            cc.write_current_company_supplements(root, registry)
+            target = root / cc.company_path(entry).strip('/') / 'index.html'
+            text = target.read_text()
+            page = Page(text)
+            self.assertEqual(page.current, [entry["entity_id"]])
+            self.assertIn('Current company profile', text)
+            self.assertIn(entry["wikipedia"]["description"], page.text)
+            self.assertIn(entry["wikipedia"]["license_url"], page.links)
+            self.assertIn('"@type":"ProfilePage"', text)
+            self.assertNotIn('Research compiled', text)
+            with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "overwrite an existing page"):
+                cc.write_current_company_supplements(root, registry)
 
 
 class ActualCurrentCompanyRegistryTests(unittest.TestCase):

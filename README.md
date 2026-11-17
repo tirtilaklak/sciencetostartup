@@ -192,9 +192,10 @@ sanitized public deployment settings; credentials never enter the repository.
 ## How the page is built
 
 The current `/companies/` directory also reads `data/current-companies.json`.
-This additive registry selects existing research organization profiles without
-changing canonical v2.5.0, the published research graph or archived packages.
-Its four November 16 additions bring the directory to 43 entries; the original
+This additive registry selects existing research organization profiles and
+source-bound current-only profiles without changing canonical v2.5.0, the
+published research graph or archived packages. Its ten November 16 additions
+bring the directory to 49 entries; the original
 research cohort and financial coverage remain 39. Current cards and profile
 supplements retain exact Wikipedia sentences, permanent revisions, author-history
 links, CC BY-SA 4.0 attribution, and separately sourced current offering labels.
@@ -202,6 +203,12 @@ Their review dates do not renew older research claims. A Wikipedia response hash
 identifies the captured revision API response containing the article wikitext;
 primary-source hashes identify the stated HTTP body or saved web-tool excerpt.
 The exported `/current-companies.json` preserves this provenance and licensing.
+An explicit `current_identity` binds each new current-only profile to its
+official identity sources, names and website. It cannot replace an existing
+profile or research identity. A `website_supplement` can fill a missing official
+website on an approved organization while retaining its reviewed names. Current
+profiles are included in native search and the sitemap, with no additions to
+the frozen research graph or its coverage counts.
 See [Wikipedia excerpt licensing](LICENSE-WIKIPEDIA.md); archived research license
 documents retain their original bytes.
 
