@@ -25,7 +25,7 @@
 .scan-meta{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:11px;color:var(--muted);line-height:1.5}
 .scan-kind{color:var(--green);font-weight:600}
 .scan-meta>span:last-child{margin-left:auto}
-.static-page .scan-item h2{font-size:21px;line-height:1.35;letter-spacing:-.025em;margin:9px 0 8px;font-weight:550;max-width:790px}
+.static-page .scan-item h2{font-size:21px;line-height:1.35;letter-spacing:-.025em;margin:9px 0 8px;font-weight:550;max-width:790px;text-wrap:balance}
 .scan-item h2 a{text-decoration:none;color:var(--ink)}
 .scan-item h2 a:hover{text-decoration:underline;text-underline-offset:4px}
 .scan-external{color:var(--green);font-size:16px;white-space:nowrap}
