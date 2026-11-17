@@ -244,7 +244,7 @@ def search_entries(entries, current_entries):
             keywords = entry.get("keywords", "")
             if isinstance(keywords, list):
                 keywords = " ".join(keywords)
-            output.append({**entry, "title": current["name"], "keywords": " ".join([keywords, current["name"], *[o["label"] for o in current["offerings"]]])})
+            output.append({**entry, "title": current["name"], "kind": "company", "keywords": " ".join([keywords, current["name"], *[o["label"] for o in current["offerings"]]])})
         else:
             output.append(entry)
     for url, current in replacements.items():

@@ -23,7 +23,7 @@ function siteSearchPages(){
   ['downloads','Download the data','JSON, CSV and SQLite files','downloads csv json sqlite dataset export license reuse'],
   ['venture','The publisher’s proposed AI lab','The publisher’s proposal, separate from the research','venture neolab investor pitch proposal']
  ].map(([id,name,meta,keys])=>({type:'page',id,name,meta,keys:keys.split(' '),href:'#'+id})).concat(
-  ((typeof window!=='undefined'&&window.SEARCH_INDEX?.researchSearchEntries)||[]).map(entry=>({type:'page',id:entry.url,name:entry.title,meta:entry.summary,keys:entry.keywords||[],href:entry.url}))
+  ((typeof window!=='undefined'&&window.SEARCH_INDEX?.researchSearchEntries)||[]).map(entry=>({type:entry.kind==='company'?'company':'page',id:entry.url,name:entry.title,meta:entry.summary,keys:entry.keywords||[],href:entry.url}))
  );
 }
 function siteSearchIndex(){

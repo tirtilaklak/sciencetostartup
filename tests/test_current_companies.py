@@ -201,6 +201,7 @@ class CurrentCompanyRenderingTests(unittest.TestCase):
         self.assertEqual(len(result), len(existing))
         self.assertEqual(sum(row["url"] == "/company/org.example/" for row in result), 1)
         self.assertEqual(result[1]["summary"], existing[1]["summary"])
+        self.assertEqual(result[1]["kind"], "company")
         self.assertNotIn(registry["entries"][0]["wikipedia"]["description"], json.dumps(result))
         self.assertIn("Data annotation", result[1]["keywords"])
         self.assertEqual(result[0], existing[0])
