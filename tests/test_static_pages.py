@@ -177,8 +177,10 @@ class StaticPageTests(unittest.TestCase):
         from research_pages import _new_company, _path_token
         context = build_context(ROOT)
         additive = {_path_token(e['id']) for e in context['graph']['entities'] if _new_company(context, e)}
-        self.assertEqual({p.name for p in (self.dist / "company").iterdir()}, set(self.companies) | additive)
-        for cid in self.companies: self.assertTrue((self.dist / "company" / cid / "index.html").is_file(), cid)
+        current = {entry["entity_id"] for entry in self.current_companies["entries"]}
+        expected = set(self.companies) | additive | current
+        self.assertEqual({p.name for p in (self.dist / "company").iterdir()}, expected)
+        for cid in expected: self.assertTrue((self.dist / "company" / cid / "index.html").is_file(), cid)
 
     def test_pages_declare_canonical_url_title_and_heading(self):
         for cid, text in self.pages.items():
