@@ -261,10 +261,16 @@ def _link(url, label):
     return '<a class="ext" href="' + escape(url, quote=True) + '" rel="noopener noreferrer" target="_blank">' + escape(label) + '</a>'
 
 
+def current_review_date(entry):
+    """A later registry update cannot refresh an unchanged entry's receipts."""
+    return min(entry["wikipedia"]["observed_on"], *(source["observed_on"] for source in entry["sources"]))
+
+
 def current_company_html(entry, reviewed_on, compact=False):
     """Attribution stays adjacent to the exact quoted text without JavaScript."""
     from static_pages import format_date
     wiki, sources = entry["wikipedia"], entry["sources"]
+    reviewed_on = min(reviewed_on, current_review_date(entry))
     refs = lambda indexes: " ".join(_link(sources[i]["url"], "[" + str(i + 1) + "]") for i in indexes)
     offerings = "".join('<li>' + escape(o["label"]) + ' ' + refs(o["source_indexes"]) + '</li>' for o in entry["offerings"])
     scope = ""
@@ -288,6 +294,7 @@ def write_current_company_supplements(output, registry):
     import static_pages as sp
     records = []
     for entry in registry["entries"]:
+        reviewed_on = current_review_date(entry)
         path = company_path(entry)
         target = Path(output) / path.strip('/') / 'index.html'
         if (entry.get("current_identity") or {}).get("scope") == "current_only":
@@ -299,20 +306,20 @@ def write_current_company_supplements(output, registry):
             body = ('<link rel="stylesheet" href="/company-profile.css">' + sp.crumb_nav(crumbs)
                     + '<article class="company-dossier"><header class="company-hero"><p class="eyebrow">Current company profile</p><h1>'
                     + escape(entry["name"]) + '</h1><p>' + _link(entry["website"], "Official website") + '</p></header><div class="company-record">'
-                    + current_company_html(entry, registry["reviewed_on"]) + '</div></article>')
-            node = sp.page_node("ProfilePage", entry["name"], description, canonical, registry["reviewed_on"], crumbs,
+                    + current_company_html(entry, reviewed_on) + '</div></article>')
+            node = sp.page_node("ProfilePage", entry["name"], description, canonical, reviewed_on, crumbs,
                                 mainEntity={"@type": "Organization", "name": entry["name"], "url": entry["website"]})
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(sp.document(SimpleNamespace(as_of=None, data={}), entry["name"] + " · " + sp.SITE_NAME,
                                           description, canonical, body, node, current="companies", state="location"), encoding="utf-8")
-            records.append({"path": path, "lastmod": registry["reviewed_on"]})
+            records.append({"path": path, "lastmod": reviewed_on})
             continue
         _require(target.is_file(), "selected organization profile is missing: " + path)
         original = target.read_text(encoding="utf-8")
         canonical = sp.ORIGIN + path
         _require(f'<link rel="canonical" href="{escape(canonical)}">' in original and original.count('<div class="company-record">') == 1, "selected organization profile has an unexpected canonical or layout: " + path)
         _require('id="current-company-description"' not in original, "current supplement already written: " + path)
-        modified = registry["reviewed_on"]
+        modified = reviewed_on
         text = original.replace('<div class="company-record">', '<div class="company-record">' + current_company_html(entry, modified), 1)
         description = entry["wikipedia"]["description"] if entry["wikipedia"].get("article_scope", "company") == "company" else None
         if description is not None:

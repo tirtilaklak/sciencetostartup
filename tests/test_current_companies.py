@@ -145,6 +145,8 @@ class CurrentCompanyValidationTests(unittest.TestCase):
 class CurrentCompanyRenderingTests(unittest.TestCase):
     def test_directory_cards_and_provenance_are_available_without_javascript(self):
         registry = example()
+        registry["reviewed_on"] = "2026-11-17"
+        registry["entries"][0]["sources"][0]["observed_on"] = "2026-11-15"
         research = SimpleNamespace(as_of="2026-10-28", data={"dataset_version": "2.5.0"})
         text = sp.render_index(research, [], {}, {}, 0, registry["reviewed_on"], current_entries=registry["entries"], current_reviewed_on=registry["reviewed_on"])
         page, entry = Page(text), registry["entries"][0]
@@ -157,7 +159,8 @@ class CurrentCompanyRenderingTests(unittest.TestCase):
             self.assertIn(url, page.links)
         self.assertIn(entry["wikipedia"]["description"], page.text)
         self.assertIn(cc.CHANGE_NOTE, " ".join(page.text))
-        self.assertIn("16 Nov 2026", " ".join(page.text))
+        self.assertIn("Current directory addition · Checked 15 Nov 2026", " ".join(page.text))
+        self.assertNotIn("Checked 17 Nov 2026", " ".join(page.text))
         self.assertIn('<details class="company-current-facts">', text)
         node = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', text, re.S).group(1))
         self.assertEqual(node["mainEntity"]["numberOfItems"], 1)
@@ -165,6 +168,7 @@ class CurrentCompanyRenderingTests(unittest.TestCase):
 
     def test_profile_updates_current_metadata_and_preserves_archived_bytes(self):
         registry, research = example(), SimpleNamespace(as_of="2026-10-28", data={"dataset_version": "2.5.0"})
+        registry["reviewed_on"] = "2026-11-17"
         entry = registry["entries"][0]
         canonical = sp.ORIGIN + cc.company_path(entry)
         historic = '<details id="approved-findings"><summary>Findings</summary><p>Original approved finding and qualification.</p></details>'
@@ -300,11 +304,12 @@ class CurrentOnlyCompanyTests(unittest.TestCase):
 
     def test_current_only_profile_is_attributed_and_cannot_overwrite_an_existing_page(self):
         registry = example()
+        registry["reviewed_on"] = "2026-11-17"
         entry = registry["entries"][0]
         entry["current_identity"] = current_identity()
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
-            cc.write_current_company_supplements(root, registry)
+            self.assertEqual(cc.write_current_company_supplements(root, registry), [{"path": cc.company_path(entry), "lastmod": "2026-11-16"}])
             target = root / cc.company_path(entry).strip('/') / 'index.html'
             text = target.read_text()
             page = Page(text)
@@ -313,6 +318,8 @@ class CurrentOnlyCompanyTests(unittest.TestCase):
             self.assertIn(entry["wikipedia"]["description"], page.text)
             self.assertIn(entry["wikipedia"]["license_url"], page.links)
             self.assertIn('"@type":"ProfilePage"', text)
+            self.assertIn('"dateModified":"2026-11-16"', text)
+            self.assertIn("Current directory addition · Checked 16 Nov 2026", " ".join(page.text))
             self.assertNotIn('Research compiled', text)
             with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "overwrite an existing page"):
                 cc.write_current_company_supplements(root, registry)
