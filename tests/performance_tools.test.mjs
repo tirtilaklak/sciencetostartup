@@ -67,8 +67,8 @@ test('browser CI partitions preserve every test and isolate all twelve chapter s
   const coreKeys = new Set(keys(core));
   assert(report.entries.every(entry => !coreKeys.has(entry.key)), 'CI partitions overlap');
   assert.deepEqual([...keys(core), ...keys(report)].sort(), keys(all), 'CI must execute exactly the complete inventory');
-  assert.equal(all.entries.length, 660);
-  assert.equal(core.entries.length, 600);
+  assert.equal(all.entries.length, 700);
+  assert.equal(core.entries.length, 640);
   assert.equal(report.entries.length, 60);
   assert.deepEqual(report.entries.map(entry => entry.project).sort(),
     ['chromium', 'firefox', 'mobile-chromium', 'mobile-webkit', 'webkit'].flatMap(name => Array(12).fill(name)).sort());
