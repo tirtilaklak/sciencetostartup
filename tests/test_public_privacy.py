@@ -244,6 +244,9 @@ class PublicPrivacyTests(unittest.TestCase):
         context = build_context(ROOT)
         added = {entity_url(entity, context).strip('/') + '/index.html'
                  for entity in context['graph']['entities'] if _new_company(context, entity)}
+        current_path = ROOT / 'data/current-companies.json'
+        current = json.loads(current_path.read_text())["entries"] if current_path.exists() else []
+        added |= {f"company/{entry['entity_id']}/index.html" for entry in current}
         self.assertEqual({p for p in self.places if p.startswith("company/")},
                          {f"company/{c['id']}/index.html" for c in companies} | added)
 

@@ -17,6 +17,27 @@ def run_stub(checks):
 
 
 class SiteSearchTests(unittest.TestCase):
+    def test_native_current_companies_keep_the_research_report_in_page_results(self):
+        checks = r'''
+run('initialize()');
+const records=[
+ {title:'Feedback',summary:'Research',url:'/research/feedback/',kind:'research',keywords:'human feedback'},
+ {title:'Human data research',summary:'Research',url:'/research/',kind:'research',keywords:'human feedback'},
+ {title:'State of AI Data Labs and Human Feedback',summary:'Research report',url:'/research/state-of-ai-data-labs/',kind:'report',keywords:'human feedback'},
+ {title:'Lionbridge',summary:'Model evaluation and human feedback',url:'/company/org.lionbridge/',kind:'company',keywords:'human feedback'}
+];
+run(`window.SEARCH_INDEX={researchSearchEntries:${JSON.stringify(records)}};siteSearchEntries=null`);
+const matches=plain(run(`siteSearch('human feedback',{types:['company','page']})`));
+const company=matches.find(row=>row.href==='/company/org.lionbridge/');
+assert.equal(company?.type,'company','Native current-company profiles belong with companies');
+assert.ok(matches.some(row=>row.type==='page'&&row.href==='/research/state-of-ai-data-labs/'),'Current companies must not displace the report from the three page results');
+run('globalThis.assignedNative=null;location.assign=href=>globalThis.assignedNative=href');
+run(`siteSearchChoose(${JSON.stringify(company)})`);
+assert.equal(run('assignedNative'),'/company/org.lionbridge/','A native company result keeps its real profile URL');
+'''
+        result = run_stub(checks)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_browse_actions_start_with_all_results(self):
         checks = r'''
 run('initialize()');

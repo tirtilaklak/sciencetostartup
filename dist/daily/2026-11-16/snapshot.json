@@ -43,7 +43,12 @@
       ],
       "date_basis": "arXiv v1 submission (UTC)",
       "read_scope": "Submission history, methods and limitations; code not executed; results not reproduced",
-      "source_timestamp": "2026-11-09T17:38:16Z"
+      "source_timestamp": "2026-11-09T17:38:16Z",
+      "explanation": [
+        "A preferred answer can contain mistakes, and a rejected answer can still contain useful text.",
+        "PORT compares how likely the model considers small pieces of each answer and uses their ranks within a training batch to change how strongly those pieces affect learning.",
+        "The aim is to learn from imperfect preference labels without letting unreliable pieces dominate; the method was less reliable with very small batches."
+      ]
     },
     {
       "id": "vepo",
@@ -70,7 +75,13 @@
       ],
       "date_basis": "arXiv v1 submission (UTC)",
       "read_scope": "Submission history, methods and limitations; code not executed; results not reproduced",
-      "source_timestamp": "2026-11-13T12:23:14Z"
+      "source_timestamp": "2026-11-13T12:23:14Z",
+      "explanation": [
+        "Image-answering models can mention objects that are absent, especially when answering in languages with less training data.",
+        "VEPO uses English questions to locate key image regions, then trains with the same answer paired with either the full image or an image with those regions hidden.",
+        "This encourages answers backed by visible evidence in other languages.",
+        "The reported tests cover Chinese, French and Hindi; Hindi training also needed English examples."
+      ]
     },
     {
       "id": "privacypr",
@@ -97,7 +108,12 @@
       ],
       "date_basis": "arXiv v1 submission (UTC)",
       "read_scope": "Abstract and submission history; results not reproduced",
-      "source_timestamp": "2026-11-13T15:18:33Z"
+      "source_timestamp": "2026-11-13T15:18:33Z",
+      "explanation": [
+        "PrivacyPR tests whether AI code reviewers can spot problems that expose or misuse personal information.",
+        "It turns real privacy fixes accepted by developers into review tasks by putting the faulty code back.",
+        "Asking agents to focus on privacy helped them find more problems, but they still raised false alarms and some dataset labels were uncertain."
+      ]
     },
     {
       "id": "mercor-series-d",
@@ -122,7 +138,12 @@
         }
       ],
       "date_basis": "Original publication date",
-      "read_scope": "Dated company announcement; reported outcomes not independently reproduced"
+      "read_scope": "Dated company announcement; reported outcomes not independently reproduced",
+      "explanation": [
+        "Mercor announced a $750 million funding deal at a $20 billion valuation.",
+        "It says the financing will support tools that use human expertise to train AI agents and test them on realistic workplace tasks.",
+        "The deal includes employee share sales, and Mercor did not say how much is new money for the business."
+      ]
     },
     {
       "id": "flinkeval",
@@ -149,7 +170,12 @@
       ],
       "date_basis": "arXiv v1 submission (UTC)",
       "read_scope": "Primary paper / release and stated limitations; results not reproduced",
-      "source_timestamp": "2026-11-12T16:54:35Z"
+      "source_timestamp": "2026-11-12T16:54:35Z",
+      "explanation": [
+        "FlinkEval tests whether AI can write database queries for data that keeps arriving, such as a stream of transactions.",
+        "It creates requests and matching queries, then checks them on a working streaming database.",
+        "This reveals problems with timing and unclear requests, but some reported scores judge query quality even when the queries could not run."
+      ]
     },
     {
       "id": "sg-legalclarify",
@@ -171,7 +197,12 @@
         }
       ],
       "date_basis": "Original publication date",
-      "read_scope": "Dated company announcement; reported outcomes not independently reproduced"
+      "read_scope": "Dated company announcement; reported outcomes not independently reproduced",
+      "explanation": [
+        "SG-LegalClarify tests whether AI asks for missing facts before answering questions about Singapore law.",
+        "Models can ask a simulated user for details, and AI judges check their answers against criteria written by legal experts.",
+        "The results reveal gaps in gathering facts and applying the law, but the score counts individual criteria rather than fully correct answers."
+      ]
     },
     {
       "id": "gaze-reward-modeling",
@@ -197,7 +228,12 @@
       ],
       "date_basis": "arXiv v1 submission (UTC)",
       "read_scope": "Submission history, methods and limitations; code not executed; results not reproduced",
-      "source_timestamp": "2026-11-10T02:36:14Z"
+      "source_timestamp": "2026-11-10T02:36:14Z",
+      "explanation": [
+        "This paper asks whether clues about how people read can help a model judge which answer people would prefer.",
+        "It predicts how long a reader might look at each word, spreads that signal to nearby words, and adds it to an answer-scoring model.",
+        "The reported gains concern preference prediction in English; the study uses predicted gaze, not new eye-tracking measurements, and does not test whether it improves a chatbot's answers."
+      ]
     },
     {
       "id": "nemotron-pii-japan",
@@ -222,7 +258,12 @@
         }
       ],
       "date_basis": "Announcement 9 Nov; dataset card release date 10 Nov 2026",
-      "read_scope": "Primary paper / release and stated limitations; results not reproduced"
+      "read_scope": "Primary paper / release and stated limitations; results not reproduced",
+      "explanation": [
+        "NVIDIA created made-up Japanese business documents to help train and test systems that find or hide personal information.",
+        "The process chooses fictional identifying details, builds documents around them and labels where those details appear.",
+        "This provides examples without collecting customer documents, but the labels do not cover every relevant detail and can contain mistakes."
+      ]
     },
     {
       "id": "labelbox-wipro",
@@ -248,7 +289,12 @@
         }
       ],
       "date_basis": "Original publication date",
-      "read_scope": "Dated company announcement; reported outcomes not independently reproduced"
+      "read_scope": "Dated company announcement; reported outcomes not independently reproduced",
+      "explanation": [
+        "Labelbox and Wipro announced a partnership to help businesses train, test and use AI agents on workplace tasks.",
+        "They say Wipro will help customers connect their systems and define what good work looks like, while Labelbox supplies simulated practice environments and agents that carry out tasks.",
+        "The companies have not published customer results showing measurable gains from the partnership."
+      ]
     },
     {
       "id": "motiongraphicsbench",
@@ -279,7 +325,12 @@
       ],
       "date_basis": "arXiv v1 submission (UTC); release article 10 Nov 2026",
       "read_scope": "Primary paper / release and stated limitations; results not reproduced",
-      "source_timestamp": "2026-11-07T08:59:49Z"
+      "source_timestamp": "2026-11-07T08:59:49Z",
+      "explanation": [
+        "MotionGraphicsBench tests whether AI can animate supplied artwork according to a designer's instructions.",
+        "Instead of comparing the result with one reference animation, readable checking programs test requested movements, timing and other properties.",
+        "This allows different valid solutions and makes failures easier to inspect, but the checks measure following instructions rather than how beautiful an animation looks."
+      ]
     },
     {
       "id": "aero",
@@ -309,7 +360,13 @@
       ],
       "date_basis": "arXiv v1 submission (UTC)",
       "read_scope": "Submission history, methods and limitations; code not executed; results not reproduced",
-      "source_timestamp": "2026-11-07T14:12:05Z"
+      "source_timestamp": "2026-11-07T14:12:05Z",
+      "explanation": [
+        "Asking for a preference judgment on every training example can be expensive.",
+        "AERO lets several answer-scoring models vote: when they disagree strongly, it requests an outside judgment; when they agree, it supplies a predicted preference itself.",
+        "This focuses the feedback budget on examples where the models are uncertain.",
+        "The experiments used a fixed AI scoring model as the outside judge, so the reported savings still need testing with human feedback."
+      ]
     },
     {
       "id": "shaping-useful-noise",
@@ -335,7 +392,12 @@
       ],
       "date_basis": "arXiv v1 submission (UTC)",
       "read_scope": "Primary paper / release and stated limitations; results not reproduced",
-      "source_timestamp": "2026-11-09T06:31:22Z"
+      "source_timestamp": "2026-11-09T06:31:22Z",
+      "explanation": [
+        "This paper asks how to choose useful synthetic images for training visual models.",
+        "It compares the distributions of confidence scores that the same image model assigns to real and synthetic images.",
+        "The comparison helped predict training results, but its proposed image selection method was checked using an existing model's features and still needs testing through new model training."
+      ]
     },
     {
       "id": "turing-company-archives",
@@ -357,7 +419,12 @@
         }
       ],
       "date_basis": "Program explanation published 11 Nov; launch date unspecified",
-      "read_scope": "Dated company announcement; reported outcomes not independently reproduced"
+      "read_scope": "Dated company announcement; reported outcomes not independently reproduced",
+      "explanation": [
+        "Turing describes turning connected company records into simulated workplaces where AI agents can practice real tasks.",
+        "It says automated checks score the work, letting AI labs train and test agents using the context found across a company's files, messages and code.",
+        "The post explains the program without giving a launch date, test results or an independent privacy audit."
+      ]
     },
     {
       "id": "omnisynth",
@@ -384,7 +451,12 @@
       ],
       "date_basis": "arXiv v1 submission (UTC)",
       "read_scope": "Primary paper / release and stated limitations; results not reproduced",
-      "source_timestamp": "2026-11-09T05:11:45Z"
+      "source_timestamp": "2026-11-09T05:11:45Z",
+      "explanation": [
+        "OmniSynth checks how well synthetic health records preserve real data patterns, including which values are missing.",
+        "It deliberately adds flaws to data to see whether measures of similarity, privacy and usefulness notice the changes.",
+        "This helps expose misleading quality scores, but some measures were unstable, fairness checks are absent and testing of usefulness for later prediction tasks remains incomplete."
+      ]
     },
     {
       "id": "surge-nemotron",
@@ -406,7 +478,12 @@
         }
       ],
       "date_basis": "Visible publication date / JSON-LD; hidden 12 Nov date excluded",
-      "read_scope": "Dated company announcement; reported outcomes not independently reproduced"
+      "read_scope": "Dated company announcement; reported outcomes not independently reproduced",
+      "explanation": [
+        "Surge tested whether focused reinforcement learning could improve Nemotron on tasks such as coding, following detailed instructions and using tools.",
+        "It trained four separate model variants and reports gains when each is tested on its relevant tasks.",
+        "The results do not describe one model with every improvement, and comparisons with other models used published scores from potentially different test setups."
+      ]
     },
     {
       "id": "loco",
@@ -432,7 +509,13 @@
       ],
       "date_basis": "arXiv v1 submission (UTC)",
       "read_scope": "Submission history, methods and limitations; code not executed; results not reproduced",
-      "source_timestamp": "2026-11-03T12:44:50Z"
+      "source_timestamp": "2026-11-03T12:44:50Z",
+      "explanation": [
+        "Reasoning models sometimes keep working after they have enough information to finish.",
+        "LoCo finds these points and trains the model to prefer a shorter, checked continuation over its original longer continuation, with both starting from the same reasoning so far.",
+        "This teaches where to conclude, potentially cutting the cost of generating answers.",
+        "The reported tests preserve or improve accuracy on mathematics and code; benefits on tasks without checkable answers remain unproven."
+      ]
     },
     {
       "id": "toloka-fireworks",
@@ -458,7 +541,13 @@
         }
       ],
       "date_basis": "Original publication date",
-      "read_scope": "Dated company announcement; reported outcomes not independently reproduced"
+      "read_scope": "Dated company announcement; reported outcomes not independently reproduced",
+      "explanation": [
+        "Toloka has joined Fireworks' Frontier Ecosystem, pairing expert-created training data and feedback with tools for training and running AI models.",
+        "Toloka says this will help teams adapt models to specific jobs and check their work.",
+        "It is also contributing its test of business tool use to Fireworks' evaluation index.",
+        "The announcements provide no measured customer improvements."
+      ]
     },
     {
       "id": "see-every-block",
@@ -484,7 +573,13 @@
       ],
       "date_basis": "arXiv v1 submission (UTC)",
       "read_scope": "Submission history, methods and limitations; code not executed; results not reproduced",
-      "source_timestamp": "2026-11-13T05:10:56Z"
+      "source_timestamp": "2026-11-13T05:10:56Z",
+      "explanation": [
+        "Masked diffusion language models build text by repeatedly filling in missing pieces.",
+        "Their training estimates a learning signal from text blocks, but random selection can repeat some blocks and miss others.",
+        "This paper evaluates every block once and averages the results, reducing that source of noise and improving the reported tests on one model.",
+        "Its proposed use with PPO or DPO, methods used to learn from preference feedback, remains untested."
+      ]
     }
   ]
 }

@@ -23,6 +23,10 @@ def edition(day="2026-11-16"):
                 "topics": ["Data", "Evaluation"],
                 "published_on": "2026-11-13",
                 "title": f"Example paper {index}",
+                "explanation": [
+                    "The researchers built a way to test AI systems.",
+                    "They report better results, but tested only one setting.",
+                ],
                 "focus": "Dataset evaluation",
                 "finding": "Author-reported benchmark result",
                 "caveat": "Single tested setting",
@@ -42,11 +46,24 @@ class PageElements(HTMLParser):
         self.elements = []
         self.date_options = []
         self.in_date_select = False
+        self.details_depth = 0
+        self.paragraphs = []
+        self.current_paragraph = None
         self.feed(html)
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
         self.elements.append((tag, attrs))
+        if tag == "details":
+            self.details_depth += 1
+        elif tag == "p":
+            self.current_paragraph = {
+                "classes": attrs.get("class", "").split(),
+                "hidden": "hidden" in attrs,
+                "details_depth": self.details_depth,
+                "text": "",
+            }
+            self.paragraphs.append(self.current_paragraph)
         if tag == "select" and attrs.get("id") == "scan-date":
             self.in_date_select = True
         elif tag == "option" and self.in_date_select:
@@ -55,6 +72,14 @@ class PageElements(HTMLParser):
     def handle_endtag(self, tag):
         if tag == "select":
             self.in_date_select = False
+        elif tag == "details":
+            self.details_depth -= 1
+        elif tag == "p":
+            self.current_paragraph = None
+
+    def handle_data(self, data):
+        if self.current_paragraph is not None:
+            self.current_paragraph["text"] += data
 
     def date_steps(self):
         return [
@@ -121,6 +146,70 @@ class DailyScanTests(unittest.TestCase):
                     else:
                         snapshot["items"][0][field] = value
                     self.assert_rejected(snapshot)
+
+    def test_explanations_require_an_array_of_two_to_four_sentences(self):
+        snapshot = edition()
+        del snapshot["items"][0]["explanation"]
+        self.assert_rejected(snapshot)
+        for value in (None, "One sentence. Another sentence.", {}, [], ["One sentence."], ["A sentence."] * 5):
+            with self.subTest(value=value):
+                snapshot = edition()
+                snapshot["items"][0]["explanation"] = value
+                self.assert_rejected(snapshot)
+
+    def test_explanation_sentences_require_text_and_sentence_endings(self):
+        for value in (None, 7, {}, "", "  ", "Dataset evaluation", ".", "...", "A fragment;"):
+            with self.subTest(value=value):
+                snapshot = edition()
+                snapshot["items"][0]["explanation"][1] = value
+                self.assert_rejected(snapshot)
+
+    def test_accepts_two_to_four_sentences_and_quoted_sentence_endings(self):
+        sentences = [
+            "The researchers tested an AI system.",
+            'An expert called the result "useful."',
+            "Does it work in other settings?",
+            "More testing is needed!",
+        ]
+        for count in (2, 3, 4):
+            with self.subTest(count=count):
+                snapshot = edition()
+                snapshot["items"][0]["explanation"] = sentences[:count]
+                self.save(snapshot)
+                self.assertEqual(load_editions(self.root), [snapshot])
+
+    def test_all_explanations_render_as_visible_escaped_paragraphs(self):
+        snapshot = edition()
+        snapshot["items"][0]["explanation"] = [
+            'Researchers tested <script>alert("read")</script> on the examples.',
+            "They report a gain, but only for this dataset.",
+        ]
+        html = render(snapshot, [snapshot], ORIGIN + "/daily/", self.root)
+        page = PageElements(html)
+        paragraphs = [row for row in page.paragraphs if "scan-explanation" in row["classes"]]
+        self.assertEqual(len(paragraphs), len(snapshot["items"]))
+        self.assertEqual(
+            [row["text"] for row in paragraphs],
+            [" ".join(item["explanation"]) for item in snapshot["items"]],
+        )
+        self.assertTrue(all(not row["hidden"] and row["details_depth"] == 0 for row in paragraphs))
+        self.assertIn("&lt;script&gt;alert(&quot;read&quot;)&lt;/script&gt;", html)
+        self.assertNotIn('<script>alert("read")</script>', html)
+        articles = [attrs for tag, attrs in page.elements if tag == "article" and "scan-item" in attrs.get("class", "").split()]
+        self.assertTrue(all("hidden" not in attrs for attrs in articles))
+
+    def test_original_technical_notes_and_sources_stay_in_expandable_details(self):
+        snapshot = edition()
+        item = snapshot["items"][0]
+        html = render(snapshot, [snapshot], ORIGIN + "/daily/", self.root)
+        article = html.split(f'<article class="scan-item" id="{item["id"]}"', 1)[1].split("</article>", 1)[0]
+        visible, details = article.split("<details>", 1)
+        self.assertIn('<p class="scan-explanation">', visible)
+        self.assertNotIn(item["focus"], visible)
+        for field in ("focus", "finding", "caveat", "date_basis", "read_scope"):
+            self.assertIn(item[field], details)
+        self.assertIn(f'<a href="{item["sources"][0]["url"]}">Primary paper', details)
+        self.assertIn('href="#example-0"', details)
 
     def test_sources_require_a_nonempty_list(self):
         for value in ("missing", [], None, {}):

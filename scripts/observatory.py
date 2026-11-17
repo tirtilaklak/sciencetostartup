@@ -931,6 +931,8 @@ def build(data, destination):
         entries = [(node.findtext(namespace + "loc"), node.findtext(namespace + "lastmod")) for node in sitemap]
         entries = [(url, max(filter(None, [modified, company_updates.get(url)]), default=None)) for url, modified in entries]
         entries += [("https://sciencetostartup.com" + entry["path"], entry.get("lastmod")) for entry in research_entries]
+        existing_urls = {url for url, _ in entries}
+        entries += [(url, modified) for url, modified in current_updates.items() if url not in existing_urls]
         entries = [(url, max(filter(None, [modified, current_updates.get(url)]), default=None)) for url, modified in entries]
         if len({entry[0] for entry in entries}) != len(entries):
             raise ValueError("Duplicate canonical URL in research sitemap")

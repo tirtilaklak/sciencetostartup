@@ -26,24 +26,34 @@ dates use UTC and are identified as such.
    Availability is not source review; reading a paper is not replication.
 5. Add `data/daily-scan/YYYY-MM-DD.json`. Use the schema of the initial snapshot:
    `id`, `title`, `kind`, `topics`, `publisher`, `published_on`, `date_basis`,
-   `focus`, `finding`, `caveat`, `read_scope` and `sources` with visible labels.
-   The filters are defined in `scripts/daily_scan.py`. Keep the factual notes
-   concise, as structured fragments rather than new narrative sentences.
-6. For explanatory prose, reuse only complete, exact, suitable sentences from
-   downloaded Wikipedia articles. The initial context excerpts and revision,
-   history, license and download hashes are in
-   `data/daily-scan/wikipedia-context.json`. Download relevant articles only,
-   check warnings and topic identity, pin the revision and response hash,
-   verify suitability against primary evidence, and attribute excerpts visibly
-   under CC BY-SA 4.0. Do not stitch fragments into invented Wikipedia sentences,
-   use generic definitions as evidence for current company events, hide reuse,
-   or claim human authorship or a guaranteed detector score. Titles, dates,
-   names, interface labels and structured facts retain their primary sources.
-7. Preserve earlier snapshot files. Correct a factual error transparently using
+   `explanation`, `focus`, `finding`, `caveat`, `read_scope` and `sources` with
+   visible labels. The filters are defined in `scripts/daily_scan.py`.
+   `explanation` is an array of 2–4 short, complete sentence strings; each must
+   contain text and end with sentence punctuation. The renderer joins them into
+   one visible paragraph beneath the headline. Original technical focus,
+   findings, limits, read scope, source dates and links remain in expandable
+   details. Explanations remain readable without JavaScript.
+6. Write faithful, plain-language paraphrases of the primary sources for item
+   explanations. State the core idea or event, what it means in practical terms,
+   and the important limit. Aim for about 40–80 words across 2–4 sentences.
+   Attribute author and company claims, avoid jargon and promotional language,
+   and do not turn reported results into independently verified conclusions.
+   Keep the accompanying structured factual notes concise. This permission to
+   paraphrase applies to Daily item explanations; they are not Wikipedia quotes.
+7. Keep Wikipedia background context separate and visibly attributed. Its
+   excerpts must remain complete, exact, suitable sentences from downloaded
+   articles. The initial excerpts and revision, history, license and download
+   hashes are in `data/daily-scan/wikipedia-context.json`. Download relevant
+   articles only, check warnings and topic identity, pin the revision and
+   response hash, verify suitability against primary evidence, and attribute
+   excerpts visibly under CC BY-SA 4.0. Do not stitch fragments into invented
+   Wikipedia sentences, use generic definitions as evidence for current events,
+   hide reuse, or claim human authorship or a guaranteed detector score.
+8. Preserve earlier snapshot files. Correct a factual error transparently using
    a dated correction note; never backdate a missed run. Keep full research
    receipts under the workspace's `research/daily-scan/YYYY-MM-DD/` outside
    the public Git checkout. Public JSON contains only selected facts and links.
-8. Build, test and publish through the current README's exact-artifact process.
+9. Build, test and publish through the current README's exact-artifact process.
    Validate daily data, responsive filters, source disclosures, date navigation,
    deep links, no-JavaScript reading, accessibility and payload/performance.
    Run the repository's required checks. Test the exact inactive Cloudflare
