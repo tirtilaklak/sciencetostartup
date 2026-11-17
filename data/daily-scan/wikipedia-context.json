@@ -1,0 +1,32 @@
+{
+  "entries": [
+    {
+      "label": "RLHF",
+      "title": "Reinforcement learning from human feedback",
+      "sentence": "In machine learning, reinforcement learning from human feedback (RLHF) is a technique to align an intelligent agent with human preferences.",
+      "article_url": "https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback",
+      "revision_id": 1382030889,
+      "revision_timestamp": "2026-10-26T03:37:43Z",
+      "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1382030889",
+      "history_url": "https://en.wikipedia.org/w/index.php?title=Reinforcement_learning_from_human_feedback&action=history",
+      "download_sha256": "fa650783c8081b2018d4f30e21e3f7be0f7b84ee0372326e961775129d91936b",
+      "downloaded_at": "2026-11-16T18:47:33.892893+00:00",
+      "normalization": "None; complete sentence from plain-text extract",
+      "license": "CC BY-SA 4.0"
+    },
+    {
+      "label": "Synthetic data",
+      "title": "Synthetic data",
+      "sentence": "Synthetic data are artificially generated data not produced by real-world events.",
+      "article_url": "https://en.wikipedia.org/wiki/Synthetic_data",
+      "revision_id": 1377697117,
+      "revision_timestamp": "2026-09-30T17:09:28Z",
+      "revision_url": "https://en.wikipedia.org/w/index.php?oldid=1377697117",
+      "history_url": "https://en.wikipedia.org/w/index.php?title=Synthetic_data&action=history",
+      "download_sha256": "d2ef09b8d80cbf8a53add00207c6846a36549c519d1ea3d06325d6956b4a3e39",
+      "downloaded_at": "2026-11-16T18:47:33.893255+00:00",
+      "normalization": "None; complete sentence from plain-text extract",
+      "license": "CC BY-SA 4.0"
+    }
+  ]
+}

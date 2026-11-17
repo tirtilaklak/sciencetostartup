@@ -203,7 +203,9 @@ def copy_public_site_inputs(root):
         shutil.copytree(ROOT / name, root / name, dirs_exist_ok=True,
                         ignore=shutil.ignore_patterns("__pycache__"))
     for path in (ROOT / "data").iterdir():
-        if path.is_file():
+        # These callers supply synthetic research graphs. Live directory choices
+        # are bound to real organization identities and must not enter fixtures.
+        if path.is_file() and path.name != "current-companies.json":
             shutil.copyfile(path, root / "data" / path.name)
     for relative in ("docs/research-id-crosswalk.json", "schema/database.sql", "package.json", "package-lock.json"):
         target = root / relative

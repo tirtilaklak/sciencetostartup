@@ -77,3 +77,8 @@ main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:
 @media(max-width:600px){.research-company-dossier .company-research-snapshot{font-size:13px}.research-company-dossier .company-fold-body .r-facts{grid-template-columns:84px minmax(0,1fr);gap:10px 16px}}
 
 .company-current-facts{margin:12px 0;font-size:14px}.company-current-facts>summary{cursor:pointer;min-height:44px;padding:10px 0}.current-fact-list{margin:0}.current-fact-list>div{padding:8px 0;border-top:1px solid var(--border)}.current-fact-list dt{font-weight:600}.current-fact-list dd{margin:4px 0 0;overflow-wrap:anywhere}
+.company-current-addition{padding:24px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
+.company-current-addition blockquote{margin:16px 0;padding:0 0 0 16px;border-left:2px solid var(--green)}
+.company-current-addition .company-wikipedia-attribution{font-size:13px;line-height:1.7;color:var(--muted)}
+.company-current-addition code{font-size:11px;overflow-wrap:anywhere;white-space:normal}
+.company-current-addition .company-current-facts li{margin:16px 0}

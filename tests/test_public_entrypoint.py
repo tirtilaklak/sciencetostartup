@@ -118,7 +118,14 @@ class PublicEntrypointTests(unittest.TestCase):
         self.assertGreaterEqual(len(research_locs), 4, "Research hub, report framework, data and review routes are discoverable")
         company_locs = [loc for loc in locs if "/company/" in loc]
         self.assertGreaterEqual(len(company_locs), len(companies))
-        self.assertEqual(len(locs), 4 + len(company_locs) + len(research_locs), "Historical profiles, new reviewed profiles and research routes have distinct canonical URLs")
+        daily_locs = [loc for loc in locs if loc.startswith(ORIGIN + "/daily/")]
+        snapshot_days = {path.stem for path in (ROOT / "data/daily-scan").glob("????-??-??.json")}
+        expected_daily = ({ORIGIN + "/daily/"} | {ORIGIN + "/daily/" + day + "/" for day in snapshot_days}) if snapshot_days else set()
+        self.assertEqual(set(daily_locs), expected_daily, "Only the daily index and actual dated snapshots are discoverable")
+        for loc in daily_locs:
+            page = self.dist / loc.removeprefix(ORIGIN).lstrip("/") / "index.html"
+            self.assertEqual(HeadLinks(page.read_text()).canonicals, [loc])
+        self.assertEqual(len(locs), 4 + len(company_locs) + len(research_locs) + len(daily_locs), "Company, research and dated daily routes have distinct canonical URLs")
         for company in companies:
             self.assertIn(ORIGIN + "/company/" + company["id"] + "/", locs)
             self.assertTrue((self.dist / "company" / company["id"] / "index.html").is_file(), company["id"])

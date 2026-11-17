@@ -13,7 +13,7 @@ const chapterIds = ['executive-assessment', 'weekly-developments', 'market-struc
   'human-expertise-and-operations', 'commercial-evidence', 'governance',
   'buyer-decision-guides', 'research-outlook', 'methods-and-appendices'];
 const readingPages = chapterIds.map((id, index) => index ? reportPath + 'chapters/' + id + '/' : reportPath);
-const publicPages = ['/', '/research/', ...readingPages, '/research/data/', '/review/', '/company/scale_ai/'];
+const publicPages = ['/', '/daily/', '/daily/2026-11-16/', '/research/', ...readingPages, '/research/data/', '/review/', '/company/scale_ai/'];
 
 test.beforeEach(async ({ page, request }, info) => {
   const response = await request.get('/manifest.json');
@@ -284,7 +284,7 @@ test('at 320 pixels the public header, navigation and page fit without horizonta
     const header = page.locator('body > header.site-header');
     await expect(header).toBeVisible();
     const nav = header.getByRole('navigation', { name: 'Main', exact: true });
-    for (const name of ['Research', 'Companies', 'Paid work', 'About']) {
+    for (const name of ['Daily scan', 'Research', 'Companies', 'Paid work', 'About']) {
       const link = nav.getByRole('link', { name, exact: true });
       await expect(link, path).toBeVisible();
       const box = await link.boundingBox();
@@ -298,6 +298,7 @@ test('at 320 pixels the public header, navigation and page fit without horizonta
   }
   // Advanced app flows stay available by hash; the primary site nav opens the native pages.
   for (const [name, target, heading] of [
+    ['Daily scan', '/daily/', 'Daily scan.'],
     ['Companies', '/companies/', 'AI data companies'],
     ['Paid work', '/work/', 'Find work in AI training.'],
     ['About', '/method/#about', 'About'],

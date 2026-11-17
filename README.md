@@ -3,6 +3,11 @@
 ScienceToStartup is a static, evidence-linked field guide to AI data organizations.
 The current public site is https://sciencetostartup.com.
 
+`/daily/` is the daily reading list for RLHF, data, evaluation and company news.
+Dated snapshots begin on 2026-11-16, with topic/type/search filters, source dates,
+expandable findings and limits, and links to original sources. The daily local
+automation targets 08:00 Pacific. See [daily scan operations](docs/daily-scan.md).
+
 ## Research publication
 
 The new `/research/` hub connects readable paper, dataset, benchmark and workflow
@@ -185,6 +190,20 @@ sanitized public deployment settings; credentials never enter the repository.
 - `design-system/`, `scripts/design_system.py`: design system tokens and the build of its stylesheet; see `design-system/README.md`.
 
 ## How the page is built
+
+The current `/companies/` directory also reads `data/current-companies.json`.
+This additive registry selects existing research organization profiles without
+changing canonical v2.5.0, the published research graph or archived packages.
+Its four November 16 additions bring the directory to 43 entries; the original
+research cohort and financial coverage remain 39. Current cards and profile
+supplements retain exact Wikipedia sentences, permanent revisions, author-history
+links, CC BY-SA 4.0 attribution, and separately sourced current offering labels.
+Their review dates do not renew older research claims. A Wikipedia response hash
+identifies the captured revision API response containing the article wikitext;
+primary-source hashes identify the stated HTTP body or saved web-tool excerpt.
+The exported `/current-companies.json` preserves this provenance and licensing.
+See [Wikipedia excerpt licensing](LICENSE-WIKIPEDIA.md); archived research license
+documents retain their original bytes.
 
 `build()` in `scripts/observatory.py` turns `web/` and the data into `dist/`.
 
