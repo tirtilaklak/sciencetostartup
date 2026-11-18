@@ -766,9 +766,19 @@ def work_freshness(route):
     """w4FreshnessLabel(): terms, pay-only review, blocked recheck, then page check."""
     receipt = work_approved_terms_receipt(route)
     if receipt: return "Terms checked " + format_date(receipt["checked_on"])
+    pay = (route.get("field_reviews") or {}).get("pay") or {}
+    if (pay.get("state") in {"sourced", "conflicting", "source_not_stated"}
+            and pay.get("basis") in {"direct_source", "stored_evidence"}
+            and ISO_DAY.fullmatch(str(pay.get("reviewed_on") or ""))):
+        return "Pay terms reviewed " + format_date(pay["reviewed_on"])
     if route.get("terms_checked_on"): return "Pay terms reviewed " + format_date(route["terms_checked_on"])
-    link = route.get("last_link_check") or {}
-    if link.get("result") == "blocked": return "Recheck blocked " + format_date(link.get("date"))
+    checks = [route.get("last_route_check") or {}, route.get("last_link_check") or {}]
+    latest_check = max((check for check in checks if ISO_DAY.fullmatch(str(check.get("date") or ""))),
+                       key=lambda check: check["date"], default={})
+    failed = {"blocked", "not_found", "unavailable", "unreadable_shell", "error"}
+    if latest_check.get("result") in failed:
+        label = "Recheck blocked " if latest_check["result"] == "blocked" else "Recheck failed "
+        return label + format_date(latest_check["date"])
     checked = max((d for d in (route.get("availability_checked_on"), (route.get("last_route_check") or {}).get("date")) if d), default="")
     if checked: return "Page checked " + format_date(checked)
     return ("Recorded " + format_date(route["reviewed_on"]) + " · " if route.get("reviewed_on") else "") + "Terms not rechecked"

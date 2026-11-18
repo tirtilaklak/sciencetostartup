@@ -2,7 +2,7 @@
 
 This pass changes the work and company-event sidecars. Canonical research dataset 2.5.0 and frozen research packages remain unchanged. The editor is Codex source review, acting under the owner's task authorization; this records no invented human signoff.
 
-Fresh official responses were captured on 18 November 2026 at the UTC times below. Source-content decisions were recorded at 2026-11-18T18:11:39Z. The first coherent editorial preparation was 2026-11-18T18:11:39Z; this is a publication-preparation timestamp, not a claim that the site was deployed then. No fact takes its review date from build or deployment time.
+Fresh official responses were captured on 18 November 2026 at the UTC times below. Source-content review decisions were recorded at 2026-11-18T18:11:39Z. The editorial preparation for this correction commit uses cutoff 2026-11-18T18:18:45Z. These are separate source-review and publication-preparation times; neither asserts deployment. Later integration/build checks do not move source-review timestamps or renew earlier facts.
 
 ## Work correction scope
 
@@ -54,5 +54,3 @@ The retained source normalizations introduce no fresh source quotation. New appr
 Release `2026-11-18.1` binds the exact work-sidecar bytes and unchanged canonical hash. Preparation changes release identity/hash only; it does not refresh other source dates or approvals. The primary discovery count stays 78 and the historical RWS record remains outside that count. Mercor and Appen retain their genuine November 8 full-terms clocks, so fresh field-only reviews cannot restore homepage promotion.
 
 Restore work and editorial-release files as a coherent pair if publication fails. Keep correction/source history; do not reset timestamps to make a restored release appear fresh. A later factual correction appends another review/correction event and requalifies the current value. Do not mutate historical approvals or frozen research packages to hide an earlier decision.
-
-Final scoped-data preparation cutoff for this change set: 2026-11-18T18:18:45Z. Source-review timestamps remain unchanged.

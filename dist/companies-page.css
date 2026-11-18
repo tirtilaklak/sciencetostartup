@@ -5,8 +5,8 @@
 .directory-filters{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,.45fr) auto;align-items:end;gap:12px;padding:16px 0;background:transparent;border:0;border-block:1px solid var(--border);border-radius:0}
 html[data-page-enhancement="pending"] .static-page .directory-filters[hidden]{display:grid!important;visibility:hidden}
 html[data-page-enhancement="pending"] .directory-groups{display:none}
-.directory-filters label{display:grid;gap:6px;font-size:.8125rem;font-weight:500}
-.directory-filters input,.directory-filters select{width:100%}
+.directory-filters label{display:grid;gap:6px;font-size:.875rem;font-weight:500}
+.directory-filters input,.directory-filters select{width:100%;font-size:16px}
 .directory-filters button{min-height:44px;border:0;padding:10px 14px;background:transparent;color:var(--green);cursor:pointer}
 .directory-result{margin:14px 0 0;max-width:none}
 .directory-empty{padding:40px 0}
@@ -22,16 +22,17 @@ html[data-page-enhancement="pending"] .directory-groups{display:none}
 ul.index-list.directory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px;border:0;margin:0}
 ul.index-list.directory-grid>li{padding:20px 0;border:0;border-top:1px solid var(--border);border-radius:0;background:transparent;min-width:0}
 .directory-company-heading{display:flex;align-items:center;gap:12px;margin-bottom:12px;min-height:40px}
-.directory-company-heading>a{display:flex;align-items:baseline;justify-content:space-between;flex:1;gap:12px;font-size:1.25rem;font-weight:600;letter-spacing:-.035em;color:var(--ink);text-decoration:none}
-.directory-company-heading>a:hover{color:var(--green)}
-.directory-company-heading>a>span{font-size:1.0625rem;font-weight:400;color:var(--muted)}
+.directory-company-heading h3{flex:1;min-width:0;margin:0;font-size:1.25rem;line-height:1.35;font-weight:600;letter-spacing:-.035em}
+.directory-company-heading h3>a{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-width:0;color:var(--ink);text-decoration:none;overflow-wrap:anywhere}
+.directory-company-heading h3>a:hover{color:var(--green)}
+.directory-company-heading svg{width:18px;height:18px;flex:none;align-self:center;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;color:var(--muted)}
 .directory-logo{display:flex;align-items:center;justify-content:center;width:40px;height:40px;flex:none;padding:5px;background:transparent;border:0;border-radius:4px}
 .directory-logo.on-dark{background:#193d31;border-color:#193d31}
 .directory-logo img{width:100%;height:100%;object-fit:contain}
 .directory-company>p{font-size:.9375rem;line-height:1.6;margin:0;color:var(--muted)}
 .directory-grid .selected-evidence{padding:12px 0 0;margin:16px 0 0;border-bottom:0}
 .directory-grid .selected-value{font-size:1.375rem;letter-spacing:-.03em;font-weight:600}
-.directory-grid .selected-evidence .sub{font-size:.75rem;line-height:1.6}
+.directory-grid .selected-evidence .sub{font-size:.875rem;line-height:1.6}
 .directory-grid .selected-archive{margin:16px 0 0;font-size:.8125rem;border-top:1px solid var(--border);padding-top:6px}
 .directory-scope{margin-top:24px;padding:12px 0;border-block:1px solid var(--border);font-size:.875rem}
 .directory-scope>summary{font-weight:500;color:var(--green)}
@@ -41,9 +42,13 @@ ul.index-list.directory-grid>li{padding:20px 0;border:0;border-top:1px solid var
 
 .company-current-facts{margin:12px 0;font-size:14px}.company-current-facts>summary{cursor:pointer;min-height:44px;padding:10px 0}.current-fact-list{margin:0}.current-fact-list>div{padding:8px 0;border-top:1px solid var(--border)}.current-fact-list dt{font-weight:600}.current-fact-list dd{margin:4px 0 0;overflow-wrap:anywhere}
 .directory-company .company-current-addition{font-size:.9375rem;line-height:1.6;overflow-wrap:anywhere}
-.directory-company .company-research-snapshot,.directory-company .company-wikipedia-attribution{font-size:.75rem;line-height:1.7;color:var(--muted)}
+.directory-company .company-research-snapshot,.directory-company .company-wikipedia-attribution{font-size:.875rem;line-height:1.7;color:var(--muted)}
+.directory-company .company-research-snapshot{margin:10px 0 0}
+.directory-company .company-offering-preview{margin:0;color:var(--muted)}
+.company-current-context{min-width:0;margin:8px 0 0}
+.company-current-context>summary{min-height:44px;padding:10px 0;color:var(--green);font-size:.875rem;line-height:1.6}
 .directory-company .company-wikipedia-description{margin:12px 0;padding:0;border:0}
 .directory-company .company-wikipedia-description p{margin:0}
 .directory-company .company-current-addition ul{padding-left:20px;margin:8px 0}
 .directory-company .company-current-addition ul li{padding:0;border:0}
-.directory-company .company-current-facts p{font-size:.8125rem}
+.directory-company .company-current-facts p{font-size:.875rem}

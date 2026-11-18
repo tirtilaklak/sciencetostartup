@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "reviewed_on": "2026-10-26",
+  "reviewed_on": "2026-11-18",
   "note": "Dated public events reviewed after dataset 2.5.0. Lawsuit entries describe allegations and filings, not findings.",
   "events": [
     {
@@ -32,9 +32,9 @@
       "date": "2026-07-20",
       "date_basis": "filed",
       "title": "An AI trainer sued Handshake alleging trainers are misclassified as contractors",
-      "detail": "The proposed class action in federal court in Northern California names Stryder Corp., which does business as Handshake, and Handshake AI Solutions. It seeks unpaid wages and other remedies under federal and California law.",
-      "status": "Pending",
-      "status_checked_on": "2026-10-23",
+      "detail": "The proposed class action alleges unpaid wages under federal and California law against Stryder Corp. (Handshake) and Handshake AI Solutions. An October 22, 2026 order stays the case for February 4, 2027 mediation; a report is due February 5. Arbitration rights remain reserved; no merits or settlement ruling is made.",
+      "status": "Stayed pending mediation",
+      "status_checked_on": "2026-11-18",
       "sources": [
         {
           "url": "https://www.courtlistener.com/docket/73643581/boggs-v-stryder-corp/",
@@ -56,6 +56,13 @@
           "publisher": "Law360",
           "published_on": "2026-07-22",
           "source_type": "news"
+        },
+        {
+          "url": "https://storage.courtlistener.com/recap/gov.uscourts.cand.474660/gov.uscourts.cand.474660.22.0.pdf",
+          "title": "Order staying case pending mediation, Boggs v. Stryder Corp., Dkt. 22",
+          "publisher": "U.S. District Court, N.D. Cal., via CourtListener",
+          "published_on": "2026-10-22",
+          "source_type": "court_record"
         }
       ]
     },
@@ -263,9 +270,9 @@
       "date": "2024-12-10",
       "date_basis": "filed",
       "title": "Contributors sued Scale AI alleging they were misclassified as contractors",
-      "detail": "Led by McKinney v. Scale AI in San Francisco Superior Court, the suits sought unpaid wages for California contributors. Scale denies the claims, and a $12.5 million settlement awaits a final approval hearing on October 30, 2026.",
-      "status": "Settlement awaiting final approval",
-      "status_checked_on": "2026-10-23",
+      "detail": "Led by McKinney v. Scale AI in San Francisco Superior Court, the suits sought unpaid wages for California contributors. Scale denies the claims. The court granted final approval to the $12.5 million settlement on October 30, 2026. A distribution status conference is set for September 13, 2027.",
+      "status": "Settlement granted final approval",
+      "status_checked_on": "2026-11-18",
       "sources": [
         {
           "url": "https://cw.simpluris.com/docs/public/downloads/SMH7/CLASS_NOTICE",
@@ -287,6 +294,20 @@
           "publisher": "TechCrunch",
           "published_on": "2025-01-09",
           "source_type": "news"
+        },
+        {
+          "url": "https://cw.simpluris.com/docs/public/downloads/SMH7/ORDER_GRANTING_FINAL_APPROVAL",
+          "title": "Final approval order, McKinney v. Scale AI, CGC-24-620481",
+          "publisher": "San Francisco Superior Court, via Simpluris",
+          "published_on": "2026-10-30",
+          "source_type": "court_record"
+        },
+        {
+          "url": "https://cw.simpluris.com/docs/public/downloads/SMH7/JUDGMENT",
+          "title": "Judgment, McKinney v. Scale AI, CGC-24-620481",
+          "publisher": "San Francisco Superior Court, via Simpluris",
+          "published_on": "2026-10-30",
+          "source_type": "court_record"
         }
       ]
     }

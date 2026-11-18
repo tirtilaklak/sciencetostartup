@@ -145,7 +145,7 @@ def main():
         assert f'data-work-route="{route_id}"' in before_details
         assert f'data-work-company="{route["company_id"]}"' in before_details
         assert any(label in before_details for label in (
-            'Terms checked ', 'Pay terms reviewed ', 'Page checked ', 'Recheck blocked ', 'Recorded ', 'Terms not rechecked'
+            'Terms checked ', 'Pay terms reviewed ', 'Page checked ', 'Recheck blocked ', 'Recheck failed ', 'Recorded ', 'Terms not rechecked'
         )) and 'Terms recorded:' in details, route_id + ': missing freshness context'
         links = [a['href'] for tag, a in Elements(before_details).elements if tag == 'a' and 'w4-open' in a.get('class', '')]
         review = route.get('editorial_review', {})
