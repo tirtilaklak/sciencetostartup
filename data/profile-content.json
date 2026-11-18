@@ -359,7 +359,44 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-18",
+        "rows": [
+          {
+            "label": "Benchmark announced",
+            "value": "DAYJOB: Law · 18 Nov 2026",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Benchmark scope",
+            "value": "71 legal assignments · 2,638 synthetic files",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company-published benchmark",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://surgehq.ai/blog/dayjob-law",
+            "title": "DAYJOB: Law — Can AI Agents Think Like Lawyers?",
+            "published_on": "2026-11-18",
+            "observed_on": "2026-11-18",
+            "response_sha256": "da70d5e74fe6dfa19d5fd6e6f4090538d42b77247d3e738bc06066ff505fb931",
+            "locator": "Article date; Introducing DAYJOB: Law; Complex environments. Messy evidence.; text.txt lines 19–23,42,57",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "company_id": "mercor",
@@ -512,7 +549,44 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-18",
+        "rows": [
+          {
+            "label": "Funding announced",
+            "value": "10 Nov 2026 · Series D",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Announced round",
+            "value": "$750 million · includes an employee tender",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Announced valuation",
+            "value": "$20 billion · company-reported",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.mercor.com/blog/series-d/",
+            "title": "Organizing human intelligence for the entire economy",
+            "published_on": "2026-11-10",
+            "observed_on": "2026-11-18",
+            "response_sha256": "1eec86e12d8b0dceb958df1b00c313453f61b73abfacef466405422dc17c36d9",
+            "locator": "Article date; Investing in our next chapter, first paragraph; retained text.txt lines 9 and 34",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "company_id": "handshake_ai",

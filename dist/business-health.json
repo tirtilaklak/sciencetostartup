@@ -1,6 +1,6 @@
 {
   "version": "1.2.0",
-  "dashboard_curated_on": "2026-11-16",
+  "dashboard_curated_on": "2026-11-18",
   "source_dataset_version": "2.5.0",
   "source_dataset_reviewed_on": "2026-10-15",
   "universe_count": 39,
@@ -67,9 +67,9 @@
     "freshness": "Selected financial statements and company disclosures were read on 28 October 2026. Each source check records its outcome separately from the reporting period. Other observations retain the October 15 research review; a page retrieval does not verify every claim. A second primary-source pass added separately dated company operating statements and corrected estimate/accounting-basis classifications; unavailable revenue sources remain flagged. TaskUs Q3 2026 reporting was separately read on 16 November 2026; that review does not refresh other companies or earlier receipts."
   },
   "source_checks": {
-    "checked_on": "2026-11-16",
+    "checked_on": "2026-11-18",
     "status": "partial_content_refresh",
-    "notes": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results published on 4 November were separately reviewed on 16 November; the October receipts retain their original dates. Second pass reviewed private-company primary news indexes; no newer revenue is inferred from product announcements, funding, commitments or network reach.",
+    "notes": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results published on 4 November were separately reviewed on 16 November; the October receipts retain their original dates. Second pass reviewed private-company primary news indexes; no newer revenue is inferred from product announcements, funding, commitments or network reach. Appen Q3 and nine-month 2026 revenue were separately reviewed on 18 November from the issuer report dated 29 October; prior source-check dates are retained.",
     "entries": [
       {
         "source_id": "appen.source.audit-ap_2025",
@@ -317,6 +317,15 @@
         "reviewer": "Codex source review",
         "approval_basis": "source_content_review",
         "note": "Read the 4 November release: consolidated service revenue is $314.747M for Q3 2026 and $929.868M for the nine months ended 30 September. AI Services growth is 27.7% year over year and its trailing-year revenue exceeds $250M. The interim statements are unaudited."
+      },
+      {
+        "source_id": "refresh.source.appen-q3-2026",
+        "url": "https://yourir.info/resources/396cdf0a32f7cb50/announcements/apx.asx/2A1706837/APX_Q3_FY26_Quarterly_Activity_Report_and_Appendix_4C.pdf",
+        "checked_on": "2026-11-18",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Read issuer report dated 29 October 2026, pages 1–2: whole-company Q3 revenue USD73.9M and nine-month revenue USD193.8M. Values are rounded to USD0.1M; January–September information is unaudited management accounts, subject to audit/change. Issuer-hosted YourIR source is bound by Appen’s official announcement feed to announcement2A1706837 and document date29October.",
+        "content_sha256": "ac47f92bf13f8af173707ad64593090050d5ce2ae3db5ac4f8ac3735094b402b"
       }
     ]
   },
@@ -5003,6 +5012,88 @@
       "cohort_label": "TTM to 30 Sep 2026 · USD · AI business / service line · Gross/net undisclosed",
       "cohort_key": "period_revenue|trailing_year|2026|2026-09-30|USD|ai_data|unspecified",
       "source_locator": "Third Quarter 2026 Financial and Frontline Highlights; first AI Services bullet; trailing-twelve-month revenue"
+    },
+    {
+      "id": "refresh.appen.9m-2026-group-revenue",
+      "company_id": "appen",
+      "signal": "revenue",
+      "label": "Revenue",
+      "qualifier": "exact",
+      "as_of": "9M 2026",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.appen.9m-2026-group-revenue.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "refresh.source.appen-q3-2026"
+      ],
+      "basis": "Appen reported revenue of USD 193.8 million for the nine months ended 30 September 2026; rounded to USD0.1M, from unaudited management accounts.",
+      "limitations": "Whole-company group revenue, not an AI-only segment or annualized pace. Source reports USD millions rounded to one decimal; January–September 2026 accounts are unaudited and subject to audit/change. Gross/net accounting basis is not newly inferred.",
+      "original_text": "193.8",
+      "evidence_assurance": "Interim company reporting; unaudited management accounts",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "Appen consolidated group; Appen Global and Appen China",
+      "evidence_checked_on": "2026-11-18",
+      "measure": "period_revenue",
+      "value": 193800000,
+      "unit": "currency",
+      "currency": "USD",
+      "period": {
+        "type": "year_to_date",
+        "label": "9M 2026",
+        "year": 2026,
+        "start": "2026-01-01",
+        "end": "2026-09-30"
+      },
+      "scope": "company",
+      "accounting_basis": "unspecified",
+      "cohort": "9M 2026 · USD · Whole company · Gross/net undisclosed",
+      "cohort_label": "9M 2026 · USD · Whole company · Gross/net undisclosed",
+      "cohort_key": "period_revenue|year_to_date|2026|2026-09-30|USD|company|unspecified",
+      "source_locator": "PDF page 2, Financial and Operating Performance, Summary table, Revenue row, YTD FY26 column; page 1 currency and unaudited management accounts qualifications"
+    },
+    {
+      "id": "refresh.appen.q3-2026-group-revenue",
+      "company_id": "appen",
+      "signal": "revenue",
+      "label": "Revenue",
+      "qualifier": "exact",
+      "as_of": "Q3 2026",
+      "evidence_type": "reported",
+      "claim_ids": [
+        "refresh.appen.q3-2026-group-revenue.claim"
+      ],
+      "metric_ids": [],
+      "source_ids": [
+        "refresh.source.appen-q3-2026"
+      ],
+      "basis": "Appen reported revenue of USD 73.9 million for the quarter ended 30 September 2026; rounded to USD0.1M, from unaudited management accounts.",
+      "limitations": "Whole-company group revenue, not an AI-only segment or annualized pace. Source reports USD millions rounded to one decimal; January–September 2026 accounts are unaudited and subject to audit/change. Gross/net accounting basis is not newly inferred.",
+      "original_text": "73.9",
+      "evidence_assurance": "Interim company reporting; unaudited management accounts",
+      "is_context": false,
+      "scope_label": "Whole company",
+      "scope_detail": "Appen consolidated group; Appen Global and Appen China",
+      "evidence_checked_on": "2026-11-18",
+      "measure": "period_revenue",
+      "value": 73900000,
+      "unit": "currency",
+      "currency": "USD",
+      "period": {
+        "type": "quarter",
+        "label": "Q3 2026",
+        "year": 2026,
+        "start": "2026-07-01",
+        "end": "2026-09-30"
+      },
+      "scope": "company",
+      "accounting_basis": "unspecified",
+      "cohort": "Q3 2026 · USD · Whole company · Gross/net undisclosed",
+      "cohort_label": "Q3 2026 · USD · Whole company · Gross/net undisclosed",
+      "cohort_key": "period_revenue|quarter|2026|2026-09-30|USD|company|unspecified",
+      "source_locator": "PDF page 2, Financial and Operating Performance, Summary table, Revenue row, Q3 FY26 column; page 1 currency and unaudited management accounts qualifications"
     }
   ],
   "measure_definitions": [
@@ -5891,6 +5982,17 @@
       "published_on": "2026-11-04",
       "accessed_on": "2026-11-16",
       "retrieval_status": "checked"
+    },
+    {
+      "id": "refresh.source.appen-q3-2026",
+      "company_id": "appen",
+      "title": "Appen Q3 FY26 Quarterly Activity Report and Appendix 4C",
+      "url": "https://yourir.info/resources/396cdf0a32f7cb50/announcements/apx.asx/2A1706837/APX_Q3_FY26_Quarterly_Activity_Report_and_Appendix_4C.pdf",
+      "publisher": "Appen / ASX issuer announcement served by Appen’s YourIR provider",
+      "source_type": "filing",
+      "published_on": "2026-10-29",
+      "accessed_on": "2026-11-18",
+      "retrieval_status": "checked"
     }
   ],
   "fresh_claims": [
@@ -6384,6 +6486,70 @@
       },
       "qualifier": "greater_than",
       "reviewer": "Codex source review",
+      "approval_basis": "source_content_review"
+    },
+    {
+      "id": "refresh.appen.9m-2026-group-revenue.claim",
+      "company_id": "appen",
+      "status": "supported",
+      "statement": "Appen reported revenue of USD 193.8 million for the nine months ended 30 September 2026; rounded to USD0.1M, from unaudited management accounts.",
+      "source_ids": [
+        "refresh.source.appen-q3-2026"
+      ],
+      "observed_on": "2026-11-18",
+      "confidence": "B",
+      "evidence_label": "Company-reported; unaudited management accounts",
+      "excerpt": "193.8",
+      "source_locator": "PDF page 2, Financial and Operating Performance, Summary table, Revenue row, YTD FY26 column; page 1 currency and unaudited management accounts qualifications",
+      "fact": {
+        "measure": "period_revenue",
+        "value": 193800000,
+        "unit": "currency",
+        "currency": "USD",
+        "period": {
+          "type": "year_to_date",
+          "label": "9M 2026",
+          "year": 2026,
+          "start": "2026-01-01",
+          "end": "2026-09-30"
+        },
+        "scope": "company",
+        "accounting_basis": "unspecified"
+      },
+      "qualifier": "exact",
+      "reviewer": "Codex current-company source review",
+      "approval_basis": "source_content_review"
+    },
+    {
+      "id": "refresh.appen.q3-2026-group-revenue.claim",
+      "company_id": "appen",
+      "status": "supported",
+      "statement": "Appen reported revenue of USD 73.9 million for the quarter ended 30 September 2026; rounded to USD0.1M, from unaudited management accounts.",
+      "source_ids": [
+        "refresh.source.appen-q3-2026"
+      ],
+      "observed_on": "2026-11-18",
+      "confidence": "B",
+      "evidence_label": "Company-reported; unaudited management accounts",
+      "excerpt": "73.9",
+      "source_locator": "PDF page 2, Financial and Operating Performance, Summary table, Revenue row, Q3 FY26 column; page 1 currency and unaudited management accounts qualifications",
+      "fact": {
+        "measure": "period_revenue",
+        "value": 73900000,
+        "unit": "currency",
+        "currency": "USD",
+        "period": {
+          "type": "quarter",
+          "label": "Q3 2026",
+          "year": 2026,
+          "start": "2026-07-01",
+          "end": "2026-09-30"
+        },
+        "scope": "company",
+        "accounting_basis": "unspecified"
+      },
+      "qualifier": "exact",
+      "reviewer": "Codex current-company source review",
       "approval_basis": "source_content_review"
     }
   ],
