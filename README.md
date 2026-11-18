@@ -304,6 +304,15 @@ from the current data, so a research update may need new expected values.
 Historical comparison tests and local audit reports remain in the research
 repository.
 
+## Cloud Daily candidate builds
+
+A source-only Daily pull request can use the
+[candidate builder](docs/candidate-builder.md) to prepare and commit matching
+`dist/` on its isolated branch. It accepts one reviewed dated JSON file, preserves
+the supplied compilation time and prior runtime generations, and leaves all
+existing CI and publication gates in place. It never merges `main` or deploys
+the website.
+
 ## Hosting
 
 The live website is served by the `sciencetostartup` Cloudflare Worker with Static
