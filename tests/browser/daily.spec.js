@@ -213,6 +213,35 @@ test('Daily date navigation retains all filters across previous and selected rea
 });
 
 test('Daily deep links reveal filtered items and native disclosures support keyboard and history', async ({ page }) => {
+  async function settledReading(link) {
+    await expect(link).toBeInViewport();
+    // Focus and fragment scrolling respect the site's smooth-scroll setting.
+    // Save the settled reading position, rather than a frame in that animation.
+    return link.evaluate(element => new Promise((resolve, reject) => {
+      const started = performance.now();
+      let lastY = scrollY, lastTop = element.getBoundingClientRect().top, stable = 0;
+      function sample() {
+        const top = element.getBoundingClientRect().top;
+        stable = Math.abs(scrollY - lastY) <= 0.25 && Math.abs(top - lastTop) <= 0.25 ? stable + 1 : 0;
+        lastY = scrollY; lastTop = top;
+        if (stable >= 4) resolve({ y: scrollY, top,
+          open: [...document.querySelectorAll('.scan-item')].filter(row => row.querySelector('details').open).map(row => row.id) });
+        else if (performance.now() - started > 3000) reject(new Error('Daily reading position did not settle'));
+        else requestAnimationFrame(sample);
+      }
+      requestAnimationFrame(sample);
+    }));
+  }
+  async function restoredReading(link, saved) {
+    await expect.poll(() => page.locator('.scan-item').evaluateAll(rows => rows
+      .filter(row => row.querySelector('details').open).map(row => row.id))).toEqual(saved.open);
+    await expect(link).toBeInViewport();
+    await expect.poll(async () => Math.abs(await page.evaluate(() => scrollY) - saved.y)).toBeLessThanOrEqual(2);
+    await expect.poll(async () => Math.abs(await link.evaluate(element => element.getBoundingClientRect().top) - saved.top)).toBeLessThanOrEqual(2);
+    const settled = await settledReading(link);
+    expect(Math.abs(settled.y - saved.y)).toBeLessThanOrEqual(2);
+    expect(Math.abs(settled.top - saved.top)).toBeLessThanOrEqual(2);
+  }
   const first = latest.items[0];
   const last = latest.items.at(-1);
   await page.goto('/daily/?q=daily-no-such-selection-987654321#' + last.id);
@@ -232,24 +261,27 @@ test('Daily deep links reveal filtered items and native disclosures support keyb
   await firstRow.locator('summary').focus();
   await page.keyboard.press('Enter');
   await firstRow.locator('.scan-permalink').focus();
+  await page.evaluate(() => history.replaceState({ ...history.state, dailyTest: { preserved: true } }, '', location.href));
   // This is where the reader leaves the original entry. Its URL still has
   // #last, but Back restores this reading position rather than a fresh visit.
-  const returnScrollY = await page.evaluate(() => scrollY);
+  const returnReading = await settledReading(firstRow.locator('.scan-permalink'));
+  expect(returnReading.open).toEqual([first.id, last.id]);
   await page.keyboard.press('Enter');
   const permanentFirst = page.locator('.scan-item[id=' + JSON.stringify(first.id) + ']');
   await expect(page).toHaveURL(url => url.pathname === `/daily/${latest.date}/` && url.hash === '#' + first.id);
   await expect(permanentFirst).toBeInViewport();
+  await expect(permanentFirst.locator('details')).toHaveAttribute('open', '');
   expect(new URL(page.url()).hash).toBe('#' + first.id);
-  const forwardScrollY = await page.evaluate(() => scrollY);
+  const forwardReading = await settledReading(permanentFirst.locator('h2 a'));
+  expect(forwardReading.open).toEqual([first.id]);
   await page.goBack();
   expect(new URL(page.url()).hash).toBe('#' + last.id);
-  await expect.poll(async () => Math.abs(await page.evaluate(() => scrollY) - returnScrollY)).toBeLessThanOrEqual(2);
-  await expect(firstRow).toBeInViewport();
+  await restoredReading(firstRow.locator('.scan-permalink'), returnReading);
+  expect(await page.evaluate(() => history.state.dailyTest)).toEqual({ preserved: true });
   await assertSelections(page, latest.items);
   await page.goForward();
   expect(new URL(page.url()).hash).toBe('#' + first.id);
-  await expect.poll(async () => Math.abs(await page.evaluate(() => scrollY) - forwardScrollY)).toBeLessThanOrEqual(2);
-  await expect(firstRow).toBeInViewport();
+  await restoredReading(permanentFirst.locator('h2 a'), forwardReading);
 });
 
 test('Daily controls, explanations and disclosed sources fit 320, 390, 768 and 1440 pixel widths', async ({ page }) => {
