@@ -368,7 +368,8 @@ class DailyScanTests(unittest.TestCase):
             write_daily_scan(destination, self.root, context=context)
             search = daily_search_entries(context)
         self.assertEqual((destination / "daily/wikipedia-context.json").read_bytes(), raw)
-        self.assertEqual(search[0]["url"], item_url(snapshot, snapshot["items"][0]).removeprefix(ORIGIN))
+        self.assertEqual(search[0]["url"], "/daily/")
+        self.assertEqual(search[1]["url"], item_url(snapshot, snapshot["items"][0]).removeprefix(ORIGIN))
         self.assertIn(self.wiki()["sentence"], (destination / "daily/index.html").read_text())
 
     def test_feeds_use_dated_identity_escape_content_and_omit_unknown_publication_times(self):
@@ -411,8 +412,8 @@ class DailyScanTests(unittest.TestCase):
             self.save(edition((date(2026, 11, 16) + timedelta(days=offset)).isoformat()))
         context = load_daily_context(self.root)
         rows = daily_search_entries(context)
-        self.assertEqual(len(rows), 300)
-        self.assertEqual(len({row["url"] for row in rows}), 300)
+        self.assertEqual(len(rows), 301)
+        self.assertEqual(len({row["url"] for row in rows}), 301)
         self.assertTrue(all(set(row) == {"title", "summary", "url", "kind", "keywords"} for row in rows))
         self.assertTrue(all(len(row["summary"]) < 220 and "No independent replication." in row["summary"] for row in rows))
         self.assertFalse(any("/2026-11-16/" in row["url"] for row in rows))

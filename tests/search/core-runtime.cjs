@@ -22,6 +22,11 @@ for (const query of ['C++', 'C#', 'CAFÉ', 'cafe\u0301', '研究', 'old name']) 
 assert.equal(search.matchedAlias(fixture, 'Old Name'), 'Old Name (historical, unverified)');
 assert.equal(search.rank(fixture, 'C++++'), -1);
 assert.equal(search.rank(search.compile({name:'Older record', summary:'No new metadata', products:[]}), 'older'), 1);
+for (const [visible, raw, href] of [['τ-Knowledge', String.raw`\tau-Knowledge`, '/research/papers/paper.arxiv.2603.04370/'], ['τ²-Bench', String.raw`\tau^2-Bench`, '/research/papers/paper.arxiv.2506.07982/']]) {
+  assert.equal(results(visible)[0].row.href, href, visible);
+  assert.equal(results(raw)[0].row.href, href, raw);
+}
+assert.equal(search.normalize('SWE-Lancer: $1 Million'), 'swe-lancer: $1 million', 'Currency titles remain literal');
 assert.ok(results('feedback').length > 7, 'Real count is computed before paging');
 assert.ok(results('human feedback').slice(0, 7).some(item => item.row.href === '/research/state-of-ai-data-labs/'), 'Research hub remains reachable among equally relevant source versions');
 const fixtures = JSON.parse(read('tests/fixtures/previous-search/manifest.json'));

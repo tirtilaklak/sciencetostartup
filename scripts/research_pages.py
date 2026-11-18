@@ -1530,7 +1530,9 @@ def research_search_entries(context):
         category = _category(entity)
         approved_org = _new_company(context, entity)
         if category or approved_org:
-            entries.append({"title": entity['name'], "summary": _label(entity) + '. Inspect source metadata and assertion-specific qualifications.',
+            title = _display_title(entity['name'])
+            original_title = [entity['name']] if title != entity['name'] else []
+            entries.append({"title": title, "summary": _label(entity) + '. Inspect source metadata and assertion-specific qualifications.',
                             "url": entity_url(entity, context), "kind": category[0][:-1] if category else 'company',
-                            "keywords": ' '.join([entity['id']] + entity.get('aliases', []) + list(entity.get('identifiers', {}).values()))})
+                            "keywords": ' '.join([entity['id']] + entity.get('aliases', []) + list(entity.get('identifiers', {}).values()) + original_title)})
     return entries

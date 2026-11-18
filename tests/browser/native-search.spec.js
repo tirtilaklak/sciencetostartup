@@ -32,3 +32,11 @@ test('homepage search transfers a real work query to the native source-backed li
   await expect(listing.locator('.work-reviewed')).toContainText(/Terms checked|Pay terms reviewed/);
   await expect(listing.locator('.work-listing-action a').first()).toHaveAttribute('href',/^https:\/\//);
 });
+
+test('global search finds the Daily hub and displayed Greek paper titles',async({page})=>{
+  await page.goto('/?search');const input=page.locator('#home-search-input');
+  for(const [query,href,title] of [['Daily scan','/daily/','Daily scan'],['τ-Knowledge','/research/papers/paper.arxiv.2603.04370/','τ-Knowledge'],[String.raw`\tau-Knowledge`,'/research/papers/paper.arxiv.2603.04370/','τ-Knowledge']]){
+    await input.fill(query);const first=page.locator('#home-search-results [role=option]').first();
+    await expect(first).toHaveAttribute('href',href);await expect(first).toContainText(title);
+  }
+});

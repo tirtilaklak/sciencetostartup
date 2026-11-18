@@ -191,9 +191,10 @@ def item_url(edition, item):
 
 def daily_search_entries(context):
     """Only recent public reading-list prose; never workers or provenance receipts."""
-    if context is None:
+    if context is None or not context.editions:
         return []
-    rows = []
+    rows = [{"title": "Daily scan", "summary": "Source-linked reading lists on AI data and evaluation. Search recent selections or browse the full dated archive. No independent replication.",
+             "url": "/daily/", "kind": "daily", "keywords": ["daily", "reading list", "archive", "papers", "company news"]}]
     for edition in reversed(context.editions[-RECENT_EDITIONS:]):
         for item in edition["items"]:
             # Do not clip a substantive caveat mid-sentence into a misleading

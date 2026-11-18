@@ -194,8 +194,8 @@ sanitized public deployment settings; credentials never enter the repository.
 The current `/companies/` directory also reads `data/current-companies.json`.
 This additive registry selects existing research organization profiles and
 source-bound current-only profiles without changing canonical v2.5.0, the
-published research graph or archived packages. Its fourteen current additions
-bring the directory to 53 entries; the original
+published research graph or archived packages. Its sixteen current additions
+bring the directory to 55 entries; the original
 research cohort and financial coverage remain 39. Current cards and profile
 supplements retain exact Wikipedia sentences, permanent revisions, author-history
 links, CC BY-SA 4.0 attribution, and separately sourced current offering labels.
@@ -359,13 +359,15 @@ Reporting periods, currencies and business scopes stay separate. The complete 39
 coverage grid and detailed evidence remain available in disclosures. There is no
 composite score or hypothetical financial calculator in the interface.
 
-The evidence layer contains 117 dated observations across 28 organizations, linked
-to 68 source records. On 28 October 2026, selected financial documents were read
+The evidence layer contains 119 dated observations across 28 organizations, linked
+to 69 source records. On 28 October 2026, selected financial documents were read
 again and thirteen new source claims added with exact excerpts, locators, response
-hashes and separately validated quantities. The source-check ledger records 27
-checks: 24 content checks, one availability-only check and two unavailable sources.
+hashes and separately validated quantities. The source-check ledger records 28
+checks: 25 content checks, one availability-only check and two unavailable sources.
 The November 16 TaskUs check adds Q3 and nine-month 2026 results, with AI Services
-observations kept separate from whole-company revenue. Earlier receipts remain intact.
+observations kept separate from whole-company revenue. Appen Q3 and nine-month
+2026 revenue were separately reviewed on 18 November from its 29 October issuer
+report. Earlier receipts remain intact.
 
 Paid-work verification requested all 135 recorded route URLs. Of these, 67 received
 content review, including 55 compensation checks; 61 had link-only checks and seven

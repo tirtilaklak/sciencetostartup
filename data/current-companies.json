@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "reviewed_on": "2026-11-17",
+  "reviewed_on": "2026-11-18",
   "entries": [
     {
       "entity_id": "org.innodata",
@@ -1058,6 +1058,213 @@
         "response_sha256": "612610527cdd9740b4884c037bd45998a631f8994528ed220f70dea4748a06c2",
         "content_kind": "mediawiki_revision_wikitext",
         "description": "Zensar Technologies Limited is an Indian publicly traded software and services company.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.tech_mahindra",
+      "name": "Tech Mahindra",
+      "group": "Managed AI & data services",
+      "website": "https://www.techmahindra.com/",
+      "offerings": [
+        {
+          "label": "Populii: data annotation and training datasets",
+          "source_indexes": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "label": "Populii: image, video, document and spatial data collection",
+          "source_indexes": [
+            0,
+            1,
+            2
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.techmahindra.com/products-and-platforms/",
+          "title": "Products and Platforms | Tech Mahindra",
+          "published_on": null,
+          "observed_on": "2026-11-18",
+          "response_sha256": "6b67fe6da46b178dd235e21d792b115c3c930dd3dbc39338835e9e3caa675440",
+          "locator": "techmahindra-products/text.txt:L223-L226: current Populii product listing; L313: Tech Mahindra Limited legal footer.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.populii.ai/",
+          "title": "Populli",
+          "published_on": null,
+          "observed_on": "2026-11-18",
+          "response_sha256": "231e051362b330a7d28c3ba752966fa49127868b9052c962547217d773373459",
+          "locator": "populii-home/text.txt:L41-L61: Advise, Annotate, Acquire; training datasets and image, video, document and spatial data acquisition; L68-L86: current enterprise offer.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.techmahindra.com/insights/press-releases/tech-mahindra-launches-global-crowdsourcing-platform-populii/",
+          "title": "Tech Mahindra Launches a Global Crowdsourcing Platform, Populii | Tech Mahindra",
+          "published_on": "2023-12-13",
+          "observed_on": "2026-11-18",
+          "response_sha256": "1f603b8ae1eebe7a2b32081aefba6094eb67384e2fb5aefbb458a3b820ec8684",
+          "locator": "populii-launch/text.txt:L206-L219: dated launch and explicit Tech Mahindra-Populii binding; data annotation, collection, transcription and human-in-the-loop services.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.techmahindra.com/about-us/",
+          "title": "About Us: Tech Mahindra Overview",
+          "published_on": null,
+          "observed_on": "2026-11-18",
+          "response_sha256": "65be0960f7d2350581d0431a8e056dddd11b8e6d15d1347d6c0aefcf8b4f949b",
+          "locator": "We are Tech Mahindra / About Tech Mahindra: global consulting, information technology services, multinational delivery.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://insights.techmahindra.com/investors/tml-integrated-annual-report-fy-2025-2026.pdf",
+          "title": "Tech Mahindra Limited Integrated Annual Report 2025–26",
+          "published_on": "2026-04-22",
+          "observed_on": "2026-11-18",
+          "response_sha256": "a71fea4f438b5b91c688f47276dae6a9a9a685fa80e6fa39805f1fa473fbf722",
+          "locator": "PDF page 451, printed page 449, Notes forming part of the Standalone Financial Statements, 1 Corporate Information: Tech Mahindra Limited; consulting and IT services delivered globally; public limited company incorporated and domiciled in India. Entire identity page extracted and visually inspected.",
+          "content_kind": "raw_http_body"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Tech Mahindra",
+        "aliases": [
+          "Tech Mahindra Limited"
+        ],
+        "website": "https://www.techmahindra.com/",
+        "source_indexes": [
+          0,
+          2,
+          3,
+          4
+        ]
+      },
+      "wikipedia": {
+        "title": "Tech Mahindra",
+        "article_url": "https://en.wikipedia.org/wiki/Tech_Mahindra",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Tech_Mahindra&oldid=1381729937",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Tech_Mahindra&action=history",
+        "page_id": 4342455,
+        "revision_id": 1381729937,
+        "revision_timestamp": "2026-10-24T11:56:31Z",
+        "observed_on": "2026-11-18",
+        "response_sha256": "ff0c1316f1c98f04831e6dc73b372ff70fcedc6729412be95f2f50d4fe448456",
+        "content_kind": "mediawiki_revision_wikitext",
+        "description": "Tech Mahindra is an Indian multinational information technology services and consulting company.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.hcltech",
+      "name": "HCLTech",
+      "group": "Managed AI & data services",
+      "website": "https://www.hcltech.com/",
+      "offerings": [
+        {
+          "label": "Training data annotation and human-in-the-loop labeling",
+          "source_indexes": [
+            0,
+            1
+          ]
+        },
+        {
+          "label": "NAT labeling tool: bounding boxes, polygons, semantic and 3D labels",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.hcltech.com/ai-technology-services",
+          "title": "AI Technology Services & AI Engineering | HCLTech",
+          "published_on": null,
+          "observed_on": "2026-11-18",
+          "response_sha256": "da877a233c80152cc7ea226a8b911393b5588747d9bc80c5091f0efd9adc654b",
+          "locator": "hcltech-ai-services/text.txt:L174-L185: current annotation and labeling service; L224-L225: NAT labeling tool for training models; L501: HCL Technologies Limited legal footer.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.hcltech.com/marketing-and-content-services",
+          "title": "Marketing Operations and Content Services | HCLTech",
+          "published_on": null,
+          "observed_on": "2026-11-18",
+          "response_sha256": "07861a1e5852720b22a4bb4eb39a542d172d5e66d0f40c170b03c3a694353e6e",
+          "locator": "hcltech-marketing/text.txt:L210-L211: Human-in-the-Loop annotation services for complex AI/ML platforms; L468: HCL Technologies Limited legal footer.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.hcltech.com/about-us",
+          "title": "About our Company: HCLTech – Supercharging Progress",
+          "published_on": null,
+          "observed_on": "2026-11-18",
+          "response_sha256": "632b4486b9fcb70396f6cd6c80abd5bb987db0c8ed410d5f7c83579743a466e8",
+          "locator": "hcltech-about/text.txt:L170-L171: current global technology company identity; L262: publicly listed; L511: HCL Technologies Limited legal footer.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.hcltech.com/investor-relations/key-facts-and-data",
+          "title": "Key Facts and Data | HCLTech",
+          "published_on": null,
+          "observed_on": "2026-11-18",
+          "response_sha256": "ea1755d683339c9cab96573522ebb4d823f4fcb5a66a8c17d8cebb17e0298489",
+          "locator": "Fast Facts: Company Name HCL Technologies Ltd.; Company Type Global IT Company; international countries of operation.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.hcltech.com/contact-us/request-for-services",
+          "title": "Contact Us: Request For Services | HCLTech",
+          "published_on": null,
+          "observed_on": "2026-11-18",
+          "response_sha256": "5464a0fe1c1494bd55659d02c087532475249c5bdefe7a308c0fe8f4d434f695",
+          "locator": "International Headquarters: HCL Technologies Ltd. | Technology Hub, SEZ | Plot No. 3A, Sector 126 | Noida – 201304, India.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.hcltech.com/sites/default/files/documents/resources/pdf-landing-page/files/2026/01/12/FinancialResults12-2026.pdf",
+          "title": "HCL Technologies Limited Financial Results — January 12, 2026",
+          "published_on": "2026-01-12",
+          "observed_on": "2026-11-18",
+          "response_sha256": "84026afbc7109a93c918a17f694664800f626c5d699292a8dd650dcfdf00b64b",
+          "locator": "PDF page 2 header: HCL TECHNOLOGIES LIMITED; Corporate Identity Number L74140DL1991PLC046369; Corporate Office Plot No. 3A, Sector 126, Noida 201 304, U.P., India. Header visually inspected; no financial figures selected.",
+          "content_kind": "raw_http_body"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "HCLTech",
+        "aliases": [
+          "HCL Technologies Limited"
+        ],
+        "website": "https://www.hcltech.com/",
+        "source_indexes": [
+          0,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "wikipedia": {
+        "title": "HCLTech",
+        "article_url": "https://en.wikipedia.org/wiki/HCLTech",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=HCLTech&oldid=1386174650",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=HCLTech&action=history",
+        "page_id": 1962747,
+        "revision_id": 1386174650,
+        "revision_timestamp": "2026-11-17T03:02:51Z",
+        "observed_on": "2026-11-18",
+        "response_sha256": "d665a9734b4cf391db77291d71cbf044649469edf5822f5f98db1d34622e8760",
+        "content_kind": "mediawiki_revision_wikitext",
+        "description": "HCL Technologies Limited (HCLTech) is an Indian multinational technology company headquartered in Noida, Uttar Pradesh.",
         "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
         "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
       }

@@ -2,7 +2,9 @@
 (() => {
   'use strict';
   if (globalThis.S2SSearch) return;
-  const normalize = value => String(value ?? '').normalize('NFKD').replace(/\p{M}+/gu, '').toLowerCase().replace(/\s+/gu, ' ').trim();
+  // Match both recorded TeX titles and the Greek spelling displayed in the UI.
+  const mathTitle = value => String(value ?? '').replace(/\$\\tau(\^2)?\$/gu, (_, squared) => squared ? 'τ²' : 'τ').replace(/\\tau(\^2)?(?![\p{L}\p{N}_])/gu, (_, squared) => squared ? 'τ²' : 'τ');
+  const normalize = value => mathTitle(value).normalize('NFKD').replace(/\p{M}+/gu, '').toLowerCase().replace(/\s+/gu, ' ').trim();
   const aliasName = value => String(value).replace(/\s*\([^()]*\)\s*$/u, '').trim();
   const values = value => Array.isArray(value) ? value.flatMap(values) : value == null ? [] : [String(value)];
   function compile(row) {
