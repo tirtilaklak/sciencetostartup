@@ -199,7 +199,10 @@ test('Daily date navigation retains all filters across previous and selected rea
   const { item, query } = distinctiveSearch();
   const params = new URLSearchParams({ q: query, topic: item.topics[0], type: item.kind });
   await page.goto('/daily/?' + params);
-  await page.getByRole('link', { name: 'Previous snapshot', exact: true }).click();
+  const previousLink = page.getByRole('link', { name: 'Previous snapshot', exact: true });
+  const previousURL = new URL(await previousLink.getAttribute('href'), page.url()).href;
+  await previousLink.click();
+  await expect(page).toHaveURL(previousURL);
   expect(new URL(page.url()).pathname).toBe(`/daily/${previous.date}/`);
   for (const [key, value] of params) expect(new URL(page.url()).searchParams.get(key)).toBe(value);
   await expect(page.getByLabel('Snapshot date')).toHaveValue(previous.date);
@@ -266,6 +269,7 @@ test('Daily deep links reveal filtered items and native disclosures support keyb
   // #last, but Back restores this reading position rather than a fresh visit.
   const returnReading = await settledReading(firstRow.locator('.scan-permalink'));
   expect(returnReading.open).toEqual([first.id, last.id]);
+  const returnURL = page.url();
   await page.keyboard.press('Enter');
   const permanentFirst = page.locator('.scan-item[id=' + JSON.stringify(first.id) + ']');
   await expect(page).toHaveURL(url => url.pathname === `/daily/${latest.date}/` && url.hash === '#' + first.id);
@@ -274,12 +278,15 @@ test('Daily deep links reveal filtered items and native disclosures support keyb
   expect(new URL(page.url()).hash).toBe('#' + first.id);
   const forwardReading = await settledReading(permanentFirst.locator('h2 a'));
   expect(forwardReading.open).toEqual([first.id]);
+  const forwardURL = page.url();
   await page.goBack();
+  await expect(page).toHaveURL(returnURL);
   expect(new URL(page.url()).hash).toBe('#' + last.id);
   await restoredReading(firstRow.locator('.scan-permalink'), returnReading);
   expect(await page.evaluate(() => history.state.dailyTest)).toEqual({ preserved: true });
   await assertSelections(page, latest.items);
   await page.goForward();
+  await expect(page).toHaveURL(forwardURL);
   expect(new URL(page.url()).hash).toBe('#' + first.id);
   await restoredReading(permanentFirst.locator('h2 a'), forwardReading);
 });
