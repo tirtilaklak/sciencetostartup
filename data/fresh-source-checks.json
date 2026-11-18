@@ -1,5 +1,5 @@
 {
-  "checked_on": "2026-11-16",
+  "checked_on": "2026-11-18",
   "scope": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results published on 4 November were separately reviewed on 16 November; the October receipts retain their original dates.",
   "entries": [
     {
@@ -248,6 +248,15 @@
       "reviewer": "Codex source review",
       "approval_basis": "source_content_review",
       "note": "Read the 4 November release: consolidated service revenue is $314.747M for Q3 2026 and $929.868M for the nine months ended 30 September. AI Services growth is 27.7% year over year and its trailing-year revenue exceeds $250M. The interim statements are unaudited."
+    },
+    {
+      "source_id": "refresh.source.appen-q3-2026",
+      "url": "https://yourir.info/resources/396cdf0a32f7cb50/announcements/apx.asx/2A1706837/APX_Q3_FY26_Quarterly_Activity_Report_and_Appendix_4C.pdf",
+      "checked_on": "2026-11-18",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Read issuer report dated 29 October 2026, pages 1–2: whole-company Q3 revenue USD73.9M and nine-month revenue USD193.8M. Values are rounded to USD0.1M; January–September information is unaudited management accounts, subject to audit/change. Issuer-hosted YourIR source is bound by Appen’s official announcement feed to announcement2A1706837 and document date29October.",
+      "content_sha256": "ac47f92bf13f8af173707ad64593090050d5ce2ae3db5ac4f8ac3735094b402b"
     }
   ],
   "private_company_review": [
