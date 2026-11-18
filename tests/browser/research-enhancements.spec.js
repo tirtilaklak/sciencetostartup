@@ -160,7 +160,7 @@ for (const [category, kinds] of Object.entries(categories)) {
 test.describe('complete research tables without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
   for (const [category, kinds] of Object.entries(categories)) {
-    test(`${category} includes every record, status, type, taxonomy and evidence link`, async ({ page, request }) => {
+    test(`${category} includes every record, status, type, taxonomy and evidence link`, async ({ page, request }, info) => {
       const graph = await getJSON(request, '/research/exports/research-graph.json');
       const entities = graph.entities.filter(entity => kinds.includes(entity.kind));
       await page.goto(`/research/${category}/?q=no-such-record&status=excluded`);
@@ -216,16 +216,22 @@ test.describe('complete research tables without JavaScript', () => {
         expect(normalize(row.evidenceText), entity.id).toBe(`${approved.length} approved assertions`);
         expect(row.evidenceHref, entity.id).toBe(href + '#approved-findings');
       }
+      let paperVersionViewport;
       if (category === 'papers') {
         const disclosure = page.locator('.r-paper-versions').first();
         await disclosure.locator(':scope > summary').click();
         await expect(disclosure.locator('[data-index-row]').first()).toBeVisible();
+        await disclosure.locator(':scope > summary').scrollIntoViewIfNeeded();
+        paperVersionViewport = await page.screenshot({ fullPage: false, animations: 'disabled', scale: 'css' });
       }
       const first = page.locator('[data-index-row] th a').first();
       const href = await first.getAttribute('href');
       await first.click();
       expect(new URL(page.url()).pathname).toBe(href);
       await expect(page.locator('#approved-findings')).toBeAttached();
+      if (paperVersionViewport) await info.attach(`research-paper-version-no-js-${info.project.name}.png`, {
+        body: paperVersionViewport, contentType: 'image/png',
+      });
     });
   }
 });

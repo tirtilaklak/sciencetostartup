@@ -48,8 +48,9 @@ test('current discovery and historical downloads keep distinct identity and work
   await expect(page.locator('.site-footer').getByRole('link', { name: 'Research data', exact: true })).toHaveAttribute('href', /\/research\/data\/$/);
 });
 
-test('opened source context and decision-critical metadata reflow at 320 pixels', async ({ page }) => {
+test('opened source context and decision-critical metadata reflow at 320 pixels', async ({ page }, info) => {
   await page.setViewportSize({ width: 320, height: 800 });
+  let companyViewport;
   const parentScoped = registry.entries.find(entry => entry.parent_company);
   const longTitle = [...registry.entries].sort((a, b) => Math.max(...b.sources.map(source => source.title.length)) - Math.max(...a.sources.map(source => source.title.length)))[0];
   for (const entry of [...new Set([parentScoped, longTitle].filter(Boolean))]) {
@@ -63,6 +64,10 @@ test('opened source context and decision-critical metadata reflow at 320 pixels'
     await expect(card.locator('.company-wikipedia-description')).toHaveText(entry.wikipedia.description);
     for (const source of entry.sources) await expect(card.locator('.company-current-facts')).toContainText(source.locator);
     await fitsViewport(card.locator('h3,.company-current-context[open] p,.company-current-context[open] a,.company-current-context[open] li,.company-current-context[open] dd'));
+    if (entry === parentScoped) {
+      await card.locator('h3').scrollIntoViewIfNeeded();
+      companyViewport = await page.screenshot({ fullPage: false, animations: 'disabled', scale: 'css' });
+    }
   }
   await page.goto('/company/mercor/');
   await page.locator('#financial-record > summary').click();
@@ -86,4 +91,9 @@ test('opened source context and decision-critical metadata reflow at 320 pixels'
     expect(box.height).toBeGreaterThanOrEqual(44);
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(321);
+  await conflict.locator('h3').scrollIntoViewIfNeeded();
+  const workViewport = await page.screenshot({ fullPage: false, animations: 'disabled', scale: 'css' });
+  // Attach the captured checkpoints only after the complete functional check passes.
+  if (companyViewport) await info.attach(`company-context-320-${info.project.name}.png`, { body: companyViewport, contentType: 'image/png' });
+  await info.attach(`work-pay-conflict-320-${info.project.name}.png`, { body: workViewport, contentType: 'image/png' });
 });
