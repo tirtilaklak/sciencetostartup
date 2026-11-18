@@ -1,0 +1,59 @@
+name: Prepare isolated Daily candidate
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: write
+concurrency:
+  group: candidate-builder-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+jobs:
+  prepare:
+    if: >-
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.base.repo.full_name == github.repository &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'codex/cloud-daily-')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: candidate
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Validate complete input before executing repository code
+        id: guard
+        run: python3 trusted/.github/scripts/candidate_builder.py preflight --repository candidate --event "$GITHUB_EVENT_PATH" --receipt "$RUNNER_TEMP/candidate-plan.json"
+      - uses: actions/setup-python@v5
+        if: steps.guard.outputs.should_build == 'true'
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        if: steps.guard.outputs.should_build == 'true'
+        with:
+          node-version: '22'
+      - name: Build and commit public candidate on the runner
+        if: steps.guard.outputs.should_build == 'true'
+        run: python3 trusted/.github/scripts/candidate_builder.py prepare --repository candidate --event "$GITHUB_EVENT_PATH" --output "$RUNNER_TEMP/public-candidate" --receipt "$RUNNER_TEMP/candidate-result.json"
+      - name: Push only the expected isolated branch
+        if: steps.guard.outputs.should_build == 'true'
+        env:
+          GH_PUSH_TOKEN: ${{ github.token }}
+        run: python3 trusted/.github/scripts/candidate_builder.py push --repository candidate --receipt "$RUNNER_TEMP/candidate-result.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: candidate-builder-result
+          path: |
+            ${{ runner.temp }}/candidate-plan.json
+            ${{ runner.temp }}/candidate-result.json
+          if-no-files-found: error
+          retention-days: 14
