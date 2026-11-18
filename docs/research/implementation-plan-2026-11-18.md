@@ -8,7 +8,7 @@ Make the static guide the dependable destination for AI-data company research, p
 
 | Object in this source baseline | Correct interpretation |
 |---|---|
-| **53 current company profiles; 39 historical companies** | The additive [current registry](../../data/current-companies.json) extends discovery. Canonical dataset 2.5.0 and its financial cohort remain 39; current offering reviews do not renew historical claims. |
+| **55 current company profiles; 39 historical companies** | The additive [current registry](../../data/current-companies.json) extends discovery. Main's 18 November company update adds Tech Mahindra and HCLTech to the 53-profile planning baseline. Canonical dataset 2.5.0 and its financial cohort remain 39; current offering reviews do not renew historical claims. |
 | **78 primary discovery routes; 135 work records at 39 companies** | The [display rules](../../scripts/static_pages.py) select 56 named listings and 22 networks/programs. This is not 78 currently hiring jobs. Archived, board and other records remain inspectable in the [route ledger](../../data/work-routes.json). |
 | **248 paper works; 208 source versions** | The [published graph](../../dist/research/exports/research-graph.json) contains 456 paper records: 377 approved and 79 candidates. Fifty-seven candidate versions have approved parents; parent approval does not approve a version. |
 | **Two Daily editions; 34 selections** | The committed [November 16](../../data/daily-scan/2026-11-16.json) and [November 17](../../data/daily-scan/2026-11-17.json) inputs contain 18 and 16 selections respectively. They are actual snapshots, not 30 populated days. |

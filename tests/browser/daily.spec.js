@@ -232,15 +232,23 @@ test('Daily deep links reveal filtered items and native disclosures support keyb
   await firstRow.locator('summary').focus();
   await page.keyboard.press('Enter');
   await firstRow.locator('.scan-permalink').focus();
+  // This is where the reader leaves the original entry. Its URL still has
+  // #last, but Back restores this reading position rather than a fresh visit.
+  const returnScrollY = await page.evaluate(() => scrollY);
   await page.keyboard.press('Enter');
   const permanentFirst = page.locator('.scan-item[id=' + JSON.stringify(first.id) + ']');
   await expect(page).toHaveURL(url => url.pathname === `/daily/${latest.date}/` && url.hash === '#' + first.id);
   await expect(permanentFirst).toBeInViewport();
   expect(new URL(page.url()).hash).toBe('#' + first.id);
+  const forwardScrollY = await page.evaluate(() => scrollY);
   await page.goBack();
-  await expect(target).toBeInViewport();
   expect(new URL(page.url()).hash).toBe('#' + last.id);
+  await expect.poll(async () => Math.abs(await page.evaluate(() => scrollY) - returnScrollY)).toBeLessThanOrEqual(2);
+  await expect(firstRow).toBeInViewport();
+  await assertSelections(page, latest.items);
   await page.goForward();
+  expect(new URL(page.url()).hash).toBe('#' + first.id);
+  await expect.poll(async () => Math.abs(await page.evaluate(() => scrollY) - forwardScrollY)).toBeLessThanOrEqual(2);
   await expect(firstRow).toBeInViewport();
 });
 

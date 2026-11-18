@@ -33,7 +33,7 @@
 .r-finding-fields{font-size:14px;line-height:1.75}
 .r-finding-fields dt{font-weight:600;margin-top:14px}
 .r-finding-fields dd{margin:4px 0 0}
-@media(max-width:700px){.r-evidence-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.r-evidence-table,.r-evidence-table tbody,.r-evidence-table tr,.r-evidence-table :is(td,th){display:block;width:auto!important;max-width:100%}.r-evidence-table tr{padding:14px 0;border-bottom:1px solid var(--r-rule)}.r-evidence-table :is(td,th){border:0;padding:4px 0}.r-evidence-table td[data-label]::before{content:attr(data-label) ': ';font-weight:600}.r-index-controls label{flex-basis:120px}}
+@media(max-width:700px){.r-evidence-table caption{display:block;max-width:100%}.r-evidence-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.r-evidence-table,.r-evidence-table tbody,.r-evidence-table tr,.r-evidence-table :is(td,th){display:block;width:auto!important;max-width:100%}.r-evidence-table tr{padding:14px 0;border-bottom:1px solid var(--r-rule)}.r-evidence-table :is(td,th){border:0;padding:4px 0}.r-evidence-table td[data-label]::before{content:attr(data-label) ': ';font-weight:600}.r-index-controls label{flex-basis:120px}}
 .research{--r-paper:var(--soft);--r-rule:var(--border);--r-accent:var(--green);--r-quiet:var(--muted);--r-warm:#79551f;padding-bottom:24px;overflow-wrap:anywhere}
 .research a{scroll-margin-top:24px}
 .research :is(section,article)[id]{scroll-margin-top:24px}
@@ -267,15 +267,15 @@
    All text remains in the initial document, including off-screen paragraphs. */
 .r-reader-chapter-content[aria-labelledby="technical-landscape"]{font-kerning:none;font-variant-ligatures:none}
 
-/* Defer only off-screen paragraph layout. Native find and focus can reveal
-   individual paragraphs; fragment navigation reveals the complete chapter
-   before the browser computes the destination, including its final citation. */
+/* Defer off-screen layout on fresh enhanced visits. History restoration and
+   script-free reading use the complete layout. Native find, focus and fragment
+   navigation keep every paragraph reachable, including the final citation. */
+.r-reader-chapter-content[aria-labelledby="technical-landscape"]>.r-paragraph>:last-child{margin-bottom:0}
 @supports(content-visibility:auto){
  @media screen{
-  .r-reader-chapter-content[aria-labelledby="technical-landscape"]>.r-paragraph{content-visibility:auto;contain-intrinsic-block-size:auto 32rem}
-  .r-reader-chapter-content[aria-labelledby="technical-landscape"]>.r-paragraph>:last-child{margin-bottom:0}
+  html[data-reader-enhanced] .r-reader-chapter-content[aria-labelledby="technical-landscape"]>.r-paragraph{content-visibility:auto;contain-intrinsic-block-size:auto 32rem}
   .r-book-reader:has(:target) .r-reader-chapter-content[aria-labelledby="technical-landscape"]>.r-paragraph,
-  .r-reader-chapter-content[aria-labelledby="technical-landscape"]:focus-within>.r-paragraph{content-visibility:visible;contain-intrinsic-size:none}
+  html[data-reader-enhanced] .r-reader-chapter-content[aria-labelledby="technical-landscape"]:focus-within>.r-paragraph{content-visibility:visible;contain-intrinsic-size:none}
  }
  @media print{
   .r-reader-chapter-content[aria-labelledby="technical-landscape"]>.r-paragraph{content-visibility:visible;contain:none;contain-intrinsic-size:none}

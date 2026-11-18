@@ -9,7 +9,7 @@ const lastSentence = 'Difficulty selection changes what an absolute score repres
 test.use({ javaScriptEnabled: false,
   trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
 
-test('complete technical chapter supports its final citation, focus and history without JavaScript', async ({ page }) => {
+async function verifyCitationHistory(page) {
   const response = await page.goto(chapter);
   expect(response.ok()).toBeTruthy();
   expect(await response.text()).toContain(lastSentence);
@@ -20,6 +20,11 @@ test('complete technical chapter supports its final citation, focus and history 
   await finalCitation.focus();
   await expect(finalCitation).toBeFocused();
   await expect(finalCitation).toBeInViewport();
+  const focusedLayout = await page.locator(paragraphSelector).evaluateAll(nodes => ({
+    supported: CSS.supports('content-visibility', 'auto'),
+    deferred: nodes.filter(node => getComputedStyle(node).contentVisibility !== 'visible').length,
+  }));
+  if (focusedLayout.supported) expect(focusedLayout.deferred).toBe(0);
   await finalCitation.press('Enter');
   await expect(page).toHaveURL(new URL(href, page.url()).href);
   await expect(page.locator('[id=' + JSON.stringify(decodeURIComponent(href.split('#')[1])) + ']')).toBeVisible();
@@ -29,6 +34,17 @@ test('complete technical chapter supports its final citation, focus and history 
   await expect(finalCitation).toBeInViewport();
   await page.goForward();
   await expect(page).toHaveURL(new URL(href, page.url()).href);
+}
+
+test('complete technical chapter supports its final citation, focus and history without JavaScript', async ({ page }) => {
+  await verifyCitationHistory(page);
+});
+
+test.describe('enhanced technical reading', () => {
+  test.use({ javaScriptEnabled: true });
+  test('final citation restores its reading position with scripts enabled', async ({ page }) => {
+    await verifyCitationHistory(page);
+  });
 });
 
 test('direct final-citation fragment and reload resolve after the complete technical layout', async ({ page }) => {

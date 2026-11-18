@@ -334,7 +334,13 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
                                research_release_context={"release_id": context["report"]["release_id"],
                                                          "evidence_as_of": context["graph"]["as_of"]})
     company_page = path.startswith('/company/')
-    text = sp.document(research, " ".join(_display_title(title).split()) + sp.SUFFIX, sp.truncate(description),
+    document_title = " ".join(title.split())
+    edition = re.match(r'^/research/editions/(\d{4}-\d{2}-\d{2})/', path)
+    if edition:
+        document_title += ' · ' + sp.format_date(edition.group(1)) + ' edition'
+    elif parent and parent[0] in {'papers', 'benchmarks'}:
+        document_title += ' · ' + ('Research paper' if parent[0] == 'papers' else 'Benchmark')
+    text = sp.document(research, document_title + sp.SUFFIX, sp.truncate(description),
                        sp.ORIGIN + path, '<div class="research wide">' + crumbs_html
                        + (_nav(path) if path != "/research/" and not company_page else "") + body + "</div>",
                        structured=structured, current="companies" if company_page else "research")
@@ -345,6 +351,13 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
              '<link rel="alternate" type="application/atom+xml" title="Research corrections" href="/research/corrections/atom.xml">\n')
     if company_page:
         extra += '<link rel="stylesheet" href="/company-profile.css">\n'
+    if page_type == 'Chapter' and path.endswith('/chapters/technical-landscape/'):
+        # A history restoration needs the complete layout used when the reader
+        # followed a citation. With scripting unavailable, keep that layout too.
+        extra += ('<script>(function(){try{var nav=performance.getEntriesByType("navigation")[0];'
+                  'if(nav&&nav.type==="navigate")document.documentElement.setAttribute("data-reader-enhanced","");'
+                  'addEventListener("pageshow",function(event){if(event.persisted)document.documentElement.removeAttribute("data-reader-enhanced")});'
+                  '}catch(_){}})();</script>\n')
     if page_type in {"Book", "Chapter"}:
         base = path.split('chapters/', 1)[0] if page_type == 'Chapter' else path
         current = next(index for index, section in enumerate(context['report']['sections']) if _reader_path(section, base) == path)

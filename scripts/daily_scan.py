@@ -305,7 +305,8 @@ def render(edition, editions, canonical, root=ROOT, context=None):
             f'<div class="scan-context">{contexts}</div><a href="/daily/wikipedia-context.json">Wikipedia revision & download records</a></details>'
             f'<p>Site search covers the latest {RECENT_EDITIONS} Daily editions. This snapshot has its own filters; the full archive remains below.</p>'
             f'<details><summary>Snapshot archive</summary><div class="scan-archive">{archive}</div></details><a class="scan-download" href="/daily/{day}/snapshot.json" download>Download this snapshot · JSON</a></footer></div>')
-    title = f'Daily scan: {format_date(day)} · ScienceToStartup'
+    latest_label = ' · Latest reading list' if canonical == ORIGIN + '/daily/' else ''
+    title = f'Daily scan: {format_date(day)}{latest_label} · ScienceToStartup'
     description = f'{len(edition["items"])} sourced selections for {format_date(day)}: RLHF, data, evaluation and AI company news. Original source dates and limits retained.'
     page = document(SimpleNamespace(as_of="", data={}), title, description, canonical, body, current="daily")
     pending = '<script>document.documentElement.setAttribute("data-daily-pending","");addEventListener("error",function(event){if(event.error||event.target.hasAttribute&&event.target.hasAttribute("data-daily-script"))document.documentElement.removeAttribute("data-daily-pending")},true)</script>'

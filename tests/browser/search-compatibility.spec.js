@@ -10,7 +10,7 @@ const current = name => read('web/search-core.js') + '\n' + read('web/' + name);
 const companies = require('../../data/canonical.json').companies;
 const origin = 'http://127.0.0.1:18769';
 const baselineEntries = JSON.parse(previous('index.json.gz')).entries;
-async function home(page, { oldMarkup = false, oldIndex = false, oldComponent = false, oldRuntime = false, query = '' } = {}) {
+async function home(page, { oldMarkup = false, oldIndex = false, oldComponent = false, oldRuntime = false, query = '', fixtureOrigin = origin } = {}) {
   let html = previous('home.html.gz');
   if (!oldMarkup) html = html.replace('<p id="home-search-status"', '<button id="home-search-more" type="button" hidden>Show more</button><p id="home-search-status"');
   // Use the current legacy-routing source; the remainder is actual baseline markup.
@@ -21,7 +21,7 @@ async function home(page, { oldMarkup = false, oldIndex = false, oldComponent = 
   const payload = JSON.stringify({...JSON.parse(previous('index.json.gz')), entries});
   config.search.sha256 = createHash('sha256').update(payload).digest('hex');
   html = html.replace(/(<script id="home-config" type="application\/json">).*?(<\/script>)/s, '$1' + JSON.stringify(config) + '$2');
-  await page.route(origin + '/**', async route => {
+  await page.route(fixtureOrigin + '/**', async route => {
     const pathname = new URL(route.request().url()).pathname;
     if (pathname === '/') return route.fulfill({contentType:'text/html', body:html});
     if (pathname === '/home-runtime.js') return route.fulfill({contentType:'application/javascript', body:oldRuntime ? previous('home-runtime.js') : read('web/home-runtime.js')});
@@ -29,7 +29,7 @@ async function home(page, { oldMarkup = false, oldIndex = false, oldComponent = 
     if (pathname === config.search.href) return route.fulfill({contentType:'application/json', body:payload});
     return route.fulfill({status:200, body:''});
   });
-  await page.goto(origin + '/' + query);
+  await page.goto(fixtureOrigin + '/' + query);
   return entries;
 }
 
@@ -74,7 +74,15 @@ test('exact names and recorded aliases lead; paging reports the complete real to
   while(await page.locator('#home-search-more').isVisible()) await page.locator('#home-search-more').click();
   await expect(page.locator('#home-search-results [role=option]')).toHaveCount(count+1);
   await expect(page.locator('#home-search-message')).toContainText(`Showing ${count} of ${count}`);
-  await input.fill('Nexdata');await expect(page.locator('#home-search-more')).toBeHidden();
+  await input.fill('Nexdata');
+  const resetCount=entries.filter(row=>[row.name,row.summary,row.group,...row.products,...row.aliases].join(' ').toLowerCase().includes('nexdata')).length;
+  await expect(page.locator('#home-search-message')).toContainText(`Showing ${Math.min(7,resetCount)} of ${resetCount}`);
+  await expect(page.locator('#home-search-results [role=option]')).toHaveCount(Math.min(7,resetCount)+1);
+  await expect(page.locator('#home-search-more')).toBeVisible({visible:resetCount>7});
+  await input.fill('s2s-no-record-987654321');
+  await expect(page.locator('#home-search-message')).toContainText('No recorded guide matches');
+  await expect(page.locator('#home-search-more')).toBeHidden();
+  await expect(page.locator('#home-search-results [role=option]')).toHaveCount(1);
 });
 
 test('initial arrows, IME and literal native work transfer preserve keyboard behavior', async ({ page }) => {
@@ -126,12 +134,17 @@ test('stalled component recovery can close and retry without a late reopen', asy
   await page.locator('#home-search-open').click();await expect(page.locator('#home-search-results')).toBeVisible();
 });
 
-test('empty component load offers retry and native modifier navigation', async ({ page, context }) => {
-  await home(page);const empty=route=>route.fulfill({contentType:'application/javascript',body:''});await page.route('**/home-search.js',empty);
+test('empty component load offers retry and native modifier navigation', async ({ page, context, baseURL }) => {
+  // WebKit's first native popup request can precede request interception. Use
+  // the real artifact origin so the unmodified relative fallback also resolves.
+  const fixtureOrigin=new URL(baseURL).origin;
+  await home(page,{fixtureOrigin});const empty=route=>route.fulfill({contentType:'application/javascript',body:''});await page.route('**/home-search.js',empty);
   await page.locator('#home-search-open').click();await expect(page.locator('[data-home-component-retry]')).toBeVisible();
-  await context.route(origin+'/companies/',route=>route.fulfill({contentType:'text/html',body:'<h1>Native companies fallback</h1>'}));
-  const opened=context.waitForEvent('page');await page.locator('#home-search-message a[href="/companies/"]').click({modifiers:['ControlOrMeta']});
-  const tab=await opened;await expect(tab).toHaveURL(origin+'/companies/');await expect(page.locator('#home-search')).toBeVisible();await tab.close();
+  const fallback=page.locator('#home-search-message a[href="/companies/"]');await expect(fallback).toHaveAttribute('href','/companies/');
+  const opened=context.waitForEvent('page');await fallback.click({modifiers:['ControlOrMeta']});
+  const tab=await opened;await expect(tab).toHaveURL(fixtureOrigin+'/companies/');
+  await expect(tab.getByRole('heading',{level:1})).toHaveText('AI data companies');
+  await expect(page.locator('#home-search')).toBeVisible();await tab.close();
   await page.unroute('**/home-search.js',empty);await page.locator('[data-home-component-retry]').click();await expect(page.locator('#home-search-results')).toBeVisible();
 });
 

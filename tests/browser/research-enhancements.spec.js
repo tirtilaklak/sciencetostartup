@@ -221,6 +221,32 @@ test.describe('complete research tables without JavaScript', () => {
         const disclosure = page.locator('.r-paper-versions').first();
         await disclosure.locator(':scope > summary').click();
         await expect(disclosure.locator('[data-index-row]').first()).toBeVisible();
+        const viewport = page.viewportSize();
+        for (const width of new Set([viewport.width, 320])) {
+          await page.setViewportSize({ width, height: viewport.height });
+          const layout = await disclosure.locator('.r-version-table').evaluate(table => {
+            const caption = table.caption;
+            const style = getComputedStyle(caption);
+            const outer = table.closest('.r-table-wrap').querySelector(':scope > .r-evidence-table');
+            return {
+              table: table.getBoundingClientRect().width,
+              caption: caption.getBoundingClientRect().width,
+              captionLines: (caption.getBoundingClientRect().height - parseFloat(style.paddingTop)
+                - parseFloat(style.paddingBottom)) / parseFloat(style.lineHeight),
+              record: table.tBodies[0].rows[0].querySelector('th').getBoundingClientRect().width,
+              outerTable: outer.getBoundingClientRect().width,
+              outerCaption: outer.caption.getBoundingClientRect().width,
+              page: document.documentElement.scrollWidth,
+              viewport: innerWidth,
+            };
+          });
+          expect(layout.caption, `${width}px version caption uses the table width`).toBeGreaterThanOrEqual(layout.table - 1);
+          expect(layout.outerCaption, `${width}px index caption uses the table width`).toBeGreaterThanOrEqual(layout.outerTable - 1);
+          expect(layout.record, `${width}px version title remains readable`).toBeGreaterThanOrEqual(Math.min(200, layout.table * .75));
+          expect(layout.captionLines, `${width}px caption does not wrap character by character`).toBeLessThanOrEqual(12);
+          expect(layout.page, `${width}px page fits the viewport`).toBeLessThanOrEqual(layout.viewport + 1);
+        }
+        await page.setViewportSize(viewport);
         await disclosure.locator(':scope > summary').scrollIntoViewIfNeeded();
         paperVersionViewport = await page.screenshot({ fullPage: false, animations: 'disabled', scale: 'css' });
       }

@@ -68,5 +68,8 @@
   filter(false);
   root.querySelector('.scan-controls').hidden = false;
   document.documentElement.removeAttribute('data-daily-pending');
-  revealHash();
+  // A history reload must leave scroll restoration to the browser, just as a
+  // cached page does. A fresh visit (or later hash change) reveals its target.
+  const navigation = globalThis.performance?.getEntriesByType?.('navigation')?.[0];
+  if (navigation?.type !== 'back_forward') revealHash();
 })();

@@ -42,7 +42,13 @@ class WorkRouteValidationTests(unittest.TestCase):
             self.assertRegex(check["response_sha256"], r"^[a-f0-9]{64}$")
             if check.get("content_reviewed"):
                 content += 1
-                self.assertEqual(route["last_route_check"]["date"], checked_on)
+                # A later field-scoped review must preserve this historical
+                # content receipt instead of resetting its date or scope.
+                route_checks = route.get("check_history", []) + [route["last_route_check"]]
+                self.assertEqual(sum(item.get("date") == checked_on
+                                     and item.get("result") in {"listing_content_reviewed", "official_listing_closed"}
+                                     for item in route_checks), 1, route["id"])
+                self.assertGreaterEqual(route["last_route_check"]["date"], checked_on)
                 self.assertTrue(any(source.get("accessed_on") == checked_on
                                     and source["url"] == route["url"]
                                     for source in route["sources"]))
