@@ -24,16 +24,14 @@ class ReaderTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.baseline = build_context(ROOT)
-        cls.render_baseline = isolated_render_context(cls.baseline)
+        if cls.baseline.get('published_edition_replay'):
+            cls.render_baseline = cls.enterClassContext(isolated_render_preparation(
+                cls.baseline, canonical_bytes=(ROOT / 'data/canonical.json').read_bytes()))
+        else:
+            cls.render_baseline = isolated_render_context(cls.baseline)
 
     def setUp(self):
-        if self.baseline.get('published_edition_replay'):
-            preparation = isolated_render_preparation(
-                self.baseline, canonical_bytes=(ROOT / 'data/canonical.json').read_bytes())
-            self.context = preparation.__enter__()
-            self.addCleanup(preparation.__exit__, None, None, None)
-        else:
-            self.context = copy.deepcopy(self.render_baseline)
+        self.context = copy.deepcopy(self.render_baseline)
         # Reader fixtures exercise synthetic, accepted findings independently of
         # the real report's current synthesis-review state. This finding-only
         # flag does not supply publication readiness or an archive receipt.
@@ -157,8 +155,13 @@ class ReaderTests(unittest.TestCase):
         self.assertIn('data-index-controls hidden', text)
         self.assertIn('name="delivery_model"', text)
         self.assertIn('name="data_purpose"', text)
+        papers = [row for row in self.context['graph']['entities']
+                  if row['kind'] in pages.CATEGORIES[0][2]]
         for facet in pages.INDEX_FACETS[:7]:
-            self.assertIn('name="' + facet + '"', text)
+            if any(row.get('taxonomy', {}).get(facet) for row in papers):
+                self.assertIn('name="' + facet + '"', text)
+            else:
+                self.assertNotIn('name="' + facet + '"', text)
         self.assertIn(pages.entity_url(paper, self.context), Facts(text).links)
         self.assertNotIn('FORBIDDEN-CLAIM', text)
         self.assertNotIn(qualification, text)

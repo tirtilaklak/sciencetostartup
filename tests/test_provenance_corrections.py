@@ -1,0 +1,167 @@
+"""Pay, eligibility and court-status corrections keep their precise evidence scope."""
+import hashlib
+import json
+from pathlib import Path
+import sys
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from editorial_work import editorial_counts, validate_editorial_release
+from observatory import validate_company_events
+
+
+class ProvenanceCorrectionsTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.work = json.loads((ROOT / "data/work-routes.json").read_text())
+        cls.routes = {row["id"]: row for row in cls.work["routes"]}
+        cls.events = json.loads((ROOT / "data/company-events.json").read_text())
+        cls.release = json.loads((ROOT / "data/editorial-release.json").read_text())
+        cls.canonical = json.loads((ROOT / "data/canonical.json").read_text())
+
+    def test_release_binds_exact_work_bytes_and_unchanged_frozen_canonical(self):
+        self.assertEqual(hashlib.sha256((ROOT / "data/canonical.json").read_bytes()).hexdigest(),
+                         "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061")
+        self.assertEqual(self.release["release_id"], "2026-11-18.1")
+        self.assertEqual(self.release["as_of"], "2026-11-18")
+        self.assertEqual(self.release["work_routes_sha256"],
+                         hashlib.sha256((ROOT / "data/work-routes.json").read_bytes()).hexdigest())
+        validate_editorial_release(self.work, self.release, self.canonical)
+        self.assertEqual(editorial_counts(self.work)["work_routes"], 78)
+
+    def test_retained_quote_normalization_is_not_a_new_source_check(self):
+        for rid, currency in [("bespoke_labs.work.mts-post-training", "USD"),
+                              ("scale_ai.work.outlier-statistics", "USD"),
+                              ("bespoke_labs.work.fulfillment-operations-associate", "USD"),
+                              ("ooak.work.data-quality-specialist", "EUR")]:
+            with self.subTest(route=rid):
+                row = self.routes[rid]
+                self.assertIn(currency, row["source_quote"])
+                self.assertEqual(row["pay_terms"]["currency"], currency)
+                self.assertEqual(row["field_reviews"]["pay"]["basis"], "stored_evidence")
+                self.assertEqual(row["field_reviews"]["pay"]["reviewed_on"], "2026-10-28")
+                self.assertEqual(row["terms_checked_on"], "2026-10-28")
+                self.assertTrue(all(r["checked_on"] != "2026-11-18"
+                                    for r in row["editorial_review"]["receipts"]))
+        mts = self.routes["bespoke_labs.work.mts-post-training"]
+        self.assertEqual(mts["pay_terms"]["unit"], "year")
+        self.assertEqual(mts["pay_basis"], mts["pay_terms"]["basis"])
+        self.assertFalse(mts["pay_terms"]["hourly_comparable"])
+        self.assertEqual(self.routes["ooak.work.data-quality-specialist"]["field_reviews"]["requirements"]["state"], "conflicting")
+
+    def test_five_scoped_reviews_leave_full_terms_and_other_field_clocks_alone(self):
+        reviewed = {"mercor.work.expert-network": "pay", "proximal.work.frontierswe-fellowship": "pay",
+                    "rws_trainai.work.polaris-asr": "destination", "invisible.work.full-stack-trainer": "destination",
+                    "aixi.work.machine-learning-research-scientist": "pay"}
+        for rid, field in reviewed.items():
+            with self.subTest(route=rid):
+                row = self.routes[rid]
+                fresh = [r for r in row["editorial_review"]["receipts"] if r["checked_on"] == "2026-11-18"]
+                self.assertEqual(len(fresh), 1)
+                receipt = fresh[0]
+                self.assertEqual(receipt["scope"], "field_review")
+                self.assertEqual(receipt["reviewed_fields"], [field])
+                self.assertEqual(receipt["approval_basis"], "source_content_review")
+                self.assertEqual(receipt["reviewer"], "Codex source review")
+                self.assertLessEqual(receipt["retrieved_at"], receipt["checked_at"])
+                self.assertEqual(row["field_reviews"][field]["reviewed_on"], "2026-11-18")
+                self.assertEqual(row["field_reviews"][field]["source_ids"], [receipt["source_id"]])
+                self.assertEqual(row["last_link_check"]["date"], "2026-10-28")
+                if rid != "mercor.work.expert-network":
+                    self.assertNotIn("approved_terms_receipt_id", row["editorial_review"])
+                for name, review in row["field_reviews"].items():
+                    if name != field:
+                        self.assertNotEqual(review["reviewed_on"], "2026-11-18")
+        mercor = self.routes["mercor.work.expert-network"]
+        self.assertEqual(mercor["editorial_review"]["approved_terms_receipt_id"], "mercor.work.expert-network.key-terms-2026-11-08")
+        self.assertFalse(mercor["numeric_pay"])
+        self.assertFalse(mercor["pay_terms"]["hourly_comparable"])
+        self.assertIn("Network context", mercor["pay_context"])
+        self.assertTrue(any("$90" in h["note"] for h in mercor["check_history"]))
+        self.assertTrue(any("$97" in h["note"] for h in mercor["check_history"]))
+        self.assertEqual(self.routes["proximal.work.frontierswe-fellowship"]["pay_terms"]["unit"], "undisclosed")
+
+    def test_turing_withdrawal_does_not_turn_a_block_into_fresh_eligibility(self):
+        row = self.routes["turing.work.machine-learning"]
+        self.assertEqual(row["geography"], "Country eligibility unverified")
+        self.assertEqual(row["status"], "unverified")
+        self.assertEqual(row["field_reviews"]["location"]["state"], "not_researched")
+        self.assertIsNone(row["field_reviews"]["location"]["reviewed_on"])
+        self.assertEqual(row["field_reviews"]["location"]["basis"], "not_reviewed")
+        receipt = row["editorial_review"]["receipts"][-1]
+        self.assertFalse(receipt["approved"])
+        self.assertEqual(receipt["result"], "blocked")
+        self.assertEqual(receipt["scope"], "retrieval")
+        self.assertEqual(receipt["correction_basis"], "retained_record_review")
+        old = row["editorial_review"]["correction_history"][-1]["previous_values"]
+        self.assertEqual(old["geography"], "Pakistan / Turkey listing")
+        self.assertEqual(old["field_reviews"]["location"]["state"], "sourced")
+        claim = next(c for c in self.canonical["claims"] if c["id"] == "turing.claim.worker_opportunities")
+        self.assertEqual(claim["status"], "unverified")
+        self.assertEqual(claim["confidence"], "U")
+
+    def test_availability_corrections_do_not_claim_specific_closure_or_placement(self):
+        rws = self.routes["rws_trainai.work.polaris-asr"]
+        self.assertEqual(rws["status"], "historical")
+        self.assertNotIn("disposition", rws["editorial_review"])
+        self.assertEqual(rws["pay_label"], "$16 / hour")
+        self.assertIsNone(rws["field_reviews"]["pay"]["reviewed_on"])
+        self.assertIn("does not establish that Polaris closed", rws["availability_note"])
+        invisible = self.routes["invisible.work.full-stack-trainer"]
+        self.assertIn("were not tested", invisible["availability_note"])
+        self.assertEqual(invisible["field_reviews"]["pay"]["reviewed_on"], "2026-10-28")
+        old = invisible["editorial_review"]["correction_history"][-1]["previous_values"]
+        self.assertIn("could not be loaded", old["availability_note"])
+
+    def test_aixi_currency_and_amount_change_does_not_rewrite_original_evidence(self):
+        row = self.routes["aixi.work.machine-learning-research-scientist"]
+        self.assertEqual(row["pay_terms"]["currency"], "USD")
+        self.assertEqual(row["pay_terms"]["unit"], "year")
+        self.assertFalse(row["pay_terms"]["hourly_comparable"])
+        self.assertEqual(row["geography"], "London / Berkeley")
+        self.assertEqual(row["research_record"]["route"]["pay"]["currency"], "GBP")
+        old = row["editorial_review"]["correction_history"][-1]["previous_values"]
+        self.assertEqual(old["source_quote"], "£120,000 – £160,000 / year")
+        self.assertEqual(row["terms_checked_on"], "2026-10-28")
+
+    def test_events_preserve_filing_dates_and_qualify_procedural_outcomes(self):
+        validate_company_events(self.events, self.canonical)
+        rows = {e["id"]: e for e in self.events["events"]}
+        scale = rows["scale_ai.event.mckinney-misclassification-suit"]
+        self.assertEqual(scale["date"], "2024-12-10")
+        self.assertEqual(scale["status"], "Settlement granted final approval")
+        self.assertIn("Scale denies the claims", scale["detail"])
+        self.assertIn("September 13, 2027", scale["detail"])
+        self.assertTrue(any(s["url"].endswith("/ORDER_GRANTING_FINAL_APPROVAL") and s["published_on"] == "2026-10-30" for s in scale["sources"]))
+        boggs = rows["handshake_ai.event.boggs-misclassification-suit"]
+        self.assertEqual(boggs["date"], "2026-07-20")
+        self.assertEqual(boggs["status"], "Stayed pending mediation")
+        self.assertIn("alleges", boggs["detail"])
+        self.assertIn("Arbitration rights remain reserved", boggs["detail"])
+        self.assertIn("no merits or settlement ruling is made", boggs["detail"])
+        for row in (scale, boggs):
+            self.assertEqual(row["kind"], "lawsuit")
+            self.assertEqual(row["date_basis"], "filed")
+            self.assertEqual(row["status_checked_on"], "2026-11-18")
+            self.assertLessEqual(len(row["detail"]), 320)
+            self.assertLessEqual(len(row["status"]), 40)
+        for row in self.events["events"]:
+            if row not in (scale, boggs):
+                self.assertLess(row["status_checked_on"], "2026-11-18")
+
+    def test_new_public_evidence_is_bounded_and_contains_no_private_capture_paths(self):
+        text = (ROOT / "data/work-routes.json").read_text()
+        self.assertNotIn("/workspace/", text)
+        self.assertNotIn("libfile_", text)
+        for row in self.work["routes"]:
+            for receipt in row["editorial_review"]["receipts"]:
+                if receipt["checked_on"] == "2026-11-18" and receipt.get("approved"):
+                    words = sum(len(e.get("quote", "").split()) for e in receipt["evidence"])
+                    if row["id"] == "aixi.work.machine-learning-research-scientist":
+                        words += len(row["source_quote"].split())
+                    self.assertLessEqual(words, 25)
+
+
+if __name__ == "__main__":
+    unittest.main()

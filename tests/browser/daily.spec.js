@@ -86,7 +86,7 @@ async function assertContent(page, edition) {
     explanation: item.explanation.map(sentence => sentence.trim()).join(' '),
     focus: item.focus, finding: item.finding, caveat: item.caveat, readScope: item.read_scope,
     dateBasis: item.date_basis, sources: item.sources.map(({ url, label }) => ({ url, label })),
-    permalink: '#' + item.id,
+    permalink: `/daily/${edition.date}/#${item.id}`,
   })));
   await expect(page.locator('.scan-explanation:visible')).toHaveCount(edition.items.length);
 }
@@ -117,11 +117,38 @@ test('Daily latest and bounded archives match complete committed snapshots and f
     expect(JSON.parse(await verifiedResponse(request, '/' + snapshotPath, snapshotPath))).toEqual(edition);
     await page.goto(route);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sciencetostartup.com' + route);
+    await expect(page).toHaveTitle(new RegExp(edition.date.slice(0, 4)));
+    await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute('href', '/daily/feed.xml');
+    await expect(page.locator('link[rel="alternate"][type="application/feed+json"]')).toHaveAttribute('href', '/daily/feed.json');
+    await expect(page.getByRole('navigation', { name: 'Follow Daily scan' }).getByRole('link', { name: 'RSS', exact: true })).toBeVisible();
     await expect(page.locator('.scan-controls')).toBeVisible();
     await assertContent(page, edition);
     expect(await page.locator('#scan-date option').evaluateAll(options => options.map(option => option.value)))
       .toEqual(editions.map(entry => entry.date).reverse());
   }
+});
+
+test('Daily feeds bind immutable editions without invented publication times', async ({ page, request }) => {
+  const expected = editions.slice(-30).reverse();
+  const json = JSON.parse(await verifiedResponse(request, '/daily/feed.json', 'daily/feed.json'));
+  expect(json.version).toBe('https://jsonfeed.org/version/1.1');
+  expect(json.items.map(item => item.id)).toEqual(expected.map(edition => `https://sciencetostartup.com/daily/${edition.date}/`));
+  for (const [index, item] of json.items.entries()) {
+    expect(item.url).toBe(item.id);
+    expect(item.date_published).toBeUndefined();
+    expect(item.date_modified).toBeUndefined();
+    expect(item.content_text).toContain(expected[index].items[0].title);
+    expect(item.content_text).toContain(expected[index].items[0].caveat);
+    expect(item.content_text).toContain(`/daily/${expected[index].date}/#${expected[index].items[0].id}`);
+  }
+  const rss = (await verifiedResponse(request, '/daily/feed.xml', 'daily/feed.xml')).toString('utf8');
+  const parsed = await page.evaluate(xml => {
+    const document = new DOMParser().parseFromString(xml, 'application/xml');
+    return { error: Boolean(document.querySelector('parsererror')),
+      ids: [...document.querySelectorAll('item guid')].map(node => node.textContent),
+      timestamps: document.querySelectorAll('pubDate,lastBuildDate').length };
+  }, rss);
+  expect(parsed).toEqual({ error: false, ids: json.items.map(item => item.id), timestamps: 0 });
 });
 
 test('Daily topic and type controls select exactly the source-backed items and update URLs', async ({ page }) => {
@@ -206,7 +233,9 @@ test('Daily deep links reveal filtered items and native disclosures support keyb
   await page.keyboard.press('Enter');
   await firstRow.locator('.scan-permalink').focus();
   await page.keyboard.press('Enter');
-  await expect(firstRow).toBeInViewport();
+  const permanentFirst = page.locator('.scan-item[id=' + JSON.stringify(first.id) + ']');
+  await expect(page).toHaveURL(url => url.pathname === `/daily/${latest.date}/` && url.hash === '#' + first.id);
+  await expect(permanentFirst).toBeInViewport();
   expect(new URL(page.url()).hash).toBe('#' + first.id);
   await page.goBack();
   await expect(target).toBeInViewport();

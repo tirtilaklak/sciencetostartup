@@ -20,6 +20,16 @@ review dates. In the first editorial release, Sage and the Mercor network have
 new approved key-terms receipts. Their reviewer is **Codex source review**, under
 the user's authorization; no human signoff is invented.
 
+The 18 November 2026 editorial correction pass adds five scoped field reviews:
+Mercor network pay context, FrontierSWE stipend semantics, RWS portal destination,
+Invisible's listing destination, and AIXI's annual salary. It also withdraws an
+unverified inherited Turing country inference after a blocked current retrieval,
+and normalizes four explicit retained pay quotations without refreshing their
+October source-review dates. Two company-event statuses cite newly read court
+orders. This pass creates no new full-terms approval. The prior full-terms receipts
+and all original source/check history remain intact; see
+`docs/editorial-corrections-2026-11-18.md` for source scope and event history.
+
 The named/program distinction describes the source destination. A named paid
 fellowship can be a named listing even if the historical research status says
 `program`. Networks may contain many projects. Migration information, contribution
@@ -98,6 +108,10 @@ Human/editorial triage:
    used for homepage promotion must address all seven explicit field states:
    destination, pay, location, requirements, assessment, commitment and duration.
    A reviewed source may leave a field unstated; do not manufacture a value.
+   Historical approved receipts remain review events after later field changes.
+   Each current direct-source field must match an approved readable receipt for
+   that field's exact date and every cited source. A later pay-only review does
+   not rewrite the old full-terms receipt or renew its promotion clock.
 5. Inspect the resulting card, source disclosure and counts. Corrections enter
    this same queue; the published seven-day correction-review commitment remains.
 

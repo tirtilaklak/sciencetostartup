@@ -865,7 +865,9 @@ class StaticPageTests(unittest.TestCase):
             name = download["contentUrl"].replace(ORIGIN + "/", "")
             self.assertTrue((self.dist / name).is_file(), name)
             self.assertIn(f'href="{download["contentUrl"]}"', text)
-        self.assertIn(f"{ORIGIN}/business-health.json", [d["contentUrl"] for d in dataset["distribution"]])
+        self.assertNotIn(f"{ORIGIN}/business-health.json", [d["contentUrl"] for d in dataset["distribution"]])
+        self.assertIn(f'<a href="{ORIGIN}/business-health.json" download>', downloads)
+        self.assertIn("Current supporting data", downloads)
         self.assertIn("Musa Ozdem", text)
         self.assertIn(str(sum(1 for c in self.data["claims"] if c["status"] in ("unverified", "contested"))), text)
 

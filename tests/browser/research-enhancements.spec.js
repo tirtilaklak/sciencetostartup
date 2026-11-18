@@ -24,6 +24,7 @@ const judgmentFields = {
   reasoning: 'Reasoning', what_would_change: 'What would change this assessment',
 };
 const text = value => Array.isArray(value) ? value.map(item => item.trim()).filter(Boolean).join('; ') : (value || '').trim();
+const displayTitle = value => value.replaceAll('$\\tau^2$', 'τ²').replaceAll('$\\tau$', 'τ');
 const normalize = value => value.replace(/\s+/g, ' ').trim();
 const selector = id => '[id=' + JSON.stringify(id) + ']';
 
@@ -40,7 +41,7 @@ function values(entity, name) {
 }
 
 function matches(entity, filters) {
-  const haystack = [entity.name, entity.id, ...(entity.aliases || []), ...Object.values(entity.identifiers || {})].join(' ').toLowerCase();
+  const haystack = [entity.name, displayTitle(entity.name), entity.id, ...(entity.aliases || []), ...Object.values(entity.identifiers || {})].join(' ').toLowerCase();
   return Object.entries(filters).every(([name, value]) => {
     if (!value) return true;
     if (name === 'q') return value.trim().toLowerCase().split(/\s+/).every(word => haystack.includes(word));
@@ -49,12 +50,31 @@ function matches(entity, filters) {
 }
 
 async function expectRecords(page, entities, filters = {}) {
-  const expected = entities.filter(entity => matches(entity, filters)).map(entity => entity.id).sort();
-  const visible = page.locator('[data-index-row]:visible');
-  await expect(visible).toHaveCount(expected.length);
-  expect((await visible.locator('th .r-record-id').allTextContents()).sort()).toEqual(expected);
-  await expect(page.locator('[data-index-count]')).toHaveText(`${expected.length} of ${entities.length} records shown`);
+  const expectedEntities = entities.filter(entity => matches(entity, filters));
+  const expected = expectedEntities.map(entity => entity.id).sort();
+  const matching = page.locator('[data-index-row]:not([hidden])');
+  await expect(matching).toHaveCount(expected.length);
+  expect((await matching.locator('th .r-record-id').allTextContents()).sort()).toEqual(expected);
+  const papers = entities.some(entity => entity.kind === 'paper_version');
+  const active = Object.values(filters).some(value => String(value || '').trim());
+  if (papers) {
+    const versions = expectedEntities.filter(entity => entity.kind === 'paper_version').length;
+    const works = expected.length - versions;
+    await expect(page.locator('[data-index-count]')).toHaveText(active
+      ? `${expected.length} of ${entities.length} matching records · ${works} paper works · ${versions} source versions`
+      : `${works} paper works · ${versions} source versions (${entities.length} records)`);
+    await expect(page.locator('[data-index-row]:visible')).toHaveCount(active ? expected.length : works);
+  } else {
+    await expect(page.locator('[data-index-row]:visible')).toHaveCount(expected.length);
+    await expect(page.locator('[data-index-count]')).toHaveText(`${expected.length} of ${entities.length} records shown`);
+  }
   await expect(page.locator('[data-index-empty]')).toBeVisible({ visible: expected.length === 0 });
+}
+
+async function openAdvanced(form, name) {
+  if (name === 'status') return;
+  const details = form.locator('[data-index-advanced]');
+  if (await details.count() && !await details.evaluate(node => node.open)) await details.locator('summary').click();
 }
 
 test.beforeEach(async ({ page, request }, info) => {
@@ -110,6 +130,7 @@ for (const [category, kinds] of Object.entries(categories)) {
       if (entities.some(entity => !values(entity, name).length)) expected.push('__not_recorded__');
       expect(options.filter(Boolean).sort(), `${category}/${name} options`).toEqual(expected.sort());
       for (const selected of [options.find(Boolean), ...(options.includes('__not_recorded__') ? ['__not_recorded__'] : [])]) {
+        await openAdvanced(form, name);
         await form.locator(`select[name="${name}"]`).selectOption(selected);
         await expectRecords(page, entities, { [name]: selected });
         expect(new URL(page.url()).searchParams.get(name)).toBe(selected);
@@ -120,6 +141,7 @@ for (const [category, kinds] of Object.entries(categories)) {
     expect(facet, `${category} must exercise a populated taxonomy facet`).toBeTruthy();
     const selected = facet.options.find(value => value && value !== '__not_recorded__');
     const combinedTarget = entities.find(entity => values(entity, facet.name).includes(selected));
+    await openAdvanced(form, facet.name);
     await form.locator(`select[name="${facet.name}"]`).selectOption(selected);
     await form.getByRole('combobox', { name: 'Review status', exact: true }).selectOption(combinedTarget.status);
     await form.getByLabel('Search records', { exact: true }).fill(combinedTarget.id);
@@ -144,10 +166,12 @@ test.describe('complete research tables without JavaScript', () => {
       await page.goto(`/research/${category}/?q=no-such-record&status=excluded`);
       await expect(page.locator('[data-index-controls]')).toBeHidden();
       await expect(page.locator('[data-index-row]')).toHaveCount(entities.length);
-      await expect(page.locator('[data-index-row]:visible')).toHaveCount(entities.length);
-      await expect(page.locator('[data-index-count]')).toHaveText(`${entities.length} records`);
-      await expect(page.getByRole('table')).toHaveAccessibleName('Evidence records. Taxonomy on candidate records is provisional.');
-      // JavaScript is disabled and all rows are already attached/visible. Read
+      const workCount = entities.filter(entity => entity.kind !== 'paper_version').length;
+      await expect(page.locator('[data-index-row]:visible')).toHaveCount(category === 'papers' ? workCount : entities.length);
+      await expect(page.locator('[data-index-count]')).toHaveText(category === 'papers'
+        ? `${workCount} paper works · ${entities.length - workCount} source versions (${entities.length} records)` : `${entities.length} records`);
+      await expect(page.getByRole('table', { name: 'Evidence records. Taxonomy on candidate records is provisional.', exact: true })).toBeVisible();
+      // JavaScript is disabled; every record is attached, versions use native details. Read
       // every rendered cell once, then retain every per-record assertion below.
       // Hundreds of locator round trips otherwise consume the test deadline.
       const records = await page.locator('[data-index-row]').evaluateAll(rows => rows.map(row => {
@@ -170,8 +194,13 @@ test.describe('complete research tables without JavaScript', () => {
         const row = matching[0];
         expect({ tag: row.headerTag, scope: row.headerScope }, entity.id + ' native rowheader').toEqual({ tag: 'TH', scope: 'row' });
         const accessibleHeaders = rowHeaders.filter(header => header.rowId === entity.id);
-        expect(accessibleHeaders, entity.id + ' accessible rowheader').toHaveLength(1);
-        expect(normalize(accessibleHeaders[0].text), entity.id).toContain(normalize(entity.name));
+        expect(normalize(row.headerText), entity.id).toContain(normalize(displayTitle(entity.name)));
+        if (category === 'papers' && entity.kind === 'paper_version') {
+          expect(accessibleHeaders, entity.id + ' initially collapsed version').toHaveLength(0);
+        } else {
+          expect(accessibleHeaders, entity.id + ' accessible rowheader').toHaveLength(1);
+          expect(normalize(accessibleHeaders[0].text), entity.id).toContain(normalize(displayTitle(entity.name)));
+        }
         expect(normalize(row.review), entity.id).toContain(labels[entity.status]);
         expect(normalize(row.review), entity.id).toContain((entity.review_depth || '').replaceAll('_', ' '));
         expect(normalize(row.type), entity.id).toBe(entity.kind.replaceAll('_', ' '));
@@ -186,6 +215,11 @@ test.describe('complete research tables without JavaScript', () => {
         expect(href).toMatch(new RegExp(`^/research/${category}/[^/#]+/$`));
         expect(normalize(row.evidenceText), entity.id).toBe(`${approved.length} approved assertions`);
         expect(row.evidenceHref, entity.id).toBe(href + '#approved-findings');
+      }
+      if (category === 'papers') {
+        const disclosure = page.locator('.r-paper-versions').first();
+        await disclosure.locator(':scope > summary').click();
+        await expect(disclosure.locator('[data-index-row]').first()).toBeVisible();
       }
       const first = page.locator('[data-index-row] th a').first();
       const href = await first.getAttribute('href');
@@ -208,6 +242,7 @@ test('filter history restores controls and results while retaining unrelated que
   await form.locator('select[name="status"]').selectOption(target.status);
   await form.locator('input[name="q"]').fill(target.id);
   const first = page.url();
+  await openAdvanced(form, 'modality');
   await form.locator('select[name="modality"]').selectOption(values(target, 'modality')[0]);
   const second = page.url();
   await expectRecords(page, entities, { status: target.status, q: target.id, modality: values(target, 'modality')[0] });

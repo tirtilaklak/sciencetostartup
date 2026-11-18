@@ -121,16 +121,14 @@ class ResearchPageTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.baseline = build_context(ROOT)
-        cls.render_baseline = isolated_render_context(cls.baseline)
+        if cls.baseline.get('published_edition_replay'):
+            cls.render_baseline = cls.enterClassContext(isolated_render_preparation(
+                cls.baseline, canonical_bytes=(ROOT / 'data/canonical.json').read_bytes()))
+        else:
+            cls.render_baseline = isolated_render_context(cls.baseline)
 
     def setUp(self):
-        if self.baseline.get('published_edition_replay'):
-            preparation = isolated_render_preparation(
-                self.baseline, canonical_bytes=(ROOT / 'data/canonical.json').read_bytes())
-            self.context = preparation.__enter__()
-            self.addCleanup(preparation.__exit__, None, None, None)
-        else:
-            self.context = copy.deepcopy(self.render_baseline)
+        self.context = copy.deepcopy(self.render_baseline)
         self.scratch = tempfile.TemporaryDirectory()
         self.addCleanup(self.scratch.cleanup)
         self.output = Path(self.scratch.name)

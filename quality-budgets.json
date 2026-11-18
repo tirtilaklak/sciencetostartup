@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "policyId": "field-guide-research-book-budgets-2026-11-14",
+  "policyId": "field-guide-research-book-budgets-2026-11-18",
   "performance": {
     "lighthouseVersion": "13.6.0",
     "playwrightVersion": "1.65.0",
@@ -9,11 +9,14 @@
     "defaultRunsPerRoute": 3,
     "routes": [
       "/",
+      "/companies/",
       "/explore/#companies",
       "/explore/#work",
       "/explore/#company/mercor/work",
       "/work/",
+      "/daily/",
       "/research/",
+      "/research/papers/",
       "/research/state-of-ai-data-labs/",
       "/research/state-of-ai-data-labs/chapters/weekly-developments/",
       "/research/state-of-ai-data-labs/chapters/market-structure/",

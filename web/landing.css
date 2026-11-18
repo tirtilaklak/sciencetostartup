@@ -21,6 +21,10 @@
 .hero-actions .primary-link{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:10px 14px;border:1px solid var(--green);border-radius:4px;background:var(--green);color:#fff;font-size:.875rem;line-height:1.5;font-weight:600;text-decoration:none;transition:background-color 120ms,border-color 120ms}
 .hero-actions .primary-link:hover{background:#193f2f;border-color:#193f2f}
 .hero-actions .primary-link>span{font-size:20px;line-height:1;flex:none}
+.home-arrow{display:inline-block;flex:none;width:18px;height:18px;vertical-align:middle}
+.site-search-more{align-self:flex-start;min-height:44px;max-width:calc(100% - 40px);margin:8px 20px 16px;padding:10px 14px;border:1px solid var(--green);border-radius:4px;background:transparent;color:var(--green);font:inherit;font-size:14px;line-height:1.5;cursor:pointer;overflow-wrap:anywhere}
+.site-search-more:hover{background:var(--pale)}
+.site-search-more:focus-visible{outline:3px solid var(--green);outline-offset:3px}
 .landing-page .hero-note{margin-top:16px;font-size:.8125rem;line-height:1.5;color:var(--muted)}
  .hero-visual{width:100%;max-width:400px;min-width:0;margin:0;overflow:hidden;border-radius:4px;background:#11120f}
 .hero-visual picture,.hero-art{display:block;width:100%}

@@ -1,0 +1,13 @@
+{
+  "source_commit": "1517ce1ac1d227a47b9f9f00b6669acb75226cba",
+  "sha256": {
+    "companies-page.js": "ee8db54ec37e34e83e998a02d14b76dd3a8836ea352823447d775cc981e56118",
+    "companies.html.gz": "4ab96c4a0387c320e2ca99a47b46d40cc9bf2cc739fa3944efb455332cdc3567",
+    "home-runtime.js": "1e3d4ec9e6d2de88dfc4253646fdbdf486738bf71a7b57f15bf902bc038b1505",
+    "home-search.js": "86b913f40493dcc0970aab8524dcf02594ada587fa35648bcfe0852a7679e6f4",
+    "home.html.gz": "ec387edb2abf9dae983a9685e69279df325a0d617d87ba570acb9f4399db75b1",
+    "index.json.gz": "6976d2038db02cf7278c4a31df1fc5854f7133514d74e5fded1f399e8023f040",
+    "work-page.js": "844de503e940e6d0218cf85d8fbbb611777268d46dc565fdce5c3b9f67edd157",
+    "work.html.gz": "c4e377a15dd25e0fc2daab32d9fc3262e171f64dd9c3d5b963cbf7c3313e46c5"
+  }
+}

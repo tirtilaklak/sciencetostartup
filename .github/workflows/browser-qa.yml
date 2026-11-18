@@ -64,16 +64,18 @@ jobs:
   browser:
     # Preserve the required check, including failures, cancellations and skips.
     if: ${{ always() }}
-    needs: [browser-core, report-accessibility]
+    needs: [browser-core, report-accessibility, performance]
     runs-on: ubuntu-24.04
     steps:
-      - name: Require both browser partitions to pass
+      - name: Require browser, accessibility and performance checks to pass
         env:
           CORE_RESULT: ${{ needs.browser-core.result }}
           REPORT_RESULT: ${{ needs.report-accessibility.result }}
+          PERFORMANCE_RESULT: ${{ needs.performance.result }}
         run: |
           test "$CORE_RESULT" = success
           test "$REPORT_RESULT" = success
+          test "$PERFORMANCE_RESULT" = success
   performance:
     # Keep the browser/performance host stable across ubuntu-latest migrations.
     runs-on: ubuntu-24.04

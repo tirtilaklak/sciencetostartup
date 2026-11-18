@@ -246,6 +246,11 @@ def _new_company(context, entity):
             and any(a.get('subject_id') == entity['id'] for a in _assertions(context, entity)))
 
 
+def _display_title(value):
+    """Render the two recorded tau spellings without changing source identity."""
+    return str(value or "").replace(r"$\tau^2$", "τ²").replace(r"$\tau$", "τ")
+
+
 def _label(entity):
     return STATUS_LABELS.get(entity.get("status"), "Review status unknown")
 
@@ -286,6 +291,7 @@ def _crumbs(label, path, parent=None):
 
 
 def _render(context, title, description, path, body, page_type="WebPage", parent=None):
+    title = _display_title(title)
     crumbs_html, crumbs = _crumbs(title, path, parent)
     identity = context["identity"]
     person = identity.get("publisher", {})
@@ -324,9 +330,11 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
                        for name, mime in (("clean-dataset.json", "application/json"), ("clean-dataset.csv", "text/csv"), ("clean-dataset.sqlite", "application/vnd.sqlite3"))]}
         structured = {"@context": "https://schema.org", "@graph": [structured, dataset]}
     research = SimpleNamespace(as_of=_day(context["graph"]["as_of"]),
-                               data={"dataset_version": context["graph"].get("canonical_dataset_version")})
+                               data={"dataset_version": context["graph"].get("canonical_dataset_version")},
+                               research_release_context={"release_id": context["report"]["release_id"],
+                                                         "evidence_as_of": context["graph"]["as_of"]})
     company_page = path.startswith('/company/')
-    text = sp.document(research, sp.truncate(title + sp.SUFFIX, sp.TITLE_LIMIT), sp.truncate(description),
+    text = sp.document(research, " ".join(_display_title(title).split()) + sp.SUFFIX, sp.truncate(description),
                        sp.ORIGIN + path, '<div class="research wide">' + crumbs_html
                        + (_nav(path) if path != "/research/" and not company_page else "") + body + "</div>",
                        structured=structured, current="companies" if company_page else "research")
@@ -538,6 +546,12 @@ def _claim_text(context, assertion):
         if isinstance(value, bool):
             value = 'Yes' if value else 'No'
         return f'{subject_html}{sp.escape(label)}: {sp.escape(value)}'
+    if assertion.get("status") in {"approved", "historical"} and assertion.get("object_id"):
+        prefix = "Scoped source statement: "
+        statements = [item[len(prefix):].strip() for item in assertion.get("qualifications", [])
+                      if isinstance(item, str) and item.startswith(prefix) and item[len(prefix):].strip()]
+        if len(statements) == 1:
+            return sp.escape(statements[0])
     relation = str(assertion.get("predicate", "relationship")).replace("_", " ")
     object_html = _link(entity_url(obj, context), obj.get("name", "Unknown object")) if obj else "Unknown object"
     return f'{subject_html} {sp.escape(relation)} {object_html}.'
@@ -556,7 +570,7 @@ def _source_evidence(context, assertion):
             excerpt = '<blockquote class="r-evidence-excerpt"><p>' + sp.escape(source['excerpt']) + '</p></blockquote>'
         rows.append('<li>' + _link(_evidence_url("source", source.get("id", "")), source.get("title", evidence.get("source_id")))
                     + f'<span class="r-source-locator">Locator: {sp.escape(evidence.get("locator", "Not recorded"))}</span>' + excerpt + '</li>')
-    return '<ul class="r-evidence-links">' + "".join(rows) + "</ul>"
+    return ('<p class="r-meta">Source records</p><ul class="r-evidence-links">' + "".join(rows) + "</ul>") if rows else ''
 
 
 def _assertion(context, assertion, *, compact=False):
@@ -578,7 +592,7 @@ def _assertion(context, assertion, *, compact=False):
         body += '<p>Correction: ' + _link(_correction_url(correction), correction['summary']) + '</p>'
         if correction.get('replacement_claim_id'):
             body += '<p>Approved replacement: ' + _link(_evidence_url('assertion', correction['replacement_claim_id']), correction['replacement_claim_id']) + '</p>'
-    body += f'<p class="r-record-id">{_link(_evidence_url("assertion", aid), aid)}</p>'
+    body += f'<p class="r-record-id">Permanent record ID: {_link(_evidence_url("assertion", aid), aid)}</p>'
     if assertion.get("qualifications") and status in {"approved", "historical"}:
         body += '<ul class="r-qualifications">' + "".join(
             '<li>' + ('<strong>Original author-stage note:</strong> ' if q.startswith(('Author-only candidate', 'Actual new author-only source-content proposal.')) else '') + sp.escape(q) + '</li>'
@@ -591,7 +605,7 @@ def _assertion(context, assertion, *, compact=False):
     reviews = {row["id"]: row for row in context["graph"].get("reviews", [])}
     receipts = [reviews[rid] for rid in assertion.get("review_ids", []) if rid in reviews]
     if receipts:
-        body += '<details class="r-receipts"><summary>Inspect actual AI review receipts</summary><ul>' + "".join(
+        body += '<details class="r-receipts"><summary>AI review receipts</summary><ul>' + "".join(
             f'<li>{sp.escape(r.get("role", "").replace("_", " ").capitalize())}: {sp.escape(r.get("verdict"))} '
             f'· {_date(r.get("reviewed_on"))}<br><span class="r-record-id">{sp.escape(r.get("invocation_id"))}</span></li>'
             for r in sorted(receipts, key=lambda row: (row.get("role", ""), row["id"]))) + "</ul></details>"
@@ -955,41 +969,93 @@ def _index_values(entity):
     return values
 
 
-def _evidence_table(context, entities):
-    """Metadata-only enhancement payload; assertions remain on native pages."""
-    values = [_index_values(entity) for entity in entities]
-    controls = '<form class="r-index-controls" data-index-controls hidden role="search" aria-label="Filter research records"><label>Search records<input name="q" type="search" autocomplete="off" placeholder="Title or identifier"></label>'
-    for key in ('status', 'type') + INDEX_FACETS:
-        options = sorted({value for row in values for value in row[key]}, key=lambda value: (value.casefold(), value))
-        if not options and key in {'delivery_model', 'data_purpose'}:
+def _index_row(context, entity):
+    """One independently filterable record, including all native evidence links."""
+    filters = _index_values(entity)
+    claims = _assertions(context, entity)
+    search = ' '.join([entity['name'], _display_title(entity['name']), entity['id']]
+                      + entity.get('aliases', [])
+                      + [str(value) for value in entity.get('identifiers', {}).values()])
+    taxonomy = '; '.join(key.replace('_', ' ') + ': ' + ', '.join(filters[key])
+                         for key in INDEX_FACETS if filters[key])
+    return ('<tr data-index-row data-record-id="' + sp.escape(entity['id'])
+            + '" data-search="' + sp.escape(search.lower()) + '" data-filters="'
+            + sp.escape(json.dumps(filters, ensure_ascii=False, separators=(',', ':'))) + '">'
+            + '<th scope="row">' + _link(entity_url(entity, context), _display_title(entity['name']))
+            + '<span class="r-record-id">' + sp.escape(entity['id']) + '</span></th>'
+            + '<td data-label="Review">' + sp.escape(_label(entity)) + '<span class="r-table-note">'
+            + sp.escape(entity.get('review_depth', '').replace('_', ' ')) + '</span></td>'
+            + '<td data-label="Type">' + sp.escape(entity['kind'].replace('_', ' ')) + '</td>'
+            + '<td data-label="Taxonomy">' + sp.escape(taxonomy or 'Not recorded') + '</td>'
+            + '<td data-label="Evidence">' + _link(entity_url(entity, context) + '#approved-findings',
+                                                    f'{len(claims)} approved assertions') + '</td></tr>')
+
+
+def _index_head():
+    return ('<thead><tr><th scope="col">Record</th><th scope="col">Review</th>'
+            '<th scope="col">Type</th><th scope="col">Taxonomy</th><th scope="col">Evidence</th></tr></thead>')
+
+
+def _paper_rows(context, entities):
+    """Versions sit in sibling nonrecord wrappers, never below a hidden work row."""
+    works = [entity for entity in entities if entity['kind'] != 'paper_version']
+    work_ids = {entity['id'] for entity in works}
+    versions = {}
+    for entity in entities:
+        if entity['kind'] == 'paper_version':
+            versions.setdefault(entity.get('parent_id'), []).append(entity)
+    rows = []
+    for work in works:
+        rows.append(_index_row(context, work))
+        children = versions.get(work['id'], [])
+        if not children:
             continue
+        title = _display_title(work['name'])
+        rows.append('<tr class="r-version-row" data-index-versions data-parent-record="'
+                    + sp.escape(work['id']) + '"><td colspan="5"><details class="r-paper-versions">'
+                    '<summary>Source versions (' + str(len(children)) + ') <span>Work context: '
+                    + sp.escape(title) + ' · ' + sp.escape(_label(work)) + '</span></summary>'
+                    '<p class="r-version-context" data-index-context hidden>Work context only; not counted as a match: '
+                    + _link(entity_url(work, context), title) + ' · ' + sp.escape(_label(work)) + '.</p>'
+                    '<table class="r-evidence-table r-version-table"><caption>Source versions for '
+                    + sp.escape(title) + '. Each version retains its own review status.</caption>'
+                    + _index_head() + '<tbody>' + ''.join(_index_row(context, child) for child in children)
+                    + '</tbody></table></details></td></tr>')
+    # Preserve an unexpected standalone version instead of silently dropping it.
+    rows.extend(_index_row(context, entity) for entity in entities
+                if entity['kind'] == 'paper_version' and entity.get('parent_id') not in work_ids)
+    return ''.join(rows)
+
+
+def _evidence_table(context, entities, *, group_papers=False):
+    """Complete metadata in HTML; optional controls only change the presentation."""
+    values = [_index_values(entity) for entity in entities]
+    def select(key):
+        options = sorted({value for row in values for value in row[key]}, key=lambda value: (value.casefold(), value))
+        if not options:
+            return ''
         label = {'status': 'Review status', 'type': 'Record type'}.get(key, key.replace('_', ' ').capitalize())
-        controls += f'<label>{label}<select name="{key}"><option value="">All</option>' + ''.join(
+        html = f'<label>{label}<select name="{key}"><option value="">All</option>' + ''.join(
             f'<option value="{sp.escape(value)}">{sp.escape(value.replace("_", " "))}</option>' for value in options)
         if any(not row[key] for row in values):
-            controls += '<option value="__not_recorded__">Not recorded</option>'
-        controls += '</select></label>'
-    controls += '<button type="reset">Clear filters</button></form>'
-    rows = []
-    for entity, filters in zip(entities, values):
-        claims = _assertions(context, entity)
-        search = ' '.join([entity['name'], entity['id']] + entity.get('aliases', [])
-                          + [str(value) for value in entity.get('identifiers', {}).values()])
-        taxonomy = '; '.join(key.replace('_', ' ') + ': ' + ', '.join(filters[key]) for key in INDEX_FACETS if filters[key])
-        rows.append('<tr data-index-row data-search="' + sp.escape(search.lower()) + '" data-filters="'
-                    + sp.escape(json.dumps(filters, ensure_ascii=False, separators=(',', ':'))) + '">'
-                    + '<th scope="row">' + _link(entity_url(entity, context), entity['name'])
-                    + '<span class="r-record-id">' + sp.escape(entity['id']) + '</span></th>'
-                    + '<td data-label="Review">' + sp.escape(_label(entity)) + '<span class="r-table-note">'
-                    + sp.escape(entity.get('review_depth', '').replace('_', ' ')) + '</span></td>'
-                    + '<td data-label="Type">' + sp.escape(entity['kind'].replace('_', ' ')) + '</td>'
-                    + '<td data-label="Taxonomy">' + sp.escape(taxonomy or 'Not recorded') + '</td>'
-                    + '<td data-label="Evidence">' + _link(entity_url(entity, context) + '#approved-findings', f'{len(claims)} approved assertions') + '</td></tr>')
-    return ('<section data-research-index>' + controls
-            + f'<p class="r-meta" data-index-count role="status" aria-live="polite" aria-atomic="true">{len(entities)} records</p>'
+            html += '<option value="__not_recorded__">Not recorded</option>'
+        return html + '</select></label>'
+    advanced = ''.join(select(key) for key in ('type',) + INDEX_FACETS)
+    controls = ('<form class="r-index-controls" data-index-controls hidden role="search" aria-label="Filter research records">'
+                '<div class="r-index-primary"><label>Search records<input name="q" type="search" autocomplete="off" placeholder="Title or identifier"></label>'
+                + select('status') + '<button type="reset">Clear filters</button></div>'
+                + ('<details class="r-index-advanced" data-index-advanced><summary>More filters '
+                   '<span data-index-advanced-count>0 active</span></summary><div class="r-index-fields">'
+                   + advanced + '</div></details>' if advanced else '') + '</form>')
+    works = sum(entity['kind'] != 'paper_version' for entity in entities)
+    initial_count = (f'{works} paper works · {len(entities) - works} source versions ({len(entities)} records)'
+                     if group_papers else f'{len(entities)} records')
+    return ('<section data-research-index' + (' data-index-kind="papers"' if group_papers else '') + '>' + controls
+            + f'<p class="r-meta" data-index-count role="status" aria-live="polite" aria-atomic="true">{initial_count}</p>'
             + '<div class="r-table-wrap"><table class="r-evidence-table"><caption>Evidence records. Taxonomy on candidate records is provisional.</caption>'
-            + '<thead><tr><th scope="col">Record</th><th scope="col">Review</th><th scope="col">Type</th><th scope="col">Taxonomy</th><th scope="col">Evidence</th></tr></thead><tbody>'
-            + ''.join(rows) + '</tbody></table></div><p data-index-empty class="r-callout" hidden>No records match these filters. Clear filters to see all records.</p></section>')
+            + _index_head() + '<tbody>'
+            + (_paper_rows(context, entities) if group_papers else ''.join(_index_row(context, entity) for entity in entities))
+            + '</tbody></table></div><p data-index-empty class="r-callout" hidden>No records match these filters. Clear filters to see all records.</p></section>')
 
 
 def _index(context, category):
@@ -997,12 +1063,18 @@ def _index(context, category):
     entities = sorted((e for e in context["graph"]["entities"] if e.get("kind") in kinds),
                       key=lambda e: (not _approved_entity(context, e), e["name"].casefold(), e["id"]))
     approved = sum(_approved_entity(context, e) for e in entities)
+    candidates = sum(e.get("status") == "candidate" for e in entities)
+    review_summary = f'{approved} approved records · {candidates} candidate records'
+    if slug == 'papers':
+        approved_works = sum(e['kind'] != 'paper_version' and _approved_entity(context, e) for e in entities)
+        candidate_works = sum(e['kind'] != 'paper_version' and e.get('status') == 'candidate' for e in entities)
+        review_summary += (f' · Approved: {approved_works} works, {approved - approved_works} source versions'
+                           f' · Candidate: {candidate_works} works, {candidates - candidate_works} source versions')
     return (f'<header class="r-page-head"><p class="r-kicker">Research evidence index</p><h1>{title}</h1>'
-            f'<p class="r-lede">{sp.escape(description)}</p><p class="r-status">{approved} approved records · '
-            f'{sum(e.get("status") == "candidate" for e in entities)} candidate records</p>' + _meta(context) + '</header>'
+            f'<p class="r-lede">{sp.escape(description)}</p><p class="r-status">{review_summary}</p>' + _meta(context) + '</header>'
             '<p class="r-callout">Candidate records help readers inspect the research queue. They are not reviewed findings, '
             'endorsements, or proof of a supplier contribution.</p>'
-            + (_evidence_table(context, entities) if entities else
+            + (_evidence_table(context, entities, group_papers=slug == "papers") if entities else
                '<section class="r-section"><h2>How this index will be built</h2><p>No records have entered this index yet. '
                'A workflow must identify its inputs, work stages, output artifact, qualifications, and version-specific source evidence. '
                'Separate source verification and adversarial review precede approval.</p>'
@@ -1064,7 +1136,7 @@ def _detail(context, entity):
     identifiers = "".join(f'<dt>{sp.escape(key)}</dt><dd>{sp.escape(value)}</dd>' for key, value in sorted(entity.get("identifiers", {}).items()))
     taxonomy = "".join(f'<dt>{sp.escape(key.replace("_", " ").capitalize())}</dt><dd>{sp.escape(", ".join(values))}</dd>'
                        for key, values in sorted(entity.get("taxonomy", {}).items()) if values)
-    title = entity["name"]
+    title = _display_title(entity["name"])
     return (f'<header class="r-page-head"><p class="r-kicker">{sp.escape(_label(entity))}</p><h1 class="r-record-title">{sp.escape(title)}</h1>'
             f'<p class="r-record-id">{sp.escape(entity["id"])}</p>' + _meta(context) + '</header>'
             '<div class="r-detail-layout"><div><section class="r-section"><h2>Evidence & scope</h2>'

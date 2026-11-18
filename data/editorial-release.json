@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0.0",
-  "release_id": "2026-11-08.1",
-  "as_of": "2026-11-08",
-  "publication_as_of": "2026-11-08T22:51:47Z",
+  "release_id": "2026-11-18.1",
+  "as_of": "2026-11-18",
+  "publication_as_of": "2026-11-18T18:18:45Z",
   "canonical_dataset_version": "2.5.0",
   "canonical_sha256": "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061",
-  "work_routes_sha256": "1701249bf7cd163c8dfc5536bd997af5c7024599ff7a72908a90f9375c140f39",
+  "work_routes_sha256": "4119e1a739c936a83b15673650b5b0c308da6a32cf3a37d8dbc12fd9e148d789",
   "counts": {
     "records": 135,
     "work_routes": 78,
@@ -30,7 +30,7 @@
     "terac.work.finance-experts",
     "toloka.work.mindrift-code"
   ],
-  "review_scope": "All 135 stored records classified and given explicit field states. Twelve records received a detailed stored-evidence audit and a public retrieval attempt. Only separately approved key-terms receipts refresh factual review dates.",
+  "review_scope": "All 135 records retain their earlier classification and explicit field states. On 18 November 2026, five scoped source-content field reviews, one retained-record country correction with blocked retrieval, and four retained-quote normalizations were recorded. No new full-terms review or hiring, allocation or payment verification is claimed.",
   "publication_policy": {
     "automated_checks_change_facts": false,
     "automated_check_interval_days": 1,

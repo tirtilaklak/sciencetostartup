@@ -26,6 +26,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from functools import cmp_to_key
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
+from schema_def import TABLES
 
 ROOT = Path(__file__).resolve().parents[1]
 ORIGIN = "https://sciencetostartup.com"
@@ -40,7 +41,7 @@ TITLE_LIMIT = 59
 METRIC_LIMIT = 8
 PRODUCT_LIMIT = 6
 # Bump by hand when page links, layout, copy or structured data change; it feeds sitemap <lastmod>.
-SITE_REVISED = "2026-11-09"
+SITE_REVISED = "2026-11-18"
 COMPANY_ID = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 ISO_DAY = re.compile(r"\b([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])\b")
 ISO_MONTH = re.compile(r"\b([0-9]{4})-(0[1-9]|1[0-2])\b")
@@ -900,7 +901,7 @@ def site_header(current=None, state="page"):
     return ('<a class="skip" href="#main">Skip to content</a>\n'
             f'<header class="site-header"><a class="wordmark" href="{ORIGIN}/"><span>{SITE_NAME}<small>The AI data field guide</small></span></a>'
             f'<nav class="site-nav" aria-label="Main">{links}</nav>'
-            f'<a class="site-search-open" href="{ORIGIN}/explore/?search" aria-label="Search the guide"><svg class="ui-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span class="site-search-label">Search</span></a></header>\n')
+            f'<a class="site-search-open" href="{ORIGIN}/?search" aria-label="Search the guide"><svg class="ui-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span class="site-search-label">Search</span></a></header>\n')
 
 
 def disclosure_html():
@@ -908,11 +909,24 @@ def disclosure_html():
 
 
 def site_footer(research, note=""):
-    """A compact byline and four useful links; full policies live on About."""
-    links = (("About", "/method/#about"), ("Data", "/method/#downloads"),
+    """Keep research release context separate from the historical company snapshot."""
+    links = (("About", "/method/#about"), ("Historical company data", "/method/#downloads"),
+             ("Research data", "/research/data/"),
              ("Corrections", "/method/#corrections"), ("Disclosures", "/method/#disclosures"))
     nav = "".join(f'<a href="{ORIGIN}{path}">{label}</a>' for label, path in links)
-    line = " · ".join(part for part in (f"Research compiled {format_date(research.as_of)}" if research.as_of else "", f"Dataset v{research.data.get('dataset_version')}" if research.data.get("dataset_version") else "") if part)
+    data = research.data
+    version, snapshot = data.get("dataset_version"), data.get("meta", {}).get("as_of")
+    release = getattr(research, "research_release_context", None) or {}
+    parts = []
+    if release.get("release_id"):
+        parts.append("Research release " + str(release["release_id"]))
+    if release.get("evidence_as_of"):
+        parts.append("Evidence as of " + format_date(release["evidence_as_of"]))
+    if version:
+        parts.append("Historical company dataset v" + str(version))
+        if snapshot:
+            parts.append("Snapshot " + format_date(snapshot))
+    line = " · ".join(parts)
     return (f'<footer class="site-footer"><div class="footer-line"><p>{SITE_NAME} <span>by {PUBLISHER_NAME}</span></p>'
             f'<nav aria-label="Site map">{nav}</nav></div>'
             + (f'<p class="site-footer-meta">{escape(line)}</p>' if line else "")
@@ -1277,7 +1291,7 @@ def company_headline_facts(research, company, figures, profile_entry, business_h
         end = supplement.get("period", {}).get("end") or (dated.group() if dated else "")
         if end >= "2025-10-28":
             rendered = business_observation_html(research, business_health, cid, inline=True, compact=True)
-            label = "Annualized pace" if supplement.get("measure") == "annualized_revenue" else "Revenue"
+            label = "Annualized revenue pace" if supplement.get("measure") == "annualized_revenue" else "Revenue"
             cards.append(f'<div class="company-key-fact company-current-fact"><span class="company-fact-label">{label}</span>{rendered}</div>')
     contexts = (profile_entry or {}).get("metric_context") or {}
     headline = next((metric for metric in figures if metric.get("kind") in REVENUE_KINDS and not research.historical_year(metric)), None)
@@ -1425,13 +1439,18 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
             logo = logos.get(cid)
             brand = (f'<span class="directory-logo {"on-dark" if logo.get("background") == "dark" else ""}"><img src="/{escape(logo["local_path"])}" alt="" width="40" height="40" loading="lazy"></span>' if logo else '')
             current_entry = current_by_id.get(cid)
-            search_text = name + " " + summary + (" " + " ".join(row["label"] for row in current_entry["offerings"]) if current_entry else "")
+            aliases = list(c.get("aliases", []))
+            if current_entry:
+                aliases += (current_entry.get("current_identity") or {}).get("aliases", [])
+            products = [value for product in ((profile_by_id or {}).get(cid) or {}).get("products", []) for value in [product.get("name", ""), product.get("description", ""), *product.get("aliases", [])] if isinstance(value, str) and value]
+            search_text = " ".join([name, summary, g, *aliases, *products] + ([row["label"] for row in current_entry["offerings"]] if current_entry else []))
+            matching = ' data-search-name="' + escape(name) + '" data-search-aliases="' + escape(json.dumps(aliases, ensure_ascii=False)) + '"'
             if current_entry:
                 from current_companies import current_company_html
                 content = current_company_html(current_entry, current_reviewed_on, compact=True)
             else:
                 content = f'<p>{escape(summary)}</p>{business_observation_html(research, business_health, cid, inline=True)}{current_facts_html((profile_by_id or {}).get(cid))}'
-            items.append(f'<li class="directory-company" data-company="{escape(cid)}" data-search="{escape(search_text)}"><div class="directory-company-heading">{brand}<a href="{ORIGIN}/company/{escape(cid)}/">{escape(name)}<span aria-hidden="true"> →</span></a></div>{content}</li>')
+            items.append(f'<li class="directory-company" data-company="{escape(cid)}" data-search="{escape(search_text)}"{matching}><div class="directory-company-heading">{brand}<h3><a href="{ORIGIN}/company/{escape(cid)}/">{escape(name)}{RIGHT_ARROW}</a></h3></div>{content}</li>')
         body.append(f'<section class="directory-section" data-group="{group_slug(g)}"><div class="directory-section-heading"><h2 id="{group_slug(g)}">{escape(labels.get(g, g))}</h2><span>{plural(len(groups[g]), "company", "companies")}</span></div><ul class="index-list directory-grid">{"".join(items)}</ul></section>\n')
     missing = [name for name in NOT_YET_PROFILED if not any(name.casefold() in row["name"].casefold().split(" / ") for row in current_entries)]
     remaining = f' Firms not yet listed in this directory include {escape(join_words(missing))}.' if missing else ''
@@ -1488,7 +1507,7 @@ def render_work(research, routes, names, modified):
             '<label>Listing type<select name="kind"><option value="">All records</option><option value="named">Named listings</option><option value="programs">Networks and programs</option><option value="boards">Career pages</option><option value="outside">Other company jobs</option><option value="closed">Past and other records</option></select></label>'
             '<label>Work arrangement<select name="arrangement"><option value="">Any arrangement</option><option value="remote">Remote possible</option><option value="onsite">On-site or hybrid</option><option value="varies">Varies or not stated</option></select></label>'
             '<button type="reset" class="work-page-clear">Clear</button></div></details></form>'
-            f'<p class="work-page-results" data-work-count aria-live="polite" aria-atomic="true">{count} records at {plural(companies, "company", "companies")}. Career pages and past records are grouped below.</p>'
+            f'<p class="work-page-results" data-work-count aria-live="polite" aria-atomic="true">{open_count} listings and networks. {count} records at {plural(companies, "company", "companies")}. Career pages and past records are grouped below.</p>'
             '<div class="work-page-empty" data-work-empty hidden><p>No listings match. Try another word or clear the filters.</p><button type="button" data-work-clear>Clear search and filters</button></div>\n',
             '<div class="work-page-list">']
     for key, label, note in WORK_DISPLAY_BUCKETS:
@@ -1498,13 +1517,17 @@ def render_work(research, routes, names, modified):
             body.append(f'<section class="work-page-group" data-work-group="{key}">{contents}</section>\n')
         else:
             body.append(f'<details class="work-page-group work-page-secondary" data-work-group="{key}"><summary>{label} <span>{len(buckets[key])}</span></summary>{contents}</details>\n')
+    route_company_ids = {route["company_id"] for route in rows}
+    aliases = {cid: list(dict.fromkeys(company["aliases"])) for cid, company in research.companies.items() if cid in route_company_ids and company.get("aliases")}
+    alias_json = json.dumps(aliases, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
+    body.append('<script id="work-search-aliases" type="application/json">' + alias_json + '</script>')
     body.append('</div><p class="work-page-more"><a href="/explore/#work">Compare pay and download results</a></p><script src="/work-page.js" data-page-enhancement-script defer></script>')
     structured = page_node("CollectionPage", title, description, canonical, modified, crumbs)
     return document(research, title, description, canonical, "".join(body), structured, current="work")
 
 
 DOWNLOADS = (("research.json", "JSON", "application/json", "The core research data in one file"), ("observatory.sqlite", "SQLite", "application/vnd.sqlite3", "The same data as one database file"),
-             ("work-routes.json", "JSON", "application/json", "Paid work listings and their sources"), ("source-updates.json", "JSON", "application/json", "Later source corrections and the values they replace"),
+             ("work-routes.json", "JSON", "application/json", "Paid-work records and editorial updates"), ("source-updates.json", "JSON", "application/json", "Later source corrections and the values they replace"),
              ("profile-content.json", "JSON", "application/json", "Profile summaries and the records they cite"), ("editorial.json", "JSON", "application/json", "Business groups and plain-language summaries"),
              ("business-health.json", "JSON", "application/json", "Each business health dashboard observation, with its sources and calculations"))
 GRADES = (("A", "Independent or buyer-side evidence, such as a filing or a customer who confirms the work."), ("B", "The company, an investor or another named first-hand source says it."), ("C", "Reporting by others, an estimate, or indirect evidence."), ("U", "Not confirmed. The fact may be undisclosed or still unresolved."))
@@ -1558,32 +1581,47 @@ def render_method(research, sizes, modified):
                 f'<p>{plural(len(research.companies), "company profile")} · {plural(len(rated), "company", "companies")} with a delivery evidence level · {plural(len(data.get("sources", [])), "source record")}.{unrated_note}</p>\n'
                 f"<p>{plural(doubtful, 'claim is', 'claims are')} unverified or disputed. Each one is labeled. The guide is a selected study of the market. It does not list every company.</p></div></details>\n")
     files = [(name, kind, mime, text) for name, kind, mime, text in DOWNLOADS if name in sizes] + [(name, "CSV", "text/csv", f"The {name[:-4].replace('_', ' ')} table") for name in sorted(n for n in sizes if n.endswith(".csv"))]
+    canonical_names = {"research.json", "observatory.sqlite", "classifications.csv"} | {name + ".csv" for name in TABLES}
+    historical_files = [item for item in files if item[0] in canonical_names]
+    supporting_files = [item for item in files if item[0] not in canonical_names]
     if files:
-        rows = "".join(f'<tr><th scope="row"><a href="{ORIGIN}/{escape(name)}" download>{escape(name)}</a></th><td data-label="Format">{kind}</td><td data-label="Size">{escape(sizes[name])}</td><td data-label="Contents">{escape(text)}</td></tr>' for name, kind, mime, text in files)
+        tables = []
+        for label, selected in (("Historical company dataset", historical_files), ("Current supporting data", supporting_files)):
+            if not selected:
+                continue
+            rows = "".join(f'<tr><th scope="row"><a href="{ORIGIN}/{escape(name)}" download>{escape(name)}</a></th><td data-label="Format">{kind}</td><td data-label="Size">{escape(sizes[name])}</td><td data-label="Contents">{escape(text)}</td></tr>' for name, kind, mime, text in selected)
+            tables.append(f'<h3>{label}</h3><table class="wide"><thead><tr><th scope="col">File</th><th scope="col">Format</th><th scope="col">Size</th><th scope="col">Contents</th></tr></thead><tbody>{rows}</tbody></table>')
         version = data.get("dataset_version", "")
         body.append(f'<details class="method-detail" id="download-files"><summary>Data and license</summary><div class="method-detail-body"><h2 id="downloads">Download the data</h2>\n<p>Dataset version {escape(version)}{escape(compiled.replace(" · research", ", research"))}. The research data files keep every claim that later research replaced.</p>\n'
                     f'<p>{SITE_NAME} licenses this data under the <a class="ext" rel="license" href="{DATA_LICENSE}">CC BY 4.0 license</a> (any use is allowed if you credit us). Cite {SITE_NAME} and the original sources. Company names and logos belong to their owners. The license does not cover them. It also leaves out product images, photos of people, text quoted from sources and personal contact details.</p>\n'
-                    f'<table class="wide"><thead><tr><th scope="col">File</th><th scope="col">Format</th><th scope="col">Size</th><th scope="col">Contents</th></tr></thead><tbody>{rows}</tbody></table></div></details>\n')
+                    + ''.join(tables) + '</div></details>\n')
     body.append('</div></div>\n')
     counts = {key: len(data.get(key, [])) for key in ("companies", "claims", "sources", "metrics", "funding_rounds", "products")}
     counts["current_claims"] = sum(1 for claim in data.get("claims", []) if claim.get("status") != "superseded")
     measured = sorted({KIND_LABELS.get(m.get("kind"), "") for m in data.get("metrics", [])} - {"", KIND_LABELS["other"]})
     # The home page's Dataset node, described in full where its files are listed. Publisher and creator link to the one Person by @id.
     dataset = {"@context": "https://schema.org", "@type": "Dataset", "@id": DATASET_ID, "name": DATASET_NAME, "alternateName": clean((data.get("meta") or {}).get("title")) or SITE_NAME,
-               "description": f"Public-source research on {counts['companies']} AI data companies: {counts['current_claims']:,} current claims ({counts['claims']:,} including earlier versions) from {counts['sources']:,} sources, with {counts['metrics']} figures, {counts['funding_rounds']} funding rounds and {counts['products']} products. Each claim keeps its business scope and confidence grade, and each figure links to its sources.",
+               "description": f"Historical public-source research on {counts['companies']} AI data companies: {counts['current_claims']:,} non-superseded claims ({counts['claims']:,} including earlier versions) from {counts['sources']:,} sources, with {counts['metrics']} figures, {counts['funding_rounds']} funding rounds and {counts['products']} products. Each claim keeps its business scope and confidence grade, and each figure links to its sources.",
                "url": canonical, "version": data.get("dataset_version", ""), "dateModified": research.as_of, "isAccessibleForFree": True, "license": DATA_LICENSE,
                "creator": {"@id": PUBLISHER["@id"]}, "publisher": {"@id": PUBLISHER["@id"]},
                "measurementTechnique": "Public-source research. Each claim is graded A, B, C or U by the strength of its sources.", "variableMeasured": measured,
-               "distribution": [{"@type": "DataDownload", "name": name, "contentUrl": f"{ORIGIN}/{name}", "encodingFormat": mime} for name, kind, mime, text in files]}
+               "distribution": [{"@type": "DataDownload", "name": name, "contentUrl": f"{ORIGIN}/{name}", "encodingFormat": mime} for name, kind, mime, text in historical_files]}
     structured = [page_node("AboutPage", title, description, canonical, modified, crumbs, about={"@id": WEBSITE["@id"]}), dataset]
     return document(research, title, description, canonical, "".join(body), structured, current="method")
 
 
-def render_not_found(research):
-    count = len(research.companies)
-    pages = (("Overview", "/", "what the guide covers"), ("Companies", "/companies/", f"profiles of all {plural(count, 'company', 'companies')}" if count else "company profiles"), ("Paid work", "/work/", "public listings with pay and location"), ("Method", "/method/", "how we check figures and how to request a correction"), ("About the publisher", "/method/#about", "who publishes the guide and how to get in touch"), ("Search", "/?search", "find a company, product or listing"))
+def render_not_found(research, directory_count=None):
+    count = len(research.companies) if directory_count is None else directory_count
+    pages = (("Research", "/research/", "the current report, evidence and open data"), ("Papers", "/research/papers/", "current paper records and their source versions"), ("Companies", "/companies/", f"profiles of all {plural(count, 'company', 'companies')}" if count else "company profiles"), ("Paid work", "/work/", "public listings with pay and location"), ("Search", "/?search", "search the current guide"), ("Method", "/method/", "how we check figures and how to request a correction"), ("About the publisher", "/method/#about", "who publishes the guide and how to get in touch"), ("Overview", "/", "what the guide covers"))
     items = "".join(f'<li><a href="{ORIGIN}{path}">{label}</a>: {text}</li>' for label, path, text in pages)
-    body = f'<p class="eyebrow">Page not found</p>\n<h1>We could not find that page.</h1>\n<p class="lede">The link may be old or mistyped. Start again from one of these pages:</p>\n<ul>{items}</ul>\n'
+    body = (f'<p class="eyebrow">Page not found</p>\n<h1>We could not find that page.</h1>\n'
+            '<p class="lede">The link may be old or mistyped. Choose a current section or search the guide:</p>\n'
+            f'<ul>{items}</ul>\n'
+            '<details class="not-found-retirement"><summary>Looking for the former platform?</summary>'
+            '<p>The earlier paper-commercialization platform and its tools are retired. Its API and MCP endpoint are unavailable.</p>'
+            '<p>ScienceToStartup now publishes research on AI data companies and paid AI training work. '
+            'Current paper records show evidence and review status; they do not restore the former platform’s scores or reports.</p>'
+            '</details>\n')
     return document(research, f"Page not found{SUFFIX}", "The page you asked for does not exist on ScienceToStartup.", "", body, robots="noindex")
 
 # ---------------------------------------------------------------------------
@@ -1651,7 +1689,7 @@ def write_static_pages(data, destination, work_data=None, profile_content=None, 
         (destination / name).mkdir(parents=True, exist_ok=True)
         (destination / name / "index.html").write_text(page, encoding="utf-8")
         written.append(destination / name / "index.html")
-    (destination / "404.html").write_text(render_not_found(research), encoding="utf-8")
+    (destination / "404.html").write_text(render_not_found(research, len(companies) + len((current_companies or {}).get("entries", []))), encoding="utf-8")
     written.append(destination / "404.html")
     entries += [(f"{ORIGIN}/companies/", index_modified)] + company_entries + [(f"{ORIGIN}/work/", work_modified), (f"{ORIGIN}/method/", method_modified)]
     (destination / "sitemap.xml").write_text(render_sitemap(entries), encoding="utf-8")

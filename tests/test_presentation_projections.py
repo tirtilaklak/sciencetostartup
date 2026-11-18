@@ -291,6 +291,14 @@ context.INITIALIZE_RUNTIME=()=>{
         self.assertEqual(set(search["profileProducts"]), set(self.summaries))
         self.assertEqual(search["profileProducts"], self.full_js["profileProducts"])
 
+    def test_home_search_preserves_recorded_company_aliases_as_optional_metadata(self):
+        home = json.loads((self.destination / self.summary["homeSearch"]["href"].lstrip('/')).read_text())
+        by_id = {row["id"]: row for row in home["entries"]}
+        for company in self.data["companies"]:
+            self.assertEqual(by_id[company["id"]]["aliases"], company.get("aliases", []))
+            self.assertEqual(by_id[company["id"]]["href"], "/company/" + company["id"] + "/")
+        self.assertTrue(any("Outlier" in alias for alias in by_id["scale_ai"]["aliases"]))
+
     def test_research_pages_only_ship_in_the_deferred_search_context(self):
         entries = [{"url": "/research/fixture/", "title": "Human feedback research", "summary": "Sourced research", "keywords": ["evidence", "feedback"], "kind": "Report"}]
         sidecars = {**self.sidecars, "RESEARCH_SEARCH": entries}

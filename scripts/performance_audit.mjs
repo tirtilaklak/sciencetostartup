@@ -41,8 +41,34 @@ export function summarizeRoutes(results, policy, requestedRuns) {
     return {route, complete, validRuns: runs.filter(run => run.valid).length, requestedRuns,
       medians, checks, passed: complete && checks.every(check => check.passed),
       runReports: runs.map(run => ({run: run.run, report: run.report, reportSha256: run.reportSha256,
-        metrics: run.metrics ?? null, error: run.error ?? null}))};
+        metrics: run.metrics ?? null, error: run.error ?? null, diagnostics: run.diagnostics ?? null}))};
   });
+}
+
+export function diagnosticReasons(record, policy) {
+  const reasons = record.valid ? [] : ['invalid-run'];
+  for (const id of METRICS) {
+    const value = record.metrics?.[id];
+    if (Number.isFinite(value) && value > policy.medianLimits[id].maximum) reasons.push(id + ':over-budget');
+  }
+  return reasons;
+}
+
+export async function saveDiagnostics(directory, prefix, artifacts, reasons) {
+  const diagnostics = {required: reasons.length > 0, reasons, files: [], missing: [], errors: []};
+  if (!diagnostics.required) return diagnostics;
+  for (const [artifact, suffix] of [['Trace', '.trace.json'], ['DevtoolsLog', '.devtoolslog.json']]) {
+    // Lighthouse retains page-load failures under these Error-suffixed keys.
+    const sourceArtifact = artifacts?.[artifact] != null ? artifact : artifact + 'Error';
+    if (artifacts?.[sourceArtifact] == null) {diagnostics.missing.push(artifact); continue;}
+    const filename = prefix + suffix;
+    try {
+      const raw = JSON.stringify(artifacts[sourceArtifact], null, 2) + '\n';
+      await writeFile(path.join(directory, filename), raw);
+      diagnostics.files.push({artifact, sourceArtifact, file: filename, bytes: Buffer.byteLength(raw), sha256: sha256(raw)});
+    } catch (error) {diagnostics.errors.push({artifact, sourceArtifact, error: error.message});}
+  }
+  return diagnostics;
 }
 
 function artifactName(url, base) {
@@ -184,6 +210,7 @@ export async function main(args = process.argv.slice(2)) {
         const prefix = 'route-' + String(routeIndex + 1).padStart(2, '0') + '-run-' + run;
         let chrome;
         let record;
+        let runArtifacts;
         const runProblems = [];
         const runStartedAt = new Date().toISOString();
         try {
@@ -194,6 +221,7 @@ export async function main(args = process.argv.slice(2)) {
           if (browserVersion !== browserInfo.Browser) runProblems.push('Browser version changed during the run');
           const runner = await lighthouse(url, {port: chrome.port, output: 'json', logLevel: 'error'},
             {extends: 'lighthouse:default', settings: structuredClone(settings)});
+          runArtifacts = runner?.artifacts;
           if (!runner?.lhr) throw new Error('Lighthouse returned no result');
           const lhr = runner.lhr;
           const raw = JSON.stringify(lhr, null, 2) + '\n';
@@ -239,6 +267,12 @@ export async function main(args = process.argv.slice(2)) {
               if (record) {record.valid = false; record.problems = [...(record.problems || []), 'Could not close audit browser'];}
             }
           }
+        }
+        // Retain diagnostic artifacts after measurement, including an outlier
+        // whose route median later passes. Missing traces are reported as such.
+        record.diagnostics = await saveDiagnostics(directory, prefix, runArtifacts, diagnosticReasons(record, performance));
+        if (record.diagnostics.errors.length || (record.valid && record.diagnostics.missing.length)) {
+          consistencyProblems.push('Could not retain required diagnostics: ' + route + ' run ' + run);
         }
         results.push(record);
         await writeFile(path.join(directory, prefix + '.metadata.json'), JSON.stringify(record, null, 2) + '\n');

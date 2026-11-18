@@ -55,7 +55,7 @@ test('homepage Search loads only its small component and index when invoked', as
   const accessibility = await new AxeBuilder({ page }).analyze();
   expect(accessibility.violations.filter(row => ['serious', 'critical'].includes(row.impact))).toEqual([]);
   const action = page.locator('#home-search-results a').filter({ hasText: 'Find paid work matching' });
-  await expect(action).toHaveAttribute('href', '/explore/#work?q=C%2B%2B');
+  await expect(action).toHaveAttribute('href', '/work/?q=C%2B%2B');
   await page.locator('#home-search-close').click();
   await expect(page.locator('#home-search-open')).toBeFocused();
 });
