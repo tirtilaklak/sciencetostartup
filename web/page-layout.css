@@ -19,5 +19,5 @@
 .static-page .site-footer nav{max-width:none}
 .static-page .site-footer-meta{overflow-wrap:anywhere}
 @media(max-width:700px){.static-page main{padding-top:16px}.static-page .site-header{min-height:0}.static-page .crumbs ol{margin-bottom:20px}.static-page .site-footer{margin-top:32px}}
-@media(max-width:700px){.static-page .site-header .site-nav{display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:stretch;gap:0 16px;height:auto;min-height:48px}.static-page .site-header .site-nav a{min-width:0;min-height:44px;white-space:nowrap;font-size:.875rem}}
+@media(max-width:700px){.static-page .site-header .site-nav{display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:stretch;gap:0 8px;height:auto;min-height:48px}.static-page .site-header .site-nav a{min-width:0;min-height:44px;white-space:nowrap;font-size:.875rem}}
 @media(prefers-reduced-motion:reduce){.static-page *{scroll-behavior:auto!important;transition:none!important}}

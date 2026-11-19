@@ -335,4 +335,4 @@ h1,h2,h3,h4{font-family:var(--fg-sans);color:var(--ink)}
 @media(max-width:700px){.site-footer .footer-line{display:block}.site-footer .footer-line nav{gap:0 16px}}
 
 /* Main destinations wrap at a readable size on small screens. */
-@media(max-width:700px){.site-header nav[aria-label=Main],.static-page .site-header .site-nav,.topbar nav[aria-label=Main]{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:0 16px;height:auto;min-height:48px;overflow:visible}.site-header nav[aria-label=Main] a,.static-page .site-header .site-nav a,.topbar nav[aria-label=Main] a{font-size:.875rem;min-height:44px;white-space:nowrap}}
+@media(max-width:700px){.site-header nav[aria-label=Main],.static-page .site-header .site-nav,.topbar nav[aria-label=Main]{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:0 8px;height:auto;min-height:48px;overflow:visible}.site-header nav[aria-label=Main] a,.static-page .site-header .site-nav a,.topbar nav[aria-label=Main] a{font-size:.875rem;min-height:44px;white-space:nowrap}}
