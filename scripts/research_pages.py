@@ -901,19 +901,34 @@ def _legacy_ledger_aliases(assertions, stubs, sources):
 def _data(context):
     graph, gate, report = context["graph"], context["gate"], context["report"]
     assertions, stubs, sources = _ledger_records(context)
-    rows = [("Privacy-filtered research JSON", "/publication/clean-dataset.json"), ("CSV", "/publication/clean-dataset.csv"),
-            ("SQLite", "/publication/clean-dataset.sqlite"), ("Full evidence graph JSON · explicit statuses", "/research/exports/research-graph.json"),
-            ("Evidence graph SQLite", "/research/exports/research-graph.sqlite"), ("Export checksums", "/research/exports/research-exports-manifest.json")]
+
+    def file_group(key, title, description, rows):
+        links = ''.join('<li>' + _link(url, label) + '</li>' for label, url in rows)
+        return (f'<section class="r-data-file-group" aria-labelledby="{key}"><h3 id="{key}">{title}</h3>'
+                f'<p>{description}</p><ul class="r-downloads">{links}</ul></section>')
+
+    reading = []
+    reuse = []
     if 'publication/report.pdf' in context.get('publication_assets', []):
-        rows.insert(0, ('Read the report PDF', '/publication/report.pdf'))
+        reading.append(('Report PDF', '/publication/report.pdf'))
     if 'publication/executive-brief.html' in context.get('publication_assets', []):
-        rows.insert(0, ('Read the executive brief', '/publication/executive-brief.html'))
+        reading.insert(0, ('Executive brief', '/publication/executive-brief.html'))
     if 'publication/current-REUSE.md' in context.get('publication_assets', []):
-        rows.append(('Working JSON and SQLite examples', '/publication/current-REUSE.md'))
-        rows.append(('Original archived reuse guide', '/publication/REUSE.md'))
+        reuse.append(('JSON & SQLite examples', '/publication/current-REUSE.md'))
+        reuse.append(('Original archived reuse guide', '/publication/REUSE.md'))
     elif 'publication/REUSE.md' in context.get('publication_assets', []):
-        rows.append(('Working JSON and SQLite examples', '/publication/REUSE.md'))
-    links = "".join('<li>' + _link(url, label) + '</li>' for label, url in rows)
+        reuse.append(('JSON & SQLite examples', '/publication/REUSE.md'))
+    files = file_group('research-files', 'Research data',
+                       'Privacy-filtered tables for analysis, with research status and historical qualifications.',
+                       [('JSON', '/publication/clean-dataset.json'), ('CSV', '/publication/clean-dataset.csv'),
+                        ('SQLite', '/publication/clean-dataset.sqlite')])
+    files += file_group('graph-files', 'Evidence graph',
+                        'Entities, assertions, source bindings and explicit review statuses.',
+                        [('Graph JSON', '/research/exports/research-graph.json'),
+                         ('Graph SQLite', '/research/exports/research-graph.sqlite'),
+                         ('Export checksums', '/research/exports/research-exports-manifest.json')])
+    if reading:
+        files += file_group('reading-files', 'Read offline', 'Available report formats for offline reading.', reading)
     citation_prefix = 'current-' if gate.get('ready') and report.get('archive', {}).get('status') == 'published' else ''
     cite = "".join('<li>' + _link('/publication/' + citation_prefix + name, label) + '</li>' for name, label in
                    (("citation.bib", "BibTeX"), ("citation.ris", "RIS"), ("citation.csl.json", "CSL JSON"), ("CITATION.cff", "CITATION.cff")))
@@ -921,20 +936,21 @@ def _data(context):
     entity_rows = "".join(f'<li id="{sp.escape(_anchor("entity", e["id"]))}">{_link(entity_url(e, context), e["name"])} '
                           f'<span class="r-meta">{sp.escape(_label(e))} · {sp.escape(e["id"])}</span></li>'
                           for e in sorted(other, key=lambda e: (e["name"].casefold(), e["id"])))
-    return (f'<header class="r-page-head"><p class="r-kicker">{_status(context)}</p><h1>Open data.<br>Visible evidence.</h1>'
-            '<p class="r-lede">Inspect what is supported, what is inherited, and what still needs review. '
-            'Research counts come from the versioned evidence graph; earlier public identifiers are labeled separately.</p>' + _meta(context) + '</header>'
+    return (f'<div class="r-data-page"><header class="r-page-head"><p class="r-kicker">{_status(context)}</p><h1>Research data</h1>'
+            '<p class="r-lede">Download the research, trace a finding to its sources, or reuse a versioned copy.</p>'
+            '<dl class="r-data-meta"><div><dt>Report edition</dt><dd>' + sp.escape(report['release_id']) + '</dd></div>'
+            '<div><dt>Evidence graph release</dt><dd>' + sp.escape(graph['release_id']) + '</dd></div>'
+            '<div><dt>Evidence snapshot</dt><dd>' + _date(graph.get('as_of')) + '</dd></div>'
+            '<div><dt>Owned research license</dt><dd>' + _link(sp.DATA_LICENSE, 'CC BY 4.0') + '</dd></div></dl>'
+            '<nav class="r-data-nav" aria-label="Research data sections">'
+            + _link('#downloads', 'Download files') + _link('#citation', 'Cite & reuse')
+            + _link('#assertions', 'Evidence records') + _link('#coverage', 'Publication checks') + '</nav></header>'
             + operating_status_notice(context) +
-            '<section class="r-section" aria-labelledby="coverage"><h2 id="coverage">Progress toward publication</h2>'
-            + _progress(context) + f'<p>{sp.escape(_counts(context))}.</p>'
-            '<p>The frozen eligible core and two separate 200-record quality audits must also pass. The reference audit requires '
-            '98% precision and 95% recall, with no critical false attribution. The screening audit must recover at least 190 records '
-            'and reach 90% recall in each major stratum.</p>' + _holds(context) + '</section>'
             '<section class="r-section" aria-labelledby="downloads"><h2 id="downloads">Download the research</h2>'
-            '<p>The privacy-filtered projection retains explicit research status and historical qualifications. '
-            'Historical records are not fresh verification. Source retrieval is not claim approval. The original canonical dataset stays at version '
-            f'{sp.escape(graph.get("canonical_dataset_version"))}, with its existing identity and downloads.</p>'
-            f'<ul class="r-downloads">{links}</ul><p class="r-meta">Research release: {sp.escape(graph["release_id"])}.</p></section>'
+            '<div class="r-data-files">' + files + '</div>'
+            '<p class="r-data-note">Historical records keep their original dates and inherited provenance; they are not fresh verification. '
+            'Source retrieval is not claim approval. The original canonical dataset stays at version '
+            f'{sp.escape(graph.get("canonical_dataset_version"))}, with its existing identity and downloads.</p></section>'
             '<section class="r-section" id="citation"><h2>Cite and reproduce</h2>'
             f'<p>{sp.escape(context["identity"].get("publisher", {}).get("name", sp.PUBLISHER_NAME))}. <cite>{sp.escape(report["title"])}</cite>. '
             f'{sp.escape(report["release_id"])}. {_date(report["updated_on"])}.</p>'
@@ -942,9 +958,15 @@ def _data(context):
             + f'<ul class="r-downloads">{cite}</ul><p>Reuse owned research under '
             + _link(sp.DATA_LICENSE, "CC BY 4.0") + '. Credit the publisher, release ID, original sources, and your changes. '
             'Source material retains its own rights and qualifications.</p>'
-            f'<ul class="r-downloads"><li>{_link("/publication/research-archive.zip", "Download the reproduction package")}</li>'
+            + ('<ul class="r-downloads">' + ''.join('<li>' + _link(url, label) + '</li>' for label, url in reuse) + '</ul>' if reuse else '')
+            + f'<ul class="r-downloads"><li>{_link("/publication/research-archive.zip", "Download the reproduction package")}</li>'
             f'<li>{_link("/publication/MANIFEST.json", "Package SHA-256 inventory")}</li>'
             f'<li>{_link("/publication/package-status.json", "Archive & mirror status")}</li></ul></section>'
+            '<section class="r-section" aria-labelledby="coverage"><h2 id="coverage">Progress toward publication</h2>'
+            + _progress(context) + f'<p>{sp.escape(_counts(context))}.</p>'
+            '<p>The frozen eligible core and two separate 200-record quality audits must also pass. The reference audit requires '
+            '98% precision and 95% recall, with no critical false attribution. The screening audit must recover at least 190 records '
+            'and reach 90% recall in each major stratum.</p>' + _holds(context) + '</section>'
             '<section class="r-section" aria-labelledby="assertions"><h2 id="assertions">Assertion records</h2>'
             '<p id="approved">Approved assertions retain their exact source bindings and review receipts.</p>'
             + ('' if any(row.get('status') == 'approved' for row in assertions.values()) else
@@ -961,7 +983,7 @@ def _data(context):
             + _ledger_parts('source', sources)
             + '</section><section class="r-section" aria-labelledby="organizations"><h2 id="organizations">Organizations & other entities</h2>'
             + f'<ul class="r-entity-register">{entity_rows}</ul></section>'
-            + _legacy_ledger_aliases(assertions, stubs, sources))
+            + _legacy_ledger_aliases(assertions, stubs, sources) + '</div>')
 
 
 def _entity_card(context, entity):
