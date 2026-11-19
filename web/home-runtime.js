@@ -10,7 +10,10 @@
     if (template) { if (slot.dataset.routeId !== candidate.routeId) { slot.replaceChildren(template.content.cloneNode(true)); slot.dataset.routeId = candidate.routeId; } }
     else if (slot.dataset.routeId) { slot.innerHTML = evergreen; delete slot.dataset.routeId; }
   };
-  refresh(); setInterval(refresh, 60000); document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+  if (slot && config.candidates?.length) {
+    refresh(); setInterval(refresh, 60000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+  }
   const opener = document.getElementById('home-search-open'), dialog = document.getElementById('home-search'), input = document.getElementById('home-search-input'), message = document.getElementById('home-search-message'), results = document.getElementById('home-search-results');
   if (!opener || !dialog || !input || !message || !results) return;
   let attempt = null, generation = 0;

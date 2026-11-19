@@ -41,7 +41,7 @@ TITLE_LIMIT = 59
 METRIC_LIMIT = 8
 PRODUCT_LIMIT = 6
 # Bump by hand when page links, layout, copy or structured data change; it feeds sitemap <lastmod>.
-SITE_REVISED = "2026-11-18"
+SITE_REVISED = "2026-11-19"
 COMPANY_ID = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 ISO_DAY = re.compile(r"\b([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])\b")
 ISO_MONTH = re.compile(r"\b([0-9]{4})-(0[1-9]|1[0-2])\b")
@@ -1327,6 +1327,12 @@ def current_facts_html(profile_entry):
     return f'<details class="company-current-facts"><summary>Updates checked {escape(format_date(facts["reviewed_on"]))}</summary><dl class="current-fact-list">{"".join(rows)}</dl></details>'
 
 
+def company_section_links(items):
+    """Native shortcuts keep the source-backed sections within reach."""
+    return '<nav class="company-section-links" aria-label="On this company page">' + "".join(
+        f'<a href="#{escape(anchor)}">{escape(label)}</a>' for anchor, label in items) + '</nav>'
+
+
 def render_company(research, company, editorial_entry, profile_entry, routes, peers, labels, modified, events=None, business_health=None):
     cid, name = company["id"], clean(company["name"])
     company = dict(company, name=name)
@@ -1352,17 +1358,21 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     brand = (f'<span class="company-logo{(" company-logo-dark" if logo.get("background") == "dark" else "")}"><img src="/{escape(logo["local_path"])}" width="112" height="48" alt=""></span>' if logo
              else f'<span class="company-logo company-monogram" aria-hidden="true">{escape("".join(word[0] for word in name.split()[:2]))}</span>')
     website = external_link(company["website"], "Website") if is_web_url(company.get("website")) else ""
+    dated, risk_rows = company_events(events, cid), risk_claims(research, cid)
+    sections = [("company-overview", "Company"), ("financial-record", "Financials")]
+    if dated or risk_rows: sections.append(("company-risks", "Risks & events"))
+    sections += [("company-work", "Paid work"), ("company-sources", "Sources & data")]
     body = ['<link rel="stylesheet" href="/company-profile.css">\n', crumb_nav(crumbs), '<article class="company-dossier">',
             f'<header class="company-hero"><div class="company-name">{brand}<h1>{escape(name)}</h1></div>'
             f'<p class="lede">{escape(lead)}</p><p class="company-actions">{website}{work_link}</p></header>',
+            f'<p class="company-evidence-context"><span>Historical snapshot · {escape(format_date(research.as_of))}</span><span>Later updates keep their own dates.</span></p>',
             company_headline_facts(research, company, figures, profile_entry, business_health), current_facts_html(profile_entry)]
-    dated, risk_rows = company_events(events, cid), risk_claims(research, cid)
     critical = next((event for event in dated if event.get("kind") in ("lawsuit", "data_incident")), None)
     if critical:
         checked = critical.get("status_checked_on")
         status_date = f' · status checked {format_date(checked)}' if ISO_DAY.fullmatch(str(checked or "")) else ""
         body.append(f'<div class="company-notice" role="note"><a href="#risks">{escape(clean(critical.get("title")))}</a><span>{escape(month_text(critical.get("date")))} · {escape(clean(critical.get("status")) + status_date)}</span></div>')
-    body.append('<div class="company-record">')
+    body.append(company_section_links(sections) + '<div class="company-record">')
     facts = []
     if group: facts.append(("Business group", f'<a href="{ORIGIN}/companies/#{group_slug(group)}">{escape(group_name)}</a>'))
     if company.get("founded_year"): facts.append(("Founded", escape(company["founded_year"])))
@@ -1370,7 +1380,7 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     tags = [clean(t) for t in entry.get("capability_tags") or [] if clean(t)]
     if tags: facts.append(("Also works on", escape(", ".join(tags))))
     products = research.products(cid, (profile_entry or {}).get("products"))[:PRODUCT_LIMIT]
-    body.append(f'<details class="company-fold"><summary><span>Products &amp; company</span><small>{plural(len(products), "offering") if products else "Company details"}</small></summary><div class="company-fold-body">')
+    body.append(f'<details class="company-fold" id="company-overview"><summary><span>Products &amp; company</span><small>{plural(len(products), "offering") if products else "Company details"}</small></summary><div class="company-fold-body">')
     if facts: body.append(f'<h2 id="facts">About {escape(name)}</h2>\n<dl class="facts">' + "".join(f"<dt>{label}</dt><dd>{value}</dd>" for label, value in facts) + "</dl>\n")
     remaining_summary = " ".join(sentences(summary)[1:])
     if remaining_summary: body.append(f'<p>{escape(remaining_summary)}</p>')
@@ -1386,11 +1396,11 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
                 + business_observation_html(research, business_health, cid)
                 + figures_html(research, company, figures, pending, others, profile_entry) + '</div></details>')
     if dated or risk_rows:
-        body.append(f'<details class="company-fold"><summary><span>Risks &amp; events</span><small>{plural(len(dated), "event")} · {plural(len(risk_rows), "risk note")}</small></summary><div class="company-fold-body">' + risks_html(research, cid, events) + '</div></details>')
-    body.append(f'<details class="company-fold"><summary><span>Paid work</span><small>{plural(len(paid_open), "listing or network", "listings and networks") if paid_open else "No confirmed listing"}</small></summary><div class="company-fold-body">' + company_work_html(research, company, routes) + '</div></details>')
+        body.append(f'<details class="company-fold" id="company-risks"><summary><span>Risks &amp; events</span><small>{plural(len(dated), "event")} · {plural(len(risk_rows), "risk note")}</small></summary><div class="company-fold-body">' + risks_html(research, cid, events) + '</div></details>')
+    body.append(f'<details class="company-fold" id="company-work"><summary><span>Paid work</span><small>{plural(len(paid_open), "listing or network", "listings and networks") if paid_open else "No confirmed listing"}</small></summary><div class="company-fold-body">' + company_work_html(research, company, routes) + '</div></details>')
     source_count = sum(source.get("company_id") == cid for source in research.data.get("sources", []))
     claim_count = sum(claim.get("company_id") == cid for claim in research.data.get("claims", []))
-    body.append(f'<details class="company-fold"><summary><span>Sources &amp; data</span><small>{plural(source_count, "source")}</small></summary><div class="company-fold-body"><h2 id="full-profile">Sources and data</h2>'
+    body.append(f'<details class="company-fold" id="company-sources"><summary><span>Sources &amp; data</span><small>{plural(source_count, "source")}</small></summary><div class="company-fold-body"><h2 id="full-profile">Sources and data</h2>'
                 f'<p>{plural(claim_count, "claim")} · {plural(source_count, "source")} · Research compiled {escape(format_date(research.as_of))}</p>'
                 f'<ul class="company-source-links"><li><a href="{app_url}/sources">Source ledger</a></li><li><a href="{app_url}/people">Funding and people</a></li><li><a href="{ORIGIN}/research.json" download>Research JSON</a></li><li><a href="{ORIGIN}/observatory.sqlite" download>SQLite database</a></li></ul>'
                 f'<p class="company-record-links"><a href="{app_url}">Interactive record</a><a href="{app_url}/traction">Figures</a><a href="{app_url}/work">Paid work</a><a href="{ORIGIN}/method/#grades">Source grades</a></p>')
@@ -1510,13 +1520,15 @@ def render_work(research, routes, names, modified):
             '<header class="work-page-heading"><h1>Find work in AI training.</h1>\n',
             '<p class="lede">Roles and projects, with published pay and sources.</p>\n',
             f'<p class="work-page-counts">{plural(named_count, "named listing")} <span>·</span> {plural(program_count, "network or program", "networks and programs")} <span>·</span> {plural(open_companies, "company", "companies")}</p></header>\n',
+            '<p class="work-page-context">Recorded pay is not guaranteed earnings. Check each record’s review date.</p>\n',
             '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Pay and availability may have changed. Check the company’s page before applying.' + (f' Links checked up to {escape(format_date(checked))}.' if checked else '') + '</p>\n' + safety_note() + '</details>\n',
             '<form class="work-page-filters" data-work-filters hidden role="search" aria-label="Find paid work">'
             '<label class="work-page-search">Search listings<input name="q" type="search" placeholder="Role, skill or company" maxlength="256" autocomplete="off"></label>'
-            '<details class="work-page-filter-options"><summary>Filters</summary><div class="work-page-filter-fields">'
+            '<div class="work-page-filter-options"><div class="work-page-filter-fields">'
             '<label>Listing type<select name="kind"><option value="">All records</option><option value="named">Named listings</option><option value="programs">Networks and programs</option><option value="boards">Career pages</option><option value="outside">Other company jobs</option><option value="closed">Past and other records</option></select></label>'
-            '<label>Work arrangement<select name="arrangement"><option value="">Any arrangement</option><option value="remote">Remote possible</option><option value="onsite">On-site or hybrid</option><option value="varies">Varies or not stated</option></select></label>'
-            '<button type="reset" class="work-page-clear">Clear</button></div></details></form>'
+            '<label>Work arrangement<select name="arrangement" aria-describedby="work-arrangement-note"><option value="">Any arrangement</option><option value="remote">Remote possible</option><option value="onsite">On-site or hybrid</option><option value="varies">Varies or not stated</option></select></label>'
+            '<button type="reset" class="work-page-clear">Clear</button></div></div>'
+            '<p class="work-page-filter-note" id="work-arrangement-note">Remote work may be limited to certain countries. Check the location and requirements.</p></form>'
             f'<p class="work-page-results" data-work-count aria-live="polite" aria-atomic="true">{open_count} listings and networks. {count} records at {plural(companies, "company", "companies")}. Career pages and past records are grouped below.</p>'
             '<div class="work-page-empty" data-work-empty hidden><p>No listings match. Try another word or clear the filters.</p><button type="button" data-work-clear>Clear search and filters</button></div>\n',
             '<div class="work-page-list">']

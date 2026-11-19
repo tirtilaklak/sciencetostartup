@@ -901,19 +901,34 @@ def _legacy_ledger_aliases(assertions, stubs, sources):
 def _data(context):
     graph, gate, report = context["graph"], context["gate"], context["report"]
     assertions, stubs, sources = _ledger_records(context)
-    rows = [("Privacy-filtered research JSON", "/publication/clean-dataset.json"), ("CSV", "/publication/clean-dataset.csv"),
-            ("SQLite", "/publication/clean-dataset.sqlite"), ("Full evidence graph JSON · explicit statuses", "/research/exports/research-graph.json"),
-            ("Evidence graph SQLite", "/research/exports/research-graph.sqlite"), ("Export checksums", "/research/exports/research-exports-manifest.json")]
+
+    def file_group(key, title, description, rows):
+        links = ''.join('<li>' + _link(url, label) + '</li>' for label, url in rows)
+        return (f'<section class="r-data-file-group" aria-labelledby="{key}"><h3 id="{key}">{title}</h3>'
+                f'<p>{description}</p><ul class="r-downloads">{links}</ul></section>')
+
+    reading = []
+    reuse = []
     if 'publication/report.pdf' in context.get('publication_assets', []):
-        rows.insert(0, ('Read the report PDF', '/publication/report.pdf'))
+        reading.append(('Report PDF', '/publication/report.pdf'))
     if 'publication/executive-brief.html' in context.get('publication_assets', []):
-        rows.insert(0, ('Read the executive brief', '/publication/executive-brief.html'))
+        reading.insert(0, ('Executive brief', '/publication/executive-brief.html'))
     if 'publication/current-REUSE.md' in context.get('publication_assets', []):
-        rows.append(('Working JSON and SQLite examples', '/publication/current-REUSE.md'))
-        rows.append(('Original archived reuse guide', '/publication/REUSE.md'))
+        reuse.append(('JSON & SQLite examples', '/publication/current-REUSE.md'))
+        reuse.append(('Original archived reuse guide', '/publication/REUSE.md'))
     elif 'publication/REUSE.md' in context.get('publication_assets', []):
-        rows.append(('Working JSON and SQLite examples', '/publication/REUSE.md'))
-    links = "".join('<li>' + _link(url, label) + '</li>' for label, url in rows)
+        reuse.append(('JSON & SQLite examples', '/publication/REUSE.md'))
+    files = file_group('research-files', 'Research data',
+                       'Privacy-filtered tables for analysis, with research status and historical qualifications.',
+                       [('JSON', '/publication/clean-dataset.json'), ('CSV', '/publication/clean-dataset.csv'),
+                        ('SQLite', '/publication/clean-dataset.sqlite')])
+    files += file_group('graph-files', 'Evidence graph',
+                        'Entities, assertions, source bindings and explicit review statuses.',
+                        [('Graph JSON', '/research/exports/research-graph.json'),
+                         ('Graph SQLite', '/research/exports/research-graph.sqlite'),
+                         ('Export checksums', '/research/exports/research-exports-manifest.json')])
+    if reading:
+        files += file_group('reading-files', 'Read offline', 'Available report formats for offline reading.', reading)
     citation_prefix = 'current-' if gate.get('ready') and report.get('archive', {}).get('status') == 'published' else ''
     cite = "".join('<li>' + _link('/publication/' + citation_prefix + name, label) + '</li>' for name, label in
                    (("citation.bib", "BibTeX"), ("citation.ris", "RIS"), ("citation.csl.json", "CSL JSON"), ("CITATION.cff", "CITATION.cff")))
@@ -921,20 +936,21 @@ def _data(context):
     entity_rows = "".join(f'<li id="{sp.escape(_anchor("entity", e["id"]))}">{_link(entity_url(e, context), e["name"])} '
                           f'<span class="r-meta">{sp.escape(_label(e))} · {sp.escape(e["id"])}</span></li>'
                           for e in sorted(other, key=lambda e: (e["name"].casefold(), e["id"])))
-    return (f'<header class="r-page-head"><p class="r-kicker">{_status(context)}</p><h1>Open data.<br>Visible evidence.</h1>'
-            '<p class="r-lede">Inspect what is supported, what is inherited, and what still needs review. '
-            'Research counts come from the versioned evidence graph; earlier public identifiers are labeled separately.</p>' + _meta(context) + '</header>'
+    return (f'<div class="r-data-page"><header class="r-page-head"><p class="r-kicker">{_status(context)}</p><h1>Research data</h1>'
+            '<p class="r-lede">Download the research, trace a finding to its sources, or reuse a versioned copy.</p>'
+            '<dl class="r-data-meta"><div><dt>Report edition</dt><dd>' + sp.escape(report['release_id']) + '</dd></div>'
+            '<div><dt>Evidence graph release</dt><dd>' + sp.escape(graph['release_id']) + '</dd></div>'
+            '<div><dt>Evidence snapshot</dt><dd>' + _date(graph.get('as_of')) + '</dd></div>'
+            '<div><dt>Owned research license</dt><dd>' + _link(sp.DATA_LICENSE, 'CC BY 4.0') + '</dd></div></dl>'
+            '<nav class="r-data-nav" aria-label="Research data sections">'
+            + _link('#downloads', 'Download files') + _link('#citation', 'Cite & reuse')
+            + _link('#assertions', 'Evidence records') + _link('#coverage', 'Publication checks') + '</nav></header>'
             + operating_status_notice(context) +
-            '<section class="r-section" aria-labelledby="coverage"><h2 id="coverage">Progress toward publication</h2>'
-            + _progress(context) + f'<p>{sp.escape(_counts(context))}.</p>'
-            '<p>The frozen eligible core and two separate 200-record quality audits must also pass. The reference audit requires '
-            '98% precision and 95% recall, with no critical false attribution. The screening audit must recover at least 190 records '
-            'and reach 90% recall in each major stratum.</p>' + _holds(context) + '</section>'
             '<section class="r-section" aria-labelledby="downloads"><h2 id="downloads">Download the research</h2>'
-            '<p>The privacy-filtered projection retains explicit research status and historical qualifications. '
-            'Historical records are not fresh verification. Source retrieval is not claim approval. The original canonical dataset stays at version '
-            f'{sp.escape(graph.get("canonical_dataset_version"))}, with its existing identity and downloads.</p>'
-            f'<ul class="r-downloads">{links}</ul><p class="r-meta">Research release: {sp.escape(graph["release_id"])}.</p></section>'
+            '<div class="r-data-files">' + files + '</div>'
+            '<p class="r-data-note">Historical records keep their original dates and inherited provenance; they are not fresh verification. '
+            'Source retrieval is not claim approval. The original canonical dataset stays at version '
+            f'{sp.escape(graph.get("canonical_dataset_version"))}, with its existing identity and downloads.</p></section>'
             '<section class="r-section" id="citation"><h2>Cite and reproduce</h2>'
             f'<p>{sp.escape(context["identity"].get("publisher", {}).get("name", sp.PUBLISHER_NAME))}. <cite>{sp.escape(report["title"])}</cite>. '
             f'{sp.escape(report["release_id"])}. {_date(report["updated_on"])}.</p>'
@@ -942,9 +958,15 @@ def _data(context):
             + f'<ul class="r-downloads">{cite}</ul><p>Reuse owned research under '
             + _link(sp.DATA_LICENSE, "CC BY 4.0") + '. Credit the publisher, release ID, original sources, and your changes. '
             'Source material retains its own rights and qualifications.</p>'
-            f'<ul class="r-downloads"><li>{_link("/publication/research-archive.zip", "Download the reproduction package")}</li>'
+            + ('<ul class="r-downloads">' + ''.join('<li>' + _link(url, label) + '</li>' for label, url in reuse) + '</ul>' if reuse else '')
+            + f'<ul class="r-downloads"><li>{_link("/publication/research-archive.zip", "Download the reproduction package")}</li>'
             f'<li>{_link("/publication/MANIFEST.json", "Package SHA-256 inventory")}</li>'
             f'<li>{_link("/publication/package-status.json", "Archive & mirror status")}</li></ul></section>'
+            '<section class="r-section" aria-labelledby="coverage"><h2 id="coverage">Progress toward publication</h2>'
+            + _progress(context) + f'<p>{sp.escape(_counts(context))}.</p>'
+            '<p>The frozen eligible core and two separate 200-record quality audits must also pass. The reference audit requires '
+            '98% precision and 95% recall, with no critical false attribution. The screening audit must recover at least 190 records '
+            'and reach 90% recall in each major stratum.</p>' + _holds(context) + '</section>'
             '<section class="r-section" aria-labelledby="assertions"><h2 id="assertions">Assertion records</h2>'
             '<p id="approved">Approved assertions retain their exact source bindings and review receipts.</p>'
             + ('' if any(row.get('status') == 'approved' for row in assertions.values()) else
@@ -961,7 +983,7 @@ def _data(context):
             + _ledger_parts('source', sources)
             + '</section><section class="r-section" aria-labelledby="organizations"><h2 id="organizations">Organizations & other entities</h2>'
             + f'<ul class="r-entity-register">{entity_rows}</ul></section>'
-            + _legacy_ledger_aliases(assertions, stubs, sources))
+            + _legacy_ledger_aliases(assertions, stubs, sources) + '</div>')
 
 
 def _entity_card(context, entity):
@@ -982,7 +1004,7 @@ def _index_values(entity):
     return values
 
 
-def _index_row(context, entity):
+def _index_row(context, entity, *, compact=False):
     """One independently filterable record, including all native evidence links."""
     filters = _index_values(entity)
     claims = _assertions(context, entity)
@@ -991,11 +1013,15 @@ def _index_row(context, entity):
                       + [str(value) for value in entity.get('identifiers', {}).values()])
     taxonomy = '; '.join(key.replace('_', ' ') + ': ' + ', '.join(filters[key])
                          for key in INDEX_FACETS if filters[key])
+    record_id = '<span class="r-record-id">' + sp.escape(entity['id']) + '</span>'
+    if compact:
+        record_id = ('<details class="r-index-record-id"><summary>Record identifier</summary>'
+                     + record_id + '</details>')
     return ('<tr data-index-row data-record-id="' + sp.escape(entity['id'])
             + '" data-search="' + sp.escape(search.lower()) + '" data-filters="'
             + sp.escape(json.dumps(filters, ensure_ascii=False, separators=(',', ':'))) + '">'
             + '<th scope="row">' + _link(entity_url(entity, context), _display_title(entity['name']))
-            + '<span class="r-record-id">' + sp.escape(entity['id']) + '</span></th>'
+            + record_id + '</th>'
             + '<td data-label="Review">' + sp.escape(_label(entity)) + '<span class="r-table-note">'
             + sp.escape(entity.get('review_depth', '').replace('_', ' ')) + '</span></td>'
             + '<td data-label="Type">' + sp.escape(entity['kind'].replace('_', ' ')) + '</td>'
@@ -1019,7 +1045,7 @@ def _paper_rows(context, entities):
             versions.setdefault(entity.get('parent_id'), []).append(entity)
     rows = []
     for work in works:
-        rows.append(_index_row(context, work))
+        rows.append(_index_row(context, work, compact=True))
         children = versions.get(work['id'], [])
         if not children:
             continue
@@ -1059,7 +1085,9 @@ def _evidence_table(context, entities, *, group_papers=False):
                 + select('status') + '<button type="reset">Clear filters</button></div>'
                 + ('<details class="r-index-advanced" data-index-advanced><summary>More filters '
                    '<span data-index-advanced-count>0 active</span></summary><div class="r-index-fields">'
-                   + advanced + '</div></details>' if advanced else '') + '</form>')
+                   + advanced + '</div></details>' if advanced else '')
+                + ('<div class="r-index-applied" data-index-applied hidden aria-label="Applied filters"></div>'
+                   if group_papers else '') + '</form>')
     works = sum(entity['kind'] != 'paper_version' for entity in entities)
     initial_count = (f'{works} paper works · {len(entities) - works} source versions ({len(entities)} records)'
                      if group_papers else f'{len(entities)} records')
@@ -1083,10 +1111,21 @@ def _index(context, category):
         candidate_works = sum(e['kind'] != 'paper_version' and e.get('status') == 'candidate' for e in entities)
         review_summary += (f' · Approved: {approved_works} works, {approved - approved_works} source versions'
                            f' · Candidate: {candidate_works} works, {candidates - candidate_works} source versions')
+    review = f'<p class="r-status">{review_summary}</p>'
+    note = ('<p class="r-callout">Candidate records help readers inspect the research queue. They are not reviewed findings, '
+            'endorsements, or proof of a supplier contribution.</p>')
+    if slug == 'papers':
+        review = (f'<p class="r-status">{approved} approved records · {candidates} candidates awaiting review</p>'
+                  '<details class="r-paper-index-guide"><summary>How to read this index</summary>'
+                  f'<p>{review_summary}.</p>'
+                  '<p>A paper work groups its source versions. Each version keeps its own review status; '
+                  'an approved work may include candidate versions. Open the evidence link to inspect approved findings.</p>'
+                  '<p>Candidate records are not reviewed findings, endorsements, or proof of a supplier contribution. '
+                  'Their recorded topics remain provisional.</p></details>')
+        note = ('<p class="r-paper-index-note">Candidate records are not reviewed findings or proof of a supplier contribution.</p>')
     return (f'<header class="r-page-head"><p class="r-kicker">Research evidence index</p><h1>{title}</h1>'
-            f'<p class="r-lede">{sp.escape(description)}</p><p class="r-status">{review_summary}</p>' + _meta(context) + '</header>'
-            '<p class="r-callout">Candidate records help readers inspect the research queue. They are not reviewed findings, '
-            'endorsements, or proof of a supplier contribution.</p>'
+            f'<p class="r-lede">{sp.escape(description)}</p>' + review + _meta(context) + '</header>'
+            + note
             + (_evidence_table(context, entities, group_papers=slug == "papers") if entities else
                '<section class="r-section"><h2>How this index will be built</h2><p>No records have entered this index yet. '
                'A workflow must identify its inputs, work stages, output artifact, qualifications, and version-specific source evidence. '
@@ -1104,13 +1143,18 @@ def _company_detail(context, entity):
     taxonomy = "".join(f'<dt>{sp.escape(key.replace("_", " ").capitalize())}</dt><dd>{sp.escape(", ".join(values))}</dd>'
                        for key, values in sorted(entity.get("taxonomy", {}).items()) if values)
     website = _safe_url(entity.get("identifiers", {}).get("website"))
+    sections = [("approved-findings", "Findings"), ("company-scope", "Company & scope")]
+    if historical: sections.append(("company-history", "Historical evidence"))
+    sections.append(("company-sources", "Sources"))
     body = ['<article class="company-dossier research-company-dossier"><header class="company-hero">'
             '<div class="company-name"><h1>' + sp.escape(entity["name"]) + '</h1></div>'
             '<p class="company-research-snapshot">' + sp.plural(len(approved), "approved finding")
             + ' · ' + sp.plural(len(source_ids), "source record") + '</p>'
             + ('<p class="company-actions">' + _link(website, 'Website') + '</p>' if website else '')
-            + '</header><div class="company-record">',
-            '<details class="company-fold" id="company-scope"><summary>Company and review scope</summary>'
+            + '</header><p class="company-evidence-context"><span>Evidence snapshot · ' + _date(context['graph'].get('as_of'))
+            + '</span><span>Prepared ' + _date(context['report'].get('updated_on')) + '</span></p>'
+            + sp.company_section_links(sections) + '<div class="company-record">',
+            '<details class="company-fold" id="company-scope"><summary><span>Company and review scope</span><small>' + sp.escape(_label(entity)) + '</small></summary>'
             '<div class="company-fold-body"><p class="r-kicker">' + sp.escape(_label(entity)) + '</p>'
             '<p class="r-record-id">' + sp.escape(entity["id"]) + '</p>' + _meta(context)
             + '<h2>Evidence & scope</h2><p>' + sp.escape(entity.get("disposition_reason"))
@@ -1122,16 +1166,16 @@ def _company_detail(context, entity):
             'commercial quality, or a contribution to another artifact.</p>'
             + ('<h3>Recorded taxonomy</h3><p class="r-meta">Candidate taxonomy remains provisional.</p><dl class="r-facts">' + taxonomy + '</dl>' if taxonomy else '')
             + _link('/review/', 'Submit a source-backed correction →', 'r-text-link') + '</div></details>',
-            '<details class="company-fold" id="approved-findings"><summary>Findings</summary>'
+            '<details class="company-fold" id="approved-findings"><summary><span>Findings</span><small>' + sp.plural(len(approved), "approved finding") + '</small></summary>'
             '<div class="company-fold-body"><h2>Approved findings</h2>'
             + ("".join(_assertion(context, a) for a in approved) if approved else
                '<p class="r-callout">No approved assertions are available for this record. Source metadata and candidate proposals do not establish a finding.</p>')
             + '</div></details>']
     if historical:
-        body.append('<details class="company-fold" id="company-history"><summary>Historical evidence</summary>'
+        body.append('<details class="company-fold" id="company-history"><summary><span>Historical evidence</span><small>' + sp.plural(len(historical), "record") + '</small></summary>'
                     '<div class="company-fold-body"><h2>Historical evidence</h2>'
                     + "".join(_assertion(context, a) for a in historical) + '</div></details>')
-    body.append('<details class="company-fold" id="company-sources"><summary>Sources</summary>'
+    body.append('<details class="company-fold" id="company-sources"><summary><span>Sources</span><small>' + sp.plural(len(source_ids), "source record") + '</small></summary>'
                 '<div class="company-fold-body"><h2>Connected evidence</h2>'
                 + ('<ul class="r-evidence-links">' + "".join('<li>' + _link(_evidence_url("source", sid), ("Source metadata withheld · " + sid) if sources.get(sid, {}).get("_withheld") else sources.get(sid, {}).get("title", sid)) + '</li>' for sid in source_ids) + '</ul>'
                    if source_ids else '<p>No source records are attached yet.</p>')

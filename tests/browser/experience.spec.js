@@ -28,10 +28,12 @@ test('current discovery and historical downloads keep distinct identity and work
   expect(homeDataset.version).toBe(canonical.dataset_version);
   expect(homeDataset.description).toContain('39 AI data companies');
   expect(homeDataset.distribution.map(item => item.contentUrl)).not.toContain('https://sciencetostartup.com/work-routes.json');
-  await expect(page.locator('.hero-actions svg')).toHaveCount(2);
-  for (const icon of await page.locator('.hero-actions svg').all()) {
-    await expect(icon).toHaveAttribute('aria-hidden', 'true');
-    await expect(icon).toHaveAttribute('focusable', 'false');
+  await expect(page.locator('.hero-actions a')).toHaveCount(2);
+  for (const [name, href] of [['Explore companies', '/companies/'], ['Find paid work', '/work/']]) {
+    const action = page.locator('.hero-actions').getByRole('link', { name, exact: true });
+    await expect(action).toBeVisible();
+    await expect(action).toHaveAttribute('href', href);
+    expect((await action.boundingBox()).height).toBeGreaterThanOrEqual(44);
   }
   await page.goto('/method/#downloads');
   await expect(page.getByRole('heading', { name: 'Current supporting data', exact: true })).toBeVisible();

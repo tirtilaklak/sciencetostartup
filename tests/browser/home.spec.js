@@ -83,6 +83,7 @@ test('homepage search times out a stalled index and retries without reporting em
   await page.goto('/');
   await page.locator('#home-search-open').click();
   await expect(page.locator('#home-search-message')).toContainText('Loading');
+  await expect.poll(() => Boolean(stalled)).toBeTruthy();
   await page.clock.fastForward(15_001);
   await expect(page.locator('#home-search-message')).toContainText('Search could not load');
   await expect(page.locator('#home-search-message')).not.toContainText('No recorded company matches');

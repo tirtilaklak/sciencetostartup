@@ -49,7 +49,6 @@
   const query = form.elements.namedItem('q');
   const kind = form.elements.namedItem('kind');
   const arrangement = form.elements.namedItem('arrangement');
-  const filterOptions = form.querySelector('.work-page-filter-options');
   const search = globalThis.S2SSearch;
   if (!search) { document.documentElement.removeAttribute('data-page-enhancement'); return; }
   let companyAliases = {};
@@ -71,12 +70,12 @@
     query.value = (params.get('q') || '').slice(0, 256);
     kind.value = validValue(kind, params.get('kind') || '');
     arrangement.value = validValue(arrangement, params.get('arrangement') || '');
-    if (filterOptions && (kind.value || arrangement.value)) filterOptions.open = true;
   }
   function render(updateURL = true) {
     const key = search.normalize(query.value);
     const active = Boolean(key || kind.value || arrangement.value);
     let matches = 0;
+    const matchKinds = {named: 0, programs: 0};
     const shownGroups = new Set();
     for (const record of records) {
       const place = arrangement.value;
@@ -84,7 +83,10 @@
       record.rank = search.rank(record.compiled, key);
       const visible = (!kind.value || record.group.dataset.workGroup === kind.value) && fitsPlace && record.rank >= 0;
       record.card.hidden = !visible;
-      if (visible) { matches++; shownGroups.add(record.group); }
+      if (visible) {
+        matches++; shownGroups.add(record.group);
+        if (record.group.dataset.workGroup in matchKinds) matchKinds[record.group.dataset.workGroup]++;
+      }
     }
     for (const group of groups) {
       const own = records.filter(record => record.group === group), list = group.querySelector('.work-listings') || own[0]?.card.parentNode;
@@ -99,7 +101,12 @@
       }
     }
     filtering = active;
-    count.textContent = active ? `${matches} matching ${matches === 1 ? 'record' : 'records'}` : initialCount;
+    const summary = [];
+    if (matchKinds.named) summary.push(`${matchKinds.named} named ${matchKinds.named === 1 ? 'listing' : 'listings'}`);
+    if (matchKinds.programs) summary.push(`${matchKinds.programs} ${matchKinds.programs === 1 ? 'network or program' : 'networks and programs'}`);
+    const other = matches - matchKinds.named - matchKinds.programs;
+    if (other) summary.push(`${other} other ${other === 1 ? 'record' : 'records'}`);
+    count.textContent = active ? `${matches} matching ${matches === 1 ? 'record' : 'records'}${summary.length ? ': ' + summary.join(' · ') : ''}.` : initialCount;
     empty.hidden = matches !== 0;
     if (groupLinks) groupLinks.hidden = active;
     if (updateURL) {
@@ -112,7 +119,6 @@
   }
   function reset() {
     query.value = ''; kind.value = ''; arrangement.value = '';
-    if (filterOptions) filterOptions.open = false;
     render(); query.focus();
   }
   function revealGroup(hash) {
