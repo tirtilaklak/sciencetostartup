@@ -61,6 +61,11 @@ token only in that step, an explicit isolated branch, and an exact expected-head
 lease. A failed or interrupted push requires branch readback before another
 attempt; it is not retried automatically.
 
+The push token is opaque: validation permits 1–16,384 UTF-8 bytes and rejects
+whitespace, C0 controls and DEL, without assuming a token prefix or format.
+Hold diagnostics expose only an allowlisted reason and CLI stage. Unexpected
+exceptions remain generic; tokens and raw Git stderr are never printed.
+
 ## Final CI and publication
 
 The builder uploads its public commit/tree/manifest receipt. After verifying
