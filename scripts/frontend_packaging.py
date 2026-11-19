@@ -41,3 +41,13 @@ def minify_javascript(source):
 
 def minify_css(source):
     return package_frontend(stylesheets={"source": source})["stylesheets"]["source"]
+
+
+SEARCH_COMPONENTS = frozenset({"home-search.js", "companies-page.js", "work-page.js"})
+
+def optional_script_source(root, name):
+    """Share matching code without a runtime dependency or a second request."""
+    source = (Path(root) / "web" / name).read_text()
+    if name in SEARCH_COMPONENTS:
+        source = (Path(root) / "web/search-core.js").read_text() + "\n" + source
+    return source

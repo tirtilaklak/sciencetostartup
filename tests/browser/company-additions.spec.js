@@ -9,7 +9,12 @@ test('current company additions can be found and linked with their attribution',
     await expect(page.locator('.directory-company:visible')).toHaveCount(1);
     const card = page.locator('.directory-company[data-company="' + entry.entity_id + '"]');
     await expect(card).toBeVisible();
+    await expect(card.getByRole('heading', { level: 3, name: entry.name, exact: true })).toBeVisible();
+    const context = card.locator('.company-current-context');
+    await expect(context).not.toHaveAttribute('open', '');
+    await context.locator(':scope > summary').click();
     await expect(card).toContainText(entry.wikipedia.description);
+    await expect(context.locator('.company-wikipedia-description')).toHaveText(entry.wikipedia.description);
     await expect(card.locator('a[href="' + entry.wikipedia.revision_url + '"]')).toBeVisible();
     await expect(card.locator('a[href="' + entry.wikipedia.license_url + '"]')).toBeVisible();
     const path = '/company/' + entry.entity_id + '/';
@@ -38,6 +43,7 @@ test('current additions and their sources remain available without JavaScript', 
       const card = page.locator('.directory-company[data-company="' + entry.entity_id + '"]');
       await expect(card).toBeVisible();
       await expect(card).toContainText(entry.wikipedia.description);
+      await card.locator('.company-current-context > summary').click();
       const details = card.locator('details.company-current-facts');
       await details.locator('summary').click();
       for (const source of entry.sources) {

@@ -145,7 +145,7 @@ def main():
         assert f'data-work-route="{route_id}"' in before_details
         assert f'data-work-company="{route["company_id"]}"' in before_details
         assert any(label in before_details for label in (
-            'Terms checked ', 'Pay terms reviewed ', 'Page checked ', 'Recheck blocked ', 'Recorded ', 'Terms not rechecked'
+            'Terms checked ', 'Pay terms reviewed ', 'Page checked ', 'Recheck blocked ', 'Recheck failed ', 'Recorded ', 'Terms not rechecked'
         )) and 'Terms recorded:' in details, route_id + ': missing freshness context'
         links = [a['href'] for tag, a in Elements(before_details).elements if tag == 'a' and 'w4-open' in a.get('class', '')]
         review = route.get('editorial_review', {})
@@ -171,15 +171,35 @@ def main():
     for route_id, labels in {
         'pareto.work.investment-analyst': ['Closed', 'Approx. $100 / approved hour'],
         'toloka.work.cad-simulation': ['Historical', 'Up to $69 / hour equivalent'],
-        # The 19 Oct portal check closed this listing. Its 12 Oct pay observation stays visible as history.
-        'rws_trainai.work.polaris-asr': ['Closed', '$16 / hour'],
+        # Board absence does not establish closure. The October pay offer remains historical.
+        'rws_trainai.work.polaris-asr': ['Historical', '$16 / hour'],
         'afterquery.work.college-swe': ['Rate conflict'],
         'afterquery.work.technical-content-writer-contract': ['Initial commitment; may expand', 'Schedule conflict: header says full-time'],
         'abundant_ai.work.research-product-manager': ['Pay period not stated.'],
-        'bespoke_labs.work.mts-post-training': ['Pay period not stated.'],
+        'bespoke_labs.work.mts-post-training': ['$300K–350K base', 'Pay terms reviewed 28 Oct 2026'],
+        'turing.work.machine-learning': ['Country eligibility unverified', 'Recheck blocked 18 Nov 2026'],
+        'aixi.work.machine-learning-research-scientist': ['$150K–$250K / year', 'London / Berkeley', 'Pay terms reviewed 18 Nov 2026'],
         'toloka.work.mindrift-code': ['hour equivalent', 'Paid per completed task'],
     }.items():
         assert all(label in visible_work[route_id] for label in labels), route_id + ': visible pay/status qualifier lost'
+    polaris = route_index['rws_trainai.work.polaris-asr']
+    assert polaris['status'] == 'historical' and 'w4-status-closed' not in visible_work[polaris['id']]
+    assert 'does not establish that Polaris closed or when; current role availability is unconfirmed.' in rendered['workCards'][polaris['id']]
+    assert polaris['field_reviews']['destination']['reviewed_on'] == '2026-11-18'
+    assert polaris['field_reviews']['pay']['reviewed_on'] is None and polaris['field_reviews']['pay']['basis'] == 'stored_evidence'
+    mts = route_index['bespoke_labs.work.mts-post-training']
+    assert mts['pay_basis'] == 'annual_salary' and mts['pay_terms']['unit'] == 'year' and mts['pay_terms']['currency'] == 'USD'
+    assert '$300,000 – $350,000 USD / year' in rendered['workCards'][mts['id']]
+    assert 'Pay period not stated.' not in visible_work[mts['id']]
+    assert mts['field_reviews']['pay']['reviewed_on'] == '2026-10-28' and mts['field_reviews']['pay']['basis'] == 'stored_evidence'
+    turing = route_index['turing.work.machine-learning']
+    assert 'Pakistan / Turkey listing' not in visible_work[turing['id']]
+    assert turing['field_reviews']['location']['state'] == 'not_researched' and turing['field_reviews']['location']['reviewed_on'] is None
+    assert 'no current opening or application acceptance was verified.' in rendered['workCards'][turing['id']]
+    aixi = route_index['aixi.work.machine-learning-research-scientist']
+    assert aixi['pay_terms']['currency'] == 'USD' and aixi['pay_terms']['unit'] == 'year' and not aixi['pay_terms']['hourly_comparable']
+    assert '£120K–£160K / year' not in visible_work[aixi['id']]
+    assert 'Full terms review not recorded' in rendered['workCards'][aixi['id']]
     assert rendered['healthObservations'], 'Business-health research does not reach the delivered runtime'
     assert not any(key in rendered['initial'] for key in ('scale-visual', 'growth-visual')), 'Removed story renderer still runs'
     # The dashboard replaced the overview's annualized pace chart, which showed each company's headline record

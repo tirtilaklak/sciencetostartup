@@ -194,8 +194,8 @@ sanitized public deployment settings; credentials never enter the repository.
 The current `/companies/` directory also reads `data/current-companies.json`.
 This additive registry selects existing research organization profiles and
 source-bound current-only profiles without changing canonical v2.5.0, the
-published research graph or archived packages. Its ten November 16 additions
-bring the directory to 49 entries; the original
+published research graph or archived packages. Its sixteen current additions
+bring the directory to 55 entries; the original
 research cohort and financial coverage remain 39. Current cards and profile
 supplements retain exact Wikipedia sentences, permanent revisions, author-history
 links, CC BY-SA 4.0 attribution, and separately sourced current offering labels.
@@ -209,6 +209,10 @@ profile or research identity. A `website_supplement` can fill a missing official
 website on an approved organization while retaining its reviewed names. Current
 profiles are included in native search and the sitemap, with no additions to
 the frozen research graph or its coverage counts.
+Homepage coverage follows the current directory. **Historical company data**
+retains dataset v2.5.0 and its 15 October snapshot; **Current supporting data**
+keeps paid-work and editorial files separate, with their own source dates.
+**Research data** identifies its research release and evidence cutoff separately.
 See [Wikipedia excerpt licensing](LICENSE-WIKIPEDIA.md); archived research license
 documents retain their original bytes.
 

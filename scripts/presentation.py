@@ -1,9 +1,14 @@
 """Reproducible presentation assets. Research exports remain the canonical archive."""
+import base64
 import copy
+from contextlib import contextmanager
 import hashlib
 import json
+import os
 import re
+import stat
 import unicodedata
+import uuid
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 
@@ -56,22 +61,198 @@ def source_identity(root):
     return digest.hexdigest()[:20]
 
 
+@contextmanager
+def _runtime_directory(path, *, create=False, missing_ok=False):
+    path = Path(path).absolute()
+    if ".." in path.parts:
+        raise ValueError("Invalid retained runtime directory")
+    descriptor = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        for part in path.parts[1:]:
+            try:
+                child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=descriptor)
+            except FileNotFoundError:
+                if create:
+                    os.mkdir(part, dir_fd=descriptor)
+                    child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=descriptor)
+                elif missing_ok:
+                    yield None
+                    return
+                else:
+                    raise ValueError("Missing retained runtime directory") from None
+            except OSError:
+                raise ValueError("Unsafe retained runtime directory") from None
+            os.close(descriptor)
+            descriptor = child
+        yield descriptor
+    finally:
+        os.close(descriptor)
+
+
+def _runtime_bytes(path):
+    with _runtime_directory(path.parent) as parent:
+        try:
+            descriptor = os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=parent)
+        except OSError:
+            raise ValueError("Missing or unsafe retained runtime file: " + str(path)) from None
+        with os.fdopen(descriptor, "rb") as stream:
+            info = os.fstat(stream.fileno())
+            if not stat.S_ISREG(info.st_mode) or info.st_size > 25 * 1024 * 1024:
+                raise ValueError("Invalid retained runtime file: " + str(path))
+            content = stream.read(25 * 1024 * 1024 + 1)
+            if len(content) > 25 * 1024 * 1024:
+                raise ValueError("Retained runtime file exceeds hosting limit")
+            return content
+
+
+def _runtime_json(content):
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError("Duplicate retained runtime JSON key")
+            result[key] = value
+        return result
+    decoder = json.JSONDecoder(object_pairs_hook=pairs,
+        parse_constant=lambda _: (_ for _ in ()).throw(ValueError("Nonfinite retained runtime JSON")))
+    try:
+        return decoder.decode(content.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError):
+        raise ValueError("Invalid retained runtime JSON") from None
+
+
+def _runtime_name(name):
+    if not isinstance(name, str):
+        raise ValueError("Invalid retained runtime asset")
+    match = re.fullmatch(r"(js|presentation)/([a-z0-9_-]+)\.([0-9a-f]+)\.(js|json)", name)
+    if not match or (match[1], match[4], len(match[3])) not in (("js", "js", 12), ("presentation", "json", 16)):
+        raise ValueError("Invalid retained runtime asset: " + name)
+    return match
+
+
 def retain_runtime_generations(root, destination):
-    manifest = json.loads((root / "release-assets/generations.json").read_text())
-    generations = manifest["generations"]
-    if len(generations) != 2:
+    """Validate two complete generations and all collisions before copying bytes."""
+    root, destination = Path(root).absolute(), Path(destination).absolute()
+    source = root / "release-assets"
+    manifest = _runtime_json(_runtime_bytes(source / "generations.json"))
+    if not isinstance(manifest, dict) or set(manifest) != {"generations"} or not isinstance(manifest["generations"], list) or len(manifest["generations"]) != 2:
         raise ValueError("Exactly two prior runtime generations must be retained")
-    for generation in generations:
-        for name, digest in generation["sha256"].items():
-            parts = Path(name).parts
-            if len(parts) != 2 or parts[0] not in ("js", "presentation") or ".." in parts or Path(name).suffix not in (".js", ".json"):
-                raise ValueError("Invalid retained runtime asset")
-            content = (root / "release-assets" / name).read_bytes()
-            if hashlib.sha256(content).hexdigest() != digest:
-                raise ValueError("Retained runtime checksum differs: " + name)
-            path = destination / name
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_bytes(content)
+    versions, merged = set(), {}
+    identity_fields = ("schemaVersion", "buildId", "editorialReleaseId", "datasetVersion", "privacyProjectionVersion")
+    for generation in manifest["generations"]:
+        if not isinstance(generation, dict) or set(generation) != {"cloudflare_version", "sha256"}:
+            raise ValueError("Invalid retained generation registry")
+        version = generation["cloudflare_version"]
+        try:
+            canonical_version = str(uuid.UUID(version))
+        except (ValueError, TypeError, AttributeError):
+            raise ValueError("Invalid retained Cloudflare version") from None
+        if canonical_version != version or version in versions:
+            raise ValueError("Retained Cloudflare versions must be distinct canonical UUIDs")
+        versions.add(version)
+        checksums = generation["sha256"]
+        if not isinstance(checksums, dict) or not checksums:
+            raise ValueError("Empty retained runtime generation")
+        payloads, documents, families = {}, {}, {}
+        for name, checksum in checksums.items():
+            match = _runtime_name(name)
+            if not isinstance(checksum, str) or not re.fullmatch(r"[0-9a-f]{64}", checksum):
+                raise ValueError("Invalid retained runtime checksum")
+            content = _runtime_bytes(source / name)
+            if hashlib.sha256(content).hexdigest() != checksum or not checksum.startswith(match[3]):
+                raise ValueError("Retained runtime checksum or filename differs: " + name)
+            if name in merged and merged[name] != content:
+                raise ValueError("Retained generations collide: " + name)
+            payloads[name] = content
+            families.setdefault((match[1], match[2]), []).append(name)
+            if match[1] == "presentation":
+                documents[name] = _runtime_json(content)
+        summary_names = families.get(("presentation", "summary"), [])
+        if len(summary_names) != 1 or any(len(families.get(("js", family), [])) != 1 for family in ("app", "data", "health")):
+            raise ValueError("Retained generation requires one summary and app/data/health assets")
+        if {family for directory, family in families if directory == "js"} != {"app", "data", "health"}:
+            raise ValueError("Unexpected retained runtime module")
+        summary_name = summary_names[0]
+        summary = documents[summary_name]
+        if not isinstance(summary, dict) or any(not isinstance(summary.get(key), str) or not summary[key] for key in (*identity_fields, "publicationAsOf")):
+            raise ValueError("Invalid retained summary identity")
+        if summary["schemaVersion"] != SCHEMA_VERSION or summary["privacyProjectionVersion"] != PRIVACY_PROJECTION_VERSION:
+            raise ValueError("Unsupported retained runtime schema")
+        for document in documents.values():
+            if not isinstance(document, dict) or any(document.get(key) != summary[key] for key in identity_fields):
+                raise ValueError("Retained runtime generation identity differs")
+            if "publicationAsOf" in document and document["publicationAsOf"] != summary["publicationAsOf"]:
+                raise ValueError("Retained publication identity differs")
+        referenced, visited = set(), {summary_name}
+        def descriptors(value):
+            if isinstance(value, dict):
+                href = value.get("href")
+                if isinstance(href, str) and href.startswith(("/js/", "/presentation/")):
+                    name = href[1:]
+                    _runtime_name(name)
+                    if name not in payloads or value.get("sha256") != checksums[name] or type(value.get("bytes")) is not int or value["bytes"] != len(payloads[name]):
+                        raise ValueError("Retained runtime dependency differs: " + name)
+                    expected_sri = "sha256-" + base64.b64encode(bytes.fromhex(checksums[name])).decode()
+                    if (name.startswith("js/") or "integrity" in value) and value.get("integrity") != expected_sri:
+                        raise ValueError("Retained runtime integrity differs: " + name)
+                    referenced.add(name)
+                    if name in documents and name not in visited:
+                        visited.add(name)
+                        descriptors(documents[name])
+                for child in value.values():
+                    descriptors(child)
+            elif isinstance(value, list):
+                for child in value:
+                    descriptors(child)
+        descriptors(summary)
+        data_name = families[("js", "data")][0]
+        data = payloads[data_name].decode("utf-8")
+        prefix = "window.SUMMARY_INDEX="
+        if not data.startswith(prefix):
+            raise ValueError("Missing retained data bootstrap")
+        # Decode only the JSON prefix. Never execute retained JavaScript.
+        decoder = json.JSONDecoder()
+        try:
+            _, end = decoder.raw_decode(data, len(prefix))
+        except json.JSONDecodeError:
+            raise ValueError("Invalid retained data bootstrap") from None
+        public_summary = _runtime_json(data[len(prefix):end].encode())
+        expected_public = {key: value for key, value in summary.items() if key not in ("bootstrap", "companies", "work")}
+        expected_public["asset"] = {"href": "/" + summary_name, "sha256": checksums[summary_name], "bytes": len(payloads[summary_name])}
+        if data[end:end + 1] != ";" or encoded(public_summary) != encoded(expected_public):
+            raise ValueError("Retained data bootstrap differs from summary")
+        descriptors(public_summary)
+        health_name = families[("js", "health")][0]
+        if not isinstance(summary.get("modules"), dict) or not isinstance(summary["modules"].get("businessHealth"), dict) or summary["modules"]["businessHealth"].get("href") != "/" + health_name:
+            raise ValueError("Retained health module descriptor differs")
+        health_prefix = '(()=>{window.SCIENCE_HEALTH_MODULE={buildId:' + json.dumps(summary["buildId"]) + ','
+        if not payloads[health_name].decode("utf-8").startswith(health_prefix):
+            raise ValueError("Retained health module build identity differs")
+        if set(payloads) != referenced | {summary_name, data_name, families[("js", "app")][0]}:
+            raise ValueError("Retained runtime dependency closure is incomplete")
+        merged.update(payloads)
+    # Validate every existing destination before creating directories or copying.
+    for name, content in merged.items():
+        target = destination / name
+        with _runtime_directory(target.parent, missing_ok=True) as parent:
+            if parent is not None:
+                try:
+                    os.stat(target.name, dir_fd=parent, follow_symlinks=False)
+                except FileNotFoundError:
+                    continue
+                if _runtime_bytes(target) != content:
+                    raise ValueError("Retained runtime destination collision: " + name)
+    for name, content in sorted(merged.items()):
+        target = destination / name
+        with _runtime_directory(target.parent, create=True) as parent:
+            try:
+                descriptor = os.open(target.name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o644, dir_fd=parent)
+            except FileExistsError:
+                if _runtime_bytes(target) != content:
+                    raise ValueError("Retained runtime destination changed: " + name)
+                continue
+            with os.fdopen(descriptor, "wb") as stream:
+                stream.write(content)
 
 
 def write_asset(destination, family, value):
@@ -348,7 +529,7 @@ def compact_work(work, research=None):
     return result
 
 
-def build_presentation(data, destination, root, sidecars, release):
+def build_presentation(data, destination, root, sidecars, release, daily_context=None):
     data = contact_safe_research(data)
     identity = {"schemaVersion": SCHEMA_VERSION, "buildId": source_identity(root),
                 "privacyProjectionVersion": PRIVACY_PROJECTION_VERSION,
@@ -392,8 +573,11 @@ def build_presentation(data, destination, root, sidecars, release):
     for company in data["companies"]:
         entry = next((e for e in sidecars["EDITORIAL"]["entries"] if e["company_id"] == company["id"]), {})
         products = next((e.get("products", []) for e in sidecars["PROFILE_CONTENT"]["entries"] if e["company_id"] == company["id"]), [])
-        search_rows.append({"id": company["id"], "name": company["name"], "summary": entry.get("summary", company.get("description", "")), "group": entry.get("primary_offering", ""), "products": [p["name"] for p in products], "href": "/company/" + company["id"] + "/"})
-    for entry in sidecars.get("RESEARCH_SEARCH", []):
+        search_rows.append({"id": company["id"], "name": company["name"], "summary": entry.get("summary", company.get("description", "")), "group": entry.get("primary_offering", ""), "products": [value for p in products for value in [p["name"], p.get("description", ""), *p.get("aliases", [])] if value], "aliases": list(company.get("aliases", [])), "href": "/company/" + company["id"] + "/"})
+    from daily_scan import daily_search_entries, daily_search_scope
+    public_search_entries = [*sidecars.get("RESEARCH_SEARCH", []), *daily_search_entries(daily_context)]
+    summary["dailySearchScope"] = daily_search_scope(daily_context)
+    for entry in public_search_entries:
         keywords = entry.get("keywords", [])
         if isinstance(keywords, str):
             keywords = keywords.split()
@@ -409,7 +593,7 @@ def build_presentation(data, destination, root, sidecars, release):
         company_search[cid] = " ".join(str(value) for value in values if value).lower()
     summary["fullSearch"] = write_asset(destination, "full-search", dict(identity, data={"dataset_version": data["dataset_version"]}, companySearch=company_search,
                                                                      profileProducts=rooted_assets(current_products), editorialReadouts=copy.deepcopy(data["editorial_readouts"]),
-                                                                     researchSearchEntries=sidecars.get("RESEARCH_SEARCH", []),
+                                                                     researchSearchEntries=public_search_entries,
                                                                      workSearch={route["id"]: work_search_text(route, company_map) for route in sidecars["WORK_ROUTES"]["routes"]}))
     # The full archive is fetched only by the explicitly opened method/archive view.
     summary["archive"] = write_asset(destination, "archive", dict(identity, data=data, businessHealth=sidecars["BUSINESS_HEALTH"], sourceUpdates=copy.deepcopy(sidecars["SOURCE_UPDATES"])))

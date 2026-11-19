@@ -7,7 +7,7 @@ const approved = sage.editorial_review.receipts.find(row => row.id === sage.edit
 const reviewed = Date.parse(approved.checked_on + 'T00:00:00Z');
 const day = 86_400_000;
 
-test('home promotes only approved current terms and retains all binding conditions', async ({ page }) => {
+test('home promotes only approved current terms and retains all binding conditions', async ({ page }, info) => {
   await page.clock.setFixedTime(new Date(reviewed + day));
   await page.goto('/');
   const example = page.locator('#home-work-example');
@@ -18,6 +18,9 @@ test('home promotes only approved current terms and retains all binding conditio
   await expect(page.locator('.example-grid article')).toHaveCount(2);
   await expect(page.getByRole('link', { name: 'Explore companies' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Find paid work', exact: true })).toBeVisible();
+  await info.attach(`home-entry-${info.project.name}.png`, {
+    body: await page.screenshot({ fullPage: false, animations: 'disabled', scale: 'css' }), contentType: 'image/png',
+  });
 });
 
 test('three-day expiry withdraws stale examples and preserves evergreen browse', async ({ page }) => {
@@ -55,7 +58,7 @@ test('homepage Search loads only its small component and index when invoked', as
   const accessibility = await new AxeBuilder({ page }).analyze();
   expect(accessibility.violations.filter(row => ['serious', 'critical'].includes(row.impact))).toEqual([]);
   const action = page.locator('#home-search-results a').filter({ hasText: 'Find paid work matching' });
-  await expect(action).toHaveAttribute('href', '/explore/#work?q=C%2B%2B');
+  await expect(action).toHaveAttribute('href', '/work/?q=C%2B%2B');
   await page.locator('#home-search-close').click();
   await expect(page.locator('#home-search-open')).toBeFocused();
 });

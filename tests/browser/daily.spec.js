@@ -54,7 +54,19 @@ test.beforeEach(async ({ page, request }, info) => {
   page.on('pageerror', error => info._dailyRuntimeErrors.push(error.message));
 });
 
-test.afterEach(async ({}, info) => {
+test.afterEach(async ({ page }, info) => {
+  if (info.status !== info.expectedStatus) {
+    let evidence;
+    try {
+      evidence = await page.evaluate(() => ({ url: location.href, readyState: document.readyState,
+        edition: document.querySelector('.daily-scan')?.dataset.edition || null,
+        navigationType: performance.getEntriesByType('navigation')[0]?.type || null,
+        readingState: history.state?.s2sDailyReading ?? null, unrelatedState: history.state?.dailyTest ?? null,
+        scrollRestoration: history.scrollRestoration, scrollX, scrollY,
+        openIDs: [...document.querySelectorAll('.scan-item')].filter(row => row.querySelector('details').open).map(row => row.id) }));
+    } catch (error) { evidence = { url: page.url(), diagnosticError: error.message }; }
+    await info.attach('daily-history-failure.json', { body: Buffer.from(JSON.stringify(evidence)), contentType: 'application/json' });
+  }
   expect(info._dailyRuntimeErrors || [], 'Unexpected Daily runtime errors').toEqual([]);
 });
 
@@ -86,7 +98,7 @@ async function assertContent(page, edition) {
     explanation: item.explanation.map(sentence => sentence.trim()).join(' '),
     focus: item.focus, finding: item.finding, caveat: item.caveat, readScope: item.read_scope,
     dateBasis: item.date_basis, sources: item.sources.map(({ url, label }) => ({ url, label })),
-    permalink: '#' + item.id,
+    permalink: `/daily/${edition.date}/#${item.id}`,
   })));
   await expect(page.locator('.scan-explanation:visible')).toHaveCount(edition.items.length);
 }
@@ -117,11 +129,38 @@ test('Daily latest and bounded archives match complete committed snapshots and f
     expect(JSON.parse(await verifiedResponse(request, '/' + snapshotPath, snapshotPath))).toEqual(edition);
     await page.goto(route);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sciencetostartup.com' + route);
+    await expect(page).toHaveTitle(new RegExp(edition.date.slice(0, 4)));
+    await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute('href', '/daily/feed.xml');
+    await expect(page.locator('link[rel="alternate"][type="application/feed+json"]')).toHaveAttribute('href', '/daily/feed.json');
+    await expect(page.getByRole('navigation', { name: 'Follow Daily scan' }).getByRole('link', { name: 'RSS', exact: true })).toBeVisible();
     await expect(page.locator('.scan-controls')).toBeVisible();
     await assertContent(page, edition);
     expect(await page.locator('#scan-date option').evaluateAll(options => options.map(option => option.value)))
       .toEqual(editions.map(entry => entry.date).reverse());
   }
+});
+
+test('Daily feeds bind immutable editions without invented publication times', async ({ page, request }) => {
+  const expected = editions.slice(-30).reverse();
+  const json = JSON.parse(await verifiedResponse(request, '/daily/feed.json', 'daily/feed.json'));
+  expect(json.version).toBe('https://jsonfeed.org/version/1.1');
+  expect(json.items.map(item => item.id)).toEqual(expected.map(edition => `https://sciencetostartup.com/daily/${edition.date}/`));
+  for (const [index, item] of json.items.entries()) {
+    expect(item.url).toBe(item.id);
+    expect(item.date_published).toBeUndefined();
+    expect(item.date_modified).toBeUndefined();
+    expect(item.content_text).toContain(expected[index].items[0].title);
+    expect(item.content_text).toContain(expected[index].items[0].caveat);
+    expect(item.content_text).toContain(`/daily/${expected[index].date}/#${expected[index].items[0].id}`);
+  }
+  const rss = (await verifiedResponse(request, '/daily/feed.xml', 'daily/feed.xml')).toString('utf8');
+  const parsed = await page.evaluate(xml => {
+    const document = new DOMParser().parseFromString(xml, 'application/xml');
+    return { error: Boolean(document.querySelector('parsererror')),
+      ids: [...document.querySelectorAll('item guid')].map(node => node.textContent),
+      timestamps: document.querySelectorAll('pubDate,lastBuildDate').length };
+  }, rss);
+  expect(parsed).toEqual({ error: false, ids: json.items.map(item => item.id), timestamps: 0 });
 });
 
 test('Daily topic and type controls select exactly the source-backed items and update URLs', async ({ page }) => {
@@ -172,7 +211,10 @@ test('Daily date navigation retains all filters across previous and selected rea
   const { item, query } = distinctiveSearch();
   const params = new URLSearchParams({ q: query, topic: item.topics[0], type: item.kind });
   await page.goto('/daily/?' + params);
-  await page.getByRole('link', { name: 'Previous snapshot', exact: true }).click();
+  const previousLink = page.getByRole('link', { name: 'Previous snapshot', exact: true });
+  const previousURL = new URL(await previousLink.getAttribute('href'), page.url()).href;
+  await previousLink.click();
+  await expect(page).toHaveURL(previousURL);
   expect(new URL(page.url()).pathname).toBe(`/daily/${previous.date}/`);
   for (const [key, value] of params) expect(new URL(page.url()).searchParams.get(key)).toBe(value);
   await expect(page.getByLabel('Snapshot date')).toHaveValue(previous.date);
@@ -186,6 +228,35 @@ test('Daily date navigation retains all filters across previous and selected rea
 });
 
 test('Daily deep links reveal filtered items and native disclosures support keyboard and history', async ({ page }) => {
+  async function settledReading(link) {
+    await expect(link).toBeInViewport();
+    // Focus and fragment scrolling respect the site's smooth-scroll setting.
+    // Save the settled reading position, rather than a frame in that animation.
+    return link.evaluate(element => new Promise((resolve, reject) => {
+      const started = performance.now();
+      let lastY = scrollY, lastTop = element.getBoundingClientRect().top, stable = 0;
+      function sample() {
+        const top = element.getBoundingClientRect().top;
+        stable = Math.abs(scrollY - lastY) <= 0.25 && Math.abs(top - lastTop) <= 0.25 ? stable + 1 : 0;
+        lastY = scrollY; lastTop = top;
+        if (stable >= 4) resolve({ y: scrollY, top,
+          open: [...document.querySelectorAll('.scan-item')].filter(row => row.querySelector('details').open).map(row => row.id) });
+        else if (performance.now() - started > 3000) reject(new Error('Daily reading position did not settle'));
+        else requestAnimationFrame(sample);
+      }
+      requestAnimationFrame(sample);
+    }));
+  }
+  async function restoredReading(link, saved) {
+    await expect.poll(() => page.locator('.scan-item').evaluateAll(rows => rows
+      .filter(row => row.querySelector('details').open).map(row => row.id))).toEqual(saved.open);
+    await expect(link).toBeInViewport();
+    await expect.poll(async () => Math.abs(await page.evaluate(() => scrollY) - saved.y)).toBeLessThanOrEqual(2);
+    await expect.poll(async () => Math.abs(await link.evaluate(element => element.getBoundingClientRect().top) - saved.top)).toBeLessThanOrEqual(2);
+    const settled = await settledReading(link);
+    expect(Math.abs(settled.y - saved.y)).toBeLessThanOrEqual(2);
+    expect(Math.abs(settled.top - saved.top)).toBeLessThanOrEqual(2);
+  }
   const first = latest.items[0];
   const last = latest.items.at(-1);
   await page.goto('/daily/?q=daily-no-such-selection-987654321#' + last.id);
@@ -205,14 +276,31 @@ test('Daily deep links reveal filtered items and native disclosures support keyb
   await firstRow.locator('summary').focus();
   await page.keyboard.press('Enter');
   await firstRow.locator('.scan-permalink').focus();
+  await page.evaluate(() => history.replaceState({ ...history.state, dailyTest: { preserved: true } }, '', location.href));
+  // This is where the reader leaves the original entry. Its URL still has
+  // #last, but Back restores this reading position rather than a fresh visit.
+  const returnReading = await settledReading(firstRow.locator('.scan-permalink'));
+  expect(returnReading.open).toEqual([first.id, last.id]);
+  const returnURL = page.url();
   await page.keyboard.press('Enter');
-  await expect(firstRow).toBeInViewport();
+  const permanentFirst = page.locator('.scan-item[id=' + JSON.stringify(first.id) + ']');
+  await expect(page).toHaveURL(url => url.pathname === `/daily/${latest.date}/` && url.hash === '#' + first.id);
+  await expect(permanentFirst).toBeInViewport();
+  await expect(permanentFirst.locator('details')).toHaveAttribute('open', '');
   expect(new URL(page.url()).hash).toBe('#' + first.id);
+  const forwardReading = await settledReading(permanentFirst.locator('h2 a'));
+  expect(forwardReading.open).toEqual([first.id]);
+  const forwardURL = page.url();
   await page.goBack();
-  await expect(target).toBeInViewport();
+  await expect(page).toHaveURL(returnURL);
   expect(new URL(page.url()).hash).toBe('#' + last.id);
+  await restoredReading(firstRow.locator('.scan-permalink'), returnReading);
+  expect(await page.evaluate(() => history.state.dailyTest)).toEqual({ preserved: true });
+  await assertSelections(page, latest.items);
   await page.goForward();
-  await expect(firstRow).toBeInViewport();
+  await expect(page).toHaveURL(forwardURL);
+  expect(new URL(page.url()).hash).toBe('#' + first.id);
+  await restoredReading(permanentFirst.locator('h2 a'), forwardReading);
 });
 
 test('Daily controls, explanations and disclosed sources fit 320, 390, 768 and 1440 pixel widths', async ({ page }) => {

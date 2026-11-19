@@ -856,7 +856,7 @@ function initCompare(){$('clear-compare').addEventListener('click',()=>{setSelec
 // Method page: evidence labels, research coverage and downloads.
 function initMethod(){return detailViewRenderer("initMethod",this,arguments);}
 
-function initialize(){$('snapshot').textContent=compiledSnapshotLabel(DATA.meta.as_of);$('footer-version').textContent=`Dataset v${DATA.dataset_version}`;
+function initialize(){$('snapshot').textContent=compiledSnapshotLabel(DATA.meta.as_of).replace('Public research · compiled ','Snapshot ');$('footer-version').textContent=`Historical company dataset v${DATA.dataset_version}`;
  const renderCards=renderDirectory;renderDirectory=function(){directoryShown=true;return renderCards.apply(this,arguments);};
  Object.assign(PAGE_SETUP,{companies:[initDirectory],method:[initMethod],work:[initWork],market:[renderStory]});
  // Each route prepares its own controls; browsers need no speculative filter-panel work.

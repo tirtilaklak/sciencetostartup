@@ -8,26 +8,33 @@
   const count=document.getElementById('company-count');
   const empty=document.getElementById('company-empty');
   const sections=[...document.querySelectorAll('.directory-section')];
-  const normalize=value=>value.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
-  const cards=sections.map(section=>({section,rows:[...section.querySelectorAll('[data-company]')].map(node=>({node,text:normalize(node.dataset.search)}))}));
+  const search=globalThis.S2SSearch;
+  if(!search){document.documentElement.removeAttribute('data-page-enhancement');return;}
+  const aliases=node=>{try{const value=JSON.parse(node.dataset.searchAliases||'[]');return Array.isArray(value)?value:[];}catch{return [];}};
+  const cards=sections.map((section,order)=>({section,order,rows:[...section.querySelectorAll('[data-company]')].map((node,index)=>({node,index,compiled:search.compile({name:node.dataset.searchName||node.querySelector('.directory-company-heading a')?.textContent||'',aliases:aliases(node),text:node.dataset.search||node.textContent})}))}));
+  const sectionParent=sections[0]?.parentNode,sectionAnchor=sections.at(-1)?.nextSibling;
   const read=()=>{
     const params=new URLSearchParams(location.search);
     query.value=params.get('q')||'';
-    group.value=params.get('group')||'';
+    const selected=params.get('group')||'';group.value=[...group.options].some(option=>option.value===selected)?selected:'';
   };
   function filter(updateURL=true){
-    const terms=normalize(query.value).split(/\s+/).filter(Boolean);
+    const key=search.normalize(query.value);
     let visible=0;
-    cards.forEach(({section,rows})=>{
-      let own=0;
-      rows.forEach(({node,text})=>{
-        const match=(!group.value||section.dataset.group===group.value)&&terms.every(term=>text.includes(term));
+    cards.forEach(entry=>{
+      const {section,rows}=entry;let own=0;entry.best=Infinity;
+      rows.forEach(row=>{
+        const {node}=row;row.rank=search.rank(row.compiled,key);
+        const match=(!group.value||section.dataset.group===group.value)&&row.rank>=0;
         node.hidden=!match;
-        if(match){own++;visible++;}
+        if(match){own++;visible++;entry.best=Math.min(entry.best,row.rank);}
       });
+      const list=section.querySelector('.directory-grid')||rows[0]?.node.parentNode;
+      if(list) [...rows].sort((a,b)=>(key?a.rank-b.rank:0)||a.index-b.index).forEach(row=>list.append(row.node));
       section.hidden=own===0;
       section.querySelector('.directory-section-heading>span').textContent=`${own} ${own===1?'company':'companies'}`;
     });
+    if(sectionParent) [...cards].sort((a,b)=>(key?a.best-b.best:0)||a.order-b.order).forEach(entry=>sectionParent.insertBefore(entry.section,sectionAnchor));
     count.textContent=`${visible} ${visible===1?'company':'companies'}`;
     empty.hidden=visible!==0;
     if(updateURL){

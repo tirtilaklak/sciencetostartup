@@ -1,0 +1,58 @@
+# Legacy platform references and current-guide migration
+
+Read-only research, 18 November 2026. This review used public web retrieval and connected GitHub reads. No former service, registry entry, social profile, redirect or endpoint was changed.
+
+## Finding and scope decision
+
+ScienceToStartup has two materially different public descriptions. The **current authoritative repository** describes a static, source-linked field guide to AI data organizations, human feedback and evaluations. Older first-party indexed pages and the LinkedIn About section describe a research-commercialization platform with viability scores, interactive workspaces and an MCP service.
+
+The five reference platforms in the competitive review apply to the **current guide**. They are not a competitive audit of every retired commercialization feature. Keep Epoch AI, Hugging Face, Artificial Analysis, Elicit and AI Training Index for this implementation, and state the scope distinction explicitly. A future decision to revive commercialization scoring would require a separate product/evidence review.
+
+These old public references provide concrete links to retired routes. Their existence does not establish the source of each production request, human demand, current service operation or ownership of an older GitHub/registry namespace. No private traffic figures are included here.
+
+## Primary-source timeline
+
+| Date or observation | Evidence | What it establishes |
+|---|---|---|
+| June 2026 indexed content | The [old resource entry](https://sciencetostartup.com/resources/directory/github) exposes Product/Proof/Developer navigation. The cached [dashboard](https://sciencetostartup.com/dashboard) describes commercialization-ranked papers; the cached [changelog](https://sciencetostartup.com/changelog) describes June 5/7 paper-workspace changes. | A former public product advertised those surfaces. Search-cache dates are not a verified retirement/cutover date, and historical feature descriptions are not proof every feature worked. |
+| 17 October 2026 | Current repo [import commit](https://github.com/tirtilaklak/sciencetostartup/commit/4b56b2fb8ec4abf1494b15f45c1739f5b1f8b230) and its [README](https://github.com/tirtilaklak/sciencetostartup/blob/4b56b2fb8ec4abf1494b15f45c1739f5b1f8b230/README.md) identify reviewed static field-guide v30, dataset 2.5.0, and an imported source snapshot. | The current guide was explicitly documented by this date. The README says earlier Sites Git history was not imported; this repository cannot establish the entire former application's code history. |
+| 10 November 2026 | [Identity/workflow commit](https://github.com/tirtilaklak/sciencetostartup/commit/ea8850d675b5b0c214d569475437140350da8b85) contains the original [legacy retirement document](https://github.com/tirtilaklak/sciencetostartup/blob/ea8850d675b5b0c214d569475437140350da8b85/docs/research/legacy-mcp-retirement.md). | The current project explicitly recognizes the former Buildability Oracle and says the static guide does not operate it. Repository access under tirtilaklak does not establish control of musa8026's namespace. |
+| 15 November 2026 recorded check | [Updated retirement document](https://github.com/tirtilaklak/sciencetostartup/blob/main/docs/research/legacy-mcp-retirement.md), changed in [first-edition commit](https://github.com/tirtilaklak/sciencetostartup/commit/aac87fd94dc86dee4976176fddb0764215898107), records registry version 2.2.0 still active with an April 29 update. | This is a dated prior registry observation. The live official registry lookup was inaccessible through this review's web tool, so this report does not assert a newly verified November 18 registry status. |
+| 18 November 2026 observation | The public [LinkedIn page](https://www.linkedin.com/company/sciencetostartup) still presents the commercialization product and links dashboard/proof/developer routes. Current [publisher identity](https://github.com/tirtilaklak/sciencetostartup/blob/main/data/public-identity.json) names the current repository and labels LinkedIn update_pending. | An external description remains inconsistent with the current guide. Employee-size, affiliations, market coverage and signing/viability claims on that profile were not validated and must not be carried into the current product description. |
+| 18 November 2026 repository reads | Approved reads of [musa8026/sciencetostartup](https://github.com/musa8026/sciencetostartup) and its contents returned 404; connected code searches returned no matches. | The old repository/history was unavailable to this connection. This does not distinguish deletion, privacy or permission/indexing limits. No alternate-account or access-control bypass was attempted. |
+
+The exact switch date between products remains unestablished. The evidence supports an older commercialization product and a separately documented current field guide, not a continuous deployment history reconstructed from matching brand names.
+
+## Bounded route inventory and safe handling
+
+| Legacy surface with evidence | Current equivalent established? | Recommendation |
+|---|---|---|
+| `/paper/identity-as-attractor-geometric-evidence-for-persistent-agent-architecture-in-llm-activation-space` | The [cached paper page](https://sciencetostartup.com/paper/identity-as-attractor-geometric-evidence-for-persistent-agent-architecture-in-llm-activation-space) identifies arXiv **2604.12016** and an old commercialization/workbench view. The inspected complete [current paper index](https://sciencetostartup.com/research/papers/) contains neither that ID nor its title. | No exact current mapping is established for this example. Do not send it to an unrelated paper or present the current index as the missing original content. A retirement notice can offer the original arXiv link and clearly labelled current browsing. |
+| `/paper/{arxiv-id}` and slug variants | Some current work/version records have exact arXiv identifiers, but that does not prove every legacy path's identity. Current scope is a selected corpus, not every new cs.AI paper. | Build only an explicit reviewed crosswalk from observed old identity to an existing current canonical. A numeric ID can be matched exactly; a slug needs the old page/source's title-to-ID binding. Do not generate slug redirects by resemblance. |
+| `/signal-canvas` and `/signal-canvas/` | Old navigation and paper controls identify an interactive synthesis surface. No equivalent current workspace contract was established. | Retire explicitly. The research index can be offered as related reading, not falsely represented as the same workspace or a successful saved-work migration. |
+| `/buildability/` and paper-specific buildability paths | The old example page advertises a Build Now receipt/workflow. The current guide does not establish equivalent scores, signatures or stored runs. | No blanket redirect to research or homepage. A retirement explanation must not imply old receipts or user state were preserved. |
+| `/dashboard`, `/proof`, `/developers`, `/developers/mcp`, `/methodology` | These are advertised in old first-party navigation/profile copy. Current `/daily/` is a selected AI-data reading list, and `/method/` explains the current guide's evidence standard. Those are changed scopes, not proven replacements for ranked commercialization and signing methods. | Use a transition explanation where appropriate. Redirect only after the old content and the target's actual purpose are checked for equivalence. Do not treat a similarly named Methods page as proof the old scoring methodology survived. |
+| `/resources/directory/github` | Its retained content is a generic GitHub tool entry. The current source repository is the code for this guide, a different object. | Do not redirect the tool entry to the guide's GitHub repository as though they were equivalent. A retirement page can retain a labelled link to github.com without rebuilding the whole retired directory. |
+| `/api/mcp` and old REST paper-pack/build-passport paths | Current retirement documentation says the service is not operated. Registry aggregators still advertise it; their listings are not a successful protocol test. | Keep the retired machine endpoint unavailable. Do not redirect it to HTML, manufacture an MCP success response or silently replace the API with current dataset JSON. An explicit 410 policy would be a separate retirement decision, not service restoration. |
+
+### What an eligible paper mapping looks like
+
+The current guide has distinct verified targets for [arXiv 2506.07982 work](https://sciencetostartup.com/research/papers/paper.arxiv.2506.07982/) and [2506.07982v1 source version](https://sciencetostartup.com/research/papers/paper.arxiv.2506.07982v1/). These demonstrate the current target identities. This review did **not** establish a corresponding historical incoming route for that paper, so they are examples of the required matching rule, not newly approved redirects.
+
+For an observed unversioned legacy arXiv path, match the exact current work ID. For an explicitly versioned path, require the same version; do not silently substitute a different version or grant approval because its parent work is approved. Preserve the current record's review status and source scope. Multiple matches, missing identity evidence and absent targets remain unresolved. A generic index or homepage is not an identity-preserving replacement.
+
+The cached old example was retrievable with historical content, while a subsequent retrieval returned an error. Other legacy paths returned retrieval-tool failures. These mixed representations cannot establish current HTTP behavior, a paywall, user-state preservation or a working API. Exact live response status/canonical/redirect behavior still requires the release's ordinary response checks.
+
+## External-description cleanup before new acquisition
+
+The current public identity already marks the external profile update as pending. Prepare a concrete replacement description using only current capabilities, for example:
+
+> ScienceToStartup publishes independent, public-source research on AI data organizations, human feedback and evaluations. Browse source-linked company profiles, dated AI training work routes and versioned research with visible evidence limits.
+
+This is a proposed draft, not a posted profile update. Remove unsupported active API/SDK, commercialization-scoring, organization-size and affiliation claims only through the actual authorized profile workflow. This review sent no message and changed no account.
+
+For the legacy registry, follow the existing retirement document: the namespace owner must authenticate through the official registry publisher, inspect all versions and deprecate the retired entry using the current documented command. Do not register a new server to obscure an old namespace, and do not infer authority from access to the current repository. The [official registry CLI documentation](https://github.com/modelcontextprotocol/registry/blob/main/docs/reference/cli/commands.md) is the authority to consult before that action. This research performed no registry mutation.
+
+## Decision for this release
+
+Keep the current-guide reference set and add an explicit retired/current-product distinction to the competitive report. Preserve a reviewed legacy inventory. Implement no broad product resurrection or catch-all redirect. Admit only exact content mappings with existing targets, and make retired machine contracts fail honestly. External description/registry correction is an ownership-dependent follow-up, not a reason to pretend a missing service works.

@@ -2,6 +2,7 @@
 import html
 import json
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -144,9 +145,9 @@ class CompanyEventsBuildTests(unittest.TestCase):
         cls.temp = tempfile.TemporaryDirectory(prefix="company-events-")
         root, cls.dist = Path(cls.temp.name) / "root", Path(cls.temp.name) / "dist"
         (root / "data").mkdir(parents=True)
-        for name in ("web", "design-system", "release-assets"): (root / name).symlink_to(ROOT / name)
-        import shutil
-        for name in ('schema', 'scripts', 'docs'):
+        # Runtime admission rejects symlinked path components, including the
+        # retained release-assets directory. Model a real checkout here.
+        for name in ('web', 'design-system', 'release-assets', 'schema', 'scripts', 'docs'):
             shutil.copytree(ROOT / name, root / name,
                             ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
         from publication_fixtures import populate_owned_inputs

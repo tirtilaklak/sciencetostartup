@@ -16,10 +16,10 @@ main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:
 .company-key-fact{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
 .company-key-fact:only-child{grid-column:1/-1}
 .company-key-fact+.company-key-fact{border-left:1px solid var(--border);padding-left:32px}
-.company-fact-label{font-size:12px;line-height:1.5;color:var(--muted)}
+.company-fact-label{font-size:14px;line-height:1.5;color:var(--muted)}
 .company-key-fact>strong,.company-current-fact .selected-value{font-size:30px;line-height:1.2;font-weight:500;letter-spacing:-.7px;overflow-wrap:anywhere}
-.company-fact-meta,.company-fact-source,.company-current-fact .sub{font-size:12px;line-height:1.7;color:var(--muted)}
-.company-fact-status{font-size:11px;line-height:1.5;color:var(--amber,#795418)}
+.company-fact-meta,.company-fact-source,.company-current-fact .sub{font-size:14px;line-height:1.7;color:var(--muted)}
+.company-fact-status{font-size:14px;line-height:1.5;color:var(--amber,#795418)}
 .company-current-fact .selected-evidence{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin:0;padding:0;border:0}
 .company-current-fact .selected-evidence .sub{margin:0}
 .company-unreported>strong{font-size:22px;line-height:1.3;letter-spacing:-.3px}
@@ -29,7 +29,8 @@ main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:
 .company-fold{margin:0;padding:0;border:0;border-bottom:1px solid var(--border);border-radius:0;background:transparent}
 .company-fold>summary{display:flex;align-items:center;gap:16px;min-height:64px;padding:16px 0;list-style:none;box-sizing:border-box;font-size:17px;line-height:1.4}
 .company-fold>summary::-webkit-details-marker{display:none}
-.company-fold>summary>small{margin-left:auto;font-size:12px;color:var(--muted);text-align:right;line-height:1.6}
+.company-fold>summary>span{min-width:0;overflow-wrap:anywhere}
+.company-fold>summary>small{margin-left:auto;font-size:14px;color:var(--muted);text-align:right;line-height:1.6}
 .company-fold>summary::after{content:'+';flex:none;font-size:22px;font-weight:400;color:var(--green)}
 .company-fold[open]>summary::after{content:'−'}
 .company-fold-body{padding:0 0 28px;min-width:0}
@@ -56,8 +57,7 @@ main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:
  .company-key-facts{gap:22px;padding:20px 0;margin-bottom:24px}
  .company-key-fact+.company-key-fact{padding-left:20px}
  .company-key-fact>strong,.company-current-fact .selected-value{font-size:26px}.company-unreported>strong{font-size:18px}
- .company-fact-label,.company-fact-meta,.company-fact-source,.company-current-fact .sub{font-size:11px}
- .company-fold>summary{min-height:64px;font-size:16px;gap:12px}.company-fold>summary>small{max-width:45%;font-size:11px}
+ .company-fold>summary{min-height:64px;font-size:16px;gap:12px}.company-fold>summary>small{max-width:45%}
  .company-notice{font-size:12px}.company-fold-body h2{font-size:22px}
 }
 @media(max-width:380px){

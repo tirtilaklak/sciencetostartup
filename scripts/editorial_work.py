@@ -22,6 +22,8 @@ REVIEW_BASES = {"stored_evidence", "direct_source", "not_reviewed"}
 RECEIPT_RESULTS = {"readable", "blocked", "not_found", "unavailable", "unreadable_shell", "error"}
 ARCHIVE_STATUSES = {"historical", "closed", "contributions", "paused", "no_route", "inquiry", "information"}
 SHA256 = re.compile(r"^[a-f0-9]{64}$")
+PRIVATE_CAPTURE_FIELDS = {"raw_path", "local_path", "extracted_text_path"}
+PRIVATE_CAPTURE_REFERENCE = re.compile(r"(?<![A-Za-z0-9:/])(?:/(?:workspace|tmp|home|private|mnt)(?:/|$)|file://)")
 
 
 class EditorialValidationError(ValueError):
@@ -39,6 +41,21 @@ def checked_date(value, label):
         return date.fromisoformat(value)
     except ValueError as error:
         raise EditorialValidationError("editorial-work: " + label + " is invalid") from error
+
+
+def public_provenance(value, label):
+    """The work sidecar is downloadable; private capture locations stay outside it."""
+    if isinstance(value, dict):
+        for key, item in value.items():
+            require(isinstance(key, str) and key not in PRIVATE_CAPTURE_FIELDS and not key.startswith("private_"),
+                    label + ": private capture field is not public provenance")
+            public_provenance(item, label)
+    elif isinstance(value, list):
+        for item in value:
+            public_provenance(item, label)
+    elif isinstance(value, str):
+        require(not PRIVATE_CAPTURE_REFERENCE.search(value),
+                label + ": private capture location is not public provenance")
 
 
 def primary_routes(work):
@@ -110,10 +127,13 @@ def validate_editorial_release(work, release, canonical, *, canonical_sha256=Non
         require(row.get("pay_basis") not in {"per_completed_task", "hour_equivalent", "hour_or_accepted_task", "approved_deliverables"} or not pay["hourly_comparable"], label + ": task/conditional pay misclassified as actual hourly payment")
 
         editorial = row.get("editorial_review", {})
+        public_provenance(editorial, label + ": editorial_review")
         require(editorial.get("release_id") == release_id, label + ": editorial release mismatch")
         require(checked_date(editorial.get("classified_on"), label + ": classified_on") <= as_of, label + ": future classification")
         require(editorial.get("classification_basis") == "stored_evidence", label + ": classification must retain its evidence basis")
         available_sources = canonical_sources | {source["id"] for source in row.get("sources", [])}
+        for source in row.get("sources", []):
+            public_provenance(source, label + ": source")
         references = editorial.get("classification_source_ids", [])
         require(bool(references) and set(references) <= available_sources, label + ": missing classification sources")
         reviews = row.get("field_reviews", {})
@@ -137,6 +157,7 @@ def validate_editorial_release(work, release, canonical, *, canonical_sha256=Non
                 require(bool(review.get("note")), where + ": absence must name its reviewed scope")
         receipt_ids = set()
         for receipt in editorial.get("receipts", []):
+            public_provenance(receipt, label + ": receipt")
             require(isinstance(receipt, dict) and isinstance(receipt.get("id"), str) and bool(receipt["id"]), label + ": receipt identity missing")
             require(receipt.get("id") not in receipt_ids, label + ": duplicate receipt")
             receipt_ids.add(receipt["id"])
@@ -144,7 +165,19 @@ def validate_editorial_release(work, release, canonical, *, canonical_sha256=Non
             require(checked_date(receipt.get("checked_on"), label + ": receipt date") <= as_of, label + ": future receipt")
             checked_at = receipt.get("checked_at", "")
             require(isinstance(checked_at, str) and bool(re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", checked_at)) and checked_at[:10] == receipt["checked_on"], label + ": receipt timestamp differs from its review date")
-            require(datetime.fromisoformat(checked_at.replace("Z", "+00:00")) <= publication_time, label + ": receipt follows publication timestamp")
+            try:
+                receipt_time = datetime.fromisoformat(checked_at.replace("Z", "+00:00"))
+            except ValueError as error:
+                raise EditorialValidationError("editorial-work: " + label + ": invalid receipt timestamp") from error
+            require(receipt_time <= publication_time, label + ": receipt follows publication timestamp")
+            if receipt.get("retrieved_at") is not None:
+                retrieved_at = receipt["retrieved_at"]
+                require(isinstance(retrieved_at, str) and bool(re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", retrieved_at)), label + ": retrieved_at must be an explicit UTC timestamp")
+                try:
+                    retrieved_time = datetime.fromisoformat(retrieved_at.replace("Z", "+00:00"))
+                except ValueError as error:
+                    raise EditorialValidationError("editorial-work: " + label + ": invalid retrieval timestamp") from error
+                require(retrieved_time <= receipt_time, label + ": capture follows review timestamp")
             require(bool(SHA256.fullmatch(receipt.get("response_sha256", ""))), label + ": missing response receipt")
             require(receipt.get("source_id") in available_sources, label + ": receipt source missing")
             if receipt.get("approved"):
@@ -155,9 +188,22 @@ def validate_editorial_release(work, release, canonical, *, canonical_sha256=Non
                 require(bool(receipt.get("evidence")), label + ": approved receipt lacks evidence locators")
                 if receipt["scope"] == "key_terms":
                     require(set(receipt["reviewed_fields"]) == FIELD_NAMES, label + ": homepage key terms require all explicit field states")
-                for field in receipt["reviewed_fields"]:
-                    review = reviews[field]
-                    require(review["basis"] == "direct_source" and review.get("reviewed_on") == receipt["checked_on"] and receipt["source_id"] in review["source_ids"] and review["state"] != "not_researched", label + ": approved receipt does not bind its reviewed fields")
+        # Receipts are immutable review events. A later field-only review must
+        # not invalidate an earlier all-fields review or rewrite its timestamp.
+        # Current direct-source claims, however, need exact date/source/field
+        # support; an old approval cannot silently bless a newer field value.
+        for field, review in reviews.items():
+            if review["basis"] != "direct_source":
+                continue
+            for source_id in review["source_ids"]:
+                require(any(receipt.get("approved") and receipt.get("result") == "readable"
+                            and receipt.get("scope") in {"field_review", "key_terms"}
+                            and receipt.get("approval_basis") == "source_content_review"
+                            and receipt.get("checked_on") == review.get("reviewed_on")
+                            and receipt.get("source_id") == source_id
+                            and field in receipt.get("reviewed_fields", [])
+                            for receipt in editorial.get("receipts", [])),
+                        label + ": current direct-source field lacks matching approved receipt: " + field)
         terms_id = editorial.get("approved_terms_receipt_id")
         if terms_id:
             require(any(receipt["id"] == terms_id and receipt.get("approved") and receipt["scope"] == "key_terms" for receipt in editorial.get("receipts", [])), label + ": approved terms pointer is invalid")

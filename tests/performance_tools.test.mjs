@@ -8,7 +8,7 @@ import {gzipSync} from 'node:zlib';
 import {spawnSync} from 'node:child_process';
 import {archiveLeak, checkPayloadBudgets, compressedSizes, extractBootstrapScripts,
   loadArtifactManifest, readBudgets, resourceReferences, sha256, stableJSON} from '../scripts/payload_budgets.mjs';
-import {median, mobileHeroRequests, summarizeRoutes, verifyServedArtifact} from '../scripts/performance_audit.mjs';
+import {diagnosticReasons, median, mobileHeroRequests, saveDiagnostics, summarizeRoutes, verifyServedArtifact} from '../scripts/performance_audit.mjs';
 
 const {policy, sha256: policySha256} = await readBudgets();
 
@@ -67,8 +67,8 @@ test('browser CI partitions preserve every test and isolate all twelve chapter s
   const coreKeys = new Set(keys(core));
   assert(report.entries.every(entry => !coreKeys.has(entry.key)), 'CI partitions overlap');
   assert.deepEqual([...keys(core), ...keys(report)].sort(), keys(all), 'CI must execute exactly the complete inventory');
-  assert.equal(all.entries.length, 700);
-  assert.equal(core.entries.length, 640);
+  assert(all.entries.length >= 700, 'The original browser inventory must not shrink');
+  assert.equal(core.entries.length, all.entries.length - 60);
   assert.equal(report.entries.length, 60);
   assert.deepEqual(report.entries.map(entry => entry.project).sort(),
     ['chromium', 'firefox', 'mobile-chromium', 'mobile-webkit', 'webkit'].flatMap(name => Array(12).fill(name)).sort());
@@ -83,19 +83,23 @@ test('browser CI partitions preserve every test and isolate all twelve chapter s
   assert.equal(report.config.workers, 1);
 });
 
-test('required browser check fails unless both CI partitions succeed', () => {
+test('required browser check fails unless browser, accessibility and performance succeed', () => {
   const job = browserJob('browser');
   assert.match(job, /^    if: \$\{\{ always\(\) \}\}$/m);
-  assert.match(job, /^    needs: \[browser-core, report-accessibility\]$/m);
+  assert.match(job, /^    needs: \[browser-core, report-accessibility, performance\]$/m);
   assert.match(job, /^          CORE_RESULT: \$\{\{ needs\.browser-core\.result \}\}$/m);
   assert.match(job, /^          REPORT_RESULT: \$\{\{ needs\.report-accessibility\.result \}\}$/m);
+  assert.match(job, /^          PERFORMANCE_RESULT: \$\{\{ needs\.performance\.result \}\}$/m);
   const script = job.split('        run: |\n')[1];
   assert(script, 'Missing required-check script');
   for (const core of ['success', 'failure', 'cancelled', 'skipped']) {
     for (const report of ['success', 'failure', 'cancelled', 'skipped']) {
-      const result = spawnSync('bash', ['-e', '-o', 'pipefail', '-c', script], {
-        env: {...process.env, CORE_RESULT: core, REPORT_RESULT: report}, encoding: 'utf8'});
-      assert.equal(result.status === 0, core === 'success' && report === 'success', core + '/' + report);
+      for (const performance of ['success', 'failure', 'cancelled', 'skipped']) {
+        const result = spawnSync('bash', ['-e', '-o', 'pipefail', '-c', script], {
+          env: {...process.env, CORE_RESULT: core, REPORT_RESULT: report, PERFORMANCE_RESULT: performance}, encoding: 'utf8'});
+        assert.equal(result.status === 0, core === 'success' && report === 'success' && performance === 'success',
+          core + '/' + report + '/' + performance);
+      }
     }
   }
 });
@@ -135,8 +139,8 @@ test('fixed gates retain the approved limits across field-guide and research rou
   assert.equal(policy.performance.lighthouseVersion, '13.6.0');
   assert.equal(policy.performance.playwrightVersion, '1.65.0');
   assert.equal(policy.performance.minimumRunsPerRoute, 3);
-  assert.deepEqual(policy.performance.routes, ['/', '/explore/#companies', '/explore/#work', '/explore/#company/mercor/work', '/work/',
-    '/research/', '/research/state-of-ai-data-labs/',
+  assert.deepEqual(policy.performance.routes, ['/', '/companies/', '/explore/#companies', '/explore/#work', '/explore/#company/mercor/work', '/work/',
+    '/daily/', '/research/', '/research/papers/', '/research/state-of-ai-data-labs/',
     '/research/state-of-ai-data-labs/chapters/weekly-developments/',
     '/research/state-of-ai-data-labs/chapters/market-structure/',
     '/research/state-of-ai-data-labs/chapters/technical-landscape/',
@@ -178,6 +182,70 @@ test('route gates require three complete samples and use inclusive median thresh
   const slow = structuredClone(results); slow[0].metrics['largest-contentful-paint'] = 2501;
   slow[1].metrics['largest-contentful-paint'] = 2501;
   assert.equal(summarizeRoutes(slow, configuration, 3)[0].passed, false);
+});
+
+test('diagnostics retain an over-budget sample even when the three-run median passes', async t => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'performance-diagnostics-'));
+  t.after(() => rm(directory, {recursive: true, force: true}));
+  const configuration = {...policy.performance, routes: ['/']};
+  const records = [100, 150, 230].map((tbt, index) => ({route: '/', run: index + 1, valid: true,
+    metrics: {'largest-contentful-paint': 1000, 'total-blocking-time': tbt, 'cumulative-layout-shift': 0}}));
+  const artifacts = {Trace: {traceEvents: [{name: 'Layout', dur: 230000}]},
+    DevtoolsLog: [{method: 'Network.responseReceived', params: {type: 'Document'}}]};
+  const reasons = diagnosticReasons(records[2], configuration);
+  assert.deepEqual(reasons, ['total-blocking-time:over-budget']);
+  records[2].diagnostics = await saveDiagnostics(directory, 'route-01-run-3', artifacts, reasons);
+  assert.equal(records[2].diagnostics.files.length, 2);
+  assert.deepEqual(records[2].diagnostics.missing, []);
+  assert.deepEqual(records[2].diagnostics.errors, []);
+  for (const file of records[2].diagnostics.files) {
+    const bytes = await readFile(path.join(directory, file.file));
+    assert.equal(bytes.length, file.bytes);
+    assert.equal(sha256(bytes), file.sha256);
+    assert.deepEqual(JSON.parse(bytes), artifacts[file.artifact]);
+  }
+  const summary = summarizeRoutes(records, configuration, 3)[0];
+  assert.equal(summary.passed, true);
+  assert.equal(summary.medians['total-blocking-time'], 150);
+  assert.deepEqual(summary.runReports[2].diagnostics, records[2].diagnostics);
+  assert.deepEqual(diagnosticReasons(records[0], configuration), []);
+  assert.deepEqual(await saveDiagnostics(directory, 'passing', artifacts, []),
+    {required: false, reasons: [], files: [], missing: [], errors: []});
+});
+
+test('failed navigation retains Lighthouse error traces and identifies their source keys', async t => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'performance-navigation-error-'));
+  t.after(() => rm(directory, {recursive: true, force: true}));
+  const artifacts = {Trace: null, TraceError: {traceEvents: [{name: 'navigationStart'}]},
+    DevtoolsLogError: [{method: 'Network.loadingFailed', params: {errorText: 'net::ERR_CONNECTION_RESET'}}]};
+  const record = {valid: false, error: 'PAGE_HUNG'};
+  const diagnostics = await saveDiagnostics(directory, 'failed-navigation', artifacts,
+    diagnosticReasons(record, policy.performance));
+  assert.deepEqual(diagnostics.missing, []);
+  assert.deepEqual(diagnostics.errors, []);
+  assert.deepEqual(diagnostics.files.map(file => file.sourceArtifact), ['TraceError', 'DevtoolsLogError']);
+  for (const file of diagnostics.files) {
+    const raw = await readFile(path.join(directory, file.file));
+    assert.deepEqual(JSON.parse(raw), artifacts[file.sourceArtifact]);
+    assert.equal(raw.length, file.bytes);
+    assert.equal(sha256(raw), file.sha256);
+  }
+  assert.equal(record.metrics, undefined);
+});
+
+test('invalid audits report absent trace artifacts without fabricating measurements', async t => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'performance-missing-'));
+  t.after(() => rm(directory, {recursive: true, force: true}));
+  const record = {route: '/', run: 1, valid: false, error: 'Browser stopped before a result'};
+  const diagnostics = await saveDiagnostics(directory, 'failed-run', undefined, diagnosticReasons(record, policy.performance));
+  assert.deepEqual(diagnostics, {required: true, reasons: ['invalid-run'], files: [],
+    missing: ['Trace', 'DevtoolsLog'], errors: []});
+  assert.equal(record.metrics, undefined);
+  const unwritable = await saveDiagnostics(path.join(directory, 'absent'), 'failed-write',
+    {Trace: {traceEvents: []}}, ['invalid-run']);
+  assert.equal(unwritable.files.length, 0);
+  assert.equal(unwritable.errors.length, 1);
+  assert.deepEqual(unwritable.missing, ['DevtoolsLog']);
 });
 
 test('settings identity is stable across object key order while arrays remain ordered', () => {

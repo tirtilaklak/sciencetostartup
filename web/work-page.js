@@ -11,10 +11,17 @@
   const kind = form.elements.namedItem('kind');
   const arrangement = form.elements.namedItem('arrangement');
   const filterOptions = form.querySelector('.work-page-filter-options');
-  const fold = value => String(value || '').normalize('NFKD').replace(/\p{M}/gu, '').toLocaleLowerCase().replace(/\s+/g, ' ').trim();
-  const records = groups.flatMap(group => [...group.querySelectorAll('[data-work-route]')].map(card => ({
-    card, group,
-    text: fold(['.work-heading', '.work-offer', '.work-listing-conditions'].map(selector => card.querySelector(selector)?.textContent || '').join(' ')),
+  const search = globalThis.S2SSearch;
+  if (!search) { document.documentElement.removeAttribute('data-page-enhancement'); return; }
+  let companyAliases = {};
+  try { companyAliases = JSON.parse(document.getElementById('work-search-aliases')?.textContent || '{}'); } catch { /* Older markup still has complete visible records. */ }
+  const aliases = card => {
+    const company = card.querySelector('.work-company'), id = company?.getAttribute('href')?.match(/\/company\/([^/]+)\//)?.[1];
+    return [company?.textContent || '', ...(Array.isArray(companyAliases[id]) ? companyAliases[id] : [])];
+  };
+  const records = groups.flatMap(group => [...group.querySelectorAll('[data-work-route]')].map((card, index) => ({
+    card, group, index,
+    compiled: search.compile({name: card.dataset.searchName || card.querySelector('.work-heading h3')?.textContent || '', aliases: aliases(card), text: card.dataset.search || ['.work-heading', '.work-offer', '.work-listing-conditions'].map(selector => card.querySelector(selector)?.textContent || '').join(' ')}),
     arrangements: (card.dataset.arrangements || '').split(' ')
   })));
   const initialOpen = new Map(groups.filter(group => group.tagName === 'DETAILS').map(group => [group, group.open]));
@@ -28,16 +35,21 @@
     if (filterOptions && (kind.value || arrangement.value)) filterOptions.open = true;
   }
   function render(updateURL = true) {
-    const words = fold(query.value).split(' ').filter(Boolean);
-    const active = Boolean(words.length || kind.value || arrangement.value);
+    const key = search.normalize(query.value);
+    const active = Boolean(key || kind.value || arrangement.value);
     let matches = 0;
     const shownGroups = new Set();
     for (const record of records) {
       const place = arrangement.value;
       const fitsPlace = !place || (place === 'onsite' ? record.arrangements.some(value => value === 'onsite' || value === 'hybrid') : place === 'varies' ? !record.arrangements.some(value => ['remote', 'onsite', 'hybrid'].includes(value)) : record.arrangements.includes(place));
-      const visible = (!kind.value || record.group.dataset.workGroup === kind.value) && fitsPlace && words.every(word => record.text.includes(word));
+      record.rank = search.rank(record.compiled, key);
+      const visible = (!kind.value || record.group.dataset.workGroup === kind.value) && fitsPlace && record.rank >= 0;
       record.card.hidden = !visible;
       if (visible) { matches++; shownGroups.add(record.group); }
+    }
+    for (const group of groups) {
+      const own = records.filter(record => record.group === group), list = group.querySelector('.work-listings') || own[0]?.card.parentNode;
+      if (list) own.sort((a, b) => (key ? a.rank - b.rank : 0) || a.index - b.index).forEach(record => list.append(record.card));
     }
     if (active && !filtering) for (const group of initialOpen.keys()) initialOpen.set(group, group.open);
     for (const group of groups) {

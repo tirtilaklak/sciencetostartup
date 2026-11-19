@@ -90,9 +90,9 @@ class CompanyProfileLayoutTests(unittest.TestCase):
     def test_reported_facts_keep_their_financial_scope_and_unknown_states(self):
         header = lambda cid: self.pages[cid].split('<article class="company-dossier">', 1)[1].split('<div class="company-record">', 1)[0]
         mercor = header("mercor")
-        for value in ("Annualized pace", "Whole company", "Gross/net not disclosed", "Investor-reported"):
+        for value in ("Annualized revenue pace", "Whole company", "Gross/net not disclosed", "Investor-reported"):
             self.assertIn(value, mercor)
-        self.assertEqual(mercor.count("Annualized pace"), 1)
+        self.assertEqual(mercor.count("Annualized revenue pace"), 1)
         self.assertIn("Jun 2026", mercor)
         self.assertNotIn("2026-06", mercor)
         afterquery = header("afterquery")

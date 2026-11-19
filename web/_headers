@@ -18,3 +18,25 @@
 /*.sqlite
   Cache-Control: public, max-age=3600
   Content-Type: application/vnd.sqlite3
+/daily/feed.xml
+  Content-Type: application/rss+xml; charset=utf-8
+/daily/feed.json
+  Content-Type: application/feed+json; charset=utf-8
+/publication/report.html
+  X-Robots-Tag: noindex
+/publication/report
+  X-Robots-Tag: noindex
+/publication/report/
+  X-Robots-Tag: noindex
+/publication/executive-brief.html
+  X-Robots-Tag: noindex
+/publication/executive-brief
+  X-Robots-Tag: noindex
+/publication/executive-brief/
+  X-Robots-Tag: noindex
+/publication/evidence.html
+  X-Robots-Tag: noindex
+/publication/evidence
+  X-Robots-Tag: noindex
+/publication/evidence/
+  X-Robots-Tag: noindex

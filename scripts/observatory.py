@@ -828,8 +828,11 @@ def build(data, destination):
     # fixtures must not accidentally inherit unrelated live research or coverage.
     research_context = None
     current_companies = None
+    from daily_scan import DailyContext, load_daily_context
+    daily_context = DailyContext((), {"entries": []}, b'{"entries": []}\n')
     public_canonical_bytes = (ROOT / "data/canonical.json").read_bytes()
     if data == json.loads(public_canonical_bytes):
+        daily_context = load_daily_context(ROOT)
         from research_report import build_context
         from research_pages import research_search_entries
         research_context = build_context(ROOT)
@@ -845,7 +848,7 @@ def build(data, destination):
         from editorial_work import load_editorial_release
         release = load_editorial_release(release_path, work_data, data)
     from presentation import build_presentation, public_logo_provenance, write_asset
-    summary, summary_asset = build_presentation(data, destination, ROOT, sidecars, release)
+    summary, summary_asset = build_presentation(data, destination, ROOT, sidecars, release, daily_context=daily_context)
     original_summary = destination / summary_asset["href"].lstrip("/")
     summary["modules"] = {"businessHealth": write_business_health_module(destination, summary["buildId"])}
     summary_asset = write_asset(destination, "summary", summary)
@@ -892,7 +895,11 @@ def build(data, destination):
     for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js", "page-layout.css", "native-details.js", "companies-page.css", "companies-page.js", "work-page.css", "work-page.js", "method-page.css", "company-profile.css", "daily-scan.css", "daily-scan.js"):
         path = ROOT / "web" / name
         if path.exists():
-            shutil.copy2(path, destination / name)
+            if name in ("home-search.js", "companies-page.js", "work-page.js"):
+                from frontend_packaging import optional_script_source
+                (destination / name).write_text(optional_script_source(ROOT, name))
+            else:
+                shutil.copy2(path, destination / name)
     html = html.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{GROUP_COUNT}}", str(len({e["primary_offering"] for e in editorial["entries"]})))
     html = render_snapshot_metadata(html, data)
     html = render_static_file_metadata(html, destination)
@@ -904,7 +911,7 @@ def build(data, destination):
     landing = landing.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{WORK_RECORD_COUNT}}", str(len(work_data["routes"])))
     landing = render_snapshot_metadata(landing, data)
     from home import render_home
-    landing = render_home(landing, data, sidecars, release, summary)
+    landing = render_home(landing, data, sidecars, release, summary, current_companies=current_companies)
     (destination / "index.html").write_text(landing)
     from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health, business_health=health, current_companies=current_companies)
     if research_context is not None:
@@ -940,7 +947,7 @@ def build(data, destination):
         (destination / "public-identity.json").write_text(json.dumps(research_context["identity"], indent=2, ensure_ascii=False) + "\n")
         (destination / "CITATION.cff").write_bytes((destination / "publication/current-CITATION.cff").read_bytes())
     from daily_scan import write_daily_scan
-    write_daily_scan(destination)
+    write_daily_scan(destination, context=daily_context)
     from presentation import retain_runtime_generations
     retain_runtime_generations(ROOT, destination)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}

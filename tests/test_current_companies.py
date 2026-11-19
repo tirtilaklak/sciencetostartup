@@ -159,12 +159,36 @@ class CurrentCompanyRenderingTests(unittest.TestCase):
             self.assertIn(url, page.links)
         self.assertIn(entry["wikipedia"]["description"], page.text)
         self.assertIn(cc.CHANGE_NOTE, " ".join(page.text))
-        self.assertIn("Current directory addition · Checked 15 Nov 2026", " ".join(page.text))
-        self.assertNotIn("Checked 17 Nov 2026", " ".join(page.text))
+        self.assertIn("Current directory addition · Offering sources checked 15 Nov 2026", " ".join(page.text))
+        self.assertNotIn("checked 17 Nov 2026", " ".join(page.text))
         self.assertIn('<details class="company-current-facts">', text)
+        self.assertIn('<details class="company-current-context">', text)
+        context_html = text.split('<details class="company-current-context">', 1)[1]
+        self.assertIn(entry["wikipedia"]["description"], context_html)
+        self.assertIn(cc.CHANGE_NOTE, context_html)
+        self.assertNotIn(entry["wikipedia"]["description"], " ".join(Page(text.split('<details class="company-current-context">', 1)[0]).text))
         node = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', text, re.S).group(1))
         self.assertEqual(node["mainEntity"]["numberOfItems"], 1)
         self.assertEqual(node["mainEntity"]["itemListElement"][0]["url"], sp.ORIGIN + cc.company_path(entry))
+
+    def test_offering_dates_exclude_identity_and_wikipedia_and_registry_review(self):
+        registry = example()
+        registry["reviewed_on"] = "2026-11-18"
+        entry = registry["entries"][0]
+        entry["wikipedia"].update(observed_on="2026-11-12", revision_timestamp="2026-11-11T12:00:00Z")
+        entry["sources"][1]["observed_on"] = "2026-11-13"
+        entry["sources"].append({**entry["sources"][0], "url": "https://example.org/evaluation", "title": "Evaluation services", "observed_on": "2026-11-17"})
+        entry["offerings"].append({"label": "Model evaluation", "source_indexes": [2]})
+        cc.validate_current_companies(registry, {"companies": []}, context())
+        original = copy.deepcopy(entry)
+        self.assertEqual(cc.current_review_date(entry), "2026-11-12")
+        self.assertEqual(cc.offering_source_dates(entry), ["2026-11-16", "2026-11-17"])
+        rendered = cc.current_company_html(entry, registry["reviewed_on"], compact=True)
+        self.assertIn("Offering sources checked 16 Nov 2026 to 17 Nov 2026", rendered)
+        self.assertNotIn("checked 12 Nov", rendered)
+        self.assertNotIn("checked 13 Nov", rendered)
+        self.assertEqual(rendered, cc.current_company_html(entry, "2026-11-19", compact=True))
+        self.assertEqual(entry, original)
 
     def test_profile_updates_current_metadata_and_preserves_archived_bytes(self):
         registry, research = example(), SimpleNamespace(as_of="2026-10-28", data={"dataset_version": "2.5.0"})
@@ -319,7 +343,7 @@ class CurrentOnlyCompanyTests(unittest.TestCase):
             self.assertIn(entry["wikipedia"]["license_url"], page.links)
             self.assertIn('"@type":"ProfilePage"', text)
             self.assertIn('"dateModified":"2026-11-16"', text)
-            self.assertIn("Current directory addition · Checked 16 Nov 2026", " ".join(page.text))
+            self.assertIn("Current directory addition · Offering sources checked 16 Nov 2026", " ".join(page.text))
             self.assertNotIn('Research compiled', text)
             with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "overwrite an existing page"):
                 cc.write_current_company_supplements(root, registry)
@@ -352,8 +376,12 @@ class ActualCurrentCompanyRegistryTests(unittest.TestCase):
         self.assertEqual(set(page.current), {e["entity_id"] for e in self.registry["entries"]})
         for entry in self.registry["entries"]:
             self.assertIn(entry["wikipedia"]["description"], page.text)
+            self.assertIn(entry["wikipedia"]["change_note"], " ".join(page.text))
             for source in entry["sources"]:
                 self.assertIn(source["url"], page.links)
+                self.assertIn(source["title"], page.text)
+                self.assertIn(source["locator"], page.text)
+                self.assertIn("Observed " + sp.format_date(source["observed_on"]), " ".join(page.text))
             for key in ("article_url", "revision_url", "history_url", "license_url"):
                 self.assertIn(entry["wikipedia"][key], page.links)
 

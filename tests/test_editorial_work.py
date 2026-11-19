@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from datetime import date, timedelta
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -83,7 +84,8 @@ class EditorialWorkTests(unittest.TestCase):
         self.assertTrue(selected["approved"])
         self.assertEqual(selected["approval_basis"], "source_content_review")
         self.assertEqual(selected["reviewer"], "Codex source review")
-        self.assertEqual(selected["checked_on"], self.release["as_of"])
+        self.assertEqual(selected["checked_on"], "2026-11-08")
+        self.assertLessEqual(selected["checked_on"], self.release["as_of"])
         self.assertRegex(selected["response_sha256"], r"^[a-f0-9]{64}$")
         evidence = " ".join(str(item) for item in selected["evidence"])
         for term in ["$15", "United States", "MacBook Pro", "qualification tests", "identity"]:
@@ -146,7 +148,8 @@ class EditorialWorkTests(unittest.TestCase):
     def test_publication_preparation_is_reproducible_and_does_not_refresh_facts(self):
         original_work = copy.deepcopy(self.work)
         original_release = copy.deepcopy(self.release)
-        arguments = {"release_id": "2026-11-09.1", "publication_as_of": "2026-11-09T12:00:00Z",
+        staged_day = (date.fromisoformat(self.release["as_of"]) + timedelta(days=1)).isoformat()
+        arguments = {"release_id": staged_day + ".1", "publication_as_of": staged_day + "T12:00:00Z",
                      "canonical_sha256": self.release["canonical_sha256"]}
         first = prepare_editorial_release(self.work, self.release, self.canonical, **arguments)
         second = prepare_editorial_release(self.work, self.release, self.canonical, **arguments)
@@ -192,9 +195,100 @@ class EditorialWorkTests(unittest.TestCase):
         work = copy.deepcopy(self.work)
         sage = next(row for row in work["routes"] if row["id"] == "appen.work.sage-media")
         receipt = next(item for item in sage["editorial_review"]["receipts"] if item.get("approved"))
-        receipt["checked_at"] = "2026-11-09T12:00:00Z"
+        future_day = (date.fromisoformat(self.release["as_of"]) + timedelta(days=1)).isoformat()
+        receipt["checked_at"] = future_day + "T12:00:00Z"
         with self.assertRaisesRegex(EditorialValidationError, "timestamp differs"):
             self.validate(work=work)
+
+    def later_pay_review(self):
+        """SYNTHETIC future field review; never a source check or published data."""
+        work = copy.deepcopy(self.work)
+        row = next(r for r in work["routes"] if r["id"] == "mercor.work.expert-network")
+        previous = copy.deepcopy(row["editorial_review"]["receipts"])
+        old_terms_id = row["editorial_review"]["approved_terms_receipt_id"]
+        day = (date.fromisoformat(self.release["as_of"]) + timedelta(days=1)).isoformat()
+        source_id = row["id"] + ".synthetic-pay-source"
+        row["sources"].append({"id": source_id, "url": "https://example.test/synthetic-pay",
+                               "title": "SYNTHETIC test-only source"})
+        receipt = {"id": row["id"] + ".synthetic-pay-review", "source_id": source_id,
+                   "scope": "field_review", "result": "readable", "checked_on": day,
+                   "checked_at": day + "T10:00:00Z", "response_sha256": "a" * 64,
+                   "approved": True, "approval_basis": "source_content_review",
+                   "reviewer": "SYNTHETIC test reviewer", "reviewed_fields": ["pay"],
+                   "evidence": ["SYNTHETIC test-only evidence; no factual source assertion."]}
+        row["editorial_review"]["receipts"].append(receipt)
+        row["field_reviews"]["pay"] = {"state": "sourced", "basis": "direct_source",
+                                       "reviewed_on": day, "source_ids": [source_id]}
+        release = copy.deepcopy(self.release)
+        release.update(as_of=day, release_id=day + ".1", publication_as_of=day + "T12:00:00Z")
+        for route in work["routes"]:
+            route["editorial_review"]["release_id"] = release["release_id"]
+        return work, release, row, receipt, previous, old_terms_id
+
+    def test_later_field_review_preserves_every_historical_approval_and_terms_clock(self):
+        work, release, row, receipt, previous, old_terms_id = self.later_pay_review()
+        self.validate(work, release)
+        self.assertEqual(row["editorial_review"]["receipts"][:-1], previous)
+        self.assertEqual(row["editorial_review"]["approved_terms_receipt_id"], old_terms_id)
+        terms = next(r for r in row["editorial_review"]["receipts"] if r["id"] == old_terms_id)
+        self.assertEqual(terms["checked_on"], "2026-11-08")
+        self.assertEqual(set(terms["reviewed_fields"]), FIELD_NAMES)
+        for field in FIELD_NAMES - {"pay"}:
+            self.assertEqual(row["field_reviews"][field], self.routes[row["id"]]["field_reviews"][field])
+
+    def test_current_direct_fields_require_exact_approved_source_date_and_field(self):
+        def wrong_date(row, receipt):
+            row["field_reviews"]["pay"]["reviewed_on"] = "2026-11-07"
+        def wrong_source(row, receipt):
+            row["field_reviews"]["pay"]["source_ids"] = [row["sources"][0]["id"]]
+        def wrong_field(row, receipt):
+            receipt["reviewed_fields"] = ["destination"]
+        def unapproved(row, receipt):
+            receipt["approved"] = False
+        def retrieval_only(row, receipt):
+            receipt.update(scope="retrieval", approved=False)
+        def unreadable(row, receipt):
+            receipt.update(result="unreadable_shell", approved=False)
+        def extra_unreviewed_source(row, receipt):
+            row["field_reviews"]["pay"]["source_ids"].append(row["sources"][0]["id"])
+        for change in [wrong_date, wrong_source, wrong_field, unapproved, retrieval_only,
+                       unreadable, extra_unreviewed_source]:
+            with self.subTest(change=change.__name__):
+                work, release, row, receipt, *_ = self.later_pay_review()
+                change(row, receipt)
+                with self.assertRaisesRegex(EditorialValidationError, "current direct-source field lacks"):
+                    self.validate(work, release)
+
+    def test_public_receipts_and_inline_sources_cannot_leak_private_capture_locations(self):
+        for private in [{"raw_path": "capture.html"}, {"local_path": "capture.pdf"},
+                        {"extracted_text_path": "capture.txt"},
+                        {"structured_evidence": {"path": "/workspace/scratch/private/capture.json"}},
+                        {"evidence": ["See (/workspace/scratch/private/capture.html) for text."]}]:
+            for target in ["receipt", "source"]:
+                with self.subTest(private=private, target=target):
+                    work, release, row, receipt, *_ = self.later_pay_review()
+                    (receipt if target == "receipt" else row["sources"][-1]).update(private)
+                    with self.assertRaisesRegex(EditorialValidationError, "private capture"):
+                        self.validate(work, release)
+
+    def test_invalid_clock_and_post_publication_receipts_are_rejected(self):
+        for value, message in [("T25:00:00Z", "invalid receipt timestamp"),
+                               ("T12:00:01Z", "follows publication")]:
+            with self.subTest(value=value):
+                work, release, row, receipt, *_ = self.later_pay_review()
+                receipt["checked_at"] = receipt["checked_on"] + value
+                with self.assertRaisesRegex(EditorialValidationError, message):
+                    self.validate(work, release)
+
+    def test_capture_time_cannot_be_after_review_or_use_an_ambiguous_format(self):
+        for value, message in [("T10:00:01Z", "capture follows review"),
+                               ("T10:00:00+00:00", "explicit UTC timestamp"),
+                               ("T25:00:00Z", "invalid retrieval timestamp")]:
+            with self.subTest(value=value):
+                work, release, row, receipt, *_ = self.later_pay_review()
+                receipt["retrieved_at"] = receipt["checked_on"] + value
+                with self.assertRaisesRegex(EditorialValidationError, message):
+                    self.validate(work, release)
 
 
 if __name__ == "__main__":

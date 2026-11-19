@@ -1,0 +1,107 @@
+const { test, expect } = require('@playwright/test');
+
+const chapter = '/research/state-of-ai-data-labs/chapters/technical-landscape/';
+const paragraphSelector = '.r-reader-chapter-content[aria-labelledby="technical-landscape"] > .r-paragraph';
+const lastSentence = 'Difficulty selection changes what an absolute score represents.';
+
+// Exercise native reading behavior with the optional application scripts off.
+// DOM snapshots of this complete chapter are large; keep diagnostic screenshots.
+test.use({ javaScriptEnabled: false,
+  trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
+
+async function verifyCitationHistory(page) {
+  const response = await page.goto(chapter);
+  expect(response.ok()).toBeTruthy();
+  expect(await response.text()).toContain(lastSentence);
+  await expect(page.locator(paragraphSelector)).toHaveCount(527);
+  const finalCitation = page.locator(paragraphSelector).last().locator('.r-paragraph-citations a').first();
+  const href = await finalCitation.getAttribute('href');
+  expect(href).toMatch(/^\/research\/data\/assertions\/[0-9a-f]\/#assertion-/);
+  await finalCitation.focus();
+  await expect(finalCitation).toBeFocused();
+  await expect(finalCitation).toBeInViewport();
+  const focusedLayout = await page.locator(paragraphSelector).evaluateAll(nodes => ({
+    supported: CSS.supports('content-visibility', 'auto'),
+    deferred: nodes.filter(node => getComputedStyle(node).contentVisibility !== 'visible').length,
+  }));
+  if (focusedLayout.supported) expect(focusedLayout.deferred).toBe(0);
+  await finalCitation.press('Enter');
+  await expect(page).toHaveURL(new URL(href, page.url()).href);
+  await expect(page.locator('[id=' + JSON.stringify(decodeURIComponent(href.split('#')[1])) + ']')).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(new RegExp(chapter + '$'));
+  await expect(page.locator(paragraphSelector)).toHaveCount(527);
+  await expect(finalCitation).toBeInViewport();
+  await page.goForward();
+  await expect(page).toHaveURL(new URL(href, page.url()).href);
+}
+
+test('complete technical chapter supports its final citation, focus and history without JavaScript', async ({ page }) => {
+  await verifyCitationHistory(page);
+});
+
+test.describe('enhanced technical reading', () => {
+  test.use({ javaScriptEnabled: true });
+  test('final citation restores its reading position with scripts enabled', async ({ page }) => {
+    await verifyCitationHistory(page);
+  });
+});
+
+test('direct final-citation fragment and reload resolve after the complete technical layout', async ({ page }) => {
+  await page.goto(chapter + '#cite');
+  await expect(page.locator('#cite')).toBeInViewport();
+  const visibility = await page.locator(paragraphSelector).evaluateAll(nodes => ({
+    supported: CSS.supports('content-visibility', 'auto'),
+    values: [...new Set(nodes.map(node => getComputedStyle(node).contentVisibility))],
+  }));
+  if (visibility.supported) expect(visibility.values).toEqual(['visible']);
+  await page.reload();
+  await expect(page.locator('#cite')).toBeInViewport();
+  await expect(page.locator(paragraphSelector)).toHaveCount(527);
+});
+
+test('native find reaches the final technical paragraph when the engine exposes it', async ({ page }) => {
+  await page.goto(chapter);
+  const supported = await page.evaluate(() => typeof window.find === 'function');
+  test.skip(!supported, 'This engine does not expose its native find API to the test runner');
+  const found = await page.evaluate(text => window.find(text, false, false, true, false, false, false), lastSentence);
+  expect(found).toBe(true);
+  const selection = await page.evaluate(() => {
+    const selected = window.getSelection();
+    const rect = selected.getRangeAt(0).getBoundingClientRect();
+    return {text: selected.toString(), top: rect.top, bottom: rect.bottom, viewport: innerHeight};
+  });
+  expect(selection.text).toBe(lastSentence);
+  expect(selection.bottom).toBeGreaterThan(0);
+  expect(selection.top).toBeLessThan(selection.viewport);
+});
+
+test('printing reveals every technical paragraph with no clipped text', async ({ page }) => {
+  await page.goto(chapter);
+  await page.emulateMedia({ media: 'print' });
+  const layout = await page.locator(paragraphSelector).evaluateAll(nodes => ({
+    count: nodes.length,
+    supported: CSS.supports('content-visibility', 'auto'),
+    hidden: nodes.filter(node => getComputedStyle(node).contentVisibility !== 'visible').length,
+    contained: nodes.filter(node => getComputedStyle(node).contain !== 'none').length,
+    empty: nodes.filter(node => node.getBoundingClientRect().height <= 0).length,
+    clipped: nodes.filter(node => ['hidden', 'clip'].includes(getComputedStyle(node).overflowY)).length,
+  }));
+  expect(layout.count).toBe(527);
+  expect(layout.empty).toBe(0);
+  expect(layout.clipped).toBe(0);
+  if (layout.supported) {expect(layout.hidden).toBe(0); expect(layout.contained).toBe(0);}
+});
+
+test('technical paragraphs preserve readable spacing and fit a 320 pixel screen', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto(chapter);
+  const layout = await page.locator(paragraphSelector).evaluateAll(nodes => {
+    const first = nodes[0], second = nodes[1];
+    return {width: document.documentElement.scrollWidth, viewport: innerWidth,
+      paragraphGap: second.getBoundingClientRect().top - first.lastElementChild.getBoundingClientRect().bottom,
+      declaredGap: parseFloat(getComputedStyle(first).marginBottom)};
+  });
+  expect(layout.width).toBeLessThanOrEqual(layout.viewport + 1);
+  expect(Math.abs(layout.paragraphGap - layout.declaredGap)).toBeLessThanOrEqual(1);
+});

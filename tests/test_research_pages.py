@@ -6,6 +6,7 @@ from html import escape
 from html.parser import HTMLParser
 from pathlib import Path
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -121,16 +122,14 @@ class ResearchPageTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.baseline = build_context(ROOT)
-        cls.render_baseline = isolated_render_context(cls.baseline)
+        if cls.baseline.get('published_edition_replay'):
+            cls.render_baseline = cls.enterClassContext(isolated_render_preparation(
+                cls.baseline, canonical_bytes=(ROOT / 'data/canonical.json').read_bytes()))
+        else:
+            cls.render_baseline = isolated_render_context(cls.baseline)
 
     def setUp(self):
-        if self.baseline.get('published_edition_replay'):
-            preparation = isolated_render_preparation(
-                self.baseline, canonical_bytes=(ROOT / 'data/canonical.json').read_bytes())
-            self.context = preparation.__enter__()
-            self.addCleanup(preparation.__exit__, None, None, None)
-        else:
-            self.context = copy.deepcopy(self.render_baseline)
+        self.context = copy.deepcopy(self.render_baseline)
         self.scratch = tempfile.TemporaryDirectory()
         self.addCleanup(self.scratch.cleanup)
         self.output = Path(self.scratch.name)
@@ -200,6 +199,53 @@ class ResearchPageTests(unittest.TestCase):
         self.assertEqual([entry.findtext('{http://www.w3.org/2005/Atom}id') for entry in
                           ET.parse(self.output / 'research/atom.xml').findall('{http://www.w3.org/2005/Atom}entry')], expected_urls)
 
+    def assert_native_reading_guard(self, source):
+        """Execute the actual bounded guard against navigation/history states."""
+        self.assertGreater(len(source.encode('utf-8')), 0)
+        self.assertLessEqual(len(source.encode('utf-8')), 1024,
+                             'The technical chapter permits only a small native-reading guard')
+        harness = r"""
+const assert = require('node:assert/strict'), vm = require('node:vm');
+const source = JSON.parse(require('node:fs').readFileSync(0, 'utf8')).source;
+const scenarios = ['navigate', 'back_forward', 'reload', 'empty', 'missing-api', 'missing-performance'];
+for (const scenario of scenarios) {
+  const attributes = new Map(), listeners = [], violations = [];
+  const element = {
+    setAttribute(name, value) { if (name !== 'data-reader-enhanced' || value !== '') violations.push('attribute'); attributes.set(name, value); },
+    removeAttribute(name) { if (name !== 'data-reader-enhanced') violations.push('attribute'); attributes.delete(name); },
+    hasAttribute(name) { return attributes.has(name); }
+  };
+  const document = new Proxy({documentElement: element}, {get(target, key) {
+    if (!(key in target)) violations.push('document access'); return target[key];
+  }});
+  const sandbox = {document, addEventListener(type, listener) {
+    if (type !== 'pageshow' || typeof listener !== 'function') violations.push('listener');
+    else listeners.push(listener);
+  }, fetch() { violations.push('network'); throw Error('No network in guard'); },
+  XMLHttpRequest: function() { violations.push('network'); },
+  WebSocket: function() { violations.push('network'); }};
+  if (scenario !== 'missing-performance') sandbox.performance = scenario === 'missing-api' ? {} : {
+    getEntriesByType(type) { assert.equal(type, 'navigation'); return scenario === 'empty' ? [] : [{type: scenario}]; }
+  };
+  vm.runInContext(source, vm.createContext(sandbox, {codeGeneration: {strings: false, wasm: false}}), {timeout: 100});
+  assert.deepEqual(violations, [], scenario);
+  assert.equal(attributes.has('data-reader-enhanced'), scenario === 'navigate', scenario);
+  if (scenario === 'navigate') {
+    assert(listeners.length > 0, 'Fresh navigation needs a persisted-history reset');
+    for (const listener of listeners) listener({persisted: false});
+    assert.equal(attributes.has('data-reader-enhanced'), true);
+    for (const listener of listeners) listener({persisted: true});
+    assert.equal(attributes.has('data-reader-enhanced'), false);
+    assert.deepEqual(violations, []);
+  }
+}
+console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
+"""
+        result = subprocess.run(['node', '-e', harness], input=json.dumps({'source': source}),
+                                text=True, capture_output=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout), {'scenarios': 6, 'passed': True})
+
     def test_every_complete_chapter_has_a_native_url_without_application_javascript(self):
         records = {row['path']: row for row in self.build()}
         report = self.page(rp.REPORT_PATH)
@@ -224,9 +270,21 @@ class ResearchPageTests(unittest.TestCase):
                     self.assertIn(escape(paragraph['text']), chapter)
                 else:
                     self.assertIn(rp.WITHHELD_PARAGRAPH, chapter)
-            self.assertTrue(all(s.get('type') == 'application/ld+json' for s in chapter_facts.scripts))
+            self.assertTrue(all('src' not in script for script in chapter_facts.scripts),
+                            'Native chapters must not load external scripts')
             self.assertNotIn('type="module"', chapter)
             tree = ReaderTree(chapter)
+            guards = [item for item in tree.elements if item['tag'] == 'script'
+                      and item['attrs'].get('type') != 'application/ld+json']
+            if section['id'] == 'technical-landscape':
+                self.assertEqual(len(guards), 1)
+                self.assertIn(guards[0]['attrs'].get('type', '').strip().lower(),
+                              ('', 'text/javascript', 'application/javascript'))
+                self.assertNotIn('data-reader-enhanced', next(
+                    item['attrs'] for item in tree.elements if item['tag'] == 'html'))
+                self.assert_native_reading_guard(ReaderTree.text(guards[0]))
+            else:
+                self.assertEqual(guards, [], 'Only the technical chapter permits the reading guard')
             toc = tree.with_class('r-reader-toc')[0]
             toc_links = [item['children'][0] for listing in toc['children']
                          if isinstance(listing, dict) and listing['tag'] == 'ol'

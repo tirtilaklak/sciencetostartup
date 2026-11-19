@@ -34,11 +34,14 @@ function w4TermsAge(route,asOf=new Date().toISOString().slice(0,10)){
   const age=Math.floor((Date.parse(day+'T00:00:00Z')-reviewedInstant)/86400000),overdue=age>=14;
   return {...result,state:overdue?'needs_recheck':'current',reviewed_on:reviewed,age_days:age,label:overdue?'Needs recheck':''};
 }
-// One date per listing: the latest link check, or the research review when the link was never rechecked.
+// Keep full-terms, scoped pay and destination-check clocks separate.
 function w4FreshnessLabel(route){
   const approved=w4ApprovedTermsReceipt(route);if(approved)return `Terms checked ${w4Date(approved.checked_on)}`;
+  const pay=route.field_reviews?.pay;
+  if(['sourced','conflicting','source_not_stated'].includes(pay?.state)&&['direct_source','stored_evidence'].includes(pay?.basis)&&/^\d{4}-\d{2}-\d{2}$/.test(pay?.reviewed_on||''))return `Pay terms reviewed ${w4Date(pay.reviewed_on)}`;
   if(route.terms_checked_on)return `Pay terms reviewed ${w4Date(route.terms_checked_on)}`;
-  if(route.last_link_check?.result==='blocked')return `Recheck blocked ${w4Date(route.last_link_check.date)}`;
+  const latest=[route.last_route_check,route.last_link_check].filter(check=>/^\d{4}-\d{2}-\d{2}$/.test(check?.date||'')).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  if(['blocked','not_found','unavailable','unreadable_shell','error'].includes(latest?.result))return `Recheck ${latest.result==='blocked'?'blocked':'failed'} ${w4Date(latest.date)}`;
   const checked=w4Checked(route);return checked?`Page checked ${w4Date(checked)}`:`${route.reviewed_on?`Recorded ${w4Date(route.reviewed_on)} · `:''}Terms not rechecked`;
 }
 function w4Uncertain(route){

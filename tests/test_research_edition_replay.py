@@ -207,6 +207,9 @@ def copy_public_site_inputs(root):
         # are bound to real organization identities and must not enter fixtures.
         if path.is_file() and path.name != "current-companies.json":
             shutil.copyfile(path, root / "data" / path.name)
+    # Daily is an independent public input, including its validated Wikipedia
+    # revision context; a full checkout must carry the complete directory.
+    shutil.copytree(ROOT / "data/daily-scan", root / "data/daily-scan", dirs_exist_ok=True)
     for relative in ("docs/research-id-crosswalk.json", "schema/database.sql", "package.json", "package-lock.json"):
         target = root / relative
         target.parent.mkdir(parents=True, exist_ok=True)

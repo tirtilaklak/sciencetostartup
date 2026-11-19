@@ -266,11 +266,16 @@ def current_review_date(entry):
     return min(entry["wikipedia"]["observed_on"], *(source["observed_on"] for source in entry["sources"]))
 
 
+def offering_source_dates(entry):
+    """Only observations bound to an offering; identity/Wikipedia dates stay separate."""
+    indexes = {index for offering in entry["offerings"] for index in offering["source_indexes"]}
+    return sorted({entry["sources"][index]["observed_on"] for index in indexes})
+
+
 def current_company_html(entry, reviewed_on, compact=False):
     """Attribution stays adjacent to the exact quoted text without JavaScript."""
     from static_pages import format_date
     wiki, sources = entry["wikipedia"], entry["sources"]
-    reviewed_on = min(reviewed_on, current_review_date(entry))
     refs = lambda indexes: " ".join(_link(sources[i]["url"], "[" + str(i + 1) + "]") for i in indexes)
     offerings = "".join('<li>' + escape(o["label"]) + ' ' + refs(o["source_indexes"]) + '</li>' for o in entry["offerings"])
     scope = ""
@@ -284,9 +289,18 @@ def current_company_html(entry, reviewed_on, compact=False):
     evidence = ('<details class="company-current-facts"><summary>' + ('Official sources' if compact else 'Current source receipts') + '</summary><ol>'
         + ''.join('<li>' + _link(s["url"], s["title"]) + '<p>' + escape(s["locator"]) + '</p><p>Observed ' + escape(format_date(s["observed_on"])) + ((' · Published ' + escape(format_date(s["published_on"]))) if s["published_on"] else '') + '</p>' + ('' if compact else '<code>SHA-256 ' + escape(s["response_sha256"]) + '</code>') + '</li>' for s in sources)
         + '</ol>' + ('' if compact else '<p>Wikipedia revision ' + escape(wiki["revision_timestamp"]) + ' · Observed ' + escape(format_date(wiki["observed_on"])) + '</p><code>SHA-256 ' + escape(wiki["response_sha256"]) + '</code>') + '<p><a href="/current-companies.json">Current directory records and provenance · JSON</a></p></details>')
-    return ('<section class="company-current-addition" data-current-company="' + escape(entry["entity_id"]) + '"' + ('' if compact else ' id="current-company-description"') + '><p class="company-research-snapshot">Current directory addition · Checked ' + escape(format_date(reviewed_on)) + '</p>'
-            + scope + '<blockquote class="company-wikipedia-description"><p>' + escape(wiki["description"]) + '</p></blockquote>' + attribution
-            + '<p><strong>Current offerings</strong></p><ul>' + offerings + '</ul>' + evidence + '</section>')
+    dates = offering_source_dates(entry)
+    observed = format_date(dates[0]) + (" to " + format_date(dates[-1]) if len(dates) > 1 else "")
+    stamp = '<p class="company-research-snapshot">Current directory addition · Offering sources checked ' + escape(observed) + '</p>'
+    context = (scope + '<blockquote class="company-wikipedia-description"><p>' + escape(wiki["description"]) + '</p></blockquote>' + attribution
+               + '<p><strong>Current offerings</strong></p><ul>' + offerings + '</ul>' + evidence)
+    if compact:
+        preview = '<p class="company-offering-preview">' + escape(" · ".join(offering["label"] for offering in entry["offerings"])) + '</p>'
+        context = preview + stamp + '<details class="company-current-context"><summary>Company context and sources</summary>' + context + '</details>'
+    else:
+        context = stamp + context
+    return ('<section class="company-current-addition" data-current-company="' + escape(entry["entity_id"]) + '"'
+            + ('' if compact else ' id="current-company-description"') + '>' + context + '</section>')
 
 
 def write_current_company_supplements(output, registry):

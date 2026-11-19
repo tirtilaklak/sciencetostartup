@@ -443,7 +443,8 @@ class StaticPageTests(unittest.TestCase):
         nodes = ld_nodes(head)
         website = next(node for node in nodes if node.get("@type") == "WebSite")
         self.assertEqual((website["@type"], website["@id"], website["url"], website["name"]), ("WebSite", ORIGIN + "/#website", ORIGIN + "/", "ScienceToStartup"))
-        self.assertIn(str(len(self.companies)), website["description"])
+        current_count = len(self.companies) + len(self.current_companies["entries"])
+        self.assertIn(f"{current_count} AI data companies", website["description"])
         # One publisher, the Person, defined once on the page; every other node names it by @id.
         people = [node for node in nodes if node.get("@type") == "Person"] + [value for node in nodes for value in node.values() if isinstance(value, dict) and value.get("@type") == "Person"]
         self.assertEqual([(p["@id"], p["name"]) for p in people], [(sp.PUBLISHER["@id"], sp.PUBLISHER_NAME)])
@@ -865,7 +866,9 @@ class StaticPageTests(unittest.TestCase):
             name = download["contentUrl"].replace(ORIGIN + "/", "")
             self.assertTrue((self.dist / name).is_file(), name)
             self.assertIn(f'href="{download["contentUrl"]}"', text)
-        self.assertIn(f"{ORIGIN}/business-health.json", [d["contentUrl"] for d in dataset["distribution"]])
+        self.assertNotIn(f"{ORIGIN}/business-health.json", [d["contentUrl"] for d in dataset["distribution"]])
+        self.assertIn(f'<a href="{ORIGIN}/business-health.json" download>', downloads)
+        self.assertIn("Current supporting data", downloads)
         self.assertIn("Musa Ozdem", text)
         self.assertIn(str(sum(1 for c in self.data["claims"] if c["status"] in ("unverified", "contested"))), text)
 
