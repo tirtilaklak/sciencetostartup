@@ -20,6 +20,21 @@ HEX40 = re.compile(r"[0-9a-f]{40}\Z")
 HEX64 = re.compile(r"[0-9a-f]{64}\Z")
 REQUEST_KEYS = {"date", "baseline_commit", "baseline_manifest_sha256", "outgoing_cloudflare_version",
                 "daily_sha256", "compiled_at", "expected_candidate_manifest_sha256"}
+GENERIC_HOLD_REASON = "candidate_builder_failed_no_automatic_retry"
+# Only fixed diagnostic codes may reach CLI output; never stringify exceptions.
+SAFE_HOLD_REASONS = frozenset("""
+artifact_bounds artifact_digest artifact_file_set artifact_symlink artifact_too_large
+baseline_html_digest baseline_manifest_mismatch baseline_mismatch candidate_build_or_verify_failed
+candidate_digest committed_path_scope compiled_at_identity compiled_source_changed daily_digest_or_size
+daily_identity daily_worktree_mismatch dirty_checkout dist_symlink fork_rejected frozen_candidate_mismatch
+git_operation_failed head_moved historical_snapshot_changed input_diff_not_source_only invalid_commit
+invalid_date invalid_outgoing_version invalid_previous_commit invalid_runtime_path nonregular_source
+outgoing_already_retained prior_generation_digest push_commit push_failed_hold_read_branch_before_any_retry
+push_head_moved push_parent push_remote push_scope push_token_bounds push_tree receipt_must_be_outside_checkout
+repository_root_mismatch request_digest request_fields request_too_large retention_count retention_symlink
+runtime_collision runtime_digest summary_identity unexpected_build_edit unexpected_retention_file
+unknown_runtime_reference unsafe_git_config unsafe_output unsafe_path wrong_branch wrong_event wrong_repository
+""".split())
 
 
 class Hold(Exception):
@@ -43,6 +58,16 @@ def clean_environment(env=None):
     return {k: v for k, v in (os.environ if env is None else env).items()
             if not k.upper().startswith(("GIT_", "GCM_"))
             and not re.search(r"TOKEN|SECRET|PASSWORD|CREDENTIAL|AUTHORIZATION|(?:^|_)KEY(?:_|$)", k, re.I)}
+
+
+def valid_push_token(token):
+    """Treat the credential as opaque, with only transport safety/size bounds."""
+    if not isinstance(token, str) or any(ch.isspace() or ord(ch) < 32 or ord(ch) == 127 for ch in token):
+        return False
+    try:
+        return 1 <= len(token.encode("utf-8")) <= 16384
+    except UnicodeEncodeError:
+        return False
 
 
 def git(repo, *args, env=None):
@@ -256,7 +281,7 @@ def prepare(repo, event, output, install=True):
 
 def push(repo, receipt, token, execute=subprocess.run):
     require(receipt.get("status") == "built_not_pushed_or_certified" and BRANCH.fullmatch(receipt.get("branch", "")), "push_scope")
-    require(isinstance(token, str) and re.fullmatch(r"[A-Za-z0-9_-]{20,512}", token), "push_token_bounds")
+    require(valid_push_token(token), "push_token_bounds")
     require(HEX40.fullmatch(receipt["source"]) and HEX40.fullmatch(receipt["builder_commit"]), "push_commit")
     require(git(repo, "rev-parse", "HEAD").decode().strip() == receipt["builder_commit"], "push_head_moved")
     require(git(repo, "rev-parse", "HEAD^").decode().strip() == receipt["source"], "push_parent")
@@ -302,8 +327,13 @@ def main():
                 with open(os.environ["GITHUB_OUTPUT"], "a") as target:
                     target.write("should_build=" + str(result["should_build"]).lower() + "\n")
         print(canonical({k: v for k, v in result.items() if k in {"status", "should_build", "builder_commit", "tree", "manifest_sha256", "build_id"}}))
+    except Hold as error:
+        code = error.args[0] if error.args and isinstance(error.args[0], str) else None
+        print(canonical({"status": "hold", "stage": args.mode,
+                         "error": code if code in SAFE_HOLD_REASONS else GENERIC_HOLD_REASON}))
+        return 2
     except Exception:
-        print('{"status":"hold","error":"candidate_builder_failed_no_automatic_retry"}')
+        print(canonical({"status": "hold", "stage": args.mode, "error": GENERIC_HOLD_REASON}))
         return 2
     return 0
 

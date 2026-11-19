@@ -2,12 +2,15 @@
 import copy
 import hashlib
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -270,10 +273,51 @@ class BuilderTests(unittest.TestCase):
         self.rawgit("commit", "-q", "--allow-empty", "-m", "concurrent change")
         with self.assertRaises(c.Hold): c.push(self.repo, receipt, TOKEN, execute=self.reject_network)
 
-    def test_token_newlines_short_and_oversized_values_rejected_before_push(self):
+    def test_opaque_tokens_include_long_dotted_values_and_utf8_byte_boundary(self):
         receipt = self.build()
-        for token in ["short", "x" * 513, TOKEN + "\n", TOKEN + "$(bad)"]:
-            with self.subTest(length=len(token)), self.assertRaises(c.Hold): c.push(self.repo, receipt, token, execute=self.reject_network)
+        tokens = ["x", TOKEN, "github_pat_SYNTHETIC_1234567890", "header." + "x" * 700 + ".signature",
+                  "x" * 16384, "é" * 8192, "opaque.$(synthetic)'\"=+/:"]
+        for index, token in enumerate(tokens):
+            calls = []
+            def fake(args, **kw):
+                calls.append(args)
+                self.assertEqual(kw["env"]["GH_PUSH_TOKEN"], token)
+                self.assertNotIn(token, args)
+                self.assertIn("--force-with-lease=refs/heads/codex/cloud-daily-2026-11-18:" + self.source, args)
+                return subprocess.CompletedProcess(args, 0)
+            with self.subTest(index=index):
+                self.assertEqual(c.push(self.repo, receipt, token, execute=fake)["builder_commit"], receipt["builder_commit"])
+                self.assertEqual(len(calls), 1)
+
+    def test_invalid_token_bytes_whitespace_and_controls_rejected_before_push(self):
+        receipt = self.build()
+        tokens = [None, b"not-a-string", "", "x" * 16385, "é" * 8193, "unpaired\ud800"]
+        tokens += [TOKEN + ch for ch in [*(chr(i) for i in range(32)), "\x7f", " ", "\u0085", "\u00a0", "\u2003"]]
+        for index, token in enumerate(tokens):
+            with self.subTest(index=index), self.assertRaisesRegex(c.Hold, "^push_token_bounds$"):
+                c.push(self.repo, receipt, token, execute=self.reject_network)
+
+    def test_cli_reports_safe_hold_reason_and_stage_without_token(self):
+        receipt = self.build()
+        path = self.root / "receipt.json"; path.write_text(json.dumps(receipt))
+        output = io.StringIO()
+        with patch.object(sys, "argv", ["candidate_builder.py", "push", "--repository", str(self.repo), "--receipt", str(path)]), \
+                patch.dict(os.environ, {"GH_PUSH_TOKEN": TOKEN + "\n"}), redirect_stdout(output):
+            self.assertEqual(c.main(), 2)
+        self.assertEqual(json.loads(output.getvalue()), {"status": "hold", "stage": "push", "error": "push_token_bounds"})
+        self.assertNotIn(TOKEN, output.getvalue())
+
+    def test_cli_keeps_unknown_hold_and_unexpected_exception_generic(self):
+        path = self.root / "receipt.json"; path.write_text("{}")
+        for error in [c.Hold(TOKEN), RuntimeError("raw stderr " + TOKEN)]:
+            output = io.StringIO()
+            with self.subTest(type=type(error).__name__), \
+                    patch.object(sys, "argv", ["candidate_builder.py", "push", "--repository", str(self.repo), "--receipt", str(path)]), \
+                    patch.dict(os.environ, {"GH_PUSH_TOKEN": TOKEN}), patch.object(c, "push", side_effect=error), redirect_stdout(output):
+                self.assertEqual(c.main(), 2)
+            self.assertEqual(json.loads(output.getvalue()), {"status": "hold", "stage": "push", "error": c.GENERIC_HOLD_REASON})
+            self.assertNotIn(TOKEN, output.getvalue())
+            self.assertNotIn("raw stderr", output.getvalue())
 
     def test_push_rejects_included_git_configuration(self):
         receipt = self.build()
