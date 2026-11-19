@@ -1,0 +1,142 @@
+name: Reviewed Daily artifact transfer
+on:
+  push:
+    branches: [codex/s2s/daily-artifact-transport-20261119]
+permissions:
+  contents: read
+jobs:
+  artifact:
+    if: github.repository == 'tirtilaklak/sciencetostartup' && github.ref == 'refs/heads/codex/s2s/daily-artifact-transport-20261119'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    outputs:
+      built_sha: ${{ steps.transfer.outputs.built_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Verify reviewed source inputs and parent
+        run: |
+          python3 - <<'PY'
+          import hashlib, subprocess
+          from pathlib import Path
+          expected = {
+              'web/daily-scan.js': '93aad0c462ff10ae15961d122ec097ef59aa522774ccf821f9eb41588c84bfe8',
+              'tests/browser/daily.spec.js': '89e0544eb1980049c388e4a15219a29f297398f31f4a19d2fd1e40e0b74d2c97',
+          }
+          assert subprocess.check_output(['git', 'rev-parse', 'HEAD^'], text=True).strip() == '542698932ccd09660c1ac21daf25d8f2db088b8f'
+          for name, expected_hash in expected.items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == expected_hash, name
+          PY
+      - run: npm ci
+      - name: Rebuild the reviewed local artifact
+        run: python3 scripts/build_public_snapshot.py --output build/reviewed-944b
+      - name: Verify complete artifact and transfer to an isolated branch
+        id: transfer
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, shutil, subprocess
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          base = '542698932ccd09660c1ac21daf25d8f2db088b8f'
+          expected_tree = '3d227fded6971d06b083080f4a74ce15a0333485'
+          expected_manifest = '0018a64f059345d3d080d4b9c2b8018c2aa3ab06454bb2dd526ce70becefae7b'
+          output_branch = 'codex/s2s/artifact-944b-20261119'
+          built = Path('build/reviewed-944b')
+          manifest_bytes = (built / 'manifest.json').read_bytes()
+          assert hashlib.sha256(manifest_bytes).hexdigest() == expected_manifest
+          assert json.loads(manifest_bytes)['build_id'] == '944bb4014ab65ee836a8'
+          validate_artifact(built)
+          shutil.rmtree('dist')
+          shutil.copytree(built, 'dist')
+          subprocess.run(['git', 'add', '-A', '--', 'dist'], check=True)
+          subprocess.run(['git', 'update-index', '--force-remove', '.github/workflows/daily-artifact-transport.yml'], check=True)
+          tree = subprocess.check_output(['git', 'write-tree'], text=True).strip()
+          assert tree == expected_tree, (tree, expected_tree)
+          commit = subprocess.check_output([
+              'git', '-c', 'user.name=github-actions[bot]',
+              '-c', 'user.email=41898282+github-actions[bot]@users.noreply.github.com',
+              'commit-tree', tree, '-p', base,
+          ], input='Restore Daily reading state after native history traversal\n\nRebuild the exact reviewed artifact; transfer workflow excluded.\n', text=True).strip()
+          assert len(commit) == 40 and all(c in '0123456789abcdef' for c in commit)
+          receipt = {'workflow_source': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
+                     'parent': base, 'tree': tree, 'built_commit': commit, 'branch': output_branch,
+                     'manifest_sha256': expected_manifest, 'build_id': '944bb4014ab65ee836a8',
+                     'push_status': 'pending'}
+          Path('output').mkdir(exist_ok=True)
+          receipt_path = Path('output/build-transport-receipt.json')
+          receipt_path.write_text(json.dumps(receipt, indent=2) + '\n')
+          subprocess.run(['git', 'push', '--force-with-lease=refs/heads/' + output_branch + ':',
+                          'origin', commit + ':refs/heads/' + output_branch], check=True)
+          receipt['push_status'] = 'confirmed'
+          receipt_path.write_text(json.dumps(receipt, indent=2) + '\n')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('built_sha=' + commit + '\n')
+          print(json.dumps(receipt))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reviewed-build-transport-receipt
+          path: output/build-transport-receipt.json
+          if-no-files-found: warn
+          retention-days: 14
+  daily-history:
+    needs: artifact
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.artifact.outputs.built_sha }}
+          persist-credentials: false
+      - name: Trust the checked-out workspace in the job container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Align the temporary home directory with the container user
+        run: chown --reference=/proc/self "$HOME"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Verify the exact transferred artifact
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          assert hashlib.sha256(Path('dist/manifest.json').read_bytes()).hexdigest() == '0018a64f059345d3d080d4b9c2b8018c2aa3ab06454bb2dd526ce70becefae7b'
+          validate_artifact(Path('dist'))
+          PY
+      - name: Reproduce both WebKit history journeys
+        run: npm run test:browser -- --project=webkit --project=mobile-webkit --grep 'Daily deep links reveal filtered items and native disclosures support keyboard and history' --workers=1
+        env:
+          QA_DIST: dist
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: daily-history-diagnostic
+          path: output/browser-qa/
+          retention-days: 14
