@@ -1126,13 +1126,18 @@ def _company_detail(context, entity):
     taxonomy = "".join(f'<dt>{sp.escape(key.replace("_", " ").capitalize())}</dt><dd>{sp.escape(", ".join(values))}</dd>'
                        for key, values in sorted(entity.get("taxonomy", {}).items()) if values)
     website = _safe_url(entity.get("identifiers", {}).get("website"))
+    sections = [("approved-findings", "Findings"), ("company-scope", "Company & scope")]
+    if historical: sections.append(("company-history", "Historical evidence"))
+    sections.append(("company-sources", "Sources"))
     body = ['<article class="company-dossier research-company-dossier"><header class="company-hero">'
             '<div class="company-name"><h1>' + sp.escape(entity["name"]) + '</h1></div>'
             '<p class="company-research-snapshot">' + sp.plural(len(approved), "approved finding")
             + ' · ' + sp.plural(len(source_ids), "source record") + '</p>'
             + ('<p class="company-actions">' + _link(website, 'Website') + '</p>' if website else '')
-            + '</header><div class="company-record">',
-            '<details class="company-fold" id="company-scope"><summary>Company and review scope</summary>'
+            + '</header><p class="company-evidence-context"><span>Evidence snapshot · ' + _date(context['graph'].get('as_of'))
+            + '</span><span>Prepared ' + _date(context['report'].get('updated_on')) + '</span></p>'
+            + sp.company_section_links(sections) + '<div class="company-record">',
+            '<details class="company-fold" id="company-scope"><summary><span>Company and review scope</span><small>' + sp.escape(_label(entity)) + '</small></summary>'
             '<div class="company-fold-body"><p class="r-kicker">' + sp.escape(_label(entity)) + '</p>'
             '<p class="r-record-id">' + sp.escape(entity["id"]) + '</p>' + _meta(context)
             + '<h2>Evidence & scope</h2><p>' + sp.escape(entity.get("disposition_reason"))
@@ -1144,16 +1149,16 @@ def _company_detail(context, entity):
             'commercial quality, or a contribution to another artifact.</p>'
             + ('<h3>Recorded taxonomy</h3><p class="r-meta">Candidate taxonomy remains provisional.</p><dl class="r-facts">' + taxonomy + '</dl>' if taxonomy else '')
             + _link('/review/', 'Submit a source-backed correction →', 'r-text-link') + '</div></details>',
-            '<details class="company-fold" id="approved-findings"><summary>Findings</summary>'
+            '<details class="company-fold" id="approved-findings"><summary><span>Findings</span><small>' + sp.plural(len(approved), "approved finding") + '</small></summary>'
             '<div class="company-fold-body"><h2>Approved findings</h2>'
             + ("".join(_assertion(context, a) for a in approved) if approved else
                '<p class="r-callout">No approved assertions are available for this record. Source metadata and candidate proposals do not establish a finding.</p>')
             + '</div></details>']
     if historical:
-        body.append('<details class="company-fold" id="company-history"><summary>Historical evidence</summary>'
+        body.append('<details class="company-fold" id="company-history"><summary><span>Historical evidence</span><small>' + sp.plural(len(historical), "record") + '</small></summary>'
                     '<div class="company-fold-body"><h2>Historical evidence</h2>'
                     + "".join(_assertion(context, a) for a in historical) + '</div></details>')
-    body.append('<details class="company-fold" id="company-sources"><summary>Sources</summary>'
+    body.append('<details class="company-fold" id="company-sources"><summary><span>Sources</span><small>' + sp.plural(len(source_ids), "source record") + '</small></summary>'
                 '<div class="company-fold-body"><h2>Connected evidence</h2>'
                 + ('<ul class="r-evidence-links">' + "".join('<li>' + _link(_evidence_url("source", sid), ("Source metadata withheld · " + sid) if sources.get(sid, {}).get("_withheld") else sources.get(sid, {}).get("title", sid)) + '</li>' for sid in source_ids) + '</ul>'
                    if source_ids else '<p>No source records are attached yet.</p>')
