@@ -87,8 +87,11 @@ test('exact names and recorded aliases lead; paging reports the complete real to
 
 test('initial arrows, IME and literal native work transfer preserve keyboard behavior', async ({ page }) => {
   await home(page);await page.locator('#home-search-open').click();const input=page.locator('#home-search-input');
-  await input.fill('human feedback');await input.press('ArrowUp');
+  await input.fill('human feedback');
   const options=page.locator('#home-search-results [role=option]');
+  await expect(options.last()).toHaveAttribute('href','/work/?q=human+feedback');
+  await expect(options.last()).toBeVisible();
+  await input.press('ArrowUp');
   await expect(options.last()).toHaveAttribute('aria-selected','true');
   await input.press('ArrowDown');await expect(options.first()).toHaveAttribute('aria-selected','true');
   await input.dispatchEvent('keydown',{key:'ArrowUp',isComposing:true});await expect(options.first()).toHaveAttribute('aria-selected','true');
