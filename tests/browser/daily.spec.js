@@ -38,6 +38,131 @@ async function verifiedResponse(request, route, filename) {
   return bytes;
 }
 
+// BEGIN READ-ONLY HISTORY EVENT DIAGNOSTIC
+const DAILY_HISTORY_EVENT_PREFIX = '__S2S_DAILY_HISTORY_EVENT__';
+test.beforeEach(async ({ page }, info) => {
+  const events = [];
+  let dropped = 0, bytes = 0;
+  info._dailyHistoryEvents = { events, get dropped() { return dropped; } };
+  page.on('console', message => {
+    const text = message.text();
+    if (!text.startsWith(DAILY_HISTORY_EVENT_PREFIX)) return;
+    const payload = text.slice(DAILY_HISTORY_EVENT_PREFIX.length);
+    if (events.length >= 400 || bytes + Buffer.byteLength(payload) > 240000) { dropped++; return; }
+    try { events.push(JSON.parse(payload)); bytes += Buffer.byteLength(payload); }
+    catch (error) { events.push({ diagnosticParseError: error.message }); }
+  });
+  await page.addInitScript(({ prefix }) => {
+    const log = console.debug.bind(console);
+    const documentID = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 9);
+    let sequence = 0;
+    function bounded(value, depth = 0) {
+      if (value === null || typeof value === 'boolean' || typeof value === 'number') return value;
+      if (typeof value === 'string') return value.slice(0, 2048);
+      if (typeof value === 'undefined') return '[undefined]';
+      if (depth >= 5) return '[depth-limit]';
+      if (Array.isArray(value)) return value.slice(0, 64).map(item => bounded(item, depth + 1));
+      if (typeof value === 'object') return Object.fromEntries(Object.keys(value).slice(0, 24)
+        .map(key => [key, bounded(value[key], depth + 1)]));
+      return '[' + typeof value + ']';
+    }
+    function selected(state) {
+      const object = state !== null && (typeof state === 'object' || typeof state === 'function');
+      return { type: state === null ? 'null' : typeof state,
+        ownKeys: object ? Object.keys(state).slice(0, 24) : [],
+        hasReading: object && Object.prototype.hasOwnProperty.call(state, 's2sDailyReading'),
+        readingState: object ? bounded(state.s2sDailyReading) : null,
+        hasForeign: object && Object.prototype.hasOwnProperty.call(state, 'dailyTest'),
+        unrelatedState: object ? bounded(state.dailyTest) : null };
+    }
+    function emit(kind, phase, extra = {}) {
+      if (sequence >= 180) return;
+      try {
+        const entry = { documentID, sequence: ++sequence, kind, phase,
+          wallTime: Date.now(), monotonicTime: performance.now(), url: location.href,
+          mainFrame: window === window.top, readyState: document.readyState,
+          navigationType: performance.getEntriesByType('navigation')[0]?.type || null,
+          state: selected(history.state), scrollRestoration: history.scrollRestoration,
+          scrollX, scrollY, openIDs: [...document.querySelectorAll('.scan-item')]
+            .filter(row => row.querySelector('details')?.open).map(row => row.id), ...extra };
+        log(prefix + JSON.stringify(entry));
+      } catch (error) {
+        try { log(prefix + JSON.stringify({ documentID, sequence: ++sequence, kind, phase,
+          diagnosticError: String(error.message || error).slice(0, 500) })); } catch (_) {}
+      }
+    }
+    for (const method of ['replaceState', 'pushState']) {
+      const descriptor = Object.getOwnPropertyDescriptor(History.prototype, method);
+      if (!descriptor || typeof descriptor.value !== 'function') continue;
+      const original = descriptor.value;
+      Object.defineProperty(History.prototype, method, { ...descriptor, value: function(...args) {
+        let requested;
+        try { requested = { state: selected(args[0]), url: bounded(args[2]) }; }
+        catch (error) { requested = { diagnosticError: String(error.message || error) }; }
+        emit('history-write', 'before', { method, requested });
+        try {
+          const result = Reflect.apply(original, this, args);
+          emit('history-write', 'after', { method });
+          return result;
+        } catch (error) {
+          emit('history-write', 'throw', { method, error: { name: error.name, message: error.message } });
+          throw error;
+        }
+      } });
+    }
+    const restorationDescriptor = Object.getOwnPropertyDescriptor(History.prototype, 'scrollRestoration');
+    if (restorationDescriptor?.set) {
+      const originalSet = restorationDescriptor.set;
+      const originalGet = restorationDescriptor.get;
+      Object.defineProperty(History.prototype, 'scrollRestoration', { ...restorationDescriptor,
+        get: originalGet && function() { return Reflect.apply(originalGet, this, []); },
+        set: function(value) {
+          emit('scroll-restoration-write', 'before', { requestedValue: bounded(value) });
+          try {
+            const result = Reflect.apply(originalSet, this, [value]);
+            emit('scroll-restoration-write', 'after', { requestedValue: bounded(value) });
+            return result;
+          } catch (error) {
+            emit('scroll-restoration-write', 'throw', { requestedValue: bounded(value),
+              error: { name: error.name, message: error.message } });
+            throw error;
+          }
+        },
+      });
+    }
+    for (const type of ['DOMContentLoaded', 'load', 'pageshow', 'pagehide', 'popstate', 'hashchange']) {
+      addEventListener(type, event => emit('lifecycle', type, {
+        persisted: 'persisted' in event ? event.persisted : null,
+        eventState: type === 'popstate' ? selected(event.state) : null,
+        oldURL: type === 'hashchange' ? event.oldURL : null,
+        newURL: type === 'hashchange' ? event.newURL : null,
+      }), true);
+    }
+    for (const capture of [true, false]) {
+      addEventListener('click', event => {
+        const anchor = event.target?.closest?.('a[href]');
+        emit('click', capture ? 'capture' : 'bubble', {
+          targetTag: event.target?.tagName || null, targetID: event.target?.id || null,
+          anchorHref: anchor?.href || null, button: event.button, buttons: event.buttons,
+          detail: event.detail, defaultPrevented: event.defaultPrevented, isTrusted: event.isTrusted,
+          ctrlKey: event.ctrlKey, metaKey: event.metaKey, shiftKey: event.shiftKey, altKey: event.altKey,
+        });
+      }, capture);
+    }
+    emit('lifecycle', 'init');
+  }, { prefix: DAILY_HISTORY_EVENT_PREFIX });
+});
+test.afterEach(async ({}, info) => {
+  const captured = info._dailyHistoryEvents || { events: [], dropped: 0 };
+  await info.attach('daily-history-events.json', {
+    body: Buffer.from(JSON.stringify({ sourceCommit, sourceTree, buildId: manifest.build_id,
+      manifestSHA256: digest(manifestBytes), project: info.project.name, retry: info.retry,
+      status: info.status, dropped: captured.dropped, events: captured.events })),
+    contentType: 'application/json',
+  });
+});
+// END READ-ONLY HISTORY EVENT DIAGNOSTIC
+
 test.beforeEach(async ({ page, request }, info) => {
   const response = await request.get('/manifest.json');
   expect(response.ok()).toBeTruthy();
@@ -363,3 +488,46 @@ test.describe('Daily without JavaScript', () => {
     await assertContent(page, oldest);
   });
 });
+
+// BEGIN OWNED LOCALHOST NATIVE HISTORY BASELINE
+// No Daily code or framework runs in either of these two intercepted documents.
+test('native History baseline preserves entry state across document Back', async ({ page, baseURL }, info) => {
+  const origin = new URL(baseURL);
+  expect(['127.0.0.1', 'localhost', '[::1]']).toContain(origin.hostname);
+  const firstURL = new URL('/__qa-history-baseline-a', origin).href;
+  const nextURL = new URL('/__qa-history-baseline-b', origin).href;
+  await page.route('**/__qa-history-baseline-*', async route => {
+    const requestURL = new URL(route.request().url());
+    expect(requestURL.origin).toBe(origin.origin);
+    const next = requestURL.pathname.endsWith('-a')
+      ? '<a href="/__qa-history-baseline-b">Native baseline next</a>' : '<p>Native baseline second document.</p>';
+    await route.fulfill({ status: 200, contentType: 'text/html',
+      body: '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Owned native history baseline</title></head><body>' + next + '</body></html>' });
+  });
+  await page.goto(firstURL);
+  const expected = { dailyTest: { preserved: true }, s2sDailyReading: {
+    url: firstURL, edition: 'native-baseline', x: 0, y: 0, open: ['native-a'], anchor: 'native-a', top: 0,
+  } };
+  const checkpoints = await page.evaluate(value => {
+    history.replaceState(value, '', location.href);
+    const afterReplace = history.state;
+    history.scrollRestoration = 'manual';
+    return { afterReplace, afterManual: history.state };
+  }, expected);
+  await info.attach('daily-history-native-baseline-checkpoints.json', {
+    body: Buffer.from(JSON.stringify(checkpoints)), contentType: 'application/json',
+  });
+  expect(checkpoints.afterReplace).toEqual(expected);
+  expect(checkpoints.afterManual).toEqual(expected);
+  await page.getByRole('link', { name: 'Native baseline next', exact: true }).click();
+  await expect(page).toHaveURL(nextURL);
+  await page.goBack();
+  await expect(page).toHaveURL(firstURL);
+  await page.waitForLoadState('load');
+  const actual = await page.evaluate(() => history.state);
+  await info.attach('daily-history-native-baseline-return.json', {
+    body: Buffer.from(JSON.stringify({ url: page.url(), state: actual })), contentType: 'application/json',
+  });
+  expect(actual).toEqual(expected);
+});
+// END OWNED LOCALHOST NATIVE HISTORY BASELINE

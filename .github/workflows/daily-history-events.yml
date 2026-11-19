@@ -1,0 +1,55 @@
+name: Daily history causal events
+on:
+  push:
+    branches: [codex/s2s/daily-history-events-20261119]
+permissions:
+  contents: read
+jobs:
+  daily-history-events:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trust the checked-out workspace in the job container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Align the temporary home directory with the container user
+        run: chown --reference=/proc/self "$HOME"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Bind the unchanged reviewed artifact and runtime
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          checks = {
+            'dist/manifest.json': '0018a64f059345d3d080d4b9c2b8018c2aa3ab06454bb2dd526ce70becefae7b',
+            'dist/daily-scan.js': '93aad0c462ff10ae15961d122ec097ef59aa522774ccf821f9eb41588c84bfe8',
+            'web/daily-scan.js': '93aad0c462ff10ae15961d122ec097ef59aa522774ccf821f9eb41588c84bfe8',
+          }
+          for name, expected in checks.items():
+              actual = hashlib.sha256(Path(name).read_bytes()).hexdigest()
+              assert actual == expected, (name, actual)
+          validate_artifact(Path('dist'))
+          PY
+      - name: Record causal events in existing history journey and native baseline
+        run: npm run test:browser -- --project=webkit --project=mobile-webkit --project=chromium --grep 'Daily deep links reveal filtered items and native disclosures support keyboard and history|native History baseline preserves entry state across document Back' --workers=1
+        env:
+          QA_DIST: dist
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: daily-history-events
+          path: output/browser-qa/
+          retention-days: 14
