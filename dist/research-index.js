@@ -4,8 +4,9 @@
   document.querySelectorAll('[data-research-index]').forEach(index => {
     const form = index.querySelector('[data-index-controls]');
     const controls = Array.from(form.elements).filter(control => control.name);
+    const normalize = value => value.normalize('NFKC').toLowerCase();
     const rows = Array.from(index.querySelectorAll('[data-index-row]')).map(node => ({
-      node, search: node.dataset.search, facets: JSON.parse(node.dataset.filters),
+      node, search: normalize(node.dataset.search), facets: JSON.parse(node.dataset.filters),
       id: node.dataset.recordId || node.querySelector('th .r-record-id')?.textContent
     }));
     const byId = new Map(rows.map(row => [row.id, row]));
@@ -18,12 +19,34 @@
     const empty = index.querySelector('[data-index-empty]');
     const advanced = form.querySelector('[data-index-advanced]');
     const advancedCount = form.querySelector('[data-index-advanced-count]');
+    const applied = form.querySelector('[data-index-applied]');
     const advancedControls = controls.filter(control => !['q', 'status'].includes(control.name));
     const papers = index.dataset.indexKind === 'papers';
     let filtering = false;
     function advancedActive() { return advancedControls.filter(control => control.value).length; }
+    function showApplied() {
+      if (!applied) return;
+      const fragment = document.createDocumentFragment();
+      controls.filter(control => control.value.trim()).forEach(control => {
+        const label = control.name === 'q' ? 'Search' : control.closest('label').firstChild.textContent.trim();
+        const value = control.name === 'q' ? control.value.trim() : control.selectedOptions[0].textContent;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.removeFilter = control.name;
+        button.setAttribute('aria-label', `Remove ${label}: ${value}`);
+        const text = document.createElement('span');
+        text.textContent = `${label}: ${value}`;
+        const remove = document.createElement('span');
+        remove.textContent = '×';
+        remove.setAttribute('aria-hidden', 'true');
+        button.append(text, remove);
+        fragment.append(button);
+      });
+      applied.replaceChildren(fragment);
+      applied.hidden = !applied.childElementCount;
+    }
     function apply() {
-      const query = form.elements.q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      const query = normalize(form.elements.q.value.trim()).split(/\s+/).filter(Boolean);
       const active = controls.some(control => control.value.trim());
       let matching = 0, works = 0, sourceVersions = 0;
       if (active && !filtering) versions.forEach(group => initialOpen.set(group.details, group.details.open));
@@ -52,6 +75,7 @@
         : `${matching} of ${rows.length} records shown`;
       if (advancedCount) advancedCount.textContent = `${advancedActive()} active`;
       empty.hidden = matching !== 0;
+      showApplied();
     }
     function restore() {
       const params = new URL(window.location.href).searchParams;
@@ -79,6 +103,14 @@
       if (advanced) advanced.open = false;
       update(false);
       form.elements.q.focus();
+    });
+    applied?.addEventListener('click', event => {
+      const button = event.target.closest('button[data-remove-filter]');
+      if (!button) return;
+      const position = Array.from(applied.children).indexOf(button);
+      form.elements[button.dataset.removeFilter].value = '';
+      update(false);
+      (applied.children[Math.min(position, applied.childElementCount - 1)] || form.elements.q).focus();
     });
     window.addEventListener('popstate', restore);
     restore();
