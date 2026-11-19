@@ -42,19 +42,30 @@
   }
   function restoreReading(scroll = true) {
     const saved = savedReading();
-    if (!saved) return false;
-    // Recreated documents lose native disclosure state. Restore their layout
-    // before restoring the reading position; a stale fragment must not win.
-    for (const row of rows) row.querySelector('details').open = saved.open.includes(row.id);
-    try { history.scrollRestoration = 'manual'; } catch (_) { /* Restore below. */ }
     const generation = ++restoration;
-    if (scroll) requestAnimationFrame(() => {
-      if (generation !== restoration || !savedReading()) return;
-      const anchor = rowById.get(saved.anchor);
-      const y = anchor && !anchor.hidden ? scrollY + anchor.getBoundingClientRect().top - saved.top : saved.y;
-      scrollTo({ left: saved.x, top: Math.max(0, Math.min(maxPosition, y)), behavior: 'instant' });
-    });
-    return true;
+    function apply(current) {
+      // Recreated documents lose native disclosure state. Layout and position
+      // must be restored together after the browser finishes its traversal.
+      for (const row of rows) row.querySelector('details').open = current.open.includes(row.id);
+      try { history.scrollRestoration = 'manual'; } catch (_) { /* Restore below. */ }
+      if (scroll) {
+        const anchor = rowById.get(current.anchor);
+        const y = anchor && !anchor.hidden ? scrollY + anchor.getBoundingClientRect().top - current.top : current.y;
+        scrollTo({ left: current.x, top: Math.max(0, Math.min(maxPosition, y)), behavior: 'instant' });
+      }
+    }
+    if (!scroll) { if (saved) apply(saved); }
+    else setTimeout(() => {
+      if (generation !== restoration) return;
+      requestAnimationFrame(() => {
+        if (generation !== restoration) return;
+        // pageshow can precede history.state restoration. Read it in the later
+        // task instead of abandoning the return when its early value is null.
+        const current = savedReading();
+        if (current) apply(current);
+      });
+    }, 0);
+    return Boolean(saved);
   }
   const fold = value => value.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase();
   const wordsIn = value => fold(value).match(/[\p{L}\p{N}]+/gu) || [];

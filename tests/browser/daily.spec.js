@@ -54,7 +54,19 @@ test.beforeEach(async ({ page, request }, info) => {
   page.on('pageerror', error => info._dailyRuntimeErrors.push(error.message));
 });
 
-test.afterEach(async ({}, info) => {
+test.afterEach(async ({ page }, info) => {
+  if (info.status !== info.expectedStatus) {
+    let evidence;
+    try {
+      evidence = await page.evaluate(() => ({ url: location.href, readyState: document.readyState,
+        edition: document.querySelector('.daily-scan')?.dataset.edition || null,
+        navigationType: performance.getEntriesByType('navigation')[0]?.type || null,
+        readingState: history.state?.s2sDailyReading ?? null, unrelatedState: history.state?.dailyTest ?? null,
+        scrollRestoration: history.scrollRestoration, scrollX, scrollY,
+        openIDs: [...document.querySelectorAll('.scan-item')].filter(row => row.querySelector('details').open).map(row => row.id) }));
+    } catch (error) { evidence = { url: page.url(), diagnosticError: error.message }; }
+    await info.attach('daily-history-failure.json', { body: Buffer.from(JSON.stringify(evidence)), contentType: 'application/json' });
+  }
   expect(info._dailyRuntimeErrors || [], 'Unexpected Daily runtime errors').toEqual([]);
 });
 
