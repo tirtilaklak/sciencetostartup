@@ -79,3 +79,28 @@ test('tau display and raw spelling reach the same records without overflowing at
   expect(await query.evaluate(node => parseFloat(getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(16);
   expect(await filters.locator('summary').evaluate(node => node.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
 });
+
+test('paper filter removal preserves history, unrelated parameters and keyboard focus at 320px', async ({ page }) => {
+  await page.setViewportSize({width:320, height:780});
+  await page.goto('/research/papers/?status=candidate&type=paper_version&reader=keep#main');
+  const applied = page.locator('[data-index-applied]');
+  await expect(applied.getByRole('button')).toHaveCount(2);
+  await applied.getByRole('button', {name:'Remove Review status: candidate', exact:true}).focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('[data-index-count]')).toHaveText('208 of 456 matching records · 0 paper works · 208 source versions');
+  await expect(applied.getByRole('button', {name:'Remove Record type: paper version', exact:true})).toBeFocused();
+  expect(new URL(page.url()).searchParams.get('status')).toBeNull();
+  expect(new URL(page.url()).searchParams.get('reader')).toBe('keep');
+  expect(new URL(page.url()).hash).toBe('#main');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+  await page.goBack();
+  await expect(applied.getByRole('button')).toHaveCount(2);
+  await expect(page.locator('[data-index-count]')).toHaveText('57 of 456 matching records · 0 paper works · 57 source versions');
+  await page.goForward();
+  await expect(applied.getByRole('button')).toHaveCount(1);
+  await applied.getByRole('button').click();
+  await expect(applied).toBeHidden();
+  await expect(page.getByLabel('Search records', {exact:true})).toBeFocused();
+  expect(new URL(page.url()).search).toBe('?reader=keep');
+  expect(new URL(page.url()).hash).toBe('#main');
+});
