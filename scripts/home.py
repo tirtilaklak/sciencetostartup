@@ -3,8 +3,6 @@ import datetime as dt
 from html import escape
 import json
 
-RIGHT_ARROW = '<svg class="home-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg>'
-EXTERNAL_ARROW = '<svg class="home-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg>'
 
 
 def label_date(value):
@@ -48,8 +46,8 @@ def work_example(candidate, companies):
             '<ul class="example-conditions">' + ''.join('<li>' + escape(value) + '</li>' for value in conditions) + '</ul>'
             '<p class="example-meta">Terms checked <time datetime="' + escape(receipt["checked_on"][:10]) + '">' + label_date(receipt["checked_on"]) + '</time></p>'
             '<p class="example-note">A public route is not a guarantee of tasks, acceptance or payment. Check the provider’s current terms.</p>'
-            '<div class="example-actions"><a class="example-action" href="/explore/#company/' + escape(route["company_id"], quote=True) + '/work">Read requirements and sources ' + RIGHT_ARROW + '</a>'
-            '<a class="example-action" href="' + escape(route["url"], quote=True) + '" target="_blank" rel="noopener noreferrer">Original listing ' + EXTERNAL_ARROW + '<span class="sr-only"> (opens in a new tab)</span></a></div></article>')
+            '<div class="example-actions"><a class="example-action" href="/explore/#company/' + escape(route["company_id"], quote=True) + '/work">Read requirements and sources</a>'
+            '<a class="example-action" href="' + escape(route["url"], quote=True) + '" target="_blank" rel="noopener noreferrer">Original listing<span class="sr-only"> (opens in a new tab)</span></a></div></article>')
 
 
 def render_home(html, data, sidecars, release, summary, current_companies=None):
@@ -59,11 +57,12 @@ def render_home(html, data, sidecars, release, summary, current_companies=None):
         reviewed = entry.get("reviewed_on", "2026-10-14")
         company = ('<article class="example-card company-example"><p class="example-kind">Example company</p><h3 class="example-title">Snorkel AI</h3>'
                    '<p class="example-summary">' + escape(entry["summary"]) + '</p><p class="example-meta">Summary reviewed <time datetime="' + reviewed + '">' + label_date(reviewed) + '</time></p>'
-                   '<p class="example-source">Company descriptions and financial figures keep their own sources and review dates.</p><div class="example-actions"><a class="example-action" href="/company/snorkel_ai/">Explore company ' + RIGHT_ARROW + '</a></div></article>')
+                   '<p class="example-source">Company descriptions and financial figures keep their own sources and review dates.</p><div class="example-actions"><a class="example-action" href="/company/snorkel_ai/">Explore company</a></div></article>')
     else:
-        company = '<article class="example-card company-example"><h3>Understand AI data companies.</h3><p><a href="/companies/">Browse sourced company profiles ' + RIGHT_ARROW + '</a></p></article>'
-    fallback = '<article class="example-card work-example home-work-fallback"><p class="example-kind">Paid AI training work</p><h3 class="example-title">Find a route that fits your expertise.</h3><p class="example-summary">Compare public listings and expert networks, with pay conditions and requirements beside the source.</p><div class="example-actions"><a class="example-action" href="/work/">Browse paid work ' + RIGHT_ARROW + '</a></div></article>'
-    candidates = promotion_candidates(sidecars["WORK_ROUTES"], release)
+        company = '<article class="example-card company-example"><h3>Understand AI data companies.</h3><p><a href="/companies/">Browse sourced company profiles</a></p></article>'
+    fallback = '<article class="example-card work-example home-work-fallback"><p class="example-kind">Paid AI training work</p><h3 class="example-title">Compare pay and requirements.</h3><p class="example-summary">Browse public listings and expert networks, with conditions beside the original source.</p><div class="example-actions"><a class="example-action" href="/work/">Browse paid work</a></div></article>'
+    # A minimal homepage has no work slot: do not ship invisible promotion terms.
+    candidates = promotion_candidates(sidecars["WORK_ROUTES"], release) if "{{HOME_WORK_EXAMPLE}}" in html else []
     config = {**{key: summary[key] for key in ("schemaVersion", "buildId", "editorialReleaseId", "datasetVersion")}, "search": summary["homeSearch"], "candidates": []}
     templates = []
     for i, candidate in enumerate(candidates):
