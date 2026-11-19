@@ -1,0 +1,412 @@
+{
+  "schema_version": "1.0.0",
+  "date": "2026-11-18",
+  "timezone": "America/Los_Angeles",
+  "compiled_at": "2026-11-18T16:07:40.844549+00:00",
+  "selection": "13 papers, evaluation tools and company updates; original source dates retained",
+  "workers": {
+    "requested_model": "gpt-6.1-sol",
+    "requested_reasoning_effort": "ultra",
+    "count": 3,
+    "roles": [
+      "RLHF and post-training papers",
+      "Data, datasets and evaluation",
+      "Company news"
+    ],
+    "configuration_evidence": "Three separate worker spawns accepted the requested model and reasoning settings. Resolved backend model and effort are not independently exposed by the worker runtime."
+  },
+  "items": [
+    {
+      "id": "gaze-rl",
+      "title": "Eyes in the Update? Learning Where Rewards Land in Multimodal Reasoning",
+      "kind": "Paper",
+      "topics": [
+        "RLHF"
+      ],
+      "publisher": "Lixuan He and coauthors",
+      "published_on": "2026-11-17",
+      "date_basis": "arXiv v1 submission: 17 Nov 2026 at 09:11:42 UTC",
+      "explanation": [
+        "Gaze-RL changes which generated words receive most of a training reward, using the model's own visual representations and uncertainty rather than extra step annotations.",
+        "The authors report improvements on image and video reasoning across three open model versions using the same 200-update budget.",
+        "It adds training computation and cannot repair a wrong reward or visual evidence the model failed to represent."
+      ],
+      "focus": "Redistributing a fixed completion-level advantage across response positions using internal visual representations and predictive uncertainty",
+      "finding": "With Qwen2.5-VL-7B, the authors report Geometry3K 47.9 versus 39.6 for GRPO and MathVista 70.4 versus 68.6 under the same 200-update budget; gains vary by benchmark",
+      "caveat": "Cannot correct erroneous verifier rewards or weak visual representations; full causal support computation adds quadratic response-length training work; Qwen NExT-QA remains below the base checkpoint; no independent replication",
+      "read_scope": "Complete primary HTML captured; submission history, method, experimental setup, main tables, limitations, compute appendix and selected ablations read; no code execution or independent replication",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.22438",
+          "label": "Paper and original submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.22438v1",
+          "label": "Full paper, experiments and limitations"
+        }
+      ]
+    },
+    {
+      "id": "say-less-hallucinate-less",
+      "title": "Say Less, Hallucinate Less? Diagnosing and Restoring Object Coverage in Preference-Optimized Vision-Language Models",
+      "kind": "Paper",
+      "topics": [
+        "RLHF",
+        "Evaluation"
+      ],
+      "publisher": "Hansang Lee",
+      "published_on": "2026-11-17",
+      "date_basis": "arXiv v1 submission: 17 Nov 2026 at 18:24:58 UTC",
+      "explanation": [
+        "Lee audited four preference-tuned LLaVA checkpoints and found lower hallucination scores came with missed object categories and no significant object-F1 gain on CHAIR.",
+        "Making the base model stop earlier reproduced 58–86% of the hallucination reduction for three checkpoints across two COCO sets.",
+        "The result supports measuring coverage alongside hallucination, but covers one backbone with greedy decoding, and the stopping comparison does not establish what caused training changes."
+      ],
+      "focus": "Recall-controlled evaluation of hallucination reduction after preference tuning; base-model early stopping and object-category restoration",
+      "finding": "Base early stopping reproduces 58–86% of CHAIRi gains for RLAIF-V, CHAIR-DPO and CSR across development and held-out COCO sets; none of four evaluated checkpoints gains significant set-level object F1 on CHAIR",
+      "caveat": "One LLaVA-1.5-7B backbone, greedy decoding and one detailed-caption prompt; stopping shares are reproduction ratios, not causal training effects; more than half of categories appended by the restoration method are hallucinated; no independent replication",
+      "read_scope": "Complete primary HTML captured; submission history, recall matching, checkpoint validation, main results, restoration controls, discussion and limitations read; no code execution or independent replication",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.23179",
+          "label": "Paper and original submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.23179v1",
+          "label": "Full paper, matched-recall results and limits"
+        }
+      ]
+    },
+    {
+      "id": "activation-steering-hinting",
+      "title": "Get Hint-Augmented GRPO Done Right Through Activation Steering",
+      "kind": "Paper",
+      "topics": [
+        "RLHF"
+      ],
+      "publisher": "Khiem Le, Ting Hua and Nitesh V. Chawla",
+      "published_on": "2026-11-17",
+      "date_basis": "arXiv v1 submission: 17 Nov 2026 at 17:43:28 UTC",
+      "explanation": [
+        "ASH trains a steering vector alongside reinforcement learning so a model can retain some benefit of hints when the test question has none.",
+        "The authors report gains across four small language models on mathematics and reasoning benchmarks.",
+        "Its generation budget matches comparison methods, but training takes about 1.5 times as long as the standard reinforcement-learning baseline, and eight-attempt scores do not measure single-answer reliability."
+      ],
+      "focus": "Learning activation steering from hinted and plain training questions to reduce the mismatch when test-time hints are absent",
+      "finding": "Authors report higher pass@k across four 1B–4B models on six reasoning benchmarks, plus transfer tests on LogiQA and LiveCodeBench-v5; steering is injected at inference without a textual hint",
+      "caveat": "About 1.5× GRPO training time despite a matched generation budget; four 1B–4B models; pass@8 differs from single-answer accuracy; training-seed uncertainty not reported; inference still injects one learned steering vector; no independent replication",
+      "read_scope": "Complete primary HTML captured; submission history, steering method, training setup, main results, transfer tests and limitations read; code not executed and results not reproduced",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.23124",
+          "label": "Paper and original submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.23124v1",
+          "label": "Full paper, training budget and limitations"
+        }
+      ]
+    },
+    {
+      "id": "regularized-score-centering",
+      "title": "Regularized Score Centering",
+      "kind": "Paper",
+      "topics": [
+        "RLHF"
+      ],
+      "publisher": "Hao Bai and coauthors",
+      "published_on": "2026-11-16",
+      "date_basis": "arXiv v1 submission: 16 Nov 2026 at 19:12:50 UTC; later index announcement dates are not the submission date",
+      "explanation": [
+        "Asynchronous reinforcement learning trains on responses from older model versions, and that gap can destabilize updates.",
+        "RSC penalizes large departures from the model that generated a training batch, while adjusting updates to account for that older model.",
+        "The authors report stronger agent-task results and more sample-efficient training, but most controlled tasks use fixed refresh schedules, and fully asynchronous software experiments use one seed per configuration."
+      ],
+      "focus": "Stabilizing off-policy and asynchronous reinforcement learning with score centering and reverse-KL regularization toward the behavior policy",
+      "finding": "Authors report RSC with truncated importance sampling improves agent-task sample efficiency; BabyAI score 18.06 versus strongest non-RSC baseline 1.83, with three seeds in the controlled task table",
+      "caveat": "Controlled agent tasks use fixed refresh intervals and three seeds; WebShop is essentially tied with IS-PPOClip; fully asynchronous software comparisons use single runs and adding KL hurts one lower-learning-rate TIS comparison; theoretical guarantees require stated fitting assumptions; no independent replication",
+      "read_scope": "Complete primary HTML captured; submission history, methodology, failure diagnostics, controlled agent results and asynchronous software setup read; proof details not independently checked and results not reproduced",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.21791",
+          "label": "Paper and original submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.21791v1",
+          "label": "Full paper, agent experiments and assumptions"
+        }
+      ]
+    },
+    {
+      "id": "mm-reportbench",
+      "title": "MM-ReportBench: A Comprehensive Benchmark for Multimodal Report Generation from Tables",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Teng Lin and Nan Tang / HKUST(GZ)",
+      "published_on": "2026-11-17",
+      "date_basis": "arXiv v1 submission history: 17 November 2026, 10:06:56 UTC. The paper states its model-access window was November 2025–January 2026.",
+      "explanation": [
+        "MM-ReportBench tests whether an AI can turn tables into a report whose text and charts agree with the data.",
+        "Its authors assembled 386 tasks and use separate judges for narrative and visualization quality, reporting that one combined judge inflated scores by 8–12 points.",
+        "The models were accessed during November 2025–January 2026, which limits the results' relevance to current model choices."
+      ],
+      "focus": "Table-grounded report generation, numerical verification, chart fidelity and separate text/visual judging.",
+      "finding": "The authors report 386 tasks over 185 tables and a best overall score of 68.9. Their manual error analysis of 200 sampled reports found numerical hallucinations in 38.5%; the unified-judge ablation scored 8–12 points higher.",
+      "caveat": "GPT-4o-based judges and an older model-access window constrain interpretation. Text-only systems receive zero visual score. Findings are author-reported; no experiments or judge outputs were reproduced.",
+      "read_scope": "Read the arXiv abstract and submission history, plus HTML sections III, IV and relevant appendix descriptions covering construction, judging, experimental setup, results and error analysis; selected sections rather than a cover-to-cover read.",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.22514",
+          "label": "arXiv abstract and dated submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.22514v1",
+          "label": "Original paper: methods, evaluation window and results"
+        }
+      ]
+    },
+    {
+      "id": "mentalgrid-spatialwalker",
+      "title": "MentalGrid tests spatial changes without intermediate visual feedback",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation",
+        "RLHF"
+      ],
+      "publisher": "Jiachun Li, Zhuoran Jin, Kang Liu and Jun Zhao / Chinese Academy of Sciences",
+      "published_on": "2026-11-17",
+      "date_basis": "arXiv v1 submission history: 17 November 2026, 10:31:56 UTC; the record identifies Findings of EMNLP 2026.",
+      "explanation": [
+        "MentalGrid asks models to track where objects and an observer move after a sequence of instructions, without showing the intervening images.",
+        "The authors supply 3,356 questions and train a 3B model with supervised learning followed by reinforcement learning.",
+        "They report a large gain over its base model, but the benchmark uses simulated scenes and leaves out collisions and material properties."
+      ],
+      "focus": "Dynamic spatial-state evaluation and curriculum training using 16k generated spatial-reasoning examples.",
+      "finding": "The authors report SpatialWalker improving overall MentalGrid accuracy from 12.54 to 46.35, a 33.81 percentage-point gain, and a 4.92-point average gain on other benchmarks. Their main benchmark contains 3,356 questions over 1,100 images from 349 scenes.",
+      "caveat": "All scenes are simulated; object pose, materials and collisions are excluded. Human results and some expensive-model results use the tiny subset, so those scores are not full-set comparisons. Results were not replicated.",
+      "read_scope": "Read arXiv abstract/history and original HTML sections 1–4 and Limitations, including the dataset pipeline, evaluation setup, Tables 1–3 and training description; selected sections rather than a complete paper read.",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.22541",
+          "label": "arXiv abstract and dated submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.22541v1",
+          "label": "Original paper: MentalGrid construction, results and limitations"
+        }
+      ]
+    },
+    {
+      "id": "dominobench",
+      "title": "DominoBench: Evaluating Multi-Step Physical Reasoning from Still Images",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Emilio Ferrara",
+      "published_on": "2026-11-16",
+      "date_basis": "arXiv v1 submitted 16 November 2026, 01:24:42 UTC; v2 revised 17 November 2026, 07:40:39 UTC. The item date is the original submission, not the revision or later discovery date.",
+      "explanation": [
+        "DominoBench uses pairs of almost identical pictures to test whether a model can predict a simulated chain reaction.",
+        "One small physical change flips the answer, exposing models that describe a plausible sequence without calculating the outcome.",
+        "The author releases 854 items and reports weak unaided performance; supplying the deciding calculation helps, but also supplies information that a still image cannot reveal."
+      ],
+      "focus": "Simulator-labelled minimal pairs, quantitative physical prediction and a four-level hint ladder.",
+      "finding": "The author evaluated 30 models from 10 families with uneven coverage. On all 854 items in DominoBench-1K, GPT-6.1 Sol and GPT-6 Astra each achieved 75% accuracy on the person whose fate changes between paired scenes; their accuracy on both complete scenes in a pair was 40% and 39%, respectively.",
+      "caveat": "The scenes use one 2D line-art style, human accuracy was not measured, and coverage differs by model. The strongest hint supplies hidden quantities, so its improvement does not establish unaided physical inference. Results were not replicated.",
+      "read_scope": "Read the arXiv abstract/history, original HTML construction, protocol, metrics, results and limitations sections, and the official Hugging Face dataset card; selected sections rather than a complete paper read.",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.20385",
+          "label": "arXiv original and revised submission dates"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.20385v2",
+          "label": "Original paper: experimental protocol and limitations"
+        },
+        {
+          "url": "https://huggingface.co/datasets/emilioferrara/DominoBench",
+          "label": "Official dataset card and evaluation harness"
+        }
+      ]
+    },
+    {
+      "id": "cae-bench",
+      "title": "CAE-Bench tests whether agent-built engineering solvers generalize",
+      "kind": "Paper",
+      "topics": [
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Zhiyu Zhou, Tianyou Liu and collaborators",
+      "published_on": "2026-11-16",
+      "date_basis": "arXiv v1 submission history: 16 November 2026, 15:40:43 UTC. The RC7 public paper-snapshot release separately shows 14 November; its tag's 20261029 component is not the publication date.",
+      "explanation": [
+        "CAE-Bench tests an agent's engineering solver on physical inputs it did not see while writing the code.",
+        "The authors evaluate 12 models on 80 computational tasks and report cases where solvers pass the public examples but fail held-out inputs.",
+        "This is useful for checking reusable simulation software, although complete grading needs maintainer-held files and the authors flag uncertainty in some reference data."
+      ],
+      "focus": "Reusable numerical solvers under changing geometry, materials and boundary conditions.",
+      "finding": "The official repository reports GPT-6.1 Sol and GPT-6 Astra at 65.24 and 64.85 overall, but 50.35 and 49.79 on varying-input tasks. The 24 fixed-problem tasks have no held-out cases and are reported separately; RC7 contains 80 computational tasks and two infrastructure tasks.",
+      "caveat": "Full grading requires maintainer-held inputs, references and grading configurations. Appendix B says not all reference data are guaranteed credible enough. Fixed-problem and varying-input scores answer different questions. No solvers or reference data were independently tested.",
+      "read_scope": "Read the arXiv abstract/history, original HTML task/protocol and release/reconstruction appendix sections, official repository README and public RC7 release notes; selected sections rather than a complete paper read.",
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2611.21273",
+          "label": "arXiv abstract and dated submission history"
+        },
+        {
+          "url": "https://arxiv.org/html/2611.21273v1",
+          "label": "Original paper: tasks, references and reconstruction limits"
+        },
+        {
+          "url": "https://github.com/AXeonV/CAE-Bench",
+          "label": "Official benchmark repository and scoring scope"
+        }
+      ]
+    },
+    {
+      "id": "mlperf-training-v61",
+      "title": "MLPerf Training v6.1 adds agentic RL and generative recommendation workloads",
+      "kind": "Release",
+      "topics": [
+        "Evaluation",
+        "RLHF"
+      ],
+      "publisher": "MLCommons",
+      "published_on": "2026-11-16",
+      "date_basis": "MLCommons' analysis is visibly dated 17 November 2026 and explicitly states that verified v6.1 Closed-division results were published 16 November at 08:00 Pacific. The item uses that result-release date.",
+      "explanation": [
+        "MLCommons released MLPerf Training v6.1 results, adding an agentic reinforcement-learning workload and a generative recommendation workload.",
+        "The round includes 250 submissions from 25 submitters and provides measured training-system comparisons under benchmark rules.",
+        "The results help infrastructure teams compare submitted configurations, while the article's broader speedup ratios remain derived analysis and do not describe every training job."
+      ],
+      "focus": "Training-system benchmarking, agentic GRPO post-training and generative recommendation.",
+      "finding": "New workloads are Qwen3.5-397B GRPO for software-repair post-training and DLRMv4-HSTU. MLCommons reports 29 GRPO submissions from seven submitters and 20 recommender submissions from eight; v6.1 has 250 submissions overall.",
+      "caveat": "The four unchanged benchmarks support specific cross-round comparisons; new benchmarks do not have prior-round baselines. Ratios in the analysis are MLCommons-derived rather than official standalone scores. No submitted systems or raw result logs were reproduced.",
+      "read_scope": "Read the official MLCommons analysis, benchmark-update sections, comparison definitions, cited result descriptions and limitations. The external spreadsheet, result explorer and supplemental PDF were not inspected.",
+      "sources": [
+        {
+          "url": "https://mlcommons.org/2026/11/mlperf-training-v6-1-insights/",
+          "label": "MLCommons release analysis with result-publication date and benchmark changes"
+        }
+      ]
+    },
+    {
+      "id": "guidepoint-labs-launch",
+      "title": "Guidepoint launches an expert-data business for AI training and evaluation",
+      "kind": "Company news",
+      "topics": [
+        "Companies",
+        "Data",
+        "Evaluation",
+        "RLHF"
+      ],
+      "publisher": "Guidepoint",
+      "published_on": "2026-11-18",
+      "date_basis": "Visible official press-release dateline: November 18, 2026",
+      "explanation": [
+        "Guidepoint publicly launched Guidepoint Labs after more than six months of work in stealth.",
+        "The business supplies expert-written training examples, preference data and evaluations, including tasks and grading rubrics for reinforcement-learning environments.",
+        "It says it already serves frontier labs and enterprises, but its launch announcement does not provide a controlled test showing that these services improve model performance."
+      ],
+      "focus": "A new business unit offering expert human data, agent trajectories, RL environments and evaluation services",
+      "finding": "Guidepoint publicly launched Guidepoint Labs; the announced services cover expert sourcing and qualification, task design, evaluation and validated training data",
+      "caveat": "Company announcement and self-reported adoption; no independent service-quality evaluation reviewed; the cited clinical-trial benchmark is a separate earlier research result",
+      "read_scope": "Full official press release, including visible dateline and service list; no customer contracts, delivered datasets or underlying clinical-trial benchmark inspected",
+      "sources": [
+        {
+          "url": "https://www.guidepoint.com/pressreleases/guidepoint-unveils-guidepoint-labs-to-power-the-next-frontier-of-ai-training-and-evaluation/",
+          "label": "Guidepoint Labs launch and service scope"
+        }
+      ]
+    },
+    {
+      "id": "lancedb-series-b",
+      "title": "LanceDB raises $57.5 million for multimodal training-data infrastructure",
+      "kind": "Company news",
+      "topics": [
+        "Companies",
+        "Data"
+      ],
+      "publisher": "LanceDB",
+      "published_on": "2026-11-17",
+      "date_basis": "Visible date beneath the headline of the official company announcement",
+      "explanation": [
+        "LanceDB announced a $57.5 million Series B to expand its platform for preparing and using multimodal training data.",
+        "The company describes a shared system where researchers can curate examples and run training workflows without moving between separate stores.",
+        "The funding is an announced completed raise; broader data-preparation and loading improvements remain development plans, and the post's performance figures are company claims."
+      ],
+      "focus": "Funding and product direction for multimodal data curation, feature engineering and pre- and post-training workflows",
+      "finding": "LanceDB reports a $57.5 million Series B led by Bessemer Venture Partners and Innovation Endeavors, bringing total funding to $98.5 million",
+      "caveat": "Performance, customer and growth figures are self-reported; planned investments in preparation, loading and caching are not completed releases",
+      "read_scope": "Full official funding announcement and product-direction sections, including the visible publication date and attributed customer statements; no product execution or performance replication",
+      "sources": [
+        {
+          "url": "https://www.lancedb.com/blog/lancedb-series-b-funding",
+          "label": "LanceDB funding announcement and development plans"
+        }
+      ]
+    },
+    {
+      "id": "scale-robot-data-diversity",
+      "title": "Scale examines diversity in 20,000 hours of robot training data",
+      "kind": "Company news",
+      "topics": [
+        "Companies",
+        "Data",
+        "Evaluation"
+      ],
+      "publisher": "Scale Labs",
+      "published_on": "2026-11-17",
+      "date_basis": "Visible official article date: 11/17/2026",
+      "explanation": [
+        "Scale analyzed a 20,000-hour slice of robot teleoperation data to measure variety beyond recording hours.",
+        "Its analysis finds that the tested vision-only representations group clips more strongly by room type than by action, while object labels have a long tail.",
+        "These checks describe the company's data and model representations; they do not establish which diversity choices improve a robot's success on new tasks."
+      ],
+      "focus": "Diversity and representation analysis of Mobile Trossen teleoperation data across tasks, verbs, objects and scenes",
+      "finding": "Scale reports 344,625 recordings and 797 tasks across 231 sites; vision-only nearest neighbors match scene type more strongly than action; 3,696 object labels have an effective count of 162",
+      "caveat": "One 20,000-hour corpus slice and selected encoders; the strongest verb representation also receives the verb in its text input; downstream policy gains remain an open question",
+      "read_scope": "Full official article, methods appendix, nearest-neighbor analysis and stated input-confounding caveat; underlying corpus and model code not inspected; results not reproduced",
+      "sources": [
+        {
+          "url": "https://labs.scale.com/blog/measuring-robot-data-diversity",
+          "label": "Scale's robot-data analysis and methods appendix"
+        }
+      ]
+    },
+    {
+      "id": "scale-hospital-operations",
+      "title": "Scale launches hospital agents tied to workflow-specific evaluations",
+      "kind": "Release",
+      "topics": [
+        "Companies",
+        "Evaluation"
+      ],
+      "publisher": "Scale AI",
+      "published_on": "2026-11-16",
+      "date_basis": "Visible official article byline: November 16, 2026",
+      "explanation": [
+        "Scale launched five hospital-operations applications for work such as scheduling referrals and reviewing patient records.",
+        "The company says the agents run inside each health system's environment and are checked against evaluations built around its workflows.",
+        "This is a product-availability announcement, not evidence of clinical benefit: the post gives no controlled results for the new applications, and its cited burnout study concerns a separate documentation tool."
+      ],
+      "focus": "Hospital operations agents supported by clinical experts, source-linked outputs and custom workflow evaluations",
+      "finding": "Scale says five applications are available to health systems starting November 16 and describes deployment in the health system's environment with engineers and clinical subject-matter experts",
+      "caveat": "Availability and deployment properties are company claims; no controlled outcomes for the new applications; the cited 2025 burnout study does not evaluate this release",
+      "read_scope": "Full official launch post, five application descriptions, evaluation section and availability statement; cited study and benchmark papers not reviewed for this item; products not executed",
+      "sources": [
+        {
+          "url": "https://scale.com/blog/scaleforhospitaloperations",
+          "label": "Scale Hospital Operations release and evaluation approach"
+        }
+      ]
+    }
+  ]
+}
