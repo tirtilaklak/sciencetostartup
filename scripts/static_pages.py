@@ -1491,7 +1491,7 @@ def work_table(research, rows, names, key):
         role = clean(r.get("role")) or "Listing"
         tag = f'<span class="work-status">{escape(status)}</span>' if status else ""
         arrangements = " ".join(r.get("arrangements") or [])
-        pay = f'<p class="work-pay"><span class="work-offer-label">Recorded pay</span><strong>{escape(work_pay(r))}</strong>{work_pay_notes(r)}</p>' if key not in ("boards", "closed") else ""
+        pay = f'<p class="work-pay"><strong>{escape(work_pay(r))}</strong>{work_pay_notes(r)}</p>' if key not in ("boards", "closed") else ""
         place = f'<p class="work-place">{escape(work_location(r))}</p>' if key != "closed" else ""
         out.append(f'<li class="work-listing" data-work-route="{escape(r.get("id"))}" data-arrangements="{escape(arrangements)}">'
                    f'<div class="work-heading"><a class="work-company" href="{ORIGIN}/company/{escape(cid)}/#work">{escape(company)}</a>{tag}'
@@ -1520,7 +1520,7 @@ def render_work(research, routes, names, modified):
             '<header class="work-page-heading"><h1>Find work in AI training.</h1>\n',
             '<p class="lede">Roles and projects, with published pay and sources.</p>\n',
             f'<p class="work-page-counts">{plural(named_count, "named listing")} <span>·</span> {plural(program_count, "network or program", "networks and programs")} <span>·</span> {plural(open_companies, "company", "companies")}</p></header>\n',
-            '<p class="work-page-context">Posted pay is not guaranteed earnings. Check each record’s review date.</p>\n',
+            '<p class="work-page-context">Recorded pay is not guaranteed earnings. Check each record’s review date.</p>\n',
             '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Pay and availability may have changed. Check the company’s page before applying.' + (f' Links checked up to {escape(format_date(checked))}.' if checked else '') + '</p>\n' + safety_note() + '</details>\n',
             '<form class="work-page-filters" data-work-filters hidden role="search" aria-label="Find paid work">'
             '<label class="work-page-search">Search listings<input name="q" type="search" placeholder="Role, skill or company" maxlength="256" autocomplete="off"></label>'
