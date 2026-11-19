@@ -1,7 +1,12 @@
 {
   "first_date": "2026-11-16",
-  "latest_date": "2026-11-17",
+  "latest_date": "2026-11-18",
   "snapshots": [
+    {
+      "date": "2026-11-18",
+      "count": 13,
+      "url": "/daily/2026-11-18/"
+    },
     {
       "date": "2026-11-17",
       "count": 16,
