@@ -5,12 +5,13 @@
 .work-page-counts{display:flex;flex-wrap:wrap;gap:8px 12px;color:var(--muted);font-size:13px;margin:12px 0 0}
 .work-page-counts span{color:var(--border)}
 .work-page-note{max-width:780px;color:var(--muted);font-size:14px;line-height:1.7}
-.work-page-filters{position:relative;display:block;margin:20px 0 12px;padding:16px 0;border:0;border-block:1px solid var(--border);border-radius:0;background:transparent}
+.work-page-context{max-width:780px;margin:0 0 8px;color:var(--muted);font-size:13px;line-height:1.65}
+.work-page-filters{position:relative;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr);align-items:end;gap:10px 20px;margin:20px 0 12px;padding:16px 0;border:0;border-block:1px solid var(--border);border-radius:0;background:transparent}
 main>.work-page-filters,main>.work-page-list,main>.work-page-groups{max-width:none}
 .work-page-filters[hidden],.work-page-empty[hidden],.work-page-group[hidden],.work-listing[hidden],.work-page-groups[hidden]{display:none}
 /* An early head opt-in reserves the real responsive form before its controls
    are ready. Without JavaScript the form keeps its native hidden fallback. */
-html[data-page-enhancement="pending"] .work-page-filters[hidden]{display:block!important;visibility:hidden}
+html[data-page-enhancement="pending"] .work-page-filters[hidden]{display:grid!important;visibility:hidden}
 .work-page-filters label{display:grid;gap:6px;font-size:12px;line-height:1.5;font-weight:500}
 .work-page-filters input,.work-page-filters select{width:100%;min-width:0;min-height:44px;padding:9px 12px;font:inherit;font-size:14px;font-weight:400;color:var(--ink);border:1px solid #8b978c;border-radius:4px;background:var(--bg,#f8f8f4)}
 .work-page-filters button,.work-page-empty button{min-height:44px;padding:9px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
@@ -27,15 +28,17 @@ html[data-page-enhancement="pending"] .work-page-filters[hidden]{display:block!i
 .work-heading{min-width:0}
 .work-heading .work-company{display:inline-block;font-size:13px;font-weight:500;line-height:1.5;margin:0 12px 8px 0;color:var(--green)}
 .work-heading h3{font:inherit;font-size:21px;font-weight:600;line-height:1.35;letter-spacing:-.4px;margin:0;color:var(--ink);overflow-wrap:anywhere}
-.work-status{display:inline-block;font-size:14px;line-height:1.5;color:var(--amber,#795418);margin-bottom:8px}
+.work-status{display:inline-block;padding:2px 7px;border:1px solid currentColor;border-radius:3px;font-size:12px;line-height:1.5;color:var(--amber,#795418);margin-bottom:8px}
 .work-offer{grid-column:2;grid-row:1/3}
 .work-pay{margin:0 0 10px}
+.work-offer-label{display:block;margin-bottom:5px;font-size:12px;line-height:1.5;color:var(--muted)}
 .work-pay strong{display:block;font-size:21px;font-weight:500;line-height:1.35;letter-spacing:-.4px;overflow-wrap:anywhere}
 .work-pay .sub,.work-place{font-size:13px;line-height:1.65;color:var(--muted)}
 .work-place{margin:0}
 .work-listing-conditions{grid-column:1;min-width:0}
 .work-listing-conditions .sub{font-size:13px;line-height:1.7;margin-top:4px;color:var(--muted)}
-.work-reviewed{grid-column:1/-1;margin:2px 0 0;font-size:14px;line-height:1.65;color:var(--muted)}
+.work-listing-conditions .sub:first-child{font-weight:500;color:var(--ink)}
+.work-reviewed{grid-column:1/-1;margin:2px 0 0;font-size:13px;line-height:1.65;color:var(--muted)}
 .work-listing-evidence{grid-column:1;min-width:0;align-self:center}
 .work-listing-evidence .work-terms{margin:0}
 .work-listing-evidence .work-terms>summary{display:list-item;min-height:44px;padding:12px 0;font-size:13px;line-height:20px;color:var(--muted);cursor:pointer}
@@ -54,11 +57,13 @@ html[data-page-enhancement="pending"] .work-page-filters[hidden]{display:block!i
 .work-page-secondary>summary>span{margin-left:auto;font-size:13px;color:var(--muted)}
 .work-page-secondary>h2{font-size:24px;margin:10px 0}
 .work-page-secondary .work-listings{padding-bottom:28px}
+.work-page-secondary .work-listing-action>a{border-color:var(--border);color:var(--green);background:transparent}
+.work-page-secondary .work-listing-action>a:hover{border-color:var(--green);background:var(--bg,#f8f8f4)}
 .work-page-empty{padding:24px 0;border:0;border-block:1px solid var(--border);border-radius:0;background:transparent;margin:24px 0}
 .work-page-empty p{margin:0 0 16px}
 .work-page-more{margin:32px 0 0;font-size:14px}
 @media(max-width:600px){
- .work-page-filters{padding:16px 0}.work-page-filter-fields{grid-template-columns:minmax(0,1fr)}
+ .work-page-filters{padding:16px 0}
  .work-page-filters :is(input,select){font-size:16px}.work-page-clear{width:auto}
  .work-page-counts{font-size:12px;gap:5px 8px}
  .work-listing{grid-template-columns:minmax(0,1fr);padding:20px 0;gap:10px}
@@ -68,17 +73,14 @@ html[data-page-enhancement="pending"] .work-page-filters[hidden]{display:block!i
  .work-page-secondary>summary{font-size:17px}.work-page-group>h2{font-size:23px}
 }
 
-/* Search stays exposed; the secondary controls use a native disclosure. */
-.work-page-search{max-width:calc(100% - 104px)}
-.work-page-filter-options{margin:0;padding:0;border:0;background:none}
-.work-page-filter-options>summary{position:absolute;top:40px;right:0;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:9px 12px;border:1px solid #8b978c;border-radius:4px;background:transparent;color:var(--ink);font-size:14px;line-height:1.5;font-weight:500;list-style:none;cursor:pointer}
-.work-page-filter-options>summary::-webkit-details-marker{display:none}
-.work-page-filter-options>summary::after{content:'+';font-size:18px;line-height:1}
-.work-page-filter-options[open]>summary::after{content:'−'}
-.work-page-filter-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:end;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+/* The two useful filters are visible beside search, with no extra click. */
+.work-page-search{max-width:none}
+.work-page-filter-options{min-width:0;margin:0;padding:0;border:0;background:none}
+.work-page-filter-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:end;gap:12px}
+.work-page-filter-note{grid-column:1/-1;margin:0;color:var(--muted);font-size:12px;line-height:1.6}
 .work-page-advice{max-width:780px;margin:8px 0 16px;padding:0;border:0}
 .work-page-advice>summary{display:list-item;min-height:44px;padding:11px 0;font-size:14px;line-height:1.5;color:var(--green);cursor:pointer}
 .work-page-advice[open]{padding-bottom:8px}
 .work-page-advice .note{margin-bottom:0}
-@media(max-width:900px){.work-page-filter-fields{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.work-page-clear{justify-self:start}}
-@media(max-width:600px){.work-page-filter-fields{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:900px){.work-page-filters{grid-template-columns:minmax(0,1fr)}.work-page-search{margin-bottom:2px}}
+@media(max-width:480px){.work-page-filter-fields{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.work-page-clear{grid-column:1/-1;justify-self:start}}
