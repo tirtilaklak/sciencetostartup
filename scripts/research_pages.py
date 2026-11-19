@@ -1004,7 +1004,7 @@ def _index_values(entity):
     return values
 
 
-def _index_row(context, entity):
+def _index_row(context, entity, *, compact=False):
     """One independently filterable record, including all native evidence links."""
     filters = _index_values(entity)
     claims = _assertions(context, entity)
@@ -1013,11 +1013,15 @@ def _index_row(context, entity):
                       + [str(value) for value in entity.get('identifiers', {}).values()])
     taxonomy = '; '.join(key.replace('_', ' ') + ': ' + ', '.join(filters[key])
                          for key in INDEX_FACETS if filters[key])
+    record_id = '<span class="r-record-id">' + sp.escape(entity['id']) + '</span>'
+    if compact:
+        record_id = ('<details class="r-index-record-id"><summary>Record identifier</summary>'
+                     + record_id + '</details>')
     return ('<tr data-index-row data-record-id="' + sp.escape(entity['id'])
             + '" data-search="' + sp.escape(search.lower()) + '" data-filters="'
             + sp.escape(json.dumps(filters, ensure_ascii=False, separators=(',', ':'))) + '">'
             + '<th scope="row">' + _link(entity_url(entity, context), _display_title(entity['name']))
-            + '<span class="r-record-id">' + sp.escape(entity['id']) + '</span></th>'
+            + record_id + '</th>'
             + '<td data-label="Review">' + sp.escape(_label(entity)) + '<span class="r-table-note">'
             + sp.escape(entity.get('review_depth', '').replace('_', ' ')) + '</span></td>'
             + '<td data-label="Type">' + sp.escape(entity['kind'].replace('_', ' ')) + '</td>'
@@ -1041,7 +1045,7 @@ def _paper_rows(context, entities):
             versions.setdefault(entity.get('parent_id'), []).append(entity)
     rows = []
     for work in works:
-        rows.append(_index_row(context, work))
+        rows.append(_index_row(context, work, compact=True))
         children = versions.get(work['id'], [])
         if not children:
             continue
@@ -1081,7 +1085,9 @@ def _evidence_table(context, entities, *, group_papers=False):
                 + select('status') + '<button type="reset">Clear filters</button></div>'
                 + ('<details class="r-index-advanced" data-index-advanced><summary>More filters '
                    '<span data-index-advanced-count>0 active</span></summary><div class="r-index-fields">'
-                   + advanced + '</div></details>' if advanced else '') + '</form>')
+                   + advanced + '</div></details>' if advanced else '')
+                + ('<div class="r-index-applied" data-index-applied hidden aria-label="Applied filters"></div>'
+                   if group_papers else '') + '</form>')
     works = sum(entity['kind'] != 'paper_version' for entity in entities)
     initial_count = (f'{works} paper works · {len(entities) - works} source versions ({len(entities)} records)'
                      if group_papers else f'{len(entities)} records')
@@ -1105,10 +1111,21 @@ def _index(context, category):
         candidate_works = sum(e['kind'] != 'paper_version' and e.get('status') == 'candidate' for e in entities)
         review_summary += (f' · Approved: {approved_works} works, {approved - approved_works} source versions'
                            f' · Candidate: {candidate_works} works, {candidates - candidate_works} source versions')
+    review = f'<p class="r-status">{review_summary}</p>'
+    note = ('<p class="r-callout">Candidate records help readers inspect the research queue. They are not reviewed findings, '
+            'endorsements, or proof of a supplier contribution.</p>')
+    if slug == 'papers':
+        review = (f'<p class="r-status">{approved} approved records · {candidates} candidates awaiting review</p>'
+                  '<details class="r-paper-index-guide"><summary>How to read this index</summary>'
+                  f'<p>{review_summary}.</p>'
+                  '<p>A paper work groups its source versions. Each version keeps its own review status; '
+                  'an approved work may include candidate versions. Open the evidence link to inspect approved findings.</p>'
+                  '<p>Candidate records are not reviewed findings, endorsements, or proof of a supplier contribution. '
+                  'Their recorded topics remain provisional.</p></details>')
+        note = ('<p class="r-paper-index-note">Candidate records are not reviewed findings or proof of a supplier contribution.</p>')
     return (f'<header class="r-page-head"><p class="r-kicker">Research evidence index</p><h1>{title}</h1>'
-            f'<p class="r-lede">{sp.escape(description)}</p><p class="r-status">{review_summary}</p>' + _meta(context) + '</header>'
-            '<p class="r-callout">Candidate records help readers inspect the research queue. They are not reviewed findings, '
-            'endorsements, or proof of a supplier contribution.</p>'
+            f'<p class="r-lede">{sp.escape(description)}</p>' + review + _meta(context) + '</header>'
+            + note
             + (_evidence_table(context, entities, group_papers=slug == "papers") if entities else
                '<section class="r-section"><h2>How this index will be built</h2><p>No records have entered this index yet. '
                'A workflow must identify its inputs, work stages, output artifact, qualifications, and version-specific source evidence. '
