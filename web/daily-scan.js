@@ -12,22 +12,32 @@
   const rowById = new Map(rows.map(row => [row.id, row]));
   const readingKey = 's2sDailyReading';
   const maxPosition = 10000000;
+  const navigationAPI = globalThis.navigation;
+  const navigationState = typeof navigationAPI?.currentEntry?.getState === 'function' &&
+    typeof navigationAPI.updateCurrentEntry === 'function' && typeof navigationAPI.addEventListener === 'function';
   let restoration = 0;
   const position = value => Number.isFinite(value) && value >= 0 && value <= maxPosition;
   function savedReading() {
-    const state = history.state?.[readingKey];
-    if (!state || state.url !== location.href || state.edition !== root.dataset.edition ||
-        !position(state.x) || !position(state.y) || !Array.isArray(state.open) ||
-        state.open.length > rows.length || !state.open.every(id => rowById.has(id)) ||
-        (state.anchor !== null && (!rowById.has(state.anchor) ||
-          !Number.isFinite(state.top) || Math.abs(state.top) > maxPosition))) return null;
-    return state;
+    let entry;
+    try { if (navigationState) entry = navigationAPI.currentEntry.getState(); } catch (_) {}
+    for (const state of [entry?.[readingKey], history.state?.[readingKey]]) {
+      if (!state || state.url !== location.href || state.edition !== root.dataset.edition ||
+          !position(state.x) || !position(state.y) || !Array.isArray(state.open) ||
+          state.open.length > rows.length || !state.open.every(id => rowById.has(id)) ||
+          (state.anchor !== null && (!rowById.has(state.anchor) ||
+            !Number.isFinite(state.top) || Math.abs(state.top) > maxPosition))) continue;
+      return state;
+    }
+    return null;
   }
   function saveReading() {
     restoration++;
-    // Keep another component's state intact, including non-object state.
-    const state = history.state;
-    if (state !== null && Object.prototype.toString.call(state) !== '[object Object]') return;
+    // Navigation state is independent of classic History state. Updating it
+    // saves this entry without starting another navigation during traversal.
+    let state;
+    try { state = navigationState ? navigationAPI.currentEntry.getState() : history.state; }
+    catch (_) { return; }
+    if (state != null && Object.prototype.toString.call(state) !== '[object Object]') return;
     const anchor = rows.find(row => !row.hidden && row.getBoundingClientRect().bottom > 0 &&
       row.getBoundingClientRect().top < innerHeight);
     const reading = { url: location.href, edition: root.dataset.edition,
@@ -35,7 +45,8 @@
       open: rows.filter(row => row.querySelector('details').open).map(row => row.id),
       anchor: anchor?.id || null, top: anchor?.getBoundingClientRect().top || 0 };
     try {
-      history.replaceState({ ...state, [readingKey]: reading }, '', location.href);
+      if (navigationState) navigationAPI.updateCurrentEntry({ state: { ...state, [readingKey]: reading } });
+      else history.replaceState({ ...state, [readingKey]: reading }, '', location.href);
       history.scrollRestoration = 'manual';
     }
     catch (_) { /* Native history remains available when state cannot be saved. */ }
@@ -97,7 +108,13 @@
       for (const [key, value] of [['q', search.value], ['topic', topic.value], ['type', kind.value]]) {
         if (value) url.searchParams.set(key, value); else url.searchParams.delete(key);
       }
-      try { history.replaceState(history.state, '', url); } catch (_) { /* Filtering still works. */ }
+      try {
+        // replaceState resets Navigation state, including other components'
+        // fields. Carry that independent state across this URL-only change.
+        const entry = navigationState ? navigationAPI.currentEntry.getState() : undefined;
+        history.replaceState(history.state, '', url);
+        if (navigationState) navigationAPI.updateCurrentEntry({ state: entry });
+      } catch (_) { /* Filtering still works. */ }
     }
     for (const link of root.querySelectorAll('a.scan-day-step')) {
       const target = new URL(link.href);
@@ -122,7 +139,12 @@
     if (link && !link.hasAttribute('download') && (!link.target || link.target === '_self') &&
         new URL(link.href).origin === location.origin) saveReading();
   });
-  addEventListener('pagehide', saveReading);
+  if (navigationState) navigationAPI.addEventListener('navigate', event => {
+    if (event.navigationType !== 'replace') saveReading();
+  });
+  // During pagehide WebKit can already expose the destination entry. Never
+  // write History or Navigation state here; only cancel pending restoration.
+  addEventListener('pagehide', () => { restoration++; });
   addEventListener('pageshow', () => restoreReading());
   addEventListener('popstate', () => restoreReading());
   function revealHash() {
@@ -140,6 +162,6 @@
   document.documentElement.removeAttribute('data-daily-pending');
   // A fresh fragment reveals its target. A saved return first restores its
   // disclosures, then pageshow restores the position in that same layout.
-  const navigation = globalThis.performance?.getEntriesByType?.('navigation')?.[0];
-  if (!restoreReading(false) && navigation?.type !== 'back_forward') revealHash();
+  const timing = globalThis.performance?.getEntriesByType?.('navigation')?.[0];
+  if (!restoreReading(false) && timing?.type !== 'back_forward') revealHash();
 })();
