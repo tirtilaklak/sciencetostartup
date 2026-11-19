@@ -81,6 +81,11 @@ test.beforeEach(async ({ page }, info) => {
         const entry = { documentID, sequence: ++sequence, kind, phase,
           wallTime: Date.now(), monotonicTime: performance.now(), url: location.href,
           mainFrame: window === window.top, readyState: document.readyState,
+          navigationAvailable: Boolean(globalThis.navigation?.addEventListener),
+          navigationCurrentEntry: globalThis.navigation?.currentEntry ? {
+            key: navigation.currentEntry.key, url: navigation.currentEntry.url,
+            index: navigation.currentEntry.index,
+          } : null,
           navigationType: performance.getEntriesByType('navigation')[0]?.type || null,
           state: selected(history.state), scrollRestoration: history.scrollRestoration,
           scrollX, scrollY, openIDs: [...document.querySelectorAll('.scan-item')]
@@ -149,6 +154,21 @@ test.beforeEach(async ({ page }, info) => {
         });
       }, capture);
     }
+    globalThis.navigation?.addEventListener?.('navigate', event => {
+      const detail = { eventNavigationType: event.navigationType, canIntercept: event.canIntercept,
+        cancelable: event.cancelable, userInitiated: event.userInitiated,
+        destination: { url: event.destination?.url || null, key: event.destination?.key || null,
+          sameDocument: event.destination?.sameDocument ?? null } };
+      emit('navigation-api', 'navigate', { ...detail, signalAborted: event.signal?.aborted ?? null });
+      queueMicrotask(() => emit('navigation-api', 'navigate.microtask', {
+        ...detail, signalAborted: event.signal?.aborted ?? null }));
+      setTimeout(() => emit('navigation-api', 'navigate.task', {
+        ...detail, signalAborted: event.signal?.aborted ?? null }), 0);
+    }, true);
+    globalThis.navigation?.addEventListener?.('currententrychange', event => emit('navigation-api', 'currententrychange', {
+      eventNavigationType: event.navigationType,
+      from: event.from ? { key: event.from.key, url: event.from.url, index: event.from.index } : null,
+    }), true);
     emit('lifecycle', 'init');
   }, { prefix: DAILY_HISTORY_EVENT_PREFIX });
 });
@@ -521,6 +541,30 @@ test('native History baseline preserves entry state across document Back', async
   expect(checkpoints.afterManual).toEqual(expected);
   await page.getByRole('link', { name: 'Native baseline next', exact: true }).click();
   await expect(page).toHaveURL(nextURL);
+  // Diagnostic-only experiment in the owned native baseline. The Daily source
+  // and its original failing journey remain unchanged.
+  const navigationProbe = await page.evaluate(() => {
+    const api = globalThis.navigation;
+    const available = Boolean(api?.addEventListener && api.currentEntry);
+    if (available) {
+      api.updateCurrentEntry({ state: { nativeForeign: { preserved: true } } });
+      api.addEventListener('navigate', event => {
+        if (event.navigationType !== 'traverse') return;
+        const prior = api.currentEntry.getState();
+        const object = prior !== null && Object.prototype.toString.call(prior) === '[object Object]';
+        api.updateCurrentEntry({ state: { ...(object ? prior : {}), nativeDepartureMarker: 'baseline-b',
+          nativeDepartureURL: location.href } });
+      });
+    }
+    return { available, href: location.href,
+      currentEntryURL: api?.currentEntry?.url || null, beforeTraverseState: history.state,
+      beforeTraverseNavigationState: api?.currentEntry?.getState() ?? null };
+  });
+  await info.attach('daily-history-native-navigation-probe.json', {
+    body: Buffer.from(JSON.stringify(navigationProbe)), contentType: 'application/json',
+  });
+  expect(navigationProbe.available, 'Actual pinned engine exposes Navigation API').toBe(true);
+  expect(navigationProbe.currentEntryURL).toBe(nextURL);
   await page.goBack();
   await expect(page).toHaveURL(firstURL);
   await page.waitForLoadState('load');
@@ -529,5 +573,16 @@ test('native History baseline preserves entry state across document Back', async
     body: Buffer.from(JSON.stringify({ url: page.url(), state: actual })), contentType: 'application/json',
   });
   expect(actual).toEqual(expected);
+  await page.goForward();
+  await expect(page).toHaveURL(nextURL);
+  await page.waitForLoadState('load');
+  const outgoingCheckpoint = await page.evaluate(() => ({ classicState: history.state,
+    navigationState: navigation.currentEntry.getState() }));
+  await info.attach('daily-history-native-navigation-forward.json', {
+    body: Buffer.from(JSON.stringify({ url: page.url(), ...outgoingCheckpoint })), contentType: 'application/json',
+  });
+  expect(outgoingCheckpoint.classicState).toBeNull();
+  expect(outgoingCheckpoint.navigationState).toEqual({ nativeForeign: { preserved: true },
+    nativeDepartureMarker: 'baseline-b', nativeDepartureURL: nextURL });
 });
 // END OWNED LOCALHOST NATIVE HISTORY BASELINE
