@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "reviewed_on": "2026-11-18",
+  "reviewed_on": "2026-11-19",
   "entries": [
     {
       "entity_id": "org.innodata",
@@ -839,6 +839,50 @@
         "description": "Cognizant Technology Solutions Corporation is an American multinational information technology consulting and outsourcing company, headquartered in Teaneck, New Jersey.",
         "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
         "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      },
+      "current_facts": {
+        "reviewed_on": "2026-11-19",
+        "rows": [
+          {
+            "label": "Acquired company",
+            "value": "Wizeline",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Completion reported",
+            "value": "6 Nov 2026",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Legal closing date",
+            "value": "Not separately disclosed in the announcement",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Transaction terms",
+            "value": "Financial terms undisclosed",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://news.cognizant.com/2026-11-06-Cognizant-Completes-Acquisition-of-Wizeline",
+            "title": "Cognizant Completes Acquisition of Wizeline - Nov 6, 2026",
+            "published_on": "2026-11-06",
+            "observed_on": "2026-11-19",
+            "response_sha256": "59a32d87f8249221b8c97d1d39af03cfcd5983de20fbc9275653c480492cd2e0",
+            "locator": "Article title; 6 Nov dateline; has acquired sentence; financial terms undisclosed. Retained text.txt lines 97–108.",
+            "content_kind": "raw_http_body"
+          }
+        ]
       }
     },
     {
@@ -1265,6 +1309,264 @@
         "response_sha256": "d665a9734b4cf391db77291d71cbf044649469edf5822f5f98db1d34622e8760",
         "content_kind": "mediawiki_revision_wikitext",
         "description": "HCL Technologies Limited (HCLTech) is an Indian multinational technology company headquartered in Noida, Uttar Pradesh.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.capgemini",
+      "name": "Capgemini",
+      "group": "Managed AI & data services",
+      "website": "https://www.capgemini.com/",
+      "offerings": [
+        {
+          "label": "Data Labeling Services: managed data annotation",
+          "source_indexes": [
+            0,
+            1
+          ]
+        },
+        {
+          "label": "Manual and ML-assisted labeling; synthetic data generation",
+          "source_indexes": [
+            0,
+            1
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.capgemini.com/solutions/data-labeling-services/",
+          "title": "Data labeling services - Capgemini",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "e36613813e8957eea4e6f947848661d40fa3ecb5200b1652377f6f76ac3dbd1f",
+          "locator": "capgemini-labeling/text.txt:L337-L353: current Data Labeling Services landing and linked brochure; L359-L360: labeling/annotation/validation director role.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.capgemini.com/wp-content/uploads/2022/07/Data-Labeling-Services-factsheet.pdf",
+          "title": "Data Labeling Services factsheet | Capgemini",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "a4b22467dc1192f40425978e173ff78bba7177916f83cb6622a29a75565675fc",
+          "locator": "Linked 2022 Data Labeling Services factsheet, PDF page 3: manual labeling, ML-assisted labeling and synthetic data generation; page 2: managed labeling/annotating operations. Copyright 2022 retained; current landing still links this brochure.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.capgemini.com/terms-of-use/",
+          "title": "Terms Of Use | Capgemini",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "b667f8eacf0c8b9d5642b3fcce7b45a846860482e81b0f84da40d378aa4a1562",
+          "locator": "capgemini-terms/text.txt:L345: www.capgemini.com sites operated by subsidiaries of Capgemini SE; L398-L400: coordinating Capgemini Service SAS identity/address.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://investors.capgemini.com/file/12740?download=1",
+          "title": "Publication of the 2025 Universal Registration Document | Capgemini SE",
+          "published_on": "2026-03-23",
+          "observed_on": "2026-11-19",
+          "response_sha256": "bdc6de2e9b4a11d994b62749d3b621ad3e5542a1351210e99c7792cfedf26148",
+          "locator": "PDF page 1, issuer legal header: Capgemini, European Company, Paris France registered office, 330703844 RCS Paris; body identifies Capgemini SE filing. No financial figure selected.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.capgemini.com/news/press-releases/capgemini-upgrades-its-2026-outlook/",
+          "title": "Capgemini upgrades its 2026 outlook - Capgemini",
+          "published_on": "2026-07-30",
+          "observed_on": "2026-11-19",
+          "response_sha256": "ebe3a39d4602d3a896d8398e0356c79830788781e96c53db1fdbe8e293784daa",
+          "locator": "capgemini-current-business/text.txt:L574-L575: global technology/engineering organization; L581-L584: consulting and application services. Scope is company identity and service type; no financial or staffing quantity selected.",
+          "content_kind": "raw_http_body"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Capgemini",
+        "aliases": [
+          "Capgemini SE"
+        ],
+        "website": "https://www.capgemini.com/",
+        "source_indexes": [
+          0,
+          2,
+          3,
+          4
+        ]
+      },
+      "wikipedia": {
+        "title": "Capgemini",
+        "article_url": "https://en.wikipedia.org/wiki/Capgemini",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Capgemini&oldid=1384063475",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Capgemini&action=history",
+        "page_id": 972237,
+        "revision_id": 1384063475,
+        "revision_timestamp": "2026-11-06T10:22:13Z",
+        "response_sha256": "73183d65a9537b765343ff4a551d57ca9bcab427fb76e3bee20d020a77504a75",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-19",
+        "description": "Capgemini SE is a French multinational information technology (IT) services and consulting company.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.ntt_data",
+      "name": "NTT DATA",
+      "group": "Managed AI & data services",
+      "website": "https://www.nttdata.com/",
+      "offerings": [
+        {
+          "label": "AI support services: data annotation for AI and machine learning",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.nttdata.com/global/en/services/business-process-services/business-support-processes",
+          "title": "Business Support Processes | NTT DATA Group",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "40048df6d764867a550462cd92631576d89722c2c6350e02a1f2d4aa1ae03294",
+          "locator": "nttdata-annotation/text.txt:L167-L168: AI support services explicitly offers high-quality data annotation for AI applications and machine-learning models; official NTT DATA Group site.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.nttdata.com/global/en/about-us/profile",
+          "title": "NTT DATA Group Corporate Profile | NTT DATA Group",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "e0abe6d5a466526148c2e9a7ebfd50228242ebd8bf2b8d2e5bc5ae53e9aecb5b",
+          "locator": "nttdata-profile/text.txt:L86: global IT/business services, consulting and Tokyo headquarters; L88-L92: NTT DATA Group Corporation and Japan headquarters. No financial or headcount quantity selected.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.nttdata.com/global/ja/about-us/profile",
+          "title": "プロフィール | NTTデータグループ - NTT DATA GROUP",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "9c4b6175a9064713a1f8c1653cea5a62f6c8bfc13554f5768536c9d664d7be3a",
+          "locator": "nttdata-profile-japanese/text.txt:L38-L45: global IT services/consulting, Japanese legal name 株式会社NTTデータグループ, English legal name and Tokyo headquarters.",
+          "content_kind": "raw_http_body"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "NTT DATA",
+        "aliases": [
+          "NTT DATA Group Corporation",
+          "株式会社NTTデータグループ"
+        ],
+        "website": "https://www.nttdata.com/",
+        "source_indexes": [
+          0,
+          1,
+          2
+        ]
+      },
+      "wikipedia": {
+        "title": "NTT Data",
+        "article_url": "https://en.wikipedia.org/wiki/NTT_Data",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=NTT_Data&oldid=1374345605",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=NTT_Data&action=history",
+        "page_id": 21800331,
+        "revision_id": 1374345605,
+        "revision_timestamp": "2026-09-11T12:48:48Z",
+        "response_sha256": "1b586b542590f7588529393f54772452e7f0c3132b185a23f5c82a4dc630aced",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-19",
+        "description": "NTT DATA Group Corporation (株式会社NTTデータグループ, Kabushiki-kaisha NTT Dēta Gurūpu) is a Japanese multinational information technology (IT) service and consulting company headquartered in Tokyo, Japan.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.tata_consultancy_services",
+      "name": "Tata Consultancy Services",
+      "group": "Managed AI & data services",
+      "website": "https://www.tcs.com/",
+      "offerings": [
+        {
+          "label": "Data Annotation Studio: autonomous vehicle training-data curation",
+          "source_indexes": [
+            0
+          ]
+        },
+        {
+          "label": "Smart validation: simulation-led AV scenario and test-case generation",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.tcs.com/what-we-do/industries/manufacturing/solution/mobility-suite-autonomous-vehicles-future",
+          "title": "TCS Mobility Suite: Easing the Development of Autonomous Vehicles",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "32b71e2be14aa1eae8edd88064489ed9ee3d10046ec8d4869237daad3bc1ab96",
+          "locator": "Official web-tool text L813-L874; retained excerpt. Direct raw HTTP returned 403; hash identifies web-tool text, not raw response bytes.",
+          "content_kind": "web_tool_text_excerpt"
+        },
+        {
+          "url": "https://www.tcs.com/who-we-are",
+          "title": "Who We Are | Tata Consultancy Services",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "11bb0711e619a690dfcf6e86eba35b0557f19cf2e8c7f86cc21b8a6c00507435",
+          "locator": "Official web-tool text L767-L775; retained excerpt. Direct raw HTTP returned 403; hash identifies web-tool text, not raw response bytes.",
+          "content_kind": "web_tool_text_excerpt"
+        },
+        {
+          "url": "https://www.tcs.com/content/dam/tcs/investor-relations/financial-statements/2025-26/q4/IND%20AS/Consolidated%20and%20Standalone.pdf",
+          "title": "Tata Consultancy Services Limited FY2026 audited consolidated results: identity header",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "5a6deb034d962c29026d5717176e6b1b4909da67179b119143ba11648e8463e7",
+          "locator": "Official web-tool text L64-L67; retained excerpt. Direct raw HTTP returned 403; hash identifies web-tool text, not raw response bytes.",
+          "content_kind": "web_tool_text_excerpt"
+        },
+        {
+          "url": "https://www.tcs.com/what-we-do/services/consulting",
+          "title": "TCS Consulting Services to Achieve Success in the Digital Era",
+          "published_on": null,
+          "observed_on": "2026-11-19",
+          "response_sha256": "c07f796440805de3d61419a50d72c8ab3519a43be0620388d45bed29e3eb37ec",
+          "locator": "Official web-tool text L773-L828; retained excerpt. Direct raw HTTP returned 403; hash identifies web-tool text, not raw response bytes.",
+          "content_kind": "web_tool_text_excerpt"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Tata Consultancy Services",
+        "aliases": [
+          "Tata Consultancy Services Limited",
+          "TCS"
+        ],
+        "website": "https://www.tcs.com/",
+        "source_indexes": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "wikipedia": {
+        "title": "Tata Consultancy Services",
+        "article_url": "https://en.wikipedia.org/wiki/Tata_Consultancy_Services",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Tata_Consultancy_Services&oldid=1382675801",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Tata_Consultancy_Services&action=history",
+        "page_id": 284006,
+        "revision_id": 1382675801,
+        "revision_timestamp": "2026-10-29T19:13:33Z",
+        "response_sha256": "e6ba4d407ed6ed52213931055910aa95b59796886feb27f6ab954ac15ee54f3f",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-19",
+        "description": "Tata Consultancy Services Limited (TCS) is an Indian multinational technology company specialising in information technology services and consulting.",
         "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
         "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
       }

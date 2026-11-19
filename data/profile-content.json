@@ -751,7 +751,44 @@
             "micro1.claim.major-products-0"
           ]
         }
-      ]
+      ],
+      "current_facts": {
+        "reviewed_on": "2026-11-19",
+        "rows": [
+          {
+            "label": "Company update",
+            "value": "18 Nov 2026 · flow qc",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Stated screening scope",
+            "value": "Benchmark contamination and duplicate tasks",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company-described capability",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.micro1.ai/blog/every-task-checked-against-every-public-benchmark",
+            "title": "Every task, checked against every public benchmark",
+            "published_on": "2026-11-18",
+            "observed_on": "2026-11-19",
+            "response_sha256": "e96d9c6f0c14b30ec222f6c02afd8a29e883e519147dd2780e68d64d858615ee",
+            "locator": "Article date; TL;DR; How it works; Flag. Retained text.txt lines 26–43, 52–72.",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "company_id": "turing",
@@ -3752,7 +3789,56 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-19",
+        "rows": [
+          {
+            "label": "Head office relocated",
+            "value": "Effective 19 Nov 2026 · completed",
+            "source_indexes": [
+              0,
+              1
+            ]
+          },
+          {
+            "label": "Current head office",
+            "value": "5F, Yunuo Building, 23-1 Kanda Higashimatsushita-cho, Chiyoda-ku, Tokyo 101-0042, Japan",
+            "source_indexes": [
+              0,
+              1
+            ]
+          },
+          {
+            "label": "Toyosu Data Factory",
+            "value": "Address unchanged",
+            "source_indexes": [
+              0,
+              1
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://apto.co.jp/en/news/notice-of-head-office-relocation/",
+            "title": "Notice of Head Office Relocation | APTO News",
+            "published_on": "2026-11-19",
+            "observed_on": "2026-11-19",
+            "response_sha256": "c088350cc2ab5d86a03d60f258dd5e0247cebbef9f31822e860bdf4ede0bebec",
+            "locator": "News date; relocation statement; New head office; Toyosu Data Factory note. Retained text.txt lines 34–39.",
+            "content_kind": "raw_http_body"
+          },
+          {
+            "url": "https://apto.co.jp/news/4060/",
+            "title": "本社移転のお知らせ | お知らせ | 株式会社APTO | イノベーティブなアノテーションでAI開発に変革を",
+            "published_on": "2026-11-19",
+            "observed_on": "2026-11-19",
+            "response_sha256": "220025b98889a39979143eaf476119c0f418b55e904c6b37444de0de0340bdfb",
+            "locator": "Article date and completed move; new head office address; Toyosu unchanged. Retained text.txt lines 92–102.",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "company_id": "g2i",
