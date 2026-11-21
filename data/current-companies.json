@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "reviewed_on": "2026-11-19",
+  "reviewed_on": "2026-11-21",
   "entries": [
     {
       "entity_id": "org.innodata",
@@ -64,7 +64,51 @@
           "locator": "Generative AI services: Data Annotation, Model Safety/Evaluation and AI Benchmarks.",
           "content_kind": "raw_http_body"
         }
-      ]
+      ],
+      "current_facts": {
+        "reviewed_on": "2026-11-21",
+        "rows": [
+          {
+            "label": "Reporting period",
+            "value": "Q3 2026 · 1 Jul–30 Sep",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated revenue",
+            "value": "US$95.6 million · +53% year over year",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated net income",
+            "value": "US$10.3 million",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company earnings release · unaudited",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.sec.gov/Archives/edgar/data/903651/000110465926123324/tm2628333d1_ex99-1.htm",
+            "title": "Innodata Reports Record Third Quarter 2026 Results",
+            "published_on": "2026-11-05",
+            "observed_on": "2026-11-21",
+            "response_sha256": "3a6282f5975d1fd0382fadab6ea86e8975beade1d1346a551d0abf90820e0940",
+            "locator": "Opening results and unaudited condensed consolidated statements, text.txt L17–34 and L193–213; rounded headline values selected.",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "entity_id": "org.dataforce",
@@ -595,7 +639,51 @@
           "locator": "Heading A new standard for contingent workforce solutions; paragraph begins Lifted is a new, wholly owned Upwork Inc. subsidiary.",
           "content_kind": "web_tool_text_excerpt"
         }
-      ]
+      ],
+      "current_facts": {
+        "reviewed_on": "2026-11-21",
+        "rows": [
+          {
+            "label": "Reporting period",
+            "value": "Q3 2026 · 1 Jul–30 Sep",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated revenue",
+            "value": "US$185.6 million",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "GAAP net income",
+            "value": "US$31.8 million",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company earnings release · unaudited",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.sec.gov/Archives/edgar/data/1627475/000162747526000053/upwork3q26-pressrelease_3q.htm",
+            "title": "Document",
+            "published_on": "2026-11-02",
+            "observed_on": "2026-11-21",
+            "response_sha256": "6672e8e7c6ffceac43611641c13751fb16b3316d7ca4a207960844ee2e7dbd57",
+            "locator": "Headline and financial highlights text.txt L7–43; condensed consolidated statements marked unaudited L342–374.",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "entity_id": "org.concentrix",
@@ -774,6 +862,50 @@
         "source_indexes": [
           1,
           2
+        ]
+      },
+      "current_facts": {
+        "reviewed_on": "2026-11-21",
+        "rows": [
+          {
+            "label": "Reporting period",
+            "value": "Q3 2026 · 1 Jul–30 Sep",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated revenue",
+            "value": "€2,532 million",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Revenue growth",
+            "value": "+1.0% reported · −1.2% like for like, year over year",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company revenue release · 5 Nov 2026",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.tp.com/media/kcdch3fb/tp-press-release-q3-2026-revenue-eng.pdf",
+            "title": "TP Q3 2026 revenue",
+            "published_on": "2026-11-05",
+            "observed_on": "2026-11-21",
+            "response_sha256": "ee6cff6f559aabc4a588bca77ce6ba14828682e59260e06320a25e5e0464874b",
+            "locator": "PDF p1 consolidated revenue total Q3-26/Q3-25 and growth columns; text.txt L8–30 and L42–47. Complete relevant page rendered and visually inspected as sources/tp-q3/page-1.png.",
+            "content_kind": "raw_http_body"
+          }
         ]
       }
     },
@@ -1204,6 +1336,50 @@
         "description": "Tech Mahindra is an Indian multinational information technology services and consulting company.",
         "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
         "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      },
+      "current_facts": {
+        "reviewed_on": "2026-11-21",
+        "rows": [
+          {
+            "label": "Reporting period",
+            "value": "Q2 FY2026–27 · 1 Jul–30 Sep 2026",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Consolidated revenue",
+            "value": "US$1,693 million",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Revenue growth",
+            "value": "+6.8% year over year · reported US dollars",
+            "source_indexes": [
+              0
+            ]
+          },
+          {
+            "label": "Evidence basis",
+            "value": "Company consolidated results announcement",
+            "source_indexes": [
+              0
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.techmahindra.com/insights/press-releases/techmahindra-q2-fy27-results/",
+            "title": "Tech Mahindra Q2 FY27 Results: EBIT Up 40.5% YoY",
+            "published_on": "2026-10-15",
+            "observed_on": "2026-11-21",
+            "response_sha256": "f49ad61fc40baccca4254547c68ab4e563aff30e1e96f166a81c33289ef7b4aa",
+            "locator": "Financial highlights for the quarter (USD), text.txt L217–225. Source calls results audited and consolidated.",
+            "content_kind": "raw_http_body"
+          }
+        ]
       }
     },
     {
@@ -1567,6 +1743,306 @@
         "content_kind": "mediawiki_revision_wikitext",
         "observed_on": "2026-11-19",
         "description": "Tata Consultancy Services Limited (TCS) is an Indian multinational technology company specialising in information technology services and consulting.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.wns",
+      "name": "WNS",
+      "group": "Managed AI & data services",
+      "website": "https://www.wns.com/",
+      "offerings": [
+        {
+          "label": "Text, audio, image and video data annotation",
+          "source_indexes": [
+            0
+          ]
+        },
+        {
+          "label": "LiDAR and geospatial data annotation",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.wns.com/industries/hi-tech-and-professional-services/product-data-operations",
+          "title": "Product Data Operations for Digital Commerce",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "209ed049f7461c37156e114355b7486ca9020ba4bfab478df9011069a723e911",
+          "locator": "wns-product-data-operations/text.txt:L304-L309: AI/ML training-data annotation service; L373-L389: text, audio, image, video, LiDAR and geospatial annotation.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.wns.com/terms-of-use",
+          "title": "WNS Terms of Use",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "57d6d80d339b7f62e7f978b8e0eef0e2c841943947c1daa2a6af39f62f1baa3f",
+          "locator": "wns-terms/text.txt:L303-L308: WNS Global Services website/service identity; L464: WNS (Holdings) Ltd. copyright identity.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.wns.com/about-us",
+          "title": "About Our Company | WNS",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "d2b233e2dd9fb3720b62cf41a1caf25e9af77aa12a056906e5894a53d850d6e2",
+          "locator": "wns-about/text.txt:L302-L306: WNS, part of Capgemini, operations/transformation business; active WNS official site.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.capgemini.com/news/press-releases/capgemini-completes-the-acquisition-of-wns-and-creates-a-global-leader-in-agentic-ai-powered-intelligent-operations/",
+          "title": "Capgemini completes the acquisition of WNS and creates a global leader in Agentic AI-powered Intelligent Operations - Capgemini",
+          "published_on": "2025-10-17",
+          "observed_on": "2026-11-21",
+          "response_sha256": "be35ebde4ed0bbcc8bfbaf5fb9bc7d7996705a46394520b885c4edaa3a2dc5be",
+          "locator": "wns-acquisition-completed/text.txt:L344-L354: completed acquisition of WNS; Oct17 2025 source date retained. Current WNS site separately confirms part of Capgemini.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.gov.je/gazette/pages/wns%28holdings%29limited.aspx",
+          "title": "WNS (Holdings) Limited notice to creditors of an application for continuance overseas",
+          "published_on": "2026-08-03",
+          "observed_on": "2026-11-21",
+          "response_sha256": "096a435642688aac62c260b5eb45ab31514a28330fdc4a5200750ed6112534f5",
+          "locator": "wns-continuance-notice/text.txt:L20-L35: issuer WNS (Holdings) Limited; published Aug3 2026; intended application for continuation in France, not proof of completed jurisdiction change.",
+          "content_kind": "raw_http_body"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "WNS",
+        "aliases": [
+          "WNS Global Services",
+          "WNS (Holdings) Limited"
+        ],
+        "website": "https://www.wns.com/",
+        "source_indexes": [
+          0,
+          1,
+          2,
+          4
+        ]
+      },
+      "wikipedia": {
+        "title": "WNS Global Services",
+        "article_url": "https://en.wikipedia.org/wiki/WNS_Global_Services",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=WNS_Global_Services&oldid=1386405745",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=WNS_Global_Services&action=history",
+        "page_id": 15621301,
+        "revision_id": 1386405745,
+        "revision_timestamp": "2026-11-18T10:05:27Z",
+        "response_sha256": "508db05ae4be5109185de5bed63d46798c2e014ced8f78b649421f17296a97c8",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-21",
+        "description": "WNS (Holdings) Limited is a global business process management (BPM) company and a subsidiary of Capgemini.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.iqvia",
+      "name": "IQVIA",
+      "group": "AI software & analytics",
+      "website": "https://www.iqvia.com/",
+      "offerings": [
+        {
+          "label": "HART: clinical text annotation and gold-standard training data",
+          "source_indexes": [
+            0
+          ]
+        },
+        {
+          "label": "HART: train/test exports for model evaluation",
+          "source_indexes": [
+            0
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.iqvia.com/solutions/real-world-evidence/iqvia-nlp-platform/iqvia-human-assisted-review-tool",
+          "title": "IQVIA Human Assisted Review Tool (HART)​ | IQVIA",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "e57c9493762dba221f38bb56294d0088ba23f1f242e8e23bade33efc79eabbe3",
+          "locator": "iqvia-hart/text.txt:L733-L736: web-based HART gold-standard/training-data tool; L755-L772: pre-annotation, review, dynamic annotation and train/test split; L783-L786: model training/evaluation.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.iqvia.com/newsroom/2026/09/iqvia-to-announce-third-quarter-2026-results-on-october-27-2026",
+          "title": "IQVIA to Announce Third-Quarter 2026 Results on October 27, 2026 | IQVIA",
+          "published_on": "2026-09-29",
+          "observed_on": "2026-11-21",
+          "response_sha256": "9c14ac15f2c1505691ee28869fa9dcc582147d3b8556add488b1b42e784db5b1",
+          "locator": "iqvia-official-identity/text.txt:L733-L741: Sep29 2026 release identifies IQVIA Holdings Inc. as IQVIA; L752-L759 clinical-research/healthcare-intelligence business and iqvia.com. No staff or financial quantity selected.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.iqvia.com/about-us/privacy/online-privacy-policy",
+          "title": "Online Privacy Policy | IQVIA",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "b461a2451e7379cd7fb347e399f59830f1263146a8299d72c37cfb9e4c6b24b5",
+          "locator": "iqvia-privacy/text.txt:L782: effective Jan23 2026 (not asserted publication date); L945: IQVIA Inc. maintains website. IQVIA Inc. is not treated as an alias of the holding company.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://s201.q4cdn.com/580005511/files/content_files/IQV-2026-09-30-10Q-Filed-with-Exhibits.pdf",
+          "title": "IQVIA Holdings Inc. Q3 2026 Form 10-Q: company identity and principal executive office",
+          "published_on": "2026-10-27",
+          "observed_on": "2026-11-21",
+          "response_sha256": "c6baa5c3ca4566a91342d227081abddf66bd707d62cc8c2f56f4ef1f126954e1",
+          "locator": "Official issuer-hosted Q3 2026 Form10-Q PDF p1, text.txt:L20-L31: IQVIA Holdings Inc.; Delaware incorporation; principal executive office at 2400 Ellis Rd., Durham, North Carolina. Scope excludes financial results.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "title": "IQVIA Holdings Inc. - Resources - Investor FAQs",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "3f564ca454407a1687fa6ad56b1f04681e93478f202e205dfb7710aaa8d9fda5",
+          "content_kind": "web_tool_text_excerpt",
+          "url": "https://ir.iqvia.com/resources/investor-faqs/default.aspx",
+          "locator": "Saved official web-tool excerpt, web open turn220view0 L55-L61: explicit headquarters at 2400 Ellis Road, Durham, North Carolina, USA. SHA identifies the saved text excerpt only."
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "IQVIA",
+        "aliases": [
+          "IQVIA Holdings Inc."
+        ],
+        "website": "https://www.iqvia.com/",
+        "source_indexes": [
+          0,
+          1,
+          3,
+          4
+        ]
+      },
+      "wikipedia": {
+        "title": "IQVIA",
+        "article_url": "https://en.wikipedia.org/wiki/IQVIA",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=IQVIA&oldid=1385554782",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=IQVIA&action=history",
+        "page_id": 6324689,
+        "revision_id": 1385554782,
+        "revision_timestamp": "2026-11-13T22:45:17Z",
+        "response_sha256": "5fe14d34cb01e41b1e991324d6a48fef0e2a181ed12b96be43fd36b33ca40206",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-21",
+        "description": "IQVIA Holdings, Inc. is an American health information technology and clinical research company headquartered in Durham, North Carolina.",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
+      }
+    },
+    {
+      "entity_id": "org.sopra_steria",
+      "name": "Sopra Steria",
+      "group": "Managed AI & data services",
+      "website": "https://www.soprasteria.com/",
+      "offerings": [
+        {
+          "label": "Synthetic image generation for computer-vision training",
+          "source_indexes": [
+            0,
+            2
+          ]
+        },
+        {
+          "label": "Training-data quality measurement and domain adaptation",
+          "source_indexes": [
+            2
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.soprasteria.com/about-us/strategic-alliances/about-usstrategic-alliancessopra-steria-transformation-services-for-aws",
+          "title": "Sopra Steria Transformation Services for AWS - Sopra Steria",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "61569b21f46768835b6c7ac04da7790f04845f70d25a542fa1650b3e83f07ff4",
+          "locator": "soprasteria-aws/text.txt:L151-L156: current Model Training Augmented Generation solution; synthetic images for CV edge cases. Raw HTML directly links prodview-yiydhzoethq6k; 2024 award and unrelated Apr19 2023 news card do not date this current page.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "title": "AWS Marketplace: Sopra Steria Model Training Augmented Generation",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "977111f11098ab3f62761b9218c8c86106911fc3e7de961464610c1d28a1e2df",
+          "content_kind": "web_tool_text_excerpt",
+          "url": "https://aws.amazon.com/marketplace/pp/prodview-yiydhzoethq6k",
+          "locator": "Current official landing-linked AWS listing; retained web-tool title/seller/delivery-method excerpt. Raw HTTP 200 was JavaScript-only; excerpt hash is not raw body hash."
+        },
+        {
+          "url": "https://aws.amazon.com/marketplace/pp/prodview-qfia5nzstw2bc",
+          "title": "Sopra Steria Model Training Augmented Generation | AWS Marketplace",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "6940d79b88e3b030fbd2ad0fe5df9aa29932ef1e33c44853c3a5172648cda8d2",
+          "locator": "soprasteria-model-training/text.txt:L25-L57: separately discovered, directly readable seller-authored listing for same named professional service; synthetic train images, reference-quality measurement and domain adaptation. This is not the exact linked listing ID.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.soprasteria.com/footer/terms-of-use",
+          "title": "Terms of use - Sopra Steria",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "3842ee0353b242812ba9f2713f242174e216f1092e0ec42288440b3b983e4751",
+          "locator": "soprasteria-terms/text.txt:L106-L115: Sopra Steria Group site publisher, Annecy registration326820065 and explicit Paris headquarters; L132-L139 group companies remain independent legal entities.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.soprasteria.com/docs/librariesprovider2/sopra-steria-corporate/finance/cp-fi/26022026_sop_fy2025_fr.pdf",
+          "title": "Sopra Steria FY2025 results: legal identity header, 26 February 2026",
+          "published_on": "2026-02-26",
+          "observed_on": "2026-11-21",
+          "response_sha256": "e5a49eb67b8d60d577f28accf64923e292736163e30e55c54e637ee1e6dad03a",
+          "locator": "Official French FY2025-results PDF p1, text.txt:L23-L25: Sopra Steria Group SA legal name. Published Feb26 2026; no financial value selected.",
+          "content_kind": "raw_http_body"
+        },
+        {
+          "url": "https://www.soprasteria.com/about-us/our-offices",
+          "title": "Our offices and locations - Sopra Steria",
+          "published_on": null,
+          "observed_on": "2026-11-21",
+          "response_sha256": "5422a6f8283c94d331172e0b144878b1b241b25bb7c10f6e2af4bfefd7fd3807",
+          "locator": "soprasteria-offices/text.txt:L412-L415 Berlin, L591-L594 Brussels and L1390-L1401 Luxembourg offices; current official footprint supports several Western European countries. No office or employee totals selected.",
+          "content_kind": "raw_http_body"
+        }
+      ],
+      "current_identity": {
+        "scope": "current_only",
+        "name": "Sopra Steria",
+        "aliases": [
+          "Sopra Steria Group SA",
+          "Sopra Steria Group"
+        ],
+        "website": "https://www.soprasteria.com/",
+        "source_indexes": [
+          0,
+          3,
+          4,
+          5
+        ]
+      },
+      "wikipedia": {
+        "title": "Sopra Steria",
+        "article_url": "https://en.wikipedia.org/wiki/Sopra_Steria",
+        "revision_url": "https://en.wikipedia.org/w/index.php?title=Sopra_Steria&oldid=1386183947",
+        "history_url": "https://en.wikipedia.org/w/index.php?title=Sopra_Steria&action=history",
+        "page_id": 4649465,
+        "revision_id": 1386183947,
+        "revision_timestamp": "2026-11-17T04:17:49Z",
+        "response_sha256": "c2866d70f54d2f749a1e54b3f773d26cc8c24e8088756dd4feda7359c191284d",
+        "content_kind": "mediawiki_revision_wikitext",
+        "observed_on": "2026-11-21",
+        "description": "The company is headquartered in Paris and has operations in several countries in Western Europe.",
         "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
         "change_note": "Sentence wording unchanged; links, formatting and citation markers omitted."
       }

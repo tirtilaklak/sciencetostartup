@@ -33,7 +33,9 @@ test('current company additions can be found and linked with their attribution',
   for (const entry of registry.entries) {
     await page.goto('/companies/?q=' + encodeURIComponent(entry.name));
     await expect(page.locator('#company-filters')).toBeVisible();
-    await expect(page.locator('.directory-company:visible')).toHaveCount(1);
+    // Other cards may mention the company, such as WNS naming its parent
+    // Capgemini. The exact company name must lead those broader matches.
+    await expect(page.locator('.directory-company:visible').first()).toHaveAttribute('data-company', entry.entity_id);
     const card = page.locator('.directory-company[data-company="' + entry.entity_id + '"]');
     await expect(card).toBeVisible();
     await expect(card.getByRole('heading', { level: 3, name: entry.name, exact: true })).toBeVisible();
