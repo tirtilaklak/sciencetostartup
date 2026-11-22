@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from editorial_work import editorial_counts, validate_editorial_release
 from observatory import validate_company_events
+from presentation import work_uncertain
 
 
 def prior_values(route, correction_id):
@@ -28,14 +29,14 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
     def test_release_binds_exact_work_bytes_and_unchanged_frozen_canonical(self):
         self.assertEqual(hashlib.sha256((ROOT / "data/canonical.json").read_bytes()).hexdigest(),
                          "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061")
-        self.assertEqual(self.release["release_id"], "2026-11-22.5")
+        self.assertEqual(self.release["release_id"], "2026-11-22.6")
         self.assertEqual(self.release["as_of"], "2026-11-22")
         self.assertEqual(self.release["work_routes_sha256"],
                          hashlib.sha256((ROOT / "data/work-routes.json").read_bytes()).hexdigest())
         validate_editorial_release(self.work, self.release, self.canonical)
         counts = editorial_counts(self.work)
         self.assertEqual(counts["records"], 135)
-        self.assertEqual(counts["work_routes"], 69)
+        self.assertEqual(counts["work_routes"], 70)
 
     def test_surge_fellowship_application_and_unstated_location_have_exact_source(self):
         row = self.routes["surge_ai.work.research-fellowship"]
@@ -78,8 +79,7 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
     def test_retained_quote_normalization_is_not_a_new_source_check(self):
         for rid, currency in [("bespoke_labs.work.mts-post-training", "USD"),
                               ("scale_ai.work.outlier-statistics", "USD"),
-                              ("bespoke_labs.work.fulfillment-operations-associate", "USD"),
-                              ("ooak.work.data-quality-specialist", "EUR")]:
+                              ("bespoke_labs.work.fulfillment-operations-associate", "USD")]:
             with self.subTest(route=rid):
                 row = self.routes[rid]
                 self.assertIn(currency, row["source_quote"])
@@ -93,7 +93,70 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
         self.assertEqual(mts["pay_terms"]["unit"], "year")
         self.assertEqual(mts["pay_basis"], mts["pay_terms"]["basis"])
         self.assertFalse(mts["pay_terms"]["hourly_comparable"])
-        self.assertEqual(self.routes["ooak.work.data-quality-specialist"]["field_reviews"]["requirements"]["state"], "conflicting")
+        ooak = self.routes["ooak.work.data-quality-specialist"]
+        previous = prior_values(ooak, "employer-listing-2026-11-22.correction")
+        self.assertIn("EUR", previous["source_quote"])
+        self.assertEqual(previous["pay_terms"]["currency"], "EUR")
+        self.assertEqual(previous["field_reviews"]["pay"]["basis"], "stored_evidence")
+        self.assertEqual(previous["field_reviews"]["pay"]["reviewed_on"], "2026-10-28")
+        self.assertEqual(ooak["terms_checked_on"], "2026-10-28")
+
+    def test_ooak_exact_employer_listing_preserves_the_original_and_application_checks(self):
+        row = self.routes["ooak.work.data-quality-specialist"]
+        employer_url = "https://ooakdata.com/careers?job_id=114405#job"
+        original_url = "https://www.ycombinator.com/companies/ooak-data/jobs/Gr7Gc1x-data-quality-specialist"
+        self.assertEqual(row["status"], "listed")
+        self.assertTrue(row["listed_on_current_company_board"])
+        self.assertEqual(row["availability_label"], "Application access unconfirmed")
+        self.assertTrue(work_uncertain(row))
+        self.assertEqual(row["url"], employer_url)
+        self.assertEqual(row["research_record"]["route"]["url"], original_url)
+        self.assertEqual(row["pay_label"], "€65K–€80K / year")
+        self.assertIn("earlier YC listing", row["pay_terms"]["note"])
+        self.assertEqual(row["source_quote"], "€65–80K")
+        self.assertEqual(row["arrangements"], ["hybrid"])
+        self.assertIn("1–2 days working from home", row["geography"])
+        self.assertEqual(row["duration"], "Permanent contract (CDI)")
+        self.assertIn("6+ years", row["requirements"][0])
+        self.assertIn("4+ years", row["requirements"][0])
+        self.assertEqual(row["field_reviews"]["requirements"]["state"], "conflicting")
+        self.assertIn("audit of an anonymized dataset", row["assessment"])
+
+        review = row["editorial_review"]
+        sources = {source["id"]: source for source in row["sources"]}
+        employer_action, original_action = review["actions"]
+        self.assertEqual((employer_action["label"], employer_action["url"], employer_action["purpose"]),
+                         ("Read employer listing", employer_url, "description"))
+        self.assertEqual((original_action["url"], original_action["purpose"]), (original_url, "archived_listing"))
+        receipts = {item["source_id"]: item for item in review["receipts"]}
+        employer_receipt = receipts[employer_action["source_id"]]
+        self.assertTrue(employer_receipt["approved"])
+        self.assertEqual(employer_receipt["scope"], "field_review")
+        self.assertNotIn("approved_terms_receipt_id", review)
+        for field, binding in row["field_reviews"].items():
+            self.assertIn(field, employer_receipt["reviewed_fields"])
+            self.assertEqual(binding["basis"], "direct_source")
+            self.assertEqual(binding["reviewed_on"], employer_receipt["checked_on"])
+            self.assertEqual([sources[sid]["url"] for sid in binding["source_ids"]], [employer_url])
+        self.assertEqual(receipts[original_action["source_id"]]["http_status"], 404)
+        self.assertFalse(receipts[original_action["source_id"]]["approved"])
+        archived = prior_values(row, "employer-listing-2026-11-22.correction")
+        self.assertEqual(archived["disposition"]["state"], "historical_page_unavailable")
+        self.assertEqual(archived["last_route_check"]["url"], original_url)
+        self.assertEqual(archived["last_route_check"]["http_status"], 404)
+        self.assertEqual(row["last_route_check"]["url"], employer_url)
+        self.assertEqual(row["last_route_check"]["http_status"], 200)
+        application = row["last_route_check"]["application_check"]
+        self.assertEqual((application["url"], application["http_status"], application["result"]),
+                         ("https://www.workatastartup.com/jobs/114405", 406, "unavailable"))
+        sign_in, = row["last_route_check"]["application_checks"]
+        self.assertEqual(sign_in["retrieval_reason"], "sign_in")
+        self.assertEqual(sign_in["rendered_observation"]["url"], "https://account.ycombinator.com/")
+        for check in (application, sign_in):
+            receipt = next(item for item in review["receipts"] if item.get("url") == check["url"])
+            self.assertEqual(receipt["scope"], "retrieval")
+            self.assertFalse(receipt["approved"])
+            self.assertEqual(sources[receipt["source_id"]]["url"], check["url"])
 
     def test_five_scoped_reviews_leave_full_terms_and_other_field_clocks_alone(self):
         reviewed = {"mercor.work.expert-network": "pay", "proximal.work.frontierswe-fellowship": "pay",

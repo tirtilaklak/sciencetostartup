@@ -49,9 +49,13 @@ class WorkRouteValidationTests(unittest.TestCase):
                                      and item.get("result") in {"listing_content_reviewed", "official_listing_closed"}
                                      for item in route_checks), 1, route["id"])
                 self.assertGreaterEqual(route["last_route_check"]["date"], checked_on)
+                reviewed_urls = {route["url"]}
+                reviewed_urls.update(change["previous_values"]["url"]
+                                     for change in route["editorial_review"].get("correction_history", [])
+                                     if "url" in change["previous_values"])
                 self.assertTrue(any(source.get("accessed_on") == checked_on
-                                    and source["url"] == route["url"]
-                                    for source in route["sources"]))
+                                    and source["url"] in reviewed_urls
+                                    for source in route["sources"]), route["id"])
             elif check["result"] == "reachable":
                 link_only += 1
             elif check["result"] == "blocked":
