@@ -2,6 +2,7 @@ const { chromium, firefox, test, expect } = require('@playwright/test');
 
 const directoryGroup = 'expert-data-evaluation';
 const compareResult = '[data-company=mercor] .directory-compare';
+const mercorDossier = '[data-company=mercor] h3 a';
 const firstMercorSource = '[data-company=mercor] .selected-evidence a[href*="felicis.com"]';
 
 async function trackDocument(page, cold) {
@@ -20,6 +21,14 @@ async function activate(link) {
   });
   await link.press('Enter');
   return position;
+}
+
+async function routePublishedDossiers(page, baseURL) {
+  await page.route('https://sciencetostartup.com/**', async route => {
+    const { pathname, search } = new URL(route.request().url());
+    const response = await route.fetch({ url: new URL(pathname + search, baseURL).href });
+    await route.fulfill({ response });
+  });
 }
 
 async function expectReturn(page, source, following, position, cached = false) {
@@ -61,7 +70,7 @@ const companyHandoffs = [
     href: '/explore/#compare', result: '#compare-view',
   },
   {
-    name: 'the Mercor dossier', query: 'Mercor', source: '[data-company=mercor] h3 a', following: compareResult,
+    name: 'the Mercor dossier', query: 'Mercor', source: mercorDossier, following: compareResult,
     href: 'https://sciencetostartup.com/company/mercor/', result: '.company-dossier',
   },
   {
@@ -75,13 +84,7 @@ for (const handoff of companyHandoffs) {
   test(`native Companies restores ${handoff.name} on cold Back`, async ({ page, baseURL }) => {
     await trackDocument(page, true);
     await page.setViewportSize({ width: 390, height: 844 });
-    if (handoff.result === '.company-dossier') {
-      await page.route('https://sciencetostartup.com/**', async route => {
-        const { pathname, search } = new URL(route.request().url());
-        const response = await route.fetch({ url: new URL(pathname + search, baseURL).href });
-        await route.fulfill({ response });
-      });
-    }
+    if (handoff.result === '.company-dossier') await routePublishedDossiers(page, baseURL);
     const group = handoff.group ?? directoryGroup;
     await page.goto(`/companies/?group=${group}&reader=keep`);
     const search = page.getByRole('searchbox', { name: 'Search companies' });
@@ -107,6 +110,83 @@ for (const handoff of companyHandoffs) {
     await expectReturn(page, source, following, position);
   });
 }
+
+test.describe('Mercor dossier viewport on cold Back', () => {
+  test.skip(({ browserName, isMobile }) => browserName !== 'webkit' || !isMobile, 'Exercise the Mobile WebKit return');
+
+  for (const userScroll of [false, true]) {
+    test(userScroll ? 'keeps a reader’s scroll after pageshow' : 'recovers from a late scroll to the top', async ({ page, baseURL }) => {
+      await trackDocument(page, true);
+      await page.setViewportSize({ width: 390, height: 844 });
+      await routePublishedDossiers(page, baseURL);
+      await page.addInitScript(({ selector, userScroll }) => {
+        if (location.pathname !== '/companies/') return;
+        const viewport = link => ({ scroll: scrollY, top: link.getBoundingClientRect().top, time: performance.now() });
+        window.mercorRestoredViewport = new Promise(resolve => {
+          document.addEventListener('focusin', event => {
+            const link = event.target;
+            if (!link.matches(selector) || window.nativeHandoffCached !== false ||
+                performance.getEntriesByType('navigation')[0]?.type !== 'back_forward') return;
+            requestAnimationFrame(() => {
+              const first = viewport(link);
+              if (userScroll) return resolve({ first });
+              // The release trace showed the browser resetting scroll in the next paint.
+              requestAnimationFrame(() => {
+                scrollTo({ top: 0, behavior: 'instant' });
+                resolve({ first, overwrite: viewport(link) });
+              });
+            });
+          });
+        });
+        if (userScroll) {
+          window.mercorReaderInput = new Promise(resolve => {
+            addEventListener('keydown', event => {
+              if (event.key !== 'Home' || !event.isTrusted) return;
+              // Make the reader's scroll instant so key animation cannot mask a correction.
+              event.preventDefault();
+              const input = viewport(document.activeElement);
+              scrollTo({ top: 0, behavior: 'instant' });
+              resolve(input);
+            });
+          });
+        }
+      }, { selector: mercorDossier, userScroll });
+
+      await page.goto(`/companies/?group=${directoryGroup}&reader=keep`);
+      const search = page.getByRole('searchbox', { name: 'Search companies' });
+      await search.fill('Mercor');
+      const origin = page.url();
+      const source = page.locator(mercorDossier);
+      const position = await activate(source);
+      expect(position.scroll).toBeGreaterThan(0);
+      await expect(page.locator('.company-dossier')).toBeVisible();
+      await page.goBack({ waitUntil: 'commit' });
+      await page.waitForFunction(() => Boolean(window.mercorRestoredViewport));
+      const { first, overwrite } = await page.evaluate(() => window.mercorRestoredViewport);
+      if (userScroll) {
+        await page.keyboard.press('Home');
+        const input = await page.evaluate(() => window.mercorReaderInput);
+        expect(input.time - first.time).toBeLessThan(200);
+        expect(Math.abs(input.scroll - position.scroll)).toBeLessThan(3);
+        await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+        // Let the short recovery window expire before checking the reader's position.
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 300)));
+        expect(await page.evaluate(() => scrollY)).toBe(0);
+        await expect(source).toBeFocused();
+      }
+      await expect(page).toHaveURL(origin);
+      await expect(search).toHaveValue('Mercor');
+      expect(await page.evaluate(() => window.nativeHandoffCached)).toBe(false);
+      expect(Math.abs(first.scroll - position.scroll)).toBeLessThan(3);
+      expect(Math.abs(first.top - position.top)).toBeLessThan(3);
+      if (!userScroll) {
+        expect(overwrite.scroll).toBe(0);
+        expect(overwrite.top - first.top).toBeGreaterThan(0);
+        await expectReturn(page, source, page.locator(compareResult), position);
+      }
+    });
+  }
+});
 
 test('native Companies leaves a new-tab Compare and ordinary visits alone', async ({ page, context, browserName, isMobile }) => {
   test.skip(browserName !== 'chromium' || isMobile, 'Exercise the desktop modifier that opens a background tab');
