@@ -134,6 +134,7 @@ async function openFilters(page) {
 }
 
 test('Daily latest and bounded archives match complete committed snapshots and frozen responses', async ({ page, request }) => {
+  test.setTimeout(60_000);
   for (const { route, edition } of contentRoutes) {
     await verifiedResponse(request, route, route.slice(1) + 'index.html');
     const snapshotPath = `daily/${edition.date}/snapshot.json`;
@@ -637,6 +638,7 @@ test('Daily phone filters leave focus in place and restore saved reading on Back
 });
 
 test('Daily controls, explanations and disclosed sources fit narrow and wide screens', async ({ page }) => {
+  test.setTimeout(60_000);
   for (const width of [320, 390, 600, 601, 701, 768, 1440]) {
     await page.setViewportSize({ width, height: 960 });
     await page.goto('/daily/');

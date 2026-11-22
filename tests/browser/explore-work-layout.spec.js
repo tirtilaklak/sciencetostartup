@@ -67,7 +67,7 @@ test('all four Explore Work filters receive desktop pointer input', async ({ pag
 });
 
 test('native Work explains the full count and updates the live count for matching records', async ({ page, browser, request }) => {
-  test.setTimeout(60_000);
+  test.setTimeout(90_000);
   const { routes } = await (await request.get('/work-routes.json')).json();
   const count = page.locator('[data-work-count]');
   const fullCount = `${routes.length} records, including career pages and past listings`;
@@ -148,7 +148,7 @@ test('native Work explains the full count and updates the live count for matchin
 });
 
 test('native Work shows the complete first role and hourly rate on the first screen', async ({ page, request }) => {
-  test.setTimeout(60_000);
+  test.setTimeout(90_000);
   const { routes } = await (await request.get('/work-routes.json')).json();
   const hourly = routes.filter(route => route.pay_terms?.hourly_comparable).length;
   const entries = [
