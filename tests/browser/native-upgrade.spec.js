@@ -32,6 +32,8 @@ const cases = [
 ];
 
 test.use({ reducedMotion: 'reduce', trace: { mode: 'retain-on-failure', snapshots: false } });
+// The bookmark controls open a second complete document in another tab.
+test.describe.configure({ timeout: 60_000 });
 
 async function prepare({ context, baseURL }, pathname, variant) {
   const origin = new URL(baseURL).origin;
