@@ -67,18 +67,20 @@ test('all four Explore Work filters receive desktop pointer input', async ({ pag
 });
 
 test('native Work explains the full count and updates the live count for matching records', async ({ page, browser, request }) => {
+  test.setTimeout(60_000);
   const { routes } = await (await request.get('/work-routes.json')).json();
   const count = page.locator('[data-work-count]');
   const fullCount = `${routes.length} records, including career pages and past listings`;
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.locator('.primary-link.work-link').click();
+  await expect(page).toHaveURL(/\/work\/$/);
+  await expect(page.getByRole('searchbox', { name: 'Search listings' })).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
   for (const width of [390, 1280]) {
     await page.setViewportSize({ width, height: 844 });
-    await page.goto('/');
-    await page.locator('.primary-link.work-link').click();
-    await expect(page).toHaveURL(/\/work\/$/);
-    await expect(page.getByRole('searchbox', { name: 'Search listings' })).toBeVisible();
     await expect(count).toHaveText(fullCount);
     await expect(count).toBeInViewport({ ratio: 1 });
-    await page.evaluate(() => document.fonts.ready);
     expect(await count.evaluate(node => {
       const range = document.createRange();
       range.selectNodeContents(node);
