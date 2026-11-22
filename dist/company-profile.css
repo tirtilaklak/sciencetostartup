@@ -82,8 +82,12 @@ main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:
  .company-notice{font-size:12px}.company-fold-body h2{font-size:22px}
  .company-review-highlight{margin-top:8px}
 }
-@media(max-width:380px){
+@media(max-width:420px){
  .company-key-facts{grid-template-columns:1fr;gap:18px}.company-key-fact+.company-key-fact{border-left:0;border-top:1px solid var(--border);padding:18px 0 0}
+}
+@media (min-width: 601px) and (max-width: 900px) and (max-height: 500px) {
+ .company-dossier:has(> .company-key-facts) .company-hero { margin-bottom: 12px; }
+ .company-key-facts { padding-block-start: 8px; }
 }
 
 /* Research-only companies use the same dossier, with the complete evidence inside. */

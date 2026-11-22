@@ -185,7 +185,7 @@ const S2SWork = (() => {
   ];
   function w4RegExpEscape(value){return value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
   function w4SearchFold(value){return String(value??'').normalize('NFKD').replace(/\p{M}+/gu,'').toLowerCase();}
-  function workSearchTerms(query){return globalThis.S2SSearch?.workTerms(query)||query;}
+  function workSearchTerms(query){return globalThis.S2SSearch?.workTerms(query)??query;}
   function w4QueryMatcher(query){
     let text=w4SearchFold(w4Text(query));
     if(!text)return null;
@@ -249,13 +249,13 @@ const S2SWork = (() => {
     const eligible = rows.filter(route => (!kind || bucket(route) === kind)
       && (!type || w4Engagement(route) === type) && w4PayMatches(route, pay) && w4WhereMatches(route, arrangement));
     const terms = workSearchTerms(q), matcher = w4QueryMatcher(terms);
-    if (!matcher) return eligible;
     if (terms !== q) {
       // Keep a literal employer or role title when a word like “jobs” belongs to its name.
       const title = w4SearchFold(w4Text(q));
       const exact = eligible.filter(route => [companyName(route), route.role].some(name => w4SearchFold(w4Text(name)) === title));
       if (exact.length) return exact;
     }
+    if (!matcher) return eligible;
     const text = new Map(eligible.map(route => [route.id, searchText(route)]));
     const phrase = eligible.filter(route => matcher.phrase(text.get(route.id)));
     return phrase.length ? phrase : eligible.filter(route => matcher.all(text.get(route.id)));

@@ -101,6 +101,7 @@
   const isHourlyPayQuery = key => key === 'hourly' || key === 'hourly pay';
   let entries = null, pending = null, active = -1, shown = pageSize, generation = 0;
   let exactIdentifiers = false, workTitles = new Set(), returnState = null;
+  const content = dialog.querySelector('.site-search-content');
   const fallback = dialog.querySelector('.site-search-fallback');
   const workRecovery = $('home-search-work-recovery') || fallback?.querySelector('a[href^="/work/"]');
   let more = $('home-search-more');
@@ -115,6 +116,8 @@
     if (status) status.textContent = value;
   }
   const options = () => [...results.querySelectorAll('[role=option]')];
+  const resultScroller = () => content && getComputedStyle(content).overflowY === 'auto' ? content : results;
+  const scrollField = scroller => scroller === results ? 'resultsScroll' : 'contentScroll';
   function updateFallback() {
     if (!workRecovery) return;
     const raw = input.value;
@@ -164,9 +167,10 @@
     if (active >= 0 && rows[active]) {
       const row = rows[active];
       input.setAttribute('aria-activedescendant', row.id);
-      const viewport = results.getBoundingClientRect(), bounds = row.getBoundingClientRect();
-      if (bounds.top < viewport.top || bounds.height > viewport.height) results.scrollTop += bounds.top - viewport.top;
-      else if (bounds.bottom > viewport.bottom) results.scrollTop += bounds.bottom - viewport.bottom;
+      const scroller = resultScroller();
+      const viewport = scroller.getBoundingClientRect(), bounds = row.getBoundingClientRect();
+      if (bounds.top < viewport.top || bounds.height > viewport.height) scroller.scrollTop += bounds.top - viewport.top;
+      else if (bounds.bottom > viewport.bottom) scroller.scrollTop += bounds.bottom - viewport.bottom;
     } else input.removeAttribute('aria-activedescendant');
   }
   function resultType(row) {
@@ -201,7 +205,6 @@
     results.innerHTML = rendered.map(option).join('');
     results.hidden = false; input.setAttribute('aria-expanded', 'true');
     const index = selected ? options().findIndex(node => node.getAttribute('href') === selected) : -1;
-    setActive(index);
     more.hidden = !key || visible.length >= matches.length;
     more.textContent = `Show ${Math.min(pageSize, matches.length - visible.length)} more`;
     if (exact) say(`Showing ${visible.length} of ${matches.length} matching research ${matches.length === 1 ? 'record' : 'records'}.`);
@@ -209,6 +212,8 @@
     else if (!key) say('Search research or companies and their products. Try a role or skill for paid work.');
     else if (matches.length) say(`Showing ${visible.length} of ${matches.length} matching guide records. Paid work uses its own listing filters.`);
     else say('No recorded guide matches. You can search paid work or browse all companies.');
+    if (!paging && content && resultScroller() === content) content.scrollTop = 0;
+    setActive(index);
     if (paging && more.hidden) input.focus();
   }
   function restore(snapshot) {
@@ -217,7 +222,8 @@
     if (index >= 0) setActive(index);
     if (index >= 0 && snapshot.focus === 'result') rows[index].focus({ preventScroll: true });
     else input.focus({ preventScroll: true });
-    results.scrollTop = snapshot.resultsScroll;
+    const scroller = resultScroller(), scrollTop = snapshot[scrollField(scroller)];
+    if (Number.isFinite(scrollTop)) scroller.scrollTop = scrollTop;
   }
   window.openHomeSearch = async snapshot => {
     const request = ++generation;
@@ -246,10 +252,11 @@
   dialog.addEventListener('click', event => {
     const link = event.target.closest('#home-search-results a[role=option]');
     if (!link || event.defaultPrevented || event.button || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || link.origin !== location.origin) return;
+    const scroller = resultScroller();
     try {
       history.replaceState({ ...history.state, [historyField]: {
         query: input.value, resultHref: link.getAttribute('href'), shown,
-        resultsScroll: results.scrollTop,
+        [scrollField(scroller)]: scroller.scrollTop,
         focus: document.activeElement === link || event.pointerType === 'touch' ? 'result' : 'input'
       } }, '');
     } catch {}
@@ -284,7 +291,8 @@
     if (event.key === 'PageDown' || event.key === 'PageUp') {
       event.preventDefault();
       const direction = event.key === 'PageDown' ? 1 : -1;
-      results.scrollTop += direction * results.clientHeight * .75;
+      const scroller = resultScroller();
+      scroller.scrollTop += direction * scroller.clientHeight * .75;
       return;
     }
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {

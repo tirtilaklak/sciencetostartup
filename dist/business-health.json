@@ -377,6 +377,25 @@
         "http_status": 403,
         "status": "unavailable",
         "note": "The historical Fintel mirror returned HTTP 403. The original filing was read on SEC EDGAR."
+      },
+      {
+        "source_id": "refresh.source.imerit-exl-june-2026-stocksguide",
+        "url": "https://stocksguide.com/en/stock/ExlService-Holdings-US3020811044?earnings_event_id=8916344",
+        "checked_on": "2026-11-22",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "The transcript of EXL’s 24 June acquisition call records CFO Maurizio Nicolelli’s preliminary unaudited iMerit revenue figure.",
+        "content_sha256": "f32ffd8cde53eb261d1089a5738128feeaacca5efcc6cb1fcfdf9661f2e76e62",
+        "source_locator": "June 24, 2026 M&A announcement transcript · Maurizio Nicolelli’s prepared remarks",
+        "excerpt": "Preliminary unaudited revenues for iMerit were approximately $59 million the 12 months ended March 31, 2026"
+      },
+      {
+        "source_id": "imerit.source.audit-im-transcript2",
+        "url": "https://earningscalls.dev/transcripts/exlservice-holdings-inc_exls_earnings_call_transcript_2026-06-24",
+        "checked_on": "2026-11-22",
+        "http_status": 404,
+        "status": "unavailable",
+        "note": "The original earningscalls.dev transcript returned HTTP 404 with “Earnings call not found.”"
       }
     ]
   },
@@ -1199,17 +1218,18 @@
       "accounting_basis": "unspecified",
       "evidence_type": "reported",
       "claim_ids": [
-        "imerit.claim.expansion-imerit-revenue-metric"
+        "imerit.claim.expansion-imerit-revenue-metric",
+        "refresh.claim.imerit-exl-june-2026-revenue-transcript"
       ],
       "metric_ids": [
         "imerit.metric.expansion-imerit-revenue"
       ],
       "source_ids": [
         "imerit.source.audit-im-transcript",
-        "imerit.source.audit-im-transcript2"
+        "refresh.source.imerit-exl-june-2026-stocksguide"
       ],
       "basis": "CFO Maurizio Nicolelli stated this on the June 24 M&A call. Not EXL consolidated revenue, not a 2026 forecast, and not annual recurring revenue.",
-      "limitations": "CFO Maurizio Nicolelli stated this on the June 24 M&A call. Not EXL consolidated revenue, not a 2026 forecast, and not annual recurring revenue.",
+      "limitations": "EXL CFO Maurizio Nicolelli gave this preliminary unaudited figure on the 24 June 2026 acquisition call. It covers iMerit’s standalone revenue for the year ended 31 March 2026. The earlier earningscalls.dev transcript returned HTTP 404 on 22 November 2026. StocksGuide carries the same CFO statement.",
       "original_text": "Approximately $59m revenue, year ended March 2026.",
       "evidence_assurance": "Preliminary unaudited acquisition disclosure, transcribed CFO statement",
       "currency": "USD",
@@ -1218,7 +1238,11 @@
       "scope_detail": "iMerit standalone business; not EXL consolidated group",
       "cohort": "Year ended 31 Mar 2026 · USD · iMerit standalone business · Gross/net undisclosed",
       "cohort_label": "Year ended 31 Mar 2026 · USD · iMerit standalone business · Gross/net undisclosed",
-      "cohort_key": "period_revenue|annual|2026|2026-03-31|USD|company|unspecified"
+      "cohort_key": "period_revenue|annual|2026|2026-03-31|USD|company|unspecified",
+      "historical_source_ids": [
+        "imerit.source.audit-im-transcript2"
+      ],
+      "evidence_checked_on": "2026-11-22"
     },
     {
       "id": "rws_trainai.claim.growth_metrics-0.metric-0",
@@ -6087,6 +6111,17 @@
       "source_type": "company",
       "accessed_on": "2026-11-22",
       "retrieval_status": "indexed_content_checked"
+    },
+    {
+      "id": "refresh.source.imerit-exl-june-2026-stocksguide",
+      "company_id": "imerit",
+      "title": "EXL June 24, 2026 M&A call transcript (StocksGuide)",
+      "url": "https://stocksguide.com/en/stock/ExlService-Holdings-US3020811044?earnings_event_id=8916344",
+      "publisher": "StocksGuide",
+      "source_type": "other",
+      "published_on": "2026-06-24",
+      "accessed_on": "2026-11-22",
+      "retrieval_status": "checked"
     }
   ],
   "fresh_claims": [
@@ -6728,6 +6763,36 @@
         "period": {
           "type": "run_rate",
           "label": "2024-12"
+        },
+        "scope": "company",
+        "accounting_basis": "unspecified"
+      }
+    },
+    {
+      "id": "refresh.claim.imerit-exl-june-2026-revenue-transcript",
+      "company_id": "imerit",
+      "status": "supported",
+      "statement": "EXL CFO Maurizio Nicolelli said iMerit’s standalone revenue was approximately $59 million for the twelve months ended 31 March 2026. The figure was preliminary and unaudited.",
+      "source_ids": [
+        "refresh.source.imerit-exl-june-2026-stocksguide"
+      ],
+      "observed_on": "2026-11-22",
+      "confidence": "B",
+      "evidence_label": "Preliminary unaudited acquisition disclosure, transcribed CFO statement",
+      "excerpt": "Preliminary unaudited revenues for iMerit were approximately $59 million the 12 months ended March 31, 2026",
+      "source_locator": "June 24, 2026 M&A announcement transcript · Maurizio Nicolelli’s prepared remarks",
+      "fact": {
+        "measure": "period_revenue",
+        "value": 59000000,
+        "unit": "currency",
+        "currency": "USD",
+        "qualifier": "approximate",
+        "period": {
+          "type": "annual",
+          "label": "Year ended 31 Mar 2026",
+          "year": 2026,
+          "start": "2025-04-01",
+          "end": "2026-03-31"
         },
         "scope": "company",
         "accounting_basis": "unspecified"
