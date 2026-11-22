@@ -68,6 +68,30 @@ test('Market restores Handshake focus to each successive evidence opener', async
   });
 });
 
+test('Back returns to the Market product link after using the revenue shortcut', async ({ page }) => {
+  await openMarket(page);
+  const revenue = page.getByRole('link', { name: 'Revenue & growth', exact: true });
+  const product = page.locator('.product-showcase').getByRole('link', { name: 'Ango Hub' });
+
+  await revenue.press('Enter');
+  await expect(page.locator('#business-health-heading')).toBeFocused();
+  await page.goBack();
+  await expect(revenue).toBeFocused();
+
+  await product.scrollIntoViewIfNeeded();
+  await product.focus();
+  const scroll = await page.evaluate(() => window.scrollY);
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/explore\/#company\/imerit\/business$/);
+  await expect(page.locator('#profile-view h1')).toBeVisible();
+
+  await page.goBack();
+  await expect(page).toHaveURL(/\/explore\/#market$/);
+  await expect(product).toBeFocused();
+  await expect(product).toBeInViewport({ ratio: 1 });
+  await expect.poll(() => page.evaluate(start => Math.abs(window.scrollY - start), scroll)).toBeLessThan(2);
+});
+
 test('Market restores RWS focus after an alternate observation and nested claim', async ({ page }) => {
   const dialog = await openMarket(page);
 
