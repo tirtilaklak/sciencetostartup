@@ -143,13 +143,11 @@ function pickCompanyObservation(company,signal){
  return list.sort((a,b)=>Number(numeric(b))-Number(numeric(a))||Number(!!a.is_context)-Number(!!b.is_context)||Number(b.measure===preferred)-Number(a.measure===preferred)||dateKey(b).slice(0,7).localeCompare(dateKey(a).slice(0,7))||Number(a.scope!=='company')-Number(b.scope!=='company')||(periodRank[a.period?.type]??2)-(periodRank[b.period?.type]??2))[0];
 }
 function evidenceLinks(o){
- const projected=financialProjection(o)?.source;
  const claimLinks=o.claim_ids.filter(id=>claims[id]).map((id,i)=>claimButton(id,o.claim_ids.length>1?'Claim '+(i+1):'Inspect claim'));
  const sourceLinks=o.source_ids.slice(0,3).map(id=>{
   const source=sourceRecord(id);
   if(!source)return '';
-  const published=o.source_ids.length===1&&projected?.url===source.url?projected.publishedOn:'';
-  const meta=profileSourceMeta({...source,publisher:''},published?{source_published_on:published}:null);
+  const meta=profileSourceMeta({...source,publisher:''});
   return `<span data-bh-source="${safe(id)}">${external(source.url,source.publisher||'Original source')}<br><small>${safe(meta)}</small>${freshnessNote(o,id)}</span>`;
  });
  return `<span class="bh-evidence-links">${claimLinks.join('')}${sourceLinks.join('')}</span>`;
@@ -284,7 +282,7 @@ function renderCompare(){
  else $('bh-plot').innerHTML=[...groups].map(([key,list])=>{
   list.sort((a,b)=>b.value-a.value||companies[a.company_id].name.localeCompare(companies[b.company_id].name));
   const min=Math.min(0,...list.map(o=>o.value)),max=Math.max(0,...list.map(o=>o.value)),span=max-min||1,zero=(0-min)/span*100;
-  return `<div class="bh-plot-group" role="group" aria-label="${safe(cohortDisplay(key,list[0]))}"><h5 class="bh-cohort-heading">${safe(cohortDisplay(key,list[0]))}</h5>${list.map(o=>{const end=(o.value-min)/span*100;const left=Math.min(zero,end),width=Math.abs(end-zero),scope=chartScope(o);return `<button type="button" class="bh-bar" aria-haspopup="dialog" aria-controls="bh-evidence-dialog" data-bh-observation="${safe(o.id)}"${bhState.observation===o.id?' aria-current="true"':''} aria-label="${esc(companies[o.company_id].name+': '+valueText(o)+', '+readableDates(o.label)+', '+accessibleDate(o)+', '+scopeLabel(o)+(isHistorical(o)?', historical':''))}"><span class="bh-bar-name">${safe(companies[o.company_id].name)}<small>${safe(periodShort(o))} · ${safe(statusText(o))}${scope?' · '+safe(scope):''}${o.is_context?' · context':''}</small></span><span class="bh-bar-track" aria-hidden="true"><i class="bh-bar-fill${['greater_than','at_least','less_than','at_most'].includes(o.qualifier)?' is-bound':''}${o.value<0?' is-negative':''}${o.evidence_type==='estimate'?' is-estimate':''}" style="left:${left}%;width:${width}%"></i>${min<0?`<i class="bh-bar-zero" style="left:${zero}%"></i>`:''}</span><span class="bh-bar-value${isHistorical(o)?' is-historical':''}">${safe(valueText(o))}</span></button>`;}).join('')}<div class="bh-axis"><span>${safe(valueText(list[0],min,false))}</span><span>${safe(valueText(list[0],max,false))}</span></div></div>`;
+  return `<div class="bh-plot-group" role="group" aria-label="${safe(cohortDisplay(key,list[0]))}"><h5 class="bh-cohort-heading">${safe(cohortDisplay(key,list[0]))}</h5>${list.map(o=>{const end=(o.value-min)/span*100;const left=Math.min(zero,end),width=Math.abs(end-zero),scope=chartScope(o);return `<button type="button" class="bh-bar" aria-haspopup="dialog" aria-controls="bh-evidence-dialog" data-bh-observation="${safe(o.id)}"${bhState.observation===o.id?' aria-current="true"':''} aria-label="${esc(companies[o.company_id].name+': '+valueText(o)+', '+readableDates(o.label)+', '+accessibleDate(o)+', '+scopeLabel(o)+(isHistorical(o)?', historical':''))}"><span class="bh-bar-label"><span class="bh-bar-name">${safe(companies[o.company_id].name)}</span><small>${safe(periodShort(o))} · ${safe(statusText(o))}${scope?' · '+safe(scope):''}${o.is_context?' · context':''}</small></span><span class="bh-bar-track" aria-hidden="true"><i class="bh-bar-fill${['greater_than','at_least','less_than','at_most'].includes(o.qualifier)?' is-bound':''}${o.value<0?' is-negative':''}${o.evidence_type==='estimate'?' is-estimate':''}" style="left:${left}%;width:${width}%"></i>${min<0?`<i class="bh-bar-zero" style="left:${zero}%"></i>`:''}</span><span class="bh-bar-value${isHistorical(o)?' is-historical':''}">${safe(valueText(o))}</span></button>`;}).join('')}<div class="bh-axis"><span>${safe(valueText(list[0],min,false))}</span><span>${safe(valueText(list[0],max,false))}</span></div></div>`;
  }).join('');
  $('bh-chart-note').textContent=`${plural(new Set(selected.map(o=>o.company_id)).size,'company')} in this selection. ${md.note||md.description||''} ${groups.size>1?'Each panel has its own scale. ':''}Select a figure for its source.`;
  if($('bh-chart-title'))$('bh-chart-title').textContent=measureLabel(bhState.measure);
@@ -303,8 +301,9 @@ function companyRows(){
 }
 function cellHTML(c,signal,state){
  if(state==='n-a')return `<td class="bh-cell" data-state="n-a" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><span title="Nonprofit research: commercial measures are not applied">n/a<span class="sr-only"> ${labels[signal]}: not applied</span></span></td>`;
- const o=pickCompanyObservation(c.id,signal),selected=bhState.company===c.id&&bhState.signal===signal;
+ const o=pickCompanyObservation(c.id,signal);
  if(!o)return `<td class="bh-cell" data-state="missing" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><span title="${safe(c.name+' · '+labels[signal]+': no reviewed public disclosure. Missing is not zero.')}">—<span class="sr-only"> ${labels[signal]}: not disclosed</span></span></td>`;
+ const selected=bhState.observation===o.id;
  const value=numeric(o)?valueText(o):'Claim',tag=cellTag(o),g=grade(o);
  const context=[c.name,readableDates(o.label),accessibleDate(o),scopeLabel(o),o.is_context?'context only':'',isHistorical(o)?'historical':'',g?'research grade '+g:''].filter(Boolean).join(' · ');
  return `<td class="bh-cell" data-state="${state}"${isHistorical(o)?' data-historical="true"':''} data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><button type="button" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"${selected?' aria-current="true"':''} aria-label="${safe(value+' · '+context)}" title="${safe(context)}" aria-haspopup="dialog" aria-controls="bh-evidence-dialog"><b>${safe(value)}${gradeChip(o)}</b><small>${safe(tag)}${o.is_context?'<span class="sr-only"> (context only)</span>':''}</small></button></td>`;

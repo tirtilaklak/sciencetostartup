@@ -1,6 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 const handshakeId = 'handshake_ai.metric.major-growth_metrics-0';
+const mercorRunRateId = 'mercor.metric.oct14-major-financial-2';
 const rwsGroupId = 'rws_trainai.claim.growth_metrics-0.metric-0';
 const rwsSegmentId = 'rws_trainai.claim.growth_metrics-1.metric-0';
 
@@ -18,8 +19,9 @@ async function ledgerControl(page, observationId, kind) {
   return control;
 }
 
-async function chartControl(page, observationId) {
+async function chartControl(page, observationId, measure) {
   await page.locator('#bh-advanced > summary').press('Enter');
+  if (measure) await page.getByRole('combobox', { name: 'Measure', exact: true }).selectOption(measure);
   await page.getByRole('combobox', { name: 'Reporting period & scope' }).selectOption('');
   return page.locator(`#bh-plot button[data-bh-observation="${observationId}"]`);
 }
@@ -103,4 +105,28 @@ test('Market restores RWS focus after an alternate observation and nested claim'
     await expect(dialog).toBeHidden();
     await expect(cell).toBeFocused();
   });
+});
+
+test('Market marks the current observation by its exact ID', async ({ page }) => {
+  const dialog = await openMarket(page);
+  const cell = await matrixControl(page, 'mercor', 'Mercor');
+  const bar = await chartControl(page, mercorRunRateId, 'annualized_revenue');
+
+  await openEvidence(bar, dialog);
+  await expect(dialog.locator('.bh-value')).toContainText('$2B');
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(bar).toBeFocused();
+  await expect(bar).toHaveAttribute('aria-current', 'true');
+  await expect(cell).toContainText('$614M');
+  await expect(cell).not.toHaveAttribute('aria-current', 'true');
+  await expect(cell.locator('xpath=ancestor::tr')).toHaveClass('is-selected');
+  await expect(page.locator('#bh-grid-head [data-bh-tab="revenue"]')).toHaveClass(/is-active/);
+
+  await openEvidence(cell, dialog);
+  await expect(dialog.locator('.bh-value')).toContainText('$614M');
+  await dialog.getByRole('button', { name: 'Close figure details' }).click();
+  await expect(dialog).toBeHidden();
+  await expect(cell).toBeFocused();
+  await expect(cell).toHaveAttribute('aria-current', 'true');
 });

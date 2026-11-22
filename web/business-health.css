@@ -23,8 +23,9 @@
 .bh-bar{display:grid;grid-template-columns:minmax(115px,.9fr) minmax(80px,1.5fr) minmax(85px,.65fr);column-gap:18px;align-items:center;width:100%;min-height:78px;border:0;border-bottom:1px solid #e5e9e1;border-radius:3px;background:transparent;text-align:left;padding:15px 10px;line-height:1.5}
 .bh-bar:hover{background:#f1f5ec}
 .bh-bar[aria-current]{background:var(--bh-soft);box-shadow:inset 3px 0 0 var(--bh-green)}
-.bh-bar-name{font-size:14px;font-weight:600;min-width:0;overflow-wrap:anywhere;color:var(--ink)}
-.bh-bar-name small{display:block;font-size:10px;font-weight:400;line-height:1.7;color:var(--bh-muted);margin-top:3px}
+.bh-bar-label{min-width:0;overflow-wrap:anywhere}
+.bh-bar-name{display:block;font-size:14px;font-weight:600;color:var(--ink)}
+.bh-bar-label small{display:block;font-size:10px;font-weight:400;line-height:1.7;color:var(--bh-muted);margin-top:3px}
 .bh-bar-track{position:relative;display:block;height:14px;background:#e6ece1;min-width:0;border-radius:2px}
 .bh-bar-fill{position:absolute;top:0;height:100%;background:var(--bh-green);border-radius:2px;min-width:0;max-width:100%}
 .bh-bar-fill.is-estimate{background:repeating-linear-gradient(120deg,#9b7c48 0 3px,#c7b795 3px 6px)}
@@ -104,8 +105,8 @@
 #business-health button:focus-visible,#business-health a:focus-visible,#business-health input:focus-visible,#business-health select:focus-visible,#business-health summary:focus-visible,#bh-grid-wrap:focus-visible{outline:3px solid var(--bh-green);outline-offset:3px;position:relative;z-index:3}
 @media(max-width:1050px){.bh-analysis-layout{display:block}.bh-chart-main{padding:20px}.bh-bar{grid-template-columns:minmax(95px,1fr) minmax(50px,1fr) minmax(74px,.7fr);gap:12px}.bh-bar-value{font-size:18px}#bh-detail{padding:22px 18px}}
 @media(max-width:800px){.bh-heading{display:block}.bh-heading>a{margin-top:10px}.bh-analysis-layout{grid-template-columns:1fr}.bh-chart-main{padding:23px}.bh-bar{grid-template-columns:minmax(110px,1fr) minmax(80px,1.8fr) minmax(85px,.75fr)}.bh-bar-value{font-size:22px}#bh-detail{border-left:0;border-top:1px solid var(--bh-line);padding:23px;border-radius:0 0 8px 8px}.bh-facts{grid-template-columns:60px minmax(0,1fr)}.bh-history svg{max-width:460px}.bh-grid tbody th:first-child,.bh-grid thead th:first-child{position:sticky;left:0;z-index:1;background:var(--bh-paper);box-shadow:1px 0 0 var(--bh-line)}.bh-grid thead th:first-child{background:#eef3e9;z-index:3}}
-@media(max-width:600px){#business-health{margin-top:28px}.bh-heading{margin-bottom:20px}.bh-heading h2{font-size:29px;letter-spacing:-.8px}.bh-heading p{font-size:14px}.bh-tabs{overflow-x:auto;scrollbar-width:thin;scroll-snap-type:x proximity;gap:3px;padding:4px}.bh-tile{flex:0 0 auto;min-width:96px;font-size:12px;min-height:44px;padding:10px 12px;scroll-snap-align:start}.bh-compare-head{padding:20px 16px}.bh-compare-head h3{font-size:21px;margin-bottom:16px}.bh-chart-controls{grid-template-columns:1fr;gap:12px}.bh-chart-controls select{font-size:12px}.bh-chart-main{padding:18px 13px 20px}.bh-bar{grid-template-columns:minmax(86px,1.1fr) minmax(38px,1fr) minmax(70px,.8fr);gap:9px;min-height:78px;padding:14px 7px}.bh-bar-name{font-size:12px}.bh-bar-name small{font-size:9px}.bh-bar-value{font-size:17px;letter-spacing:-.45px}.bh-bar-track{height:11px}.bh-bar-fill.is-bound::after{top:2px;width:7px;height:7px}.bh-cohort-heading{font-size:10px}.bh-chart-note{font-size:11px}#bh-detail{padding:20px 18px}#bh-detail .bh-value{font-size:29px}.bh-evidence-links a,.bh-evidence-links button,.bh-profile,.bh-history-points button,.bh-related button{min-height:44px;font-size:12px}.bh-coverage-disclosure>summary{padding:16px 0;font-size:14px}.bh-controls{padding:16px;gap:12px}.bh-controls>label{flex-basis:calc(50% - 6px)}.bh-controls>.bh-search-label{flex-basis:100%}.bh-controls>.bh-check{flex-basis:100%}#bh-matrix-count{padding-inline:16px}.bh-key{padding-inline:16px}.bh-method p{font-size:12px}}
-@media(max-width:360px){.bh-bar{grid-template-columns:minmax(80px,1.1fr) minmax(22px,.7fr) minmax(67px,.8fr);gap:7px}.bh-bar-value{font-size:16px}}
+@media(max-width:600px){#business-health{margin-top:28px}.bh-heading{margin-bottom:20px}.bh-heading h2{font-size:29px;letter-spacing:-.8px}.bh-heading p{font-size:14px}.bh-tabs{overflow-x:auto;scrollbar-width:thin;scroll-snap-type:x proximity;gap:3px;padding:4px}.bh-tile{flex:0 0 auto;min-width:96px;font-size:12px;min-height:44px;padding:10px 12px;scroll-snap-align:start}.bh-compare-head{padding:20px 16px}.bh-compare-head h3{font-size:21px;margin-bottom:16px}.bh-chart-controls{grid-template-columns:1fr;gap:12px}.bh-chart-controls select{font-size:12px}.bh-chart-main{padding:18px 13px 20px}.bh-bar{min-height:78px;padding:14px 7px}.bh-bar-name{font-size:12px}.bh-bar-value{font-size:17px;letter-spacing:-.45px}.bh-bar-track{height:11px}.bh-bar-fill.is-bound::after{top:2px;width:7px;height:7px}.bh-cohort-heading{font-size:10px}.bh-chart-note{font-size:11px}#bh-detail{padding:20px 18px}#bh-detail .bh-value{font-size:29px}.bh-evidence-links a,.bh-evidence-links button,.bh-profile,.bh-history-points button,.bh-related button{min-height:44px;font-size:12px}.bh-coverage-disclosure>summary{padding:16px 0;font-size:14px}.bh-controls{padding:16px;gap:12px}.bh-controls>label{flex-basis:calc(50% - 6px)}.bh-controls>.bh-search-label{flex-basis:100%}.bh-controls>.bh-check{flex-basis:100%}#bh-matrix-count{padding-inline:16px}.bh-key{padding-inline:16px}.bh-method p{font-size:12px}}
+@media(max-width:360px){.bh-bar-value{font-size:16px}}
 @media(forced-colors:active){.bh-tile[aria-selected=true],.bh-bar[aria-current]{outline:2px solid Highlight;outline-offset:-3px}.bh-bar-track{border:1px solid CanvasText}.bh-bar-fill{background:CanvasText}.bh-bar-fill.is-bound::after{border-color:CanvasText}.bh-bar-zero{background:CanvasText}.bh-svg-line,.bh-svg-point{stroke:CanvasText}}
 /* On phones, keep the first plotted value close to its controls. */
 @media(max-width:700px){
@@ -181,13 +182,14 @@
  .bh-ledger-company>a{font-size:15px}
 }
 @media(max-width:600px){
- .bh-heading{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+ .bh-heading{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-bottom:10px}
+ .bh-heading>div{flex:1 0 auto;max-width:100%}
  .bh-heading h2{font-size:28px;margin:0;letter-spacing:-.7px}
  .bh-heading .eyebrow{font-size:10px;margin-bottom:5px;letter-spacing:.9px}
- .bh-heading>a{font-size:12px;max-width:110px;text-align:right;margin:0;line-height:1.6;min-height:44px}
- .bh-overview-tabs{gap:0;justify-content:space-between}
- .bh-overview-tabs button{font-size:12px;gap:5px;padding:12px 0;min-height:48px}
- .bh-overview-tabs button span{font-size:10px;min-width:17px;height:18px;padding:0 4px}
+ .bh-heading>a{display:block;flex:1 0 min-content;max-width:100%;align-content:center;font-size:12px;text-align:end;margin:0;line-height:1.6;text-wrap:balance;overflow-wrap:break-word}
+ .bh-overview-tabs{flex-wrap:wrap;gap:0 12px;justify-content:space-between}
+ .bh-overview-tabs button{font-size:12px;gap:5px;padding:12px 0;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+ .bh-overview-tabs button span{font-size:10px;min-width:17px;height:auto;padding:0 4px}
  .bh-ledger-note{font-size:13px;margin:14px 0;line-height:1.5}
  .bh-ledger-head{display:none}
  #bh-ledger{border-top:1px solid var(--bh-line)}
@@ -206,6 +208,12 @@
  .bh-advanced{margin-top:18px}
  .bh-advanced>summary{font-size:14px;padding:16px 0}
  .bh-advanced>summary>span{font-size:12px}
+ .bh-bar{grid-template:"name value" auto "context context" auto "track track" auto / minmax(0,1fr) minmax(0,max-content);gap:4px 12px}
+ .bh-bar-label{display:contents}
+ .bh-bar-name{grid-area:name;overflow-wrap:anywhere}
+ .bh-bar-label small{grid-area:context;margin-top:0;font-size:9px;overflow-wrap:anywhere}
+ .bh-bar-value{grid-area:value;white-space:normal;overflow-wrap:anywhere}
+ .bh-bar-track{grid-area:track}
  .bh-evidence-dialog{width:calc(100vw - 20px);max-height:calc(100dvh - 24px);border-radius:8px}
  .bh-dialog-top{padding:8px 18px}
  .bh-evidence-dialog #bh-detail{padding:20px}
@@ -215,8 +223,8 @@
 }
 @media(max-width:360px){
  .bh-heading h2{font-size:25px}
- .bh-heading>a{max-width:95px}
- .bh-overview-tabs button{font-size:12px}
+ .bh-overview-tabs{column-gap:4px}
+ .bh-overview-tabs button span{padding-inline:2px}
  .bh-ledger-row{padding-inline:0;column-gap:8px}
  .bh-ledger-value{font-size:22px}
  .bh-source-action .ui-icon{display:none}
