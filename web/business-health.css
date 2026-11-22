@@ -89,6 +89,9 @@
 .bh-grid th:first-child{width:22%}
 .bh-grid thead{position:sticky;top:0;z-index:5;background:#eef3e9}
 .bh-grid thead th{background:#eef3e9;padding:10px 14px}
+/* Let an oversized Explore masthead scroll away while the matrix keeps its measure headings. */
+html[data-bh-masthead-scroll]:has(#market-view:not([hidden]) .bh-coverage-disclosure[open]){scroll-padding-top:12px}
+html[data-bh-masthead-scroll]:has(#market-view:not([hidden]) .bh-coverage-disclosure[open]) > body > .topbar{position:static}
 .bh-colhead{display:block;width:100%;border:0;border-radius:0;padding:0;background:transparent;font-weight:600;text-align:left;min-height:42px;font-size:12px;color:var(--ink)}
 .bh-colhead.is-active{color:var(--bh-green)}
 .bh-colhead small,.bh-grid tbody th small{display:block;font-size:10px;line-height:1.5;font-weight:400;color:var(--bh-muted);margin-top:4px}

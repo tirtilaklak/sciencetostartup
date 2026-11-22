@@ -427,6 +427,19 @@ $('bh-evidence-dialog').addEventListener('click',e=>{
  if(e.target===$('bh-evidence-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}
 });
 const matrix=$('bh-grid-wrap');
+const masthead=document.querySelector('body > .topbar');
+if(masthead&&typeof ResizeObserver==='function'){
+ const heading=matrix.querySelector('thead');
+ const update=()=>{
+  const headingHeight=heading.getBoundingClientRect().height;
+  const totalHeight=masthead.getBoundingClientRect().height+headingHeight;
+  document.documentElement.toggleAttribute('data-bh-masthead-scroll',headingHeight>0&&totalHeight>innerHeight/2);
+ };
+ const observer=new ResizeObserver(update);
+ observer.observe(masthead);
+ observer.observe(heading);
+ window.addEventListener('resize',update);
+}
 matrix.addEventListener('focusin',({target})=>{
  if(evidenceOrigin?.pointerScroll||!target.matches(':is(thead button,tbody a,tbody button):focus-visible'))return;
  revealGridFocus(target,matrix);
