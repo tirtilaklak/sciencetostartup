@@ -106,8 +106,15 @@ const search='RLHF  jobs';
 const matches=plain(run(`selectWorkRoutes(workRouteRows(),{q:${JSON.stringify(search)}}).map(row=>row.id)`));
 assert.deepEqual(matches,['afterquery.work.software-engineer-rl-environments']);
 assert.equal(run(`normalizeWorkCriteria({q:' RLHF  jobs '}).q`),' RLHF  jobs ');
+const workIds=q=>plain(run(`selectWorkRoutes(workRouteRows(),{q:${JSON.stringify(q)},arrangement:'remote'}).map(row=>row.id)`));
+for(const query of ['jobs','careers','hiring']){
+ assert.deepEqual(workIds(query),workIds(''),query+' describes an intent, not a role or employer');
+}
 const literalTitles=[{id:'literal',role:'Hiring Assistant',status:'listed'},{id:'broader',role:'Assistant',status:'listed'}];
 assert.deepEqual(plain(run(`S2SWork.select(${JSON.stringify(literalTitles)},{q:'Hiring Assistant'},row=>S2SWork.fold(row.role)).map(row=>row.id)`)),['literal']);
+const exactGenericTitle=[{id:'literal',role:'Jobs',status:'listed'},literalTitles[1]];
+assert.deepEqual(plain(run(`S2SWork.select(${JSON.stringify(exactGenericTitle)},{q:'Jobs'},row=>S2SWork.fold(row.role)).map(row=>row.id)`)),['literal']);
+
 
 const revised={...writer,availability_note:'No schedule conflict stated.',field_reviews:{...writer.field_reviews,commitment:{...writer.field_reviews.commitment,state:'sourced'}}};
 assert.equal(run(`w4ScheduleNote(${JSON.stringify(revised)})`),'','Do not retain an obsolete conflict after source text changes');
