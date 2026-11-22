@@ -155,7 +155,7 @@ test('native Work shows the complete first role and hourly rate on the first scr
     ['/work/', 'afterquery.work.technical-content-writer-contract', `${routes.length} records, including career pages and past listings`],
     ['/work/?pay=hourly&sort=hourly', 'afterquery.work.world-models', `${hourly} records with published hourly pay`],
   ];
-  for (const [width, height] of [[320, 720], [390, 844], [1024, 600]]) {
+  for (const [width, height] of [[320, 720], [390, 844], [760, 390], [844, 390], [1024, 600]]) {
     await page.setViewportSize({ width, height });
     for (const [url, firstId, scopedCount] of entries) {
       await test.step(`${url} at ${width} × ${height}`, async () => {
