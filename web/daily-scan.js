@@ -21,6 +21,9 @@
   const navigationAPI = globalThis.navigation;
   const navigationState = typeof navigationAPI?.currentEntry?.getState === 'function' &&
     typeof navigationAPI.updateCurrentEntry === 'function' && typeof navigationAPI.addEventListener === 'function';
+  const timing = globalThis.performance?.getEntriesByType?.('navigation')?.[0];
+  const hashTarget = () => rowById.get(location.hash.slice(1));
+  let coldFragmentURL = timing?.type === 'back_forward' && hashTarget() ? location.href : null;
   let restoration = 0;
   const position = value => Number.isFinite(value) && value >= 0 && value <= maxPosition;
   function savedReading() {
@@ -96,7 +99,21 @@
         // pageshow can precede history.state restoration. Read it in the later
         // task instead of abandoning the return when its early value is null.
         const current = savedReading();
+        const target = coldFragmentURL === location.href ? hashTarget() : null;
+        coldFragmentURL = null;
         if (current) apply(current);
+        else if (target) revealHash(target);
+
+        // A recreated document can restore scroll without the fragment's Tab
+        // starting point. Keep an existing focus or a saved position elsewhere.
+        if (target && !target.hidden && document.activeElement === document.body) {
+          const heading = target.querySelector('h2');
+          const box = heading.getBoundingClientRect();
+          if (!current || (box.bottom > 0 && box.top < innerHeight)) {
+            heading.tabIndex = -1;
+            heading.focus({ preventScroll: true });
+          }
+        }
       });
     }, 0);
     return Boolean(saved);
@@ -173,13 +190,13 @@
   });
   // During pagehide WebKit can already expose the destination entry. Never
   // write History or Navigation state here; only cancel pending restoration.
-  addEventListener('pagehide', () => { restoration++; });
+  addEventListener('pagehide', () => { restoration++; coldFragmentURL = null; });
   addEventListener('pageshow', () => restoreReading());
   addEventListener('popstate', () => restoreReading());
-  function revealHash() {
+  function revealHash(target = hashTarget()) {
     restoration++;
-    const target = document.getElementById(location.hash.slice(1));
-    if (target && target.classList.contains('scan-item')) {
+    coldFragmentURL = null;
+    if (target) {
       if (target.hidden) { search.value = ''; topic.value = ''; kind.value = ''; filter(); }
       target.querySelector('details').open = true;
       target.scrollIntoView({block: 'start'});
@@ -192,6 +209,5 @@
   document.documentElement.removeAttribute('data-daily-pending');
   // A fresh fragment reveals its target. A saved return first restores its
   // disclosures, then pageshow restores the position in that same layout.
-  const timing = globalThis.performance?.getEntriesByType?.('navigation')?.[0];
   if (!restoreReading(false) && timing?.type !== 'back_forward') revealHash();
 })();

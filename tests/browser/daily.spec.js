@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect, firefox } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 const { readFileSync, readdirSync } = require('node:fs');
 const { createHash } = require('node:crypto');
@@ -302,6 +302,8 @@ test('Daily deep links reveal filtered items and native disclosures support keyb
   await expect(target.locator('details')).toHaveAttribute('open', '');
   await assertSelections(page, latest.items);
   expect(new URL(page.url()).searchParams.has('q')).toBe(false);
+  await page.keyboard.press('Tab');
+  await expect(target.locator('h2 a')).toBeFocused();
   const summary = target.locator('summary');
   await summary.focus();
   await page.keyboard.press('Enter');
@@ -349,56 +351,111 @@ async function traversePermalinkHistory(page, direction, destination) {
 
 const datedKeyboardCases = [...new Set([latest, oldest])]
   .map(edition => ({ label: edition.date, route: `/daily/${edition.date}/`, edition }));
-for (const { label, route, edition } of [{ label: 'filtered latest', route: '/daily/', edition: latest }, ...datedKeyboardCases]) {
-  test(`Daily ${label} permalink Back returns focus and Tab to the exact reading position`, async ({ page }) => {
-    const search = page.getByLabel('Search', { exact: true });
-    const filtered = route === '/daily/';
-    const { item, query } = filtered ? distinctiveSearch() : { item: edition.items[Math.floor((edition.items.length - 1) / 2)], query: '' };
-    await page.goto(route);
-    const archiveSummary = page.locator('.scan-archive-disclosure summary');
-    await archiveSummary.press('Enter');
-    await expect(page.locator('.scan-archive-disclosure')).toHaveAttribute('open', '');
-    if (filtered) {
-      await search.pressSequentially(query);
-      await assertSelections(page, [item], edition.items.length);
-    }
+const filteredKeyboardCase = { label: 'filtered latest', route: '/daily/', edition: latest };
 
-    const row = page.locator('.scan-item[id=' + JSON.stringify(item.id) + ']');
-    await row.locator('summary').press('Enter');
-    const permalink = row.locator('.scan-permalink');
-    for (let i = 0; i < item.sources.length + 1; i++) await page.keyboard.press('Tab');
-    await expect(permalink).toBeFocused();
-    const nextItem = edition.items[edition.items.indexOf(item) + 1];
-    const next = filtered || !nextItem ? page.locator('.scan-notes summary') :
-      page.locator('.scan-item[id=' + JSON.stringify(nextItem.id) + '] h2 a');
-    await page.keyboard.press('Tab');
-    await expect(next).toBeFocused();
-    await page.keyboard.press('Shift+Tab');
-    await expect(permalink).toBeFocused();
-    const startURL = page.url();
-    const start = await settledReading(permalink);
+async function keyboardPermalinkHistory(page, { route, edition }, recreated = false) {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const search = page.getByLabel('Search', { exact: true });
+  const topic = page.getByLabel('Topic', { exact: true });
+  const kind = page.getByLabel('Type', { exact: true });
+  const filtered = route === '/daily/';
+  const { item, query } = filtered ? distinctiveSearch() : { item: edition.items[Math.floor((edition.items.length - 1) / 2)], query: '' };
+  await page.goto(route);
+  const archive = page.locator('.scan-archive-disclosure');
+  await archive.locator('summary').press('Enter');
+  await expect(archive).toHaveAttribute('open', '');
+  if (filtered) {
+    await topic.selectOption(item.topics[0]);
+    await kind.selectOption(item.kind);
+    await search.pressSequentially(query);
+    await assertSelections(page, [item], edition.items.length);
+  }
 
-    await page.keyboard.press('Enter');
-    const targetURL = new URL(`/daily/${edition.date}/#${item.id}`, startURL).href;
-    await expect(page).toHaveURL(targetURL);
-    await expect(row.locator('details')).toHaveAttribute('open', '');
-    await expect(row).toBeInViewport();
-    await traversePermalinkHistory(page, 'goBack', startURL);
-    await expect(permalink).toBeFocused();
-    await assertSelections(page, filtered ? [item] : edition.items, edition.items.length);
-    await expect(search).toHaveValue(query);
-    await expect(page.locator('.scan-archive-disclosure')).toHaveAttribute('open', '');
-    const back = await settledReading(permalink);
-    expect(back.open).toEqual(start.open);
-    expect(Math.abs(back.y - start.y)).toBeLessThanOrEqual(2);
-    expect(Math.abs(back.top - start.top)).toBeLessThanOrEqual(2);
+  const row = page.locator('.scan-item[id=' + JSON.stringify(item.id) + ']');
+  await row.locator('summary').press('Enter');
+  const permalink = row.locator('.scan-permalink');
+  for (let i = 0; i < item.sources.length + 1; i++) await page.keyboard.press('Tab');
+  await expect(permalink).toBeFocused();
+  const nextItem = edition.items[edition.items.indexOf(item) + 1];
+  const next = filtered || !nextItem ? page.locator('.scan-notes summary') :
+    page.locator('.scan-item[id=' + JSON.stringify(nextItem.id) + '] h2 a');
+  await page.keyboard.press('Tab');
+  await expect(next).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(permalink).toBeFocused();
+  const startURL = page.url();
+  const start = await settledReading(permalink);
+
+  await page.keyboard.press('Enter');
+  const targetURL = new URL(`/daily/${edition.date}/#${item.id}`, startURL).href;
+  await expect(page).toHaveURL(targetURL);
+  const details = row.locator('details');
+  const headline = row.locator('h2 a');
+  await expect(details).toHaveAttribute('open', '');
+  const arrival = await settledReading(headline);
+  const arrivalDocument = await page.evaluate(() => performance.timeOrigin);
+  await traversePermalinkHistory(page, 'goBack', startURL);
+  await expect(permalink).toBeFocused();
+  await assertSelections(page, filtered ? [item] : edition.items, edition.items.length);
+  await expect(search).toHaveValue(query);
+  await expect(topic).toHaveValue(filtered ? item.topics[0] : '');
+  await expect(kind).toHaveValue(filtered ? item.kind : '');
+  await expect(archive).toHaveAttribute('open', '');
+  const back = await settledReading(permalink);
+  expect(back.open).toEqual(start.open);
+  expect(Math.abs(back.y - start.y)).toBeLessThanOrEqual(2);
+  expect(Math.abs(back.top - start.top)).toBeLessThanOrEqual(2);
+  await page.keyboard.press('Tab');
+  await expect(next).toBeFocused();
+  await traversePermalinkHistory(page, 'goForward', targetURL);
+  await expect(details).toHaveAttribute('open', '');
+  const forward = await settledReading(headline);
+  expect(forward.open).toEqual(arrival.open);
+  expect(Math.abs(forward.y - arrival.y)).toBeLessThanOrEqual(2);
+  expect(Math.abs(forward.top - arrival.top)).toBeLessThanOrEqual(2);
+  if (recreated) expect(await page.evaluate(() => performance.timeOrigin)).not.toBe(arrivalDocument);
+  if (filtered) {
     await page.keyboard.press('Tab');
-    await expect(next).toBeFocused();
-    await traversePermalinkHistory(page, 'goForward', targetURL);
-    await expect(row.locator('details')).toHaveAttribute('open', '');
-    await expect(row).toBeInViewport();
+    await expect(headline).toBeFocused();
+  }
+  return { row, details, startURL, targetURL };
+}
+
+for (const scenario of [filteredKeyboardCase, ...datedKeyboardCases]) {
+  test(`Daily ${scenario.label} permalink Back and Forward restore the reading position`, async ({ page }) => {
+    await keyboardPermalinkHistory(page, scenario);
   });
 }
+
+test('Daily classic history cold Forward reveals a fragment and honors a saved close', async ({ browserName, baseURL }, info) => {
+  test.skip(browserName !== 'firefox', 'Firefox can disable the Navigation API and history cache');
+  const browser = await firefox.launch({ firefoxUserPrefs: {
+    'dom.navigation.webidl.enabled': false, 'browser.sessionhistory.max_total_viewers': 0,
+  } });
+  try {
+    const page = await browser.newPage({ baseURL });
+    page.on('pageerror', error => info._dailyRuntimeErrors.push(error.message));
+    const { row, details, startURL, targetURL } = await keyboardPermalinkHistory(page, filteredKeyboardCase, true);
+    expect(await page.evaluate(() => typeof globalThis.navigation)).toBe('undefined');
+    await row.locator('summary').press('Enter');
+    await expect(details).not.toHaveAttribute('open', '');
+    const previousLink = page.locator('a.scan-day-step[rel="prev"]');
+    const previousURL = new URL(await previousLink.getAttribute('href'), targetURL).href;
+    await previousLink.press('Enter');
+    await expect(page).toHaveURL(previousURL);
+    await traversePermalinkHistory(page, 'goBack', targetURL);
+    await expect(previousLink).toBeInViewport();
+    expect((await settledReading(previousLink)).open).toEqual([]);
+
+    await traversePermalinkHistory(page, 'goBack', startURL);
+    await expect(row.locator('.scan-permalink')).toBeFocused();
+    await traversePermalinkHistory(page, 'goForward', targetURL);
+    await expect(previousLink).toBeInViewport();
+    expect((await settledReading(previousLink)).open).toEqual([]);
+  } finally {
+    await browser.close();
+  }
+});
 
 test('Daily controls, explanations and disclosed sources fit narrow and wide screens', async ({ page }) => {
   for (const width of [320, 390, 600, 601, 701, 768, 1440]) {
