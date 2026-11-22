@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect, firefox } = require('@playwright/test');
 
 const chapter = '/research/state-of-ai-data-labs/chapters/technical-landscape/';
 const datedChapter = '/research/editions/2026-11-12/chapters/technical-landscape/';
@@ -37,6 +37,39 @@ async function verifyCitationHistory(page) {
   await expect(page).toHaveURL(new URL(href, page.url()).href);
 }
 
+async function verifyPassageHistory(page, path) {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(path);
+  const destination = page.locator('#scalable-oversight-result');
+  const shortcut = page.getByRole('navigation', { name: 'Reading shortcuts' })
+    .locator('a[href="#scalable-oversight-result"]');
+  await shortcut.focus();
+  await expect(shortcut).toBeInViewport();
+  const originalURL = page.url();
+  const originalScroll = await page.evaluate(() => scrollY);
+  const destinationURL = new URL(await shortcut.getAttribute('href'), originalURL).href;
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(destinationURL);
+  await expect(destination).toBeFocused();
+  await expect(destination).toBeInViewport();
+
+  await page.goBack();
+  await expect(page).toHaveURL(originalURL);
+  await expect(shortcut).toBeFocused();
+  await expect(shortcut).toBeInViewport();
+  expect(await page.evaluate(() => scrollY)).toBeCloseTo(originalScroll, 0);
+  await page.keyboard.press('Tab');
+  const next = page.locator('.r-reader-book-title a');
+  await expect(next).toBeFocused();
+  await expect(next).toBeInViewport();
+
+  await page.goForward();
+  await expect(page).toHaveURL(destinationURL);
+  await expect(destination).toBeFocused();
+  await expect(destination).toBeInViewport();
+}
+
 test('complete technical chapter supports its final citation, focus and history without JavaScript', async ({ page }) => {
   await verifyCitationHistory(page);
 });
@@ -64,38 +97,37 @@ test.describe('enhanced technical reading', () => {
 
   for (const [edition, path] of [['current', chapter], ['dated', datedChapter]]) {
     test(`${edition} Technical passage keeps keyboard focus with browser Back and Forward`, async ({ page }) => {
-      await page.setViewportSize({ width: 390, height: 844 });
-      await page.emulateMedia({ reducedMotion: 'reduce' });
-      await page.goto(path);
-      const destination = page.locator('#scalable-oversight-result');
-      const shortcut = page.getByRole('navigation', { name: 'Reading shortcuts' })
-        .locator('a[href="#scalable-oversight-result"]');
-      await shortcut.focus();
-      await expect(shortcut).toBeInViewport();
-      const originalURL = page.url();
-      const originalScroll = await page.evaluate(() => scrollY);
-      const destinationURL = new URL(await shortcut.getAttribute('href'), originalURL).href;
-      await page.keyboard.press('Enter');
-      await expect(page).toHaveURL(destinationURL);
-      await expect(destination).toBeFocused();
-      await expect(destination).toBeInViewport();
-
-      await page.goBack();
-      await expect(page).toHaveURL(originalURL);
-      await expect(shortcut).toBeFocused();
-      await expect(shortcut).toBeInViewport();
-      expect(await page.evaluate(() => scrollY)).toBeCloseTo(originalScroll, 0);
-      await page.keyboard.press('Tab');
-      const next = page.locator('.r-reader-book-title a');
-      await expect(next).toBeFocused();
-      await expect(next).toBeInViewport();
-
-      await page.goForward();
-      await expect(page).toHaveURL(destinationURL);
-      await expect(destination).toBeFocused();
-      await expect(destination).toBeInViewport();
+      await verifyPassageHistory(page, path);
     });
   }
+
+  test('Firefox at 28px restores a visible passage on Forward and lets a reader scroll away', async ({ browserName, baseURL }) => {
+    test.skip(browserName !== 'firefox', 'Firefox provides a real minimum font preference');
+    test.setTimeout(60_000);
+    const browser = await firefox.launch({ firefoxUserPrefs: { 'font.minimum-size.x-western': 28 } });
+    try {
+      const page = await browser.newPage({ baseURL });
+      await verifyPassageHistory(page, chapter);
+
+      const destinationURL = page.url();
+      const destination = page.locator('#scalable-oversight-result');
+      const belowPassage = await page.evaluate(() => scrollY + innerHeight);
+      await page.evaluate(() => scrollBy({ top: innerHeight * 3, behavior: 'instant' }));
+      await expect(destination).not.toBeInViewport();
+
+      await page.goBack();
+      await expect(page).toHaveURL(new URL(chapter, destinationURL).href);
+      await expect(page.locator('a[href="#scalable-oversight-result"]')).toBeFocused();
+      await page.keyboard.press('Tab');
+      await page.goForward();
+      await expect(page).toHaveURL(destinationURL);
+      await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(belowPassage);
+      await expect(destination).not.toBeInViewport();
+      await expect(destination).not.toBeFocused();
+    } finally {
+      await browser.close();
+    }
+  });
 
   test('final citation restores its reading position with scripts enabled', async ({ page }) => {
     await verifyCitationHistory(page);

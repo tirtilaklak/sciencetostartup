@@ -27,6 +27,8 @@
   const navigation = window.navigation;
   if (navigation && document.querySelector('.r-bulk-shortcuts')) {
     const shortcutVisits = new Map();
+    const passage = link => document.getElementById(link.hash.slice(1));
+    const inView = bounds => bounds && bounds.bottom > 0 && bounds.top < innerHeight;
     let activatedShortcut;
     document.addEventListener('click', event => {
       activatedShortcut = event.isTrusted && !event.defaultPrevented && event.button === 0 &&
@@ -36,6 +38,14 @@
     navigation.addEventListener('navigate', event => {
       const link = activatedShortcut;
       activatedShortcut = null;
+      if (event.navigationType === 'traverse') {
+        const visit = shortcutVisits.get(navigation.currentEntry.key);
+        if (visit?.from === event.destination.key) {
+          // Remember the passage position only while the reader is still there.
+          const bounds = passage(visit.link)?.getBoundingClientRect();
+          visit.passageTop = inView(bounds) ? bounds.top : null;
+        }
+      }
       if (!link || event.sourceElement !== link || event.navigationType !== 'push' || !event.hashChange) return;
       navigation.addEventListener('currententrychange', ({ from, navigationType }) => {
         if (navigationType !== 'push') return;
@@ -50,15 +60,20 @@
       const key = navigation.currentEntry.key;
       const departure = shortcutVisits.get(from.key);
       const arrival = shortcutVisits.get(key);
-      const target = departure?.from === key ? departure.link
-        : arrival?.from === from.key ? document.getElementById(arrival.link.hash.slice(1)) : null;
-      if (!target) return;
+      const goingBack = departure?.from === key;
+      const target = goingBack ? departure.link : arrival?.from === from.key ? passage(arrival.link) : null;
+      if (!target || (!goingBack && arrival.passageTop === null)) return;
 
       // The browser restores scroll after currententrychange.
       requestAnimationFrame(() => {
         if (navigation.currentEntry.key !== key) return;
-        const { top, bottom } = target.getBoundingClientRect();
-        if (bottom > 0 && top < innerHeight) target.focus({ preventScroll: true });
+        let bounds = target.getBoundingClientRect();
+        // Some browsers can restore a different part of a long chapter on Forward.
+        if (!inView(bounds) && !goingBack && Number.isFinite(arrival.passageTop)) {
+          scrollBy({ top: bounds.top - arrival.passageTop, behavior: 'instant' });
+          bounds = target.getBoundingClientRect();
+        }
+        if (inView(bounds)) target.focus({ preventScroll: true });
       });
     });
   }
