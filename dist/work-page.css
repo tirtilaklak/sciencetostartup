@@ -8,7 +8,7 @@
 html[data-work-load] .work-page-filter-slot,.work-page-filter-slot:has(.work-page-filters:not([hidden])){margin-top:12px}
 .work-page-filter-slot>*{grid-area:1/1}
 .work-page-filters{display:grid;grid-template-columns:minmax(0,1fr);gap:8px 12px;margin:0;padding:8px 0;border:0;border-block:1px solid var(--border);border-radius:0;background:transparent}
-main>.work-page-filter-slot,main>.work-page-list,main>.work-page-groups,main>.work-results-toolbar,main>[data-work-comparison]{max-width:none}
+main>.work-page-filter-slot,main>.work-page-list,main>.work-page-disclosures,main>.work-results-toolbar,main>[data-work-comparison]{max-width:none}
 .work-page-filters[hidden],.work-page-empty[hidden],.work-page-group[hidden],.work-listing[hidden],.work-page-groups[hidden],.work-results-actions>[hidden],.work-load-status[hidden]{display:none}
 /* Keep the real controls in the layout while the enhancer loads. The failure
    notice shares the search slot without making unavailable controls tabbable. */
@@ -130,10 +130,14 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
  .work-page-filter-options>summary{grid-area:1/2;align-self:end}
  .work-page-filter-options::details-content{grid-area:2/1/3/-1}
 }
-.work-page-advice{max-width:780px;margin:0 0 6px;padding:0;border:0}
+.work-page-disclosures{margin-bottom:6px}
+.work-page-advice{max-width:780px;margin:0;padding:0;border:0}
 .work-page-advice>summary{display:list-item;min-height:44px;padding:11px 0;font-size:14px;line-height:1.5;color:var(--green);cursor:pointer}
 .work-page-advice[open]{padding-bottom:8px}
 .work-page-advice .note{margin-bottom:0}
+@media(max-width:600px),(max-height:820px){
+ .work-page-disclosures:not(:has(details[open])){display:flex;flex-wrap:wrap;gap:0 16px}
+}
 @media(orientation:landscape) and (max-height:460px){
  .static-page main:has(.work-page-heading){padding-top:10px}
  .static-page .work-crumbs ol{margin-bottom:8px}

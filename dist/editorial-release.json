@@ -1,19 +1,19 @@
 {
   "schema_version": "1.0.0",
-  "release_id": "2026-11-22.5",
+  "release_id": "2026-11-22.6",
   "as_of": "2026-11-22",
-  "publication_as_of": "2026-11-22T11:38:11Z",
+  "publication_as_of": "2026-11-22T12:28:37Z",
   "canonical_dataset_version": "2.5.0",
   "canonical_sha256": "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061",
-  "work_routes_sha256": "1580dacb389edacd9078843c651a9970de727b95ea7422f802739b9db637d26b",
+  "work_routes_sha256": "00be42a2f1707f1b5b02de5fc409398f0fcd2ae168efb1c6c9d76fd27a81ab7d",
   "counts": {
     "records": 135,
-    "work_routes": 69,
-    "named_listings": 48,
+    "work_routes": 70,
+    "named_listings": 49,
     "networks_programs": 21,
-    "providers": 28,
+    "providers": 29,
     "career_pages": 23,
-    "past_other_records": 32,
+    "past_other_records": 31,
     "other_company_jobs": 11
   },
   "calibration_route_ids": [
@@ -30,7 +30,7 @@
     "terac.work.finance-experts",
     "toloka.work.mindrift-code"
   ],
-  "review_scope": "The 22 November review checked 52 distinct routes in the source handoff, plus the two Prolific waitlists and the recorded RWS Polaris board action. Scoped reviews cover employer-posting terms and public destinations. Four exact missing listings, Terac’s explicit closure, APTO’s unpublished application and three superseded or general-intake listings remain as historical or informational records. Prior source checks and terms reviews remain in the record. The follow-up confirms Prolific participant eligibility and program intake wording, consolidates Pareto’s expert requirements and clarifies two AfterQuery schedule conflicts. The AIXI fellowship correction covers the advertised workplace and the empirical-project qualification alternative. The Surge AI fellowship correction records the application instructions and the absence of a workplace in the publisher’s description.",
+  "review_scope": "The 22 November review checked 52 distinct routes in the source handoff, plus the two Prolific waitlists and the recorded RWS Polaris board action. Scoped reviews cover employer-posting terms and public destinations. Three exact missing listings, Terac’s explicit closure, APTO’s unpublished application and three superseded or general-intake listings remain as historical or informational records. Prior source checks and terms reviews remain in the record. The follow-up confirms Prolific participant eligibility and program intake wording, consolidates Pareto’s expert requirements and clarifies two AfterQuery schedule conflicts. The AIXI fellowship correction covers the advertised workplace and the empirical-project qualification alternative. The Surge AI fellowship correction records the application instructions and the absence of a workplace in the publisher’s description. OOAK’s employer careers site lists the matching Data Quality Specialist role. The original YC posting still returns 404 and application access remains unconfirmed. The employer’s header and description give different experience thresholds.",
   "publication_policy": {
     "automated_checks_change_facts": false,
     "automated_check_interval_days": 1,
