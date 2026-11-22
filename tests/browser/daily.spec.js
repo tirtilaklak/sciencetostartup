@@ -103,7 +103,7 @@ async function assertContent(page, edition) {
 }
 
 async function assertSelections(page, items, total = latest.items.length) {
-  expect(await page.locator('.scan-item:visible').evaluateAll(rows => rows.map(row => row.id)))
+  await expect.poll(() => page.locator('.scan-item:visible').evaluateAll(rows => rows.map(row => row.id)))
     .toEqual(items.map(item => item.id));
   await expect(page.locator('#scan-count')).toHaveText(`${items.length} of ${total} selections`);
 }
