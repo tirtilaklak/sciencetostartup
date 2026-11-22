@@ -205,3 +205,13 @@ The corrected build is `f0975074a40dcf85aacb` at 1d4f9df6. All 1,278 payloads an
 The third review reproduced further issues. At ordinary 390px width, the native Work sort control provides at most 143px for a label that needs 181px. In the interactive Market evidence dialog, Handshake’s nearly $1B gross annualized AI revenue shows April 14 under “Date” and omits its April 2026 measurement period. The underlying claim and native profile do distinguish the dates. [Native Work at 390px](site-quality-20261121/work-build-f097507-native-sort-390.png)
 
 The Market evidence dialog also returned keyboard focus to an earlier ledger amount after chart and matrix actions. The reviewer saw focus return correctly after all 18 ledger actions, eight of 26 chart actions, and none of 23 matrix actions. In native Work, a keyboard Retry restored the Sage selection after a script failure but left the focused search box above the viewport when the saved fragment pointed to an excluded Mercor record. Chromium, Firefox and WebKit reproduced that sequence.
+
+## Third independent retest
+
+Ten reviewers matched all 52 affected Work records across four views. The 25 exact employer postings still carried the reviewed terms when read again. Across the two Research editions, 48 phone journeys and all 13 historical edition links passed. In Market, the reviewers opened 73 actions for 26 exact observations. They also found that the RWS history control labeled a change between the group and its Generate segment as a change of date.
+
+All five browser projects and the dedicated Research accessibility job passed. The 69 mobile Lighthouse reports matched their recorded hashes, and all 23 routes stayed within budget. Native Work’s median largest paint was 1.59 seconds with zero layout shift. At freeze the candidate published the approved November 18 Daily edition. The public site still published November 17. [Retest and receipt hashes](site-quality-20261121/third-retest.json) · [Dedicated mobile measurements](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45003145015/job/137148847439)
+
+## Fourth implementation
+
+The fourth round covers the reproduced native filter and Retry issues, the Market dates, and keyboard return after inspecting evidence. The RWS control must identify the selected business scope when two figures cover the same period.
