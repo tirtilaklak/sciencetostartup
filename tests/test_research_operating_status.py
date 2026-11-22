@@ -93,7 +93,7 @@ class OperatingStatusTests(unittest.TestCase):
         text = " ".join(parsed.text)
         self.assertIn("Next edition delayed", text)
         self.assertIn("November 16, 2026 at 9:00 a.m. Pacific", text)
-        self.assertIn("edition shown on this website remains November 12, 2026", text)
+        self.assertIn("Latest published edition November 12, 2026", text)
         self.assertIn("Status observed", text)
         self.assertNotIn("script", parsed.tags)
         self.assertNotIn("gate", text.lower())
@@ -199,11 +199,11 @@ class OperatingStatusTests(unittest.TestCase):
         result = self.validate(preparing, now=before)
         html = operating.operating_status_notice({operating.CONTEXT_KEY: result})
         self.assertIn("Next edition preparation", html)
-        self.assertIn("the next edition was being prepared for", html)
+        self.assertIn("The next edition was being prepared for", html)
         self.assertEqual(result, self.validate(preparing))
         self.assertEqual(html, operating.operating_status_notice({
             operating.CONTEXT_KEY: self.validate(preparing)}))
-        self.assertIn("At the recorded observation", html)
+        self.assertIn('Status observed <time datetime="2026-11-15T17:00:00Z">', html)
         with self.assertRaises(ValueError):
             self.validate({**preparing, "reason_codes": ["technical_checks"]}, now=before)
         with self.assertRaises(ValueError):
@@ -244,7 +244,7 @@ class OperatingStatusTests(unittest.TestCase):
         self.assertEqual({name: (self.root / name).read_bytes() for name in files}, files)
         self.assertIn("November 16, 2026 at 9:00 a.m. Pacific", after)
         self.assertIn("November 15, 2026 at 17:00:00 UTC", after)
-        self.assertIn("At the recorded observation", after)
+        self.assertIn('Status observed <time datetime="2026-11-15T17:00:00Z">', after)
         self.assertNotIn("published on time", after)
 
     def test_malformed_duplicate_symlink_oversized_and_nonfinite_status_refused(self):

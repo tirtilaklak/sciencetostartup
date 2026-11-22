@@ -187,7 +187,7 @@ test.describe('native navigation with enlarged Firefox text and no scripts', () 
               await research.click();
             }
             await expect(page).toHaveURL(researchURL);
-            await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Research on\s*AI data\./);
+            await expect(page.getByRole('heading', { level: 1 })).toHaveText('AI data research');
           }
         });
       }

@@ -57,7 +57,7 @@ test.describe('research without JavaScript', () => {
 
   test('hub opens all twelve complete native chapters without JavaScript', async ({ page }) => {
     await page.goto('/research/');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Research on');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('AI data research');
     await expect(page.locator('.r-chapter-list a')).toHaveCount(12);
     await page.getByRole('link', { name: 'Read the report →', exact: true }).click();
     await expect(page).toHaveURL(new RegExp(reportPath + '$'));
@@ -428,9 +428,9 @@ test('at 320 pixels the public header, navigation and page fit without horizonta
   }
   // Advanced app flows stay available by hash; the primary site nav opens the native pages.
   for (const [name, target, heading] of [
-    ['Daily scan', '/daily/', 'Daily scan.'],
+    ['Daily scan', '/daily/', 'Daily scan'],
     ['Companies', '/companies/', 'AI data companies'],
-    ['Paid work', '/work/', 'Find work in AI training.'],
+    ['Paid work', '/work/', 'Paid work in AI training'],
     ['About', '/method/#about', 'About'],
   ]) {
     await page.goto('/explore/#companies');

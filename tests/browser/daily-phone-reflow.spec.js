@@ -55,11 +55,11 @@ function filterLayout(grid) {
   const controls = [...grid.querySelectorAll('input, select')].map(measureControl);
   const scan = grid.closest('.daily-scan');
   const date = scan.querySelector('.scan-date-form select');
-  const rank = document.createRange();
-  rank.selectNodeContents(scan.querySelector('.scan-rank'));
-  const kind = scan.querySelector('.scan-kind').getBoundingClientRect();
+  const kind = document.createRange();
+  kind.selectNodeContents(scan.querySelector('.scan-kind'));
+  const kindLines = Array.from(kind.getClientRects(), ({ left, right }) => ({ left, right }));
   return { hint, selects, controls, searchTop: input.getBoundingClientRect().top,
-    documentWidth: document.scrollingElement.scrollWidth, rankGap: kind.left - rank.getBoundingClientRect().right,
+    documentWidth: document.scrollingElement.scrollWidth, kindLines,
     date: date.getClientRects().length ? { ...measureSelect(date), ...measureControl(date) } : null };
 }
 
@@ -103,7 +103,11 @@ test('Daily filter controls fit and have visible boundaries across Firefox text 
 
             const [topic, type] = layout.selects;
             expect(layout.documentWidth).toBe(width);
-            expect(layout.rankGap).toBeGreaterThanOrEqual(0);
+            expect(layout.kindLines.length).toBeGreaterThan(0);
+            for (const { left, right } of layout.kindLines) {
+              expect(left).toBeGreaterThanOrEqual(0);
+              expect(right).toBeLessThanOrEqual(width);
+            }
             if (width === 320 || (width === 390 && minimum > 0)) {
               expect(type.top).toBeGreaterThanOrEqual(topic.bottom);
             }

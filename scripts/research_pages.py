@@ -494,12 +494,11 @@ def _hub(context, editions=()):
                      + ''.join(f'<li>{_link(path, snapshot["report"]["release_id"])} · {_date(snapshot["report"]["updated_on"])}</li>'
                                for path, snapshot in editions) + '</ul></section>') if editions else ''
     return ('<header class="r-hero"><div>'
-            '<h1>Research on<br>AI data.</h1><p class="r-lede">A guide to the suppliers, papers and datasets behind AI training. '
-            'Every finding links to its sources.</p>'
+            '<h1>AI data research</h1><p class="r-lede">Research on the suppliers, papers and datasets behind AI training.</p>'
             f'<p class="r-status">{_status(context)}</p>'
             f'<p class="r-meta">Evidence snapshot {_date(context["graph"].get("as_of"))}</p></div>'
-            '<aside class="r-report-card" aria-label="Current research report"><p class="r-kicker">Current report</p>'
-            f'<h2>{_link(REPORT_PATH, report["title"])}</h2>'
+            '<aside class="r-report-card" aria-label="Current research report">'
+            f'<h2>{sp.escape(report["title"])}</h2>'
             f'<p>{len(report["sections"])} chapters on suppliers, human feedback, research methods and paid pilots.</p>'
             f'{_link(REPORT_PATH, "Read the report →", "r-button")}</aside></header>'
             + operating_status_notice(context) +
@@ -511,7 +510,7 @@ def _hub(context, editions=()):
             f'<summary>Report contents <span>{len(report["sections"])} chapters</span></summary>'
             f'<ol class="r-chapter-list">{chapters}</ol></details>'
             '<details class="r-disclosure" id="coverage"><summary>Publication status and coverage</summary>'
-            f'<p class="r-status">{_status(context)}</p>{_meta(context)}'
+            f'{_meta(context)}'
             f'<p class="r-section-intro">{sp.escape(report.get("summary"))}</p>'
             '<p class="r-section-intro">Publication totals count suppliers, distinct paper works and dataset or benchmark families. '
             'Browse counts also include individual versions. '
@@ -1241,16 +1240,25 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
             f'<ul class="r-downloads"><li>{_link("/publication/research-archive.zip", "Download the reproduction package")}</li>'
             f'<li>{_link("/publication/MANIFEST.json", "Package SHA-256 inventory")}</li>'
             f'<li>{_link("/publication/package-status.json", "Archive & mirror status")}</li></ul></section>')
-    return (f'<header class="r-page-head"><p class="r-kicker">{_status(context)}</p><h1>Open data.<br>Visible evidence.</h1>'
-            '<p class="r-lede">Inspect what is supported, what is inherited, and what still needs review. '
-            'Research counts come from the versioned evidence graph; earlier public identifiers are labeled separately.</p>' + _meta(context) + '</header>'
-            + operating_status_notice(context) +
-            '<section class="r-section" aria-labelledby="coverage"><h2 id="coverage">Progress toward publication</h2>'
-            + _progress(context) + f'<p>{sp.escape(_counts(context))}.</p>'
+    coverage = (_progress(context) + f'<p>{sp.escape(_counts(context))}.</p>'
             '<p>The frozen eligible core and two separate 200-record quality audits must also pass. The reference audit requires '
             '98% precision and 95% recall, with no critical false attribution. The screening audit must recover at least 190 records '
-            'and reach 90% recall in each major stratum.</p>' + _holds(context) + '</section>'
-            + download_citation +
+            'and reach 90% recall in each major stratum.</p>' + _holds(context))
+    if metadata:
+        intro = (f'<header class="r-page-head"><p class="r-kicker">{_status(context)}</p><h1>Open data.<br>Visible evidence.</h1>'
+                 '<p class="r-lede">Inspect what is supported, what is inherited, and what still needs review. '
+                 'Research counts come from the versioned evidence graph; earlier public identifiers are labeled separately.</p>' + _meta(context) + '</header>'
+                 + operating_status_notice(context)
+                 + '<section class="r-section" aria-labelledby="coverage"><h2 id="coverage">Progress toward publication</h2>'
+                 + coverage + '</section>' + download_citation)
+    else:
+        intro = ('<header class="r-page-head"><h1>Research data and sources</h1>'
+                 '<p class="r-lede">Download the data or look up a finding and its sources.</p>'
+                 + _meta(context) + '</header>' + download_citation
+                 + operating_status_notice(context)
+                 + '<details class="r-section r-disclosure" id="coverage"><summary>Publication checks and coverage</summary>'
+                 + coverage + '</details>')
+    return (intro +
             '<section class="r-section" aria-labelledby="assertions"><h2 id="assertions">Assertion records</h2>'
             '<p id="approved">Approved assertions retain their exact source bindings and review receipts.</p>'
             + ('' if any(row.get('status') == 'approved' for row in assertions.values()) else
@@ -1591,19 +1599,17 @@ def _record_correction(context, stable_id, path, title=''):
 def _review(context):
     identity = context["identity"]
     new_issue = _issue_endpoint(identity)
-    return ('<header class="r-page-head"><p class="r-kicker">Open methods. Specific corrections.</p><h1>Help make the<br>evidence better.</h1>'
-            '<p class="r-lede">Review a claim, challenge a missing qualification, or show how you reused the research. '
-            'A precise source and locator make a contribution useful.</p>' + _meta(context) + '</header>'
-            '<div class="r-browse-grid r-review-grid"><article class="r-browse-card"><p class="r-kicker">Correct a record</p>'
-            '<h2>A claim needs a change.</h2><p>Include its stable ID, the original source version and locator, the proposed wording, '
+    return ('<header class="r-page-head"><h1>Review the research</h1>' + _meta(context) + '</header>'
+            '<div class="r-browse-grid r-review-grid"><article class="r-browse-card">'
+            '<h2>Correct a record</h2><p>Include its record ID, the source version and page or section, the proposed wording, '
             'and the reason. Source and review dates are preserved when a correction is accepted.</p>'
             + _link(new_issue + '?template=correction.yml', 'Submit a correction →', 'r-text-link')
             + '<p>' + _link('/method/#corrections', 'Continue to private email') + '</p></article>'
-            '<article class="r-browse-card"><p class="r-kicker">Review a section</p><h2>Put a conclusion to the test.</h2>'
+            '<article class="r-browse-card"><h2>Review a chapter</h2>'
             '<p>Name the report release and chapter. Check the source support, alternatives, missing evidence, and practical '
             'implications. State relevant interests and whether scoped public credit is permitted.</p>'
             + _link(new_issue + '?template=section-review.yml', 'Contribute a review →', 'r-text-link') + '</article>'
-            '<article class="r-browse-card"><p class="r-kicker">Share a reuse</p><h2>Show the work it supports.</h2>'
+            '<article class="r-browse-card"><h2>Share how you used the data</h2>'
             '<p>Link a public artifact and explain which release, data, or methods you used. A visit, download, or repository star '
             'is an activity measure, not evidence of adoption.</p>'
             + _link(new_issue + '?template=reuse.yml', 'Report a public reuse →', 'r-text-link') + '</article></div>'
@@ -1724,9 +1730,8 @@ def _correction_url(row):
 def _corrections_page(context, rows):
     prepublication = sum(row['status'] == 'accepted' for row in rows)
     errata = sum(row['status'] == 'published' for row in rows)
-    body = ('<header class="r-page-head"><p class="r-kicker">Research correction log</p><h1>Corrections</h1>'
-            '<p class="r-lede">Accepted corrections identify the affected edition and claim, preserve the correction date, '
-            'and link to supporting evidence.</p><p>'
+    body = ('<header class="r-page-head"><h1>Research corrections</h1>'
+            '<p class="r-lede">Each correction links to the original claim and its evidence. Review notes describe how it was checked.</p><p>'
             + sp.plural(prepublication, 'accepted prepublication correction') + ' · '
             + sp.plural(errata, 'published-edition erratum', 'published-edition errata')
             + '</p>' + _meta(context) + '</header>'
@@ -1737,14 +1742,15 @@ def _corrections_page(context, rows):
     for row in rows:
         stamp = row['instant'].isoformat().replace('+00:00', 'Z')
         body += (f'<article class="r-source" id="{sp.escape("correction-" + row["id"])}"><h2>'
-                 + _link(_correction_url(row), 'Correction for ' + row['claim_id']) + '</h2><p>' + sp.escape(row['summary']) + '</p><dl class="r-facts">'
+                 + _link(_correction_url(row), 'Correction for ' + row['claim_id']) + '</h2><dl class="r-facts">'
                  f'<dt>Status</dt><dd>{sp.escape(row["status"].capitalize())}</dd>'
                  f'<dt>Edition</dt><dd>{sp.escape(row["edition_id"])}</dd>'
                  '<dt>Claim</dt><dd>' + _link(_evidence_url('assertion', row['claim_id']), row['claim_id']) + '</dd>'
                  + ('<dt>Approved replacement</dt><dd>' + _link(_evidence_url('assertion', row['replacement_claim_id']), row['replacement_claim_id']) + '</dd>' if row.get('replacement_claim_id') else '') +
                  f'<dt>Corrected</dt><dd><time datetime="{stamp}">{stamp}</time></dd></dl>'
                  '<h3>Supporting evidence</h3><ul>'
-                 + ''.join('<li>' + _link(url, url) + '</li>' for url in row['evidence_urls']) + '</ul></article>')
+                 + ''.join('<li>' + _link(url, url) + '</li>' for url in row['evidence_urls']) + '</ul>'
+                 + '<details class="r-disclosure"><summary>Review notes</summary><p>' + sp.escape(row['summary']) + '</p></details></article>')
     return body
 
 
@@ -1888,9 +1894,9 @@ def write_research_pages(output, context):
                 context['_page_revisions'].get(path) or observed_day, observed_day)
     download_sizes = {url: file.stat().st_size for url in DATA_JSON_DOWNLOADS
                       if (file := output / url.lstrip('/')).is_file()}
-    pages = [("/research/", "Human data research", "Public-source research connecting AI data suppliers, papers, datasets, benchmarks, and workflows, with visible evidence and coverage.", _hub(context, editions), "CollectionPage", None),
+    pages = [("/research/", "AI data research", "Source-linked research on the suppliers, papers and datasets behind AI training.", _hub(context, editions), "CollectionPage", None),
              (REPORT_PATH, context["report"]["title"], context["report"].get("summary", "Research methods and findings."), _report(context), "Book", None),
-             ("/research/data/", "Research data & evidence", "Versioned research data, source and assertion permalinks, publication progress, citations, and reproducible downloads.", _data(context, download_sizes=download_sizes), "CollectionPage", None),
+             ("/research/data/", "Research data and sources", "Download the research data or look up a finding and its sources.", _data(context, download_sizes=download_sizes), "CollectionPage", None),
              ("/review/", "Review & correct the research", "Contribute a source-backed correction, scoped review, or public reuse of ScienceToStartup research.", _review(context), "WebPage", None),
              (CORRECTIONS_PATH, "Research corrections", "Accepted research corrections, with affected editions, claims, correction dates and supporting evidence.", _corrections_page(context, corrections), "CollectionPage", None)]
     pages.extend((_reader_path(section), section['title'],

@@ -80,8 +80,7 @@ async function assertContent(page, edition) {
     };
     const field = label => [...row.querySelectorAll('dl > div')]
       .find(pair => pair.querySelector('dt').textContent === label).querySelector('dd').textContent;
-    return { id: row.id, rank: Number(row.querySelector('.scan-rank').textContent),
-      kind: row.dataset.kind, topics: row.dataset.topics.split('|'),
+    return { id: row.id, kind: row.dataset.kind, topics: row.dataset.topics.split('|'),
       publisher: row.querySelector('.scan-meta > span:nth-child(2)').textContent,
       publishedOn: row.querySelector('time').getAttribute('datetime'),
       title: text(row.querySelector('h2 a')), primaryURL: row.querySelector('h2 a').getAttribute('href'),
@@ -92,8 +91,8 @@ async function assertContent(page, edition) {
         url: link.getAttribute('href'), label: text(link),
       })), permalink: row.querySelector('.scan-permalink').getAttribute('href') };
   }));
-  expect(actual).toEqual(edition.items.map((item, index) => ({
-    id: item.id, rank: index + 1, kind: item.kind, topics: item.topics, publisher: item.publisher,
+  expect(actual).toEqual(edition.items.map(item => ({
+    id: item.id, kind: item.kind, topics: item.topics, publisher: item.publisher,
     publishedOn: item.published_on, title: item.title, primaryURL: item.sources[0].url,
     explanation: item.explanation.map(sentence => sentence.trim()).join(' '),
     focus: item.focus, finding: item.finding, caveat: item.caveat, readScope: item.read_scope,

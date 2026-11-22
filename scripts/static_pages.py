@@ -69,7 +69,7 @@ DISCLOSURE = "The publisher is also proposing an AI research lab, described on t
 WORK_DISCLOSURE = "The publisher has applied for paid work at some profiled companies and is a member of A.Team's talent network."
 # Cloudflare Web Analytics is injected at the edge. Both About texts (web/index.html and /method/) say so in these words.
 VISITS_NOTE = "Visits are counted by Cloudflare Web Analytics, which sets no cookies."
-COVERAGE = "The guide is a selected study of the market. It does not list every company."
+COVERAGE = "The guide covers selected companies."
 LOGO_NOTE = "Company names and logos belong to their owners and identify them here."
 NOT_YET_PROFILED = ("Uber AI Solutions", "TELUS Digital", "CloudFactory", "SuperAnnotate", "Encord", "Defined.ai", "LXT", "Welocalize")
 LINK_STATES = {"not_found": "page unavailable", "gone": "page unavailable", "sign_in": "sign-in required"}
@@ -1491,8 +1491,10 @@ def company_work_html(research, company, routes, compact=False):
     return heading + "".join(body)
 
 
-def safety_note():
-    return f'<div class="note"><p><strong>Before you apply.</strong> Never pay to get work. Apply only through the company\'s own website. {external_link(SCAM_GUIDE, "How to spot a job scam")}</p></div>\n'
+def safety_note(show_label=True):
+    label = "<strong>Before you apply.</strong> " if show_label else ""
+    return (f'<div class="note"><p>{label}Never pay to get work. Use the employer’s official site or a form it links to. '
+            f'{external_link(SCAM_GUIDE, "How to spot a job scam")}</p></div>\n')
 
 
 def company_title(name, figures, has_work):
@@ -1862,8 +1864,8 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     body.append(f'<details class="company-fold"><summary><span>Paid work</span><small>{plural(len(paid_open), "listing or network", "listings and networks") if paid_open else "No confirmed listing"}</small></summary><div class="company-fold-body">' + company_work + '</div></details>')
     source_count = sum(source.get("company_id") == cid for source in research.data.get("sources", []))
     claim_count = sum(claim.get("company_id") == cid for claim in research.data.get("claims", []))
-    body.append(f'<details class="company-fold"><summary id="sources" data-native-sources><span>Sources &amp; data</span><small>{plural(source_count, "source")}</small></summary><div class="company-fold-body"><h2 id="full-profile">Sources and data</h2>'
-                f'<p>{plural(claim_count, "claim")} · {plural(source_count, "source")} · Research compiled {escape(format_date(research.as_of))}</p>'
+    body.append(f'<details class="company-fold"><summary id="sources" data-native-sources><span>Sources &amp; data</span><small>{plural(source_count, "source")}</small></summary><div class="company-fold-body"><h2 id="full-profile">Source records</h2>'
+                f'<p>{plural(claim_count, "claim")} · Research compiled {escape(format_date(research.as_of))}</p>'
                 + (f'<p><a href="/company/{cid}/work-sources/">{plural(len(work_source_ids), "paid work source")}</a></p>' if work_source_ids else '')
                 + company_sources_html(research, cid, name, work_source_ids, business_health) +
                 f'<ul class="company-source-links"><li><a href="{app_url}/sources">Source ledger</a></li><li><a href="{app_url}/people">Funding and people</a></li><li><a href="{ORIGIN}/research.json" download>Research JSON</a></li><li><a href="{ORIGIN}/observatory.sqlite" download>SQLite database</a></li></ul>'
@@ -1907,12 +1909,11 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
     order = group_order(groups)
     nonprofit = len(groups.get("Nonprofit research", []))
     compiled = f" · {'historical ' if current_entries else ''}research compiled {format_date(research.as_of)}" if research.as_of else ""
-    additions = f" · {historical_count} original profiles + {len(current_entries)} current additions" if current_entries else ""
     logos = {row['company_id']: row for row in json.loads((ROOT / 'data/logo-provenance.json').read_text()).get('logos', []) if row.get('status') == 'verified' and row.get('local_path')}
     body = ['<link rel="stylesheet" href="/companies-page.css">', crumb_nav(crumbs, "directory-crumbs"),
             '<header class="directory-intro"><h1>AI data companies</h1></header>',
             '<form class="directory-filters" id="company-filters" role="search" hidden><label>Search companies<input type="search" id="company-query" name="q" placeholder="Name, offering, or specialty" autocomplete="off"></label><label>Business group<select id="company-group" name="group"><option value="">All groups</option>' + ''.join(f'<option value="{group_slug(g)}">{escape(labels.get(g, g))}</option>' for g in order) + '</select></label><button type="reset">Clear</button></form>',
-            f'<div class="directory-results-bar"><p class="directory-result" id="company-count" role="status" aria-live="polite">{count} companies</p><a class="directory-compare" href="/explore/#compare">Compare {historical_count} original profiles</a></div>',
+            f'<div class="directory-results-bar"><p class="directory-result" id="company-count" role="status" aria-live="polite">{count} companies</p><a class="directory-compare" href="/explore/#compare">Compare {historical_count} companies</a></div>',
             '<p class="directory-selected-group" data-directory-selected-group hidden></p>',
             '<p id="company-empty" class="directory-empty" hidden>No companies in this directory match. <a data-full-guide-search href="/?search=#browse-guide">Search the full guide</a></p>',
             '<nav class="directory-groups" aria-label="Business groups"><ul class="chips">' + "".join(f'<li><a href="#{group_slug(g)}">{escape(labels.get(g, g))} <span>{len(groups[g])}</span></a></li>' for g in order) + "</ul></nav>\n"]
@@ -1942,8 +1943,8 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
         body.append(f'<section class="directory-section" data-group="{group_slug(g)}"><div class="directory-section-heading"><h2 id="{group_slug(g)}" tabindex="-1">{escape(labels.get(g, g))}</h2><span>{plural(len(groups[g]), "company", "companies")}</span></div><ul class="index-list directory-grid">{"".join(items)}</ul></section>\n')
     missing = [name for name in NOT_YET_PROFILED if not any(name.casefold() in row["name"].casefold().split(" / ") for row in current_entries)]
     remaining = f' Firms not yet listed in this directory include {escape(join_words(missing))}.' if missing else ''
-    scope = (f' The {len(current_entries)} current additions retain separate dated Wikipedia attribution and official-source offering checks. They do not change the {historical_count}-company historical dataset or published research coverage.' if current_entries else '')
-    body.append(f'<details class="directory-scope"><summary>Coverage and sources</summary><p>{count} profiles · {len(groups)} business groups{additions}{escape(compiled)}</p><p>{COVERAGE}{remaining}</p>' + (f'<p>{scope.strip()}</p>' if scope else '') + '<p>Each figure keeps its reporting date, business scope and source. Historical profiles list any paid work recorded.' + (f' {count_word(nonprofit)} of the {count} are nonprofit research groups.' if nonprofit else '') + f'</p><a href="{ORIGIN}/method/">How we check the research</a></details>')
+    scope = (f'Compare uses the {historical_count} historical profiles. The {len(current_entries)} newer profiles cite dated Wikipedia context and official sources for their offerings.' if current_entries else '')
+    body.append(f'<details class="directory-scope"><summary>Coverage and sources</summary><p>{len(groups)} business groups{escape(compiled)}.</p><p>{COVERAGE}{remaining}</p>' + (f'<p>{scope}</p>' if scope else '') + '<p>Figures show their reporting date, business scope and source.' + (f' {count_word(nonprofit)} of the {count} companies are nonprofit research groups.' if nonprofit else '') + f'</p><a href="{ORIGIN}/method/">How we check the research</a></details>')
     if work_count:
         body.append(f'<p class="actions directory-next"><a href="{ORIGIN}/work/">See {plural(work_count, "paid work route")}</a></p>')
     body.append('<script src="/companies-page.js" data-page-enhancement-script defer></script>')
@@ -2011,7 +2012,7 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
         for key, label in WORK_ENGAGEMENT_LABELS.items()
     )
     body = ['<link rel="stylesheet" href="/work-page.css">\n<div class="work-page-intro">', crumb_nav(crumbs, "work-crumbs"),
-            '<header class="work-page-heading" id="work-directory"><h1>Find work in AI training.</h1></header></div>\n',
+            '<header class="work-page-heading" id="work-directory"><h1>Paid work in AI training</h1></header></div>\n',
             '<div class="work-page-filter-slot" data-work-filter-slot><form class="work-page-filters" data-work-filters hidden role="search" aria-label="Find paid work" id="work-filters">'
             '<label class="work-page-search">Search listings<input name="q" type="search" placeholder="Role, skill or firm" maxlength="256" autocomplete="off" id="name-filter"></label>'
             '<details class="work-page-filter-options"><summary>Filters</summary><div class="work-page-filter-fields">'
@@ -2022,7 +2023,7 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
             '<label>Sort<select name="sort"><option value="">Default order</option><option value="hourly">Top listed pay/hr</option><option value="checked">Last checked</option></select></label>'
             '<button type="reset" class="work-page-clear">Clear</button></div></details></form>'
             '<div class="work-load-status" data-work-load-status hidden><p data-work-load-message role="status"></p><button type="button" data-work-retry hidden>Retry filters</button></div></div>'
-            '<noscript><p data-work-native-fallback>Filters need JavaScript. Showing the full directory. Use your browser’s Find command to look for a company or role.</p></noscript>'
+            '<noscript><p data-work-native-fallback>Filters need JavaScript. Use your browser’s Find command to search the full list.</p></noscript>'
             '<div class="work-page-tools"><div class="work-results-toolbar" data-work-toolbar id="work-results">'
             '<p class="work-page-results" data-work-count aria-live="polite" aria-atomic="true">'
             f'{count_label}</p>'
@@ -2031,7 +2032,7 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
             '<p class="work-export-status" data-work-export-status aria-live="polite"></p>'
             '<div class="work-page-disclosures"><details class="work-page-groups work-section-disclosure"><summary>Jump to section</summary>'
             f'{directory_counts}<nav aria-label="Work sections" data-work-section-navigation><ul>{section_links}</ul></nav></details>'
-            '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Pay and availability may have changed. Current openings and individual eligibility are not guaranteed. The employer decides who can apply and who is selected. Check the company’s page before applying.' + (f' Links checked up to {escape(format_date(checked))}.' if checked else '') + '</p>\n' + safety_note() + '</details></div></div>\n',
+            '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Check the employer’s page for current openings, pay and eligibility.' + (f' Latest link check {escape(format_date(checked))}.' if checked else '') + '</p>\n' + safety_note(show_label=False) + '</details></div></div>\n',
             '<div class="work-page-empty" data-work-empty hidden><p>No records match. Try another word or clear the filters.</p><button type="button" data-work-clear>Clear search and filters</button></div>\n',
             '<section id="work-integrated-table" data-work-comparison hidden><h2 tabindex="-1">Compare paid work results</h2></section>',
             '<div class="work-page-list">']
@@ -2043,7 +2044,7 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
             body.append(f'<section class="work-page-group" data-work-group="{key}">{contents}</section>\n')
         else:
             body.append(f'<details class="work-page-group work-page-secondary" data-work-group="{key}"><summary>{label} <span>{len(buckets[key])}</span></summary>{contents}</details>\n')
-    body.append('</div><p class="work-page-more"><a href="/explore/#work" data-work-explore>Compare pay and download results</a></p>')
+    body.append('</div><p class="work-page-more"><a href="/explore/#work" data-work-explore>Open Work in Explore</a></p>')
     structured = page_node("CollectionPage", title, description, canonical, modified, crumbs)
     return document(research, title, description, canonical, "".join(body), structured, current="work", work_script=work_script)
 
@@ -2079,16 +2080,15 @@ def render_method(research, sizes, modified):
             f'<p>Email address <span>{escape(CORRECTION_EMAIL)}</span></p>'
             f'<a href="{ORIGIN}/research/corrections/">Read the accepted correction log</a></div></aside>\n',
             '<div class="method-sections"><details class="method-detail" id="disclosures"><summary>Publisher and disclosures</summary><div class="method-detail-body">\n'
-            f'<p>{SITE_NAME} is published by {escape(PUBLISHER_NAME)}. It is a public-source research guide to the companies that produce AI training data.</p>\n'
             '<p>No profiled company has paid for coverage, and none is a customer, investor or affiliate of the publisher.</p>\n'
             f'<p>{escape(WORK_DISCLOSURE)}</p>\n'
             f'<p><strong>Disclosure.</strong> {disclosure_html()}</p>\n'
             '<p><strong>Personal data and removal.</strong> Company profiles name founders and executives from public company sources only. Profiles do not show personal contact details. If you are named here and want a record corrected or removed, <a href="#corrections">send a correction request</a>. '
             f'{VISITS_NOTE}</p></div></details>\n',
             '<details class="method-detail" id="method-notes"><summary>How we check figures</summary><div class="method-detail-body"><h2 id="figures">How figures are shown</h2>\n'
-            '<p>Each claim links to its evidence. A figure keeps its reporting period and business scope. Missing figures stay unknown.</p><ul>'
-            '<li>Each figure keeps its date and business scope: the whole company or one segment.</li>'
-            '<li>Key figures use supported claims about reported results. The interactive guide follows the same rule.</li>'
+            '<p>Each claim links to its evidence. Missing figures stay unknown.</p><ul>'
+            '<li>Figures keep their reporting period and business scope, whether they cover a segment or the whole company.</li>'
+            '<li>Key figures show reported results supported by sources.</li>'
             '<li>Talks, unverified reports, and conflicting sources appear separately as Not confirmed, with their status in words.</li>'
             + (f'<li>Historical marks figures from {int(year.group(0)) - 2} or earlier.</li>' if year else '')
             + '<li>Annualized pace projects recent revenue across a full year. Gross or net revenue is stated when the source specifies it.</li>'

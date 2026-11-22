@@ -265,12 +265,12 @@ def write_daily_feeds(folder, context):
     (folder / "feed.xml").write_bytes(ET.tostring(rss, encoding="utf-8", xml_declaration=True) + b"\n")
 
 
-def card(item, rank, edition):
+def card(item, edition):
     sources = "".join(f'<li>{external_link(source["url"], source["label"])}</li>' for source in item["sources"])
     topics = " · ".join(item["topics"])
     explanation = " ".join(sentence.strip() for sentence in item["explanation"])
     return (f'<article class="scan-item" id="{e(item["id"])}" data-kind="{e(item["kind"])}" data-topics="{e("|".join(item["topics"]))}">'
-            f'<span class="scan-rank" aria-label="Selection {rank}">{rank:02d}</span><div class="scan-item-body">'
+            '<div class="scan-item-body">'
             f'<div class="scan-meta"><span class="scan-kind">{e(item["kind"])}</span><span>{e(item["publisher"])}</span>'
             f'<span>Source <time datetime="{item["published_on"]}">{format_date(item["published_on"])}</time></span></div>'
             f'<h2>{external_link(item["sources"][0]["url"], item["title"])}</h2>'
@@ -297,7 +297,7 @@ def render(edition, editions, canonical, root=ROOT, context=None):
     options = "".join(f'<option value="{row["date"]}"' + (' selected' if row["date"] == day else '') + f'>{format_date(row["date"])}</option>' for row in reversed(editions))
     topic_options = "".join(f'<option>{e(topic)}</option>' for topic in TOPICS)
     kind_options = "".join(f'<option>{e(kind)}</option>' for kind in KINDS)
-    items = "".join(card(item, i + 1, edition) for i, item in enumerate(edition["items"]))
+    items = "".join(card(item, edition) for item in edition["items"])
     source_dates = [item["published_on"] for item in edition["items"]]
     attribution = context.wikipedia if context is not None else load_wikipedia_context(root)[0]
     contexts = "".join(f'<div><h3>{e(row["label"])}</h3><blockquote>{e(row["sentence"])}</blockquote><p class="scan-credit"><a href="{e(row["revision_url"])}">Wikipedia · {e(row["title"])}</a> · <a href="{e(row["history_url"])}">Authors & history</a> · <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> · Verbatim excerpt</p></div>' for row in attribution["entries"])
@@ -306,14 +306,14 @@ def render(edition, editions, canonical, root=ROOT, context=None):
         f'>{format_date(row["date"])} <span>{len(row["items"])} items</span></a>'
         for row in reversed(editions)
     )
-    body = (f'<div class="daily-scan" data-edition="{day}"><header class="scan-heading"><div><p class="eyebrow">THE DAILY READING LIST</p>'
-            '<h1>Daily scan<span>.</span></h1><p class="scan-deck">RLHF, data & the companies behind AI.</p></div>'
-            f'<div class="scan-issue"><span>ISSUE {current + 1:03d}</span><strong><time datetime="{day}">{format_date(day)}</time></strong><span>Pacific time</span></div></header>'
+    body = (f'<div class="daily-scan" data-edition="{day}"><header class="scan-heading"><div>'
+            '<h1>Daily scan</h1><p class="scan-deck">Papers, datasets and company news on AI training.</p></div>'
+            f'<time class="scan-issue" datetime="{day}">{format_date(day)}</time></header>'
             f'<nav class="scan-edition-nav" aria-label="Snapshots">{steps}'
             # Keep the links visible on a native history return even when the
             # browser recreates the document and loses its disclosure state.
             f'<details class="scan-archive-disclosure" open><summary>Snapshot archive and feeds</summary><div class="scan-archive">{archive}</div>'
-            '<nav class="scan-follow" aria-label="Follow Daily scan"><strong>Follow Daily scan</strong> '
+            '<nav class="scan-follow" aria-label="Follow Daily scan">'
             '<a href="/daily/feed.xml">RSS</a> <a href="/daily/feed.json">JSON Feed</a> '
             '<a href="/research/feed.xml">Research editions</a> <a href="/research/corrections/feed.xml">Research corrections</a></nav></details>'
             '<script>document.currentScript.previousElementSibling.open=false</script>'
@@ -326,7 +326,7 @@ def render(edition, editions, canonical, root=ROOT, context=None):
             '<script>if(matchMedia("(max-width:600px)").matches)document.currentScript.previousElementSibling.open=false</script>'
             f'<div class="scan-list-heading"><p id="scan-count" role="status" aria-live="polite">{len(edition["items"])} selections</p><span>Source dates: {format_date(min(source_dates))} – {format_date(max(source_dates))}</span><button type="button" id="scan-reset" hidden>Clear filters</button></div>'
             f'<div class="scan-list">{items}</div><div id="scan-empty" class="scan-empty" hidden><h2>No matching items</h2><button type="button" id="scan-empty-reset">Clear filters</button></div>'
-            '<footer class="scan-notes"><details><summary>Dates, sources & background</summary><dl><div><dt>Snapshot</dt><dd>Selection date in America/Los_Angeles</dd></div><div><dt>Source date</dt><dd>Original publication, release or arXiv submission; updates labeled separately</dd></div><div><dt>Selection</dt><dd>Recent papers, datasets and company announcements; source-linked facts; author and company results attributed</dd></div><div><dt>Coverage</dt><dd>Selected reading list; abstracts and announcements where indicated; no independent replication</dd></div><div><dt>Writing</dt><dd>Plain-language explanations paraphrase original sources; verbatim Wikipedia background excerpts below</dd></div></dl>'
+            '<footer class="scan-notes"><details><summary>Dates, sources & background</summary><dl><div><dt>Snapshot</dt><dd>Selection date in Pacific time</dd></div><div><dt>Source date</dt><dd>Original publication, release or arXiv submission. We label later updates.</dd></div><div><dt>Coverage</dt><dd>We attribute results to their authors and flag readings based on abstracts or announcements. The list includes no independent replication.</dd></div><div><dt>Background</dt><dd>Story summaries paraphrase the sources. Wikipedia excerpts below are verbatim.</dd></div></dl>'
             f'<div class="scan-context">{contexts}</div><a href="/daily/wikipedia-context.json">Wikipedia revision & download records</a></details>'
             f'<p>Site search covers the latest {RECENT_EDITIONS} Daily editions.</p>'
             f'<a class="scan-download" href="{_edition_path(edition)}snapshot.json" download>Download this snapshot · JSON</a></footer></div>')

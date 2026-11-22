@@ -11,7 +11,7 @@ test('native Companies carries the exact saved search result into Compare', asyn
   await expect(results).toHaveAttribute('data-company', 'mercor');
   await expect(action).toHaveAttribute('href', '/explore/#compare/mercor');
   await expect(action).toBeInViewport({ ratio: 1 });
-  await expect(page.getByRole('link', { name: 'Compare 39 original profiles' })).toBeInViewport({ ratio: 1 });
+  await expect(page.getByRole('link', { name: 'Compare 39 companies' })).toBeInViewport({ ratio: 1 });
   const directoryURL = page.url();
   expect(Object.fromEntries(new URL(directoryURL).searchParams)).toEqual({ group: 'expert-data-evaluation', reader: 'keep', q: 'Mercor' });
 
@@ -45,7 +45,7 @@ test('the directory offers historical comparisons and current-only profile links
   await expect(results).toHaveAttribute('data-company', 'org.dataforce');
   await expect(results.getByRole('link', { name: 'TransPerfect / DataForce' })).toHaveAttribute('href', /\/company\/org\.dataforce\/$/);
   await expect(results.locator('.directory-compare')).toHaveCount(0);
-  await expect(page.getByRole('link', { name: 'Compare 39 original profiles' })).toHaveAttribute('href', '/explore/#compare');
+  await expect(page.getByRole('link', { name: 'Compare 39 companies' })).toHaveAttribute('href', '/explore/#compare');
   await page.getByRole('button', { name: 'Clear', exact: true }).click();
   await expect(results).toHaveCount(55);
   const historical = results.locator('.directory-compare');

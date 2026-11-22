@@ -859,7 +859,7 @@ class StaticPageTests(unittest.TestCase):
         self.assertIn(f'data-work-count aria-live="polite" aria-atomic="true">{len(self.routes)} records, including career pages and past listings</p>', work)
         self.assertIn(f"See {len(paid)} paid work routes</a>", (self.dist / "companies/index.html").read_text())
         checked = max(d for r in self.routes for d in (r.get("availability_checked_on"), (r.get("last_route_check") or {}).get("date")) if d)
-        self.assertIn(f"Links checked up to {sp.format_date(checked)}", work)
+        self.assertIn(f"Latest link check {sp.format_date(checked)}", work)
         for path in self.html_files():
             self.assertNotRegex(plain(path.read_text()), r"\bopen (?:paid work )?listings?\b", str(path.relative_to(self.dist)))
 
