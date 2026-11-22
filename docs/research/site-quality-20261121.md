@@ -4,7 +4,7 @@ The audit began at 7:30 PM Pacific on November 21, 2026. The first three hours a
 
 ## Current pass
 
-Ten GPT-6.2 Sol Ultra reviewers completed the first three-hour audit at 10:30 PM Pacific on November 21. Ten different Sol Ultra implementers completed the first patch, with six working at once. A separate ten-person cohort completed the first independent retest. Ten second-round contributors delivered the next candidate. Its independent review is underway. They own Home, Work source decisions, native pages, Work filtering and export, research wrappers, search, shared navigation, finance, Compare, and Daily. The production manifest identifies build `d8d18622a82c541129c1`. The repository baseline is main at `4d7dae5d40c1dea7978ab519cd3ac66d547cf29f`, with checked-in build `6d57f30fbf456b1e48a8`. The deployed Daily index contains the November 17 issue. The repository contains the November 18 issue. A push to GitHub alone does not publish the Worker.
+Ten GPT-6.2 Sol Ultra reviewers completed the first three-hour audit at 10:30 PM Pacific on November 21. Ten different Sol Ultra implementers completed the first patch, with six working at once. A separate ten-person cohort completed the first independent retest. Ten second-round contributors delivered the next candidate. Ten independent reviewers completed its retest. The third patch is underway. They own Home, Work source decisions, native pages, Work filtering and export, research wrappers, search, shared navigation, finance, Compare, and Daily. The production manifest identifies build `d8d18622a82c541129c1`. The repository baseline is main at `4d7dae5d40c1dea7978ab519cd3ac66d547cf29f`, with checked-in build `6d57f30fbf456b1e48a8`. The deployed Daily index contains the November 17 issue. The repository contains the November 18 issue. A push to GitHub alone does not publish the Worker.
 
 The verification ledger covers H1–H3, W1–W3, S1–S5, E1–E5, R1–R4, N1–N2 and D1. The screenshots and working browser trials below establish candidate behavior during the audit window. Production verification follows the implementation and independent retest.
 
@@ -189,3 +189,13 @@ The second frozen build is `bd112c3ccc17282c5d59`, checked into 7c88072e with ed
 The second review found that setting Chromium’s default text size to 32px clips the Work sort label and lets Filters overlap the search box at 320px and 390px. Standard 200% page zoom passed. [320px enlarged-text screenshot](site-quality-20261121/work-build-bd112c3-enlarged-320.png)
 
 Twenty-five risk dialogs still describe a research intake day as a date supplied by a source. The evidence file lists the exact claims and three date controls. Two compatibility tests also exposed old Home and Work markup that fails with newer JavaScript. The original production Worker still served all traffic at the freeze. The pass ends at 7:30 PM Pacific on November 22.
+
+## Second independent retest
+
+Both phone and desktop opened all 245 Explore destinations. All 135 Work records were accounted for across the 33 dispositions and 25 employer posts. The reviewer verified the original 77 field-to-source bindings in native Work, company profiles and Explore. All 47 Daily selections and their 94 labelled source links agreed across the issued snapshots and feeds. The dated publication remains November 18 on this candidate. Production still showed November 17 at the midnight checkpoint.
+
+All 69 mobile Lighthouse measurements passed across 23 routes. Native Work recorded zero layout shift in all three dedicated runs. Datasets had median blocking time of 139ms and Methods 97ms. The Explore footer, enlarged-text controls and historical Report link still need changes. WebKit also leaves the final Technical citation offscreen when a reader presses Shift+Tab from the bibliography with JavaScript off. The full browser workflow on 7c88072e reports 23 failures in each project. [Retest findings and receipt hashes](site-quality-20261121/second-retest.json) · [Mobile measurements](https://github.com/tirtilaklak/sciencetostartup/actions/runs/44999835797/job/137138721750)
+
+## Third implementation
+
+The third cohort is fixing those reproduced findings and testing stale native Work scripts through the actual loading and retry paths. A missing old script can legitimately show all records. The failure under review instead showed four records while announcing the full list of 135, and the search field covered Retry.

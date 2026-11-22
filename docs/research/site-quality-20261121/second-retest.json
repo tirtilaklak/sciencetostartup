@@ -1,0 +1,188 @@
+{
+  "candidate": "bd112c3ccc17282c5d59",
+  "manifest_sha256": "21709d30cf8850ea9646325ddcbae62b192e54e9c25fcff5a244279743cf7b1d",
+  "source_commit": "7c88072e0fe792f821876c8cfe4fc61f9a85d649",
+  "cohort": {
+    "model": "gpt-6.2-sol",
+    "reasoning_effort": "ultra",
+    "reviewers": [
+      "retest2_work",
+      "retest2_finance",
+      "retest2_contacts",
+      "retest2_native",
+      "retest2_home",
+      "retest2_reading",
+      "retest2_nav",
+      "retest2_perf",
+      "retest2_daily",
+      "retest2_release"
+    ],
+    "maximum_concurrent_subagents": 6
+  },
+  "work": {
+    "work_actions": 33,
+    "employer_entries": 25,
+    "retained_archive_acceptance_checks": 276,
+    "cross_surface_checks": {
+      "native": {
+        "actions_matched": 52,
+        "field_bindings_matched": 77
+      },
+      "company": {
+        "actions_matched": 52,
+        "field_bindings_matched": 77
+      },
+      "explore": {
+        "actions_matched": 52,
+        "field_bindings_matched": 77
+      },
+      "explore_profile": {
+        "actions_matched": 40,
+        "field_bindings_matched": 37
+      }
+    },
+    "native_aria_names": {
+      "work": 135,
+      "company": 135
+    },
+    "checker_null_staleness_cases_passed": 12,
+    "checker_exact_nested_passed": 3,
+    "checker_gateway_scenarios_passed": 2
+  },
+  "reading": {
+    "routeChecks": 48,
+    "originalParagraphInstances": 3812,
+    "orderedCitations": 15206,
+    "currentHistoricalDataBookmarks": 3568,
+    "browserPrints": 4,
+    "unlabeledDatedReportLinks": 13
+  },
+  "mobile": {
+    "job": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/44999835797/job/137138721750",
+    "runsValid": 69,
+    "rawReportsVerified": 69,
+    "routesTotal": 23,
+    "routesPassed": 23,
+    "consistencyProblems": [],
+    "spotlight": [
+      {
+        "route": "/work/",
+        "validRuns": 3,
+        "medians": {
+          "largest-contentful-paint": 1572.1487,
+          "total-blocking-time": 48.84480000000008,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      },
+      {
+        "route": "/research/state-of-ai-data-labs/chapters/datasets-and-benchmarks/",
+        "validRuns": 3,
+        "medians": {
+          "largest-contentful-paint": 1507.0355,
+          "total-blocking-time": 139.48225000000002,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      },
+      {
+        "route": "/research/state-of-ai-data-labs/chapters/methods-and-appendices/",
+        "validRuns": 3,
+        "medians": {
+          "largest-contentful-paint": 1207.4032,
+          "total-blocking-time": 97.2983999999999,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      },
+      {
+        "route": "/research/state-of-ai-data-labs/chapters/technical-landscape/",
+        "validRuns": 3,
+        "medians": {
+          "largest-contentful-paint": 1656.1197000000002,
+          "total-blocking-time": 13.757550000000037,
+          "cumulative-layout-shift": 0
+        },
+        "passed": true
+      }
+    ]
+  },
+  "navigation": {
+    "distinct_destinations": 245,
+    "desktop_visits": 245,
+    "phone_visits": 245,
+    "targeted_journeys": 15
+  },
+  "daily": {
+    "selection_day": "2026-11-18",
+    "stories_in_all_three_editions": 47,
+    "labelled_source_links": 94,
+    "firefox_enlarged_text_cases": 72,
+    "unissued_day_checked": "2026-11-15",
+    "baseline_public_selection_day": "2026-11-17"
+  },
+  "normal_ci": {
+    "source": "7c88072e0fe792f821876c8cfe4fc61f9a85d649",
+    "ci_run": 44999835808,
+    "browser_run": 44999835797,
+    "failed_cases_per_browser_project": 23,
+    "dedicated_performance": "passed",
+    "report_accessibility": "passed",
+    "result": "failure"
+  },
+  "residuals": [
+    {
+      "id": "W3",
+      "observed": "Explore Work active Filters covers Search at true 200% text and truncates the selected sort value. Native Work likewise overlaps in Firefox at 390 CSS px and 28px minimum text."
+    },
+    {
+      "id": "E1",
+      "observed": "At least 25 strict risk dialogs misattribute intake dates to sources. AfterQuery risk 0 also presents a source-record day as an evidence day when its citation publication dates differ. Preserve sourced date roles, otherwise identify the research record date."
+    },
+    {
+      "id": "N2",
+      "observed": "Explore site footer is nested in main, so browsers omit the site contentinfo landmark."
+    },
+    {
+      "id": "H2",
+      "observed": "Short-landscape Firefox with minimum font 28px clips the bottom of the focused Show more control."
+    },
+    {
+      "id": "R2",
+      "observed": "All 12 dated chapter wrappers and the dated Data page label the link to the current reader simply Report."
+    },
+    {
+      "id": "R4",
+      "observed": "No-JS WebKit Shift+Tab from a direct Technical #cite leaves its final focused assertion citation 46px above the viewport in both editions."
+    },
+    {
+      "id": "W3",
+      "observed": "The full-directory failure state can coexist with only four unhidden old results and a covered Retry button if a delayed prior Work script executes."
+    },
+    {
+      "id": "N2",
+      "observed": "Active predecessor Work HTML plus the newly served unversioned C2 script fails to initialize Work filters. An older Home fixture requires a guard for its absent paging button. Local compatibility code came after the C2 release identity."
+    }
+  ],
+  "availability": {
+    "AfterQuery Experts": "Employer returned 403; capture does not establish current intake.",
+    "Mercor role country lists": "Two individual role URLs returned 503. The project-specific country wording is supported by the retained review; individual qualification is unconfirmed.",
+    "DominoBench": "The paper and official listing corroborate the dataset. A direct raw GET returned a proxy 503."
+  },
+  "raw_receipt_sha256": {
+    "retest-home/receipt.json": "aca9c06ecaa47313b5769f5cd2a20ddd9ff104b6d1788b2956fd2a0417805cc7",
+    "retest-home/mercor-promotion.json": "39fd293d74a3ca2a5130702893e457ceafb8498e3a78c866c514cebe292c664d",
+    "retest-work/matrix-summary.json": "d0f769a471314da1f8f3ed66c24a0be064005932e2d08b999cbc4dbd1b675c0e",
+    "retest-native-terms/summary.json": "2b4cb0aaaa526f8e639fdebd39bc5680d233ff2d4560d1a90743066d86913e52",
+    "retest-nav/journeys.json": "20bd58f3ef32fdf8472516431b90ca1c55953d6586b4a64de0d4d1ada2e0e938",
+    "retest-reading/summary.json": "7716dc7b1eb24dac71d62d9c79dbc2bc6877173d387c5f4cebcd85e3d419321b",
+    "retest-perf/ci-measurements.json": "39fa1d2a0d6b88d960ba9d6002bb816cab4a2e6fcfa33606fc48b79f68c705fe",
+    "retest-finance/date-origin-browser.json": "0c82f170ae9baaf9c1372c027cb4ed5f2a0d4ab43fd983f8ee8a0d70d52d9e7b",
+    "retest-contacts/privacy.json": "65ccb7d5fe2d712a63f76a72f5c310a5b824048fe16849b97f6a14ec6996d9d4",
+    "retest-daily/browser.json": "df69b1880b256925fb26513fd030f92603a3ea2ec55294e61ab4d6620cd02a95",
+    "retest-release/artifact-and-http.json": "5206f4441b667b96c70db3fd98337622c90e55986a978a6c8e324a0aff8d1ff6",
+    "retest-release/actual-predecessor-mixed-native.json": "632614ad9ad27bf558c09d29df0c6da34bd765c4803d3e06d885eff28dce20c7",
+    "retest-release/rollback-open-tab.json": "9458766d2f56b8f0619d52e68a4a1a0fc9d2b3e13ccd55203ec08c70dfd05da8",
+    "ci-qa/stale-work-enhancer.json": "1a414d8d265f2eba2f678bebd00e2574dd6454db132a8a60f63d017a1b9d175a"
+  }
+}
