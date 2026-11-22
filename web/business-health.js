@@ -230,7 +230,7 @@ function restoreEvidenceFocus(){
   render();
   trigger=document.querySelector(origin.selector);
  }
- trigger?.focus();
+ trigger?.focus({preventScroll:!!trigger.closest('#bh-matrix-body')});
 }
 function alternateFigures(heading,figures,withMeasure=false){
  if(!figures.length)return '';
@@ -307,13 +307,19 @@ function companyRows(){
  return {pool,sorted,states};
 }
 function cellHTML(c,signal,state){
- if(state==='n-a')return `<td class="bh-cell" data-state="n-a" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><span title="Nonprofit research: commercial measures are not applied">n/a<span class="sr-only"> ${labels[signal]}: not applied</span></span></td>`;
- const o=pickCompanyObservation(c.id,signal);
- if(!o)return `<td class="bh-cell" data-state="missing" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><span title="${safe(c.name+' · '+labels[signal]+': no reviewed public disclosure. Missing is not zero.')}">—<span class="sr-only"> ${labels[signal]}: not disclosed</span></span></td>`;
+ const key=`data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"`;
+ const action=`type="button" ${key} aria-haspopup="dialog" aria-controls="bh-evidence-dialog"`;
+ const o=state==='n-a'?null:pickCompanyObservation(c.id,signal);
+ if(!o){
+  const notApplied=state==='n-a';
+  const reason=notApplied?'Nonprofit research: commercial measures are not applied':'No reviewed public disclosure. Missing is not zero.';
+  const label=safe((notApplied?'n/a · ':'')+c.name+' · '+labels[signal]+' · '+reason);
+  return `<td class="bh-cell" data-state="${state}" ${key}><button ${action} aria-label="${label}" title="${label}">${notApplied?'n/a':'—'}</button></td>`;
+ }
  const selected=bhState.observation===o.id;
  const value=numeric(o)?valueText(o):'Claim',tag=cellTag(o),g=grade(o);
  const context=[c.name,readableDates(o.label),accessibleDate(o),scopeLabel(o),o.is_context?'context only':'',isHistorical(o)?'historical':'',g?'research grade '+g:''].filter(Boolean).join(' · ');
- return `<td class="bh-cell" data-state="${state}"${isHistorical(o)?' data-historical="true"':''} data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><button type="button" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"${selected?' aria-current="true"':''} aria-label="${safe(value+' · '+context)}" title="${safe(context)}" aria-haspopup="dialog" aria-controls="bh-evidence-dialog"><b>${safe(value)}${gradeChip(o)}</b><small>${safe(tag)}${o.is_context?'<span class="sr-only"> (context only)</span>':''}</small></button></td>`;
+ return `<td class="bh-cell" data-state="${state}"${isHistorical(o)?' data-historical="true"':''} ${key}><button ${action}${selected?' aria-current="true"':''} aria-label="${safe(value+' · '+context)}" title="${safe(context)}"><b>${safe(value)}${gradeChip(o)}</b><small>${safe(tag)}${o.is_context?'<span class="sr-only"> (context only)</span>':''}</small></button></td>`;
 }
 function renderGrid(){
  const {pool,sorted,states}=companyRows(),query=bhState.query.trim();
@@ -333,11 +339,27 @@ function revealSelection(){
 
 function keepGridFocusVisible(target, wrap, heading, masthead){
  const gap=6;
+ const cell=target.closest('th,td'), organization=cell.parentElement.cells[0];
+ const scrollport=wrap.getBoundingClientRect();
+ const clipLeft=scrollport.left+wrap.clientLeft;
+ const stickyRight=organization!==cell&&getComputedStyle(organization).position==='sticky'?organization.getBoundingClientRect().right:clipLeft;
+ const left=Math.max(0,clipLeft,stickyRight)+gap;
+ const right=Math.min(innerWidth,clipLeft+wrap.clientWidth)-gap;
+ const control=target.getBoundingClientRect();
+ // Native focus scrolling does not always account for the sticky organization column.
+ const visibleWidth=Math.min(control.width,right-left);
+ if(visibleWidth>0){
+  const gridScroll=Math.min(0,control.left-left)||Math.max(0,control.left+visibleWidth-right);
+  if(gridScroll)wrap.scrollBy({left:gridScroll,behavior:'instant'});
+ }
+ if(heading.contains(target))return;
  const mastheadBottom=masthead&&getComputedStyle(masthead).position==='sticky'?masthead.getBoundingClientRect().bottom:0;
- const header=heading.getBoundingClientRect(), control=target.getBoundingClientRect();
- const visibleHeight=Math.min(control.height,wrap.clientHeight-header.height-2*gap,innerHeight-mastheadBottom-header.height-2*gap);
+ const header=heading.getBoundingClientRect();
+ const rowName=organization.querySelector('a').getBoundingClientRect();
+ const focusedHeight=Math.max(control.height,rowName.bottom-control.top);
+ const visibleHeight=Math.min(focusedHeight,wrap.clientHeight-header.height-2*gap,innerHeight-mastheadBottom-header.height-2*gap);
  if(visibleHeight<=0)return;
- // Keep the column header and the start of the focused control in the same viewport.
+ // Keep the column header, organization name, and focused control together where they fit.
  const pageScroll=Math.min(0,header.top-mastheadBottom)||Math.max(0,header.bottom+visibleHeight+2*gap-innerHeight);
  if(pageScroll)window.scrollBy({top:pageScroll,behavior:'instant'});
  const top=heading.getBoundingClientRect().bottom+gap;
@@ -395,7 +417,7 @@ $('bh-evidence-dialog').addEventListener('click',e=>{
 });
 const matrix=$('bh-grid-wrap');
 matrix.addEventListener('focusin',({target})=>{
- if(!target.matches('tbody :is(a,button):focus-visible'))return;
+ if(!target.matches(':is(thead button,tbody a,tbody button):focus-visible'))return;
  requestAnimationFrame(()=>{
   if(document.activeElement===target)keepGridFocusVisible(target,matrix,matrix.querySelector('thead'),document.querySelector('body > .topbar'));
  });
@@ -422,12 +444,11 @@ document.addEventListener('click',e=>{
  // Header buttons are rebuilt with the grid, so focus returns to the new button in the same place.
  const sort=e.target.closest('[data-bh-sort]');if(sort){bhState.sort=sort.dataset.bhSort;$('bh-sort').value=bhState.sort;renderGrid();revealSelection();$('bh-grid-head').querySelector?.('[data-bh-sort]')?.focus({preventScroll:true});return;}
  const tab=e.target.closest('[data-bh-tab]');if(tab){const inGrid=!!tab.closest('thead');selectSignal(tab.dataset.bhTab);if(inGrid)revealSelection();(inGrid?$('bh-grid-head').querySelector?.(`[data-bh-tab="${tab.dataset.bhTab}"]`):$('bh-tab-'+tab.dataset.bhTab))?.focus({preventScroll:true});return;}
- const cell=e.target.closest('[data-bh-company]');
+ const cell=e.target.closest('.bh-cell');
  if(cell){
   const {bhCompany:company,bhSignal:signal}=cell.dataset;
-  const button=cell.matches('button')||cell.querySelector('button');
   selectSignal(signal,company);
-  openEvidence(button?`#bh-matrix-body button[data-bh-company="${CSS.escape(company)}"][data-bh-signal="${CSS.escape(signal)}"]`:'#bh-grid-wrap');
+  openEvidence(`#bh-matrix-body button[data-bh-company="${CSS.escape(company)}"][data-bh-signal="${CSS.escape(signal)}"]`);
   return;
  }
  const mark=e.target.closest('[data-bh-observation], [data-bh-context]');
