@@ -810,6 +810,7 @@ let entryScrollTimer=0;
 const keepEntryScroll=()=>{
  clearTimeout(entryScrollTimer);
  const scrollY=shortlistScrollForEntry()?.top??window.scrollY;
+ if(window.APP_RELOADING_MARKET_BOOKMARK)return scrollY;
  try{if(window.navigation)window.navigation.updateCurrentEntry({state:{...(window.navigation.currentEntry?.getState?.()||{}),scrollY}});else history.replaceState({...(history.state||{}),scrollY},'');}catch{}
  return scrollY;
 };

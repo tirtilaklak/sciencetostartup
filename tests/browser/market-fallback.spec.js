@@ -5,7 +5,7 @@ async function expectMarketLanding(page) {
   const dashboard = page.locator('#business-health');
   const heading = dashboard.getByRole('heading', { name: 'Revenue & growth.' });
   await expect(heading).toBeFocused();
-  await expect(heading).toBeInViewport();
+  await expect(heading).toBeInViewport({ ratio: 1 });
   await expect(dashboard.getByRole('tablist', { name: 'Revenue views' }).getByRole('tab')).toHaveCount(3);
   await page.keyboard.press('Tab');
   await expect(dashboard.getByRole('link', { name: /^Download data/ })).toBeFocused();
@@ -71,6 +71,58 @@ for (const bundle of ['data', 'app']) {
     await expectMarketLanding(page);
   });
 }
+
+for (const [asset, path] of [
+  ['overview response', '**/presentation/overview.*.json'],
+  ['business-health module', '**/js/health.*.js'],
+]) {
+  test(`Market reloads the bookmark into view after a blocked ${asset}`, async ({ page }) => {
+    await page.route(path, route => route.abort('failed'));
+    await page.goto('/explore/#business-health');
+
+    const root = page.locator('html');
+    const reload = page.getByRole('button', { name: 'Reload page' });
+    await expect(root).toHaveAttribute('data-app', 'ready');
+    await expect(root).toHaveAttribute('data-view-state', 'failed');
+    await expect(reload).toBeVisible();
+    for (let step = 0; step < 25; step++) {
+      if (await reload.evaluate(button => button === document.activeElement)) break;
+      await page.keyboard.press('Tab');
+    }
+    await expect(reload).toBeFocused();
+    await page.unroute(path);
+    await page.keyboard.press('Enter');
+
+    await expect(root).toHaveAttribute('data-view-state', 'ready');
+    await page.waitForLoadState('load');
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    await expect(reload).toBeHidden();
+    await expectMarketLanding(page);
+  });
+}
+
+test('Market preserves the reading position on ordinary reload and Back', async ({ page }) => {
+  const bookmark = '/explore/#business-health';
+  const heading = page.locator('#business-health-heading');
+  await page.goto(bookmark);
+  await expect(heading).toBeInViewport();
+  const readingPosition = await page.evaluate(() => {
+    window.scrollBy({ top: 680, behavior: 'instant' });
+    return window.scrollY;
+  });
+  await expect(heading).not.toBeInViewport();
+
+  const expectReadingPosition = async () => {
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    await page.waitForLoadState('load');
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(readingPosition);
+  };
+  await page.reload();
+  await expectReadingPosition();
+  await page.goto('/companies/');
+  await page.goBack();
+  await expectReadingPosition();
+});
 
 for (const readerTabbed of [false, true]) {
   test(`Market keeps ${readerTabbed ? 'the selected Download link' : 'the heading'} focused after a late page load`, async ({ page, browserName, isMobile }) => {

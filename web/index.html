@@ -157,8 +157,9 @@ initialize();</script><script>(()=>{
   main.scrollIntoView({behavior:'instant'});
  });
  document.getElementById('app-reload').addEventListener('click',()=>{
-  if(location.hash.toLowerCase()==='#business-health'){
-   // The recovery button reopens this bookmark, including when the prior visit ended farther down the page.
+  if(location.hash.split(/[/?]/,1)[0].toLowerCase()==='#business-health'){
+   // Reopen the bookmark and leave the failure notice's position in this document.
+   window.APP_RELOADING_MARKET_BOOKMARK=true;
    try{
     const navigation=window.navigation;
     const state=navigation?navigation.currentEntry.getState():history.state;
