@@ -1,0 +1,237 @@
+{
+  "build": "5dc63fbcf19634a55c66",
+  "manifest_sha256": "11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+  "frozen_product_source": "f305c436d8bbce642159d5687f9f56e88ddba0ed",
+  "source_and_artifact_commit": "f8287d077c3a6cd3a70c2fa65db39005e96cb54f",
+  "dist_git_tree": "8fc0cf64921cf4e27e32d038da123ca1af5f23f7",
+  "model": "gpt-6.2-sol",
+  "reasoning_effort": "ultra",
+  "independent_reviewers": [
+    "retest5_companies",
+    "retest5_daily",
+    "retest5_design",
+    "retest5_downloads",
+    "retest5_market",
+    "retest5_navigation",
+    "retest5_reading",
+    "retest5_release",
+    "retest5_sources",
+    "retest5_work"
+  ],
+  "work": {
+    "records": 135,
+    "primary_routes": 69,
+    "providers": 28,
+    "selection_cases": 70,
+    "actual_downloads": 210,
+    "empty_selections": 13,
+    "saved_options": 28,
+    "keyboard_retries_across_three_engines": 24,
+    "reviewed_unique": 52,
+    "archived_checks": 276,
+    "exact_historical_field_bindings_per_surface": 77,
+    "new_qualified_student_match": "aixi.work.research-fellowship"
+  },
+  "navigation": {
+    "unique_explore_destinations": 285,
+    "phone_and_desktop_visits": 570,
+    "new_destinations": 40,
+    "removed_destinations": 0,
+    "native_company_profiles": 55,
+    "eligible_native_compare_actions": 39,
+    "native_in_page_targets": 49,
+    "native_work_record_bookmarks": 135
+  },
+  "research": {
+    "chapters_in_two_editions": 24,
+    "authored_paragraph_instances": 3812,
+    "ordered_paragraph_citations": 15206,
+    "additional_finding_citations": 698,
+    "first_paragraph_checks": 80,
+    "exact_passage_checks": 80,
+    "late_reference_round_trips": 12,
+    "generated_technical_prints": 4,
+    "pages_per_print": 199,
+    "archive_pdf_pages": 482,
+    "archive_checked_members": 56,
+    "lossless_data_projection_rows": 17763
+  },
+  "editorial": {
+    "approved_candidate_issue": "2026-11-18",
+    "public_control_issue_at_review": "2026-11-17",
+    "matched_stories": 47,
+    "matched_labelled_source_links": 94,
+    "financial_figure_actions_per_input_mode": 73,
+    "distinct_market_observations": 26,
+    "shared_company_amounts": 18,
+    "verified_source_publication_corrections": 5
+  },
+  "initial_performance": {
+    "git": "c23cf7a859866d63423467ea6e495341738ee57f",
+    "raw_lighthouse_reports": 69,
+    "routes_within_budgets": 23,
+    "workflow": 45008906694,
+    "job": 137166589058,
+    "mercor_work_median_cls": 0.0329894,
+    "previous_median_cls": 7.64e-05,
+    "budget": 0.05,
+    "layout_issue": "The footer moves in the same frame as the initial profile tab scroll. A bounded replay isolated the timing."
+  },
+  "initial_ci": {
+    "workflow": 45008906615,
+    "result": "failed",
+    "underlying": "Six Node VM errors from a missing router fixture and one stale expected Companies comparison link. Two test-only commits supplied the route and asserted all 39 individual comparison links.",
+    "changed_product_or_dist_bytes": false
+  },
+  "succeeding_ci": {
+    "head": "f8287d077c3a6cd3a70c2fa65db39005e96cb54f",
+    "ci": 45010244776,
+    "browser": 45010244739
+  },
+  "remaining_findings": [
+    {
+      "id": "N5-native-ledger-back",
+      "status": "confirmed on fresh-document Back in two browsers",
+      "route": "/company/imerit/ → Source ledger → Back",
+      "observation": "The original forward handoff now promptly focuses the correct heading. On a cold return to the native page, Sources & data is closed and focus is on BODY. Tab goes to Skip to content. Warm history retains its native disclosure and link.",
+      "target": "Preserve the native originating disclosure, visible link focus and scroll on a cold history return. Leave fresh direct visits and warm browser restoration intact.",
+      "receipts": [
+        "candidate-5-final/retest-navigation/imerit-anchor.json"
+      ],
+      "controls": "All eight cold combinations failed to restore the native disclosure/focus across Chromium/Firefox, desktop/390 and normal/held images. Real Chromium BFCache restored native disclosure/link and Forward citation/scroll."
+    },
+    {
+      "id": "A5-shortlist-limit",
+      "status": "confirmed at 320×720 in Firefox with true 28px minimum text",
+      "route": "/explore/#companies",
+      "observation": "The three selected company IDs are correct and both tray actions can be clicked. With Trajectory Labs, Laude Institute / Terminal-Bench and Invisible Technologies selected, a fourth pick produces 245px of status text in a 216px region. The rejection is partly hidden below that region.",
+      "target": "Keep the reason and recovery instruction visible when a fourth company is rejected, preserve access to all selected names and Compare/Clear.",
+      "receipts": [
+        "candidate-5-final/retest-design/firefox-min320.json",
+        "candidate-5-final/retest-design/screens/c5-firefox-min320-company-shortlist-limit.png"
+      ],
+      "geometry": "Rejection glyphs y640.5–674.5; status region ends at y646. At 390px it fits."
+    },
+    {
+      "id": "N5-shortlist-back",
+      "status": "confirmed on the 320px enlarged Firefox flow, other cases under review",
+      "route": "/explore/#companies → selected companies Compare → Back",
+      "observation": "The saved selection returns, but focus goes to the Companies heading at y=-1532 while scroll is restored to y=1741.",
+      "target": "Restore visible focus to the initiating Compare control and retain the original shortlist and scroll position.",
+      "receipts": [
+        "candidate-5-final/retest-design/firefox-min320.json",
+        "candidate-5-final/retest-design/screens/c5-firefox-min320-shortlist-return.png"
+      ],
+      "next_tab": "First Tab jumps to y208, a 1,533px move to the Browse the 55-company directory link. This also reproduced on C4."
+    },
+    {
+      "id": "D5-market-anchor-offset",
+      "status": "measured in C5, browser-only source of extra scroll spacing confirmed",
+      "observation": "Market shortcut and direct bookmark do focus Revenue & growth, but Firefox 28px at 320 and 390 shows the heading at y364 with a 185px sticky header. The previous card remains visible and no ledger row fits in the 320×720 initial viewport. A diagnostic removal of the section margin alone moves the heading up 90px.",
+      "target": "Avoid applying a second sticky-header offset to the section target, preserve keyboard and history focus.",
+      "receipts": [
+        "candidate-5-final/retest-design/report.md",
+        "candidate-5-final/retest-design/screens/c5-firefox-min320-market-shortcut-arrival.png"
+      ]
+    },
+    {
+      "id": "A5-market-advanced-values",
+      "status": "confirmed on C4 and C5",
+      "observation": "A 320px Firefox viewport at minimum 28px shows Revenue over a c and 9M 2026 · USD · … in advanced Market selects. They provide 207px for selected text that measures 428px and 726px respectively.",
+      "target": "Make the active financial measure and reporting cohort readable while preserving the full source-backed scope and keyboard-selectable controls.",
+      "receipts": [
+        "candidate-5-final/retest-design/diagnostic.json",
+        "candidate-5-final/retest-design/screens/c5-firefox-min320-market-advanced.png"
+      ]
+    },
+    {
+      "id": "N5-market-fallback-tab",
+      "status": "confirmed on Chromium without JavaScript, control URLs passed",
+      "observation": "Direct /explore/#business-health renders the native fallback near y150, but Tab starts in the footer and does not reach Skip to content until the seventh press. Direct /explore/ and /explore/#work reach Skip first.",
+      "target": "Keep the native fallback and first useful keyboard action available on the added Market fragment with JavaScript disabled, and preserve the enhanced shortcut and all existing URLs.",
+      "receipts": [
+        "candidate-5-final/retest-navigation/no-script-sequences.json",
+        "candidate-5-final/retest-navigation/no-script-market.png"
+      ]
+    },
+    {
+      "id": "R5-passage-back-focus",
+      "status": "confirmed in Chromium with and without JavaScript at 390px, and Firefox 159 minimum 28px",
+      "observation": "Enter on a Technical passage shortcut focuses the requested paragraph. Back restores the original y42 position but retains focus on the offscreen paragraph. Next Tab follows a citation around y558500 in enlarged text.",
+      "target": "Allow a keyboard reader to continue from the originating native shortcut after Back in supported cases while preserving direct URLs and authored markup, and accurately document browser-native limits for scripts-disabled use.",
+      "receipts": [
+        "candidate-5-final/retest-reading/history-focus.json",
+        "candidate-5-final/retest-reading/browser-firefox.json"
+      ]
+    },
+    {
+      "id": "E5-grade-a-description",
+      "status": "confirmed in frozen Market inspector, matrix tooltip, Market method and native rubric",
+      "observation": "The Grade A explanatory text groups evidence as independent or buyer-side even for the RWS issuer interim filing. Its PDF explicitly calls the report board-approved and unaudited. The stable record rws_trainai.source.d_rws4 is a filing. A separately checked customer statement supports real buyer-side evidence on the Surge claim.",
+      "target": "Describe the existing A rubric with an explicit public filing category, alongside independent evidence and buyer confirmation. Preserve the grades, source IDs, caveats and business scopes.",
+      "receipts": [
+        "candidate-5-final/retest-market/"
+      ]
+    },
+    {
+      "id": "P5-mercor-profile-scroll-timing",
+      "status": "observed on all three official C5 mobile Lighthouse measurements, within budget, then reproduced in paired local timing replay",
+      "observation": "Mercor Explore Work footer contributed 0.032913 to median CLS 0.032989, versus 0.0000764 on C4. C5 paints results and scrolls to the profile tabs in the same frame. Deferring only that initial tab scroll removed the shift at normal and constrained network, preserving the final 187px offset. Both candidates already had the logo loaded.",
+      "target": "Avoid timing-induced layout shift while preserving prompt iMerit section handoff, late image behavior, visibility, focus and history.",
+      "receipts": [
+        "candidate-5-final/retest-release/mobile-regression-attribution.json",
+        "candidate-5-final/retest-release/mercor-layout-timing-comparison.json"
+      ]
+    }
+  ],
+  "cleared_controls": [
+    {
+      "id": "R5-dated-checksum-inline",
+      "state": "false attribution cleared against the actual fifth candidate HTML and pointer on port 18857",
+      "observation": "The older retained URL used ?download=1, which would cause an attachment. C5 already uses the query-less primary URL verified to return the complete inline checksum. No candidate product correction required.",
+      "receipts": [
+        "candidate-5-final/retest-downloads/zenodo-checksum-preview-variants.json",
+        "candidate-5-final/retest-downloads/"
+      ]
+    }
+  ],
+  "external_observations": "All 25 Ashby employer terms match the issuer board. Eight other public application or intake endpoints returned access blocks. The explicitly unpublished APTO response and genuine role 404s have independent evidence. All direct Zenodo/Mirror publication files tested have the recorded bytes.",
+  "unchanged_test_receipt_sha256": {
+    "retest-companies/findings.md": "d97424895ef4df2a3ff1d9750249bb1278b60f56e688753fbdb73bdff314b70c",
+    "retest-companies/parity.json": "8ca53be728e1ffb6261f1bbb5ee51b15875389ee8927f7d5e583e724753675a4",
+    "retest-companies/work-destinations.json": "fe50bd0e9651a8d4412f5380640aa5809923b824be031d247ed2fb4df59c5d43",
+    "retest-companies/webkit.json": "1ad2096502f01dd444b88ff113fad391551b816ba6f36e85dbc6e978bbf0e028",
+    "retest-daily/report.md": "a4fdc33408db93fcdb0f3c66ee17c09678f9d701fb7c6c05f5e3759bdd3cd223",
+    "retest-daily/daily-identity.json": "e0c4e9b478d62589cc6e76d29caa078796036f3144e58f7f3813a4ba5a59f2f7",
+    "retest-daily/release-comparison.json": "90dbf3090c48d7e83fc541263f60a2bcf66b2f291ac99caba2feeb7d8b0c8290",
+    "retest-design/report.md": "89a15427538eed54ffec1de1db25fd43be05f558f28f25d1100e1a84fa4a7f79",
+    "retest-design/firefox-min320.json": "fb53d3719ab1d62c9df734396dd86f5d4cdcc3f6895b5cbcffff34cbb61398eb",
+    "retest-design/diagnostic.json": "4c847f158664df9e6f82814545affd96c34cfd8613ac5646e44f6d31ff4e663f",
+    "retest-downloads/README.md": "fa9b5eea1b7f7552ae4318aa0f37dc3c21a40acab71d299344ca1098cf4ab026",
+    "retest-downloads/byte-parity.json": "0c42aee7d164100b5097607cfbd4b1acdcf555fc996e02877469e308ed45aca7",
+    "retest-downloads/browser.json": "5ae6d3232a3d63f42e51a059336ca63a886fad0fa73844529625127411d0a929",
+    "retest-downloads/live-browser.json": "cdf79c60a9805e0dfbbff1a6d153c02eaf09826b5ebcdeb1116b02cb72fb9c8e",
+    "retest-downloads/external.json": "e3ce0a861902d756ced67b3d4d7eb7d495cfcafb781e61fb5b457b80f549e223",
+    "retest-market/findings.md": "3e9efc22061c583dfeedb9fcd955f9e2b97442721454bbc8611f4aa8942f8ea7",
+    "retest-market/viewport-proof.json": "ef2bb3c78a476ae3f7524a6688c16a16660c13901f56740cc293f4f6cd48f2b4",
+    "retest-navigation/README.md": "5b34be50a001d57d7b865d8c17325b8ef15f16d65c1054b54691e7438c23b714",
+    "retest-navigation/route-summary.json": "ea416523db939d2cf298de1f9cb4217c8a10abc93cc4708d477af6b9e600a4fe",
+    "retest-navigation/imerit-anchor.json": "ac09c4d3cdcd175240af0fbf66d97e1f4591de2e80458bbea37550110ba9b5e9",
+    "retest-navigation/no-script-sequences.json": "83c9910480be293c77c75a3c41cf9e885cb4d5a731e407c7c8b465cc2ac2ee99",
+    "retest-reading/README.md": "ff461b1c0e62d791dc288c5f70b097f7a2ede637e94323580fc5d4110c4f56ea",
+    "retest-reading/history-focus.json": "2e13c0259d69ccccfd5863d3c74c3a0f29cce45f399099ce119798db396b380c",
+    "retest-reading/static.json": "0ff7dd2d21575a68e2ba44b1ccdeed3ac14c56ff6c43bcecaeda2d85ecf4897b",
+    "retest-reading/print.json": "58c87807126ba79902cc71d90622272005a3e54ba2d30b4c84d228c9fbfbac2b",
+    "retest-release/README.md": "b06453332f3c284ff4f7468e2601708da6aecd7fdd17bd5761ae8f9648283d49",
+    "retest-release/ci-measurements.json": "e235352670254fbe316f219b330f6c39669ba4a975e0ae2abff1ce8bd9a1c9a8",
+    "retest-release/performance-comparison.json": "a261230124928991c7d28e1297cdddb190ffacfcda8f228cad41cde7e3070b9c",
+    "retest-release/mercor-layout-timing-comparison.json": "a1cf2b77d538e9b3f80f2b6f9ebbe057839442dbbd65f110053b9b6344cef176",
+    "retest-sources/README.md": "ec3e680fda34eac705afc2b63c8c5d6fe2f71a165d8ebd96bb41af3dccedd14d",
+    "retest-sources/summary.json": "29145e69cfd55f68768ac326a5e42fb7a54cbfb19bda85c7c3d7315421307844",
+    "retest-sources/native-evidence.json": "dd0b434e9cdfb92050d79b15642848ea42608b735047c8d4e88709b9c9872de5",
+    "retest-work/README.md": "92802a0e36027dedd9518f3d570594a8499459883cba1f9ba1cace30104bfcdb",
+    "retest-work/ordered-source.json": "1be4c8c8053fb8993ee76f9e2e7b0b52be7e5302a145041796f5296db01ef485",
+    "retest-work/matrix-summary.json": "9707fcc49ea660bff47d635207e5096158f00aa6810bbe4b8896195456ae02ce",
+    "retest-work/hidden.json": "1b126fe1f07c33ab3d7c5d7ec6a47dd508e190440c5e467ba29d56994e8dd3fe"
+  }
+}

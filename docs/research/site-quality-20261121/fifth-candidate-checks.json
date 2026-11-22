@@ -1,0 +1,183 @@
+{
+  "source_and_artifact_commit": "f8287d077c3a6cd3a70c2fa65db39005e96cb54f",
+  "commit": "f305c436d8bbce642159d5687f9f56e88ddba0ed",
+  "build_id": "5dc63fbcf19634a55c66",
+  "manifest_sha256": "11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+  "payloads": 1278,
+  "editorial_release_id": "2026-11-22.3",
+  "contributors": [
+    "fix5_work_explore",
+    "fix5_work_native",
+    "fix5_publication_facts",
+    "fix5_aixi",
+    "fix5_source_projection",
+    "fix5_market_layout",
+    "fix5_reading",
+    "fix5_profile_focus",
+    "fix5_discovery",
+    "fix5_company_handoffs"
+  ],
+  "model": "gpt-6.2-sol",
+  "reasoning_effort": "ultra",
+  "acceptance_checks": 86,
+  "frozen_http_controls": {
+    "cutover-journeys/summary.json": {
+      "cases": 20,
+      "private_receipt": "candidate-5-final/cutover-journeys/summary.json",
+      "sha256": "d64cb6a8c6671969f726374d7c5261eb8ed6f12bb9353e3697e0e830055ae83a"
+    },
+    "changed-journeys/summary.json": {
+      "cases": 26,
+      "private_receipt": "candidate-5-final/changed-journeys/summary.json",
+      "sha256": "7a117c9ba8c5a731874c82f9ea1aea18d1189c698aeac58d1900de1b5a07aa4e"
+    },
+    "payload-budgets.json": {
+      "cases": null,
+      "private_receipt": "candidate-5-final/payload-budgets.json",
+      "sha256": "1d490d9e3811d617cf1428507aa35b29f9a93f3bb627c228ec643c54ef042317"
+    }
+  },
+  "fourth_findings_implemented": {
+    "W4-saved-first-screen": {
+      "commits": [
+        "3acdce6e"
+      ],
+      "private_receipt": "candidate-5/native-work/README.md",
+      "sha256": "c6e7e457a159aafc4fc405292cda3b99701b5100e4cd36786120a929b4c56945"
+    },
+    "E4-afterquery-issuer": {
+      "commits": [
+        "db7a4c6c",
+        "6c282500",
+        "c20fc8d6",
+        "a20738bc"
+      ],
+      "private_receipt": "candidate-5/source-projection/findings.md",
+      "sha256": "124074b981383f2ddf9065590a96b57405f0e8f07440f3307cfb3268809b807e"
+    },
+    "A4-market-width": {
+      "commits": [
+        "4ab9acba"
+      ],
+      "private_receipt": "candidate-5/market-layout/findings.md",
+      "sha256": "2c7a7aee8e13d4bbf8f9e70bd1f2195d51dd2a8eab7884e45468331086b05a90"
+    },
+    "E4-matrix-current": {
+      "commits": [
+        "4ab9acba"
+      ],
+      "private_receipt": "candidate-5/market-layout/findings.md",
+      "sha256": "2c7a7aee8e13d4bbf8f9e70bd1f2195d51dd2a8eab7884e45468331086b05a90"
+    },
+    "W4-explore-filter-options": {
+      "commits": [
+        "a20738bc"
+      ],
+      "private_receipt": "candidate-5/discovery/picker.json",
+      "sha256": "ae9217329584de17934ec9aa7f1e2516177a01c03f5e1d9bd677d24f22869d6c"
+    },
+    "W4-explore-desktop-overlap": {
+      "commits": [
+        "a3e56030",
+        "8b662581"
+      ],
+      "private_receipt": "candidate-5/explore-work/README.md",
+      "sha256": "eb6635ce7ab54a9bbd8e11b0264d3eb8c2c99363faee104f808faa512900aa63"
+    },
+    "D4-market-discovery": {
+      "commits": [
+        "9e81c829",
+        "a20738bc",
+        "d95ca8ea"
+      ],
+      "private_receipt": "candidate-5/discovery/back-after.json",
+      "sha256": "1e75a4e3110deb84385cc27cfab78e019ffeca006a29f51619f9833a4399492a"
+    },
+    "R4-first-paragraph": {
+      "commits": [
+        "ebf8f4e9"
+      ],
+      "private_receipt": "candidate-5/reading/README.md",
+      "sha256": "d35296e1c1a2c40f6025622eab3860a920dae9515733701ac52c3685b8e79f96"
+    },
+    "R4-precise-reading": {
+      "commits": [
+        "ebf8f4e9"
+      ],
+      "private_receipt": "candidate-5/reading/parity.json",
+      "sha256": "6fee5ddcba63c178aa667a7d3eb59031f6dcaed2447cafa0c0f9678478ed0ac1"
+    },
+    "N4-source-ledger-focus": {
+      "commits": [
+        "01ab73c9",
+        "10fbb7b0"
+      ],
+      "private_receipt": "candidate-5/profile-focus/README.md",
+      "sha256": "d0b64d8585a31dcac040252f372404c33548a2dbd8a1ee301fee075e253f3bd4"
+    },
+    "W4-aixi-fellowship": {
+      "commits": [
+        "1d797a7d"
+      ],
+      "private_receipt": "candidate-5/aixi/README.md",
+      "sha256": "1d2b3a84d0a26f40e53dcd1289d1c851965bbd69e9dcadc0899e91e6ceaa757d"
+    },
+    "R4-dated-reuse": {
+      "commits": [
+        "ebf8f4e9"
+      ],
+      "private_receipt": "candidate-5/reading/mirror.json",
+      "sha256": "25aaf3449dcda40a19d92efb8475012c1b59b89ea57f5a331480b675fa553621"
+    },
+    "A4-compare-tray": {
+      "commits": [
+        "4ab9acba",
+        "526b446f",
+        "a20738bc"
+      ],
+      "private_receipt": "candidate-5/market-layout/findings.md",
+      "sha256": "2c7a7aee8e13d4bbf8f9e70bd1f2195d51dd2a8eab7884e45468331086b05a90"
+    },
+    "N4-companies-compare-context": {
+      "commits": [
+        "ad6673db",
+        "8b662581"
+      ],
+      "private_receipt": "candidate-5/company-handoff/README.md",
+      "sha256": "7c8e34ba11b712ba46ad4a3a9c6e1b4c730f3ea4cf59b1d6fb5451f88fd4fda4"
+    },
+    "R4-json-download": {
+      "commits": [
+        "ebf8f4e9"
+      ],
+      "private_receipt": "candidate-5/reading/downloads.json",
+      "sha256": "0eec37fd6aebaf0c960b6c5223dd63e7d2326e395a076fcd5ae55ad50dd974fd"
+    }
+  },
+  "exact_git_payloads_and_plan": {
+    "source_and_artifact_commit": "f8287d077c3a6cd3a70c2fa65db39005e96cb54f",
+    "frozen_source": "f305c436d8bbce642159d5687f9f56e88ddba0ed",
+    "git_blobs_verified": 1279,
+    "build_id": "5dc63fbcf19634a55c66",
+    "manifest_sha256": "11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+    "plan_sha256": "c2e736b62ce6babac828324b96ace167d346f007551f4bccc05f3efdec6144ae",
+    "uploadable_assets": 1277,
+    "dist_tree": "8fc0cf64921cf4e27e32d038da123ca1af5f23f7",
+    "editorial_release_id": "2026-11-22.3"
+  },
+  "repo_ci": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45010244776",
+  "browser_ci": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45010244739",
+  "repository_controls": {
+    "js_logic": 0,
+    "company_search_prefix_logic": 0,
+    "redesign_checks": 0,
+    "revision_app_logic": 0,
+    "revision_work_logic": 0,
+    "work_route_summary_logic": 0,
+    "reliability_copy_context_logic": 0,
+    "reliability_failure_state_logic": 0,
+    "risk_section_logic": 0,
+    "acceptance": 0,
+    "payload": 0
+  }
+}

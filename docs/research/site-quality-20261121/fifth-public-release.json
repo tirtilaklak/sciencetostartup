@@ -1,0 +1,218 @@
+{
+  "checked_utc": "2026-11-22T10:20:33.125862+00:00",
+  "pull_request": "https://github.com/tirtilaklak/sciencetostartup/pull/34",
+  "commit": "f8287d077c3a6cd3a70c2fa65db39005e96cb54f",
+  "build": "5dc63fbcf19634a55c66",
+  "manifest_sha256": "11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+  "editorial_release": "2026-11-22.3",
+  "latest_public_daily_edition": "2026-11-18",
+  "worker": {
+    "version": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+    "number": 41,
+    "immutable_preview": "https://a5900bbc-sciencetostartup.musaeminozdem.workers.dev",
+    "public_deployment": {
+      "id": "6523aad9-1019-4eca-b781-408a55b9f33a",
+      "created_on": "2026-11-22T10:18:22.645027Z",
+      "versions": [
+        {
+          "version_id": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+          "percentage": 100
+        }
+      ]
+    },
+    "predecessor": {
+      "id": "f802e85c-4be5-4f9d-be93-07ba3f56e2f4",
+      "created_on": "2026-11-19T03:21:07.619992Z",
+      "versions": [
+        {
+          "version_id": "cddaa614-befb-4bfe-81b2-8553bd74afac",
+          "percentage": 100
+        }
+      ]
+    },
+    "previous_build": "d8d18622a82c541129c1"
+  },
+  "gates": {
+    "Browser QA": {
+      "url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45010244739",
+      "head": "f8287d077c3a6cd3a70c2fa65db39005e96cb54f",
+      "jobs_passed": 8
+    },
+    "CI": {
+      "url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45010244776",
+      "head": "f8287d077c3a6cd3a70c2fa65db39005e96cb54f",
+      "jobs_passed": 10
+    }
+  },
+  "performance": {
+    "mobile_runs": 69,
+    "routes": 23,
+    "archive_sha256": "0365b446b800e99bac3c0b5e399e0b1158c7cecf9da2ba72f58ffb9ecea99186",
+    "largest_route_medians": {
+      "largest-contentful-paint": {
+        "route": "/explore/#companies",
+        "median": 2460.093,
+        "limit": 2500
+      },
+      "total-blocking-time": {
+        "route": "/research/papers/",
+        "median": 43,
+        "limit": 200
+      },
+      "cumulative-layout-shift": {
+        "route": "/explore/#company/mercor/work",
+        "median": 0.03298937831003726,
+        "limit": 0.05
+      }
+    }
+  },
+  "transfer": {
+    "assets_in_complete_plan": 1277,
+    "newly_uploaded": 94,
+    "provider_responses": [
+      202,
+      202,
+      201
+    ]
+  },
+  "edge_checks": {
+    "immutable": {
+      "started_utc": "2026-11-22T10:15:43.310787+00:00",
+      "finished_utc": "2026-11-22T10:17:46.169936+00:00",
+      "target": "https://a5900bbc-sciencetostartup.musaeminozdem.workers.dev",
+      "version": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+      "commit": "f8287d077c3a6cd3a70c2fa65db39005e96cb54f",
+      "build": "5dc63fbcf19634a55c66",
+      "manifest_sha256": "11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+      "passed": true,
+      "return_codes": {
+        "identity": 0,
+        "headers": 0,
+        "acceptance": 0,
+        "journeys": 0,
+        "changed-journeys": 0
+      },
+      "accepted_checks": {
+        "search": 10,
+        "accessibility": 17,
+        "home": 48,
+        "editorial": 11
+      },
+      "browser_cases": {
+        "journeys": 20,
+        "changed-journeys": 26
+      },
+      "identity_routes": 11,
+      "header_checks": 28,
+      "receipts": {
+        "identity.json": "d8e58925f7ad3bf447184710d98f39941055923fe4eb16ba194b433488949266",
+        "headers.json": "37c61028a63abcdcc13d1fa04540e5454fa5151a3e48e83708f531ced519f59c",
+        "acceptance/summary.json": "bc92241a90b7a5e06521f9d148723a378e4fc89d89d6f7add15225217f7603fe",
+        "journeys/summary.json": "1ec8483a08a0633a87ca7059ac36001bd4ca0f197a2deded25a5fcc1ab066741",
+        "changed-journeys/summary.json": "f84ec7e925655fcf5f57a7a84f69f4a17141e9125186357610ff7f65f13bc07c"
+      }
+    },
+    "public": {
+      "started_utc": "2026-11-22T10:18:29.767048+00:00",
+      "finished_utc": "2026-11-22T10:20:17.800799+00:00",
+      "target": "https://sciencetostartup.com",
+      "version": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+      "commit": "f8287d077c3a6cd3a70c2fa65db39005e96cb54f",
+      "build": "5dc63fbcf19634a55c66",
+      "manifest_sha256": "11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+      "passed": true,
+      "return_codes": {
+        "domains": 0,
+        "identity": 0,
+        "headers": 0,
+        "acceptance": 0,
+        "journeys": 0,
+        "changed-journeys": 0
+      },
+      "accepted_checks": {
+        "search": 10,
+        "accessibility": 17,
+        "home": 48,
+        "editorial": 11
+      },
+      "browser_cases": {
+        "journeys": 20,
+        "changed-journeys": 26
+      },
+      "identity_routes": 11,
+      "header_checks": 28,
+      "receipts": {
+        "identity.json": "d1adda383fad205052dbe34aeccd4a4ea721314926841639ea7ab6ff47ce3f99",
+        "headers.json": "4cb49368a4cb58b18d90d79691bb4ebc5ac13fae2f0d6db38d8b80f26bb62753",
+        "acceptance/summary.json": "91a8219af84aa11f134c3506fb337a2fa872b92fb5309a71e41f18b91851a4bf",
+        "journeys/summary.json": "dac2efedc7cb481835894446fcfee3f08f9e344e9f2898edb1da84f7656d1538",
+        "changed-journeys/summary.json": "7ea0ceb96d89ec1e553dadc1508409f589bdaf939a853226daaf7db1652d19d5",
+        "domains.json": "bc9323381fda92439913451e57f45f6125801b0432f02f40f8bcb262a763ae1c"
+      }
+    }
+  },
+  "public_canonical_redirects": {
+    "checked_utc": "2026-11-22T10:18:29.964291+00:00",
+    "rows": [
+      {
+        "request": "http://sciencetostartup.com/work/?q=Sage&reader=keep",
+        "expected": "https://sciencetostartup.com/work/?q=Sage&reader=keep",
+        "state": "passed",
+        "attempts": [
+          {
+            "status": 301,
+            "location": "https://sciencetostartup.com/work/?q=Sage&reader=keep",
+            "cf_ray": "a5e730c0cd6ba3e1-ORD",
+            "state": "passed",
+            "network_error": null
+          }
+        ]
+      },
+      {
+        "request": "http://www.sciencetostartup.com/work/?q=Sage&reader=keep",
+        "expected": "https://sciencetostartup.com/work/?q=Sage&reader=keep",
+        "state": "passed",
+        "attempts": [
+          {
+            "status": 301,
+            "location": "https://sciencetostartup.com/work/?q=Sage&reader=keep",
+            "cf_ray": "a5e730c0f9ee02a2-ORD",
+            "state": "passed",
+            "network_error": null
+          }
+        ]
+      },
+      {
+        "request": "https://www.sciencetostartup.com/work/?q=Sage&reader=keep",
+        "expected": "https://sciencetostartup.com/work/?q=Sage&reader=keep",
+        "state": "passed",
+        "attempts": [
+          {
+            "status": 301,
+            "location": "https://sciencetostartup.com/work/?q=Sage&reader=keep",
+            "cf_ray": "a5e730c129fd61dc-ORD",
+            "state": "passed",
+            "network_error": null
+          }
+        ]
+      }
+    ],
+    "passed": true
+  },
+  "browser_tls": "The enlarged Firefox homepage views use the workspace interception certificate exception. The capture matched the expected bytes. Independent HTTP clients checked the certificates and file identities.",
+  "private_receipt_sha256": {
+    "official-prepared/receipt.json": "73ba19117424044bf8d29990353a8ed053f432c27dde797980f74fa28c69bd83",
+    "prepared-verification.json": "e159aac7bdd0d8c38b867e8e36fe6dca89673e42909a692179de8fd06c72ea99",
+    "asset-upload-receipts/completed.json": "0521e1ee303f19fa2d75e43570b6ef8c3984cccabe2520f649b7ddc6fb462896",
+    "immutable-version.json": "ad75c9ac71b2f77b1f1036f05a7523c187617e82afb3d51542cc907384d8c982",
+    "prepromotion-provider.json": "222f4f1d5cdc353f720e87ba026565cae9d2a18ea09f69a98065d4dd3db78bf0",
+    "predecessor-identity.json": "bd2ee5d9fbb9baab0b8f262a772c47c89b36cc42720d7e6752de45f32fc2aacc",
+    "postpromotion-provider.json": "a3a0baa69eabc11b8197392c65fa829f1c2de65d482b5d8bda3a0e6cadd65c29",
+    "immutable-edge/summary.json": "8f155f7c50b6acce3556578a160b35f6b4282cb390928d21f55e2e87c361aac2",
+    "public-edge/summary.json": "23dec2fd6381542fa7a1f07d0df994a414aa0ad76d1a3484f31614903dab6ad8",
+    "retest-release/successor-f8287d07/official-workflows.json": "4f9061f0f56e110169002dffa52a089cf73bf75c7d1239a4fd86233576adbd59",
+    "retest-release/successor-f8287d07/ci-archive-crosscheck.json": "ce525ce9740496194b39d2df341e7a45020f78c1aed8af3a324b01166e1f044e",
+    "retest-release/successor-f8287d07/ci-measurements.json": "701728e6092ad1eadd7ee11af8b0db52e2a66901e4c437a39a5a08811b46bf6f",
+    "retest-release/successor-f8287d07/performance-comparison.json": "8885710f03aa0fe4e5ccfbc976ac20c0c6c1d881e7ef29ecf9fe566f1de0f979"
+  }
+}
