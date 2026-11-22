@@ -187,9 +187,10 @@ const imeritLedger = '/explore/#company/imerit/sources';
 const imeritImage = '/assets/products/imerit-exl-visual.png';
 
 async function openNativeSourceLedger(page, baseURL) {
-  await page.route('https://sciencetostartup.com/explore/', route => route.fulfill({
-    status: 307,
-    headers: { location: new URL('/explore/', baseURL).href },
+  const explore = new URL('/explore/', baseURL).href;
+  const canonical = 'https://sciencetostartup.com/explore/';
+  if (explore !== canonical) await page.route(canonical, route => route.fulfill({
+    status: 307, headers: { location: explore },
   }));
   await page.goto('/company/imerit/');
   await page.locator('summary#sources, #sources > summary').press('Enter');
