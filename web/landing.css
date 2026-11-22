@@ -207,18 +207,24 @@
   .landing-page .site-header .home-nav { display: none; }
   .site-header .site-search-open { flex: none; justify-content: center; width: 44px; min-width: 44px; padding: 0; }
   .site-header .site-search-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  .home-menu { display: block; flex: none; position: relative; margin-left: auto; }
-  .home-menu summary { display: flex; align-items: center; min-width: 44px; min-height: 44px; color: var(--green); }
+  .site-header:has(> .home-menu[open]) { align-items: flex-start; padding-block: 6px; }
+  .site-header:has(> .home-menu[open]) > .wordmark { margin-block: max(0px, (44px - 1.2em) / 2); }
+  .home-menu { display: block; flex: none; margin-inline-start: auto; }
+  .home-menu summary { display: flex; align-items: center; width: max-content; min-width: 44px; min-height: 44px; margin-inline-start: auto; color: var(--green); }
   .home-menu > nav[aria-label="Main"] {
-    position: absolute;
-    z-index: 2;
-    inset: 100% 0 auto auto;
-    display: grid;
-    gap: 0;
-    min-width: max-content;
-    padding: 2px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 8px;
+    width: max-content;
+    max-width: calc(100vw - 2 * var(--home-gutter));
+    padding: 2px 10px;
     border: 1px solid var(--border);
     background: var(--bg);
+    overflow-wrap: anywhere;
+  }
+  .home-menu > nav a { min-width: 44px; max-width: 100%; padding-inline: 4px; }
+  @supports selector(::details-content) and (contain: inline-size) {
+    .home-menu::details-content { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: end; contain: inline-size; }
   }
 }
 @media (max-width: 700px) {
