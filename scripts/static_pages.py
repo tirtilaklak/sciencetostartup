@@ -948,14 +948,13 @@ STYLE = (
     ".site-footer nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 32px;max-width:var(--measure);margin-bottom:20px}"
     ".site-footer>p{max-width:var(--measure)}.site-footer h2{margin:0 0 6px;padding:0;border:0;font-size:14px;font-weight:500;color:var(--ink)}.site-footer ul{margin:0;padding:0;list-style:none}.site-footer li{margin:0}.site-footer li a{display:inline-flex;align-items:center;min-height:44px;color:var(--muted);text-decoration:none}.site-footer li a:hover{color:var(--green);text-decoration:underline}"
     "@media(max-width:1100px){:root{--gutter:32px}.site-header{gap:24px}.site-nav{gap:22px}}"
-    "@media(max-width:700px){:root{--gutter:20px}.site-header{flex-wrap:wrap;gap:4px 12px;min-height:0;padding-top:12px}"
-    ".site-nav{flex-basis:100%;justify-content:space-between;gap:8px;height:48px}.site-nav a{font-size:14px}.wordmark{font-size:18px}"
+    "@media(max-width:700px){:root{--gutter:20px}"
     "h1{font-size:42px;line-height:1.08;letter-spacing:-1.2px}.lede{font-size:17px}h2{margin-top:40px;font-size:22px}dl.facts{grid-template-columns:7rem 1fr;gap:6px 16px;font-size:14px}"
     "thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}table,tbody,th,td{display:block}"
     "tbody tr{display:flex;flex-wrap:wrap;column-gap:18px;padding:12px 0;border-bottom:1px solid var(--border)}th,td{padding:0;border:0}td{margin-top:4px}td.value{white-space:normal}tbody th,td.wide-cell{flex-basis:100%}"
     "td[data-label]::before{content:attr(data-label) ': ';content:attr(data-label) ': ' / '';font-size:14px;font-weight:400;color:var(--muted)}"
     ".site-footer nav{grid-template-columns:1fr 1fr}.site-footer li{margin:0}.site-footer li a{display:inline-flex;align-items:center;min-height:44px}}"
-    "@media(max-width:380px){:root{--gutter:16px}.site-nav{gap:4px}.site-nav a{white-space:nowrap}h1{font-size:38px}}"
+    "@media(max-width:380px){:root{--gutter:16px}h1{font-size:38px}}"
     "@media(forced-colors:active){.ext::after{background:LinkText}}"
 )
 RIGHT_ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg>'
@@ -983,10 +982,11 @@ def cta(href, label):
 
 def site_header(current=None, state="page"):
     links = "".join(f'<a href="{ORIGIN}{path}"' + (f' aria-current="{state}"' if key == current else "") + f">{label}</a>" for key, label, path in NAV)
+    nav = f'<nav class="site-nav" aria-label="Main">{links}</nav>'
     return ('<a class="skip" href="#main">Skip to content</a>\n'
             f'<header class="site-header"><a class="wordmark" href="{ORIGIN}/"><span>{SITE_NAME}<small>The AI data field guide</small></span></a>'
-            f'<nav class="site-nav" aria-label="Main">{links}</nav>'
-            '<a class="site-search-open" href="/?search=#browse-guide" aria-label="Search the guide"><svg class="ui-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span class="site-search-label">Search</span></a></header>\n')
+            f'{nav}<a class="site-search-open" href="/?search=#browse-guide" aria-label="Search the guide"><svg class="ui-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span class="site-search-label">Search</span></a>'
+            f'<details class="site-menu"><summary>Menu</summary>{nav}</details></header>\n')
 
 
 def disclosure_html():
@@ -1850,8 +1850,8 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     claim_count = sum(claim.get("company_id") == cid for claim in research.data.get("claims", []))
     body.append(f'<details class="company-fold"><summary id="sources" data-native-sources><span>Sources &amp; data</span><small>{plural(source_count, "source")}</small></summary><div class="company-fold-body"><h2 id="full-profile">Sources and data</h2>'
                 f'<p>{plural(claim_count, "claim")} · {plural(source_count, "source")} · Research compiled {escape(format_date(research.as_of))}</p>'
+                + (f'<p><a href="/company/{cid}/work-sources/">{plural(len(work_source_ids), "paid work source")}</a></p>' if work_source_ids else '')
                 + company_sources_html(research, cid, name, work_source_ids) +
-                (f'<p><a href="/company/{cid}/work-sources/">{plural(len(work_source_ids), "paid work source")}</a></p>' if work_source_ids else '') +
                 f'<ul class="company-source-links"><li><a href="{app_url}/sources">Source ledger</a></li><li><a href="{app_url}/people">Funding and people</a></li><li><a href="{ORIGIN}/research.json" download>Research JSON</a></li><li><a href="{ORIGIN}/observatory.sqlite" download>SQLite database</a></li></ul>'
                 f'<p class="company-record-links"><a href="{app_url}">Interactive record</a><a href="{app_url}/traction">Figures</a><a href="{app_url}/work">Paid work</a><a href="{ORIGIN}/method/#grades">Source grades</a></p>')
     if logo: body.append(f'<p class="company-logo-source">Company logo: {external_link(logo.get("source_page") or logo.get("asset_url"), "official source")}. {LOGO_NOTE}</p>')

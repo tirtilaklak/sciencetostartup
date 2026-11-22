@@ -410,11 +410,9 @@ test('at 320 pixels the public header, navigation and page fit without horizonta
     await page.goto(path);
     const header = page.locator('body > header.site-header');
     await expect(header).toBeVisible();
-    if (path === '/') {
-      const menu = header.locator('.home-menu > summary');
-      await expect(menu).toBeVisible();
-      await menu.press('Enter');
-    }
+    const menu = header.locator('details > summary');
+    await expect(menu).toBeVisible();
+    await menu.press('Enter');
     const nav = header.getByRole('navigation', { name: 'Main', exact: true });
     for (const name of ['Daily scan', 'Research', 'Companies', 'Paid work', 'About']) {
       const link = nav.getByRole('link', { name, exact: true });
