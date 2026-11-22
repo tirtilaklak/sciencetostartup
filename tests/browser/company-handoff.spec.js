@@ -15,7 +15,7 @@ test('native Companies carries the exact saved search result into Compare', asyn
   const directoryURL = page.url();
   expect(Object.fromEntries(new URL(directoryURL).searchParams)).toEqual({ group: 'expert-data-evaluation', reader: 'keep', q: 'Mercor' });
 
-  await action.click();
+  await action.press('Enter');
   await expect(page).toHaveURL(/\/explore\/#compare\/mercor$/);
   await expect(page.locator('#compare-content [data-remove]')).toHaveAttribute('data-remove', 'mercor');
   const add = page.getByRole('combobox', { name: 'Add a company' });
@@ -28,6 +28,7 @@ test('native Companies carries the exact saved search result into Compare', asyn
   await expect(search).toHaveValue('Mercor');
   await expect(page.getByRole('combobox', { name: 'Business group' })).toHaveValue('expert-data-evaluation');
   await expect(results).toHaveAttribute('data-company', 'mercor');
+  await expect(action).toBeFocused();
   await expect(action).toBeInViewport({ ratio: 1 });
   await page.goForward();
   await expect(page.locator('#compare-content [data-remove]')).toHaveAttribute('data-remove', 'mercor');
