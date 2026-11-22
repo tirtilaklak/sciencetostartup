@@ -51,6 +51,8 @@ const cases = [
 
 for (const { name, criteria, includes, excludes } of cases) {
   test(`Work cards, Compare and both CSV downloads agree for ${name}`, async ({ browser, page, baseURL }, testInfo) => {
+    const search = new URLSearchParams(criteria).toString();
+    if (!search) test.slow(); // The full directory opens every lazy group before downloading.
     const staticGroups = await noScriptWork(browser, baseURL, async fallback => {
       await expect(fallback.locator('[data-work-native-fallback]')).toBeVisible();
       const groups = await fallback.locator('[data-work-group]').evaluateAll(sections => Object.fromEntries(
@@ -63,7 +65,6 @@ for (const { name, criteria, includes, excludes } of cases) {
       return groups;
     });
 
-    const search = new URLSearchParams(criteria).toString();
     await page.goto(search ? `/work/?${search}` : '/work/');
     const compareLink = page.getByRole('link', { name: 'Compare results', exact: true });
     await expect(compareLink).toBeVisible();
