@@ -152,8 +152,11 @@ class CurrentCompanyRenderingTests(unittest.TestCase):
         page, entry = Page(text), registry["entries"][0]
         self.assertEqual([card["data-company"] for card in page.cards], ["org.example"])
         self.assertIn("Data annotation", page.cards[0]["data-search"])
-        self.assertIn("1 profiles", " ".join(page.text))
-        self.assertIn("0 original profiles + 1 current additions", " ".join(page.text))
+        directory_text = " ".join(page.text)
+        self.assertRegex(directory_text, r"1 compan(?:y|ies)")
+        self.assertIn("Compare uses the 0 historical profiles", directory_text)
+        self.assertIn("Wikipedia context and official sources for their offerings", directory_text)
+        self.assertEqual(page.links.count("/current-companies.json"), 1)
         self.assertIn(sp.ORIGIN + cc.company_path(entry), page.links)
         for url in [entry["wikipedia"][key] for key in ("article_url", "revision_url", "history_url", "license_url")] + [source["url"] for source in entry["sources"]]:
             self.assertIn(url, page.links)
