@@ -1215,7 +1215,7 @@ def work_requirements(route):
     return requirements
 
 
-def work_conditions(route, requirements=None):
+def work_conditions(route, requirements=None, *, include_kind=True):
     """Show the source terms before the destination on both plain surfaces."""
     if requirements is None: requirements = work_requirements(route)
     hours_record = ((route.get("research_record") or {}).get("route") or {}).get("hours") or {}
@@ -1225,7 +1225,10 @@ def work_conditions(route, requirements=None):
     conflict = commitment_review.get("state") == "conflicting" and commitment_review.get("note")
     hours = [f"Schedule conflict. {clean(conflict)}"] if conflict else [route.get("hours"), hours_detail]
     commitment = list(dict.fromkeys(clean(v) for v in (*hours, route.get("duration")) if clean(v)))
-    parts = [f'<span class="sub">{escape(WORK_KIND_LABELS[work_kind(route)])} · {escape(WORK_ENGAGEMENT_LABELS[work_engagement(route)])}</span>']
+    classification = WORK_ENGAGEMENT_LABELS[work_engagement(route)]
+    if include_kind:
+        classification = f"{WORK_KIND_LABELS[work_kind(route)]} · {classification}"
+    parts = [f'<span class="sub">{escape(classification)}</span>']
     if commitment: parts.append('<span class="sub">' + escape(" · ".join(commitment)) + '</span>')
     if requirements:
         parts.append('<span class="sub">' + escape(" · ".join(requirements)) + '</span>')
@@ -1958,7 +1961,7 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
     return document(research, title, description, canonical, "".join(body), structured, current="companies", note=f"<p>{LOGO_NOTE}</p>")
 
 
-def work_table(research, rows, names, key):
+def work_table(research, rows, names, key, *, include_kind=True):
     """Native listing cards retain all conditions and evidence without JavaScript."""
     out = []
     for index, r in enumerate(rows):
@@ -1978,10 +1981,16 @@ def work_table(research, rows, names, key):
         place = f'<p class="work-place">{escape(work_location(r))}' if key != "boards" else ""
         offer_html = f'<div class="work-offer">{offer}{place}</div>' if offer or place else ""
         action_html = f'<p class="work-listing-action">{external_link(destination, action, work_action_name(action, r, company))}{availability(destination, research.health)}</p>' if destination else ""
+        full_review = work_review_label(research, r)
+        brief_review = work_review_label(research, r, compact=True)
+        # Compare reads the full review line. The card only needs a shared date once.
+        review_html = escape(brief_review)
+        if brief_review != full_review:
+            review_html += f'<span hidden>{escape(full_review.removeprefix(brief_review))}</span>'
         out.append(f'<li class="work-listing" id="{rid}" tabindex="-1" data-work-route="{rid}" data-arrangements="{escape(arrangements)}">'
                    f'<div class="work-heading"><span class="work-company" id="{company_label}">{escape(company)}</span>{tag}'
                    f'<h3><a href="/company/{escape(cid)}/#{rid}" aria-describedby="{company_label}">{escape(role)}</a></h3></div>{offer_html}'
-                   f'<p class="work-reviewed">{escape(work_review_label(research, r))}<div class="work-listing-conditions">{work_conditions(r)}</div>'
+                   f'<p class="work-reviewed">{review_html}<div class="work-listing-conditions">{work_conditions(r, include_kind=include_kind)}</div>'
                    f'{action_html}{work_terms_html(research, r, company, detailed=False, primary_action_url=destination)}')
     return f'<ul class="work-listings">{"".join(out)}</ul>\n'
 
@@ -1998,6 +2007,8 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
     description = truncate(f"{plural(named_count, 'named listing')} and {plural(program_count, 'expert network or program', 'expert networks and programs')} at {plural(open_companies, 'AI data company', 'AI data companies')}, with published pay, requirements, sources and separate review dates.")
     crumbs = [("Overview", f"{ORIGIN}/"), ("Paid work", canonical)]
     buckets = {key: sort_routes([r for r in rows if work_display_bucket(r) == key], names) for key, _, _ in WORK_DISPLAY_BUCKETS}
+    directory_labels = {"outside": "Non-training jobs", "closed": "Past & reference"}
+    groups = [(key, directory_labels.get(key, label), note) for key, label, note in WORK_DISPLAY_BUCKETS]
     scope = " and ".join(label for present, label in (
         (bool(buckets["boards"]), "career pages"),
         (any(row.get("status") in ("historical", "closed") for row in buckets["closed"]), "past listings"),
@@ -2009,7 +2020,9 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
         f'{plural(open_companies, "company", "companies")}</p>'
     )
     export = work_results or {}
-    section_links = "".join(f'<li><a data-work-jump="{key}" href="#{key}">{label}</a></li>' for key, label, _ in WORK_DISPLAY_BUCKETS if buckets[key])
+    section_links = "".join(f'<li><a data-work-jump="{key}" href="#{key}">{escape(label)}</a></li>' for key, label, _ in groups if buckets[key])
+    kind_options = "".join(f'<option value="{key}">{escape("Network/program" if key == "programs" else label)}</option>'
+                           for key, label, _ in groups)
     engagement_filter_labels = {
         "employment": "Staff jobs", "bounty": "Bounty", "varies": "Varies", "unknown": "Unconfirmed",
     }
@@ -2022,7 +2035,7 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
             '<div class="work-page-filter-slot" data-work-filter-slot><form class="work-page-filters" data-work-filters hidden role="search" aria-label="Find paid work" id="work-filters">'
             '<label class="work-page-search">Search listings<input name="q" type="search" placeholder="Role, skill or firm" maxlength="256" autocomplete="off" id="name-filter"></label>'
             '<details class="work-page-filter-options"><summary>Filters</summary><div class="work-page-filter-fields">'
-            '<label>Listing type<select name="kind"><option value="">All records</option><option value="named">Named listings</option><option value="programs">Network/program</option><option value="boards">Career pages</option><option value="outside">Other jobs</option><option value="closed">Past &amp; other</option></select></label>'
+            f'<label>Listing type<select name="kind"><option value="">All records</option>{kind_options}</select></label>'
             '<label>Work arrangement<select name="arrangement"><option value="">Any arrangement</option><option value="remote">Remote possible</option><option value="onsite">On-site or hybrid</option><option value="varies">Varies or unlisted</option></select></label>'
             f'<label>Engagement<select name="type"><option value="">Any engagement</option>{engagement_options}</select></label>'
             '<label>Pay unit<select name="pay"><option value="">Any pay</option><option value="hourly">Hourly</option><option value="task">Per task</option><option value="yearly">Yearly</option><option value="monthly">Monthly</option><option value="numeric">Listed amount</option><option value="undisclosed">Pay unlisted</option></select></label>'
@@ -2042,14 +2055,16 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
             '<div class="work-page-empty" data-work-empty hidden><p>No records match. Try another word or clear the filters.</p><button type="button" data-work-clear>Clear search and filters</button></div>\n',
             '<section id="work-integrated-table" data-work-comparison hidden><h2 tabindex="-1">Compare paid work results</h2></section>',
             '<div class="work-page-list">']
-    for key, label, note in WORK_DISPLAY_BUCKETS:
+    for key, label, note in groups:
         if not buckets[key]: continue
         fallback = '<noscript><p class="work-no-js-message">Filters need JavaScript. Showing the full directory.</p></noscript>'
-        contents = f'<h2 id="{key}" tabindex="-1">{label}</h2>\n{fallback}' + (f'<p class="muted">{note}</p>\n' if note else '') + work_table(research, buckets[key], names, key)
+        common_kind = WORK_KIND_LABELS[work_kind(buckets[key][0])] if key in ("named", "programs", "boards") else ""
+        kind_attr = f' data-work-kind-label="{escape(common_kind)}"' if common_kind else ""
+        contents = f'<h2 id="{key}" tabindex="-1">{escape(label)}</h2>\n{fallback}' + (f'<p class="muted">{note}</p>\n' if note else '') + work_table(research, buckets[key], names, key, include_kind=not common_kind)
         if key in ("named", "programs"):
-            body.append(f'<section class="work-page-group" data-work-group="{key}">{contents}</section>\n')
+            body.append(f'<section class="work-page-group" data-work-group="{key}"{kind_attr}>{contents}</section>\n')
         else:
-            body.append(f'<details class="work-page-group work-page-secondary" data-work-group="{key}"><summary>{label} <span>{len(buckets[key])}</span></summary>{contents}</details>\n')
+            body.append(f'<details class="work-page-group work-page-secondary" data-work-group="{key}"{kind_attr}><summary>{escape(label)} <span>{len(buckets[key])}</span></summary>{contents}</details>\n')
     body.append('</div><p class="work-page-more"><a href="/explore/#work" data-work-explore>Open Work in Explore</a></p>')
     structured = page_node("CollectionPage", title, description, canonical, modified, crumbs)
     return document(research, title, description, canonical, "".join(body), structured, current="work", work_script=work_script)

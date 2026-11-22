@@ -116,9 +116,12 @@
           ...Array.from(pay?.querySelectorAll('strong ~ .sub') || [], note => note.textContent.trim()),
         ]);
         const detail = row.insertCell();
+        const groupKind = card.closest('[data-work-group]')?.dataset.workKindLabel;
+        const conditionFields = Array.from(card.querySelector('.work-listing-conditions').children, field => field.textContent.trim());
+        if (groupKind && conditionFields.length) conditionFields[0] = groupKind + ' · ' + conditionFields[0];
         appendComparisonFields(detail, [
           text(card, '.work-place'),
-          ...Array.from(card.querySelector('.work-listing-conditions').children, field => field.textContent.trim()),
+          ...conditionFields,
           text(card, '.work-reviewed'),
         ]);
         const action = card.querySelector('.work-listing-action a');

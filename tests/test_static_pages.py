@@ -820,6 +820,8 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(sorted(listed), sorted(r["id"] for r in self.routes))
         order = [key for key, _, _ in sp.WORK_DISPLAY_BUCKETS if any(sp.work_display_bucket(r) == key for r in self.routes)]
         self.assertEqual(re.findall(r'<h2 id="([a-z]+)"', text), order)
+        self.assertIn('<option value="outside">Non-training jobs</option>', text)
+        self.assertIn('<option value="closed">Past &amp; reference</option>', text)
         self.assertIn(f'href="{sp.SCAM_GUIDE}"', text)
         self.assertIn("Never pay to get work.", text)
         self.assertNotIn("JobPosting", text)
