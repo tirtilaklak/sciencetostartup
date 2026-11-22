@@ -17,14 +17,19 @@
 .scan-follow a{display:inline-flex;align-items:center;min-height:44px}
 .scan-date-form{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-width:0;max-width:100%}
 .scan-date-form label{font-size:11px;letter-spacing:.025em;color:var(--muted)}
-.scan-date-form>div{display:flex;align-items:center;gap:8px;min-width:0;max-width:100%}
+.scan-date-form>div{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0;max-width:100%}
 .static-page .scan-date-form select,.static-page .scan-date-form button{font-size:13px;min-height:44px}
 .scan-date-form button{padding:0 12px;border:1px solid var(--green);border-radius:4px;background:var(--green);color:white;cursor:pointer}
 .scan-filter-disclosure{border-bottom:1px solid var(--border)}
 :root[data-daily-pending] .daily-scan .scan-filter-disclosure[hidden]{display:block!important;visibility:hidden}
-.scan-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,140px) minmax(0,155px);gap:16px;padding:12px 0 16px}
+.scan-controls{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;padding:12px 0 16px}
+/* Native selects contribute the width of their widest option before wrapping. */
+.scan-controls>div{flex:0 1 max-content;min-width:min(140px,100%);max-width:100%}
+.scan-controls>div:last-child{min-width:min(155px,100%)}
+.scan-controls>.scan-search-control{flex:1 0 min(224px,100%);min-width:0}
 .scan-controls label{display:block;font-size:11px;letter-spacing:.025em;color:var(--muted);margin-bottom:8px}
-.scan-controls input,.scan-controls select{width:100%;border-color:var(--border);background:transparent;border-radius:3px;font-size:13px;min-height:44px}
+.scan-controls input,.scan-controls select{width:100%;background:transparent;border-radius:3px;font-size:13px;min-height:44px}
+.scan-controls input,.scan-controls select,.static-page .scan-date-form select{border-color:#7b8978}
 .scan-list-heading{display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;min-height:40px;padding:8px 0;font-size:11px;color:var(--muted)}
 .scan-list-heading p{margin:0;font-weight:600;color:var(--ink)}
 .scan-list-heading button,.scan-empty button{background:none;border:0;text-decoration:underline;color:var(--green);font-size:12px;padding:8px}
@@ -42,7 +47,7 @@
 .scan-item h2 a:hover{text-decoration:underline;text-underline-offset:4px}
 .scan-explanation{margin:0;color:var(--ink);font-size:14px;line-height:1.7;max-width:72ch;overflow-wrap:anywhere}
 .scan-bottom{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:16px;margin-top:12px}
-.scan-topic-label{font-size:10px;letter-spacing:.035em;color:var(--muted);flex:none}
+.scan-topic-label{font-size:10px;letter-spacing:.035em;color:var(--muted);flex:none;max-width:100%;overflow-wrap:anywhere}
 .scan-bottom details{max-width:700px;flex:1;text-align:right}
 .static-page .scan-bottom summary{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:11px;color:var(--green);list-style:none}
 .scan-bottom summary::-webkit-details-marker{display:none}
@@ -85,11 +90,12 @@
   .scan-issue>span:first-child{font-size:10px}
   .scan-archive-disclosure:not([open])~.scan-date-form{display:none}
   .scan-date-form{padding-bottom:4px}
-  .scan-controls{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px;padding-top:0}
-  .scan-search-control{grid-column:1/-1}
+  .scan-controls{gap:14px 12px;padding-top:0}
+  .scan-controls>div:not(.scan-search-control){flex-grow:1;min-width:0}
+  .scan-controls>.scan-search-control{flex-basis:100%}
   .scan-list-heading{gap:4px 8px}
   .scan-list-heading>span{font-size:10px}
-  .scan-item{grid-template-columns:24px 1fr;gap:10px;padding-top:22px}
+  .scan-item{grid-template-columns:minmax(24px,max-content) 1fr;gap:10px;padding-top:22px}
   .scan-rank{font-size:10px}
   .scan-meta{font-size:10px;gap:6px 10px}
   .scan-meta>span:last-child{margin-left:0;flex-basis:100%}
@@ -104,6 +110,6 @@
   .scan-item:target{box-shadow:8px 0 #eaf0e5,-8px 0 #eaf0e5}
 }
 @media(max-width:360px){
-  .scan-controls{grid-template-columns:minmax(0,1fr)}
+  .scan-controls>div:not(.scan-search-control){flex-basis:100%}
   .scan-controls select{padding-inline:10px}
 }

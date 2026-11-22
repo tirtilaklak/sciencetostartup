@@ -51,8 +51,9 @@
     try {
       const state = history.state;
       if (state != null && Object.prototype.toString.call(state) !== '[object Object]') return;
+      const active = document.activeElement;
       history.replaceState({ ...state, [filterKey]: { url: location.href,
-        open: filterDisclosure.open, focusSummary: document.activeElement === filterSummary } }, '');
+        open: filterDisclosure.open, focusSummary: active === filterSummary, focusSearch: active === search } }, '');
       history.scrollRestoration = 'auto';
     } catch (_) { /* Keep native disclosure and history behavior. */ }
   }
@@ -133,7 +134,9 @@
         if (!returnFocus && document.activeElement === document.body) {
           const archiveLink = archive.open ? archiveLinks.get(reading?.returnToArchive) : null;
           const focusSummary = compact.matches && (filters?.focusSummary ?? reading?.returnToFilterSummary) === true;
-          returnFocus = focusSummary ? filterSummary : reading?.returnToDateGo === true ? dateGo : archiveLink;
+          const focusSearch = filterDisclosure.open && filters?.focusSearch === true;
+          returnFocus = focusSummary ? filterSummary : focusSearch ? search :
+            reading?.returnToDateGo === true ? dateGo : archiveLink;
         }
         returnFocus?.focus({ preventScroll: true });
       }
@@ -212,7 +215,9 @@
         // replaceState resets Navigation state, including other components'
         // fields. Carry that independent state across this URL-only change.
         const entry = navigationState ? navigationAPI.currentEntry.getState() : undefined;
-        history.replaceState(history.state, '', url);
+        const filters = savedClassicFilters();
+        const state = filters ? { ...history.state, [filterKey]: { ...filters, url: url.href } } : history.state;
+        history.replaceState(state, '', url);
         if (navigationState) navigationAPI.updateCurrentEntry({ state: entry });
       } catch (_) { /* Filtering still works. */ }
     }
@@ -229,6 +234,10 @@
     filter();
     if (compact.matches) showFilters(true);
     search.focus();
+    if (filterObserver && compact.matches) {
+      const saved = savedClassicFilters();
+      if (!saved?.open || !saved.focusSearch) saveClassicFilters();
+    }
   }
   compact.addEventListener('change', event => {
     const active = document.activeElement;
@@ -268,7 +277,8 @@
     filterObserver.observe(filterDisclosure, { attributeFilter: ['open'] });
     document.addEventListener('focusin', event => {
       const saved = savedClassicFilters();
-      if (compact.matches && saved && saved.focusSummary !== (event.target === filterSummary)) saveClassicFilters();
+      if (compact.matches && saved && (saved.focusSummary !== (event.target === filterSummary) ||
+          (saved.focusSearch === true) !== (event.target === search))) saveClassicFilters();
     });
   }
   // During pagehide WebKit can already expose the destination entry. Never

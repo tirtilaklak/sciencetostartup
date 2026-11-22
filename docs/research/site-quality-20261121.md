@@ -4,7 +4,7 @@ The audit began at 7:30 PM Pacific on November 21, 2026. The first three hours a
 
 ## Current pass
 
-PR #34 merged at `1cecd451`. Public Worker 41 serves build `5dc63fbcf19634a55c66`. The latest approved Daily edition is November 18. PR #35’s twelfth build passed 1,109 Python tests and all 72 mobile performance runs. Ten independent reviewers checked the twelfth build. The thirteenth contributors are addressing their new findings. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Public release receipts](site-quality-20261121/fifth-public-release.json)
+PR #34 merged at `1cecd451`. Public Worker 41 serves build `5dc63fbcf19634a55c66`. PR #35 now contains thirteenth build `ea33475d17a8c53ceb65`. Ten contributors delivered the changes. The twelfth build passed 228 targeted browser cases and all official workflows. Its independent review found enlarged menus clipping and a Mobile WebKit cold-Back scroll reset. The thirteenth exact-build audit is in progress. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Public release receipts](site-quality-20261121/fifth-public-release.json)
 
 ## Initial baseline and first three rounds
 
@@ -368,3 +368,11 @@ Both GitHub workflows passed on `ec9345d5`. The 72 mobile scores ranged from 98 
 At 390px with enlarged text, the native Menu clipped its destination labels and Daily cropped its selected filter values. Global Search’s placeholder clipped at 320px. Clear filters lost the open search field on Forward in classic Firefox. Keyboard readers had to pass 234 Market controls to reach Definitions. [Observed issues and acceptance criteria](site-quality-20261121/twelfth-audit-findings.json) · [Phone screenshots and layout trials](site-quality-20261121/twelfth-phone-menu-and-filters.png)
 
 Reviewers also followed 230 more Explore destinations discovered after rendering. All 515 distinct destinations reached the intended content on phone and desktop, for 1,030 successful visits. The twelfth frozen build passed 228 targeted browser cases. Three groups passed on full repeat after browser or local server failures. The first runs are retained. The thirteenth repair also covers the open Menu obscuring the next focused control and enlarged Daily ranks overlapping the story kind.
+
+## Thirteenth implementation
+
+The native Menu now expands the header so its labels and the next focused page control remain visible. Enlarged Firefox text at 390px previously put the first link 67px outside the viewport. The Daily filters give the selected option its full width. The rank, topic chips and date picker reflow at larger text sizes. The global Home search hint reads “Search” and uses 6.17:1 contrast.
+
+The Work page links each visible job title to its exact company role. All 135 role destinations and the separate issuer actions are preserved. Work weighs 299,700 bytes raw and 42,501 bytes compressed. The Companies page repairs a late WebKit scroll reset after returning from a dossier and respects intervening reader input. Daily restores the open Search field after Clear filters and a cold Forward.
+
+Keyboard users can skip the 234 Market matrix controls directly to Definitions. Grouped sorting announces its actual order. Unavailable Paid delivery buttons and dialogs now name the visible measure. The 39-company results export matched the previous build byte for byte in contributor testing. [Contributors and frozen source](site-quality-20261121/thirteenth-implementation.json) · [Twelfth findings](site-quality-20261121/twelfth-audit-findings.json)

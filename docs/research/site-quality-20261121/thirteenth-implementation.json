@@ -1,0 +1,194 @@
+{
+  "commit": "0632edf1eb2333744b0180cd9bc64fad866e397e",
+  "build_id": "ea33475d17a8c53ceb65",
+  "manifest_sha256": "302ff62b32ee3c9e8b1e8fec4f5dcdd1ca9a09b7baf480a98ffea4adbca273f1",
+  "payloads": 1281,
+  "editorial_release_id": "2026-11-22.9",
+  "model": "gpt-6.2-sol",
+  "reasoning_effort": "ultra",
+  "workers": {
+    "fix13_menu": {
+      "ownership_recorded_utc": "2026-11-22T15:49:47.593028+00:00",
+      "findings": [
+        "A12-menu"
+      ],
+      "paths": [
+        "web/field-guide.css",
+        "web/page-layout.css"
+      ],
+      "commits": [
+        "d8553fcd",
+        "9d25eea4"
+      ]
+    },
+    "fix13_companies_back": {
+      "ownership_recorded_utc": "2026-11-22T15:55:52.939335+00:00",
+      "findings": [
+        "A12-companies-cold"
+      ],
+      "paths": [
+        "web/companies-page.js"
+      ],
+      "commits": [
+        "a9acc8d3"
+      ]
+    },
+    "fix13_company_history_tests": {
+      "ownership_recorded_utc": "2026-11-22T15:55:53.032929+00:00",
+      "findings": [
+        "A12-companies-cold"
+      ],
+      "paths": [
+        "tests/browser/native-handoff-history.spec.js"
+      ],
+      "commits": [
+        "eea69124"
+      ]
+    },
+    "fix13_daily_forward": {
+      "ownership_recorded_utc": "2026-11-22T15:55:53.114430+00:00",
+      "findings": [
+        "A12-clear-forward"
+      ],
+      "paths": [
+        "web/daily-scan.js",
+        "tests/browser/daily.spec.js"
+      ],
+      "commits": [
+        "57318d95"
+      ]
+    },
+    "fix13_daily_layout": {
+      "ownership_recorded_utc": "2026-11-22T15:55:54.194918+00:00",
+      "findings": [
+        "A12-daily-390",
+        "A12-daily-boundary"
+      ],
+      "paths": [
+        "web/daily-scan.css",
+        "tests/browser/daily-phone-reflow.spec.js"
+      ],
+      "commits": [
+        "cc0e1d37"
+      ]
+    },
+    "fix13_market": {
+      "ownership_recorded_utc": "2026-11-22T16:01:06.755926+00:00",
+      "findings": [
+        "A12-market-skip",
+        "A12-market-sort",
+        "A12-market-measure"
+      ],
+      "paths": [
+        "web/business-health.js",
+        "web/index.html"
+      ],
+      "commits": [
+        "ae62e20b"
+      ]
+    },
+    "fix13_search": {
+      "ownership_recorded_utc": "2026-11-22T16:01:06.792616+00:00",
+      "findings": [
+        "A12-search-hint"
+      ],
+      "paths": [
+        "web/landing.html",
+        "web/landing.css",
+        "web/home-search.js",
+        "tests/browser/home.spec.js"
+      ],
+      "commits": [
+        "0c9d7ba2"
+      ]
+    },
+    "fix13_market_tests": {
+      "ownership_recorded_utc": "2026-11-22T16:01:58.932522+00:00",
+      "findings": [
+        "A12-market-skip",
+        "A12-market-sort",
+        "A12-market-measure"
+      ],
+      "paths": [
+        "tests/browser/market-phone-accessibility.spec.js",
+        "tests/browser/market-focus.spec.js"
+      ],
+      "commits": [
+        "87f1558a"
+      ]
+    },
+    "fix13_native_header_tests": {
+      "ownership_recorded_utc": "2026-11-22T16:03:32.606898+00:00",
+      "findings": [
+        "A12-menu",
+        "A12-menu-open"
+      ],
+      "paths": [
+        "tests/browser/native-phone-navigation.spec.js"
+      ],
+      "commits": [
+        "68952c1f"
+      ]
+    },
+    "fix13_work_title": {
+      "ownership_recorded_utc": "2026-11-22T16:04:02.672505+00:00",
+      "findings": [
+        "A12-work-title"
+      ],
+      "paths": [
+        "scripts/static_pages.py",
+        "tests/browser/explore-work-layout.spec.js",
+        "tests/test_static_pages.py",
+        "web/work-page.js",
+        "web/work-page.css",
+        "tests/browser/work-profile-return.spec.js",
+        "tests/browser/native-search.spec.js"
+      ],
+      "commits": [
+        "7ca024c7"
+      ]
+    }
+  },
+  "native_page_sizes": {
+    "work": {
+      "bytes": 299700,
+      "gzip9": 42501
+    },
+    "company/afterquery": {
+      "bytes": 154676,
+      "gzip9": 22542
+    }
+  },
+  "previous_candidate": {
+    "source_and_artifact": "ec9345d5a2f118e066fc897b3d9e96d7338f1d88",
+    "build": "96e25098b02da34fdb20",
+    "manifest": "3ee2246bc0506c355cbdc00907ff057fda6978631bd0212fc48b8e753885c888",
+    "local_targeted_journeys": 228,
+    "acceptance": 86,
+    "official_ci": 45039549361,
+    "official_browser": 45039549372,
+    "disposition": "Superseded before staging after independent native-menu and cold-return findings."
+  },
+  "public_at_freeze": {
+    "checked_utc": "2026-11-22T16:02:34.452Z",
+    "deployment": {
+      "id": "6523aad9-1019-4eca-b781-408a55b9f33a",
+      "created_on": "2026-11-22T10:18:22.645027Z",
+      "versions": [
+        {
+          "version_id": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+          "percentage": 100
+        }
+      ]
+    },
+    "version": {
+      "id": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+      "number": 41,
+      "annotations": {
+        "workers/commit_sha": "f8287d077c3a6cd3a70c2fa65db39005e96cb54f",
+        "workers/message": "ScienceToStartup build 5dc63fbcf19634a55c66; editorial 2026-11-22.3; manifest 11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+        "workers/triggered_by": "version_upload"
+      }
+    }
+  }
+}

@@ -563,6 +563,7 @@ const S2SWork = (() => {
     const groupElements = new Map([...list.querySelectorAll('[data-work-group]')].map(group => [group.dataset.workGroup, group]));
     const fields = Object.fromEntries(S2SWork.keys.map(key => [key, form.elements.namedItem(key)]));
     const cards = new Map([...list.querySelectorAll('[data-work-route]')].map(card => [card.dataset.workRoute, card]));
+    const profileLinkSelector = '.work-heading a[href^="/company/"]';
     const text = (card, selector) => card.querySelector(selector)?.textContent.trim() || '';
     // An older page can still request the current unversioned enhancer. Its own
     // cards supply search terms and groups so a newer release cannot change their facts.
@@ -794,7 +795,7 @@ const S2SWork = (() => {
       if (workReturnFocus) {
         const { kind, page, href, top, role, termsOpen } = workReturnFocus;
         const card = kind === 'profile' ? cards.get(role) : null;
-        const link = kind === 'profile' ? card?.querySelector('a.work-company') : handoffLinks[kind];
+        const link = kind === 'profile' ? card?.querySelector(profileLinkSelector) : handoffLinks[kind];
         if (link && page === location.href && href === link.href) return { link, top, card, termsOpen };
       } else if (workCompareFocus && compareLink) return { link: compareLink };
       return null;
@@ -933,7 +934,7 @@ const S2SWork = (() => {
     }
     if (comparison && window.top === window) {
       list.addEventListener('click', event => {
-        const link = event.target.closest?.('a.work-company[href^="/company/"]');
+        const link = event.target.closest?.(profileLinkSelector);
         if (!link || !sameTabActivation(event, link)) return;
         const card = link.closest('[data-work-route]');
         if (!card) return;
