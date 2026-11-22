@@ -318,7 +318,9 @@ class StaticPageTests(unittest.TestCase):
         facts = PageFacts(text)
         self.assertEqual(facts.canonicals, [ORIGIN + "/companies/"])
         for cid in self.companies: self.assertIn(f'href="{ORIGIN}/company/{cid}/"', text, cid)
-        self.assertIn(f'href="{ORIGIN}/explore/#companies"', text)
+        compare_links = [a["href"] for a in facts.anchors if "directory-compare" in a.get("class", "").split()]
+        expected_comparisons = [f"/explore/#compare/{cid}" for cid in self.companies]
+        self.assertCountEqual(compare_links, ["/explore/#compare", *expected_comparisons])
         labels = sp.read_js_object(ROOT / "web/editorial.js", "GROUP_LABELS")
         for group in {e["primary_offering"] for e in self.editorial.values()}:
             slug = re.sub(r"[^a-z0-9]+", "-", group.lower()).strip("-")
