@@ -10,7 +10,7 @@ function readableDate(text){
 function profileDate(value){return readableDate(dateText(value));}
 function profileSourceMeta(s,finance){
  const added=profileDate(s.accessed_on),published=finance?.source_published_on||s.published_on||evidenceContextSourcePublicationDate(s.id),checked=finance?.source_checked_on;
- const original=s.retrieval_status==='checked'?'Checked '+added:s.retrieval_status==='summary_only'?(checked?'Source summary recorded ':'Summary only, page not reviewed · recorded ')+added:s.retrieval_status==='unverified'?'Not checked again · recorded '+added:'Recorded '+added;
+ const original=s.retrieval_status==='checked'?'Checked '+added:s.retrieval_status==='indexed_content_checked'?'Indexed text checked '+added+' · Direct access encountered a bot challenge':s.retrieval_status==='summary_only'?(checked?'Source summary recorded ':'Summary only, page not reviewed · recorded ')+added:s.retrieval_status==='unverified'?'Not checked again · recorded '+added:'Recorded '+added;
  return [s.publisher,published?'Published '+profileDate(published):'Publication date not stated',original,checked&&checked!==s.accessed_on?'Source checked '+profileDate(checked):''].filter(Boolean).join(' · ');
 }
 function profileFinanceProjection(id){return window.BUSINESS_HEALTH?.profile_finance?.[id];}
@@ -23,6 +23,14 @@ function profileReviewedObservationForClaim(cl){
  if(!cl)return null;
  return (window.BUSINESS_HEALTH?.observations||[]).find(o=>o.evidence_type==='estimate'&&o.company_id===cl.company_id&&
   o.metric_ids?.length===1&&o.id===o.metric_ids[0]&&o.claim_ids?.length===1&&o.claim_ids[0]===cl.id);
+}
+function profileFinanceReview(cl){
+ return cl&&(window.BUSINESS_HEALTH?.observations||[]).find(o=>o.company_id===cl.company_id&&o.claim_ids[0]===cl.id&&
+  o.id===o.metric_ids[0]&&(o.qualifier_reviewed_on||o.primary_source_id));
+}
+function profileSupplementalSource(cl){
+ const id=profileFinanceReview(cl)?.primary_source_id;
+ return id&&(window.BUSINESS_HEALTH?.sources||[]).find(s=>s.id===id);
 }
 function profileMetricEstimate(metric){
  const reviewed=profileReviewedObservationForClaim(claims[metric.claim_id]);

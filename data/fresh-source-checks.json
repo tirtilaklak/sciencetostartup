@@ -1,6 +1,6 @@
 {
-  "checked_on": "2026-11-18",
-  "scope": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results published on 4 November were separately reviewed on 16 November; the October receipts retain their original dates.",
+  "checked_on": "2026-11-22",
+  "scope": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results published on 4 November were separately reviewed on 16 November; the October receipts retain their original dates. On 22 November, the Snorkel announcement and Nebius SEC filing were read directly. Turing’s issuer release was checked in the public index after direct retrieval returned a bot challenge. Earlier receipts retain their original dates.",
   "entries": [
     {
       "source_id": "appen.source.audit-ap_2025",
@@ -77,11 +77,22 @@
     {
       "source_id": "turing.source.oct14-6d7f270a4e05",
       "url": "https://markets.financialcontent.com/wss/article/bizwire-2025-1-28-turing-annual-revenue-runrate-nearly-triples-to-300m-in-profitable-year-as-company-sets-stage-for-agi-advancements-in-2025",
-      "checked_on": "2026-10-28",
+      "checked_on": "2026-11-22",
       "http_status": 301,
       "status": "unavailable",
-      "note": "The source did not return readable content in this check. Historical evidence is retained with the failed refresh disclosed.",
-      "error": "curl: (47) Maximum (50) redirects followed\n"
+      "note": "The historical syndicated copy redirects back to itself. The issuer publication was checked in the public index.",
+      "error": "curl: (47) Maximum (3) redirects followed\n",
+      "previous_checks": [
+        {
+          "source_id": "turing.source.oct14-6d7f270a4e05",
+          "url": "https://markets.financialcontent.com/wss/article/bizwire-2025-1-28-turing-annual-revenue-runrate-nearly-triples-to-300m-in-profitable-year-as-company-sets-stage-for-agi-advancements-in-2025",
+          "checked_on": "2026-10-28",
+          "http_status": 301,
+          "status": "unavailable",
+          "note": "The source did not return readable content in this check. Historical evidence is retained with the failed refresh disclosed.",
+          "error": "curl: (47) Maximum (50) redirects followed\n"
+        }
+      ]
     },
     {
       "source_id": "afterquery.source.round2-funding",
@@ -257,6 +268,46 @@
       "status": "content_checked",
       "note": "Read issuer report dated 29 October 2026, pages 1–2: whole-company Q3 revenue USD73.9M and nine-month revenue USD193.8M. Values are rounded to USD0.1M; January–September information is unaudited management accounts, subject to audit/change. Issuer-hosted YourIR source is bound by Appen’s official announcement feed to announcement2A1706837 and document date29October.",
       "content_sha256": "ac47f92bf13f8af173707ad64593090050d5ce2ae3db5ac4f8ac3735094b402b"
+    },
+    {
+      "source_id": "snorkel_ai.source.audit-s5",
+      "url": "https://snorkel.ai/blog/data-2-0-and-the-research-era-of-ai-data/",
+      "checked_on": "2026-11-22",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Snorkel’s 22 September 2026 announcement says it crossed a $375M annualized revenue run rate.",
+      "content_sha256": "59338187d8c2908556217e461d63d644556c81e65814277a8b7f86bda242d970",
+      "excerpt": "this week crossed an annualized revenue run rate of $375M"
+    },
+    {
+      "source_id": "refresh.source.nebius-fy2025-sec-note-3",
+      "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926052948/nbis-20251231x20f.htm",
+      "checked_on": "2026-11-22",
+      "http_status": 200,
+      "status": "content_checked",
+      "note": "Note 3 of the SEC filing reports Toloka discontinued-operations revenue of $11.1M for FY2023 and $26.1M for FY2024, in USD.",
+      "content_sha256": "88955517816e8197aa3a65a8772e639bf9a7e227657b015345dfb3083a323636",
+      "source_locator": "Note 3 · Toloka Deconsolidation and Investment Transaction · F-30 · Revenues",
+      "publication_date_url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926052948/0001104659-26-052948-index.html"
+    },
+    {
+      "source_id": "refresh.source.turing-2024-run-rate-issuer",
+      "url": "https://www.turing.com/press/turing-annual-revenue-runrate-nearly-triples-to-300m",
+      "checked_on": "2026-11-22",
+      "http_status": 200,
+      "status": "indexed_content_checked",
+      "direct_response": "bot_challenge",
+      "note": "The indexed issuer release confirms the annual revenue run rate. Direct retrieval returned a bot challenge.",
+      "direct_body_sha256": "1da118a9899d1257e9d1cf3b9754a9230aefe63aa6d2e91778f0fdbb14621c52",
+      "indexed_excerpt_sha256": "7792e60bec5b4b3fdfb779668e9b3f410ee2bda5c24aa09a3c1ce21fd55fa94f"
+    },
+    {
+      "source_id": "toloka.source.audit-tol_2025",
+      "url": "https://fintel.io/doc/sec-nebius-group-nv-1513845-20f-2026-april-30-20573-500",
+      "checked_on": "2026-11-22",
+      "http_status": 403,
+      "status": "unavailable",
+      "note": "The historical Fintel mirror returned HTTP 403. The original filing was read on SEC EDGAR."
     }
   ],
   "private_company_review": [

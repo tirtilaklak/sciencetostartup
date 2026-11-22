@@ -1066,7 +1066,8 @@ def figure_row(research, metric, context=None):
     notes = [research.correction(metric, "display_attribution"), clean(context.get("note"))]
     head = f'<th scope="row">{escape(label)}<span class="sub">{escape(" · ".join(d for d in details if d))}</span>' + "".join(f'<span class="sub">{escape(note)}</span>' for note in notes if note and note != "Undated company claim") + "</th>"
     assurance = "Third-party estimate" if context.get("estimated") else "Estimate" if metric.get("reported_vs_estimated") == "estimated" else ""
-    value = f'<td class="value" data-label="Value">{escape(value_text(metric))}' + (f' <span class="tag">{escape(assurance)}</span>' if assurance else "") + "</td>"
+    display_metric = {**metric, "qualifier": context.get("qualifier", metric.get("qualifier"))}
+    value = f'<td class="value" data-label="Value">{escape(value_text(display_metric))}' + (f' <span class="tag">{escape(assurance)}</span>' if assurance else "") + "</td>"
     when = context.get("date") or metric_period(research, metric)
     period = f'<td data-label="Date">{escape("Not stated" if when == "Date not stated" else when)}' + (' <span class="tag">Historical</span>' if research.historical_year(metric) else "") + "</td>"
     citations = source_html(research, metric)
@@ -1075,6 +1076,9 @@ def figure_row(research, metric, context=None):
     if fact and fact.get("source_id") != (original or {}).get("id"):
         origin = external_link(fact["source_url"], fact["source_title"])
         citations += f'<span class="sub">{escape(fact["claimant"])} · {origin}</span>'
+    if supplemental := context.get("supplemental_source"):
+        link = external_link(supplemental["url"], supplemental["title"])
+        citations = f'<span class="sub" data-source-id="{escape(supplemental["id"])}">{link}</span>' + citations
     return f'<tr id="metric-{escape(metric["id"])}" data-metric="{escape(metric["id"])}">{head}{value}{period}<td data-label="Grade">{escape(research.grade(metric) or "Not graded")}</td><td class="wide-cell" data-label="Source">{citations}</td></tr>'
 
 
@@ -1127,7 +1131,7 @@ def pending_item(research, m):
     return f'<li data-metric="{escape(m["id"])}"><strong>{escape(figure_label(research, m))}: {escape(value_text(m))}</strong>{old} · {escape(metric_period(research, m))} · {escape(figure_scope(research, m))}. {escape(status_words(research, m))} {source_html(research, m, inline=True)}</li>'
 
 
-def figures_html(research, company, figures, pending, others, profile_entry, finance=None, observations=()):
+def figures_html(research, company, figures, pending, others, profile_entry, finance=None, health=None):
     contexts = dict((profile_entry or {}).get("metric_context") or {})
     finance = finance or {}
     archived = finance.get("archived_record")
@@ -1141,10 +1145,17 @@ def figures_html(research, company, figures, pending, others, profile_entry, fin
         if rid in figure_ids:
             contexts[rid] = {**(contexts.get(rid) or {}), "date": fact["display_date"], "scope": fact["scope"],
                              "display_label": fact["label"], "finance_fact": fact}
-    for observation in observations:
+    sources = {source["id"]: source for source in (health or {}).get("sources", [])}
+    for observation in (health or {}).get("observations", []):
         rid = observation.get("id")
-        if rid in figure_ids and observation.get("metric_ids") == [rid] and observation.get("evidence_type") == "estimate":
+        if rid not in figure_ids or observation.get("metric_ids") != [rid]:
+            continue
+        if observation.get("evidence_type") == "estimate":
             contexts[rid] = {**(contexts.get(rid) or {}), "display_label": observation["label"], "estimated": True}
+        if observation.get("qualifier_reviewed_on"):
+            contexts[rid] = {**(contexts.get(rid) or {}), "qualifier": observation["qualifier"]}
+        if supplemental := sources.get(observation.get("primary_source_id")):
+            contexts[rid] = {**(contexts.get(rid) or {}), "supplemental_source": supplemental, "note": observation["limitations"]}
     if figures:
         rows = "".join(figure_row(research, m, contexts.get(m["id"])) for m in figures)
         body = f'<table class="figures wide"><thead><tr><th scope="col">Figure</th><th scope="col">Value</th><th scope="col">Date</th><th scope="col">Grade</th><th scope="col">Source</th></tr></thead><tbody>{rows}</tbody></table>\n'
@@ -1538,26 +1549,29 @@ def business_observation_html(research, health, company_id, inline=False, compac
     row = selected_business_observation(health, company_id)
     if not row: return ""
     source_ids = row.get("source_ids", [])
-    source = next((s for s in health.get("sources", []) if s.get("id") in source_ids), None)
+    primary = row.get("primary_source_id")
+    source = next((s for s in health.get("sources", []) if s.get("id") in ([primary] if primary else source_ids)), None)
     if not source: source = next((s for s in research.data.get("sources", []) if s.get("id") in source_ids), None)
     checks = [c for c in health.get("source_checks", {}).get("entries", []) if c.get("source_id") in source_ids]
     failed = row.get("refresh_status") == "source_unavailable" or any(c.get("status") == "unavailable" for c in checks)
-    checked = next((c.get("checked_on") for c in checks if c.get("status") == "content_checked"), None)
+    checked = next((c.get("checked_on") for c in checks if c.get("status") == "content_checked" and (not primary or c["source_id"] == primary)), None)
     period = research.observation_period(row)
     scope = row.get("scope_label") or {"company": "Whole company", "ai_data": "AI data business"}.get(row.get("scope"), row.get("scope", ""))
     if company_id == "rws_trainai" and row.get("scope") in ("company", "parent"): scope = "RWS Holdings plc group"
     kind = "Annualized revenue run rate" if row.get("measure") == "annualized_revenue" else "Revenue"
-    basis = {"gross": "Gross revenue", "net": "Net revenue"}.get(row.get("accounting_basis"), "Gross/net not disclosed")
+    basis = {"gross": "Gross revenue", "net": "Net revenue", "latest_discontinued_operations_comparative": "Discontinued operations"}.get(row.get("accounting_basis"), "Gross/net not disclosed")
     shown_period = period_text(period) if compact else period
     meta = " · ".join(str(x) for x in (None if compact else kind, shown_period, row.get("currency"), scope, basis) if x)
     link = external_link(source.get("url"), source.get("publisher") or "Original source") if source else ""
+    if source and primary:
+        link = external_link(source["url"], source["title"])
     if source and company_id == "snorkel_ai" and row.get("measure") == "annualized_revenue":
         link = external_link(source.get("url"), "Snorkel company disclosure")
     published = research.reviewed_source_dates.get(source["id"]) if source else None
     dates = f"Published {format_date(published)} · {source_record_status(source)}" if published else ""
     citation = " · ".join(filter(None, (link, escape(dates), escape(row.get("evidence_assurance") or "Attributed source"))))
     source_attr = f' data-source-id="{escape(source["id"])}"' if source else ""
-    warning = '<span class="sub">Original citation could not be rechecked. Historical source attribution retained.</span>' if failed else ""
+    warning = f'<span class="sub">{"Earlier" if primary else "Original"} citation could not be rechecked. Historical source attribution retained.</span>' if failed else ""
     content = (f'<div class="selected-evidence" data-financial-observation="{escape(row["id"])}">'
                + ('' if inline else '<h2>Selected financial evidence</h2>')
                + f'<strong class="selected-value">{escape(value_text(dict(row, qualifier="approximate" if row.get("qualifier") == "approximately" else row.get("qualifier"))))}</strong><span class="sub">{escape(meta)}</span>'
@@ -1717,7 +1731,7 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     if pending: financial_meta += f' · {len(pending)} not confirmed'
     body.append(f'<details class="company-fold" id="financial-record"><summary><span>Financial record</span><small>{financial_meta}</small></summary><div class="company-fold-body">'
                 + business_observation_html(research, business_health, cid)
-                + figures_html(research, company, figures, pending, others, profile_entry, finance, (business_health or {}).get("observations", ()))
+                + figures_html(research, company, figures, pending, others, profile_entry, finance, business_health)
                 + ''.join(finance_fact_html(record) for record in detail_records) + '</div></details>')
     body.extend(overview)
     if dated or risk_rows:

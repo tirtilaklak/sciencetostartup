@@ -143,8 +143,10 @@ function pickCompanyObservation(company,signal){
  return list.sort((a,b)=>Number(numeric(b))-Number(numeric(a))||Number(!!a.is_context)-Number(!!b.is_context)||Number(b.measure===preferred)-Number(a.measure===preferred)||dateKey(b).slice(0,7).localeCompare(dateKey(a).slice(0,7))||Number(a.scope!=='company')-Number(b.scope!=='company')||(periodRank[a.period?.type]??2)-(periodRank[b.period?.type]??2))[0];
 }
 function evidenceLinks(o){
- const claimLinks=o.claim_ids.filter(id=>claims[id]).map((id,i)=>claimButton(id,o.claim_ids.length>1?'Claim '+(i+1):'Inspect claim'));
- const sourceLinks=o.source_ids.slice(0,3).map(id=>{
+ const canonicalClaims=o.claim_ids.filter(id=>claims[id]);
+ const claimLinks=canonicalClaims.map((id,i)=>claimButton(id,canonicalClaims.length>1?'Claim '+(i+1):'Inspect claim'));
+ const preferred=o.primary_source_id,sourceIds=preferred?[preferred,...o.source_ids.filter(id=>id!==preferred)]:o.source_ids;
+ const sourceLinks=sourceIds.slice(0,3).map(id=>{
   const source=sourceRecord(id);
   if(!source)return '';
   const meta=profileSourceMeta({...source,publisher:''});
@@ -153,12 +155,14 @@ function evidenceLinks(o){
  return `<span class="bh-evidence-links">${claimLinks.join('')}${sourceLinks.join('')}</span>`;
 }
 function checkedSource(o){
+ if(o.primary_source_id)return sourceChecks.get(o.primary_source_id);
  const checks=o.source_ids.map(id=>sourceChecks.get(id)).filter(Boolean);
  return checks.find(c=>c.status==='content_checked')||checks.find(c=>c.status==='unavailable')||checks[0];
 }
 function freshnessNote(o,sourceId){
  const check=sourceChecks.get(sourceId),fresh=o.claim_ids.map(id=>freshClaims.get(id)).find(c=>c?.source_ids.includes(sourceId));
- if(check?.status==='unavailable')return `<span class="bh-refresh-note is-unavailable"><br>Source could not be retrieved on ${safe(readableDates(check.checked_on))}. The figure retains its earlier attribution.</span>`;
+ if(check?.status==='unavailable')return `<span class="bh-refresh-note is-unavailable"><br>${o.primary_source_id?safe(check.note):`Source could not be retrieved on ${safe(readableDates(check.checked_on))}. The figure retains its earlier attribution.`}</span>`;
+ if(check?.status==='indexed_content_checked')return `<span class="bh-refresh-note"><br>Indexed issuer text verified ${safe(readableDates(check.checked_on))}. Direct access encountered a bot challenge.</span>`;
  return check?.status==='content_checked'?`<span class="bh-refresh-note"><br>Source page read ${safe(readableDates(check.checked_on))}${fresh?.source_locator?' · '+safe(fresh.source_locator):''}.</span>`:'';
 }
 

@@ -439,18 +439,22 @@ def company_summaries(data, sidecars, root):
         observation = selected_business_observation(health, cid)
         financial = None
         if observation:
-            record = next((s for s in health.get("sources", []) if s["id"] in observation.get("source_ids", [])), None) or research.sources.get(next(iter(observation.get("source_ids", [])), ""))
+            primary = observation.get("primary_source_id")
+            source_ids = [primary] if primary else observation["source_ids"]
+            record = next((s for s in health.get("sources", []) if s["id"] in source_ids), None) or research.sources.get(source_ids[0])
             fresh = next((c for c in health.get("fresh_claims", []) if c["id"] in observation.get("claim_ids", [])), {})
-            checked = fresh.get("observed_on") or next((c.get("checked_on") for c in health.get("source_checks", {}).get("entries", []) if c["source_id"] in observation.get("source_ids", []) and c.get("status") == "content_checked"), None)
+            checked = (fresh.get("observed_on") if not primary else None) or next((c.get("checked_on") for c in health.get("source_checks", {}).get("entries", []) if c["source_id"] in source_ids and c.get("status") == "content_checked"), None)
             end = observation.get("period", {}).get("end") or next(iter(re.findall(r"\d{4}(?:-\d{2}){0,2}", str(observation.get("as_of") or ""))), "")
             financial = {"recordType": "observation", "id": observation["id"], "claimId": next(iter(observation.get("claim_ids", [])), None),
                          "display": current["display"], "type": "Annualized pace" if observation["measure"] == "annualized_revenue" else "Revenue",
                          "period": research.observation_period(observation), "currency": current["currency"], "scope": current["scope_label"],
-                         "basis": "Gross revenue" if observation.get("accounting_basis") == "gross" else "Net revenue" if observation.get("accounting_basis") == "net" else "Gross/net not disclosed" if observation["measure"] == "annualized_revenue" else "",
+                         "basis": {"gross": "Gross revenue", "net": "Net revenue", "latest_discontinued_operations_comparative": "Discontinued operations"}.get(observation.get("accounting_basis"), "Gross/net not disclosed" if observation["measure"] == "annualized_revenue" else ""),
                          "attribution": observation.get("evidence_assurance") or "Attributed source", "limitations": observation.get("limitations") or "",
                          "quote": observation.get("original_text") or fresh.get("excerpt") or "", "checkedOn": checked,
                          "failed": observation.get("refresh_status") == "source_unavailable" or any(c.get("status") == "unavailable" and c["source_id"] in observation.get("source_ids", []) for c in health.get("source_checks", {}).get("entries", [])),
                          "age": "historical" if not end or end < "2025-10-28" else "current"}
+            if primary:
+                financial["primarySource"] = True
         elif metric:
             record, _ = latest_source(research, metric)
             claim = research.claim(metric)
@@ -466,8 +470,8 @@ def company_summaries(data, sidecars, root):
             if historical:
                 financial["historicalYear"] = historical
         if financial is not None:
-            citation = {"url": record["url"], "publisher": record.get("publisher") or "Original source"} if record else None
-            if record and (published := research.reviewed_source_dates.get(record["id"])):
+            citation = {"url": record["url"], "publisher": (record["title"] if observation and observation.get("primary_source_id") else record.get("publisher")) or "Original source"} if record else None
+            if record and (published := research.reviewed_source_dates.get(record["id"]) or (record.get("published_on") if observation and observation.get("primary_source_id") else None)):
                 citation.update(id=record["id"], publishedOn=published, accessedOn=record.get("accessed_on"), retrievalStatus=record.get("retrieval_status"))
                 if not observation:
                     financial["checkedOn"] = None

@@ -229,7 +229,7 @@ const byRecent=(a,b)=>dateRank(b.as_of||b.announced_on).localeCompare(dateRank(a
 const metricLabels={funding_total_reported:'Reported lifetime financing',funding_total_calculated:'Sum of disclosed rounds',valuation:'Valuation',arr:'Yearly recurring subscription revenue',annualized_revenue_run_rate:'Annualized revenue pace',revenue:'Period revenue',gmv:'Gross merchandise value',headcount:'Company team size',expert_network:'Expert / contributor network',active_paid_experts:'Active paid experts',customer_count:'Customer count',growth_rate:'Growth measure',other:'Other operating measure'};
 const COMPACT_FORMATS={compact:new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:2}),standard:new Intl.NumberFormat('en',{notation:'standard',maximumFractionDigits:2})};
 const compact=v=>COMPACT_FORMATS[Math.abs(v)>=100000?'compact':'standard'].format(v);
-function metricValue(m){return ({at_least:'≥ ',greater_than:'> ',less_than:'< ',nearly:'Nearly ',at_most:'≤ ',approximate:'≈ ',range:'',exact:''}[m.qualifier]||'')+(m.unit==='currency'?({USD:'$',GBP:'£',EUR:'€'}[m.currency]||m.currency+' '):'')+compact(m.value)+(m.qualifier==='range'?'–'+compact(m.upper_value):'')+(m.unit==='percent'?'%':m.unit==='multiple'?'×':'');}
+function metricValue(m){const review=m.claim_id&&profileFinanceReview(claims[m.claim_id]),qualifier=review?.id===m.id&&review.qualifier_reviewed_on?review.qualifier:m.qualifier;return ({at_least:'≥ ',greater_than:'> ',less_than:'< ',nearly:'Nearly ',at_most:'≤ ',approximate:'≈ ',range:'',exact:''}[qualifier]||'')+(m.unit==='currency'?({USD:'$',GBP:'£',EUR:'€'}[m.currency]||m.currency+' '):'')+compact(m.value)+(qualifier==='range'?'–'+compact(m.upper_value):'')+(m.unit==='percent'?'%':m.unit==='multiple'?'×':'');}
 function financialPeriod(m){if(m.period_type)return ['week','quarter','partial'].includes(m.period_type)?'short':m.period_type;const s=(m.period_label||m.label||'')+' '+m.as_of;return /half|H1|H2|six.month/i.test(s)?'half':/week|quarter|Q[1-4]|month/i.test(s)?'short':/FY\d{4}|annual|full.year|^20\d{2}$/i.test(s.trim())?'annual':/^20\d{2}$/.test(m.period_label||'')?'annual':'other';}
 function evidenceLabel(cl){
  const types=cl.source_ids.map(id=>sources[id].source_type);
@@ -298,7 +298,7 @@ function evidenceAccess(ids,label,topicHint=''){
  const dates=[...new Set(dateInfo.map(({heading,text})=>heading+': '+text))];
  const name=label+' for '+companyNames.join(' and ')+': '+topic+'. '+dates.join('. ')+'.';
  const description=selected.map((cl,index)=>{
-  const statement=publicText(cl.statement),caveat=publicText(cl.caveat);
+  const current=profileFinanceReview(cl),statement=publicText(current?.qualifier_reviewed_on?current.original_text:cl.statement),caveat=publicText(cl.caveat);
   const curatedScope=finance[index]?.scope||reviewed[index]?.scope_label;
   const details=curatedScope?[]:[...(evidenceMetricScopes.get(cl.id)||[])];
   const originalScope=scopeText(cl.segment_scope,cl.company_id),scope=curatedScope||evidenceContextScopeLabel(cl,originalScope),context=evidenceContextClaimDescription(cl);
@@ -309,7 +309,7 @@ function evidenceAccess(ids,label,topicHint=''){
 }
 const claimButton=(id,label='Evidence',topic='')=>{const access=evidenceAccess([id],label,topic);return `<button class="evidence-action" data-claim="${esc(id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;};
 const numberButton=m=>{const label=metricValue(m),access=evidenceAccess([m.claim_id],label,metricEvidenceTopic(m,m.label||metricLabels[m.kind]));return `<button class="number-button" data-claim="${esc(m.claim_id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;};
-const sourceLinks=cl=>cl.source_ids.map(id=>external(sources[id].url,sources[id].publisher)).join(' ');
+const sourceLinks=cl=>{const supplemental=profileSupplementalSource(cl);return [supplemental?external(supplemental.url,supplemental.title):'',...cl.source_ids.map(id=>external(sources[id].url,sources[id].publisher))].filter(Boolean).join(' ');};
 const provenance=cl=>`<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(profileRecordDate(cl))}</span><span>· ${esc(evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id)))}</span><span>· ${esc(evidenceLabel(cl))}</span>${claimButton(cl.id)}</div>`;
 function metricMeta(m){
  const finance=financeClaimContextFor(m.claim_id),accounting=metricCurrentBasis(m,['revenue','annualized_revenue_run_rate','arr'].includes(m.kind)?m.gross_vs_net==='unspecified'?'Gross or net revenue not stated':title(m.gross_vs_net)+' basis':'');
@@ -997,18 +997,19 @@ function financialAttribution(assurance,published,accessed,retrievalStatus){
 function financialSummaryHTML(id){
  const summary=companySummaryFor(id);if(summary&&!companyContextReady(id))return summaryFinancialHTML(id,summary.financial);
  const o=financialObservationFor(id);if(!o)return signalFor(id,preferredFinancial(id));
- const health=window.BUSINESS_HEALTH,record=(health.sources||[]).find(s=>o.source_ids.includes(s.id))||sources[o.source_ids[0]],fresh=(health.fresh_claims||[]).find(c=>o.claim_ids.includes(c.id));
+ const health=window.BUSINESS_HEALTH,primary=o.primary_source_id,sourceIds=primary?[primary]:o.source_ids;
+ const record=(health.sources||[]).find(s=>sourceIds.includes(s.id))||sources[sourceIds[0]],fresh=(health.fresh_claims||[]).find(c=>o.claim_ids.includes(c.id));
  const projected=summary?.financial,period=projected?.recordType==='observation'&&projected.id===o.id?projected.period:o.period?.label||o.as_of;
- const value=window.BusinessHealth?.valueText(o)||String(o.value),scope=o.scope_label||scopeText(o.scope,id),basis=o.accounting_basis==='gross'?'Gross revenue':o.accounting_basis==='net'?'Net revenue':o.measure==='annualized_revenue'?'Gross/net not disclosed':'',type=o.measure==='annualized_revenue'?'Annualized pace':'Revenue';
- const checked=fresh?.observed_on||(health.source_checks?.entries||[]).find(e=>o.source_ids.includes(e.source_id)&&e.status==='content_checked')?.checked_on;
+ const value=window.BusinessHealth?.valueText(o)||String(o.value),scope=o.scope_label||scopeText(o.scope,id),basis=({gross:'Gross revenue',net:'Net revenue',latest_discontinued_operations_comparative:'Discontinued operations'}[o.accounting_basis]||(o.measure==='annualized_revenue'?'Gross/net not disclosed':'')),type=o.measure==='annualized_revenue'?'Annualized pace':'Revenue';
+ const checked=(!primary&&fresh?.observed_on)||(health.source_checks?.entries||[]).find(e=>sourceIds.includes(e.source_id)&&e.status==='content_checked')?.checked_on;
  const end=o.period?.end||(String(o.as_of||'').match(/\d{4}(?:-\d{2}){0,2}/)||[''])[0],old=!end||end<'2025-10-28';
- const citation=record?external(record.url,record.publisher||'Original source'):'';
+ const citation=record?external(record.url,(primary?record.title:record.publisher)||'Original source'):'';
  const projectedSource=projected?.id===o.id&&projected.source?.id===record?.id?projected.source:null;
  const published=record&&(window.ScienceDetailViews?.evidenceContextSourcePublicationDate?.(record.id)||projectedSource?.publishedOn);
  const attribution=financialAttribution(o.evidence_assurance,published,record?.accessed_on,record?.retrieval_status);
  const quote=o.original_text||fresh?.excerpt||'';
  const failed=o.refresh_status==='source_unavailable'||(health.source_checks?.entries||[]).some(e=>o.source_ids.includes(e.source_id)&&e.status==='unavailable');
- const warning=failed?'<p class="financial-source-warning">Original citation could not be rechecked. Historical source attribution retained.</p>':'';
+ const warning=failed?`<p class="financial-source-warning">${primary?'Earlier':'Original'} citation could not be rechecked. Historical source attribution retained.</p>`:'';
  const observationAttr=String(o.id).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const content=`<div class="financial-summary" data-financial-observation="${observationAttr}"><div class="row-number"><strong>${esc(value)}</strong><span>${esc(type)}</span></div><span class="row-period">${esc(readableDates(period))} · ${esc(o.currency||'')} · ${esc(scope)}${basis?' · '+esc(basis):''}</span><div class="financial-citation">${citation}<span>${esc(attribution)}</span></div>${warning}<details class="financial-source-details"><summary>Figure details</summary><p>${esc(o.limitations||'')}</p>${quote?`<blockquote>${esc(quote)}</blockquote>`:''}${checked?`<p>Source content checked ${esc(readableDates(checked))}.</p>`:''}</details></div>`;
  return old?`<span class="signal-label">No recent revenue figure</span><details class="historical-signal"><summary>Historical figure · ${esc(readableDates(period))}</summary>${content}</details>`:content;
@@ -1018,7 +1019,7 @@ function summaryFinancialHTML(id,financial){
  const f=financial,source=f.source?external(f.source.url,f.source.publisher||'Original source'):'',period=readableDates(f.period||''),basis=f.basis?' · '+esc(f.basis):'';
  const attribution=financialAttribution(f.attribution,f.source?.publishedOn,f.source?.accessedOn,f.source?.retrievalStatus);
  const value=f.recordType==='metric'&&f.claimId?`<a class="number-button" href="#company/${attr(id)}/claim/${attr(f.claimId)}">${esc(f.display)}</a>`:`<strong>${esc(f.display)}</strong>`;
- const content=`<div class="financial-summary" data-financial-observation="${attr(f.id)}"><div class="row-number">${value}<span>${esc(f.type)}</span></div><span class="row-period">${esc(period)} · ${esc(f.currency||'')} · ${esc(f.scope||'')}${basis}</span><div class="financial-citation">${source}<span>${esc(attribution)}</span></div>${f.failed?'<p class="financial-source-warning">Original citation could not be rechecked. Historical source attribution retained.</p>':''}<details class="financial-source-details"><summary>Figure details</summary>${f.limitations?`<p>${esc(f.limitations)}</p>`:''}${f.quote?`<blockquote>${esc(f.quote)}</blockquote>`:''}${f.checkedOn?`<p>Source content checked ${esc(readableDates(f.checkedOn))}.</p>`:''}</details></div>`;
+ const content=`<div class="financial-summary" data-financial-observation="${attr(f.id)}"><div class="row-number">${value}<span>${esc(f.type)}</span></div><span class="row-period">${esc(period)} · ${esc(f.currency||'')} · ${esc(f.scope||'')}${basis}</span><div class="financial-citation">${source}<span>${esc(attribution)}</span></div>${f.failed?`<p class="financial-source-warning">${f.primarySource?'Earlier':'Original'} citation could not be rechecked. Historical source attribution retained.</p>`:''}<details class="financial-source-details"><summary>Figure details</summary>${f.limitations?`<p>${esc(f.limitations)}</p>`:''}${f.quote?`<blockquote>${esc(f.quote)}</blockquote>`:''}${f.checkedOn?`<p>Source content checked ${esc(readableDates(f.checkedOn))}.</p>`:''}</details></div>`;
  return f.age==='current'?content:`<span class="signal-label">${f.age==='undated'?'No dated revenue figure':'No recent revenue figure'}</span><details class="historical-signal"><summary>${f.age==='undated'?'Undated financial claim':'Historical figure · '+esc(period)}</summary>${content}</details>`;
 }
 function compactSignal(id){return financialSummaryHTML(id);}

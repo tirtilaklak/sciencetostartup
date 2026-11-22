@@ -14,6 +14,7 @@ FINANCE_DATE_ROLES = {'announcement', 'company_announcement_context', 'period_en
                       'source_publication', 'source_check', 'undated'}
 MERCOR_H1_ESTIMATE = 'mercor.metric.major-growth_metrics-1'
 RWS_GENERATE_REVENUE = 'rws_trainai.claim.growth_metrics-1.metric-0'
+SNORKEL_RUN_RATE = 'snorkel_ai.metric.major-growth_metrics-0'
 
 
 def profile_finance_claim_context(profile):
@@ -203,6 +204,34 @@ def _validate_reviewed_revenue(observations, metrics, claims, sources, checks):
             raise ValueError(f'business-health: {identifier}: the observation must name Generate and its businesses')
 
 
+def _checked_source(source, check):
+    if check.get('url') != source.get('url') or check.get('http_status') != 200:
+        return False
+    if check.get('status') == 'content_checked':
+        return bool(SHA256.fullmatch(check.get('content_sha256', '')))
+    return (check.get('status') == source.get('retrieval_status') == 'indexed_content_checked'
+            and check.get('direct_response') == 'bot_challenge'
+            and check.get('checked_on') == source.get('accessed_on')
+            and bool(SHA256.fullmatch(check.get('direct_body_sha256', '')))
+            and bool(SHA256.fullmatch(check.get('indexed_excerpt_sha256', ''))))
+
+
+def _validate_threshold(row, metric, claim, source, check):
+    fields = ('value', 'currency', 'as_of', 'unit', 'company_id')
+    if (row['id'] != SNORKEL_RUN_RATE or metric.get('qualifier') != 'exact'
+            or any(row.get(key) != metric.get(key) for key in fields)
+            or row.get('measure') != 'annualized_revenue' or row['period'] != {'type': 'run_rate', 'label': metric['as_of']}
+            or row['scope'] != metric.get('segment_scope') or row['accounting_basis'] != metric.get('gross_vs_net')
+            or row['metric_ids'] != [metric['id']] or row['claim_ids'] != [claim['id']]
+            or row['source_ids'] != claim['source_ids'] or row['evidence_assurance'] != 'Company-reported'
+            or row.get('qualifier') != 'greater_than' or check.get('status') != 'content_checked'
+            or not _checked_source(source, check) or source.get('published_on') != metric['as_of']
+            or row.get('qualifier_reviewed_on') != check.get('checked_on')
+            or row['original_text'] != '… ' + check.get('excerpt', '')
+            or 'crossed an annualized revenue run rate of $375M' not in row['original_text']):
+        raise ValueError(f"business-health: {row['id']}: qualifier requires the dated issuer threshold receipt")
+
+
 def load_business_health(path, data, profile_content=None):
     # Fixtures and other research versions must never inherit this curated layer. After a
     # SIDECAR_DATASET_VERSION bump the source_dataset_version check below fails loudly until
@@ -220,7 +249,7 @@ def load_business_health(path, data, profile_content=None):
     # Each new claim binds the exact quantity and period to a checked source excerpt.
     checked = {entry['source_id']: entry for entry in health.get('source_checks', {}).get('entries', [])}
     # Supplemental sources may add new primary documents, but must not replace
-    # canonical URLs or bypass the successful content-read receipt requirement.
+    # canonical URLs or bypass the indexed or direct content receipt requirement.
     source_ids = set()
     for source in health.get('sources', []):
         sid = source.get('id')
@@ -237,10 +266,7 @@ def load_business_health(path, data, profile_content=None):
         if (not sid.startswith('refresh.source.') or source.get('company_id') not in companies
                 or parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password
                 or any(ord(char) <= 32 for char in url)
-                or not source.get('title') or not source.get('publisher')
-                or check.get('url') != url or check.get('status') != 'content_checked'
-                or check.get('http_status') != 200
-                or not re.fullmatch(r'[a-f0-9]{64}', check.get('content_sha256', ''))):
+                or not source.get('title') or not source.get('publisher') or not _checked_source(source, check)):
             raise ValueError('business-health: supplemental source requires a valid checked public document')
         sources[sid] = source
     fresh_ids = set()
@@ -258,11 +284,9 @@ def load_business_health(path, data, profile_content=None):
             raise ValueError('business-health: fresh claim requires a source')
         for sid in claim['source_ids']:
             check = checked.get(sid, {})
-            if (sid not in sources or check.get('url') != sources[sid]['url']
-                    or check.get('status') != 'content_checked' or check.get('http_status') != 200
+            if (sid not in sources or not _checked_source(sources[sid], check)
                     or (sources[sid].get('company_id') and sources[sid]['company_id'] != claim['company_id'])
-                    or check.get('checked_on') != claim['observed_on']
-                    or not re.fullmatch(r'[a-f0-9]{64}', check.get('content_sha256', ''))):
+                    or check.get('checked_on') != claim['observed_on']):
                 raise ValueError('business-health: fresh claim requires a successfully checked source')
         claims[cid] = claim
         fresh_ids.add(cid)
@@ -297,15 +321,26 @@ def load_business_health(path, data, profile_content=None):
                 for field in ('measure', 'value', 'unit', 'currency', 'period', 'scope', 'accounting_basis'):
                     if row.get(field) != claims[cid]['fact'].get(field):
                         raise ValueError(prefix + 'fresh quantity or reporting basis differs from checked claim')
+                if 'qualifier' in claims[cid]['fact'] and row['qualifier'] != claims[cid]['fact']['qualifier']:
+                    raise ValueError(prefix + 'qualifier differs from checked claim')
         linked_sources = {sid for cid in row['claim_ids'] for sid in claims[cid]['source_ids']}
         if any(sid not in sources or sid not in linked_sources for sid in row['source_ids']):
             raise ValueError(prefix + 'source must support the cited claim')
+        if 'primary_source_id' in row:
+            supplemental = {sid for cid in row['claim_ids'] if cid in fresh_ids for sid in claims[cid]['source_ids']}
+            if row['primary_source_id'] not in row['source_ids'] or row['primary_source_id'] not in supplemental:
+                raise ValueError(prefix + 'primary source must bind to checked supplemental evidence')
         for mid in row.get('metric_ids', []):
             if mid not in metrics or metrics[mid]['company_id'] != row['company_id'] or metrics[mid]['claim_id'] not in row['claim_ids']:
                 raise ValueError(prefix + 'metric binding differs from cited claim')
         if row['evidence_type'] == 'calculated' and not row.get('calculation'):
             raise ValueError(prefix + 'calculation required')
     observations = {row['id']: row for row in health['observations']}
+    if SNORKEL_RUN_RATE in observations:
+        metric = metrics[SNORKEL_RUN_RATE]
+        issuer_source = 'snorkel_ai.source.audit-s5'
+        _validate_threshold(observations[SNORKEL_RUN_RATE], metric, claims[metric['claim_id']],
+                            sources[issuer_source], checked.get(issuer_source, {}))
     for row in health['observations']:
         if row['evidence_type'] != 'calculated':
             continue
