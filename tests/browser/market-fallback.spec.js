@@ -78,7 +78,7 @@ for (const readerTabbed of [false, true]) {
     const hash = '/explore/#business-health';
     const bundlePath = '**/js/data.*.js';
     const heading = page.locator('#business-health-heading');
-    const download = page.locator('#business-health a[download]');
+    const download = page.locator('#business-health').getByRole('link', { name: /^Download data/ });
     let unblockImage;
     const held = new Promise(resolve => { unblockImage = resolve; });
     await page.addInitScript(() => {
