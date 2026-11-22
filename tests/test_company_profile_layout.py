@@ -79,9 +79,12 @@ class CompanyProfileLayoutTests(unittest.TestCase):
     def test_every_work_record_and_critical_event_remains_available(self):
         for cid, text in self.pages.items():
             content = ProfileContent(text)
-            actual = [attrs["data-work-route"] for attrs, _ in content.records if "data-work-route" in attrs]
+            routes = [attrs for attrs, _ in content.records if "data-work-route" in attrs]
+            actual = [attrs["data-work-route"] for attrs in routes]
             expected = [route["id"] for route in self.work["routes"] if route["company_id"] == cid]
             self.assertCountEqual(actual, expected, cid)
+            self.assertTrue(all(attrs.get("id") == attrs["data-work-route"] and attrs.get("tabindex") == "-1" for attrs in routes), cid)
+            self.assertIn('<summary id="sources" data-native-sources>', text, cid)
             events = [event for event in sp.company_events(json.loads((ROOT / "data/company-events.json").read_text()), cid) if event.get("kind") in ("lawsuit", "data_incident")]
             if events:
                 self.assertIn('class="company-notice"', text, cid)

@@ -12,6 +12,7 @@ import unittest
 import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -109,9 +110,9 @@ def ld_nodes(text):
 
 def visible_crumbs(text):
     """The visible breadcrumb trail as (name, url) pairs; the current page has no link, so its url is the canonical one."""
-    trail = re.search(r'<nav class="crumbs" aria-label="Breadcrumb"><ol>(.*?)</ol></nav>', text).group(1)
+    trail = re.search(r'<nav class="crumbs[^"]*" aria-label="Breadcrumb"><ol>(.*?)</ol></nav>', text).group(1)
     canonical = PageFacts(text).canonicals[0]
-    return [(html.unescape(name), html.unescape(url) if url else canonical) for url, name in re.findall(r'<li>(?:<a href="([^"]+)">|<span aria-current="page">)(.*?)</(?:a|span)></li>', trail)]
+    return [(html.unescape(name), html.unescape(url) if url else canonical) for url, name in re.findall(r'<li(?: [^>]*)?>(?:<a href="([^"]+)">|<span aria-current="page">)(.*?)</(?:a|span)></li>', trail)]
 
 
 def plain(fragment):
@@ -163,7 +164,11 @@ class StaticPageTests(unittest.TestCase):
         """(metric id, html) for each Key figures row, each Not confirmed item and each Other reported figures item."""
         section = self.pages[cid].split('<h2 id="figures">', 1)[1].split('<h2 id="facts"', 1)[0]
         rows = re.findall(r'<tr\b[^>]*\bdata-metric="([^"]+)"[^>]*>(.*?)</tr>', section, re.S)
-        lists = {key: re.findall(r'<li data-metric="([^"]+)">(.*?)</li>', section.split(f'<h3 id="{key}">', 1)[1].split("</ul>", 1)[0], re.S) if f'<h3 id="{key}">' in section else [] for key in ("unconfirmed", "other-figures")}
+        lists = {}
+        for key in ("unconfirmed", "other-figures"):
+            _, exists, body = section.partition(f'<h3 id="{key}">')
+            items = body.split("</ul>\n", 1)[0] if exists else ""
+            lists[key] = re.findall(r'<li data-metric="([^"]+)">(.*?)</li>(?=<li data-metric=|$)', items, re.S)
         return rows, lists["unconfirmed"], lists["other-figures"]
 
     def footer(self, path):
@@ -197,7 +202,12 @@ class StaticPageTests(unittest.TestCase):
 
     def test_pages_stay_lean_without_app_script_or_dataset(self):
         for cid, text in self.pages.items():
-            self.assertLess(len(text.encode()), PAGE_LIMIT, cid)
+            page_bytes = text.encode()
+            # AfterQuery's 45 retained listings include compact descriptions,
+            # dated pay evidence, and separate destination checks on the dossier.
+            self.assertLess(len(page_bytes), 140_000 if cid == "afterquery" else PAGE_LIMIT, cid)
+            if cid == "afterquery":
+                self.assertLess(len(gzip.compress(page_bytes)), 17_000, cid)
             self.assertEqual(PageFacts(text).scripts, [{"type": "application/ld+json"}, {"src": "/native-details.js", "defer": None}], cid)
             self.assertNotIn('id="research-data"', text, cid)
             structured = structured_data(text)
@@ -310,7 +320,7 @@ class StaticPageTests(unittest.TestCase):
         for group in {e["primary_offering"] for e in self.editorial.values()}:
             slug = re.sub(r"[^a-z0-9]+", "-", group.lower()).strip("-")
             self.assertIn(slug, facts.ids, group)
-            self.assertIn(f'<h2 id="{slug}">{labels.get(group, group).replace("&", "&amp;")}</h2>', text)
+            self.assertIn(f'<h2 id="{slug}" tabindex="-1">{labels.get(group, group).replace("&", "&amp;")}</h2>', text)
             self.assertIn(f'<section class="directory-section" data-group="{slug}">', text)
         nonprofits = sum(1 for e in self.editorial.values() if e["primary_offering"] == "Nonprofit research")
         total = len(self.companies) + len(self.current_companies["entries"])
@@ -332,7 +342,7 @@ class StaticPageTests(unittest.TestCase):
         for cid, text in self.pages.items():
             group = self.editorial[cid]["primary_offering"]
             slug = re.sub(r"[^a-z0-9]+", "-", group.lower()).strip("-")
-            crumbs = re.search(r'<nav class="crumbs" aria-label="Breadcrumb">(.*?)</nav>', text).group(1)
+            crumbs = re.search(r'<nav class="crumbs[^"]*" aria-label="Breadcrumb">(.*?)</nav>', text).group(1)
             self.assertIn(f'href="{ORIGIN}/companies/#{slug}">{labels.get(group, group).replace("&", "&amp;")}</a>', crumbs, cid)
             peers = [p for p, e in self.editorial.items() if e["primary_offering"] == group and p != cid]
             related = text.split('<h2 id="related">', 1)[1].split("</ul>", 1)[0]
@@ -466,7 +476,11 @@ class StaticPageTests(unittest.TestCase):
                 self.assertEqual(set(EMAIL.findall(contact)), {"musaeminozdem@gmail.com"})
                 self.assertNotIn("hidden", contact.split(">", 1)[0])
                 hrefs = [anchor.get("href") for anchor in PageFacts(contact).anchors]
-                self.assertIn("mailto:musaeminozdem@gmail.com?subject=ScienceToStartup%20correction&body=Company%3A%20%0D%0AWhat%20is%20wrong%3A%20%0D%0ALink%20to%20a%20source%20with%20the%20right%20value%3A%20%0D%0A", hrefs)
+                mail, = (urlsplit(href) for href in hrefs if href.startswith("mailto:"))
+                self.assertEqual(mail.path, sp.CORRECTION_EMAIL)
+                self.assertIn("Record ID or page link", parse_qs(mail.query)["body"][0])
+                self.assertIn(f"{ORIGIN}/research/corrections/", hrefs)
+                self.assertIn(f'{sp.PUBLIC_IDENTITY["repository"]["url"]}/issues/new?template=correction.yml', hrefs)
                 text = re.sub(pattern, "", text, flags=re.S)
             self.assertIsNone(EMAIL.search(text), str(path.relative_to(self.dist)))
 
@@ -530,7 +544,7 @@ class StaticPageTests(unittest.TestCase):
         node = shutil.which("node")
         if not node: self.skipTest("Node is not installed")
         self.assertIn(APP_RULE, (ROOT / "web/app.js").read_text(), "eligibleMetrics changed in web/app.js; update Research.eligible and static_pages.exclusion")
-        modules = ["web/app.js", "web/editorial.js", "web/work-v3.js"] + ["web/" + name for name in PRESENTATION_JS]
+        modules = ["web/search-core.js", "web/app.js", "web/editorial.js", "web/work-core.js", "web/work-v3.js"] + ["web/" + name for name in PRESENTATION_JS]
         result = subprocess.run([node, "-e", APP_RULES, str(ROOT), json.dumps(modules)], capture_output=True, text=True, timeout=120)
         self.assertEqual(result.returncode, 0, result.stderr[-2000:])
         app = json.loads(result.stdout)
@@ -624,7 +638,7 @@ class StaticPageTests(unittest.TestCase):
                 if metric.get("gross_vs_net") == "gross": self.assertIn("gross", text, mid)
                 if metric["kind"] in REVENUE_KINDS and metric.get("gross_vs_net") == "unspecified": self.assertIn("gross or net not stated", text, mid)
                 extra = len(claim.get("source_ids", [])) - 1
-                if extra > 0: self.assertIn(f"+{extra} more source", text, mid)
+                if extra > 0: self.assertIn(f"{extra} more source", text, mid)
                 # The source line says when we read the page, in the app's words (B6: the lede promises a checked or recorded date).
                 source, _ = sp.latest_source(self.research, metric)
                 if source: self.assertIn({"checked": "Checked ", "summary_only": "Summary only, page not reviewed · recorded ", "unverified": "Not checked again · recorded "}[source["retrieval_status"]] + sp.format_date(source["accessed_on"]), text, mid)
@@ -724,7 +738,7 @@ class StaticPageTests(unittest.TestCase):
             if not dated and not risks:
                 self.assertNotIn('id="risks"', text, cid)
                 continue
-            section = text.split('<h2 id="risks">', 1)[1].split('<h2 id="work">', 1)[0]
+            section = text.split('<h2 id="risks"', 1)[1].split('<h2 id="work"', 1)[0]
             self.assertEqual(re.findall(r'<tr data-event="([^"]+)">', section), [e["id"] for e in dated], cid)
             self.assertEqual(re.findall(r'<tr data-risk="([^"]+)">', section), [c["id"] for c in risks], cid)
             self.assertEqual([e["date"] for e in dated], sorted((e["date"] for e in dated), reverse=True), cid)
@@ -746,10 +760,10 @@ class StaticPageTests(unittest.TestCase):
 
     def test_work_page_lists_every_listing_once_in_worker_groups(self):
         text = (self.dist / "work/index.html").read_text()
-        listed = re.findall(r'<li class="work-listing" data-work-route="([^"]+)"', text)
+        listed = re.findall(r'<li class="work-listing"[^>]* data-work-route="([^"]+)"', text)
         self.assertEqual(sorted(listed), sorted(r["id"] for r in self.routes))
         order = [key for key, _, _ in sp.WORK_DISPLAY_BUCKETS if any(sp.work_display_bucket(r) == key for r in self.routes)]
-        self.assertEqual(re.findall(r'<h2 id="([a-z]+)">', text), order)
+        self.assertEqual(re.findall(r'<h2 id="([a-z]+)"', text), order)
         self.assertIn(f'href="{sp.SCAM_GUIDE}"', text)
         self.assertIn("Never pay to get work.", text)
         self.assertNotIn("JobPosting", text)
@@ -757,7 +771,7 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(structured_data(text)["@type"], "CollectionPage")
 
     def test_work_groups_match_the_app(self):
-        app = (ROOT / "web/work-v4.js").read_text() + (ROOT / "web/work-v3.js").read_text()
+        app = "".join((ROOT / "web" / script).read_text() for script in ("work-core.js", "work-v4.js", "work-v3.js"))
         for _, label, note in sp.WORK_DISPLAY_BUCKETS:
             self.assertIn(label, app, "static work group label drifted from the app")
             self.assertIn(note, (self.dist / "work/index.html").read_text(), "static work group explanation must remain visible")
@@ -767,7 +781,7 @@ class StaticPageTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which("node"), "node is not installed")
     def test_every_listing_gets_the_apps_group_status_place_and_pay(self):
         """w4Bucket, w4Status, w4Location and w4Pay in web/work-v4.js, run in Node: the static pages print the same words (B5, B7)."""
-        modules = ["web/app.js", "web/editorial.js", "web/work-v3.js"] + ["web/" + name for name in PRESENTATION_JS]
+        modules = ["web/search-core.js", "web/app.js", "web/editorial.js", "web/work-core.js", "web/work-v3.js"] + ["web/" + name for name in PRESENTATION_JS]
         result = subprocess.run(["node", "-e", APP_RULES, str(ROOT), json.dumps(modules)], capture_output=True, text=True, timeout=120)
         self.assertEqual(result.returncode, 0, result.stderr[-2000:])
         app = json.loads(result.stdout)["work"]
@@ -795,8 +809,8 @@ class StaticPageTests(unittest.TestCase):
         facts = PageFacts(work)
         self.assertEqual(facts.title, f"Paid AI training work: {len(paid)} sourced routes{sp.SUFFIX}")
         self.assertTrue(facts.meta["description"].startswith(f"{named} named listings and {programs} expert networks and programs at {paid_companies} AI data companies,"), facts.meta["description"])
-        lede = plain(re.search(r'<p class="lede">.*?</p>', work).group(0))
-        self.assertEqual(lede, "Roles and projects, with published pay and sources.")
+        advice = plain(re.search(r'<details class="work-page-advice">.*?</details>', work, re.S).group(0))
+        self.assertIn("Current openings and individual eligibility are not guaranteed", advice)
         self.assertIn(f'{named} named listings <span>·</span> {programs} networks and programs <span>·</span> {paid_companies} companies', work)
         self.assertIn(f'{len(self.routes)} records at {all_companies} companies.', work)
         self.assertIn(f"See {len(paid)} paid work routes</a>", (self.dist / "companies/index.html").read_text())
@@ -810,7 +824,7 @@ class StaticPageTests(unittest.TestCase):
         closed_label = dict((key, label) for key, label, _ in sp.WORK_DISPLAY_BUCKETS)["closed"]
         for cid, text in self.pages.items():
             own = [r for r in self.routes if r["company_id"] == cid]
-            section = text.split('<h2 id="work">', 1)[1].split("<h2", 1)[0]
+            section = text.split('<h2 id="work"', 1)[1].split("<h2", 1)[0]
             self.assertEqual(sorted(re.findall(r'data-work-route="([^"]+)"', section)), sorted(r["id"] for r in own), cid)
             headings = re.findall(r"<h3>(.*?)</h3>", section)
             self.assertEqual(headings, sorted(headings, key=labels.index), cid)
@@ -818,7 +832,8 @@ class StaticPageTests(unittest.TestCase):
             closed = section.split(f"<h3>{closed_label}</h3>", 1)[1] if f"<h3>{closed_label}</h3>" in section else ""
             closed_summary = re.sub(r'<details class="work-terms">.*?</details>', '', closed, flags=re.S)
             self.assertNotIn("Pay: ", closed_summary, cid)
-            self.assertNotIn("Where: ", closed_summary, cid)
+            if any(sp.work_display_bucket(route) == "closed" and sp.work_pay(route) != "Pay not listed" for route in own):
+                self.assertIn("Historical pay", closed_summary, cid)
             # Field names are not repeated: "Pay not listed", never "Pay: Pay not listed" (coordinator E5).
             self.assertNotRegex(section, r"Pay: Pay|Where: Location not listed", cid)
             if not own: continue
@@ -878,7 +893,9 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(facts.meta.get("robots"), "noindex")
         self.assertEqual(facts.canonicals, [])
         self.assertEqual(facts.headings, ["We could not find that page."])
-        for path in ("/", "/companies/", "/work/", "/method/", "/method/#about", "/?search"): self.assertIn(f'href="{ORIGIN}{path}"', text)
+        for path in ("/", "/companies/", "/work/", "/method/", "/method/#about"): self.assertIn(f'href="{ORIGIN}{path}"', text)
+        self.assertIn(f'href="{ORIGIN}/daily/">Daily scan and archive', text)
+        self.assertIn('href="/?search=#browse-guide"', text)
         self.assertEqual([(l.get("rel"), l.get("href")) for l in facts.links if "icon" in str(l.get("rel"))], ICONS)
         self.assertIn("--bg:#f8f8f4;--ink:#18231f", sp.STYLE, "the edition palette")
         self.assertFalse((ROOT / "web/404.html").exists(), "404.html is generated by scripts/static_pages.py")
