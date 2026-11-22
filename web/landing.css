@@ -62,6 +62,7 @@
 .site-header nav a:hover { color: var(--ink); text-decoration: underline; }
 .home-menu { display: none; }
 .landing-page .site-search-panel { overflow-y: auto; }
+.site-search-content { display: contents; }
 .landing-page .site-search-input::placeholder { color: var(--muted); opacity: 1; }
 .site-search-more {
   flex: none;
@@ -257,6 +258,14 @@
 @media (max-height: 450px) {
   .landing-page .site-search { max-height: calc(100dvh - 24px); margin: 12px auto auto; }
   .landing-page .site-search-results { min-height: min(96px, 30dvh); }
+}
+@media (max-height: 210px) {
+  /* Keep the search controls in view and give the rest of the dialog one scroll area. */
+  .landing-page .site-search { max-height: calc(100dvh - 8px); margin: 4px auto auto; }
+  .landing-page .site-search-panel:has(> .site-search-content) { overflow: clip; }
+  .landing-page .site-search-bar:has(+ .site-search-content) { flex: none; padding-block: 6px; }
+  .site-search-content { display: block; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .landing-page .site-search-content .site-search-results { min-height: 0; overflow: visible; }
 }
 @media (prefers-reduced-motion: reduce) {
   .landing-page :is(a, button) { transition: none; }
