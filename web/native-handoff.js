@@ -3,6 +3,7 @@
   if (window.navigation || window.top !== window) return;
 
   const key = 's2s.nativeHandoff';
+  const firstKey = 'nativeHandoffFirst';
   let storage;
   try { storage = window.sessionStorage; } catch { return; }
 
@@ -11,14 +12,21 @@
       const value = storage.getItem(key);
       if (!value) return;
       storage.removeItem(key);
-      return value;
+      return JSON.parse(value);
     } catch {}
   }
 
-  const previous = takeWitness();
-  // A warm document also consumes the witness when a traversal lands there.
-  addEventListener('pageshow', event => { if (event.persisted) takeWitness(); });
+  let witness = takeWitness();
+  addEventListener('pageshow', event => { if (event.persisted) witness = takeWitness(); });
   if (!NATIVE_HANDOFF_PARTICIPANT) return;
+
+  const source = ['/companies/', '/work/', '/explore/'].includes(location.pathname);
+  // An uninstrumented page can leave a witness behind after a skipped traversal.
+  // Only the oldest entry cannot receive that witness on Forward. Mark it while
+  // it is alone, since history.length can later include forward entries.
+  if (source && history.length === 1) {
+    try { history.replaceState({ ...history.state, [firstKey]: true }, ''); } catch {}
+  }
 
   const entryKey = 'nativeHandoffArrival';
   // Match a pending arrival without putting the address or search text in storage.
@@ -31,16 +39,13 @@
     return hash >>> 0;
   };
 
-  let witness;
-  if (previous) try { witness = JSON.parse(previous); } catch {}
   const type = performance.getEntriesByType('navigation')[0]?.type;
   if (type === 'navigate' && witness?.id && witness.target === fingerprint(witness.id, location.href)) {
     try { history.replaceState({ ...history.state, [entryKey]: witness.id }, ''); } catch {}
   }
 
-  const nativeSource = location.pathname === '/companies/' || location.pathname === '/work/';
   let pending;
-  if (nativeSource || history.state?.[entryKey] || type === 'back_forward' || type === 'reload') {
+  if (source || history.state?.[entryKey] || type === 'back_forward' || type === 'reload') {
     addEventListener('pagehide', () => {
       const outgoing = pending;
       pending = undefined;
@@ -56,17 +61,19 @@
     });
   }
 
-  if (nativeSource) {
+  if (source) {
     window.S2SNativeHandoff = {
       begin(href, event) {
-        if (new URL(href).origin !== location.origin) return;
+        if (!history.state?.[firstKey] || new URL(href).origin !== location.origin) return;
         try {
           const id = Array.from(crypto.getRandomValues(new Uint32Array(4)), part => part.toString(36)).join('-');
           pending = { id, target: fingerprint(id, href), event };
           return id;
         } catch {}
       },
-      returnedFrom(id) { return Boolean(id && witness?.target === undefined && witness?.id === id); },
+      returnedFrom(id) {
+        return Boolean(history.state?.[firstKey] && id && witness?.target === undefined && witness?.id === id);
+      },
     };
   }
 })();

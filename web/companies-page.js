@@ -74,7 +74,8 @@
   const fromIndex=activation?.from?.index;
   const goingForward=fromIndex>=0&&fromIndex<=activation.entry?.index;
   const saved=history.state?.directoryReturn;
-  const returning=saved?.page===location.href&&performance.getEntriesByType('navigation')[0]?.type==='back_forward'&&
+  const revisiting=saved?.page===location.href&&performance.getEntriesByType('navigation')[0]?.type==='back_forward';
+  const returning=revisiting&&
     (window.navigation?!goingForward:window.S2SNativeHandoff?.returnedFrom(saved.entry));
   if(returning)window.addEventListener('pageshow',event=>{
     if(event.persisted)return;
@@ -99,7 +100,7 @@
   window.addEventListener('popstate',()=>{
     if(displayedSearch!==location.search){read();filter(false);}
   });
-  read(returning?saved.query:undefined);filter(false);form.hidden=false;
+  read(revisiting?saved.query:undefined);filter(false);form.hidden=false;
   document.documentElement.removeAttribute('data-page-enhancement');
   const jumps=document.querySelector('.directory-groups');
   if(jumps)jumps.hidden=true;
