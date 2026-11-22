@@ -52,6 +52,7 @@
       open: rows.filter(row => row.querySelector('details').open).map(row => row.id),
       anchor: anchor?.id || null, top: anchor?.getBoundingClientRect().top || 0,
       archiveOpen: archive.open,
+      returnToPermalink: active?.matches('.scan-permalink') ? active.closest('.scan-item')?.id : null,
       returnToArchive: active?.matches('.scan-archive a') ? new URL(active.href).pathname : null,
       returnToDateGo: active === dateGo };
     try {
@@ -74,7 +75,12 @@
         const anchor = rowById.get(current.anchor);
         const y = anchor && !anchor.hidden ? scrollY + anchor.getBoundingClientRect().top - current.top : current.y;
         scrollTo({ left: current.x, top: Math.max(0, Math.min(maxPosition, y)), behavior: 'instant' });
-        if (document.activeElement === document.body) {
+        const item = rowById.get(current.returnToPermalink);
+        const permalink = item && !item.hidden ? item.querySelector('details[open] .scan-permalink') : null;
+        // Fragment traversal can leave focus or the next Tab at the target
+        // article. Restore the originating link after reopening its details.
+        if (permalink) permalink.focus({ preventScroll: true });
+        else if (document.activeElement === document.body) {
           const archiveLink = archive.open ? archiveLinks.get(current.returnToArchive) : null;
           const returnFocus = current.returnToDateGo === true ? dateGo : archiveLink;
           returnFocus?.focus({ preventScroll: true });

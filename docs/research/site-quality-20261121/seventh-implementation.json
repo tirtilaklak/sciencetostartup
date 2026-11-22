@@ -1,0 +1,111 @@
+{
+  "frozen_source": "7ee2a7e2a1f4d79d2f548e4c564963b4df7943ed",
+  "source_files": 768,
+  "build": "d0522f0b467a6a759b76",
+  "manifest_sha256": "322bf59a0e479ce23c4f2e1ab81a6acdc7cbc76c910962d3397d21f7eb94a26d",
+  "editorial_release": "2026-11-22.4",
+  "prior_public_version": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+  "sixth_immutable_preview": "47b6c921-403d-4881-a2cf-7820ee092ed6",
+  "cohort": {
+    "model": "gpt-6.2-sol",
+    "reasoning": "ultra",
+    "workers": {
+      "fix7_surge": {
+        "integrated_from": [
+          "57de1284"
+        ],
+        "finding_ids": [
+          "S6-surge-work-terms"
+        ]
+      },
+      "fix7_market_recovery": {
+        "integrated_from": [
+          "fc9a25f4"
+        ],
+        "finding_ids": [
+          "N6-market-failure"
+        ]
+      },
+      "fix7_explore_history": {
+        "integrated_from": [
+          "5688c403",
+          "736918fd"
+        ],
+        "finding_ids": [
+          "N6-new-directory-fresh-link",
+          "N6-explore-work-compare-back",
+          "N6-compare-row-back",
+          "N6-compare-financing-back"
+        ]
+      },
+      "fix7_compare_actions": {
+        "integrated_from": [
+          "5c6efb9a"
+        ],
+        "finding_ids": [
+          "N6-compare-work-label",
+          "N6-compare-row-back",
+          "N6-compare-financing-back"
+        ]
+      },
+      "fix7_native_handoffs": {
+        "integrated_from": [
+          "95085284"
+        ],
+        "finding_ids": [
+          "N6-native-directory-back"
+        ]
+      },
+      "fix7_finance": {
+        "integrated_from": [
+          "6f21cec1",
+          "6bd113da",
+          "055550dd",
+          "eacc2dbd"
+        ],
+        "finding_ids": [
+          "E6-snorkel-threshold",
+          "E6-toloka-source",
+          "E6-turing-source"
+        ]
+      },
+      "fix7_work_copy": {
+        "integrated_from": [
+          "5525211f",
+          "c3583946"
+        ],
+        "finding_ids": [
+          "W6-coverage-scope",
+          "N6-native-directory-back"
+        ]
+      },
+      "fix7_search": {
+        "integrated_from": [
+          "1a1a020f",
+          "975f67ac",
+          "37eb26d7"
+        ],
+        "finding_ids": [
+          "A6-hourly-search"
+        ]
+      },
+      "fix7_reading_labels": {
+        "integrated_from": [
+          "816367f8"
+        ],
+        "finding_ids": [
+          "R6-research-archive-actions"
+        ]
+      },
+      "fix7_daily": {
+        "integrated_from": [
+          "ccf76cd0"
+        ],
+        "finding_ids": [
+          "D6-daily-permalink-back"
+        ]
+      }
+    }
+  },
+  "initial_retest_status": "Independent checks and GitHub workflows in progress. This commit does not represent a public release."
+}
