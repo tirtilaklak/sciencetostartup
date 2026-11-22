@@ -114,7 +114,8 @@ const S2SWork = (() => {
   }
   function w4CurrencyCode(route){const code=route.pay_terms?.currency;return /^[A-Z]{3}$/.test(code||'')?code:null;}
   function w4RateTie(a,b){const x=w4HourlyRange(a),y=w4HourlyRange(b),currency=w4CurrencyCode(a);return x&&y&&currency&&currency===w4CurrencyCode(b)?y.high-x.high:0;}
-  function w4BestOrder(a,b, companyName = route => route.company_name || route.company_id){return w4BestRank(a)-w4BestRank(b)||(w4Checked(b)||'').localeCompare(w4Checked(a)||'')||w4RateTie(a,b)||companyName(a).localeCompare(companyName(b))||a.role.localeCompare(b.role)||String(a.id || '').localeCompare(String(b.id || ''));}
+  // English title ties keep the initial HTML, native enhancements and Explore in the same order.
+  function w4BestOrder(a,b, companyName = route => route.company_name || route.company_id){return w4BestRank(a)-w4BestRank(b)||(w4Checked(b)||'').localeCompare(w4Checked(a)||'')||w4RateTie(a,b)||companyName(a).localeCompare(companyName(b),'en')||a.role.localeCompare(b.role,'en')||String(a.id || '').localeCompare(String(b.id || ''),'en');}
   // Highest hourly rate: top of the published range, then its low end ("up to" last), then open-ended
   // ranges. Listings without a rate keep best-match order after them. US dollar rates come before other
   // currencies, and unknown currencies retain best-match order without comparing amounts.

@@ -1972,9 +1972,9 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
     return document(research, title, description, canonical, "".join(body), structured, current="companies", note=f"<p>{LOGO_NOTE}</p>")
 
 
-def work_table(research, rows, names, key, *, include_kind=True):
+def work_table(research, rows, names, key, *, include_kind=True, ordered_ids=None):
     """Native listing cards retain all conditions and evidence without JavaScript."""
-    out = []
+    out = {}
     for index, r in enumerate(rows):
         cid, status = r.get("company_id"), work_status(r)
         company = names.get(cid, cid)
@@ -1998,12 +1998,15 @@ def work_table(research, rows, names, key, *, include_kind=True):
         review_html = escape(brief_review)
         if brief_review != full_review:
             review_html += f'<span hidden>{escape(full_review.removeprefix(brief_review))}</span>'
-        out.append(f'<li class="work-listing" id="{rid}" tabindex="-1" data-work-route="{rid}" data-arrangements="{escape(arrangements)}">'
-                   f'<div class="work-heading"><span class="work-company" id="{company_label}">{escape(company)}</span>{tag}'
-                   f'<h3><a href="/company/{escape(cid)}/#{rid}" aria-describedby="{company_label}">{escape(role)}</a></h3></div>{offer_html}'
-                   f'<p class="work-reviewed">{review_html}<div class="work-listing-conditions">{work_conditions(r, include_kind=include_kind)}</div>'
-                   f'{action_html}{work_terms_html(research, r, company, detailed=False, primary_action_url=destination)}')
-    return f'<ul class="work-listings">{"".join(out)}</ul>\n'
+        out[r["id"]] = (f'<li class="work-listing" id="{rid}" tabindex="-1" data-work-route="{rid}" data-arrangements="{escape(arrangements)}">'
+                        f'<div class="work-heading"><span class="work-company" id="{company_label}">{escape(company)}</span>{tag}'
+                        f'<h3><a href="/company/{escape(cid)}/#{rid}" aria-describedby="{company_label}">{escape(role)}</a></h3></div>{offer_html}'
+                        f'<p class="work-reviewed">{review_html}<div class="work-listing-conditions">{work_conditions(r, include_kind=include_kind)}</div>'
+                        f'{action_html}{work_terms_html(research, r, company, detailed=False, primary_action_url=destination)}')
+    if ordered_ids is not None and (len(ordered_ids) != len(out) or set(ordered_ids) != out.keys()):
+        raise ValueError(f"Work card membership differs from the browser's {key} group")
+    render_order = out if ordered_ids is None else ordered_ids
+    return f'<ul class="work-listings">{"".join(out[record_id] for record_id in render_order)}</ul>\n'
 
 
 def render_work(research, routes, names, modified, work_results=None, work_script=None):
@@ -2018,6 +2021,11 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
     description = truncate(f"{plural(named_count, 'named listing')} and {plural(program_count, 'expert network or program', 'expert networks and programs')} at {plural(open_companies, 'AI data company', 'AI data companies')}, with published pay, requirements, sources and separate review dates.")
     crumbs = [("Overview", f"{ORIGIN}/"), ("Paid work", canonical)]
     buckets = {key: sort_routes([r for r in rows if work_display_bucket(r) == key], names) for key, _, _ in WORK_DISPLAY_BUCKETS}
+    ranked = {}
+    if work_script is not None:
+        from frontend_packaging import work_default_order
+        from presentation import work_native_selection
+        ranked = work_default_order(work_native_selection({"routes": rows}, research.companies))
     directory_labels = {"outside": "Non-training jobs", "closed": "Past & reference"}
     groups = [(key, directory_labels.get(key, label), note) for key, label, note in WORK_DISPLAY_BUCKETS]
     scope = " and ".join(label for present, label in (
@@ -2071,7 +2079,8 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
         fallback = '<noscript><p class="work-no-js-message">Filters need JavaScript. Showing the full directory.</p></noscript>'
         common_kind = WORK_KIND_LABELS[work_kind(buckets[key][0])] if key in ("named", "programs", "boards") else ""
         kind_attr = f' data-work-kind-label="{escape(common_kind)}"' if common_kind else ""
-        contents = f'<h2 id="{key}" tabindex="-1">{escape(label)}</h2>\n{fallback}' + (f'<p class="muted">{note}</p>\n' if note else '') + work_table(research, buckets[key], names, key, include_kind=not common_kind)
+        cards = work_table(research, buckets[key], names, key, include_kind=not common_kind, ordered_ids=ranked.get(key))
+        contents = f'<h2 id="{key}" tabindex="-1">{escape(label)}</h2>\n{fallback}' + (f'<p class="muted">{note}</p>\n' if note else '') + cards
         if key in ("named", "programs"):
             body.append(f'<section class="work-page-group" data-work-group="{key}"{kind_attr}>{contents}</section>\n')
         else:
