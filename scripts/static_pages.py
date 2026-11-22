@@ -1940,9 +1940,10 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
 def work_table(research, rows, names, key):
     """Native listing cards retain all conditions and evidence without JavaScript."""
     out = []
-    for r in rows:
+    for index, r in enumerate(rows):
         cid, status = r.get("company_id"), work_status(r)
         company = names.get(cid, cid)
+        company_label = f"{key}-{index}"
         destination, action = work_destination(r, research)
         role = clean(r.get("role")) or "Listing"
         rid = escape(r["id"])
@@ -1957,8 +1958,8 @@ def work_table(research, rows, names, key):
         offer_html = f'<div class="work-offer">{offer}{place}</div>' if offer or place else ""
         action_html = f'<p class="work-listing-action">{external_link(destination, action, work_action_name(action, r, company))}{availability(destination, research.health)}</p>' if destination else ""
         out.append(f'<li class="work-listing" id="{rid}" tabindex="-1" data-work-route="{rid}" data-arrangements="{escape(arrangements)}">'
-                   f'<div class="work-heading"><a class="work-company" href="/company/{escape(cid)}/#{rid}" aria-label="{escape(f"{company} · {role}")}">{escape(company)}</a>{tag}'
-                   f'<h3>{escape(role)}</h3></div>{offer_html}'
+                   f'<div class="work-heading"><span class="work-company" id="{company_label}">{escape(company)}</span>{tag}'
+                   f'<h3><a href="/company/{escape(cid)}/#{rid}" aria-describedby="{company_label}">{escape(role)}</a></h3></div>{offer_html}'
                    f'<p class="work-reviewed">{escape(work_review_label(research, r))}<div class="work-listing-conditions">{work_conditions(r)}</div>'
                    f'{action_html}{work_terms_html(research, r, company, detailed=False, primary_action_url=destination)}')
     return f'<ul class="work-listings">{"".join(out)}</ul>\n'

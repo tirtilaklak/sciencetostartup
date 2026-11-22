@@ -28,7 +28,7 @@ test('a research-only company can be recovered from an empty native directory se
 test('native work search uses company aliases and preserves listing buckets and literal queries',async({page})=>{
   await page.goto('/work/?reader=keep&q=DataAnnotation#main');
   const matches=page.locator('[data-work-route]:visible');expect(await matches.count()).toBeGreaterThan(0);
-  for(const href of await matches.locator('.work-company').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('href'))))expect(href).toContain('/company/surge_ai/');
+  for(const href of await matches.locator('.work-heading h3 a').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('href'))))expect(href).toContain('/company/surge_ai/');
   const query=page.locator('[data-work-filters] input[name=q]');await query.fill('C++');
   await expect(query).toHaveValue('C++');expect(new URL(page.url()).searchParams.get('q')).toBe('C++');expect(new URL(page.url()).hash).toBe('#main');
   await page.locator('.work-page-filter-options').evaluate(node=>{node.open=true;});await page.getByRole('button',{name:'Clear',exact:true}).click();

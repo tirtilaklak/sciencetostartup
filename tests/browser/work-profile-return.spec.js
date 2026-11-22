@@ -8,7 +8,8 @@ function controls(page) {
   const card = page.locator(`[data-work-route="${roleId}"]`);
   return {
     card,
-    opener: card.getByRole('link', { name: 'AfterQuery · World Models Machine Learning Expert', exact: true }),
+    opener: card.getByRole('heading', { name: 'World Models Machine Learning Expert', exact: true })
+      .getByRole('link', { name: 'World Models Machine Learning Expert', exact: true }),
     application: card.locator('.work-listing-action a'),
     terms: card.locator('details.work-terms'),
   };
@@ -34,6 +35,7 @@ async function activateProfile(page) {
   expect(ids).toHaveLength(17);
   expect(ids[0]).toBe(roleId);
   const { opener, application, terms } = controls(page);
+  await expect(opener).toHaveAccessibleDescription('AfterQuery');
   await terms.locator('summary').press('Enter');
   await expect(terms).toHaveJSProperty('open', true);
   await expect(terms.locator('a[href="https://experts.afterquery.com/apply/world-models-ml-experts"]')).toBeVisible();
@@ -150,7 +152,7 @@ test.describe('Work company-profile handoff', () => {
   test.skip(({ isMobile }) => isMobile, 'Use the audited desktop keyboard layout');
 
   for (const hash of ['', '#' + roleId]) {
-    test(`cold Back restores the company link${hash ? ' on a bookmarked Work entry' : ''}`, async ({ page }) => {
+    test(`cold Back restores the role title link${hash ? ' on a bookmarked Work entry' : ''}`, async ({ page }) => {
       await observeHistory(page, true);
       await page.goto(work + hash);
       await expect(page).toHaveURL(work + hash);
@@ -189,7 +191,7 @@ test.describe('Work company-profile handoff', () => {
       await page.addInitScript(`if (location.pathname === '/work/') {
         document.addEventListener('focusin', function openerFocused(event) {
           if (performance.getEntriesByType('navigation')[0]?.type !== 'back_forward') return;
-          if (!event.target.matches('[data-work-route="${roleId}"] .work-company')) return;
+          if (!event.target.matches('[data-work-route="${roleId}"] h3 a')) return;
           document.removeEventListener('focusin', openerFocused);
           (${holdWorkFrames})();
           if (${readerScroll}) return;

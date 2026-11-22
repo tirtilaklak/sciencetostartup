@@ -168,9 +168,16 @@ test('native Work shows the complete first role and hourly rate on the first scr
         expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
         await expect(page.locator('.work-page-counts')).toBeHidden();
         const first = page.locator('[data-work-route]:visible').first();
-        const { role, pay_label: pay } = routes.find(route => route.id === firstId);
+        const { role, company_id: company, pay_label: pay } = routes.find(route => route.id === firstId);
         await expect(first).toHaveAttribute('data-work-route', firstId);
-        const title = first.getByRole('heading', { name: role, exact: true });
+        const title = first.getByRole('heading', { name: role, exact: true })
+          .getByRole('link', { name: role, exact: true });
+        const profile = `/company/${company}/#${firstId}`;
+        await expect(title).toHaveAttribute('href', profile);
+        await expect(title).toHaveAccessibleDescription('AfterQuery');
+        await expect(title).toHaveCSS('text-decoration-line', 'underline');
+        await expect(first.locator(`a[href="${profile}"]`)).toHaveCount(1);
+        expect((await title.boundingBox()).height).toBeGreaterThanOrEqual(44);
         const rate = first.locator('.work-pay strong');
         await expect(rate).toHaveText(pay);
         await expect(title).toBeInViewport({ ratio: 1 });

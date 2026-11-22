@@ -50,8 +50,9 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
 .work-listing:focus,.work-page-group>h2:focus{outline:2px solid var(--green);outline-offset:2px}
 .work-listing,.work-page-group>h2{scroll-margin-top:88px}
 .work-heading{min-width:0}
-.work-heading .work-company{display:inline-flex;align-items:center;min-height:44px;font-size:13px;font-weight:500;line-height:1.5;margin:0 12px 3px 0;color:var(--green)}
+.work-heading .work-company{display:inline-block;font-size:13px;font-weight:500;line-height:1.5;margin:0 12px 3px 0;color:var(--muted)}
 .work-heading h3{font:inherit;font-size:21px;font-weight:600;line-height:1.35;letter-spacing:-.4px;margin:0;color:var(--ink);overflow-wrap:anywhere}
+.work-heading h3>a{display:inline-block;min-width:44px;min-height:44px;align-content:center;text-decoration:underline}
 .work-status{display:inline-block;font-size:14px;line-height:1.5;color:var(--amber,#795418);margin-bottom:8px}
 .work-offer{grid-column:2;grid-row:1;min-width:0}
 .work-offer:empty{display:none}
