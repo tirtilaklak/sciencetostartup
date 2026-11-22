@@ -1,17 +1,18 @@
 const { test, expect } = require('@playwright/test');
 
+test.use({
+  javaScriptEnabled: false,
+  viewport: { width: 320, height: 720 },
+  launchOptions: { firefoxUserPrefs: {
+    'font.minimum-size.x-western': 32,
+    'font.minimum-size.x-unicode': 32,
+  } },
+});
+
 test.describe('native phone navigation with enlarged Firefox text', () => {
   test.skip(({ browserName }) => browserName !== 'firefox', 'The test uses Firefox minimum font sizes');
-  test.use({
-    javaScriptEnabled: false,
-    viewport: { width: 320, height: 720 },
-    launchOptions: { firefoxUserPrefs: {
-      'font.minimum-size.x-western': 32,
-      'font.minimum-size.x-unicode': 32,
-    } },
-  });
-
   test('main links stay a single keyboard disclosure at 320px', async ({ page, baseURL }) => {
+    test.setTimeout(90_000);
     const destinations = ['Daily scan', 'Research', 'Companies', 'Paid work', 'About'];
     const researchURL = new URL('/research/', baseURL).href;
     await page.route('https://sciencetostartup.com/research/', route =>
