@@ -201,8 +201,6 @@ test.describe('complete research tables without JavaScript', () => {
           expect(accessibleHeaders, entity.id + ' accessible rowheader').toHaveLength(1);
           expect(normalize(accessibleHeaders[0].text), entity.id).toContain(normalize(displayTitle(entity.name)));
         }
-        expect(normalize(row.review), entity.id).toContain(labels[entity.status]);
-        expect(normalize(row.review), entity.id).toContain((entity.review_depth || '').replaceAll('_', ' '));
         expect(normalize(row.type), entity.id).toBe(entity.kind.replaceAll('_', ' '));
         const taxonomy = facets.filter(name => values(entity, name).length).map(name => `${name.replaceAll('_', ' ')}: ${values(entity, name).join(', ')}`).join('; ');
         expect(normalize(row.taxonomy), entity.id).toBe(taxonomy || 'Not recorded');
@@ -211,9 +209,16 @@ test.describe('complete research tables without JavaScript', () => {
           graph.entities.filter(item => item.parent_id === entity.id).forEach(item => scope.add(item.id));
         }
         const approved = graph.assertions.filter(assertion => assertion.status === 'approved' && (scope.has(assertion.subject_id) || scope.has(assertion.object_id)));
+        const metadataApproval = entity.status === 'approved' && (entity.review_depth === 'metadata' || approved.length === 0);
+        if (metadataApproval) {
+          expect(normalize(row.review), entity.id).toBe('Approved metadata');
+        } else {
+          expect(normalize(row.review), entity.id).toContain(labels[entity.status]);
+          expect(normalize(row.review), entity.id).toContain((entity.review_depth || '').replaceAll('_', ' '));
+        }
         const href = row.titleHref;
         expect(href).toMatch(new RegExp(`^/research/${category}/[^/#]+/$`));
-        expect(normalize(row.evidenceText), entity.id).toBe(`${approved.length} approved assertions`);
+        expect(normalize(row.evidenceText), entity.id).toBe(`${approved.length} approved assertion${approved.length === 1 ? '' : 's'}`);
         expect(row.evidenceHref, entity.id).toBe(href + '#approved-findings');
       }
       let paperVersionViewport;
