@@ -325,6 +325,10 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         report = self.page(rp.REPORT_PATH)
         facts = Facts(report)
         sections = self.context['report']['sections']
+        shortcuts, = ReaderTree(report).with_class('r-bulk-shortcuts')
+        self.assertEqual(ReaderTree.links(shortcuts), ['#first-paragraph', '#contents'])
+        self.assertIn(f'Browse {len(sections)} chapters', ReaderTree.text(shortcuts))
+        self.assertEqual(facts.ids.count('contents'), 1)
         routes = [rp.REPORT_PATH if index == 0 else rp.REPORT_PATH + 'chapters/' + section['id'] + '/'
                   for index, section in enumerate(sections)]
         early_shortcuts = {'technical-landscape', 'datasets-and-benchmarks', 'methods-and-appendices',

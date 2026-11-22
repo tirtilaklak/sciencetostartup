@@ -539,6 +539,7 @@ function syncComparisonLayout(){
  comparisonScrollRegion();
  revealComparisonFocus();
 }
+function compareSettingsFocus(){return $('compare-setup').open?$('compare-preset'):$('compare-setup-toggle');}
 function resizeComparison(returnFocus=null){
  const view=$('compare-view'),container=$('compare-content');
  if(view.hidden)return;
@@ -552,7 +553,7 @@ function resizeComparison(returnFocus=null){
  if(picker&&window.innerWidth>700)picker.open=false;
  if(!container.contains(active))return;
  if(active.closest('.mobile-column-options')&&window.innerWidth>700){
-  $('compare-preset').focus({preventScroll:true});
+  compareSettingsFocus().focus({preventScroll:true});
   return;
  }
  const cell=active.closest('[data-comparison-company]'),row=active.closest('[data-comparison-row]'),header=active.closest('thead th'),company=cell?.dataset.comparisonCompany||active.dataset.remove||header?.querySelector('a[href^="#company/"]')?.getAttribute('href').split('/')[1];
@@ -567,7 +568,7 @@ function resizeComparison(returnFocus=null){
  const scope=identity.row?[...container.querySelectorAll('[data-comparison-row]')].find(n=>n.dataset.comparisonRow===identity.row):container.querySelector('thead');
  const candidates=[...(scope||container).querySelectorAll('a,button,summary')];
  const restored=candidates.find(n=>n.getClientRects().length&&n.tagName===identity.tag&&(identity.claim?n.dataset.claim===identity.claim:identity.remove?n.dataset.remove===identity.remove:identity.href?n.getAttribute('href')===identity.href:identity.summary&&n.tagName==='SUMMARY'));
- const pairSummary=container.querySelector('.mobile-column-options summary');(restored||(pairSummary?.getClientRects().length?pairSummary:null)||$('compare-preset')).focus({preventScroll:true});
+ const pairSummary=container.querySelector('.mobile-column-options summary');(restored||(pairSummary?.getClientRects().length?pairSummary:null)||compareSettingsFocus()).focus({preventScroll:true});
 }
 function syncComparisonPreset(){const presets={scale:['taskus','appen','scale_ai'],work:['surge_ai','toloka','labelbox']},match=Object.keys(presets).find(key=>presets[key].join('|')===state.selected.join('|'));$('compare-preset').value=match||'';const placeholder=$('compare-preset').querySelector?.('option[value=""]');if(placeholder)placeholder.textContent=state.selected.length&&!match?'Custom selection':'Choose an example';}
 // #compare/<id>/<id>/<id> names an explicit selection,
@@ -598,21 +599,31 @@ function compareRouteNotice({unavailable,overflow}){
 }
 function compareNoticeHTML(notice){return notice?`<p data-compare-unavailable>${esc(notice)} <a href="/companies/">Browse the company directory</a>.</p>`:'';}
 function renderComparisonScope(view){
- const heading=$(view+'-view')?.querySelector?.('.page-heading');
- if(!heading||heading.querySelector('[data-comparison-scope]'))return;
+ const scope=$(view+'-view')?.querySelector?.(view==='compare'?'.compare-scope':'.page-heading');
+ if(!scope||scope.querySelector('[data-comparison-scope]'))return;
  const historical=DATA.companies.length,counts=window.SUMMARY_INDEX?.publicCompanyCounts;
  const directory=counts?.directory?`Browse the ${counts.directory}-company directory`:'Browse the company directory';
  const profiles=counts?.publishedProfiles?` <a href="/?search">Search all ${counts.publishedProfiles} published profiles</a>.`:'';
- heading.insertAdjacentHTML('beforeend',`<p class="sub" data-comparison-scope>Explore uses a historical set of ${historical} companies. <a href="/companies/">${directory}</a>.${profiles}</p>`);
+ scope.insertAdjacentHTML('beforeend',`<p class="sub" data-comparison-scope>Explore uses a historical set of ${historical} companies. <a href="/companies/">${directory}</a>.${profiles}</p>`);
 }
 function syncCompareAdd(){const select=$('compare-add'),full=state.selected.length>=3;if(!select)return;select.innerHTML=`<option value="">${full?'Remove one to add another':'Choose a company'}</option>`+[...DATA.companies].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option value="${esc(c.id)}"${full||state.selected.includes(c.id)?' disabled':''}>${esc(c.name)}</option>`).join('');select.value='';const add=$('compare-add-button');if(add)add.hidden=true;}
+function syncCompareTools(ids){
+ const setup=$('compare-setup'),toggle=$('compare-setup-toggle'),clear=$('clear-compare'),copy=$('copy-compare');
+ const hasCompanies=ids.length>0,wasEmpty=clear.hidden;
+ const leavingSetup=hasCompanies&&wasEmpty&&document.activeElement&&setup.contains(document.activeElement);
+ clear.hidden=copy.hidden=!hasCompanies;
+ copy.textContent='Copy comparison link';
+ toggle.textContent=hasCompanies?`Edit companies (${ids.length} selected)`:'Choose up to three companies';
+ if(!hasCompanies||wasEmpty)setup.open=!hasCompanies;
+ if(leavingSetup)toggle.focus({preventScroll:true});
+}
 function renderCompare({pairOnly=false}={}){
  if(!onCompareRoute()||$('compare-content').hasAttribute?.('aria-busy'))return;
  const selection=syncCompareRoute(),notice=compareRouteNotice(selection),ids=selection.ids;
  renderComparisonScope('compare');
- if(!pairOnly){syncComparisonPreset();syncCompareAdd();}
+ if(!pairOnly){syncComparisonPreset();syncCompareAdd();syncCompareTools(ids);}
  if(!ids.length){
-  $('compare-content').innerHTML=compareNoticeHTML(notice)+'<div class="comparison-empty"><h2>Which companies are you considering?</h2><p>Add up to three companies above, or start with a selection.</p><div class="comparison-starts"><button type="button" data-preset="scale">TaskUs, Appen &amp; Scale AI</button><button type="button" data-preset="work">Surge AI, Toloka &amp; Labelbox</button></div></div>';
+  $('compare-content').innerHTML=compareNoticeHTML(notice);
   $('compare-status').textContent=notice||'No companies selected.';
   syncComparisonLayout();
   return;
@@ -623,7 +634,16 @@ function renderCompare({pairOnly=false}={}){
 // The table box becomes a focusable, named region only while it really scrolls sideways.
 // The stylesheet lets the table wrap, so today it never does and keyboard users skip it.
 function comparisonScrollRegion(){const box=document.querySelector('#compare-content .comparison-scroll');if(!box)return;const scrolls=typeof getComputedStyle==='function'&&/auto|scroll/.test(getComputedStyle(box).overflowX)&&box.scrollWidth>box.clientWidth+1;if(scrolls){box.setAttribute('tabindex','0');box.setAttribute('role','region');box.setAttribute('aria-label','Comparison table, scroll for more fields');}else for(const name of ['tabindex','role','aria-label'])box.removeAttribute(name);}
-function copyCompareLink(button){const done=copied=>{$('compare-status').textContent=copied?'Link copied.':'Copy the address from your browser bar.';button.textContent=copied?'Link copied':'Copy link';},clip=typeof navigator==='undefined'?null:navigator.clipboard;if(!clip?.writeText)return done(false);clip.writeText(location.href).then(()=>done(true),()=>done(false));}
+function copyCompareLink(button){
+ const href=location.href,clip=typeof navigator==='undefined'?null:navigator.clipboard;
+ const done=copied=>{
+  if(location.href!==href)return;
+  $('compare-status').textContent=copied?'Link copied.':'Copy the address from your browser bar.';
+  button.textContent=copied?'Link copied':'Copy comparison link';
+ };
+ if(!clip?.writeText)return done(false);
+ clip.writeText(href).then(()=>done(true),()=>done(false));
+}
 
 function evidenceMetricStatus(m){
  const estimated=m.reported_vs_estimated==='estimated',status=m.observation_status||'reported';
@@ -934,7 +954,8 @@ function rememberExploreOrigin(event){
  const href=link.getAttribute('href'),view=routeParts()[0];
  const work=view==='work'&&link.id==='work-native-compare';
  const compare=view==='compare'&&link.closest('#compare-content')&&(link.dataset.compareOrigin||href.startsWith('#company/'));
- if(!work&&!compare){
+ const market=(!view||view==='market'||VIEW_ANCHORS[view]==='market')&&href.startsWith('#company/')&&link.matches('#market-view .product-preview h3 a');
+ if(!work&&!compare&&!market){
   if(history.state?.exploreReturnOrigin){const {exploreReturnOrigin,...rest}=history.state;history.replaceState(rest,'');}
   return;
  }
@@ -944,14 +965,18 @@ function rememberExploreOrigin(event){
  if(work)flushWorkRoute();
  const destination=link.href;
  const opener=compare?{action:link.dataset.compareOrigin,pair:state.mobileCompare,expanded:comparisonExpanded,left:link.closest('.comparison-scroll')?.scrollLeft||0}:null;
- history.replaceState({...history.state,exploreReturnOrigin:{href,destination,work,compare:opener}},'');
+ history.replaceState({...history.state,exploreReturnOrigin:{href,destination,work,compare:opener,market}},'');
  pendingExploreLink=href.startsWith('#')?{key:exploreEntryKey,destination}:null;
  keepEntryScroll();
 }
 window.addEventListener('click',rememberExploreOrigin);
 function exploreReturnOrigin({traversedFragment=false,initial=false,persisted=false}){
  const origin=history.state?.exploreReturnOrigin;
- if(!origin||routeParts()[0]!==(origin.work?'work':'compare'))return null;
+ if(!origin)return null;
+ const view=routeParts()[0];
+ if(origin.market){
+  if(!traversedFragment||(view&&view!=='market'&&VIEW_ANCHORS[view]!=='market'))return null;
+ }else if(view!==(origin.work?'work':'compare'))return null;
  if(traversedFragment)return explorePreviousKey&&exploreFragmentDestinations.get(historyKey())===explorePreviousKey?origin:null;
  if(!(initial||persisted)||document.activeElement!==document.body)return null;
  const activation=window.navigation?.activation;
@@ -963,8 +988,8 @@ function exploreReturnOrigin({traversedFragment=false,initial=false,persisted=fa
  }else if(!persisted&&window.performance?.getEntriesByType?.('navigation')[0]?.type!=='back_forward')return null;
  return origin;
 }
-function focusExploreOrigin({work,compare,href}){
- const links=work?[$('work-native-compare')]:[...$('compare-content').querySelectorAll('a[href]')];
+function focusExploreOrigin({work,compare,market,href}){
+ const links=work?[$('work-native-compare')]:[...(market?$('market-view').querySelectorAll('.product-preview h3 a[href]'):$('compare-content').querySelectorAll('a[href]'))];
  const target=links.find(link=>link?.getAttribute('href')===href&&link.dataset.compareOrigin===compare?.action&&link.getClientRects().length);
  if(!target)return null;
  const scrollbox=compare&&target.closest('.comparison-scroll');
@@ -1078,12 +1103,12 @@ function route(event){
  renderTray(shortlist?.notice);
  const waitForShortlist=shortlist&&restore!==null&&searchContextPending(state.query);
  const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();if(!waitForShortlist)queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;
+ const linkedOpener=returnOrigin&&focusExploreOrigin(returnOrigin);
+ if(linkedOpener)return linkedOpener;
  if(wasTraversal&&view==='market'&&!anchorId){
   const hash=location.hash;
   queueMicrotask(()=>{if(location.hash===hash)marketShortcutOrigins.get(key)?.focus({preventScroll:true});});
  }
- const linkedOpener=returnOrigin&&focusExploreOrigin(returnOrigin);
- if(linkedOpener)return linkedOpener;
  const opener=shortlist?$('compare-tray').querySelector?.('a'):wasTraversal&&view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():wasTraversal&&view==='companies'?companyReturnFocusTarget():null;
  if(opener?.getClientRects().length)opener.focus({preventScroll:true});
  if(waitForShortlist)deferShortlistScroll(restore,opener);
@@ -1348,7 +1373,7 @@ function initWork(){
 }
 
 // Compare page: selection controls and the narrow-screen layout switch.
-function initCompare(){$('clear-compare').addEventListener('click',()=>{setSelection([]);$('compare-preset').value='';});$('compare-preset').addEventListener('change',event=>{if(!event.target.value){syncComparisonPreset();return;}state.mobileCompare=0;setSelection(event.target.value==='scale'?['taskus','appen','scale_ai']:['surge_ai','toloka','labelbox']);});
+function initCompare(){$('clear-compare').addEventListener('click',()=>{setSelection([]);$('compare-add').focus();});$('compare-preset').addEventListener('change',event=>{if(!event.target.value){syncComparisonPreset();return;}state.mobileCompare=0;setSelection(event.target.value==='scale'?['taskus','appen','scale_ai']:['surge_ai','toloka','labelbox']);});
  // Add a company: a pick with a pointer adds it at once. With the keyboard, arrow keys only
  // browse the list; Enter or the Add button adds the company that is showing.
  const add=$('compare-add'),addButton=$('compare-add-button');let picked=false;const addChosen=()=>{const id=add.value;if(!isCompanyId(id)||state.selected.includes(id))return;add.focus?.({preventScroll:true});state.mobileCompare=Math.max(0,comparePairOptions([...state.selected,id]).findIndex(pair=>pair.includes(state.selected.length)));chooseCompare(id,true);};
@@ -1395,7 +1420,7 @@ function initialize(){$('snapshot').textContent=compiledSnapshotLabel(DATA.meta.
  if(typeof requestIdleCallback!=='function'&&typeof requestAnimationFrame!=='function'){for(const view of ['companies','method','work'])preparePage(view);renderDirectory();preparePage('market');}
  route();initCompare();if(typeof initSiteNav==='function')initSiteNav();
  $('close-company').addEventListener('click',()=>$('company-dialog').close());$('close-evidence').addEventListener('click',()=>$('evidence-dialog').close());
- document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||$('clear-compare');next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.dataset.preset){state.mobileCompare=0;setSelection(b.dataset.preset==='scale'?['taskus','appen','scale_ai']:['surge_ai','toloka','labelbox']);}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});window.addEventListener('hashchange',route);
+ document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||(state.selected.length?compareSettingsFocus():$('compare-add'));next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});window.addEventListener('hashchange',route);
  // On small screens the Filters fields open as a panel under the button. A short screen can leave the whole panel
  // below the fold, so bring it into view when it opens. toggle does not bubble, so listen in the capture phase.
  document.addEventListener('toggle',e=>{const panel=e.target;if(!panel?.open||!panel.matches?.('.responsive-filter-panel,.more-filters'))return;if(panel.matches('.responsive-filter-panel')&&window.innerWidth>900)return;const fields=panel.querySelector('.responsive-filter-fields,.more-filters-panel'),box=fields?.getBoundingClientRect();if(box?.height&&box.bottom>window.innerHeight)fields.scrollIntoView({block:'nearest'});},true);

@@ -89,7 +89,11 @@
   function resultType(row) {
     if (row.href.startsWith('/company/')) return 'Company';
     if (row.group === 'paper') return row.recordKind === 'paper_version' ? 'Paper source version' : 'Paper';
-    return { dataset: 'Dataset', benchmark: 'Benchmark', report: 'Research report', workflow: 'Workflow', daily: 'Daily scan', data: 'Research data', review: 'Review log', market: 'Market' }[row.group] || 'Research';
+    return {
+      dataset: 'Dataset', benchmark: 'Benchmark', report: 'Research report', workflow: 'Workflow',
+      daily: 'Daily scan', data: 'Research data', review: 'Review log', market: 'Market',
+      directory: 'Company directory', compare: 'Comparison',
+    }[row.group] || 'Research';
   }
   function option({ name, summary, href, type }, index) {
     return `<a id="home-result-${index}" class="site-search-option" role="option" aria-selected="false" tabindex="-1" data-result-type="${escape(type)}" href="${escape(href)}"><strong>${escape(name)}</strong><span>${escape(type + ' · ' + summary)}</span></a>`;

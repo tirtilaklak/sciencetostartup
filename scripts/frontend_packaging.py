@@ -43,6 +43,20 @@ def minify_css(source):
     return package_frontend(stylesheets={"source": source})["stylesheets"]["source"]
 
 
+def work_default_order(rows):
+    """Use the browser's ranking to order the initial Work HTML."""
+    core = (ROOT / "web/work-core.js").read_text(encoding="utf-8")
+    command = core + """
+const rows = JSON.parse(require('node:fs').readFileSync(0, 'utf8'));
+const groups = S2SWork.groupResults(rows);
+const ids = Object.fromEntries(S2SWork.groups.map(group => [group, groups[group].map(row => row.id)]));
+process.stdout.write(JSON.stringify(ids));
+"""
+    result = subprocess.run(["node", "-e", command], input=json.dumps(rows),
+                            capture_output=True, text=True, check=True, timeout=15)
+    return json.loads(result.stdout)
+
+
 SEARCH_COMPONENTS = frozenset({"home-search.js", "companies-page.js", "work-page.js", "research-index.js"})
 
 def optional_script_source(root, name):

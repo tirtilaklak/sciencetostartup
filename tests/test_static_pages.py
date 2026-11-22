@@ -355,6 +355,7 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(text.count('href="/current-companies.json"'), 1)
         coverage = re.search(r'<details class="directory-scope">.*?</details>', text, re.S).group(0)
         self.assertIn(supplemental, coverage)
+        self.assertIn(f'Choose up to three of {len(self.companies)} historical profiles in Compare.', coverage)
         for addition in self.current_companies["entries"]:
             slug = addition["entity_id"]
             card = text.split(f'<li class="directory-company" data-company="{slug}"', 1)[1].split('</section></li>', 1)[0]
@@ -819,6 +820,8 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(sorted(listed), sorted(r["id"] for r in self.routes))
         order = [key for key, _, _ in sp.WORK_DISPLAY_BUCKETS if any(sp.work_display_bucket(r) == key for r in self.routes)]
         self.assertEqual(re.findall(r'<h2 id="([a-z]+)"', text), order)
+        self.assertIn('<option value="outside">Non-training jobs</option>', text)
+        self.assertIn('<option value="closed">Past &amp; reference</option>', text)
         self.assertIn(f'href="{sp.SCAM_GUIDE}"', text)
         self.assertIn("Never pay to get work.", text)
         self.assertNotIn("JobPosting", text)
@@ -871,7 +874,7 @@ class StaticPageTests(unittest.TestCase):
         self.assertIn(f'data-work-count aria-live="polite" aria-atomic="true">{len(self.routes)} records, including career pages and past listings</p>', work)
         self.assertIn(f"See {len(paid)} paid work routes</a>", (self.dist / "companies/index.html").read_text())
         checked = max(d for r in self.routes for d in (r.get("availability_checked_on"), (r.get("last_route_check") or {}).get("date")) if d)
-        self.assertIn(f"Latest link check {sp.format_date(checked)}", work)
+        self.assertIn(f"The most recent individual link check was on {sp.format_date(checked)}. See each card for available dates.", advice)
         for path in self.html_files():
             self.assertNotRegex(plain(path.read_text()), r"\bopen (?:paid work )?listings?\b", str(path.relative_to(self.dist)))
 
@@ -996,6 +999,9 @@ class StaticPageTests(unittest.TestCase):
         text = (self.dist / "method/index.html").read_text()
         facts = PageFacts(text)
         for anchor in ("about", "figures", "grades", "labels", "coverage", "downloads"): self.assertIn(anchor, facts.ids)
+        self.assertLess(text.index('id="figures"'), text.index('id="downloads"'))
+        self.assertLess(text.index('id="grades"'), text.index('id="downloads"'))
+        self.assertLess(text.index('id="downloads"'), text.index('id="corrections"'))
         nodes = ld_nodes(text)
         self.assertEqual([node["@type"] for node in nodes], ["AboutPage", "Dataset"])
         page, dataset = nodes
@@ -1016,7 +1022,11 @@ class StaticPageTests(unittest.TestCase):
         rated = {a["company_id"] for a in self.data["assessments"]}
         unrated = [c for c in self.data["companies"] if c["id"] not in rated]
         self.assertTrue(unrated and all(c["entity_type"] == "adjacent_research" for c in unrated))
-        self.assertIn(f"{len(rated)} companies with a delivery evidence level", text)
+        coverage = text.split('id="coverage-notes"', 1)[1].split('</details>', 1)[0]
+        self.assertIn(f'Historical company dataset v{self.data["dataset_version"]}', coverage)
+        self.assertIn(f'This dataset covers {len(self.data["companies"])} company profiles and {len(self.data["sources"])} source records.', coverage)
+        self.assertIn(f"{len(rated)} companies have a delivery evidence level", coverage)
+        self.assertIn(f'<a href="{ORIGIN}/companies/">current company directory</a>', coverage)
         self.assertIn(f"The {sp.count_word(len(unrated)).lower()} nonprofit research groups get no level.", text)
         self.assertNotIn("delivery evidence rating", text)
         self.assertTrue(50 <= len(dataset["description"]) <= 5000)

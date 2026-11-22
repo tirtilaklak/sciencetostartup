@@ -399,7 +399,7 @@ The Market retry restores the visible Revenue & growth heading after a failed da
 
 Six workers began with live checks on reliability, design, data, copy, navigation and links. The baseline had 940 generated HTML pages and six XML files. All 40,151 declared static fragment targets exist in the captured build. Another 277 Explore routes require JavaScript to verify. The audit checks the actual served destination separately from whether a generated path exists.
 
-The public site still lists the unavailable AfterQuery People Programs Lead role. It treats two live employer posts as past listings and shows an outdated Engagement Manager pay range. The branch carries corrected dispositions and the employer’s pay disagreement. A fresh pass over all 144 employer URLs found no further changes. All 135 public work records matched across the three browser CSV downloads.
+Worker 41 listed the unavailable AfterQuery People Programs Lead role, treated two live employer posts as past listings, and showed an outdated Engagement Manager pay range. Worker 45 publishes the corrected dispositions and the employer’s pay disagreement. A fresh pass over all 144 employer URLs found no further changes. All 135 public work records matched across the three browser CSV downloads.
 
 A generic search for “jobs” returned a single literal result. The shared Work selector now respects the requested filters and all eligible listings for a generic query. A literal role or company with the exact title still takes precedence.
 
@@ -411,4 +411,12 @@ Home presents Companies, Paid work and Research as the first three choices. The 
 
 Shared Search now opens Home at the homepage and Companies at the current directory. One paid-work action keeps the query. All 20 browser journeys in the separate Search build passed across the five project configurations.
 
-Two release defects were reproduced on Worker 41. A blocked Market data request left the old Companies results on screen. A timed-out Explore script could erase a focused recovery action when it arrived late. The product changes keep the failure scoped to the requested page, retain the original bookmark and offer a usable Reload page action. The integrated build still needs its release checks.
+Two release defects were reproduced on Worker 41. A blocked Market data request left the old Companies results on screen. A timed-out Explore script could erase a focused recovery action when it arrived late. Worker 45 keeps the failure scoped to the requested page, retains the original bookmark and offers a usable Reload page action.
+
+### Worker 45 public release
+
+Worker 45 moved to full public traffic at 11:40 AM Pacific on November 22. Build `cf5b6da2f7fdde7f2595` and its signed manifest matched across the immutable preview and production. The private preview passed 296 browser journeys and 86 acceptance checks. Hosted CI verified 1,112 unit tests and all 24 mobile performance budgets. [Release PR](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45056824579) · [Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45056824546)
+
+All 1,014 live paths worked, including 941 HTML pages with the exact signed bodies and all 40,151 linked static targets. Public checks confirmed the iMerit CFO transcript, changed employer dispositions, conflicting pay figures, and the archived brief’s link to its exact finding. The 22.47 MB evidence appendix matched its verified checksum.
+
+A normal WebKit Back to a bookmarked Work listing ends with focus on the card in both releases. Worker 45 also reopens Terms and briefly restores the exact role link before WebKit moves focus to the card. The follow-up addresses that remaining keyboard behavior.

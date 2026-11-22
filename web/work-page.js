@@ -116,9 +116,12 @@
           ...Array.from(pay?.querySelectorAll('strong ~ .sub') || [], note => note.textContent.trim()),
         ]);
         const detail = row.insertCell();
+        const groupKind = card.closest('[data-work-group]')?.dataset.workKindLabel;
+        const conditionFields = Array.from(card.querySelector('.work-listing-conditions').children, field => field.textContent.trim());
+        if (groupKind && conditionFields.length) conditionFields[0] = groupKind + ' · ' + conditionFields[0];
         appendComparisonFields(detail, [
           text(card, '.work-place'),
-          ...Array.from(card.querySelector('.work-listing-conditions').children, field => field.textContent.trim()),
+          ...conditionFields,
           text(card, '.work-reviewed'),
         ]);
         const action = card.querySelector('.work-listing-action a');
@@ -268,10 +271,21 @@
       // A warm history traversal keeps this document and its browser-managed focus.
       // On a verified cold return, the browser may focus the opener's bookmark first.
       const bookmark = card && card === targetFromHash() ? card : null;
-      returnBookmark = bookmark;
+      const bookmarkHandoff = bookmark && { target: bookmark, recover: null };
+      returnBookmark = bookmarkHandoff;
       const input = readerInput;
       const canRestore = () => input === readerInput && !loader?.interacted &&
         savedHandoff()?.link === link && !link.closest('[hidden]');
+
+      function clearBookmark() {
+        if (returnBookmark === bookmarkHandoff) returnBookmark = null;
+      }
+
+      function recoverBookmarkFocus() {
+        if (returnBookmark === bookmarkHandoff && document.activeElement === bookmark && canRestore()) {
+          link.focus({ preventScroll: true });
+        }
+      }
 
       function restorePosition() {
         const bounds = link.getBoundingClientRect();
@@ -284,22 +298,24 @@
       }
 
       function settleBookmarkPosition(event) {
-        if (event?.persisted) return;
-        // Native history can apply a fragment scroll after pageshow. Focus has
-        // already returned, so only adjust the viewport after it settles.
+        if (event?.persisted) return clearBookmark();
+        // WebKit can apply the native fragment focus and scroll after the
+        // opener has already received focus. Leave other focus moves alone.
         setTimeout(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+          recoverBookmarkFocus();
           if (document.activeElement === link && canRestore()) restorePosition();
+          clearBookmark();
         })), 0);
       }
 
       requestAnimationFrame(() => requestAnimationFrame(() => {
-        const focusAvailable = document.activeElement === document.body || document.activeElement === returnBookmark;
-        returnBookmark = null;
-        if (!focusAvailable || !canRestore()) return;
+        const focusAvailable = document.activeElement === document.body || document.activeElement === bookmark;
+        if (!focusAvailable || !canRestore()) return clearBookmark();
         const group = card?.closest('details[data-work-group]');
         if (group) group.open = true;
         const terms = termsOpen && card?.querySelector('details.work-terms');
         if (terms) terms.open = true;
+        if (bookmarkHandoff) bookmarkHandoff.recover = () => queueMicrotask(recoverBookmarkFocus);
         link.focus({ preventScroll: true });
         restorePosition();
         if (bookmark) {
@@ -421,7 +437,8 @@
     }
     document.addEventListener('focusin', event => {
       const handoff = savedHandoff();
-      const bookmarkFocus = event.target === returnBookmark && !loader?.interacted;
+      const bookmarkFocus = event.target === returnBookmark?.target && !loader?.interacted;
+      if (bookmarkFocus) returnBookmark.recover?.();
       if (handoff && event.target !== handoff.link && !bookmarkFocus) remember({ workReturnFocus: null, workCompareFocus: false });
     });
     navigation?.addEventListener('click', event => {

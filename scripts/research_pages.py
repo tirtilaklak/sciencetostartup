@@ -9,7 +9,7 @@ coordinator calls these two public functions from the ordinary static build.
 from __future__ import annotations
 
 from pathlib import Path
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from email.utils import format_datetime
 import hashlib
 from itertools import groupby
@@ -31,6 +31,8 @@ REPORT_PATH = "/research/state-of-ai-data-labs/"
 CORRECTIONS_PATH = "/research/corrections/"
 LEDGER_BUCKETS = "0123456789abcdef"
 SOURCE_ANCHORS = "data/research-source-anchors.json"
+SOURCE_RECHECKS = "data/research-source-rechecks.json"
+COMPANY_WEBSITES = "data/research-company-websites.json"
 # Earlier public fragment IDs preserved by the current website wrapper.
 RETIRED_ASSERTION_IDS = (
     'candidate.cohort3.dataset.magpie.06',
@@ -501,10 +503,10 @@ def _hub(context, editions=()):
             f'<h2>{sp.escape(report["title"])}</h2>'
             f'<p>{len(report["sections"])} chapters on suppliers, human feedback, research methods and paid pilots.</p>'
             f'{_link(REPORT_PATH, "Read the report →", "r-button")}</aside></header>'
-            + operating_status_notice(context) +
             '<section class="r-section" aria-labelledby="browse"><div class="r-section-head">'
             '<h2 id="browse">Browse the research</h2>'
             f'{_link("/research/data/", "Sources & downloads →", "r-text-link")}</div>' + _browse(context) + '</section>'
+            + operating_status_notice(context) +
             '<section class="r-section r-hub-details" aria-label="Report details">'
             '<details class="r-disclosure" id="chapters">'
             f'<summary>Report contents <span>{len(report["sections"])} chapters</span></summary>'
@@ -797,13 +799,14 @@ def _chapter_content(context, section, outline, passages=()):
     return ''.join(blocks)
 
 
-def _reader_shortcuts(outline=(), passages=()):
+def _reader_shortcuts(outline=(), passages=(), *, chapter_count=0):
     jumps = ''
     if passages:
         entries = ''.join('<li>' + _link('#' + anchor, label) + '</li>' for _, anchor, label in passages)
         jumps = '<div class="r-passage-shortcuts"><span>Jump to</span><ul>' + entries + '</ul></div>'
     return ('<nav class="r-bulk-shortcuts r-outline-early" aria-label="Reading shortcuts">'
             + _link('#first-paragraph', 'First paragraph')
+            + (_link('#contents', f'Browse {sp.plural(chapter_count, "chapter")}') if chapter_count else '')
             + (_link('#section-contents', 'Section contents') if outline else '') + jumps + '</nav>')
 
 
@@ -906,8 +909,9 @@ def _report(context, edition=False, base=REPORT_PATH):
     report = context['report']
     section = report['sections'][0]
     state = 'Published edition' if edition else _status(context)
+    shortcuts = _reader_shortcuts(chapter_count=0 if edition else len(report['sections']))
     header = (f'<header class="r-page-head"><p class="r-kicker">{sp.escape(state)}</p>'
-              f'<h1>{sp.escape(report["title"])}</h1>' + _reader_shortcuts()
+              f'<h1>{sp.escape(report["title"])}</h1>' + shortcuts
               + f'<p class="r-lede">{sp.escape(report.get("subtitle"))}</p>'
               + _meta(context) + '<p class="r-callout">' + sp.escape(report.get('summary')) + '</p>'
               + '<p class="r-meta">' + sp.escape(report.get('review_statement')) + '</p>'
@@ -945,7 +949,14 @@ def _reader_chapter(context, section, base=REPORT_PATH, edition=False):
             + '<div class="r-report-body">' + body + '</div></div>')
 
 
-def _source(source, correction=''):
+def _source_recheck_notice(recheck):
+    if not recheck:
+        return ''
+    return ('Original file unavailable when checked ' + _date(recheck['unavailable_on']) + '. '
+            + _link(recheck['current_url'], 'Current issuer source (JavaScript)'))
+
+
+def _source(source, correction='', recheck=None):
     if source.get('_compatibility'):
         return (f'<article class="r-source-stub" data-evidence-status="withheld" id="{sp.escape(_anchor("source", source["id"]))}">'
                 '<h3>Earlier public source identifier</h3><p class="r-record-id">'
@@ -959,9 +970,11 @@ def _source(source, correction=''):
                 'It has no evidence binding in the current approved or historical findings. '
                 'Draft-only citation metadata is withheld while its source identity and support are reviewed.</p>'
                 + correction + '</article>')
+    notice = _source_recheck_notice(recheck)
     return (f'<article class="r-source" id="{sp.escape(_anchor("source", source["id"]))}">'
             f'<h3>{_link(source.get("url"), source.get("title", source["id"]))}</h3>'
-            f'<p class="r-record-id">{_link(_evidence_url("source", source["id"]), source["id"])}</p>'
+            + (f'<p class="r-meta">{notice}</p>' if notice else '')
+            + f'<p class="r-record-id">{_link(_evidence_url("source", source["id"]), source["id"])}</p>'
             '<dl class="r-facts"><dt>Publisher</dt><dd>' + sp.escape(source.get("publisher")) + '</dd>'
             f'<dt>Published</dt><dd>{_date(source.get("published_on"))}</dd>'
             f'<dt>Captured</dt><dd>{_date(source.get("captured_on"))} · {sp.escape(source.get("status", "").replace("_", " "))}</dd>'
@@ -969,6 +982,100 @@ def _source(source, correction=''):
             f'<dt>Locator</dt><dd>{sp.escape(source.get("locator"))}</dd></dl>'
             '<p class="r-meta">A source capture records retrieval. Assertion-specific review is recorded separately.</p>'
             + correction + '</article>')
+
+
+def _source_rechecks(context):
+    """Bind mutable reader links to the still-pinned approved evidence."""
+    if not context.get('published_edition_replay') or context.get('root') is None:
+        return {}
+    root = Path(context['root'])
+    path = root / SOURCE_RECHECKS
+    if not path.exists():
+        return {}
+    if path.is_symlink() or not path.is_file() or path.stat().st_size > 16384:
+        raise ValueError('Research source rechecks must be a bounded JSON file')
+    data = json.loads(path.read_text(encoding='utf-8'))
+    if (data.get('schema_version') != 'research-source-recheck-v1'
+            or not data.get('release_id') or not isinstance(data.get('rechecks'), list)):
+        raise ValueError('Invalid research source rechecks')
+    if data['release_id'] != context['report']['release_id']:
+        return {}
+    health = sp.link_health_index(json.loads((root / 'data/link-health.json').read_text(encoding='utf-8')))
+    sources = {row['id']: row for row in context['graph']['sources']}
+    claims = {row['id']: row for row in context['graph']['assertions'] if row['status'] == 'approved'}
+    by_source = {}
+    for recheck in data['rechecks']:
+        original, current, homepage = (recheck[key] for key in ('original_url', 'current_url', 'publisher_homepage'))
+        observed = health.get(sp.health_key(original), {})
+        urls = [urlsplit(_safe_url(url)) for url in (original, current, homepage)]
+        if (original == current or observed.get('status') != 'not_found'
+                or any(not url.netloc or url.netloc != urls[0].netloc or url.query or url.fragment for url in urls)
+                or any(re.search(r'[\s\x00-\x1f]', url) for url in (original, current, homepage))):
+            raise ValueError('Research source recheck requires a dated unavailable original and the same issuer host')
+        checked_on = recheck['checked_on']
+        if date.fromisoformat(checked_on).isoformat() != checked_on:
+            raise ValueError('Invalid research source recheck date')
+        if any(not re.fullmatch(r'[a-f0-9]{64}', recheck[key])
+               for key in ('original_response_sha256', 'current_response_sha256', 'homepage_sha256')):
+            raise ValueError('Invalid research source recheck hashes')
+        matched, seen_claims = {}, set()
+        for proof in recheck['evidence']:
+            claim_id = proof['claim_id']
+            pins = {pin['source_id'] for pin in claims.get(claim_id, {}).get('evidence', [])}
+            pinned = {sid for sid in pins if sources[sid]['url'] == original}
+            if not pinned or pinned != set(proof['source_ids']) or claim_id in seen_claims:
+                raise ValueError('Research source recheck does not match approved evidence pins')
+            if not proof['support_spans'] or any(
+                    type(span['start']) is not int or type(span['end']) is not int
+                    or not 0 <= span['start'] < span['end']
+                    or not re.fullmatch(r'[a-f0-9]{64}', span['sha256']) for span in proof['support_spans']):
+                raise ValueError('Invalid research source recheck support spans')
+            for sid in pinned:
+                matched.setdefault(sid, set()).add(claim_id)
+            seen_claims.add(claim_id)
+        if not matched or matched.keys() & by_source.keys() or any(
+                sources[sid]['response_sha256'] != recheck['original_response_sha256'] for sid in matched):
+            raise ValueError('Research source recheck does not match original evidence captures')
+        for sid, claim_ids in matched.items():
+            by_source[sid] = {'current_url': current, 'unavailable_on': observed['checked_on'], 'claim_ids': claim_ids}
+    return by_source
+
+
+def _company_websites(context):
+    """Read current homepage links without changing the reviewed entities."""
+    if not context.get('published_edition_replay') or context.get('root') is None:
+        return {}
+    path = Path(context['root']) / COMPANY_WEBSITES
+    if not path.exists():
+        return {}
+    data = json.loads(path.read_text(encoding='utf-8'))
+    if data.get('schema_version') != '1.0.0' or not isinstance(data.get('entries'), list):
+        raise ValueError('Invalid research company websites')
+    if data['release_id'] != context['report']['release_id']:
+        return {}
+    checked = data['checked_on']
+    if date.fromisoformat(checked).isoformat() != checked:
+        raise ValueError('Invalid research company website check date')
+    entities = _entities(context)
+    claims = {row['id']: row for row in context['graph']['assertions'] if row['status'] == 'approved'}
+    websites = {}
+    for entry in data['entries']:
+        eid, original, current = (entry[key] for key in ('entity_id', 'recorded_url', 'current_url'))
+        entity = entities.get(eid, {})
+        if (eid in websites or entity.get('status') != 'approved'
+                or entity.get('identifiers', {}).get('website') != original
+                or not _safe_url(original) or current == original or not _safe_url(current)
+                or re.search(r'[\s\x00-\x1f]', current) or urlsplit(current).query or urlsplit(current).fragment
+                or entry.get('language') not in ('en', 'zh')
+                or not re.fullmatch(r'[a-f0-9]{64}', entry.get('response_sha256', ''))):
+            raise ValueError(f'Invalid current website for {eid}')
+        if not entry['evidence'] or any(
+                (claim := claims.get(proof['claim_id'], {})).get('subject_id') != eid
+                or not any(pin.get('source_id') == proof['source_id'] for pin in claim.get('evidence', []))
+                for proof in entry['evidence']):
+            raise ValueError(f'Current website for {eid} requires approved evidence for that entity')
+        websites[eid] = {**entry, 'checked_on': checked}
+    return websites
 
 
 def _source_anchor_ids(root):
@@ -1068,6 +1175,7 @@ def _ledger_pages(context, ledger_path='/research/data/'):
     """Thirty-two bounded static documents; no per-record pages or runtime API."""
     assertions, stubs, sources = _ledger_records(context)
     retired = _retired_assertions(context, assertions, stubs)
+    rechecks = context.get('_render_source_rechecks', {}) if ledger_path == '/research/data/' else {}
     pages = []
     for kind, ids, label in (("assertion", sorted(assertions.keys() | stubs.keys() | retired), "Assertion"),
                              ("source", sorted(sources), "Source")):
@@ -1098,7 +1206,7 @@ def _ledger_pages(context, ledger_path='/research/data/'):
                 permalink = ledger_path + _evidence_url(kind, stable_id).removeprefix('/research/data/')
                 correction = _record_correction(context, stable_id, permalink)
                 if kind == 'source':
-                    body += _source(sources[stable_id], correction)
+                    body += _source(sources[stable_id], correction, rechecks.get(stable_id))
                 elif stable_id in assertions:
                     body += _assertion(context, assertions[stable_id], correction=correction)
                 elif stable_id in stubs:
@@ -1186,10 +1294,10 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
     rows = [("Privacy-filtered research JSON", "/publication/clean-dataset.json"), ("CSV", "/publication/clean-dataset.csv"),
             ("SQLite", "/publication/clean-dataset.sqlite"), ("Full evidence graph JSON · explicit statuses", "/research/exports/research-graph.json"),
             ("Evidence graph SQLite", "/research/exports/research-graph.sqlite"), ("Export checksums", "/research/exports/research-exports-manifest.json")]
-    if 'publication/report.pdf' in context.get('publication_assets', []):
-        rows.insert(0, ('Read the report PDF', '/publication/report.pdf'))
     if 'publication/executive-brief.html' in context.get('publication_assets', []):
-        rows.insert(0, ('Read the executive brief', '/publication/executive-brief.html'))
+        rows.append(('Read the executive brief', '/publication/executive-brief.html'))
+    if 'publication/report.pdf' in context.get('publication_assets', []):
+        rows.append(('Read the report PDF', '/publication/report.pdf'))
     if 'publication/current-REUSE.md' in context.get('publication_assets', []):
         rows.append(('Working JSON and SQLite examples', '/publication/current-REUSE.md'))
         rows.append(('Original archived reuse guide', '/publication/REUSE.md'))
@@ -1224,9 +1332,8 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
         doi = publication_metadata(context).get('doi')
         download_citation = (
             '<section class="r-section" aria-labelledby="downloads"><h2 id="downloads">Download the research</h2>'
-            '<p>The privacy-filtered projection retains explicit research status and historical qualifications. '
-            'Historical records are not fresh verification. Source retrieval is not claim approval. The original canonical dataset stays at version '
-            f'{sp.escape(graph.get("canonical_dataset_version"))}, with its existing identity and downloads.</p>'
+            '<p>Downloads keep each record’s review status and source notes. Historical records reflect earlier reviews. '
+            f'The separate company dataset remains at version {sp.escape(graph.get("canonical_dataset_version"))}.</p>'
             '<ul class="r-downloads">' + ''.join(links) + '</ul>'
             f'<p class="r-meta">Research release: {sp.escape(graph["release_id"])}.</p></section>'
             '<section class="r-section" id="citation"><h2>Cite and reproduce</h2>'
@@ -1458,17 +1565,20 @@ def _company_highlight(context, entity, approved, sources):
         review_day = next((_day(review['reviewed_on']) for rid in claim.get('review_ids', [])
                            if (review := reviews.get(rid, {})).get('role') == 'source_verifier'
                            and review.get('verdict') == 'pass' and review.get('reviewed_on')), '')
-        source = next((url for pin in claim.get('evidence', [])
-                       if (url := _safe_url(sources.get(pin['source_id'], {}).get('url')))), '')
+        source_id, source = next(((pin['source_id'], url) for pin in claim.get('evidence', [])
+                                  if (url := _safe_url(sources.get(pin['source_id'], {}).get('url')))), ('', ''))
         if not review_day or not source:
             continue
         statement = statement.removeprefix(entity['name'] + ' ')
         if (claim['id'] == 'candidate.cohort3.humans_in_the_loop.annotation-trial'
                 and statement.casefold() == 'describes a two-hour annotation trial on sample data and instructions before final guideline and setup adjustments.'):
             statement = 'Describes a two-hour annotation trial on sample data.'
+        recheck = context.get('_render_source_rechecks', {}).get(source_id, {})
+        notice = _source_recheck_notice(recheck) if claim['id'] in recheck.get('claim_ids', ()) else ''
         return ('<div class="company-review-highlight"><p class="company-review-finding">'
                 + sp.escape(statement[0].upper() + statement[1:])
                 + '<span class="company-review-context">' + _link(source, 'Original source')
+                + (f' · {notice}' if notice else '')
                 + f' · Evidence reviewed <time datetime="{sp.escape(review_day)}">{_date(review_day)}</time></span></p>'
                 '<p class="company-actions company-review-actions">'
                 + _link('#' + _token(_anchor('assertion', claim['id'])), 'Read finding') + '</p></div>')
@@ -1481,16 +1591,23 @@ def _company_detail(context, entity):
     linked = [a for a in context["graph"]["assertions"] if entity["id"] in {a.get("subject_id"), a.get("object_id")}]
     _, _, sources = _ledger_records(context)
     source_ids = sorted({item["source_id"] for a in linked for item in a.get("evidence", [])})
-    identifiers = "".join(f'<dt>{sp.escape(key)}</dt><dd>{sp.escape(value)}</dd>' for key, value in sorted(entity.get("identifiers", {}).items()))
+    current = context.get('_render_company_websites', {}).get(entity['id'])
+    identifiers = ''.join(
+        f'<dt>Recorded website</dt><dd>{_link(value, value)}</dd>' if current and key == 'website'
+        else f'<dt>{sp.escape(key)}</dt><dd>{sp.escape(value)}</dd>'
+        for key, value in sorted(entity.get('identifiers', {}).items()))
     taxonomy = "".join(f'<dt>{sp.escape(key.replace("_", " ").capitalize())}</dt><dd>{sp.escape(", ".join(values))}</dd>'
                        for key, values in sorted(entity.get("taxonomy", {}).items()) if values)
-    website = _safe_url(entity.get("identifiers", {}).get("website"))
+    website = current['current_url'] if current else _safe_url(entity.get('identifiers', {}).get('website'))
+    website_label = 'Website (Chinese)' if current and current['language'] == 'zh' else 'Website'
+    website_review = ('<p class="r-meta">Current website checked ' + _date(current['checked_on']) + ' · '
+                      + _link(_evidence_url('assertion', current['evidence'][0]['claim_id']), 'Identity evidence') + '</p>') if current else ''
     highlight = _company_highlight(context, entity, approved, sources)
     body = ['<article class="company-dossier research-company-dossier"><header class="company-hero">'
             '<div class="company-name"><h1>' + sp.escape(entity["name"]) + '</h1></div>'
             + highlight + '<p class="company-research-snapshot">' + sp.plural(len(approved), "approved finding")
             + ' · ' + sp.plural(len(source_ids), "source record") + '</p>'
-            + ('<p class="company-actions">' + _link(website, 'Website') + '</p>' if website else '')
+            + ('<p class="company-actions">' + _link(website, website_label) + '</p>' if website else '')
             + '</header><div class="company-record">',
             '<details class="company-fold" id="company-scope"><summary>Company and review scope</summary>'
             '<div class="company-fold-body"><p class="r-kicker">' + sp.escape(_label(entity)) + '</p>'
@@ -1499,7 +1616,7 @@ def _company_detail(context, entity):
             + '</p><dl class="r-facts"><dt>Review depth</dt><dd>'
             + sp.escape(entity.get("review_depth", "").replace("_", " "))
             + '</dd><dt>Disposition</dt><dd>' + sp.escape(entity.get("disposition")) + '</dd>'
-            + identifiers + '</dl><h2>Read this record carefully</h2>'
+            + identifiers + '</dl>' + website_review + '<h2>Read this record carefully</h2>'
             '<p>Approval applies to a specific assertion and its qualifications. It does not imply provider endorsement, '
             'commercial quality, or a contribution to another artifact.</p>'
             + ('<h3>Recorded taxonomy</h3><p class="r-meta">Candidate taxonomy remains provisional.</p><dl class="r-facts">' + taxonomy + '</dl>' if taxonomy else '')
@@ -1884,6 +2001,8 @@ def write_research_pages(output, context):
     # Keep current operational notices outside immutable publication contexts.
     context = with_operating_status(context, now=datetime.now(timezone.utc))
     context = {**context, '_legacy_current_bookmarks': True,
+               '_render_company_websites': _company_websites(context),
+               '_render_source_rechecks': _source_rechecks(context),
                '_render_source_anchor_ids': _source_anchor_ids(context['root']) if context.get('root') is not None else []}
     context = _render_context(context, corrections)
     status = context.get('operating_status')

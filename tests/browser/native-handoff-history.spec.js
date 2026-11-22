@@ -123,19 +123,34 @@ test.describe('Mercor dossier viewport on cold Back', () => {
         if (location.pathname !== '/companies/') return;
         const viewport = link => ({ scroll: scrollY, top: link.getBoundingClientRect().top, time: performance.now() });
         window.mercorRestoredViewport = new Promise(resolve => {
+          if (!userScroll) {
+            const listen = window.addEventListener;
+            window.addEventListener = function (type, callback, options) {
+              const result = Reflect.apply(listen, this, arguments);
+              const link = document.activeElement;
+              if (this === window && type === 'scroll' && options?.signal && link?.matches(selector) &&
+                  window.nativeHandoffCached === false &&
+                  performance.getEntriesByType('navigation')[0]?.type === 'back_forward') {
+                window.addEventListener = listen;
+                const guardStarted = performance.now();
+                // The opener is already positioned when its guarded scroll listener is installed.
+                // Inject on the next microtask so a slow animation frame cannot outlast the guard.
+                queueMicrotask(() => {
+                  const first = viewport(link);
+                  const guardActive = !options.signal.aborted;
+                  scrollTo({ top: 0, behavior: 'instant' });
+                  resolve({ first, overwrite: viewport(link), guardStarted, guardActive });
+                });
+              }
+              return result;
+            };
+            return;
+          }
           document.addEventListener('focusin', event => {
             const link = event.target;
             if (!link.matches(selector) || window.nativeHandoffCached !== false ||
                 performance.getEntriesByType('navigation')[0]?.type !== 'back_forward') return;
-            requestAnimationFrame(() => {
-              const first = viewport(link);
-              if (userScroll) return resolve({ first });
-              // The release trace showed the browser resetting scroll in the next paint.
-              requestAnimationFrame(() => {
-                scrollTo({ top: 0, behavior: 'instant' });
-                resolve({ first, overwrite: viewport(link) });
-              });
-            });
+            requestAnimationFrame(() => resolve({ first: viewport(link) }));
           });
         });
         if (userScroll) {
@@ -162,7 +177,7 @@ test.describe('Mercor dossier viewport on cold Back', () => {
       await expect(page.locator('.company-dossier')).toBeVisible();
       await page.goBack({ waitUntil: 'commit' });
       await page.waitForFunction(() => Boolean(window.mercorRestoredViewport));
-      const { first, overwrite } = await page.evaluate(() => window.mercorRestoredViewport);
+      const { first, overwrite, guardStarted, guardActive } = await page.evaluate(() => window.mercorRestoredViewport);
       if (userScroll) {
         await page.keyboard.press('Home');
         const input = await page.evaluate(() => window.mercorReaderInput);
@@ -180,6 +195,8 @@ test.describe('Mercor dossier viewport on cold Back', () => {
       expect(Math.abs(first.scroll - position.scroll)).toBeLessThan(3);
       expect(Math.abs(first.top - position.top)).toBeLessThan(3);
       if (!userScroll) {
+        expect(guardActive).toBe(true);
+        expect(overwrite.time - guardStarted).toBeLessThan(250);
         expect(overwrite.scroll).toBe(0);
         expect(overwrite.top - first.top).toBeGreaterThan(0);
         await expectReturn(page, source, page.locator(compareResult), position);

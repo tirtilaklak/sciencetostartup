@@ -1,5 +1,10 @@
 const { test, expect } = require('@playwright/test');
 
+async function openCompareSetup(page) {
+  const setup = page.locator('#compare-setup');
+  if (!await setup.evaluate(element => element.open)) await setup.locator('summary').press('Enter');
+}
+
 test('native Companies carries the exact saved search result into Compare', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/companies/?group=expert-data-evaluation&reader=keep');
@@ -11,13 +16,14 @@ test('native Companies carries the exact saved search result into Compare', asyn
   await expect(results).toHaveAttribute('data-company', 'mercor');
   await expect(action).toHaveAttribute('href', '/explore/#compare/mercor');
   await expect(action).toBeInViewport({ ratio: 1 });
-  await expect(page.getByRole('link', { name: 'Compare 39 companies' })).toBeInViewport({ ratio: 1 });
+  await expect(page.getByRole('link', { name: 'Compare companies', exact: true })).toBeInViewport({ ratio: 1 });
   const directoryURL = page.url();
   expect(Object.fromEntries(new URL(directoryURL).searchParams)).toEqual({ group: 'expert-data-evaluation', reader: 'keep', q: 'Mercor' });
 
   await action.press('Enter');
   await expect(page).toHaveURL(/\/explore\/#compare\/mercor$/);
   await expect(page.locator('#compare-content [data-remove]')).toHaveAttribute('data-remove', 'mercor');
+  await openCompareSetup(page);
   const add = page.getByRole('combobox', { name: 'Add a company' });
   await expect(add).toBeInViewport({ ratio: 1 });
   await expect(add.locator('option[value=mercor]')).toBeDisabled();
@@ -32,6 +38,7 @@ test('native Companies carries the exact saved search result into Compare', asyn
   await expect(action).toBeInViewport({ ratio: 1 });
   await page.goForward();
   await expect(page.locator('#compare-content [data-remove]')).toHaveAttribute('data-remove', 'mercor');
+  await openCompareSetup(page);
   await add.selectOption('appen');
   await page.getByRole('button', { name: 'Add', exact: true }).click();
   await expect(page).toHaveURL(/\/explore\/#compare\/mercor\/appen$/);
@@ -45,7 +52,7 @@ test('the directory offers historical comparisons and current-only profile links
   await expect(results).toHaveAttribute('data-company', 'org.dataforce');
   await expect(results.getByRole('link', { name: 'TransPerfect / DataForce' })).toHaveAttribute('href', /\/company\/org\.dataforce\/$/);
   await expect(results.locator('.directory-compare')).toHaveCount(0);
-  await expect(page.getByRole('link', { name: 'Compare 39 companies' })).toHaveAttribute('href', '/explore/#compare');
+  await expect(page.getByRole('link', { name: 'Compare companies', exact: true })).toHaveAttribute('href', '/explore/#compare');
   await page.getByRole('button', { name: 'Clear', exact: true }).click();
   await expect(results).toHaveCount(55);
   const historical = results.locator('.directory-compare');
@@ -53,6 +60,12 @@ test('the directory offers historical comparisons and current-only profile links
   expect(await historical.evaluateAll(links => links.every(link =>
     link.getAttribute('href') === '/explore/#compare/' + link.closest('[data-company]').dataset.company
   ))).toBe(true);
+  const market = page.getByRole('link', { name: 'Revenue & growth', exact: true });
+  await expect(market).toHaveCount(1);
+  await expect(market).toBeInViewport();
+  await market.click();
+  await expect(page).toHaveURL(/\/explore\/#business-health$/);
+  await expect(page.locator('#business-health-heading')).toBeInViewport();
 });
 
 test.describe('without JavaScript', () => {
@@ -222,6 +235,7 @@ shortlistTest('Explore shortlist restores the initiating Compare after editing a
   const [first, removed, last] = shortlist;
   await activate(page.getByRole('button', { name: `Remove ${removed.name}`, exact: true }));
   await expectComparison([first.id, last.id]);
+  await openCompareSetup(page);
   await page.getByRole('combobox', { name: 'Add a company' }).selectOption('appen');
   await activate(page.getByRole('button', { name: 'Add', exact: true }));
   const editedIds = [first.id, last.id, 'appen'];

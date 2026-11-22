@@ -4,6 +4,48 @@ function compareCell(page, row, company) {
   return page.locator(`[data-comparison-row="${row}"] [data-comparison-company="${company}"]`);
 }
 
+test('Compare shows the selected figures on the first phone screen with one selection editor', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/explore/#compare/mercor/snorkel_ai/labelbox');
+  const view = page.locator('#compare-view');
+  const editor = view.locator('#compare-setup');
+  const toggle = editor.locator('summary');
+  const add = view.getByRole('combobox', { name: 'Add a company' });
+  const examples = view.getByRole('combobox', { name: 'Examples' });
+  const clear = view.getByRole('button', { name: 'Clear selection' });
+  const share = view.locator('#copy-compare');
+  await expect(view.locator('.comparison-table')).toBeVisible();
+  await expect(editor).toHaveJSProperty('open', false);
+  await expect(view.getByRole('rowheader', { name: 'Business' })).toBeInViewport();
+  await expect(compareCell(page, 'Published revenue figure', 'snorkel_ai').locator('.row-number')).toBeInViewport({ ratio: 1 });
+  await expect(share).toBeInViewport({ ratio: 1 });
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true, value: { writeText: async text => { window.compareCopiedUrl = text; } },
+    });
+  });
+  await share.press('Enter');
+  await expect(share).toHaveText('Link copied');
+  expect(await page.evaluate(() => window.compareCopiedUrl)).toBe(page.url());
+
+  await toggle.press('Enter');
+  await expect(examples).toBeVisible();
+  await clear.press('Enter');
+  await expect(page).toHaveURL('/explore/#compare');
+  await expect(add).toBeFocused();
+  await expect(clear).toBeHidden();
+  await expect(share).toBeHidden();
+  await expect(view.getByRole('combobox', { name: 'Examples' })).toHaveCount(1);
+  await expect(view.getByRole('button', { name: 'TaskUs, Appen & Scale AI' })).toHaveCount(0);
+
+  await examples.focus();
+  await examples.selectOption('scale');
+  await expect(page).toHaveURL('/explore/#compare/taskus/appen/scale_ai');
+  await expect(editor).toHaveJSProperty('open', false);
+  await expect(toggle).toBeFocused();
+  await expect(view.locator('.comparison-table')).toBeVisible();
+});
+
 test('Back returns to the exact Compare link when two links open the same profile', async ({ page }) => {
   const compare = '/explore/#compare/mercor/a-team/sama';
   await page.goto(compare);
@@ -160,6 +202,7 @@ enlargedCompare('trusted Tab reveals Compare labels on a short phone with large 
     await expect(page).toHaveURL('/explore/#compare/snorkel_ai');
     await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
 
+    await page.locator('#compare-setup-toggle').press('Enter');
     const picker = page.getByRole('combobox', { name: 'Add a company', exact: true });
     await picker.focus();
     for (const [company, path] of [['toloka', 'snorkel_ai/toloka'], ['turing', 'snorkel_ai/toloka/turing']]) {
@@ -180,6 +223,7 @@ enlargedCompare('trusted Tab reveals Compare labels on a short phone with large 
 
     for (const target of [
       compare.getByRole('button', { name: 'Clear selection' }),
+      ...await compare.locator('[data-comparison-scope] a').all(),
       compare.getByRole('button', { name: 'Copy comparison link' }),
       compare.getByRole('link', { name: 'Snorkel AI', exact: true }),
       compare.getByRole('button', { name: 'Remove Snorkel AI' }),
@@ -319,13 +363,13 @@ enlargedCompare('Compare preserves visible keyboard focus when a phone rotates w
     });
   }
 
-  const preset = page.locator('#compare-preset');
-  await test.step('use the visible preset when landscape hides the pair picker', async () => {
+  const editor = page.locator('#compare-setup-toggle');
+  await test.step('use the visible selection editor when landscape hides the pair picker', async () => {
     await rotate(720, 320);
     await expect(changePair).toBeHidden();
-    await expectFocusedTextInView(preset, true);
+    await expectFocusedTextInView(editor, true);
     await rotate(320, 720);
-    await expectFocusedTextInView(preset, true);
+    await expectFocusedTextInView(editor, true);
     await expect(changePair.locator('..')).toHaveJSProperty('open', false);
     await expect(revenue('toloka')).toBeVisible();
     await expect(revenue('turing')).toBeHidden();

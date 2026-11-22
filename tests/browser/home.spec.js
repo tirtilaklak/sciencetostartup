@@ -293,6 +293,38 @@ test('homepage Search loads only its small component and index when invoked', as
   await expect(page.locator('#home-search-open')).toBeFocused();
 });
 
+test('homepage Search leads to the company directory, comparison and market figures', async ({ page }) => {
+  for (const { queries, route, type, destination } of [
+    { queries: ['companies', 'company directory'], route: '/companies/', type: 'Company directory',
+      destination: page.getByRole('heading', { name: 'AI data companies', exact: true }) },
+    { queries: ['compare', 'compare companies', 'shortlist'], route: '/explore/#compare', type: 'Comparison',
+      destination: page.getByRole('combobox', { name: 'Add a company', exact: true }) },
+    { queries: ['AI data market', 'market overview', 'revenue'], route: '/explore/#business-health', type: 'Market',
+      destination: page.getByRole('heading', { name: 'Revenue & growth.', exact: true }) },
+  ]) {
+    await page.goto('/');
+    await page.getByRole('link', { name: 'Search the guide' }).click();
+    const search = page.getByRole('dialog', { name: 'Search the guide' });
+    const input = search.getByRole('combobox');
+    const first = search.getByRole('option').first();
+    for (const query of queries) {
+      await input.fill(query);
+      await expect(first).toHaveAttribute('href', route);
+      await expect(first).toHaveAttribute('data-result-type', type);
+    }
+    await first.click();
+    await expect(page).toHaveURL(new URL(route, page.url()).href);
+    await expect(destination).toBeInViewport();
+  }
+
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Search the guide' }).click();
+  const search = page.getByRole('dialog', { name: 'Search the guide' });
+  await search.getByRole('combobox').fill('market research');
+  await expect(search.getByRole('option').first()).toHaveAttribute('href',
+    '/research/state-of-ai-data-labs/chapters/market-structure/');
+});
+
 test('keyboard paging keeps its focused button and outline inside the short dialog at a 28px Firefox minimum', async ({ browserName, baseURL }) => {
   test.skip(browserName !== 'firefox', 'Uses a Firefox text preference');
   const browser = await firefox.launch({ firefoxUserPrefs: { 'font.minimum-size.x-western': 28 } });

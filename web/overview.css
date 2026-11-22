@@ -1,14 +1,10 @@
 /* Market overview, company links, and product examples. */
-#market-view .market-hero{display:block;max-width:none;margin:0;padding:34px 0 0;border:0}
-#market-view .market-hero h1{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(40px,5vw,64px);font-weight:400;line-height:1.08;letter-spacing:-.035em}
-#market-view .market-hero .intro{max-width:560px;margin:12px 0 0;font-size:16px;line-height:1.55;color:var(--muted)}
-#market-view .hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:16px 0 0}
-#market-view .hero-actions a{display:inline-flex;justify-content:space-between;align-items:center;gap:22px;min-height:48px;padding:12px 19px;border:1px solid var(--green);border-radius:7px;font-size:14px;font-weight:550;line-height:1.5;text-decoration:none}
-#market-view .hero-actions .button-primary{background:var(--green);color:#fff;box-shadow:0 4px 12px #173d2e15}
-#market-view .hero-actions .button-primary:hover{background:#173d2e;border-color:#173d2e}
-#market-view .hero-actions .button-secondary{background:#fff;color:var(--green);border-color:var(--border)}
-#market-view .hero-actions .button-secondary:hover{background:var(--pale);border-color:var(--green)}
-#market-view .hero-source-note{margin:10px 0 0;font-size:12px;line-height:1.5;color:var(--muted)}
+#market-view .market-hero{display:grid;grid-template-columns:minmax(0,1fr) max-content;align-items:end;gap:8px 24px;max-width:none;margin:0;padding:28px 0 20px;border-bottom:1px solid var(--border)}
+#market-view .market-hero h1{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(38px,4.4vw,56px);font-weight:400;line-height:1.08;letter-spacing:-.035em}
+#market-view .market-hero .intro{max-width:560px;margin:8px 0 0;font-size:16px;line-height:1.55;color:var(--muted)}
+#market-view .hero-actions{margin:0}
+#market-view .hero-actions a,.hero-company-strip>a{display:inline-flex;align-items:center;min-height:44px;max-width:100%;font-size:14px;line-height:1.5;color:var(--green)}
+#market-view .hero-source-note{margin:0;font-size:12px;line-height:1.5;color:var(--muted)}
 #market-view .hero-research[hidden]{display:none}
 .hero-company-strip{display:flex;align-items:center;gap:28px;margin:32px 0 0;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .hero-company-strip>p{flex:none;margin:0;font-size:12px;line-height:1.65;color:var(--muted)}
@@ -95,8 +91,6 @@
 .venture-figures .investor-qualifications dd{margin:6px 0 0;font-size:13px;line-height:1.7;color:var(--muted)}
 
 @media(max-width:1100px){
-  #market-view .hero-actions{gap:10px}
-  #market-view .hero-actions a{padding:12px 14px;font-size:13px;gap:14px}
   .hero-company-strip{display:block}
   .hero-company-strip>p{margin-bottom:14px}
   #market-view .hero-logo-grid{gap:12px 28px}
@@ -105,9 +99,9 @@
   .product-preview-body{padding:20px}
 }
 @media(max-width:760px){
-  #market-view .market-hero{padding-top:24px}
+  #market-view .market-hero{grid-template-columns:minmax(0,1fr);padding:20px 0 16px}
   #market-view .market-hero .intro{font-size:15px}
-  #market-view .hero-actions a{min-height:46px;padding:11px 15px;font-size:13px;gap:18px}
+  #market-view .market-hero-meta{display:flex;flex-wrap:wrap;align-items:center;gap:0 14px}
   .hero-company-strip>p{font-size:11px;margin-bottom:12px}
   #market-view .hero-logo-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 20px}
   #market-view .hero-logo-grid>a{min-height:46px;padding:2px}
@@ -136,9 +130,5 @@
   .venture-note{grid-template-columns:1fr;gap:24px;padding-bottom:22px}
   .venture-figures .investor-qualifications{grid-template-columns:1fr;gap:0}
   .venture-copy h2{font-size:22px}
-}
-@media(max-width:400px){
-  #market-view .hero-actions{gap:8px}
-  #market-view .hero-actions a{padding:11px 12px;font-size:12px;gap:12px}
 }
 @media(forced-colors:active){.grade-bar{display:none}.grade-key dt,.story-grade{border-color:CanvasText}}

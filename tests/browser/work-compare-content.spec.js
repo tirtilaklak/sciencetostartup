@@ -7,6 +7,19 @@ test('native Work Compare preserves separate pay and terms fields for every reco
   const cardIds = await page.locator('.work-page-list [data-work-route]')
     .evaluateAll(cards => cards.map(card => card.dataset.workRoute));
   expect(cardIds).toHaveLength(135);
+  const named = page.locator('[data-work-group="named"] .work-listing-conditions > :first-child').first();
+  await expect(named).not.toContainText('Specific listing');
+  const duplicatedDates = await page.locator('.work-reviewed:visible > [hidden]').evaluateAll(notes => notes.map(note => ({
+    hidden: !note.getClientRects().length,
+    day: note.textContent.trim().match(/^\(as of (.+)\)$/)?.[1],
+    visibleReview: note.parentElement.innerText,
+  })));
+  for (const { hidden, day, visibleReview } of duplicatedDates) {
+    expect(hidden).toBe(true);
+    expect(day).toBeTruthy();
+    expect(visibleReview).toContain(day);
+    expect(visibleReview).not.toContain('as of');
+  }
   await compareLink.click();
 
   const compare = page.getByRole('region', { name: 'Matching work records' });
@@ -24,6 +37,7 @@ test('native Work Compare preserves separate pay and terms fields for every reco
     const lines = cell => cell.innerText.split(/\n+/).map(line => line.trim()).filter(Boolean);
     const link = anchor => anchor && [text(anchor), anchor.getAttribute('href'), anchor.getAttribute('aria-label')];
     const equal = (actual, expected) => JSON.stringify(actual) === JSON.stringify(expected);
+    const sharedKinds = { named: 'Specific listing', programs: 'Expert network or program', boards: 'Career page' };
     return rows.flatMap(row => {
       const id = row.dataset.compareRoute;
       const card = cards.get(id);
@@ -33,9 +47,12 @@ test('native Work Compare preserves separate pay and terms fields for every reco
         pay.splice(0, 2, pay.slice(0, 2).join(' '));
       }
       const nativeAction = card.querySelector('.work-listing-action a');
+      const conditionFields = [...card.querySelector('.work-listing-conditions').children].map(text);
+      const kind = sharedKinds[card.closest('[data-work-group]').dataset.workGroup];
+      if (kind) conditionFields[0] = kind + ' · ' + conditionFields[0];
       const details = [
         text(card.querySelector('.work-place')),
-        ...[...card.querySelector('.work-listing-conditions').children].map(text),
+        ...conditionFields,
         text(card.querySelector('.work-reviewed')),
         text(nativeAction),
       ].filter(Boolean);

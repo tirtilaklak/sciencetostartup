@@ -196,7 +196,10 @@ test.describe('Work company-profile handoff', () => {
           (${holdWorkFrames})();
           if (${readerScroll}) return;
           const displace = () => setTimeout(() => {
-            // Recreate the late native viewport displacement independently of run timing.
+            // Model WebKit's late native bookmark focus and viewport displacement.
+            const bookmark = document.getElementById('${roleId}');
+            bookmark.focus({ preventScroll: true });
+            window.workLateBookmarkFocused = document.activeElement === bookmark;
             scrollTo(0, document.documentElement.scrollHeight);
             window.workLateScroll = scrollY;
           }, 0);
@@ -223,6 +226,7 @@ test.describe('Work company-profile handoff', () => {
         await expect(terms).toHaveJSProperty('open', true);
       } else {
         await expect.poll(() => page.evaluate(() => window.workLateScroll ?? 0)).toBeGreaterThan(departure.position.scroll + 300);
+        expect(await page.evaluate(() => window.workLateBookmarkFocused)).toBe(true);
         await releaseWorkFrames(page);
         await expectProfileReturn(page, departure, false);
       }

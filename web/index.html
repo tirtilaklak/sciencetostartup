@@ -27,20 +27,24 @@
 <div class="explore-layout">
 <main id="main" tabindex="-1">
 <section id="app-failure" class="availability-notice" hidden role="alert" aria-labelledby="app-failure-title"><h1 id="app-failure-title">The interactive guide could not load.</h1><p><button type="button" id="app-reload">Reload page</button> <a href="/?search#browse-guide">Search the guide</a> <a href="/companies/">Companies</a> <a href="/work/">Paid work</a> <a href="/method/">Method</a></p></section>
-<noscript><section class="availability-notice" aria-labelledby="noscript-title"><h1 id="noscript-title">ScienceToStartup: the AI data field guide</h1><p>Research on {{COMPANY_COUNT}} AI data companies, with sourced profiles and public work listings. Turn on JavaScript to use the interactive guide. These plain pages work without it:</p><p><a href="/?search#browse-guide">Search the plain guide</a> <a href="/companies/">Company list</a> <a href="/work/">Paid work list</a> <a href="/method/">Method page</a></p><p>Download the research: <a href="research.json" download>Research database · JSON</a> <a href="observatory.sqlite" download>Research database · {{FILE_META_SQLITE}}</a> <a href="source-updates.json" download>Later source corrections · {{FILE_META_SOURCE_UPDATES}}</a></p></section></noscript>
+<noscript><section class="availability-notice" aria-labelledby="noscript-title"><h1 id="noscript-title">ScienceToStartup: the AI data field guide</h1><p>Research on {{COMPANY_COUNT}} AI data companies, with sourced profiles and public work listings. Turn on JavaScript to use the interactive guide. These plain pages work without it:</p><p><a href="/#browse-guide">Browse the guide</a> <a href="/companies/">Company list</a> <a href="/work/">Paid work list</a> <a href="/method/">Method page</a></p><p>Download the research: <a href="research.json" download>Research database · JSON</a> <a href="observatory.sqlite" download>Research database · {{FILE_META_SQLITE}}</a> <a href="source-updates.json" download>Later source corrections · {{FILE_META_SOURCE_UPDATES}}</a></p></section></noscript>
 
 <aside id="compare-tray" hidden aria-label="Comparison shortlist"><div class="tray-summary"><span id="tray-text" role="status" aria-live="polite" aria-atomic="true"></span><span id="tray-notice" role="status" aria-live="polite" aria-atomic="true"></span></div><a href="#compare" class="primary-link"><span>Compare<span class="tray-link-extra"> selection</span></span> <svg class="ui-icon" data-icon="right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg></a><button type="button" data-clear-compare class="quiet">Clear<span class="sr-only"> selection</span></button></aside>
 
 <section id="market-view" class="view">
 <header class="market-hero">
-  <h1>AI data market</h1>
-  <p class="intro">Company revenue and growth figures with their reporting periods and sources.</p>
-  <div class="hero-actions"><a class="button-primary" href="#business-health">Revenue &amp; growth</a><a class="button-secondary" href="#companies">Browse companies <svg class="ui-icon" data-icon="right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg></a><a class="button-secondary" href="#work">Find paid work <svg class="ui-icon" data-icon="right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg></a></div>
-  <p class="hero-source-note" id="hero-snapshot"></p>
+  <div>
+    <h1>AI data market</h1>
+    <p class="intro">Company figures with reporting periods and sources.</p>
+  </div>
+  <div class="market-hero-meta">
+    <div class="hero-actions"><a href="#business-health">Revenue &amp; growth</a></div>
+    <p class="hero-source-note" id="hero-snapshot"></p>
+  </div>
   <div class="hero-research" hidden aria-hidden="true"><span id="organization-count">{{COMPANY_COUNT}}</span><span id="source-count">{{SOURCE_COUNT}}</span><span id="hero-work-stat" data-pending><b id="hero-work-count"></b></span></div>
 </header>
 <section data-fragment-id="business-health" aria-labelledby="business-health-heading">
-<header class="bh-heading"><div><p class="eyebrow">THE MARKET, IN NUMBERS</p><h2 id="business-health-heading">Revenue &amp; growth.</h2></div><a href="business-health.json" download>Download data · {{FILE_META_HEALTH}}</a></header>
+<header class="bh-heading"><div><h2 id="business-health-heading">Revenue &amp; growth.</h2></div><a href="business-health.json" download>Download data · {{FILE_META_HEALTH}}</a></header>
 <div id="bh-overview-tabs" class="bh-overview-tabs" role="tablist" aria-label="Revenue views"></div>
 <section id="bh-ledger-panel" role="tabpanel" aria-labelledby="bh-overview-period_revenue"><p id="bh-ledger-note" class="bh-ledger-note"></p><div class="bh-ledger-head" aria-hidden="true"><span>Company / business</span><span>Figure</span><span>Period / snapshot</span><span>Evidence</span></div><div id="bh-ledger"></div><p id="bh-ledger-count" class="bh-ledger-count"></p><button type="button" id="bh-ledger-more" class="bh-ledger-more" aria-expanded="false" aria-controls="bh-ledger" hidden></button></section>
 <details id="bh-advanced" class="bh-advanced"><summary>Compare matching periods &amp; explore more metrics <span>Profit, customers, expert activity and cash</span></summary>
@@ -59,7 +63,7 @@
 <details class="bh-method"><summary id="bh-method-summary">Definitions and evidence limits</summary><div id="bh-method-content"></div><p><a href="business-health.json" download>Download observations and calculations · {{FILE_META_HEALTH}}</a> · <a href="#method">Research method</a></p></details>
 <dialog id="bh-evidence-dialog" class="bh-evidence-dialog" aria-labelledby="bh-detail-title"><div class="bh-dialog-top"><span>Figure &amp; source</span><button type="button" id="bh-close-evidence" aria-label="Close figure details">Close ×</button></div><div id="bh-detail"></div><div id="bh-history" class="bh-history" hidden></div></dialog>
 </section>
-<div class="hero-company-strip"><p>Selected companies</p><nav id="hero-logo-grid" class="hero-logo-grid" aria-label="Selected company profiles"><a href="#company/scale_ai">Scale AI</a><a href="#company/mercor">Mercor</a><a href="#company/surge_ai">Surge AI</a><a href="#company/snorkel_ai">Snorkel AI</a><a href="#company/labelbox">Labelbox</a><a href="#company/prime_intellect">Prime Intellect</a></nav></div>
+<div class="hero-company-strip"><p>Selected companies</p><nav id="hero-logo-grid" class="hero-logo-grid" aria-label="Selected company profiles"><a href="#company/scale_ai">Scale AI</a><a href="#company/mercor">Mercor</a><a href="#company/surge_ai">Surge AI</a><a href="#company/snorkel_ai">Snorkel AI</a><a href="#company/labelbox">Labelbox</a><a href="#company/prime_intellect">Prime Intellect</a></nav><a href="#companies">Historical company comparisons</a></div>
 <section class="product-showcase" aria-labelledby="product-showcase-title">
   <h2 class="product-showcase-heading" id="product-showcase-title">Product examples</h2>
   <div class="product-preview-grid">
@@ -79,7 +83,7 @@
       <p>Most evidence comes from the companies themselves. Every figure keeps its source, date and confidence grade. <a href="#method">Read the method</a>.</p>
       <div class="grade-key"><dl><div><dt>A</dt><dd>Public filing, independent evidence or buyer confirmation.</dd></div><div><dt>B</dt><dd>stated by the company, an investor or another named source</dd></div><div><dt>C</dt><dd>reported by others, or an estimate</dd></div><div><dt>U</dt><dd>unverified or unresolved</dd></div></dl></div>
       <div id="overview-check" class="overview-check-body"></div>
-      <div class="overview-work-audit"><h3>Paid work checks</h3><div id="overview-work" class="overview-work-body"></div><a href="#work">Browse the paid work listings →</a></div>
+      <div class="overview-work-audit"><h3>Paid work checks</h3><div id="overview-work" class="overview-work-body"></div><a href="#work">Paid work in Explore →</a></div>
     </div>
   </details>
   <details class="overview-disclosure publisher-disclosure" open>
@@ -103,7 +107,23 @@
 
 <section id="work-view" class="view" hidden><div class="page-heading"><h1>Find paid work.</h1><p class="intro">Paid roles and expert networks, with sources.</p></div><div class="filters work-filters"><label class="search-label">Search paid work<input type="search" id="work-search" placeholder="Role, skill or company" autocomplete="off"></label><details class="responsive-filter-panel"><summary>Filters</summary><div class="responsive-filter-fields"><label>Opportunity type<select id="work-kind"><option value="">All records</option><option value="named">Named listings</option><option value="programs">Network programs</option><option value="boards">Career pages</option><option value="outside">Other jobs</option><option value="closed">Past and other</option></select></label><label>Work type<select id="work-group"><option value="">Any type</option></select></label><label>Pay<select id="work-pay"><option value="">Any pay</option><option value="hourly">Hourly rate published</option><option value="task">Paid per task</option><option value="yearly">Salary or yearly pay</option><option value="monthly">Stipend or monthly pay</option><option value="numeric">Any amount published</option><option value="undisclosed">Pay not published</option></select></label><label>Work arrangement<select id="work-eligibility"><option value="">Any arrangement</option><option value="remote">Remote possible</option><option value="onsite">On-site or hybrid</option><option value="varies">Varies or not stated</option></select></label><button id="work-reset" class="quiet">Clear filters</button></div></details></div><div class="w4-results-bar"><p id="work-count" class="sub" aria-live="polite"></p><div class="w4-results-actions"><a href="/work/?view=compare" id="work-native-compare">Compare results</a><button type="button" id="work-export" class="quiet" aria-describedby="work-count">Download CSV</button></div><label class="w4-sort">Sort<select id="work-sort"><option value="">Best match</option><option value="hourly">Highest hourly rate</option><option value="checked">Recently checked</option></select></label></div><p id="work-export-status" role="status"></p><p id="work-sort-note" class="w4-sort-note" hidden></p><div id="work-overview" class="work-overview"></div><div id="work-safety" class="w4-safety-slot"></div><div id="work-cards" class="card-grid work-grid"></div></section>
 
-<section id="compare-view" class="view" hidden><div class="page-heading"><h1>Compare</h1><p class="intro">Put up to three companies side by side. Each figure keeps its date and links to its source.</p></div><div class="presets compare-controls"><div class="compare-add"><label class="compare-add-label">Add a company<select id="compare-add"><option value="">Choose a company</option></select></label><button type="button" id="compare-add-button" class="quiet" hidden>Add</button></div><label class="compare-preset-label">Examples<select id="compare-preset"><option value="">Choose an example</option><option value="scale">Revenue examples</option><option value="work">Contract work examples</option></select></label><button type="button" id="clear-compare" class="quiet">Clear selection</button></div><p id="compare-status" class="sr-only" role="status" aria-live="polite"></p><div id="compare-content"></div></section>
+<section id="compare-view" class="view" hidden>
+<div class="page-heading"><h1>Compare</h1></div>
+<div class="compare-tools">
+<details id="compare-setup" open>
+<summary id="compare-setup-toggle">Choose up to three companies</summary>
+<div class="compare-controls">
+<div class="compare-add"><label class="compare-add-label">Add a company<select id="compare-add"><option value="">Choose a company</option></select></label><button type="button" id="compare-add-button" class="quiet" hidden>Add</button></div>
+<label class="compare-preset-label">Examples<select id="compare-preset"><option value="">Choose an example</option><option value="scale">Revenue examples</option><option value="work">Contract work examples</option></select></label>
+<button type="button" id="clear-compare" class="quiet" hidden>Clear selection</button>
+</div>
+<div class="compare-scope"></div>
+</details>
+<button type="button" id="copy-compare" class="text-link" data-copy-compare hidden>Copy comparison link</button>
+</div>
+<p id="compare-status" class="sr-only" role="status" aria-live="polite"></p>
+<div id="compare-content"></div>
+</section>
 
 <section id="profile-view" class="view" hidden></section>
 

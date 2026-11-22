@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0.0",
+  "release_id": "research-2026-11-12.1",
+  "checked_on": "2026-11-22",
+  "entries": [
+    {
+      "entity_id": "org.datatang",
+      "recorded_url": "https://en.datatang.com/",
+      "current_url": "https://www.datatang.com/",
+      "language": "zh",
+      "response_sha256": "4e6e68e71844fb36d9c1f32f3acf804e2a818626d49fe53c0cc451f6d3e4d557",
+      "evidence": [
+        {
+          "claim_id": "candidate.mandatory14.datatang.issuer-identity",
+          "source_id": "mandatory14.source.datatang.issuer-identity"
+        }
+      ]
+    },
+    {
+      "entity_id": "org.e2f",
+      "recorded_url": "https://www.e2f.com/",
+      "current_url": "https://www.trustscale.ai/",
+      "language": "en",
+      "response_sha256": "88fe72ce75b54841481aad349369e1214e635a942c4d388d9ba73149bf965a93",
+      "evidence": [
+        {
+          "claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.current-rebrand",
+          "source_id": "repair.qualbinding.20261111.v1.source.4d4794da57f6.identity-article"
+        }
+      ]
+    },
+    {
+      "entity_id": "org.globose_technology_solutions",
+      "recorded_url": "https://www.globosetechnologysolutions.com/",
+      "current_url": "https://gts.ai/",
+      "language": "en",
+      "response_sha256": "a2b4f65021e19c0f8bde01c9c43b54be29751f3b6c898f786bce6e4e3a657de8",
+      "evidence": [
+        {
+          "claim_id": "candidate.mandatory14.globose_technology_solutions.official-identity",
+          "source_id": "mandatory14.source.globose_technology_solutions.official-identity"
+        }
+      ]
+    },
+    {
+      "entity_id": "org.speechocean",
+      "recorded_url": "https://en.speechocean.com/",
+      "current_url": "https://dataoceanai.com/",
+      "language": "en",
+      "response_sha256": "92cd25fdc9091fb8fb8a98d6daaebfdbca97b4d2d313d9c7b06566f0f62c1c4c",
+      "evidence": [
+        {
+          "claim_id": "candidate.cohort6.speechocean.speechocean-domain-brand",
+          "source_id": "cohort6.source.speechocean.speechocean-domain-brand"
+        },
+        {
+          "claim_id": "candidate.cohort6.speechocean.website-privacy-scope",
+          "source_id": "cohort6.source.speechocean.website-privacy-scope"
+        }
+      ]
+    }
+  ]
+}

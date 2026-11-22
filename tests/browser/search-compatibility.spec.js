@@ -179,9 +179,15 @@ async function pauseWorkDocument(page) {
     await route.fulfill({ contentType: 'text/javascript', body: '' });
   });
   await page.route(url => url.pathname === '/work/', async route => {
-    const response = await route.fetch();
-    const body = (await response.text()).replace('</head>', '<script src="' + parserBlock + '"></script></head>');
-    await route.fulfill({ response, body });
+    // This fixture edits HTML. Playwright fetch may expose raw zstd when Firefox negotiates it.
+    const response = await route.fetch({ headers: { ...route.request().headers(), 'accept-encoding': 'identity' } });
+    expect(response.ok()).toBe(true);
+    const html = await response.text();
+    expect(html).toContain('</head>');
+    const body = html.replace('</head>', '<script src="' + parserBlock + '"></script></head>');
+    const headers = response.headers();
+    for (const name of ['content-encoding', 'content-length', 'transfer-encoding']) delete headers[name];
+    await route.fulfill({ response, headers, body });
   });
   return resume;
 }

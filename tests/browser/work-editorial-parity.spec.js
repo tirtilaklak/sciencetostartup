@@ -51,6 +51,31 @@ async function downloadRows(page) {
   return JSON.parse(parsed);
 }
 
+test('native Work keeps the open terms and record order when filters load late', async ({ page }) => {
+  let resume;
+  const delayed = new Promise(resolve => { resume = resolve; });
+  await page.route('**/js/work.*.js', async route => {
+    await delayed;
+    await route.continue();
+  });
+  try {
+    await page.goto('/work/', { waitUntil: 'domcontentloaded' });
+    const before = await orderedIds(page.locator(nativeCards));
+    const first = recordFor(page, nativeCards, before[0]);
+    const terms = first.locator('.work-terms summary');
+    await terms.press('Enter');
+    await expect(first.locator('.work-terms')).toHaveJSProperty('open', true);
+    await expect(terms).toBeFocused();
+    resume();
+    await expect(page.getByRole('link', { name: 'Compare results', exact: true })).toBeVisible();
+    expect(await orderedIds(page.locator(nativeCards))).toEqual(before);
+    await expect(first.locator('.work-terms')).toHaveJSProperty('open', true);
+    await expect(terms).toBeFocused();
+  } finally {
+    resume();
+  }
+});
+
 const cases = [
   { name: 'all records', criteria: {}, includes: [role, yearlyStaff, monthlyStaff, pastStaff], excludes: [] },
   { name: 'yearly on-site or hybrid staff listings', criteria: { kind: 'named', type: 'employment', pay: 'yearly', arrangement: 'onsite' },
@@ -89,7 +114,8 @@ for (const { name, criteria, includes, excludes } of cases) {
     expect(nativeLabel).toBe(search ? recordCount : `${recordCount}, including career pages and past listings`);
     expect(new Set(ids).size).toBe(ids.length);
     const staticIds = criteria.kind ? staticGroups[criteria.kind] : Object.values(staticGroups).flat();
-    if (criteria.type) expect(staticIds).toEqual(expect.arrayContaining(ids));
+    if (!search) expect(ids).toEqual(staticIds);
+    else if (criteria.type) expect(staticIds).toEqual(expect.arrayContaining(ids));
     else expect([...ids].sort()).toEqual([...staticIds].sort());
     if (criteria.kind === 'closed') {
       await expect(recordFor(page, chosen, rlScenarios).locator('.work-status')).toHaveText(rlScenariosStatus);

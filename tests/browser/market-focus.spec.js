@@ -39,6 +39,20 @@ async function openEvidence(control, dialog) {
   await expect(dialog).toBeVisible();
 }
 
+test('Market puts two sourced revenue rows on the first desktop screen', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await openMarket(page);
+  const dashboard = page.locator('#market-view');
+  const shortcut = dashboard.locator('.hero-actions').getByRole('link', { name: 'Revenue & growth', exact: true });
+  await expect(dashboard.locator('.hero-actions a')).toHaveCount(1);
+  await expect(shortcut).toHaveAttribute('href', '#business-health');
+  const rows = dashboard.locator('#bh-ledger .bh-ledger-row');
+  await expect(rows.nth(0)).toBeInViewport({ ratio: 1 });
+  await expect(rows.nth(1)).toBeInViewport({ ratio: 1 });
+  await expect(dashboard.getByRole('link', { name: 'Historical company comparisons', exact: true }))
+    .toHaveAttribute('href', '#companies');
+});
+
 test('Market restores Handshake focus to each successive evidence opener', async ({ page }) => {
   const dialog = await openMarket(page);
   await page.getByRole('tab', { name: /^Annualized pace/ }).press('Enter');
@@ -138,6 +152,59 @@ test('Market marks the current observation by its exact ID', async ({ page }) =>
   await expect(dialog).toBeHidden();
   await expect(cell).toBeFocused();
   await expect(cell).toHaveAttribute('aria-current', 'true');
+});
+
+test('Market Back returns to the product link from both Market addresses', async ({ page }) => {
+  await openMarket(page);
+  const shortcut = page.getByRole('link', { name: 'Revenue & growth', exact: true });
+  const product = page.getByRole('link', { name: 'Ango Hub', exact: true });
+  const productSource = product.locator('xpath=ancestor::article').getByRole('link', { name: /^Image: iMerit/ });
+  const companies = page.getByRole('link', { name: 'Historical company comparisons', exact: true });
+
+  async function activate(link) {
+    await link.scrollIntoViewIfNeeded();
+    await link.focus();
+    const top = await page.evaluate(() => new Promise(resolve => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve(window.scrollY)));
+    }));
+    await page.keyboard.press('Enter');
+    return top;
+  }
+
+  async function expectBack(hash, top) {
+    await page.goBack();
+    await expect(page).toHaveURL(new RegExp(`\\/explore\\/#${hash}$`));
+    await expect.poll(() => page.evaluate(scroll => Math.abs(window.scrollY - scroll), top)).toBeLessThan(2);
+  }
+
+  const shortcutTop = await activate(shortcut);
+  await expect(page.locator('#business-health-heading')).toBeFocused();
+  await expectBack('market', shortcutTop);
+  await expect(shortcut).toBeFocused();
+
+  for (const hash of ['market', 'business-health']) {
+    await test.step(`Return to the exact product link on ${hash}`, async () => {
+      if (hash === 'business-health') {
+        await activate(shortcut);
+        await expect(page.locator('#business-health-heading')).toBeFocused();
+      }
+      const productTop = await activate(product);
+      await expect(page).toHaveURL(/#company\/imerit\/business$/);
+      await expect(page.locator('#profile-view').getByRole('heading', { name: 'iMerit / EXL', level: 1 })).toBeVisible();
+      await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+      await expectBack(hash, productTop);
+      await expect(product).toBeFocused();
+      await page.keyboard.press('Tab');
+      await expect(productSource).toBeFocused();
+    });
+
+    if (hash === 'market') {
+      const companiesTop = await activate(companies);
+      await expect(page).toHaveURL(/#companies$/);
+      await expectBack('market', companiesTop);
+      await expect(product).not.toBeFocused();
+    }
+  }
 });
 
 const enlargedText = test.extend({
