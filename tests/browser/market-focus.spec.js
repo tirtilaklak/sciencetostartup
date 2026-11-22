@@ -140,6 +140,59 @@ test('Market marks the current observation by its exact ID', async ({ page }) =>
   await expect(cell).toHaveAttribute('aria-current', 'true');
 });
 
+test('Market Back returns to the product link from both Market addresses', async ({ page }) => {
+  await openMarket(page);
+  const shortcut = page.getByRole('link', { name: 'Revenue & growth', exact: true });
+  const product = page.getByRole('link', { name: 'Ango Hub', exact: true });
+  const productSource = product.locator('xpath=ancestor::article').getByRole('link', { name: /^Image: iMerit/ });
+  const companies = page.locator('.market-hero a[href="#companies"]');
+
+  async function activate(link) {
+    await link.scrollIntoViewIfNeeded();
+    await link.focus();
+    const top = await page.evaluate(() => new Promise(resolve => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve(window.scrollY)));
+    }));
+    await page.keyboard.press('Enter');
+    return top;
+  }
+
+  async function expectBack(hash, top) {
+    await page.goBack();
+    await expect(page).toHaveURL(new RegExp(`\\/explore\\/#${hash}$`));
+    await expect.poll(() => page.evaluate(scroll => Math.abs(window.scrollY - scroll), top)).toBeLessThan(2);
+  }
+
+  const shortcutTop = await activate(shortcut);
+  await expect(page.locator('#business-health-heading')).toBeFocused();
+  await expectBack('market', shortcutTop);
+  await expect(shortcut).toBeFocused();
+
+  for (const hash of ['market', 'business-health']) {
+    await test.step(`Return to the exact product link on ${hash}`, async () => {
+      if (hash === 'business-health') {
+        await activate(shortcut);
+        await expect(page.locator('#business-health-heading')).toBeFocused();
+      }
+      const productTop = await activate(product);
+      await expect(page).toHaveURL(/#company\/imerit\/business$/);
+      await expect(page.locator('#profile-view').getByRole('heading', { name: 'iMerit / EXL', level: 1 })).toBeVisible();
+      await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+      await expectBack(hash, productTop);
+      await expect(product).toBeFocused();
+      await page.keyboard.press('Tab');
+      await expect(productSource).toBeFocused();
+    });
+
+    if (hash === 'market') {
+      const companiesTop = await activate(companies);
+      await expect(page).toHaveURL(/#companies$/);
+      await expectBack('market', companiesTop);
+      await expect(product).not.toBeFocused();
+    }
+  }
+});
+
 const enlargedText = test.extend({
   enlargedPage: async ({ baseURL }, use) => {
     const browser = await firefox.launch({

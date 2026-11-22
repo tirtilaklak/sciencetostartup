@@ -954,7 +954,8 @@ function rememberExploreOrigin(event){
  const href=link.getAttribute('href'),view=routeParts()[0];
  const work=view==='work'&&link.id==='work-native-compare';
  const compare=view==='compare'&&link.closest('#compare-content')&&(link.dataset.compareOrigin||href.startsWith('#company/'));
- if(!work&&!compare){
+ const market=(!view||view==='market'||VIEW_ANCHORS[view]==='market')&&href.startsWith('#company/')&&link.matches('#market-view .product-preview h3 a');
+ if(!work&&!compare&&!market){
   if(history.state?.exploreReturnOrigin){const {exploreReturnOrigin,...rest}=history.state;history.replaceState(rest,'');}
   return;
  }
@@ -964,14 +965,18 @@ function rememberExploreOrigin(event){
  if(work)flushWorkRoute();
  const destination=link.href;
  const opener=compare?{action:link.dataset.compareOrigin,pair:state.mobileCompare,expanded:comparisonExpanded,left:link.closest('.comparison-scroll')?.scrollLeft||0}:null;
- history.replaceState({...history.state,exploreReturnOrigin:{href,destination,work,compare:opener}},'');
+ history.replaceState({...history.state,exploreReturnOrigin:{href,destination,work,compare:opener,market}},'');
  pendingExploreLink=href.startsWith('#')?{key:exploreEntryKey,destination}:null;
  keepEntryScroll();
 }
 window.addEventListener('click',rememberExploreOrigin);
 function exploreReturnOrigin({traversedFragment=false,initial=false,persisted=false}){
  const origin=history.state?.exploreReturnOrigin;
- if(!origin||routeParts()[0]!==(origin.work?'work':'compare'))return null;
+ if(!origin)return null;
+ const view=routeParts()[0];
+ if(origin.market){
+  if(!traversedFragment||(view&&view!=='market'&&VIEW_ANCHORS[view]!=='market'))return null;
+ }else if(view!==(origin.work?'work':'compare'))return null;
  if(traversedFragment)return explorePreviousKey&&exploreFragmentDestinations.get(historyKey())===explorePreviousKey?origin:null;
  if(!(initial||persisted)||document.activeElement!==document.body)return null;
  const activation=window.navigation?.activation;
@@ -983,8 +988,8 @@ function exploreReturnOrigin({traversedFragment=false,initial=false,persisted=fa
  }else if(!persisted&&window.performance?.getEntriesByType?.('navigation')[0]?.type!=='back_forward')return null;
  return origin;
 }
-function focusExploreOrigin({work,compare,href}){
- const links=work?[$('work-native-compare')]:[...$('compare-content').querySelectorAll('a[href]')];
+function focusExploreOrigin({work,compare,market,href}){
+ const links=work?[$('work-native-compare')]:[...(market?$('market-view').querySelectorAll('.product-preview h3 a[href]'):$('compare-content').querySelectorAll('a[href]'))];
  const target=links.find(link=>link?.getAttribute('href')===href&&link.dataset.compareOrigin===compare?.action&&link.getClientRects().length);
  if(!target)return null;
  const scrollbox=compare&&target.closest('.comparison-scroll');
@@ -1098,12 +1103,12 @@ function route(event){
  renderTray(shortlist?.notice);
  const waitForShortlist=shortlist&&restore!==null&&searchContextPending(state.query);
  const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();if(!waitForShortlist)queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;
+ const linkedOpener=returnOrigin&&focusExploreOrigin(returnOrigin);
+ if(linkedOpener)return linkedOpener;
  if(wasTraversal&&view==='market'&&!anchorId){
   const hash=location.hash;
   queueMicrotask(()=>{if(location.hash===hash)marketShortcutOrigins.get(key)?.focus({preventScroll:true});});
  }
- const linkedOpener=returnOrigin&&focusExploreOrigin(returnOrigin);
- if(linkedOpener)return linkedOpener;
  const opener=shortlist?$('compare-tray').querySelector?.('a'):wasTraversal&&view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():wasTraversal&&view==='companies'?companyReturnFocusTarget():null;
  if(opener?.getClientRects().length)opener.focus({preventScroll:true});
  if(waitForShortlist)deferShortlistScroll(restore,opener);
