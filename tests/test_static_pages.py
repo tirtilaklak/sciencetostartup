@@ -507,7 +507,28 @@ class StaticPageTests(unittest.TestCase):
     def test_manifest_covers_the_static_pages(self):
         manifest = json.loads((self.dist / "manifest.json").read_text())["sha256"]
         for name in ("sitemap.xml", "companies/index.html", "company/mercor/index.html", "work/index.html", "method/index.html", "404.html", "favicon.ico", "assets/favicon.svg", "assets/favicon-48.png", "assets/apple-touch-icon.png", "assets/share/sciencetostartup-1200x630.png"): self.assertIn(name, manifest)
-        self.assertEqual(sum(1 for n in manifest if n.startswith("company/") and n.endswith("/index.html")), len(list((self.dist / 'company').glob('*/index.html'))))
+        company_pages = {path.relative_to(self.dist).as_posix()
+                         for path in (self.dist / "company").rglob("index.html")}
+        self.assertIn("company/afterquery/work-sources/index.html", company_pages)
+        self.assertEqual({name for name in manifest if name.startswith("company/") and name.endswith("/index.html")},
+                         company_pages)
+
+    def test_afterquery_native_source_index_preserves_the_original_citations(self):
+        prefix = "company/afterquery/"
+        index_route = "/" + prefix + "work-sources/"
+        profile = self.pages["afterquery"]
+        self.assertIn(index_route, {link.get("href") for link in PageFacts(profile).anchors})
+        index = (self.dist / index_route.lstrip("/") / "index.html").read_text()
+        self.assertEqual(PageFacts(index).canonicals, [ORIGIN + index_route])
+        expected = {source["id"]: source["url"] for source in self.data["sources"]
+                    if source.get("company_id") == "afterquery" and sp.is_web_url(source.get("url"))}
+        rows = []
+        for page in (profile, index):
+            entries = re.findall(r'<li\b[^>]*\bdata-native-source="([^"]+)"><a\b[^>]*\bhref="([^"]+)"', page)
+            self.assertTrue(entries)
+            rows.extend((html.unescape(sid), html.unescape(url)) for sid, url in entries)
+        self.assertEqual(len(rows), len(expected))
+        self.assertEqual(dict(rows), expected)
 
     def test_static_pages_are_reproducible(self):
         with tempfile.TemporaryDirectory(prefix="static-pages-again-") as temp:
