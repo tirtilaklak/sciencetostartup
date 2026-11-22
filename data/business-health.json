@@ -371,6 +371,17 @@
         "indexed_excerpt_sha256": "7792e60bec5b4b3fdfb779668e9b3f410ee2bda5c24aa09a3c1ce21fd55fa94f"
       },
       {
+        "source_id": "refresh.source.turing-series-e-issuer",
+        "url": "https://www.turing.com/press/turing-111-million-series-e",
+        "checked_on": "2026-11-22",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Turing’s official Series E release describes its talent-cloud network as more than four million people. A separate automated request returned an access challenge.",
+        "content_sha256": "7a51d8a027d1f3ba09afd76ec0ba631265a9624ab05634187052ff4bb67378b7",
+        "source_locator": "6 March 2025 Series E release · CEO’s remarks on the size of the talent cloud",
+        "excerpt": "more than four million of the world’s most talented software engineers, data scientists, and STEM experts"
+      },
+      {
         "source_id": "toloka.source.audit-tol_2025",
         "url": "https://fintel.io/doc/sec-nebius-group-nv-1513845-20f-2026-april-30-20573-500",
         "checked_on": "2026-11-22",
@@ -3457,13 +3468,15 @@
       "accounting_basis": "unspecified",
       "evidence_type": "reported",
       "claim_ids": [
-        "turing.claim.major-growth_metrics-4-metric"
+        "turing.claim.major-growth_metrics-4-metric",
+        "refresh.claim.turing-series-e-talent-cloud"
       ],
       "metric_ids": [
         "turing.metric.major-growth_metrics-4"
       ],
       "source_ids": [
-        "turing.source.audit-t1"
+        "turing.source.audit-t1",
+        "refresh.source.turing-series-e-issuer"
       ],
       "basis": "Network size, not employees or active AI-data contributors.",
       "limitations": "Context only: company-defined network, registered/vetted pool or signups. Not comparable monthly active paid experts, employee count, utilization or accepted delivery.",
@@ -3474,7 +3487,8 @@
       "scope_detail": "Whole company",
       "cohort": "Dated snapshots · people · Whole company · Gross/net undisclosed",
       "cohort_label": "Dated snapshots · people · Whole company · Gross/net undisclosed",
-      "cohort_key": "network_reach|snapshot|undated|||company|unspecified"
+      "cohort_key": "network_reach|snapshot|undated|||company|unspecified",
+      "primary_source_id": "refresh.source.turing-series-e-issuer"
     },
     {
       "id": "surge_ai.metric.audit-0",
@@ -6113,6 +6127,17 @@
       "retrieval_status": "indexed_content_checked"
     },
     {
+      "id": "refresh.source.turing-series-e-issuer",
+      "company_id": "turing",
+      "title": "Turing’s official Series E release",
+      "url": "https://www.turing.com/press/turing-111-million-series-e",
+      "publisher": "Turing",
+      "source_type": "company",
+      "published_on": "2025-03-06",
+      "accessed_on": "2026-11-22",
+      "retrieval_status": "checked"
+    },
+    {
       "id": "refresh.source.imerit-exl-june-2026-stocksguide",
       "company_id": "imerit",
       "title": "EXL June 24, 2026 M&A call transcript (StocksGuide)",
@@ -6763,6 +6788,32 @@
         "period": {
           "type": "run_rate",
           "label": "2024-12"
+        },
+        "scope": "company",
+        "accounting_basis": "unspecified"
+      }
+    },
+    {
+      "id": "refresh.claim.turing-series-e-talent-cloud",
+      "company_id": "turing",
+      "status": "supported",
+      "statement": "Turing’s 6 March 2025 Series E release describes a talent-cloud network of more than four million software engineers, data scientists and STEM experts.",
+      "source_ids": [
+        "refresh.source.turing-series-e-issuer"
+      ],
+      "observed_on": "2026-11-22",
+      "confidence": "B",
+      "evidence_label": "Company-reported",
+      "excerpt": "more than four million of the world’s most talented software engineers, data scientists, and STEM experts",
+      "source_locator": "6 March 2025 Series E release · CEO’s remarks on the size of the talent cloud",
+      "fact": {
+        "measure": "network_reach",
+        "value": 4000000,
+        "unit": "people",
+        "qualifier": "greater_than",
+        "period": {
+          "type": "snapshot",
+          "label": "2025-03-06"
         },
         "scope": "company",
         "accounting_basis": "unspecified"

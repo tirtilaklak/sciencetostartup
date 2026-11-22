@@ -8,6 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import static_pages as sp
+from business_health import load_business_health
+from presentation import health_subset
 
 
 class StaticBusinessSupplementTests(unittest.TestCase):
@@ -79,6 +81,25 @@ class StaticBusinessSupplementTests(unittest.TestCase):
                 self.assertIn('CEO-reported operating figures; unaudited', page)
                 self.assertEqual(page.count('page unavailable when checked 22 Nov 2026'), 1)
                 self.assertNotIn('citation could not be rechecked', page)
+
+    def test_turing_talent_cloud_keeps_original_citation_beside_official_release(self):
+        health = load_business_health(ROOT / 'data/business-health.json', self.data)
+        record_id = 'turing.metric.major-growth_metrics-4'
+        original_id = 'turing.source.audit-t1'
+        issuer_id = 'refresh.source.turing-series-e-issuer'
+        issuer_url = 'https://www.turing.com/press/turing-111-million-series-e'
+        row = next(row for row in health['observations'] if row['id'] == record_id)
+        metric = next(metric for metric in self.data['metrics'] if metric['id'] == record_id)
+        self.assertEqual((row['value'], row['unit'], row['qualifier'], row['as_of']),
+                         (4_000_000, 'people', 'greater_than', '2025-03-06'))
+        self.assertEqual(row['source_ids'], [original_id, issuer_id])
+        self.assertEqual(self.research.claim(metric)['source_ids'], [original_id])
+
+        scoped = health_subset(health, [row], 'turing')
+        self.assertEqual({source['id'] for source in scoped['sources']}, {original_id, issuer_id})
+        page = sp.figures_html(self.research, self.research.companies['turing'], [metric], [], [], {}, health=scoped)
+        self.assertIn(f'data-source-id="{issuer_id}"><a class="ext" href="{issuer_url}">Turing’s official Series E release</a>', page)
+        self.assertIn(f'href="{self.research.sources[original_id]["url"]}"', page)
 
 
 if __name__ == '__main__':

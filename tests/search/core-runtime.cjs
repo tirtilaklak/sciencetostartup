@@ -32,7 +32,7 @@ assert.ok(results('human feedback').slice(0, 7).some(item => item.row.href === '
 const fixtures = JSON.parse(read('tests/fixtures/previous-search/manifest.json'));
 assert.equal(fixtures.source_commit, '1517ce1ac1d227a47b9f9f00b6669acb75226cba');
 for (const [name, digest] of Object.entries(fixtures.sha256)) assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root, 'tests/fixtures/previous-search', name))).digest('hex'), digest);
-function harness(url = 'https://fixture.test/') {
+function harness(url = 'https://fixture.test/', { nativeDialog = true } = {}) {
   const timers = new Map(), scripts = [], listeners = new Map(); let timerId = 0;
   const nodes = {};
   function node(id) {
@@ -48,6 +48,13 @@ function harness(url = 'https://fixture.test/') {
     createElement:()=>({remove(){this.removed=true;}}),head:{append:script=>scripts.push(script)},
     addEventListener(name, fn){(listeners.get(name)||listeners.set(name,[]).get(name)).push(fn);}};
   node('home-config').textContent=JSON.stringify({candidates:[]});
+  const opener = node('home-search-open');
+  const parts = {'.site-search-label':node('search-label'),'.ui-icon':node('search-icon'),kbd:node('search-shortcut')};
+  opener.querySelector = selector => parts[selector] || null;
+  opener.setAttribute('aria-label','Browse the guide');
+  parts['.site-search-label'].textContent = 'Browse';
+  parts['.ui-icon'].hidden = parts.kbd.hidden = true;
+  if (!nativeDialog) delete node('home-search').showModal;
   const location = new URL(url), history = {state:{kept:true}, replaceState(state,unused,value){this.state=state;const next=new URL(value,location);location.href=next.href;}};
   const context = {document,location,history,URL,URLSearchParams,performance:{getEntriesByType:()=>[]},Date,window:null,setInterval(){},setTimeout(fn,delay){timers.set(++timerId,{fn,delay});return timerId;},clearTimeout:id=>timers.delete(id)};
   context.window=context;
@@ -56,7 +63,19 @@ function harness(url = 'https://fixture.test/') {
     timeout(){const [id,timer]=[...timers].find(([,timer])=>timer.delay===15000);timers.delete(id);timer.fn();},
     retry(){node('home-search-message').emit('click',{target:{closest:selector=>selector==='[data-home-component-retry]'?{}:null}});}};
 }
-const stalled=harness();stalled.click();assert.equal(stalled.node('home-search').open,true);assert.equal(stalled.scripts.length,1);
+const unsupported = harness(undefined,{nativeDialog:false});
+unsupported.click();
+assert.equal(unsupported.node('home-search-open')['aria-label'],'Browse the guide');
+assert.equal(unsupported.node('search-label').textContent,'Browse');
+assert.equal(unsupported.node('search-shortcut').hidden,true);
+assert.equal(unsupported.scripts.length,0);
+const stalled = harness();
+assert.equal(stalled.node('home-search-open')['aria-label'],'Search the guide');
+assert.equal(stalled.node('home-search-open').dataset.searchReady,'');
+assert.equal(stalled.node('search-label').textContent,'Search');
+assert.equal(stalled.node('search-icon').hidden,undefined);
+assert.equal(stalled.node('search-shortcut').hidden,undefined);
+stalled.click();assert.equal(stalled.node('home-search').open,true);assert.equal(stalled.scripts.length,1);
 const late=stalled.scripts[0].onload;stalled.timeout();assert.match(stalled.node('home-search-message').innerHTML,/Try again/);
 stalled.node('home-search-close').emit('click');assert.equal(stalled.node('home-search').open,false);let opens=0;stalled.context.openHomeSearch=()=>opens++;late();assert.equal(opens,0,'Late callback cannot reopen a closed fallback');
 stalled.click();assert.equal(opens,1,'Deliberate new activation can reuse a late installation');

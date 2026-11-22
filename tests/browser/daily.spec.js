@@ -38,7 +38,16 @@ async function verifiedResponse(request, route, filename) {
   return bytes;
 }
 
-test.beforeEach(async ({ page, request }, info) => {
+function isCloudflareRumAccessError(error) {
+  const message = '/sciencetostartup.com/cdn-cgi/rum? due to access control checks.';
+  if (error.message !== message || typeof error.stack !== 'string') return false;
+  const [headline, ...frames] = error.stack.trimEnd().split('\n');
+  const beaconFrame = /^    at [^(]+\(https:\/\/static\.cloudflareinsights\.com\/beacon\.min\.js\/v[a-f0-9]+:\d+:\d+\)$/;
+  return headline === 'XMLHttpRequest cannot load https:/' + message &&
+    frames.length > 0 && frames.every(frame => beaconFrame.test(frame));
+}
+
+test.beforeEach(async ({ page, request, browserName, baseURL }, info) => {
   const response = await request.get('/manifest.json');
   expect(response.ok()).toBeTruthy();
   const actual = await response.body();
@@ -51,10 +60,22 @@ test.beforeEach(async ({ page, request }, info) => {
     contentType: 'application/json',
   });
   info._dailyRuntimeErrors = [];
-  page.on('pageerror', error => info._dailyRuntimeErrors.push(error.message));
+  info._dailyCloudflareRumErrors = [];
+  page.on('pageerror', error => {
+    if (browserName === 'webkit' && baseURL === 'https://sciencetostartup.com' && isCloudflareRumAccessError(error)) {
+      info._dailyCloudflareRumErrors.push({ message: error.message, stack: error.stack });
+    } else {
+      info._dailyRuntimeErrors.push(error.stack || error.message);
+    }
+  });
 });
 
 test.afterEach(async ({ page }, info) => {
+  if (info._dailyCloudflareRumErrors?.length) {
+    await info.attach('daily-cloudflare-rum-errors.json', {
+      body: Buffer.from(JSON.stringify(info._dailyCloudflareRumErrors)), contentType: 'application/json',
+    });
+  }
   if (info.status !== info.expectedStatus) {
     let evidence;
     try {
