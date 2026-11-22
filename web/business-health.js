@@ -14,7 +14,6 @@ const preferredMeasures={revenue:['period_revenue','revenue_growth_yoy','annuali
 const stateRank={observed:0,proxy:1,missing:2,'n-a':3};
 const periodRank={annual:0,trailing_year:0,run_rate:0,half_year:1,snapshot:1,daily:1,cumulative:1,undated:2,unclear:2};
 const ACRONYMS={us:'US',gaap:'GAAP',ebitda:'EBITDA',fx:'FX',nrr:'NRR (net revenue retention)',ifrs:'IFRS'};
-const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const bhState={signal:'revenue',measure:'period_revenue',cohort:null,group:'',query:'',sort:'coverage',evidenceOnly:false,company:'',observation:''};
 const all=()=>bundle?.observations||[];
 let overviewMeasure='period_revenue';
@@ -25,7 +24,7 @@ let freshClaims=new Map((bundle?.fresh_claims||[]).map(c=>[c.id,c]));
 let refreshedSources=new Map((bundle?.sources||[]).map(s=>[s.id,s]));
 let sourceChecks=new Map((bundle?.source_checks?.entries||[]).map(s=>[s.source_id,s]));
 function refreshBundle(){bundle=window.BUSINESS_HEALTH;freshClaims=new Map((bundle?.fresh_claims||[]).map(c=>[c.id,c]));refreshedSources=new Map((bundle?.sources||[]).map(s=>[s.id,s]));sourceChecks=new Map((bundle?.source_checks?.entries||[]).map(s=>[s.source_id,s]));}
-let evidenceOrigin='';
+let evidenceOrigin=null;
 const claimRecord=id=>claims[id]||freshClaims.get(id);
 const sourceRecord=id=>refreshedSources.get(id)||sources[id];
 const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -48,7 +47,7 @@ const basisText=o=>String(o.basis||'').split(/(?:^|;\s*)(?:Scope|Source type|Ori
 const limitationsText=o=>o.basis&&o.limitations.startsWith(o.basis)?(basisText(o)+' '+o.limitations.slice(o.basis.length)).trim():o.limitations;
 function cohort(o){return o.cohort||[o.period?.label,o.currency,o.scope,o.accounting_basis].filter(Boolean).join(' · ');}
 // The cohort key stays as the data wrote it; only the display drops a money phrase from a people or percent basis.
-function cohortDisplay(key,o){return o&&basisLabel(o)==='Not stated'?human(key.replace(/\s·\sGross\/net undisclosed$/,'')):human(key);}
+function cohortDisplay(key,o){return human(readableDates(o&&basisLabel(o)==='Not stated'?key.replace(/\s·\sGross\/net undisclosed$/,''):key));}
 function observations(){return all().map(o=>({...o}));}
 function rows(signal,measure,filters={}){
  let result=all().filter(o=>o.signal===signal&&(!measure||o.measure===measure)&&numeric(o));
@@ -84,22 +83,28 @@ function valueText(o,amount=o.value,qualify=true){
  return q+val;
 }
 const boundWord=o=>({greater_than:'More than ',at_least:'At least ',at_most:'At most ',less_than:'Less than ',approximately:'About ',approximate:'About ',nearly:'Nearly '}[o.qualifier]||'');
-function shortDate(text,day=true){
- const s=String(text||'').trim(),m=s.match(/(\d{4})-(\d{2})(?:-(\d{2}))?/);
- if(!m)return s.replace(/^as of /i,'');
- return (/inferred/i.test(s)?'≈ ':'')+(day&&m[3]?Number(m[3])+' ':'')+MONTHS[Number(m[2])-1]+' '+m[1];
+function financialProjection(o){
+ const financial=companySummaryFor(o.company_id)?.financial;
+ return financial?.recordType==='observation'&&financial.id===o.id?financial:null;
 }
-// Cell tags keep month precision; the inspector shows the full period and date.
-function periodShort(o,day=false){
- const p=o.period||{},label=String(p.label||''),named=label.match(/^H[12](?: FY)?\d{4}/);
- switch(p.type){
-  case 'annual':return p.end&&!/-12-31$/.test(p.end)?'FY to '+shortDate(p.end,day):p.year?'FY'+p.year:label;
-  case 'half_year':{if(named)return named[0];const month=String(p.start||'').slice(5,7);return month==='01'&&p.year?'H1 '+p.year:month==='07'&&p.year?'H2 '+p.year:'6 months to '+shortDate(p.end||o.as_of,day);}
-  case 'trailing_year':return '12 months to '+shortDate(p.end||o.as_of,day);
-  case 'cumulative':return /\d{4}/.test(o.as_of)?shortDate(o.as_of,day):'';
-  case 'undated':return day?'undated':'';
-  default:{const d=shortDate(o.as_of,day);return /^undated$/i.test(d)&&!day?'':d||label;}
- }
+function figureDate(o){
+ const raw=financialProjection(o)?.period||o.period?.label||'';
+ const label=readableDates(raw);
+ if(!label||/^undated$/i.test(label))return {heading:'Reporting period',label:'Not stated',display:'Undated'};
+ if(/^Reported /i.test(label))return {heading:'Reporting day',label:label.slice(9),display:label};
+ if(/ snapshot$/i.test(label))return {heading:'Snapshot',label:label.slice(0,-9),display:label};
+ if(o.period?.type==='snapshot')return {heading:'Snapshot',label,display:'Snapshot · '+label};
+ if(o.period?.type==='unclear')return {heading:'Period unclear',label,display:label};
+ if(/^\d{4}-\d{2}-\d{2}$/.test(raw))return {heading:'Date basis unclear',label,display:label+' · date basis unclear'};
+ return {heading:'Reporting period',label,display:label};
+}
+function accessibleDate(o){
+ const {heading,label}=figureDate(o);
+ return heading+' '+label;
+}
+function periodShort(o){
+ const {display}=figureDate(o);
+ return display.match(/^H[12](?:\s+FY)?\s*\d{4}/i)?.[0]||display;
 }
 const dateKey=o=>o.period?.end||(String(o.as_of||'').match(/\d{4}(?:-\d{2}){0,2}/)||[''])[0];
 // Same rule as the company cards: a figure more than a year older than the dataset is historical.
@@ -113,7 +118,7 @@ const gradeChip=o=>{const g=grade(o);return g?`<i class="bh-grade" title="Resear
 // The tag names the scope and a gross basis when they matter, and marks old figures.
 function cellTag(o){return [columnDefault[o.signal]===o.measure?'':measureShort[o.measure]||measureLabel(o.measure).toLowerCase(),scopeWord(o),o.accounting_basis==='gross'?'gross':'',periodShort(o),isHistorical(o)?'historical':''].filter(Boolean).join(' · ');}
 // Labels for the inspector's lists of a company's other figures: measure, scope, period and value.
-function otherLabel(r,withMeasure){return [withMeasure?measureShort[r.measure]||measureLabel(r.measure):'',scopeWord(r),r.accounting_basis==='gross'?'gross':'',periodShort(r,true),numeric(r)?valueText(r):'claim'].filter(Boolean).join(' · ');}
+function otherLabel(r,withMeasure){return [withMeasure?measureShort[r.measure]||measureLabel(r.measure):'',chartScope(r)||scopeWord(r),r.accounting_basis==='gross'?'gross':'',figureDate(r).display,numeric(r)?valueText(r):'claim'].filter(Boolean).join(' · ');}
 function measureDefinition(id){const d=bundle?.measure_definitions;if(Array.isArray(d))return d.find(m=>m.id===id)||{};return d?.[id]||{};}
 function measureLabel(id){return measureDefinition(id).label||all().find(o=>o.measure===id)?.measure_label||human(id);}
 function measures(signal){return [...new Set(all().filter(o=>o.signal===signal&&numeric(o)).map(o=>o.measure))];}
@@ -137,25 +142,31 @@ function pickCompanyObservation(company,signal){
  const list=all().filter(o=>o.company_id===company&&o.signal===signal),preferred=bestMeasure(signal);
  return list.sort((a,b)=>Number(numeric(b))-Number(numeric(a))||Number(!!a.is_context)-Number(!!b.is_context)||Number(b.measure===preferred)-Number(a.measure===preferred)||dateKey(b).slice(0,7).localeCompare(dateKey(a).slice(0,7))||Number(a.scope!=='company')-Number(b.scope!=='company')||(periodRank[a.period?.type]??2)-(periodRank[b.period?.type]??2))[0];
 }
-function evidenceLinks(o){return `<span class="bh-evidence-links">${o.claim_ids.filter(id=>claims[id]).map((id,i)=>claimButton(id,o.claim_ids.length>1?'Claim '+(i+1):'Inspect claim')).join('')}${o.source_ids.slice(0,3).map(id=>{const source=sourceRecord(id);return source?external(source.url,source.publisher||'Original source'):'';}).join('')}</span>`;}
+function evidenceLinks(o){
+ const projected=financialProjection(o)?.source;
+ const claimLinks=o.claim_ids.filter(id=>claims[id]).map((id,i)=>claimButton(id,o.claim_ids.length>1?'Claim '+(i+1):'Inspect claim'));
+ const sourceLinks=o.source_ids.slice(0,3).map(id=>{
+  const source=sourceRecord(id);
+  if(!source)return '';
+  const published=o.source_ids.length===1&&projected?.url===source.url?projected.publishedOn:'';
+  const meta=profileSourceMeta({...source,publisher:''},published?{source_published_on:published}:null);
+  return `<span data-bh-source="${safe(id)}">${external(source.url,source.publisher||'Original source')}<br><small>${safe(meta)}</small>${freshnessNote(o,id)}</span>`;
+ });
+ return `<span class="bh-evidence-links">${claimLinks.join('')}${sourceLinks.join('')}</span>`;
+}
 function checkedSource(o){
  const checks=o.source_ids.map(id=>sourceChecks.get(id)).filter(Boolean);
  return checks.find(c=>c.status==='content_checked')||checks.find(c=>c.status==='unavailable')||checks[0];
 }
-function freshnessNote(o){
- const check=checkedSource(o),fresh=o.claim_ids.map(id=>freshClaims.get(id)).filter(Boolean);
- if(check?.status==='unavailable')return `<p class="bh-refresh-note is-unavailable">Source could not be retrieved on ${safe(shortDate(check.checked_on))}. The figure retains its earlier attribution.</p>`;
- return check?.status==='content_checked'?`<p class="bh-refresh-note">Source page read ${safe(shortDate(check.checked_on))}${fresh[0]?.source_locator?' · '+safe(fresh[0].source_locator):''}. This check date is separate from the reporting period.</p>`:'';
+function freshnessNote(o,sourceId){
+ const check=sourceChecks.get(sourceId),fresh=o.claim_ids.map(id=>freshClaims.get(id)).find(c=>c?.source_ids.includes(sourceId));
+ if(check?.status==='unavailable')return `<span class="bh-refresh-note is-unavailable"><br>Source could not be retrieved on ${safe(readableDates(check.checked_on))}. The figure retains its earlier attribution.</span>`;
+ return check?.status==='content_checked'?`<span class="bh-refresh-note"><br>Source page read ${safe(readableDates(check.checked_on))}${fresh?.source_locator?' · '+safe(fresh.source_locator):''}.</span>`:'';
 }
 
 function statusText(o){return o.evidence_type==='estimate'?'Third-party estimate':o.evidence_type==='calculated'?'Calculated':o.is_context?'Context only':'Reported';}
 function pillClass(o){return o.evidence_type==='estimate'?'is-estimate':o.is_context?'is-context':'';}
 function assuranceText(o){const text=String(o.evidence_assurance||'');const cl=claimRecord(o.claim_ids[0]);return text&&!/Research label:/i.test(text)?text:cl?.evidence_label||(cl?evidenceLabel(cl):'Source attribution');}
-function dateRow(o){
- const label=o.period.label,extra=shortDate(o.as_of,true),month=shortDate(o.as_of,false);
- if(!/\d{4}-\d{2}/.test(o.as_of)||label.includes(o.as_of)||label.includes(month)||label.includes(dateKey(o).slice(0,7)))return label;
- return label+' · stated '+extra;
-}
 // One latest observation per company. Dates decide the order, never incompatible amounts.
 function latestFigures(measure){
  const grouped=new Map();
@@ -177,10 +188,10 @@ function sourceKind(o){
 function ledgerPeriod(o){
  const p=o.period||{};
  if(p.type==='half_year'&&p.start&&p.end){
-  const start=shortDate(p.start,false),end=shortDate(p.end,false);
+  const start=readableDates(p.start.slice(0,7)),end=readableDates(p.end.slice(0,7));
   return p.start.slice(0,4)===p.end.slice(0,4)?start.replace(/ \d{4}$/,'')+'–'+end:start+'–'+end;
  }
- return periodShort(o,true);
+ return figureDate(o).display;
 }
 function renderLedger(){
  const list=latestFigures(overviewMeasure);
@@ -188,28 +199,59 @@ function renderLedger(){
  $('bh-overview-tabs').innerHTML=Object.entries(overviewMeasures).map(([id,label])=>`<button type="button" role="tab" id="bh-overview-${id}" aria-controls="bh-ledger-panel" aria-selected="${overviewMeasure===id}" tabindex="${overviewMeasure===id?0:-1}" data-bh-overview="${id}">${label}<span>${latestFigures(id).length}</span></button>`).join('');
  $('bh-ledger-panel').setAttribute('aria-labelledby','bh-overview-'+overviewMeasure);
  $('bh-ledger-note').textContent=overviewMeasure==='annualized_revenue'?'A projection of recent revenue across a year. Dates, scopes and gross/net definitions differ.':overviewMeasure==='revenue_growth_yoy'?'Year-on-year changes within each business. Full-year and half-year comparisons stay labeled.':'Latest disclosed revenue for each business. Reporting periods and scopes differ; rows are ordered by date.';
- $('bh-ledger').innerHTML=visible.map(o=>{const kind=sourceKind(o),check=checkedSource(o),unavailable=check?.status==='unavailable';return `<article class="bh-ledger-row${isHistorical(o)?' is-historical':''}"><div class="bh-ledger-company"><a href="#company/${safe(o.company_id)}">${safe(companies[o.company_id].name)}</a><span>${safe(scopeLabel(o))}${o.accounting_basis==='gross'?' · gross':''}</span></div><button type="button" class="bh-ledger-value" data-bh-ledger="${safe(o.id)}" aria-label="${safe(companies[o.company_id].name+' '+valueText(o)+': inspect evidence')}">${safe(valueText(o))}</button><div class="bh-ledger-period">${safe(ledgerPeriod(o))}${isHistorical(o)?'<small>Historical</small>':''}</div><button type="button" class="bh-ledger-source" data-bh-ledger="${safe(o.id)}" aria-label="${safe('Source for '+companies[o.company_id].name+' '+valueText(o))}"><span class="bh-source-kind" data-kind="${kind.toLowerCase()}">${kind}</span><span class="bh-source-action">Source ${iconHTML('right')}</span>${unavailable?'<small class="bh-source-unavailable">Retrieval failed</small>':''}</button></article>`;}).join('');
+ $('bh-ledger').innerHTML=visible.map(o=>{const kind=sourceKind(o),check=checkedSource(o),unavailable=check?.status==='unavailable',date=accessibleDate(o);return `<article class="bh-ledger-row${isHistorical(o)?' is-historical':''}"><div class="bh-ledger-company"><a href="#company/${safe(o.company_id)}">${safe(companies[o.company_id].name)}</a><span>${safe(scopeLabel(o))}${o.accounting_basis==='gross'?' · gross':''}</span></div><button type="button" class="bh-ledger-value" aria-haspopup="dialog" aria-controls="bh-evidence-dialog" data-bh-ledger="${safe(o.id)}" aria-label="${safe(companies[o.company_id].name+' '+valueText(o)+' · '+date+' · Inspect evidence')}">${safe(valueText(o))}</button><div class="bh-ledger-period">${safe(ledgerPeriod(o))}${isHistorical(o)?'<small>Historical</small>':''}</div><button type="button" class="bh-ledger-source" aria-haspopup="dialog" aria-controls="bh-evidence-dialog" data-bh-ledger="${safe(o.id)}" aria-label="${safe('Source for '+companies[o.company_id].name+' '+valueText(o)+' · '+date)}"><span class="bh-source-kind" data-kind="${kind.toLowerCase()}">${kind}</span><span class="bh-source-action">Source ${iconHTML('right')}</span>${unavailable?'<small class="bh-source-unavailable">Retrieval failed</small>':''}</button></article>`;}).join('');
  $('bh-ledger-count').textContent=(visible.length<list.length?'Showing '+visible.length+' of '+list.length+' companies.':plural(list.length,'company')+'.')+' Select a figure for its source and history.';
  const more=$('bh-ledger-more');
  if(more){more.hidden=list.length<=overviewLimit;more.textContent=overviewExpanded?'Show fewer companies':'Show all '+list.length+' companies';more.setAttribute('aria-expanded',String(overviewExpanded));}
 }
-function openEvidence(origin=''){const dialog=$('bh-evidence-dialog');evidenceOrigin=origin||evidenceOrigin;if(dialog&&!dialog.open)dialog.showModal();}
+function openEvidence(selector){
+ const dialog=$('bh-evidence-dialog');
+ dialog.scrollTop=0;
+ if(dialog.open){
+  $('bh-detail-title').focus({preventScroll:true});
+  return;
+ }
+ const {signal,measure,cohort,company,observation}=bhState;
+ evidenceOrigin={selector,selection:{signal,measure,cohort,company,observation}};
+ dialog.showModal();
+}
+function restoreEvidenceFocus(){
+ const origin=evidenceOrigin;
+ evidenceOrigin=null;
+ if(!origin)return;
+ let trigger=document.querySelector(origin.selector);
+ // An alternate measure or scope can remove an invoking chart bar.
+ if(!trigger){
+  Object.assign(bhState,origin.selection);
+  render();
+  trigger=document.querySelector(origin.selector);
+ }
+ trigger?.focus();
+}
+function alternateFigures(heading,figures,withMeasure=false){
+ if(!figures.length)return '';
+ const attribute=withMeasure?'data-bh-context':'data-bh-observation';
+ return `<details class="bh-related"><summary>${heading}</summary><p>${figures.map(r=>`<button type="button" class="text-link" ${attribute}="${safe(r.id)}">${safe(otherLabel(r,withMeasure))}</button>`).join(' ')}</p></details>`;
+}
 function renderDetail(){
  const o=byId(bhState.observation),id=bhState.company||(o?.company_id),name=companies[id]?.name,group=id?groupLabel(modelGroup(id)):'';
  if(id&&evidenceState(id,bhState.signal)==='n-a'){
-  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name)} · ${safe(group)}</p><h3 id="bh-detail-title">Not applied</h3><p class="bh-lede">${safe(name)} is a nonprofit research organization. Commercial measures are not applied to it.</p><a class="bh-profile" href="#company/${safe(id)}">Full company profile ${iconHTML('external')}</a>`;
+  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name)} · ${safe(group)}</p><h3 id="bh-detail-title" tabindex="-1">Not applied</h3><p class="bh-lede">${safe(name)} is a nonprofit research organization. Commercial measures are not applied to it.</p><a class="bh-profile" href="#company/${safe(id)}">Full company profile ${iconHTML('external')}</a>`;
   return;
  }
  if(!o||o.company_id!==id||o.signal!==bhState.signal){
   const context=all().filter(r=>r.company_id===id&&r.signal===bhState.signal);
-  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name?name+' · '+group:'Read the evidence')}</p><h3 id="bh-detail-title">${name?'No reviewed public figure':'Select a figure'}</h3><p class="bh-lede">${name?'The reviewed sources do not establish '+labels[bhState.signal].toLowerCase()+' for '+safe(name)+'. Missing is not zero.':'Select a chart bar to read its source and reporting details.'}</p><p class="bh-note">${esc(definition(bhState.signal).ideal_measure||questions[bhState.signal])}</p>${context.length?`<div class="bh-related"><p><strong>Available context</strong></p>${context.map(r=>`<p>${esc(r.label)}: ${numeric(r)?safe(valueText(r)):esc(r.original_text)} ${evidenceLinks(r)}</p>`).join('')}</div>`:''}${id?`<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`:''}`;
+  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name?name+' · '+group:'Read the evidence')}</p><h3 id="bh-detail-title" tabindex="-1">${name?'No reviewed public figure':'Select a figure'}</h3><p class="bh-lede">${name?'The reviewed sources do not establish '+labels[bhState.signal].toLowerCase()+' for '+safe(name)+'. Missing is not zero.':'Select a chart bar to read its source and reporting details.'}</p><p class="bh-note">${esc(definition(bhState.signal).ideal_measure||questions[bhState.signal])}</p>${context.length?`<div class="bh-related"><p><strong>Available context</strong></p>${context.map(r=>`<p>${esc(r.label)}: ${numeric(r)?safe(valueText(r)):esc(r.original_text)} ${evidenceLinks(r)}</p>`).join('')}</div>`:''}${id?`<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`:''}`;
   return;
  }
  const history=all().filter(r=>r.company_id===id&&r.signal===o.signal&&r.measure===o.measure&&r.id!==o.id).sort((a,b)=>dateKey(b).localeCompare(dateKey(a)));
  const related=all().filter(r=>r.company_id===id&&r.signal===o.signal&&r.measure!==o.measure);
- const sparkline=historySeries(id,o.measure).some(list=>list.length>1&&list.some(r=>r.id===o.id));
- const g=grade(o);
- $('bh-detail').innerHTML=`<p class="bh-kicker">Selected evidence</p><h3 id="bh-detail-title">${safe(name)}</h3><p class="bh-measure-name">${esc(measureLabel(o.measure))}</p>${isHistorical(o)?`<span class="bh-historical">Historical · ${yearOf(o)}</span>`:''}<p class="bh-value${isHistorical(o)?' is-historical':''}">${safe(numeric(o)?valueText(o):'Not quantified')}<span class="bh-pill ${pillClass(o)}">${statusText(o)}</span></p><dl class="bh-facts"><dt>Date</dt><dd>${safe(dateRow(o))}</dd><dt>Scope</dt><dd>${safe(inspectorScope(o))}</dd><dt>Basis</dt><dd>${safe(basisLabel(o))}</dd><dt>Source</dt><dd>${esc(assuranceText(o))} ${evidenceLinks(o)}${freshnessNote(o)}</dd></dl>${o.calculation?`<p class="bh-note"><strong>Calculated:</strong> ${esc(o.calculation.formula||o.calculation)}</p>`:''}${o.normalization?`<p class="bh-note">${esc(o.normalization)}</p>`:''}<details class="bh-caveats"><summary>Caveats and source wording</summary>${g?`<p class="bh-note">Research grade ${g}: ${safe(gradeText[g])}.</p>`:''}${basisText(o)&&!o.limitations.includes(o.basis)?`<p>${esc(basisText(o))}</p>`:''}<p class="bh-warning">${esc(limitationsText(o))}</p><p class="bh-quote">“${esc(o.original_text)}”</p></details>${history.length&&!sparkline?`<details class="bh-related"><summary>Other dates</summary><p> ${history.map(r=>`<button type="button" class="text-link" data-bh-observation="${safe(r.id)}">${safe(otherLabel(r,false))}</button>`).join(' ')}</p></details>`:''}${related.length?`<details class="bh-related"><summary>Other measures</summary><p> ${related.map(r=>`<button type="button" class="text-link" data-bh-context="${safe(r.id)}">${esc(otherLabel(r,true))}</button>`).join(' ')}</p></details>`:''}<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`;
+ const sameDate=accessibleDate(o);
+ const scopes=history.filter(r=>accessibleDate(r)===sameDate&&scopeLabel(r)!==scopeLabel(o));
+ const sparkline=historySeries(id,o.measure).find(list=>list.length>1&&list.some(r=>r.id===o.id));
+ const dates=history.filter(r=>!scopes.includes(r)&&!sparkline?.includes(r));
+ const g=grade(o),date=figureDate(o);
+ $('bh-detail').innerHTML=`<p class="bh-kicker">Selected evidence</p><h3 id="bh-detail-title" tabindex="-1">${safe(name)}</h3><p class="bh-measure-name">${esc(measureLabel(o.measure))}</p>${isHistorical(o)?`<span class="bh-historical">Historical · ${yearOf(o)}</span>`:''}<p class="bh-value${isHistorical(o)?' is-historical':''}">${safe(numeric(o)?valueText(o):'Not quantified')}<span class="bh-pill ${pillClass(o)}">${statusText(o)}</span></p><dl class="bh-facts"><dt>${date.heading}</dt><dd>${safe(date.label)}</dd><dt>Scope</dt><dd>${safe(inspectorScope(o))}</dd><dt>Basis</dt><dd>${safe(basisLabel(o))}</dd><dt>Source</dt><dd>${esc(assuranceText(o))} ${evidenceLinks(o)}</dd></dl>${o.calculation?`<p class="bh-note"><strong>Calculated:</strong> ${esc(o.calculation.formula||o.calculation)}</p>`:''}${o.normalization?`<p class="bh-note">${esc(o.normalization)}</p>`:''}<details class="bh-caveats"><summary>Caveats and source wording</summary>${g?`<p class="bh-note">Research grade ${g}: ${safe(gradeText[g])}.</p>`:''}${basisText(o)&&!o.limitations.includes(o.basis)?`<p>${esc(basisText(o))}</p>`:''}<p class="bh-warning">${esc(limitationsText(o))}</p><p class="bh-quote">“${esc(o.original_text)}”</p></details>${alternateFigures('Other business scopes',scopes)}${alternateFigures('Other dates',dates)}${alternateFigures('Other measures',related,true)}<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`;
 }
 function historySeries(company,measure){
  const grouped=new Map();
@@ -229,7 +271,7 @@ function renderHistory(){
  const positions=list.map((r,i)=>({r,x:list.length===1?150:28+(Number.isFinite(timeSpan)&&timeSpan>0?(times[i]-times[0])/timeSpan:i/(list.length-1))*244,y:66-(r.value-min)/span*40}));
  const first=list[0],last=list.at(-1),exact=first.value>0&&list.every(r=>['exact','calculated'].includes(r.qualifier)&&r.evidence_type!=='estimate');
  const basis=[first.period.type==='annual'?'Full years':first.period.type==='half_year'?'Half years':human(first.period.type),first.currency||'percent',scopeLabel(first),basisLabel(first)].join(' · ');
- $('bh-history').innerHTML=`<h4>${safe(companies[company].name)} over time</h4><p class="bh-cohort-heading">${safe(basis)}${exact&&list.length>1?` · ${((last.value/first.value-1)*100).toFixed(1)}% change, first to last`:''}</p><svg viewBox="0 0 300 88" role="img" aria-label="${esc(companies[company].name+' '+first.label+', '+list.map(r=>r.period.label+': '+valueText(r)).join('; '))}"><line class="bh-svg-base" x1="28" y1="66" x2="272" y2="66"/>${positions.length>1?`<polyline class="bh-svg-line" points="${positions.map(p=>p.x+','+p.y).join(' ')}" fill="none" stroke-width="2" stroke-linejoin="round"/>`:''}${positions.map((p,i)=>`<circle class="bh-svg-point${p.r.id===o.id?' is-selected':''}" cx="${p.x}" cy="${p.y}" r="${p.r.id===o.id?5:3.5}" stroke-width="2"/>${i===0||i===positions.length-1||p.r.id===o.id?`<text x="${p.x}" y="${p.y-9}" text-anchor="${i===0?'start':i===positions.length-1?'end':'middle'}" class="bh-svg-value">${safe(valueText(p.r))}</text>`:''}<text x="${p.x}" y="82" text-anchor="${i===0?'start':i===positions.length-1?'end':'middle'}" class="bh-svg-axis">${safe(periodShort(p.r))}</text>`).join('')}</svg><div class="bh-history-points">${list.map(r=>`<button type="button" data-bh-observation="${safe(r.id)}"${bhState.observation===r.id?' aria-current="true"':''}>${safe(periodShort(r,true))} · ${safe(valueText(r))}</button>`).join('')}</div>`;
+ $('bh-history').innerHTML=`<h4>${safe(companies[company].name)} over time</h4><p class="bh-cohort-heading">${safe(basis)}${exact&&list.length>1?` · ${((last.value/first.value-1)*100).toFixed(1)}% change, first to last`:''}</p><svg viewBox="0 0 300 88" role="img" aria-label="${esc(companies[company].name+' '+first.label+', '+list.map(r=>accessibleDate(r)+' '+valueText(r)).join('; '))}"><line class="bh-svg-base" x1="28" y1="66" x2="272" y2="66"/>${positions.length>1?`<polyline class="bh-svg-line" points="${positions.map(p=>p.x+','+p.y).join(' ')}" fill="none" stroke-width="2" stroke-linejoin="round"/>`:''}${positions.map((p,i)=>`<circle class="bh-svg-point${p.r.id===o.id?' is-selected':''}" cx="${p.x}" cy="${p.y}" r="${p.r.id===o.id?5:3.5}" stroke-width="2"/>${i===0||i===positions.length-1||p.r.id===o.id?`<text x="${p.x}" y="${p.y-9}" text-anchor="${i===0?'start':i===positions.length-1?'end':'middle'}" class="bh-svg-value">${safe(valueText(p.r))}</text>`:''}<text x="${p.x}" y="82" text-anchor="${i===0?'start':i===positions.length-1?'end':'middle'}" class="bh-svg-axis">${safe(periodShort(p.r))}</text>`).join('')}</svg><div class="bh-history-points">${list.map(r=>`<button type="button" data-bh-observation="${safe(r.id)}"${bhState.observation===r.id?' aria-current="true"':''}>${safe(figureDate(r).display)} · ${safe(valueText(r))}</button>`).join('')}</div>`;
 }
 function renderCompare(){
  const selected=rows(bhState.signal,bhState.measure,{group:bhState.group,cohort:bhState.cohort}),groups=new Map(),current=byId(bhState.observation);
@@ -242,7 +284,7 @@ function renderCompare(){
  else $('bh-plot').innerHTML=[...groups].map(([key,list])=>{
   list.sort((a,b)=>b.value-a.value||companies[a.company_id].name.localeCompare(companies[b.company_id].name));
   const min=Math.min(0,...list.map(o=>o.value)),max=Math.max(0,...list.map(o=>o.value)),span=max-min||1,zero=(0-min)/span*100;
-  return `<div class="bh-plot-group" role="group" aria-label="${safe(cohortDisplay(key,list[0]))}"><h5 class="bh-cohort-heading">${safe(cohortDisplay(key,list[0]))}</h5>${list.map(o=>{const end=(o.value-min)/span*100;const left=Math.min(zero,end),width=Math.abs(end-zero),scope=chartScope(o);return `<button type="button" class="bh-bar" data-bh-observation="${safe(o.id)}"${bhState.observation===o.id?' aria-current="true"':''} aria-label="${esc(companies[o.company_id].name+': '+valueText(o)+', '+o.label+', '+o.period.label+', '+scopeLabel(o)+(isHistorical(o)?', historical':''))}"><span class="bh-bar-name">${safe(companies[o.company_id].name)}<small>${safe(periodShort(o,true))} · ${safe(statusText(o))}${scope?' · '+safe(scope):''}${o.is_context?' · context':''}</small></span><span class="bh-bar-track" aria-hidden="true"><i class="bh-bar-fill${['greater_than','at_least','less_than','at_most'].includes(o.qualifier)?' is-bound':''}${o.value<0?' is-negative':''}${o.evidence_type==='estimate'?' is-estimate':''}" style="left:${left}%;width:${width}%"></i>${min<0?`<i class="bh-bar-zero" style="left:${zero}%"></i>`:''}</span><span class="bh-bar-value${isHistorical(o)?' is-historical':''}">${safe(valueText(o))}</span></button>`;}).join('')}<div class="bh-axis"><span>${safe(valueText(list[0],min,false))}</span><span>${safe(valueText(list[0],max,false))}</span></div></div>`;
+  return `<div class="bh-plot-group" role="group" aria-label="${safe(cohortDisplay(key,list[0]))}"><h5 class="bh-cohort-heading">${safe(cohortDisplay(key,list[0]))}</h5>${list.map(o=>{const end=(o.value-min)/span*100;const left=Math.min(zero,end),width=Math.abs(end-zero),scope=chartScope(o);return `<button type="button" class="bh-bar" aria-haspopup="dialog" aria-controls="bh-evidence-dialog" data-bh-observation="${safe(o.id)}"${bhState.observation===o.id?' aria-current="true"':''} aria-label="${esc(companies[o.company_id].name+': '+valueText(o)+', '+readableDates(o.label)+', '+accessibleDate(o)+', '+scopeLabel(o)+(isHistorical(o)?', historical':''))}"><span class="bh-bar-name">${safe(companies[o.company_id].name)}<small>${safe(periodShort(o))} · ${safe(statusText(o))}${scope?' · '+safe(scope):''}${o.is_context?' · context':''}</small></span><span class="bh-bar-track" aria-hidden="true"><i class="bh-bar-fill${['greater_than','at_least','less_than','at_most'].includes(o.qualifier)?' is-bound':''}${o.value<0?' is-negative':''}${o.evidence_type==='estimate'?' is-estimate':''}" style="left:${left}%;width:${width}%"></i>${min<0?`<i class="bh-bar-zero" style="left:${zero}%"></i>`:''}</span><span class="bh-bar-value${isHistorical(o)?' is-historical':''}">${safe(valueText(o))}</span></button>`;}).join('')}<div class="bh-axis"><span>${safe(valueText(list[0],min,false))}</span><span>${safe(valueText(list[0],max,false))}</span></div></div>`;
  }).join('');
  $('bh-chart-note').textContent=`${plural(new Set(selected.map(o=>o.company_id)).size,'company')} in this selection. ${md.note||md.description||''} ${groups.size>1?'Each panel has its own scale. ':''}Select a figure for its source.`;
  if($('bh-chart-title'))$('bh-chart-title').textContent=measureLabel(bhState.measure);
@@ -263,8 +305,9 @@ function cellHTML(c,signal,state){
  if(state==='n-a')return `<td class="bh-cell" data-state="n-a" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><span title="Nonprofit research: commercial measures are not applied">n/a<span class="sr-only"> ${labels[signal]}: not applied</span></span></td>`;
  const o=pickCompanyObservation(c.id,signal),selected=bhState.company===c.id&&bhState.signal===signal;
  if(!o)return `<td class="bh-cell" data-state="missing" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><span title="${safe(c.name+' · '+labels[signal]+': no reviewed public disclosure. Missing is not zero.')}">—<span class="sr-only"> ${labels[signal]}: not disclosed</span></span></td>`;
- const value=numeric(o)?valueText(o):'Claim',tag=cellTag(o);
- return `<td class="bh-cell" data-state="${state}"${isHistorical(o)?' data-historical="true"':''} data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><button type="button" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"${selected?' aria-current="true"':''} title="${esc(c.name+' · '+o.label+' · '+o.period.label+' · '+scopeLabel(o)+(o.is_context?' · context only':'')+(isHistorical(o)?' · historical':'')+(grade(o)?' · research grade '+grade(o):''))}"><b>${safe(value)}${gradeChip(o)}</b><small>${safe(tag)}${o.is_context?'<span class="sr-only"> (context only)</span>':''}</small></button></td>`;
+ const value=numeric(o)?valueText(o):'Claim',tag=cellTag(o),g=grade(o);
+ const context=[c.name,readableDates(o.label),accessibleDate(o),scopeLabel(o),o.is_context?'context only':'',isHistorical(o)?'historical':'',g?'research grade '+g:''].filter(Boolean).join(' · ');
+ return `<td class="bh-cell" data-state="${state}"${isHistorical(o)?' data-historical="true"':''} data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"><button type="button" data-bh-company="${safe(c.id)}" data-bh-signal="${signal}"${selected?' aria-current="true"':''} aria-label="${safe(value+' · '+context)}" title="${safe(context)}" aria-haspopup="dialog" aria-controls="bh-evidence-dialog"><b>${safe(value)}${gradeChip(o)}</b><small>${safe(tag)}${o.is_context?'<span class="sr-only"> (context only)</span>':''}</small></button></td>`;
 }
 function renderGrid(){
  const {pool,sorted,states}=companyRows(),query=bhState.query.trim();
@@ -302,11 +345,20 @@ function selectSignal(signal,company=''){
  if(company){const o=pickCompanyObservation(company,signal);if(o){bhState.measure=o.measure;bhState.observation=o.id;bhState.cohort=cohort(o);}}
  render();
 }
+function selectObservation(o){
+ Object.assign(bhState,{signal:o.signal,company:o.company_id,observation:o.id,measure:o.measure,cohort:cohort(o)});
+ render();
+}
 window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries,latestFigures,refreshBundle};
 if(!bundle)return;
+const ledgerDateHeading=document.querySelector('.bh-ledger-head > :nth-child(3)');
+if(ledgerDateHeading)ledgerDateHeading.textContent='Period / date';
 $('bh-close-evidence').addEventListener('click',()=>$('bh-evidence-dialog').close());
-$('bh-evidence-dialog').addEventListener('close',()=>{const trigger=[...document.querySelectorAll('[data-bh-ledger]')].find(n=>n.dataset.bhLedger===evidenceOrigin);trigger?.focus({preventScroll:true});});
-$('bh-evidence-dialog').addEventListener('click',e=>{if(e.target===$('bh-evidence-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}});
+$('bh-evidence-dialog').addEventListener('close',restoreEvidenceFocus);
+$('bh-evidence-dialog').addEventListener('click',e=>{
+ e.target.closest('button[data-claim]')?.focus({preventScroll:true});
+ if(e.target===$('bh-evidence-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}
+});
 $('bh-overview-tabs').addEventListener('keydown',e=>{if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;e.preventDefault();const ids=Object.keys(overviewMeasures);let i=ids.indexOf(overviewMeasure);i=e.key==='Home'?0:e.key==='End'?ids.length-1:(i+(e.key==='ArrowRight'?1:-1)+ids.length)%ids.length;overviewMeasure=ids[i];renderLedger();$('bh-overview-'+overviewMeasure).focus();});
 $('bh-measure').addEventListener('change',e=>{bhState.measure=e.target.value;bhState.cohort=null;bhState.company='';bhState.observation='';render();});
 $('bh-cohort').addEventListener('change',e=>{bhState.cohort=e.target.value;bhState.company='';bhState.observation='';render();});
@@ -317,12 +369,34 @@ $('bh-evidence-only').addEventListener('change',e=>{bhState.evidenceOnly=!!e.tar
 document.addEventListener('click',e=>{
  const expand=e.target.closest('#bh-ledger-more');if(expand){overviewExpanded=!overviewExpanded;renderLedger();expand.focus({preventScroll:true});return;}
  const overview=e.target.closest('[data-bh-overview]');if(overview){overviewMeasure=overview.dataset.bhOverview;renderLedger();$('bh-overview-'+overviewMeasure).focus({preventScroll:true});return;}
- const ledger=e.target.closest('[data-bh-ledger]');if(ledger){const o=byId(ledger.dataset.bhLedger);if(!o)return;bhState.signal=o.signal;bhState.company=o.company_id;bhState.observation=o.id;bhState.measure=o.measure;bhState.cohort=cohort(o);render();openEvidence(o.id);return;}
+ const ledger=e.target.closest('[data-bh-ledger]');
+ if(ledger){
+  const o=byId(ledger.dataset.bhLedger);
+  if(!o)return;
+  const role=ledger.classList.contains('bh-ledger-source')?'bh-ledger-source':'bh-ledger-value';
+  selectObservation(o);
+  openEvidence(`.${role}[data-bh-ledger="${CSS.escape(o.id)}"]`);
+  return;
+ }
  // Header buttons are rebuilt with the grid, so focus returns to the new button in the same place.
  const sort=e.target.closest('[data-bh-sort]');if(sort){bhState.sort=sort.dataset.bhSort;$('bh-sort').value=bhState.sort;renderGrid();revealSelection();$('bh-grid-head').querySelector?.('[data-bh-sort]')?.focus({preventScroll:true});return;}
  const tab=e.target.closest('[data-bh-tab]');if(tab){const inGrid=!!tab.closest('thead');selectSignal(tab.dataset.bhTab);if(inGrid)revealSelection();(inGrid?$('bh-grid-head').querySelector?.(`[data-bh-tab="${tab.dataset.bhTab}"]`):$('bh-tab-'+tab.dataset.bhTab))?.focus({preventScroll:true});return;}
- const cell=e.target.closest('[data-bh-company]');if(cell){selectSignal(cell.dataset.bhSignal,cell.dataset.bhCompany);openEvidence();return;}
- const mark=e.target.closest('[data-bh-observation], [data-bh-context]');if(mark){const o=byId(mark.dataset.bhObservation||mark.dataset.bhContext);if(!o)return;const panel=mark.closest('#bh-plot, #bh-history, #bh-detail');bhState.company=o.company_id;bhState.observation=o.id;bhState.measure=o.measure;bhState.cohort=cohort(o);render();const home=panel&&document.getElementById(panel.id),find=root=>[...root.querySelectorAll('[data-bh-observation]')].find(el=>el.dataset.bhObservation===o.id);(home&&find(home)||find(document))?.focus({preventScroll:true});openEvidence();}
+ const cell=e.target.closest('[data-bh-company]');
+ if(cell){
+  const {bhCompany:company,bhSignal:signal}=cell.dataset;
+  const button=cell.matches('button')||cell.querySelector('button');
+  selectSignal(signal,company);
+  openEvidence(button?`#bh-matrix-body button[data-bh-company="${CSS.escape(company)}"][data-bh-signal="${CSS.escape(signal)}"]`:'#bh-grid-wrap');
+  return;
+ }
+ const mark=e.target.closest('[data-bh-observation], [data-bh-context]');
+ if(mark){
+  const o=byId(mark.dataset.bhObservation||mark.dataset.bhContext);
+  if(!o)return;
+  const fromChart=mark.closest('#bh-plot');
+  selectObservation(o);
+  openEvidence(fromChart?`#bh-plot [data-bh-observation="${CSS.escape(o.id)}"]`:undefined);
+ }
 });
 $('bh-tabs').addEventListener('keydown',e=>{
  if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;e.preventDefault();let i=signals.indexOf(bhState.signal);i=e.key==='Home'?0:e.key==='End'?4:(i+(e.key==='ArrowRight'?1:-1)+5)%5;selectSignal(signals[i]);const active=$('bh-tab-'+signals[i]);active.focus({preventScroll:true});active.scrollIntoView({block:'nearest',inline:'nearest'});
