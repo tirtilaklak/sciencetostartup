@@ -1,5 +1,5 @@
 /* Market overview, company links, and product examples. */
-#market-view .market-hero{max-width:none;margin:0;padding:34px 0 0;border:0}
+#market-view .market-hero{display:block;max-width:none;margin:0;padding:34px 0 0;border:0}
 #market-view .market-hero h1{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(40px,5vw,64px);font-weight:400;line-height:1.08;letter-spacing:-.035em}
 #market-view .market-hero .intro{max-width:560px;margin:12px 0 0;font-size:16px;line-height:1.55;color:var(--muted)}
 #market-view .hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:16px 0 0}
