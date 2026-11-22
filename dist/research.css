@@ -300,3 +300,9 @@
   .r-reader-chapter-content[aria-labelledby="technical-landscape"]>.r-paragraph{content-visibility:visible;contain:none;contain-intrinsic-size:none}
  }
 }
+
+/* On narrow screens with enough height, keep the preceding evidence links
+   in view when #cite opens below the stacked chapter navigation. */
+@media screen and (max-width:720px) and (min-height:34rem){
+ .r-reader-chapter-content[aria-labelledby="technical-landscape"]~#cite:target{scroll-margin-block-start:min(24rem,68vh)}
+}

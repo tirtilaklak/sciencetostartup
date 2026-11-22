@@ -24,7 +24,7 @@
   const subject = `ScienceToStartup correction · ${stableId}`;
   const lines = [`Edition: ${edition}`, `Stable record ID: ${stableId}`, `Record URL: ${permalink}`];
   if (title) lines.push(`Record: ${title}`);
-  lines.push('What should change: ', 'Supporting public evidence: ', '');
+  lines.push('What should change:', 'Supporting public evidence:', '');
   email.href = `${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\r\n'))}`;
   recordLink.href = record;
   recordLink.textContent = stableId;

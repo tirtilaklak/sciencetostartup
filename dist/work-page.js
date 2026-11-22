@@ -433,6 +433,7 @@ const S2SWork = (() => {
     if (!form) return;
     const list = document.querySelector('.work-page-list');
     const count = document.querySelector('[data-work-count]');
+    const initialCount = count.textContent;
     const empty = document.querySelector('[data-work-empty]');
     const navigation = document.querySelector('[data-work-section-navigation]');
     const compareLink = document.querySelector('[data-work-compare]');
@@ -440,12 +441,28 @@ const S2SWork = (() => {
     const comparison = document.querySelector('[data-work-comparison]');
     const exportButton = document.querySelector('[data-work-export]');
     const exportStatus = document.querySelector('[data-work-export-status]');
+    const legacy = !compareLink && !exportButton;
+    const legacyNavigation = legacy && document.querySelector('.work-page-groups');
     const filterOptions = form.querySelector('.work-page-filter-options');
     const filterSummary = filterOptions.querySelector('summary');
     const groupElements = new Map([...list.querySelectorAll('[data-work-group]')].map(group => [group.dataset.workGroup, group]));
     const fields = Object.fromEntries(S2SWork.keys.map(key => [key, form.elements.namedItem(key)]));
     const cards = new Map([...list.querySelectorAll('[data-work-route]')].map(card => [card.dataset.workRoute, card]));
-    const records = window.WORK_NATIVE_SELECTION.filter(route => cards.has(route.id)).map(route => ({
+    const text = (card, selector) => card.querySelector(selector)?.textContent.trim() || '';
+    // An older page can still request the current unversioned enhancer. Its own
+    // cards supply search terms and groups so a newer release cannot change their facts.
+    const legacyKinds = { named: 'named_listing', programs: 'network_program', boards: 'career_page', outside: 'named_listing', closed: 'other_record' };
+    const legacyRecords = () => [...cards].map(([id, card]) => {
+      const group = card.closest('[data-work-group]').dataset.workGroup;
+      const search = ['.work-heading', '.work-offer', '.work-listing-conditions'].map(selector => text(card, selector)).join(' ');
+      return {
+        id, card,
+        route_kind: legacyKinds[group], ai_data_work: group !== 'outside',
+        arrangements: (card.dataset.arrangements || '').split(' '),
+        searchText: S2SWork.fold(search).replace(/\s+/g, ' '),
+      };
+    });
+    const records = legacy ? legacyRecords() : window.WORK_NATIVE_SELECTION.filter(route => cards.has(route.id)).map(route => ({
       ...route, card: cards.get(route.id)
     }));
     if (records.length !== cards.size) throw new Error('Work selection does not match the page');
@@ -457,11 +474,9 @@ const S2SWork = (() => {
     function readURL() {
       const criteria = S2SWork.readCriteria(new URLSearchParams(location.search));
       for (const [key, input] of Object.entries(fields)) if (input) input.value = criteria[key];
-      const selectedOption = S2SWork.keys.some(key => key !== 'q' && criteria[key]);
+      const selectedOption = S2SWork.keys.some(key => key !== 'q' && fields[key] && criteria[key]);
       if (selectedOption) filterOptions.open = true;
     }
-
-    const text = (card, selector) => card.querySelector(selector)?.textContent.trim() || '';
 
     function comparisonRows(results) {
       const heading = comparison.querySelector('h2');
@@ -510,12 +525,21 @@ const S2SWork = (() => {
       const criteria = currentCriteria();
       const url = new URL(location.href);
       if (updateURL) {
-        S2SWork.writeCriteria(url.searchParams, criteria);
+        if (legacy) {
+          for (const key of ['q', 'kind', 'arrangement']) {
+            if (criteria[key]) url.searchParams.set(key, criteria[key]);
+            else url.searchParams.delete(key);
+          }
+        } else S2SWork.writeCriteria(url.searchParams, criteria);
         if (url.href !== location.href) history.replaceState(history.state, '', url.href);
       }
       displayedSearch = location.search;
-      const showCompare = url.searchParams.get('view') === 'compare';
-      const groups = S2SWork.groupResults(S2SWork.select(records, criteria, route => route.searchText), criteria.sort, criteria.q);
+      const showCompare = !legacy && url.searchParams.get('view') === 'compare';
+      const matches = S2SWork.select(records, legacy ? { ...criteria, q: '' } : criteria, route => route.searchText);
+      const words = legacy && S2SWork.fold(criteria.q).trim().split(/\s+/).filter(Boolean);
+      const groups = legacy ? Object.fromEntries(S2SWork.groups.map(key => [key, matches.filter(route =>
+        S2SWork.bucket(route) === key && words.every(word => route.searchText.includes(word)))]))
+        : S2SWork.groupResults(matches, criteria.sort, criteria.q);
       selection = S2SWork.groups.flatMap(key => groups[key]);
       const selectedIds = new Set(selection.map(route => route.id));
       const optionCount = S2SWork.keys.filter(key => key !== 'q' && criteria[key]).length;
@@ -534,17 +558,19 @@ const S2SWork = (() => {
         }
         if (group.tagName === 'DETAILS') {
           const badge = group.querySelector(':scope > summary span');
-          if (badge) badge.textContent = matches.length;
+          if (!legacy && badge) badge.textContent = matches.length;
           if (filtering && matches.length) group.open = true;
           else if (!filtering && active) group.open = initialOpen.get(group);
         }
       }
       active = filtering;
+      if (legacyNavigation) legacyNavigation.hidden = filtering;
       list.hidden = showCompare;
-      comparison.hidden = !showCompare;
+      if (comparison) comparison.hidden = !showCompare;
       empty.hidden = selection.length !== 0;
       if (showCompare) comparisonRows(selection);
-      count.textContent = `${selection.length} ${filtering ? 'matching ' : ''}${selection.length === 1 ? 'record' : 'records'}`;
+      count.textContent = legacy && !filtering ? initialCount
+        : `${selection.length} ${filtering ? 'matching ' : ''}${selection.length === 1 ? 'record' : 'records'}`;
       if (navigation) {
         navigation.hidden = showCompare || !selection.length;
         for (const link of navigation.querySelectorAll('[data-work-jump]')) {
@@ -555,10 +581,12 @@ const S2SWork = (() => {
           if (badge) badge.textContent = matches;
         }
       }
-      if (showCompare) url.searchParams.delete('view');
-      else url.searchParams.set('view', 'compare');
-      compareLink.href = url.pathname + url.search + url.hash;
-      compareLink.textContent = showCompare ? 'Back to listings' : 'Compare results';
+      if (compareLink) {
+        if (showCompare) url.searchParams.delete('view');
+        else url.searchParams.set('view', 'compare');
+        compareLink.href = url.pathname + url.search + url.hash;
+        compareLink.textContent = showCompare ? 'Back to listings' : 'Compare results';
+      }
       const search = S2SWork.writeCriteria(new URLSearchParams(), criteria).toString();
       if (exploreLink) exploreLink.href = '/explore/#work' + (search ? '?' + search : '');
     }
@@ -621,7 +649,7 @@ const S2SWork = (() => {
     window.addEventListener('popstate', () => {
       if (displayedSearch !== location.search) { readURL(); render(); }
     });
-    exportButton.addEventListener('click', async () => {
+    exportButton?.addEventListener('click', async () => {
       if (exportButton.getAttribute('aria-busy') === 'true') return;
       const { workExportAsset: href, workExportDigest: sha256 } = exportButton.dataset;
       exportButton.setAttribute('aria-busy', 'true');
@@ -638,7 +666,9 @@ const S2SWork = (() => {
     });
     readURL();
     render();
-    form.hidden = compareLink.hidden = exportButton.hidden = false;
+    form.hidden = false;
+    if (compareLink) compareLink.hidden = false;
+    if (exportButton) exportButton.hidden = false;
     const revealed = revealTarget(!loader?.interacted || loader?.retried);
     if (!revealed && loader?.retried) fields.q.focus({ preventScroll: true });
     if (!revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {

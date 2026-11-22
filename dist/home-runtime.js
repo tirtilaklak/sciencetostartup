@@ -102,7 +102,8 @@
     message.textContent = 'Loading search…';
     results.hidden = true;
     input.setAttribute('aria-expanded', 'false');
-    document.getElementById('home-search-more').hidden = true;
+    const more = document.getElementById('home-search-more');
+    if (more) more.hidden = true;
     opener.setAttribute('aria-busy', 'true');
 
     const failure = () => {

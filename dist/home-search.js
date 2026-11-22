@@ -252,7 +252,13 @@
   }
   input.addEventListener('input', edited);
   input.addEventListener('compositionend', edited);
-  more.addEventListener('click', () => { shown += pageSize; render(true); });
+  const revealMore = () => more.scrollIntoView({ block: 'nearest' });
+  more.addEventListener('focus', revealMore);
+  more.addEventListener('click', () => {
+    shown += pageSize;
+    render(true);
+    if (document.activeElement === more) revealMore();
+  });
   input.addEventListener('keydown', event => {
     if (event.isComposing || event.keyCode === 229) return;
     if (event.key === 'Escape') { event.preventDefault(); dialog.close(); return; }
