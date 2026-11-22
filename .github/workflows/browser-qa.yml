@@ -9,6 +9,10 @@ jobs:
     # Keep the browser/performance host stable across ubuntu-latest migrations.
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit, mobile-chromium, mobile-webkit]
     container:
       image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
       options: --init --ipc=host
@@ -30,13 +34,14 @@ jobs:
         env:
           PYTHONPATH: scripts
         run: python3 -c 'from pathlib import Path; from release_artifact import validate_artifact; validate_artifact(Path("dist"))'
-      - run: npm run test:browser -- --grep-invert 'no serious or critical accessibility violations on /research/state-of-ai-data-labs/($|chapters/)'
+      - run: npm run test:browser -- --project "$QA_PROJECT" --grep-invert 'no serious or critical accessibility violations on /research/state-of-ai-data-labs/($|chapters/)'
         env:
           QA_DIST: dist
+          QA_PROJECT: ${{ matrix.project }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: browser-core-qa
+          name: browser-core-qa-${{ matrix.project }}
           path: output/browser-qa/
           retention-days: 14
   report-accessibility:
