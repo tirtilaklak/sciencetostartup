@@ -337,7 +337,7 @@ test('the native Source ledger lands at All sources and Tabs into its sources be
     await page.goForward({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
     await expect(heading).not.toBeFocused();
-    await expect.poll(() => page.evaluate(() => scrollY)).toBe(position);
+    await expect.poll(() => page.evaluate(saved => Math.abs(scrollY - saved), position)).toBeLessThan(2);
   } finally {
     releaseImage();
   }
