@@ -24,6 +24,41 @@
   document.addEventListener('beforematch', event => openDisclosures(event.target));
   reveal();
 
+  const navigation = window.navigation;
+  if (navigation && document.querySelector('.r-bulk-shortcuts')) {
+    const shortcutVisits = new WeakMap();
+    let activatedShortcut;
+    document.addEventListener('click', event => {
+      activatedShortcut = event.isTrusted && !event.defaultPrevented && event.button === 0 &&
+        !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey ?
+        event.target.closest?.('.r-bulk-shortcuts a[href^="#"]') : null;
+    });
+    navigation.addEventListener('navigate', event => {
+      const link = activatedShortcut;
+      activatedShortcut = null;
+      if (!link || event.sourceElement !== link || event.navigationType !== 'push' || !event.hashChange) return;
+      navigation.addEventListener('currententrychange', ({ from, navigationType }) => {
+        if (navigationType === 'push') shortcutVisits.set(navigation.currentEntry, { from, link });
+      }, { once: true, signal: event.signal });
+    });
+    navigation.addEventListener('currententrychange', ({ from, navigationType }) => {
+      if (navigationType !== 'traverse') return;
+      const entry = navigation.currentEntry;
+      const departure = shortcutVisits.get(from);
+      const arrival = shortcutVisits.get(entry);
+      const target = departure?.from === entry ? departure.link
+        : arrival?.from === from ? document.getElementById(arrival.link.hash.slice(1)) : null;
+      if (!target) return;
+
+      // The browser restores scroll after currententrychange.
+      requestAnimationFrame(() => {
+        if (navigation.currentEntry !== entry) return;
+        const { top, bottom } = target.getBoundingClientRect();
+        if (bottom > 0 && top < innerHeight) target.focus({ preventScroll: true });
+      });
+    });
+  }
+
   const company = location.pathname.match(/^\/company\/([a-z0-9_-]+)\/$/)?.[1];
   const dossier = document.querySelector('.company-dossier');
   if (company && dossier) {
@@ -55,7 +90,7 @@
       const saved = history.state?.nativeCompanyReturn;
       if (event.persisted || saved?.page !== location.href ||
           performance.getEntriesByType('navigation')[0]?.type !== 'back_forward') return;
-      const activation = window.navigation?.activation;
+      const activation = navigation?.activation;
       if (activation?.from && activation.from.index <= activation.entry.index) return;
       const matches = handoffs.filter(link => link.href === saved.href);
       if (matches.length !== 1) return;
