@@ -2128,7 +2128,7 @@
         "toloka.claim.major-growth_metrics-1"
       ],
       "profile_statement": "Toloka’s discontinued-operations revenue grew approximately 135.1% year over year, calculated from rounded revenue of $26.1M in FY2024 and $11.1M in FY2023.",
-      "profile_confidence_reason": "Grade A applies to the Form 20-F filing that reports the revenue inputs. The 135.1% is calculated from those rounded figures.",
+      "profile_confidence_reason": "Grade A applies to the Form 20-F filing that reports the revenue inputs.",
       "signal": "revenue",
       "measure": "revenue_growth_yoy",
       "label": "Revenue growth · FY2024 comparative basis",
