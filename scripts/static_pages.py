@@ -1913,7 +1913,7 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
     body = ['<link rel="stylesheet" href="/companies-page.css">', crumb_nav(crumbs, "directory-crumbs"),
             '<header class="directory-intro"><h1>AI data companies</h1></header>',
             '<form class="directory-filters" id="company-filters" role="search" hidden><label>Search companies<input type="search" id="company-query" name="q" placeholder="Name, offering, or specialty" autocomplete="off"></label><label>Business group<select id="company-group" name="group"><option value="">All groups</option>' + ''.join(f'<option value="{group_slug(g)}">{escape(labels.get(g, g))}</option>' for g in order) + '</select></label><button type="reset">Clear</button></form>',
-            f'<div class="directory-results-bar"><p class="directory-result" id="company-count" role="status" aria-live="polite">{count} companies</p><a class="directory-compare" href="/explore/#compare">Compare {historical_count} companies</a></div>',
+            f'<div class="directory-results-bar"><p class="directory-result" id="company-count" role="status" aria-live="polite">{count} companies</p><a class="directory-compare" href="/explore/#compare">Compare companies</a></div>',
             '<p class="directory-selected-group" data-directory-selected-group hidden></p>',
             '<p id="company-empty" class="directory-empty" hidden>No companies in this directory match. <a data-full-guide-search href="/?search=#browse-guide">Search the full guide</a></p>',
             '<nav class="directory-groups" aria-label="Business groups"><ul class="chips">' + "".join(f'<li><a href="#{group_slug(g)}">{escape(labels.get(g, g))} <span>{len(groups[g])}</span></a></li>' for g in order) + "</ul></nav>\n"]
@@ -1943,8 +1943,10 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
         body.append(f'<section class="directory-section" data-group="{group_slug(g)}"><div class="directory-section-heading"><h2 id="{group_slug(g)}" tabindex="-1">{escape(labels.get(g, g))}</h2><span>{plural(len(groups[g]), "company", "companies")}</span></div><ul class="index-list directory-grid">{"".join(items)}</ul></section>\n')
     missing = [name for name in NOT_YET_PROFILED if not any(name.casefold() in row["name"].casefold().split(" / ") for row in current_entries)]
     remaining = f' Firms not yet listed in this directory include {escape(join_words(missing))}.' if missing else ''
-    scope = (f'<p>Compare uses the {historical_count} historical profiles. The {len(current_entries)} newer profiles cite dated Wikipedia context and official sources for their offerings.</p>'
-             f'<p><a href="/current-companies.json">Supplemental records for {len(current_entries)} added companies (JSON)</a></p>' if current_entries else '')
+    scope = f'<p>Choose up to three of {plural(historical_count, "historical profile")} in Compare.</p>'
+    if current_entries:
+        scope += (f'<p>The {len(current_entries)} newer profiles cite dated Wikipedia context and official sources for their offerings.</p>'
+                  f'<p><a href="/current-companies.json">Supplemental records for {len(current_entries)} added companies (JSON)</a></p>')
     body.append(f'<details class="directory-scope"><summary>Coverage and sources</summary><p>{len(groups)} business groups{escape(compiled)}.</p><p>{COVERAGE}{remaining}</p>' + scope + '<p>Each figure links to its source and keeps the original reporting date and scope.' + (f' {count_word(nonprofit)} of the {count} companies are nonprofit research groups.' if nonprofit else '') + f'</p><a href="{ORIGIN}/method/">How we check the research</a></details>')
     if work_count:
         body.append(f'<p class="actions directory-next"><a href="{ORIGIN}/work/">See {plural(work_count, "paid work route")}</a></p>')

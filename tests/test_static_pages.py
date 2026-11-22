@@ -355,6 +355,7 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(text.count('href="/current-companies.json"'), 1)
         coverage = re.search(r'<details class="directory-scope">.*?</details>', text, re.S).group(0)
         self.assertIn(supplemental, coverage)
+        self.assertIn(f'Choose up to three of {len(self.companies)} historical profiles in Compare.', coverage)
         for addition in self.current_companies["entries"]:
             slug = addition["entity_id"]
             card = text.split(f'<li class="directory-company" data-company="{slug}"', 1)[1].split('</section></li>', 1)[0]
