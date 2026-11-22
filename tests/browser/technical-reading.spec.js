@@ -4,6 +4,29 @@ const chapter = '/research/state-of-ai-data-labs/chapters/technical-landscape/';
 const datedChapter = '/research/editions/2026-11-12/chapters/technical-landscape/';
 const paragraphSelector = '.r-reader-chapter-content[aria-labelledby="technical-landscape"] > .r-paragraph';
 const lastSentence = 'Difficulty selection changes what an absolute score represents.';
+const touchCitations = [
+  {
+    name: 'IFEval',
+    phrase: 'GPT-4 prompt-level strict accuracy of 76.89%',
+    assertionId: 'assertion-cohort6.claim.ifeval.gpt4-result',
+    sourceId: 'source-cohort6.source.ifeval.gpt4-result',
+    sourceShard: 'f',
+  },
+  {
+    name: 'GPQA',
+    phrase: '39.7% on the 448-question main split',
+    assertionId: 'assertion-cohort6.claim.gpqa.gpt4-result',
+    sourceId: 'source-cohort6.source.gpqa.gpt4-result',
+    sourceShard: '6',
+  },
+  {
+    name: 'OSWorld',
+    phrase: 'do not efficiently detect latent unnecessary damaging side effects',
+    assertionId: 'assertion-cohort4.claim.osworld.side-effect-gap',
+    sourceId: 'source-cohort4.source.osworld.side-effect-gap',
+    sourceShard: 'd',
+  },
+];
 
 // Exercise native reading behavior with the optional application scripts off.
 // DOM snapshots of this complete chapter are large; keep diagnostic screenshots.
@@ -68,6 +91,19 @@ async function verifyPassageHistory(page, path) {
   await expect(page).toHaveURL(destinationURL);
   await expect(destination).toBeFocused();
   await expect(destination).toBeInViewport();
+}
+
+async function citationTapPoint(citation) {
+  return citation.evaluate(anchor => {
+    // An inline link can wrap. Its bounding box can include text from another link.
+    for (const rect of Array.from(anchor.getClientRects()).reverse()) {
+      if (rect.left < 0 || rect.right > innerWidth || rect.top < 0 || rect.bottom > innerHeight) continue;
+      const x = Math.round((rect.left + rect.right) / 2);
+      const y = Math.round((rect.top + rect.bottom) / 2);
+      if (document.elementFromPoint(x, y)?.closest('a') === anchor) return { x, y };
+    }
+    return null;
+  });
 }
 
 test('complete technical chapter supports its final citation, focus and history without JavaScript', async ({ page }) => {
@@ -238,6 +274,56 @@ test.describe('enhanced technical reading', () => {
     await page.keyboard.press('End');
     await expect(page.locator('footer')).toBeInViewport();
   });
+});
+
+test.describe('technical citations after native Find on a phone', () => {
+  test.use({ javaScriptEnabled: true, viewport: { width: 390, height: 844 } });
+  test.skip(({ browserName, isMobile, hasTouch }) => browserName !== 'chromium' || !isMobile || !hasTouch,
+    'Exercise the first physical tap in mobile Chromium');
+
+  const editions = [
+    { name: 'current', path: chapter, data: '/research/data' },
+    { name: '2026-11-12', path: datedChapter, data: '/research/editions/2026-11-12/data' },
+  ];
+  for (const edition of editions) {
+    for (const { name, phrase, assertionId, sourceId, sourceShard } of touchCitations) {
+      test(`${edition.name} Technical ${name} citation opens on the first tap after Find`, async ({ page }) => {
+        await page.goto(edition.path);
+        const chapterURL = page.url();
+        expect(new URL(chapterURL).hash).toBe('');
+        await expect(page.locator('html')).toHaveAttribute('data-reader-enhanced', '');
+        const selection = await page.evaluate(text => window.find(text) ? getSelection().toString() : null, phrase);
+        expect(selection).toBe(phrase);
+
+        const assertionPath = `${edition.data}/assertions/1/#${assertionId}`;
+        const assertionURL = new URL(assertionPath, chapterURL).href;
+        const citation = page.locator(paragraphSelector).filter({ hasText: phrase })
+          .locator(`.r-paragraph-citations a[href="${assertionPath}"]`);
+        let point = await citationTapPoint(citation);
+        if (!point) {
+          await citation.scrollIntoViewIfNeeded();
+          point = await citationTapPoint(citation);
+        }
+        expect(point, 'The citation must be the hit target before tapping').not.toBeNull();
+        await page.touchscreen.tap(point.x, point.y);
+        await expect(page, 'One tap must open the exact assertion').toHaveURL(assertionURL);
+
+        const assertion = page.locator(`:target[id="${assertionId}"]`);
+        await expect(assertion).toBeInViewport();
+        const sourcePath = `${edition.data}/sources/${sourceShard}/#${sourceId}`;
+        await assertion.locator(`a[href="${sourcePath}"]`).tap();
+        await expect(page).toHaveURL(new URL(sourcePath, chapterURL).href);
+        await expect(page.locator(`:target[id="${sourceId}"]`)).toBeInViewport();
+
+        await page.goBack();
+        await expect(page).toHaveURL(assertionURL);
+        await expect(assertion).toBeInViewport();
+        await page.goBack();
+        await expect(page).toHaveURL(chapterURL);
+        await expect.poll(() => citationTapPoint(citation)).not.toBeNull();
+      });
+    }
+  }
 });
 
 test('direct final-citation fragment and reload resolve after the complete technical layout', async ({ page }) => {
