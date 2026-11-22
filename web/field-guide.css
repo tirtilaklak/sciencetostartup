@@ -246,11 +246,13 @@ h1,h2,h3,h4{font-family:var(--fg-sans);color:var(--ink)}
 }
 @media(max-width:900px){.site-search-open{width:44px;min-width:44px;padding:0;justify-content:center}.site-search-open .site-search-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}#work-view .responsive-filter-panel[open]>.responsive-filter-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){
- .topbar{display:grid;grid-template-columns:minmax(0,1fr) 44px;min-height:100px;height:auto;padding:8px 20px 0;gap:0 12px}
- .topbar .wordmark{grid-column:1;grid-row:1;font-size:20px}
- .topbar nav{grid-column:1/-1;grid-row:2;order:0;display:grid;grid-template-columns:repeat(4,max-content);align-items:stretch;justify-content:space-between;width:100%;height:auto;min-height:48px;margin:0;gap:0 8px}
+ /* Let Search wrap when the wordmark needs the first row at enlarged text sizes. */
+ :is(.topbar,.static-page .site-header){display:flex;flex-wrap:wrap;align-items:center;min-height:100px;height:auto;padding:8px 20px 0;gap:0 12px}
+ :is(.topbar,.static-page .site-header)>.wordmark{display:flex;align-items:center;max-width:100%;min-height:44px;white-space:normal;overflow-wrap:anywhere}
+ .topbar .wordmark{font-size:20px}
+ :is(.topbar,.static-page .site-header)>.site-search-open{flex:none;order:1;margin-inline-start:auto;width:44px;min-width:44px;min-height:44px;height:auto;padding:0;justify-content:center}
+ :is(.topbar,.static-page .site-header)>nav{order:2;flex:0 0 100%;width:100%;height:auto;min-height:48px;margin:0}
  .topbar nav a{height:auto;min-height:44px;padding:0;font-size:var(--fg-meta);line-height:1.5}
- .topbar .site-search-open{grid-column:2;grid-row:1;order:0;margin:0;width:44px;min-height:44px;height:auto}
  .page-heading,#companies-view .page-heading{padding:24px 0 20px;margin:0}
  .page-heading h1{font-size:2.25rem;line-height:1.12;margin-bottom:8px}
  .page-heading .intro{font-size:1rem;line-height:1.5}
@@ -310,10 +312,6 @@ h1,h2,h3,h4{font-family:var(--fg-sans);color:var(--ink)}
  .evidence-data{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
  body.static-page main,.static-page .site-footer{margin-inline:20px;padding-inline:0}
  .static-page h1{font-size:2.25rem}
- .static-page .site-header{display:grid;grid-template-columns:minmax(0,1fr) 44px;min-height:100px;padding:8px 20px 0;gap:0 12px}
- .static-page .site-header .wordmark{grid-column:1;grid-row:1}
- .static-page .site-header .site-nav{grid-column:1/-1;grid-row:2;flex-wrap:wrap;width:100%;min-height:48px;margin:0;gap:0 16px}
- .static-page .site-header .site-search-open{grid-column:2;grid-row:1;width:44px;min-width:44px;min-height:44px;margin:0;padding:0;justify-content:center}
  .static-page .site-nav a{font-size:var(--fg-meta)}
 }
 @media(max-width:359px){

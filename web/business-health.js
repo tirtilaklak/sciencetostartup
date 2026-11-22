@@ -331,6 +331,22 @@ function revealSelection(){
  if(pressed)pressed.scrollIntoView({block:'nearest',inline:'nearest'});else wrap.scrollTop=0;
 }
 
+function keepGridFocusVisible(target, wrap, heading, masthead){
+ const gap=6;
+ const mastheadBottom=masthead&&getComputedStyle(masthead).position==='sticky'?masthead.getBoundingClientRect().bottom:0;
+ const header=heading.getBoundingClientRect(), control=target.getBoundingClientRect();
+ const visibleHeight=Math.min(control.height,wrap.clientHeight-header.height-2*gap,innerHeight-mastheadBottom-header.height-2*gap);
+ if(visibleHeight<=0)return;
+ // Keep the column header and the start of the focused control in the same viewport.
+ const pageScroll=Math.min(0,header.top-mastheadBottom)||Math.max(0,header.bottom+visibleHeight+2*gap-innerHeight);
+ if(pageScroll)window.scrollBy({top:pageScroll,behavior:'instant'});
+ const top=heading.getBoundingClientRect().bottom+gap;
+ const bottom=Math.min(wrap.getBoundingClientRect().bottom,innerHeight)-gap;
+ const start=target.getBoundingClientRect().top;
+ const gridScroll=Math.min(0,start-top)||Math.max(0,start+visibleHeight-bottom);
+ if(gridScroll)wrap.scrollBy({top:gridScroll,behavior:'instant'});
+}
+
 function renderCompareSelect(id,options,selected){
  const select=$(id);
  select.innerHTML=options;
@@ -376,6 +392,13 @@ $('bh-evidence-dialog').addEventListener('close',restoreEvidenceFocus);
 $('bh-evidence-dialog').addEventListener('click',e=>{
  e.target.closest('button[data-claim]')?.focus({preventScroll:true});
  if(e.target===$('bh-evidence-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}
+});
+const matrix=$('bh-grid-wrap');
+matrix.addEventListener('focusin',({target})=>{
+ if(!target.matches('tbody :is(a,button):focus-visible'))return;
+ requestAnimationFrame(()=>{
+  if(document.activeElement===target)keepGridFocusVisible(target,matrix,matrix.querySelector('thead'),document.querySelector('body > .topbar'));
+ });
 });
 $('bh-overview-tabs').addEventListener('keydown',e=>{if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;e.preventDefault();const ids=Object.keys(overviewMeasures);let i=ids.indexOf(overviewMeasure);i=e.key==='Home'?0:e.key==='End'?ids.length-1:(i+(e.key==='ArrowRight'?1:-1)+ids.length)%ids.length;overviewMeasure=ids[i];renderLedger();$('bh-overview-'+overviewMeasure).focus();});
 $('bh-measure').addEventListener('change',e=>{bhState.measure=e.target.value;bhState.cohort=null;bhState.company='';bhState.observation='';render();});
