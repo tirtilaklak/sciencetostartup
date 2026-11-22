@@ -34,7 +34,7 @@ test('home shows both dated sources before the phone portrait and aligns the des
     await expect(page.locator('.hero-actions a[href="/work/"]')).toBeInViewport({ ratio: 1 });
     await expect(page.locator('.hero-actions a[href="/research/"]')).toBeInViewport({ ratio: 1 });
     await expect(page.locator('a[href="/research/data/"]')).toHaveCount(1);
-    await expect(page.locator('.proof-strip p').first()).toHaveText('55 companies in the directory');
+    await expect(page.locator('.proof-strip p').first()).toHaveText('55 companies');
 
     const workBox = await program.boundingBox();
     const portraitBox = await page.locator('.hero-visual').boundingBox();
@@ -49,9 +49,9 @@ test('both directory actions fit on one row on narrow phones', async ({ page }) 
     await page.goto('/');
     await page.evaluate(() => document.fonts.ready);
     const actions = page.locator('.hero-actions');
-    const companies = actions.getByRole('link', { name: 'Browse companies', exact: true });
-    const work = actions.getByRole('link', { name: 'Find paid work', exact: true });
-    const research = actions.getByRole('link', { name: 'Read research', exact: true });
+    const companies = actions.getByRole('link', { name: 'Companies', exact: true });
+    const work = actions.getByRole('link', { name: 'Paid work', exact: true });
+    const research = actions.getByRole('link', { name: 'Research', exact: true });
     await expect(work).toHaveAttribute('href', '/work/');
     await expect(research).toHaveAttribute('href', '/research/');
     await expect(research).toBeInViewport({ ratio: 1 });
@@ -79,8 +79,8 @@ test('home promotes only approved current terms and retains all binding conditio
   await expect(example.locator('time')).toHaveAttribute('datetime', approved.checked_on);
   await expect(example.getByRole('link', { name: /Official program page/ })).toHaveAttribute('href', promotion.url);
   await expect(page.locator('.example-grid article')).toHaveCount(2);
-  await expect(page.locator('.hero').getByRole('link', { name: 'Browse companies' })).toBeVisible();
-  await expect(page.locator('.hero').getByRole('link', { name: 'Find paid work', exact: true })).toBeVisible();
+  await expect(page.locator('.hero').getByRole('link', { name: 'Companies' })).toBeVisible();
+  await expect(page.locator('.hero').getByRole('link', { name: 'Paid work', exact: true })).toBeVisible();
   await info.attach(`home-entry-${info.project.name}.png`, {
     body: await page.screenshot({ fullPage: false, animations: 'disabled', scale: 'css' }), contentType: 'image/png',
   });
@@ -90,7 +90,7 @@ test('three-day expiry withdraws stale examples and preserves evergreen browse',
   await page.clock.setFixedTime(new Date(expires));
   await page.goto('/');
   await expect(page.locator('#home-work-example')).toBeHidden();
-  await expect(page.locator('.hero-actions').getByRole('link', { name: 'Find paid work' })).toBeVisible();
+  await expect(page.locator('.hero-actions').getByRole('link', { name: 'Paid work', exact: true })).toBeVisible();
   await expect(page.locator('.example-grid article')).toHaveCount(2);
 });
 
@@ -103,7 +103,7 @@ test('expiry moves focus from the promotion to the native Work link', async ({ p
   await focused.focus();
   await expect(focused).toBeFocused();
   await page.clock.fastForward(60_000);
-  const fallback = page.locator('.hero-actions').getByRole('link', { name: 'Find paid work' });
+  const fallback = page.locator('.hero-actions').getByRole('link', { name: 'Paid work', exact: true });
   await expect(fallback).toBeFocused();
   await expect(fallback).toBeInViewport();
   await expect(slot).toBeHidden();
@@ -115,7 +115,7 @@ test('without JavaScript the homepage offers its menu and native browse links', 
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('#home-work-example')).toBeHidden();
-  await expect(page.locator('.hero').getByRole('link', { name: 'Browse companies' })).toHaveAttribute('href', '/companies/');
+  await expect(page.locator('.hero').getByRole('link', { name: 'Companies', exact: true })).toHaveAttribute('href', '/companies/');
   await expect(page.locator('.example-grid article')).toHaveCount(2);
   await page.locator('.home-menu summary').press('Enter');
   await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Daily scan' })).toBeVisible();
@@ -123,7 +123,7 @@ test('without JavaScript the homepage offers its menu and native browse links', 
   await page.locator('#home-search-open').press('Enter');
   await expect(page).toHaveURL(/#browse-guide$/);
   const routes = page.getByRole('navigation', { name: 'Browse the guide' }).getByRole('link');
-  await expect(routes).toHaveText(['Browse companies', 'Find paid work', 'Read research']);
+  await expect(routes).toHaveText(['Companies', 'Paid work', 'Research']);
   expect(await routes.evaluateAll(links => links.map(link => link.getAttribute('href'))))
     .toEqual(['/companies/', '/work/', '/research/']);
   await context.close();
@@ -173,15 +173,15 @@ test.describe('home keyboard controls in compact viewports', () => {
         .map(name => nav.getByRole('link', { name, exact: true }));
       const main = page.getByRole('main');
       const heroActions = main.locator('.hero-actions');
-      const work = heroActions.getByRole('link', { name: 'Find paid work', exact: true });
+      const work = heroActions.getByRole('link', { name: 'Paid work', exact: true });
       const sources = main.getByRole('link', { name: 'Sources and data', exact: true });
       const target = name === 'Sources and data' ? sources : work;
 
       await tabThrough(page, ...headerLinks(page), menu.getByText('Menu', { exact: true }));
       await page.keyboard.press('Enter');
       await expect(menu).toHaveJSProperty('open', true);
-      await tabThrough(page, ...menuLinks, heroActions.getByRole('link', { name: 'Browse companies', exact: true }), work);
-      if (name === 'Sources and data') await tabThrough(page, heroActions.getByRole('link', { name: 'Read research' }), sources);
+      await tabThrough(page, ...menuLinks, heroActions.getByRole('link', { name: 'Companies', exact: true }), work);
+      if (name === 'Sources and data') await tabThrough(page, heroActions.getByRole('link', { name: 'Research', exact: true }), sources);
       await expect(menu).toHaveJSProperty('open', true);
       await expectUncoveredFocus(target);
       await page.keyboard.press('Enter');
@@ -189,70 +189,85 @@ test.describe('home keyboard controls in compact viewports', () => {
     });
   }
 
-  test('home Search pages a tall selected result without moving focus', async ({ page }) => {
-    await page.setViewportSize({ width: 320, height: 218 });
-    await page.goto('/');
-    await page.evaluate(() => document.fonts.ready);
-    const links = headerLinks(page);
-    const opener = links.at(-1);
-    const dialog = page.getByRole('dialog', { name: 'Search the guide' });
-    const input = dialog.getByRole('combobox');
-    const option = dialog.getByRole('option', { name: /^Mercor Company/ });
+  for (const { height, title } of [
+    { height: 218, title: 'home Search pages a tall selected result without moving focus' },
+    { height: 178, title: 'home Search reveals the selected result in a 178px viewport' },
+  ]) {
+    test(title, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height });
+      await page.goto('/');
+      await page.evaluate(() => document.fonts.ready);
+      const links = headerLinks(page);
+      const opener = links.at(-1);
+      const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+      const input = dialog.getByRole('combobox');
+      const option = dialog.getByRole('option', { name: /^Mercor Company/ });
 
-    await tabThrough(page, ...links);
-    await page.keyboard.press('Enter');
-    await expect(input).toBeFocused();
-    await page.keyboard.type('Mercor');
-    await expect(option).toBeVisible();
-    await page.keyboard.press('ArrowDown');
-
-    const optionId = await option.getAttribute('id');
-    const expectSelection = async () => {
+      await tabThrough(page, ...links);
+      await page.keyboard.press('Enter');
       await expect(input).toBeFocused();
-      await expect(input).toBeInViewport({ ratio: 1 });
-      await expect(input).toHaveValue('Mercor');
-      await expect(input).toHaveAttribute('aria-activedescendant', optionId);
-      await expect(option).toHaveAttribute('aria-selected', 'true');
-      await expect(option).toHaveAttribute('href', '/company/mercor/');
-    };
-    const readResult = () => option.evaluate(element => {
-      const results = element.closest('[role="listbox"]');
-      const viewport = results.getBoundingClientRect();
-      const top = Math.max(0, viewport.top);
-      const bottom = Math.min(innerHeight, viewport.bottom);
-      const range = document.createRange();
-      const visibleLines = ['strong', 'span'].flatMap(selector => {
-        range.selectNodeContents(element.querySelector(selector));
-        return Array.from(range.getClientRects(), line => line.top >= top - 0.5 && line.bottom <= bottom + 0.5);
-      });
-      return {
-        resultHeight: element.getBoundingClientRect().height,
-        viewportHeight: viewport.height,
-        scrollTop: results.scrollTop,
-        visibleLines,
+      await page.keyboard.type('Mercor');
+      await expect(option).toBeVisible();
+      await page.keyboard.press('ArrowDown');
+
+      const optionId = await option.getAttribute('id');
+      const expectSelection = async () => {
+        await expect(input).toBeFocused();
+        await expect(input).toBeInViewport({ ratio: 1 });
+        await expect(input).toHaveValue('Mercor');
+        await expect(input).toHaveAttribute('aria-activedescendant', optionId);
+        await expect(option).toHaveAttribute('aria-selected', 'true');
+        await expect(option).toHaveAttribute('href', '/company/mercor/');
       };
+      const readResult = () => option.evaluate(element => {
+        const results = element.closest('[role="listbox"]');
+        const content = results.closest('.site-search-content');
+        const scroller = content && getComputedStyle(content).overflowY === 'auto' ? content : results;
+        const viewport = scroller.getBoundingClientRect();
+        const top = Math.max(0, viewport.top);
+        const bottom = Math.min(innerHeight, viewport.bottom);
+        const range = document.createRange();
+        const visibleLines = ['strong', 'span'].flatMap(selector => {
+          range.selectNodeContents(element.querySelector(selector));
+          return Array.from(range.getClientRects(), line => line.top >= top - 0.5 && line.bottom <= bottom + 0.5
+            && element.contains(document.elementFromPoint((line.left + line.right) / 2, (line.top + line.bottom) / 2)));
+        });
+        return {
+          resultHeight: element.getBoundingClientRect().height,
+          viewportHeight: viewport.height,
+          scrollTop: scroller.scrollTop,
+          visibleLines,
+        };
+      });
+
+      await expectSelection();
+      const initial = await readResult();
+      expect(initial.visibleLines[0]).toBe(true);
+      if (height === 218) {
+        expect(initial.resultHeight).toBeGreaterThan(initial.viewportHeight);
+        expect(initial.visibleLines.at(-1)).toBe(false);
+      }
+      const seen = [...initial.visibleLines];
+      let pages = 0;
+      while (pages < 4 && seen.some(visible => !visible)) {
+        const previous = (await readResult()).scrollTop;
+        await page.keyboard.press('PageDown');
+        await expect.poll(async () => (await readResult()).scrollTop).toBeGreaterThan(previous);
+        const down = await readResult();
+        down.visibleLines.forEach((visible, index) => { seen[index] ||= visible; });
+        pages++;
+      }
+      expect(seen).toEqual(initial.visibleLines.map(() => true));
+      await expectSelection();
+
+      for (let n = 0; n < pages; n++) await page.keyboard.press('PageUp');
+      await expect.poll(async () => Math.abs((await readResult()).scrollTop - initial.scrollTop)).toBeLessThan(1);
+      await expectSelection();
+      await page.keyboard.press('Escape');
+      await expect(dialog).toBeHidden();
+      await expectUncoveredFocus(opener);
     });
-
-    await expectSelection();
-    const initial = await readResult();
-    expect(initial.resultHeight).toBeGreaterThan(initial.viewportHeight);
-    expect(initial.visibleLines[0]).toBe(true);
-    expect(initial.visibleLines.at(-1)).toBe(false);
-
-    await page.keyboard.press('PageDown');
-    await expect.poll(async () => (await readResult()).scrollTop).toBeGreaterThan(initial.scrollTop);
-    const down = await readResult();
-    expect(down.visibleLines.map((visible, index) => visible || initial.visibleLines[index]))
-      .toEqual(initial.visibleLines.map(() => true));
-    await expectSelection();
-
-    await page.keyboard.press('PageUp');
-    await expect.poll(async () => Math.abs((await readResult()).scrollTop - initial.scrollTop)).toBeLessThan(1);
-    await expectSelection();
-    await page.keyboard.press('Escape');
-    await expect(dialog).toBeHidden();
-    await expectUncoveredFocus(opener);
-  });
+  }
 });
 
 test('homepage Search loads only its small component and index when invoked', async ({ page }) => {
