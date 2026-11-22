@@ -693,11 +693,39 @@ const marketShortcutOrigins=new Map();
 // Hashes that name a place inside a page. route() shows that page, then brings the element to the top with focus.
 const VIEW_ANCHORS={'business-health':'market',venture:'market',about:'method',labels:'method',corrections:'method',coverage:'method',downloads:'method'};
 function viewAnchorId(hash=location.hash){const id=String(routeParts(hash)[0]||'').toLowerCase();return Object.hasOwn(VIEW_ANCHORS,id)?id:'';}
+// Firefox can process the native bookmark after the enhanced view is ready.
+function keepInitialMarketFocus(focusTarget){
+ if(document.readyState==='complete')return;
+ const bookmark=location.href;
+ let intended=focusTarget;
+ function remember(event){
+  if(event.target!==document.body&&event.target!==document.documentElement)intended=event.target;
+ }
+ document.addEventListener('focusin',remember,true);
+ window.addEventListener('pageshow',()=>{
+  requestAnimationFrame(()=>{
+   document.removeEventListener('focusin',remember,true);
+   if(location.href!==bookmark||!intended.isConnected||intended.closest('[hidden],[inert]'))return;
+   if(document.activeElement===document.body||document.activeElement===document.documentElement){
+    intended.focus();
+   }
+  });
+ },{once:true});
+}
 function showViewAnchor(target){
  if(!target)return;
  for(let node=target;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;
- const focusTarget=target.id==='business-health'?$('business-health-heading'):target;
+ const market=target.id==='business-health';
+ const focusTarget=market?$('business-health-heading'):target;
  if(!focusTarget.matches?.('a[href],button,input,select,textarea,summary'))focusTarget.setAttribute('tabindex','-1');
+ if(market&&!previousRoute){
+  const active=document.activeElement;
+  if(active&&active!==document.body&&active!==document.documentElement&&active!==target&&active!==focusTarget){
+   keepInitialMarketFocus(active);
+   return;
+  }
+  keepInitialMarketFocus(focusTarget);
+ }
  focusTarget.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});
 }
 // Back and Forward return each history entry to where the reader left it.

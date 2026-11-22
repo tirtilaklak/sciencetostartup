@@ -154,7 +154,21 @@ initialize();</script><script>(()=>{
   main.focus({preventScroll:true});
   main.scrollIntoView({behavior:'instant'});
  });
- document.getElementById('app-reload').addEventListener('click',()=>location.reload());
+ document.getElementById('app-reload').addEventListener('click',()=>{
+  if(location.hash.toLowerCase()==='#business-health'){
+   // The recovery button reopens this bookmark, including when the prior visit ended farther down the page.
+   try{
+    const navigation=window.navigation;
+    const state=navigation?navigation.currentEntry.getState():history.state;
+    if(Number.isFinite(state?.scrollY)){
+     const {scrollY,...rest}=state;
+     if(navigation)navigation.updateCurrentEntry({state:rest});
+     else history.replaceState(rest,'');
+    }
+   }catch{}
+  }
+  location.reload();
+ });
  const load=()=>{
   if(started)return;started=true;root.setAttribute('data-app','loading');watchdog=setTimeout(()=>fail('timeout'),15000);
   const next=index=>{
