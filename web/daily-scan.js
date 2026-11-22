@@ -23,6 +23,10 @@
     typeof navigationAPI.updateCurrentEntry === 'function' && typeof navigationAPI.addEventListener === 'function';
   const timing = globalThis.performance?.getEntriesByType?.('navigation')?.[0];
   const hashTarget = () => rowById.get(location.hash.slice(1));
+  const disclosureObserver = navigationState ? null : new MutationObserver(mutations => {
+    const details = hashTarget()?.querySelector('details');
+    if (mutations.some(mutation => mutation.target === details)) saveReading();
+  });
   let coldFragmentURL = timing?.type === 'back_forward' && hashTarget() ? location.href : null;
   let restoration = 0;
   const position = value => Number.isFinite(value) && value >= 0 && value <= maxPosition;
@@ -65,48 +69,53 @@
     }
     catch (_) { /* Native history remains available when state cannot be saved. */ }
   }
-  function restoreReading(scroll = true) {
-    const saved = savedReading();
+  function restoreReading(scroll = true, changedHash = false) {
     const generation = ++restoration;
     function apply(current) {
       // Recreated documents lose native disclosure state. Layout and position
       // must be restored together after the browser finishes its traversal.
       for (const row of rows) row.querySelector('details').open = current.open.includes(row.id);
       if (typeof current.archiveOpen === 'boolean') archive.open = current.archiveOpen;
+      disclosureObserver?.takeRecords();
       try { history.scrollRestoration = 'manual'; } catch (_) { /* Restore below. */ }
+      let returnFocus;
       if (scroll) {
         const anchor = rowById.get(current.anchor);
         const y = anchor && !anchor.hidden ? scrollY + anchor.getBoundingClientRect().top - current.top : current.y;
         scrollTo({ left: current.x, top: Math.max(0, Math.min(maxPosition, y)), behavior: 'instant' });
         const item = rowById.get(current.returnToPermalink);
-        const permalink = item && !item.hidden ? item.querySelector('details[open] .scan-permalink') : null;
+        returnFocus = item && !item.hidden ? item.querySelector('details[open] .scan-permalink') : null;
         // Fragment traversal can leave focus or the next Tab at the target
         // article. Restore the originating link after reopening its details.
-        if (permalink) permalink.focus({ preventScroll: true });
-        else if (document.activeElement === document.body) {
+        if (!returnFocus && document.activeElement === document.body) {
           const archiveLink = archive.open ? archiveLinks.get(current.returnToArchive) : null;
-          const returnFocus = current.returnToDateGo === true ? dateGo : archiveLink;
-          returnFocus?.focus({ preventScroll: true });
+          returnFocus = current.returnToDateGo === true ? dateGo : archiveLink;
         }
+        returnFocus?.focus({ preventScroll: true });
       }
       if (current.returnToDateGo === true) date.value = root.dataset.edition;
+      return returnFocus;
     }
-    if (!scroll) { if (saved) apply(saved); }
-    else setTimeout(() => {
+    if (!scroll) {
+      const saved = savedReading();
+      if (saved) apply(saved);
+      return Boolean(saved);
+    }
+    setTimeout(() => {
       if (generation !== restoration) return;
       requestAnimationFrame(() => {
         if (generation !== restoration) return;
         // pageshow can precede history.state restoration. Read it in the later
         // task instead of abandoning the return when its early value is null.
         const current = savedReading();
-        const target = coldFragmentURL === location.href ? hashTarget() : null;
+        const target = changedHash || coldFragmentURL === location.href ? hashTarget() : null;
         coldFragmentURL = null;
-        if (current) apply(current);
-        else if (target) revealHash(target);
+        const returnFocus = current && apply(current);
+        if (!current && target) revealHash(target);
 
-        // A recreated document can restore scroll without the fragment's Tab
-        // starting point. Keep an existing focus or a saved position elsewhere.
-        if (target && !target.hidden && document.activeElement === document.body) {
+        // Browsers can retain focus from the previous fragment or lose its
+        // Tab starting point on a cold return. Honor the saved origin first.
+        if (target && !target.hidden && !returnFocus && (changedHash || document.activeElement === document.body)) {
           const heading = target.querySelector('h2');
           const box = heading.getBoundingClientRect();
           if (!current || (box.bottom > 0 && box.top < innerHeight)) {
@@ -116,7 +125,6 @@
         }
       });
     }, 0);
-    return Boolean(saved);
   }
   const fold = value => value.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase();
   const wordsIn = value => fold(value).match(/[\p{L}\p{N}]+/gu) || [];
@@ -188,6 +196,9 @@
   if (navigationState) navigationAPI.addEventListener('navigate', event => {
     if (event.navigationType !== 'replace') saveReading();
   });
+  // Classic History has no event before browser Back leaves the entry. Save
+  // a changed fragment disclosure in the same task as its native toggle.
+  disclosureObserver?.observe(root, { subtree: true, attributeFilter: ['open'] });
   // During pagehide WebKit can already expose the destination entry. Never
   // write History or Navigation state here; only cancel pending restoration.
   addEventListener('pagehide', () => { restoration++; coldFragmentURL = null; });
@@ -199,10 +210,11 @@
     if (target) {
       if (target.hidden) { search.value = ''; topic.value = ''; kind.value = ''; filter(); }
       target.querySelector('details').open = true;
+      disclosureObserver?.takeRecords();
       target.scrollIntoView({block: 'start'});
     }
   }
-  addEventListener('hashchange', () => { if (!restoreReading()) revealHash(); });
+  addEventListener('hashchange', () => restoreReading(true, true));
   filter(false);
   if (dateForm) dateForm.hidden = false;
   root.querySelector('.scan-controls').hidden = false;
