@@ -718,7 +718,8 @@ function rememberShortlistOrigin(event){
 }
 window.addEventListener('hashchange',()=>{
  if(onCompareRoute()){
-  if(!routeTraversal&&pendingShortlist?.hash===location.hash)history.replaceState({...history.state,compareShortlistSource:pendingShortlist.key},'');
+  // Browsers without the Navigation API can emit popstate on a new fragment link, too.
+  if(pendingShortlist?.hash===location.hash)history.replaceState({...history.state,compareShortlistSource:pendingShortlist.key},'');
   compareShortlistSource=history.state?.compareShortlistSource;
  }
  pendingShortlist=null;
