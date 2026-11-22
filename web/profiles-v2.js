@@ -331,8 +331,8 @@ comparisonRows=function(){return profileComparisonRows().map(([label,render])=>{
 // Leave focus and scroll alone if the reader starts using Explore while it loads.
 const [profileEntryView,,profileEntrySection]=routeParts();
 const profileEntryHash=profileEntryView==='company'&&profileRouteSection(profileEntrySection)?location.hash:'';
-const profileEntryEvents=['focusin','keydown','pointerdown','touchstart','wheel'];
-let profileHasRouted=false,profileEntryInteracted=false;
+const profileEntryEvents=['focusin','keydown','pointerdown','touchstart','wheel','pagehide'];
+let profileRouteCount=0,profileEntryInteracted=false;
 function stopWatchingProfileEntry(){
   for(const name of profileEntryEvents)window.removeEventListener(name,markProfileEntryInteraction,true);
 }
@@ -355,10 +355,11 @@ window.navigation?.addEventListener('navigate',event=>{
 });
 const profileRoute=route;
 route=function(event){
-  const initial=!profileHasRouted;profileHasRouted=true;
-  if(initial&&profileEntryHash)stopWatchingProfileEntry();
+  const run=++profileRouteCount,initial=run===1;
   const entry=initial&&!event&&profileEntryHash&&profileEntryHash===location.hash;
   const readerMoved=entry&&(profileEntryInteracted||(document.activeElement&&document.activeElement!==document.body));
+  const entryTop=entry&&!readerMoved?window.scrollY:null;
+  let deferredScroll=false;
   const previousCompany=previousRoute==='company'?document.querySelector('.profile-v2')?.dataset.profileCompany:null;
   const fragmentNavigation=profileFragmentNavigation;
   if(event?.type==='hashchange')profileFragmentNavigation=null;
@@ -381,12 +382,21 @@ route=function(event){
       if(focusTarget&&focusTarget.tagName!=='SUMMARY')focusTarget.setAttribute('tabindex','-1');
       if(!readerMoved){
         if(event?.type==='hashchange'||transferFocus)focusTarget?.focus({preventScroll:true});
-        // Profile media already reserve their space before loading.
         const anchor=primary?document.querySelector('.profile-tabs'):destination;
-        anchor?.scrollIntoView({block:'start',behavior:'instant'});
+        const scroll=()=>anchor?.scrollIntoView({block:'start',behavior:'instant'});
+        if(entry&&primary&&!transferFocus&&anchor&&document.visibilityState!=='hidden'&&typeof window.requestAnimationFrame==='function'){
+          // Let the new pane paint before the initial tabs scroll brings the old footer into view.
+          deferredScroll=true;
+          const hash=location.hash;
+          window.requestAnimationFrame(()=>window.requestAnimationFrame(()=>{
+            stopWatchingProfileEntry();
+            if(!profileEntryInteracted&&run===profileRouteCount&&location.hash===hash&&anchor.isConnected&&window.scrollY===entryTop)scroll();
+          }));
+        }else scroll();
       }
     }
   }
+  if(initial&&profileEntryHash&&!deferredScroll)stopWatchingProfileEntry();
   if(company&&parts[2]==='claim'&&parts[3])showEvidence(parts[3]);
   return result;
 };
