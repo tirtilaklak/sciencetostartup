@@ -136,6 +136,9 @@ class StaticPageTests(unittest.TestCase):
         cls.say = staticmethod(say)
         cls.research = sp.Research(cls.data, sp.read_js_object(ROOT / "web/app.js", "FINANCIAL_HEADLINES"), json.loads((ROOT / "data/source-updates.json").read_text()), say=say)
         cls.metrics = {m["id"]: m for m in cls.data["metrics"]}
+        observations = json.loads((ROOT / "data/business-health.json").read_text())["observations"]
+        cls.reviewed_estimates = {row["id"] for row in observations
+                                  if row["evidence_type"] == "estimate" and row["metric_ids"] == [row["id"]]}
         cls.routes = json.loads((ROOT / "data/work-routes.json").read_text())["routes"]
         cls.events = json.loads((ROOT / "data/company-events.json").read_text())
         cls.editorial = {e["company_id"]: e for e in json.loads((ROOT / "data/editorial.json").read_text())["entries"]}
@@ -633,7 +636,8 @@ class StaticPageTests(unittest.TestCase):
                 claim = self.research.claims[metric["claim_id"]]
                 self.assertIn(sp.figure_scope(self.research, metric, self.contexts.get(mid)), text, mid)
                 self.assertEqual("Historical" in text, bool(self.research.historical_year(metric)), mid)
-                self.assertEqual("Estimate" in text, metric.get("reported_vs_estimated") == "estimated", mid)
+                is_estimate = mid in self.reviewed_estimates or metric.get("reported_vs_estimated") == "estimated"
+                self.assertEqual(bool(re.search(r'<span class="tag">(?:Third-party estimate|Estimate)</span>', row)), is_estimate, mid)
                 self.assertIn(f'data-label="Grade">{claim["confidence"]}<', row, mid)
                 if metric.get("gross_vs_net") == "gross": self.assertIn("gross", text, mid)
                 if metric["kind"] in REVENUE_KINDS and metric.get("gross_vs_net") == "unspecified": self.assertIn("gross or net not stated", text, mid)
@@ -845,6 +849,43 @@ class StaticPageTests(unittest.TestCase):
             else: self.assertEqual(lead, "No confirmed paid listing. Career pages and past records appear below.", cid)
         self.assertIn("No confirmed paid listing.", self.pages["quesma"])
         self.assertIn("Pay not listed. Where:", self.pages["turing"] + self.pages["prolific"])
+
+    def test_native_work_keeps_pay_qualifications_quotes_and_action_context(self):
+        def cards(text):
+            return {re.search(r'data-work-route="([^"]+)"', card).group(1): card
+                    for card in re.split(r'(?=<li\b[^>]*\bdata-work-route=)', text)[1:]}
+
+        work_cards = cards((self.dist / "work/index.html").read_text())
+        company_cards = {cid: cards(page) for cid, page in self.pages.items()}
+        scholar = "afterquery.work.research-scholar"
+        for route in self.routes:
+            rid, cid = route["id"], route["company_id"]
+            employer, role = self.companies[cid]["name"], sp.clean(route["role"])
+            for surface, card in (("work", work_cards[rid]), ("company", company_cards[cid][rid])):
+                with self.subTest(route=rid, surface=surface):
+                    terms = re.search(r'<details class="work-terms">(.*?)</details>', card, re.S)
+                    self.assertIsNotNone(terms)
+                    quote = route.get("source_quote")
+                    if quote: self.assertIn(f'<blockquote>{html.escape(quote)}</blockquote>', terms.group(1))
+                    actions = sp.work_actions(route, self.research)
+                    anchors = PageFacts(card).anchors
+                    for url, action in actions:
+                        self.assertTrue(any(a.get("href") == url and a["text"] == action and
+                                            a.get("aria-label") == f"{action} for {role}, {sp.clean(employer)}"
+                                            for a in anchors), action)
+                    if rid == scholar:
+                        before_details = card[:terms.start()]
+                        self.assertIn("$1,000–$10,000 one-time award", before_details)
+                        self.assertIn(route["pay_terms"]["note"], before_details)
+
+    def test_native_mercor_estimate_preserves_metric_and_sacra_citation(self):
+        rid = "mercor.metric.major-growth_metrics-1"
+        rows = re.findall(rf'<tr\b[^>]*\bdata-metric="{re.escape(rid)}"[^>]*>(.*?)</tr>', self.pages["mercor"], re.S)
+        self.assertEqual(len(rows), 1)
+        row = rows[0]
+        for text in ("Estimated H1 gross revenue", "$614M", "Third-party estimate", "H1 2026",
+                     '<td data-label="Grade">C</td>', 'href="https://sacra.com/c/mercor/"'):
+            self.assertIn(text, row)
 
     def test_method_page_describes_the_dataset_and_its_license(self):
         """The owner chose CC BY 4.0 with ScienceToStartup as licensor (25 Oct 2026), so this test now requires the license

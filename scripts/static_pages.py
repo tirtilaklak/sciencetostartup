@@ -1006,7 +1006,8 @@ def figure_row(research, metric, context=None):
     label = context.get("display_label") or figure_label(research, metric)
     notes = [research.correction(metric, "display_attribution"), clean(context.get("note"))]
     head = f'<th scope="row">{escape(label)}<span class="sub">{escape(" · ".join(d for d in details if d))}</span>' + "".join(f'<span class="sub">{escape(note)}</span>' for note in notes if note and note != "Undated company claim") + "</th>"
-    value = f'<td class="value" data-label="Value">{escape(value_text(metric))}' + (' <span class="tag">Estimate</span>' if metric.get("reported_vs_estimated") == "estimated" else "") + "</td>"
+    assurance = "Third-party estimate" if context.get("estimated") else "Estimate" if metric.get("reported_vs_estimated") == "estimated" else ""
+    value = f'<td class="value" data-label="Value">{escape(value_text(metric))}' + (f' <span class="tag">{escape(assurance)}</span>' if assurance else "") + "</td>"
     when = context.get("date") or metric_period(research, metric)
     period = f'<td data-label="Date">{escape("Not stated" if when == "Date not stated" else when)}' + (' <span class="tag">Historical</span>' if research.historical_year(metric) else "") + "</td>"
     citations = source_html(research, metric)
@@ -1064,7 +1065,7 @@ def pending_item(research, m):
     return f'<li data-metric="{escape(m["id"])}"><strong>{escape(figure_label(research, m))}: {escape(value_text(m))}</strong>{old} · {escape(metric_period(research, m))} · {escape(figure_scope(research, m))}. {escape(status_words(research, m))} {source_html(research, m, inline=True)}</li>'
 
 
-def figures_html(research, company, figures, pending, others, profile_entry, finance=None):
+def figures_html(research, company, figures, pending, others, profile_entry, finance=None, observations=()):
     contexts = dict((profile_entry or {}).get("metric_context") or {})
     finance = finance or {}
     archived = finance.get("archived_record")
@@ -1078,6 +1079,10 @@ def figures_html(research, company, figures, pending, others, profile_entry, fin
         if rid in figure_ids:
             contexts[rid] = {**(contexts.get(rid) or {}), "date": fact["display_date"], "scope": fact["scope"],
                              "display_label": fact["label"], "finance_fact": fact}
+    for observation in observations:
+        rid = observation.get("id")
+        if rid in figure_ids and observation.get("metric_ids") == [rid] and observation.get("evidence_type") == "estimate":
+            contexts[rid] = {**(contexts.get(rid) or {}), "display_label": observation["label"], "estimated": True}
     if figures:
         rows = "".join(figure_row(research, m, contexts.get(m["id"])) for m in figures)
         body = f'<table class="figures wide"><thead><tr><th scope="col">Figure</th><th scope="col">Value</th><th scope="col">Date</th><th scope="col">Grade</th><th scope="col">Source</th></tr></thead><tbody>{rows}</tbody></table>\n'
@@ -1105,20 +1110,26 @@ def work_conditions(route, include_requirements=True):
     if assessment and not any(assessment.casefold() in v.casefold() for v in requirements): requirements.append(assessment)
     hours_record = ((route.get("research_record") or {}).get("route") or {}).get("hours") or {}
     hours_detail = hours_record.get("detail") if isinstance(hours_record, dict) else None
-    commitment = list(dict.fromkeys(clean(v) for v in (route.get("hours"), hours_detail, route.get("duration")) if clean(v)))
+    field_reviews = route.get("field_reviews") or {}
+    commitment_review = field_reviews.get("commitment") or {}
+    conflict = commitment_review.get("state") == "conflicting" and commitment_review.get("note")
+    hours = [f"Schedule conflict. {clean(conflict)}"] if conflict else [route.get("hours"), hours_detail]
+    commitment = list(dict.fromkeys(clean(v) for v in (*hours, route.get("duration")) if clean(v)))
     parts = [f'<span class="sub">{escape(WORK_KIND_LABELS[work_kind(route)])} · {escape(WORK_ENGAGEMENT_LABELS[work_engagement(route)])}</span>']
     if commitment: parts.append('<span class="sub">' + escape(" · ".join(commitment)) + '</span>')
     if requirements and include_requirements:
         parts.append('<span class="sub">' + escape(" · ".join(requirements)) + '</span>')
-    note = clean(route.get("availability_note"))
-    if route.get("id") == "afterquery.work.research-fellow" and re.fullmatch("full-time", clean(route.get("hours")), re.I) and re.search(r"20\+ hours/week and in-person preferred", note, re.I):
-        parts.append('<span class="sub">Schedule conflict: full-time on-site required. Another line lists 20+ h/week and says in-person work is preferred.</span>')
-    elif route.get("id") == "afterquery.work.technical-content-writer-contract" and re.search(r"Header employment type says full-time; role body specifies a part-time contract", note, re.I):
-        parts.append('<span class="sub">Schedule conflict: header says full-time; role body specifies a part-time contract.</span>')
-    for field, review in (route.get("field_reviews") or {}).items():
+    for field, review in field_reviews.items():
+        if field == "commitment" and conflict: continue
         if field in WORK_FIELD_LABELS and review.get("state") == "conflicting":
             parts.append('<span class="sub">' + escape(WORK_FIELD_LABELS[field] + " sources conflict." + (" " + clean(review["note"]) if review.get("note") else "")) + '</span>')
     return "".join(parts)
+
+
+def work_pay_qualification(route):
+    """Conditions on a one-time award belong next to the amount."""
+    terms = route.get("pay_terms") or {}
+    return clean(terms.get("note")) if terms.get("unit") == "one_time" else ""
 
 
 def work_pay_notes(route):
@@ -1130,6 +1141,7 @@ def work_pay_notes(route):
         notes.append({"per_completed_task": "Paid per completed task", "hour_equivalent": "Hourly equivalent", "approved_deliverables": "Approved deliverables · advertised range", "hour_or_accepted_task": "Hourly or accepted tasks; rejected tasks may be unpaid", "month_stipend": "Monthly stipend", "approved_recording": "Payment requires approval", "approved_submission": "Payment requires approval", "accepted_project": "Payment requires acceptance", "accepted_task": "Payment requires acceptance"}.get(route.get("pay_basis"), ""))
     if route.get("pay_basis") == "advertised_maximum_hourly": notes.append("Rates vary by expertise, assessment, location and project. Non-core work can pay less.")
     if str(route.get("pay_basis") or "").endswith("salary_period_unspecified"): notes.append("Pay period not stated." + (" Bonus terms not stated." if re.search("Bonus eligibility and payout terms are undisclosed", route.get("availability_note") or "", re.I) else ""))
+    notes.append(work_pay_qualification(route))
     return '<span class="sub">' + escape(" · ".join(dict.fromkeys(n for n in notes if n))) + '</span>' if any(notes) else ""
 
 
@@ -1141,23 +1153,35 @@ WORK_SOURCE_PURPOSES = {
 }
 
 
-def work_source_lines(research, route, detailed):
+def work_action_name(label, route, employer):
+    return f"{label} for {clean(route.get('role')) or 'Listing'}, {employer}"
+
+
+def work_source_lines(research, route, employer, detailed):
     """One URL per list item with every distinct observation and field binding."""
-    fields, earlier_fields, receipts, grouped = {}, {}, {}, {}
+    fields, earlier_fields, receipts, grouped, prior_quotes = {}, {}, {}, {}, {}
     review = route.get("editorial_review") or {}
     for field, label in WORK_FIELD_LABELS.items():
         for source_id in ((route.get("field_reviews") or {}).get(field) or {}).get("source_ids", []):
             fields.setdefault(source_id, []).append(label.lower())
         for correction in review.get("correction_history", []):
-            previous = ((correction.get("previous_values") or {}).get("field_reviews") or {}).get(field) or {}
+            values = correction.get("previous_values") or {}
+            previous = (values.get("field_reviews") or {}).get(field) or {}
             for source_id in previous.get("source_ids", []):
                 if label.lower() not in fields.get(source_id, []):
                     earlier_fields.setdefault(source_id, []).append(label.lower())
+                if field == "pay" and values.get("source_quote") and values["source_quote"] != route.get("source_quote"):
+                    prior_quotes.setdefault(source_id, []).append(values["source_quote"])
     for receipt in review.get("receipts") or []:
         receipts.setdefault(receipt.get("source_id"), []).append(receipt)
     for source in route.get("sources") or []:
         if is_web_url(source.get("url")):
             grouped.setdefault(source["url"], []).append(source)
+    recorded_quote = route.get("source_quote")
+    record_quote_html = f'<blockquote>{escape(recorded_quote)}</blockquote>' if recorded_quote else ""
+    quote_url = route.get("url")
+    pay_sources = ((route.get("field_reviews") or {}).get("pay") or {}).get("source_ids", [])
+    quote_source = pay_sources[0] if len(pay_sources) == 1 and re.search(r"[$£€]\s*\d", recorded_quote or "") else None
     last_check = route.get("last_route_check") or {}
     checks = [last_check["application_check"]] if last_check.get("application_check") else []
     checks.extend(last_check.get("application_checks") or [])
@@ -1172,14 +1196,17 @@ def work_source_lines(research, route, detailed):
     for url, sources in grouped.items():
         first = sources[0] if sources else {}
         label = secondary.get(url) or clean(first.get("title") or first.get("publisher")) or ("Application checked" if url in applications else "Source")
-        role = clean(route.get("role")) or "Listing"
-        link = external_link(url, label, f"{label} for {role}" if url in secondary else "")
+        link = external_link(url, label, work_action_name(label, route, employer) if url in secondary else "")
         observations = []
         for index, source in enumerate(sources):
             sid = source.get("id")
             published = next((source[k] for k in ("published_on", "source_publication_date", "published_at") if source.get(k) and source[k] != "undated"), None)
             published = published or (research.sources.get(sid) or {}).get("published_on")
-            details = [clean(source.get("title"))] if index and (detailed or not source.get("purpose")) else []
+            title = clean(source.get("title"))
+            recorded = format_date(source.get("accessed_on"))
+            short_title = re.sub(r"([A-Z][a-z]{2})[a-z]+(?= \d{4}$)", r"\1", title)
+            check_title = bool(recorded) and short_title == "Official listing checked " + recorded
+            details = [title] if index and (detailed or not source.get("purpose") and not check_title and title != label) else []
             if detailed and source.get("publisher"): details.append(clean(source["publisher"]))
             if published and published != "undated": details.append("Published " + format_date(published))
             purpose = source.get("purpose")
@@ -1187,9 +1214,10 @@ def work_source_lines(research, route, detailed):
                 purpose = purpose or review.get("recorded_url_purpose")
             if purpose: details.append(WORK_SOURCE_PURPOSES.get(purpose) or readable(purpose))
             entry_receipts = receipts.get(sid, [])
-            if source.get("accessed_on"):
+            if recorded:
                 verb = "URL checked" if any(r.get("scope") == "retrieval" for r in entry_receipts) else "Recorded"
-                details.append(verb + " " + format_date(source["accessed_on"]))
+                if not detailed and index and check_title: verb = "Listing checked"
+                details.append(verb + " " + recorded)
             if sid in fields: details.append("Source for " + ", ".join(fields[sid]))
             if sid in earlier_fields: details.append("Earlier source for " + ", ".join(dict.fromkeys(earlier_fields[sid])))
             for check in entry_receipts:
@@ -1203,6 +1231,18 @@ def work_source_lines(research, route, detailed):
             if details:
                 attribute = f' data-field-source="{escape(sid)}"' if (sid in fields or sid in earlier_fields) and index < len(sources) - 1 else f' data-work-source="{escape(sid)}"' if detailed else ""
                 observations.append(f'<small{attribute}>{escape(" · ".join(dict.fromkeys(p for p in details if p)))}</small>')
+            if record_quote_html and sid and sid == quote_source:
+                observations.append(record_quote_html)
+                record_quote_html = ""
+            excerpts = [f'Earlier excerpt · <q>{escape(quote)}</q>' for quote in dict.fromkeys(prior_quotes.get(sid, []))]
+            for receipt in entry_receipts:
+                for evidence in receipt.get("evidence") or []:
+                    if not isinstance(evidence, dict) or not evidence.get("quote"): continue
+                    field_label = WORK_FIELD_LABELS.get(evidence.get("field"))
+                    checked = receipt.get("checked_on")
+                    context = " · ".join(part for part in (field_label, format_date(checked) if checked != source.get("accessed_on") else "") if part)
+                    excerpts.append((escape(context) + " · " if context else "") + f'<q>{escape(evidence["quote"])}</q>')
+            observations.extend(f'<small>{excerpt}</small>' for excerpt in dict.fromkeys(excerpts))
         for check in applications.get(url, []):
             if not detailed and check.get("result") == "readable" and sources:
                 continue
@@ -1210,11 +1250,14 @@ def work_source_lines(research, route, detailed):
                                                    f'HTTP {check["http_status"]}' if check.get("http_status") else "",
                                                    readable(check.get("result")), clean(check.get("note")) if detailed else "") if p)
             observations.append(f'<small>Application check · {escape(observation)}</small>')
+        if record_quote_html and not quote_source and url == quote_url:
+            observations.append(record_quote_html)
+            record_quote_html = ""
         lines.append(f'<li>{link}{"".join(observations)}</li>')
-    return "<ul>" + "".join(lines) + "</ul>" if lines else ""
+    return record_quote_html + ("<ul>" + "".join(lines) + "</ul>" if lines else "")
 
 
-def work_terms_html(research, route, detailed=True):
+def work_terms_html(research, route, employer, detailed=True):
     """One native source disclosure; a replaced original URL remains in its history."""
     parts = ['<details class="work-terms"><summary>Terms &amp; sources</summary>']
     if detailed and route.get("summary"): parts.append('<p>' + escape(clean(route["summary"])) + '</p>')
@@ -1227,45 +1270,59 @@ def work_terms_html(research, route, detailed=True):
         }.get(availability_note, availability_note)
     if availability_note: parts.append(f'<p>{escape(availability_note)}</p>')
     pay_note = clean((route.get("pay_terms") or {}).get("note"))
-    if pay_note and (detailed or work_pay_notes(route)) and pay_note not in (route.get("availability_note") or ""):
+    if pay_note and pay_note != work_pay_qualification(route) and pay_note not in availability_note:
         parts.append(f'<p>{escape(pay_note)}</p>')
     reviews = {}
+    source_dates = {source.get("id"): source.get("accessed_on") for source in route.get("sources") or [] if is_web_url(source.get("url"))}
     for field, review in (route.get("field_reviews") or {}).items():
         if field not in WORK_FIELD_LABELS or review.get("state") not in WORK_FIELD_STATES: continue
-        if not detailed and not review.get("reviewed_on") and review["state"] not in ("conflicting", "source_not_stated"): continue
+        reviewed_on, state = review.get("reviewed_on"), review["state"]
+        if not detailed and state not in ("conflicting", "source_not_stated"):
+            # The source list already pairs this date and field with the exact link.
+            if not reviewed_on or (state == "sourced" and any(source_dates.get(sid) == reviewed_on for sid in review.get("source_ids", []))):
+                continue
         label = WORK_FIELD_LABELS[field]
-        text = WORK_FIELD_STATES[review["state"]]
-        if review.get("reviewed_on"): text = "Reviewed " + format_date(review["reviewed_on"]) + " · " + text
-        if detailed and review.get("note"): text += ". " + clean(review["note"])
+        text = WORK_FIELD_STATES[state]
+        if reviewed_on:
+            date_label = "Reviewed " + format_date(reviewed_on)
+            text = date_label if not detailed and state == "sourced" else date_label + " · " + text
+        note = clean(review.get("note"))
+        if detailed and note and note not in (availability_note, pay_note) and state != "conflicting":
+            text += ". " + note
         reviews.setdefault(text, []).append(label.lower())
     if reviews:
         parts.append('<ul>' + "".join(f'<li>{escape(f"{text} ({join_words(labels)})")}</li>' for text, labels in reviews.items()) + '</ul>')
     if route.get("as_of") and (detailed or route["as_of"] != "undated"):
         parts.append('<p>Terms recorded · ' + escape(format_date(route["as_of"]) if route["as_of"] != "undated" else "date not stated") + '</p>')
-    parts.append(work_source_lines(research, route, detailed))
+    parts.append(work_source_lines(research, route, employer, detailed))
     disposition = (route.get("editorial_review") or {}).get("disposition") or {}
     if detailed and disposition.get("note"): parts.append('<p>' + escape(clean(disposition["note"])) + '</p>')
-    if detailed and route.get("source_quote"): parts.append('<blockquote>' + escape(clean(route["source_quote"])) + '</blockquote>')
     parts.append('</details>')
     return "".join(parts)
 
 
-def work_item(research, route, compact=False):
+def work_item(research, route, employer, compact=False):
     """One source-backed route; critical conditions and review scope precede its action."""
     status, bucket = work_status(route), work_display_bucket(route)
     place = work_location(route)
     pay = work_pay(route)
     show_pay = bucket != "boards" and (bucket != "closed" or pay != "Pay not listed")
-    parts = [(f"Historical pay · {pay}" if bucket == "closed" else labelled("Pay", pay)) if show_pay else "", place if place == NO_PLACE else labelled("Where", place), work_review_label(research, route)]
+    offer = (f"Historical pay · {pay}" if bucket == "closed" else labelled("Pay", pay)) if show_pay else ""
+    pay_notes = work_pay_notes(route) if show_pay else ""
+    qualified_offer = ""
+    if offer and work_pay_qualification(route):
+        qualified_offer = f'<span class="sub">{escape(offer)}</span>{pay_notes}'
+        offer, pay_notes = "", ""
+    parts = [offer, place if place == NO_PLACE else labelled("Where", place), work_review_label(research, route)]
     tag = f' <span class="tag">{escape(status)}</span>' if status else ""
     destination, action = work_destination(route, research)
     rid, role = escape(route.get("id")), clean(route.get("role")) or "Listing"
-    link = f'<p class="work-action">{external_link(destination, action, f"{action} for {role}")}{availability(destination, research.health)}</p>' if destination else ''
+    link = f'<p class="work-action">{external_link(destination, action, work_action_name(action, route, employer))}{availability(destination, research.health)}</p>' if destination else ''
     conditions = work_conditions(route, include_requirements=not compact)
     title = f'<a class="work-role-link" href="/work/#{rid}">{escape(role)}</a>' if compact else escape(role)
-    terms = work_terms_html(research, route, detailed=not compact)
+    terms = work_terms_html(research, route, employer, detailed=not compact)
     return (f'<li id="{rid}" tabindex="-1" data-work-route="{rid}"><strong>{title}</strong>{tag}'
-            f'<span class="sub">{escape(". ".join(p for p in parts if p))}</span>{work_pay_notes(route) if show_pay else ""}'
+            f'{qualified_offer}<span class="sub">{escape(". ".join(p for p in parts if p))}</span>{pay_notes}'
             f'{conditions}{terms}{link}</li>')
 
 
@@ -1282,7 +1339,7 @@ def company_work_html(research, company, routes, compact=False):
     if compact: body.append('<p>Open a role name for its full requirements and pay details on Paid work.</p>\n')
     for key, label, _ in WORK_DISPLAY_BUCKETS:
         rows = sort_routes([r for r in routes if work_display_bucket(r) == key], names)
-        if rows: body.append(f"<h3>{label}</h3>\n<ul class=\"listings\">" + "".join(work_item(research, r, compact=compact) for r in rows) + "</ul>\n")
+        if rows: body.append(f"<h3>{label}</h3>\n<ul class=\"listings\">" + "".join(work_item(research, r, name, compact=compact) for r in rows) + "</ul>\n")
     return heading + "".join(body)
 
 
@@ -1575,7 +1632,7 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     if pending: financial_meta += f' · {len(pending)} not confirmed'
     body.append(f'<details class="company-fold" id="financial-record"><summary><span>Financial record</span><small>{financial_meta}</small></summary><div class="company-fold-body">'
                 + business_observation_html(research, business_health, cid)
-                + figures_html(research, company, figures, pending, others, profile_entry, finance)
+                + figures_html(research, company, figures, pending, others, profile_entry, finance, (business_health or {}).get("observations", ()))
                 + ''.join(finance_fact_html(record) for record in detail_records) + '</div></details>')
     body.extend(overview)
     if dated or risk_rows:
@@ -1689,12 +1746,12 @@ def work_table(research, rows, names, key):
         pay_class = 'work-pay work-historical-pay' if archived else 'work-pay'
         offer = f'<p class="{pay_class}">{archived}<strong>{escape(pay)}</strong>{work_pay_notes(r)}</p>' if show_pay else ""
         place = f'<p class="work-place">{escape(work_location(r))}</p>' if key != "boards" else ""
-        action_html = f'<p class="work-listing-action">{external_link(destination, action, f"{action} for {role}, {company}")}{availability(destination, research.health)}</p>' if destination else ""
+        action_html = f'<p class="work-listing-action">{external_link(destination, action, work_action_name(action, r, company))}{availability(destination, research.health)}</p>' if destination else ""
         out.append(f'<li class="work-listing" id="{rid}" tabindex="-1" data-work-route="{rid}" data-arrangements="{escape(arrangements)}">'
                    f'<div class="work-heading"><a class="work-company" href="/company/{escape(cid)}/#{rid}" aria-label="{escape(f"{company} · {role}")}">{escape(company)}</a>{tag}'
                    f'<h3>{escape(role)}</h3></div><div class="work-offer">{offer}{place}</div>'
                    f'<p class="work-reviewed">{escape(work_review_label(research, r))}</p><div class="work-listing-conditions">{work_conditions(r)}</div>'
-                   f'{action_html}{work_terms_html(research, r, detailed=False)}</li>')
+                   f'{action_html}{work_terms_html(research, r, company, detailed=False)}</li>')
     return f'<ul class="work-listings">{"".join(out)}</ul>\n'
 
 
@@ -1716,7 +1773,7 @@ def render_work(research, routes, names, modified, work_results=None):
     body = ['<link rel="stylesheet" href="/work-page.css">\n', crumb_nav(crumbs, "work-crumbs"),
             '<header class="work-page-heading" id="work-directory"><h1>Find work in AI training.</h1>\n',
             f'<p class="work-page-counts">{plural(named_count, "named listing")} <span>·</span> {plural(program_count, "network or program", "networks and programs")} <span>·</span> {plural(open_companies, "company", "companies")}</p></header>\n',
-            '<form class="work-page-filters" data-work-filters hidden role="search" aria-label="Find paid work" id="work-filters">'
+            '<div class="work-page-filter-slot" data-work-filter-slot><form class="work-page-filters" data-work-filters hidden role="search" aria-label="Find paid work" id="work-filters">'
             '<label class="work-page-search">Search listings<input name="q" type="search" placeholder="Role, skill or company" maxlength="256" autocomplete="off" id="name-filter"></label>'
             '<details class="work-page-filter-options"><summary>Filters</summary><div class="work-page-filter-fields">'
             '<label>Listing type<select name="kind"><option value="">All records</option><option value="named">Named listings</option><option value="programs">Network programs</option><option value="boards">Career pages</option><option value="outside">Other jobs</option><option value="closed">Past &amp; other</option></select></label>'
@@ -1725,10 +1782,12 @@ def render_work(research, routes, names, modified, work_results=None):
             '<label>Pay unit<select name="pay"><option value="">Any pay</option><option value="hourly">Hourly</option><option value="task">Per task</option><option value="yearly">Yearly</option><option value="monthly">Monthly</option><option value="numeric">Published amount</option><option value="undisclosed">Pay unlisted</option></select></label>'
             '<label>Sort<select name="sort"><option value="">Default order</option><option value="hourly">Highest stated hourly pay</option><option value="checked">Recently checked</option></select></label>'
             '<button type="reset" class="work-page-clear">Clear</button></div></details></form>'
-            '<div class="work-load-status" data-work-load-status hidden><p data-work-load-message role="status"></p><button type="button" data-work-retry hidden>Retry filters</button></div>'
+            '<div class="work-load-status" data-work-load-status hidden><p data-work-load-message role="status"></p><button type="button" data-work-retry hidden>Retry filters</button></div></div>'
             '<noscript><p data-work-native-fallback>Filters need JavaScript. Showing the full directory. Use your browser’s Find command to look for a company or role.</p></noscript>'
             '<div class="work-results-toolbar" data-work-toolbar id="work-results">'
-            f'<p class="work-page-results" data-work-count aria-live="polite" aria-atomic="true">{open_count} listings and networks. {count} records at {plural(companies, "company", "companies")}. Career pages and past records are grouped below.</p>'
+            '<p class="work-page-results" data-work-count aria-live="polite" aria-atomic="true">'
+            f'<span class="work-count-native">{open_count} listings and networks. {count} records at {plural(companies, "company", "companies")}. Career pages and past records are grouped below.</span>'
+            f'<span class="work-count-compact" hidden>{plural(count, "record")}</span></p>'
             '<div class="work-results-actions"><a href="/work/?view=compare" data-work-compare hidden>Compare results</a>'
             f'<button type="button" data-work-export data-work-export-asset="{escape(export.get("href"))}" data-work-export-digest="{escape(export.get("sha256"))}" hidden>Download CSV</button></div></div>'
             '<p class="work-export-status" data-work-export-status aria-live="polite"></p>'
@@ -1775,8 +1834,9 @@ def render_method(research, sizes, modified):
             f'<p>A public-source guide to AI data companies and paid work, published by {escape(PUBLISHER_NAME)}.</p></header>\n',
             '<aside id="corrections" tabindex="-1" aria-labelledby="corrections-title"><h2 id="corrections-title">Corrections</h2>'
             '<p>Include the record or page link, what needs correcting, and a source. We review requests within seven days.</p>'
+            '<p id="correction-record" hidden>Record to correct <a href="#corrections"></a></p>'
             f'<div class="method-contact">{external_link(github_link, "Submit a correction on GitHub")}'
-            f'<a href="{escape(email_link)}">Email a correction</a>'
+            f'<a id="correction-email" href="{escape(email_link)}">Email a correction</a>'
             f'<p>Email address <span>{escape(CORRECTION_EMAIL)}</span></p>'
             f'<a href="{ORIGIN}/research/corrections/">Read the accepted correction log</a></div></aside>\n',
             '<div class="method-sections"><details class="method-detail" id="disclosures"><summary>Publisher and disclosures</summary><div class="method-detail-body">\n'
@@ -1826,7 +1886,7 @@ def render_method(research, sizes, modified):
         body.append(f'<details class="method-detail" id="download-files"><summary>Data and license</summary><div class="method-detail-body"><h2 id="downloads">Download the data</h2>\n<p>Dataset version {escape(version)}{escape(compiled.replace(" · research", ", research"))}. The research data files keep every claim that later research replaced.</p>\n'
                     f'<p>{SITE_NAME} licenses this data under the <a class="ext" rel="license" href="{DATA_LICENSE}">CC BY 4.0 license</a> (any use is allowed if you credit us). Cite {SITE_NAME} and the original sources. Company names and logos belong to their owners. The license does not cover them. It also leaves out product images, photos of people, text quoted from sources and personal contact details.</p>\n'
                     + ''.join(tables) + '</div></details>\n')
-    body.append('</div></div>\n')
+    body.append('</div></div>\n<script src="/method-correction.js" defer></script>\n')
     counts = {key: len(data.get(key, [])) for key in ("companies", "claims", "sources", "metrics", "funding_rounds", "products")}
     counts["current_claims"] = sum(1 for claim in data.get("claims", []) if claim.get("status") != "superseded")
     measured = sorted({KIND_LABELS.get(m.get("kind"), "") for m in data.get("metrics", [])} - {"", KIND_LABELS["other"]})
