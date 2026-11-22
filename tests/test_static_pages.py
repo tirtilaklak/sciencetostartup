@@ -344,12 +344,12 @@ class StaticPageTests(unittest.TestCase):
             self.assertIn(f'<section class="directory-section" data-group="{slug}">', text)
         nonprofits = sum(1 for e in self.editorial.values() if e["primary_offering"] == "Nonprofit research")
         total = len(self.companies) + len(self.current_companies["entries"])
-        self.assertIn(f"{sp.count_word(nonprofits)} of the {total} are nonprofit research groups.", text)
+        self.assertIn(f"{sp.count_word(nonprofits)} of the {total} companies are nonprofit research groups.", text)
 
     def test_index_states_coverage_limits(self):
         text = (self.dist / "companies/index.html").read_text()
-        self.assertIn("The guide is a selected study of the market. It does not list every company.", text)
-        self.assertIn("The guide is a selected study of the market. It does not list every company.", (self.dist / "method/index.html").read_text())
+        self.assertIn("The guide covers selected companies.", text)
+        self.assertIn("The guide covers selected companies.", (self.dist / "method/index.html").read_text())
         missing = re.search(r"Firms not yet listed in this directory include ([^<]+)", text).group(1)
         remaining = [name for name in sp.NOT_YET_PROFILED if not any(name.casefold() in entry["name"].casefold().split(" / ") for entry in self.current_companies["entries"])]
         self.assertEqual(missing, sp.join_words(remaining) + ".")
@@ -854,7 +854,8 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(facts.title, f"Paid AI training work: {len(paid)} sourced routes{sp.SUFFIX}")
         self.assertTrue(facts.meta["description"].startswith(f"{named} named listings and {programs} expert networks and programs at {paid_companies} AI data companies,"), facts.meta["description"])
         advice = plain(re.search(r'<details class="work-page-advice">.*?</details>', work, re.S).group(0))
-        self.assertIn("Current openings and individual eligibility are not guaranteed", advice)
+        self.assertIn("Check the employer’s page for current openings and pay.", advice)
+        self.assertIn("The employer sets eligibility.", advice)
         self.assertIn(f'{named} named listings <span>·</span> {programs} networks and programs <span>·</span> {paid_companies} companies', work)
         self.assertIn(f'data-work-count aria-live="polite" aria-atomic="true">{len(self.routes)} records, including career pages and past listings</p>', work)
         self.assertIn(f"See {len(paid)} paid work routes</a>", (self.dist / "companies/index.html").read_text())

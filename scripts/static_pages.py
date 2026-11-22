@@ -2109,7 +2109,7 @@ def render_method(research, sizes, modified):
     body.append('<details class="method-detail" id="coverage-notes"><summary>Coverage and limits</summary><div class="method-detail-body"><h2 id="coverage">Research coverage</h2>\n'
                 f'<p class="method-snapshot">Dataset v{escape(data.get("dataset_version", ""))}{escape(compiled)}</p>\n'
                 f'<p>{plural(len(research.companies), "company profile")} · {plural(len(rated), "company", "companies")} with a delivery evidence level · {plural(len(data.get("sources", [])), "source record")}.{unrated_note}</p>\n'
-                f"<p>{plural(doubtful, 'claim is', 'claims are')} unverified or disputed. Each one is labeled. The guide is a selected study of the market. It does not list every company.</p></div></details>\n")
+                f"<p>{plural(doubtful, 'claim is', 'claims are')} unverified or disputed. Each one is labeled. {COVERAGE}</p></div></details>\n")
     files = [(name, kind, mime, text) for name, kind, mime, text in DOWNLOADS if name in sizes] + [(name, "CSV", "text/csv", f"The {name[:-4].replace('_', ' ')} table") for name in sorted(n for n in sizes if n.endswith(".csv"))]
     canonical_names = {"research.json", "observatory.sqlite", "classifications.csv"} | {name + ".csv" for name in TABLES}
     historical_files = [item for item in files if item[0] in canonical_names]
