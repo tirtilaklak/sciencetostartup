@@ -19,7 +19,7 @@ class AppBootstrapTests(unittest.TestCase):
         checks = r'''
 const vm=require('node:vm'),assert=require('node:assert/strict');
 const source=SOURCE,bundledInit=BUNDLED_INIT;
-function harness(build='build-test'){
+function harness(build='build-test',hash='',navigationApi=false){
  const attrs=new Map([['data-route','other']]),timers=new Map(),scripts=[],frames=[],callbacks={};let timerId=0,reloads=0;
  const root={dataset:{buildId:'build-test'},style:{removeProperty(){}},setAttribute:(k,v)=>attrs.set(k,v),removeAttribute:k=>attrs.delete(k),getAttribute:k=>attrs.get(k)};
  const failure={hidden:true},reload={addEventListener:(name,callback)=>{callbacks[name]=callback;}},skip={addEventListener(){}};
@@ -28,7 +28,10 @@ function harness(build='build-test'){
  const document={documentElement:root,
   querySelector:selector=>selector==='#market-view > [data-fragment-id]'?marketSection:selector==='.skip'?skip:null,
   getElementById:id=>id==='app-failure'?failure:reload,querySelectorAll:s=>s==='main>.view'?views:s==='dialog[open]'?[dialog]:[],createElement:()=>({}),body:{append:script=>scripts.push(script)}};
- const context=vm.createContext({window:{APP_BUILD_ID:build},document,location:{reload:()=>{reloads++;}},requestAnimationFrame:callback=>frames.push(callback),setTimeout:(callback,delay=0)=>{timers.set(++timerId,{callback,delay});return timerId;},clearTimeout:id=>timers.delete(id)});
+ let entryState={scrollY:3017,retained:'reading'};
+ const navigation=navigationApi?{currentEntry:{getState:()=>entryState},updateCurrentEntry:({state})=>{entryState=state;}}:null;
+ const history={get state(){return entryState;},replaceState(state){entryState=state;}};
+ const context=vm.createContext({window:{APP_BUILD_ID:build,navigation},document,history,location:{hash,reload:()=>{reloads++;}},requestAnimationFrame:callback=>frames.push(callback),setTimeout:(callback,delay=0)=>{timers.set(++timerId,{callback,delay});return timerId;},clearTimeout:id=>timers.delete(id)});
  vm.runInContext(source,context);
  assert.equal(marketSection.id,'');
  const fire=delay=>{const pair=[...timers].find(([,timer])=>timer.delay===delay);assert.ok(pair,'Missing timer '+delay);timers.delete(pair[0]);pair[1].callback();};
@@ -40,7 +43,14 @@ function harness(build='build-test'){
   };
   vm.runInContext(bundledInit,context);
  };
- return {attrs,timers,scripts,frames,views,failure,dialog,marketSection,start,fire,initialize,reload:()=>callbacks.click(),reloads:()=>reloads};
+ return {attrs,timers,scripts,frames,views,failure,dialog,marketSection,start,fire,initialize,reload:()=>callbacks.click(),reloads:()=>reloads,entryState:()=>entryState};
+}
+// Explicit Market recovery returns to its bookmark. Other entries retain their reading position.
+for(const navigationApi of [false,true]){
+ const market=harness('build-test','#business-health',navigationApi);
+ market.reload();assert.equal(market.reloads(),1);assert.equal(market.entryState().scrollY,undefined);assert.equal(market.entryState().retained,'reading');
+ const other=harness('build-test','#work',navigationApi);
+ other.reload();assert.equal(other.entryState().scrollY,3017);
 }
 // Data must finish before app code runs. A failed data download cannot run the app against missing data.
 const network=harness();network.start();assert.equal(network.scripts.length,1);network.scripts[0].onerror();
