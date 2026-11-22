@@ -1,28 +1,79 @@
 /* Keep native document links useful when their destination is in a disclosure. */
 (() => {
-  function reveal() {
-    let id;
-    try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
-    const target = id && document.getElementById(id);
-    if (!target) return;
+  function openDisclosures(target) {
     let detail = target.closest('details');
     let changed = false;
     while (detail) {
       if (!detail.open) { detail.open = true; changed = true; }
       detail = detail.parentElement?.closest('details');
     }
-    if (changed) target.scrollIntoView({ block: 'start' });
+    return changed;
+  }
+
+  function reveal() {
+    let id;
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+    const target = id && document.getElementById(id);
+    if (target && openDisclosures(target)) target.scrollIntoView({ block: 'start' });
   }
   addEventListener('hashchange', reveal);
   document.addEventListener('click', event => {
     const link = event.target.closest?.('a[href^="#"]');
     if (link && link.hash === location.hash) reveal();
   });
-  document.addEventListener('beforematch', event => {
-    let detail = event.target.closest('details');
-    while (detail) { detail.open = true; detail = detail.parentElement?.closest('details'); }
-  });
+  document.addEventListener('beforematch', event => openDisclosures(event.target));
   reveal();
+
+  const company = location.pathname.match(/^\/company\/([a-z0-9_-]+)\/$/)?.[1];
+  const dossier = document.querySelector('.company-dossier');
+  if (company && dossier) {
+    const canonical = new URL(document.querySelector('link[rel="canonical"]')?.href || location.href);
+    const route = `#company/${company}`;
+    const handoffs = [...dossier.querySelectorAll('details a[href*="/explore/#company/"]')].filter(link => {
+      const url = new URL(link.href);
+      return (url.origin === canonical.origin || url.origin === location.origin) &&
+        url.pathname === '/explore/' && (url.hash === route || url.hash.startsWith(`${route}/`));
+    });
+
+    document.addEventListener('click', event => {
+      const link = event.target.closest?.('a[href]');
+      if (!link || event.defaultPrevented || event.button !== 0 || event.ctrlKey ||
+          event.metaKey || event.shiftKey || event.altKey || link.hasAttribute('download') ||
+          (link.target && link.target !== '_self')) return;
+
+      const { nativeCompanyReturn, ...state } = history.state || {};
+      if (handoffs.includes(link)) {
+        state.nativeCompanyReturn = { page: location.href, href: link.href, top: link.getBoundingClientRect().top };
+      } else if (!nativeCompanyReturn || link.hash && link.href.split('#')[0] === location.href.split('#')[0]) {
+        return;
+      }
+      // The originating entry can share its URL with other entries or tabs.
+      try { history.replaceState(state, ''); } catch {}
+    });
+
+    addEventListener('pageshow', event => {
+      const saved = history.state?.nativeCompanyReturn;
+      if (event.persisted || saved?.page !== location.href ||
+          performance.getEntriesByType('navigation')[0]?.type !== 'back_forward') return;
+      const activation = window.navigation?.activation;
+      if (activation?.from && activation.from.index <= activation.entry.index) return;
+      const matches = handoffs.filter(link => link.href === saved.href);
+      if (matches.length !== 1) return;
+      const [link] = matches;
+      // Wait for the browser's history scroll restoration before aligning the reopened link.
+      requestAnimationFrame(() => {
+        if (document.activeElement !== document.body) return;
+        openDisclosures(link);
+        link.focus({ preventScroll: true });
+        const bounds = link.getBoundingClientRect();
+        if (saved.top >= 0 && saved.top + bounds.height <= innerHeight) {
+          scrollBy({ top: bounds.top - saved.top, behavior: 'instant' });
+        } else {
+          link.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+      });
+    });
+  }
 
   const chapter = document.querySelector('.r-reader-chapter-content[aria-labelledby="technical-landscape"]');
   const footer = document.querySelector('.site-footer');

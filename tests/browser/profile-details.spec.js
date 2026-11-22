@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect, chromium } = require('@playwright/test');
 
 const renderers = ['profileProductGrid', 'profileCase', 'profileRelationshipGrid', 'profileRisks',
   'profilePeople', 'profileCapital', 'profileTraction', 'profileArchive'];
@@ -186,16 +186,93 @@ test('the correction address restores the exact claim drafts in a fresh tab and 
 const imeritLedger = '/explore/#company/imerit/sources';
 const imeritImage = '/assets/products/imerit-exl-visual.png';
 
+async function mapNativeExploreLinks(page, baseURL) {
+  // An origin redirect preserves the link and its fragment in browser history.
+  await page.route('https://sciencetostartup.com/explore/', route => route.fulfill({
+    status: 307, headers: { location: new URL('/explore/', baseURL).href },
+  }));
+}
+
 async function openNativeSourceLedger(page, baseURL) {
+  await mapNativeExploreLinks(page, baseURL);
   await page.goto('/company/imerit/');
   await page.locator('summary#sources, #sources > summary').press('Enter');
   const ledger = page.getByRole('link', { name: 'Source ledger', exact: true });
   await expect(ledger).toHaveAttribute('href', 'https://sciencetostartup.com' + imeritLedger);
-  // Map the public origin to the QA host while leaving the link activation native.
-  await ledger.evaluate((link, destination) => { link.href = destination; }, new URL(imeritLedger, baseURL).href);
+  await ledger.focus();
+  const scroll = await page.evaluate(() => scrollY);
   await ledger.press('Enter');
   await expect(page).toHaveURL(new URL(imeritLedger, baseURL).href);
+  return scroll;
 }
+
+async function recordNativeHistory(page, cold) {
+  await page.addInitScript(cold => {
+    addEventListener('pageshow', event => { window.nativePagePersisted = event.persisted; });
+    if (cold && location.pathname === '/company/imerit/') addEventListener('unload', () => {});
+  }, cold);
+}
+
+async function expectNativeLedgerReturn(page, scroll, persisted) {
+  await page.goBack({ waitUntil: 'commit' });
+  const ledger = page.getByRole('link', { name: 'Source ledger', exact: true });
+  await expect(ledger).toBeFocused();
+  await expect(ledger).toBeInViewport({ ratio: 1 });
+  await expect.poll(() => page.evaluate(() => window.nativePagePersisted)).toBe(persisted);
+  expect(Math.abs(await page.evaluate(() => scrollY) - scroll)).toBeLessThan(2);
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Funding and people', exact: true })).toBeFocused();
+}
+
+test('a fresh-document Back reopens Sources and data at the exact activated native link', async ({ page, baseURL }) => {
+  await recordNativeHistory(page, true);
+  const ledgerScroll = await openNativeSourceLedger(page, baseURL);
+  await expect(page.getByRole('heading', { name: 'All sources', exact: true })).toBeFocused();
+  await expectNativeLedgerReturn(page, ledgerScroll, false);
+  expect(await page.evaluate(() => performance.getEntriesByType('navigation')[0].type)).toBe('back_forward');
+
+  const funding = page.getByRole('link', { name: 'Funding and people', exact: true });
+  const fundingScroll = await page.evaluate(() => scrollY);
+  await funding.press('Enter');
+  await expect(page).toHaveURL(/#company\/imerit\/people$/);
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  await page.goBack({ waitUntil: 'commit' });
+  await expect(funding).toBeFocused();
+  await expect(funding).toBeInViewport({ ratio: 1 });
+  expect(Math.abs(await page.evaluate(() => scrollY) - fundingScroll)).toBeLessThan(2);
+
+  await page.reload();
+  await expect(page.locator('body')).toBeFocused();
+  await expect(page.locator('#sources').locator('..')).toHaveJSProperty('open', false);
+  await page.locator('#sources').press('Enter');
+  await page.route('https://sciencetostartup.com/method/', route => route.fulfill({
+    status: 307, headers: { location: new URL('/method/', baseURL).href },
+  }));
+  await page.getByRole('link', { name: 'Source grades', exact: true }).press('Enter');
+  await expect(page).toHaveURL(/\/method\/#grades$/);
+  await page.goBack({ waitUntil: 'commit' });
+  await expect(page.locator('body')).toBeFocused();
+  await expect(page.locator('#sources').locator('..')).toHaveJSProperty('open', false);
+
+  await page.locator('.company-hero a[href="#work"]').press('Enter');
+  await expect(page).toHaveURL(/\/company\/imerit\/#work$/);
+  await expect(page.locator('#work').locator('..').locator('..')).toHaveJSProperty('open', true);
+  await expect(page.locator('#sources').locator('..')).toHaveJSProperty('open', false);
+});
+
+test('a cached Back preserves the browser’s native ledger restoration', async ({ baseURL, browserName, isMobile, viewport }) => {
+  test.skip(browserName !== 'chromium', 'Exercise an explicitly enabled Chromium back-forward cache');
+  const browser = await chromium.launch({ channel: 'chromium', ignoreDefaultArgs: ['--disable-back-forward-cache'] });
+  try {
+    const page = await browser.newPage({ baseURL, isMobile, viewport, hasTouch: isMobile });
+    await recordNativeHistory(page, false);
+    const scroll = await openNativeSourceLedger(page, baseURL);
+    await expect(page.getByRole('heading', { name: 'All sources', exact: true })).toBeFocused();
+    await expectNativeLedgerReturn(page, scroll, true);
+  } finally {
+    await browser.close();
+  }
+});
 
 async function expectSourceHeadingInView(heading) {
   await expect.poll(() => heading.evaluate(node => {
