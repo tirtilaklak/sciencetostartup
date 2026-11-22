@@ -1105,9 +1105,10 @@ def source_meta(research, source, check=None):
     return " · ".join(part for part in (clean(source.get("publisher")), f"Published {format_date(published)}" if published else "", source_record_status(source), status) if part)
 
 
-def company_source_link(research, source):
+def company_source_link(research, source, show_availability=True):
     label = shown_text(research, source.get("title")) or clean(source.get("publisher")) or "Source"
-    return external_link(source.get("url"), label) + availability(source.get("url"), research.health)
+    url = source.get("url")
+    return external_link(url, label) + (availability(url, research.health) if show_availability else "")
 
 
 def company_citations(research, claim, primary_id, sources=None, checks=None):
@@ -1158,6 +1159,7 @@ def figures_html(research, company, figures, pending, others, profile_entry, fin
                              "display_label": fact["label"], "finance_fact": fact}
     sources = {source["id"]: source for source in (health or {}).get("sources", [])}
     observations = {row["id"]: row for row in (health or {}).get("observations", [])}
+    checks = {row["source_id"]: row for row in (health or {}).get("source_checks", {}).get("entries", [])}
     calculated = {}
     for observation in observations.values():
         profile_metric = observation.get("profile_metric_id")
@@ -1169,13 +1171,17 @@ def figures_html(research, company, figures, pending, others, profile_entry, fin
                 "assurance": "Calculated", "note": f"Calculated from rounded revenue of {amounts}.",
                 "confidence_reason": observation["profile_confidence_reason"],
                 "citation_evidence": [sources[sid] for sid in observation_source_ids(observation)],
-                "source_checks": {row["source_id"]: row for row in health["source_checks"]["entries"]}}
+                "source_checks": checks}
         rid = observation.get("id")
         if rid not in figure_ids or observation.get("metric_ids") != [rid]:
             continue
         if observation.get("evidence_type") == "estimate":
             contexts[rid] = {**(contexts.get(rid) or {}), "display_label": observation["label"], "estimated": True}
-        if supplemental := sources.get(observation.get("primary_source_id")):
+        if observation.get("historical_source_ids"):
+            contexts[rid] = {**(contexts.get(rid) or {}),
+                "citation_evidence": [sources[sid] if sid in sources else research.sources[sid] for sid in observation_source_ids(observation)],
+                "source_checks": checks}
+        elif supplemental := sources.get(observation.get("primary_source_id")):
             contexts[rid] = {**(contexts.get(rid) or {}), "supplemental_source": supplemental, "note": observation["limitations"]}
     if figures:
         shown = [{**m, "value": round(calculated[m["id"]]["value"], 1), "qualifier": "approximate"}
@@ -1745,20 +1751,28 @@ def company_work_source_ids(research, company_id, routes):
             and is_web_url(source.get("url")) and (sid, source["url"]) in recorded}
 
 
-def company_source_item(research, source, bookmark=False):
+def company_source_item(research, source, bookmark=False, historical_check=None):
     sid = source["id"]
-    meta = source_meta(research, source) if bookmark or sid in research.reviewed_source_dates else ""
+    meta = source_meta(research, source, historical_check) if bookmark or historical_check or sid in research.reviewed_source_dates else ""
+    if historical_check:
+        meta = f"Historical citation · {meta}"
     anchor = f' id="{escape(sid)}"' if bookmark else ""
     annotation = f'<span class="sub">{escape(meta)}</span>' if meta else ""
-    return f'<li{anchor} data-native-source="{escape(sid)}">{company_source_link(research, source)}{annotation}</li>'
+    return f'<li{anchor} data-native-source="{escape(sid)}">{company_source_link(research, source, not historical_check)}{annotation}</li>'
 
 
-def company_sources_html(research, company_id, name, work_source_ids):
-    items = [company_source_item(research, source) for sid, source in research.sources.items()
+def company_sources_html(research, company_id, name, work_source_ids, health=None):
+    health = health or {}
+    revised = [row for row in health.get("observations", []) if row["company_id"] == company_id and row.get("historical_source_ids")]
+    historical_ids = {sid for row in revised for sid in row["historical_source_ids"]}
+    replacement_ids = {sid for row in revised for sid in row["source_ids"] if sid not in research.sources}
+    historical_checks = {row["source_id"]: row for row in health.get("source_checks", {}).get("entries", []) if row["source_id"] in historical_ids}
+    items = [company_source_item(research, source, historical_check=historical_checks.get(sid)) for sid, source in research.sources.items()
              if source.get("company_id") == company_id and is_web_url(source.get("url")) and sid not in work_source_ids]
-    if not items:
-        return '<p>No original source links recorded.</p>'
-    return f'<h3>Original sources for {escape(name)}</h3><ol data-native-source-list>{"".join(items)}</ol>'
+    originals = (f'<h3>Original sources for {escape(name)}</h3><ol data-native-source-list>{"".join(items)}</ol>'
+                 if items else '<p>No original source links recorded.</p>')
+    replacements = "".join(company_source_item(research, source, bookmark=True) for source in health.get("sources", []) if source["id"] in replacement_ids)
+    return originals + (f'<h3>Replacement sources</h3><ol>{replacements}</ol>' if replacements else "")
 
 
 def render_company_work_sources(research, company, source_ids, modified):
@@ -1851,7 +1865,7 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     body.append(f'<details class="company-fold"><summary id="sources" data-native-sources><span>Sources &amp; data</span><small>{plural(source_count, "source")}</small></summary><div class="company-fold-body"><h2 id="full-profile">Sources and data</h2>'
                 f'<p>{plural(claim_count, "claim")} · {plural(source_count, "source")} · Research compiled {escape(format_date(research.as_of))}</p>'
                 + (f'<p><a href="/company/{cid}/work-sources/">{plural(len(work_source_ids), "paid work source")}</a></p>' if work_source_ids else '')
-                + company_sources_html(research, cid, name, work_source_ids) +
+                + company_sources_html(research, cid, name, work_source_ids, business_health) +
                 f'<ul class="company-source-links"><li><a href="{app_url}/sources">Source ledger</a></li><li><a href="{app_url}/people">Funding and people</a></li><li><a href="{ORIGIN}/research.json" download>Research JSON</a></li><li><a href="{ORIGIN}/observatory.sqlite" download>SQLite database</a></li></ul>'
                 f'<p class="company-record-links"><a href="{app_url}">Interactive record</a><a href="{app_url}/traction">Figures</a><a href="{app_url}/work">Paid work</a><a href="{ORIGIN}/method/#grades">Source grades</a></p>')
     if logo: body.append(f'<p class="company-logo-source">Company logo: {external_link(logo.get("source_page") or logo.get("asset_url"), "official source")}. {LOGO_NOTE}</p>')
