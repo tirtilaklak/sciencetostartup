@@ -4,7 +4,7 @@ The audit began at 7:30 PM Pacific on November 21, 2026. The first three hours a
 
 ## Current pass
 
-PR #34 merged at `1cecd451`. Public Worker 41 serves build `5dc63fbcf19634a55c66`. PR #35 now contains thirteenth build `ea33475d17a8c53ceb65`. Ten contributors delivered the changes. The twelfth build passed 228 targeted browser cases and all official workflows. Its independent review found enlarged menus clipping and a Mobile WebKit cold-Back scroll reset. The thirteenth exact-build audit is in progress. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Public release receipts](site-quality-20261121/fifth-public-release.json)
+PR #34 merged at `1cecd451`. The public site still serves Worker 41, build `5dc63fbcf19634a55c66`. The follow-up in PR #35 passed both official workflows at `ba844440`. A separate six-hour pass began November 22 at 9:44 AM Pacific to simplify the main pages, correct data and audit links throughout the site. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Public release receipts](site-quality-20261121/fifth-public-release.json)
 
 ## Initial baseline and first three rounds
 
@@ -394,3 +394,13 @@ A single tap on a visible Technical Landscape citation keeps its position until 
 Daily gives enlarged labels enough space above 600px. Finding and Source date previously overlapped their values in all 47 stories. The selected story keeps its background on mobile WebKit Forward. Home’s Menu makes room for the next focused action at browser zoom, and keyboard readers can reveal the lower lines of a long search result.
 
 The Market retry restores the visible Revenue & growth heading after a failed data or module request. Compare keeps its focused controls readable on a short phone with enlarged text. The browser tests also capture the ledger’s actual scroll position on departure and wait for the failed request before retrying a claim. [Contributors and source](site-quality-20261121/fourteenth-implementation.json) · [Reproductions](site-quality-20261121/thirteenth-audit-findings.json)
+
+## November 22 sitewide pass
+
+Six workers began with live checks on reliability, design, data, copy, navigation and links. The baseline had 940 generated HTML pages and six XML files. All 40,151 declared static fragment targets exist in the captured build. Another 277 Explore routes require JavaScript to verify. The audit checks the actual served destination separately from whether a generated path exists.
+
+The public site still lists the unavailable AfterQuery People Programs Lead role. It treats two live employer posts as past listings and shows an outdated Engagement Manager pay range. The branch carries corrected dispositions and the employer’s pay disagreement. A fresh pass over all 144 employer URLs found no further changes. All 135 public work records matched across the three browser CSV downloads.
+
+A generic search for “jobs” returned a single literal result. The shared Work selector now respects the requested filters and all eligible listings for a generic query. A literal role or company with the exact title still takes precedence.
+
+The iMerit finance record now links to a second transcript that publishes the same CFO statement, approximately $59 million in preliminary unaudited revenue for the 12 months ended March 31, 2026. The prior transcript is recorded as a historical 404. The canonical dataset and deposited evidence remain available under their original identities.
