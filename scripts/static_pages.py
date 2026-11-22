@@ -1261,7 +1261,7 @@ def work_action_name(label, route, employer):
     return f"{label} for {clean(route.get('role')) or 'Listing'}, {employer}"
 
 
-def work_source_lines(research, route, employer, detailed, profile_destination=None):
+def work_source_lines(research, route, employer, detailed, primary_action_url=None):
     """One URL per list item with every distinct observation and field binding."""
     fields, earlier_fields, receipts, grouped, prior_quotes = {}, {}, {}, {}, {}
     review = route.get("editorial_review") or {}
@@ -1294,17 +1294,23 @@ def work_source_lines(research, route, employer, detailed, profile_destination=N
         if is_web_url(check.get("url")):
             applications.setdefault(check["url"], []).append(check)
     secondary = dict(work_actions(route, research)[1:])
+    separate_evidence_link = any(
+        action.get("purpose") == "archived_listing"
+        or (action.get("purpose") == "application" and action.get("url") == primary_action_url)
+        for action in review.get("actions") or []
+    )
     for url in (*applications, *secondary):
         grouped.setdefault(url, [])
     lines = []
     for url, sources in grouped.items():
         first = sources[0] if sources else {}
         label = secondary.get(url) or clean(first.get("title") or first.get("publisher")) or ("Application checked" if url in applications else "Source")
-        if profile_destination and first.get("purpose") == "terms" and url not in secondary and route.get("role"):
+        if primary_action_url and first.get("purpose") == "terms" and url not in secondary and route.get("role"):
             # The surrounding card already identifies the role.
             label = label.removesuffix(" · " + clean(route["role"])) or label
-        repeats_action = url == profile_destination and url not in secondary
-        # The observations still describe this exact page. Its direct link follows the disclosure.
+        repeats_action = url == primary_action_url and url not in secondary and not separate_evidence_link
+        # The card already links to this page. Keep the exact application and
+        # links that compare current and archived destinations in the disclosure.
         link = escape(label) if repeats_action else external_link(url, label, work_action_name(label, route, employer) if url in secondary else "")
         observations = []
         for index, source in enumerate(sources):
@@ -1322,7 +1328,7 @@ def work_source_lines(research, route, employer, detailed, profile_destination=N
             if not index and url == route.get("url"):
                 purpose = purpose or review.get("recorded_url_purpose")
             entry_receipts = receipts.get(sid, [])
-            terms_review = profile_destination and purpose == "terms" and sid in fields and recorded and any(
+            terms_review = primary_action_url and purpose == "terms" and sid in fields and recorded and any(
                 check.get("scope") == "field_review" and check.get("checked_on") == source.get("accessed_on")
                 for check in entry_receipts
             )
@@ -1371,19 +1377,20 @@ def work_source_lines(research, route, employer, detailed, profile_destination=N
         if record_quote_html and not quote_source and url == quote_url:
             observations.append(record_quote_html)
             record_quote_html = ""
-        # Each next item (or the end of the list) closes the item in a compact card.
-        lines.append(f'<li>{link}{"".join(observations)}' + ("" if profile_destination else "</li>"))
+        # Each next item (or the end of the list) closes the item.
+        lines.append(f'<li>{link}{"".join(observations)}')
     return record_quote_html + ("<ul>" + "".join(lines) + "</ul>" if lines else "")
 
 
-def work_terms_html(research, route, employer, detailed=True, more_requirements=(), profile_destination=None):
+def work_terms_html(research, route, employer, detailed=True, more_requirements=(), primary_action_url=None):
     """One native source disclosure; a replaced original URL remains in its history."""
     label = "More requirements, terms &amp; sources" if more_requirements else "Terms &amp; sources"
     parts = [f'<details class="work-terms"><summary>{label}</summary>']
+    # The next block or closing disclosure ends a paragraph. Each list item
+    # ends at the next item or at the end of its list.
     if more_requirements:
-        # HTML closes each list item at the next item or the end of its list.
         parts.append('<ul aria-label="Additional requirements">' + ''.join(f'<li>{escape(term)}' for term in more_requirements) + '</ul>')
-    if detailed and route.get("summary"): parts.append('<p>' + escape(clean(route["summary"])) + '</p>')
+    if detailed and route.get("summary"): parts.append('<p>' + escape(clean(route["summary"])))
     availability_note = clean(route.get("availability_note"))
     if not detailed:
         availability_note = {
@@ -1391,14 +1398,14 @@ def work_terms_html(research, route, employer, detailed=True, more_requirements=
             "This is an official route directory or program entry point. Specific openings, pay, hours and individual eligibility require checking the linked destination.": "Check the linked page for individual opportunities.",
             "Official listing and compensation header reviewed 28 October 2026. No application submitted; selection and work availability remain employer decisions.": "Listing and compensation header reviewed 28 Oct 2026.",
         }.get(availability_note, availability_note)
-    if availability_note: parts.append(f'<p>{escape(availability_note)}</p>')
+    if availability_note: parts.append(f'<p>{escape(availability_note)}')
     pay_note = clean((route.get("pay_terms") or {}).get("note"))
-    repeats_salary_unit = profile_destination and any(
+    repeats_salary_unit = primary_action_url and any(
         pay_note == f"The employer lists this component as {period} salary." and work_pay(route).endswith(f" {period} salary")
         for period in ("monthly", "annual")
     )
     if pay_note and not repeats_salary_unit and pay_note != work_pay_qualification(route) and pay_note not in availability_note:
-        parts.append(f'<p>{escape(pay_note)}</p>')
+        parts.append(f'<p>{escape(pay_note)}')
     reviews = {}
     source_dates = {source.get("id"): source.get("accessed_on") for source in route.get("sources") or [] if is_web_url(source.get("url"))}
     for field, review in (route.get("field_reviews") or {}).items():
@@ -1418,12 +1425,12 @@ def work_terms_html(research, route, employer, detailed=True, more_requirements=
             text += ". " + note
         reviews.setdefault(text, []).append(label.lower())
     if reviews:
-        parts.append('<ul>' + "".join(f'<li>{escape(f"{text} ({join_words(labels)})")}</li>' for text, labels in reviews.items()) + '</ul>')
+        parts.append('<ul>' + "".join(f'<li>{escape(f"{text} ({join_words(labels)})")}' for text, labels in reviews.items()) + '</ul>')
     if route.get("as_of") and (detailed or route["as_of"] != "undated"):
-        parts.append('<p>Terms recorded · ' + escape(format_date(route["as_of"]) if route["as_of"] != "undated" else "date not stated") + '</p>')
-    parts.append(work_source_lines(research, route, employer, detailed, profile_destination))
+        parts.append('<p>Terms recorded · ' + escape(format_date(route["as_of"]) if route["as_of"] != "undated" else "date not stated"))
+    parts.append(work_source_lines(research, route, employer, detailed, primary_action_url))
     disposition = (route.get("editorial_review") or {}).get("disposition") or {}
-    if detailed and disposition.get("note"): parts.append('<p>' + escape(clean(disposition["note"])) + '</p>')
+    if detailed and disposition.get("note"): parts.append('<p>' + escape(clean(disposition["note"])))
     parts.append('</details>')
     return "".join(parts)
 
@@ -1455,14 +1462,14 @@ def work_item(research, route, employer, compact=False):
     conditions = work_conditions(route, requirements[:visible])
     title = f'<a class="work-role-link" href="/work/#{rid}">{escape(role)}</a>' if compact else escape(role)
     terms = work_terms_html(research, route, employer, detailed=not compact, more_requirements=requirements[visible:],
-                            profile_destination=destination if compact else None)
+                            primary_action_url=destination if compact else None)
     return (f'<li id="{rid}" tabindex="-1" data-work-route="{rid}"><strong>{title}</strong>{tag}'
             f'{qualified_offer}<span class="sub">{escape(". ".join(p for p in parts if p))}</span>{pay_notes}'
             f'{conditions}{terms}{link}</li>')
 
 
 def company_work_html(research, company, routes, compact=False):
-    cid, name = company["id"], company["name"]
+    cid, name = company["id"], clean(company["name"])
     heading = f'<h2 id="work" tabindex="-1">Paid work at {escape(name)}</h2>\n'
     if not routes: return heading + f'<p class="muted">No public work listing is recorded for {escape(name)}.</p>\n'
     names = {cid: name}
@@ -1724,18 +1731,51 @@ def current_facts_html(profile_entry):
     return f'<details class="company-current-facts"><summary>Updates checked {escape(format_date(facts["reviewed_on"]))}</summary><dl class="current-fact-list">{"".join(rows)}</dl></details>'
 
 
-def company_sources_html(research, company_id, name):
-    items = []
-    for sid, source in research.sources.items():
-        if source.get("company_id") == company_id and is_web_url(source.get("url")):
-            meta = f'<span class="sub">{escape(source_meta(research, source))}</span>' if sid in research.reviewed_source_dates else ""
-            items.append(f'<li data-native-source="{escape(sid)}">{company_source_link(research, source)}{meta}</li>')
+def company_work_source_ids(research, company_id, routes):
+    """Find citations already in work cards that serve only paid work claims."""
+    recorded = {(source.get("id"), source.get("url")) for route in routes for source in route.get("sources") or []}
+    work_claims = {claim_id for route in routes for claim_id in route.get("claim_ids") or []}
+    work_ids, shared_ids = set(), set()
+    for claim in research.claims.values():
+        if claim.get("company_id") != company_id: continue
+        group = work_ids if claim["id"] in work_claims else shared_ids
+        group.update(claim.get("source_ids") or [])
+    return {sid for sid, source in research.sources.items() if sid in work_ids - shared_ids
+            and source.get("company_id") == company_id and sid not in research.reviewed_source_dates
+            and is_web_url(source.get("url")) and (sid, source["url"]) in recorded}
+
+
+def company_source_item(research, source, bookmark=False):
+    sid = source["id"]
+    meta = source_meta(research, source) if bookmark or sid in research.reviewed_source_dates else ""
+    anchor = f' id="{escape(sid)}"' if bookmark else ""
+    annotation = f'<span class="sub">{escape(meta)}</span>' if meta else ""
+    return f'<li{anchor} data-native-source="{escape(sid)}">{company_source_link(research, source)}{annotation}</li>'
+
+
+def company_sources_html(research, company_id, name, work_source_ids):
+    items = [company_source_item(research, source) for sid, source in research.sources.items()
+             if source.get("company_id") == company_id and is_web_url(source.get("url")) and sid not in work_source_ids]
     if not items:
         return '<p>No original source links recorded.</p>'
     return f'<h3>Original sources for {escape(name)}</h3><ol data-native-source-list>{"".join(items)}</ol>'
 
 
-def render_company(research, company, editorial_entry, profile_entry, routes, peers, labels, modified, events=None, business_health=None):
+def render_company_work_sources(research, company, source_ids, modified):
+    cid, name = company["id"], clean(company["name"])
+    canonical = f"{ORIGIN}/company/{cid}/work-sources/"
+    heading = f"{name} paid work sources"
+    title = heading + SUFFIX
+    description = f"Original sources cited in the {name} paid work records."
+    crumbs = [("Overview", f"{ORIGIN}/"), ("Companies", f"{ORIGIN}/companies/"),
+              (name, f"{ORIGIN}/company/{cid}/"), ("Paid work sources", canonical)]
+    items = "".join(company_source_item(research, source, bookmark=True) for sid, source in research.sources.items() if sid in source_ids)
+    body = crumb_nav(crumbs) + f'<h1>{escape(heading)}</h1><ol data-native-source-list>{items}</ol>'
+    structured = page_node("CollectionPage", title, description, canonical, modified, crumbs)
+    return document(research, title, description, canonical, body, structured, current="companies", state="true")
+
+
+def render_company(research, company, editorial_entry, profile_entry, routes, peers, labels, modified, events, business_health, company_work, work_source_ids):
     cid, name = company["id"], clean(company["name"])
     company = dict(company, name=name)
     canonical, app_url = f"{ORIGIN}/company/{cid}/", f"{ORIGIN}/explore/#company/{cid}"
@@ -1805,17 +1845,13 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     body.extend(overview)
     if dated or risk_rows:
         body.append(f'<details class="company-fold"><summary><span>Risks &amp; events</span><small>{plural(len(dated), "event")} · {plural(len(risk_rows), "risk note")}</small></summary><div class="company-fold-body">' + risks_html(research, cid, events) + '</div></details>')
-    company_work = company_work_html(research, company, routes)
-    # Keep long dossiers scannable by folding longer requirements into their
-    # local source disclosures and linking to each complete Work record.
-    if len(company_work.encode()) > 70_000:
-        company_work = company_work_html(research, company, routes, compact=True)
     body.append(f'<details class="company-fold"><summary><span>Paid work</span><small>{plural(len(paid_open), "listing or network", "listings and networks") if paid_open else "No confirmed listing"}</small></summary><div class="company-fold-body">' + company_work + '</div></details>')
     source_count = sum(source.get("company_id") == cid for source in research.data.get("sources", []))
     claim_count = sum(claim.get("company_id") == cid for claim in research.data.get("claims", []))
     body.append(f'<details class="company-fold"><summary id="sources" data-native-sources><span>Sources &amp; data</span><small>{plural(source_count, "source")}</small></summary><div class="company-fold-body"><h2 id="full-profile">Sources and data</h2>'
                 f'<p>{plural(claim_count, "claim")} · {plural(source_count, "source")} · Research compiled {escape(format_date(research.as_of))}</p>'
-                + company_sources_html(research, cid, name) +
+                + company_sources_html(research, cid, name, work_source_ids) +
+                (f'<p><a href="/company/{cid}/work-sources/">{plural(len(work_source_ids), "paid work source")}</a></p>' if work_source_ids else '') +
                 f'<ul class="company-source-links"><li><a href="{app_url}/sources">Source ledger</a></li><li><a href="{app_url}/people">Funding and people</a></li><li><a href="{ORIGIN}/research.json" download>Research JSON</a></li><li><a href="{ORIGIN}/observatory.sqlite" download>SQLite database</a></li></ul>'
                 f'<p class="company-record-links"><a href="{app_url}">Interactive record</a><a href="{app_url}/traction">Figures</a><a href="{app_url}/work">Paid work</a><a href="{ORIGIN}/method/#grades">Source grades</a></p>')
     if logo: body.append(f'<p class="company-logo-source">Company logo: {external_link(logo.get("source_page") or logo.get("asset_url"), "official source")}. {LOGO_NOTE}</p>')
@@ -1916,14 +1952,15 @@ def work_table(research, rows, names, key):
         show_pay = key != "boards" and (key != "closed" or pay != "Pay not listed")
         archived = '<span class="sub">Historical advertised pay · </span>' if key == "closed" else ""
         pay_class = 'work-pay work-historical-pay' if archived else 'work-pay'
-        offer = f'<p class="{pay_class}">{archived}<strong>{escape(pay)}</strong>{work_pay_notes(r)}</p>' if show_pay else ""
-        place = f'<p class="work-place">{escape(work_location(r))}</p>' if key != "boards" else ""
+        offer = f'<p class="{pay_class}">{archived}<strong>{escape(pay)}</strong>{work_pay_notes(r)}' if show_pay else ""
+        place = f'<p class="work-place">{escape(work_location(r))}' if key != "boards" else ""
+        offer_html = f'<div class="work-offer">{offer}{place}</div>' if offer or place else ""
         action_html = f'<p class="work-listing-action">{external_link(destination, action, work_action_name(action, r, company))}{availability(destination, research.health)}</p>' if destination else ""
         out.append(f'<li class="work-listing" id="{rid}" tabindex="-1" data-work-route="{rid}" data-arrangements="{escape(arrangements)}">'
                    f'<div class="work-heading"><a class="work-company" href="/company/{escape(cid)}/#{rid}" aria-label="{escape(f"{company} · {role}")}">{escape(company)}</a>{tag}'
-                   f'<h3>{escape(role)}</h3></div><div class="work-offer">{offer}{place}</div>'
-                   f'<p class="work-reviewed">{escape(work_review_label(research, r))}</p><div class="work-listing-conditions">{work_conditions(r)}</div>'
-                   f'{action_html}{work_terms_html(research, r, company, detailed=False)}</li>')
+                   f'<h3>{escape(role)}</h3></div>{offer_html}'
+                   f'<p class="work-reviewed">{escape(work_review_label(research, r))}<div class="work-listing-conditions">{work_conditions(r)}</div>'
+                   f'{action_html}{work_terms_html(research, r, company, detailed=False, primary_action_url=destination)}')
     return f'<ul class="work-listings">{"".join(out)}</ul>\n'
 
 
@@ -2155,9 +2192,24 @@ def write_static_pages(data, destination, work_data=None, profile_content=None, 
         modified = latest(research.as_of, SITE_REVISED, (editorial_by_id.get(cid) or {}).get("reviewed_on"), ((profile_by_id.get(cid) or {}).get("current_facts") or {}).get("reviewed_on"), (selected_business_observation(business_health, cid) or {}).get("evidence_checked_on"), events_reviewed if company_events(events, cid) else "", *(d for r in own for d in route_dates(r))) or research.as_of
         folder = destination / "company" / cid
         folder.mkdir(parents=True, exist_ok=True)
-        (folder / "index.html").write_text(render_company(research, company, editorial_by_id.get(cid), profile_by_id.get(cid), own, peers, labels, modified, events, business_health), encoding="utf-8")
+        company_work = company_work_html(research, company, own)
+        work_source_ids = ()
+        # Long dossiers retain all work evidence in the cards. Their source
+        # ledger links to the duplicate work-specific records.
+        if len(company_work.encode()) > 70_000:
+            company_work = company_work_html(research, company, own, compact=True)
+            work_source_ids = company_work_source_ids(research, cid, own)
+        page = render_company(research, company, editorial_by_id.get(cid), profile_by_id.get(cid), own, peers, labels,
+                              modified, events, business_health, company_work, work_source_ids)
+        (folder / "index.html").write_text(page, encoding="utf-8")
         written.append(folder / "index.html")
         company_entries.append((f"{ORIGIN}/company/{cid}/", modified))
+        if work_source_ids:
+            index = folder / "work-sources/index.html"
+            index.parent.mkdir(exist_ok=True)
+            index.write_text(render_company_work_sources(research, company, work_source_ids, modified), encoding="utf-8")
+            written.append(index)
+            company_entries.append((f"{ORIGIN}/company/{cid}/work-sources/", modified))
     index_modified = latest(research.as_of, SITE_REVISED, *reviewed, *((e.get("current_facts") or {}).get("reviewed_on") for e in profile_by_id.values()), (business_health or {}).get("dashboard_curated_on"), (current_companies or {}).get("reviewed_on")) or research.as_of
     work_modified = latest(research.as_of, SITE_REVISED, *(d for r in routes for d in route_dates(r))) or research.as_of
     method_modified = latest(research.as_of, SITE_REVISED) or research.as_of
