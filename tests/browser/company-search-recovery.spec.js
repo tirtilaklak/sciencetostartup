@@ -163,7 +163,8 @@ async function downloadedCompanyIds(page) {
 }
 
 test('failed filters and CSV reflect the current criteria and recovery exports the matching IDs', async ({ page }) => {
-  const index = await holdFirstIndexRequest(page, attempt => attempt === 1);
+  let unavailable = true;
+  const index = await holdFirstIndexRequest(page, () => unavailable);
   try {
     await openCompanies(page);
     await search(page).fill(query);
@@ -194,6 +195,8 @@ test('failed filters and CSV reflect the current criteria and recovery exports t
     await page.goBack({ waitUntil: 'commit' });
     await expect(page).toHaveURL(origin);
     await expectCriteria(page);
+    await expect(retry(page)).toBeVisible();
+    unavailable = false;
     await retry(page).press('Enter');
     await expectResults(page, []);
     await expectCriteria(page);
