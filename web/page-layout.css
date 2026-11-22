@@ -23,7 +23,8 @@
  .static-page main{padding-top:16px}
  .static-page .crumbs ol{margin-bottom:20px}
  .static-page .site-footer{margin-top:32px}
- .static-page .site-header{flex-wrap:wrap;gap:0 8px;min-height:58px;padding:4px 20px}
+ /* Keep the panel inside the viewport when Menu wraps onto its own line. */
+ .static-page .site-header{flex-wrap:wrap;justify-content:flex-end;gap:0 8px;min-height:58px;padding:4px 20px}
  .static-page .site-header>.wordmark{flex:1 1 auto;max-width:100%;font-size:18px;white-space:normal;overflow-wrap:anywhere}
  .static-page .site-header>.site-nav{display:none}
  .static-page .site-header>.site-search-open{flex:none;margin-inline-start:auto}
