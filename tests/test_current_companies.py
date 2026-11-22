@@ -44,6 +44,13 @@ def current_identity(scope="current_only"):
             "website": "https://example.org/", "source_indexes": [1]}
 
 
+def current_facts():
+    return {"reviewed_on": "2026-11-18",
+        "rows": [{"label": "Acquisition completed", "value": "Research & Data · reported 17 Nov 2026", "source_indexes": [0]}],
+        "sources": [{"url": "https://example.org/acquisition", "title": "Acquisition announcement", "published_on": "2026-11-17",
+            "observed_on": "2026-11-18", "response_sha256": "d" * 64, "locator": "Completed transaction and dateline", "content_kind": "raw_http_body"}]}
+
+
 class Page(HTMLParser):
     def __init__(self, text):
         super().__init__()
@@ -128,6 +135,35 @@ class CurrentCompanyValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "duplicate entity"):
             cc.validate_current_companies(value, {"companies": []}, context())
 
+    def test_current_facts_require_validated_identity_and_independent_source_receipts(self):
+        registry = example()
+        registry["reviewed_on"] = "2026-11-19"
+        registry["entries"][0]["current_facts"] = current_facts()
+        original = copy.deepcopy(registry)
+        self.assertIs(cc.validate_current_companies(registry, {"companies": []}, context()), registry)
+        self.assertEqual(registry, original)
+        registry["entries"][0]["entity_id"] = "org.unreviewed"
+        with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "existing approved"):
+            cc.validate_current_companies(registry, {"companies": []}, context())
+        changes = [
+            (lambda f: f.update(reviewed_on="2026-11-20"), "after the registry review"),
+            (lambda f: f["sources"][0].update(observed_on="2026-11-19"), "after the review"),
+            (lambda f: f["sources"][0].update(published_on="2026-11-19"), "after observation"),
+            (lambda f: f["sources"][0].update(response_sha256="unbound"), "SHA-256"),
+            (lambda f: f["sources"][0].update(locator=""), "non-empty"),
+            (lambda f: f["sources"][0].update(content_kind="search_snippet"), "content_kind"),
+            (lambda f: f["sources"][0].update(private_note="private"), "unsupported source fields"),
+            (lambda f: f["rows"][0].update(source_indexes=[1]), "invalid reference"),
+            (lambda f: f["rows"][0].update(source_indexes=[True]), "invalid reference"),
+            (lambda f: f["rows"][0].update(source_indexes=[0, 0]), "repeats a reference"),
+        ]
+        for change, error in changes:
+            with self.subTest(error=error):
+                value = copy.deepcopy(original)
+                change(value["entries"][0]["current_facts"])
+                with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, error):
+                    cc.validate_current_companies(value, {"companies": []}, context())
+
     def test_parent_article_requires_explicit_narrow_binding(self):
         self.reject(lambda e: e["wikipedia"].update(article_scope="parent_company"), "DataForce")
         value, graph = example(), context()
@@ -143,6 +179,38 @@ class CurrentCompanyValidationTests(unittest.TestCase):
 
 
 class CurrentCompanyRenderingTests(unittest.TestCase):
+    def test_current_fact_cards_and_profiles_keep_receipt_dates_separate(self):
+        registry = example()
+        registry["reviewed_on"] = "2026-11-19"
+        entry = registry["entries"][0]
+        entry["current_identity"] = current_identity()
+        entry["current_facts"] = current_facts()
+        entry["wikipedia"].update(observed_on="2026-11-12", revision_timestamp="2026-11-11T12:00:00Z")
+        entry["sources"][1]["observed_on"] = "2026-11-13"
+        cc.validate_current_companies(registry, {"companies": []}, {"graph": {"entities": [], "assertions": []}})
+        before = copy.deepcopy(entry)
+        self.assertEqual(cc.current_review_date(entry), "2026-11-18")
+        self.assertEqual(cc.offering_source_dates(entry), ["2026-11-16"])
+        research = SimpleNamespace(as_of="2026-10-28", data={"dataset_version": "2.5.0"})
+        card = sp.render_index(research, [], {}, {}, 0, registry["reviewed_on"], current_entries=[entry], current_reviewed_on=registry["reviewed_on"])
+        with tempfile.TemporaryDirectory() as folder:
+            self.assertEqual(cc.write_current_company_supplements(folder, registry), [{"path": cc.company_path(entry), "lastmod": "2026-11-18"}])
+            profile = (Path(folder) / cc.company_path(entry).strip('/') / 'index.html').read_text()
+        for markup in (card, profile):
+            page = Page(markup)
+            self.assertIn("Updates checked 18 Nov 2026", " ".join(page.text))
+            self.assertIn("Research & Data · reported 17 Nov 2026", " ".join(page.text))
+            self.assertIn("Research &amp; Data", markup)
+            self.assertIn("https://example.org/acquisition", page.links)
+            self.assertIn("Offering sources checked 16 Nov 2026", markup)
+            self.assertNotIn("Offering sources checked 18 Nov", markup)
+            self.assertNotIn("Updates checked 19 Nov", markup)
+            self.assertEqual(markup.count('class="company-current-facts company-current-update-facts"'), 1)
+            self.assertEqual(markup.count('class="company-current-facts company-current-source-receipts"'), 1)
+        self.assertIn('"dateModified":"2026-11-18"', profile)
+        self.assertIn("Wikipedia revision 2026-11-11T12:00:00Z · Observed 12 Nov 2026", profile)
+        self.assertEqual(entry, before)
+
     def test_directory_cards_and_provenance_are_available_without_javascript(self):
         registry = example()
         registry["reviewed_on"] = "2026-11-17"
@@ -161,7 +229,7 @@ class CurrentCompanyRenderingTests(unittest.TestCase):
         self.assertIn(cc.CHANGE_NOTE, " ".join(page.text))
         self.assertIn("Current directory addition · Offering sources checked 15 Nov 2026", " ".join(page.text))
         self.assertNotIn("checked 17 Nov 2026", " ".join(page.text))
-        self.assertIn('<details class="company-current-facts">', text)
+        self.assertIn('<details class="company-current-facts company-current-source-receipts">', text)
         self.assertIn('<details class="company-current-context">', text)
         context_html = text.split('<details class="company-current-context">', 1)[1]
         self.assertIn(entry["wikipedia"]["description"], context_html)
@@ -219,6 +287,18 @@ class CurrentCompanyRenderingTests(unittest.TestCase):
             self.assertEqual(page.scripts, [{"type": "application/ld+json"}, {"src": "/native-details.js", "defer": None}])
             with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "already written"):
                 cc.write_current_company_supplements(root, registry)
+            # A later fact review also applies to an existing research profile.
+            registry["reviewed_on"] = "2026-11-19"
+            entry["current_facts"] = current_facts()
+            cc.validate_current_companies(registry, {"companies": []}, context())
+            target.write_text(original)
+            self.assertEqual(cc.write_current_company_supplements(root, registry), [{"path": cc.company_path(entry), "lastmod": "2026-11-18"}])
+            updated = target.read_text()
+            self.assertIn('"dateModified":"2026-11-18"', updated)
+            self.assertIn("Updates checked 18 Nov 2026", updated)
+            self.assertIn("Offering sources checked 16 Nov 2026", updated)
+            self.assertIn(historic, updated)
+            self.assertEqual(hashlib.sha256(archive.read_bytes()).hexdigest(), frozen)
 
     def test_search_uses_one_stable_profile_result_and_preserves_non_wikipedia_copy(self):
         registry = example()

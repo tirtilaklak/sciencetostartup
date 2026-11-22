@@ -53,16 +53,22 @@ test('opened company source context and metadata reflow at 320 pixels', async ({
   let companyViewport;
   const parentScoped = registry.entries.find(entry => entry.parent_company);
   const longTitle = [...registry.entries].sort((a, b) => Math.max(...b.sources.map(source => source.title.length)) - Math.max(...a.sources.map(source => source.title.length)))[0];
-  for (const entry of [...new Set([parentScoped, longTitle].filter(Boolean))]) {
+  const updated = registry.entries.find(entry => entry.current_facts);
+  for (const entry of [...new Set([parentScoped, longTitle, updated].filter(Boolean))]) {
     await page.goto('/companies/?q=' + encodeURIComponent(entry.name), { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#company-query')).toHaveCSS('font-size', '16px');
     await expect(page.locator('#company-group')).toHaveCSS('font-size', '16px');
     const card = page.locator('[data-company="' + entry.entity_id + '"]');
     await expect(card.getByRole('heading', { name: entry.name, exact: true })).toBeVisible();
     await card.locator('.company-current-context > summary').click();
-    await card.locator('.company-current-facts > summary').click();
+    await card.locator('.company-current-source-receipts > summary').click();
     await expect(card.locator('.company-wikipedia-description')).toHaveText(entry.wikipedia.description);
-    for (const source of entry.sources) await expect(card.locator('.company-current-facts')).toContainText(source.locator);
+    for (const source of entry.sources) await expect(card.locator('.company-current-source-receipts')).toContainText(source.locator);
+    if (entry.current_facts) {
+      const updates = card.locator('.company-current-update-facts');
+      await updates.locator(':scope > summary').click();
+      for (const row of entry.current_facts.rows) await expect(updates).toContainText(row.value);
+    }
     await fitsViewport(card.locator('h3,.company-current-context[open] p,.company-current-context[open] a,.company-current-context[open] li,.company-current-context[open] dd'));
     if (entry === parentScoped) {
       await card.locator('h3').scrollIntoViewIfNeeded();

@@ -16,6 +16,8 @@ import re
 import unicodedata
 from urllib.parse import parse_qs, unquote, urlsplit
 
+from company_updates import CompanyUpdatesValidationError, validate_profile_current_facts
+
 
 LICENSE = "https://creativecommons.org/licenses/by-sa/4.0/"
 CHANGE_NOTE = "Sentence wording unchanged; links, formatting and citation markers omitted."
@@ -88,7 +90,7 @@ def validate_current_companies(registry, data, context):
     seen, articles, admitted_names = set(), set(), {}
     for entry in registry["entries"]:
         fields = {"entity_id", "name", "group", "website", "wikipedia", "offerings", "sources"}
-        _require(isinstance(entry, dict) and fields <= set(entry) <= fields | {"parent_company", "current_identity"}, "entry has unsupported fields")
+        _require(isinstance(entry, dict) and fields <= set(entry) <= fields | {"parent_company", "current_identity", "current_facts"}, "entry has unsupported fields")
         eid = entry["entity_id"]
         _require(isinstance(eid, str) and re.fullmatch(r"org\.[a-z0-9][a-z0-9_.-]*", eid), "entity_id must be an organization ID")
         _require(eid not in canonical, "canonical companies cannot be replaced by current additions")
@@ -209,6 +211,13 @@ def validate_current_companies(registry, data, context):
             previous = admitted_names.get(token)
             _require(not previous or previous[0] == eid or not (current_only or previous[1]), eid + " current identity duplicates an existing organization")
             admitted_names[token] = (eid, current_only)
+    # Admit these IDs only after their complete identity/evidence validation.
+    facts = {"entries": [{"company_id": row["entity_id"], "current_facts": row["current_facts"]}
+                         for row in registry["entries"] if "current_facts" in row]}
+    try:
+        validate_profile_current_facts(facts, data, additional_company_ids=seen, reviewed_through=reviewed)
+    except CompanyUpdatesValidationError as exc:
+        raise CurrentCompaniesValidationError("current-companies: " + str(exc)) from None
     return registry
 
 
@@ -262,8 +271,9 @@ def _link(url, label):
 
 
 def current_review_date(entry):
-    """A later registry update cannot refresh an unchanged entry's receipts."""
-    return min(entry["wikipedia"]["observed_on"], *(source["observed_on"] for source in entry["sources"]))
+    """Page metadata may include fact updates; source-specific dates stay separate."""
+    sources_reviewed = min(entry["wikipedia"]["observed_on"], *(source["observed_on"] for source in entry["sources"]))
+    return max(sources_reviewed, (entry.get("current_facts") or {}).get("reviewed_on", sources_reviewed))
 
 
 def offering_source_dates(entry):
@@ -274,7 +284,7 @@ def offering_source_dates(entry):
 
 def current_company_html(entry, reviewed_on, compact=False, native_sources=False):
     """Attribution stays adjacent to the exact quoted text without JavaScript."""
-    from static_pages import format_date
+    from static_pages import current_facts_html, format_date
     wiki, sources = entry["wikipedia"], entry["sources"]
     refs = lambda indexes: " ".join(_link(sources[i]["url"], "[" + str(i + 1) + "]") for i in indexes)
     offerings = "".join('<li>' + escape(o["label"]) + ' ' + refs(o["source_indexes"]) + '</li>' for o in entry["offerings"])
@@ -287,14 +297,15 @@ def current_company_html(entry, reviewed_on, compact=False, native_sources=False
                    + _link(wiki["revision_url"], "Revision " + str(wiki["revision_id"])) + ' · '
                    + _link(LICENSE, "CC BY-SA 4.0") + '. ' + escape(wiki["change_note"]) + '</p>')
     anchor = ' id="sources" data-native-sources' if native_sources else ''
-    evidence = (f'<details class="company-current-facts"><summary{anchor}>' + ('Official sources' if compact else 'Current source receipts') + '</summary><ol>'
+    evidence = (f'<details class="company-current-facts company-current-source-receipts"><summary{anchor}>' + ('Official sources' if compact else 'Current source receipts') + '</summary><ol>'
         + ''.join('<li>' + _link(s["url"], s["title"]) + '<p>' + escape(s["locator"]) + '</p><p>Observed ' + escape(format_date(s["observed_on"])) + ((' · Published ' + escape(format_date(s["published_on"]))) if s["published_on"] else '') + '</p>' + ('' if compact else '<code>SHA-256 ' + escape(s["response_sha256"]) + '</code>') + '</li>' for s in sources)
         + '</ol>' + ('' if compact else '<p>Wikipedia revision ' + escape(wiki["revision_timestamp"]) + ' · Observed ' + escape(format_date(wiki["observed_on"])) + '</p><code>SHA-256 ' + escape(wiki["response_sha256"]) + '</code>') + '<p><a href="/current-companies.json">Current directory records and provenance · JSON</a></p></details>')
     dates = offering_source_dates(entry)
     observed = format_date(dates[0]) + (" to " + format_date(dates[-1]) if len(dates) > 1 else "")
     stamp = '<p class="company-research-snapshot">Current directory addition · Offering sources checked ' + escape(observed) + '</p>'
+    updates = current_facts_html(entry).replace('class="company-current-facts"', 'class="company-current-facts company-current-update-facts"', 1)
     context = (scope + '<blockquote class="company-wikipedia-description"><p>' + escape(wiki["description"]) + '</p></blockquote>' + attribution
-               + '<p><strong>Current offerings</strong></p><ul>' + offerings + '</ul>' + evidence)
+               + '<p><strong>Current offerings</strong></p><ul>' + offerings + '</ul>' + updates + evidence)
     if compact:
         preview = '<p class="company-offering-preview">' + escape(" · ".join(offering["label"] for offering in entry["offerings"])) + '</p>'
         context = preview + stamp + '<details class="company-current-context"><summary>Company context and sources</summary>' + context + '</details>'
