@@ -9635,7 +9635,7 @@
             "final_url": "https://jobs.ashbyhq.com/terac/9f8d7438-ffd8-42be-b169-a46437154c79/",
             "http_status": 404,
             "retrieved_at": "2026-11-22T14:40:57Z",
-            "retrieval_reason": "posting_not_found",
+            "retrieval_reason": "http_not_found",
             "note": "The original Ashby posting returned HTTP 404."
           }
         ],
