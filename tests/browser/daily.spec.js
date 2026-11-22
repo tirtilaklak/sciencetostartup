@@ -367,6 +367,112 @@ async function traversePermalinkHistory(page, direction, destination) {
   await expect(page).toHaveURL(destination);
 }
 
+async function phoneFragmentHighlight(page, scripting) {
+  const audited = latest.items.find(item => item.id === 'dominobench');
+  const { item, query } = audited ? { item: audited, query: audited.id } : distinctiveSearch();
+  const row = page.locator(`.scan-item[id="${item.id}"]`);
+  const details = row.locator('details');
+  const permalink = row.locator('.scan-permalink');
+  const headline = row.locator('h2 a');
+  const markedRows = page.locator('.scan-item[data-fragment-target]');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/daily/?q=' + encodeURIComponent(query));
+  if (scripting) await assertSelections(page, [item]);
+  const start = page.url();
+  const destination = new URL(`/daily/${latest.date}/#${item.id}`, start).href;
+  await row.locator('summary').press('Enter');
+  await permalink.focus();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(destination);
+
+  async function reading() {
+    await page.waitForLoadState('load');
+    await page.evaluate(() => document.fonts.ready);
+    await expect(row).toHaveCSS('background-color', 'rgb(234, 240, 229)');
+    await expect(row).toHaveCSS('box-shadow', 'rgb(234, 240, 229) 8px 0px 0px 0px, rgb(234, 240, 229) -8px 0px 0px 0px');
+    if (scripting) {
+      await expect(details).toHaveAttribute('open', '');
+    } else {
+      await expect(markedRows).toHaveCount(0);
+      await expect(page.locator('.scan-item:target')).toHaveAttribute('id', item.id);
+      await expect(details).not.toHaveAttribute('open', '');
+    }
+    return { ...await settledReading(headline), ...await page.evaluate(() => ({ document: performance.timeOrigin,
+      navigationType: performance.getEntriesByType('navigation')[0].type })) };
+  }
+
+  const arrival = await reading();
+  await traversePermalinkHistory(page, 'goBack', start);
+  await expect(markedRows).toHaveCount(0);
+  await traversePermalinkHistory(page, 'goForward', destination);
+  const forward = await reading();
+  if (scripting) {
+    await expect(markedRows).toHaveCount(1);
+    await expect(markedRows).toHaveAttribute('id', item.id);
+  }
+  expect(forward.navigationType).toBe('back_forward');
+  expect(forward.document).not.toBe(arrival.document);
+  expect(forward.open).toEqual(arrival.open);
+  expect(Math.abs(forward.y - arrival.y)).toBeLessThanOrEqual(2);
+  expect(Math.abs(forward.top - arrival.top)).toBeLessThanOrEqual(2);
+  await page.keyboard.press('Tab');
+  await expect(headline).toBeFocused();
+}
+
+test('Daily phone WebKit keeps the story highlight on cold Forward', async ({ page, request, browserName, isMobile }) => {
+  test.skip(browserName !== 'webkit' || !isMobile, 'Exercise the iPhone WebKit history return');
+  await verifiedResponse(request, '/daily-scan.js', 'daily-scan.js');
+  await verifiedResponse(request, '/daily-scan.css', 'daily-scan.css');
+  await phoneFragmentHighlight(page, true);
+});
+
+test('Daily story highlight follows the visible fragment as filters and history change', async ({ page }) => {
+  const [first, second] = latest.items;
+  const rows = page.locator('.scan-item');
+  const markedRows = page.locator('.scan-item[data-fragment-target]');
+  const search = page.getByRole('searchbox', { name: 'Search', exact: true });
+  const address = `/daily/${latest.date}/`;
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(address);
+
+  async function expectHighlight(id) {
+    await expect(markedRows).toHaveCount(id ? 1 : 0);
+    if (id) await expect(markedRows).toHaveAttribute('id', id);
+    await expect.poll(() => rows.filter({ visible: true }).evaluateAll(items => items
+      .filter(row => getComputedStyle(row).backgroundColor === 'rgb(234, 240, 229)').map(row => row.id)))
+      .toEqual(id ? [id] : []);
+  }
+
+  await expectHighlight();
+  await rows.nth(0).locator('summary').press('Enter');
+  await rows.nth(0).locator('.scan-permalink').press('Enter');
+  await expect(page).toHaveURL(address + '#' + first.id);
+  await expectHighlight(first.id);
+  await rows.nth(0).locator('summary').press('Enter');
+  await openFilters(page);
+  await search.fill('daily-no-such-selection-987654321');
+  await expect(rows.nth(0)).toBeHidden();
+  await expectHighlight();
+  await search.clear();
+  await expect(rows.nth(0)).toBeVisible();
+  await expectHighlight(first.id);
+  await expect(rows.nth(0).locator('details')).not.toHaveAttribute('open', '');
+
+  await rows.nth(1).locator('summary').press('Enter');
+  await rows.nth(1).locator('.scan-permalink').press('Enter');
+  await expect(page).toHaveURL(address + '#' + second.id);
+  await expectHighlight(second.id);
+  const encoded = `#%${first.id.charCodeAt(0).toString(16)}${first.id.slice(1)}`;
+  await page.goto(address + encoded);
+  await expectHighlight(first.id);
+  await page.goto(address + '#%');
+  await expectHighlight();
+  await traversePermalinkHistory(page, 'goBack', new URL(address + encoded, page.url()).href);
+  await expectHighlight(first.id);
+  await page.evaluate(() => { location.hash = ''; });
+  await expectHighlight();
+});
+
 const datedKeyboardCases = [...new Set([latest, oldest])]
   .map(edition => ({ label: edition.date, route: `/daily/${edition.date}/`, edition }));
 const filteredKeyboardCase = { label: 'filtered latest', route: '/daily/', edition: latest };
@@ -793,6 +899,12 @@ test('Daily latest and bounded archive documents have no serious or critical acc
 
 test.describe('Daily without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
+  test('phone WebKit keeps the native story highlight on cold Forward', async ({ page, request, browserName, isMobile }) => {
+    test.skip(browserName !== 'webkit' || !isMobile, 'Exercise the iPhone WebKit history return');
+    await verifiedResponse(request, '/daily-scan.css', 'daily-scan.css');
+    await phoneFragmentHighlight(page, false);
+  });
+
   test('complete explanations, native sources, archive navigation and JSON remain readable', async ({ page, request }) => {
     await page.setViewportSize({ width: 320, height: 720 });
     for (const { route, edition } of readingRoutes) {
