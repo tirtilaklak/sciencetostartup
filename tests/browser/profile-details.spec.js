@@ -141,12 +141,17 @@ async function expectFundingCorrectionDrafts(page) {
 test('a refused claim bookmark reopens the exact sources on keyboard retry', async ({ page }) => {
   let refused = true;
   await page.route('**/presentation/company-a-team.*.json', route => refused ? route.abort() : route.continue());
-  await page.goto(fundingBookmark, { waitUntil: 'domcontentloaded' });
+  await Promise.all([
+    page.waitForEvent('requestfailed', request => new URL(request.url()).pathname.startsWith('/presentation/company-a-team.')),
+    page.goto(fundingBookmark, { waitUntil: 'domcontentloaded' }),
+  ]);
   await expect(page.getByRole('heading', { name: 'A.Team', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Read the plain company sources' })).toHaveAttribute('href', '/company/a-team/#sources');
+  const retry = page.getByRole('button', { name: 'Try again' });
+  await expect(retry).toBeVisible();
 
   refused = false;
-  await page.getByRole('button', { name: 'Try again' }).press('Enter');
+  await retry.press('Enter');
   await expect(page.locator('#evidence-dialog')).toBeVisible();
   await expect(page.locator('#close-evidence')).toBeFocused();
   await expect(page.locator('#evidence-dialog [data-source-id]')).toHaveCount(3);
@@ -279,8 +284,8 @@ test('a cached Back preserves the browser’s native ledger restoration', async 
   }
 });
 
-async function expectSourceHeadingInView(heading) {
-  await expect.poll(() => heading.evaluate(node => {
+async function expectBelowProfileNavigation(locator) {
+  await expect.poll(() => locator.evaluate(node => {
     const { top, bottom } = node.getBoundingClientRect();
     const masthead = document.querySelector('.topbar').getBoundingClientRect();
     const tabs = document.querySelector('.profile-tabs').getBoundingClientRect();
@@ -314,9 +319,10 @@ test('the native Source ledger lands at All sources and Tabs into its sources be
     await openNativeSourceLedger(page, baseURL);
     await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
     const heading = page.getByRole('heading', { name: 'All sources', exact: true });
-    const source = page.locator('#profile-sources .sources-list a').first();
+    const sources = page.locator('#profile-sources .sources-list');
+    const source = sources.getByRole('link').first();
     const image = page.locator(`.profile-v2 img[src="${imeritImage}"]`);
-    await expectSourceHeadingInView(heading);
+    await expectBelowProfileNavigation(heading);
     await expect(heading).toBeFocused();
     await expect.poll(() => imageRequested).toBe(true);
     expect(await image.evaluate(node => node.complete)).toBe(false);
@@ -326,18 +332,35 @@ test('the native Source ledger lands at All sources and Tabs into its sources be
     releaseImage();
     await expect.poll(() => image.evaluate(node => node.complete)).toBe(true);
     await expect(source).toBeFocused();
-    await expectSourceHeadingInView(heading);
+    await expectBelowProfileNavigation(heading);
 
-    const position = await page.evaluate(() => {
+    await sources.locator('[data-source]').evaluateAll(rows => {
+      // An immediate scroll sample can precede the final layout adjustment.
+      addEventListener('pagehide', () => {
+        const navigationBottom = Math.max(...['.topbar', '.profile-tabs'].map(selector =>
+          document.querySelector(selector).getBoundingClientRect().bottom));
+        const visibleSource = rows.find(row => {
+          const { top, bottom } = row.getBoundingClientRect();
+          return top >= navigationBottom && bottom <= innerHeight;
+        });
+        sessionStorage.setItem('test-source-ledger-departure', JSON.stringify({
+          scrollY, sourceId: visibleSource?.dataset.source,
+        }));
+      }, { once: true });
       window.scrollBy({ top: 400, behavior: 'instant' });
-      return scrollY;
     });
     await page.goBack({ waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(new URL('/company/imerit/', baseURL).href);
+    const departure = await page.evaluate(() => JSON.parse(sessionStorage.getItem('test-source-ledger-departure')));
+    expect(departure).toMatchObject({ scrollY: expect.any(Number), sourceId: expect.any(String) });
     await page.goForward({ waitUntil: 'domcontentloaded' });
+    await expect(page).toHaveURL(new URL(imeritLedger, baseURL).href);
     await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    await expect(heading).toBeVisible();
     await expect(heading).not.toBeFocused();
-    await expect.poll(() => page.evaluate(saved => Math.abs(scrollY - saved), position)).toBeLessThan(2);
+    await expect.poll(() => page.evaluate(saved => Math.abs(scrollY - saved), departure.scrollY)).toBeLessThan(2);
+    const restoredSource = sources.locator(`[data-source="${departure.sourceId}"]`).getByRole('link');
+    await expectBelowProfileNavigation(restoredSource);
   } finally {
     releaseImage();
   }
