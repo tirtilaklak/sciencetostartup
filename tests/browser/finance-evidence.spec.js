@@ -368,6 +368,89 @@ test('Market retains exact reporting days for micro1 and Snorkel', async ({ page
   }
 });
 
+test('Snorkel issuer threshold survives Home, profiles, Compare, Market and current exports', async ({ page, request }) => {
+  const id = 'snorkel_ai.metric.major-growth_metrics-0';
+  const claim = 'snorkel_ai.claim.major-growth_metrics-0-metric';
+  const issuer = 'https://snorkel.ai/blog/data-2-0-and-the-research-era-of-ai-data/';
+  await page.goto('/');
+  await expect(page.locator('[data-observation="' + id + '"] .example-pay')).toHaveText(/(?:(?:more than |over |>\s*)\$375M|\$375M\+) annualized revenue run rate/i);
+  await page.goto('/company/snorkel_ai/#financial-record');
+  await openDisclosure(page.locator('#financial-record > summary'));
+  const native = page.locator('[data-metric="' + id + '"]');
+  await expect(native.locator('.value')).toHaveText(/^more than \$375M$/i);
+  await expect(native).toContainText('22 Sep 2026');
+  await page.goto('/explore/#company/snorkel_ai/claim/' + claim);
+  const exactClaim = page.locator('#evidence-dialog');
+  await expect(exactClaim.locator('[data-evidence-metric="' + id + '"] .evidence-metric-value')).toHaveText('> $375M USD');
+  await expect(exactClaim.locator('.evidence-statement')).toContainText('crossed an annualized revenue run rate of $375M');
+  await expect(exactClaim.locator('.sources-list a[href="' + issuer + '"]')).toHaveCount(2);
+
+  await page.goto('/explore/#compare/snorkel_ai/micro1');
+  const compare = page.locator('[data-comparison-company="snorkel_ai"] [data-financial-observation="' + id + '"]');
+  await expect(compare.locator('.row-number strong')).toHaveText('> $375M');
+  await expect(compare.locator('.row-period')).toContainText('22 Sep 2026');
+  await expect(compare.getByRole('link')).toHaveAttribute('href', issuer);
+
+  await openMarket(page);
+  const chart = await marketChart(page, 'annualized_revenue');
+  const plotted = chart.locator('[data-bh-observation="' + id + '"]');
+  await expect(plotted.locator('.bh-bar-value')).toHaveText('> $375M');
+  await expect(plotted.locator('.bh-bar-fill')).toHaveClass(/is-bound/);
+  await plotted.press('Enter');
+  const inspector = page.getByRole('dialog', { name: 'Snorkel AI' });
+  await expect(inspector.locator('.bh-value')).toHaveText(/> \$375M/);
+  await expect(marketFact(inspector, 'Reporting day')).toHaveText('22 Sep 2026');
+  await closeMarketEvidence(page);
+
+  const health = await (await request.get('/business-health.json')).json();
+  const original = await (await request.get('/research.json')).json();
+  expect(health.observations.find(row => row.id === id)).toMatchObject({ qualifier: 'greater_than', value: 375000000, as_of: '2026-09-22' });
+  expect(original.metrics.find(row => row.id === id)).toMatchObject({ qualifier: 'exact', value: 375000000, as_of: '2026-09-22' });
+  await page.goto('/explore/#companies');
+  await page.locator('#search').fill('Snorkel AI');
+  await page.goto('/explore/#downloads');
+  await expect(page.locator('#search')).toHaveValue('Snorkel AI');
+  const pending = page.waitForEvent('download');
+  await page.locator('#download-csv').click();
+  const csv = require('node:fs').readFileSync(await (await pending).path(), 'utf8');
+  expect(csv).toMatch(/annualized_revenue_run_rate[^\n]+375000000[^\n]+greater_than[^\n]+> \$375M/);
+  expect(csv).toContain(id);
+});
+
+test('Toloka and Turing pair the original publisher with their historical citation', async ({ page }) => {
+  const sec = 'https://www.sec.gov/Archives/edgar/data/1513845/000110465926052948/nbis-20251231x20f.htm';
+  const issuer = 'https://www.turing.com/press/turing-annual-revenue-runrate-nearly-triples-to-300m';
+  await page.goto('/company/toloka/#financial-record');
+  await openDisclosure(page.locator('#financial-record > summary'));
+  for (const [index, period, amount] of [[1, 'FY2023', '$11.1M'], [2, 'FY2024', '$26.1M']]) {
+    const row = page.locator('[data-metric="toloka.metric.major-financial_metrics-' + index + '"]');
+    await expect(row).toContainText(period);
+    await expect(row.locator('.value')).toHaveText(amount);
+    await expect(row).toContainText('discontinued-operations revenue in USD');
+    await expect(row.getByRole('link', { name: /Note 3/ })).toHaveAttribute('href', sec);
+    await expect(row.locator('a[href*="fintel.io"]')).toHaveCount(1);
+  }
+  await page.goto('/explore/#compare/turing/toloka');
+  const past = page.locator('[data-comparison-row="Published revenue figure"] [data-comparison-company="turing"] .historical-signal');
+  await openDisclosure(past.locator(':scope > summary'));
+  await expect(past.locator('.row-number strong')).toHaveText('$300M');
+  await expect(past.locator('.row-period')).toContainText('Dec 2024');
+  await expect(past.getByRole('link', { name: /Turing issuer release/ })).toHaveAttribute('href', issuer);
+  await openDisclosure(past.locator('.financial-source-details > summary'));
+  await expect(past).toContainText('A direct automated request returned a bot challenge');
+  await expect(past).not.toContainText('Source content checked');
+
+  await openMarket(page);
+  const chart = await marketChart(page, 'annualized_revenue');
+  await chart.locator('[data-bh-observation="turing.metric.major-growth_metrics-1"]').press('Enter');
+  const dialog = page.getByRole('dialog', { name: 'Turing' });
+  const current = marketCitation(dialog, 'refresh.source.turing-2024-run-rate-issuer');
+  await expect(current.getByRole('link')).toHaveAttribute('href', issuer);
+  await expect(current).toContainText('Indexed text checked 22 Nov 2026 · Direct access encountered a bot challenge');
+  const historic = marketCitation(dialog, 'turing.source.oct14-6d7f270a4e05');
+  await expect(historic).toContainText('redirects back to itself');
+});
+
 test('Market distinguishes the July expert payout snapshot from the March reporting day', async ({ page }) => {
   await openMarket(page);
   const row = await marketMatrixRow(page, 'Mercor');

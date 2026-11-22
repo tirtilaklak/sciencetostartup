@@ -208,7 +208,7 @@ def _checked_source(source, check):
     if check.get('url') != source.get('url') or check.get('http_status') != 200:
         return False
     if check.get('status') == 'content_checked':
-        return bool(SHA256.fullmatch(check.get('content_sha256', '')))
+        return source.get('retrieval_status') != 'indexed_content_checked' and bool(SHA256.fullmatch(check.get('content_sha256', '')))
     return (check.get('status') == source.get('retrieval_status') == 'indexed_content_checked'
             and check.get('direct_response') == 'bot_challenge'
             and check.get('checked_on') == source.get('accessed_on')

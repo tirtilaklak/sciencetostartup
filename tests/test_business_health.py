@@ -191,6 +191,13 @@ class BusinessHealthTests(unittest.TestCase):
         bad = copy.deepcopy(self.health)
         next(row for row in bad["observations"] if row["id"] == "mercor.metric.major-growth_metrics-1")["evidence_type"] = "reported"
         mutations.append(("Sacra estimate promoted to a reported result", bad))
+        bad = copy.deepcopy(self.health)
+        next(row for row in bad["observations"] if row["id"] == "snorkel_ai.metric.major-growth_metrics-0")["qualifier"] = "exact"
+        mutations.append(("issuer threshold presented as an exact amount", bad))
+        bad = copy.deepcopy(self.health)
+        issuer = next(row for row in bad["source_checks"]["entries"] if row["source_id"] == "refresh.source.turing-2024-run-rate-issuer")
+        issuer.update(status="content_checked", content_sha256=issuer["direct_body_sha256"])
+        mutations.append(("Turing bot response presented as issuer page content", bad))
         for name, value in mutations:
             with self.subTest(mutation=name), self.assertRaises(ValueError):
                 load(value)
@@ -356,6 +363,33 @@ console.log(JSON.stringify({observations:observations.length,filtering:true,cont
             if row["evidence_type"] == "calculated":
                 with self.subTest(observation=row["id"]):
                     self.assertEqual(row["original_text"], "\n".join(observations[i]["original_text"] for i in row["calculation"]["input_observation_ids"]))
+
+    def test_reviewed_finance_keeps_original_records_and_qualifies_access(self):
+        rows = {row["id"]: row for row in self.observations}
+        snorkel = rows["snorkel_ai.metric.major-growth_metrics-0"]
+        canonical = self.metrics[snorkel["id"]]
+        self.assertEqual((canonical["qualifier"], snorkel["qualifier"]), ("exact", "greater_than"))
+        self.assertEqual(snorkel["source_ids"], self.claims[canonical["claim_id"]]["source_ids"])
+        self.assertEqual((snorkel["value"], snorkel["currency"], snorkel["as_of"]), (375_000_000, "USD", "2026-09-22"))
+        self.assertIn("crossed an annualized revenue run rate of $375M", snorkel["original_text"])
+
+        checks = {row["source_id"]: row for row in self.health["source_checks"]["entries"]}
+        for period, suffix, amount in (("FY2023", 1, 11_100_000), ("FY2024", 2, 26_100_000)):
+            row = rows[f"toloka.metric.major-financial_metrics-{suffix}"]
+            self.assertIn("toloka.source.audit-tol_2025", row["source_ids"])
+            self.assertEqual(row["primary_source_id"], "refresh.source.nebius-fy2025-sec-note-3")
+            self.assertEqual((row["value"], row["currency"], row["period"]["label"]), (amount, "USD", period))
+            self.assertEqual(row["accounting_basis"], "latest_discontinued_operations_comparative")
+            self.assertEqual(checks[row["primary_source_id"]]["status"], "content_checked")
+
+        turing = rows["turing.metric.major-growth_metrics-1"]
+        prior = "turing.source.oct14-6d7f270a4e05"
+        self.assertEqual((turing["value"], turing["as_of"], turing["measure"]), (300_000_000, "2024-12", "annualized_revenue"))
+        self.assertIn(prior, turing["source_ids"])
+        self.assertEqual(checks[prior]["previous_checks"][0]["checked_on"], "2026-10-28")
+        issuer = checks[turing["primary_source_id"]]
+        self.assertEqual((issuer["status"], issuer["direct_response"]), ("indexed_content_checked", "bot_challenge"))
+        self.assertNotIn("published_on", self.sources[turing["primary_source_id"]])
 
     def test_missing_information_has_no_zero_placeholder_records(self):
         # Zero may be an actual financial result; unknown observations instead

@@ -162,7 +162,6 @@ function checkedSource(o){
 function freshnessNote(o,sourceId){
  const check=sourceChecks.get(sourceId),fresh=o.claim_ids.map(id=>freshClaims.get(id)).find(c=>c?.source_ids.includes(sourceId));
  if(check?.status==='unavailable')return `<span class="bh-refresh-note is-unavailable"><br>${o.primary_source_id?safe(check.note):`Source could not be retrieved on ${safe(readableDates(check.checked_on))}. The figure retains its earlier attribution.`}</span>`;
- if(check?.status==='indexed_content_checked')return `<span class="bh-refresh-note"><br>Indexed issuer text verified ${safe(readableDates(check.checked_on))}. Direct access encountered a bot challenge.</span>`;
  return check?.status==='content_checked'?`<span class="bh-refresh-note"><br>Source page read ${safe(readableDates(check.checked_on))}${fresh?.source_locator?' · '+safe(fresh.source_locator):''}.</span>`:'';
 }
 
