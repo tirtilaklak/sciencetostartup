@@ -5,6 +5,13 @@
   const $ = id => document.getElementById(id), dialog = $('home-search'), input = $('home-search-input'), results = $('home-search-results'), message = $('home-search-message');
   const config = JSON.parse($('home-config').textContent), search = globalThis.S2SSearch;
   const pageSize = 7, historyField = 's2sHomeSearchReturn';
+  const hourlyWork = {
+    name: 'See roles with published hourly pay',
+    summary: 'Includes past listings',
+    type: 'Work search',
+    href: '/work/?pay=hourly'
+  };
+  const isHourlyPayQuery = key => key === 'hourly' || key === 'hourly pay';
   let entries = null, pending = null, active = -1, shown = pageSize, generation = 0;
   let exactIdentifiers = false, workTitles = new Set(), returnState = null;
   const fallback = dialog.querySelector('.site-search-fallback');
@@ -22,9 +29,14 @@
   }
   const options = () => [...results.querySelectorAll('[role=option]')];
   function updateFallback() {
-    if (workRecovery) {
-      workRecovery.href = search.workUrl(input.value);
-      workRecovery.textContent = input.value.trim() ? 'Search paid work for this query' : 'Browse paid work';
+    if (!workRecovery) return;
+    const raw = input.value;
+    if (isHourlyPayQuery(search.normalize(raw))) {
+      workRecovery.href = hourlyWork.href;
+      workRecovery.textContent = hourlyWork.name;
+    } else {
+      workRecovery.href = search.workUrl(raw);
+      workRecovery.textContent = raw.trim() ? 'Search paid work for this query' : 'Browse paid work';
     }
   }
   function clearResults() {
@@ -75,7 +87,7 @@
     return `<a id="home-result-${index}" class="site-search-option" role="option" aria-selected="false" tabindex="-1" data-result-type="${escape(type)}" href="${escape(href)}"><strong>${escape(name)}</strong><span>${escape(type + ' · ' + summary)}</span></a>`;
   }
   function render(paging = false) {
-    const raw = input.value, key = search.normalize(raw);
+    const raw = input.value, key = search.normalize(raw), hourly = isHourlyPayQuery(key);
     const exact = exactIdentifiers ? search.identifier(raw) : '';
     const selected = paging ? results.querySelector('[aria-selected=true]')?.getAttribute('href') : null;
     const matches = exact ? entries.filter(entry => entry.identifiers.includes(exact))
@@ -91,8 +103,8 @@
       return { ...row, type: resultType(row), summary: alias ? 'Recorded alias: ' + alias + '. ' + row.summary : row.summary };
     });
     if (!exact) {
-      const work = { name: key ? 'Find paid work matching “' + raw.trim() + '”' : 'Browse paid work', summary: 'Public listings, expert networks and requirements', type: 'Work search', href: search.workUrl(raw) };
-      if (search.isWorkQuery(raw, workTitles)) rendered.unshift(work);
+      const work = hourly ? hourlyWork : { name: key ? 'Find paid work matching “' + raw.trim() + '”' : 'Browse paid work', summary: 'Public listings, expert networks and requirements', type: 'Work search', href: search.workUrl(raw) };
+      if (hourly || search.isWorkQuery(raw, workTitles)) rendered.unshift(work);
       else rendered.push(work);
     }
     results.innerHTML = rendered.map(option).join('');

@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+const {routes}=require('../../data/work-routes.json');
 
 test('static header points to lightweight search and native directory matches contributor brands',async({page})=>{
   await page.goto('/companies/');
@@ -43,6 +44,57 @@ test('homepage search transfers a real work query to the native source-backed li
   for(const value of ['MacBook Pro','qualification','identity'])await expect(listing).toContainText(new RegExp(value,'i'));
   await expect(listing.locator('.work-reviewed')).toContainText(/Terms checked|Pay terms reviewed/);
   await expect(listing.locator('.work-listing-action a').first()).toHaveAttribute('href',/^https:\/\//);
+});
+
+test('bare hourly searches lead to published hourly rates by keyboard or touch',async({page,isMobile})=>{
+  const expected=routes.filter(route=>route.pay_terms?.hourly_comparable).map(route=>route.id).sort();
+  const input=page.getByRole('combobox',{name:'Search the guide'});
+  const options=page.locator('#home-search-results').getByRole('option');
+  const first=options.first();
+  await page.goto('/');
+  if(isMobile) await page.getByRole('link',{name:'Search the guide'}).tap();
+  else await page.keyboard.press('Control+k');
+  await expect(input).toBeFocused();
+  for(const [query,href] of [
+    ['A.Team','/company/a-team/'],
+    ['revenue','/explore/#business-health'],
+    ['annualized pace','/explore/#business-health'],
+    ['remote hourly jobs','/work/?q=remote+hourly+jobs'],
+  ]){
+    await input.fill(query);
+    await expect(first).toHaveAttribute('href',href);
+    await expect(options.filter({hasText:'See roles with published hourly pay'})).toHaveCount(0);
+  }
+
+  for(const query of ['hourly','  Hourly   Pay  ']){
+    await input.fill(query);
+    await expect(first.locator('strong')).toHaveText('See roles with published hourly pay');
+    await expect(first).toHaveAttribute('href','/work/?pay=hourly');
+    if(isMobile) await first.tap();
+    else {
+      await input.press('ArrowDown');
+      await expect(first).toHaveAttribute('aria-selected','true');
+      await input.press('Enter');
+    }
+    await expect(page).toHaveURL(/\/work\/\?pay=hourly$/);
+    await expect(page.locator('[data-work-filters] input[name=q]')).toHaveValue('');
+    await expect(page.locator('[data-work-filters] select[name=pay]')).toHaveValue('hourly');
+    await expect(page.locator('[data-work-count]')).toHaveText(`${expected.length} matching records`);
+    await expect.poll(()=>page.locator('[data-work-route]:visible').evaluateAll(cards=>cards.map(card=>card.dataset.workRoute).sort())).toEqual(expected);
+    await page.goBack();
+    await expect(input).toHaveValue(query);
+    await expect(first).toHaveAttribute('aria-selected','true');
+    if(!isMobile) await expect(input).toBeFocused();
+  }
+});
+
+test('the hourly shortcut remains available when the search index cannot load',async({page})=>{
+  await page.route('**/presentation/search.*.json',route=>route.abort());
+  await page.goto('/');
+  await page.getByRole('link',{name:'Search the guide'}).click();
+  await expect(page.getByRole('button',{name:'Try again'})).toBeVisible();
+  await page.getByRole('combobox',{name:'Search the guide'}).fill('hourly pay');
+  await expect(page.getByRole('link',{name:'See roles with published hourly pay'})).toHaveAttribute('href','/work/?pay=hourly');
 });
 
 test('global search finds the Daily hub and displayed Greek paper titles',async({page})=>{
