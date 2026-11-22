@@ -588,6 +588,19 @@ def compact_work(work, research=None):
         if review:
             route["editorial_review"] = {key: value for key, value in review.items() if key in ("triaged_on", "approved_terms_receipt_id", "disposition", "alternative_destination", "actions", "recorded_url_purpose")}
             route["editorial_review"]["receipts"] = [{k: v for k, v in receipt.items() if k in ("id", "source_id", "checked_on", "checked_at", "scope", "result", "approved", "approval_basis", "reviewer", "reviewed_fields")} for receipt in review.get("receipts", []) if receipt.get("id") == review.get("approved_terms_receipt_id")]
+            history = []
+            for change in review.get("correction_history", []):
+                previous = change.get("previous_values") or {}
+                previous_fields = previous.get("field_reviews") or {}
+                field_sources = {field: {"source_ids": value["source_ids"]} for field, value in previous_fields.items()
+                                 if value and value.get("source_ids")}
+                retained_values = {"role": previous["role"]} if previous.get("role") else {}
+                if field_sources:
+                    retained_values["field_reviews"] = field_sources
+                if retained_values:
+                    history.append({"previous_values": retained_values})
+            if history:
+                route["editorial_review"]["correction_history"] = history
     return result
 
 

@@ -5,7 +5,7 @@ const S2SWork = (() => {
   const WORK_TYPE_GROUPS={contract:'Expert & contractor projects',employment:'Employment',fellowship:'Research fellowship',bounty:'Contributor bounties',study:'study',varies:'varies',unknown:'Unverified route'};
   const WORK_FILTER_VALUES={kind:['','named','programs','boards','outside','closed'],type:['',...Object.keys(WORK_TYPE_GROUPS)],pay:['','hourly','task','yearly','monthly','numeric','undisclosed'],arrangement:['','remote','onsite','varies'],sort:['','hourly','checked']};
   function normalizeWorkCriteria(value={}){
-    const result={q:String(value.q??'').trim().slice(0,256)};
+    const result={q:String(value.q??'').slice(0,256)};
     for(const key of Object.keys(WORK_FILTER_VALUES)){const raw=String(value[key]??'');result[key]=WORK_FILTER_VALUES[key].includes(raw)?raw:'';}
     return result;
   }
@@ -96,6 +96,7 @@ const S2SWork = (() => {
   ];
   function w4RegExpEscape(value){return value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
   function w4SearchFold(value){return String(value??'').normalize('NFKD').replace(/\p{M}+/gu,'').toLowerCase();}
+  function workSearchTerms(query){return globalThis.S2SSearch?.workTerms(query)||query;}
   function w4QueryMatcher(query){
     let text=w4SearchFold(w4Text(query));
     if(!text)return null;
@@ -154,12 +155,18 @@ const S2SWork = (() => {
     return params;
   }
 
-  function select(rows, criteria, searchText) {
+  function select(rows, criteria, searchText, companyName = route => route.company_name || route.company_id) {
     const { q, kind, type, pay, arrangement } = criteria;
     const eligible = rows.filter(route => (!kind || bucket(route) === kind)
       && (!type || w4Engagement(route) === type) && w4PayMatches(route, pay) && w4WhereMatches(route, arrangement));
-    const matcher = w4QueryMatcher(q);
+    const terms = workSearchTerms(q), matcher = w4QueryMatcher(terms);
     if (!matcher) return eligible;
+    if (terms !== q) {
+      // Keep a literal employer or role title when a word like “jobs” belongs to its name.
+      const title = w4SearchFold(w4Text(q));
+      const exact = eligible.filter(route => [companyName(route), route.role].some(name => w4SearchFold(w4Text(name)) === title));
+      if (exact.length) return exact;
+    }
     const text = new Map(eligible.map(route => [route.id, searchText(route)]));
     const phrase = eligible.filter(route => matcher.phrase(text.get(route.id)));
     return phrase.length ? phrase : eligible.filter(route => matcher.all(text.get(route.id)));
@@ -169,7 +176,7 @@ const S2SWork = (() => {
     const grouped = Object.fromEntries(groups.map(key => [key, []]));
     for (const route of rows) grouped[bucket(route)].push(route);
     const order = sort === 'hourly' ? w4RateOrder : sort === 'checked' ? w4CheckedOrder : w4BestOrder;
-    const matcher = !sort && w4QueryMatcher(query);
+    const matcher = !sort && w4QueryMatcher(workSearchTerms(query));
     for (const group of groups) {
       const list = grouped[group];
       list.sort((a, b) => order(a, b, companyName));
@@ -321,6 +328,6 @@ const S2SWork = (() => {
     approvedReceipt: w4ApprovedTermsReceipt, termsReviewDate: w4TermsReviewDate, checked: w4Checked, uncertain: w4Uncertain,
     status: w4Status, payQualification: w4PayQualification, opportunityKind: w4OpportunityKind, engagement: w4Engagement,
     hourlyRange: w4HourlyRange, payMatches: w4PayMatches, arrangements: w4Arrangements, whereMatches: w4WhereMatches,
-    queryMatcher: w4QueryMatcher, fold: w4SearchFold, bestOrder: w4BestOrder, rateTie: w4RateTie, rateOrder: w4RateOrder, checkedOrder: w4CheckedOrder
+    queryMatcher: query => w4QueryMatcher(workSearchTerms(query)), fold: w4SearchFold, bestOrder: w4BestOrder, rateTie: w4RateTie, rateOrder: w4RateOrder, checkedOrder: w4CheckedOrder
   });
 })();

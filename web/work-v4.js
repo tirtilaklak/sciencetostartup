@@ -154,9 +154,6 @@ function w4Requirements(route){
     'a-team.work.expert-network':[
       [/Senior production experience/i,'Senior production experience'],
       [/portfolio review, interview, and additional AI evaluation/i,'Portfolio review + interview; AI-role evaluation']],
-    'prolific.work.study-participant':[
-      [/verified account|identity verification/i,'Identity verification'],
-      [/supported country of residence|supported residence/i,'Supported country of residence']],
     'datacurve.work.shipd-bounties':[
       [/At least 18, legal capacity to contract/i,'18+ and legal capacity to contract'],
       [/project access depends on skills and invitation/i,'Skills-based project access + invitation']],
@@ -255,8 +252,29 @@ function w4Details(route,level=4){
   }
   const actions=w4SourceBoundActions(route).slice(1);
   const fieldNames={destination:'application destination',pay:'pay',location:'location',requirements:'requirements',commitment:'commitment',duration:'duration',assessment:'assessment'};
-  const supports=source=>Object.entries(route.field_reviews||{}).filter(([,review])=>review.source_ids?.includes(source.id)).map(([field])=>fieldNames[field]||field);
-  const commitment=[...new Set([route.hours,route.research_record?.route?.hours?.detail].map(w4Text).filter(Boolean))].join(' · ');
+  const currentFields=new Map(),earlierFields=new Map();
+  for(const [field,review] of Object.entries(route.field_reviews||{})){
+    for(const id of review.source_ids||[]){
+      if(!currentFields.has(id))currentFields.set(id,new Set());
+      currentFields.get(id).add(field);
+    }
+  }
+  for(const change of route.editorial_review?.correction_history||[]){
+    for(const [field,review] of Object.entries(change.previous_values?.field_reviews||{})){
+      for(const id of review?.source_ids||[]){
+        if(currentFields.get(id)?.has(field))continue;
+        if(!earlierFields.has(id))earlierFields.set(id,new Set());
+        earlierFields.get(id).add(field);
+      }
+    }
+  }
+  const fieldList=fields=>[...(fields||[])].map(field=>fieldNames[field]||field).join(', ');
+  const scheduleNote=w4ScheduleNote(route);
+  const commitment=scheduleNote||[...new Set([route.hours,route.research_record?.route?.hours?.detail].map(w4Text).filter(Boolean))].join(' · ');
+  const availability=w4Text(route.availability_note),payContext=w4Text(route.pay_context),payNote=w4Text(route.pay_terms?.note);
+  const payContextText=payContext===availability?'':payContext;
+  const payPolicy=route.pay_policy?.source_url;
+  const shownNotes=new Set([availability,payContext,payNote,scheduleNote&&w4Text(route.field_reviews?.commitment?.note)]);
   const rows=[['Payment',route.pay_label],['Commitment',commitment],['Duration',route.duration],['Location',route.geography]].filter(([,v])=>v);
   const h=`h${Math.min(Math.max(level,2),6)}`,published=s=>{const date=w4SourcePublicationDate(s);return date&&date!=='undated'?`Published ${w4Date(date)}`:'Publication date not stated';};
   return `<div class="w4-detail-content">
@@ -265,49 +283,57 @@ function w4Details(route,level=4){
     <dl class="w4-term-table">${rows.map(([label,value])=>`<div><dt>${w4Escape(label)}</dt><dd>${w4Escape(value)}</dd></div>`).join('')}</dl>
     ${requirements.length?`<div class="w4-detail-block"><${h}>Requirements</${h}><ul>${requirements.map(t=>`<li>${w4Escape(t)}</li>`).join('')}</ul></div>`:''}
     ${route.pay_observations?.length?`<div class="w4-detail-block"><${h}>Published pay terms</${h}><dl class="w4-term-table">${route.pay_observations.map(p=>`<div><dt>${w4Escape(p.label)}</dt><dd>${w4Escape(p.value)}</dd></div>`).join('')}</dl></div>`:''}
-    ${route.availability_note?`<p class="w4-availability-note">${w4Escape(route.availability_note)}</p>`:''}
+    ${availability?`<p class="w4-availability-note">${w4Escape(availability)}</p>`:''}
     ${actions.length?`<ul class="w4-secondary-actions">${actions.map(action=>`<li>${w4SourceLink(action.url,action.label,'',route.role)}</li>`).join('')}</ul>`:''}
-    ${route.pay_context?`<p>${w4Escape(route.pay_context)}${route.pay_policy?.source_url?` ${w4SourceLink(route.pay_policy.source_url,'Payment policy')}`:''}</p>`:''}
+    ${payContextText||payPolicy?`<p>${w4Escape(payContextText)}${payPolicy?` ${w4SourceLink(payPolicy,'Payment policy')}`:''}</p>`:''}
+    ${payNote&&payNote!==payContext&&payNote!==availability?`<p>${w4Escape(payNote)}</p>`:''}
     ${route.historical_pay_context?`<details class="w4-source-notes"><summary>Past payment offer</summary><p>${w4Escape(route.historical_pay_context.label)}: ${w4Escape(route.historical_pay_context.amount)}.</p><p>${w4Escape(route.historical_pay_context.note)}</p>${w4SourceLink(route.historical_pay_context.url,'Historical source')}</details>`:''}
     <div class="w4-detail-block w4-sources"><${h}>Sources</${h}>
       <p class="w4-source-dates"><span>Terms recorded: ${w4Escape(route.as_of&&route.as_of!=='undated'?w4Date(route.as_of):'date not stated')}</span><span>${w4Escape(w4FreshnessLabel(route))}</span></p>
       ${sourceRows.size?`<ul>${[...sourceRows.values()].map(group=>{
         const first=group[0];
         return `<li>${w4SourceLink(first.url,first.title||first.publisher||'Source')}${group.map(source=>{
-          const fields=supports(source);
+          const fields=fieldList(currentFields.get(source.id)),earlier=fieldList(earlierFields.get(source.id));
           const retrieval=(route.editorial_review?.receipts||[]).some(receipt=>receipt.source_id===source.id&&receipt.scope==='retrieval');
-          const purpose=fields.length?`Supports ${fields.join(', ')}`
-            :retrieval?'Retrieval observation':source!==first?source.title:'';
-          const date=source.accessed_on?` · Checked ${w4Date(source.accessed_on)}`:'';
-          return `<small data-work-source="${w4Escape(source.id)}">${w4Escape(published(source)+date+(purpose?' · '+purpose:''))}</small>`;
+          const purpose=fields?`Supports ${fields}`:retrieval?'Retrieval observation':source!==first?source.title:'';
+          const annotation=[published(source),source.accessed_on&&`Checked ${w4Date(source.accessed_on)}`,purpose,earlier&&`Earlier source for ${earlier}`].filter(Boolean).join(' · ');
+          return `<small data-work-source="${w4Escape(source.id)}">${w4Escape(annotation)}</small>`;
         }).join('')}</li>`;
       }).join('')}</ul>`:''}
       ${route.source_quote?`<blockquote>${w4Escape(route.source_quote)}</blockquote>`:''}
       ${route.last_route_check?.note?`<details class="w4-source-notes"><summary>What we checked</summary><p>${w4Escape(w4CheckNote(route.last_route_check))}</p>${route.last_link_check?`<p>Link requested ${w4Escape(w4Date(route.last_link_check.date))}: ${w4Escape(route.last_link_check.result)}.${route.last_link_check.note?' '+w4Escape(route.last_link_check.note):''}</p>`:''}</details>`:''}
-      ${w4FieldReviewHTML(route)}${route.claim_ids?.length?`<div class="w4-evidence-links">${w4ClaimAccess(route.claim_ids,route.role)}</div>`:''}
+      ${w4FieldReviewHTML(route,shownNotes)}${route.claim_ids?.length?`<div class="w4-evidence-links">${w4ClaimAccess(route.claim_ids,route.role)}</div>`:''}
     </div>
   </div>`;
 }
-function w4FieldReviewHTML(route){
+function w4FieldReviewHTML(route,shownNotes=new Set()){
  const labels={destination:'Application destination',pay:'Pay',location:'Location',requirements:'Requirements',commitment:'Commitment',duration:'Duration',assessment:'Assessment'};
  const states={sourced:'Source evidence recorded',source_not_stated:'Not stated in the reviewed source',not_researched:'Not researched',conflicting:'Sources conflict'};
  const reviews=Object.entries(route.field_reviews||{}).filter(([field,review])=>labels[field]&&states[review.state]);
  if(!reviews.length)return '';
- return `<div class="w4-field-reviews"><h4>What the sources establish</h4><dl class="w4-term-table">${reviews.map(([field,review])=>`<div><dt>${labels[field]}</dt><dd>${states[review.state]}${review.reviewed_on?` · Reviewed ${w4Escape(w4Date(review.reviewed_on))}`:''}${review.note?`<span class="sub">${w4Escape(review.note)}</span>`:''}</dd></div>`).join('')}</dl></div>`;
+ return `<div class="w4-field-reviews"><h4>What the sources establish</h4><dl class="w4-term-table">${reviews.map(([field,review])=>`<div><dt>${labels[field]}</dt><dd>${states[review.state]}${review.reviewed_on?` · Reviewed ${w4Escape(w4Date(review.reviewed_on))}`:''}${review.note&&!shownNotes.has(w4Text(review.note))?`<span class="sub">${w4Escape(review.note)}</span>`:''}</dd></div>`).join('')}</dl></div>`;
 }
 function w4HistoricalPayLabel(route){
   return WORK_ROUTE_ARCHIVE.has(route.status)&&route.numeric_pay?'<span class="w4-historical-pay">Historical advertised pay</span>':'';
 }
 function w4PayNotes(route){
-  const payNote=w4PayNote(route),payQualification=w4PayQualification(route);
-  return `${route.pay_indicator?`<span class="w4-pay-note w4-pay-indicator">${w4Escape(route.pay_indicator)}</span>`:''}${payNote?`<span class="w4-pay-note">${w4Escape(payNote)}</span>`:''}${payQualification?`<span class="w4-pay-note w4-pay-qualification">${w4Escape(payQualification)}</span>`:''}`;
+  const notes=[[route.pay_indicator,' w4-pay-indicator'],[w4PayNote(route),''],[w4PayQualification(route),' w4-pay-qualification']];
+  const shown=new Set();
+  return notes.map(([note,style])=>{
+    const text=w4Text(note);
+    if(!text||shown.has(text))return '';
+    shown.add(text);
+    return `<span class="w4-pay-note${style}">${w4Escape(text)}</span>`;
+  }).join('');
 }
 function w4StatusBadge(route){const status=w4Status(route),age=w4TermsAge(route);return (status?`<span class="w4-status w4-status-${w4Escape(route.status)}">${w4Escape(status)}</span>`:'')+(age.label?`<span class="w4-status w4-status-review" data-work-review-age="${w4Escape(age.state)}" title="As of ${w4Escape(w4Date(age.as_of))}">${w4Escape(age.label)}</span>`:'');}
 // Pieces of a card. A compact card shows its pay in the summary, so its offer leaves the pay out.
 function w4CardParts(route,compact){
-  const company=companies[route.company_id],commitment=w4Hours(route),scheduleNote=w4ScheduleNote(route),requirements=w4Requirements(route);
+  const company=companies[route.company_id],scheduleNote=w4ScheduleNote(route),requirements=w4Requirements(route);
+  const commitment=scheduleNote?w4Text(route.duration):w4Hours(route);
   const assessment=w4Text(route.assessment);
-  if(assessment&&!requirements.some(text=>w4SearchFold(text).includes(w4SearchFold(assessment))))requirements.push(assessment);
+  const assessmentKey=w4SearchFold(assessment).replace(/\.$/,'');
+  if(assessmentKey&&![...requirements,...(route.requirements||[])].some(text=>w4SearchFold(w4Text(text)).includes(assessmentKey)))requirements.push(assessment);
   const locationReview=route.field_reviews?.location,locationWarning=locationReview?.state==='conflicting'?`<p class="w4-location-warning">Location sources conflict.${locationReview.note?' '+w4Escape(locationReview.note):' Confirm the role-specific location rules.'}</p>`:'';
   return {context:`${route.role}, ${company.name}`,
     identity:`<a class="w4-company" href="#company/${w4Escape(company.id)}/work"><span class="w4-logo">${typeof logoHTML==='function'?logoHTML(company.id,'',true):''}</span><span>${w4Escape(company.name)}</span></a>`,
@@ -380,7 +406,13 @@ function w4Where(route){const values=w4Arrangements(route);return values.include
 const w4WhereMatches=S2SWork.whereMatches;
 const w4SearchFold=S2SWork.fold;
 const w4QueryMatcher=S2SWork.queryMatcher;
-function w4SearchText(route){const compiled=window.SEARCH_INDEX?.workSearch?.[route.id]??window.SEARCH_INDEX?.workSearchText?.[route.id];if(compiled!==undefined)return compiled;const c=companies[route.company_id];return w4SearchFold([c?.name,...(c?.aliases||[]),route.role,route.summary,route.group,route.geography,w4Location(route),route.pay_label,route.hours,route.duration,...(route.requirements||[])].filter(Boolean).join(' '));}
+function w4SearchText(route){
+  const compiled=window.SEARCH_INDEX?.workSearch?.[route.id]??window.SEARCH_INDEX?.workSearchText?.[route.id];
+  if(compiled!==undefined)return compiled;
+  const company=companies[route.company_id];
+  const titles=[route.role,...(route.editorial_review?.correction_history||[]).map(change=>change.previous_values?.role)];
+  return w4SearchFold([company?.name,...(company?.aliases||[]),...titles,route.summary,route.group,route.geography,w4Location(route),route.pay_label,route.hours,route.duration,...(route.requirements||[])].filter(Boolean).join(' '));
+}
 function w4CompanyName(route){return companies[route.company_id]?.name||route.company_id||'';}
 const w4RateTie=S2SWork.rateTie;
 function w4BestOrder(a,b){return S2SWork.bestOrder(a,b,w4CompanyName);}
@@ -541,7 +573,7 @@ function w4NetworkSuggestions(shown){
 }
 function w4EmptyState(query,filters){
   if(!workRouteRows().length)return '<p class="w4-empty">No listings are available right now.</p>';
-  const matcher=query&&filters?w4QueryMatcher(query):null,queryAlone=matcher?workRouteRows().filter(route=>matcher.all(w4SearchText(route))).length:0;
+  const queryAlone=query&&filters?selectWorkRoutes(workRouteRows(),{q:query}).length:0;
   const message=!query?'No listing matches these filters.':queryAlone?'No listing matches this search with these filters.':`No listing mentions “${w4Escape(query)}”. Try a broader word.`;
   return `<div class="w4-empty-state"><p class="w4-empty">${message}</p><p class="w4-empty-actions">${query?'<button type="button" data-work-clear="search">Clear search</button>':''}${filters?'<button type="button" data-work-clear="filters">Clear filters</button>':''}</p></div>`;
 }

@@ -1,10 +1,16 @@
 """Focused work-summary regressions using the shared JS harness; no browser."""
 import ast
+import json
 import shutil
 import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+from presentation import compact_work
+
 tree = ast.parse((ROOT / "tests/js_logic.py").read_text())
 stub = next(
     ast.literal_eval(node.value)
@@ -41,13 +47,21 @@ assert.equal(run('hasWorkRoute("hackerrank")'),false);
 assert.equal(run('hasWorkRoute("quesma")'),false);
 assert.equal(run('workType("aixi")'),'Named listings');
 const writer=plain(run(`workRouteRows().find(route=>route.id==='afterquery.work.technical-content-writer-contract')`));
-assert.equal(run(`w4Hours(${JSON.stringify(writer)})`),'10–15 h/week initially, with potential expansion · Six months');
+const fellow=plain(run(`workRouteRows().find(route=>route.id==='afterquery.work.research-fellow')`));
 for(const mode of ['', 'compact']){
- const html=run(`workCard(${JSON.stringify(writer)},${JSON.stringify(mode)})`);
- assert.ok(html.includes('10–15 h/week initially, with potential expansion'),'writer hours qualifier '+mode);
- assert.ok(html.includes('Schedule conflict. The description specifies part-time work.'),'writer schedule conflict '+mode);
- assert.ok(html.slice(html.indexOf('<details class="w4-details">')).includes('with potential expansion'),'writer expanded terms qualifier '+mode);
+ for(const route of [writer,fellow]){
+  const html=run(`workCard(${JSON.stringify(route)},${JSON.stringify(mode)})`);
+  const details=html.indexOf('<details class="w4-details">');
+  const note=run(`w4Escape(${JSON.stringify(route.field_reviews.commitment.note)})`);
+  for(const part of [html.slice(0,details),html.slice(details)]){
+   assert.equal(part.split(note).length,2,route.id+' schedule wording appears once per section '+mode);
+   assert.ok(part.includes(route.duration),route.id+' duration '+mode);
+  }
+  assert.ok(html.includes('<blockquote>'+route.source_quote+'</blockquote>'),route.id+' exact evidence quote');
+ }
 }
+assert.match(writer.field_reviews.commitment.note,/10–15 hours\/week.+expansion.+full-time/i);
+assert.match(fellow.field_reviews.commitment.note,/full-time.+20\+ hours\/week.+prefer.+in-person/i);
 // Link check notes: a result code becomes plain words and a result phrase ends with a period.
 assert.equal(run(`w4CheckNote({result:'public_page_live',note:'public_page_live 35 open roles listed.'})`),'Public page was live. 35 open roles listed.');
 assert.equal(run(`w4CheckNote({result:'Published route observed',note:'Published route observed Five positions listed.'})`),'Published route observed. Five positions listed.');
@@ -65,16 +79,49 @@ assert.equal((terms.match(/href="https:\/\/snorkel\.ai\/expert-community\/"/g)||
 assert.match(terms,/review-2026-10-28">[^<]+28 Oct 2026 · Supports [^<]*\bpay\b/);
 assert.match(terms,/retrieval-2026-11-08">[^<]+8 Nov 2026 · Retrieval observation/);
 
+const historical={
+ 'aixi.work.research-fellowship':['application destination'],
+ 'aixi.work.machine-learning-research-scientist':['application destination'],
+ 'prolific.work.study-participant':['application destination'],
+ 'toloka.work.mindrift-code':['application destination'],
+ 'afterquery.work.technical-content-writer-contract':['application destination','pay','location','requirements','commitment','duration'],
+};
+const projected=JSON.parse(fs.readFileSync(expectedPath,'utf8'));
+for(const [id,fields] of Object.entries(historical)){
+ const route=projected.routes.find(row=>row.id===id),sourceId=id+'.review-2026-10-28';
+ const html=run(`w4Details(${JSON.stringify(route)})`);
+ const source=html.split('data-work-source="'+sourceId+'">')[1].split('</small>',1)[0];
+ assert.ok(source.includes('Checked 28 Oct 2026'),id+' retains source date');
+ const earlier=source.split('Earlier source for ')[1].split(', ');
+ for(const field of fields)assert.ok(earlier.includes(field),id+' retains source for '+field);
+ const url=route.sources.find(row=>row.id===sourceId).url;
+ assert.equal(html.split('w4-detail-block w4-sources')[1].split(`href="${url}"`).length,2,id+' binds observations to one source link');
+}
+const scholar=projected.routes.find(row=>row.id==='afterquery.work.research-scholar');
+const qualification=scholar.pay_terms.note;
+assert.equal(run(`w4Details(${JSON.stringify(scholar)})`).split(qualification).length,2,'Scholar payment condition in the disclosure');
+assert.equal(run(`w4PayNotes(${JSON.stringify(scholar)})`).split(qualification).length,2,'Scholar payment condition beside the rate');
+
+const search='RLHF  jobs';
+const matches=plain(run(`selectWorkRoutes(workRouteRows(),{q:${JSON.stringify(search)}}).map(row=>row.id)`));
+assert.deepEqual(matches,['afterquery.work.software-engineer-rl-environments']);
+assert.equal(run(`normalizeWorkCriteria({q:' RLHF  jobs '}).q`),' RLHF  jobs ');
+const literalTitles=[{id:'literal',role:'Hiring Assistant',status:'listed'},{id:'broader',role:'Assistant',status:'listed'}];
+assert.deepEqual(plain(run(`S2SWork.select(${JSON.stringify(literalTitles)},{q:'Hiring Assistant'},row=>S2SWork.fold(row.role)).map(row=>row.id)`)),['literal']);
+
 const revised={...writer,availability_note:'No schedule conflict stated.',field_reviews:{...writer.field_reviews,commitment:{...writer.field_reviews.commitment,state:'sourced'}}};
 assert.equal(run(`w4ScheduleNote(${JSON.stringify(revised)})`),'','Do not retain an obsolete conflict after source text changes');
 console.log(JSON.stringify({companies_checked:workLabels.length,summary_filter_alignment:true,approved_opportunity_kinds:true,no_route_label:true,check_notes:checkNotes,writer_card_variants:2,writer_qualifications:true,browser_verified:false}));
 '''
 node = shutil.which("node") or "/opt/homebrew/bin/node"
-result = subprocess.run(
-    [node, "-", str(ROOT / "data/canonical.json"), str(ROOT)],
-    input=stub.split("(async()=>{", 1)[0] + checks,
-    text=True,
-    cwd=ROOT,
-    check=False,
-)
+with tempfile.TemporaryDirectory() as directory:
+    projected_path = Path(directory) / "work.json"
+    projected_path.write_text(json.dumps(compact_work(json.loads((ROOT / "data/work-routes.json").read_text()))))
+    result = subprocess.run(
+        [node, "-", str(ROOT / "data/canonical.json"), str(ROOT), str(projected_path)],
+        input=stub.split("(async()=>{", 1)[0] + checks,
+        text=True,
+        cwd=ROOT,
+        check=False,
+    )
 raise SystemExit(result.returncode)
