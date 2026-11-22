@@ -112,6 +112,76 @@ test('native Work explains the full count and updates the live count for matchin
   }
 });
 
+test('native Work shows the first hourly result on short desktops and remembers keyboard toggles', async ({ page, hasTouch, request }) => {
+  test.skip(hasTouch, 'Checks the desktop disclosure and keyboard history');
+  test.setTimeout(60_000);
+  const { routes } = await (await request.get('/work-routes.json')).json();
+  const hourlyIds = routes.filter(route => route.pay_terms?.hourly_comparable).map(route => route.id).sort();
+  const form = page.getByRole('search', { name: 'Find paid work' });
+  const options = form.locator('.work-page-filter-options');
+  const count = page.locator('[data-work-count]');
+  const cards = page.locator('[data-work-route]:visible');
+  const ids = () => cards.evaluateAll(nodes => nodes.map(node => node.dataset.workRoute));
+
+  await page.setViewportSize({ width: 1280, height: 720 });
+  for (const [sort, firstId] of [['', 'afterquery.work.technical-content-writer-contract'], ['hourly', 'afterquery.work.world-models']]) {
+    const params = new URLSearchParams({ pay: 'hourly' });
+    if (sort) params.set('sort', sort);
+    const url = `/work/?${params}`;
+    await page.goto(url);
+    await expect(form).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    await expect(options).toHaveJSProperty('open', false);
+    await expect(count).toHaveText(`${hourlyIds.length} records with published hourly pay`);
+    await expect(count).toBeInViewport({ ratio: 1 });
+    const firstCard = cards.first();
+    await expect(firstCard).toHaveAttribute('data-work-route', firstId);
+    await expect(firstCard.locator('h3')).toBeInViewport({ ratio: 1 });
+    await expect(firstCard.locator('.work-pay strong')).toBeInViewport({ ratio: 1 });
+    const before = await ids();
+    expect([...before].sort()).toEqual(hourlyIds);
+
+    const summary = options.getByText(sort ? 'Filters (2)' : 'Filters (1)', { exact: true });
+    await summary.press('Enter');
+    await expect(summary).toBeFocused();
+    await expect(options).toHaveJSProperty('open', true);
+    await expect(form.getByRole('combobox', { name: 'Pay unit' })).toHaveValue('hourly');
+    await expect(form.getByRole('combobox', { name: 'Sort' })).toHaveValue(sort);
+    await expect(page).toHaveURL(url);
+    expect(await ids()).toEqual(before);
+
+    const compare = page.getByRole('link', { name: 'Compare results' });
+    await compare.press('Enter');
+    const rows = page.locator('[data-compare-route]');
+    await expect(rows).toHaveCount(before.length);
+    expect(await rows.evaluateAll(nodes => nodes.map(node => node.dataset.compareRoute))).toEqual(before);
+    await page.goBack();
+    await expect(page).toHaveURL(url);
+    await expect(compare).toBeFocused();
+    await expect(options).toHaveJSProperty('open', true);
+    await expect(form.getByRole('combobox', { name: 'Pay unit' })).toHaveValue('hourly');
+    await expect(form.getByRole('combobox', { name: 'Sort' })).toHaveValue(sort);
+    expect(await ids()).toEqual(before);
+  }
+
+  await page.setViewportSize({ width: 1280, height: 844 });
+  await page.goto('/work/?pay=hourly');
+  await expect(form.getByRole('combobox', { name: 'Pay unit' })).toHaveValue('hourly');
+  await expect(options).toHaveJSProperty('open', true);
+  await options.getByText('Filters (1)', { exact: true }).press('Space');
+  await page.reload();
+  await expect(form).toBeVisible();
+  await expect(options).toHaveJSProperty('open', false);
+  await expect(count).toHaveText(`${hourlyIds.length} records with published hourly pay`);
+  const search = form.getByRole('searchbox', { name: 'Search listings' });
+  await search.fill('Technical Content Writer');
+  await expect(count).toHaveText('1 matching record');
+  await search.fill('unfindable-work-record-fixture');
+  await expect(count).toHaveText('0 matching records');
+  await search.clear();
+  await expect(count).toHaveText(`${hourlyIds.length} records with published hourly pay`);
+});
+
 test('native Work fits every filter option in its closed select at narrow widths', async ({ page }) => {
   test.setTimeout(60_000);
   const form = page.getByRole('search', { name: 'Find paid work' });
@@ -120,7 +190,7 @@ test('native Work fits every filter option in its closed select at narrow widths
   for (const filtered of [false, true]) {
     await page.goto(filtered ? '/work/?pay=hourly&sort=hourly' : '/work/', { waitUntil: 'domcontentloaded' });
     await expect(form).toBeVisible();
-    await expect(count).toHaveText(filtered ? /^[1-9]\d* matching records?$/ : /^[1-9]\d* records, including career pages and past listings$/);
+    await expect(count).toHaveText(filtered ? /^[1-9]\d* records? with published hourly pay$/ : /^[1-9]\d* records, including career pages and past listings$/);
     const options = form.locator('.work-page-filter-options');
     if (filtered) {
       await expect(options).toHaveJSProperty('open', false);
@@ -244,7 +314,7 @@ delayedWorkTest('native Work reserves the search row while the filter count load
 
   await expect(search).toBeVisible();
   await expect(summary).toHaveText('Filters (2)');
-  await expect(page.locator('[data-work-count]')).toHaveText(/^[1-9]\d* matching records?$/);
+  await expect(page.locator('[data-work-count]')).toHaveText(/^[1-9]\d* records? with published hourly pay$/);
   const ready = await snapshot();
   for (const [key, value] of Object.entries(reserved.geometry)) {
     expect.soft(ready.geometry[key], key).toBeCloseTo(value, 1);

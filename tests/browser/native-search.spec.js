@@ -83,7 +83,7 @@ test('bare hourly searches lead to published hourly rates by keyboard or touch',
     await expect(page).toHaveURL(/\/work\/\?pay=hourly$/);
     await expect(page.locator('[data-work-filters] input[name=q]')).toHaveValue('');
     await expect(page.locator('[data-work-filters] select[name=pay]')).toHaveValue('hourly');
-    await expect(page.locator('[data-work-count]')).toHaveText(`${expected.length} matching records`);
+    await expect(page.locator('[data-work-count]')).toHaveText(`${expected.length} records with published hourly pay`);
     await expect.poll(()=>page.locator('[data-work-route]:visible').evaluateAll(cards=>cards.map(card=>card.dataset.workRoute).sort())).toEqual(expected);
     await page.goBack();
     await expect(input).toHaveValue(query);

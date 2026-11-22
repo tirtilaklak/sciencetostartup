@@ -12,7 +12,7 @@
   const filtered = Boolean(params.get('q')?.slice(0, 256).trim() || hasOptions || params.get('view') === 'compare');
   const savedOptionsOpen = history.state?.workFilterOptionsOpen;
   const initialOptionsOpen = typeof savedOptionsOpen === 'boolean' ? savedOptionsOpen
-    : hasOptions && !matchMedia('(max-width: 600px)').matches;
+    : hasOptions && !matchMedia('(max-width: 600px), (max-height: 820px)').matches;
   const initialHash = location.hash;
   let current, attempts = 0, deadline, interacted = false, retryHadFocus = false;
 

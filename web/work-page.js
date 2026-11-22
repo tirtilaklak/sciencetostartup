@@ -175,8 +175,11 @@
       if (comparison) comparison.hidden = !showCompare;
       empty.hidden = selection.length !== 0;
       if (showCompare) comparisonRows(selection);
-      const matching = S2SWork.keys.some(key => key !== 'sort' && criteria[key]);
-      const countLabel = matching ? `${selection.length} matching ${selection.length === 1 ? 'record' : 'records'}` : initialCount;
+      const matchKeys = S2SWork.keys.filter(key => key !== 'sort' && criteria[key]);
+      const record = selection.length === 1 ? 'record' : 'records';
+      const hourlyOnly = matchKeys.length === 1 && criteria.pay === 'hourly';
+      const countLabel = hourlyOnly ? `${selection.length} ${record} with published hourly pay`
+        : matchKeys.length ? `${selection.length} matching ${record}` : initialCount;
       if (count.textContent !== countLabel) count.textContent = countLabel;
       if (navigation) {
         navigation.hidden = showCompare || !selection.length;
