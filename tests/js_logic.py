@@ -21,28 +21,34 @@ const tableHead={getBoundingClientRect:()=>({height:90})};
 const table=Object.assign(node('comparison-table'),{tHead:tableHead,style:{setProperty(key,value){this[key]=value}}});
 function toggleAttribute(key,enabled){if(enabled)this.setAttribute(key,'');else this.removeAttribute(key);}
 table.toggleAttribute=toggleAttribute;
-Object.assign(node('compare-view'),{toggleAttribute,querySelector:selector=>selector==='.comparison-table'?table:null});
+const compareView=node('compare-view'),compareContent=node('compare-content');
+Object.assign(compareView,{toggleAttribute,contains:element=>[compareView,compareContent,table,tableHead].includes(element),querySelector:selector=>selector==='.comparison-table'?table:null});
+compareContent.contains=element=>[compareContent,table,tableHead].includes(element);
 node('compare-content').querySelector=selector=>selector==='thead'?tableHead:null;
 node('bh-grid-wrap').querySelector=selector=>selector==='thead'?node('market-head'):null;
 const observers=[];
 class ResizeObserver {
  constructor(callback){this.callback=callback;this.targets=new Set();observers.push(this);}
  observe(element){assert.ok(element);this.targets.add(element);}
+ unobserve(element){this.targets.delete(element);}
  disconnect(){this.targets.clear();}
 }
 node('research-data').textContent=JSON.stringify(data);
-const document={getElementById:node,querySelectorAll:s=>s==='[data-compare]'?boxes:[],querySelector:s=>s==='body > .topbar'?masthead:null,documentElement:Object.assign(node('html'),{toggleAttribute}),createElement:()=>node('created'),addEventListener(k,f){(documentCallbacks[k]??=[]).push(f)}};
+const document={getElementById:node,querySelectorAll:s=>s==='[data-compare]'?boxes:[],querySelector:s=>['body > .topbar','body > header.topbar'].includes(s)?masthead:null,documentElement:Object.assign(node('html'),{toggleAttribute,style:{setProperty(key,value){this[key]=value},removeProperty(key){delete this[key]}}}),body:node('body'),activeElement:node('body'),createElement:()=>node('created'),addEventListener(k,f){(documentCallbacks[k]??=[]).push(f)}};
+function getComputedStyle(element){
+ return element===masthead?{position:!compareView.hidden&&Object.hasOwn(compareView,'data-compare-flow-masthead')?'static':'sticky'}:{};
+}
 const location={hash:'#market'};
 // Match observatory.py's optional single-company profile overlay exactly.
 const profileData=readJSON('data/profile-content.json'),afterqueryPath=path.join(root,'data/profile-afterquery.json');
 if(fs.existsSync(afterqueryPath))profileData.entries=profileData.entries.filter(entry=>entry.company_id!=='afterquery').concat(JSON.parse(fs.readFileSync(afterqueryPath,'utf8')));
-const window={innerHeight:800,scrollY:0,scrollTo(){},addEventListener(k,f){(windowCallbacks[k]??=[]).push(f)},EDITORIAL:readJSON('data/editorial.json'),LOGOS:readJSON('data/logo-provenance.json'),WORK_ROUTES:synthetic?{routes:[]}:readJSON('data/work-routes.json'),PROFILE_CONTENT:profileData,RESEARCH_ALIASES:readJSON('docs/research-id-crosswalk.json')};
+const window={innerWidth:1280,innerHeight:800,scrollY:0,scrollTo(){},addEventListener(k,f){(windowCallbacks[k]??=[]).push(f)},EDITORIAL:readJSON('data/editorial.json'),LOGOS:readJSON('data/logo-provenance.json'),WORK_ROUTES:synthetic?{routes:[]}:readJSON('data/work-routes.json'),PROFILE_CONTENT:profileData,RESEARCH_ALIASES:readJSON('docs/research-id-crosswalk.json')};
 window.SOURCE_UPDATES=readJSON('data/source-updates.json');
 window.BUSINESS_HEALTH=synthetic?null:readJSON('data/business-health.json');
 const history={state:null,scrollRestoration:'auto',replaceState(state,title,url){this.state=state;if(url!==undefined)location.hash=String(url).includes('#')?'#'+String(url).split('#').slice(1).join('#'):'';}};
 let downloadedBlob;
 class CaptureURL extends URL {static createObjectURL(blob){downloadedBlob=blob;return 'blob:test'}static revokeObjectURL(){}}
-const context=vm.createContext({document,window,history,ResizeObserver,innerHeight:window.innerHeight,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,URLSearchParams,Blob,queueMicrotask,setTimeout:()=>{},clearTimeout:()=>{},console});
+const context=vm.createContext({document,window,history,ResizeObserver,getComputedStyle,innerHeight:window.innerHeight,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,URLSearchParams,Blob,queueMicrotask,setTimeout:()=>{},clearTimeout:()=>{},console});
 // The icon script runs first. This stub's window is separate from its global.
 // Combining the remaining modules matches declaration hoisting in the build.
 const modules=['web/icons.js','web/search-core.js','web/app.js','web/editorial.js','web/work-core.js','web/work-v3.js','web/work-v4.js','web/profiles-v2.js','web/source-updates.js','web/site-nav.js','web/detail-views.js','web/source-update-details.js','web/profile-details.js','web/business-health.js'];
@@ -51,7 +57,11 @@ context.iconHTML=window.iconHTML;
 assert.equal(typeof context.iconHTML,'function');
 vm.runInContext(modules.slice(1).map(f=>fs.readFileSync(path.join(root,f),'utf8')).join('\n'),context);
 const run=s=>vm.runInContext(s,context),plain=v=>JSON.parse(JSON.stringify(v));
-const click=button=>{for(const handler of documentCallbacks.click||[])handler({target:{closest:s=>s==='button'?button:null}});};
+const click=button=>{
+ const event={target:{closest:s=>s==='button'||s==='[data-mobile-compare]'&&button.dataset.mobileCompare!==undefined?button:null}};
+ if(button.dataset.mobileCompare!==undefined)compareView.callbacks.click?.(event);
+ for(const handler of documentCallbacks.click||[])handler(event);
+};
 const button=dataset=>({dataset,hasAttribute:()=>false});
 
 (async()=>{
@@ -191,7 +201,7 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  assert.ok(!node('compare-content').innerHTML.includes('comparison-table'),'Selecting from another view does not render the hidden table');
  location.hash=run('compareHash()');run('route()');
  const compareObserver=observers.find(observer=>observer.targets.has(tableHead));
- assert.deepEqual([...compareObserver.targets],[masthead,tableHead]);
+ assert.deepEqual([...compareObserver.targets],[masthead,compareView,tableHead]);
  assert.equal(table.style['--compare-head-height'],'90px');
  assert.equal(Object.hasOwn(table,'data-compare-flow-head'),false);
  window.innerHeight=280;compareObserver.callback();

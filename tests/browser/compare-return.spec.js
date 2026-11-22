@@ -112,10 +112,21 @@ test('Compare work links describe career pages, archived records and paid networ
   }
 });
 
-async function expectFocusedTextInView(locator) {
+async function expectFocusedTextInView(locator, checkControl = false) {
   await expect(locator).toBeFocused();
-  await expect.poll(() => locator.evaluate(element => {
+  await expect.poll(() => locator.evaluate((element, checkControl) => {
     if (!element.matches(':focus-visible')) return ['focus ring missing'];
+    const hits = (rect, fractions) => fractions.every(fraction => element.contains(
+      document.elementFromPoint(rect.left + rect.width * fraction, rect.top + rect.height / 2)
+    ));
+    const inViewport = rect => rect.left >= 0 && rect.right <= innerWidth &&
+      rect.top >= 0 && rect.bottom <= innerHeight;
+    const fractions = checkControl ? [0.12, 0.5, 0.88] : [0.5];
+    if (checkControl) {
+      const box = element.getBoundingClientRect();
+      if (!inViewport(box) || !hits(box, fractions)) return [{ control: box.toJSON() }];
+      if (element.matches('select')) return [];
+    }
     const textNodes = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
     const range = document.createRange();
     const lines = [];
@@ -126,11 +137,8 @@ async function expectFocusedTextInView(locator) {
       lines.push(...[...range.getClientRects()].filter(rect => rect.width && rect.height));
     }
     if (!lines.length) return ['no rendered label'];
-    return lines.filter(rect => (
-      rect.left < 0 || rect.right > innerWidth || rect.top < 0 || rect.bottom > innerHeight ||
-      !element.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2))
-    )).map(rect => rect.toJSON());
-  })).toEqual([]);
+    return lines.filter(rect => !inViewport(rect) || !hits(rect, fractions)).map(rect => rect.toJSON());
+  }, checkControl)).toEqual([]);
 }
 
 const enlargedCompare = test.extend({
@@ -204,4 +212,147 @@ enlargedCompare('trusted Tab reveals Compare labels on a short phone with large 
     await expect(compareCell(page, 'Published revenue figure', 'turing')).toBeHidden();
     await expect(page).toHaveURL('/explore/#compare/snorkel_ai/toloka/turing');
   });
+});
+
+const threeCompanyComparison = '/explore/#compare/snorkel_ai/toloka/turing';
+
+async function tabTo(page, target) {
+  for (let stops = 0; stops < 30; stops++) {
+    if (await target.evaluate(element => document.activeElement === element)) return;
+    await page.keyboard.press('Tab');
+  }
+  await expect(target).toBeFocused();
+}
+
+async function openPhoneComparison(page) {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto(threeCompanyComparison);
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  const changePair = page.locator('.mobile-column-options summary');
+  await expect(changePair).toBeVisible();
+  const revenue = company => compareCell(page, 'Published revenue figure', company);
+  await expect(revenue('snorkel_ai')).toBeVisible();
+  await expect(revenue('toloka')).toBeVisible();
+  await expect(revenue('turing')).toBeHidden();
+  return { changePair, revenue };
+}
+
+async function openPairPicker(page, changePair) {
+  await tabTo(page, changePair);
+  await expectFocusedTextInView(changePair, true);
+  await page.keyboard.press('Enter');
+  await expect(changePair.locator('..')).toHaveJSProperty('open', true);
+  const first = page.getByRole('button', { name: 'Snorkel AI + Toloka', exact: true });
+  const second = page.getByRole('button', { name: 'Snorkel AI + Turing', exact: true });
+  await page.keyboard.press('Tab');
+  await expectFocusedTextInView(first, true);
+  return { first, second };
+}
+
+async function afterLayout(page) {
+  await page.evaluate(() => new Promise(resolve => {
+    requestAnimationFrame(() => requestAnimationFrame(resolve));
+  }));
+}
+
+enlargedCompare('an open Compare pair stays visible and usable after a height change at 32px minimum text', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'Uses a Chromium minimum font setting');
+  const { changePair, revenue } = await openPhoneComparison(page);
+  const { first, second } = await openPairPicker(page, changePair);
+
+  await test.step('increase the phone height with the first pair focused', async () => {
+    await page.setViewportSize({ width: 320, height: 720 });
+    await afterLayout(page);
+    await expectFocusedTextInView(first, true);
+  });
+
+  await page.keyboard.press('Tab');
+  await expectFocusedTextInView(second, true);
+  await page.keyboard.press('Shift+Tab');
+  await expectFocusedTextInView(first, true);
+  await page.keyboard.press('Enter');
+  await expectFocusedTextInView(changePair, true);
+  await expect(changePair.locator('..')).toHaveJSProperty('open', false);
+  await expect(revenue('toloka')).toBeVisible();
+  await expect(revenue('turing')).toBeHidden();
+  await expect(page).toHaveURL(threeCompanyComparison);
+
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Tab');
+  await expectFocusedTextInView(second, true);
+  await page.keyboard.press('Enter');
+  await expectFocusedTextInView(changePair, true);
+  await expect(changePair.locator('..')).toHaveJSProperty('open', false);
+  await expect(revenue('turing')).toBeVisible();
+  await expect(revenue('toloka')).toBeHidden();
+  await expect(page).toHaveURL(threeCompanyComparison);
+  await page.keyboard.press('Tab');
+  await expectFocusedTextInView(revenue('snorkel_ai').getByRole('link', { name: /snorkel\.ai/ }));
+});
+
+enlargedCompare('Compare preserves visible keyboard focus when a phone rotates with the pair picker open', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile-chromium', 'Uses Chromium phone orientation emulation');
+  const { changePair, revenue } = await openPhoneComparison(page);
+  const { first, second } = await openPairPicker(page, changePair);
+  const cdp = await page.context().newCDPSession(page);
+  async function rotate(width, height) {
+    const landscape = width > height;
+    await cdp.send('Emulation.setDeviceMetricsOverride', {
+      width, height, deviceScaleFactor: 1, mobile: true,
+      screenOrientation: {
+        type: landscape ? 'landscapePrimary' : 'portraitPrimary',
+        angle: landscape ? 90 : 0,
+      },
+    });
+    await afterLayout(page);
+  }
+
+  for (const [width, height] of [[568, 320], [320, 568], [320, 720]]) {
+    await test.step(`keep the pair picker open at ${width} × ${height}`, async () => {
+      await rotate(width, height);
+      await expectFocusedTextInView(first, true);
+      await page.keyboard.press('Tab');
+      await expectFocusedTextInView(second, true);
+      await page.keyboard.press('Shift+Tab');
+      await expectFocusedTextInView(first, true);
+    });
+  }
+
+  const preset = page.locator('#compare-preset');
+  await test.step('use the visible preset when landscape hides the pair picker', async () => {
+    await rotate(720, 320);
+    await expect(changePair).toBeHidden();
+    await expectFocusedTextInView(preset, true);
+    await rotate(320, 720);
+    await expectFocusedTextInView(preset, true);
+    await expect(changePair.locator('..')).toHaveJSProperty('open', false);
+    await expect(revenue('toloka')).toBeVisible();
+    await expect(revenue('turing')).toBeHidden();
+    await expect(page).toHaveURL(threeCompanyComparison);
+  });
+});
+
+enlargedCompare('Compare keeps the reading position after wheel scrolling and a height change', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'Uses a Chromium minimum font setting');
+  const { changePair } = await openPhoneComparison(page);
+  await tabTo(page, changePair);
+  await expectFocusedTextInView(changePair, true);
+
+  const initial = await page.evaluate(() => scrollY);
+  await page.evaluate(() => {
+    window.compareWheelDone = new Promise(resolve => {
+      addEventListener('scrollend', () => resolve(scrollY), { once: true });
+    });
+  });
+  await page.mouse.move(160, 460);
+  await page.mouse.wheel(0, 1200);
+  const readingPosition = await page.evaluate(() => window.compareWheelDone);
+  expect(readingPosition - initial).toBeGreaterThan(568);
+  await expect(changePair).toBeFocused();
+
+  await page.setViewportSize({ width: 320, height: 720 });
+  await afterLayout(page);
+  expect(await page.evaluate(() => scrollY)).toBe(readingPosition);
+  await expect(page).toHaveURL(threeCompanyComparison);
 });
