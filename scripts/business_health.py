@@ -15,6 +15,7 @@ FINANCE_DATE_ROLES = {'announcement', 'company_announcement_context', 'period_en
 MERCOR_H1_ESTIMATE = 'mercor.metric.major-growth_metrics-1'
 RWS_GENERATE_REVENUE = 'rws_trainai.claim.growth_metrics-1.metric-0'
 SNORKEL_RUN_RATE = 'snorkel_ai.metric.major-growth_metrics-0'
+IMERIT_REVENUE = 'imerit.metric.expansion-imerit-revenue'
 
 
 def profile_finance_claim_context(profile):
@@ -275,6 +276,42 @@ def _validate_toloka_growth(observations, metrics, claims, sources, checks):
         raise ValueError(prefix + 'the checked SEC filing must lead and retain the separately dated mirror failure')
 
 
+def _validate_imerit_transcript(observations, metrics, claims, sources, checks):
+    row = observations.get(IMERIT_REVENUE, {})
+    metric = metrics[IMERIT_REVENUE]
+    claim = claims[metric['claim_id']]
+    primary = 'imerit.source.audit-im-transcript'
+    original = 'imerit.source.audit-im-transcript2'
+    replacement = 'refresh.source.imerit-exl-june-2026-stocksguide'
+    checked_claim = claims.get('refresh.claim.imerit-exl-june-2026-revenue-transcript', {})
+    period = row.get('period', {})
+    prefix = f'business-health: {IMERIT_REVENUE}: '
+    if (claim['source_ids'] != [primary, original] or row.get('source_ids') != [primary, replacement]
+            or row.get('historical_source_ids') != [original] or row.get('metric_ids') != [IMERIT_REVENUE]
+            or row.get('claim_ids') != [claim['id'], checked_claim.get('id')]
+            or checked_claim.get('source_ids') != [replacement]):
+        raise ValueError(prefix + 'the original attribution and checked replacement must be linked separately')
+    if (row.get('measure') != 'period_revenue' or row.get('evidence_type') != 'reported'
+            or any(row.get(field) != metric[field] for field in ('value', 'unit', 'currency', 'qualifier', 'as_of'))
+            or (period.get('type'), period.get('start'), period.get('end')) !=
+               (metric['period_type'], metric['period_start'], metric['period_end'])
+            or (row.get('scope'), row.get('accounting_basis')) != (metric['segment_scope'], metric['gross_vs_net'])
+            or row.get('evidence_assurance') != claim['evidence_label']):
+        raise ValueError(prefix + 'the replacement must preserve the reported amount, scope, period and assurance')
+    new_check, old_check = checks.get(replacement, {}), checks.get(original, {})
+    checked_on = row.get('evidence_checked_on')
+    if (not _finance_day(checked_on) or checked_on != checked_claim['observed_on']
+            or checked_on != new_check.get('checked_on') or checked_on != old_check.get('checked_on')
+            or not _checked_source(sources[replacement], new_check)
+            or sources[replacement].get('accessed_on') != checked_on
+            or sources[replacement].get('published_on') != sources[primary].get('published_on')
+            or new_check.get('excerpt') != checked_claim['excerpt']
+            or new_check.get('source_locator') != checked_claim['source_locator']
+            or (old_check.get('status'), old_check.get('http_status'), old_check.get('url')) !=
+               ('unavailable', 404, sources[original]['url'])):
+        raise ValueError(prefix + 'the checked transcript and historical 404 require dated source receipts')
+
+
 def load_business_health(path, data, profile_content=None):
     # Fixtures and other research versions must never inherit this curated layer. After a
     # SIDECAR_DATASET_VERSION bump the source_dataset_version check below fails loudly until
@@ -416,6 +453,7 @@ def load_business_health(path, data, profile_content=None):
         if row['unit'] != 'percent' or not math.isclose(row['value'], expected, rel_tol=1e-10, abs_tol=1e-10):
             raise ValueError(prefix + 'calculated value differs from its cited inputs')
     _validate_toloka_growth(observations, metrics, claims, sources, checked)
+    _validate_imerit_transcript(observations, metrics, claims, sources, checked)
     if 'profile_finance' in health:
         if profile_content is None:
             profile_path = path.with_name('profile-content.json')
