@@ -264,26 +264,26 @@ test('Daily date navigation retains filters and restores the open issue on Back'
   await expect(page).toHaveURL(datedURL(previous));
 });
 
+async function settledReading(link) {
+  await expect(link).toBeInViewport();
+  // Focus and fragment scrolling respect the site's smooth-scroll setting.
+  return link.evaluate(element => new Promise((resolve, reject) => {
+    const started = performance.now();
+    let lastY = scrollY, lastTop = element.getBoundingClientRect().top, stable = 0;
+    function sample() {
+      const top = element.getBoundingClientRect().top;
+      stable = Math.abs(scrollY - lastY) <= 0.25 && Math.abs(top - lastTop) <= 0.25 ? stable + 1 : 0;
+      lastY = scrollY; lastTop = top;
+      if (stable >= 4) resolve({ y: scrollY, top,
+        open: [...document.querySelectorAll('.scan-item')].filter(row => row.querySelector('details').open).map(row => row.id) });
+      else if (performance.now() - started > 3000) reject(new Error('Daily reading position did not settle'));
+      else requestAnimationFrame(sample);
+    }
+    requestAnimationFrame(sample);
+  }));
+}
+
 test('Daily deep links reveal filtered items and native disclosures support keyboard and history', async ({ page }) => {
-  async function settledReading(link) {
-    await expect(link).toBeInViewport();
-    // Focus and fragment scrolling respect the site's smooth-scroll setting.
-    // Save the settled reading position, rather than a frame in that animation.
-    return link.evaluate(element => new Promise((resolve, reject) => {
-      const started = performance.now();
-      let lastY = scrollY, lastTop = element.getBoundingClientRect().top, stable = 0;
-      function sample() {
-        const top = element.getBoundingClientRect().top;
-        stable = Math.abs(scrollY - lastY) <= 0.25 && Math.abs(top - lastTop) <= 0.25 ? stable + 1 : 0;
-        lastY = scrollY; lastTop = top;
-        if (stable >= 4) resolve({ y: scrollY, top,
-          open: [...document.querySelectorAll('.scan-item')].filter(row => row.querySelector('details').open).map(row => row.id) });
-        else if (performance.now() - started > 3000) reject(new Error('Daily reading position did not settle'));
-        else requestAnimationFrame(sample);
-      }
-      requestAnimationFrame(sample);
-    }));
-  }
   async function restoredReading(link, saved) {
     await expect.poll(() => page.locator('.scan-item').evaluateAll(rows => rows
       .filter(row => row.querySelector('details').open).map(row => row.id))).toEqual(saved.open);
@@ -339,6 +339,66 @@ test('Daily deep links reveal filtered items and native disclosures support keyb
   expect(new URL(page.url()).hash).toBe('#' + first.id);
   await restoredReading(permanentFirst.locator('h2 a'), forwardReading);
 });
+
+async function traversePermalinkHistory(page, direction, destination) {
+  try { await page[direction]({ waitUntil: 'commit', timeout: 5_000 }); }
+  // A cached return can change the URL without Playwright observing a commit.
+  catch (error) { if (page.url() !== destination) throw error; }
+  await expect(page).toHaveURL(destination);
+}
+
+const datedKeyboardCases = [...new Set([latest, oldest])]
+  .map(edition => ({ label: edition.date, route: `/daily/${edition.date}/`, edition }));
+for (const { label, route, edition } of [{ label: 'filtered latest', route: '/daily/', edition: latest }, ...datedKeyboardCases]) {
+  test(`Daily ${label} permalink Back returns focus and Tab to the exact reading position`, async ({ page }) => {
+    const search = page.getByLabel('Search', { exact: true });
+    const filtered = route === '/daily/';
+    const { item, query } = filtered ? distinctiveSearch() : { item: edition.items[Math.floor((edition.items.length - 1) / 2)], query: '' };
+    await page.goto(route);
+    const archiveSummary = page.locator('.scan-archive-disclosure summary');
+    await archiveSummary.press('Enter');
+    await expect(page.locator('.scan-archive-disclosure')).toHaveAttribute('open', '');
+    if (filtered) {
+      await search.pressSequentially(query);
+      await assertSelections(page, [item], edition.items.length);
+    }
+
+    const row = page.locator('.scan-item[id=' + JSON.stringify(item.id) + ']');
+    await row.locator('summary').press('Enter');
+    const permalink = row.locator('.scan-permalink');
+    for (let i = 0; i < item.sources.length + 1; i++) await page.keyboard.press('Tab');
+    await expect(permalink).toBeFocused();
+    const nextItem = edition.items[edition.items.indexOf(item) + 1];
+    const next = filtered || !nextItem ? page.locator('.scan-notes summary') :
+      page.locator('.scan-item[id=' + JSON.stringify(nextItem.id) + '] h2 a');
+    await page.keyboard.press('Tab');
+    await expect(next).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(permalink).toBeFocused();
+    const startURL = page.url();
+    const start = await settledReading(permalink);
+
+    await page.keyboard.press('Enter');
+    const targetURL = new URL(`/daily/${edition.date}/#${item.id}`, startURL).href;
+    await expect(page).toHaveURL(targetURL);
+    await expect(row.locator('details')).toHaveAttribute('open', '');
+    await expect(row).toBeInViewport();
+    await traversePermalinkHistory(page, 'goBack', startURL);
+    await expect(permalink).toBeFocused();
+    await assertSelections(page, filtered ? [item] : edition.items, edition.items.length);
+    await expect(search).toHaveValue(query);
+    await expect(page.locator('.scan-archive-disclosure')).toHaveAttribute('open', '');
+    const back = await settledReading(permalink);
+    expect(back.open).toEqual(start.open);
+    expect(Math.abs(back.y - start.y)).toBeLessThanOrEqual(2);
+    expect(Math.abs(back.top - start.top)).toBeLessThanOrEqual(2);
+    await page.keyboard.press('Tab');
+    await expect(next).toBeFocused();
+    await traversePermalinkHistory(page, 'goForward', targetURL);
+    await expect(row.locator('details')).toHaveAttribute('open', '');
+    await expect(row).toBeInViewport();
+  });
+}
 
 test('Daily controls, explanations and disclosed sources fit narrow and wide screens', async ({ page }) => {
   for (const width of [320, 390, 600, 601, 701, 768, 1440]) {
