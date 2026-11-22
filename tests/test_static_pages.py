@@ -153,6 +153,7 @@ class StaticPageTests(unittest.TestCase):
                                   if row["evidence_type"] == "estimate" and row["metric_ids"] == [row["id"]]}
         cls.reviewed_comparatives = {row["id"] for row in observations
                                     if row.get("primary_source_id") and row.get("accounting_basis") == "latest_discontinued_operations_comparative"}
+        cls.reviewed_profile_growth = {row["profile_metric_id"]: row for row in observations if row.get("profile_metric_id")}
         cls.routes = json.loads((ROOT / "data/work-routes.json").read_text())["routes"]
         cls.events = json.loads((ROOT / "data/company-events.json").read_text())
         cls.editorial = {e["company_id"]: e for e in json.loads((ROOT / "data/editorial.json").read_text())["entries"]}
@@ -220,11 +221,10 @@ class StaticPageTests(unittest.TestCase):
     def test_pages_stay_lean_without_app_script_or_dataset(self):
         for cid, text in self.pages.items():
             page_bytes = text.encode()
-            # AfterQuery's 45 retained listings include compact descriptions,
-            # dated pay evidence, and separate destination checks on the dossier.
-            self.assertLess(len(page_bytes), 140_000 if cid == "afterquery" else PAGE_LIMIT, cid)
+            # AfterQuery's 45 compact cards include eligibility text and separate checks.
+            self.assertLess(len(page_bytes), 160_000 if cid == "afterquery" else PAGE_LIMIT, cid)
             if cid == "afterquery":
-                self.assertLess(len(gzip.compress(page_bytes)), 17_000, cid)
+                self.assertLess(len(gzip.compress(page_bytes)), 23_000, cid)
             self.assertEqual(PageFacts(text).scripts, [{"type": "application/ld+json"}, {"src": "/native-details.js", "defer": None}], cid)
             self.assertNotIn('id="research-data"', text, cid)
             structured = structured_data(text)
@@ -650,7 +650,9 @@ class StaticPageTests(unittest.TestCase):
             for mid, row in self.figures(cid)[0]:
                 metric, text = self.metrics[mid], plain(row)
                 claim = self.research.claims[metric["claim_id"]]
-                self.assertIn(sp.figure_scope(self.research, metric, self.contexts.get(mid)), text, mid)
+                growth = self.reviewed_profile_growth.get(mid)
+                scope = growth["scope_detail"] if growth else sp.figure_scope(self.research, metric, self.contexts.get(mid))
+                self.assertIn(scope, text, mid)
                 self.assertEqual("Historical" in text, bool(self.research.historical_year(metric)), mid)
                 is_estimate = mid in self.reviewed_estimates or metric.get("reported_vs_estimated") == "estimated"
                 self.assertEqual(bool(re.search(r'<span class="tag">(?:Third-party estimate|Estimate)</span>', row)), is_estimate, mid)
@@ -873,6 +875,8 @@ class StaticPageTests(unittest.TestCase):
 
         work_cards = cards((self.dist / "work/index.html").read_text())
         company_cards = {cid: cards(page) for cid, page in self.pages.items()}
+        self.assertEqual(set(work_cards), {route["id"] for route in self.routes})
+        self.assertEqual(sum(len(rows) for rows in company_cards.values()), len(self.routes))
         scholar = "afterquery.work.research-scholar"
         for route in self.routes:
             rid, cid = route["id"], route["company_id"]
@@ -881,6 +885,24 @@ class StaticPageTests(unittest.TestCase):
                 with self.subTest(route=rid, surface=surface):
                     terms = re.search(r'<details class="work-terms">(.*?)</details>', card, re.S)
                     self.assertIsNotNone(terms)
+                    action_start = re.search(r'<p class="work-(?:listing-)?action">', card)
+                    if surface == "company" and action_start:
+                        self.assertLessEqual(terms.end(), action_start.start())
+                    preview = card[:min(terms.start(), action_start.start()) if action_start else terms.start()]
+                    expanded_eligibility = re.search(r'<ul aria-label="Additional requirements">(.*?)</ul>', terms.group(1), re.S)
+                    eligibility = [html.unescape(plain(preview)), html.unescape(plain(expanded_eligibility.group(1))) if expanded_eligibility else ""]
+                    for requirement in sp.work_requirements(route):
+                        self.assertTrue(any(requirement in region for region in eligibility), requirement)
+                        self.assertFalse(all(requirement in region for region in eligibility), requirement)
+                    if expanded_eligibility:
+                        self.assertIn("More requirements, terms & sources", plain(terms.group(1)))
+                        self.assertIn(f'href="/work/#{rid}"', preview)
+                    if rid == "afterquery.work.software-engineering-intern":
+                        self.assertIn("Able to take a gap semester off and join our team in person in San Francisco", eligibility[0])
+                        if surface == "company": self.assertIn("Any background in AI research", eligibility[1])
+                    if rid == "afterquery.work.world-models":
+                        self.assertIn("PhD or ABD", eligibility[0])
+                        self.assertIn("first-author peer-reviewed publication", eligibility[0])
                     quote = route.get("source_quote")
                     if quote: self.assertIn(f'<blockquote>{html.escape(quote)}</blockquote>', terms.group(1))
                     actions = sp.work_actions(route, self.research)
@@ -890,9 +912,34 @@ class StaticPageTests(unittest.TestCase):
                                             a.get("aria-label") == f"{action} for {role}, {sp.clean(employer)}"
                                             for a in anchors), action)
                     if rid == scholar:
-                        before_details = card[:terms.start()]
-                        self.assertIn("$1,000–$10,000 one-time award", before_details)
-                        self.assertIn(route["pay_terms"]["note"], before_details)
+                        self.assertIn("$1,000–$10,000 one-time award", preview)
+                        self.assertIn(route["pay_terms"]["note"], preview)
+
+    def test_native_toloka_growth_shows_the_calculation_and_source_history(self):
+        rid = "toloka.metric.major-growth_metrics-1"
+        page = self.pages["toloka"]
+        row = dict(self.figures("toloka")[0])[rid]
+        text = plain(row)
+        for phrase in ("about 135.1% Calculated", "$26.1M in FY2024 and $11.1M in FY2023",
+                       "Toloka discontinued operations", "Grade A applies to the Form 20-F filing",
+                       "Recheck unavailable 22 Nov 2026 (HTTP 403)"):
+            self.assertIn(phrase, text)
+        self.assertIn('data-label="Grade">A<', row)
+        self.assertEqual(re.findall(r'data-source-id="([^"]+)"', row), [
+            "refresh.source.nebius-fy2025-sec-note-3", "toloka.source.audit-tol_2025", "toloka.source.audit-tol_2024"])
+        self.assertIn("Note 3 SEC EDGAR · Published 30 Apr 2026 · Checked 22 Nov 2026", text)
+        self.assertNotIn("138%", text)
+        self.assertIn("reported 138% growth on a segment basis using $26.4M in FY2024", page)
+        self.assertIn("toloka.metric.major-growth_metrics-0", self.metrics)
+
+    def test_native_snorkel_check_is_bound_to_the_selected_source_record(self):
+        section = self.pages["snorkel_ai"].split('id="financial-record"', 1)[1].split('id="figures"', 1)[0]
+        self.assertIn('data-financial-observation="snorkel_ai.metric.major-growth_metrics-0"', section)
+        self.assertIn('data-source-id="snorkel_ai.source.audit-s5"', section)
+        self.assertIn("more than $375M", section)
+        self.assertIn("Reported 22 Sep 2026", section)
+        self.assertIn("Source content checked 22 Nov 2026.", section)
+        self.assertNotIn("28 Oct 2026", section)
 
     def test_native_mercor_estimate_preserves_metric_and_sacra_citation(self):
         rid = "mercor.metric.major-growth_metrics-1"

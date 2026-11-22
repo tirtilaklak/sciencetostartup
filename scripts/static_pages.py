@@ -27,6 +27,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from functools import cmp_to_key
 from pathlib import Path
 from urllib.parse import quote, urlsplit, urlunsplit
+from presentation import observation_source_ids
 from schema_def import TABLES
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1065,11 +1066,11 @@ def figure_row(research, metric, context=None):
     label = context.get("display_label") or figure_label(research, metric)
     notes = [research.correction(metric, "display_attribution"), clean(context.get("note"))]
     head = f'<th scope="row">{escape(label)}<span class="sub">{escape(" · ".join(d for d in details if d))}</span>' + "".join(f'<span class="sub">{escape(note)}</span>' for note in notes if note and note != "Undated company claim") + "</th>"
-    assurance = "Third-party estimate" if context.get("estimated") else "Estimate" if metric.get("reported_vs_estimated") == "estimated" else ""
+    assurance = context.get("assurance") or ("Third-party estimate" if context.get("estimated") else "Estimate" if metric.get("reported_vs_estimated") == "estimated" else "")
     value = f'<td class="value" data-label="Value">{escape(value_text(metric))}' + (f' <span class="tag">{escape(assurance)}</span>' if assurance else "") + "</td>"
     when = context.get("date") or metric_period(research, metric)
     period = f'<td data-label="Date">{escape("Not stated" if when == "Date not stated" else when)}' + (' <span class="tag">Historical</span>' if research.historical_year(metric) else "") + "</td>"
-    citations = source_html(research, metric)
+    citations = source_html(research, metric, evidence=context.get("citation_evidence"), checks=context.get("source_checks"))
     fact = context.get("finance_fact")
     original, _ = latest_source(research, metric)
     if fact and fact.get("source_id") != (original or {}).get("id"):
@@ -1078,7 +1079,9 @@ def figure_row(research, metric, context=None):
     if supplemental := context.get("supplemental_source"):
         link = external_link(supplemental["url"], supplemental["title"])
         citations = f'<span class="sub" data-source-id="{escape(supplemental["id"])}">{link}</span>' + citations
-    return f'<tr id="metric-{escape(metric["id"])}" data-metric="{escape(metric["id"])}">{head}{value}{period}<td data-label="Grade">{escape(research.grade(metric) or "Not graded")}</td><td class="wide-cell" data-label="Source">{citations}</td></tr>'
+    confidence = context.get("confidence_reason")
+    grade = escape(research.grade(metric) or "Not graded") + (f'<span class="sub">{escape(confidence)}</span>' if confidence else "")
+    return f'<tr id="metric-{escape(metric["id"])}" data-metric="{escape(metric["id"])}">{head}{value}{period}<td data-label="Grade">{grade}</td><td class="wide-cell" data-label="Source">{citations}</td></tr>'
 
 
 SOURCE_CHECKS = {"checked": "Checked {}", "summary_only": "Summary only, page not reviewed · recorded {}", "unverified": "Not checked again · recorded {}"}
@@ -1089,10 +1092,14 @@ def source_record_status(source):
     return SOURCE_CHECKS.get(source.get("retrieval_status"), "Recorded {}").format(format_date(read)) if ISO_DAY.fullmatch(str(read or "")) else ""
 
 
-def source_meta(research, source):
+def source_meta(research, source, check=None):
     """Publisher, publication date and when we read the page, in the words of profileSourceMeta() in web/profiles-v2.js."""
     published = source.get("published_on") if ISO_DAY.fullmatch(str(source.get("published_on") or "")) else research.reviewed_source_dates.get(source["id"])
-    return " · ".join(part for part in (clean(source.get("publisher")), f"Published {format_date(published)}" if published else "", source_record_status(source)) if part)
+    status = ""
+    if check and check.get("status") == "unavailable":
+        http = f' (HTTP {check["http_status"]})' if check.get("http_status") else ""
+        status = f'Recheck unavailable {format_date(check.get("checked_on"))}{http}'
+    return " · ".join(part for part in (clean(source.get("publisher")), f"Published {format_date(published)}" if published else "", source_record_status(source), status) if part)
 
 
 def company_source_link(research, source):
@@ -1100,28 +1107,30 @@ def company_source_link(research, source):
     return external_link(source.get("url"), label) + availability(source.get("url"), research.health)
 
 
-def company_citations(research, claim, primary_id):
+def company_citations(research, claim, primary_id, sources=None, checks=None):
     """Expose the exact supporting records in claim order, even at a shared URL."""
-    sources = [research.sources[sid] for sid in claim.get("source_ids", []) if sid != primary_id and sid in research.sources]
+    if sources is None:
+        sources = [research.sources[sid] for sid in claim.get("source_ids", []) if sid != primary_id and sid in research.sources]
     if not sources:
         return ""
     lines = []
     for source in sources:
-        meta = source_meta(research, source)
+        meta = source_meta(research, source, (checks or {}).get(source["id"]))
         lines.append(f'<li data-source-id="{escape(source["id"])}">{company_source_link(research, source)}'
                      + (f'<span class="sub">{escape(meta)}</span>' if meta else "") + '</li>')
     return (f'<details class="company-citations" data-citations-for="{escape(claim["id"])}">'
             f'<summary>{plural(len(lines), "more source")}</summary><ul>{"".join(lines)}</ul></details>')
 
 
-def source_html(research, metric, inline=False):
+def source_html(research, metric, inline=False, evidence=None, checks=None):
     """A primary source and the other records cited by the same claim."""
-    source, _ = latest_source(research, metric)
+    source, rest = (evidence[0], evidence[1:]) if evidence else (latest_source(research, metric)[0], None)
     if not source: return '<span class="muted">No source recorded.</span>' if inline else '<span class="sub">No source recorded</span>'
-    meta = source_meta(research, source)
+    meta = source_meta(research, source, (checks or {}).get(source["id"]))
     link = company_source_link(research, source)
-    rest = company_citations(research, research.claim(metric), source["id"])
+    rest = company_citations(research, research.claim(metric), source["id"], rest, checks)
     if inline: return "Source: " + link + (f' <span class="muted">({escape(meta)})</span>' if meta else "") + rest
+    if evidence: link = f'<span data-source-id="{escape(source["id"])}">{link}</span>'
     return link + (f'<span class="sub">{escape(meta)}</span>' if meta else "") + rest
 
 
@@ -1145,7 +1154,19 @@ def figures_html(research, company, figures, pending, others, profile_entry, fin
             contexts[rid] = {**(contexts.get(rid) or {}), "date": fact["display_date"], "scope": fact["scope"],
                              "display_label": fact["label"], "finance_fact": fact}
     sources = {source["id"]: source for source in (health or {}).get("sources", [])}
-    for observation in (health or {}).get("observations", []):
+    observations = {row["id"]: row for row in (health or {}).get("observations", [])}
+    calculated = {}
+    for observation in observations.values():
+        profile_metric = observation.get("profile_metric_id")
+        if profile_metric in figure_ids:
+            calculated[profile_metric] = observation
+            inputs = [observations[rid] for rid in observation["calculation"]["input_observation_ids"]]
+            amounts = " and ".join(f'{value_text(row)} in {row["period"]["label"]}' for row in inputs)
+            contexts[profile_metric] = {**(contexts.get(profile_metric) or {}), "scope": observation["scope_detail"],
+                "assurance": "Calculated", "note": f"Calculated from rounded revenue of {amounts}.",
+                "confidence_reason": observation["profile_confidence_reason"],
+                "citation_evidence": [sources[sid] for sid in observation_source_ids(observation)],
+                "source_checks": {row["source_id"]: row for row in health["source_checks"]["entries"]}}
         rid = observation.get("id")
         if rid not in figure_ids or observation.get("metric_ids") != [rid]:
             continue
@@ -1154,8 +1175,12 @@ def figures_html(research, company, figures, pending, others, profile_entry, fin
         if supplemental := sources.get(observation.get("primary_source_id")):
             contexts[rid] = {**(contexts.get(rid) or {}), "supplemental_source": supplemental, "note": observation["limitations"]}
     if figures:
-        rows = "".join(figure_row(research, m, contexts.get(m["id"])) for m in figures)
+        shown = [{**m, "value": round(calculated[m["id"]]["value"], 1), "qualifier": "approximate"}
+                 if m["id"] in calculated else m for m in figures]
+        rows = "".join(figure_row(research, m, contexts.get(m["id"])) for m in shown)
         body = f'<table class="figures wide"><thead><tr><th scope="col">Figure</th><th scope="col">Value</th><th scope="col">Date</th><th scope="col">Grade</th><th scope="col">Source</th></tr></thead><tbody>{rows}</tbody></table>\n'
+        for observation in calculated.values():
+            body += f'<p class="muted">{escape(observation["basis"])}</p>\n'
     else:
         body = f'<p>{"Commercial revenue does not apply to this research organization." if company.get("entity_type") == "adjacent_research" else "No reported figure meets the source requirements."}</p>\n'
     if pending:
@@ -1173,11 +1198,17 @@ def labelled(label, value):
     return value if value.lower().startswith(label.lower()) else f"{label}: {value}"
 
 
-def work_conditions(route, include_requirements=True):
-    """Binding source wording stays visible before the destination on both plain surfaces."""
+def work_requirements(route):
+    """Requirements in source order, without repeating an assessment already listed."""
     requirements = list(dict.fromkeys(clean(v) for v in route.get("requirements") or [] if clean(v)))
     assessment = clean(route.get("assessment"))
     if assessment and not any(assessment.casefold() in v.casefold() for v in requirements): requirements.append(assessment)
+    return requirements
+
+
+def work_conditions(route, requirements=None):
+    """Show the source terms before the destination on both plain surfaces."""
+    if requirements is None: requirements = work_requirements(route)
     hours_record = ((route.get("research_record") or {}).get("route") or {}).get("hours") or {}
     hours_detail = hours_record.get("detail") if isinstance(hours_record, dict) else None
     field_reviews = route.get("field_reviews") or {}
@@ -1187,7 +1218,7 @@ def work_conditions(route, include_requirements=True):
     commitment = list(dict.fromkeys(clean(v) for v in (*hours, route.get("duration")) if clean(v)))
     parts = [f'<span class="sub">{escape(WORK_KIND_LABELS[work_kind(route)])} · {escape(WORK_ENGAGEMENT_LABELS[work_engagement(route)])}</span>']
     if commitment: parts.append('<span class="sub">' + escape(" · ".join(commitment)) + '</span>')
-    if requirements and include_requirements:
+    if requirements:
         parts.append('<span class="sub">' + escape(" · ".join(requirements)) + '</span>')
     for field, review in field_reviews.items():
         if field == "commitment" and conflict: continue
@@ -1327,9 +1358,12 @@ def work_source_lines(research, route, employer, detailed):
     return record_quote_html + ("<ul>" + "".join(lines) + "</ul>" if lines else "")
 
 
-def work_terms_html(research, route, employer, detailed=True):
+def work_terms_html(research, route, employer, detailed=True, more_requirements=()):
     """One native source disclosure; a replaced original URL remains in its history."""
-    parts = ['<details class="work-terms"><summary>Terms &amp; sources</summary>']
+    label = "More requirements, terms &amp; sources" if more_requirements else "Terms &amp; sources"
+    parts = [f'<details class="work-terms"><summary>{label}</summary>']
+    if more_requirements:
+        parts.append('<ul aria-label="Additional requirements">' + ''.join(f'<li>{escape(term)}</li>' for term in more_requirements) + '</ul>')
     if detailed and route.get("summary"): parts.append('<p>' + escape(clean(route["summary"])) + '</p>')
     availability_note = clean(route.get("availability_note"))
     if not detailed:
@@ -1388,9 +1422,16 @@ def work_item(research, route, employer, compact=False):
     destination, action = work_destination(route, research)
     rid, role = escape(route.get("id")), clean(route.get("role")) or "Listing"
     link = f'<p class="work-action">{external_link(destination, action, work_action_name(action, route, employer))}{availability(destination, research.health)}</p>' if destination else ''
-    conditions = work_conditions(route, include_requirements=not compact)
+    requirements = work_requirements(route)
+    visible = len(requirements)
+    if compact:
+        # Keep at least the first full requirement visible. Longer source lists
+        # continue in the disclosure immediately before the employer action.
+        while visible > 1 and len(" · ".join(requirements[:visible])) > 280:
+            visible -= 1
+    conditions = work_conditions(route, requirements[:visible])
     title = f'<a class="work-role-link" href="/work/#{rid}">{escape(role)}</a>' if compact else escape(role)
-    terms = work_terms_html(research, route, employer, detailed=not compact)
+    terms = work_terms_html(research, route, employer, detailed=not compact, more_requirements=requirements[visible:])
     return (f'<li id="{rid}" tabindex="-1" data-work-route="{rid}"><strong>{title}</strong>{tag}'
             f'{qualified_offer}<span class="sub">{escape(". ".join(p for p in parts if p))}</span>{pay_notes}'
             f'{conditions}{terms}{link}</li>')
@@ -1406,7 +1447,7 @@ def company_work_html(research, company, routes, compact=False):
     lead = ("Pay and availability may have changed. Check the current terms on the company’s website." if paid
             else "No confirmed paid listing. Career pages and past records appear below.")
     body = [f"<p>{lead}</p>\n", safety_note()]
-    if compact: body.append('<p>Open a role name for its full requirements and pay details on Paid work.</p>\n')
+    if compact: body.append('<p>Open a role name to see its full Paid work record.</p>\n')
     for key, label, _ in WORK_DISPLAY_BUCKETS:
         rows = sort_routes([r for r in routes if work_display_bucket(r) == key], names)
         if rows: body.append(f"<h3>{label}</h3>\n<ul class=\"listings\">" + "".join(work_item(research, r, name, compact=compact) for r in rows) + "</ul>\n")
@@ -1545,13 +1586,14 @@ def business_observation_html(research, health, company_id, inline=False, compac
     """A clearly dated supplement beside the unchanged research snapshot."""
     row = selected_business_observation(health, company_id)
     if not row: return ""
-    source_ids = row.get("source_ids", [])
+    source_ids = observation_source_ids(row)
     primary = row.get("primary_source_id")
-    source = next((s for s in health.get("sources", []) if s.get("id") in ([primary] if primary else source_ids)), None)
-    if not source: source = next((s for s in research.data.get("sources", []) if s.get("id") in source_ids), None)
+    sources = {**research.sources, **{entry["id"]: entry for entry in health.get("sources", [])}}
+    source = next((sources[sid] for sid in source_ids if sid in sources), None)
     checks = [c for c in health.get("source_checks", {}).get("entries", []) if c.get("source_id") in source_ids]
     failed = row.get("refresh_status") == "source_unavailable" or any(c.get("status") == "unavailable" for c in checks)
-    checked = next((c.get("checked_on") for c in checks if c.get("status") == "content_checked" and (not primary or c["source_id"] == primary)), None)
+    checked = max((c["checked_on"] for c in checks if source and c.get("status") == "content_checked"
+                   and c["source_id"] == source["id"] and c["url"] == source["url"]), default=None)
     period = research.observation_period(row)
     scope = row.get("scope_label") or {"company": "Whole company", "ai_data": "AI data business"}.get(row.get("scope"), row.get("scope", ""))
     if company_id == "rws_trainai" and row.get("scope") in ("company", "parent"): scope = "RWS Holdings plc group"
@@ -1740,8 +1782,8 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     if dated or risk_rows:
         body.append(f'<details class="company-fold"><summary><span>Risks &amp; events</span><small>{plural(len(dated), "event")} · {plural(len(risk_rows), "risk note")}</small></summary><div class="company-fold-body">' + risks_html(research, cid, events) + '</div></details>')
     company_work = company_work_html(research, company, routes)
-    # Reuse the complete Work listing for detailed eligibility when a company's
-    # dossier would otherwise duplicate a large section of the whole directory.
+    # Keep long dossiers scannable by folding longer requirements into their
+    # local source disclosures and linking to each complete Work record.
     if len(company_work.encode()) > 70_000:
         company_work = company_work_html(research, company, routes, compact=True)
     body.append(f'<details class="company-fold"><summary><span>Paid work</span><small>{plural(len(paid_open), "listing or network", "listings and networks") if paid_open else "No confirmed listing"}</small></summary><div class="company-fold-body">' + company_work + '</div></details>')
