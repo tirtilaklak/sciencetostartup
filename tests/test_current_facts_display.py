@@ -70,6 +70,7 @@ const context = vm.createContext({
   document: {addEventListener() {}},
   publicText: value => String(value ?? ''), iconHTML: () => '',
   dateText: value => value, comparisonRows: () => [], route() {},
+  routeParts: () => ['market'],
   Intl, Date, JSON, Set, Map,
 });
 vm.runInContext([
