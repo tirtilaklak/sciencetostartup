@@ -114,6 +114,7 @@
     more.hidden = !key || visible.length >= matches.length;
     more.textContent = `Show ${Math.min(pageSize, matches.length - visible.length)} more`;
     if (exact) say(`Showing ${visible.length} of ${matches.length} matching research ${matches.length === 1 ? 'record' : 'records'}.`);
+    else if (hourly) say('The first result opens Work with the Hourly filter selected.');
     else if (!key) say('Search research, companies and their offerings, or continue to paid work.');
     else if (matches.length) say(`Showing ${visible.length} of ${matches.length} matching guide records. Paid work uses its own listing filters.`);
     else say('No recorded guide matches. You can search paid work or browse all companies.');

@@ -50,6 +50,7 @@ test('bare hourly searches lead to published hourly rates by keyboard or touch',
   const expected=routes.filter(route=>route.pay_terms?.hourly_comparable).map(route=>route.id).sort();
   const input=page.getByRole('combobox',{name:'Search the guide'});
   const options=page.locator('#home-search-results').getByRole('option');
+  const status=page.locator('#home-search-status');
   const first=options.first();
   await page.goto('/');
   if(isMobile) await page.getByRole('link',{name:'Search the guide'}).tap();
@@ -65,11 +66,14 @@ test('bare hourly searches lead to published hourly rates by keyboard or touch',
     await expect(first).toHaveAttribute('href',href);
     await expect(options.filter({hasText:'See roles with published hourly pay'})).toHaveCount(0);
   }
+  await input.fill('zzqxv-no-matching-guide-record');
+  await expect(status).toHaveText('No recorded guide matches. You can search paid work or browse all companies.');
 
   for(const query of ['hourly','  Hourly   Pay  ']){
     await input.fill(query);
     await expect(first.locator('strong')).toHaveText('See roles with published hourly pay');
     await expect(first).toHaveAttribute('href','/work/?pay=hourly');
+    await expect(status).toHaveText('The first result opens Work with the Hourly filter selected.');
     if(isMobile) await first.tap();
     else {
       await input.press('ArrowDown');
