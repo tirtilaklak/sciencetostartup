@@ -404,3 +404,11 @@ The public site still lists the unavailable AfterQuery People Programs Lead role
 A generic search for “jobs” returned a single literal result. The shared Work selector now respects the requested filters and all eligible listings for a generic query. A literal role or company with the exact title still takes precedence.
 
 The iMerit finance record now links to a second transcript that publishes the same CFO statement, approximately $59 million in preliminary unaudited revenue for the 12 months ended March 31, 2026. The prior transcript is recorded as a historical 404. The canonical dataset and deposited evidence remain available under their original identities.
+
+Verified all 1,013 distinct public paths after retrying 15 proxy errors. The after-check manifest still matches Worker 41. The repository now checks generated paths and static fragments before a release. Explore routes that need JavaScript remain part of the browser sweep.
+
+Home presents Companies, Paid work and Research as the first three choices. The original company and paid-work examples keep their source links. The Market page puts financial figures ahead of product examples. The native pages remove repeated instructions and let readers open release and review details as needed. Checks against the preceding build confirmed that all 103 revised native pages retained their destinations and anchors. All 71 archival assets, Daily snapshots and feeds retained their checksums.
+
+Shared Search now opens Home at the homepage and Companies at the current directory. One paid-work action keeps the query. All 20 browser journeys in the separate Search build passed across the five project configurations.
+
+Two release defects were reproduced on Worker 41. A blocked Market data request left the old Companies results on screen. A timed-out Explore script could erase a focused recovery action when it arrived late. The product changes keep the failure scoped to the requested page, retain the original bookmark and offer a usable Reload page action. The integrated build still needs its release checks.
