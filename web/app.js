@@ -781,11 +781,14 @@ function rememberExploreOrigin(event){
   if(history.state?.exploreReturnOrigin){const {exploreReturnOrigin,...rest}=history.state;history.replaceState(rest,'');}
   return;
  }
+ // Opening the same address can create an entry without a hashchange event.
+ ensureHistoryEntryKey();
+ exploreEntryKey=historyKey();
  if(work)flushWorkRoute();
- const destination=link.href,key=historyKey();
+ const destination=link.href;
  const opener=compare?{action:link.dataset.compareOrigin,pair:state.mobileCompare,expanded:comparisonExpanded,left:link.closest('.comparison-scroll')?.scrollLeft||0}:null;
  history.replaceState({...history.state,exploreReturnOrigin:{href,destination,work,compare:opener}},'');
- pendingExploreLink=href.startsWith('#')?{key,destination}:null;
+ pendingExploreLink=href.startsWith('#')?{key:exploreEntryKey,destination}:null;
  keepEntryScroll();
 }
 window.addEventListener('click',rememberExploreOrigin);

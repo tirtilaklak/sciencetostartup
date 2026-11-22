@@ -27,6 +27,21 @@ test('Back returns to the exact Compare link when two links open the same profil
   }
 });
 
+test('Back restores the opener from a new entry at the same Compare URL', async ({ page }) => {
+  const compare = '/explore/#compare/mercor/a-team/sama';
+  await page.goto(compare);
+  const work = compareCell(page, 'Paid work', 'mercor').getByRole('link', { name: 'Pay & requirements' });
+  await expect(work).toBeVisible();
+  await page.goto(compare, { waitUntil: 'commit' });
+  await work.press('Enter');
+  await expect(page).toHaveURL('/explore/#company/mercor/work');
+
+  await page.goBack({ waitUntil: 'commit' });
+  await expect(page).toHaveURL(compare);
+  await expect(work).toBeFocused();
+  await expect(work).toBeInViewport();
+});
+
 test('fresh Back from native financing evidence restores More, the Compare pair and keyboard focus', async ({ page }) => {
   await page.addInitScript(() => {
     addEventListener('unload', () => {});
