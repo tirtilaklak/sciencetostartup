@@ -45,6 +45,8 @@
     }));
     if (records.length !== cards.size) throw new Error('Work selection does not match the page');
     const initialOpen = new Map([...groupElements.values()].filter(group => group.tagName === 'DETAILS').map(group => [group, group.open]));
+    const compareArrivalKey = 's2s.workCompareArrival';
+    let compareDeparture;
     let selection = [];
     let active = false;
     let displayedSearch;
@@ -264,6 +266,34 @@
       }));
     }
 
+    function takeCompareArrival() {
+      if (!comparison || window.top !== window) return false;
+      try {
+        if (!sessionStorage.getItem(compareArrivalKey)) return false;
+        sessionStorage.removeItem(compareArrivalKey);
+        if (comparison.hidden || !document.referrer || performance.getEntriesByType('navigation')[0]?.type !== 'navigate') return false;
+        // Match the native same-tab link without storing the reader's search.
+        const expected = new URL(document.referrer);
+        expected.searchParams.set('view', 'compare');
+        const arrival = new URL(location.href);
+        arrival.hash = '';
+        return expected.href === arrival.href;
+      } catch {
+        return false;
+      }
+    }
+
+    function focusComparison() {
+      const heading = comparison.querySelector('h2');
+      const toolbar = compareLink.closest('[data-work-toolbar]');
+      const arrival = location.href;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (loader?.interacted || document.activeElement !== document.body || location.href !== arrival || comparison.hidden) return;
+        heading.focus({ preventScroll: true });
+        toolbar.scrollIntoView({ block: 'start', behavior: 'instant' });
+      }));
+    }
+
     form.addEventListener('submit', event => event.preventDefault());
     form.addEventListener('input', () => render(true));
     form.addEventListener('change', () => render(true));
@@ -276,8 +306,17 @@
       link?.addEventListener('click', event => {
         if (!event.isTrusted || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ||
             link.hasAttribute('download') || (link.target && link.target.toLowerCase() !== '_self')) return;
+        if (link === compareLink && comparison?.hidden) compareDeparture = event;
         const entry = window.S2SNativeHandoff?.begin(link.href, event);
         remember({ workReturnFocus: { kind, page: location.href, href: link.href, top: link.getBoundingClientRect().top, entry }, workCompareFocus: false });
+      });
+    }
+    if (comparison && window.top === window) {
+      window.addEventListener('pagehide', () => {
+        const departure = compareDeparture;
+        compareDeparture = null;
+        if (!departure || departure.defaultPrevented) return;
+        try { sessionStorage.setItem(compareArrivalKey, '1'); } catch {}
       });
     }
     document.addEventListener('focusin', event => {
@@ -323,18 +362,20 @@
     if (compareLink) compareLink.hidden = false;
     if (exportButton) exportButton.hidden = false;
     const retried = loader?.retried;
+    const compareArrival = takeCompareArrival() && !loader?.interacted;
     const activation = window.navigation?.activation;
     const goingForward = activation?.from && activation.from.index <= activation.entry?.index;
     const returning = window.navigation ? !goingForward : window.S2SNativeHandoff?.returnedFrom(history.state?.workReturnFocus?.entry);
     const handoff = returning && !loader?.interacted && performance.getEntriesByType('navigation')[0]?.type === 'back_forward' && savedHandoff();
-    const revealed = revealTarget(!handoff && (!loader?.interacted || retried));
-    if (!handoff && !revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
+    const revealed = !compareArrival && revealTarget(!handoff && (!loader?.interacted || retried));
+    if (!compareArrival && !handoff && !revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
       // A saved anchor can be excluded by the saved criteria.
       count.scrollIntoView({ block: 'start', behavior: 'instant' });
     }
     loader?.complete(script);
     document.documentElement.removeAttribute('data-page-enhancement');
-    if (handoff) restoreHandoff(handoff);
+    if (compareArrival) focusComparison();
+    else if (handoff) restoreHandoff(handoff);
     if (!revealed && retried) {
       // A failed load can leave the reader at a bookmark the filters now hide.
       fields.q.focus({ preventScroll: true });
