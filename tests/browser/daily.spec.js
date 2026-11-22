@@ -541,6 +541,10 @@ classicFirefox.describe('Daily classic Firefox history', () => {
   classicFirefox('cold Forward keeps a manually closed phone filter panel', async ({ page }) => {
     await compactFilterHistory(page, { recreated: true });
   });
+
+  classicFirefox('cold Forward keeps native scroll after a previous Next-link return', async ({ page }) => {
+    await compactFilterHistory(page, { recreated: true, revisit: true });
+  });
 });
 
 test('Daily shows the complete first headline on the first screen', async ({ page }) => {
@@ -643,7 +647,7 @@ test('Daily phone filters leave focus in place and restore saved reading on Back
   await expect(search).toBeVisible();
 });
 
-async function compactFilterHistory(page, { recreated = false } = {}) {
+async function compactFilterHistory(page, { recreated = false, revisit = false } = {}) {
   await page.setViewportSize({ width: 320, height: 720 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const { item, query } = previous.date === '2026-11-17' ? {
@@ -667,6 +671,18 @@ async function compactFilterHistory(page, { recreated = false } = {}) {
   await expect(search).toBeHidden();
   const address = page.url();
   expect(new URL(address).searchParams.get('q')).toBe(query);
+  if (revisit) {
+    const next = page.locator('.scan-day-step[rel="next"]');
+    const nextAddress = new URL(await next.getAttribute('href'), address).href;
+    await next.press('Enter');
+    await expect(page).toHaveURL(nextAddress);
+    await traversePermalinkHistory(page, 'goBack', address);
+    await expect(search).toBeHidden();
+    await summary.press('Enter');
+    await expect(search).toBeVisible();
+    await summary.press('Enter');
+    await expect(search).toBeHidden();
+  }
   const departure = await page.evaluate(() => {
     scrollTo({ top: 80, behavior: 'instant' });
     return { document: performance.timeOrigin, y: scrollY };

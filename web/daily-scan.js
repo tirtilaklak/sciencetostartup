@@ -53,6 +53,7 @@
       if (state != null && Object.prototype.toString.call(state) !== '[object Object]') return;
       history.replaceState({ ...state, [filterKey]: { url: location.href,
         open: filterDisclosure.open, focusSummary: document.activeElement === filterSummary } }, '');
+      history.scrollRestoration = 'auto';
     } catch (_) { /* Keep native disclosure and history behavior. */ }
   }
   const position = value => Number.isFinite(value) && value >= 0 && value <= maxPosition;
@@ -106,34 +107,37 @@
     function apply(current, filters) {
       // Recreated documents lose native disclosure state. Layout and position
       // must be restored together after the browser finishes its traversal.
+      const reading = filters ? null : current;
       if (current) {
         for (const row of rows) row.querySelector('details').open = current.open.includes(row.id);
         if (typeof current.archiveOpen === 'boolean') archive.open = current.archiveOpen;
-        if (current.returnToDateGo === true && compact.matches) archive.open = true;
+        if (reading?.returnToDateGo === true && compact.matches) archive.open = true;
         disclosureObserver?.takeRecords();
+      }
+      if (reading) {
         try { history.scrollRestoration = 'manual'; } catch (_) { /* Restore below. */ }
       }
       const filtersOpen = filters?.open ?? current?.filtersOpen;
       if (typeof filtersOpen === 'boolean') showFilters(filtersOpen);
       let returnFocus;
       if (scroll) {
-        if (current) {
-          const anchor = rowById.get(current.anchor);
-          const y = anchor && !anchor.hidden ? scrollY + anchor.getBoundingClientRect().top - current.top : current.y;
-          scrollTo({ left: current.x, top: Math.max(0, Math.min(maxPosition, y)), behavior: 'instant' });
-          const item = rowById.get(current.returnToPermalink);
+        if (reading) {
+          const anchor = rowById.get(reading.anchor);
+          const y = anchor && !anchor.hidden ? scrollY + anchor.getBoundingClientRect().top - reading.top : reading.y;
+          scrollTo({ left: reading.x, top: Math.max(0, Math.min(maxPosition, y)), behavior: 'instant' });
+          const item = rowById.get(reading.returnToPermalink);
           returnFocus = item && !item.hidden ? item.querySelector('details[open] .scan-permalink') : null;
         }
         // Fragment traversal can leave focus or the next Tab at the target
         // article. Restore the originating link after reopening its details.
         if (!returnFocus && document.activeElement === document.body) {
-          const archiveLink = archive.open ? archiveLinks.get(current?.returnToArchive) : null;
-          const focusSummary = compact.matches && (filters?.focusSummary ?? current?.returnToFilterSummary) === true;
-          returnFocus = focusSummary ? filterSummary : current?.returnToDateGo === true ? dateGo : archiveLink;
+          const archiveLink = archive.open ? archiveLinks.get(reading?.returnToArchive) : null;
+          const focusSummary = compact.matches && (filters?.focusSummary ?? reading?.returnToFilterSummary) === true;
+          returnFocus = focusSummary ? filterSummary : reading?.returnToDateGo === true ? dateGo : archiveLink;
         }
         returnFocus?.focus({ preventScroll: true });
       }
-      if (current?.returnToDateGo === true) date.value = root.dataset.edition;
+      if (reading?.returnToDateGo === true) date.value = root.dataset.edition;
       return returnFocus;
     }
     if (!scroll) {
