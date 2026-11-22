@@ -4,7 +4,7 @@ The audit began at 7:30 PM Pacific on November 21, 2026. The first three hours a
 
 ## Current pass
 
-PR #34 merged at `1cecd451`. Public production serves Worker version 41, build `5dc63fbcf19634a55c66`, on all traffic. The latest approved Daily edition is November 18. Five fix rounds and five independent retests followed the initial three-hour audit, with ten distinct Sol Ultra contributors in each phase and up to six active workers at a time. The sixth implementation and independent verification use branch `codex/site-quality-20261122` based on the merged main. The closing checkpoint remains November 22 at 7:30 PM Pacific. [Merged PR #34](https://github.com/tirtilaklak/sciencetostartup/pull/34) · [Production receipts](site-quality-20261121/fifth-public-release.json)
+PR #34 merged at `1cecd451`. Public production serves Worker version 41, build `5dc63fbcf19634a55c66`, on all traffic. The latest approved Daily edition is November 18. Five fix rounds and five independent retests followed the initial three-hour audit, with ten distinct Sol Ultra contributors in each phase and up to six active workers at a time. The sixth candidate is build `81071f0430d00446056b` on branch `codex/site-quality-20261122`, based on the merged main. The closing checkpoint remains November 22 at 7:30 PM Pacific. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Merged PR #34](https://github.com/tirtilaklak/sciencetostartup/pull/34) · [Production receipts](site-quality-20261121/fifth-public-release.json)
 
 ## Initial baseline and first three rounds
 

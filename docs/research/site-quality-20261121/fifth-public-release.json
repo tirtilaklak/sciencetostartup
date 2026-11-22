@@ -213,6 +213,78 @@
     "retest-release/successor-f8287d07/official-workflows.json": "4f9061f0f56e110169002dffa52a089cf73bf75c7d1239a4fd86233576adbd59",
     "retest-release/successor-f8287d07/ci-archive-crosscheck.json": "ce525ce9740496194b39d2df341e7a45020f78c1aed8af3a324b01166e1f044e",
     "retest-release/successor-f8287d07/ci-measurements.json": "701728e6092ad1eadd7ee11af8b0db52e2a66901e4c437a39a5a08811b46bf6f",
-    "retest-release/successor-f8287d07/performance-comparison.json": "8885710f03aa0fe4e5ccfbc976ac20c0c6c1d881e7ef29ecf9fe566f1de0f979"
+    "retest-release/successor-f8287d07/performance-comparison.json": "8885710f03aa0fe4e5ccfbc976ac20c0c6c1d881e7ef29ecf9fe566f1de0f979",
+    "public-downloads/comparison.json": "f669dcd5cb3baf6f59cd0724db6aa30125cc53974ab63a5c1c95f9880f01021e",
+    "public-design/public-design.json": "b260deef066b0991024fb0d93ca31ed3f19837099b0302439f345fe02026172c",
+    "public-design/screens/original-and-current-phone.png": "17a230e3d42e62df7385f85889bae14ca980b4f181dc8f5a0e60955709683100"
+  },
+  "public_download_verification": {
+    "manifest": {
+      "build_id": "5dc63fbcf19634a55c66",
+      "bytes": 162639,
+      "sha256": "11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+      "url": "https://sciencetostartup.com/manifest.json",
+      "browser_status_before": 200,
+      "browser_status_after": 200,
+      "http_status": 200
+    },
+    "resources": [
+      {
+        "label": "Privacy-filtered research JSON (22.4 MB)",
+        "browser_mode": "download",
+        "browser_bytes": 22412892,
+        "browser_sha256": "8359515b173a9625633ceea1459084793fda717caef2a5ded7ade4767def2785",
+        "http_status": 200,
+        "same_as_immutable_browser": true
+      },
+      {
+        "label": "Full evidence graph JSON \u00b7 explicit statuses (18.5 MB)",
+        "browser_mode": "download",
+        "browser_bytes": 18491631,
+        "browser_sha256": "f9e92133564ba89b024d537066a9d6e27972c3842f900c69264bef59a4cacf3a",
+        "http_status": 200,
+        "same_as_immutable_browser": true
+      },
+      {
+        "label": "Export checksums",
+        "browser_mode": "inline",
+        "browser_bytes": 764,
+        "browser_sha256": "039bbf273bed31d8a3ef907554afb263c42197064bd260b7b217f61c8577171c",
+        "http_status": 200,
+        "same_as_immutable_browser": true
+      },
+      {
+        "label": "Package SHA-256 inventory",
+        "browser_mode": "inline",
+        "browser_bytes": 8103,
+        "browser_sha256": "8371f4ade74111fd0fc3cc5f00d7d26b69e1709235a50cb719f72f7bef205dce",
+        "http_status": 200,
+        "same_as_immutable_browser": true
+      },
+      {
+        "label": "View edition checksums (JSON)",
+        "browser_mode": "inline",
+        "browser_bytes": 8103,
+        "browser_sha256": "8371f4ade74111fd0fc3cc5f00d7d26b69e1709235a50cb719f72f7bef205dce",
+        "http_status": 200,
+        "same_as_immutable_browser": true
+      },
+      {
+        "label": "Edition checksums (JSON)",
+        "browser_mode": "inline",
+        "browser_bytes": 8103,
+        "browser_sha256": "8371f4ade74111fd0fc3cc5f00d7d26b69e1709235a50cb719f72f7bef205dce",
+        "http_status": 200,
+        "same_as_immutable_browser": true
+      },
+      {
+        "label": "Edition ZIP",
+        "browser_mode": "download",
+        "browser_bytes": 17451639,
+        "browser_sha256": "fdd231690c9bf9ed57339502a9e52b96eb59461afb6771191eb1337b69a85917",
+        "http_status": 200,
+        "same_as_immutable_browser": true
+      }
+    ]
   }
 }
