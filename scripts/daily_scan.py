@@ -9,7 +9,7 @@ from types import SimpleNamespace
 from urllib.parse import parse_qsl, unquote, urlsplit, urlunsplit
 import xml.etree.ElementTree as ET
 
-from static_pages import document, escape as e, format_date, ORIGIN, PUBLISHER_NAME, render_sitemap
+from static_pages import document, escape as e, external_link, format_date, ORIGIN, PUBLISHER_NAME, render_sitemap
 
 ROOT = Path(__file__).resolve().parents[1]
 TOPICS = ("RLHF", "Data", "Evaluation", "Companies")
@@ -266,14 +266,14 @@ def write_daily_feeds(folder, context):
 
 
 def card(item, rank, edition):
-    sources = "".join('<li><a href="' + e(s["url"]) + '">' + e(s["label"]) + ' <span aria-hidden="true">↗</span></a></li>' for s in item["sources"])
+    sources = "".join(f'<li>{external_link(source["url"], source["label"])}</li>' for source in item["sources"])
     topics = " · ".join(item["topics"])
     explanation = " ".join(sentence.strip() for sentence in item["explanation"])
     return (f'<article class="scan-item" id="{e(item["id"])}" data-kind="{e(item["kind"])}" data-topics="{e("|".join(item["topics"]))}">'
             f'<span class="scan-rank" aria-label="Selection {rank}">{rank:02d}</span><div class="scan-item-body">'
             f'<div class="scan-meta"><span class="scan-kind">{e(item["kind"])}</span><span>{e(item["publisher"])}</span>'
             f'<span>Source <time datetime="{item["published_on"]}">{format_date(item["published_on"])}</time></span></div>'
-            f'<h2><a href="{e(item["sources"][0]["url"])}">{e(item["title"])} <span class="scan-external" aria-hidden="true">↗</span></a></h2>'
+            f'<h2>{external_link(item["sources"][0]["url"], item["title"])}</h2>'
             f'<p class="scan-explanation">{e(explanation)}</p><div class="scan-bottom"><span class="scan-topic-label">{e(topics)}</span>'
             f'<details><summary>Details & sources</summary><dl><div><dt>Focus</dt><dd>{e(item["focus"])}</dd></div>'
             f'<div><dt>Finding</dt><dd>{e(item["finding"])}</dd></div>'
@@ -320,7 +320,7 @@ def render(edition, editions, canonical, root=ROOT, context=None):
             f'<form class="scan-date-form" hidden><label for="scan-date">Snapshot date</label>'
             f'<div><select id="scan-date">{options}</select><button id="scan-date-go" type="submit">Go</button></div></form></nav>'
             '<details class="scan-filter-disclosure" open hidden><summary>Search and filter</summary><div class="scan-controls">'
-            '<div class="scan-search-control"><label for="scan-search">Search</label><input id="scan-search" type="search" placeholder="Paper, company or keyword" autocomplete="off"></div>'
+            '<div class="scan-search-control"><label for="scan-search">Search</label><input id="scan-search" type="search" placeholder="Keyword" autocomplete="off"></div>'
             f'<div><label for="scan-topic">Topic</label><select id="scan-topic"><option value="">All topics</option>{topic_options}</select></div>'
             f'<div><label for="scan-kind">Type</label><select id="scan-kind"><option value="">All types</option>{kind_options}</select></div></div></details>'
             '<script>if(matchMedia("(max-width:600px)").matches)document.currentScript.previousElementSibling.open=false</script>'
