@@ -1,20 +1,20 @@
 {
   "schema_version": "1.0.0",
-  "release_id": "2026-11-22.7",
+  "release_id": "2026-11-22.8",
   "as_of": "2026-11-22",
-  "publication_as_of": "2026-11-22T13:21:32Z",
+  "publication_as_of": "2026-11-22T14:06:10Z",
   "canonical_dataset_version": "2.5.0",
   "canonical_sha256": "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061",
-  "work_routes_sha256": "f3b93f5ceef57e088ea65cef31a4d80eb481687269ce6af331923a744c681bb6",
+  "work_routes_sha256": "4d1e710f669eb12c946c9f507447ecfc12a83092e9beb341d0c6a1aaf12b7e88",
   "counts": {
     "records": 135,
-    "work_routes": 70,
-    "named_listings": 49,
+    "work_routes": 72,
+    "named_listings": 51,
     "networks_programs": 21,
     "providers": 29,
     "career_pages": 23,
-    "past_other_records": 31,
-    "other_company_jobs": 11
+    "past_other_records": 30,
+    "other_company_jobs": 10
   },
   "calibration_route_ids": [
     "g2i.work.senior-swe-training",
@@ -30,7 +30,7 @@
     "terac.work.finance-experts",
     "toloka.work.mindrift-code"
   ],
-  "review_scope": "The 22 November review checked 52 distinct routes in the source handoff, plus the two Prolific waitlists and the recorded RWS Polaris board action. Scoped reviews cover employer-posting terms and public destinations. Three exact missing listings, Terac’s explicit closure, APTO’s unpublished application and three superseded or general-intake listings remain as historical or informational records. Prior source checks and terms reviews remain in the record. The follow-up confirms Prolific participant eligibility and program intake wording, consolidates Pareto’s expert requirements and clarifies two AfterQuery schedule conflicts. The AIXI fellowship correction covers the advertised workplace and the empirical-project qualification alternative. The Surge AI fellowship correction records the application instructions and the absence of a workplace in the publisher’s description. OOAK’s employer careers site lists the matching Data Quality Specialist role. The original YC posting and the separately linked Work at a Startup page both returned a readable 404. A default request to the linked page returned an empty 406. The separate application URL reached sign-in and application access remains unconfirmed. The employer’s header and description give different experience thresholds.",
+  "review_scope": "The 22 November review checked 52 distinct routes in the source handoff, plus the two Prolific waitlists and the recorded RWS Polaris board action. Scoped reviews cover employer-posting terms and public destinations. Three exact missing listings, Terac’s explicit closure, APTO’s unpublished application and three superseded or general-intake listings remain as historical or informational records. Prior source checks and terms reviews remain in the record. The follow-up confirms Prolific participant eligibility and program intake wording, consolidates Pareto’s expert requirements and clarifies two AfterQuery schedule conflicts. The AIXI fellowship correction covers the advertised workplace and the empirical-project qualification alternative. The Surge AI fellowship correction records the application instructions and the absence of a workplace in the publisher’s description. OOAK’s employer careers site lists the matching Data Quality Specialist role. The original YC posting and the separately linked Work at a Startup page both returned a readable 404. A default request to the linked page returned an empty 406. The separate application URL reached sign-in and application access remains unconfirmed. The employer’s header and description give different experience thresholds. The AfterQuery reconciliation compares all 45 records with the official careers page and Ashby board. Both boards list 36 exact IDs, omit three exact IDs and leave six company or expert records in their own source scope. The review records 11 annual salary periods and three changed compensation quotes, including distinct salary and on-target earnings figures for Engagement Manager. The original Security/Infrastructure listing appears again with its exact application. Both original People Programs Lead URLs returned HTTP 404. The application rendered a not-found message. The employer’s closure decision is unconfirmed. Terac again lists the Shopping Assistant evaluator role at $30 per hour. Its linked application start requests LinkedIn. The separate RL Environment listing still explicitly says it has closed.",
   "publication_policy": {
     "automated_checks_change_facts": false,
     "automated_check_interval_days": 1,
