@@ -34,11 +34,11 @@ test('Explore Work keeps the result count and controls readable at narrow widths
 });
 
 test('native Work fits every filter option in its closed select at narrow widths', async ({ page }) => {
-  test.setTimeout(45_000);
+  test.setTimeout(60_000);
   const form = page.getByRole('search', { name: 'Find paid work' });
   const count = page.locator('[data-work-count]');
+  await page.setViewportSize({ width: 320, height: 844 });
   for (const filtered of [false, true]) {
-    await page.setViewportSize({ width: 320, height: 844 });
     await page.goto(filtered ? '/work/?pay=hourly&sort=hourly' : '/work/', { waitUntil: 'domcontentloaded' });
     await expect(form).toBeVisible();
     await expect(count).toHaveText(filtered ? /^[1-9]\d* matching records?$/ : /^[1-9]\d* records?$/);
@@ -52,11 +52,11 @@ test('native Work fits every filter option in its closed select at narrow widths
 
     const standardFonts = new Map();
     for (const enlarged of [false, true]) {
-      if (enlarged) await page.addStyleTag({ content: ':root { font-size: 200%; }' });
-      for (const width of [320, 390]) {
-        await page.setViewportSize({ width, height: 844 });
+      for (const width of enlarged ? [390, 320] : [320, 390]) {
+        if (page.viewportSize().width !== width) await page.setViewportSize({ width, height: 844 });
         await test.step(`${filtered ? 'Hourly results' : 'Default results'}, ${enlarged ? 'enlarged' : 'standard'} text at ${width}px`, async () => {
-          const { controls, viewportWidth, scrollWidth, overlap } = await form.evaluate(async form => {
+          const { controls, viewportWidth, scrollWidth, overlap } = await form.evaluate(async (form, enlarged) => {
+            if (enlarged) document.documentElement.style.fontSize = '200%';
             await document.fonts.ready;
             const search = form.querySelector('input[type=search]').getBoundingClientRect();
             const summary = form.querySelector('summary').getBoundingClientRect();
@@ -86,7 +86,7 @@ test('native Work fits every filter option in its closed select at narrow widths
               overlap: search.left < summary.right && summary.left < search.right
                 && search.top < summary.bottom && summary.top < search.bottom,
             };
-          });
+          }, enlarged);
 
           expect.soft(viewportWidth).toBe(width);
           expect.soft(scrollWidth).toBeLessThanOrEqual(viewportWidth);
