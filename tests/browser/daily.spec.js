@@ -122,6 +122,17 @@ function distinctiveSearch() {
   throw new Error('Real Daily source must supply a distinctive title prefix for search coverage');
 }
 
+const archiveToggle = page => page.getByText('Snapshot archive and feeds', { exact: true });
+const filterToggle = page => page.getByText('Search and filter', { exact: true });
+
+async function openFilters(page) {
+  const toggle = filterToggle(page);
+  if (await toggle.isVisible() && !(await page.locator('.scan-filter-disclosure').evaluate(node => node.open))) {
+    await toggle.click();
+  }
+  await expect(page.getByRole('searchbox', { name: 'Search', exact: true })).toBeVisible();
+}
+
 test('Daily latest and bounded archives match complete committed snapshots and frozen responses', async ({ page, request }) => {
   for (const { route, edition } of contentRoutes) {
     await verifiedResponse(request, route, route.slice(1) + 'index.html');
@@ -132,7 +143,11 @@ test('Daily latest and bounded archives match complete committed snapshots and f
     await expect(page).toHaveTitle(new RegExp(edition.date.slice(0, 4)));
     await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute('href', '/daily/feed.xml');
     await expect(page.locator('link[rel="alternate"][type="application/feed+json"]')).toHaveAttribute('href', '/daily/feed.json');
-    await expect(page.getByRole('navigation', { name: 'Follow Daily scan' }).getByRole('link', { name: 'RSS', exact: true })).toBeVisible();
+    await archiveToggle(page).click();
+    const feeds = page.getByRole('navigation', { name: 'Follow Daily scan' });
+    await expect(feeds.getByRole('link', { name: 'RSS', exact: true })).toHaveAttribute('href', '/daily/feed.xml');
+    await expect(feeds.getByRole('link', { name: 'JSON Feed', exact: true })).toHaveAttribute('href', '/daily/feed.json');
+    await openFilters(page);
     await expect(page.locator('.scan-controls')).toBeVisible();
     await assertContent(page, edition);
     expect(await page.locator('#scan-date option').evaluateAll(options => options.map(option => option.value)))
@@ -165,6 +180,7 @@ test('Daily feeds bind immutable editions without invented publication times', a
 
 test('Daily topic and type controls select exactly the source-backed items and update URLs', async ({ page }) => {
   await page.goto('/daily/');
+  await openFilters(page);
   const topics = await page.locator('#scan-topic option').evaluateAll(options => options.map(option => option.value).filter(Boolean));
   expect(topics).toEqual(['RLHF', 'Data', 'Evaluation', 'Companies']);
   for (const topic of topics) {
@@ -227,7 +243,7 @@ test('Daily date navigation retains filters and restores the open issue on Back'
   await expect(page.getByLabel('Type', { exact: true })).toHaveValue(item.kind);
   await nextLink.click();
   await expect(page).toHaveURL(datedURL(latest));
-  const archiveSummary = navigation.getByText('Snapshot archive', { exact: true });
+  const archiveSummary = archiveToggle(page);
   const openArticle = page.locator('.scan-item:not([hidden]) details').first();
   await openArticle.locator('summary').click();
   await archiveSummary.focus();
@@ -249,6 +265,7 @@ test('Daily date navigation retains filters and restores the open issue on Back'
   await page.goto(latestURL);
   const details = page.locator('.scan-item:not([hidden]) details').first();
   await details.locator('summary').click();
+  if (!(await date.isVisible())) await archiveSummary.press('Enter');
   await date.selectOption(previous.date);
   await expect(page).toHaveURL(latestURL);
   await go.focus();
@@ -365,6 +382,7 @@ async function keyboardPermalinkHistory(page, { route, edition }, { recreated = 
   await archive.locator('summary').press('Enter');
   await expect(archive).toHaveAttribute('open', '');
   if (filtered) {
+    await openFilters(page);
     await topic.selectOption(item.topics[0]);
     await kind.selectOption(item.kind);
     await search.pressSequentially(query);
@@ -518,11 +536,113 @@ test('Daily classic history cold Forward reveals a fragment and honors a direct 
   }
 });
 
+test('Daily shows the complete first headline on the first screen', async ({ page }) => {
+  const first = latest.items[0];
+  for (const [width, height] of [[320, 720], [390, 844], [1024, 600]]) {
+    await test.step(`${width} × ${height}`, async () => {
+      await page.setViewportSize({ width, height });
+      await page.goto('/daily/');
+      await expect(page.locator('#scan-count')).toHaveText(`${latest.items.length} of ${latest.items.length} selections`);
+      await page.evaluate(() => document.fonts.ready);
+      const headline = page.locator('.scan-item').first().getByRole('link', { name: first.title, exact: true });
+      await expect(headline).toHaveAttribute('href', first.sources[0].url);
+      const { lines, x, y, documentWidth } = await headline.evaluate(link => {
+        const range = document.createRange();
+        range.selectNodeContents(link.firstChild);
+        return { lines: [...range.getClientRects()].map(({ top, bottom, left, right }) => ({ top, bottom, left, right })),
+          x: scrollX, y: scrollY, documentWidth: document.documentElement.scrollWidth };
+      });
+      expect([x, y]).toEqual([0, 0]);
+      expect(documentWidth).toBe(width);
+      expect(lines.length).toBeGreaterThan(0);
+      for (const line of lines) {
+        expect(line.top, JSON.stringify(lines)).toBeGreaterThanOrEqual(0);
+        expect(line.left, JSON.stringify(lines)).toBeGreaterThanOrEqual(0);
+        expect(line.bottom, JSON.stringify(lines)).toBeLessThanOrEqual(height);
+        expect(line.right, JSON.stringify(lines)).toBeLessThanOrEqual(width);
+      }
+      await expect(page.getByRole('link', { name: 'RSS', exact: true })).toBeHidden();
+      await expect(archiveToggle(page)).toBeVisible();
+      const compact = width <= 600;
+      const fields = [page.getByRole('searchbox', { name: 'Search', exact: true }), page.getByLabel('Snapshot date')];
+      for (const field of fields) {
+        if (compact) await expect(field).toBeHidden();
+        else await expect(field).toBeVisible();
+      }
+      if (compact) await expect(filterToggle(page)).toBeVisible();
+      else await expect(filterToggle(page)).toBeHidden();
+    });
+  }
+});
+
+test('Daily phone filters leave focus in place and restore saved reading on Back', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 720 });
+  const { item, query } = distinctiveSearch();
+  const filterSummary = filterToggle(page);
+  const archiveSummary = archiveToggle(page);
+  const date = page.getByLabel('Snapshot date');
+  const go = page.getByRole('button', { name: 'Go', exact: true });
+  const search = page.getByRole('searchbox', { name: 'Search', exact: true });
+  const topic = page.getByLabel('Topic', { exact: true });
+  const type = page.getByLabel('Type', { exact: true });
+  const params = new URLSearchParams({ q: query, topic: item.topics[0], type: item.kind });
+
+  await page.goto('/daily/');
+  await filterSummary.press('Enter');
+  await expect(filterSummary).toBeFocused();
+  await search.fill(query);
+  await assertSelections(page, [item]);
+  await expect(search).toBeFocused();
+  await topic.focus();
+  await topic.selectOption(item.topics[0]);
+  await expect(topic).toBeFocused();
+  await type.focus();
+  await type.selectOption(item.kind);
+  await expect(type).toBeFocused();
+  await assertSelections(page, [item]);
+  await expect(page).toHaveURL('/daily/?' + params);
+
+  await page.reload();
+  await expect(page.locator('.scan-filter-disclosure')).toHaveJSProperty('open', true);
+  await expect(search).toHaveValue(query);
+  await expect(topic).toHaveValue(item.topics[0]);
+  await expect(type).toHaveValue(item.kind);
+  await assertSelections(page, [item]);
+  expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
+
+  await filterSummary.press('Space');
+  await expect(search).toBeHidden();
+  await expect(filterSummary).toBeFocused();
+  await archiveSummary.press('Enter');
+  await expect(archiveSummary).toBeFocused();
+  await expect(page.getByRole('link', { name: 'RSS', exact: true })).toHaveAttribute('href', '/daily/feed.xml');
+  await expect(page.getByRole('link', { name: 'JSON Feed', exact: true })).toHaveAttribute('href', '/daily/feed.json');
+  await date.selectOption(previous.date);
+  await expect(page).toHaveURL('/daily/?' + params);
+  await go.press('Enter');
+  await expect(page).toHaveURL(`/daily/${previous.date}/?${params}`);
+  await expect(search).toHaveValue(query);
+  await expect(search).toBeVisible();
+  expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
+
+  await page.goBack();
+  await expect(page).toHaveURL('/daily/?' + params);
+  await expect(go).toBeFocused();
+  await expect(date).toHaveValue(latest.date);
+  await expect(search).toBeHidden();
+  await assertSelections(page, [item]);
+  await page.goForward();
+  await expect(page).toHaveURL(`/daily/${previous.date}/?${params}`);
+  await expect(search).toBeVisible();
+});
+
 test('Daily controls, explanations and disclosed sources fit narrow and wide screens', async ({ page }) => {
   for (const width of [320, 390, 600, 601, 701, 768, 1440]) {
     await page.setViewportSize({ width, height: 960 });
     await page.goto('/daily/');
-    await expect(page.locator('.scan-controls')).toBeVisible();
+    await openFilters(page);
+    if (width <= 600) await archiveToggle(page).press('Enter');
+    await expect(page.getByLabel('Snapshot date')).toBeVisible();
     await page.locator('.scan-item summary').first().click();
     await expect(page.locator('.scan-item .scan-explanation:visible')).toHaveCount(latest.items.length);
     const dimensions = await page.evaluate(() => ({ viewport: innerWidth,
@@ -553,9 +673,11 @@ test('Daily latest and bounded archive documents have no serious or critical acc
 test.describe('Daily without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
   test('complete explanations, native sources, archive navigation and JSON remain readable', async ({ page, request }) => {
+    await page.setViewportSize({ width: 320, height: 720 });
     for (const { route, edition } of readingRoutes) {
-      await page.goto(route + '?q=daily-no-such-selection-987654321');
+      await page.goto(route + '?q=daily-no-such-selection-987654321&topic=RLHF&type=Dataset');
       await expect(page.locator('.scan-controls')).toBeHidden();
+      await expect(filterToggle(page)).toBeHidden();
       await expect(page.getByLabel('Snapshot date')).toBeHidden();
       await assertContent(page, edition);
       await expect(page.locator('#scan-count')).toHaveText(`${edition.items.length} selections`);
@@ -590,12 +712,22 @@ test.describe('Daily without JavaScript', () => {
     await page.goBack();
     await expect(page).toHaveURL(url => url.pathname === `/daily/${latest.date}/`);
     await expect(archive).toBeVisible();
-    const archiveSummary = navigation.getByText('Snapshot archive', { exact: true });
+    const archiveSummary = archiveToggle(page);
+    const feeds = navigation.getByRole('navigation', { name: 'Follow Daily scan' });
+    const rss = feeds.getByRole('link', { name: 'RSS', exact: true });
+    const json = feeds.getByRole('link', { name: 'JSON Feed', exact: true });
+    await expect(rss).toHaveAttribute('href', '/daily/feed.xml');
+    await expect(json).toHaveAttribute('href', '/daily/feed.json');
     await archiveSummary.focus();
     await page.keyboard.press('Enter');
     await expect(archive).toBeHidden();
+    await expect(rss).toBeHidden();
     await page.keyboard.press('Enter');
     await expect(archive).toBeVisible();
+    await rss.focus();
+    await expect(rss).toBeFocused();
+    await json.focus();
+    await expect(json).toBeFocused();
     const missing = await request.get('/daily/2026-11-15/', { headers: { 'Cache-Control': 'no-cache' } });
     expect(missing.status()).toBe(404);
   });

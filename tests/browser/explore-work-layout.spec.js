@@ -71,11 +71,25 @@ test('native Work explains the full count and updates the live count for matchin
   const { routes } = await (await request.get('/work-routes.json')).json();
   const count = page.locator('[data-work-count]');
   const fullCount = `${routes.length} records, including career pages and past listings`;
+  const hourlyCount = `${routes.filter(route => route.pay_terms?.hourly_comparable).length} records with published hourly pay`;
+  const archived = new Set(['historical', 'closed', 'contributions', 'paused', 'no_route', 'inquiry', 'information']);
+  const current = routes.filter(route => !archived.has(route.status) && route.ai_data_work !== false);
+  const named = current.filter(route => route.route_kind === 'named_listing');
+  const programs = current.filter(route => route.route_kind === 'network_program');
+  const companies = new Set([...named, ...programs].map(route => route.company_id));
+  const totalText = `${named.length} named listings · ${programs.length} networks and programs · ${companies.size} companies`;
+  const sections = page.locator('.work-section-disclosure');
+  const jump = sections.getByText('Jump to section', { exact: true });
+  const totals = sections.locator('.work-page-counts');
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await page.locator('.primary-link.work-link').click();
   await expect(page).toHaveURL(/\/work\/$/);
   await expect(page.getByRole('searchbox', { name: 'Search listings' })).toBeVisible();
+  await expect(count).toHaveAttribute('aria-live', 'polite');
+  await expect(count).toHaveAttribute('aria-atomic', 'true');
+  await expect(page.locator('.work-page-counts')).toHaveCount(1);
+  await expect(totals).toBeHidden();
   await page.evaluate(() => document.fonts.ready);
   for (const width of [390, 1280]) {
     await page.setViewportSize({ width, height: 844 });
@@ -91,6 +105,18 @@ test('native Work explains the full count and updates the live count for matchin
   await page.locator('.work-page-filter-options summary').click();
   await page.getByRole('combobox', { name: 'Sort', exact: true }).selectOption('checked');
   await expect(count).toHaveText(fullCount);
+  await jump.press('Enter');
+  await expect(jump).toBeFocused();
+  await expect(totals).toMatchAriaSnapshot(`- paragraph: ${totalText}`);
+  await expect(count).toHaveText(fullCount);
+  const pay = page.getByRole('combobox', { name: 'Pay unit' });
+  await pay.selectOption('hourly');
+  await expect(count).toHaveText(hourlyCount);
+  await expect(totals).toMatchAriaSnapshot(`- paragraph: ${totalText}`);
+  await jump.press('Space');
+  await expect(totals).toBeHidden();
+  await expect(count).toHaveText(hourlyCount);
+  await pay.selectOption('');
   const search = page.getByRole('searchbox', { name: 'Search listings' });
   await search.fill('Sage');
   await expect(count).toHaveText('1 matching record');
@@ -107,15 +133,59 @@ test('native Work explains the full count and updates the live count for matchin
     await expect(fallback.locator('[data-work-count]')).toBeVisible();
     await expect(fallback.locator('[data-work-count]')).toHaveText(fullCount);
     await expect(fallback.locator('[data-work-route]')).toHaveCount(routes.length);
-    const jump = fallback.getByText('Jump to section', { exact: true });
-    await jump.press('Enter');
-    const named = fallback.getByRole('navigation', { name: 'Work sections' }).getByRole('link', { name: 'Named listings' });
-    await named.press('Enter');
+    const fallbackSections = fallback.locator('.work-section-disclosure');
+    const fallbackTotals = fallbackSections.locator('.work-page-counts');
+    await expect(fallbackTotals).toBeHidden();
+    await fallbackSections.getByText('Jump to section', { exact: true }).press('Enter');
+    await expect(fallbackTotals).toMatchAriaSnapshot(`- paragraph: ${totalText}`);
+    await fallback.getByRole('navigation', { name: 'Work sections' }).getByRole('link', { name: 'Named listings' }).press('Enter');
     await expect(fallback).toHaveURL(/#named$/);
     await fallback.getByText('Before you apply', { exact: true }).press('Space');
     await expect(fallback.locator('.work-page-advice .note')).toBeVisible();
   } finally {
     await noScript.close();
+  }
+});
+
+test('native Work shows the complete first role and hourly rate on the first screen', async ({ page, request }) => {
+  test.setTimeout(60_000);
+  const { routes } = await (await request.get('/work-routes.json')).json();
+  const hourly = routes.filter(route => route.pay_terms?.hourly_comparable).length;
+  const entries = [
+    ['/work/', 'afterquery.work.technical-content-writer-contract', `${routes.length} records, including career pages and past listings`],
+    ['/work/?pay=hourly&sort=hourly', 'afterquery.work.world-models', `${hourly} records with published hourly pay`],
+  ];
+  for (const [width, height] of [[320, 720], [390, 844], [1024, 600]]) {
+    await page.setViewportSize({ width, height });
+    for (const [url, firstId, scopedCount] of entries) {
+      await test.step(`${url} at ${width} × ${height}`, async () => {
+        await page.goto(url);
+        const search = page.getByRole('searchbox', { name: 'Search listings' });
+        await expect(search).toBeVisible();
+        await expect(page.locator('[data-work-count]')).toHaveText(scopedCount);
+        await page.evaluate(() => document.fonts.ready);
+        expect(await page.evaluate(() => [scrollX, scrollY])).toEqual([0, 0]);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
+        await expect(page.locator('.work-page-counts')).toBeHidden();
+        const first = page.locator('[data-work-route]:visible').first();
+        const { role, pay_label: pay } = routes.find(route => route.id === firstId);
+        await expect(first).toHaveAttribute('data-work-route', firstId);
+        const title = first.getByRole('heading', { name: role, exact: true });
+        const rate = first.locator('.work-pay strong');
+        await expect(rate).toHaveText(pay);
+        await expect(title).toBeInViewport({ ratio: 1 });
+        await expect(rate).toBeInViewport({ ratio: 1 });
+        const { needed, available, placeholder } = await search.evaluate(input => {
+          const style = getComputedStyle(input);
+          const canvas = document.createElement('canvas').getContext('2d');
+          canvas.font = getComputedStyle(input, '::placeholder').font || style.font;
+          return { needed: canvas.measureText(input.placeholder).width, placeholder: input.placeholder,
+            available: input.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) };
+        });
+        expect(placeholder.trim()).not.toBe('');
+        expect(needed, `Search placeholder has ${available}px`).toBeLessThanOrEqual(available);
+      });
+    }
   }
 });
 
