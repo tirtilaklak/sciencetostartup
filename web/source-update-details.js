@@ -102,6 +102,19 @@ function detail_historicalOfferContextValid(update){
  const product=snapshot.products[0];if(product.company_id!=='ooak'||product.claim_id!==claimIds[1]||product.segment_scope!=='ai_data'||product.work_performed!==claims[claimIds[1]].statement)return false;
  return Array.isArray(update.sources)&&update.sources.length===1&&exact(update.sources[0],{source_id:sourceIds[0],claim_id:claimIds[0],publication_date:null,publication_date_basis:'not_established',role:'retained_issuer_offer',access_status:'retained_readable_page'});
 }
+function detail_sourcePublicationDateValid(update){
+ // The build validates the receipt. Runtime also requires the exact original citation in the active graph.
+ const sourceId=update.target?.source_id,source=typeof sourceId==='string'&&sources[sourceId];
+ const snapshot=update.historical_snapshot,original=snapshot?.sources?.[0];
+ if(!source||source.company_id!==update.company_id||source.published_on!=null||Object.keys(update.target).length!==1)return false;
+ if(snapshot?.dataset_version!==DATA.dataset_version||!Array.isArray(snapshot.sources)||snapshot.sources.length!==1||
+    !original||Object.keys(source).length!==Object.keys(original).length||!evidenceContextSnapshotMatches(source,original))return false;
+ const day=update.publication_date,parsed=Date.parse(day),receipt=update.evidence;
+ return update.id===`${sourceId}.publication-date-${update.reviewed_on}`&&update.review_basis==='retained_publication_evidence'&&
+   update.publication_date_basis==='publisher_displayed_date'&&receipt?.retrieval_scope==='publication_date_only'&&receipt.url===source.url&&
+   receipt.http_status===200&&typeof receipt.visible_date_text==='string'&&receipt.visible_date_text.trim()&&
+   typeof day==='string'&&Number.isFinite(parsed)&&new Date(parsed).toISOString().slice(0,10)===day&&day<=source.accessed_on;
+}
 function detail_evidenceContextCorrections(){
  if(evidenceContextCache&&evidenceContextCacheSource===window.SOURCE_UPDATES)return evidenceContextCache;
  evidenceContextCacheSource=window.SOURCE_UPDATES;
@@ -111,6 +124,7 @@ function detail_evidenceContextCorrectionsCompute(){
  const document=window.SOURCE_UPDATES,section=document?.evidence_context;
  if(document?.baseline_dataset_version!==DATA.dataset_version||section?.version!=='1.0.0'||!Array.isArray(section.corrections))return [];
  return section.corrections.filter(update=>{
+  if(update?.kind==='source_publication_date')return detail_sourcePublicationDateValid(update)&&section.corrections.filter(row=>row?.id===update.id||row?.kind===update.kind&&row.target?.source_id===update.target.source_id).length===1&&!(document.updates||[]).some(row=>row.id===update.id);
   if(update?.kind==='historical-offer-source-context')return section.corrections.filter(row=>row?.id===update.id||row?.kind===update.kind).length===1&&!(document.updates||[]).some(row=>row.id===update.id)&&historicalOfferContextValid(update);
   if(update?.kind==='relationship-assessment-scope-context')return section.corrections.filter(row=>row?.id===update.id||row?.kind===update.kind).length===1&&!(document.updates||[]).some(row=>row.id===update.id)&&relationshipAssessmentContextValid(update);
   if(!['metric_reporting_context','claim_source_supplement','financial-basis-source-supplement'].includes(update?.kind))return false;
@@ -144,6 +158,10 @@ function detail_evidenceContextSourcePublicationDate(sourceId){
  const dates=new Set();
  // A retained publication date applies wherever the exact source record is cited.
  for(const update of evidenceContextCorrections()){
+  if(update.kind==='source_publication_date'){
+   if(update.target.source_id===sourceId)dates.add(update.publication_date);
+   continue;
+  }
   for(const ref of update.sources){
    if(ref.source_id!==sourceId||!ref.publication_date||ref.publication_date_basis!=='retained_page_text'||ref.access_status!=='retained_readable_page')continue;
    const claim=claims[ref.claim_id];
@@ -192,7 +210,7 @@ function detail_evidenceContextClaimHTML(id){
  const claim=claims[id];return claim?evidenceContextForClaim(claim).map(update=>evidenceContextUpdateHTML(update,id)).join(''):'';
 }
 function detail_evidenceContextArchiveHTML(id){
- return evidenceContextCorrections().filter(update=>update.company_id===id).map(update=>evidenceContextUpdateHTML(update)).join('');
+ return evidenceContextCorrections().filter(update=>update.company_id===id&&update.kind!=='source_publication_date').map(update=>evidenceContextUpdateHTML(update)).join('');
 }
 Object.assign(window.ScienceDetailViews,{sourceContextBuildId:window.APP_BUILD_ID,sourceUpdatesFor:detail_sourceUpdatesFor,sourceUpdateUnknownText:detail_sourceUpdateUnknownText,applyProductSourceUpdates:detail_applyProductSourceUpdates,sourceUpdateReferenceHTML:detail_sourceUpdateReferenceHTML,productSourceHTML:detail_productSourceHTML,productSourceContextHTML:detail_productSourceContextHTML,sourceUpdatesArchiveHTML:detail_sourceUpdatesArchiveHTML,sourceUpdateClaimHTML:detail_sourceUpdateClaimHTML,evidenceContextSnapshotMatches:detail_evidenceContextSnapshotMatches,relationshipAssessmentContextValid:detail_relationshipAssessmentContextValid,financialBasisContextValid:detail_financialBasisContextValid,historicalOfferContextValid:detail_historicalOfferContextValid,evidenceContextCorrections:detail_evidenceContextCorrections,evidenceContextCorrectionsCompute:detail_evidenceContextCorrectionsCompute,evidenceContextForMetric:detail_evidenceContextForMetric,financialBasisContextForMetric:detail_financialBasisContextForMetric,metricCurrentBasis:detail_metricCurrentBasis,metricCurrentAttribution:detail_metricCurrentAttribution,metricCurrentBasisDescription:detail_metricCurrentBasisDescription,historicalOfferContextForMetric:detail_historicalOfferContextForMetric,metricPresentationLabel:detail_metricPresentationLabel,metricEvidenceTopic:detail_metricEvidenceTopic,evidenceContextForClaim:detail_evidenceContextForClaim,evidenceContextSourcePublicationDate:detail_evidenceContextSourcePublicationDate,relationshipAssessmentContextForClaim:detail_relationshipAssessmentContextForClaim,evidenceContextScopeLabel:detail_evidenceContextScopeLabel,evidenceContextClaimDescription:detail_evidenceContextClaimDescription,historicalOfferContextForClaim:detail_historicalOfferContextForClaim,evidenceContextStatementHeading:detail_evidenceContextStatementHeading,originalProductContextHTML:detail_originalProductContextHTML,evidenceContextStatementHeadingHTML:detail_evidenceContextStatementHeadingHTML,evidenceContextOriginalScope:detail_evidenceContextOriginalScope,evidenceContextScopeHTML:detail_evidenceContextScopeHTML,relationshipAssessmentContextForAssessment:detail_relationshipAssessmentContextForAssessment,evidenceContextAssessmentHTML:detail_evidenceContextAssessmentHTML,evidenceContextCriterionHTML:detail_evidenceContextCriterionHTML,profileRelationshipScopeContext:detail_profileRelationshipScopeContext,metricCurrentPeriod:detail_metricCurrentPeriod,evidenceContextDateHeading:detail_evidenceContextDateHeading,metricContextMetaPeriod:detail_metricContextMetaPeriod,evidenceContextUpdateHTML:detail_evidenceContextUpdateHTML,evidenceContextClaimHTML:detail_evidenceContextClaimHTML,evidenceContextArchiveHTML:detail_evidenceContextArchiveHTML});
 })();

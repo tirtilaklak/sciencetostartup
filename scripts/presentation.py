@@ -440,9 +440,6 @@ def company_summaries(data, sidecars, root):
         financial = None
         if observation:
             record = next((s for s in health.get("sources", []) if s["id"] in observation.get("source_ids", [])), None) or research.sources.get(next(iter(observation.get("source_ids", [])), ""))
-            citation = {"url": record["url"], "publisher": record.get("publisher") or "Original source"} if record else None
-            if record and (published := research.reviewed_source_dates.get(record["id"])):
-                citation["publishedOn"] = published
             fresh = next((c for c in health.get("fresh_claims", []) if c["id"] in observation.get("claim_ids", [])), {})
             checked = fresh.get("observed_on") or next((c.get("checked_on") for c in health.get("source_checks", {}).get("entries", []) if c["source_id"] in observation.get("source_ids", []) and c.get("status") == "content_checked"), None)
             end = observation.get("period", {}).get("end") or next(iter(re.findall(r"\d{4}(?:-\d{2}){0,2}", str(observation.get("as_of") or ""))), "")
@@ -452,7 +449,6 @@ def company_summaries(data, sidecars, root):
                          "basis": "Gross revenue" if observation.get("accounting_basis") == "gross" else "Net revenue" if observation.get("accounting_basis") == "net" else "Gross/net not disclosed" if observation["measure"] == "annualized_revenue" else "",
                          "attribution": observation.get("evidence_assurance") or "Attributed source", "limitations": observation.get("limitations") or "",
                          "quote": observation.get("original_text") or fresh.get("excerpt") or "", "checkedOn": checked,
-                         "source": citation,
                          "failed": observation.get("refresh_status") == "source_unavailable" or any(c.get("status") == "unavailable" and c["source_id"] in observation.get("source_ids", []) for c in health.get("source_checks", {}).get("entries", [])),
                          "age": "historical" if not end or end < "2025-10-28" else "current"}
         elif metric:
@@ -465,11 +461,17 @@ def company_summaries(data, sidecars, root):
                          "period": metric_period(research, metric), "currency": metric.get("currency") or "", "scope": current["scope_label"],
                          "basis": basis_text(research, metric), "attribution": research.correction(metric, "display_attribution") or claim.get("evidence_label") or "Attributed source",
                          "limitations": metric.get("limitations") or "", "quote": claim.get("statement") or "", "checkedOn": claim.get("observed_on"),
-                         "source": {"url": record["url"], "publisher": record.get("publisher") or "Original source"} if record else None,
                          "failed": False, "age": "undated" if rank == "0000" else "historical" if end < "2025-10-28" else "current"}
             historical = research.historical_year(metric)
             if historical:
                 financial["historicalYear"] = historical
+        if financial is not None:
+            citation = {"url": record["url"], "publisher": record.get("publisher") or "Original source"} if record else None
+            if record and (published := research.reviewed_source_dates.get(record["id"])):
+                citation.update(id=record["id"], publishedOn=published, accessedOn=record.get("accessed_on"), retrievalStatus=record.get("retrieval_status"))
+                if not observation:
+                    financial["checkedOn"] = None
+            financial["source"] = citation
         result[cid] = {"firstOffering": {"name": products[0]["name"]} if products else None, "hasFinancial": bool(metric),
                        "financial": financial, "currentCompanyResult": current}
         if health.get("profile_finance", {}).get(cid, {}).get("compare_projection") == "native_evidence_link_only":

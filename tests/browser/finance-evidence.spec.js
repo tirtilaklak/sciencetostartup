@@ -386,3 +386,149 @@ test('Market distinguishes the July expert payout snapshot from the March report
   await expect(marketFact(dialog, 'Source').getByRole('link', { name: /^Mercor / })).toHaveAttribute('href',
     'https://www.mercor.com/blog/organizing-human-intelligence-to-power-the-ai-economy/');
 });
+
+const afterQueryArticle = 'https://www.afterquery.com/blog/human-expertise-reimagined';
+const chemistryArticle = 'https://www.chemistry.vc/post/staying-ahead-of-the-curve';
+const reutersArticle = 'https://www.aol.com/news/exclusive-scale-ais-bigger-rival-152327362.html';
+const firstRoundInterview = 'https://review.firstround.com/labelboxs-path-to-pmf-founders-need-to-be-contrarian-and-right-heres-how/';
+const publicationCases = [
+  { company: 'afterquery', metric: 'afterquery.metric.round2-financial-2', claim: 'afterquery.claim.round2-financial-2',
+    source: 'afterquery.source.round2-funding', url: afterQueryArticle, publication: '9 Apr 2026',
+    measure: 'annualized_revenue', role: 'Reporting day', period: '9 Apr 2026', value: '> $100M', check: true },
+  { company: 'scale_ai', metric: 'scale_ai.metric.major-growth_metrics-0', claim: 'scale_ai.claim.oct14-major-financial-2',
+    source: 'scale_ai.source.oct14-891cd0d871ee', url: reutersArticle, publication: '1 Jul 2025',
+    measure: 'period_revenue', role: 'Reporting period', period: 'FY2024', value: '$870M', check: true },
+  { company: 'surge_ai', metric: 'surge_ai.metric.oct14-major-financial-0', claim: 'surge_ai.claim.oct14-major-financial-0',
+    source: 'surge_ai.source.oct14-891cd0d871ee', url: reutersArticle, publication: '1 Jul 2025',
+    measure: 'period_revenue', role: 'Reporting period', period: 'FY2024', value: '> $1B', check: true },
+  { company: 'datacurve', metric: 'datacurve.metric.oct14-0-contributor-payouts', claim: 'datacurve.claim.oct14-metric-0-contributor-payouts',
+    source: 'datacurve.source.oct14-9b179f419da7', url: chemistryArticle, publication: '9 Oct 2025',
+    measure: 'cumulative_expert_payouts', role: 'Reporting period', period: 'To 9 Oct 2025', value: '> $1M' },
+  { company: 'labelbox', metric: 'labelbox.metric.major-growth_metrics-0', claim: 'labelbox.claim.major-growth_metrics-0-metric',
+    source: 'labelbox.source.audit-lb_firstround', url: firstRoundInterview,
+    measure: 'customer_count', role: 'Snapshot', period: 'Dec 2018', value: '37' },
+];
+const secondAfterQueryCitation = { company: 'afterquery', claim: 'afterquery.claim.oct14-metric-0-revenue-run-rate',
+  source: 'afterquery.source.oct14-fd3e4675dd42', publication: '9 Apr 2026', url: afterQueryArticle };
+
+for (const record of publicationCases) {
+  test(`Market preserves the period and source dates for ${record.company}`, async ({ page }) => {
+    await openMarket(page);
+    const { metric, measure, role, period, value, source, claim, url, publication, check } = record;
+    let trigger;
+    if (check) {
+      const tab = measure === 'annualized_revenue' ? /^Annualized pace/ : /^Actual revenue/;
+      const row = (await marketLedgerFigure(page, metric, tab)).locator('..');
+      trigger = row.locator('.bh-ledger-source');
+    } else {
+      const chart = await marketChart(page, measure);
+      trigger = chart.locator(`[data-bh-observation="${metric}"]`);
+    }
+    await expect(trigger).toHaveAccessibleName(new RegExp(`${role} ${period}`));
+    await trigger.press('Enter');
+    const dialog = page.locator('#bh-evidence-dialog');
+    await expect(dialog.locator('.bh-value')).toContainText(value);
+    await expect(marketFact(dialog, role)).toHaveText(period);
+    const citation = marketCitation(dialog, source);
+    const accessed = publication ? '14 Oct 2026' : '12 Oct 2026';
+    const dates = `${publication ? `Published ${publication}` : 'Publication date not stated'} · Checked ${accessed}`;
+    await expect(citation.getByRole('link')).toHaveAttribute('href', url);
+    await expect(citation.locator('small')).toHaveText(dates);
+    if (check) await expect(citation.locator('.bh-refresh-note')).toContainText('Source page read 28 Oct 2026');
+    else await expect(citation.locator('.bh-refresh-note')).toHaveCount(0);
+
+    const claimButton = dialog.locator(`[data-claim="${claim}"]`);
+    await claimButton.press('Enter');
+    const nested = page.locator('#evidence-dialog');
+    const cited = nested.locator(`[data-source-id="${source}"]`);
+    await expect(cited.getByRole('link')).toHaveAttribute('href', url);
+    await expect(cited.locator('p.sub').first()).toContainText(dates);
+    await expect(nested.locator('.evidence-data')).toContainText(new RegExp(`Research observation recorded\\s*${accessed}`));
+    await page.keyboard.press('Escape');
+    await expect(claimButton).toBeFocused();
+    await closeMarketEvidence(page);
+    await expect(trigger).toBeFocused();
+  });
+}
+
+test('a distinct citation to the same article keeps its own historical retrieval role', async ({ page }) => {
+  const records = [
+    { ...secondAfterQueryCitation, status: 'Checked 14 Oct 2026' },
+    { company: 'datacurve', claim: 'datacurve.claim.audit-bounties-paid', source: 'datacurve.source.audit-chemistry',
+      url: chemistryArticle, publication: '9 Oct 2025', status: 'Checked 12 Oct 2026' },
+    { company: 'surge_ai', claim: 'surge_ai.claim.growth_metrics-0', source: 'surge_ai.source.b_sg4',
+      url: reutersArticle.replace('/news/', '/'), publication: '1 Jul 2025', status: summaryRecorded },
+  ];
+  for (const { company, claim, source, url, publication, status } of records) {
+    await page.goto(`/explore/#company/${company}/claim/${claim}`);
+    const row = page.locator(`#evidence-dialog [data-source-id="${source}"]`);
+    await expect(row.getByRole('link')).toHaveAttribute('href', url);
+    await expect(row.locator('p.sub').first()).toContainText(`Published ${publication} · ${status}`);
+  }
+});
+
+test.describe('exact publisher dates on native company pages', () => {
+  test.use({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+
+  for (const { company, metric, source, url, publication, check } of [...publicationCases, secondAfterQueryCitation]) {
+    test(`${source} has the original citation and its own dates without JavaScript`, async ({ page }) => {
+      await page.goto(`/company/${company}/`);
+      await openDisclosure(page.locator('#sources'));
+      const row = page.locator(`[data-native-source="${source}"]`);
+      await expect(row.getByRole('link')).toBeVisible();
+      await expect(row.getByRole('link')).toHaveAttribute('href', url);
+      if (publication) await expect(row.locator('.sub')).toHaveText(new RegExp(`Published ${publication} · Checked 14 Oct 2026$`));
+      else await expect(row).not.toContainText('Published');
+      if (!check) return;
+
+      await openDisclosure(page.locator('#financial-record > summary'));
+      const historical = page.locator('#financial-record .selected-archive > summary');
+      if (await historical.count()) await openDisclosure(historical);
+      const selected = page.locator(`#financial-record [data-financial-observation="${metric}"]`);
+      const citation = selected.locator(`[data-source-id="${source}"]`);
+      await expect(citation.getByRole('link')).toHaveAttribute('href', url);
+      await expect(citation).toContainText(`Published ${publication} · Checked 14 Oct 2026`);
+      await expect(selected).toContainText('Source content checked 28 Oct 2026');
+    });
+  }
+});
+
+test('compact Companies, hydrated Compare and Companies keep exact source dates', async ({ page }) => {
+  const cases = publicationCases.filter(record => record.check);
+  async function expectFinancialSources(container) {
+    for (const { metric, url, publication } of cases) {
+      const financial = container.locator(`[data-financial-observation="${metric}"]`);
+      const historical = financial.locator('xpath=ancestor::details[contains(@class,"historical-signal")][1]/summary');
+      if (await historical.count()) await openDisclosure(historical);
+      const citation = financial.locator('.financial-citation');
+      await expect(citation.getByRole('link')).toHaveAttribute('href', url);
+      await expect(citation).toContainText(`Published ${publication} · Checked 14 Oct 2026`);
+      await openDisclosure(financial.locator('.financial-source-details > summary'));
+      await expect(financial).toContainText('Source content checked 28 Oct 2026');
+    }
+  }
+
+  await page.goto('/explore/#companies');
+  const cards = page.locator('#company-cards');
+  await expect(cards.locator('[data-company-card="afterquery"]')).toBeVisible();
+  await expectFinancialSources(cards);
+  expect(await page.evaluate(() => window.COMPANY_CONTEXTS_READY.size)).toBe(0);
+
+  for (const pair of ['afterquery/scale_ai', 'afterquery/surge_ai']) {
+    await page.goto(`/explore/#compare/${pair}`);
+    const compare = page.locator('[data-comparison-row="Published revenue figure"]');
+    await expect(compare).toBeVisible();
+    for (const { company, publication, url } of cases.filter(record => pair.split('/').includes(record.company))) {
+      const cell = compare.locator(`[data-comparison-company="${company}"]`);
+      const historical = cell.locator('details.historical-signal > summary');
+      if (await historical.count()) await openDisclosure(historical);
+      const citation = cell.locator('.financial-citation');
+      await expect(citation.getByRole('link')).toHaveAttribute('href', url);
+      await expect(citation).toContainText(`Published ${publication} · Checked 14 Oct 2026`);
+    }
+  }
+  await page.goto('/explore/#companies');
+  await expect(cards.locator('[data-company-card="afterquery"]')).toBeVisible();
+  expect(await page.evaluate(() => [...window.COMPANY_CONTEXTS_READY].sort())).toEqual(cases.map(record => record.company).sort());
+  await expectFinancialSources(cards);
+});

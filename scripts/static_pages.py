@@ -21,6 +21,7 @@ import html
 import json
 import re
 import unicodedata
+from collections import Counter
 from datetime import date, datetime, timezone
 from decimal import ROUND_HALF_UP, Decimal
 from functools import cmp_to_key
@@ -352,7 +353,7 @@ class Research:
         self.headlines = dict(headlines or {})
         current = isinstance(updates, dict) and updates.get("baseline_dataset_version") == data.get("dataset_version")
         self.corrections = self._corrections(updates) if current else {}
-        self.reviewed_source_dates = self._reviewed_source_dates()
+        self.reviewed_source_dates = self._reviewed_source_dates(updates if current else {})
         self.product_updates = [row for row in updates.get("updates") or [] if isinstance(row, dict)] if current else []
 
     def _corrections(self, updates):
@@ -371,8 +372,24 @@ class Research:
     def correction(self, metric, field):
         return next((clean(row[field]) for row in self.corrections.get(metric.get("id"), []) if isinstance(row.get(field), str) and row[field].strip()), "")
 
-    def _reviewed_source_dates(self):
+    def _reviewed_source_dates(self, updates):
+        from observatory import ValidationError, validate_source_publication_date
+
         dates = {}
+        section = updates.get("evidence_context") or {}
+        if section.get("version") == "1.0.0":
+            corrections = [row for row in section.get("corrections", []) if isinstance(row, dict)]
+            id_counts = Counter(row.get("id") for row in [*corrections, *(updates.get("updates") or [])] if isinstance(row, dict) and isinstance(row.get("id"), str))
+            publications = [row for row in corrections if row.get("kind") == "source_publication_date"]
+            source_counts = Counter(row["target"]["source_id"] for row in publications if isinstance(row.get("target"), dict) and isinstance(row["target"].get("source_id"), str))
+            for row in publications:
+                try:
+                    validate_source_publication_date(row, self.sources, self.data.get("dataset_version"))
+                except ValidationError:
+                    continue
+                sid = row["target"]["source_id"]
+                if id_counts[row["id"]] == source_counts[sid] == 1:
+                    dates.setdefault(sid, set()).add(row["publication_date"])
         for corrections in self.corrections.values():
             for update in corrections:
                 snapshot = update["historical_snapshot"]
@@ -1064,12 +1081,15 @@ def figure_row(research, metric, context=None):
 SOURCE_CHECKS = {"checked": "Checked {}", "summary_only": "Summary only, page not reviewed · recorded {}", "unverified": "Not checked again · recorded {}"}
 
 
+def source_record_status(source):
+    read = source.get("accessed_on")
+    return SOURCE_CHECKS.get(source.get("retrieval_status"), "Recorded {}").format(format_date(read)) if ISO_DAY.fullmatch(str(read or "")) else ""
+
+
 def source_meta(research, source):
     """Publisher, publication date and when we read the page, in the words of profileSourceMeta() in web/profiles-v2.js."""
     published = source.get("published_on") if ISO_DAY.fullmatch(str(source.get("published_on") or "")) else research.reviewed_source_dates.get(source["id"])
-    read = source.get("accessed_on") if ISO_DAY.fullmatch(str(source.get("accessed_on") or "")) else ""
-    check = SOURCE_CHECKS.get(source.get("retrieval_status"), "Recorded {}").format(format_date(read)) if read else ""
-    return " · ".join(part for part in (clean(source.get("publisher")), f"Published {format_date(published)}" if published else "", check) if part)
+    return " · ".join(part for part in (clean(source.get("publisher")), f"Published {format_date(published)}" if published else "", source_record_status(source)) if part)
 
 
 def company_source_link(research, source):
@@ -1534,12 +1554,14 @@ def business_observation_html(research, health, company_id, inline=False, compac
     if source and company_id == "snorkel_ai" and row.get("measure") == "annualized_revenue":
         link = external_link(source.get("url"), "Snorkel company disclosure")
     published = research.reviewed_source_dates.get(source["id"]) if source else None
-    citation = " · ".join(filter(None, (link, escape("Published " + format_date(published)) if published else "", escape(row.get("evidence_assurance") or "Attributed source"))))
+    dates = f"Published {format_date(published)} · {source_record_status(source)}" if published else ""
+    citation = " · ".join(filter(None, (link, escape(dates), escape(row.get("evidence_assurance") or "Attributed source"))))
+    source_attr = f' data-source-id="{escape(source["id"])}"' if source else ""
     warning = '<span class="sub">Original citation could not be rechecked. Historical source attribution retained.</span>' if failed else ""
     content = (f'<div class="selected-evidence" data-financial-observation="{escape(row["id"])}">'
                + ('' if inline else '<h2>Selected financial evidence</h2>')
                + f'<strong class="selected-value">{escape(value_text(dict(row, qualifier="approximate" if row.get("qualifier") == "approximately" else row.get("qualifier"))))}</strong><span class="sub">{escape(meta)}</span>'
-               + f'<span class="sub">{citation}</span>' + warning)
+               + f'<span class="sub"{source_attr}>{citation}</span>' + warning)
     if checked and not inline: content += f'<span class="sub">Source content checked {escape(format_date(checked))}.</span>'
     if not inline: content += f'<details><summary>Source wording and limits</summary><p>{escape(row.get("original_text") or "")}</p><p>{escape(row.get("limitations") or "")}</p></details>'
     content += '</div>'
