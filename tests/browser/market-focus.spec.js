@@ -198,7 +198,7 @@ enlargedText.describe('Market with a 28px minimum font', () => {
     await expect(bar).toBeFocused();
   });
 
-  enlargedText('Market anchors account for the sticky header once', async ({ enlargedPage: page }) => {
+  enlargedText('Market anchors account for the sticky header and Back restores the keyboard shortcut', async ({ enlargedPage: page }) => {
     const heading = page.locator('#business-health-heading');
     const section = page.locator('#business-health');
     const expectAnchor = async () => {
@@ -213,11 +213,19 @@ enlargedText.describe('Market with a 28px minimum font', () => {
 
     await openMarket(page);
     const shortcut = page.getByRole('link', { name: 'Revenue & growth', exact: true });
-    await shortcut.scrollIntoViewIfNeeded();
-    const originalScroll = await page.evaluate(() => window.scrollY);
-    await shortcut.press('Enter');
+    for (let step = 0; step < 30; step++) {
+      if (await shortcut.evaluate(link => link === document.activeElement)) break;
+      await page.keyboard.press('Tab');
+    }
+    await expect(shortcut).toBeFocused();
+    // Record the scroll position after Firefox has brought the focused link into view.
+    const originalScroll = await page.evaluate(() => new Promise(resolve => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve(window.scrollY)));
+    }));
+    await page.keyboard.press('Enter');
     await expectAnchor();
     await page.goBack();
+    await expect(page).toHaveURL(/\/explore\/#market$/);
     await expect(shortcut).toBeFocused();
     await expect.poll(() => page.evaluate(scroll => Math.abs(window.scrollY - scroll), originalScroll)).toBeLessThan(2);
   });
