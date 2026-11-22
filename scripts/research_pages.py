@@ -32,6 +32,7 @@ CORRECTIONS_PATH = "/research/corrections/"
 LEDGER_BUCKETS = "0123456789abcdef"
 SOURCE_ANCHORS = "data/research-source-anchors.json"
 SOURCE_RECHECKS = "data/research-source-rechecks.json"
+COMPANY_WEBSITES = "data/research-company-websites.json"
 # Earlier public fragment IDs preserved by the current website wrapper.
 RETIRED_ASSERTION_IDS = (
     'candidate.cohort3.dataset.magpie.06',
@@ -1038,6 +1039,43 @@ def _source_rechecks(context):
     return by_source
 
 
+def _company_websites(context):
+    """Read current homepage links without changing the reviewed entities."""
+    if not context.get('published_edition_replay') or context.get('root') is None:
+        return {}
+    path = Path(context['root']) / COMPANY_WEBSITES
+    if not path.exists():
+        return {}
+    data = json.loads(path.read_text(encoding='utf-8'))
+    if data.get('schema_version') != '1.0.0' or not isinstance(data.get('entries'), list):
+        raise ValueError('Invalid research company websites')
+    if data['release_id'] != context['report']['release_id']:
+        return {}
+    checked = data['checked_on']
+    if date.fromisoformat(checked).isoformat() != checked:
+        raise ValueError('Invalid research company website check date')
+    entities = _entities(context)
+    claims = {row['id']: row for row in context['graph']['assertions'] if row['status'] == 'approved'}
+    websites = {}
+    for entry in data['entries']:
+        eid, original, current = (entry[key] for key in ('entity_id', 'recorded_url', 'current_url'))
+        entity = entities.get(eid, {})
+        if (eid in websites or entity.get('status') != 'approved'
+                or entity.get('identifiers', {}).get('website') != original
+                or not _safe_url(original) or current == original or not _safe_url(current)
+                or re.search(r'[\s\x00-\x1f]', current) or urlsplit(current).query or urlsplit(current).fragment
+                or entry.get('language') not in ('en', 'zh')
+                or not re.fullmatch(r'[a-f0-9]{64}', entry.get('response_sha256', ''))):
+            raise ValueError(f'Invalid current website for {eid}')
+        if not entry['evidence'] or any(
+                (claim := claims.get(proof['claim_id'], {})).get('subject_id') != eid
+                or not any(pin.get('source_id') == proof['source_id'] for pin in claim.get('evidence', []))
+                for proof in entry['evidence']):
+            raise ValueError(f'Current website for {eid} requires approved evidence for that entity')
+        websites[eid] = {**entry, 'checked_on': checked}
+    return websites
+
+
 def _source_anchor_ids(root):
     """Read website-only public compatibility IDs, outside frozen research."""
     path = Path(root) / SOURCE_ANCHORS
@@ -1551,16 +1589,23 @@ def _company_detail(context, entity):
     linked = [a for a in context["graph"]["assertions"] if entity["id"] in {a.get("subject_id"), a.get("object_id")}]
     _, _, sources = _ledger_records(context)
     source_ids = sorted({item["source_id"] for a in linked for item in a.get("evidence", [])})
-    identifiers = "".join(f'<dt>{sp.escape(key)}</dt><dd>{sp.escape(value)}</dd>' for key, value in sorted(entity.get("identifiers", {}).items()))
+    current = context.get('_render_company_websites', {}).get(entity['id'])
+    identifiers = ''.join(
+        f'<dt>Recorded website</dt><dd>{_link(value, value)}</dd>' if current and key == 'website'
+        else f'<dt>{sp.escape(key)}</dt><dd>{sp.escape(value)}</dd>'
+        for key, value in sorted(entity.get('identifiers', {}).items()))
     taxonomy = "".join(f'<dt>{sp.escape(key.replace("_", " ").capitalize())}</dt><dd>{sp.escape(", ".join(values))}</dd>'
                        for key, values in sorted(entity.get("taxonomy", {}).items()) if values)
-    website = _safe_url(entity.get("identifiers", {}).get("website"))
+    website = current['current_url'] if current else _safe_url(entity.get('identifiers', {}).get('website'))
+    website_label = 'Website (Chinese)' if current and current['language'] == 'zh' else 'Website'
+    website_review = ('<p class="r-meta">Current website checked ' + _date(current['checked_on']) + ' · '
+                      + _link(_evidence_url('assertion', current['evidence'][0]['claim_id']), 'Identity evidence') + '</p>') if current else ''
     highlight = _company_highlight(context, entity, approved, sources)
     body = ['<article class="company-dossier research-company-dossier"><header class="company-hero">'
             '<div class="company-name"><h1>' + sp.escape(entity["name"]) + '</h1></div>'
             + highlight + '<p class="company-research-snapshot">' + sp.plural(len(approved), "approved finding")
             + ' · ' + sp.plural(len(source_ids), "source record") + '</p>'
-            + ('<p class="company-actions">' + _link(website, 'Website') + '</p>' if website else '')
+            + ('<p class="company-actions">' + _link(website, website_label) + '</p>' if website else '')
             + '</header><div class="company-record">',
             '<details class="company-fold" id="company-scope"><summary>Company and review scope</summary>'
             '<div class="company-fold-body"><p class="r-kicker">' + sp.escape(_label(entity)) + '</p>'
@@ -1569,7 +1614,7 @@ def _company_detail(context, entity):
             + '</p><dl class="r-facts"><dt>Review depth</dt><dd>'
             + sp.escape(entity.get("review_depth", "").replace("_", " "))
             + '</dd><dt>Disposition</dt><dd>' + sp.escape(entity.get("disposition")) + '</dd>'
-            + identifiers + '</dl><h2>Read this record carefully</h2>'
+            + identifiers + '</dl>' + website_review + '<h2>Read this record carefully</h2>'
             '<p>Approval applies to a specific assertion and its qualifications. It does not imply provider endorsement, '
             'commercial quality, or a contribution to another artifact.</p>'
             + ('<h3>Recorded taxonomy</h3><p class="r-meta">Candidate taxonomy remains provisional.</p><dl class="r-facts">' + taxonomy + '</dl>' if taxonomy else '')
@@ -1954,6 +1999,7 @@ def write_research_pages(output, context):
     # Keep current operational notices outside immutable publication contexts.
     context = with_operating_status(context, now=datetime.now(timezone.utc))
     context = {**context, '_legacy_current_bookmarks': True,
+               '_render_company_websites': _company_websites(context),
                '_render_source_rechecks': _source_rechecks(context),
                '_render_source_anchor_ids': _source_anchor_ids(context['root']) if context.get('root') is not None else []}
     context = _render_context(context, corrections)
