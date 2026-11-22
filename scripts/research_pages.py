@@ -42,6 +42,23 @@ BUYER_RECORDS = {
     'Common pilot record': 'buyer-common-pilot-record',
     'Proposed commercial acceptance record': 'buyer-commercial-acceptance-record',
 }
+OVERSIGHT_TITLE = 'Measuring Progress on Scalable Oversight for Large Language Models'
+PASSAGE_SHORTCUTS = {
+    'technical-landscape': (
+        ('scalable-oversight-result', OVERSIGHT_TITLE, f'Study result — {OVERSIGHT_TITLE}.',
+         'mandatory1.claim.arxiv.2211.03540.result'),
+    ),
+    'buyer-decision-guides': (
+        ('buyer-statistical-acceptance-rule', 'Proposed statistical acceptance rule',
+         'A proposed statistical acceptance rule should make its assumptions explicit.', ''),
+    ),
+    'commercial-evidence': (
+        ('commercial-buyer-calculation', 'Reproducible buyer calculation', 'Reproducible buyer calculation:', ''),
+        ('commercial-review-calculation', 'Reproducible review calculation', 'Reproducible review calculation:', ''),
+    ),
+}
+EARLY_READER_SHORTCUTS = {'technical-landscape', 'datasets-and-benchmarks', 'methods-and-appendices',
+                          'commercial-evidence'}
 PROVIDER_BRANDS = {'Nexdata': 'org.nexdata', 'Clickworker': 'org.clickworker'}
 PROVIDER_ADJACENT = {
     'Translated': 'narrow artifact contribution',
@@ -53,6 +70,11 @@ EDITION_CITATIONS = {
     'citation.csl.json': 'Download CSL JSON citation',
     'CITATION.cff': 'Download CITATION.cff',
 }
+DATA_JSON_DOWNLOADS = ('/publication/clean-dataset.json', '/research/exports/research-graph.json')
+# The 12 November archive, PDF and manifest were verified byte-for-byte at this commit.
+EDITION_MIRROR_ARCHIVE_SHA256 = 'fdd231690c9bf9ed57339502a9e52b96eb59461afb6771191eb1337b69a85917'
+EDITION_MIRROR = ('https://raw.githubusercontent.com/tirtilaklak/sciencetostartup/'
+                  'aac87fd94dc86dee4976176fddb0764215898107/data/research/releases/research-2026-11-12.1/publication/')
 CATEGORIES = (
     ("papers", "Papers", {"paper", "paper_work", "paper_version"},
      "Papers, source versions and the findings they support."),
@@ -675,10 +697,10 @@ def _assertion(context, assertion, *, compact=False, correction='', focusable=Fa
     return f'<article class="r-assertion" data-status="{sp.escape(status)}" id="{sp.escape(_anchor("assertion", aid))}"{target}>{body}</article>'
 
 
-def _paragraph(context, paragraph, *, first=False, original_sources=()):
+def _paragraph(context, paragraph, *, anchor='', original_sources=()):
     ids = paragraph.get("claim_ids", [])
     kind = paragraph.get("kind")
-    target = ' id="first-paragraph" tabindex="-1"' if first else ''
+    target = f' id="{sp.escape(anchor)}" tabindex="-1"' if anchor else ''
     if not paragraph_supported(context, paragraph):
         return '<div class="r-paragraph is-gap"' + target + '><span class="r-paragraph-kind">Research gap</span><p>' + WITHHELD_PARAGRAPH + '</p></div>'
     label = "Historical example" if paragraph.get("historical") else KIND_LABELS.get(kind, "Research note")
@@ -725,11 +747,25 @@ def _chapter_outline(section, assertions):
                 yield rows[0][0], rows[-1][0] + 1, 'provider-' + stable_id, title
 
 
-def _chapter_content(context, section, outline):
+def _chapter_shortcuts(context, section, assertions):
+    for anchor, label, lead_in, claim_id in PASSAGE_SHORTCUTS.get(section['id'], ()):
+        if claim_id and assertions.get(claim_id, {}).get('status') != 'approved':
+            continue
+        matches = [(index, paragraph) for index, paragraph in enumerate(section['paragraphs'])
+                   if paragraph['text'].startswith(lead_in) and
+                   (claim_id in paragraph.get('claim_ids', []) if claim_id else paragraph['kind'] == 'method')]
+        if len(matches) == 1:
+            index, paragraph = matches[0]
+            if index and paragraph_supported(context, paragraph):
+                yield index, anchor, label
+
+
+def _chapter_content(context, section, outline, passages=()):
     assertions = {row['id']: row for row in context['graph']['assertions']}
     sources = {row['id']: row for row in context['graph']['sources']}
     openings = {start: (anchor, title) for start, _, anchor, title in outline}
     ends = {end for _, end, _, _ in outline}
+    passage_anchors = {index: anchor for index, anchor, _ in passages}
     contents = ''
     if outline:
         entries = ''.join('<li>' + _link('#' + anchor, title) + '</li>' for _, _, anchor, title in outline)
@@ -753,7 +789,8 @@ def _chapter_content(context, section, outline):
                     source = sources.get(pin.get('source_id'), {})
                     if (url := _safe_url(source.get('url'))) and re.search(re.escape(url) + r'(?=$|[\s;,.\)])', prose):
                         originals.setdefault(url, source.get('title') or url)
-        blocks.append(_paragraph(context, paragraph, first=index == 0, original_sources=originals.items()))
+        anchor = 'first-paragraph' if index == 0 else passage_anchors.get(index, '')
+        blocks.append(_paragraph(context, paragraph, anchor=anchor, original_sources=originals.items()))
         if index + 1 in ends:
             blocks.append('</section>')
         if index == 0:
@@ -761,10 +798,14 @@ def _chapter_content(context, section, outline):
     return ''.join(blocks)
 
 
-def _reader_shortcuts(outline=()):
+def _reader_shortcuts(outline=(), passages=()):
+    jumps = ''
+    if passages:
+        entries = ''.join('<li>' + _link('#' + anchor, label) + '</li>' for _, anchor, label in passages)
+        jumps = '<div class="r-passage-shortcuts"><span>Jump to</span><ul>' + entries + '</ul></div>'
     return ('<nav class="r-bulk-shortcuts r-outline-early" aria-label="Reading shortcuts">'
             + _link('#first-paragraph', 'First paragraph')
-            + (_link('#section-contents', 'Section contents') if outline else '') + '</nav>')
+            + (_link('#section-contents', 'Section contents') if outline else '') + jumps + '</nav>')
 
 
 def _findings(context):
@@ -879,15 +920,18 @@ def _reader_chapter(context, section, base=REPORT_PATH, edition=False):
     assertions = {row['id']: row for row in context['graph']['assertions']}
     outline = tuple(row for row in _chapter_outline(section, assertions)
                     if paragraph_supported(context, section['paragraphs'][row[0]]))
+    passages = tuple(_chapter_shortcuts(context, section, assertions))
+    shortcuts = _reader_shortcuts(outline, passages)
+    early_shortcuts = bool(outline or passages) or section['id'] in EARLY_READER_SHORTCUTS
     header = ('<header class="r-page-head"><p class="r-kicker">Chapter ' + str(index + 1) + ' of '
               + str(len(report['sections'])) + ' · ' + sp.escape(_status(context)) + '</p>'
               + '<p class="r-reader-book-title">' + _link(base, report['title']) + '</p>'
               + '<h1 id="' + sp.escape(section['id']) + '" tabindex="-1">' + sp.escape(section['title']) + '</h1>'
-              + ('' if outline else _reader_shortcuts()) + _meta(context) + _reader_downloads(context, base, edition) + '</header>')
+              + ('' if early_shortcuts else shortcuts) + _meta(context) + _reader_downloads(context, base, edition) + '</header>')
     body = ('<section class="r-chapter r-reader-chapter-content" aria-labelledby="' + sp.escape(section['id']) + '">'
-            + _chapter_content(context, section, outline) + '</section>'
+            + _chapter_content(context, section, outline, passages) + '</section>'
             + _reader_navigation(context, section['id'], base) + _reader_citation(context, edition))
-    return ((_reader_shortcuts(outline) if outline else '') + header + '<div class="r-report-layout r-book-reader">'
+    return ((shortcuts if early_shortcuts else '') + header + '<div class="r-report-layout r-book-reader">'
             + _reader_toc(context, section['id'], base)
             + '<div class="r-report-body">' + body + '</div></div>')
 
@@ -1091,16 +1135,27 @@ def _edition_downloads(context, metadata, ledger_path, reuse_path):
     )
     links = ''.join('<li>' + _link(_deposit_file(record, name, download=download), label) + '</li>'
                     for name, label, download in downloads)
+    mirror = ''
+    if context['report'].get('archive', {}).get('artifact_sha256') == EDITION_MIRROR_ARCHIVE_SHA256:
+        mirror_links = ''.join('<li>' + _link(EDITION_MIRROR + name, label) + '</li>' for name, label in (
+            ('research-archive.zip', 'Edition ZIP'),
+            ('report.pdf', 'Report PDF'),
+            ('MANIFEST.json', 'Edition checksums (JSON)'),
+        ))
+        mirror = f'<h3>Archived copy on GitHub</h3><ul class="r-downloads">{mirror_links}</ul>'
     files = ''.join(f'<li><strong>{label}</strong> <code>{name}</code>'
                     + (f' · <code>{unit}</code>' if unit else '') + '</li>' for label, name, unit in members)
     citations = ''.join(f'<li><a href="{sp.escape(ledger_path)}citations/{name}" download="{name}">{label}</a></li>'
                         for name, label in EDITION_CITATIONS.items())
     originals = ''.join(f'<li><code>{name}</code></li>' for name in EDITION_CITATIONS)
-    reuse = ('<p>For the corrected SQLite <code>subject_id</code> example, see the '
-             + _link(reuse_path, 'current reuse guide') + '.</p>') if reuse_path else ''
+    reuse = ''
+    if reuse_path and context['report']['release_id'] == 'research-2026-11-12.1':
+        reuse = ('<p>The ' + _link(reuse_path, 'current reuse guide')
+                 + ' corrects the Python example for <code>clean-dataset.json</code> to use <code>subject_id</code>.</p>')
     return (
         '<section class="r-section" aria-labelledby="downloads"><h2 id="downloads">Download the research</h2>'
-        f'<ul class="r-downloads">{links}</ul><h3>Files inside the ZIP</h3><ul class="r-archive-members">{files}</ul>'
+        f'<ul class="r-downloads">{links}</ul>{mirror}<h3>Files inside the ZIP</h3>'
+        f'<ul class="r-archive-members">{files}</ul>'
         + reuse +
         f'<p class="r-meta">Frozen evidence graph release <code>{sp.escape(context["graph"]["release_id"])}</code>.</p></section>'
         '<section class="r-section" id="citation"><h2>Cite and reproduce</h2>'
@@ -1114,7 +1169,7 @@ def _edition_downloads(context, metadata, ledger_path, reuse_path):
         + '. Credit the publisher, release ID, original sources, and your changes. Source material retains its own rights and qualifications.</p></section>')
 
 
-def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path=''):
+def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='', download_sizes=None):
     graph, gate, report = context["graph"], context["gate"], context["report"]
     assertions, stubs, sources = _ledger_records(context)
     retired = _retired_assertions(context, assertions, stubs)
@@ -1130,7 +1185,17 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
         rows.append(('Original archived reuse guide', '/publication/REUSE.md'))
     elif 'publication/REUSE.md' in context.get('publication_assets', []):
         rows.append(('Working JSON and SQLite examples', '/publication/REUSE.md'))
-    links = "".join('<li>' + _link(url, label) + '</li>' for label, url in rows)
+    download_sizes = download_sizes or {}
+    links = []
+    for label, url in rows:
+        if url in DATA_JSON_DOWNLOADS:
+            size = download_sizes.get(url)
+            if size is not None:
+                label += f' ({size / 1_000_000:.1f} MB)'
+            link = f'<a href="{sp.escape(url)}" download>{sp.escape(label)}</a>'
+        else:
+            link = _link(url, label)
+        links.append(f'<li>{link}</li>')
     citation_prefix = 'current-' if gate.get('ready') and report.get('archive', {}).get('status') == 'published' else ''
     cite = "".join('<li>' + _link('/publication/' + citation_prefix + name, label) + '</li>' for name, label in
                    (("citation.bib", "BibTeX"), ("citation.ris", "RIS"), ("citation.csl.json", "CSL JSON"), ("CITATION.cff", "CITATION.cff")))
@@ -1148,7 +1213,8 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
             '<p>The privacy-filtered projection retains explicit research status and historical qualifications. '
             'Historical records are not fresh verification. Source retrieval is not claim approval. The original canonical dataset stays at version '
             f'{sp.escape(graph.get("canonical_dataset_version"))}, with its existing identity and downloads.</p>'
-            f'<ul class="r-downloads">{links}</ul><p class="r-meta">Research release: {sp.escape(graph["release_id"])}.</p></section>'
+            '<ul class="r-downloads">' + ''.join(links) + '</ul>'
+            f'<p class="r-meta">Research release: {sp.escape(graph["release_id"])}.</p></section>'
             '<section class="r-section" id="citation"><h2>Cite and reproduce</h2>'
             f'<p>{sp.escape(context["identity"].get("publisher", {}).get("name", sp.PUBLISHER_NAME))}. <cite>{sp.escape(report["title"])}</cite>. '
             f'{sp.escape(report["release_id"])}. {_date(report["updated_on"])}.</p>'
@@ -1804,9 +1870,11 @@ def write_research_pages(output, context):
         for path in ('/research/', REPORT_PATH, '/research/data/'):
             context['_page_revisions'][path] = max(
                 context['_page_revisions'].get(path) or observed_day, observed_day)
+    download_sizes = {url: file.stat().st_size for url in DATA_JSON_DOWNLOADS
+                      if (file := output / url.lstrip('/')).is_file()}
     pages = [("/research/", "Human data research", "Public-source research connecting AI data suppliers, papers, datasets, benchmarks, and workflows, with visible evidence and coverage.", _hub(context, editions), "CollectionPage", None),
              (REPORT_PATH, context["report"]["title"], context["report"].get("summary", "Research methods and findings."), _report(context), "Book", None),
-             ("/research/data/", "Research data & evidence", "Versioned research data, source and assertion permalinks, publication progress, citations, and reproducible downloads.", _data(context), "CollectionPage", None),
+             ("/research/data/", "Research data & evidence", "Versioned research data, source and assertion permalinks, publication progress, citations, and reproducible downloads.", _data(context, download_sizes=download_sizes), "CollectionPage", None),
              ("/review/", "Review & correct the research", "Contribute a source-backed correction, scoped review, or public reuse of ScienceToStartup research.", _review(context), "WebPage", None),
              (CORRECTIONS_PATH, "Research corrections", "Accepted research corrections, with affected editions, claims, correction dates and supporting evidence.", _corrections_page(context, corrections), "CollectionPage", None)]
     pages.extend((_reader_path(section), section['title'],
@@ -1863,8 +1931,8 @@ def write_research_pages(output, context):
         ledger_path = path + 'data/'
         ledger = output / ledger_path.lstrip('/') / 'index.html'
         ledger.parent.mkdir(parents=True, exist_ok=True)
-        reuse_path = next(('/' + asset for asset in ('publication/current-REUSE.md', 'publication/REUSE.md')
-                           if asset in context.get('publication_assets', [])), '')
+        reuse_path = ('/publication/current-REUSE.md'
+                      if 'publication/current-REUSE.md' in context.get('publication_assets', []) else '')
         ledger.write_text(edition_links(_render(snapshot, 'Edition evidence and sources', 'Frozen assertion and source records for this exact archived edition.',
                                                ledger_path, _data(snapshot, ledger_path=ledger_path, metadata=metadata,
                                                                   reuse_path=reuse_path), 'CollectionPage')), encoding='utf-8')

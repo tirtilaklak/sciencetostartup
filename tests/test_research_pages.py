@@ -156,6 +156,13 @@ class ResearchPageTests(unittest.TestCase):
         else:
             self.assertEqual(self.context['gate'], publication_gate(
                 self.context['graph'], self.context['report'], self.context['policy']))
+        json_sizes = {'/publication/clean-dataset.json': 2_810_000, '/research/exports/research-graph.json': 3_920_000}
+        for url, size in json_sizes.items():
+            file = self.output / url.lstrip('/')
+            file.parent.mkdir(parents=True, exist_ok=True)
+            with file.open('wb') as stream:
+                stream.truncate(size)
+        self.context['publication_assets'] = ['publication/current-REUSE.md']
         records = self.build()
         paths = [r['path'] for r in records]
         for path in ('/research/', rp.REPORT_PATH, '/research/data/', '/review/',
@@ -181,6 +188,22 @@ class ResearchPageTests(unittest.TestCase):
             self.assertNotIn('published_on', metadata)
             self.assertIn('Prelaunch', self.page('/research/'))
         editions = rp._published_editions(self.context)
+        data = ReaderTree(self.page('/research/data/'))
+        links = {node['attrs']['href']: node for node in data.elements if node['tag'] == 'a'}
+        for url, size in json_sizes.items():
+            self.assertIn('download', links[url]['attrs'])
+            self.assertTrue(ReaderTree.text(links[url]).endswith(f'({size / 1_000_000:.1f} MB)'))
+        for url in ('/research/exports/research-exports-manifest.json', '/publication/MANIFEST.json'):
+            self.assertNotIn('download', links[url]['attrs'])
+        for path, snapshot in editions:
+            if snapshot['report']['release_id'] == 'research-2026-11-12.1':
+                edition_data = self.page(path + 'data/')
+                self.assertIn('corrects the Python example for <code>clean-dataset.json</code> to use <code>subject_id</code>', edition_data)
+                self.assertIn('/publication/current-REUSE.md', Facts(edition_data).links)
+                mirror = ('https://raw.githubusercontent.com/tirtilaklak/sciencetostartup/'
+                          'aac87fd94dc86dee4976176fddb0764215898107/data/research/releases/research-2026-11-12.1/publication/')
+                self.assertTrue({mirror + name for name in ('research-archive.zip', 'report.pdf', 'MANIFEST.json')}
+                                <= set(Facts(edition_data).links))
         if metadata['status'] == 'published':
             self.assertIn(self.context['report']['release_id'],
                           [snapshot['report']['release_id'] for _, snapshot in editions])
@@ -258,6 +281,16 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         sections = self.context['report']['sections']
         routes = [rp.REPORT_PATH if index == 0 else rp.REPORT_PATH + 'chapters/' + section['id'] + '/'
                   for index, section in enumerate(sections)]
+        early_shortcuts = {'technical-landscape', 'datasets-and-benchmarks', 'methods-and-appendices',
+                           'commercial-evidence'}
+        passage_targets = {
+            'technical-landscape': {'scalable-oversight-result':
+                                    'Study result — Measuring Progress on Scalable Oversight for Large Language Models.'},
+            'buyer-decision-guides': {'buyer-statistical-acceptance-rule':
+                                      'A proposed statistical acceptance rule should make its assumptions explicit.'},
+            'commercial-evidence': {'commercial-buyer-calculation': 'Reproducible buyer calculation:',
+                                    'commercial-review-calculation': 'Reproducible review calculation:'},
+        }
         expected_parts = [rp.sp.ORIGIN + route + ('#executive-assessment' if index == 0 else '')
                           for index, route in enumerate(routes)]
         for index, section in enumerate(sections):
@@ -281,6 +314,20 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
                              [{'src': '/native-details.js', 'defer': None}] if index else [])
             self.assertNotIn('type="module"', chapter)
             tree = ReaderTree(chapter)
+            shortcuts = tree.with_class('r-bulk-shortcuts')[0]
+            if section['id'] in early_shortcuts:
+                self.assertLess(tree.elements.index(shortcuts),
+                                next(index for index, item in enumerate(tree.elements) if item['tag'] == 'h1'))
+            for anchor, lead_in in passage_targets.get(section['id'], {}).items():
+                matching = [paragraph for paragraph in section['paragraphs']
+                            if paragraph['text'].startswith(lead_in) and rp.paragraph_supported(self.context, paragraph)]
+                if not matching:
+                    continue  # The held legacy authoring inputs predate some reviewed passages.
+                self.assertEqual(len(matching), 1)
+                target, = [item for item in tree.with_class('r-paragraph') if item['attrs'].get('id') == anchor]
+                self.assertEqual(target['attrs'].get('tabindex'), '-1')
+                self.assertIn('#' + anchor, ReaderTree.links(shortcuts))
+                self.assertEqual(ReaderTree.text(target['children'][1]), matching[0]['text'])
             guards = [item for item in tree.elements if item['tag'] == 'script'
                       and 'src' not in item['attrs'] and item['attrs'].get('type') != 'application/ld+json']
             if section['id'] == 'technical-landscape':
