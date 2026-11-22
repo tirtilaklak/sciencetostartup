@@ -329,8 +329,10 @@ test('Reconciled employer listings render scoped pay and exact source actions in
             await expect(issuer).toContainText('HTTP 200');
             await expect(original).toContainText('22 Nov 2026 · HTTP 404');
           } else {
-            await expect(issuer.locator(`[data-work-source="${rlScenarios}.issuer-closure-2026-11-22"]`)).toContainText('Retrieval observation');
-            await expect(original.locator(`[data-work-source="${rlScenarios}.ashby-recheck-2026-11-22"]`)).toContainText('Retrieval observation');
+            await expect(issuer.locator(`[data-work-source="${rlScenarios}.issuer-closure-2026-11-22"]`))
+              .toContainText('Checked 22 Nov 2026 · Terac archived role description and closure notice');
+            await expect(original.locator(`[data-work-source="${rlScenarios}.ashby-recheck-2026-11-22"]`))
+              .toContainText('Checked 22 Nov 2026 · Original Ashby posting recheck');
           }
         }
         if (id === engagement) {
