@@ -233,6 +233,9 @@
   .example-grid { grid-template-columns: minmax(0, 1fr); }
   .example-card, .example-grid .example-card + .example-card { padding-inline: 0; border-left: 0; }
 }
+@media (max-width: 375px) {
+  .hero-actions .home-arrow { display: none; }
+}
 @media (max-width: 359px) {
   .site-header { padding-block: 4px; }
   .site-header .site-search-open { margin-left: auto; }

@@ -45,6 +45,24 @@ test('home shows both dated sources before the phone portrait and aligns the des
   }
 });
 
+test('both directory actions fit on one row on narrow phones', async ({ page }) => {
+  for (const width of [320, 360, 375]) {
+    await page.setViewportSize({ width, height: 720 });
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+    const actions = page.locator('.hero-actions');
+    const companies = actions.getByRole('link', { name: 'Browse companies', exact: true });
+    const work = actions.getByRole('link', { name: 'Find paid work', exact: true });
+    await expect(work).toHaveAttribute('href', '/work/');
+    const first = await companies.boundingBox();
+    const second = await work.boundingBox();
+    expect(second.y).toBeCloseTo(first.y, 0);
+    expect(second.x).toBeGreaterThanOrEqual(first.x + first.width);
+    expect(second.x + second.width).toBeLessThanOrEqual(width);
+    expect(Math.min(first.height, second.height)).toBeGreaterThanOrEqual(48);
+  }
+});
+
 test('home promotes only approved current terms and retains all binding conditions', async ({ page }, info) => {
   const example = page.locator('#home-work-example [data-home-route]');
   for (const timestamp of [reviewed, expires - 1]) {
@@ -61,7 +79,7 @@ test('home promotes only approved current terms and retains all binding conditio
   await expect(example.getByRole('link', { name: /Official program page/ })).toHaveAttribute('href', promotion.url);
   await expect(page.locator('.example-grid article')).toHaveCount(2);
   await expect(page.locator('.hero').getByRole('link', { name: 'Browse companies' })).toBeVisible();
-  await expect(page.locator('.hero').getByRole('link', { name: 'Paid work', exact: true })).toBeVisible();
+  await expect(page.locator('.hero').getByRole('link', { name: 'Find paid work', exact: true })).toBeVisible();
   await info.attach(`home-entry-${info.project.name}.png`, {
     body: await page.screenshot({ fullPage: false, animations: 'disabled', scale: 'css' }), contentType: 'image/png',
   });
