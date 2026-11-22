@@ -64,7 +64,8 @@
       link.href.split('#')[0]===location.href.split('#')[0])return;
     const {directoryReturn,...state}=history.state||{};
     if(link.matches(handoffs)){
-      state.directoryReturn={page:location.href,href:link.href,query:query.value,top:link.getBoundingClientRect().top};
+      state.directoryReturn={page:location.href,href:link.href,query:query.value,top:link.getBoundingClientRect().top,
+        entry:window.S2SNativeHandoff?.begin(link.href,event)};
     }else if(!directoryReturn)return;
     try{history.replaceState(state,'');}catch{}
   });
@@ -73,7 +74,8 @@
   const fromIndex=activation?.from?.index;
   const goingForward=fromIndex>=0&&fromIndex<=activation.entry?.index;
   const saved=history.state?.directoryReturn;
-  const returning=saved?.page===location.href&&!goingForward&&performance.getEntriesByType('navigation')[0]?.type==='back_forward';
+  const returning=saved?.page===location.href&&performance.getEntriesByType('navigation')[0]?.type==='back_forward'&&
+    (window.navigation?!goingForward:window.S2SNativeHandoff?.returnedFrom(saved.entry));
   if(returning)window.addEventListener('pageshow',event=>{
     if(event.persisted)return;
     // The browser applies history scroll restoration after pageshow.

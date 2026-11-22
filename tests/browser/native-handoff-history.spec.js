@@ -1,4 +1,4 @@
-const { chromium, test, expect } = require('@playwright/test');
+const { chromium, firefox, test, expect } = require('@playwright/test');
 
 const directoryGroup = 'expert-data-evaluation';
 const compareResult = '[data-company=mercor] .directory-compare';
@@ -150,6 +150,119 @@ for (const compare of [true, false]) {
     await expectReturn(page, source, following, position);
   });
 }
+
+const legacy = test.extend({
+  browser: [async ({}, use) => {
+    const browser = await firefox.launch({ firefoxUserPrefs: {
+      'dom.navigation.webidl.enabled': false,
+      'browser.sessionhistory.max_total_viewers': 0,
+    } });
+    try {
+      await use(browser);
+    } finally {
+      await browser.close();
+    }
+  }, { scope: 'worker' }],
+});
+
+legacy.describe('native handoffs without the Navigation API', () => {
+  legacy.skip(({ browserName }) => browserName !== 'firefox', 'Use Firefox with the legacy History API');
+  legacy.use({ viewport: { width: 390, height: 844 } });
+  legacy.describe.configure({ timeout: 90_000 });
+
+  const cases = [
+    { from: '/companies/?q=Mercor', opener: compareResult, destination: '#compare-content [data-remove=mercor]', next: firstMercorSource },
+    { from: '/work/?q=Snorkel&sort=checked', opener: '[data-work-compare]', destination: '[data-work-comparison]', next: '[data-work-export]' },
+    { from: '/work/?q=Snorkel&sort=checked', opener: '[data-work-explore]', destination: '#work-search', next: '.site-footer nav a' },
+  ];
+
+  for (const { from, opener, destination, next } of cases) {
+    legacy(`${opener} restores on Back after a cold Forward visit`, async ({ page }) => {
+      await trackDocument(page, true);
+      await page.goto('/method/');
+      const previous = page.url();
+      await page.goto(from);
+      const source = page.locator(opener);
+      const origin = page.url();
+      const position = await activate(source);
+      const target = page.locator(destination);
+      await expect(target).toBeVisible();
+      const landing = page.url();
+
+      await page.goBack({ waitUntil: 'commit' });
+      await expect(page).toHaveURL(origin);
+      await expect(source).toBeFocused();
+      await page.goForward({ waitUntil: 'commit' });
+      await expect(page).toHaveURL(landing);
+      await expect(target).toBeVisible();
+
+      await Promise.all([page.waitForURL(previous), page.evaluate(() => setTimeout(() => history.go(-2), 0))]);
+      await page.goForward({ waitUntil: 'commit' });
+      await expect(page).toHaveURL(origin);
+      await expect(source).toBeVisible();
+      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(resolve)))));
+      expect(await page.evaluate(() => ({
+        api: Boolean(window.navigation), cached: window.nativeHandoffCached,
+        type: performance.getEntriesByType('navigation')[0]?.type,
+      }))).toEqual({ api: false, cached: false, type: 'back_forward' });
+      await expect(page.locator('body')).toBeFocused();
+
+      await page.goForward({ waitUntil: 'commit' });
+      await expect(page).toHaveURL(landing);
+      await expect(target).toBeVisible();
+      await page.goBack({ waitUntil: 'commit' });
+      await expectReturn(page, source, page.locator(next).first(), position);
+    });
+  }
+
+  legacy('a duplicate directory address and another tab keep their own focus', async ({ page }) => {
+    await trackDocument(page, true);
+    await page.goto('/companies/?q=Mercor');
+    const origin = page.url();
+    const source = page.locator(compareResult);
+    const position = await activate(source);
+    const target = '#compare-content [data-remove=mercor]';
+    await expect(page.locator(target)).toBeVisible();
+
+    const duplicate = await page.context().newPage();
+    await duplicate.goto(origin);
+    await expect(duplicate.locator(compareResult)).toBeVisible();
+    await expect(duplicate.locator('body')).toBeFocused();
+    expect(await duplicate.evaluate(() => sessionStorage.getItem('s2s.nativeHandoff'))).toBeNull();
+    await duplicate.close();
+
+    await page.goto(origin);
+    await expect(source).toBeVisible();
+    await expect(page.locator('body')).toBeFocused();
+    await page.goBack({ waitUntil: 'commit' });
+    await expect(page.locator(target)).toBeVisible();
+    await page.goBack({ waitUntil: 'commit' });
+    await expect(page).toHaveURL(origin);
+    await expectReturn(page, source, page.locator(firstMercorSource), position);
+  });
+
+  legacy('storage denial leaves native history and filters usable', async ({ page }) => {
+    await trackDocument(page, true);
+    await page.addInitScript(() => {
+      Object.defineProperty(window, 'sessionStorage', {
+        get() { throw new DOMException('Storage denied', 'SecurityError'); },
+      });
+    });
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.goto('/work/?q=Snorkel&sort=checked');
+    const origin = page.url();
+    const source = page.locator('[data-work-compare]');
+    await activate(source);
+    await expect(page.locator('[data-work-comparison]')).toBeVisible();
+    await page.goBack({ waitUntil: 'commit' });
+    await expect(page).toHaveURL(origin);
+    await expect(source).toBeVisible();
+    await expect(page.locator('[data-work-filters] [name=q]')).toHaveValue('Snorkel');
+    await expect(page.locator('body')).toBeFocused();
+    expect(errors).toEqual([]);
+  });
+});
 
 test('cached Companies and Work Back keep browser-managed focus', async ({ baseURL, browserName, isMobile }) => {
   test.skip(browserName !== 'chromium' || isMobile, 'Enable and verify the Chromium back-forward cache');

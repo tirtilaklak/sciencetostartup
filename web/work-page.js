@@ -276,7 +276,8 @@
       link?.addEventListener('click', event => {
         if (!event.isTrusted || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ||
             link.hasAttribute('download') || (link.target && link.target.toLowerCase() !== '_self')) return;
-        remember({ workReturnFocus: { kind, page: location.href, href: link.href, top: link.getBoundingClientRect().top }, workCompareFocus: false });
+        const entry = window.S2SNativeHandoff?.begin(link.href, event);
+        remember({ workReturnFocus: { kind, page: location.href, href: link.href, top: link.getBoundingClientRect().top, entry }, workCompareFocus: false });
       });
     }
     document.addEventListener('focusin', event => {
@@ -324,7 +325,8 @@
     const retried = loader?.retried;
     const activation = window.navigation?.activation;
     const goingForward = activation?.from && activation.from.index <= activation.entry?.index;
-    const handoff = !goingForward && !loader?.interacted && performance.getEntriesByType('navigation')[0]?.type === 'back_forward' && savedHandoff();
+    const returning = window.navigation ? !goingForward : window.S2SNativeHandoff?.returnedFrom(history.state?.workReturnFocus?.entry);
+    const handoff = returning && !loader?.interacted && performance.getEntriesByType('navigation')[0]?.type === 'back_forward' && savedHandoff();
     const revealed = revealTarget(!handoff && (!loader?.interacted || retried));
     if (!handoff && !revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
       // A saved anchor can be excluded by the saved criteria.

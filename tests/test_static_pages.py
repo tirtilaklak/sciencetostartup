@@ -225,7 +225,8 @@ class StaticPageTests(unittest.TestCase):
             self.assertLess(len(page_bytes), 160_000 if cid == "afterquery" else PAGE_LIMIT, cid)
             if cid == "afterquery":
                 self.assertLess(len(gzip.compress(page_bytes)), 23_000, cid)
-            self.assertEqual(PageFacts(text).scripts, [{"type": "application/ld+json"}, {"src": "/native-details.js", "defer": None}], cid)
+            self.assertEqual(PageFacts(text).scripts, [{"data-native-handoff": None}, {"type": "application/ld+json"},
+                                                        {"src": "/native-details.js", "defer": None}], cid)
             self.assertNotIn('id="research-data"', text, cid)
             structured = structured_data(text)
             self.assertEqual(structured["mainEntity"]["name"], self.companies[cid]["name"], cid)
