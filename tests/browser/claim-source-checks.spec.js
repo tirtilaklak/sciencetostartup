@@ -9,7 +9,7 @@ const citations = [
   { id: 'snorkel_ai.source.oct14-006107ac93e3', checked: '28 Oct 2026', archivedTitle: articleTitle, archivedCheck: '2026-10-14' },
 ];
 
-test('the Snorkel claim pairs same-URL checks by source ID and preserves the archive', async ({ page }, info) => {
+test('the Snorkel claim pairs same-URL checks by source ID and preserves the archive', async ({ page, context }, info) => {
   await page.goto(`/explore/#company/snorkel_ai/claim/${claimId}`);
   const dialog = page.locator('#evidence-dialog');
   await expect(dialog).toBeVisible();
@@ -28,12 +28,13 @@ test('the Snorkel claim pairs same-URL checks by source ID and preserves the arc
   }
   const current = await rows.evaluateAll(items => items.map(row => ({ id: row.dataset.sourceId, text: row.innerText })));
 
-  await page.keyboard.press('Escape');
-  await expect(dialog).toBeHidden();
-  await page.goto('/explore/#downloads');
-  const pending = page.waitForEvent('download');
-  await page.locator('#download-json').press('Enter');
-  const download = await pending;
+  const downloads = await context.newPage();
+  await downloads.goto('/explore/#downloads');
+  await expect(downloads.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  const [download] = await Promise.all([
+    downloads.waitForEvent('download'),
+    downloads.locator('#download-json').click(),
+  ]);
   const archive = JSON.parse(await readFile(await download.path(), 'utf8'));
   expect(archive.claims.find(claim => claim.id === claimId).source_ids).toEqual(citations.map(citation => citation.id));
   const archived = citations.map(citation => archive.sources.find(source => source.id === citation.id));
