@@ -17,6 +17,27 @@ def run_stub(checks):
 
 
 class SiteSearchTests(unittest.TestCase):
+    def test_exact_identifiers_and_work_intent_use_whole_queries(self):
+        checks = r'''
+const assert=require('node:assert/strict');
+const {identifier,identifiers,isWorkQuery,normalize,workTerms,workUrl}=globalThis.S2SSearch;
+assert.deepEqual(identifiers(['2203.02155v1','arXiv:2203.02155v1','https://arxiv.org/pdf/2203.02155v1.pdf?source=guide']),['arxiv:2203.02155v1']);
+assert.equal(identifier('https://doi.org/10.48550/arXiv.2203.02155'),'doi:10.48550/arxiv.2203.02155');
+assert.equal(identifier('/research/papers/paper.arxiv.2203.02155v1/'),'record:paper.arxiv.2203.02155v1');
+assert.equal(identifier('2203.02155 and human feedback'),'');
+assert.equal(identifier('https://arxiv.org@elsewhere.example/pdf/2203.02155v1'),'');
+const titles=new Set(['Software Engineer - RL Environments'].map(normalize));
+assert.equal(isWorkQuery('Software Engineer - RL Environments',titles),true);
+assert.equal(isWorkQuery('software engineer',titles),false);
+assert.equal(isWorkQuery('RLHF  jobs',titles),true);
+assert.equal(isWorkQuery('RLHF papers about jobs',titles),false);
+assert.equal(workTerms('RLHF  jobs'),'RLHF');
+assert.equal(workUrl('RLHF  jobs'),'/work/?q=RLHF++jobs');
+'''
+        result = subprocess.run([shutil.which("node") or "/opt/homebrew/bin/node", "-"],
+                                input=(ROOT / "web/search-core.js").read_text() + checks, text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_native_current_companies_keep_the_research_report_in_page_results(self):
         checks = r'''
 run('initialize()');

@@ -2,14 +2,26 @@ const {test,expect}=require('@playwright/test');
 
 test('static header points to lightweight search and native directory matches contributor brands',async({page})=>{
   await page.goto('/companies/');
-  await expect(page.locator('.site-search-open')).toHaveAttribute('href','https://sciencetostartup.com/?search');
-  for(const [query,id] of [['Outlier','scale_ai'],['Remotasks','scale_ai'],['Alignerr','labelbox'],['DataAnnotation','surge_ai'],['Mindrift','toloka']]){
+  await expect(page.locator('.site-search-open')).toHaveAttribute('href',/\/\?search=?#browse-guide$/);
+  for(const [query,id] of [['Outlier','scale_ai'],['Remotasks','scale_ai'],['Alignerr','labelbox'],['DataAnnotation','surge_ai'],['Mindrift','toloka'],['DataForce by TransPerfect','org.dataforce']]){
     await page.goto('/companies/?reader=keep&q='+encodeURIComponent(query)+'#main');
     await expect(page.locator('.directory-company:visible')).toHaveCount(1);
     await expect(page.locator('.directory-company[data-company="'+id+'"]')).toBeVisible();
     await page.getByRole('button',{name:'Clear',exact:true}).click();
+    await expect(page.locator('#company-query')).toBeFocused();
     expect(new URL(page.url()).searchParams.get('reader')).toBe('keep');expect(new URL(page.url()).hash).toBe('#main');
   }
+});
+
+test('a research-only company can be recovered from an empty native directory search',async({page})=>{
+  await page.goto('/companies/?q=Humans+in+the+Loop');
+  const recovery=page.getByRole('link',{name:'Search the full guide'});
+  await expect(recovery).toBeVisible();
+  await recovery.focus();
+  await page.keyboard.press('Enter');
+  const input=page.locator('#home-search-input');
+  await expect(input).toHaveValue('Humans in the Loop');
+  await expect(page.locator('#home-search-results [role=option]').first()).toHaveAttribute('href','/company/org.humans_in_the_loop/');
 });
 
 test('native work search uses company aliases and preserves listing buckets and literal queries',async({page})=>{
@@ -39,4 +51,43 @@ test('global search finds the Daily hub and displayed Greek paper titles',async(
     await input.fill(query);const first=page.locator('#home-search-results [role=option]').first();
     await expect(first).toHaveAttribute('href',href);await expect(first).toContainText(title);
   }
+});
+
+test('Home routes exact versions, rejects unknown versions and restores keyboard selection on Back',async({page})=>{
+  await page.goto('/');
+  await page.keyboard.press('Control+k');
+  const input=page.getByRole('combobox',{name:'Search the guide'});
+  const results=page.locator('#home-search-results [role=option]');
+  await expect(input).toBeFocused();
+  await input.fill('arXiv:2203.02155v999');
+  await expect(page.locator('#home-search-message')).toContainText('No matching research record');
+  await expect(results).toHaveCount(0);
+  const query='https://arxiv.org/pdf/2203.02155v1.pdf';
+  const target='/research/papers/paper.arxiv.2203.02155v1/';
+  await input.fill(query);
+  await expect(results.first()).toHaveAttribute('href',target);
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('button',{name:'Close search'})).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(input).toBeFocused();
+  await input.press('ArrowDown');
+  await expect(input).toHaveAttribute('aria-activedescendant',await results.first().getAttribute('id'));
+  await input.press('Enter');
+  await expect(page).toHaveURL(new RegExp(target+'$'));
+  await page.goBack();
+  await expect(input).toBeFocused();
+  await expect(input).toHaveValue(query);
+  await expect(results.first()).toHaveAttribute('aria-selected','true');
+});
+
+test('employment intent leads to native paid work, preserving spaces in the query',async({page})=>{
+  const query='RLHF  jobs';
+  await page.goto('/?'+new URLSearchParams({search:query}));
+  const result=page.locator('#home-search-results [role=option]').first();
+  await expect(result).toContainText('Work search');
+  await expect(result).toHaveAttribute('href','/work/?q=RLHF++jobs');
+  await page.locator('#home-search-input').press('Enter');
+  await expect(page).toHaveURL(/\/work\/\?q=RLHF\+\+jobs$/);
+  await expect(page.locator('[data-work-filters] input[name=q]')).toHaveValue(query);
+  await expect(page.locator('[data-work-route="afterquery.work.software-engineer-rl-environments"]')).toBeVisible();
 });

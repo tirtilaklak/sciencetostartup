@@ -468,11 +468,30 @@ def search_fold(value):
     return "".join(ch for ch in unicodedata.normalize("NFKD", value) if not unicodedata.category(ch).startswith("M")).lower()
 
 
+def work_recorded_titles(route):
+    history = (route.get("editorial_review") or {}).get("correction_history", [])
+    previous = ((item.get("previous_values") or {}).get("role") for item in history)
+    return [title for title in (route.get("role"), *previous) if isinstance(title, str) and title]
+
+
 def work_search_text(route, companies):
     from static_pages import work_location
     company = companies.get(route["company_id"], {})
-    values = [company.get("name"), *company.get("aliases", []), route.get("role"), route.get("summary"), route.get("group"), route.get("geography"), work_location(route), route.get("pay_label"), route.get("hours"), route.get("duration"), *route.get("requirements", [])]
+    values = [company.get("name"), *company.get("aliases", []), *work_recorded_titles(route), route.get("summary"), route.get("group"), route.get("geography"), work_location(route), route.get("pay_label"), route.get("hours"), route.get("duration"), *route.get("requirements", [])]
     return search_fold(" ".join(str(value) for value in values if value))
+
+
+def work_search_titles(routes):
+    from static_pages import work_kind
+
+    return sorted({title for route in routes if work_kind(route) in ("named_listing", "network_program")
+                   for title in work_recorded_titles(route)})
+
+
+def company_search_aliases(company_id, aliases=()):
+    # Both labels resolve to the same reviewed TransPerfect subsidiary profile.
+    recorded_names = ("DataForce by TransPerfect", "TransPerfect / DataForce") if company_id == "org.dataforce" else ()
+    return list(dict.fromkeys([*aliases, *recorded_names]))
 
 
 EDITORIAL_RUNTIME_FIELDS = frozenset({'company_id', 'summary', 'primary_offering',
@@ -491,16 +510,54 @@ def compact_editorial(editorial):
     return result
 
 
+def work_uncertain(route):
+    from static_pages import UNCERTAIN_CHECK
+
+    check = route.get("last_route_check") or {}
+    return (route.get("status") in ("unverified", "intake_unverified", "pay_conflict")
+            or (route.get("last_link_check") or {}).get("result") in ("blocked", "not_found", "unavailable")
+            or ((route.get("research_record") or {}).get("route") or {}).get("live_application_verified") is False
+            or bool(UNCERTAIN_CHECK.search(" ".join(str(v) for v in (check.get("result"), check.get("note")) if v))))
+
+
+def work_field_reviews(route):
+    fields = ("state", "reviewed_on", "source_ids", "basis")
+    return {field: {k: v for k, v in value.items() if k in fields or field in ("location", "commitment") and k == "note"}
+            for field, value in route.get("field_reviews", {}).items()}
+
+
+def work_native_selection(work, companies):
+    """Supply the native filter script with selection fields and searchable text."""
+    from static_pages import work_approved_terms_receipt
+
+    fields = ("id", "company_id", "role", "route_kind", "engagement_type", "status", "group", "ai_data_work",
+              "arrangements", "geography", "numeric_pay", "pay_label", "pay_basis", "terms_checked_on",
+              "reviewed_on", "availability_checked_on")
+    rows = []
+    for route in work.get("routes", []):
+        row = {key: value for key, value in route.items() if key in fields}
+        row["company_name"] = companies.get(route["company_id"], {}).get("name") or route["company_id"]
+        row["searchText"] = work_search_text(route, companies)
+        row["uncertain"] = work_uncertain(route)
+        for key, keys in (("pay_terms", ("unit", "currency", "hourly_comparable")),
+                          ("last_route_check", ("date", "result"))):
+            if route.get(key):
+                row[key] = {field: value for field, value in route[key].items() if field in keys}
+        receipt = work_approved_terms_receipt(route)
+        if receipt:
+            fields_to_keep = ("id", "source_id", "checked_on", "scope", "result", "approved", "approval_basis")
+            row["editorial_review"] = {"approved_terms_receipt_id": receipt["id"],
+                                       "receipts": [{key: value for key, value in receipt.items() if key in fields_to_keep}]}
+        rows.append(row)
+    return rows
+
+
 def compact_work(work, research=None):
     result = copy.deepcopy(work)
     for route in result.get("routes", []):
         if research:
-            from static_pages import UNCERTAIN_CHECK, work_action
-            check = route.get("last_route_check") or {}
-            route["uncertain"] = (route.get("status") in ("unverified", "intake_unverified", "pay_conflict")
-                                  or (route.get("last_link_check") or {}).get("result") in ("blocked", "not_found", "unavailable")
-                                  or ((route.get("research_record") or {}).get("route") or {}).get("live_application_verified") is False
-                                  or bool(UNCERTAIN_CHECK.search(" ".join(str(v) for v in (check.get("result"), check.get("note")) if v))))
+            from static_pages import work_action
+            route["uncertain"] = work_uncertain(route)
             route["source_action"] = work_action(route, research)
             route["details_deferred"] = True
         record = route.pop("research_record", None)
@@ -521,11 +578,56 @@ def compact_work(work, research=None):
                 route[key] = {k: v for k, v in route[key].items() if k in ("date", "result")}
         if route.get("entry_point_research"):
             route["entry_point_research"] = {"entry": {k: v for k, v in route["entry_point_research"].get("entry", {}).items() if k in ("url", "type")}}
-        route["field_reviews"] = {field: {k: v for k, v in value.items() if k in ("state", "reviewed_on", "source_ids", "basis") or field == "location" and k == "note"} for field, value in route.get("field_reviews", {}).items()}
+        route["field_reviews"] = work_field_reviews(route)
         review = route.get("editorial_review")
         if review:
-            route["editorial_review"] = {key: value for key, value in review.items() if key in ("triaged_on", "approved_terms_receipt_id", "disposition", "alternative_destination")}
+            route["editorial_review"] = {key: value for key, value in review.items() if key in ("triaged_on", "approved_terms_receipt_id", "disposition", "alternative_destination", "actions", "recorded_url_purpose")}
             route["editorial_review"]["receipts"] = [{k: v for k, v in receipt.items() if k in ("id", "source_id", "checked_on", "checked_at", "scope", "result", "approved", "approval_basis", "reviewer", "reviewed_fields")} for receipt in review.get("receipts", []) if receipt.get("id") == review.get("approved_terms_receipt_id")]
+    return result
+
+
+def work_export_rows(work, research):
+    """Bind CSV evidence to the same release as the filters, on download only."""
+    from static_pages import work_actions
+
+    fields = ("id", "company_id", "role", "route_kind", "engagement_type", "status", "group", "ai_data_work",
+              "arrangements", "geography", "pay_label", "pay_basis", "pay_terms", "pay_observations", "numeric_pay",
+              "requirements", "assessment", "hours", "duration", "terms_checked_on", "availability_label",
+              "availability_note", "availability_checked_on", "url", "form_available")
+
+    def retain(record, keys):
+        return {key: value for key, value in (record or {}).items() if key in keys}
+
+    result = []
+    for route in work.get("routes", []):
+        row = retain(route, fields)
+        row["company_name"] = research.companies.get(route["company_id"], {}).get("name") or route["company_id"]
+        row["source_actions"] = [{"url": url, "label": label} for url, label in work_actions(route, research)]
+        row["uncertain"] = work_uncertain(route)
+        row["field_reviews"] = work_field_reviews(route)
+        link_keys = ("date", "result", "url", "http_status", "final_url")
+        for key, keys in (("last_link_check", link_keys), ("last_route_check", (*link_keys, "application_check", "application_checks"))):
+            if route.get(key):
+                row[key] = retain(route[key], keys)
+        recorded = retain((route.get("research_record") or {}).get("route"),
+                          ("overview_url", "application_url", "checked_on", "live_application_verified"))
+        if recorded:
+            row["research_record"] = {"route": recorded}
+        row["sources"] = [retain(source, ("id", "url", "source_type", "title", "accessed_on", "purpose", "field_support"))
+                          for source in route.get("sources", [])]
+        review = route.get("editorial_review") or {}
+        editorial = retain(review, ("approved_terms_receipt_id", "disposition", "alternative_destination", "actions", "recorded_url_purpose"))
+        disposition_ids = (review.get("disposition") or {}).get("source_ids", [])
+        receipts = [retain(receipt, ("id", "source_id", "checked_on", "checked_at", "scope", "result", "http_status",
+                                     "approved", "approval_basis", "reviewed_fields"))
+                    for receipt in review.get("receipts", [])
+                    if receipt.get("id") == review.get("approved_terms_receipt_id")
+                    or receipt.get("scope") == "retrieval" and receipt.get("source_id") in disposition_ids]
+        if receipts:
+            editorial["receipts"] = receipts
+        if editorial:
+            row["editorial_review"] = editorial
+        result.append(row)
     return result
 
 
@@ -569,20 +671,29 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
     summary = dict(identity, bootstrap=bootstrap, companies=bootstrap["companies"], work=compact_work(sidecars["WORK_ROUTES"], research), companySummaries=summaries,
                    companyDetails=details, statistics=stats, exports=exports,
                    publicationAsOf=release.get("publication_as_of", release.get("published_at", "2026-11-08T20:30:00Z")))
+    summary["workResults"] = write_asset(destination, "work-results", dict(identity, routes=work_export_rows(sidecars["WORK_ROUTES"], research)))
     search_rows = []
     for company in data["companies"]:
         entry = next((e for e in sidecars["EDITORIAL"]["entries"] if e["company_id"] == company["id"]), {})
         products = next((e.get("products", []) for e in sidecars["PROFILE_CONTENT"]["entries"] if e["company_id"] == company["id"]), [])
-        search_rows.append({"id": company["id"], "name": company["name"], "summary": entry.get("summary", company.get("description", "")), "group": entry.get("primary_offering", ""), "products": [value for p in products for value in [p["name"], p.get("description", ""), *p.get("aliases", [])] if value], "aliases": list(company.get("aliases", [])), "href": "/company/" + company["id"] + "/"})
+        search_rows.append({"id": company["id"], "name": company["name"], "summary": entry.get("summary", company.get("description", "")), "group": entry.get("primary_offering", ""), "products": [value for p in products for value in [p["name"], p.get("description", ""), *p.get("aliases", [])] if value], "aliases": company_search_aliases(company["id"], company.get("aliases", [])), "href": "/company/" + company["id"] + "/"})
     from daily_scan import daily_search_entries, daily_search_scope
     public_search_entries = [*sidecars.get("RESEARCH_SEARCH", []), *daily_search_entries(daily_context)]
+    work_titles = work_search_titles(sidecars["WORK_ROUTES"]["routes"])
     summary["dailySearchScope"] = daily_search_scope(daily_context)
     for entry in public_search_entries:
         keywords = entry.get("keywords", [])
         if isinstance(keywords, str):
             keywords = keywords.split()
-        search_rows.append({"id": entry["url"], "name": entry["title"], "summary": entry["summary"], "group": entry["kind"], "products": keywords, "href": entry["url"]})
-    summary["homeSearch"] = write_asset(destination, "search", dict(identity, entries=search_rows))
+        row = {"id": entry["url"], "name": entry["title"], "summary": entry["summary"], "group": entry["kind"], "products": keywords, "href": entry["url"]}
+        if entry.get("identifiers"):
+            row["identifiers"] = entry["identifiers"]
+        if entry.get("recordKind"):
+            row["recordKind"] = entry["recordKind"]
+        if entry["kind"] == "company":
+            row["aliases"] = company_search_aliases(entry["url"].strip("/").removeprefix("company/"), entry.get("aliases", []))
+        search_rows.append(row)
+    summary["homeSearch"] = write_asset(destination, "search", dict(identity, entries=search_rows, workTitles=work_titles))
     company_map = {company["id"]: company for company in data["companies"]}
     editorial_map = {entry["company_id"]: entry for entry in sidecars["EDITORIAL"]["entries"]}
     company_search = {}
@@ -593,7 +704,7 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
         company_search[cid] = " ".join(str(value) for value in values if value).lower()
     summary["fullSearch"] = write_asset(destination, "full-search", dict(identity, data={"dataset_version": data["dataset_version"]}, companySearch=company_search,
                                                                      profileProducts=rooted_assets(current_products), editorialReadouts=copy.deepcopy(data["editorial_readouts"]),
-                                                                     researchSearchEntries=public_search_entries,
+                                                                     researchSearchEntries=public_search_entries, workTitles=work_titles,
                                                                      workSearch={route["id"]: work_search_text(route, company_map) for route in sidecars["WORK_ROUTES"]["routes"]}))
     # The full archive is fetched only by the explicitly opened method/archive view.
     summary["archive"] = write_asset(destination, "archive", dict(identity, data=data, businessHealth=sidecars["BUSINESS_HEALTH"], sourceUpdates=copy.deepcopy(sidecars["SOURCE_UPDATES"])))

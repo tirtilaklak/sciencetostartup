@@ -7,6 +7,8 @@
   const group=document.getElementById('company-group');
   const count=document.getElementById('company-count');
   const empty=document.getElementById('company-empty');
+  const fullGuide=empty?.querySelector('[data-full-guide-search]');
+  const selectedGroup=document.querySelector('[data-directory-selected-group]');
   const sections=[...document.querySelectorAll('.directory-section')];
   const search=globalThis.S2SSearch;
   if(!search){document.documentElement.removeAttribute('data-page-enhancement');return;}
@@ -37,6 +39,11 @@
     if(sectionParent) [...cards].sort((a,b)=>(key?a.best-b.best:0)||a.order-b.order).forEach(entry=>sectionParent.insertBefore(entry.section,sectionAnchor));
     count.textContent=`${visible} ${visible===1?'company':'companies'}`;
     empty.hidden=visible!==0;
+    if(fullGuide) fullGuide.href='/?'+new URLSearchParams({search:query.value})+'#browse-guide';
+    if(selectedGroup){
+      selectedGroup.hidden=!group.value;
+      selectedGroup.textContent=group.value?group.selectedOptions[0].textContent:'';
+    }
     if(updateURL){
       const url=new URL(location.href);
       if(query.value.trim())url.searchParams.set('q',query.value.trim());else url.searchParams.delete('q');
@@ -47,7 +54,7 @@
   form.addEventListener('submit',event=>event.preventDefault());
   query.addEventListener('input',()=>filter());
   group.addEventListener('change',()=>filter());
-  form.addEventListener('reset',()=>{query.value='';group.value='';filter();});
+  form.addEventListener('reset',event=>{event.preventDefault();query.value='';group.value='';filter();query.focus();});
   window.addEventListener('popstate',()=>{read();filter(false);});
   read();filter(false);form.hidden=false;
   document.documentElement.removeAttribute('data-page-enhancement');
