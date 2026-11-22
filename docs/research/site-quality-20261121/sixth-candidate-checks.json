@@ -1,0 +1,109 @@
+{
+  "frozen_source": "e521d0534aa39bccc2b52617011f44631ae13241",
+  "source_and_artifact_commit": "ac642cf2b9c14737a130a8fdca5f5207d1176ebe",
+  "build": "81071f0430d00446056b",
+  "manifest_sha256": "b463473f55949cd41cc67fde90dc247eaa8a46834b02339d7562c126eac65336",
+  "editorial_release_id": "2026-11-22.3",
+  "model": "gpt-6.2-sol",
+  "reasoning_effort": "ultra",
+  "implementation_workers": [
+    "fix6_cross_release",
+    "fix6_grade_native",
+    "fix6_market_fallback",
+    "fix6_market_selects",
+    "fix6_native_ledger",
+    "fix6_profile_timing",
+    "fix6_research_history",
+    "fix6_runtime_retention",
+    "fix6_shortlist",
+    "fix6_shortlist_browser"
+  ],
+  "parent_pr": 34,
+  "active_pr": 35,
+  "retained_production_versions": [
+    "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+    "cddaa614-befb-4bfe-81b2-8553bd74afac"
+  ],
+  "retained_runtime_paths": 96,
+  "exact_runtime_compatibility_cases": 30,
+  "local_targeted_checks": 86,
+  "local_changed_and_cutover_browser_cases": {
+    "cutover-journeys-serial": 20,
+    "fifth-journeys": 26,
+    "sixth-journeys": 20
+  },
+  "logic_suites": 9,
+  "prepared_files_bound_to_git": 1280,
+  "private_receipts": {
+    "candidate-6/market-selects/README.md": "597a41bb6aa49d083369adafde4712bfba37f479a6b9bbdebb58711c96db54ca",
+    "candidate-6/shortlist/README.md": "93a36754ede6bd474f1db788f93bcb7ec63c394e40e5da1557f63c223d10b46b",
+    "candidate-6/shortlist-browser/README.md": "116d72479fa3d2ceff113ccaa3a406a618982f0d1ebae24bdc33b7f2e3956e48",
+    "candidate-6/native-ledger/README.md": "2ae55adae4b70bd8e3fa334c56f448546fa419f06a65309cfa29652de392e7a1",
+    "candidate-6/research-history/README.md": "4bd78fe9ce944edc567c95a18ca828fdd70e5761fefa82c39fa40d57dc924b66",
+    "candidate-6/grade-native/receipt.md": "da957e4a782be5431121f911e13904868f787be90fb280126b987e5afe76b091",
+    "candidate-6/market-fallback/summary.json": "b0d6886a04d1b9cdf1be4bcd3d526fe75f964a19065345b7042f2bad73281995",
+    "candidate-6/native-upgrade/final-served-assets.json": "eaa393be664457a40ba692de623ecfd382daf40aab7e8cac9433c54d825efd09",
+    "candidate-6/runtime-retention/README.md": "d6b31e35e78e9e5f8dc87081bce3b56d59b3b3043d21ae0ffebeb3c01291e6bd",
+    "candidate-6/profile-timing/paired-replay-summary.json": "070d24266705f6f589ba3a7ca0600915d8f85e867e233968ef3c01127714be6a"
+  },
+  "local_gates_sha256": "fc54ea4915aca3bdf9c0b4b51dc18066fcbbea1b19527523f12c0ef65bf2be06",
+  "official_verification": {
+    "head": "ac642cf2b9c14737a130a8fdca5f5207d1176ebe",
+    "workflows": {
+      "Browser QA": {
+        "url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45013200844",
+        "jobsPassed": 8
+      },
+      "CI": {
+        "url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45013200775",
+        "jobsPassed": 10
+      }
+    },
+    "performance": {
+      "archiveSha256": "6a703ecb13c260ae447972c5cbaf12336fd6a4b34158d5223324021013fcef96",
+      "reportFilesVerified": 69,
+      "routesPassed": 23,
+      "payloadBudgetsPassed": 6,
+      "largestRouteMedians": {
+        "largest-contentful-paint": {
+          "route": "/explore/#companies",
+          "median": 2393.2889,
+          "limit": 2500
+        },
+        "total-blocking-time": {
+          "route": "/research/papers/",
+          "median": 66.5,
+          "limit": 200
+        },
+        "cumulative-layout-shift": {
+          "route": "/explore/#companies",
+          "median": 7.640304785414474e-05,
+          "limit": 0.05
+        }
+      },
+      "mercorWork": {
+        "route": "/explore/#company/mercor/work",
+        "passed": true,
+        "priorMedians": {
+          "largest-contentful-paint": 2383.25695,
+          "total-blocking-time": 0,
+          "cumulative-layout-shift": 0.03298937831003726
+        },
+        "currentMedians": {
+          "largest-contentful-paint": 2222.8222,
+          "total-blocking-time": 0,
+          "cumulative-layout-shift": 7.640304785414474e-05
+        },
+        "medianChanges": {
+          "largest-contentful-paint": -160.4347499999999,
+          "total-blocking-time": 0,
+          "cumulative-layout-shift": -0.03291297526218311
+        }
+      },
+      "individualBudgetExceedances": []
+    },
+    "planSha256": "5d6308627ed279ca9ac356b6af7f259298c90eec4ea3f2518b1bf6dab55875d6",
+    "cloudflarePlanAssets": 1278
+  },
+  "official_verification_receipt_sha256": "4bf8169a02cbaa8791cd8d9be711d76d0f6f6d2867772a2ade8183eed401951d"
+}
