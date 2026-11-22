@@ -4,7 +4,7 @@ The audit began at 7:30 PM Pacific on November 21, 2026. The first three hours a
 
 ## Current pass
 
-PR #34 merged at `1cecd451`. The public site serves build `5dc63fbcf19634a55c66` on Worker 41. November 18 is the latest approved Daily edition. The eleventh build passed both GitHub workflows and staged at zero public traffic as Worker 44. Its independent review reproduced a Work filter timeout on delayed script execution. Ten twelfth-round contributors have delivered fixes in build `96e25098b02da34fdb20`. Independent review of this build is in progress. The audit closes November 22 at 7:30 PM Pacific. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Merged PR #34](https://github.com/tirtilaklak/sciencetostartup/pull/34) · [Production receipts](site-quality-20261121/fifth-public-release.json)
+PR #34 merged at `1cecd451`. Public Worker 41 serves build `5dc63fbcf19634a55c66`. The latest approved Daily edition is November 18. PR #35’s twelfth build passed 1,109 Python tests and all 72 mobile performance runs. Ten independent reviewers checked the twelfth build. The thirteenth contributors are addressing their new findings. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Public release receipts](site-quality-20261121/fifth-public-release.json)
 
 ## Initial baseline and first three rounds
 
@@ -358,3 +358,11 @@ Work keeps its filters when a downloaded script executes late. The bookmarked Wo
 Terac explicitly marks its ML Scenarios listing closed. Work, the company profile, Compare and CSV distinguish this notice from the Ashby listing’s dated 404. The separately listed Shopping Assistant retains its own evidence. [Twelfth source, contributors and page sizes](site-quality-20261121/twelfth-implementation.json)
 
 Worker 44 received zero public traffic. Its immutable preview served the correct build, passed 86 acceptance checks, and opened the archive’s Executive brief. The first attempt to open the 22.47 MB deposited evidence appendix exceeded 25 seconds. The verified public predecessor at the time of this freeze was Worker 41. [Eleventh CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45036903655) · [Eleventh Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45036903644)
+
+## Twelfth independent retest
+
+All 210 Work exports matched their visible selections. The one change in the recently checked ordering was Terac ML Scenarios moving up two places. All 880 company source IDs and URLs matched between the native dossiers and Explore. The 144 employer URL checks confirmed the current commissioning, pay and availability evidence. All 48 phone chapter reads passed. The original archive’s eight navigation steps worked under the prepared routing settings. [Retest receipts](site-quality-20261121/twelfth-retest.json)
+
+Both GitHub workflows passed on `ec9345d5`. The 72 mobile scores ranged from 98 to 100. Explore Companies had the slowest median LCP at 2.41 seconds. One Mobile WebKit case passed on retry. Its trace showed the correctly restored Mercor result jump 113px after Back. [CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45039549361) · [Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45039549372)
+
+At 390px with enlarged text, the native Menu clipped its destination labels and Daily cropped its selected filter values. Global Search’s placeholder clipped at 320px. Clear filters lost the open search field on Forward in classic Firefox. Keyboard readers had to pass 234 Market controls to reach Definitions. [Observed issues and acceptance criteria](site-quality-20261121/twelfth-audit-findings.json) · [Phone screenshots and layout trials](site-quality-20261121/twelfth-phone-menu-and-filters.png)
