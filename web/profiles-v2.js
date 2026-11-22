@@ -9,7 +9,7 @@ function readableDate(text){
 }
 function profileDate(value){return readableDate(dateText(value));}
 function profileSourceMeta(s,finance){
- const added=profileDate(s.accessed_on),published=finance?.source_published_on||s.published_on,checked=finance?.source_checked_on;
+ const added=profileDate(s.accessed_on),published=finance?.source_published_on||s.published_on||evidenceContextSourcePublicationDate(s.id),checked=finance?.source_checked_on;
  const original=s.retrieval_status==='checked'?'Checked '+added:s.retrieval_status==='summary_only'?(checked?'Source summary recorded ':'Summary only, page not reviewed · recorded ')+added:s.retrieval_status==='unverified'?'Not checked again · recorded '+added:'Recorded '+added;
  return [s.publisher,published?'Published '+profileDate(published):'Publication date not stated',original,checked&&checked!==s.accessed_on?'Source checked '+profileDate(checked):''].filter(Boolean).join(' · ');
 }

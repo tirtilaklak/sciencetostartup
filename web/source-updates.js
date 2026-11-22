@@ -25,6 +25,7 @@ function historicalOfferContextForMetric(metric){return detailViewRenderer("hist
 function metricPresentationLabel(metric,fallback){return detailViewRenderer("metricPresentationLabel",this,arguments);}
 function metricEvidenceTopic(metric,fallback){return detailViewRenderer("metricEvidenceTopic",this,arguments);}
 function evidenceContextForClaim(claim){return detailViewRenderer("evidenceContextForClaim",this,arguments);}
+function evidenceContextSourcePublicationDate(sourceId){return detailViewRenderer("evidenceContextSourcePublicationDate",this,arguments);}
 function relationshipAssessmentContextForClaim(claim){return detailViewRenderer("relationshipAssessmentContextForClaim",this,arguments);}
 function evidenceContextScopeLabel(claim,fallback){return detailViewRenderer("evidenceContextScopeLabel",this,arguments);}
 function evidenceContextClaimDescription(claim){return detailViewRenderer("evidenceContextClaimDescription",this,arguments);}
