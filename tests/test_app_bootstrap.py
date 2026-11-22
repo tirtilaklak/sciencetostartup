@@ -23,8 +23,12 @@ function harness(build='build-test'){
  const root={dataset:{buildId:'build-test'},style:{removeProperty(){}},setAttribute:(k,v)=>attrs.set(k,v),removeAttribute:k=>attrs.delete(k),getAttribute:k=>attrs.get(k)};
  const failure={hidden:true},reload={addEventListener:(name,callback)=>{callbacks[name]=callback;}};
  const views=[{hidden:false},{hidden:true}],dialog={open:true,close(){this.open=false;}};
- const document={documentElement:root,getElementById:id=>id==='app-failure'?failure:reload,querySelectorAll:s=>s==='main>.view'?views:s==='dialog[open]'?[dialog]:[],createElement:()=>({}),body:{append:script=>scripts.push(script)}};
+ const marketSection={dataset:{fragmentId:'business-health'}};
+ const document={documentElement:root,
+  querySelector:selector=>selector==='#market-view > [data-fragment-id]'?marketSection:null,
+  getElementById:id=>id==='app-failure'?failure:reload,querySelectorAll:s=>s==='main>.view'?views:s==='dialog[open]'?[dialog]:[],createElement:()=>({}),body:{append:script=>scripts.push(script)}};
  vm.runInNewContext(source,{window:{APP_BUILD_ID:build},document,location:{reload:()=>{reloads++;}},requestAnimationFrame:callback=>frames.push(callback),setTimeout:(callback,delay=0)=>{timers.set(++timerId,{callback,delay});return timerId;},clearTimeout:id=>timers.delete(id)});
+ assert.equal(marketSection.id,'business-health');
  const fire=delay=>{const pair=[...timers].find(([,timer])=>timer.delay===delay);assert.ok(pair,'Missing timer '+delay);timers.delete(pair[0]);pair[1].callback();};
  const start=()=>fire(1500),ready=()=>{root.setAttribute('data-app','ready');failure.hidden=true;};
  return {attrs,timers,scripts,frames,views,failure,dialog,start,fire,ready,reload:()=>callbacks.click(),reloads:()=>reloads};
