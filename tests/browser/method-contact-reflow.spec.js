@@ -21,6 +21,8 @@ test('the Method correction address and actions fit at Firefox minimum font size
         const actions = actionNames.map(name => contact.getByRole('link', { name, exact: true }));
         const destination = new URL(await actions[1].getAttribute('href'));
         const address = await contact.locator('.method-contact > p > span').evaluate(element => {
+          element.scrollIntoView({ block: 'center', inline: 'start', behavior: 'instant' });
+          window.scrollTo({ left: 0, top: scrollY, behavior: 'instant' });
           const range = document.createRange();
           range.selectNodeContents(element);
           const selection = window.getSelection();
@@ -34,6 +36,7 @@ test('the Method correction address and actions fit at Firefox minimum font size
             userSelect: getComputedStyle(element).userSelect,
             lines: Array.from(range.getClientRects(), rect => rect.toJSON()),
             documentWidth: document.scrollingElement.scrollWidth,
+            scrollX,
           };
         });
         const boxes = await Promise.all(actions.map(async (action, index) => ({
@@ -50,6 +53,7 @@ test('the Method correction address and actions fit at Firefox minimum font size
         expect(address.text).toBe(destination.pathname);
         expect(address.selected).toBe(address.text);
         expect(address.userSelect).not.toBe('none');
+        expect(address.scrollX).toBe(0);
         expect.soft(address.documentWidth, 'The page fits without horizontal panning').toBe(viewport.width);
         expect(address.lines.length).toBeGreaterThan(0);
         for (const line of address.lines) {
