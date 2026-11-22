@@ -29,7 +29,9 @@ test.describe('Explore without JavaScript', () => {
       await expect(page.locator('#main')).toBeFocused();
 
       await page.keyboard.press('Tab');
-      await expect(fallback.getByRole('link', { name: 'Search the plain guide' })).toBeFocused();
+      const browse = fallback.getByRole('link', { name: 'Browse the guide', exact: true });
+      await expect(browse).toHaveAttribute('href', '/#browse-guide');
+      await expect(browse).toBeFocused();
       await page.keyboard.press('Tab');
       await expect(fallback.getByRole('link', { name: 'Company list' })).toBeFocused();
       await page.keyboard.press('Enter');
