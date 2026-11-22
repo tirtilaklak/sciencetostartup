@@ -294,11 +294,7 @@ function evidenceAccess(ids,label,topicHint=''){
  const reviewed=selected.map(profileReviewedObservationForClaim),finance=selected.map(cl=>financeClaimContextFor(cl.id));
  const topic=publicText(topicHint)||reviewed[0]?.label||finance[0]?.label||evidenceRecordTopics.get(selected[0].id)||criterion||subjects[selected[0].subject]||title(selected[0].subject.replace(/\s+\d+$/,''));
  const companyNames=[...new Set(selected.map(cl=>companies[cl.company_id]?.name).filter(Boolean))];
- const dateInfo=selected.map(cl=>{
-  const heading=evidenceContextDateHeading(cl),prefix=heading+': ';
-  const text=evidenceDate(evidenceContextClaimPeriod(cl,cl.as_of&&cl.as_of!=='undated'?cl.as_of:'not stated'));
-  return profileEvidenceDate(cl,text.startsWith(prefix)?text.slice(prefix.length):text,heading);
- });
+ const dateInfo=selected.map(profileEvidenceDate);
  const dates=[...new Set(dateInfo.map(({heading,text})=>heading+': '+text))];
  const name=label+' for '+companyNames.join(' and ')+': '+topic+'. '+dates.join('. ')+'.';
  const description=selected.map((cl,index)=>{
@@ -314,7 +310,7 @@ function evidenceAccess(ids,label,topicHint=''){
 const claimButton=(id,label='Evidence',topic='')=>{const access=evidenceAccess([id],label,topic);return `<button class="evidence-action" data-claim="${esc(id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;};
 const numberButton=m=>{const label=metricValue(m),access=evidenceAccess([m.claim_id],label,metricEvidenceTopic(m,m.label||metricLabels[m.kind]));return `<button class="number-button" data-claim="${esc(m.claim_id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;};
 const sourceLinks=cl=>cl.source_ids.map(id=>external(sources[id].url,sources[id].publisher)).join(' ');
-const provenance=cl=>`<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(evidenceContextArchiveDate(cl,dateText(cl.as_of)))}</span><span>· ${esc(evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id)))}</span><span>· ${esc(evidenceLabel(cl))}</span>${claimButton(cl.id)}</div>`;
+const provenance=cl=>`<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(profileRecordDate(cl))}</span><span>· ${esc(evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id)))}</span><span>· ${esc(evidenceLabel(cl))}</span>${claimButton(cl.id)}</div>`;
 function metricMeta(m){
  const finance=financeClaimContextFor(m.claim_id),accounting=metricCurrentBasis(m,['revenue','annualized_revenue_run_rate','arr'].includes(m.kind)?m.gross_vs_net==='unspecified'?'Gross or net revenue not stated':title(m.gross_vs_net)+' basis':'');
  const period=finance?.display_date||metricContextMetaPeriod(m,m.kind==='revenue'?m.period_label||m.as_of:dateText(m.as_of));
@@ -575,10 +571,11 @@ function evidenceMetricContextHTML(m){return detailViewRenderer("evidenceMetricC
 const CONFIDENCE_GRADES={A:'Independent or buyer-side evidence, such as a filing or a customer who confirms the work.',B:'The company, an investor or another named first-hand source says it.',C:'Reporting by others, an estimate, or indirect evidence.',U:'Not confirmed. The fact may be undisclosed or still unresolved.'};
 function claimConfidenceHTML(cl){return detailViewRenderer("claimConfidenceHTML",this,arguments);}
 // Display wording for common research date notes (records unchanged).
+const LEGACY_EVIDENCE_DATE_NOTE='Date label preserved from research; access dates are not substituted.';
 const EVIDENCE_DATE_NOTES={
- 'Date label preserved from research; access dates are not substituted.':'This date comes from the source. We did not swap in the date we checked it.',
- 'The observation date is October 14. An undated page is not assigned a synthetic publication date.':'We read this source on 14 Oct 2026. When a page shows no date, we do not make one up.',
- 'Review date is not substituted for an unknown publication, closing or milestone date.':'When a publication, closing or milestone date is unknown, we leave it unknown. We do not use the date we checked the source.'
+ [LEGACY_EVIDENCE_DATE_NOTE]:'',
+ 'The observation date is October 14. An undated page is not assigned a synthetic publication date.':'The research observation was recorded on 14 Oct 2026.',
+ 'Review date is not substituted for an unknown publication, closing or milestone date.':''
 };
 let evidenceRecordHash='',evidenceReturnHash='';
 // Record links: #company/<id>/claim/<claim-id> opens the profile with this dialog.

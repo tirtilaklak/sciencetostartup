@@ -1415,7 +1415,26 @@ def claim_source_html(research, claim):
     """A risk claim's cited evidence, with the first source visible by default."""
     rows = [research.sources[sid] for sid in claim.get("source_ids", []) if sid in research.sources]
     if not rows: return '<span class="sub">No source recorded</span>'
-    return company_source_link(research, rows[0]) + company_citations(research, claim, rows[0]["id"])
+    primary = rows[0]
+    meta = source_meta(primary)
+    return company_source_link(research, primary) + (f'<span class="sub">{escape(meta)}</span>' if meta else '') + company_citations(research, claim, primary["id"])
+
+
+def risk_date_cell(research, claim):
+    day = claim.get("as_of")
+    if not month_text(day):
+        return '<td class="date" data-label="Date">Source date not stated</td>'
+    if day != claim.get("observed_on"):
+        return f'<td class="date" data-label="As of">{escape(month_text(day))}</td>'
+    label = "Research record date"
+    # The reviewed RWS risk is dated by the check of two undated pages.
+    reviewed = {"rws_trainai.source.d_rws3", "rws_trainai.source.d_rws6"}
+    source_ids = claim.get("source_ids", [])
+    if claim["id"] == "rws_trainai.claim.risks-1" and len(source_ids) == len(reviewed) and set(source_ids) == reviewed:
+        sources = [research.sources.get(sid, {}) for sid in source_ids]
+        if all(s.get("retrieval_status") == "checked" and s.get("accessed_on") == day and not s.get("published_on") for s in sources):
+            label = "Source checked"
+    return f'<td class="date" data-label="Date"><span class="sub">{escape(label)}</span>{escape(format_date(day))}</td>'
 
 
 def risks_html(research, company_id, events):
@@ -1428,9 +1447,8 @@ def risks_html(research, company_id, events):
         rows = "".join(f'<tr data-event="{escape(e["id"])}"><th scope="row">{escape(clean(e.get("title")))}<span class="sub">{escape(clean(e.get("detail")))}</span></th><td class="date" data-label="Date">{escape(month_text(e.get("date")) or clean(e.get("date")))}<span class="sub">{escape(EVENT_KINDS.get(e.get("kind")) or readable(e.get("kind")))}</span></td><td data-label="Status">{escape(clean(e.get("status")))}</td><td class="wide-cell" data-label="Sources">{sources(e)}</td></tr>' for e in dated)
         parts.append(f'<h3>Dated events</h3>\n<table class="wide events"><thead><tr><th scope="col">Event</th><th scope="col">Date</th><th scope="col">Status</th><th scope="col">Sources</th></tr></thead><tbody>{rows}</tbody></table>\n')
     if risks:
-        when = lambda value: f'<td class="date" data-label="As of">{escape(month_text(value))}</td>' if month_text(value) else '<td class="date" data-label="Date">Source date not stated</td>'
-        rows = "".join(f'<tr data-risk="{escape(c["id"])}"><th scope="row">{escape(shown_text(research, c.get("statement")))}</th>{when(c.get("as_of"))}<td class="wide-cell" data-label="Source">{claim_source_html(research, c)}</td></tr>' for c in risks)
-        parts.append(f'<h3>Risks named in the evidence</h3>\n<table class="wide risks"><thead><tr><th scope="col">Risk</th><th scope="col">As of</th><th scope="col">Source</th></tr></thead><tbody>{rows}</tbody></table>\n')
+        rows = "".join(f'<tr data-risk="{escape(c["id"])}"><th scope="row">{escape(shown_text(research, c.get("statement")))}</th>{risk_date_cell(research, c)}<td class="wide-cell" data-label="Source">{claim_source_html(research, c)}</td></tr>' for c in risks)
+        parts.append(f'<h3>Risks named in the evidence</h3>\n<table class="wide risks"><thead><tr><th scope="col">Risk</th><th scope="col">Date</th><th scope="col">Source</th></tr></thead><tbody>{rows}</tbody></table>\n')
     if dated: parts.append(f'<p class="muted">{EVENTS_NOTE} {escape(statuses_checked(dated))}</p>\n')
     parts.append(f'<p><a href="{ORIGIN}/explore/#company/{escape(company_id)}/risks">Open risks and disputes in Explore</a></p>\n')
     return "".join(parts)

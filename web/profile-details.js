@@ -7,7 +7,10 @@ function profileRelationshipGrid(id){const rows=profileRelationships(id),feature
 function profileRisks(id){
  const events=profileEvents(id),risks=profileRiskClaims(id);if(!events.length&&!risks.length)return '';
  const eventRows=events.map(e=>`<article class="relationship-card" data-profile-event="${attr(e.id)}"><div><p class="risk-date">${profileMonthHTML(e.date)}</p><p class="relationship-kind">${esc(PROFILE_EVENT_KINDS[e.kind]||title(e.kind))}</p></div><div class="relationship-account"><h4>${esc(e.title)}</h4><p>${esc(e.detail)}</p><p class="risk-meta">${esc(e.status)}${e.sources.map(s=>' · '+external(s.url,s.publisher)).join('')}</p></div></article>`).join('');
- const riskRows=risks.map(c=>`<article class="relationship-card" data-profile-risk="${attr(c.id)}"><div><p class="risk-date">${profileMonthHTML(c.as_of,'As of ')}</p></div><div class="relationship-account"><p>${esc(c.statement)}</p></div><div class="profile-card-source">${profileReferences([c.id])}</div></article>`).join('');
+ const riskRows=risks.map(c=>{
+  const date=c.as_of===c.observed_on?esc(profileRecordDate(c)):profileMonthHTML(c.as_of,'As of ');
+  return `<article class="relationship-card" data-profile-risk="${attr(c.id)}"><div><p class="risk-date">${date}</p></div><div class="relationship-account"><p>${esc(c.statement)}</p></div><div class="profile-card-source">${profileReferences([c.id])}</div></article>`;
+ }).join('');
  return profileSection('risks','Risks and disputes',`<div class="profile-risks">${events.length?`<h3 class="eyebrow">Dated events</h3><div class="profile-relationship-grid">${eventRows}</div>`:''}${risks.length?`<h3 class="eyebrow">Risks named in the evidence</h3><div class="profile-relationship-grid">${riskRows}</div>`:''}${events.length?`<p class="sub">Lawsuit entries describe allegations and court filings, not findings. Dates show when a case was filed or an event was reported. ${esc(profileStatusesChecked(events))}</p>`:''}</div>`);
 }
 function profilePeople(id){

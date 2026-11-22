@@ -28,7 +28,7 @@ function profileMetricEstimate(metric){
  const reviewed=profileReviewedObservationForClaim(claims[metric.claim_id]);
  return reviewed?.id===metric.id?reviewed:null;
 }
-function profileEvidenceDate(cl,fallbackDate,fallbackHeading){
+function profileEvidenceDate(cl){
  const finance=financeClaimContextFor(cl.id);
  if(finance){
   const sourceCheck=finance.date_role==='source_check';
@@ -41,19 +41,25 @@ function profileEvidenceDate(cl,fallbackDate,fallbackHeading){
  // This risk record uses the shared check date of two undated RWS pages.
  const rwsRiskSources=['rws_trainai.source.d_rws3','rws_trainai.source.d_rws6'];
  if(cl.id==='rws_trainai.claim.risks-1'&&cl.as_of===cl.observed_on&&cl.source_ids.length===rwsRiskSources.length&&
-    rwsRiskSources.every(id=>cl.source_ids.includes(id)&&sources[id]?.accessed_on===cl.observed_on&&!sources[id].published_on)){
+    rwsRiskSources.every(id=>cl.source_ids.includes(id)&&sources[id]?.retrieval_status==='checked'&&sources[id].accessed_on===cl.observed_on&&!sources[id].published_on)){
   return {text:profileDate(cl.observed_on),heading:'Source checked',description:'The cited sources give no publication dates.'};
  }
- return {text:fallbackDate,heading:fallbackHeading,description:''};
+ const heading=evidenceContextDateHeading(cl),dated=cl.as_of&&cl.as_of!=='undated';
+ const description=heading==='Research record date'&&dated&&cl.date_note===LEGACY_EVIDENCE_DATE_NOTE?'The record does not identify where this date came from.':'';
+ return {text:dated?evidenceDate(cl.as_of):'Not stated',heading,description};
+}
+function profileRecordDate(cl){
+ const date=profileEvidenceDate(cl);
+ return financeClaimContextFor(cl.id)?.display_date||date.heading+' · '+date.text;
 }
 function profileFinancingEvidenceLink(id){
  const href=companySummaryFor(id)?.financingEvidenceHref;
  return href?`<a href="${attr(href)}">Read ${esc(companies[id].name)}’s financing evidence ${iconHTML('right')}</a>`:'';
 }
 function profileProvenance(cl){
- const finance=financeClaimContextFor(cl.id),date=profileEvidenceDate(cl,evidenceContextArchiveDate(cl,profileDate(cl.as_of)));
+ const finance=financeClaimContextFor(cl.id);
  const scope=finance?.scope||evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id));
- return `<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(finance?.display_date||(date.heading?date.heading+' '+date.text:date.text))}</span><span>· ${esc(scope)}</span><span>· ${esc(profileEvidenceLabel(cl))}</span>${claimButton(cl.id,'Source')}</div>`;
+ return `<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(profileRecordDate(cl))}</span><span>· ${esc(scope)}</span><span>· ${esc(profileEvidenceLabel(cl))}</span>${claimButton(cl.id,'Source')}</div>`;
 }
 // Canonical company id for a route value (case and alias fixes).
 function profileRouteCompany(value=routeParts()[1]){const raw=String(value??''),lower=raw.toLowerCase(),aliases=window.RESEARCH_ALIASES;return isCompanyId(raw)?raw:isCompanyId(lower)?lower:aliases&&Object.hasOwn(aliases,lower)&&isCompanyId(aliases[lower])?aliases[lower]:'';}
@@ -157,7 +163,7 @@ function profileMetricDate(m){
  const estimate=profileMetricEstimate(m);if(estimate)return estimate.period.label;
  const corrected=metricCurrentPeriod(m);if(corrected)return corrected;
  if(m.kind==='revenue')return readableDate(m.period_label||financialPeriod(m));
- if(m.as_of==='undated')return 'Undated · checked '+profileDate(claims[m.claim_id].observed_on);
+ if(m.as_of==='undated')return 'Undated';
  const date=profileDate(String(m.as_of).replace(/^as of\s+/i,''));return /^(\d|[A-Z][a-z]{2,3} \d{4})/.test(date)?'As of '+date:date.charAt(0).toUpperCase()+date.slice(1);
 }
 function profileMetricYear(m){const rank=dateRank(m.as_of);return rank==='0000'?null:Number(rank.slice(0,4));}
