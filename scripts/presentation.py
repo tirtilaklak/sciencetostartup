@@ -653,11 +653,12 @@ def work_export_rows(work, research):
         row["uncertain"] = work_uncertain(route)
         row["field_reviews"] = work_field_reviews(route)
         link_keys = ("date", "result", "url", "http_status", "final_url")
-        for key, keys in (("last_link_check", link_keys), ("last_route_check", (*link_keys, "application_check", "application_checks"))):
+        page_keys = (*link_keys, "checked_at", "retrieval_reason", "application_check", "application_checks")
+        for key, keys in (("last_link_check", link_keys), ("last_route_check", page_keys)):
             if route.get(key):
                 row[key] = retain(route[key], keys)
         recorded = retain((route.get("research_record") or {}).get("route"),
-                          ("overview_url", "application_url", "checked_on", "live_application_verified"))
+                          ("url", "overview_url", "application_url", "checked_on", "live_application_verified"))
         if recorded:
             row["research_record"] = {"route": recorded}
         row["sources"] = [retain(source, ("id", "url", "source_type", "title", "accessed_on", "purpose", "field_support"))
@@ -668,13 +669,20 @@ def work_export_rows(work, research):
         action_urls = {action["url"] for action in row["source_actions"]}
         separate_archive = any(action.get("purpose") == "archived_listing" and action.get("url") != route.get("url")
                                and action.get("url") in action_urls for action in review.get("actions", []))
+        page_check = route.get("last_route_check") or {}
+        if page_check.get("result") in ("official_role_not_found", "official_role_not_found_redirect"):
+            row["source_ids"] = route.get("source_ids", [])
+        history = route.get("check_history") or []
+        if not separate_archive:
+            history = [check for check in history if check.get("result") == "application_form_available"
+                       and (route.get("status") == "historical" or check.get("url"))]
+        if history:
+            row["check_history"] = [retain(check, ("date", "result", "note", "url")) for check in history]
         receipt_keys = ("id", "source_id", "checked_on", "checked_at", "scope", "result", "http_status",
                         "approved", "approval_basis", "reviewed_fields")
         source_ids = {source.get("id") for source in row["sources"] if source.get("id")}
         if separate_archive:
             receipt_keys += ("url", "final_url", "retrieval_reason", "rendered_observation")
-            if route.get("check_history"):
-                row["check_history"] = [retain(check, ("date", "result", "note")) for check in route["check_history"]]
         receipts = [retain(receipt, receipt_keys)
                     for receipt in review.get("receipts", [])
                     if receipt.get("id") == review.get("approved_terms_receipt_id")

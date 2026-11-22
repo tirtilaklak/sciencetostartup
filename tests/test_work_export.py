@@ -14,6 +14,10 @@ from presentation import work_export_rows
 
 
 class WorkExportTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.routes = json.loads((ROOT / "data/work-routes.json").read_text())["routes"]
+
     def csv_rows(self, routes):
         projected = work_export_rows({"routes": routes}, SimpleNamespace(companies={}))
         script = (ROOT / "web/work-core.js").read_text() + """
@@ -37,23 +41,27 @@ process.stdout.write(S2SWork.csvFor(rows, {}));
         description_review = {"recorded_url_purpose": "description", "actions": [description_action]}
         cases = {
             "Description with separate current application": (
-                dict(role, editorial_review=dict(description_review, actions=[description_action, separate_action])), "", None),
+                dict(role, editorial_review=dict(description_review, actions=[description_action, separate_action])), "", None,
+                None, "description"),
             "Combined description and application instructions": (
-                dict(role, editorial_review=dict(description_review, actions=[combined_action])), description, description),
+                dict(role, editorial_review=dict(description_review, actions=[combined_action])), description, description,
+                "application", "application"),
             "Description with separate original application": (
                 dict(role, editorial_review=description_review,
                      research_record={"route": {"overview_url": description, "application_url": application}}),
-                application, application),
-            "Legacy URL": (role, description, None),
+                application, application, "application", "description"),
+            "Legacy URL": (role, description, None, "description", "description"),
         }
-        rows = self.csv_rows([route for route, _, _ in cases.values()])
-        for row, (name, (_, original_column, application_url)) in zip(rows, cases.items(), strict=True):
+        rows = self.csv_rows([case[0] for case in cases.values()])
+        for row, (name, (_, original_column, application_url, legacy_purpose, action_purpose)) in zip(rows, cases.items(), strict=True):
             with self.subTest(name=name):
                 self.assertEqual(row["original_application_url"], original_column)
                 self.assertEqual(row["current_action_url"], description)
                 urls = json.loads(row["original_url_details"])
                 self.assertEqual(urls["source_url"], description)
                 self.assertEqual(urls["application_url"], application_url)
+                self.assertEqual(urls["legacy_url_purpose"], legacy_purpose)
+                self.assertEqual(urls["current_action_purpose"], action_purpose)
 
     def test_replaced_listing_keeps_each_bound_source_observation(self):
         description, archived = "https://example.org/role", "https://example.org/original"
@@ -74,3 +82,127 @@ process.stdout.write(S2SWork.csvFor(rows, {}));
         self.assertEqual(json.loads(row["original_url_details"])["archived_source_url"], archived)
         self.assertEqual(json.loads(row["review_evidence"])["source_receipts"],
                          [dict(first, url=archived), dict(second, url=archived)])
+
+    def test_release_urls_have_machine_readable_purpose_and_exact_source_bindings(self):
+        rows = self.csv_rows(self.routes)
+        self.assertEqual([row["route_id"] for row in rows], [route["id"] for route in self.routes])
+        self.assertEqual(len(rows[0]), 33)
+        career_rows = []
+        for row, route in zip(rows, self.routes, strict=True):
+            with self.subTest(route=row["route_id"]):
+                urls = json.loads(row["original_url_details"])
+                sources = {source["id"]: source for source in route["sources"]}
+                self.assertEqual(urls["recorded_url"], route["url"])
+                self.assertEqual(bool(row["original_application_url"]), bool(urls["legacy_url_purpose"]))
+                self.assertEqual(bool(row["current_action_url"]), bool(urls["current_action_purpose"]))
+                if urls["legacy_url_purpose"] == "application":
+                    self.assertEqual(row["original_application_url"], urls["application_url"])
+                for url, key in ((row["current_action_url"], "current_action_source_ids"),
+                                 (urls["source_url"], "source_ids"),
+                                 (urls["application_url"], "application_source_ids"),
+                                 (urls.get("archived_source_url"), "archived_source_ids")):
+                    self.assertTrue(all(sources[sid]["url"] == url for sid in urls.get(key, [])))
+                for observation in urls.get("source_observations", []):
+                    self.assertEqual(observation["accessed_on"], sources[observation["source_id"]]["accessed_on"])
+                for check in urls.get("checked_destinations", []):
+                    self.assertTrue(check["source_ids"])
+                    self.assertTrue(all(sources[sid]["url"] == check["url"] for sid in check["source_ids"]))
+                if row["opportunity_kind"] == "career_page" or row["route_id"] == "rws_trainai.work.polaris-asr":
+                    career_rows.append(row)
+                    self.assertEqual(urls["legacy_url_purpose"], "career_board")
+                    self.assertEqual(urls["current_action_purpose"], "career_board")
+                    self.assertIsNone(urls["application_url"])
+        self.assertEqual(len(career_rows), 24)
+
+    def test_archived_ashby_listings_are_recoverable_apart_from_generic_boards(self):
+        earlier_urls = {
+            "bespoke_labs.work.devops-sre": "bespokelabs/1548fb45-e179-4c28-aec1-d1f3461028e8",
+            "bespoke_labs.work.corporate-finance": "bespokelabs/4402a6fd-0785-49d6-8bd8-d8b033907f0b/",
+            "polymath_ai_labs.work.research-resident": "polymath/feac8f33-2e28-4434-bff5-cf26c849f270",
+            "elorian.work.model-safety": "elorian-ai-inc/69acef27-d755-4b22-8257-94759edb0efb",
+            "elorian.work.rl-infrastructure-engineer": "elorian-ai-inc/7fc67724-f805-4715-a157-fa00e050bf8d",
+        }
+        checks = {route["id"]: route["last_route_check"]["date"] for route in self.routes if route["id"] in earlier_urls}
+        rows = self.csv_rows([route for route in self.routes if route["id"] in earlier_urls])
+        self.assertEqual(len(rows), len(earlier_urls))
+        for row in rows:
+            with self.subTest(route=row["route_id"]):
+                urls = json.loads(row["original_url_details"])
+                evidence = json.loads(row["review_evidence"])
+                earlier = "https://jobs.ashbyhq.com/" + earlier_urls[row["route_id"]]
+                self.assertEqual(urls["archived_source_url"], earlier)
+                self.assertEqual(urls["source_url"], earlier)
+                self.assertTrue(urls["source_observations"])
+                self.assertEqual(evidence["page_check"]["url"], earlier)
+                self.assertEqual(evidence["page_check"]["date"], checks[row["route_id"]])
+                self.assertIsNone(urls["application_url"])
+                self.assertEqual(urls["legacy_url_purpose"], "career_board")
+                self.assertEqual(urls["current_action_purpose"], "career_board")
+                self.assertEqual(row["original_application_url"], row["current_action_url"])
+                self.assertNotEqual(row["current_action_url"], earlier)
+
+    def test_historical_forms_keep_prior_render_and_later_unavailable_checks(self):
+        observed = {
+            "g2i.work.senior-swe-training": "2026-10-23",
+            "afterquery.work.research-engineer": "2026-10-14",
+            "afterquery.work.research-scientist-frontier-evaluations": "2026-10-14",
+            "afterquery.work.senior-software-engineer-security-infrastructure": "2026-10-14",
+        }
+        rows = self.csv_rows([route for route in self.routes if route["id"] in observed])
+        self.assertEqual(len(rows), len(observed))
+        for row in rows:
+            with self.subTest(route=row["route_id"]):
+                urls = json.loads(row["original_url_details"])
+                evidence = json.loads(row["review_evidence"])
+                exact = row["original_application_url"]
+                self.assertEqual(urls["application_url"], exact)
+                self.assertEqual(urls["legacy_url_purpose"], "application")
+                self.assertEqual(urls["current_action_purpose"], "career_board")
+                self.assertNotEqual(row["current_action_url"], exact)
+                self.assertEqual(urls["application_check"], {"url": exact, "date": observed[row["route_id"]],
+                                 "result": "application_form_available", "verified_in_research": True})
+                checks = evidence["archive_disposition"]["checks"]
+                self.assertTrue(any(check["url"] == exact and check.get("http_status") == 404
+                                    and check["date"] > observed[row["route_id"]] for check in checks))
+
+    def test_archived_descriptions_and_checked_form_destinations_keep_distinct_roles(self):
+        expected = {
+            "appen.work.sage-media": ("archived_listing", "network", "application_migrated",
+                                    "https://app.crowdgen.com/apply/signup?p=6RA3aZSrnQdD"),
+            "apto.work.ai-data-research-engineer": (None, "career_board", "application_unpublished",
+                                                   "https://herp.careers/v1/apto/NyufvNJGg7Td"),
+            "terac.work.rl-environment-creation": ("archived_listing", "archived_listing", None, None),
+            "quesma.work.route-review": ("source", "source", None, None),
+            "apto.work.harbest-experts": ("network", "registration", None, None),
+            "ooak.work.data-quality-specialist": (None, "description", None, None),
+        }
+        rows = {row["route_id"]: row for row in self.csv_rows([route for route in self.routes if route["id"] in expected])}
+        self.assertEqual(rows.keys(), expected.keys())
+        for route_id, (legacy_purpose, action_purpose, result, application) in expected.items():
+            with self.subTest(route=route_id):
+                row = rows[route_id]
+                urls = json.loads(row["original_url_details"])
+                evidence = json.loads(row["review_evidence"])
+                self.assertEqual(urls["legacy_url_purpose"], legacy_purpose)
+                self.assertEqual(urls["current_action_purpose"], action_purpose)
+                self.assertEqual(urls["application_url"], application)
+                self.assertNotIn("application_check", urls)
+                if result:
+                    self.assertNotEqual(urls["source_url"], application)
+                    self.assertEqual(evidence["application_check"]["url"], application)
+                    self.assertEqual(evidence["application_check"]["retrieval_reason"], result)
+                    observed_on = [item["accessed_on"] for item in urls["source_observations"]
+                                   if item["source_id"] in urls["source_ids"]]
+                    self.assertLess(min(observed_on), evidence["application_check"]["date"])
+
+        harbest = json.loads(rows["apto.work.harbest-experts"]["original_url_details"])
+        self.assertEqual(harbest["checked_destinations"][0]["purpose"], "registration")
+        terac = json.loads(rows["terac.work.rl-environment-creation"]["original_url_details"])
+        self.assertEqual(terac["archived_source_url"], rows["terac.work.rl-environment-creation"]["current_action_url"])
+        ooak = json.loads(rows["ooak.work.data-quality-specialist"]["original_url_details"])
+        review = json.loads(rows["ooak.work.data-quality-specialist"]["review_evidence"])
+        checks = [review["application_check"], *review["application_checks"]]
+        self.assertEqual([(check["http_status"], check["retrieval_reason"]) for check in checks],
+                         [(404, "http_not_found"), (406, "http_not_acceptable"), (200, "sign_in")])
+        self.assertEqual([(check["url"], check["purpose"]) for check in ooak["checked_destinations"]],
+                         list(dict.fromkeys((check["url"], "application") for check in checks)))

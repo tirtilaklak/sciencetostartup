@@ -211,11 +211,16 @@ const S2SWork = (() => {
     const review = { status: route.status };
     const add = (key, value) => { if (value != null && value !== '') review[key] = value; };
     add('availability_checked_on', route.availability_checked_on);
-    const checkData = ({ date, result, url, final_url, http_status }) => ({
-      date, result, ...(url && { url }), ...(final_url && { final_url }), ...(http_status != null && { http_status })
+    const checkData = ({ date, result, url, final_url, http_status, checked_at, retrieval_reason }) => ({
+      date, result, ...(url && { url }), ...(final_url && { final_url }), ...(http_status != null && { http_status }),
+      ...(checked_at && { checked_at }), ...(retrieval_reason && { retrieval_reason })
     });
     if (link?.date) add('http_check', checkData(link));
-    if (page?.date) add('page_check', checkData(page));
+    if (page?.date) {
+      const url = page.url || (original.recorded_url_purpose === 'career_board' && missingRole(page)
+        ? original.archived_source_url : null);
+      add('page_check', checkData({ ...page, url }));
+    }
     if (page?.application_check) add('application_check', page.application_check);
     if (page?.application_checks?.length) add('application_checks', page.application_checks);
     add('key_terms_source_id', w4ApprovedTermsReceipt(route)?.source_id);
@@ -235,7 +240,9 @@ const S2SWork = (() => {
           final_url, http_status, retrieval_reason, rendered_observation, approved, approval_basis, reviewed_fields }];
       });
       if (receipts.length) add('source_receipts', receipts);
-      if (route.check_history?.length) add('check_history', route.check_history.map(({ date, result, note }) => ({ date, result, note })));
+    }
+    if (route.check_history?.length) {
+      add('check_history', route.check_history.map(({ date, result, url, note }) => ({ date, result, url, note })));
     }
     if (disposition?.approval_basis === 'source_content_review' && disposition.source_ids?.length
         && disposition.source_ids.every(getSource)) {
@@ -249,51 +256,128 @@ const S2SWork = (() => {
     return review;
   }
 
-  function originalUrls(route) {
+  function missingRole(check) {
+    return ['official_role_not_found', 'official_role_not_found_redirect'].includes(check?.result);
+  }
+
+  function originalUrls(route, action) {
     const listed = route.research_record?.route;
-    const at = url => (route.sources || []).filter(source => url && source.url === url);
-    const actions = (route.editorial_review?.actions || []).filter(action =>
-      at(action.url).some(source => source.id === action.source_id)
+    const editorial = route.editorial_review;
+    const page = route.last_route_check;
+    const sources = route.sources || [];
+    const at = url => sources.filter(source => url && source.url === url && source.id);
+    const idsAt = url => at(url).map(source => source.id);
+    const actions = (editorial?.actions || []).filter(item =>
+      at(item.url).some(source => source.id === item.source_id)
     );
-    const rolePage = at(listed?.overview_url).length ? listed.overview_url : route.url;
-    const form = route.form_available === true ? at(route.url).find(source =>
+    const kind = w4OpportunityKind(route);
+    const form = at(route.url).find(source =>
       source.source_type === 'company' && source.title?.endsWith(' — public application form')
-    ) : null;
-    const originalAction = actions.find(action => action.url === route.url && action.purpose === 'application');
-    const archivedAction = actions.find(action => action.url !== route.url && action.purpose === 'archived_listing');
-    const application = at(listed?.application_url).length ? listed.application_url : form?.url || originalAction?.url;
-    const original = { source_url: at(rolePage).length ? rolePage : null, application_url: application || null };
-    const purpose = route.editorial_review?.recorded_url_purpose;
-    if (purpose || original.source_url === route.url) original.recorded_url_purpose = purpose || (application === route.url ? 'application' : 'source');
-    if (original.source_url) original.source_ids = at(rolePage).map(source => source.id);
-    if (archivedAction) {
-      original.archived_source_url = archivedAction.url;
-      original.archived_source_ids = at(archivedAction.url).map(source => source.id);
+    );
+    const earlierForm = (route.check_history || []).find(check => check.result === 'application_form_available' && check.date
+      && (check.url ? at(check.url).length : form?.accessed_on && form.accessed_on === check.date));
+    const originalAction = actions.find(item => item.url === route.url && item.purpose === 'application');
+    const recordedApplication = at(listed?.application_url).length ? listed.application_url
+      : (route.form_available === true ? form?.url : null) || originalAction?.url;
+
+    const checkedDestinations = new Map();
+    const formerApplications = new Set();
+    for (const check of [page?.application_check, ...(page?.application_checks || [])]) {
+      const matching = at(check?.url);
+      if (!matching.length) continue;
+      const former = route.status === 'historical'
+        && ['application_migrated', 'application_unpublished'].includes(check.retrieval_reason)
+        && matching.some(source => source.purpose === 'historical_observation');
+      const purpose = former ? 'application' : matching.find(source =>
+        ['application', 'registration', 'network'].includes(source.purpose))?.purpose;
+      if (former) formerApplications.add(check.url);
+      if (purpose) checkedDestinations.set(check.url, { url: check.url, purpose, source_ids: idsAt(check.url) });
     }
+    const formerApplication = formerApplications.size === 1 ? [...formerApplications][0] : null;
+    const earlierApplication = earlierForm && (earlierForm.url || form?.url);
+    const application = recordedApplication || earlierApplication || formerApplication;
+
+    // Some archived rows replaced the exact URL with a board. Recover the role only from its bound source.
+    let replacedListing;
+    if (route.status === 'historical' && missingRole(page) && !at(route.url).length) {
+      const candidates = new Set(sources.filter(source => source.id && source.url && source.url !== route.url
+        && (route.source_ids?.includes(source.id) || listed?.url === source.url || source.title === route.role))
+        .map(source => source.url));
+      if (candidates.size === 1) [replacedListing] = candidates;
+    }
+    const rolePage = replacedListing || (at(listed?.overview_url).length ? listed.overview_url : route.url);
+    const archived = actions.find(item => item.purpose === 'archived_listing')?.url || replacedListing
+      || (kind === 'named_listing' && at(route.url).length
+        && (missingRole(page) || editorial?.disposition?.state === 'historical_page_unavailable'
+          || ['official_closed_notice', 'official_listing_closed'].includes(page?.result)) ? route.url : null);
+    const isRegistration = kind === 'network_program' && listed?.url === route.url && at(route.url).length
+      && page?.result === 'Live public signup landing page verified';
+    let recordedPurpose = editorial?.recorded_url_purpose;
+    if (!recordedPurpose) {
+      if (kind === 'career_page' || replacedListing) recordedPurpose = 'career_board';
+      else if (application === route.url && application) recordedPurpose = 'application';
+      else if (isRegistration) recordedPurpose = 'registration';
+      else if (kind === 'network_program') recordedPurpose = 'network';
+      else if (archived === route.url && archived) recordedPurpose = 'archived_listing';
+      else if (kind === 'named_listing' && !WORK_ROUTE_ARCHIVE.has(route.status) && at(route.url).length) recordedPurpose = 'description';
+      else recordedPurpose = 'source';
+    }
+
+    // Keep the legacy values, including cells cleared for documented description-only records.
+    const legacy = editorial?.recorded_url_purpose === 'description' ? recordedApplication : route.url;
+    const current = actions.find(item => item.url === action.url && item.label === action.label)
+      || actions.find(item => item.url === action.url);
+    const alternative = editorial?.alternative_destination;
+    let actionPurpose = current?.purpose;
+    if (!actionPurpose && action.url) {
+      if (alternative?.url === action.url && idsAt(action.url).includes(alternative.source_id)) actionPurpose = 'career_board';
+      else if (action.url === route.url) actionPurpose = recordedPurpose;
+      else actionPurpose = checkedDestinations.get(action.url)?.purpose || 'source';
+    }
+    const original = {
+      source_url: at(rolePage).length ? rolePage : null,
+      application_url: application || null,
+      recorded_url: route.url || null,
+      recorded_url_purpose: route.url ? recordedPurpose : null,
+      legacy_url_purpose: legacy ? (legacy === application ? 'application' : recordedPurpose) : null,
+      current_action_purpose: actionPurpose || null
+    };
+    if (original.source_url) original.source_ids = idsAt(rolePage);
+    if (at(action.url).length) original.current_action_source_ids = current ? [current.source_id] : idsAt(action.url);
+    if (archived) {
+      original.archived_source_url = archived;
+      original.archived_source_ids = idsAt(archived);
+    }
+    if (archived || formerApplication) {
+      const observed = new Set([rolePage, archived, application]);
+      original.source_observations = sources.filter(source => source.id && source.accessed_on && observed.has(source.url))
+        .map(({ id, accessed_on }) => ({ source_id: id, accessed_on }));
+    }
+    if (checkedDestinations.size) original.checked_destinations = [...checkedDestinations.values()];
     if (application) {
-      original.application_source_ids = at(application).map(source => source.id);
-      if (typeof listed?.live_application_verified === 'boolean' && listed.checked_on) {
+      original.application_source_ids = idsAt(application);
+      if (application === listed?.application_url && typeof listed.live_application_verified === 'boolean' && listed.checked_on) {
         original.application_check = { date: listed.checked_on, verified_in_research: listed.live_application_verified };
-      } else if (form?.accessed_on) {
+      } else if (application === earlierApplication) {
+        original.application_check = { date: earlierForm.date, verified_in_research: true, result: earlierForm.result, url: application };
+      } else if (application === form?.url && form.accessed_on) {
         original.application_check = { date: form.accessed_on, verified_in_research: true };
       }
     }
-    return original;
+    return { original, legacy };
   }
 
   function csvFor(routes, criteria, destination = route => route.source_actions?.[0] || {}) {
     const rows = routes.map(route => {
       const action = destination(route);
-      const original = originalUrls(route);
-      // The legacy column keeps its values unless the recorded URL is explicitly a description.
-      const originalApplication = original.recorded_url_purpose === 'description' ? original.application_url : route.url;
+      const { original, legacy } = originalUrls(route, action);
       return [
         route.id, route.company_name || route.company_id, route.role, w4OpportunityKind(route), w4Engagement(route),
         w4Status(route) || 'Recorded listing', route.pay_label, route.pay_terms?.unit,
         route.pay_terms?.hourly_comparable === true, route.pay_terms?.currency, w4Arrangements(route).join(' | '),
         route.geography, (route.requirements || []).join(' | '), route.assessment, route.hours, route.duration,
         w4TermsReviewDate(route), w4ApprovedTermsReceipt(route) ? 'key_terms' : route.terms_checked_on ? 'pay_terms' : '',
-        originalApplication, action.url, action.label, (route.sources || []).map(source => source.url).join(' | '),
+        legacy, action.url, action.label, (route.sources || []).map(source => source.url).join(' | '),
         JSON.stringify(fieldReviews(route)), 'https://sciencetostartup.com/company/' + encodeURIComponent(route.company_id) + '/',
         ...keys.map(key => criteria[key]), w4PayQualification(route), JSON.stringify(reviewEvidence(route, original)),
         JSON.stringify(original)

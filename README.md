@@ -8,6 +8,20 @@ Dated snapshots begin on 2026-11-16, with topic/type/search filters, source date
 expandable findings and limits, and links to original sources. The daily local
 automation targets 08:00 Pacific. See [daily scan operations](docs/daily-scan.md).
 
+## Work CSV
+
+The Work, Compare and Explore downloads use the same columns. The legacy
+`original_application_url` can contain a careers board, description or other
+source. Parse the `original_url_details` JSON to get `legacy_url_purpose` and
+`current_action_purpose` for the two URL columns. Use `application_url` for the
+recorded role-specific application and `archived_source_url` for an exact former
+listing. Either may be empty. `checked_destinations` identifies other checked
+application, registration or network URLs and their source IDs.
+
+Source dates appear in `source_observations` for archived records and former
+applications. Look in `review_evidence` for later checks by exact URL and for
+access limits such as closure, migration or sign-in.
+
 ## Research publication
 
 The new `/research/` hub connects readable paper, dataset, benchmark and workflow
