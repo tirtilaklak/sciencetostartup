@@ -106,8 +106,15 @@ for (const handoff of companyHandoffs) {
     await expect(page.getByRole('combobox', { name: 'Business group' })).toHaveValue(group);
     await expect(source).toHaveAttribute('href', handoff.href);
     expect(await orderedCompanies()).toEqual(before);
-    const following = handoff.following ? page.locator(handoff.following) : page.locator('[data-company]:visible h3 a').first();
-    await expectReturn(page, source, following, position);
+    if (handoff.following) {
+      await expectReturn(page, source, page.locator(handoff.following), position);
+    } else {
+      const revenue = page.getByRole('link', { name: 'Revenue & growth', exact: true });
+      await expect(revenue).toHaveAttribute('href', '/explore/#business-health');
+      await expectReturn(page, source, revenue, position);
+      await page.keyboard.press('Tab');
+      await expect(page.locator('[data-company]:visible h3 a').first()).toBeFocused();
+    }
   });
 }
 

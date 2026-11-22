@@ -154,7 +154,7 @@ class CurrentCompanyRenderingTests(unittest.TestCase):
         self.assertIn("Data annotation", page.cards[0]["data-search"])
         directory_text = " ".join(page.text)
         self.assertRegex(directory_text, r"1 compan(?:y|ies)")
-        self.assertIn("Compare uses the 0 historical profiles", directory_text)
+        self.assertIn("Choose up to three of 0 historical profiles in Compare.", directory_text)
         self.assertIn("Wikipedia context and official sources for their offerings", directory_text)
         self.assertEqual(page.links.count("/current-companies.json"), 1)
         self.assertIn(sp.ORIGIN + cc.company_path(entry), page.links)

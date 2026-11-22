@@ -349,7 +349,12 @@ class StaticPageTests(unittest.TestCase):
     def test_index_states_coverage_limits(self):
         text = (self.dist / "companies/index.html").read_text()
         self.assertIn("The guide covers selected companies.", text)
-        self.assertIn("The guide covers selected companies.", (self.dist / "method/index.html").read_text())
+        method = (self.dist / "method/index.html").read_text()
+        method_coverage = re.search(r'<details class="method-detail" id="coverage-notes">.*?</details>', method, re.S).group(0)
+        compiled = sp.format_date(self.data["meta"]["as_of"])
+        self.assertIn(f'Historical company dataset v{self.data["dataset_version"]} · research compiled {compiled}', method_coverage)
+        self.assertIn(f'This dataset covers {len(self.companies)} company profiles and {len(self.data["sources"])} source records.', method_coverage)
+        self.assertIn(f'Browse the <a href="{ORIGIN}/companies/">current company directory</a> for newer profiles.', method_coverage)
         count = len(self.current_companies["entries"])
         supplemental = '<a href="/current-companies.json">Supplemental records for ' + str(count) + ' added companies (JSON)</a>'
         self.assertEqual(text.count('href="/current-companies.json"'), 1)
