@@ -1,6 +1,4 @@
-const { test, expect } = require('@playwright/test');
-
-test.use({ launchOptions: { firefoxUserPrefs: { 'font.minimum-size.x-western': 28, 'font.minimum-size.x-unicode': 28 } } });
+const { test, expect, firefox } = require('@playwright/test');
 
 const handshakeId = 'handshake_ai.metric.major-growth_metrics-0';
 const mercorRunRateId = 'mercor.metric.oct14-major-financial-2';
@@ -142,11 +140,23 @@ test('Market marks the current observation by its exact ID', async ({ page }) =>
   await expect(cell).toHaveAttribute('aria-current', 'true');
 });
 
-test.describe('Market with a 28px minimum font', () => {
-  test.use({ viewport: { width: 320, height: 720 } });
+const enlargedText = test.extend({
+  enlargedPage: async ({ baseURL }, use) => {
+    const browser = await firefox.launch({
+      firefoxUserPrefs: { 'font.minimum-size.x-western': 28, 'font.minimum-size.x-unicode': 28 },
+    });
+    try {
+      await use(await browser.newPage({ baseURL, viewport: { width: 320, height: 720 } }));
+    } finally {
+      await browser.close();
+    }
+  },
+});
 
-  test('advanced picks show the entire applied measure and scope', async ({ page, browserName }) => {
-    test.skip(browserName !== 'firefox', 'Firefox provides a real minimum font preference');
+enlargedText.describe('Market with a 28px minimum font', () => {
+  enlargedText.skip(({ browserName }) => browserName !== 'firefox', 'Firefox provides a real minimum font preference');
+
+  enlargedText('advanced picks show the entire applied measure and scope', async ({ enlargedPage: page }) => {
     const dialog = await openMarket(page);
     await page.locator('#bh-advanced > summary').click();
     const measure = page.getByRole('combobox', { name: 'Measure', exact: true });
@@ -187,8 +197,7 @@ test.describe('Market with a 28px minimum font', () => {
     await expect(bar).toBeFocused();
   });
 
-  test('Market anchors account for the sticky header once', async ({ page, browserName }) => {
-    test.skip(browserName !== 'firefox', 'Firefox provides a real minimum font preference');
+  enlargedText('Market anchors account for the sticky header once', async ({ enlargedPage: page }) => {
     const heading = page.locator('#business-health-heading');
     const section = page.locator('#business-health');
     const expectAnchor = async () => {
