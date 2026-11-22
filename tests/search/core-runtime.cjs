@@ -44,12 +44,12 @@ function harness(url = 'https://fixture.test/') {
       emit(name,event={}){for(const fn of callbacks[name]||[])fn({target:this,preventDefault(){this.prevented=true;},...event});},
       remove(){this.removed=true;},closest(){return null;}};
   }
-  const document = {getElementById:id=>id==='home-work-example'?null:node(id), activeElement:null, hidden:false,
+  const document = {getElementById:id=>id==='home-work-example'?null:node(id), querySelector:()=>null, activeElement:null, hidden:false,
     createElement:()=>({remove(){this.removed=true;}}),head:{append:script=>scripts.push(script)},
     addEventListener(name, fn){(listeners.get(name)||listeners.set(name,[]).get(name)).push(fn);}};
   node('home-config').textContent=JSON.stringify({candidates:[]});
   const location = new URL(url), history = {state:{kept:true}, replaceState(state,unused,value){this.state=state;const next=new URL(value,location);location.href=next.href;}};
-  const context = {document,location,history,URL,Date,window:null,setInterval(){},setTimeout(fn,delay){timers.set(++timerId,{fn,delay});return timerId;},clearTimeout:id=>timers.delete(id)};
+  const context = {document,location,history,URL,URLSearchParams,performance:{getEntriesByType:()=>[]},Date,window:null,setInterval(){},setTimeout(fn,delay){timers.set(++timerId,{fn,delay});return timerId;},clearTimeout:id=>timers.delete(id)};
   context.window=context;
   vm.runInNewContext(read('web/home-runtime.js'),context);
   return {context,document,location,history,node,scripts,timers,click:()=>node('home-search-open').emit('click',{button:0}),

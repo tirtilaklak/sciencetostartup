@@ -52,4 +52,8 @@ def optional_script_source(root, name):
         source = (Path(root) / "web/work-core.js").read_text() + "\n" + source
     if name in SEARCH_COMPONENTS:
         source = (Path(root) / "web/search-core.js").read_text() + "\n" + source
+    if name == "work-page.js":
+        # A timed-out script can still execute before a retry on another URL.
+        # Keep its lexical bindings local so the active request can initialize.
+        source = "(() => {\n" + source + "\n})();\n"
     return source

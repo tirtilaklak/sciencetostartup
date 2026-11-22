@@ -117,3 +117,9 @@
   .w4-compact-pay .w4-status { font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) { .w4-details > summary > span { transition: none; } }
+
+.work-card-v4 .w4-details > summary{min-height:44px}
+.work-card-v4 .w4-open{min-width:44px;min-height:44px;white-space:normal;overflow-wrap:anywhere}
+.w4-historical-pay{display:block;color:var(--w4-muted);font-size:11px;line-height:1.5}
+.w4-secondary-actions{display:flex;flex-wrap:wrap;gap:4px 20px;margin:12px 0;padding:0;list-style:none}
+.w4-secondary-actions a{display:inline-flex;gap:5px;align-items:center;min-height:44px}
