@@ -179,6 +179,29 @@ test.describe('390px Chromium matrix', () => {
   });
 });
 
+test.describe('Market figure return with a sorted table', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test('closing a figure reveals its opener after the selected measure reorders the rows', async ({ page, hasTouch }) => {
+    await page.goto('/explore/#business-health');
+    await page.locator('.bh-coverage-disclosure > summary').click();
+    await page.locator('#bh-sort').selectOption('signal');
+    const opener = matrixButton(page, 'appen', 'delivery');
+    const rowBefore = await opener.evaluate(button => button.closest('tr').rowIndex);
+    if (hasTouch) await opener.tap();
+    else await opener.click();
+    const close = page.getByRole('button', { name: 'Close figure details' });
+    if (hasTouch) await close.tap();
+    else await close.click();
+    await expect(opener).toBeFocused();
+    expect(await opener.evaluate(button => button.closest('tr').rowIndex)).not.toBe(rowBefore);
+    await expect.poll(() => opener.evaluate(button => {
+      const box = button.getBoundingClientRect();
+      return button.contains(document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2));
+    })).toBe(true);
+  });
+});
+
 const sharedHeaders = {
   Market: '/explore/',
   Work: '/work/?pay=hourly&sort=hourly',
