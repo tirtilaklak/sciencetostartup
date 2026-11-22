@@ -1996,8 +1996,8 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
         f'<option value="{key}">{escape(engagement_filter_labels.get(key, label))}</option>'
         for key, label in WORK_ENGAGEMENT_LABELS.items()
     )
-    body = ['<link rel="stylesheet" href="/work-page.css">\n', crumb_nav(crumbs, "work-crumbs"),
-            '<header class="work-page-heading" id="work-directory"><h1>Find work in AI training.</h1></header>\n',
+    body = ['<link rel="stylesheet" href="/work-page.css">\n<div class="work-page-intro">', crumb_nav(crumbs, "work-crumbs"),
+            '<header class="work-page-heading" id="work-directory"><h1>Find work in AI training.</h1></header></div>\n',
             '<div class="work-page-filter-slot" data-work-filter-slot><form class="work-page-filters" data-work-filters hidden role="search" aria-label="Find paid work" id="work-filters">'
             '<label class="work-page-search">Search listings<input name="q" type="search" placeholder="Role, skill or firm" maxlength="256" autocomplete="off" id="name-filter"></label>'
             '<details class="work-page-filter-options"><summary>Filters</summary><div class="work-page-filter-fields">'
@@ -2009,7 +2009,7 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
             '<button type="reset" class="work-page-clear">Clear</button></div></details></form>'
             '<div class="work-load-status" data-work-load-status hidden><p data-work-load-message role="status"></p><button type="button" data-work-retry hidden>Retry filters</button></div></div>'
             '<noscript><p data-work-native-fallback>Filters need JavaScript. Showing the full directory. Use your browser’s Find command to look for a company or role.</p></noscript>'
-            '<div class="work-results-toolbar" data-work-toolbar id="work-results">'
+            '<div class="work-page-tools"><div class="work-results-toolbar" data-work-toolbar id="work-results">'
             '<p class="work-page-results" data-work-count aria-live="polite" aria-atomic="true">'
             f'{count_label}</p>'
             '<div class="work-results-actions"><a href="/work/?view=compare" data-work-compare hidden>Compare results</a>'
@@ -2017,7 +2017,7 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
             '<p class="work-export-status" data-work-export-status aria-live="polite"></p>'
             '<div class="work-page-disclosures"><details class="work-page-groups work-section-disclosure"><summary>Jump to section</summary>'
             f'{directory_counts}<nav aria-label="Work sections" data-work-section-navigation><ul>{section_links}</ul></nav></details>'
-            '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Pay and availability may have changed. Current openings and individual eligibility are not guaranteed. The employer decides who can apply and who is selected. Check the company’s page before applying.' + (f' Links checked up to {escape(format_date(checked))}.' if checked else '') + '</p>\n' + safety_note() + '</details></div>\n',
+            '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Pay and availability may have changed. Current openings and individual eligibility are not guaranteed. The employer decides who can apply and who is selected. Check the company’s page before applying.' + (f' Links checked up to {escape(format_date(checked))}.' if checked else '') + '</p>\n' + safety_note() + '</details></div></div>\n',
             '<div class="work-page-empty" data-work-empty hidden><p>No records match. Try another word or clear the filters.</p><button type="button" data-work-clear>Clear search and filters</button></div>\n',
             '<section id="work-integrated-table" data-work-comparison hidden><h2 tabindex="-1">Compare paid work results</h2></section>',
             '<div class="work-page-list">']
