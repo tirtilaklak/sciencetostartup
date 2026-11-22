@@ -277,6 +277,39 @@ test('native work rejects a stale script and restores the selected record and CS
   expect(errors).toEqual([]);
 });
 
+const sageWorkId = 'appen.work.sage-media';
+for (const [bookmark, recordId] of [['excluded', 'mercor.work.company-careers'], ['matching', sageWorkId]]) {
+  test(`native work keyboard retry restores visible focus for ${bookmark} bookmarks`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 844 });
+    await page.route(url => /^\/js\/work\.[a-f0-9]{12}\.js$/.test(url.pathname), route => route.abort('connectionrefused'), { times: 1 });
+
+    const url = `/work/?reader=keep&q=Sage#${recordId}`;
+    const record = page.locator(`[data-work-route="${recordId}"]`);
+    const search = page.getByRole('searchbox', { name: 'Search listings', exact: true });
+    const retry = page.getByRole('button', { name: 'Retry filters', exact: true });
+    await page.goto(url);
+    await expect(retry).toBeVisible();
+    await expect(record).toBeVisible();
+    await retry.focus();
+    await page.keyboard.press('Enter');
+
+    await expect(retry).toBeHidden();
+    await expect(search).toHaveValue('Sage');
+    await expect(page.locator('[data-work-count]')).toHaveText('1 matching record');
+    const results = page.locator('[data-work-route]:visible');
+    expect(await results.evaluateAll(cards => cards.map(card => card.dataset.workRoute))).toEqual([sageWorkId]);
+    await expect(page).toHaveURL(url);
+    if (recordId === sageWorkId) {
+      await expect(record).toBeFocused();
+      await expect(record).toBeInViewport();
+    } else {
+      await expect(record).toBeHidden();
+      await expect(search).toBeFocused();
+      await expect(search).toBeInViewport({ ratio: 1 });
+    }
+  });
+}
+
 test('stalled component recovery can close and retry without a late reopen', async ({ page }) => {
   await home(page);await page.clock.install();let stalled;
   const hold=route=>{stalled=route;};await page.route('**/home-search.js',hold);
