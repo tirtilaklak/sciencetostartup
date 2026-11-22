@@ -1,0 +1,62 @@
+{
+  "build": "6637c48a4c2a9cd6000e",
+  "manifest_sha256": "aeaf890fad5f99b385fc188c8512580206198553e5d3cd190342171d872abdcc",
+  "items": [
+    {
+      "id": "C9-shortlist-back-scroll",
+      "observation": "Companies lost scroll after Back to a searched shortlist. Chromium saved 274px and restored 18px while the index was loading. Firefox lost 1,085.8px in the original official run. Desktop WebKit also reproduced it.",
+      "acceptance": "Restore the saved scroll when the matching search results arrive. Preserve an intervening reader action, an edited search and a new history entry.",
+      "receipt": "release/shortlist-scroll.json",
+      "receipt_sha256": "b1c41fa780396efcb3268dd8ef69aeb7a2a4d78737c15f3dde275aa980c35474"
+    },
+    {
+      "id": "V9-work-compare-landing",
+      "observation": "On a 1024 × 600 desktop, the first hourly comparison title extended below the viewport. At 320px its rate began at y739. The first Tab returned to Skip to content after activating Compare results.",
+      "acceptance": "After explicit activation, the first rate and complete role are visible, the Back control remains reachable and the next Tab enters the matching records. Preserve direct visits and filtered list return.",
+      "receipt": "visual/findings.md",
+      "receipt_sha256": "e1851342a85cb7bcf7d589211dd75c6a42c628c340d4550d45d42e11e2a5d7ff"
+    },
+    {
+      "id": "V9-work-profile-cold-back",
+      "observation": "Back from the first hourly role’s AfterQuery profile closed Terms & sources and lost the employer-link focus. A cached return kept both.",
+      "acceptance": "Restore the exact opener and disclosure on a recreated Work history entry. Preserve the current filters and deliberate user focus.",
+      "receipt": "visual/c9-short1024-profile_back-back-proof.json",
+      "receipt_sha256": "7db01c15a7e104a24868aeaa25841de94e54e7c3faa8ae7287725db745598f3b"
+    },
+    {
+      "id": "D9-daily-rapid-traversal-tab",
+      "observation": "A real Tab directly after the observed Daily hash change selected the wrong item in five of six Chromium Forward trials and two of six Back trials. Deferred focus then moved the keyboard away again.",
+      "acceptance": "The first trusted Tab after an observed traversal continues at the intended item and focus remains on the reader’s selection. Preserve normal restored scroll and intentional disclosure closure.",
+      "receipt": "daily/rapid-tab.json",
+      "receipt_sha256": "8c9333a6c768ea0cdc73f455cbadffbcc20455cffc532c00ce1657cbbe466012"
+    },
+    {
+      "id": "A9-market-matrix-sticky",
+      "observation": "On 320px Firefox, focusing Appen revenue let the value overlap the sticky company label and appear below the wrong metric heading. Only 5.3px of the control cleared the company column at a 32px text minimum.",
+      "acceptance": "Keep the focused amount readable with its metric and company context on a phone at default and enlarged sizes. Enter and Escape must retain correct evidence navigation.",
+      "receipt": "accessibility/matrix.json",
+      "receipt_sha256": "6a8d15b4047b03d0a47cc254ccbb07d155faafdec2447c46c1aad99c9f9403ca"
+    },
+    {
+      "id": "A9-brand-hit-region",
+      "observation": "At 320px with a 32px minimum font, clicking the last letter of the wordmark opened Search on Market, Work, Research, Companies and AfterQuery. All five passed at 28px and Home passed both sizes.",
+      "acceptance": "The entire visible wordmark follows Home and Search remains operable across these routes and sizes.",
+      "receipt": "accessibility/navigation.json",
+      "receipt_sha256": "9a8c180c8733e8889bfe1dad0f346bd1c3a45b9e78cd4687eced054f1442d509"
+    },
+    {
+      "id": "W9-ooak-application-404",
+      "observation": "The employer still publishes the Data Quality Specialist listing. Its linked Work at a Startup page produced readable 404 HTML in Chromium and a separate HTML request. The default request returned 406. The separate signup URL reached sign-in.",
+      "acceptance": "Date the structured observations against the exact URLs. Preserve the employer listing and terms, the historic YC 404 and the distinction between the sign-in route and an available application.",
+      "receipt": "work-sources/README.md",
+      "receipt_sha256": "c7a41889fa0399dfe8e802f643b91ed9fbb2ba1bf3a8bed6429cb3f05ae336be"
+    },
+    {
+      "id": "W9-work-csv-link-purpose",
+      "observation": "The legacy export column mixes historic applications with generic boards, information and program links. The audit found four evidenced historical application URLs and distinct records for descriptions, subsequent generic destinations and earlier signup URLs.",
+      "acceptance": "Give CSV readers an accurate, evidenced URL purpose and historical destination. Preserve established columns and the four evidenced applications, including the G2i form. Verify all 135 pairs of native and Explore rows.",
+      "receipt": "work-matrix/application-column-audit.json",
+      "receipt_sha256": "d42ee5ee3bdfb3c4a81c5ab3b9be34eeb0acbd1ba72e5defdcbe1111efe29591"
+    }
+  ]
+}
