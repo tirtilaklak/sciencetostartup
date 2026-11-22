@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0.0",
-  "release_id": "2026-11-22.4",
+  "release_id": "2026-11-22.5",
   "as_of": "2026-11-22",
-  "publication_as_of": "2026-11-22T10:44:36Z",
+  "publication_as_of": "2026-11-22T11:38:11Z",
   "canonical_dataset_version": "2.5.0",
   "canonical_sha256": "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061",
-  "work_routes_sha256": "e8bd3f09e49313a9d82291b88b1be4c51c730ebb7473c5e97955e011ffcd3dfc",
+  "work_routes_sha256": "1580dacb389edacd9078843c651a9970de727b95ea7422f802739b9db637d26b",
   "counts": {
     "records": 135,
     "work_routes": 69,

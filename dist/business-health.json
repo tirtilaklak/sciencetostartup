@@ -2122,6 +2122,13 @@
     {
       "id": "dashboard.toloka.fy2024-revenue-growth",
       "company_id": "toloka",
+      "profile_metric_id": "toloka.metric.major-growth_metrics-1",
+      "profile_claim_ids": [
+        "toloka.claim.major-growth_metrics-1-metric",
+        "toloka.claim.major-growth_metrics-1"
+      ],
+      "profile_statement": "Toloka’s discontinued-operations revenue grew approximately 135.1% year over year, calculated from rounded revenue of $26.1M in FY2024 and $11.1M in FY2023.",
+      "profile_confidence_reason": "Grade A applies to the Form 20-F filing that reports the revenue inputs.",
       "signal": "revenue",
       "measure": "revenue_growth_yoy",
       "label": "Revenue growth · FY2024 comparative basis",
@@ -2150,14 +2157,14 @@
         "toloka.metric.major-financial_metrics-1"
       ],
       "source_ids": [
+        "refresh.source.nebius-fy2025-sec-note-3",
         "toloka.source.audit-tol_2025",
-        "toloka.source.audit-tol_2024",
-        "refresh.source.nebius-fy2025-sec-note-3"
+        "toloka.source.audit-tol_2024"
       ],
-      "basis": "Latest rounded discontinued-operations comparative revenue; original segment presentation of $26.4M produced a different 138% headline.",
-      "limitations": "Calculated from the displayed source observations; not a separately reported metric. Latest FY2025 20-F comparative discontinued-operations presentation. The earlier FY2024 report showed $26.4M as segment revenue. The original Fintel citation returned a retrieval error on 22 November 2026. The SEC filing provides the direct evidence.",
+      "basis": "The FY2025 Form 20-F provides the discontinued-operations revenue comparatives. The earlier FY2024 Form 20-F reported 138% growth on a segment basis using $26.4M in FY2024 and $11.1M in FY2023.",
+      "limitations": "The FY2025 filing gives revenue rounded to $0.1M. The calculation uses those rounded inputs.",
       "original_text": "Revenues · FY2024: 26.1 million USD.\nRevenues · FY2023: 11.1 million USD.",
-      "evidence_assurance": "Nebius annual reports (Form 20-F)",
+      "evidence_assurance": "Revenue inputs · Nebius FY2025 Form 20-F, Note 3",
       "calculation": {
         "formula": "(26100000 / 11100000 - 1) * 100",
         "input_observation_ids": [
@@ -2171,7 +2178,8 @@
       "cohort": "FY2024 · percent · Toloka business · latest discontinued operations comparative",
       "cohort_label": "FY2024 · percent · Toloka business · latest discontinued operations comparative",
       "cohort_key": "revenue_growth_yoy|annual|2024|2024-12-31||company|latest_discontinued_operations_comparative",
-      "primary_source_id": "refresh.source.nebius-fy2025-sec-note-3"
+      "primary_source_id": "refresh.source.nebius-fy2025-sec-note-3",
+      "evidence_checked_on": "2026-11-22"
     },
     {
       "id": "appen.metric.major-financial_metrics-9",

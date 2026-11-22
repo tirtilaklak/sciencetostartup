@@ -1,0 +1,111 @@
+{
+  "source": "324072f0027873cea084dc05a87c3dd64b8d3d5f",
+  "source_files": 774,
+  "build": "0223193390f17ca8cadc",
+  "manifest": "3e4ecab1082bf7508608a411c5fd0dea025be910b4de83c62e64834449838a87",
+  "editorial_release": "2026-11-22.5",
+  "cohort": {
+    "model": "gpt-6.2-sol",
+    "reasoning_effort": "ultra",
+    "contributors": {
+      "fix8_archive_routing": {
+        "commits": [
+          "3868469d"
+        ],
+        "findings": [
+          "R7-archive-host-relative"
+        ]
+      },
+      "fix8_toloka_evidence": {
+        "commits": [
+          "5cc820c8",
+          "597b0fe6",
+          "7dbcaf42",
+          "f3c0ebe9"
+        ],
+        "findings": [
+          "M7-toloka-derived-growth"
+        ]
+      },
+      "fix8_native_profiles": {
+        "commits": [
+          "284004c5"
+        ],
+        "findings": [
+          "W7-profile-applicant-conditions",
+          "M7-toloka-derived-growth",
+          "M7-snorkel-source-date"
+        ]
+      },
+      "fix8_finance_views": {
+        "commits": [
+          "aa2a29ee"
+        ],
+        "findings": [
+          "M7-snorkel-source-date",
+          "M7-toloka-derived-growth",
+          "M7-export-primary-source"
+        ]
+      },
+      "fix8_work_compare": {
+        "commits": [
+          "998478f0"
+        ],
+        "findings": [
+          "W7-compare-terms"
+        ]
+      },
+      "fix8_daily_forward": {
+        "commits": [
+          "2f9ffdba"
+        ],
+        "findings": [
+          "D7-daily-cold-forward"
+        ]
+      },
+      "fix8_research_doi": {
+        "commits": [
+          "1fb0aaf0"
+        ],
+        "findings": [
+          "R7-current-citation-doi"
+        ]
+      },
+      "fix8_native_traversal": {
+        "commits": [
+          "324072f0"
+        ],
+        "findings": [
+          "N7-work-forward-fallback",
+          "N7-company-forward-fallback"
+        ]
+      },
+      "fix8_work_layout": {
+        "commits": [
+          "169f6988"
+        ],
+        "findings": [
+          "W7-short-desktop-first-result"
+        ]
+      },
+      "fix8_explore_search": {
+        "commits": [
+          "1f2c8482"
+        ],
+        "findings": [
+          "N7-companies-live-search-focus"
+        ]
+      }
+    }
+  },
+  "supplementary_changes": {
+    "test_precision": "f3633a8e",
+    "seventh_review_record": "9cf4f6a7",
+    "home_cta_status": "Twenty checks passed in five browser projects on the private source build.",
+    "home_cta": "3f2d960b"
+  },
+  "previous_public_version": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+  "previous_public_build": "5dc63fbcf19634a55c66",
+  "prior_immutable_preview": "27014a36-75d8-40c4-8eac-b39083bb9a95",
+  "status_at_freeze": "Independent verification in progress"
+}

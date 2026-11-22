@@ -487,6 +487,16 @@ const S2SWork = (() => {
       else remember({ workFilterOptionsOpen: filterOptions.open });
     }
 
+    function appendComparisonFields(cell, fields) {
+      for (const value of fields) {
+        if (!value) continue;
+        const field = document.createElement('div');
+        field.textContent = value;
+        if (cell.hasChildNodes()) cell.append('\n');
+        cell.append(field);
+      }
+    }
+
     function comparisonRows(results) {
       const heading = comparison.querySelector('h2');
       comparison.replaceChildren(heading);
@@ -512,14 +522,24 @@ const S2SWork = (() => {
         identity.scope = 'row';
         identity.textContent = [company_name, text(card, 'h3'), text(card, '.work-status')].filter(Boolean).join(' · ');
         row.append(identity);
-        row.insertCell().textContent = text(card, '.work-historical-pay') || text(card, '.work-pay') || 'Pay not listed';
+        const pay = card.querySelector('.work-pay');
+        const amount = pay?.querySelector('strong');
+        const historicalLabel = amount?.previousElementSibling?.textContent.trim();
+        appendComparisonFields(row.insertCell(), [
+          [historicalLabel, amount?.textContent.trim()].filter(Boolean).join(' ') || 'Pay not listed',
+          ...Array.from(pay?.querySelectorAll('strong ~ .sub') || [], note => note.textContent.trim()),
+        ]);
         const detail = row.insertCell();
-        detail.append([text(card, '.work-place'), text(card, '.work-listing-conditions'), text(card, '.work-reviewed')].filter(Boolean).join(' · '));
+        appendComparisonFields(detail, [
+          text(card, '.work-place'),
+          ...Array.from(card.querySelector('.work-listing-conditions').children, field => field.textContent.trim()),
+          text(card, '.work-reviewed'),
+        ]);
         const action = card.querySelector('.work-listing-action a');
         if (action) {
           const copy = action.cloneNode(true);
           copy.removeAttribute('id');
-          detail.append(' ', copy);
+          detail.append('\n', copy);
         }
       }
       region.append(table);
@@ -578,8 +598,11 @@ const S2SWork = (() => {
       if (comparison) comparison.hidden = !showCompare;
       empty.hidden = selection.length !== 0;
       if (showCompare) comparisonRows(selection);
-      const matching = S2SWork.keys.some(key => key !== 'sort' && criteria[key]);
-      const countLabel = matching ? `${selection.length} matching ${selection.length === 1 ? 'record' : 'records'}` : initialCount;
+      const matchKeys = S2SWork.keys.filter(key => key !== 'sort' && criteria[key]);
+      const record = selection.length === 1 ? 'record' : 'records';
+      const hourlyOnly = matchKeys.length === 1 && criteria.pay === 'hourly';
+      const countLabel = hourlyOnly ? `${selection.length} ${record} with published hourly pay`
+        : matchKeys.length ? `${selection.length} matching ${record}` : initialCount;
       if (count.textContent !== countLabel) count.textContent = countLabel;
       if (navigation) {
         navigation.hidden = showCompare || !selection.length;
@@ -676,7 +699,8 @@ const S2SWork = (() => {
       link?.addEventListener('click', event => {
         if (!event.isTrusted || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ||
             link.hasAttribute('download') || (link.target && link.target.toLowerCase() !== '_self')) return;
-        remember({ workReturnFocus: { kind, page: location.href, href: link.href, top: link.getBoundingClientRect().top }, workCompareFocus: false });
+        const entry = window.S2SNativeHandoff?.begin(link.href, event);
+        remember({ workReturnFocus: { kind, page: location.href, href: link.href, top: link.getBoundingClientRect().top, entry }, workCompareFocus: false });
       });
     }
     document.addEventListener('focusin', event => {
@@ -724,7 +748,8 @@ const S2SWork = (() => {
     const retried = loader?.retried;
     const activation = window.navigation?.activation;
     const goingForward = activation?.from && activation.from.index <= activation.entry?.index;
-    const handoff = !goingForward && !loader?.interacted && performance.getEntriesByType('navigation')[0]?.type === 'back_forward' && savedHandoff();
+    const returning = window.navigation ? !goingForward : window.S2SNativeHandoff?.returnedFrom(history.state?.workReturnFocus?.entry);
+    const handoff = returning && !loader?.interacted && performance.getEntriesByType('navigation')[0]?.type === 'back_forward' && savedHandoff();
     const revealed = revealTarget(!handoff && (!loader?.interacted || retried));
     if (!handoff && !revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
       // A saved anchor can be excluded by the saved criteria.
