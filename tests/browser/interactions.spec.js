@@ -388,6 +388,38 @@ test('global search transfers the literal query and exact work selection', async
   expect(new URLSearchParams((await page.evaluate(() => location.hash)).split('?')[1]).get('q')).toBe('Python');
 });
 
+test('global search opens Home, the company directory, and one search for paid work', async ({ page }) => {
+  await ready(page, '#market');
+  const search = async query => {
+    await page.locator('#site-search-open').click();
+    const input = page.getByRole('combobox', { name: 'Search the guide' });
+    await input.fill(query);
+    return input;
+  };
+
+  const home = await search('Home');
+  await expect(page.getByRole('option', { name: /^Home\b/ })).toHaveAttribute('href', '/');
+  await home.press('Enter');
+  await expect(page).toHaveURL('/');
+  await expect(page.locator('body')).toHaveClass(/landing-page/);
+
+  await ready(page, '#market');
+  await search('Companies');
+  const directory = page.getByRole('option', { name: /^Companies\b/ });
+  await expect(directory).toHaveAttribute('href', '/companies/');
+  await directory.click();
+  await expect(page.getByRole('heading', { level: 1, name: 'AI data companies' })).toBeVisible();
+
+  await ready(page, '#market');
+  await search('remote jobs');
+  const work = page.getByRole('option', { name: /^Search paid work for “remote jobs”/ });
+  await expect(work).toHaveAttribute('href', '/work/?q=remote+jobs');
+  await expect(page.getByRole('option', { name: /See all .*“remote jobs”/ })).toHaveCount(0);
+  await work.click();
+  await expect(page.locator('#name-filter')).toHaveValue('remote jobs');
+  await expect(page.locator('[data-work-route="afterquery.work.technical-content-writer-contract"]')).toBeVisible();
+});
+
 test('malformed work links remain usable and canonical', async ({ page }) => {
   await ready(page, '#work?q=%E0%A4%A&kind=invalid&type=__proto__&pay=bogus&sort=invalid');
   await expect(page.locator('#work-view')).toBeVisible();

@@ -14,8 +14,10 @@ function siteSearchAlias(value){const m=String(value).match(/^(.+?)\s*\((.+)\)$/
 function siteSearchPages(){
  const work=typeof w4DiscoveryGroups==='function'?w4DiscoveryGroups(workRouteRows()):{named:[],programs:[]};
  return [
-  ['market','Overview','The front page, with the main figures and business groups','home start charts market'],
-  ['companies','Companies',`Compare ${DATA.companies.length} historical profiles`,'index directory list organizations organisations firms startups'],
+  ['home','Home','','front page start','/'],
+  ['market','Market overview','Revenue and growth charts','charts market overview'],
+  ['company-directory','Companies','Current company directory','index directory firms startups organizations organisations','/companies/'],
+  ['companies','Historical company comparisons',`Compare ${DATA.companies.length} profiles`,'historical companies comparisons'],
   ['work','Paid work',`${w4Count(work.named.length,'named listing','named listings')} · ${w4Count(work.programs.length,'network or program','networks and programs')}`,'jobs gigs hiring careers contract contractor freelance hourly pay earn'],
   ['compare','Compare','Put up to three companies side by side','versus vs comparison'],
   ['method','Method','How each figure is checked and graded','methodology sources evidence research'],
@@ -24,7 +26,7 @@ function siteSearchPages(){
   ['corrections','Request a correction','Tell us when a figure or listing is wrong','corrections error mistake wrong fix report'],
   ['downloads','Download the data','JSON, CSV and SQLite files','downloads csv json sqlite dataset export license reuse'],
   ['venture','The publisher’s proposed AI lab','The publisher’s proposal, separate from the research','venture neolab investor pitch proposal']
- ].map(([id,name,meta,keys])=>({type:'page',id,name,meta,keys:keys.split(' '),href:'#'+id})).concat(
+ ].map(([id,name,meta,keys,href])=>({type:'page',id,name,meta,keys:keys.split(' '),href:href||'#'+id})).concat(
   (window.SEARCH_INDEX?.researchSearchEntries||[]).map(entry=>({
    type:entry.kind==='company'?'company':'page',id:entry.url,name:entry.title,
    meta:(entry.kind==='paper'?(entry.recordKind==='paper_version'?'Paper version · ':'Paper · '):entry.kind==='company'?'Company profile · ':'')+entry.summary,
@@ -99,9 +101,28 @@ function siteSearchView(query){
  for(const item of results){if(groups.at(-1)?.type!==item.type)groups.push({type:item.type,label:item.group,items:[]});groups.at(-1).items.push(item);}
  if(siteSearchTools?.identifier(query))return groups;
  const work=groups.find(g=>g.type==='work'),raw=String(query).slice(0,256),text=raw.trim(),matches=work?selectWorkRoutes(workRouteRows(),{q:raw}):[],count=matches.length;
- if(work&&count){const all={type:'action',action:'work',query:raw,name:`See all ${count} ${count===1?'match':'matches'} for “${text}”`,meta:workResultsLabel(summarizeWorkResults(matches)),href:workHashFor({q:raw})};if(work.items[0].rank>=4)work.items.unshift(all);else work.items.push(all);}
  const workTitles=new Set((window.SEARCH_INDEX?.workTitles||[]).map(title=>siteSearchTools?.normalize(title)));
- if(siteSearchTools?.isWorkQuery(query,workTitles))groups.unshift({label:'Work search',items:[{type:'action',name:`Search paid work for “${text}”`,meta:'Work search · Public listings and programs',href:siteSearchTools.workUrl(query)}]});
+ if(siteSearchTools?.isWorkQuery(raw,workTitles)){
+  const browse=!siteSearchTools.workTerms(raw).trim();
+  const pages=groups.find(g=>g.type==='page');
+  if(pages){
+   pages.items=pages.items.filter(item=>item.id!=='work');
+   if(!pages.items.length)groups.splice(groups.indexOf(pages),1);
+  }
+  const action={
+   type:'action',
+   name:browse?'Browse paid work':`Search paid work for “${text}”`,
+   href:siteSearchTools.workUrl(browse?'':raw)
+  };
+  if(work){
+   work.items.unshift(action);
+   groups.splice(groups.indexOf(work),1);
+  }
+  groups.unshift(work||{label:'Paid work',items:[action]});
+ }else if(work&&count){
+  const all={type:'action',action:'work',query:raw,name:`See all ${count} ${count===1?'match':'matches'} for “${text}”`,meta:workResultsLabel(summarizeWorkResults(matches)),href:workHashFor({q:raw})};
+  if(work.items[0].rank>=4)work.items.unshift(all);else work.items.push(all);
+ }
  const fullDirectory={type:'action',name:'Search the full company directory',meta:`Explore compares ${DATA.companies.length} historical profiles.`,href:'/companies/?'+new URLSearchParams({q:query})};
  const company=groups.find(g=>g.type==='company');
  if(company?.items.some(item=>item.rank===0&&item.href.startsWith('/company/')))company.items.push(fullDirectory);
@@ -128,7 +149,7 @@ function siteSearchRender(){
  list.innerHTML=groups.map(g=>`<div class="site-search-group" role="group" aria-label="${attr(g.label)}"><div class="site-search-group-label" aria-hidden="true">${esc(g.label)}</div>${g.items.map(item=>{const i=index++;const native=typeof item.href==='string'&&item.href.startsWith('/')&&!item.href.startsWith('//'),tag=native?'a':'div';return `<${tag}${native?' href="'+attr(item.href)+'" tabindex="-1"':''} class="site-search-option${i||!tokens.length?'':' is-first'}" id="site-search-option-${i}" role="option" aria-selected="false" data-site-search-index="${i}"><span class="site-search-name">${siteSearchMark(item.name,item.type==='action'?[]:tokens)}${item.badge?` <span class="site-search-badge">${esc(item.badge)}</span>`:''}</span>${item.meta?`<span class="site-search-meta">${siteSearchMark(item.meta,item.type==='action'?[]:tokens)}</span>`:''}<kbd class="site-search-enter" aria-hidden="true">Enter</kbd></${tag}>`;}).join('')}</div>`).join('');
  list.hidden=!siteSearchItems.length;input.setAttribute('aria-expanded',String(siteSearchItems.length>0));input.removeAttribute('aria-activedescendant');
  const results=siteSearchItems.filter(i=>i.rank!==undefined).length,exact=siteSearchItems.some(i=>i.rank<6);
- const workAction=siteSearchItems[0]?.href?.startsWith('/work/?');
+ const workAction=siteSearchItems[0]?.type==='action'&&siteSearchItems[0]?.href?.startsWith('/work/');
  const noMatch=siteSearchTools?.identifier(query)?'No matching research record':'No match';
  $('site-search-message').textContent=!tokens.length?'Type a name or a role. Press Enter to open the first result.':!results&&!workAction?`${noMatch} for “${query.trim()}”.`:exact||workAction?'':`No exact match for “${query.trim()}”. Showing close matches.`;
  if(tokens.length)siteSearchAnnounce(workAction?siteSearchItems[0].name:results?`${results} ${results===1?'result':'results'}. Top result: ${siteSearchItems[0].name}.`:'No results.');
