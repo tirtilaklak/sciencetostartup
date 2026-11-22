@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 from types import SimpleNamespace
 import unittest
+from urllib.parse import urljoin
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
@@ -42,8 +43,9 @@ class NotFoundRetirementTests(unittest.TestCase):
 
     def test_generic_error_keeps_native_research_search_and_existing_destinations(self):
         self.assertIn('<h1>We could not find that page.</h1>', self.html)
-        for path in ('/research/', '/research/papers/', '/?search', '/', '/companies/', '/work/', '/method/', '/method/#about'):
-            self.assertIn(sp.ORIGIN + path, self.facts.links)
+        links = {urljoin(sp.ORIGIN, href) for href in self.facts.links}
+        for path in ('/research/', '/research/papers/', '/?search=#browse-guide', '/', '/companies/', '/work/', '/method/', '/method/#about'):
+            self.assertIn(sp.ORIGIN + path, links)
         self.assertIn('53 companies', self.html)
         self.assertEqual(self.facts.meta.get('robots'), 'noindex')
         self.assertEqual(self.facts.canonicals, [])
