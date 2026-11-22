@@ -171,6 +171,46 @@ test('new work script accepts old native markup', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test('native Work applies its saved filter when the bundle arrives before slow HTML finishes', async ({ page }) => {
+  const parserBlock = '/qa-work-document-pause.js';
+  let resume;
+  const paused = new Promise(resolve => { resume = resolve; });
+  await page.clock.install();
+  await page.addInitScript(() => {
+    const observer = new MutationObserver(changes => {
+      for (const change of changes) {
+        for (const node of change.addedNodes) {
+          if (node instanceof HTMLScriptElement && /\/js\/work\.[0-9a-f]+\.js$/.test(node.src)) {
+            node.addEventListener('load', () => { window.workBundleReadyState = document.readyState; });
+            observer.disconnect();
+          }
+        }
+      }
+    });
+    observer.observe(document, { childList: true, subtree: true });
+  });
+  await page.route('**' + parserBlock, async route => {
+    await paused;
+    await route.fulfill({ contentType: 'text/javascript', body: '' });
+  });
+  await page.route(url => url.pathname === '/work/', async route => {
+    const response = await route.fetch();
+    const body = (await response.text()).replace('</head>', '<script src="' + parserBlock + '"></script></head>');
+    await route.fulfill({ response, body });
+  });
+  try {
+    await page.goto('/work/?q=Sage', { waitUntil: 'commit' });
+    await expect.poll(() => page.evaluate(() => window.workBundleReadyState)).toBe('loading');
+    await page.clock.fastForward(4000);
+  } finally {
+    resume();
+  }
+  await page.waitForLoadState('domcontentloaded');
+  await expect(page.getByRole('searchbox', { name: 'Search listings' })).toHaveValue('Sage');
+  await expect(page.locator('.work-page-list [data-work-route]:visible')).toHaveAttribute('data-work-route', 'appen.work.sage-media');
+  await expect(page.locator('[data-work-retry]')).toBeHidden();
+});
+
 test('native work rejects a stale script and restores the selected record and CSV after retry', async ({ page, request }) => {
   test.setTimeout(45_000);
   const sageId = 'appen.work.sage-media';

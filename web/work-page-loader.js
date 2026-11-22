@@ -100,6 +100,13 @@
     get interacted() { return interacted; },
     get retried() { return attempts > 1; },
     accepts: script => current === script,
+    waitingForDocument(script) {
+      if (current !== script) return;
+      // The bundle has executed. Its initialization listener runs when the HTML is complete.
+      clearTimeout(deadline);
+      script.onload = null;
+      document.addEventListener('DOMContentLoaded', () => fail(script), { once: true });
+    },
     complete(script) {
       if (current !== script) return;
       clearTimeout(deadline);
