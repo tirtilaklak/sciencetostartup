@@ -35,9 +35,9 @@ async function openPage(page, path, minimum) {
   expect(minimumSize / large).toBeCloseTo(32 / 40, 2);
 }
 
-async function tabTo(page, control) {
+async function tabTo(page, control, stops = 60) {
   await expect(control).toBeVisible();
-  for (let step = 0; step < 60; step++) {
+  for (let step = 0; step < stops; step++) {
     if (await control.evaluate(node => node === document.activeElement)) return;
     await page.keyboard.press('Tab');
   }
@@ -259,6 +259,52 @@ for (const minimum of [0, 32]) {
     }
 
     if (minimum) {
+      phone('Market keeps wrapped Laude and Trajectory names readable on Tab and after Escape', async ({ page }) => {
+        phone.setTimeout(90_000);
+        const figures = [
+          {
+            company: 'laude', signal: 'cash', organization: 'Laude Institute / Terminal-Bench', metric: 'Cash', value: 'n/a',
+            heading: 'Not applied', description: /Laude Institute \/ Terminal-Bench is a nonprofit research organization\./,
+            profile: '#company/laude',
+          },
+          {
+            company: 'trajectory_labs_pbc', signal: 'revenue', organization: 'Trajectory Labs, PBC', metric: 'Revenue', value: '—',
+            heading: 'No reviewed public figure', description: /for Trajectory Labs, PBC\. Missing is not zero\./,
+            profile: '#company/trajectory_labs_pbc/traction',
+          },
+        ];
+        await openMatrix(page, minimum);
+        const grid = page.locator('#bh-grid-wrap');
+        const readMatrix = () => grid.evaluate(wrap => {
+          const table = wrap.querySelector('table');
+          return {
+            scrollport: [wrap.clientWidth, wrap.clientHeight, wrap.scrollWidth, wrap.scrollHeight],
+            columnWidths: [...table.tHead.rows[0].cells].map(cell => cell.offsetWidth),
+            rows: [...table.tBodies[0].rows].map(row => ({
+              height: row.offsetHeight,
+              cells: [...row.cells].map(cell => [cell.dataset.state, cell.textContent.trim()]),
+            })),
+          };
+        });
+        const initial = await readMatrix();
+        const tabStops = 60 + await grid.locator('a, button').count();
+
+        for (const figure of figures) {
+          await test.step(`${figure.organization} ${figure.metric}`, async () => {
+            const button = matrixButton(page, figure.company, figure.signal);
+            await tabTo(page, button, tabStops);
+            await expectReadableEvidence(button, figure, 'after Tab');
+            expect(await readMatrix()).toEqual(initial);
+
+            await page.keyboard.press('Enter');
+            const dialog = await expectUnavailableDialog(page, figure);
+            await closeEvidence(page, dialog, button);
+            await expectReadableEvidence(button, figure, 'after Escape');
+            expect(await readMatrix()).toEqual(initial);
+          });
+        }
+      });
+
       phone('Market keeps wrapped organization names readable beside short matrix values', async ({ page }) => {
         await openMatrix(page, minimum);
         for (const figure of [
