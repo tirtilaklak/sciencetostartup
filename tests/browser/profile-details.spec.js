@@ -182,3 +182,97 @@ test('the correction address restores the exact claim drafts in a fresh tab and 
   const genericIssue = new URL(await coldTab.getByRole('link', { name: 'Start a public GitHub correction' }).getAttribute('href'));
   expect(genericIssue.searchParams.get('target')).toBeNull();
 });
+
+const imeritLedger = '/explore/#company/imerit/sources';
+const imeritImage = '/assets/products/imerit-exl-visual.png';
+
+async function openNativeSourceLedger(page, baseURL) {
+  await page.route('https://sciencetostartup.com/explore/', route => route.fulfill({
+    status: 307,
+    headers: { location: new URL('/explore/', baseURL).href },
+  }));
+  await page.goto('/company/imerit/');
+  await page.locator('summary#sources, #sources > summary').press('Enter');
+  await page.getByRole('link', { name: 'Source ledger', exact: true }).press('Enter');
+  await expect(page).toHaveURL(new URL(imeritLedger, baseURL).href);
+}
+
+async function expectSourceHeadingInView(heading) {
+  await expect.poll(() => heading.evaluate(node => {
+    const { top, bottom } = node.getBoundingClientRect();
+    const masthead = document.querySelector('.topbar').getBoundingClientRect();
+    const tabs = document.querySelector('.profile-tabs').getBoundingClientRect();
+    return top >= Math.max(masthead.bottom, tabs.bottom) && bottom <= innerHeight;
+  })).toBe(true);
+}
+
+test('the native Source ledger lands at All sources and Tabs into its sources before images load', async ({ page, baseURL }) => {
+  let releaseImage;
+  const imageGate = new Promise(resolve => { releaseImage = resolve; });
+  let imageRequested = false;
+  await page.route('**' + imeritImage, async route => {
+    if (new URL(page.url()).pathname === '/explore/') {
+      imageRequested = true;
+      await imageGate;
+    }
+    await route.continue();
+  });
+  try {
+    await openNativeSourceLedger(page, baseURL);
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    const heading = page.getByRole('heading', { name: 'All sources', exact: true });
+    const source = page.locator('#profile-sources .sources-list a').first();
+    const image = page.locator(`.profile-v2 img[src="${imeritImage}"]`);
+    await expectSourceHeadingInView(heading);
+    await expect(heading).toBeFocused();
+    await expect.poll(() => imageRequested).toBe(true);
+    expect(await image.evaluate(node => node.complete)).toBe(false);
+
+    await page.keyboard.press('Tab');
+    await expect(source).toBeFocused();
+    releaseImage();
+    await expect.poll(() => image.evaluate(node => node.complete)).toBe(true);
+    await expect(source).toBeFocused();
+    await expectSourceHeadingInView(heading);
+
+    const position = await page.evaluate(() => { window.scrollBy(0, 400); return scrollY; });
+    await page.goBack({ waitUntil: 'domcontentloaded' });
+    await expect(page).toHaveURL(new URL('/company/imerit/', baseURL).href);
+    await page.goForward({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    await expect(heading).not.toBeFocused();
+    await expect.poll(() => page.evaluate(() => scrollY)).toBe(position);
+  } finally {
+    releaseImage();
+  }
+});
+
+test('an initial section route respects keyboard focus established while its evidence loads', async ({ page, baseURL }) => {
+  let releaseEvidence;
+  const evidenceGate = new Promise(resolve => { releaseEvidence = resolve; });
+  await page.route('**/presentation/company-imerit.*.json', async route => {
+    await evidenceGate;
+    await route.continue();
+  });
+  try {
+    await openNativeSourceLedger(page, baseURL);
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'loading');
+    await page.keyboard.press('Tab');
+    const skip = page.getByRole('link', { name: 'Skip to content', exact: true });
+    await expect(skip).toBeFocused();
+    const position = await page.evaluate(() => scrollY);
+    releaseEvidence();
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    await expect(skip).toBeFocused();
+    expect(await page.evaluate(() => scrollY)).toBe(position);
+  } finally {
+    releaseEvidence();
+  }
+});
+
+test('a fresh profile bookmark scrolls to the source heading without setting focus', async ({ page }) => {
+  await page.goto(imeritLedger);
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  await expectSourceHeadingInView(page.getByRole('heading', { name: 'All sources', exact: true }));
+  await expect(page.locator('body')).toBeFocused();
+});

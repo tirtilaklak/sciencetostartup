@@ -327,28 +327,24 @@ comparisonRows=function(){return profileComparisonRows().map(([label,render])=>{
   return [label,render];
 });};
 
-// Direct links can scroll before a lazy product image above the archive has its
-// height. Correct that initial position after the visible images and page settle.
-let profileHasRouted=false,profileInitialAnchorCleanup=null;
-function settleInitialProfileAnchor(hash,destination){
-  let cancelled=false;
-  const events=['wheel','touchstart','pointerdown','keydown'];
-  const cancel=()=>{cancelled=true;for(const name of events)window.removeEventListener(name,cancel);};
-  profileInitialAnchorCleanup=cancel;
-  for(const name of events)window.addEventListener(name,cancel,{passive:true});
-  const top=destination.getBoundingClientRect().top;
-  const images=[...document.querySelectorAll('.profile-v2 img')].filter(img=>img.getClientRects().length&&img.getBoundingClientRect().top<top&&!img.complete);
-  const pending=images.map(img=>new Promise(resolve=>{
-    const ready=()=>{img.removeEventListener('load',ready);img.removeEventListener('error',ready);resolve();};
-    img.addEventListener('load',ready);img.addEventListener('error',ready);
-    img.loading='eager';
-  }));
-  if(document.readyState!=='complete')pending.push(new Promise(resolve=>window.addEventListener('load',resolve,{once:true})));
-  const frame=callback=>typeof requestAnimationFrame==='function'?requestAnimationFrame(callback):setTimeout(callback,0);
-  Promise.all(pending).then(()=>frame(()=>frame(()=>{
-    if(!cancelled&&location.hash===hash&&destination.isConnected)destination.scrollIntoView({block:'start',behavior:'instant'});
-    cancel();if(profileInitialAnchorCleanup===cancel)profileInitialAnchorCleanup=null;
-  })));
+// A native page can link to a profile section before its evidence is available.
+// Leave focus and scroll alone if the reader starts using Explore while it loads.
+const [profileEntryView,,profileEntrySection]=routeParts();
+const profileEntryHash=profileEntryView==='company'&&profileRouteSection(profileEntrySection)?location.hash:'';
+const profileEntryEvents=['focusin','keydown','pointerdown','touchstart','wheel'];
+let profileHasRouted=false,profileEntryInteracted=false;
+function stopWatchingProfileEntry(){
+  for(const name of profileEntryEvents)window.removeEventListener(name,markProfileEntryInteraction,true);
+}
+function markProfileEntryInteraction(event){
+  if(!event.isTrusted)return;
+  profileEntryInteracted=true;stopWatchingProfileEntry();
+}
+if(profileEntryHash)for(const name of profileEntryEvents)window.addEventListener(name,markProfileEntryInteraction,{capture:true,passive:true});
+
+function isInternalProfileEntry(){
+  return document.referrer&&new URL(document.referrer).origin===location.origin&&
+    window.performance?.getEntriesByType?.('navigation')[0]?.type==='navigate';
 }
 // The Navigation API distinguishes a new fragment from history traversal.
 // Without it, an entry the reader has not scrolled yet has no saved position in history.state
@@ -360,7 +356,9 @@ window.navigation?.addEventListener('navigate',event=>{
 const profileRoute=route;
 route=function(event){
   const initial=!profileHasRouted;profileHasRouted=true;
-  profileInitialAnchorCleanup?.();profileInitialAnchorCleanup=null;
+  if(initial&&profileEntryHash)stopWatchingProfileEntry();
+  const entry=initial&&!event&&profileEntryHash&&profileEntryHash===location.hash;
+  const readerMoved=entry&&(profileEntryInteracted||(document.activeElement&&document.activeElement!==document.body));
   const previousCompany=previousRoute==='company'?document.querySelector('.profile-v2')?.dataset.profileCompany:null;
   const fragmentNavigation=profileFragmentNavigation;
   if(event?.type==='hashchange')profileFragmentNavigation=null;
@@ -377,12 +375,16 @@ route=function(event){
     const destination=profileRouteDestination(section);
     if(destination){
       for(let node=destination;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;
-      const focusTarget=destination.tagName==='DETAILS'?destination.querySelector('summary'):destination;
+      const transferFocus=entry&&!readerMoved&&isInternalProfileEntry();
+      let focusTarget=destination.tagName==='DETAILS'?destination.querySelector('summary'):destination;
+      if(transferFocus&&!primary)focusTarget=destination.querySelector(':scope > h2')||focusTarget;
       if(focusTarget&&focusTarget.tagName!=='SUMMARY')focusTarget.setAttribute('tabindex','-1');
-      if(event?.type==='hashchange')focusTarget?.focus({preventScroll:true});
-      const anchor=primary?document.querySelector('.profile-tabs'):destination;
-      if(initial&&anchor)settleInitialProfileAnchor(location.hash,anchor);
-      else anchor?.scrollIntoView({block:'start',behavior:'instant'});
+      if(!readerMoved){
+        if(event?.type==='hashchange'||transferFocus)focusTarget?.focus({preventScroll:true});
+        // Profile media already reserve their space before loading.
+        const anchor=primary?document.querySelector('.profile-tabs'):destination;
+        anchor?.scrollIntoView({block:'start',behavior:'instant'});
+      }
     }
   }
   if(company&&parts[2]==='claim'&&parts[3])showEvidence(parts[3]);
