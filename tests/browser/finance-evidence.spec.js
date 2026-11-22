@@ -403,10 +403,10 @@ const publicationCases = [
     measure: 'period_revenue', role: 'Reporting period', period: 'FY2024', value: '> $1B', check: true },
   { company: 'datacurve', metric: 'datacurve.metric.oct14-0-contributor-payouts', claim: 'datacurve.claim.oct14-metric-0-contributor-payouts',
     source: 'datacurve.source.oct14-9b179f419da7', url: chemistryArticle, publication: '9 Oct 2025',
-    measure: 'cumulative_expert_payouts', role: 'Reporting period', period: 'To 9 Oct 2025', value: '> $1M' },
+    signal: 'delivery', measure: 'cumulative_expert_payouts', role: 'Reporting period', period: 'To 9 Oct 2025', value: '> $1M' },
   { company: 'labelbox', metric: 'labelbox.metric.major-growth_metrics-0', claim: 'labelbox.claim.major-growth_metrics-0-metric',
     source: 'labelbox.source.audit-lb_firstround', url: firstRoundInterview,
-    measure: 'customer_count', role: 'Snapshot', period: 'Dec 2018', value: '37' },
+    signal: 'customers', measure: 'customer_count', role: 'Snapshot', period: 'Dec 2018', value: '37' },
 ];
 const secondAfterQueryCitation = { company: 'afterquery', claim: 'afterquery.claim.oct14-metric-0-revenue-run-rate',
   source: 'afterquery.source.oct14-fd3e4675dd42', publication: '9 Apr 2026', url: afterQueryArticle };
@@ -414,13 +414,15 @@ const secondAfterQueryCitation = { company: 'afterquery', claim: 'afterquery.cla
 for (const record of publicationCases) {
   test(`Market preserves the period and source dates for ${record.company}`, async ({ page }) => {
     await openMarket(page);
-    const { metric, measure, role, period, value, source, claim, url, publication, check } = record;
+    const { metric, signal, measure, role, period, value, source, claim, url, publication, check } = record;
     let trigger;
     if (check) {
       const tab = measure === 'annualized_revenue' ? /^Annualized pace/ : /^Actual revenue/;
       const row = (await marketLedgerFigure(page, metric, tab)).locator('..');
       trigger = row.locator('.bh-ledger-source');
     } else {
+      await openDisclosure(page.locator('#bh-advanced > summary'));
+      await page.locator(`#bh-tab-${signal}`).press('Enter');
       const chart = await marketChart(page, measure);
       trigger = chart.locator(`[data-bh-observation="${metric}"]`);
     }
