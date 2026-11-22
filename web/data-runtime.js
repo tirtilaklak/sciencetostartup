@@ -218,7 +218,7 @@ route=function(event){
  const comparison=view==='compare'?compareRouteSelection(hash):null;
  const correction=view==='corrections'?exploreCorrectionTarget(hash):null;
  const correctionCompany=correction&&!exploreCorrectionClaim(correction)?correction.company:'';
- const overview=['','market','venture'].includes(view)||!['companies','work','compare','method','company',...Object.keys(VIEW_ANCHORS)].includes(view);
+ const overview=view===''||view==='market'||VIEW_ANCHORS[view]==='market'||!['companies','work','compare','method','company',...Object.keys(VIEW_ANCHORS)].includes(view);
  const workCriteria=view==='work'?workCriteriaForRoute(hash,routeTraversal):null;
  const needsSearch=view==='work'?searchContextPending(workCriteria.q):view==='companies'&&searchContextPending(state.query);
  const ids=company?[company]:correctionCompany?[correctionCompany]:comparison?.ids||[];

@@ -651,7 +651,16 @@ function selectionFact(id){
 }
 function openCompanyStory(id){return detailViewRenderer("openCompanyStory",this,arguments);}
 
-function renderTray(){const n=state.selected.length;$('compare-tray').hidden=!n||onCompareRoute();$('tray-text').textContent=n?`${n} of 3 selected: ${listText(state.selected.map(id=>companies[id].name))}`:'';$('nav-count').textContent=n?`(${n})`:'';document.querySelectorAll('[data-nav="compare"],#compare-tray a[href^="#compare"]').forEach(a=>a.setAttribute('href',compareHash()));}
+function renderTray(notice=''){
+ const count=state.selected.length,comparing=onCompareRoute();
+ const tray=$('compare-tray');
+ tray.hidden=!count||comparing;
+ if(notice)tray.setAttribute('data-selection-limit','');else tray.removeAttribute?.('data-selection-limit');
+ $('tray-text').textContent=count?`${count} of 3 selected: ${listText(state.selected.map(id=>companies[id].name))}${notice?'. '+notice:''}`:'';
+ if(notice&&comparing)$('compare-status').textContent=notice;
+ $('nav-count').textContent=count?`(${count})`:'';
+ document.querySelectorAll('[data-nav="compare"],#compare-tray a[href^="#compare"]').forEach(a=>a.setAttribute('href',compareHash()));
+}
 function syncSelection(){document.querySelectorAll('[data-compare]').forEach(el=>el.checked=state.selected.includes(el.dataset.compare));}
 // On the compare page the URL follows the selection; replaceState keeps Back history short.
 function setSelection(ids){
@@ -666,21 +675,23 @@ function setSelection(ids){
  }
  renderCompare();
 }
-function chooseCompare(id,on){if(on&&!state.selected.includes(id)&&state.selected.length>=3){syncSelection();$('tray-text').textContent='Three selected. Remove one to add another.';return;}setSelection(on?[...state.selected,id]:state.selected.filter(x=>x!==id));}
+function chooseCompare(id,on){if(on&&!state.selected.includes(id)&&state.selected.length>=3){syncSelection();renderTray('Remove one first.');return;}setSelection(on?[...state.selected,id]:state.selected.filter(x=>x!==id));}
 function reset(){Object.assign(state,{query:'',category:'',stage:'',financial:false,work:false,sort:'name'});$('search').value='';$('category').value='';$('stage').value='';$('financial-only').checked=false;$('work-only').checked=false;$('sort').value='name';renderDirectory();writeDirectoryRoute();$('search').focus({preventScroll:true});}
 
 // previousSection is set after a section link such as #venture, so the next plain view link starts at the top.
 let previousRoute='',previousSection='';const viewScroll={};
 let companyReturnFocus=null;
 const comparisonOrigins=new Map();
+const marketShortcutOrigins=new Map();
 // Hashes that name a place inside a page. route() shows that page, then brings the element to the top with focus.
-const VIEW_ANCHORS={venture:'market',about:'method',labels:'method',corrections:'method',coverage:'method',downloads:'method'};
+const VIEW_ANCHORS={'business-health':'market',venture:'market',about:'method',labels:'method',corrections:'method',coverage:'method',downloads:'method'};
 function viewAnchorId(hash=location.hash){const id=String(routeParts(hash)[0]||'').toLowerCase();return Object.hasOwn(VIEW_ANCHORS,id)?id:'';}
 function showViewAnchor(target){
  if(!target)return;
  for(let node=target;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;
- if(!target.matches?.('a[href],button,input,select,textarea,summary'))target.setAttribute('tabindex','-1');
- target.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});
+ const focusTarget=target.id==='business-health'?$('business-health-heading'):target;
+ if(!focusTarget.matches?.('a[href],button,input,select,textarea,summary'))focusTarget.setAttribute('tabindex','-1');
+ focusTarget.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});
 }
 // Back and Forward return each history entry to where the reader left it.
 // The Navigation API identifies entries; other browsers store the position in history.state.
@@ -771,6 +782,10 @@ function repeatMainRoute(event){
  if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});heading.scrollIntoView({block:'start',behavior:'instant'});}
 }
 document.addEventListener('click',rememberCompanyOrigin);
+document.addEventListener('click',event=>{
+ const shortcut=event.target.closest?.('#market-view .hero-actions a[href="#business-health"]');
+ if(normalSelfLinkActivation(event,shortcut)&&location.hash!==shortcut.hash)marketShortcutOrigins.set(historyKey(),shortcut);
+});
 document.addEventListener('click',repeatCompanyRoute);
 document.addEventListener('click',repeatMainRoute);
 // Grouped profile citations can also appear in a quick summary. Close that
@@ -784,7 +799,9 @@ function renderMissingCompanyProfile(parts){
 }
 function route(event){const wasTraversal=routeTraversal;ensureHistoryEntryKey(event?.type==='hashchange'&&!wasTraversal&&location.hash!==lastRoutedHash);if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''||routeTraversal?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=Number.isFinite(kept)?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeRestoredScroll=restore;routeTraversal=false;const closingDialog=event?.closedDialog||event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';if(parts[0]&&parts[0]!=='market'&&view==='market'&&!anchorId)history.replaceState(null,'','#market');if(view!=='company')preparePage(view);if(previousRoute&&view!==previousRoute)viewScroll[previousRoute]=window.scrollY;for(const name of ['market','companies','work','compare','method','profile'])$(name+'-view').hidden=(name!==(view==='company'?'profile':view));document.querySelectorAll('[data-nav]').forEach(a=>{if(a.dataset.nav===(view==='company'?'companies':view))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});if(view==='company'){if(isCompanyId(parts[1])){renderCompanyProfile(parts[1]);document.title=companies[parts[1]].name+' · ScienceToStartup';}else renderMissingCompanyProfile(parts);}
  else{document.title=VIEW_TITLES[view];if(view==='companies'){renderComparisonScope(view);if(typeof syncDirectoryRoute==='function')syncDirectoryRoute(parts.slice(1));showDirectory();}if(view==='method'){showDirectory();renderExploreCorrections(anchorId==='corrections');}if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare')renderCompare();}
- renderTray();const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;lastRoutedHash=location.hash;if(wasTraversal&&['work','companies'].includes(view)){const hash=location.hash;queueMicrotask(()=>{if(location.hash!==hash)return;const origin=view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():view==='companies'?companyReturnFocusTarget():null;origin?.focus({preventScroll:true});});}if(wasTraversal&&view==='compare'){const hash=location.hash;queueMicrotask(()=>{if(location.hash===hash)restoreComparisonFocus(key,hash);});}if(closingDialog){const hash=location.hash;requestAnimationFrame(()=>{if(location.hash!==hash)return;focusRouteDestination(hash);});}}
+ renderTray();const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;lastRoutedHash=location.hash;
+ if(wasTraversal&&view==='market'&&!anchorId)marketShortcutOrigins.get(key)?.focus({preventScroll:true});
+ if(wasTraversal&&['work','companies'].includes(view)){const hash=location.hash;queueMicrotask(()=>{if(location.hash!==hash)return;const origin=view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():view==='companies'?companyReturnFocusTarget():null;origin?.focus({preventScroll:true});});}if(wasTraversal&&view==='compare'){const hash=location.hash;queueMicrotask(()=>{if(location.hash===hash)restoreComparisonFocus(key,hash);});}if(closingDialog){const hash=location.hash;requestAnimationFrame(()=>{if(location.hash!==hash)return;focusRouteDestination(hash);});}}
 function download(name,body,type){const url=URL.createObjectURL(new Blob([body],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function csvCell(v){let s=String(v??'');if(/^[\t\r\n]/.test(s)||/^\s*[=+@-]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';}
 // The CSV starts with a byte order mark, so spreadsheet software such as Excel reads it as UTF-8.
@@ -861,6 +878,11 @@ function financialObservationFor(id){
  const recent=candidates.filter(o=>end(o)>='2025-10-28');
  return (recent.length?recent:candidates).sort((a,b)=>scopeRank(a)-scopeRank(b)||Number(b.measure==='period_revenue')-Number(a.measure==='period_revenue')||end(b).localeCompare(end(a)))[0]||null;
 }
+function financialAttribution(assurance,published,accessed,retrievalStatus){
+ const publication=published?'Published '+profileDate(published):'';
+ const originalCheck=published&&accessed?(retrievalStatus==='checked'?'Checked ':'Recorded ')+profileDate(accessed):'';
+ return [publication,originalCheck,assurance||'Attributed source'].filter(Boolean).join(' · ');
+}
 function financialSummaryHTML(id){
  const summary=companySummaryFor(id);if(summary&&!companyContextReady(id))return summaryFinancialHTML(id,summary.financial);
  const o=financialObservationFor(id);if(!o)return signalFor(id,preferredFinancial(id));
@@ -870,8 +892,9 @@ function financialSummaryHTML(id){
  const checked=fresh?.observed_on||(health.source_checks?.entries||[]).find(e=>o.source_ids.includes(e.source_id)&&e.status==='content_checked')?.checked_on;
  const end=o.period?.end||(String(o.as_of||'').match(/\d{4}(?:-\d{2}){0,2}/)||[''])[0],old=!end||end<'2025-10-28';
  const citation=record?external(record.url,record.publisher||'Original source'):'';
- const published=record&&window.ScienceDetailViews?.evidenceContextSourcePublicationDate?.(record.id);
- const attribution=(published?'Published '+profileDate(published)+' · ':'')+(o.evidence_assurance||'Attributed source');
+ const projectedSource=projected?.id===o.id&&projected.source?.id===record?.id?projected.source:null;
+ const published=record&&(window.ScienceDetailViews?.evidenceContextSourcePublicationDate?.(record.id)||projectedSource?.publishedOn);
+ const attribution=financialAttribution(o.evidence_assurance,published,record?.accessed_on,record?.retrieval_status);
  const quote=o.original_text||fresh?.excerpt||'';
  const failed=o.refresh_status==='source_unavailable'||(health.source_checks?.entries||[]).some(e=>o.source_ids.includes(e.source_id)&&e.status==='unavailable');
  const warning=failed?'<p class="financial-source-warning">Original citation could not be rechecked. Historical source attribution retained.</p>':'';
@@ -882,7 +905,7 @@ function financialSummaryHTML(id){
 function summaryFinancialHTML(id,financial){
  if(!financial)return `<span class="unavailable">${companies[id].entity_type==='adjacent_research'?'Research organization':'Not disclosed'}</span>`;
  const f=financial,source=f.source?external(f.source.url,f.source.publisher||'Original source'):'',period=readableDates(f.period||''),basis=f.basis?' · '+esc(f.basis):'';
- const attribution=(f.source?.publishedOn?'Published '+profileDate(f.source.publishedOn)+' · ':'')+(f.attribution||'Attributed source');
+ const attribution=financialAttribution(f.attribution,f.source?.publishedOn,f.source?.accessedOn,f.source?.retrievalStatus);
  const value=f.recordType==='metric'&&f.claimId?`<a class="number-button" href="#company/${attr(id)}/claim/${attr(f.claimId)}">${esc(f.display)}</a>`:`<strong>${esc(f.display)}</strong>`;
  const content=`<div class="financial-summary" data-financial-observation="${attr(f.id)}"><div class="row-number">${value}<span>${esc(f.type)}</span></div><span class="row-period">${esc(period)} · ${esc(f.currency||'')} · ${esc(f.scope||'')}${basis}</span><div class="financial-citation">${source}<span>${esc(attribution)}</span></div>${f.failed?'<p class="financial-source-warning">Original citation could not be rechecked. Historical source attribution retained.</p>':''}<details class="financial-source-details"><summary>Figure details</summary>${f.limitations?`<p>${esc(f.limitations)}</p>`:''}${f.quote?`<blockquote>${esc(f.quote)}</blockquote>`:''}${f.checkedOn?`<p>Source content checked ${esc(readableDates(f.checkedOn))}.</p>`:''}</details></div>`;
  return f.age==='current'?content:`<span class="signal-label">${f.age==='undated'?'No dated revenue figure':'No recent revenue figure'}</span><details class="historical-signal"><summary>${f.age==='undated'?'Undated financial claim':'Historical figure · '+esc(period)}</summary>${content}</details>`;
@@ -947,7 +970,7 @@ function initDirectory(){addOptions('category',Object.keys(MODEL_GROUPS).map(x=>
 function initWork(){
  $('work-export')?.addEventListener('click',exportWorkCsv);
  state.workSort=state.workSort||'';
- const labels={contract:'Contract work',employment:'Staff employment',fellowship:'Research fellowships',bounty:'Bounties for contributions',study:'Paid studies',varies:'Varies by project',unknown:'Engagement not established'},types=new Set(workRouteRows().map(w4Engagement));
+ const labels={contract:'Contract work',employment:'Staff employment',fellowship:'Fellowships',bounty:'Bounties',study:'Paid studies',varies:'Varies by project',unknown:'Type unconfirmed'},types=new Set(workRouteRows().map(w4Engagement));
  addOptions('work-group',Object.entries(labels).filter(([key])=>types.has(key)));
  $('work-safety').innerHTML=workSafetyHTML(workRouteRows());
  $('work-search').addEventListener('input',event=>{state.workQuery=event.target.value.slice(0,256);queueWorkRoute();if(event.isTrusted)w4QueueRender();else renderWork();});

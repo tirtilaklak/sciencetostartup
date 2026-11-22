@@ -54,7 +54,17 @@ for(const options of cases){
  check('all-company-results-remain',()=>{assert.equal(h.run('filtered().length'),39);assert.equal((h.node('company-cards').innerHTML.match(/data-company-card=/g)||[]).length,39);assert.ok(!h.node('company-cards').innerHTML.includes('[object Object]'));});
  check('search-remains-interactive',()=>{h.node('search').callbacks.input({target:{value:'AfterQuery'}});assert.equal(h.run('filtered().length'),1);h.run('reset()');assert.equal(h.run('filtered().length'),39);});
  check('selection-rejects-invalid-ids-and-deduplicates',()=>{h.run('setSelection(["constructor","__proto__","afterquery","afterquery","elorian","appen","taskus"])');assert.equal(h.run('state.selected.join("|")'),'afterquery|elorian|appen');assert.equal(h.node('nav-count').textContent,'(3)');});
- check('selection-limit-and-clear-remain-interactive',()=>{h.run('chooseCompare("taskus",true)');assert.equal(h.run('state.selected.join("|")'),'afterquery|elorian|appen');assert.equal(h.node('tray-text').textContent,'Three selected. Remove one to add another.');h.run('setSelection([])');assert.equal(h.run('state.selected.length'),0);});
+ check('selection-limit-and-clear-remain-interactive',()=>{
+  h.run('chooseCompare("taskus",true)');
+  assert.equal(h.run('state.selected.join("|")'),'afterquery|elorian|appen');
+  assert.equal(h.node('tray-text').textContent,'3 of 3 selected: AfterQuery, Elorian and Appen. Remove one first.');
+  h.run('chooseCompare("elorian",false)');
+  h.run('chooseCompare("taskus",true)');
+  assert.equal(h.run('state.selected.join("|")'),'afterquery|appen|taskus');
+  assert.equal(h.node('tray-text').textContent,'3 of 3 selected: AfterQuery, Appen and TaskUs');
+  h.run('setSelection([])');
+  assert.equal(h.run('state.selected.length'),0);
+ });
  check('unknown-profile-recovers-through-real-navigation-handler',()=>{h.location.hash='#company/constructor/%5D%5B';h.windowCallbacks.hashchange.forEach(fn=>fn({type:'hashchange'}));assert.ok(h.node('profile-view').innerHTML.includes('Profile not found'));h.location.hash='#companies';h.windowCallbacks.hashchange.forEach(fn=>fn({type:'hashchange'}));assert.equal(h.node('companies-view').hidden,false);});
  check('canonical-profile-can-render',()=>{h.location.hash='#company/afterquery';h.run('route()');assert.ok(h.node('profile-view').innerHTML.includes('<h1>AfterQuery</h1>'));});
  check('work-renders-with-supported-optional-fallback',()=>{h.location.hash='#work';h.run('route()');if(options.missing?.includes('WORK_ROUTES')){assert.equal(h.run('workRouteRows().length'),0);assert.ok(h.node('work-cards').innerHTML.includes('No listings are available right now.'));}else{assert.equal(h.run('workRouteRows().length'),135);assert.ok(h.node('work-cards').innerHTML.includes('data-work-route='));}});
