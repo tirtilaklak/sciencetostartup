@@ -21,7 +21,7 @@
     if (!status) return;
     const message = status.querySelector('[data-work-load-message]');
     const retry = status.querySelector('[data-work-retry]');
-    const normalPosition = document.querySelector('[data-work-toolbar]');
+    const normalPosition = document.querySelector('[data-work-filter-slot]');
     let target;
     try { target = document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch { /* Malformed bookmark. */ }
     const group = target?.closest('[data-work-group]');
@@ -33,11 +33,11 @@
       normalPosition.append(status);
     }
 
-    status.hidden = !state;
+    status.hidden = state !== 'pending' && state !== 'failed';
     message.textContent = state === 'pending' ? 'Applying your filters…'
       : state === 'failed' ? 'Filters did not load. Showing the full directory.' : '';
     retry.hidden = state !== 'failed';
-    if (state && target && !interacted && initialHash === location.hash) {
+    if (!status.hidden && target && !interacted && initialHash === location.hash) {
       requestAnimationFrame(() => target.scrollIntoView({ block: 'start', behavior: 'instant' }));
     }
     retry.onclick = start;
@@ -62,8 +62,7 @@
   }
 
   function start() {
-    if (filtered) setState('pending');
-    if (filtered && hasOptions) root.dataset.workOptions = '';
+    setState(filtered ? 'pending' : 'loading');
     const script = document.createElement('script');
     script.src = '/work-page.js' + (attempts ? '?s2s_retry=' + attempts + '-' + Date.now() : '');
     attempts++;
@@ -95,7 +94,6 @@
       if (current !== script) return;
       clearTimeout(deadline);
       current = null;
-      delete root.dataset.workOptions;
       setState('');
     }
   };

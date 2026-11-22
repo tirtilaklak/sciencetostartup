@@ -4,18 +4,24 @@
 .work-page-counts{display:flex;flex-wrap:wrap;gap:8px 12px;color:var(--muted);font-size:13px;margin:0}
 .work-page-counts span{color:var(--border)}
 .work-page-note{max-width:780px;color:var(--muted);font-size:14px;line-height:1.7}
-.work-page-filters{position:relative;display:block;margin:12px 0 0;padding:8px 0;border:0;border-block:1px solid var(--border);border-radius:0;background:transparent}
-main>.work-page-filters,main>.work-page-list,main>.work-page-groups,main>.work-results-toolbar,main>[data-work-comparison]{max-width:none}
+.work-page-filter-slot{display:grid;grid-template-columns:minmax(0,1fr)}
+html[data-work-load] .work-page-filter-slot,.work-page-filter-slot:has(.work-page-filters:not([hidden])){margin-top:12px}
+.work-page-filter-slot>*{grid-area:1/1}
+.work-page-filters{position:relative;display:block;margin:0;padding:8px 0;border:0;border-block:1px solid var(--border);border-radius:0;background:transparent}
+main>.work-page-filter-slot,main>.work-page-list,main>.work-page-groups,main>.work-results-toolbar,main>[data-work-comparison]{max-width:none}
 .work-page-filters[hidden],.work-page-empty[hidden],.work-page-group[hidden],.work-listing[hidden],.work-page-groups[hidden],.work-results-actions>[hidden],.work-load-status[hidden]{display:none}
-/* An early head opt-in reserves the real responsive form before its controls
-   are ready. Without JavaScript the form keeps its native hidden fallback. */
-html[data-work-load="pending"] .work-page-filters[hidden]{display:block!important;visibility:hidden}
+/* Keep the real controls in the layout while the enhancer loads. The failure
+   notice shares the search slot without making unavailable controls tabbable. */
+html[data-work-load] .work-page-filters[hidden]{display:block!important;visibility:hidden}
+html[data-work-load] .work-results-actions>[hidden]{display:inline-flex!important;visibility:hidden}
+html[data-work-load] .work-count-native{display:none}
+html[data-work-load] .work-count-compact[hidden]{display:inline!important}
+html[data-work-load="failed"] .work-page-filter-fields{display:none}
 html[data-work-load="pending"] .work-page-list{visibility:hidden}
 html[data-work-load="pending"] :is(.work-page-more,.site-footer,.work-page-advice){visibility:hidden}
-html[data-work-load="pending"] :is(.work-results-toolbar,[data-work-group]){position:relative}
+html[data-work-load="pending"] [data-work-group]{position:relative}
 html[data-work-load="pending"] :is(.work-page-results,.work-results-actions){visibility:hidden}
-html[data-work-load="pending"] .work-results-actions>[hidden]{display:inline-flex}
-html[data-work-load="pending"] .work-load-status{position:absolute;inset-block-start:8px;margin:0;visibility:visible}
+html[data-work-load="pending"] [data-work-group] .work-load-status{position:absolute;inset-block-start:8px;margin:0;visibility:visible}
 .work-page-filters label{display:grid;gap:6px;font-size:12px;line-height:1.5;font-weight:500}
 .work-page-filters input,.work-page-filters select{width:100%;min-width:0;min-height:44px;padding:9px 12px;font:inherit;font-size:14px;font-weight:400;color:var(--ink);border:1px solid #69796d;border-radius:4px;background:var(--bg,#f8f8f4)}
 .work-page-filters button,.work-page-empty button{min-height:44px;padding:9px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
@@ -26,6 +32,8 @@ html[data-work-load="pending"] .work-load-status{position:absolute;inset-block-s
 .work-results-actions :is(a,button),.work-load-status button{display:inline-flex;align-items:center;min-height:44px;padding:6px 12px;border:1px solid var(--green);border-radius:4px;background:transparent;color:var(--green);font:inherit;font-size:14px;text-align:left;cursor:pointer}
 .work-export-status:empty{display:none}
 .work-load-status{margin:8px 0;color:var(--muted);font-size:14px}
+.work-page-filter-slot .work-load-status{align-self:center;margin:6px 0}
+.work-page-filter-slot .work-load-status p{margin:0 0 4px}
 .work-no-js-message{display:none}
 .work-page-group>h2:target+noscript>.work-no-js-message{display:block}
 .work-page-groups{margin:0}

@@ -28,7 +28,7 @@
   const footer = document.querySelector('.site-footer');
   if (!chapter || !footer) return;
 
-  const controls = 'input,textarea,select,button,summary,[contenteditable],[role="combobox"],[role="listbox"],[role="textbox"]';
+  const editors = 'input,textarea,select,[contenteditable],[role="combobox"],[role="listbox"],[role="textbox"]';
   function hasTextCaret() {
     const selection = getSelection();
     return Boolean(selection?.rangeCount &&
@@ -36,11 +36,18 @@
   }
   addEventListener('keydown', event => {
     if (event.key !== 'End' || event.defaultPrevented || event.isComposing ||
-        event.ctrlKey || event.metaKey || event.altKey || event.shiftKey ||
+        event.metaKey || event.altKey || event.shiftKey ||
         !document.documentElement.hasAttribute('data-reader-enhanced')) return;
     const target = event.target;
-    if (!(target instanceof Element) || target.isContentEditable || target.closest(controls) || hasTextCaret()) return;
+    if (!(target instanceof Element) || target.isContentEditable || target.closest(editors)) return;
 
+    if (event.ctrlKey) {
+      // Native Ctrl+End needs the final document height before it scrolls.
+      if (getSelection()?.isCollapsed !== false) document.documentElement.removeAttribute('data-reader-enhanced');
+      return;
+    }
+
+    if (target.closest('button,summary') || hasTextCaret()) return;
     // Native End runs first and can create a caret in Firefox caret browsing.
     requestAnimationFrame(() => {
       if (event.defaultPrevented || hasTextCaret()) return;

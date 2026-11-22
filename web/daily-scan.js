@@ -9,6 +9,9 @@
   const date = document.getElementById('scan-date');
   const dateForm = date.form;
   const dateGo = document.getElementById('scan-date-go');
+  const archiveContent = root.querySelector('.scan-archive');
+  const archive = archiveContent.closest('details');
+  const archiveLinks = new Map([...archiveContent.querySelectorAll('a')].map(link => [new URL(link.href).pathname, link]));
   const editionLinks = root.querySelectorAll('a.scan-day-step, .scan-archive a');
   const reset = document.getElementById('scan-reset');
   const rows = [...root.querySelectorAll('.scan-item')];
@@ -43,11 +46,14 @@
     if (state != null && Object.prototype.toString.call(state) !== '[object Object]') return;
     const anchor = rows.find(row => !row.hidden && row.getBoundingClientRect().bottom > 0 &&
       row.getBoundingClientRect().top < innerHeight);
+    const active = document.activeElement;
     const reading = { url: location.href, edition: root.dataset.edition,
       x: Math.max(0, Math.min(maxPosition, scrollX)), y: Math.max(0, Math.min(maxPosition, scrollY)),
       open: rows.filter(row => row.querySelector('details').open).map(row => row.id),
       anchor: anchor?.id || null, top: anchor?.getBoundingClientRect().top || 0,
-      returnToDateGo: document.activeElement === dateGo };
+      archiveOpen: archive.open,
+      returnToArchive: active?.matches('.scan-archive a') ? new URL(active.href).pathname : null,
+      returnToDateGo: active === dateGo };
     try {
       if (navigationState) navigationAPI.updateCurrentEntry({ state: { ...state, [readingKey]: reading } });
       else history.replaceState({ ...state, [readingKey]: reading }, '', location.href);
@@ -62,13 +68,16 @@
       // Recreated documents lose native disclosure state. Layout and position
       // must be restored together after the browser finishes its traversal.
       for (const row of rows) row.querySelector('details').open = current.open.includes(row.id);
+      if (typeof current.archiveOpen === 'boolean') archive.open = current.archiveOpen;
       try { history.scrollRestoration = 'manual'; } catch (_) { /* Restore below. */ }
       if (scroll) {
         const anchor = rowById.get(current.anchor);
         const y = anchor && !anchor.hidden ? scrollY + anchor.getBoundingClientRect().top - current.top : current.y;
         scrollTo({ left: current.x, top: Math.max(0, Math.min(maxPosition, y)), behavior: 'instant' });
-        if (current.returnToDateGo === true && document.activeElement === document.body) {
-          dateGo?.focus({ preventScroll: true });
+        if (document.activeElement === document.body) {
+          const archiveLink = archive.open ? archiveLinks.get(current.returnToArchive) : null;
+          const returnFocus = current.returnToDateGo === true ? dateGo : archiveLink;
+          returnFocus?.focus({ preventScroll: true });
         }
       }
       if (current.returnToDateGo === true) date.value = root.dataset.edition;

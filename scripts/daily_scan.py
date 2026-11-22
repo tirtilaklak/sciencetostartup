@@ -313,7 +313,10 @@ def render(edition, editions, canonical, root=ROOT, context=None):
             '<a href="/daily/feed.xml">RSS</a> · <a href="/daily/feed.json">JSON Feed</a> · '
             '<a href="/research/feed.xml">Research editions</a> · <a href="/research/corrections/feed.xml">Research corrections</a></nav>'
             f'<nav class="scan-edition-nav" aria-label="Snapshots">{steps}'
-            f'<details><summary>Snapshot archive</summary><div class="scan-archive">{archive}</div></details>'
+            # Keep the links visible on a native history return even when the
+            # browser recreates the document and loses its disclosure state.
+            f'<details class="scan-archive-disclosure" open><summary>Snapshot archive</summary><div class="scan-archive">{archive}</div></details>'
+            '<script>document.currentScript.previousElementSibling.open=false</script>'
             f'<form class="scan-date-form" hidden><label for="scan-date">Snapshot date</label>'
             f'<div><select id="scan-date">{options}</select><button id="scan-date-go" type="submit">Go</button></div></form></nav>'
             '<div class="scan-controls" hidden>'
