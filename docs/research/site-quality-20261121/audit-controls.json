@@ -1,0 +1,266 @@
+{
+  "scope": "Initial audit controls. Scratch passes demonstrate a proposed behavior. Integrated release verification follows separately.",
+  "source_branch_build": "6d57f30fbf456b1e48a8",
+  "public_build": "d8d18622a82c541129c1",
+  "checks": [
+    {
+      "finding": "release",
+      "scope": "immutable and public baseline",
+      "receipt": "release-smoke/acceptance-equivalence.json",
+      "receipt_sha256": "bb70262aa9e9efda984cf29c9a088a4fbfee15abab8810c68384466fec34bc6a",
+      "result": {
+        "manifest_sha256": "b1f4eb01b4ae26caae077522ca67db7189c792dae2896ea02f76aa7303e54008",
+        "suite_counts": {
+          "search": [
+            1,
+            10
+          ],
+          "accessibility": [
+            2,
+            17
+          ],
+          "home": [
+            32,
+            48
+          ],
+          "editorial": [
+            5,
+            11
+          ]
+        },
+        "derived_checks": {
+          "matched_manifest_across_origins": true,
+          "matched_four_suite_outcomes": true,
+          "matched_accessibility_cases_and_no_transport_errors": true
+        }
+      }
+    },
+    {
+      "finding": "H3",
+      "scope": "branch baseline",
+      "receipt": "profile-card-design/candidate-check/negative/receipt.json",
+      "receipt_sha256": "8b0fbf6fcac4b5d9d81e7f862962b6c50e094718c2a1013b54dc7143a9d21e41",
+      "result": {
+        "passed": 21,
+        "total": 36
+      }
+    },
+    {
+      "finding": "H3",
+      "scope": "scratch prototype",
+      "receipt": "profile-card-design/candidate-check/positive/receipt.json",
+      "receipt_sha256": "e014a77d4c651ea2310875e565fbe4651e802c5908d565cec5551de9d5972b4b",
+      "result": {
+        "passed": 36,
+        "total": 36
+      }
+    },
+    {
+      "finding": "W2",
+      "scope": "branch baseline",
+      "receipt": "checker-audit/repair-trial/candidate-baseline.json",
+      "receipt_sha256": "cce699af702af0c6ae60f7020700d137049e4bf81860321c428999d21c982ed7",
+      "result": {
+        "fixture_cases": 10,
+        "raw_cases": 12,
+        "result_mismatches": 6,
+        "reason_mismatches": 22,
+        "primary_checks_failed": 32,
+        "nested_passed": 0,
+        "nested_unsupported": 3,
+        "nested_failed": 0
+      }
+    },
+    {
+      "finding": "W2",
+      "scope": "scratch prototype",
+      "receipt": "checker-audit/repair-trial/candidate-prototype.json",
+      "receipt_sha256": "6841dce0f24dab93167a117f979cf21c955d65f78c24e0f620a2be4b066089a0",
+      "result": {
+        "fixture_cases": 10,
+        "raw_cases": 12,
+        "result_mismatches": 0,
+        "reason_mismatches": 0,
+        "primary_checks_failed": 0,
+        "nested_passed": 3,
+        "nested_unsupported": 0,
+        "nested_failed": 0
+      }
+    },
+    {
+      "finding": "W1",
+      "scope": "branch baseline",
+      "receipt": "acceptance/work-six/negative-control.json",
+      "receipt_sha256": "696dc3407046ec53489c9cb3c1e7106d7e9b93ec7b05be447559f6d20111b0e0",
+      "result": {
+        "checked_count": 276,
+        "passed_count": 173,
+        "failure_count": 103,
+        "editorial_approval_issued": false
+      }
+    },
+    {
+      "finding": "W3",
+      "scope": "scratch prototype",
+      "receipt": "work-integrated/layout-acceptance/first-screen/results.json",
+      "receipt_sha256": "8ac448243b899bec9618296c71a974deb5128bec62cfe67000f5f06eea7f1a4f",
+      "result": [
+        {
+          "size": [
+            390,
+            844
+          ],
+          "javascript": true,
+          "records_preserved_exactly": 135,
+          "keyboard_behavior_matched": true
+        },
+        {
+          "size": [
+            390,
+            844
+          ],
+          "javascript": false,
+          "records_preserved_exactly": 135,
+          "keyboard_behavior_matched": true
+        },
+        {
+          "size": [
+            844,
+            390
+          ],
+          "javascript": true,
+          "records_preserved_exactly": 135,
+          "keyboard_behavior_matched": true
+        },
+        {
+          "size": [
+            844,
+            390
+          ],
+          "javascript": false,
+          "records_preserved_exactly": 135,
+          "keyboard_behavior_matched": true
+        }
+      ]
+    },
+    {
+      "finding": "R2",
+      "scope": "branch baseline",
+      "receipt": "acceptance/research-r2/baseline.json",
+      "receipt_sha256": "e33f17e52d258abd5d1636feb3ba1fa0f3c4d3de920e823b865dbcb46ccc27ca",
+      "result": {
+        "routeChecks": 48,
+        "passingRouteChecks": 0,
+        "stableBuild": true,
+        "passed": false
+      }
+    },
+    {
+      "finding": "R2",
+      "scope": "scratch prototype",
+      "receipt": "acceptance/research-r2/trial.json",
+      "receipt_sha256": "cc27af4e5f525a919c337cdea2e5890e48c07de5998c0e50f54c0a60f186618c",
+      "result": {
+        "routeChecks": 48,
+        "passingRouteChecks": 48,
+        "stableBuild": true,
+        "passed": true
+      }
+    },
+    {
+      "finding": "R4",
+      "scope": "branch baseline",
+      "receipt": "legacy-anchor-audit/served-check/old-branch-negative.json",
+      "receipt_sha256": "c711324fe67b1d369f75cdbb5a55138134cd30814e7f402c16bdf75f1a22004b",
+      "result": {
+        "verified_served_paths": 68,
+        "historical_current_resolved": 3565,
+        "current_aliases": 5953,
+        "dated_aliases": 5852,
+        "passed": false
+      }
+    },
+    {
+      "finding": "R4",
+      "scope": "scratch prototype",
+      "receipt": "legacy-anchor-audit/served-check/scratch-positive.json",
+      "receipt_sha256": "5eb379fb40908514bec6dbf714ea031a5951df69ceb1318debfd42d5555df4bd",
+      "result": {
+        "verified_served_paths": 68,
+        "historical_current_resolved": 3568,
+        "current_aliases": 5956,
+        "dated_aliases": 5852,
+        "passed": true
+      }
+    },
+    {
+      "finding": "E3",
+      "scope": "branch baseline",
+      "receipt": "corrections-journey/candidate-gate/baseline-negative.json",
+      "receipt_sha256": "dc3ef3c9201e9fc018a529c31bfa13ce6c591c78cfb2af639e9770eb8d8d3103",
+      "result": {
+        "passed": 17,
+        "failed": 13
+      }
+    },
+    {
+      "finding": "E3",
+      "scope": "scratch prototype",
+      "receipt": "corrections-journey/candidate-gate/scratch-positive.json",
+      "receipt_sha256": "e4f5df5ac0e580aa25916d04060ff3cc99f2698d14d78958ca2c310c40ce499d",
+      "result": {
+        "passed": 30,
+        "failed": 0
+      }
+    },
+    {
+      "finding": "release",
+      "scope": "local switch between exact predecessor and branch artifacts",
+      "receipt": "asset-compatibility/upgrade/branch-baseline-replay.json",
+      "receipt_sha256": "6779df8ddcae351c43705e5e07261f4b19aa1a8221ae7fe2131296925a978f9a",
+      "result": {
+        "old": {
+          "build": "d8d18622a82c541129c1",
+          "manifest": "b1f4eb01b4ae26caae077522ca67db7189c792dae2896ea02f76aa7303e54008"
+        },
+        "candidate": {
+          "build": "6d57f30fbf456b1e48a8",
+          "manifest": "f970e6098cd780539568254a19ef9dff8b56edfe212b2bf4db0abf69af593c3b"
+        },
+        "cold": [
+          {
+            "asset": "presentation/full-search.4fb46664b399c868.json",
+            "stage": "6d57f30fbf456b1e48a8",
+            "status": 200,
+            "sha256": "4fb46664b399c868e1f641899e7920fc897c8d391d15c155a03d029f60ccdc96"
+          },
+          {
+            "asset": "presentation/company-labelbox.42fbec3d9c3a1e22.json",
+            "stage": "6d57f30fbf456b1e48a8",
+            "status": 200,
+            "sha256": "42fbec3d9c3a1e220fdc835cb7a3a398179a8ff989aed2829dc4ce8ae5bcb7f5"
+          },
+          {
+            "asset": "presentation/company-labelbox.99e92576a6c68f21.json",
+            "stage": "6d57f30fbf456b1e48a8",
+            "status": 200,
+            "sha256": "99e92576a6c68f21735acb13658b6926ec61c42298829e70b52237bd9b15264d"
+          }
+        ],
+        "errors": [],
+        "problems": []
+      }
+    },
+    {
+      "finding": "release",
+      "scope": "intentional missing retained payload",
+      "receipt": "asset-compatibility/upgrade/missing-retained-asset-negative.json",
+      "receipt_sha256": "cfdc70b2bef0d6976ba84173d606f14deed5f7cf2936dc49381fd53c8a65d62d",
+      "result": {
+        "exit_code": 1,
+        "deleted_only_in_disposable_copy": "presentation/company-labelbox.42fbec3d9c3a1e22.json",
+        "unchanged_source_asset_sha256": "42fbec3d9c3a1e220fdc835cb7a3a398179a8ff989aed2829dc4ce8ae5bcb7f5"
+      }
+    }
+  ]
+}
