@@ -21,10 +21,14 @@
       slot.dataset.routeId = route;
       if (hadFocus) slot.querySelector('a[href]')?.focus();
     } else {
-      if (hadFocus) document.querySelector('.hero-actions a[href="/work/"]')?.focus();
       slot.replaceChildren();
       slot.hidden = true;
       delete slot.dataset.routeId;
+      if (hadFocus) {
+        const work = document.querySelector('.hero-actions a[href="/work/"]');
+        work?.focus({ preventScroll: true });
+        work?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
     }
   }
 
