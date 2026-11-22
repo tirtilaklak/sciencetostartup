@@ -1171,6 +1171,7 @@ def _edition_downloads(context, metadata, ledger_path, reuse_path):
 
 def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='', download_sizes=None):
     graph, gate, report = context["graph"], context["gate"], context["report"]
+    archive = report.get('archive', {})
     assertions, stubs, sources = _ledger_records(context)
     retired = _retired_assertions(context, assertions, stubs)
     rows = [("Privacy-filtered research JSON", "/publication/clean-dataset.json"), ("CSV", "/publication/clean-dataset.csv"),
@@ -1193,10 +1194,14 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
             if size is not None:
                 label += f' ({size / 1_000_000:.1f} MB)'
             link = f'<a href="{sp.escape(url)}" download>{sp.escape(label)}</a>'
+        elif (url == '/publication/report.pdf' and archive.get('status') == 'published'
+              and archive.get('artifact_sha256') == EDITION_MIRROR_ARCHIVE_SHA256):
+            link = (_link(url, f'Read the archived report PDF ({report["release_id"]})')
+                    + '. The cover was prepared before DOI registration.')
         else:
             link = _link(url, label)
         links.append(f'<li>{link}</li>')
-    citation_prefix = 'current-' if gate.get('ready') and report.get('archive', {}).get('status') == 'published' else ''
+    citation_prefix = 'current-' if gate.get('ready') and archive.get('status') == 'published' else ''
     cite = "".join('<li>' + _link('/publication/' + citation_prefix + name, label) + '</li>' for name, label in
                    (("citation.bib", "BibTeX"), ("citation.ris", "RIS"), ("citation.csl.json", "CSL JSON"), ("CITATION.cff", "CITATION.cff")))
     other = [e for e in graph["entities"] if not _category(e)]

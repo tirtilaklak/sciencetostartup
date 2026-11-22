@@ -140,6 +140,16 @@ class ResearchPageTests(unittest.TestCase):
     def page(self, path):
         return (self.output / path.strip('/') / 'index.html').read_text()
 
+    def test_current_data_explains_the_frozen_pdf_cover(self):
+        self.context['publication_assets'] = ['publication/report.pdf']
+        report = self.context['report']
+        pdf_link = '<a href="/publication/report.pdf">Read the report PDF</a>'
+        self.assertIn(pdf_link, rp._data(self.context))
+        report.update(release_id='research-2026-11-12.1', archive={
+            'status': 'published', 'artifact_sha256': rp.EDITION_MIRROR_ARCHIVE_SHA256})
+        self.assertIn('<a href="/publication/report.pdf">Read the archived report PDF (research-2026-11-12.1)</a>'
+                      '. The cover was prepared before DOI registration.', rp._data(self.context))
+
     def test_actual_baseline_lifecycle_has_only_verified_publications(self):
         import research_citations as citations
         from research_report import publication_gate

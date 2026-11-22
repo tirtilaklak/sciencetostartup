@@ -1,6 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 const chapter = '/research/state-of-ai-data-labs/chapters/technical-landscape/';
+const datedChapter = '/research/editions/2026-11-12/chapters/technical-landscape/';
 const paragraphSelector = '.r-reader-chapter-content[aria-labelledby="technical-landscape"] > .r-paragraph';
 const lastSentence = 'Difficulty selection changes what an absolute score represents.';
 
@@ -40,8 +41,61 @@ test('complete technical chapter supports its final citation, focus and history 
   await verifyCitationHistory(page);
 });
 
+test('Technical passage links open natively and keep their copied fragment in each edition', async ({ page, context }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const path of [chapter, datedChapter]) {
+    await page.goto(path);
+    await page.getByRole('navigation', { name: 'Reading shortcuts' })
+      .locator('a[href="#scalable-oversight-result"]').press('Enter');
+    const passage = page.locator('#scalable-oversight-result:target');
+    await expect(passage).toBeFocused();
+    await expect(passage).toBeInViewport();
+    const copied = await context.newPage();
+    await copied.goto(page.url());
+    await expect(copied.locator('#scalable-oversight-result:target')).toBeInViewport();
+    await copied.close();
+  }
+});
+
 test.describe('enhanced technical reading', () => {
   test.use({ javaScriptEnabled: true });
+
+  for (const [edition, path] of [['current', chapter], ['dated', datedChapter]]) {
+    test(`${edition} Technical passage keeps keyboard focus with browser Back and Forward`, async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto(path);
+      const destination = page.locator('#scalable-oversight-result');
+      const shortcut = page.getByRole('navigation', { name: 'Reading shortcuts' })
+        .locator('a[href="#scalable-oversight-result"]');
+      await shortcut.focus();
+      await expect(shortcut).toBeInViewport();
+      const originalURL = page.url();
+      const originalScroll = await page.evaluate(() => scrollY);
+      const destinationURL = new URL(await shortcut.getAttribute('href'), originalURL).href;
+      await page.keyboard.press('Enter');
+      await expect(page).toHaveURL(destinationURL);
+      await expect(destination).toBeFocused();
+      await expect(destination).toBeInViewport();
+
+      await page.goBack();
+      await expect(page).toHaveURL(originalURL);
+      await expect(shortcut).toBeFocused();
+      await expect(shortcut).toBeInViewport();
+      expect(await page.evaluate(() => scrollY)).toBeCloseTo(originalScroll, 0);
+      await page.keyboard.press('Tab');
+      const next = page.locator('.r-reader-book-title a');
+      await expect(next).toBeFocused();
+      await expect(next).toBeInViewport();
+
+      await page.goForward();
+      await expect(page).toHaveURL(destinationURL);
+      await expect(destination).toBeFocused();
+      await expect(destination).toBeInViewport();
+    });
+  }
+
   test('final citation restores its reading position with scripts enabled', async ({ page }) => {
     await verifyCitationHistory(page);
   });
