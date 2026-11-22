@@ -284,10 +284,13 @@ def rooted_assets(value):
     return value
 
 
-def health_subset(health, observations):
+def health_subset(health, observations, company_id=None):
     if health is None:
         return None
     result = copy.deepcopy(health)
+    if "profile_finance" in result:
+        profiles = health["profile_finance"]
+        result["profile_finance"] = {company_id: copy.deepcopy(profiles[company_id])} if company_id in profiles else {}
     result["observations"] = observations
     claim_ids = {cid for observation in observations for cid in observation.get("claim_ids", [])}
     source_ids = {sid for observation in observations for sid in observation.get("source_ids", [])}
@@ -461,6 +464,8 @@ def company_summaries(data, sidecars, root):
                 financial["historicalYear"] = historical
         result[cid] = {"firstOffering": {"name": products[0]["name"]} if products else None, "hasFinancial": bool(metric),
                        "financial": financial, "currentCompanyResult": current}
+        if health.get("profile_finance", {}).get(cid, {}).get("compare_projection") == "native_evidence_link_only":
+            result[cid]["financingEvidenceHref"] = f"/company/{cid}/#financial-record"
     return result, products_by_company, research
 
 
@@ -645,7 +650,11 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
         # A fresh root object is installed, invalidating source-context caches safely.
         detail["profileContent"] = rooted_assets({"entries": [e for e in sidecars["PROFILE_CONTENT"].get("entries", []) if e["company_id"] == cid]})
         detail["companyEvents"] = {"events": [e for e in sidecars["COMPANY_EVENTS"].get("events", []) if e["company_id"] == cid or cid in e.get("related_company_ids", [])]}
-        detail["businessHealth"] = health_subset(sidecars["BUSINESS_HEALTH"], [o for o in (sidecars["BUSINESS_HEALTH"] or {}).get("observations", []) if o["company_id"] == cid])
+        health = sidecars["BUSINESS_HEALTH"] or {}
+        detail["businessHealth"] = health_subset(sidecars["BUSINESS_HEALTH"], [o for o in health.get("observations", []) if o["company_id"] == cid], cid)
+        if cid in health.get("profile_finance", {}):
+            from business_health import profile_finance_claim_context
+            detail["financeClaimContext"] = profile_finance_claim_context(health["profile_finance"][cid])
         detail["sourceUpdates"] = source_updates_context(sidecars["SOURCE_UPDATES"], cid)
         detail["workRoutes"] = {**{key: copy.deepcopy(value) for key, value in sidecars["WORK_ROUTES"].items() if key != "routes"}, "routes": [copy.deepcopy(route) for route in sidecars["WORK_ROUTES"].get("routes", []) if route["company_id"] == cid or cid in route.get("related_company_ids", [])]}
         details[cid] = write_asset(destination, "company-" + cid, detail)

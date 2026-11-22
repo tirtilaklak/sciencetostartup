@@ -1198,9 +1198,9 @@
       "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "GBP",
       "is_context": false,
-      "scope_label": "Whole company",
+      "scope_label": "RWS Holdings plc group",
       "scope_detail": "RWS parent group; not standalone TrainAI",
-      "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · Gross/net undisclosed",
+      "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · RWS Holdings plc group · Gross/net undisclosed",
       "cohort_label": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · Gross/net undisclosed",
       "cohort_key": "period_revenue|half_year|2026|2026-03-31|GBP|company|unspecified",
       "evidence_checked_on": "2026-10-28"
@@ -2499,9 +2499,9 @@
       "original_text": "H1 FY2026 group gross margin was 41.6%, down 1.7 percentage points. The filing attributes the mix effect partly to faster growth in lower-margin TrainAI work.\nCaveat: This supports the warning against treating data-services revenue as SaaS economics. It does not disclose a standalone TrainAI margin.",
       "evidence_assurance": "Interim company reporting; unaudited",
       "is_context": false,
-      "scope_label": "Whole company",
+      "scope_label": "RWS Holdings plc group",
       "scope_detail": "RWS parent group; not standalone TrainAI",
-      "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · percent · Whole company · group gross margin",
+      "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · percent · RWS Holdings plc group · group gross margin",
       "cohort_label": "H1 FY2026 · Oct 2025–Mar 2026 · percent · Whole company · group gross margin",
       "cohort_key": "gross_margin|half_year|2026|2026-03-31||company|group_gross_margin",
       "evidence_checked_on": "2026-10-28"
@@ -2539,9 +2539,9 @@
       "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "GBP",
       "is_context": false,
-      "scope_label": "Whole company",
+      "scope_label": "RWS Holdings plc group",
       "scope_detail": "RWS parent group; not standalone TrainAI",
-      "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · adjusted ebitda",
+      "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · RWS Holdings plc group · adjusted ebitda",
       "cohort_label": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · adjusted ebitda",
       "cohort_key": "adjusted_ebitda|half_year|2026|2026-03-31|GBP|company|adjusted_ebitda",
       "evidence_checked_on": "2026-10-28"
@@ -2579,9 +2579,9 @@
       "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "GBP",
       "is_context": false,
-      "scope_label": "Whole company",
+      "scope_label": "RWS Holdings plc group",
       "scope_detail": "RWS parent group; not standalone TrainAI",
-      "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · reported pretax income",
+      "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · RWS Holdings plc group · reported pretax income",
       "cohort_label": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · reported pretax income",
       "cohort_key": "pretax_income|half_year|2026|2026-03-31|GBP|company|reported_pretax_income",
       "evidence_checked_on": "2026-10-28"
@@ -3859,9 +3859,9 @@
       "evidence_assurance": "Interim company reporting; unaudited",
       "currency": "GBP",
       "is_context": false,
-      "scope_label": "Whole company",
+      "scope_label": "RWS Holdings plc group",
       "scope_detail": "RWS parent group; not standalone TrainAI",
-      "cohort": "Dated snapshots · GBP · Whole company · net debt",
+      "cohort": "Dated snapshots · GBP · RWS Holdings plc group · net debt",
       "cohort_label": "Dated snapshots · GBP · Whole company · net debt",
       "cohort_key": "net_debt|snapshot|2026|2026-03-31|GBP|company|net_debt",
       "evidence_checked_on": "2026-10-28"
@@ -4543,7 +4543,7 @@
       "original_text": "Net cash inflow from operating activities 21.5 37.2",
       "evidence_assurance": "Interim company reporting; unaudited",
       "is_context": false,
-      "scope_label": "Whole company",
+      "scope_label": "RWS Holdings plc group",
       "scope_detail": "RWS consolidated group, including language services and technology",
       "evidence_checked_on": "2026-10-28",
       "measure": "operating_cash_flow",
@@ -4559,7 +4559,7 @@
       },
       "scope": "company",
       "accounting_basis": "reported",
-      "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · Reported",
+      "cohort": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · RWS Holdings plc group · Reported",
       "cohort_label": "H1 FY2026 · Oct 2025–Mar 2026 · GBP · Whole company · Reported",
       "cohort_key": "operating_cash_flow|half_year|2026|2026-03-31|GBP|company|reported",
       "source_locator": "Condensed consolidated cash flow statement; GBP millions; six months ended 31 March 2026 column"
@@ -4584,7 +4584,7 @@
       "original_text": "Cash and cash equivalents at the end of the period 8 33.7 69.5",
       "evidence_assurance": "Interim company reporting; unaudited",
       "is_context": false,
-      "scope_label": "Whole company",
+      "scope_label": "RWS Holdings plc group",
       "scope_detail": "RWS consolidated group, including language services and technology",
       "evidence_checked_on": "2026-10-28",
       "measure": "cash_balance",
@@ -4599,7 +4599,7 @@
       },
       "scope": "company",
       "accounting_basis": "reported",
-      "cohort": "2026-03-31 · GBP · Whole company · Reported",
+      "cohort": "2026-03-31 · GBP · RWS Holdings plc group · Reported",
       "cohort_label": "2026-03-31 · GBP · Whole company · Reported",
       "cohort_key": "cash_balance|snapshot|2026|2026-03-31|GBP|company|reported",
       "source_locator": "Condensed consolidated cash flow statement; GBP millions; six months ended 31 March 2026 column"
@@ -6608,5 +6608,321 @@
       "content_sha256": "2a85a44ab41ede137c829322d5c9034c309ba3bf84d2d6e1179c76ca8656402f",
       "outcome": "Reviewed current news index. No newer quantitative revenue disclosure identified in its visible articles; does not establish absence of undiscovered disclosures."
     }
-  ]
+  ],
+  "profile_finance": {
+    "mercor": {
+      "headline": {
+        "record_id": "mercor-series-d",
+        "source_id": "profile-content.json/mercor/current_facts/sources/0",
+        "source_url": "https://www.mercor.com/blog/series-d/",
+        "source_title": "Mercor Series D announcement",
+        "source_published_on": "2026-11-10",
+        "source_accessed_on": "2026-11-18",
+        "receipt_sha256": "1eec86e12d8b0dceb958df1b00c313453f61b73abfacef466405422dc17c36d9",
+        "raw_date": "2026-11-10",
+        "date_role": "announcement",
+        "label": "Latest announced valuation",
+        "claimant": "Company-reported",
+        "display_date": "Series D announced 10 Nov 2026",
+        "scope": "Whole company",
+        "note": "$750M announced round includes an employee tender. New-capital amount undisclosed.",
+        "amount": 20000000000,
+        "currency": "USD",
+        "qualifier": "exact",
+        "date_label": "Series D announcement",
+        "evidence_date": "2026-11-10",
+        "source_status": "checked"
+      },
+      "archived_record": "mercor.metric.major-round-valuation-3",
+      "archived_record_context": "Earlier announced valuation from Series C. The Series D announcement supplies the newer valuation.",
+      "preserved_metric_rows": [
+        "mercor.metric.major-growth_metrics-1",
+        "mercor.metric.major-growth_metrics-4",
+        "mercor.metric.major-growth_metrics-5",
+        "mercor.metric.major-growth_metrics-7",
+        "mercor.metric.major-round-valuation-3",
+        "mercor.metric.major-total_funding",
+        "mercor.metric.oct14-major-financial-2"
+      ],
+      "native_detail_records": [],
+      "compare_projection": "native_evidence_link_only"
+    },
+    "datacurve": {
+      "headline": {
+        "record_id": "datacurve.round.0",
+        "claim_ids": [
+          "datacurve.claim.audit-funding"
+        ],
+        "source_id": "datacurve.source.audit-chemistry",
+        "source_url": "https://www.chemistry.vc/post/staying-ahead-of-the-curve",
+        "source_title": "Staying ahead of the curve: Our Series A in Datacurve",
+        "source_status": "checked",
+        "source_published_on": "2025-10-09",
+        "source_accessed_on": "2026-10-12",
+        "raw_date": "2025-10-09",
+        "date_role": "announcement",
+        "label": "Series A financing",
+        "claimant": "Chemistry, lead investor",
+        "display_date": "Announced 9 Oct 2025",
+        "scope": "Whole company",
+        "note": null,
+        "amount": 15000000,
+        "currency": "USD",
+        "qualifier": "exact",
+        "date_label": "Series A announcement",
+        "evidence_date": "2025-10-09"
+      },
+      "archived_record": "datacurve.metric.specialist-12",
+      "archived_record_context": "Undated recruiting valuation claim. The dated investor announcement supports the Series A amount.",
+      "preserved_metric_rows": [
+        "datacurve.metric.oct14-2-benchmark-size",
+        "datacurve.metric.specialist-12",
+        "datacurve.metric.specialist-13",
+        "datacurve.metric.specialist-14",
+        "datacurve.metric.specialist-8"
+      ],
+      "native_detail_records": [
+        {
+          "record_id": "datacurve.metric.specialist-8",
+          "claim_ids": [
+            "datacurve.claim.specialist-8-metric"
+          ],
+          "source_id": "datacurve.source.audit-dc-funding",
+          "source_url": "https://www.linkedin.com/posts/datacurveai_were-excited-to-announce-that-datacurve-activity-7382142078681587712-Ncml",
+          "source_title": "Datacurve announces $17.7M",
+          "source_status": "checked",
+          "source_published_on": null,
+          "source_accessed_on": "2026-10-12",
+          "raw_date": "2025-10-09",
+          "date_role": "company_announcement_context",
+          "label": "Cumulative funding reported",
+          "claimant": "Datacurve company post",
+          "display_date": "Reported alongside the 9 Oct 2025 Series A",
+          "scope": "Whole company",
+          "note": "Includes a $2.7M seed",
+          "amount": 17700000,
+          "currency": "USD",
+          "qualifier": "exact",
+          "date_label": "Series A announcement context",
+          "evidence_date": "2025-10-09"
+        }
+      ],
+      "compare_projection": "native_evidence_link_only"
+    },
+    "rws_trainai": {
+      "headline": {
+        "record_id": "rws_trainai.claim.growth_metrics-0.metric-0",
+        "claim_ids": [
+          "rws_trainai.claim.growth_metrics-0"
+        ],
+        "source_id": "rws_trainai.source.d_rws4",
+        "source_url": "https://www.rws.com/media/images/RWS-HY26-Results-Statement-Final-260610_tcm228-298858.pdf",
+        "source_title": "RWS half-year results for six months ended 31 March 2026",
+        "source_status": "checked",
+        "source_published_on": "2026-06-11",
+        "source_accessed_on": "2026-10-12",
+        "raw_date": "H1 FY2026",
+        "date_role": "period_end",
+        "label": "Interim revenue",
+        "claimant": "RWS Holdings plc, unaudited",
+        "display_date": "H1 FY2026, ended 31 Mar 2026",
+        "scope": "RWS Holdings plc group",
+        "note": "GBP · Gross/net basis undisclosed",
+        "amount": 360300000,
+        "currency": "GBP",
+        "qualifier": "exact",
+        "date_label": "Reporting period end",
+        "evidence_date": "2026-03-31"
+      },
+      "archived_record": null,
+      "archived_record_context": "",
+      "preserved_metric_rows": [
+        "rws_trainai.claim.growth_metrics-0.metric-0",
+        "rws_trainai.metric.oct14-0-freelance-community",
+        "rws_trainai.metric.oct14-1-language-coverage"
+      ],
+      "native_detail_records": [],
+      "compare_projection": "parent_scope"
+    },
+    "polymath_ai_labs": {
+      "headline": null,
+      "archived_record": "polymath_ai_labs.metric.specialist-5",
+      "archived_record_context": "Undated employer recruiting claim, reviewed through a source summary. Cumulative funding remains unverified.",
+      "preserved_metric_rows": [
+        "polymath_ai_labs.metric.oct14-0-benchmark-size",
+        "polymath_ai_labs.metric.specialist-5",
+        "polymath_ai_labs.metric.specialist-6"
+      ],
+      "native_detail_records": [
+        {
+          "record_id": "polymath_ai_labs.round.0",
+          "claim_ids": [
+            "polymath_ai_labs.claim.audit-funding"
+          ],
+          "source_id": "polymath_ai_labs.source.audit-pm-founder",
+          "source_url": "https://www.linkedin.com/in/dylanma5621",
+          "source_title": "Dylan Ma public funding statement",
+          "source_status": "summary_only",
+          "source_published_on": null,
+          "source_accessed_on": "2026-10-12",
+          "raw_date": "undated",
+          "date_role": "undated",
+          "label": "Seed financing",
+          "claimant": "Founder-reported, summary only",
+          "display_date": "Undated · Announcement and closing dates unverified",
+          "scope": "Whole company",
+          "note": null,
+          "amount": 8000000,
+          "currency": "USD",
+          "qualifier": "approximate",
+          "date_label": "Founder statement",
+          "evidence_date": null
+        }
+      ],
+      "compare_projection": "native_evidence_link_only"
+    },
+    "elorian": {
+      "headline": {
+        "record_id": "elorian.round.0",
+        "claim_ids": [
+          "elorian.claim.audit-financing-0"
+        ],
+        "source_id": "elorian.source.elorian-4",
+        "source_url": "https://www.wsgr.com/en/insights/wilson-sonsini-advises-elorian-on-dollar55-million-seed-financing-as-company-emerges-from-stealth.html",
+        "source_title": "Wilson Sonsini Advises Elorian on $55 Million Seed Financing",
+        "source_status": "checked",
+        "source_published_on": "2026-04-13",
+        "source_accessed_on": "2026-10-12",
+        "raw_date": "2026-04-09",
+        "date_role": "announcement",
+        "label": "Seed financing",
+        "claimant": "Elorian and transaction counsel",
+        "display_date": "Announced 9 Apr 2026",
+        "scope": "Whole company",
+        "note": "Counsel published 13 Apr 2026",
+        "amount": 55000000,
+        "currency": "USD",
+        "qualifier": "exact",
+        "date_label": "Seed announcement",
+        "evidence_date": "2026-04-09"
+      },
+      "archived_record": "elorian.claim.valuation.metric-0",
+      "archived_record_context": "Grade C founder-interview and private-market reporting. TechCrunch published the interview 16 Jul 2026.",
+      "preserved_metric_rows": [
+        "elorian.claim.total_funding.metric-0",
+        "elorian.claim.valuation.metric-0",
+        "elorian.metric.core-elorian.claim.growth_metrics-0.metric-0"
+      ],
+      "native_detail_records": [
+        {
+          "record_id": "elorian.claim.valuation.metric-0",
+          "claim_ids": [
+            "elorian.claim.valuation"
+          ],
+          "source_id": "elorian.source.elorian-6",
+          "source_url": "https://techcrunch.com/podcast/how-elorian-ai-pulled-off-a-300m-pre-seed-valuation/",
+          "source_title": "How Elorian AI pulled off a $300M pre-seed valuation",
+          "source_status": "checked",
+          "source_accessed_on": "2026-10-12",
+          "raw_date": "2026-04-09",
+          "date_role": "source_publication",
+          "label": "Reported valuation",
+          "claimant": "TechCrunch founder interview",
+          "display_date": "Interview published 16 Jul 2026",
+          "scope": "Whole company",
+          "note": "Grade C · Founder interview and private-market reporting. Issuer confirmation of valuation terms remains unverified.",
+          "amount": 300000000,
+          "currency": "USD",
+          "qualifier": "exact",
+          "receipt_sha256": "6b08952f9dd5da35c2e3e2555d387ab4e8beaafc03a6b7f3581eb14d4b979bd9",
+          "source_checked_on": "2026-11-22",
+          "receipt_checked_at": "2026-11-22T04:47:40.290697+00:00",
+          "receipt_locator": "Podcast article publication metadata and episode description",
+          "receipt_excerpt": "In this episode of Build Mode , host and Startup Battlefield lead Isabelle Johannessen sits down with Andrew Dai, founder and CEO of Elorian and former Google DeepMind researcher, to unpack how his company raised a $55 million seed round at a $300 million valuation before generating revenue or releasing a product.",
+          "captured_source_published_at": "2026-07-16T14:02:00Z",
+          "source_published_on": "2026-07-16",
+          "date_label": "Interview published",
+          "evidence_date": "2026-07-16"
+        }
+      ],
+      "compare_projection": "native_evidence_link_only"
+    },
+    "benchflow": {
+      "headline": {
+        "record_id": "benchflow.claim.total_funding.metric-0",
+        "claim_ids": [
+          "benchflow.claim.total_funding"
+        ],
+        "source_id": "benchflow.source.b_bf3",
+        "source_url": "https://www.linkedin.com/posts/l1xiangyi_build-the-future-of-ai-evals-backed-by-activity-7295017974141198337-I0iB",
+        "source_title": "Build the future of AI evals; funding and hiring announcement",
+        "source_status": "summary_only",
+        "source_published_on": "2025-02-11",
+        "source_accessed_on": "2026-10-12",
+        "raw_date": "2026-10-12",
+        "date_role": "source_publication",
+        "label": "Reported funding",
+        "claimant": "Founder Xiangyi Li",
+        "display_date": "Posted 11 Feb 2025",
+        "scope": "Whole company",
+        "note": "A later CUHK–Shenzhen profile describes seed financing. Exact round date and cumulative funding unverified.",
+        "amount": 1000000,
+        "currency": "USD",
+        "qualifier": "at_least",
+        "captured_source_published_at": "2025-02-11T09:56:59.889Z",
+        "receipt_sha256": "1a6bbde0f3766b1ebbe4853bb9594797381f08afd2fd23710af7d5037d46b68a",
+        "source_checked_on": "2026-11-22",
+        "receipt_checked_at": "2026-11-22T04:49:21.333722+00:00",
+        "receipt_locator": "Main SocialMediaPosting datePublished and text",
+        "receipt_excerpt": "We've secured $1M+ in funding from investors including Google Chief Scientist Jeff Dean, A16z Scout Fund, and Dropbox co-founder Arash Ferdowsi",
+        "date_label": "Founder post published",
+        "evidence_date": "2025-02-11"
+      },
+      "archived_record": "benchflow.claim.total_funding.metric-0",
+      "archived_record_context": "Legacy source-check date recorded on 12 Oct 2026. The founder statement has its own post date.",
+      "preserved_metric_rows": [
+        "benchflow.claim.total_funding.metric-0",
+        "benchflow.metric.oct14-2-benchmark-size"
+      ],
+      "native_detail_records": [],
+      "compare_projection": "native_evidence_link_only"
+    },
+    "a-team": {
+      "headline": {
+        "record_id": "a-team.claim.total_funding.metric-0",
+        "claim_ids": [
+          "a-team.claim.total_funding"
+        ],
+        "source_id": "a-team.source.ateam-2",
+        "source_url": "https://www.a.team/hire-tech-talent",
+        "source_title": "Hire Pre-Vetted Tech & AI Talent",
+        "source_status": "checked",
+        "source_published_on": null,
+        "source_accessed_on": "2026-10-12",
+        "raw_date": "2026-10-12",
+        "date_role": "source_check",
+        "label": "Funding claimed",
+        "claimant": "A.Team, undated hiring page",
+        "display_date": "Source checked 12 Oct 2026",
+        "scope": "Whole company",
+        "note": "The two separately disclosed rounds total $60M. Timing and terms for the $5M difference remain unverified.",
+        "amount": 65000000,
+        "currency": "USD",
+        "qualifier": "exact",
+        "date_label": "Source checked",
+        "evidence_date": null
+      },
+      "archived_record": "a-team.claim.total_funding.metric-0",
+      "archived_record_context": "12 Oct 2026 is a source check. The hiring statement itself is undated.",
+      "preserved_metric_rows": [
+        "a-team.claim.growth_metrics-2.metric-0",
+        "a-team.claim.total_funding.metric-0",
+        "a-team.metric.audit-ateam-scope",
+        "a-team.metric.oct14-1-customer-count",
+        "a-team.metric.oct14-2-experience"
+      ],
+      "native_detail_records": [],
+      "compare_projection": "native_evidence_link_only"
+    }
+  }
 }

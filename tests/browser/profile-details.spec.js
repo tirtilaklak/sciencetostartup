@@ -85,14 +85,68 @@ for (const registry of ['ScienceProfileDetails', 'ScienceDetailViews']) for (con
     }, {fault: mode, registry});
     await page.goto('/explore/#company/mercor/work');
     await expect(page.locator('html')).toHaveAttribute('data-view-state', 'failed');
-    await expect(page.getByRole('heading', { name: 'This company’s evidence could not load.' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Read the plain company page' })).toHaveAttribute('href', '/company/mercor/');
+    await expect(page).toHaveTitle('Mercor · ScienceToStartup');
+    await expect(page.getByRole('heading', { name: 'Evidence for Mercor could not load.' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Read the plain paid work section' })).toHaveAttribute('href', '/company/mercor/#work');
     expect(await page.evaluate(() => window.APP_HEALTH_READY)).toBeUndefined();
     await page.evaluate(() => { window.testRendererFault = ''; });
     await page.getByRole('button', { name: 'Try again' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    await expect(page.locator('#profile-pane-work')).toBeFocused();
     expect(await page.evaluate(() => window.ScienceProfileDetails.buildId)).toBe(await page.evaluate(() => window.APP_BUILD_ID));
     await page.getByRole('tab', { name: 'Business', exact: true }).click();
     await expect(page.locator('#profile-pane-business .offering-card').first()).toBeVisible();
   });
 }
+
+test('a comparison keeps its exact peer request and retries the missing evidence', async ({ page }) => {
+  const requested = [];
+  let refused = true;
+  await page.route('**/presentation/company-*.json', route => {
+    const id = new URL(route.request().url()).pathname.split('/').at(-1).split('.')[0].replace('company-', '');
+    requested.push(id);
+    return id === 'taskus' || id === 'appen' || id === 'scale_ai' && refused ? route.abort() : route.continue();
+  });
+  const pair = '/explore/#compare/snorkel_ai/scale_ai?reader=keep';
+  await page.goto(pair);
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'failed');
+  await expect(page).toHaveTitle('Snorkel AI and Scale AI · Compare · ScienceToStartup');
+  await expect(page.locator('#compare-content')).not.toContainText('TaskUs');
+  expect(requested.toSorted()).toEqual(['scale_ai', 'snorkel_ai']);
+
+  refused = false;
+  await page.getByRole('button', { name: 'Try again' }).press('Enter');
+  await expect(page).toHaveURL(new RegExp(pair.replace('?', '\\?') + '$'));
+  await expect(page.locator('#compare-content thead a')).toHaveText(['Snorkel AI', 'Scale AI']);
+  await expect(page.locator('#compare-view h1')).toBeFocused();
+});
+
+test('a refused claim bookmark reopens the exact sources on keyboard retry', async ({ page }) => {
+  const bookmark = '/explore/#company/a-team/claim/a-team.claim.total_funding';
+  let refused = true;
+  await page.route('**/presentation/company-a-team.*.json', route => refused ? route.abort() : route.continue());
+  await page.goto(bookmark);
+  await expect(page.getByRole('heading', { name: 'A.Team', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Read the plain company sources' })).toHaveAttribute('href', '/company/a-team/#sources');
+
+  refused = false;
+  await page.getByRole('button', { name: 'Try again' }).press('Enter');
+  await expect(page.locator('#evidence-dialog')).toBeVisible();
+  await expect(page.locator('#close-evidence')).toBeFocused();
+  await expect(page.locator('#evidence-dialog [data-source-id]')).toHaveCount(3);
+  await expect(page.locator('#evidence-dialog .evidence-data')).toContainText('Source checked');
+  expect(new URL(page.url()).pathname + new URL(page.url()).hash).toBe(bookmark);
+
+  await page.locator('#evidence-dialog a[href="#corrections"]').press('Enter');
+  await expect(page.locator('#corrections')).toBeFocused();
+  for (const [label, parameter] of [
+    ['Email a correction for this record', 'body'],
+    ['Start a public GitHub correction', 'target'],
+  ]) {
+    const draft = new URL(await page.getByRole('link', { name: label }).getAttribute('href'));
+    expect(draft.searchParams.get(parameter)).toContain('https://sciencetostartup.com' + bookmark);
+  }
+  await page.goBack();
+  await expect(page.locator('#close-evidence')).toBeFocused();
+  expect(new URL(page.url()).hash).toBe(new URL(bookmark, page.url()).hash);
+});

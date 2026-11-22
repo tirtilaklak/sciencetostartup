@@ -45,6 +45,46 @@ test.describe('enhanced technical reading', () => {
   test('final citation restores its reading position with scripts enabled', async ({ page }) => {
     await verifyCitationHistory(page);
   });
+
+  test('End reaches the technical footer while leaving text editing to the browser', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(chapter);
+    await expect(page.locator('html')).toHaveAttribute('data-reader-enhanced', '');
+    const shortcut = page.getByRole('link', { name: 'First paragraph', exact: true });
+    await shortcut.focus();
+    await page.keyboard.press('End');
+    await expect(page.locator('footer')).toBeInViewport();
+    await expect(shortcut).toBeFocused();
+    const last = page.locator(paragraphSelector).last();
+    if (await page.evaluate(() => CSS.supports('content-visibility', 'auto'))) {
+      await expect(last).toHaveCSS('content-visibility', 'auto');
+    }
+
+    await page.evaluate(() => {
+      const editor = document.createElement('input');
+      editor.id = 'reader-typing-test';
+      editor.value = 'Preserve the caret';
+      document.querySelector('main').prepend(editor);
+      editor.focus();
+      editor.setSelectionRange(3, 3);
+    });
+    const editor = page.locator('#reader-typing-test');
+    await editor.press('End');
+    const caret = await editor.evaluate(input => ({ position: input.selectionStart, length: input.value.length }));
+    expect(caret.position).toBe(caret.length);
+    await expect(editor).toBeFocused();
+    await expect(page.locator('footer')).not.toBeInViewport();
+  });
+
+  test('native End remains usable when the reader script is refused', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.route('**/native-details.js', route => route.abort());
+    await page.goto(chapter);
+    await expect(page.locator('html')).not.toHaveAttribute('data-reader-enhanced', '');
+    await page.keyboard.press('End');
+    await expect(page.locator('footer')).toBeInViewport();
+  });
 });
 
 test('direct final-citation fragment and reload resolve after the complete technical layout', async ({ page }) => {

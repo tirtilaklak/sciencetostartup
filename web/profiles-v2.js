@@ -8,8 +8,22 @@ function readableDate(text){
  return String(text??'').replace(/\bFY ended (\d{4})-12-31\b/g,'FY$1').replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g,(all,y,m,d)=>{const date=valid(y,m,d);return date?PROFILE_DAY_FORMAT.format(date).replace('Sept','Sep'):all;}).replace(/\b(\d{4})-(\d{2})\b(?!-\d)/g,(all,y,m)=>{const date=valid(y,m);return date?PROFILE_MONTH_FORMAT.format(date).replace('Sept','Sep'):all;});
 }
 function profileDate(value){return readableDate(dateText(value));}
-function profileSourceMeta(s){const added=profileDate(s.accessed_on);return [s.publisher,s.published_on?'Published '+profileDate(s.published_on):'Publication date not stated',s.retrieval_status==='checked'?'Checked '+added:s.retrieval_status==='summary_only'?'Summary only, page not reviewed · recorded '+added:s.retrieval_status==='unverified'?'Not checked again · recorded '+added:'Recorded '+added].filter(Boolean).join(' · ');}
-function profileProvenance(cl){return `<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(evidenceContextArchiveDate(cl,profileDate(cl.as_of)))}</span><span>· ${esc(evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id)))}</span><span>· ${esc(profileEvidenceLabel(cl))}</span>${claimButton(cl.id,'Source')}</div>`;}
+function profileSourceMeta(s,finance){
+ const added=profileDate(s.accessed_on),published=finance?.source_published_on||s.published_on,checked=finance?.source_checked_on;
+ const original=s.retrieval_status==='checked'?'Checked '+added:s.retrieval_status==='summary_only'?(checked?'Source summary recorded ':'Summary only, page not reviewed · recorded ')+added:s.retrieval_status==='unverified'?'Not checked again · recorded '+added:'Recorded '+added;
+ return [s.publisher,published?'Published '+profileDate(published):'Publication date not stated',original,checked&&checked!==s.accessed_on?'Source checked '+profileDate(checked):''].filter(Boolean).join(' · ');
+}
+function profileFinanceProjection(id){return window.BUSINESS_HEALTH?.profile_finance?.[id];}
+function financeClaimContextFor(id){return window.FINANCE_CLAIM_CONTEXT?.[id];}
+function profileFinancingEvidenceLink(id){
+ const href=companySummaryFor(id)?.financingEvidenceHref;
+ return href?`<a href="${attr(href)}">Read ${esc(companies[id].name)}’s financing evidence ${iconHTML('right')}</a>`:'';
+}
+function profileProvenance(cl){
+ const finance=financeClaimContextFor(cl.id),date=finance?.display_date||evidenceContextArchiveDate(cl,profileDate(cl.as_of));
+ const scope=finance?.scope||evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id));
+ return `<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(date)}</span><span>· ${esc(scope)}</span><span>· ${esc(profileEvidenceLabel(cl))}</span>${claimButton(cl.id,'Source')}</div>`;
+}
 // Canonical company id for a route value (case and alias fixes).
 function profileRouteCompany(value=routeParts()[1]){const raw=String(value??''),lower=raw.toLowerCase(),aliases=window.RESEARCH_ALIASES;return isCompanyId(raw)?raw:isCompanyId(lower)?lower:aliases&&Object.hasOwn(aliases,lower)&&isCompanyId(aliases[lower])?aliases[lower]:'';}
 function profileReferences(ids,label='Source',topic=''){
@@ -107,6 +121,7 @@ function profileMetricLabel(m){
   return metricLabels[m.kind]||profileSentenceCase(m.label);
 }
 function profileMetricDate(m){
+ const finance=financeClaimContextFor(m.claim_id);if(finance)return finance.display_date;
  const corrected=metricCurrentPeriod(m);if(corrected)return corrected;
  if(m.kind==='revenue')return readableDate(m.period_label||financialPeriod(m));
  if(m.as_of==='undated')return 'Undated · checked '+profileDate(claims[m.claim_id].observed_on);
@@ -127,7 +142,7 @@ const PROFILE_METRIC_ATTRIBUTIONS={
 };
 // Lead decision: TaskUs and Appen figures are annual-report figures, never "audited".
 const PROFILE_EVIDENCE_LABELS={'Audited filing':'Annual report filing','Audited public company':'Public company annual report'};
-function profileEvidenceLabel(cl){const label=evidenceLabel(cl);return ['taskus','appen'].includes(cl.company_id)&&PROFILE_EVIDENCE_LABELS[label]||label;}
+function profileEvidenceLabel(cl){const label=evidenceLabel(cl);return financeClaimContextFor(cl.id)?.attribution||(['taskus','appen'].includes(cl.company_id)&&PROFILE_EVIDENCE_LABELS[label])||label;}
 function profileMetricAttribution(m){
  const claim=claims[m.claim_id];
  if(claim.status!=='supported'||claim.source_ids.length&&claim.source_ids.every(id=>sources[id].retrieval_status==='unverified'))return profileEvidenceLabel(claim);
@@ -330,7 +345,7 @@ route=function(event){
       else anchor?.scrollIntoView({block:'start',behavior:'instant'});
     }
   }
-  if(company&&parts[2]==='claim'&&claims[parts[3]]?.company_id===company)showEvidence(parts[3]);
+  if(company&&parts[2]==='claim'&&parts[3])showEvidence(parts[3]);
   return result;
 };
 function profileTabHash(id){const tab=document.querySelector('#profile-view .profile-tabs [aria-selected="true"]')?.dataset?.profileTab;return '#company/'+id+(tab&&tab!=='business'?'/'+tab:'');}

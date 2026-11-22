@@ -19,7 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SIGNALS = {"revenue", "profit", "customers", "delivery", "cash"}
 sys.path.insert(0, str(ROOT / "scripts"))
-from business_health import load_business_health
+from business_health import load_business_health, profile_finance_claim_context
 from artifact_verification import verify_artifact
 
 
@@ -170,11 +170,53 @@ class BusinessHealthTests(unittest.TestCase):
         bad = copy.deepcopy(self.health)
         bad["sources"][0]["url"] = "https://example.com/substitute"
         mutations.append(("supplemental layer overrides canonical source URL", bad))
+        bad = copy.deepcopy(self.health)
+        bad["profile_finance"]["mercor"]["headline"]["amount"] = 750_000_000
+        mutations.append(("Mercor financing substituted for valuation", bad))
+        bad = copy.deepcopy(self.health)
+        bad["profile_finance"]["datacurve"]["headline"]["source_id"] = "datacurve.source.audit-dc-funding"
+        mutations.append(("Datacurve aggregate source substituted for Series A source", bad))
+        bad = copy.deepcopy(self.health)
+        bad["profile_finance"]["a-team"]["headline"]["evidence_date"] = "2026-10-12"
+        mutations.append(("A.Team check date promoted to financing date", bad))
+        bad = copy.deepcopy(self.health)
+        bad["profile_finance"]["benchflow"]["headline"]["receipt_sha256"] = "invalid"
+        mutations.append(("BenchFlow post date without review receipt", bad))
+        bad = copy.deepcopy(self.health)
+        next(row for row in bad["observations"] if row["id"] == "rws_trainai.claim.growth_metrics-0.metric-0")["scope_label"] = "Whole company"
+        mutations.append(("RWS observation omits the parent group", bad))
         for name, value in mutations:
             with self.subTest(mutation=name), self.assertRaises(ValueError):
                 load(value)
         fixture = {"dataset_version": "fixture"}
         self.assertIsNone(load(self.health, fixture), "Other datasets must not inherit curated research")
+
+    def test_profile_finance_dates_and_totals_keep_their_source_roles(self):
+        finance = self.health["profile_finance"]
+        self.assertEqual(len(finance), 7)
+        self.assertEqual(sum(len(row["preserved_metric_rows"]) for row in finance.values()), 28)
+        self.assertEqual([company for company, row in finance.items() if row["compare_projection"] == "parent_scope"], ["rws_trainai"])
+        polymath = finance["polymath_ai_labs"]
+        self.assertIsNone(polymath["headline"])
+        self.assertEqual(polymath["native_detail_records"][0]["qualifier"], "approximate")
+        self.assertEqual(polymath["native_detail_records"][0]["source_status"], "summary_only")
+        datacurve = finance["datacurve"]
+        self.assertEqual(datacurve["headline"]["amount"], 15_000_000)
+        self.assertEqual(datacurve["native_detail_records"][0]["amount"], 17_700_000)
+        self.assertNotEqual(datacurve["headline"]["source_id"], datacurve["native_detail_records"][0]["source_id"])
+        elorian = profile_finance_claim_context(finance["elorian"])
+        self.assertEqual(elorian["elorian.claim.audit-financing-0"]["evidence_date"], "2026-04-09")
+        self.assertEqual(elorian["elorian.claim.audit-financing-0"]["source_published_on"], "2026-04-13")
+        self.assertEqual(elorian["elorian.claim.valuation"]["source_published_on"], "2026-07-16")
+        self.assertEqual(elorian["elorian.claim.valuation"]["attribution"], "TechCrunch founder interview")
+        benchflow = profile_finance_claim_context(finance["benchflow"])["benchflow.claim.total_funding"]
+        self.assertEqual(benchflow["evidence_date"], "2025-02-11")
+        self.assertEqual(benchflow["source_accessed_on"], "2026-10-12")
+        self.assertEqual(benchflow["source_checked_on"], "2026-11-22")
+        a_team = profile_finance_claim_context(finance["a-team"])["a-team.claim.total_funding"]
+        self.assertIsNone(a_team["evidence_date"])
+        self.assertEqual(a_team["date_role"], "source_check")
+        self.assertEqual(a_team["source_accessed_on"], "2026-10-12")
 
     def test_private_company_estimates_and_activity_do_not_become_financial_actuals(self):
         rows = {row["id"]: row for row in self.observations}
@@ -199,6 +241,7 @@ assert.ok(observations.length>0);
 h.render();
 assert.ok(node('bh-measure').innerHTML.includes('value="annualized_revenue"'),'Measure option IDs must retain underscores');
 assert.ok(!node('bh-measure').innerHTML.includes('value="annualized revenue"'),'Public copy formatting must not rewrite control identifiers');
+assert.match(node('bh-matrix-body').innerHTML, /<b>£360\.3M.*?<\/b><small>RWS Holdings plc group/);
 for(const signal of ['revenue','profit','customers','delivery','cash']){
  const rows=h.rows(signal);
  assert.ok(rows.every(row=>row.signal===signal&&typeof row.value==='number'&&Number.isFinite(row.value)));

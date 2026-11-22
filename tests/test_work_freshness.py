@@ -38,7 +38,7 @@ const input=JSON.parse(fs.readFileSync(0,'utf8'));
 const context={document:{addEventListener(){},querySelectorAll(){return[]},activeElement:null,body:{}},
  window:{innerWidth:1000,addEventListener(){}},queueMicrotask(){}};
 vm.createContext(context);
-for(const name of ['work-v3.js','work-v4.js'])vm.runInContext(fs.readFileSync(process.argv[1]+'/web/'+name,'utf8'),context);
+for(const name of ['work-core.js','work-v3.js','work-v4.js'])vm.runInContext(fs.readFileSync(process.argv[1]+'/web/'+name,'utf8'),context);
 context.rows=input.routes;context.asOf=input.asOf;
 process.stdout.write(vm.runInContext("JSON.stringify(Object.fromEntries(rows.map(r=>[r.id,{label:w4FreshnessLabel(r),terms:w4TermsReviewDate(r)}])))",context));
 '''
@@ -67,7 +67,8 @@ process.stdout.write(vm.runInContext("JSON.stringify(Object.fromEntries(rows.map
 
     def test_failure_label_uses_actual_newest_status_and_never_publication_date(self):
         row = self.routes["turing.work.machine-learning"]
-        self.assertEqual(sp.work_freshness(row), "Recheck blocked 18 Nov 2026")
+        self.assertEqual(row["last_route_check"]["result"], "blocked")
+        self.assertEqual(sp.work_freshness(row), "Recheck blocked " + sp.format_date(row["last_route_check"]["date"]))
         self.assertEqual(row["last_link_check"]["date"], "2026-10-28")
         labels = {row["id"]: sp.work_freshness(row) for row in self.fixtures}
         self.assertEqual(labels["newer-success"], "Page checked 18 Nov 2026")

@@ -36,8 +36,9 @@ for(const key of options.missing||[])delete window[key];
 if(options.linkHealth!==undefined)window.LINK_HEALTH=options.linkHealth;
 """ + marker,
 )
-assert "'web/icons.js','web/app.js'" in prefix
-prefix = prefix.replace("'web/icons.js','web/app.js'", "'web/icons.js','web/link-health.js','web/app.js'")
+icons_module = "'web/icons.js',"
+assert prefix.count(icons_module) == 1 and "'web/link-health.js'" not in prefix
+prefix = prefix.replace(icons_module, icons_module + "'web/link-health.js',")
 setup = "function harness(options={}){\n" + prefix + "\nreturn {run,node,context,document,window,history,location,windowCallbacks,getAttempts:()=>({storage:storageGetterAttempts,network:networkAttempts})};}\n"
 
 checks = r"""
@@ -71,8 +72,8 @@ console.log(JSON.stringify({cases:reports.length,checks:reports.reduce((total,re
 """
 
 source_paths = [
-    "web/icons.js", "web/link-health.js", "web/app.js", "web/editorial.js",
-    "web/work-v3.js", "web/work-v4.js", "web/profiles-v2.js", "web/source-updates.js", "web/site-nav.js",
+    "web/icons.js", "web/link-health.js", "web/search-core.js", "web/app.js", "web/editorial.js",
+    "web/work-core.js", "web/work-v3.js", "web/work-v4.js", "web/profiles-v2.js", "web/source-updates.js", "web/site-nav.js",
     "web/detail-views.js", "web/source-update-details.js", "web/profile-details.js",
     "data/canonical.json", "data/editorial.json", "data/logo-provenance.json",
     "data/work-routes.json", "data/profile-content.json", "data/profile-afterquery.json",

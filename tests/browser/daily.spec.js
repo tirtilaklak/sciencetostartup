@@ -126,7 +126,7 @@ test('Daily latest and bounded archives match complete committed snapshots and f
   for (const { route, edition } of contentRoutes) {
     await verifiedResponse(request, route, route.slice(1) + 'index.html');
     const snapshotPath = `daily/${edition.date}/snapshot.json`;
-    expect(JSON.parse(await verifiedResponse(request, '/' + snapshotPath, snapshotPath))).toEqual(edition);
+    expect(digest(await verifiedResponse(request, '/' + snapshotPath, snapshotPath))).toBe(sourceHashes[edition.date]);
     await page.goto(route);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sciencetostartup.com' + route);
     await expect(page).toHaveTitle(new RegExp(edition.date.slice(0, 4)));
@@ -207,24 +207,47 @@ test('Daily prefix search combines filters, restores URLs, and resets empty resu
   await assertSelections(page, latest.items);
 });
 
-test('Daily date navigation retains all filters across previous and selected real snapshots', async ({ page }) => {
+test('Daily date navigation retains filters and restores the open issue on Back', async ({ page }) => {
   const { item, query } = distinctiveSearch();
-  const params = new URLSearchParams({ q: query, topic: item.topics[0], type: item.kind });
+  const params = new URLSearchParams({ q: query, topic: item.topics[0], type: item.kind, reader: 'keep' });
   await page.goto('/daily/?' + params);
-  const previousLink = page.getByRole('link', { name: 'Previous snapshot', exact: true });
-  const previousURL = new URL(await previousLink.getAttribute('href'), page.url()).href;
+  const navigation = page.getByRole('navigation', { name: 'Snapshots', exact: true });
+  const date = page.getByLabel('Snapshot date');
+  const go = navigation.getByRole('button', { name: 'Go', exact: true });
+  const previousLink = navigation.getByRole('link', { name: /^Previous snapshot · / });
+  const nextLink = navigation.getByRole('link', { name: /^Next snapshot · / });
+  const datedURL = edition => new URL(`/daily/${edition.date}/?${params}`, page.url()).href;
+  const latestURL = page.url();
+  await expect(previousLink).toHaveAttribute('href', datedURL(previous));
   await previousLink.click();
-  await expect(page).toHaveURL(previousURL);
-  expect(new URL(page.url()).pathname).toBe(`/daily/${previous.date}/`);
-  for (const [key, value] of params) expect(new URL(page.url()).searchParams.get(key)).toBe(value);
-  await expect(page.getByLabel('Snapshot date')).toHaveValue(previous.date);
+  await expect(page).toHaveURL(datedURL(previous));
+  await expect(date).toHaveValue(previous.date);
   await expect(page.getByLabel('Search', { exact: true })).toHaveValue(query);
   await expect(page.getByLabel('Topic', { exact: true })).toHaveValue(item.topics[0]);
   await expect(page.getByLabel('Type', { exact: true })).toHaveValue(item.kind);
-  await page.getByLabel('Snapshot date').selectOption(latest.date);
-  await expect(page).toHaveURL(url => url.pathname === `/daily/${latest.date}/`);
-  for (const [key, value] of params) expect(new URL(page.url()).searchParams.get(key)).toBe(value);
+  await nextLink.click();
+  await expect(page).toHaveURL(datedURL(latest));
+  await navigation.getByText('Snapshot archive', { exact: true }).click();
+  const oldestLink = navigation.locator('.scan-archive a').last();
+  await expect(oldestLink).toHaveAttribute('href', datedURL(oldest));
+  await oldestLink.click();
+  await expect(page).toHaveURL(datedURL(oldest));
+  await page.goto(latestURL);
+  const details = page.locator('.scan-item:not([hidden]) details').first();
+  await details.locator('summary').click();
+  await date.selectOption(previous.date);
+  await expect(page).toHaveURL(latestURL);
+  await go.focus();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(datedURL(previous));
+  await page.goBack();
+  await expect(page).toHaveURL(latestURL);
+  await expect(date).toHaveValue(latest.date);
+  await expect(go).toBeFocused();
+  await expect(details).toHaveAttribute('open', '');
   await assertSelections(page, [item]);
+  await page.goForward();
+  await expect(page).toHaveURL(datedURL(previous));
 });
 
 test('Daily deep links reveal filtered items and native disclosures support keyboard and history', async ({ page }) => {
@@ -303,8 +326,8 @@ test('Daily deep links reveal filtered items and native disclosures support keyb
   await restoredReading(permanentFirst.locator('h2 a'), forwardReading);
 });
 
-test('Daily controls, explanations and disclosed sources fit 320, 390, 768 and 1440 pixel widths', async ({ page }) => {
-  for (const width of [320, 390, 768, 1440]) {
+test('Daily controls, explanations and disclosed sources fit narrow and wide screens', async ({ page }) => {
+  for (const width of [320, 390, 600, 601, 701, 768, 1440]) {
     await page.setViewportSize({ width, height: 960 });
     await page.goto('/daily/');
     await expect(page.locator('.scan-controls')).toBeVisible();
@@ -312,7 +335,7 @@ test('Daily controls, explanations and disclosed sources fit 320, 390, 768 and 1
     await expect(page.locator('.scan-item .scan-explanation:visible')).toHaveCount(latest.items.length);
     const dimensions = await page.evaluate(() => ({ viewport: innerWidth,
       document: document.documentElement.scrollWidth, body: document.body.scrollWidth,
-      boxes: [...document.querySelectorAll('.scan-controls input,.scan-controls select,.scan-item h2,.scan-item details[open] .scan-sources')]
+      boxes: [...document.querySelectorAll('.scan-date-form select,.scan-date-form button,.scan-controls input,.scan-controls select,.scan-item h2,.scan-item details[open] .scan-sources')]
         .map(element => { const box = element.getBoundingClientRect(); return { left: box.left, right: box.right }; }) }));
     expect(dimensions.document, String(width)).toBeLessThanOrEqual(width + 1);
     expect(dimensions.body, String(width)).toBeLessThanOrEqual(width + 1);
@@ -341,6 +364,7 @@ test.describe('Daily without JavaScript', () => {
     for (const { route, edition } of readingRoutes) {
       await page.goto(route + '?q=daily-no-such-selection-987654321');
       await expect(page.locator('.scan-controls')).toBeHidden();
+      await expect(page.getByLabel('Snapshot date')).toBeHidden();
       await assertContent(page, edition);
       await expect(page.locator('#scan-count')).toHaveText(`${edition.items.length} selections`);
       const row = page.locator('.scan-item').last();
@@ -355,11 +379,24 @@ test.describe('Daily without JavaScript', () => {
       expect(JSON.parse(await verifiedResponse(request, '/' + snapshotPath, snapshotPath))).toEqual(edition);
     }
     await page.goto('/daily/');
-    await page.getByText('Snapshot archive', { exact: true }).click();
-    const archive = page.locator(`.scan-archive a[href="/daily/${oldest.date}/"]`);
+    const navigation = page.getByRole('navigation', { name: 'Snapshots', exact: true });
+    await expect(navigation).toBeVisible();
+    expect(await navigation.evaluate(node => Boolean(node.compareDocumentPosition(
+      document.querySelector('.scan-item')) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
+    await navigation.getByRole('link', { name: /^Previous snapshot · / }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(url => url.pathname === `/daily/${previous.date}/`);
+    await navigation.getByRole('link', { name: /^Next snapshot · / }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(url => url.pathname === `/daily/${latest.date}/`);
+    await navigation.getByText('Snapshot archive', { exact: true }).focus();
+    await page.keyboard.press('Enter');
+    const archive = navigation.locator(`.scan-archive a[href="/daily/${oldest.date}/"]`);
     await archive.focus();
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(url => url.pathname === `/daily/${oldest.date}/`);
     await assertContent(page, oldest);
+    const missing = await request.get('/daily/2026-11-15/', { headers: { 'Cache-Control': 'no-cache' } });
+    expect(missing.status()).toBe(404);
   });
 });

@@ -384,11 +384,15 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
              '<link rel="alternate" type="application/atom+xml" title="Research corrections" href="/research/corrections/atom.xml">\n')
     if company_page:
         extra += '<link rel="stylesheet" href="/company-profile.css">\n'
+    if page_type == 'Chapter':
+        extra += '<script src="/native-details.js" defer></script>\n'
     if page_type == 'Chapter' and path.endswith('/chapters/technical-landscape/'):
         # A history restoration needs the complete layout used when the reader
         # followed a citation. With scripting unavailable, keep that layout too.
         extra += ('<script>(function(){try{var nav=performance.getEntriesByType("navigation")[0];'
                   'if(nav&&nav.type==="navigate")document.documentElement.setAttribute("data-reader-enhanced","");'
+                  'addEventListener("DOMContentLoaded",function(){if(!document.documentElement.hasAttribute("data-reader-end-ready"))'
+                  'document.documentElement.removeAttribute("data-reader-enhanced")});'
                   'addEventListener("pageshow",function(event){if(event.persisted)document.documentElement.removeAttribute("data-reader-enhanced")});'
                   '}catch(_){}})();</script>\n')
     if page_type in {"Book", "Chapter"}:
@@ -1361,6 +1365,9 @@ def _company_highlight(context, entity, approved, sources):
         if not review_day or not source:
             continue
         statement = statement.removeprefix(entity['name'] + ' ')
+        if (claim['id'] == 'candidate.cohort3.humans_in_the_loop.annotation-trial'
+                and statement.casefold() == 'describes a two-hour annotation trial on sample data and instructions before final guideline and setup adjustments.'):
+            statement = 'Describes a two-hour annotation trial on sample data.'
         return ('<div class="company-review-highlight"><p class="company-review-finding">'
                 + sp.escape(statement[0].upper() + statement[1:])
                 + '<span class="company-review-context">' + _link(source, 'Original source')

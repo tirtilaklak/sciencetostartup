@@ -1,15 +1,175 @@
 """Validate the dashboard's evidence layer without changing the canonical audit."""
+from datetime import date, datetime
 import json
 import math
+from pathlib import Path
 import re
 from urllib.parse import urlsplit
 
 from observatory import SIDECAR_DATASET_VERSION
 
 SIGNALS = {'revenue', 'profit', 'customers', 'delivery', 'cash'}
+SHA256 = re.compile(r'[a-f0-9]{64}')
+FINANCE_DATE_ROLES = {'announcement', 'company_announcement_context', 'period_end',
+                      'source_publication', 'source_check', 'undated'}
 
 
-def load_business_health(path, data):
+def profile_finance_claim_context(profile):
+    """Project the reviewed date and source attribution for exact claim dialogs."""
+    if not profile:
+        return {}
+    fields = ('date_label', 'date_role', 'display_date', 'evidence_date', 'source_id', 'source_published_on',
+              'source_accessed_on', 'source_checked_on', 'source_status', 'note', 'scope')
+    return {cid: {**{field: fact.get(field) for field in fields}, 'attribution': fact['claimant']}
+            for fact in (profile['headline'], *profile['native_detail_records']) if fact
+            for cid in fact.get('claim_ids', [])}
+
+
+def _finance_day(value):
+    if isinstance(value, str) and re.fullmatch(r'\d{4}-\d{2}-\d{2}', value):
+        try:
+            return date.fromisoformat(value)
+        except ValueError:
+            pass
+    return None
+
+
+def _finance_source_receipt(fact, source, require):
+    """Check supplemental publication metadata against its dated content-read receipt."""
+    try:
+        published = datetime.fromisoformat(fact.get('captured_source_published_at', ''))
+        checked = datetime.fromisoformat(fact.get('receipt_checked_at', ''))
+    except (TypeError, ValueError):
+        require(False, 'publication override requires a dated source receipt')
+    require(published.tzinfo and checked.tzinfo and published <= checked
+            and checked.date() == _finance_day(fact.get('source_checked_on'))
+            and published.date() == _finance_day(fact.get('source_published_on'))
+            and not source.get('published_on')
+            and isinstance(fact.get('receipt_sha256'), str) and SHA256.fullmatch(fact['receipt_sha256'])
+            and fact.get('receipt_locator') and fact.get('receipt_excerpt'),
+            'publication override requires a dated source receipt')
+
+
+def _mercor_current_finance(fact, profile_content, require):
+    """Bind the displayed valuation and tender context to the approved current facts."""
+    entry = next((entry for entry in profile_content['entries'] if entry['company_id'] == 'mercor'), {})
+    current = entry.get('current_facts', {})
+    sources = current.get('sources', [])
+    require(sources, 'Series D requires the approved current profile source')
+    source = sources[0]
+    rows = {row['label']: row for row in current.get('rows', []) if 0 in row['source_indexes']}
+    valuation = re.fullmatch(r'\$(\d+) billion · company-reported', rows.get('Announced valuation', {}).get('value', ''))
+    round_amount = re.fullmatch(r'\$(\d+) million · includes an employee tender', rows.get('Announced round', {}).get('value', ''))
+    day = _finance_day(source.get('published_on'))
+    require(day and valuation and round_amount
+            and rows.get('Funding announced', {}).get('value') == f'{day.day} {day:%b %Y} · Series D',
+            'Series D valuation and announced tender must use the same dated company source')
+    note = fact.get('note') or ''
+    require(fact['record_id'] == 'mercor-series-d'
+            and fact.get('source_id') == 'profile-content.json/mercor/current_facts/sources/0'
+            and fact.get('source_url') == source['url']
+            and fact.get('source_published_on') == fact.get('raw_date') == source['published_on']
+            and fact.get('source_accessed_on') == source['observed_on']
+            and fact.get('receipt_sha256') == source['response_sha256']
+            and (fact.get('amount'), fact.get('currency'), fact.get('qualifier')) == (int(valuation[1]) * 10**9, 'USD', 'exact')
+            and isinstance(note, str) and f'${round_amount[1]}M' in note and 'employee tender' in note
+            and fact.get('date_role') == 'announcement',
+            'Series D display differs from approved profile evidence')
+
+
+def _validate_profile_finance(finances, data, claims, metrics, sources, observations, profile_content):
+    if not isinstance(finances, dict):
+        raise ValueError('business-health: profile finance must be keyed by company')
+    companies = {company['id']: company for company in data['companies']}
+    records = {**metrics, **{row['id']: row for row in data.get('funding_rounds', [])}}
+    for company, profile in finances.items():
+        prefix = 'business-health: profile finance ' + company + ': '
+
+        def require(condition, message):
+            if not condition:
+                raise ValueError(prefix + message)
+
+        require(company in companies and isinstance(profile, dict), 'known company required')
+        headline = profile.get('headline')
+        purposes = {'native_evidence_link_only', 'parent_scope'}
+        projection = profile.get('compare_projection')
+        require(projection in purposes, 'Compare display purpose required')
+        archived = profile.get('archived_record')
+        kept = profile.get('preserved_metric_rows', [])
+        require(isinstance(kept, list) and kept and len(kept) == len(set(kept))
+                and all(metrics.get(mid, {}).get('company_id') == company for mid in kept),
+                'unique same-company metric history required')
+        require(archived is None or archived in kept and profile.get('archived_record_context'),
+                'archive must use a preserved metric with source context')
+        details = profile.get('native_detail_records')
+        require(isinstance(details, list), 'detail records required')
+        facts = [fact for fact in (headline, *details) if fact is not None]
+        require(facts and all(isinstance(fact, dict) and isinstance(fact.get('record_id'), str) and fact['record_id']
+                              for fact in facts)
+                and len({fact['record_id'] for fact in facts}) == len(facts), 'unique finance records required')
+        for fact in facts:
+            record_id = fact['record_id']
+            prefix = 'business-health: profile finance ' + record_id + ': '
+            require(all(isinstance(fact.get(key), str) and fact[key].strip() for key in
+                        ('label', 'claimant', 'display_date', 'date_label', 'scope', 'source_title')),
+                    'display label, date role, scope and attribution required')
+            amount = fact.get('amount')
+            require(type(amount) in (int, float) and math.isfinite(amount) and amount > 0, 'positive finite amount required')
+            role = fact.get('date_role')
+            require(role in FINANCE_DATE_ROLES, 'invalid evidence date role')
+            if company == 'mercor' and record_id == 'mercor-series-d':
+                _mercor_current_finance(fact, profile_content, require)
+            else:
+                record = records.get(record_id, {})
+                claim = claims.get(record.get('claim_id'), {})
+                sid = fact.get('source_id')
+                source = sources.get(sid, {})
+                require(record.get('company_id') == company and source.get('company_id') == company
+                        and claim.get('status') == 'supported' and claim.get('company_id') == company
+                        and fact.get('claim_ids') == [claim.get('id')] and sid in claim.get('source_ids', []),
+                        'a cited same-company record, supported claim and source are required')
+                require((amount, fact.get('currency'), fact.get('qualifier'), fact.get('raw_date')) ==
+                        (record.get('amount', record.get('value')), record.get('currency'), record.get('qualifier'),
+                         record.get('announced_on', record.get('as_of'))),
+                        'quantity, basis or original date differs from the cited record')
+                require(fact.get('source_url') == source['url'] and fact['source_title'] == source['title']
+                        and fact.get('source_status') == source['retrieval_status']
+                        and fact.get('source_accessed_on') == source.get('accessed_on'),
+                        'source link, original review date or original source status differs from the cited source')
+                if fact.get('source_published_on') != source.get('published_on') or fact.get('source_checked_on'):
+                    _finance_source_receipt(fact, source, require)
+            expected_date = fact['raw_date']
+            if role == 'source_publication':
+                expected_date = fact.get('source_published_on')
+            elif role == 'period_end':
+                observation = observations.get(record_id, {})
+                require(observation.get('measure') == 'period_revenue' and fact['source_id'] in observation.get('source_ids', [])
+                        and [observation.get(field) for field in ('value', 'currency', 'qualifier')] ==
+                        [amount, fact['currency'], fact['qualifier']],
+                        'reporting period must be bound to the selected period revenue observation')
+                expected_date = observation['period'].get('end')
+            elif role == 'source_check':
+                require(not fact.get('source_published_on') and fact['raw_date'] == fact.get('source_accessed_on'),
+                        'source-check date must belong to an undated source')
+                expected_date = None
+            elif role == 'undated':
+                require(fact['raw_date'] == 'undated' and not fact.get('source_published_on'), 'undated fact requires an undated record and source')
+                expected_date = None
+            display_day = _finance_day(expected_date if role != 'source_check' else fact['source_accessed_on'])
+            require('evidence_date' in fact and fact['evidence_date'] == expected_date
+                    and (display_day and f'{display_day.day} {display_day:%b %Y}' in fact['display_date'] or role == 'undated'),
+                    'displayed date must match the date role')
+        if projection == 'parent_scope':
+            prefix = 'business-health: profile finance ' + company + ': '
+            group = (companies[company].get('aliases') or [companies[company]['name']])[0] + ' group'
+            require(headline and headline['date_role'] == 'period_end' and headline['scope'] == group
+                    and observations[headline['record_id']]['scope'] == 'company'
+                    and all(row.get('scope_label') == group and group in row.get('cohort', '')
+                            for row in observations.values() if row['company_id'] == company and row['scope'] == 'company'),
+                    'parent scope must identify the group in the headline and reported observations')
+
+
+def load_business_health(path, data, profile_content=None):
     # Fixtures and other research versions must never inherit this curated layer. After a
     # SIDECAR_DATASET_VERSION bump the source_dataset_version check below fails loudly until
     # the dashboard is rebaselined, instead of the dashboard silently disappearing.
@@ -143,4 +303,11 @@ def load_business_health(path, data):
             raise ValueError(prefix + 'unknown calculation measure')
         if row['unit'] != 'percent' or not math.isclose(row['value'], expected, rel_tol=1e-10, abs_tol=1e-10):
             raise ValueError(prefix + 'calculated value differs from its cited inputs')
+    if 'profile_finance' in health:
+        if profile_content is None:
+            profile_path = path.with_name('profile-content.json')
+            if not profile_path.exists():
+                profile_path = Path(__file__).resolve().parents[1] / 'data/profile-content.json'
+            profile_content = json.loads(profile_path.read_text())
+        _validate_profile_finance(health['profile_finance'], data, claims, metrics, sources, observations, profile_content)
     return health

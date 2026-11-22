@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 const canonical = require('../../data/canonical.json');
 const workData = require('../../data/work-routes.json');
+const workScope = require('../../data/editorial-release.json').counts;
 
 async function ready(page, hash = '#companies') {
   await page.goto('/explore/' + hash);
@@ -69,10 +70,15 @@ test('compact work data preserves every selector and visible condition', async (
   const expected = original.map(route => Object.fromEntries(keys.map(key => [key, route[key] ?? null])));
   expect(compact).toEqual(expected);
   const summary = await page.evaluate(() => summarizeWorkResults(workRouteRows()));
-  expect(summary).toMatchObject({ total: 135, named: 56, programs: 22, careers: 23, outside: 11 });
+  expect(summary).toMatchObject({
+    total: workScope.records, named: workScope.named_listings, programs: workScope.networks_programs,
+    careers: workScope.career_pages, outside: workScope.other_company_jobs,
+  });
+  await ready(page, '#work?q=Sage&kind=closed');
   const sage = page.locator('[data-work-route="appen.work.sage-media"]');
+  await sage.locator('summary').first().click();
   await expect(sage).toContainText('Terms checked 8 Nov 2026');
-  await expect(sage.locator('.w4-conditions-column')).toContainText('Qualification tests and identity verification');
+  await expect(sage.getByRole('list', { name: 'Requirements' })).toContainText('Qualification tests and identity verification');
   const alternatives = await page.evaluate(() => workRouteRows().filter(route => route.status === 'historical' && ['terac.work.ml-scenarios', 'afterquery.work.senior-software-engineer-security-infrastructure'].includes(route.id)).map(route => ({ id: route.id, original: route.url, action: w4Destination(route), status: w4Status(route) })));
   expect(alternatives).toHaveLength(2);
   for (const item of alternatives) {
@@ -213,8 +219,59 @@ test('current company CSV uses the same financial observation as the visible car
   expect(csv).not.toContain('214218000');
 });
 
-test('work CSV exports the current shared selection and its binding conditions', async ({ page }) => {
-  await ready(page, '#work?q=Sage&kind=named');
+async function downloadedWorkRows(page, button) {
+  const pending = page.waitForEvent('download');
+  await button.click();
+  const download = await pending;
+  const { execFileSync } = require('node:child_process');
+  const parsed = execFileSync('python3', ['-c', [
+    'import csv, json, sys',
+    'with open(sys.argv[1], encoding="utf-8-sig", newline="") as source:',
+    '    reader = csv.DictReader(source)',
+    '    print(json.dumps({"columns": reader.fieldnames, "rows": list(reader)}))',
+  ].join('\n'), await download.path()], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+  return JSON.parse(parsed);
+}
+
+for (const selection of [
+  { query: 'kind=named&arrangement=onsite', matches: true },
+  { query: 'q=' + encodeURIComponent('no such opening + C++ & 研究'), matches: false },
+]) {
+  test('native Work, Compare and both CSV downloads preserve ' + selection.query, async ({ page }) => {
+    await page.goto('/work/?' + selection.query);
+    const compare = page.getByRole('button', { name: 'Compare results', exact: true })
+      .or(page.getByRole('link', { name: 'Compare results', exact: true }));
+    await expect(compare).toBeVisible();
+    const download = page.locator('[data-work-export]');
+    const ids = await page.locator('[data-work-route]:visible').evaluateAll(rows => rows.map(row => row.dataset.workRoute));
+    expect(ids.length > 0).toBe(selection.matches);
+    expect(new Set(ids).size).toBe(ids.length);
+    const nativeCsv = await downloadedWorkRows(page, download);
+    expect(nativeCsv.columns).toEqual(expect.arrayContaining(['route_id', 'pay_qualification', 'review_evidence', 'original_url_details']));
+    expect(nativeCsv.rows.map(row => row.route_id)).toEqual(ids);
+
+    await compare.click();
+    await expect(page.locator('#work-integrated-table')).toBeVisible();
+    const tableIds = () => page.locator('[data-compare-route]:visible').evaluateAll(rows => rows.map(row => row.dataset.compareRoute));
+    expect(await tableIds()).toEqual(ids);
+    await page.reload();
+    await expect(page.locator('#work-integrated-table')).toBeVisible();
+    expect(await tableIds()).toEqual(ids);
+
+    await page.locator('[data-work-explore]').click();
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    const exploreIds = page.locator('#work-cards [data-work-route]:visible');
+    await expect(exploreIds).toHaveCount(ids.length);
+    expect(await exploreIds.evaluateAll(rows => rows.map(row => row.dataset.workRoute))).toEqual(ids);
+    expect(await downloadedWorkRows(page, page.locator('#work-export'))).toEqual(nativeCsv);
+    await page.goBack();
+    await expect(page.locator('#work-integrated-table')).toBeVisible();
+    expect(await tableIds()).toEqual(ids);
+  });
+}
+
+test('work CSV preserves the selected historical Sage terms and their review', async ({ page }) => {
+  await ready(page, '#work?q=Sage&kind=closed');
   await openFilters(page);
   const count = await page.evaluate(() => filteredWork().length);
   expect(count).toBeGreaterThan(0);
@@ -280,16 +337,16 @@ test('suggested work counts and every provider use the approved primary scope', 
       providerParity: DATA.companies.every(company => JSON.stringify(ids(workRouteSummary(company.id).primary).sort()) === JSON.stringify(ids(w4DiscoveryGroups(workRoutesFor(company.id)).primary).sort())),
     };
   });
-  expect(counts.named).toBe(56);
-  expect(counts.programs).toBe(22);
-  expect(counts.primary).toHaveLength(78);
+  expect(counts.named).toBe(workScope.named_listings);
+  expect(counts.programs).toBe(workScope.networks_programs);
+  expect(counts.primary).toHaveLength(workScope.work_routes);
   expect([...counts.legacy].sort()).toEqual([...counts.primary].sort());
   expect(counts.overview).toEqual(counts.primary);
-  expect(counts.providers).toBe(29);
+  expect(counts.providers).toBe(workScope.providers);
   expect(counts.providerParity).toBe(true);
-  expect(counts.allRecords).toBe(135);
+  expect(counts.allRecords).toBe(workScope.records);
   await page.locator('#site-search-open').click();
-  await expect(page.getByRole('option', { name: /Paid work 56 named listings · 22 networks and programs/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: new RegExp(`Paid work ${workScope.named_listings} named listings · ${workScope.networks_programs} networks and programs`) })).toBeVisible();
   await page.locator('#site-search-close').click();
   await expect(page.locator('#work-search')).toHaveValue('Sage');
 });
@@ -638,17 +695,27 @@ test('a stalled initial profile reserves the viewport and keeps the footer below
   await expect(profile).not.toHaveAttribute('aria-busy', 'true');
 });
 
-test('named terms become overdue at the fourteenth UTC day and failed checks do not refresh them', async ({ page }) => {
+test('the previously named Sage listing crosses its fourteenth UTC day without refreshing its review', async ({ page }) => {
   const sage = workData.routes.find(route => route.id === 'appen.work.sage-media');
   const review = sage.editorial_review.receipts.find(receipt => receipt.id === sage.editorial_review.approved_terms_receipt_id);
   const reviewed = Date.parse(review.checked_on + 'T00:00:00Z'), day = 86_400_000;
+  // Replay the approved November 8 listing before its later migration to a general portal.
+  // The durable sidecar continues to publish the resulting historical disposition.
+  const showHistoricalFixture = async () => {
+    await ready(page, '#work');
+    await page.evaluate(() => {
+      const route = workRouteRows().find(entry => entry.id === 'appen.work.sage-media');
+      route.status = 'listed';
+      renderWork();
+    });
+  };
   await page.clock.setFixedTime(new Date(reviewed + 14 * day - 1));
-  await ready(page, '#work?q=Sage&kind=named');
-  let card = page.locator('#work-cards [data-work-route="appen.work.sage-media"]');
+  await showHistoricalFixture();
+  const card = page.locator('#work-cards [data-work-route="appen.work.sage-media"]');
+  await expect(card).toBeVisible();
   await expect(card.locator('[data-work-review-age="needs_recheck"]')).toHaveCount(0);
   await page.clock.setFixedTime(new Date(reviewed + 14 * day));
-  await page.reload();
-  card = page.locator('#work-cards [data-work-route="appen.work.sage-media"]');
+  await showHistoricalFixture();
   await expect(card.locator('[data-work-review-age="needs_recheck"]')).toHaveText('Needs recheck');
   await page.evaluate(() => {
     const route = workRouteRows().find(route => route.id === 'appen.work.sage-media');

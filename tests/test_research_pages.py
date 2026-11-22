@@ -209,7 +209,7 @@ const assert = require('node:assert/strict'), vm = require('node:vm');
 const source = JSON.parse(require('node:fs').readFileSync(0, 'utf8')).source;
 const scenarios = ['navigate', 'back_forward', 'reload', 'empty', 'missing-api', 'missing-performance'];
 for (const scenario of scenarios) {
-  const attributes = new Map(), listeners = [], violations = [];
+  const attributes = new Map(), listeners = new Map(), violations = [];
   const element = {
     setAttribute(name, value) { if (name !== 'data-reader-enhanced' || value !== '') violations.push('attribute'); attributes.set(name, value); },
     removeAttribute(name) { if (name !== 'data-reader-enhanced') violations.push('attribute'); attributes.delete(name); },
@@ -219,8 +219,8 @@ for (const scenario of scenarios) {
     if (!(key in target)) violations.push('document access'); return target[key];
   }});
   const sandbox = {document, addEventListener(type, listener) {
-    if (type !== 'pageshow' || typeof listener !== 'function') violations.push('listener');
-    else listeners.push(listener);
+    if (!['pageshow', 'DOMContentLoaded'].includes(type) || typeof listener !== 'function') violations.push('listener');
+    else listeners.set(type, listener);
   }, fetch() { violations.push('network'); throw Error('No network in guard'); },
   XMLHttpRequest: function() { violations.push('network'); },
   WebSocket: function() { violations.push('network'); }};
@@ -231,10 +231,15 @@ for (const scenario of scenarios) {
   assert.deepEqual(violations, [], scenario);
   assert.equal(attributes.has('data-reader-enhanced'), scenario === 'navigate', scenario);
   if (scenario === 'navigate') {
-    assert(listeners.length > 0, 'Fresh navigation needs a persisted-history reset');
-    for (const listener of listeners) listener({persisted: false});
+    assert.equal(listeners.size, 2);
+    listeners.get('DOMContentLoaded')();
+    assert.equal(attributes.has('data-reader-enhanced'), false, 'Unavailable deferred script retains native End');
+    attributes.set('data-reader-enhanced', '');
+    attributes.set('data-reader-end-ready', '');
+    listeners.get('DOMContentLoaded')();
+    listeners.get('pageshow')({persisted: false});
     assert.equal(attributes.has('data-reader-enhanced'), true);
-    for (const listener of listeners) listener({persisted: true});
+    listeners.get('pageshow')({persisted: true});
     assert.equal(attributes.has('data-reader-enhanced'), false);
     assert.deepEqual(violations, []);
   }

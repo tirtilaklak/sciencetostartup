@@ -796,7 +796,10 @@ def build(data, destination):
     write_csv(destination / "classifications.csv", classification_rows, ["company_id", "company", "segment_scope", "stage", "confidence", "rubric_version", "as_of"])
     # JSON is inert and HTML-sensitive characters are escaped before embedding.
     embedded = json.dumps(data, ensure_ascii=False, separators=(",", ":"), sort_keys=True, allow_nan=False).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
-    html = (ROOT / "web/index.html").read_text().replace("/* OBSERVATORY_CSS */", (ROOT / "web/style.css").read_text()).replace("/* OBSERVATORY_JS */", (ROOT / "web/link-health.js").read_text() + "\n" + (ROOT / "web/app.js").read_text()).replace("<!-- OBSERVATORY_DATA -->", embedded)
+    app_source = "\n".join((ROOT / "web" / name).read_text() for name in ("link-health.js", "search-core.js", "app.js"))
+    html = (ROOT / "web/index.html").read_text()
+    html = html.replace("/* OBSERVATORY_CSS */", (ROOT / "web/style.css").read_text())
+    html = html.replace("/* OBSERVATORY_JS */", app_source).replace("<!-- OBSERVATORY_DATA -->", embedded)
     editorial = json.loads((ROOT / "data/editorial.json").read_text())
     logo_path = ROOT / "data/logo-provenance.json"
     logo_data = json.loads(logo_path.read_text()) if logo_path.exists() else {"logos": []}
@@ -820,7 +823,7 @@ def build(data, destination):
     aliases = json.loads((ROOT / "docs/research-id-crosswalk.json").read_text())
     from business_health import load_business_health
     health_path = ROOT / "data/business-health.json"
-    health = load_business_health(health_path, data)
+    health = load_business_health(health_path, data, profile_content=profile_content)
     sidecars = dict(EDITORIAL=editorial, RESEARCH_ALIASES=aliases, LOGOS=logo_data,
                     WORK_ROUTES=work_data, PROFILE_CONTENT=profile_content, COMPANY_EVENTS=company_events,
                     SOURCE_UPDATES=source_updates, BUSINESS_HEALTH=health)
@@ -847,9 +850,18 @@ def build(data, destination):
     if release_path.exists() and data["dataset_version"] == SIDECAR_DATASET_VERSION:
         from editorial_work import load_editorial_release
         release = load_editorial_release(release_path, work_data, data)
-    from presentation import build_presentation, public_logo_provenance, write_asset
+    from presentation import build_presentation, public_logo_provenance, work_native_selection, work_search_titles, write_asset
     summary, summary_asset = build_presentation(data, destination, ROOT, sidecars, release, daily_context=daily_context)
     original_summary = destination / summary_asset["href"].lstrip("/")
+    from current_companies import company_path
+    directory_paths = {f"/company/{company['id']}/" for company in data["companies"]}
+    directory_paths.update(company_path(entry) for entry in (current_companies or {}).get("entries", []))
+    research_paths = {entry["url"] for entry in sidecars.get("RESEARCH_SEARCH", [])
+                      if re.fullmatch(r"/company/[^/?#]+/", entry.get("url", ""))}
+    summary["publicCompanyCounts"] = {"directory": len(directory_paths), "publishedProfiles": len(directory_paths | research_paths)}
+    from public_identity import load_identity
+    identity = load_identity()
+    summary["correctionIntake"] = {"origin": identity["origin"], "issueUrl": identity["contacts"]["issues"].removesuffix("/choose")}
     summary["modules"] = {"businessHealth": write_business_health_module(destination, summary["buildId"])}
     summary_asset = write_asset(destination, "summary", summary)
     # The pre-module intermediate is not an extra public presentation generation.
@@ -871,8 +883,8 @@ def build(data, destination):
     html = html.replace("/* ICONS_CSS */", (ROOT / "web/icons.css").read_text())
     html = html.replace("/* ICONS_JS */", (ROOT / "web/icons.js").read_text())
     html = html.replace("/* EDITORIAL_JS */", (ROOT / "web/editorial.js").read_text())
-    work_js = ROOT / "web/work-v3.js"
-    html = html.replace("/* WORK_V3_JS */", (work_js.read_text() if work_js.exists() else "") + "".join((ROOT / "web" / name).read_text() for name in INITIAL_PRESENTATION_JS))
+    work_modules = ("work-core.js", "work-v3.js", *INITIAL_PRESENTATION_JS)
+    html = html.replace("/* WORK_V3_JS */", "\n".join((ROOT / "web" / name).read_text() for name in work_modules))
     html = html.replace("/* DATA_RUNTIME_JS */", (ROOT / "web/data-runtime.js").read_text().replace("/* APP_BUILD_ID */null", json.dumps(summary["buildId"])))
     html = html.replace('<html lang="en">', '<html lang="en" data-build-id="' + summary["buildId"] + '" data-editorial-release="' + summary["editorialReleaseId"] + '" data-dataset-version="' + summary["datasetVersion"] + '">')
     import shutil
@@ -897,7 +909,13 @@ def build(data, destination):
         if path.exists():
             if name in ("home-search.js", "companies-page.js", "work-page.js"):
                 from frontend_packaging import optional_script_source
-                (destination / name).write_text(optional_script_source(ROOT, name))
+                source = optional_script_source(ROOT, name)
+                if name == "work-page.js":
+                    companies_by_id = {company["id"]: company for company in data["companies"]}
+                    rows = work_native_selection(work_data, companies_by_id)
+                    payload = json.dumps(rows, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+                    source = "window.WORK_NATIVE_SELECTION=" + script_safe(payload) + ";\n" + source
+                (destination / name).write_text(source)
             else:
                 shutil.copy2(path, destination / name)
     html = html.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{GROUP_COUNT}}", str(len({e["primary_offering"] for e in editorial["entries"]})))
@@ -913,7 +931,10 @@ def build(data, destination):
     from home import render_home
     landing = render_home(landing, data, sidecars, release, summary, current_companies=current_companies)
     (destination / "index.html").write_text(landing)
-    from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health, business_health=health, current_companies=current_companies)
+    from static_pages import write_static_pages
+    write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events,
+                       link_health=link_health, business_health=health, current_companies=current_companies,
+                       work_results=summary["workResults"])
     if research_context is not None:
         from research_graph import write_exports
         from research_citations import write_publication_assets, publication_asset_inventory
@@ -925,7 +946,8 @@ def build(data, destination):
             raise ValueError('Publication files exceed the static asset limit: '
                              + ', '.join(sorted(inventory['oversized']))
                              + '. Prepare a compressed frozen package; keep every research record and export.')
-        research_entries = write_research_pages(destination, research_context)
+        reader_context = {**research_context, "work_search_titles": work_search_titles(work_data["routes"])}
+        research_entries = write_research_pages(destination, reader_context)
         company_updates = {"https://sciencetostartup.com" + row['path']: row.get('lastmod')
                            for row in write_company_supplements(destination, research_context)}
         from current_companies import write_current_company_supplements

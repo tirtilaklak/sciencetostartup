@@ -5,6 +5,7 @@
 const SITE_SEARCH_GROUPS={company:['Companies',5],group:['Business groups',2],work:['Paid work',5],product:['Products',3],page:['Pages',3]};
 const SITE_SEARCH_SUGGESTED=['scale_ai','mercor','surge_ai','labelbox'];
 let siteSearchEntries=null,siteSearchItems=[],siteSearchActive=-1,siteSearchStatusTimer=0,siteSearchGeneration=0;
+const siteSearchTools=globalThis.S2SSearch;
 const siteSearchFold=v=>String(v??'').normalize('NFKD').replace(/\p{M}+/gu,'').toLowerCase();
 const siteSearchWords=v=>siteSearchFold(Array.isArray(v)?v.join(' '):v).match(/[\p{L}\p{N}]+(?:\+\+|#)?/gu)||[];
 // "Outlier (contributor brand)" is matched as "Outlier"; the note stays with it in the result.
@@ -13,7 +14,7 @@ function siteSearchPages(){
  const work=typeof w4DiscoveryGroups==='function'?w4DiscoveryGroups(workRouteRows()):{named:[],programs:[]};
  return [
   ['market','Overview','The front page, with the main figures and business groups','home start charts market'],
-  ['companies','Companies',`All ${DATA.companies.length} companies, with search and filters`,'index directory list organizations organisations firms startups'],
+  ['companies','Companies',`Compare ${DATA.companies.length} historical profiles`,'index directory list organizations organisations firms startups'],
   ['work','Paid work',`${w4Count(work.named.length,'named listing','named listings')} · ${w4Count(work.programs.length,'network or program','networks and programs')}`,'jobs gigs hiring careers contract contractor freelance hourly pay earn'],
   ['compare','Compare','Put up to three companies side by side','versus vs comparison'],
   ['method','Method','How each figure is checked and graded','methodology sources evidence research'],
@@ -23,7 +24,11 @@ function siteSearchPages(){
   ['downloads','Download the data','JSON, CSV and SQLite files','downloads csv json sqlite dataset export license reuse'],
   ['venture','The publisher’s proposed AI lab','The publisher’s proposal, separate from the research','venture neolab investor pitch proposal']
  ].map(([id,name,meta,keys])=>({type:'page',id,name,meta,keys:keys.split(' '),href:'#'+id})).concat(
-  ((typeof window!=='undefined'&&window.SEARCH_INDEX?.researchSearchEntries)||[]).map(entry=>({type:entry.kind==='company'?'company':'page',id:entry.url,name:entry.title,meta:entry.summary,keys:entry.keywords||[],href:entry.url}))
+  (window.SEARCH_INDEX?.researchSearchEntries||[]).map(entry=>({
+   type:entry.kind==='company'?'company':'page',id:entry.url,name:entry.title,
+   meta:(entry.kind==='paper'?(entry.recordKind==='paper_version'?'Paper version · ':'Paper · '):entry.kind==='company'?'Company profile · ':'')+entry.summary,
+   keys:entry.keywords||[],href:entry.url,recordKind:entry.recordKind,identifiers:siteSearchTools?.identifiers(entry.identifiers)||[]
+  }))
  );
 }
 function siteSearchIndex(){
@@ -62,7 +67,13 @@ function siteSearchNear(t,words){if(t.length<3)return words.some(w=>w.startsWith
 function siteSearch(query,opts={}){
  const o=typeof opts==='number'?{limit:opts}:opts||{},tokens=siteSearchWords(query);
  if(!tokens.length)return [];
- const key=tokens.join(' '),stems=tokens.map(siteSearchStem),entries=siteSearchIndex().filter(e=>!o.types||o.types.includes(e.type)),workMatches=new Set(typeof selectWorkRoutes==='function'?selectWorkRoutes(workRouteRows(),{q:query}).map(row=>row.id):[]);
+ const index=siteSearchIndex(),entries=index.filter(e=>!o.types||o.types.includes(e.type)),identifier=siteSearchTools?.identifier(query);
+ if(identifier&&index.some(e=>e.identifiers?.length)){
+  const exact=entries.filter(e=>e.identifiers?.includes(identifier));
+  exact.sort((a,b)=>Number(a.recordKind==='paper_version')-Number(b.recordKind==='paper_version'));
+  return exact.slice(0,o.limit||SITE_SEARCH_GROUPS.page[1]).map(e=>({...e,rank:0,group:'Papers',total:exact.length}));
+ }
+ const key=tokens.join(' '),stems=tokens.map(siteSearchStem),workMatches=new Set(typeof selectWorkRoutes==='function'?selectWorkRoutes(workRouteRows(),{q:query}).map(row=>row.id):[]);
  // One or two letters match names, aliases and context only; descriptions join from three letters.
  const most=key.length<3?4:5;
  let hits=entries.map(e=>{let rank=siteSearchRank(e,tokens,key);if(e.type==='work')return [workMatches.has(e.id)?(rank<0?5:rank):-1,e];if(rank<0&&stems.join(' ')!==key&&siteSearchRank(e,stems,stems.join(' '))>=0)rank=5;return [rank,e];}).filter(([rank,e])=>rank>=0&&(e.type==='work'||rank<=most));
@@ -78,16 +89,26 @@ function siteSearch(query,opts={}){
   return {type:e.type,id:e.id,name:e.name,meta:alias?`Also known as ${alias.name}${alias.note?' ('+alias.note+')':''}`:e.meta,badge:e.badge||'',href:e.href,company:e.company||'',product:e.product||'',rank,group:SITE_SEARCH_GROUPS[e.type][0],total:g.total};
  }));
 }
-// Global search covers every listing, independent of earlier Paid work filters.
+// Global search counts all matching routes, independent of earlier Paid work filters.
 function siteSearchWorkCount(query){return typeof selectWorkRoutes==='function'?selectWorkRoutes(workRouteRows(),{q:query}).length:0;}
 function siteSearchView(query){
  const tokens=siteSearchWords(query);
  if(!tokens.length){const pages=siteSearchPages();return [{label:'Suggested',items:[...SITE_SEARCH_SUGGESTED.filter(isCompanyId).map(id=>({type:'company',name:companies[id].name,meta:groupLabel(modelGroup(id)),href:'#company/'+id})),...['work','compare','method'].map(id=>pages.find(p=>p.id===id))]}];}
  const results=siteSearch(query),groups=[];
  for(const item of results){if(groups.at(-1)?.type!==item.type)groups.push({type:item.type,label:item.group,items:[]});groups.at(-1).items.push(item);}
+ if(siteSearchTools?.identifier(query))return groups;
  const work=groups.find(g=>g.type==='work'),text=String(query).trim().slice(0,256),matches=work?selectWorkRoutes(workRouteRows(),{q:text}):[],count=matches.length;
  if(work&&count){const all={type:'action',action:'work',query:text,name:`See all ${count} ${count===1?'match':'matches'} for “${text}”`,meta:workResultsLabel(summarizeWorkResults(matches)),href:workHashFor({q:text})};if(work.items[0].rank>=4)work.items.unshift(all);else work.items.push(all);}
- if(!groups.length)groups.push({label:'Try instead',items:[{type:'action',action:'companies',name:`Browse all ${DATA.companies.length} companies`,meta:'The full company list',href:'#companies'},{type:'action',action:'work',query:'',name:'See all paid work',meta:'Every listing, with filters',href:'#work'}]});
+ const workTitles=new Set((window.SEARCH_INDEX?.workTitles||[]).map(title=>siteSearchTools?.normalize(title)));
+ if(siteSearchTools?.isWorkQuery(query,workTitles))groups.unshift({label:'Work search',items:[{type:'action',name:`Search paid work for “${text}”`,meta:'Work search · Public listings and programs',href:siteSearchTools.workUrl(query)}]});
+ const fullDirectory={type:'action',name:'Search the full company directory',meta:`Explore compares ${DATA.companies.length} historical profiles.`,href:'/companies/?'+new URLSearchParams({q:query})};
+ const company=groups.find(g=>g.type==='company');
+ if(company?.items.some(item=>item.rank===0&&item.href.startsWith('/company/')))company.items.push(fullDirectory);
+ if(!groups.length)groups.push({label:'Try instead',items:[
+  ...(window.SEARCH_INDEX?[fullDirectory]:[]),
+  {type:'action',action:'companies',name:'Browse historical company profiles',meta:`Compare ${DATA.companies.length} companies`,href:'#companies'},
+  {type:'action',action:'work',query:'',name:'See all paid work',meta:'Every listing, with filters',href:'#work'}
+ ]});
  return groups;
 }
 function siteSearchMark(text,tokens){
@@ -101,23 +122,27 @@ function siteSearchMark(text,tokens){
 }
 function siteSearchAnnounce(text){clearTimeout(siteSearchStatusTimer);siteSearchStatusTimer=setTimeout(()=>{$('site-search-status').textContent=text;},450);}
 function siteSearchRender(){
- const input=$('site-search-input'),list=$('site-search-results'),query=input.value.trim(),tokens=siteSearchWords(query),groups=siteSearchView(query);
+ const input=$('site-search-input'),list=$('site-search-results'),query=input.value,tokens=siteSearchWords(query),groups=siteSearchView(query);
  siteSearchItems=groups.flatMap(g=>g.items);siteSearchActive=-1;let index=0;
- list.innerHTML=groups.map(g=>`<div class="site-search-group" role="group" aria-label="${attr(g.label)}"><div class="site-search-group-label" aria-hidden="true">${esc(g.label)}</div>${g.items.map(item=>{const i=index++;const native=typeof item.href==='string'&&item.href.startsWith('/')&&!item.href.startsWith('//'),tag=native?'a':'div';return `<${tag}${native?' href="'+attr(item.href)+'"':''} class="site-search-option${i||!tokens.length?'':' is-first'}" id="site-search-option-${i}" role="option" aria-selected="false" data-site-search-index="${i}"><span class="site-search-name">${siteSearchMark(item.name,item.type==='action'?[]:tokens)}${item.badge?` <span class="site-search-badge">${esc(item.badge)}</span>`:''}</span>${item.meta?`<span class="site-search-meta">${siteSearchMark(item.meta,item.type==='action'?[]:tokens)}</span>`:''}<kbd class="site-search-enter" aria-hidden="true">Enter</kbd></${tag}>`;}).join('')}</div>`).join('');
+ list.innerHTML=groups.map(g=>`<div class="site-search-group" role="group" aria-label="${attr(g.label)}"><div class="site-search-group-label" aria-hidden="true">${esc(g.label)}</div>${g.items.map(item=>{const i=index++;const native=typeof item.href==='string'&&item.href.startsWith('/')&&!item.href.startsWith('//'),tag=native?'a':'div';return `<${tag}${native?' href="'+attr(item.href)+'" tabindex="-1"':''} class="site-search-option${i||!tokens.length?'':' is-first'}" id="site-search-option-${i}" role="option" aria-selected="false" data-site-search-index="${i}"><span class="site-search-name">${siteSearchMark(item.name,item.type==='action'?[]:tokens)}${item.badge?` <span class="site-search-badge">${esc(item.badge)}</span>`:''}</span>${item.meta?`<span class="site-search-meta">${siteSearchMark(item.meta,item.type==='action'?[]:tokens)}</span>`:''}<kbd class="site-search-enter" aria-hidden="true">Enter</kbd></${tag}>`;}).join('')}</div>`).join('');
  list.hidden=!siteSearchItems.length;input.setAttribute('aria-expanded',String(siteSearchItems.length>0));input.removeAttribute('aria-activedescendant');
  const results=siteSearchItems.filter(i=>i.rank!==undefined).length,exact=siteSearchItems.some(i=>i.rank<6);
- $('site-search-message').textContent=!tokens.length?'Type a name or a role. Press Enter to open the first result.':!results?`No match for “${query}”.`:exact?'':`No exact match for “${query}”. Showing close matches.`;
- if(tokens.length)siteSearchAnnounce(results?`${results} ${results===1?'result':'results'}. Top result: ${siteSearchItems[0].name}.`:'No results.');
+ const workAction=siteSearchItems[0]?.href?.startsWith('/work/?');
+ const noMatch=siteSearchTools?.identifier(query)?'No matching research record':'No match';
+ $('site-search-message').textContent=!tokens.length?'Type a name or a role. Press Enter to open the first result.':!results&&!workAction?`${noMatch} for “${query.trim()}”.`:exact||workAction?'':`No exact match for “${query.trim()}”. Showing close matches.`;
+ if(tokens.length)siteSearchAnnounce(workAction?siteSearchItems[0].name:results?`${results} ${results===1?'result':'results'}. Top result: ${siteSearchItems[0].name}.`:'No results.');
 }
 function siteSearchRequestRender(){
  const generation=++siteSearchGeneration,dialog=$('site-search');
+ clearTimeout(siteSearchStatusTimer);$('site-search-status').textContent='';
  if(typeof window.ensureSearchContext!=='function'||window.SEARCH_INDEX){dialog.removeAttribute?.('aria-busy');siteSearchRender();return;}
  siteSearchItems=[];siteSearchActive=-1;$('site-search-results').innerHTML='';$('site-search-results').hidden=true;
  $('site-search-input').setAttribute('aria-expanded','false');$('site-search-input').removeAttribute('aria-activedescendant');
  dialog.setAttribute('aria-busy','true');$('site-search-message').textContent='Loading search…';
  window.ensureSearchContext().then(()=>{if(generation!==siteSearchGeneration||!dialog.open)return;dialog.removeAttribute('aria-busy');siteSearchEntries=null;siteSearchRender();}).catch(()=>{
   if(generation!==siteSearchGeneration||!dialog.open)return;dialog.removeAttribute('aria-busy');
-  $('site-search-message').innerHTML='Search could not load. <button type="button" data-retry-site-search>Try again</button> or <a href="#companies">browse companies</a> and <a href="#work">paid work</a>.';
+  const query=$('site-search-input').value,params=query.trim()?'?'+new URLSearchParams({q:query}):'';
+  $('site-search-message').innerHTML=`Search could not load. <button type="button" data-retry-site-search>Try again</button> or browse <a href="/companies/${attr(params)}">companies</a> and <a href="/work/${attr(params)}">paid work</a>.`;
  });
 }
 function siteSearchSetActive(index){
@@ -166,29 +191,49 @@ function siteSearchOpen(text){
  dialog.showModal();$('site-search-open').setAttribute('aria-expanded','true');
  siteSearchRequestRender();input.focus();input.select();
 }
-// "/" and Ctrl or Cmd+K open search, except while typing in a field or while another dialog is open.
+// Ctrl or Cmd+K opens search when a text field or another dialog does not own the keyboard.
 function siteSearchTyping(el){return Boolean(el?.isContentEditable||el?.closest?.('textarea,select')||(el?.matches?.('input')&&!/^(?:checkbox|radio|button|submit|reset|range|color|file|image)$/.test(el.type)));}
 function siteSearchShortcut(event){
  if(event.defaultPrevented||event.isComposing||event.altKey)return;
  const command=(event.ctrlKey||event.metaKey)&&!event.shiftKey&&(String(event.key).toLowerCase()==='k'||event.code==='KeyK');
- if(!command&&!(event.key==='/'&&!event.ctrlKey&&!event.metaKey))return;
+ if(!command)return;
  if(siteSearchTyping(event.target)||document.querySelector('dialog[open]'))return;
  event.preventDefault();siteSearchOpen();
 }
 
 function initSiteNav(){
  const button=$('site-search-open'),dialog=$('site-search'),input=$('site-search-input'),list=$('site-search-results');
- button.addEventListener('click',()=>siteSearchOpen());
+ const header=document.querySelector('body > header.topbar');
+ if(header&&typeof ResizeObserver==='function'){
+  const root=document.documentElement;
+  const measure=()=>{
+   if(getComputedStyle(header).position==='sticky')root.style.setProperty('--header-height',header.getBoundingClientRect().height+'px');
+   else root.style.removeProperty('--header-height');
+  };
+  new ResizeObserver(measure).observe(header);
+  window.addEventListener('resize',measure);
+  measure();
+ }
+ button.setAttribute('aria-haspopup','dialog');
+ button.setAttribute('aria-expanded','false');
+ button.setAttribute('aria-keyshortcuts','Control+K Meta+K');
+ button.addEventListener('click',event=>{
+  if(event&&!normalSelfLinkActivation(event,button))return;
+  event?.preventDefault();siteSearchOpen();
+ });
  $('site-search-close').addEventListener('click',()=>dialog.close());
  input.addEventListener('input',siteSearchRequestRender);
  input.addEventListener('keydown',siteSearchKey);
  // Options keep focus in the field; a click chooses one.
  list.addEventListener('mousedown',event=>{if(!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&event.button===0)event.preventDefault();});
- list.addEventListener('click',event=>{const option=event.target.closest?.('[role=option]');if(!option)return;const item=siteSearchItems[Number(option.dataset.siteSearchIndex)];if(event.ctrlKey||event.metaKey||event.shiftKey||event.button>0)return;if(item?.href?.startsWith('/'))event.preventDefault();siteSearchChoose(item);});
+ list.addEventListener('click',event=>{const option=event.target.closest?.('[role=option]');if(!normalSelfLinkActivation(event,option))return;const item=siteSearchItems[Number(option.dataset.siteSearchIndex)];if(item?.href?.startsWith('/'))event.preventDefault();siteSearchChoose(item);});
  dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});
- // Focus returns to the opener. When search opened with nothing focused (on load, or "/" on the page), it goes to the button.
- dialog.addEventListener('close',()=>{siteSearchGeneration++;dialog.removeAttribute('aria-busy');button.setAttribute('aria-expanded','false');$('site-search-status').textContent='';const active=document.activeElement;if(!active||active===document.body||dialog.contains(active))button.focus();});
- dialog.addEventListener('click',event=>{if(event.target.closest?.('[data-retry-site-search]'))siteSearchRequestRender();const link=event.target.closest?.('a[href^="#"]');if(normalSelfLinkActivation(event,link))dialog.close();});
+ // Native focus restoration returns to the opener; a search opened on load can fall back to the header action.
+ dialog.addEventListener('close',()=>{siteSearchGeneration++;clearTimeout(siteSearchStatusTimer);dialog.removeAttribute('aria-busy');button.setAttribute('aria-expanded','false');$('site-search-status').textContent='';const active=document.activeElement;if(!active||active===document.body||dialog.contains(active))button.focus();});
+ dialog.addEventListener('click',event=>{
+  if(!event.target.closest?.('[data-retry-site-search]'))return;
+  siteSearchRequestRender();input.focus();
+ });
  document.addEventListener('keydown',siteSearchShortcut);
  window.addEventListener('hashchange',()=>{if(dialog.open)dialog.close();});
  // Static pages link to /?search (or /?q=text): open search once, then drop the query from the address.

@@ -488,7 +488,7 @@ function resizeComparison(returnFocus=null){
  if(!container.contains(active)){renderCompare();return;}
  const cell=active.closest('[data-comparison-company]'),row=active.closest('[data-comparison-row]'),header=active.closest('thead th'),company=cell?.dataset.comparisonCompany||active.dataset.remove||header?.querySelector('a[href^="#company/"]')?.getAttribute('href').split('/')[1];
  const identity={tag:active.tagName,claim:active.dataset.claim,remove:active.dataset.remove,href:active.getAttribute('href'),pair:active.dataset.mobileCompare,summary:active.tagName==='SUMMARY',company,row:row?.dataset.comparisonRow};
- const ids=state.selected.length?state.selected:['taskus','appen','scale_ai'],index=ids.indexOf(company),pairs=comparePairOptions(ids);
+ const ids=state.selected,index=ids.indexOf(company),pairs=comparePairOptions(ids);
  if(window.innerWidth<=700&&index>=0&&!pairs[state.mobileCompare]?.includes(index))state.mobileCompare=pairs.findIndex(pair=>pair.includes(index));
  renderCompare();
  const scope=identity.row?[...container.querySelectorAll('[data-comparison-row]')].find(n=>n.dataset.comparisonRow===identity.row):container.querySelector('thead');
@@ -500,16 +500,53 @@ function resizeComparison(returnFocus=null){
 function syncComparisonPreset(){const presets={scale:['taskus','appen','scale_ai'],work:['surge_ai','toloka','labelbox']},match=Object.keys(presets).find(key=>presets[key].join('|')===state.selected.join('|'));$('compare-preset').value=match||'';const placeholder=$('compare-preset').querySelector?.('option[value=""]');if(placeholder)placeholder.textContent=state.selected.length&&!match?'Custom selection':'Choose an example';}
 // #compare/<id>/<id>/<id> names an explicit selection,
 // so a comparison survives reloads, Back and Forward, and can be shared.
-const COMPARE_EXAMPLE=['taskus','appen','scale_ai'];
-function compareIds(){return state.selected.filter(id=>companies[id]);}
+function compareIds(){return state.selected.filter(isCompanyId);}
 let comparisonExpanded=false;
 function onCompareRoute(){return String(routeParts()[0]||'').toLowerCase()==='compare';}
 function compareHash(){return '#compare'+state.selected.map(id=>'/'+id).join('');}
-function compareRouteId(value){let id=String(value||'');try{id=decodeURIComponent(id);}catch{}id=id.trim().toLowerCase();const aliases=window.RESEARCH_ALIASES;return isCompanyId(id)?id:aliases&&Object.hasOwn(aliases,id)&&isCompanyId(aliases[id])?aliases[id]:'';}
-// Also reads the comma form (#compare/a,b) and rewrites it to the slash form.
-function syncCompareRoute(){if(!onCompareRoute())return;const parts=routeParts().slice(1).flatMap(part=>String(part).split(',')).filter(Boolean);if(parts.length){const ids=[...new Set(parts.map(compareRouteId).filter(Boolean))].slice(0,3);if(ids.length&&ids.join('|')!==state.selected.join('|')){state.selected=ids;state.mobileCompare=0;syncSelection();renderTray();}}if(location.hash!==compareHash())history.replaceState(history.state,'',compareHash());document.title=(state.selected.length?listText(state.selected.map(id=>companies[id].name))+' · ':'')+VIEW_TITLES.compare;}
+function compareRouteSelection(hash=location.hash){
+ const requested=routeParts(hash).slice(1).flatMap(part=>part.split(',')).map(part=>part.trim()).filter(Boolean);
+ const resolved=requested.map(profileRouteCompany),recognized=[...new Set(resolved.filter(Boolean))];
+ return {ids:recognized.slice(0,3),unavailable:resolved.filter(id=>!id).length,overflow:Math.max(0,recognized.length-3)};
+}
+function compareTitle(ids){document.title=(ids.length?listText(ids.map(id=>companies[id].name))+' · ':'')+VIEW_TITLES.compare;}
+function syncCompareRoute(selection=compareRouteSelection()){
+ const {ids,unavailable,overflow}=selection;
+ if(ids.join('|')!==state.selected.join('|')){state.selected=ids;state.mobileCompare=0;syncSelection();renderTray();}
+ // Keep the original address if normalizing would erase an unavailable request.
+ const canonical=compareHash()+(location.hash.match(/\?.*$/)?.[0]||'');
+ if(!unavailable&&!overflow&&location.hash!==canonical)history.replaceState(history.state,'',canonical);
+ compareTitle(ids);
+ return selection;
+}
+function compareRouteNotice({unavailable,overflow}){
+ const issue=unavailable===1?'One company in this link is unavailable in Compare.':unavailable?`${unavailable} companies in this link are unavailable in Compare.`:'';
+ const limit=overflow?'Compare shows the first three companies in this link.':'';
+ return [issue,limit].filter(Boolean).join(' ');
+}
+function compareNoticeHTML(notice){return notice?`<p data-compare-unavailable>${esc(notice)} <a href="/companies/">Browse the company directory</a>.</p>`:'';}
+function renderComparisonScope(view){
+ const heading=$(view+'-view')?.querySelector?.('.page-heading');
+ if(!heading||heading.querySelector('[data-comparison-scope]'))return;
+ const historical=DATA.companies.length,counts=window.SUMMARY_INDEX?.publicCompanyCounts;
+ const directory=counts?.directory?`Browse the ${counts.directory}-company directory`:'Browse the company directory';
+ const profiles=counts?.publishedProfiles?` <a href="/?search">Search all ${counts.publishedProfiles} published profiles</a>.`:'';
+ heading.insertAdjacentHTML('beforeend',`<p class="sub" data-comparison-scope>Explore uses a historical set of ${historical} companies. <a href="/companies/">${directory}</a>.${profiles}</p>`);
+}
 function syncCompareAdd(){const select=$('compare-add'),full=state.selected.length>=3;if(!select)return;select.innerHTML=`<option value="">${full?'Remove one to add another':'Choose a company'}</option>`+[...DATA.companies].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option value="${esc(c.id)}"${full||state.selected.includes(c.id)?' disabled':''}>${esc(c.name)}</option>`).join('');select.value='';const add=$('compare-add-button');if(add)add.hidden=true;}
-function renderCompare(){if(window.COMPANY_CONTEXTS_READY&&!onCompareRoute())return;return detailViewRenderer("renderCompare",this,arguments);}
+function renderCompare(){
+ if(!onCompareRoute()||$('compare-content').hasAttribute?.('aria-busy'))return;
+ const selection=syncCompareRoute(),notice=compareRouteNotice(selection),ids=selection.ids;
+ renderComparisonScope('compare');
+ syncComparisonPreset();syncCompareAdd();
+ if(!ids.length){
+  $('compare-content').innerHTML=compareNoticeHTML(notice)+'<div class="comparison-empty"><h2>Which companies are you considering?</h2><p>Add up to three companies above, or start with a selection.</p><div class="comparison-starts"><button type="button" data-preset="scale">TaskUs, Appen &amp; Scale AI</button><button type="button" data-preset="work">Surge AI, Toloka &amp; Labelbox</button></div></div>';
+  $('compare-status').textContent=notice||'No companies selected.';
+  return;
+ }
+ if(window.COMPANY_CONTEXTS_READY&&ids.some(id=>!window.COMPANY_CONTEXTS_READY.has(id)))return;
+ return detailViewRenderer("renderCompare",this,[notice]);
+}
 // The table box becomes a focusable, named region only while it really scrolls sideways.
 // The stylesheet lets the table wrap, so today it never does and keyboard users skip it.
 function comparisonScrollRegion(){const box=document.querySelector('#compare-content .comparison-scroll');if(!box)return;const scrolls=typeof getComputedStyle==='function'&&/auto|scroll/.test(getComputedStyle(box).overflowX)&&box.scrollWidth>box.clientWidth+1;if(scrolls){box.setAttribute('tabindex','0');box.setAttribute('role','region');box.setAttribute('aria-label','Comparison table, scroll for more fields');}else for(const name of ['tabindex','role','aria-label'])box.removeAttribute(name);}
@@ -534,6 +571,35 @@ const EVIDENCE_DATE_NOTES={
 let evidenceRecordHash='',evidenceReturnHash='';
 // Record links: #company/<id>/claim/<claim-id> opens the profile with this dialog.
 function evidenceRecordLink(cl){return '#company/'+encodeURIComponent(cl.company_id)+'/claim/'+encodeURIComponent(cl.id);}
+let pendingCorrectionRecord='';
+document.addEventListener('click',event=>{
+ const link=event.target.closest?.('[data-correction-record]');
+ if(normalSelfLinkActivation(event,link))pendingCorrectionRecord=link.dataset.correctionRecord;
+});
+function renderExploreCorrections(atCorrections){
+ const panel=$('corrections'),email=panel.querySelector?.('.correction-email a');
+ if(!email)return;
+ if(atCorrections&&pendingCorrectionRecord){
+  history.replaceState({...history.state,correctionRecord:pendingCorrectionRecord},'');
+  pendingCorrectionRecord='';
+ }
+ const id=atCorrections?history.state?.correctionRecord:'',claim=Object.hasOwn(claims,id)?claims[id]:null;
+ const dataset='Explore dataset v'+DATA.dataset_version,release=window.SUMMARY_INDEX?.editorialReleaseId;
+ const edition=release?`${dataset} · ${release}`:dataset;
+ const intake=window.SUMMARY_INDEX?.correctionIntake,origin=intake?.origin||'https://sciencetostartup.com';
+ const record=claim?new URL('/explore/'+evidenceRecordLink(claim),origin).href:'';
+ const lines=claim?[`Edition: ${edition}`,`Stable record ID: ${claim.id}`,`Record URL: ${record}`]:['Edition, page and claim ID: '];
+ lines.push('What should change: ','Supporting public evidence: ','');
+ const mailbox=email.getAttribute('href').split('?')[0];
+ email.href=mailbox+'?subject='+encodeURIComponent(claim?'ScienceToStartup correction · '+claim.id:'ScienceToStartup correction')+'&body='+encodeURIComponent(lines.join('\r\n'));
+ email.textContent=claim?'Email a correction for this record':mailbox.slice('mailto:'.length);
+ const issue=new URL(intake?.issueUrl||'https://github.com/tirtilaklak/sciencetostartup/issues/new');
+ issue.searchParams.set('template','correction.yml');
+ if(claim)issue.searchParams.set('target',[edition,claim.id,record].join(' · '));
+ panel.querySelector('[data-explore-correction-issue]')?.remove();
+ email.closest('.correction-email').insertAdjacentHTML('afterend',`<p data-explore-correction-issue>${external(issue.href,'Start a public GitHub correction')} · GitHub requires sign-in.</p>`);
+ panel.querySelector('h3 + p').textContent=claim?'Request a correction for '+claim.id+'.':'Include the record or page link, what needs correcting, and a source.';
+}
 function showEvidence(id,group=[]){return detailViewRenderer("showEvidence",this,arguments);}
 $('evidence-dialog').addEventListener('close',()=>{
  const opener=evidenceReturnFocus,resize=pendingComparisonResize,record=evidenceRecordHash,back=evidenceReturnHash;
@@ -576,13 +642,25 @@ function openCompanyStory(id){return detailViewRenderer("openCompanyStory",this,
 function renderTray(){const n=state.selected.length;$('compare-tray').hidden=!n||onCompareRoute();$('tray-text').textContent=n?`${n} of 3 selected: ${listText(state.selected.map(id=>companies[id].name))}`:'';$('nav-count').textContent=n?`(${n})`:'';document.querySelectorAll('[data-nav="compare"],#compare-tray a[href^="#compare"]').forEach(a=>a.setAttribute('href',compareHash()));}
 function syncSelection(){document.querySelectorAll('[data-compare]').forEach(el=>el.checked=state.selected.includes(el.dataset.compare));}
 // On the compare page the URL follows the selection; replaceState keeps Back history short.
-function setSelection(ids){state.selected=[...new Set(ids)].filter(isCompanyId).slice(0,3);state.mobileCompare=Math.min(state.mobileCompare,Math.max(0,comparePairOptions(state.selected).length-1));syncSelection();renderTray();if(onCompareRoute()&&location.hash!==compareHash())history.replaceState(history.state,'',compareHash());renderCompare();}
+function setSelection(ids){
+ state.selected=[...new Set(ids)].filter(isCompanyId).slice(0,3);
+ state.mobileCompare=Math.min(state.mobileCompare,Math.max(0,comparePairOptions(state.selected).length-1));
+ syncSelection();renderTray();
+ if(!onCompareRoute())return;
+ const hash=compareHash()+(location.hash.match(/\?.*$/)?.[0]||'');
+ if(location.hash!==hash){
+  history.replaceState(history.state,'',hash);
+  if(window.COMPANY_CONTEXTS_READY)return route({type:'compare-selection'});
+ }
+ renderCompare();
+}
 function chooseCompare(id,on){if(on&&!state.selected.includes(id)&&state.selected.length>=3){syncSelection();$('tray-text').textContent='Three selected. Remove one to add another.';return;}setSelection(on?[...state.selected,id]:state.selected.filter(x=>x!==id));}
 function reset(){Object.assign(state,{query:'',category:'',stage:'',financial:false,work:false,sort:'name'});$('search').value='';$('category').value='';$('stage').value='';$('financial-only').checked=false;$('work-only').checked=false;$('sort').value='name';renderDirectory();writeDirectoryRoute();$('search').focus({preventScroll:true});}
 
 // previousSection is set after a section link such as #venture, so the next plain view link starts at the top.
 let previousRoute='',previousSection='';const viewScroll={};
 let companyReturnFocus=null;
+const comparisonOrigins=new Map();
 // Hashes that name a place inside a page. route() shows that page, then brings the element to the top with focus.
 const VIEW_ANCHORS={venture:'market',about:'method',labels:'method',corrections:'method',coverage:'method',downloads:'method'};
 function viewAnchorId(hash=location.hash){const id=String(routeParts(hash)[0]||'').toLowerCase();return Object.hasOwn(VIEW_ANCHORS,id)?id:'';}
@@ -624,6 +702,11 @@ function normalSelfLinkActivation(event,link){
 }
 function rememberCompanyOrigin(event){
  if(event.defaultPrevented||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(event.button!==undefined&&event.button!==0))return;
+ const peer=event.target.closest?.('#compare-content a[href^="#company/"]');
+ if(onCompareRoute()&&normalSelfLinkActivation(event,peer)){
+  comparisonOrigins.set(historyKey(),{hash:location.hash,href:peer.getAttribute('href')});
+  return;
+ }
  const origin=event.target.closest?.('#company-cards a[href^="#company/"],#company-cards [data-open-company]');
  if(!origin||(origin.tagName==='A'&&!normalSelfLinkActivation(event,origin)))return;
  // The logo link is out of the tab order, so Back returns focus to the card's name link instead.
@@ -650,6 +733,12 @@ function focusRouteDestination(hash){
  target?.focus({preventScroll:true});
  (destination&&primary?document.querySelector('.profile-tabs'):destination||target)?.scrollIntoView({block:'start',behavior:'instant'});
 }
+function restoreComparisonFocus(key,hash){
+ const origin=comparisonOrigins.get(key);
+ if(origin?.hash!==hash)return;
+ const target=[...document.querySelectorAll('#compare-content a[href]')].find(link=>link.getAttribute('href')===origin.href&&link.getClientRects().length);
+ target?.focus({preventScroll:true});
+}
 function repeatCompanyRoute(event){
  if(event.defaultPrevented||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(event.button!==undefined&&event.button!==0))return;
  const link=event.target.closest?.('a[href]'),hash=link?.getAttribute('href');
@@ -675,9 +764,15 @@ document.addEventListener('click',repeatMainRoute);
 // Grouped profile citations can also appear in a quick summary. Close that
 // modal before the profile module opens its evidence dialog.
 document.addEventListener('click',event=>{if(event.target.closest?.('[data-profile-evidence]')&&$('company-dialog').open)$('company-dialog').close();});
-function route(event){const wasTraversal=routeTraversal;ensureHistoryEntryKey(event?.type==='hashchange'&&!wasTraversal&&location.hash!==lastRoutedHash);if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''||routeTraversal?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=Number.isFinite(kept)?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeRestoredScroll=restore;routeTraversal=false;const closingDialog=event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';if(parts[0]&&parts[0]!=='market'&&view==='market'&&!anchorId)history.replaceState(null,'','#market');if(view!=='company')preparePage(view);if(previousRoute&&view!==previousRoute)viewScroll[previousRoute]=window.scrollY;for(const name of ['market','companies','work','compare','method','profile'])$(name+'-view').hidden=(name!==(view==='company'?'profile':view));document.querySelectorAll('[data-nav]').forEach(a=>{if(a.dataset.nav===(view==='company'?'companies':view))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});if(view==='company'){if(isCompanyId(parts[1])){renderCompanyProfile(parts[1]);document.title=companies[parts[1]].name+' · ScienceToStartup';}else{document.title='Profile not found · ScienceToStartup';$('profile-view').innerHTML='<div class="page-heading"><h1>Profile not found</h1><p>No company in this guide uses that address.</p><a href="#companies">Browse the companies</a></div>';}}
- else{document.title=VIEW_TITLES[view];if(view==='companies'){if(typeof syncDirectoryRoute==='function')syncDirectoryRoute(parts.slice(1));showDirectory();}if(view==='method')showDirectory();if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare')renderCompare();}
- renderTray();const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;lastRoutedHash=location.hash;if(wasTraversal&&['work','companies'].includes(view)){const hash=location.hash;queueMicrotask(()=>{if(location.hash!==hash)return;const origin=view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():view==='companies'?companyReturnFocusTarget():null;origin?.focus({preventScroll:true});});}if(closingDialog){const hash=location.hash;requestAnimationFrame(()=>{if(location.hash!==hash)return;focusRouteDestination(hash);});}}
+function renderMissingCompanyProfile(parts){
+ const query=parts[1]||'',searchUrl='/companies/'+(query?'?'+new URLSearchParams({q:query}):'');
+ const recovery=profileRouteSection(parts[2])==='work'?'<p>Once you find the company, open its Paid work section.</p>':'';
+ document.title='Profile not found · ScienceToStartup';
+ $('profile-view').innerHTML=`<div class="page-heading"><h1>Profile not found</h1><p>No company in this historical Explore set uses ${query?'“'+esc(query)+'”':'that address'}.</p>${recovery}<p><a href="${attr(searchUrl)}">Search the company directory</a></p></div>`;
+}
+function route(event){const wasTraversal=routeTraversal;ensureHistoryEntryKey(event?.type==='hashchange'&&!wasTraversal&&location.hash!==lastRoutedHash);if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''||routeTraversal?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=Number.isFinite(kept)?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeRestoredScroll=restore;routeTraversal=false;const closingDialog=event?.closedDialog||event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';if(parts[0]&&parts[0]!=='market'&&view==='market'&&!anchorId)history.replaceState(null,'','#market');if(view!=='company')preparePage(view);if(previousRoute&&view!==previousRoute)viewScroll[previousRoute]=window.scrollY;for(const name of ['market','companies','work','compare','method','profile'])$(name+'-view').hidden=(name!==(view==='company'?'profile':view));document.querySelectorAll('[data-nav]').forEach(a=>{if(a.dataset.nav===(view==='company'?'companies':view))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});if(view==='company'){if(isCompanyId(parts[1])){renderCompanyProfile(parts[1]);document.title=companies[parts[1]].name+' · ScienceToStartup';}else renderMissingCompanyProfile(parts);}
+ else{document.title=VIEW_TITLES[view];if(view==='companies'){renderComparisonScope(view);if(typeof syncDirectoryRoute==='function')syncDirectoryRoute(parts.slice(1));showDirectory();}if(view==='method'){showDirectory();renderExploreCorrections(anchorId==='corrections');}else pendingCorrectionRecord='';if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare')renderCompare();}
+ renderTray();const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;lastRoutedHash=location.hash;if(wasTraversal&&['work','companies'].includes(view)){const hash=location.hash;queueMicrotask(()=>{if(location.hash!==hash)return;const origin=view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():view==='companies'?companyReturnFocusTarget():null;origin?.focus({preventScroll:true});});}if(wasTraversal&&view==='compare'){const hash=location.hash;queueMicrotask(()=>{if(location.hash===hash)restoreComparisonFocus(key,hash);});}if(closingDialog){const hash=location.hash;requestAnimationFrame(()=>{if(location.hash!==hash)return;focusRouteDestination(hash);});}}
 function download(name,body,type){const url=URL.createObjectURL(new Blob([body],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function csvCell(v){let s=String(v??'');if(/^[\t\r\n]/.test(s)||/^\s*[=+@-]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';}
 // The CSV starts with a byte order mark, so spreadsheet software such as Excel reads it as UTF-8.
@@ -850,7 +945,7 @@ function initCompare(){$('clear-compare').addEventListener('click',()=>{setSelec
  // browse the list; Enter or the Add button adds the company that is showing.
  const add=$('compare-add'),addButton=$('compare-add-button');let picked=false;const addChosen=()=>{const id=add.value;if(!isCompanyId(id)||state.selected.includes(id))return;add.focus?.({preventScroll:true});state.mobileCompare=Math.max(0,comparePairOptions([...state.selected,id]).findIndex(pair=>pair.includes(state.selected.length)));chooseCompare(id,true);};
  add.addEventListener('pointerdown',()=>{picked=true;});add.addEventListener('keydown',event=>{if(event.key!=='Enter'){picked=false;return;}if(add.value){event.preventDefault();addChosen();}});add.addEventListener('change',()=>{if(picked){picked=false;addChosen();}else addButton.hidden=!add.value;});addButton.addEventListener('click',addChosen);
- document.addEventListener('click',event=>{const button=event.target.closest?.('[data-copy-compare]');if(button)copyCompareLink(button);const more=event.target.closest?.('[data-compare-extra]');if(more){comparisonExpanded=!comparisonExpanded;const extra=$('comparison-extra');if(extra)extra.hidden=!comparisonExpanded;more.setAttribute('aria-expanded',String(comparisonExpanded));more.textContent=comparisonExpanded?'Hide additional details':'Show funding, products, relationships & people';}});
+ document.addEventListener('click',event=>{const button=event.target.closest?.('[data-copy-compare]');if(button)copyCompareLink(button);const more=event.target.closest?.('[data-compare-extra]');if(more){comparisonExpanded=!comparisonExpanded;const extra=$('comparison-extra');if(extra)extra.hidden=!comparisonExpanded;more.setAttribute('aria-expanded',String(comparisonExpanded));more.textContent=comparisonExpanded?'Hide additional details':'Show more evidence';}});
  let compareNarrow=window.innerWidth<=700;window.addEventListener('resize',()=>{const next=window.innerWidth<=700;if(next!==compareNarrow){compareNarrow=next;resizeComparison();}comparisonScrollRegion();});}
 
 // Method page: evidence labels, research coverage and downloads.
@@ -864,7 +959,7 @@ function initialize(){$('snapshot').textContent=compiledSnapshotLabel(DATA.meta.
  if(typeof requestIdleCallback!=='function'&&typeof requestAnimationFrame!=='function'){for(const view of ['companies','method','work'])preparePage(view);renderDirectory();preparePage('market');}
  route();initCompare();if(typeof initSiteNav==='function')initSiteNav();
  $('close-company').addEventListener('click',()=>$('company-dialog').close());$('close-evidence').addEventListener('click',()=>$('evidence-dialog').close());
- document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||$('clear-compare');next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.dataset.preset){state.mobileCompare=0;setSelection(b.dataset.preset==='scale'?['taskus','appen','scale_ai']:['surge_ai','toloka','labelbox']);}if(b.dataset.mobileCompare!==undefined){state.mobileCompare=Math.min(Number(b.dataset.mobileCompare),Math.max(0,comparePairOptions(state.selected.length?state.selected:['taskus','appen','scale_ai']).length-1));renderCompare();document.querySelector('.mobile-column-options summary')?.focus();}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});window.addEventListener('hashchange',route);
+ document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||$('clear-compare');next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.dataset.preset){state.mobileCompare=0;setSelection(b.dataset.preset==='scale'?['taskus','appen','scale_ai']:['surge_ai','toloka','labelbox']);}if(b.dataset.mobileCompare!==undefined){state.mobileCompare=Math.min(Number(b.dataset.mobileCompare),Math.max(0,comparePairOptions(state.selected).length-1));renderCompare();document.querySelector('.mobile-column-options summary')?.focus();}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});window.addEventListener('hashchange',route);
  // On small screens the Filters fields open as a panel under the button. A short screen can leave the whole panel
  // below the fold, so bring it into view when it opens. toggle does not bubble, so listen in the capture phase.
  document.addEventListener('toggle',e=>{const panel=e.target;if(!panel?.open||!panel.matches?.('.responsive-filter-panel,.more-filters'))return;if(panel.matches('.responsive-filter-panel')&&window.innerWidth>900)return;const fields=panel.querySelector('.responsive-filter-fields,.more-filters-panel'),box=fields?.getBoundingClientRect();if(box?.height&&box.bottom>window.innerHeight)fields.scrollIntoView({block:'nearest'});},true);

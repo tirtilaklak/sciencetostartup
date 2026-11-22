@@ -30,7 +30,7 @@ class CaptureURL extends URL {static createObjectURL(blob){downloadedBlob=blob;r
 const context=vm.createContext({document,window,history,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,URLSearchParams,Blob,queueMicrotask,setTimeout:()=>{},clearTimeout:()=>{},console});
 // The icon script runs first. This stub's window is separate from its global.
 // Combining the remaining modules matches declaration hoisting in the build.
-const modules=['web/icons.js','web/app.js','web/editorial.js','web/work-v3.js','web/work-v4.js','web/profiles-v2.js','web/source-updates.js','web/site-nav.js','web/detail-views.js','web/source-update-details.js','web/profile-details.js','web/business-health.js'];
+const modules=['web/icons.js','web/search-core.js','web/app.js','web/editorial.js','web/work-core.js','web/work-v3.js','web/work-v4.js','web/profiles-v2.js','web/source-updates.js','web/site-nav.js','web/detail-views.js','web/source-update-details.js','web/profile-details.js','web/business-health.js'];
 vm.runInContext(fs.readFileSync(path.join(root,modules[0]),'utf8'),context);
 context.iconHTML=window.iconHTML;
 assert.equal(typeof context.iconHTML,'function');
@@ -173,7 +173,9 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  for(const id of ['mercor','snorkel_ai','labelbox','appen','g2i','surge_ai','toloka'])for(const view of ['directory','work','profile'])boxes.push({dataset:{compare:id},checked:false,view});
  run(`setSelection(['mercor','snorkel_ai','labelbox','appen'])`);assert.equal(run('state.selected.length'),3);assert.ok(boxes.filter(b=>b.dataset.compare==='mercor').every(b=>b.checked));
  boxes.filter(b=>b.dataset.compare==='g2i').forEach(b=>b.checked=true);run(`chooseCompare('g2i',true)`);assert.ok(boxes.filter(b=>b.dataset.compare==='g2i').every(b=>!b.checked));
- assert.equal((node('compare-content').innerHTML.match(/data-comparison-row=/g)||[]).length,9);assert.equal((node('compare-content').innerHTML.match(/data-comparison-company=/g)||[]).length,27);
+ assert.ok(!node('compare-content').innerHTML.includes('comparison-table'),'Selecting from another view does not render the hidden table');
+ location.hash=run('compareHash()');run('route()');
+ assert.equal((node('compare-content').innerHTML.match(/data-comparison-row=/g)||[]).length,10);assert.equal((node('compare-content').innerHTML.match(/data-comparison-company=/g)||[]).length,30);
  node('clear-compare').callbacks.click();assert.ok(boxes.every(b=>!b.checked));assert.equal(run('state.selected.length'),0);
  node('compare-preset').value='work';node('compare-preset').callbacks.change({target:node('compare-preset')});assert.deepEqual(plain(run('state.selected')),['surge_ai','toloka','labelbox']);assert.ok(boxes.filter(b=>b.dataset.compare==='surge_ai').every(b=>b.checked));
  run('setSelection([])');assert.ok(node('compare-content').innerHTML.includes('comparison-empty'),'Clearing selection must show an honest empty state');assert.equal((node('compare-content').innerHTML.match(/data-comparison-company=/g)||[]).length,0,'Empty selection must not render unselected companies');
@@ -190,19 +192,26 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  window.scrollTo=()=>{};location.hash='#market';run('route()');
  location.hash='#company/Scale_AI/WORK';run('route()');assert.ok(node('profile-view').innerHTML.includes('data-profile-pane="work">'),'Section case must not hide the Paid work tab');
  assert.equal(location.hash,'#company/scale_ai/work','Mixed-case company links are rewritten to their canonical form');run(`activateProfileTab('traction')`);assert.equal(location.hash,'#company/scale_ai/traction','Profile tabs work after a mixed-case link');
- // Compare links use #compare/<id>/<id>. The earlier comma form (#compare/a,b) still opens and is rewritten to it.
- location.hash='#compare/mercor,Handshake_AI,unknown,mercor';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai']);assert.equal(location.hash,'#compare/mercor/handshake_ai');
+ // Normalize valid legacy comma links. Keep invalid requests in the address.
+ location.hash='#compare/mercor,Handshake_AI,mercor?reader=keep';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai']);assert.equal(location.hash,'#compare/mercor/handshake_ai?reader=keep');
+ location.hash='#compare/mercor,Handshake_AI,unknown,mercor';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai']);assert.equal(location.hash,'#compare/mercor,Handshake_AI,unknown,mercor');
+ assert.match(node('compare-content').innerHTML,/One company in this link is unavailable/);
  run(`chooseCompare('appen',true)`);assert.equal(location.hash,'#compare/mercor/handshake_ai/appen');
- location.hash='#compare/junk,nope';run('route()');assert.deepEqual(plain(run('state.selected')),['mercor','handshake_ai','appen'],'A compare link naming no known company keeps the selection');assert.equal(location.hash,'#compare/mercor/handshake_ai/appen');
- location.hash='#compare/Appen/unknown/appen/Scale_AI';run('route()');assert.deepEqual(plain(run('state.selected')),['appen','scale_ai'],'Slash links ignore case, unknown and repeated companies');assert.equal(location.hash,'#compare/appen/scale_ai');
+ location.hash='#compare/junk,nope';run('route()');assert.deepEqual(plain(run('state.selected')),[]);
+ assert.equal(location.hash,'#compare/junk,nope');assert.match(node('compare-content').innerHTML,/2 companies in this link are unavailable/);
+ location.hash='#compare/Appen/unknown/appen/Scale_AI';run('route()');assert.deepEqual(plain(run('state.selected')),['appen','scale_ai']);
+ assert.equal(location.hash,'#compare/Appen/unknown/appen/Scale_AI');assert.match(node('compare-content').innerHTML,/One company in this link is unavailable/);
  run('setSelection([])');assert.equal(location.hash,'#compare');location.hash='#market';run('route()');
  // A research alias opens its company: #compare/<alias>/<unknown>/<id> keeps the known companies, in order, under their ids.
- location.hash='#compare/Polymath/no-such-company/appen';run('route()');assert.deepEqual(plain(run('state.selected')),['polymath_ai_labs','appen'],'Compare links resolve research aliases and drop unknown parts');assert.equal(location.hash,'#compare/polymath_ai_labs/appen');
+ location.hash='#compare/Polymath/no-such-company/appen';run('route()');assert.deepEqual(plain(run('state.selected')),['polymath_ai_labs','appen'],'Compare links resolve research aliases');assert.equal(location.hash,'#compare/Polymath/no-such-company/appen');
  // The table box is a plain box. comparisonScrollRegion() names it as a focusable region only when it scrolls sideways.
  assert.ok(node('compare-content').innerHTML.includes('<div class="comparison-scroll"><table'),'The comparison box is not a Tab stop by default');
  run('setSelection([])');location.hash='#market';run('route()');
  // The overview counts approved listings and programs, without treating page checks as terms review.
- assert.match(node('overview-work').innerHTML,/<b>78<\/b> work routes<\/span>/);assert.ok(node('overview-work').innerHTML.includes('56 named listings and 22 networks and programs.'));assert.ok(node('overview-work').innerHTML.includes('Page checks do not establish current terms or availability.'));assert.ok(!/We reviewed every listing|open/i.test(node('overview-work').innerHTML.split('<p class="overview-safety">')[0]),'Overview work counts never imply vacancies or full terms review');
+ const approved=plain(run('storyWorkRows()')),discovery=plain(run('w4DiscoveryGroups(storyWorkRows())'));
+ assert.ok(node('overview-work').innerHTML.includes(`<b>${approved.length}</b> work routes</span>`));
+ assert.ok(node('overview-work').innerHTML.includes(`${discovery.named.length} named listings and ${discovery.programs.length} networks and programs.`));
+ assert.ok(node('overview-work').innerHTML.includes('Page checks do not establish current terms or availability.'));assert.ok(!/We reviewed every listing|open/i.test(node('overview-work').innerHTML.split('<p class="overview-safety">')[0]),'Overview work counts never imply vacancies or full terms review');
  // #companies/<group> filters the list to that group. An address that names no group shows the full list and becomes #companies.
  location.hash='#companies/expert-data-evaluation';run('route()');assert.equal(node('companies-view').hidden,false);assert.equal(run('state.category'),'Expert data & evaluation');assert.equal(run('filtered().length'),9);assert.equal(location.hash,'#companies/expert-data-evaluation');
  location.hash='#companies/no-such-group';run('route()');assert.equal(run('state.category'),'','An unknown group address shows the full list');assert.equal(run('filtered().length'),39);assert.equal(location.hash,'#companies','An unknown group address is rewritten to #companies');
@@ -245,7 +254,9 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  // funding, acquisition consideration, short periods and out-of-scope parent sales.
  for(const [id,kind,value] of [['bespoke_labs','funding_total_reported',40000000],['elorian','funding_total_reported',55000000],['snorkel_ai','funding_total_calculated',585000000],['mercor','funding_total_calculated',483600000]])assert.equal(run(`metricFor('${id}','${kind}').value`),value);
  assert.equal(run(`metricFor('rws_trainai','revenue').currency`),'GBP');
- const mercorProfile=run(`profileHTML('mercor')`);assert.ok(mercorProfile.includes('Unconfirmed valuation · Talks'));assert.ok(mercorProfile.includes('class="metric-tile unconfirmed-metric"'));assert.ok(mercorProfile.indexOf('$10B')<mercorProfile.indexOf('$20B'));
+ const mercorProfile=run(`profileHTML('mercor')`);assert.ok(mercorProfile.includes('Unconfirmed valuation · Talks'));assert.ok(mercorProfile.includes('class="metric-tile unconfirmed-metric"'));
+ const mercorCapital=run(`profileCapital('mercor')`);assert.ok(mercorCapital.includes('$20B')&&mercorCapital.includes('Series D announced 10 Nov 2026'));
+ assert.ok(run(`profileArchive('mercor')`).includes('$10B'),'The earlier valuation remains in source history');
  assert.equal(run(`preferredFinancial('micro1').id`),'micro1.metric.oct14-q3-run-rate');assert.equal(run(`preferredFinancial('micro1').qualifier`),'greater_than');assert.equal(run(`metricValue(preferredFinancial('micro1'))`),'> $1B');
  assert.equal(run(`metricFor('micro1','valuation').value`),4000000000);assert.equal(run(`metricFor('micro1','valuation').observation_status`),'reported');assert.equal(run(`metricFor('micro1','valuation').as_of`),'2026-10-12');
  assert.equal(run(`claims['micro1.claim.major-valuation-metric'].status`),'superseded');assert.equal(run(`DATA.metrics.find(m=>m.id==='micro1.metric.major-valuation').observation_status`),'talks');assert.ok(run(`profileHTML('micro1')`).includes('micro1.claim.major-valuation-metric'));
@@ -297,7 +308,7 @@ function readJSONFrom(file){return JSON.parse(fs.readFileSync(file,'utf8'));}
 # The stub loads the page scripts in the build's order (PRESENTATION_JS in scripts/observatory.py).
 # link-health.js is left out on purpose: test_link_health.py loads it later to check the fallback without it.
 STUB_MODULES=re.search(r"const modules=\[([^\]]*)\];",STUB).group(1).replace("'","").split(',')
-assert STUB_MODULES==['web/icons.js','web/app.js','web/editorial.js','web/work-v3.js']+['web/'+name for name in PRESENTATION_JS],'The JS stub must load every presentation script in the build order'
+assert STUB_MODULES==['web/icons.js','web/search-core.js','web/app.js','web/editorial.js','web/work-core.js','web/work-v3.js']+['web/'+name for name in PRESENTATION_JS],'The JS stub must load every presentation script in the build order'
 
 with tempfile.TemporaryDirectory(prefix='observatory-js-') as tmp:
  tmp=Path(tmp);(tmp/'test.cjs').write_text(STUB);data=fixture();expected=[]

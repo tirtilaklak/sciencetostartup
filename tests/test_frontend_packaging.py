@@ -58,7 +58,7 @@ function initialize(){events.push('init');return route()}'''
         self.assertEqual(json.loads(result.stdout), {"result": 7, "events": ['init', 'runtime', 'editorial', 'base'], "route": 'function', "state": 7, "evidence": 'source', "init": 'function', "name": 'initialize'})
 
     def test_actual_classic_modules_keep_public_bindings_and_semantic_fixtures(self):
-        modules = ['web/app.js', 'web/editorial.js', 'web/work-v3.js'] + ['web/' + name for name in PRESENTATION_JS] + ['web/data-runtime.js']
+        modules = ['web/search-core.js', 'web/app.js', 'web/editorial.js', 'web/work-core.js', 'web/work-v3.js'] + ['web/' + name for name in PRESENTATION_JS] + ['web/data-runtime.js']
         source = '\n'.join((ROOT / name).read_text() for name in modules)
         # Same minimal DOM harness as the independent source/data parity tests.
         prefix = APP_RULES.split("vm.runInContext(JSON.parse(modules).map(read).join('\\n'),context);")[0]
@@ -124,9 +124,9 @@ process.stdout.write(JSON.stringify({build:window.SCIENCE_HEALTH_MODULE.buildId,
             app_href = re.search(r'href="(/js/app\.[^"]+\.js)"', html).group(1)
             template = (ROOT / 'web/index.html').read_text()
             source = re.search(r'<script data-bundle="app">(.*?)</script>', template, re.S).group(1)
-            source = source.replace('/* OBSERVATORY_JS */', (ROOT / 'web/link-health.js').read_text() + '\n' + (ROOT / 'web/app.js').read_text())
+            source = source.replace('/* OBSERVATORY_JS */', '\n'.join((ROOT / 'web' / name).read_text() for name in ('link-health.js', 'search-core.js', 'app.js')))
             source = source.replace('/* EDITORIAL_JS */', (ROOT / 'web/editorial.js').read_text())
-            source = source.replace('/* WORK_V3_JS */', (ROOT / 'web/work-v3.js').read_text() + ''.join((ROOT / 'web' / name).read_text() for name in initial))
+            source = source.replace('/* WORK_V3_JS */', '\n'.join((ROOT / 'web' / name).read_text() for name in ('work-core.js', 'work-v3.js', *initial)))
             source = source.replace('/* DATA_RUNTIME_JS */', (ROOT / 'web/data-runtime.js').read_text().replace('/* APP_BUILD_ID */null', json.dumps(manifest['build_id'])))
             self.assertEqual((folder / app_href.lstrip('/')).read_text(), minify_javascript(source))
             # The runtime descriptor is the same one referenced by the summary,
