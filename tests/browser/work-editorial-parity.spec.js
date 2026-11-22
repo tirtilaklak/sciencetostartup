@@ -9,7 +9,7 @@ const employerListing = 'https://ooakdata.com/careers?job_id=114405#job';
 const originalPosting = 'https://www.ycombinator.com/companies/ooak-data/jobs/Gr7Gc1x-data-quality-specialist';
 const applicationLink = 'https://www.workatastartup.com/jobs/114405';
 const signInLink = 'https://www.workatastartup.com/application?signup_job_id=114405';
-const applicationStatus = 'Application access unconfirmed';
+const applicationStatus = 'Application link returned 404';
 
 const nativeCards = '.work-page-list [data-work-route]';
 const exploreCards = '#work-cards [data-work-route]';
@@ -118,15 +118,16 @@ async function expectSources(card, termsSummary) {
   await termsSummary.click();
   const terms = termsSummary.locator('..');
   await expect(terms.getByRole('link', { name: 'Original unavailable posting' })).toHaveAttribute('href', originalPosting);
-  await expect(terms.getByText(/(?:Historical observation|Exact historical posting).*HTTP 404/).first()).toBeVisible();
   await expect(terms.getByRole('link', { name: /Data Quality Specialist · employer listing/ })).toHaveAttribute('href', employerListing);
-  await expect(terms.getByRole('link', { name: /Employer’s application link · access unconfirmed/ })).toHaveAttribute('href', applicationLink);
+  await expect(terms.getByRole('link', { name: /Employer’s application link · page not found/ })).toHaveAttribute('href', applicationLink);
   await expect(terms.getByRole('link', { name: /Separate application URL · sign-in required/ })).toHaveAttribute('href', signInLink);
+  await expect(terms.getByText(/OOAK still lists this role\..*404 Page not found.*empty 406.*Y Combinator sign-in.*original YC posting also returned 404/)).toBeVisible();
   await expect(card.getByRole('link', { name: /^Apply(?: now| for| on| through|$)/i })).toHaveCount(0);
   return terms;
 }
 
 test('OOAK’s exact employer listing and application checks keep separate statuses', async ({ browser, page, baseURL }, testInfo) => {
+  test.setTimeout(60_000);
   await noScriptWork(browser, baseURL, async fallback => {
     const card = recordFor(fallback, nativeCards);
     await expect(card.locator('xpath=ancestor::*[@data-work-group]')).toHaveAttribute('data-work-group', 'named');
@@ -135,11 +136,16 @@ test('OOAK’s exact employer listing and application checks keep separate statu
     await expect(card.locator('.work-status')).toHaveText(applicationStatus);
     await expect(card.getByRole('link', { name: /^Read employer listing/ })).toHaveAttribute('href', employerListing);
     const terms = await expectSources(card, card.locator('.work-terms > summary'));
-    await expect(terms.getByText(/Application check · .*HTTP 406 · Unavailable/).first()).toBeVisible();
-    await expect(terms.getByText(/Application check · .*HTTP 200 · Blocked/).first()).toBeVisible();
+    const linkedApplication = terms.getByRole('link', { name: /Employer’s application link · page not found/ }).locator('..');
+    await expect(linkedApplication.getByText(/Application check · .*HTTP 404 · Not found/)).toBeVisible();
+    await expect(linkedApplication.getByText(/Application check · .*HTTP 406 · Unavailable/)).toBeVisible();
+    const separateApplication = terms.getByRole('link', { name: /Separate application URL · sign-in required/ }).locator('..');
+    await expect(separateApplication.getByText(/Application check · .*HTTP 200 · Blocked/)).toBeVisible();
+    await expect(terms.getByText(/(?:Historical observation|Exact historical posting).*HTTP 404/).first()).toBeVisible();
   });
 
-  await page.goto('/work/?kind=named&type=employment&pay=yearly&arrangement=onsite');
+  const criteria = 'kind=named&type=employment&pay=yearly&arrangement=onsite';
+  await page.goto(`/work/?${criteria}`);
   const card = recordFor(page, nativeCards);
   await expect(card).toBeVisible();
   await expect(card.locator('.work-status')).toHaveText(applicationStatus);
@@ -151,14 +157,17 @@ test('OOAK’s exact employer listing and application checks keep separate statu
   await expect(row.getByRole('rowheader')).toHaveText(`Ooak Data · Data Quality Specialist · ${applicationStatus}`);
   await expect(row.getByRole('link', { name: /^Read employer listing/ })).toHaveAttribute('href', employerListing);
   await expect(row.getByRole('link', { name: /^Apply/i })).toHaveCount(0);
+  const nativeCsv = (await downloadRows(page)).find(row => row.route_id === role);
 
   await page.locator('[data-work-explore]').click();
+  await expect(page).toHaveURL(`/explore/#work?${criteria}`);
   const explore = recordFor(page, exploreCards);
   await expect(explore.locator('.w4-status-listed')).toHaveText(applicationStatus);
   await expect(explore.getByRole('link', { name: /^Read employer listing/ })).toHaveAttribute('href', employerListing);
   await expectSources(explore, explore.locator('.w4-details > summary'));
 
   const rowCsv = (await downloadRows(page)).find(row => row.route_id === role);
+  expect(rowCsv).toEqual(nativeCsv);
   const review = JSON.parse(rowCsv.review_evidence);
   const urls = JSON.parse(rowCsv.original_url_details);
   await testInfo.attach('ooak-browser-export', {
@@ -169,7 +178,9 @@ test('OOAK’s exact employer listing and application checks keep separate statu
     availability: applicationStatus, original_application_url: '', current_action_url: employerListing, current_action_label: 'Read employer listing',
   });
   expect(urls).toMatchObject({
-    source_url: employerListing, application_url: null, recorded_url_purpose: 'description', archived_source_url: originalPosting,
+    source_url: employerListing, application_url: null, recorded_url_purpose: 'description', legacy_url_purpose: null,
+    current_action_purpose: 'description', archived_source_url: originalPosting,
+    checked_destinations: [{ url: applicationLink, purpose: 'application' }, { url: signInLink, purpose: 'application' }],
   });
   expect(urls).not.toHaveProperty('application_check');
   expect(rowCsv.source_urls.split(' | ')).toEqual(expect.arrayContaining([originalPosting, employerListing, applicationLink, signInLink]));
@@ -177,11 +188,21 @@ test('OOAK’s exact employer listing and application checks keep separate statu
     status: 'listed',
     http_check: { final_url: originalPosting, date: '2026-10-28', http_status: 200, result: 'reachable' },
     page_check: { url: employerListing, date: '2026-11-22', http_status: 200, result: 'readable' },
-    application_check: { url: applicationLink, date: '2026-11-22', http_status: 406, result: 'unavailable' },
-    application_checks: [{ url: signInLink, date: '2026-11-22', http_status: 200, result: 'blocked', retrieval_reason: 'sign_in' }],
+    application_check: {
+      url: applicationLink, final_url: applicationLink, date: '2026-11-22', http_status: 404, result: 'not_found',
+      retrieval_reason: 'http_not_found', rendered_observation: { url: applicationLink, http_status: 404 },
+    },
+    application_checks: [
+      { url: applicationLink, date: '2026-11-22', http_status: 406, result: 'unavailable', retrieval_reason: 'http_not_acceptable' },
+      { url: signInLink, date: '2026-11-22', http_status: 200, result: 'blocked', retrieval_reason: 'sign_in',
+        rendered_observation: { url: 'https://account.ycombinator.com/', http_status: 200 } },
+    ],
   });
   expect(review.source_receipts).toEqual(expect.arrayContaining([
     expect.objectContaining({ url: originalPosting, checked_on: '2026-11-08', http_status: 200, result: 'readable' }),
     expect.objectContaining({ url: originalPosting, checked_on: '2026-11-22', http_status: 404, result: 'not_found' }),
+    expect.objectContaining({ url: applicationLink, checked_at: '2026-11-22T12:56:45Z', http_status: 404, result: 'not_found' }),
+    expect.objectContaining({ url: applicationLink, checked_at: '2026-11-22T12:57:37Z', http_status: 406, result: 'unavailable' }),
+    expect.objectContaining({ url: signInLink, checked_at: '2026-11-22T11:56:48Z', http_status: 200, result: 'blocked' }),
   ]));
 });
