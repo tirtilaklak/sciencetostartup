@@ -741,6 +741,211 @@
             }
           ]
         }
+      },
+      {
+        "id": "afterquery.source.round2-funding.publication-date-2026-11-22",
+        "kind": "source_publication_date",
+        "company_id": "afterquery",
+        "reviewed_on": "2026-11-22",
+        "checked_at": "2026-11-22T09:01:44Z",
+        "reviewer": "Codex source review",
+        "review_basis": "retained_publication_evidence",
+        "target": {
+          "source_id": "afterquery.source.round2-funding"
+        },
+        "publication_date": "2026-04-09",
+        "publication_date_basis": "publisher_displayed_date",
+        "evidence": {
+          "url": "https://www.afterquery.com/blog/human-expertise-reimagined",
+          "effective_url": "https://www.afterquery.com/blog/human-expertise-reimagined",
+          "canonical_url": "https://www.afterquery.com/blog/human-expertise-reimagined",
+          "http_status": 200,
+          "redirects": 0,
+          "content_sha256": "41a816cbd0b8359effa729aa64f8ff7aadfd6e49936e563192f7aca6774fec59",
+          "visible_date_text": "Apr 9, 2026",
+          "date_locator": "time[datetime=\"2026-04-09\"]",
+          "retrieval_scope": "publication_date_only"
+        },
+        "historical_snapshot": {
+          "dataset_version": "2.5.0",
+          "sources": [
+            {
+              "accessed_on": "2026-10-14",
+              "company_id": "afterquery",
+              "id": "afterquery.source.round2-funding",
+              "notes": "Round 2 reviewed research. Access method: public_web",
+              "publisher": "AfterQuery",
+              "retrieval_status": "checked",
+              "source_type": "company",
+              "title": "Funding",
+              "url": "https://www.afterquery.com/blog/human-expertise-reimagined"
+            }
+          ]
+        }
+      },
+      {
+        "id": "afterquery.source.oct14-fd3e4675dd42.publication-date-2026-11-22",
+        "kind": "source_publication_date",
+        "company_id": "afterquery",
+        "reviewed_on": "2026-11-22",
+        "checked_at": "2026-11-22T09:01:44Z",
+        "reviewer": "Codex source review",
+        "review_basis": "retained_publication_evidence",
+        "target": {
+          "source_id": "afterquery.source.oct14-fd3e4675dd42"
+        },
+        "publication_date": "2026-04-09",
+        "publication_date_basis": "publisher_displayed_date",
+        "evidence": {
+          "url": "https://www.afterquery.com/blog/human-expertise-reimagined",
+          "effective_url": "https://www.afterquery.com/blog/human-expertise-reimagined",
+          "canonical_url": "https://www.afterquery.com/blog/human-expertise-reimagined",
+          "http_status": 200,
+          "redirects": 0,
+          "content_sha256": "41a816cbd0b8359effa729aa64f8ff7aadfd6e49936e563192f7aca6774fec59",
+          "visible_date_text": "Apr 9, 2026",
+          "date_locator": "time[datetime=\"2026-04-09\"]",
+          "retrieval_scope": "publication_date_only"
+        },
+        "historical_snapshot": {
+          "dataset_version": "2.5.0",
+          "sources": [
+            {
+              "accessed_on": "2026-10-14",
+              "company_id": "afterquery",
+              "id": "afterquery.source.oct14-fd3e4675dd42",
+              "notes": "Reviewed public source in the October 14 research pass. Source and claim dates remain separate; company statements are not independent audits.",
+              "publisher": "www.afterquery.com",
+              "retrieval_status": "checked",
+              "source_type": "company",
+              "title": "AfterQuery: /blog/human-expertise-reimagined",
+              "url": "https://www.afterquery.com/blog/human-expertise-reimagined"
+            }
+          ]
+        }
+      },
+      {
+        "id": "datacurve.source.oct14-9b179f419da7.publication-date-2026-11-22",
+        "kind": "source_publication_date",
+        "company_id": "datacurve",
+        "reviewed_on": "2026-11-22",
+        "checked_at": "2026-11-22T09:01:44Z",
+        "reviewer": "Codex source review",
+        "review_basis": "retained_publication_evidence",
+        "target": {
+          "source_id": "datacurve.source.oct14-9b179f419da7"
+        },
+        "publication_date": "2025-10-09",
+        "publication_date_basis": "publisher_displayed_date",
+        "evidence": {
+          "url": "https://www.chemistry.vc/post/staying-ahead-of-the-curve",
+          "effective_url": "https://www.chemistry.vc/post/staying-ahead-of-the-curve",
+          "canonical_url": "https://www.chemistry.vc/post/staying-ahead-of-the-curve",
+          "http_status": 200,
+          "redirects": 0,
+          "content_sha256": "3b23bcfac2d494cb86c002d4e0034d19844dbe952edcc12687a3823fa5a4b235",
+          "visible_date_text": "October 9, 2025",
+          "date_locator": "article date block (.text-block-21)",
+          "retrieval_scope": "publication_date_only"
+        },
+        "historical_snapshot": {
+          "dataset_version": "2.5.0",
+          "sources": [
+            {
+              "accessed_on": "2026-10-14",
+              "company_id": "datacurve",
+              "id": "datacurve.source.oct14-9b179f419da7",
+              "notes": "Reviewed public source in the October 14 research pass. Source and claim dates remain separate; company statements are not independent audits.",
+              "publisher": "www.chemistry.vc",
+              "retrieval_status": "checked",
+              "source_type": "investor",
+              "title": "Datacurve: /post/staying-ahead-of-the-curve",
+              "url": "https://www.chemistry.vc/post/staying-ahead-of-the-curve"
+            }
+          ]
+        }
+      },
+      {
+        "id": "scale_ai.source.oct14-891cd0d871ee.publication-date-2026-11-22",
+        "kind": "source_publication_date",
+        "company_id": "scale_ai",
+        "reviewed_on": "2026-11-22",
+        "checked_at": "2026-11-22T09:02:16Z",
+        "reviewer": "Codex source review",
+        "review_basis": "retained_publication_evidence",
+        "target": {
+          "source_id": "scale_ai.source.oct14-891cd0d871ee"
+        },
+        "publication_date": "2025-07-01",
+        "publication_date_basis": "publisher_displayed_date",
+        "evidence": {
+          "url": "https://www.aol.com/news/exclusive-scale-ais-bigger-rival-152327362.html",
+          "effective_url": "https://www.aol.com/exclusive-scale-ais-bigger-rival-152327362.html",
+          "canonical_url": "https://www.aol.com/exclusive-scale-ais-bigger-rival-152327362.html",
+          "http_status": 200,
+          "redirects": 1,
+          "content_sha256": "52b85943e89d7a23afc6a2c62d44dfe632cc9677bc347609453388ba5245c8cd",
+          "visible_date_text": "Tue, July 1, 2025 at 3:23 PM UTC",
+          "date_locator": "time[datetime=\"2025-07-01T15:23:27.000Z\"]",
+          "retrieval_scope": "publication_date_only"
+        },
+        "historical_snapshot": {
+          "dataset_version": "2.5.0",
+          "sources": [
+            {
+              "accessed_on": "2026-10-14",
+              "company_id": "scale_ai",
+              "id": "scale_ai.source.oct14-891cd0d871ee",
+              "notes": "Reviewed public source in the October 14 research pass. Source and claim dates remain separate; company statements are not independent audits.",
+              "publisher": "www.aol.com",
+              "retrieval_status": "checked",
+              "source_type": "independent_reporting",
+              "title": "Reuters via AOL: Surge financing",
+              "url": "https://www.aol.com/news/exclusive-scale-ais-bigger-rival-152327362.html"
+            }
+          ]
+        }
+      },
+      {
+        "id": "surge_ai.source.oct14-891cd0d871ee.publication-date-2026-11-22",
+        "kind": "source_publication_date",
+        "company_id": "surge_ai",
+        "reviewed_on": "2026-11-22",
+        "checked_at": "2026-11-22T09:02:16Z",
+        "reviewer": "Codex source review",
+        "review_basis": "retained_publication_evidence",
+        "target": {
+          "source_id": "surge_ai.source.oct14-891cd0d871ee"
+        },
+        "publication_date": "2025-07-01",
+        "publication_date_basis": "publisher_displayed_date",
+        "evidence": {
+          "url": "https://www.aol.com/news/exclusive-scale-ais-bigger-rival-152327362.html",
+          "effective_url": "https://www.aol.com/exclusive-scale-ais-bigger-rival-152327362.html",
+          "canonical_url": "https://www.aol.com/exclusive-scale-ais-bigger-rival-152327362.html",
+          "http_status": 200,
+          "redirects": 1,
+          "content_sha256": "52b85943e89d7a23afc6a2c62d44dfe632cc9677bc347609453388ba5245c8cd",
+          "visible_date_text": "Tue, July 1, 2025 at 3:23 PM UTC",
+          "date_locator": "time[datetime=\"2025-07-01T15:23:27.000Z\"]",
+          "retrieval_scope": "publication_date_only"
+        },
+        "historical_snapshot": {
+          "dataset_version": "2.5.0",
+          "sources": [
+            {
+              "accessed_on": "2026-10-14",
+              "company_id": "surge_ai",
+              "id": "surge_ai.source.oct14-891cd0d871ee",
+              "notes": "Reviewed public source in the October 14 research pass. Source and claim dates remain separate; company statements are not independent audits.",
+              "publisher": "www.aol.com",
+              "retrieval_status": "checked",
+              "source_type": "independent_reporting",
+              "title": "Reuters via AOL",
+              "url": "https://www.aol.com/news/exclusive-scale-ais-bigger-rival-152327362.html"
+            }
+          ]
+        }
       }
     ]
   },

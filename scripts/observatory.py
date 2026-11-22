@@ -497,6 +497,66 @@ def validate_historical_offer_context(update, data):
     require(product["company_id"] == "ooak" and product["claim_id"] == claim_ids[1] and product["segment_scope"] == "ai_data" and product["work_performed"] == tables["claims"][claim_ids[1]]["statement"], prefix + "original product binding mismatch")
     require(update["sources"] == [{"source_id": source_ids[0], "claim_id": claim_id, "publication_date": None, "publication_date_basis": "not_established", "role": "retained_issuer_offer", "access_status": "retained_readable_page"}], prefix + "invalid source context")
 
+def validate_source_publication_date(update, sources, dataset_version):
+    """Bind a publisher's visible date to one undated original citation."""
+    prefix = "source-updates: source publication date "
+    fields = {"id", "kind", "company_id", "reviewed_on", "checked_at", "reviewer", "review_basis", "target",
+              "publication_date", "publication_date_basis", "evidence", "historical_snapshot"}
+    require(set(update) == fields, prefix + "invalid fields")
+    def day(value):
+        require(isinstance(value, str) and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value), prefix + "invalid date")
+        try: return date.fromisoformat(value)
+        except ValueError: raise ValidationError(prefix + "invalid date")
+    def plain_text(value):
+        return isinstance(value, str) and value.strip() and not UNSAFE_EVENT_TEXT.search(value)
+    def public_url(value):
+        require(isinstance(value, str) and not re.search(r"[\s\x00-\x1f\x7f]", value), prefix + "invalid evidence URL")
+        try: parsed = urlsplit(value); parsed.port
+        except ValueError: raise ValidationError(prefix + "invalid evidence URL")
+        require(parsed.scheme == "https" and parsed.hostname and parsed.username is None and parsed.password is None,
+                prefix + "invalid evidence URL")
+        return parsed
+    target = update["target"]
+    require(isinstance(target, dict) and set(target) == {"source_id"} and isinstance(target["source_id"], str),
+            prefix + "invalid exact source target")
+    source_id = target["source_id"]
+    source = sources.get(source_id)
+    require(source is not None and source["company_id"] == update["company_id"] and source.get("published_on") is None,
+            prefix + "target must be an undated source in that company")
+    require(update["historical_snapshot"] == {"dataset_version": dataset_version, "sources": [source]},
+            prefix + "historical snapshot differs from original source")
+    reviewed, published = day(update["reviewed_on"]), day(update["publication_date"])
+    require(update["id"] == f"{source_id}.publication-date-{reviewed}" and plain_text(update["reviewer"])
+            and update["review_basis"] == "retained_publication_evidence"
+            and update["publication_date_basis"] == "publisher_displayed_date", prefix + "invalid review assertion")
+    checked_at = update["checked_at"]
+    require(isinstance(checked_at, str) and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", checked_at),
+            prefix + "invalid UTC retrieval time")
+    try: checked = datetime.fromisoformat(checked_at.replace("Z", "+00:00"))
+    except ValueError: raise ValidationError(prefix + "invalid UTC retrieval time")
+    now = datetime.now(timezone.utc)
+    require(published <= day(source.get("accessed_on")) <= checked.date() <= reviewed <= now.date() and checked <= now,
+            prefix + "inconsistent publication, record, retrieval or review dates")
+    evidence = update["evidence"]
+    require(isinstance(evidence, dict) and set(evidence) == {"url", "effective_url", "canonical_url", "http_status",
+            "redirects", "content_sha256", "visible_date_text", "date_locator", "retrieval_scope"}, prefix + "invalid evidence fields")
+    require(evidence["url"] == source["url"] and evidence["effective_url"] == evidence["canonical_url"],
+            prefix + "stored URL or canonical destination mismatch")
+    original, effective = public_url(evidence["url"]), public_url(evidence["effective_url"])
+    redirects = evidence["redirects"]
+    require(original.hostname == effective.hostname and type(redirects) is int and redirects >= 0
+            and bool(redirects) == (evidence["url"] != evidence["effective_url"]), prefix + "invalid redirect receipt")
+    require(type(evidence["http_status"]) is int and evidence["http_status"] == 200
+            and evidence["retrieval_scope"] == "publication_date_only" and plain_text(evidence["date_locator"])
+            and isinstance(evidence["content_sha256"], str) and re.fullmatch(r"[a-f0-9]{64}", evidence["content_sha256"]),
+            prefix + "invalid publication-only retrieval receipt")
+    visible = evidence["visible_date_text"]
+    require(plain_text(visible), prefix + "visible dateline required")
+    printed_day = f"{published:%B} {published.day}, {published.year}"
+    require(visible in (printed_day, f"{published:%b} {published.day}, {published.year}")
+            or re.fullmatch(re.escape(f"{published:%a}, {printed_day}") + r" at (?:[1-9]|1[0-2]):[0-5][0-9] [AP]M UTC", visible),
+            prefix + "visible dateline does not match publication date")
+
 def validate_evidence_context(section, data, existing_ids=(), profiles=None):
     """Validate presentation context against complete, unchanged source records."""
     prefix = "source-updates: evidence context "
@@ -514,6 +574,13 @@ def validate_evidence_context(section, data, existing_ids=(), profiles=None):
     for update in section["corrections"]:
         require(isinstance(update, dict), prefix + "invalid correction")
         kind = update.get("kind")
+        if kind == "source_publication_date":
+            validate_source_publication_date(update, tables["sources"], data["dataset_version"])
+            binding = (kind, update["target"]["source_id"])
+            require(update["id"] not in seen and binding not in targets, prefix + "duplicate correction")
+            seen.add(update["id"])
+            targets.add(binding)
+            continue
         if kind == "historical-offer-source-context":
             validate_historical_offer_context(update, data)
             binding = (kind, update["target"]["claim_id"])
