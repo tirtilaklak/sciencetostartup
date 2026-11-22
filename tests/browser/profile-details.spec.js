@@ -187,14 +187,13 @@ const imeritLedger = '/explore/#company/imerit/sources';
 const imeritImage = '/assets/products/imerit-exl-visual.png';
 
 async function openNativeSourceLedger(page, baseURL) {
-  const explore = new URL('/explore/', baseURL).href;
-  const canonical = 'https://sciencetostartup.com/explore/';
-  if (explore !== canonical) await page.route(canonical, route => route.fulfill({
-    status: 307, headers: { location: explore },
-  }));
   await page.goto('/company/imerit/');
   await page.locator('summary#sources, #sources > summary').press('Enter');
-  await page.getByRole('link', { name: 'Source ledger', exact: true }).press('Enter');
+  const ledger = page.getByRole('link', { name: 'Source ledger', exact: true });
+  await expect(ledger).toHaveAttribute('href', 'https://sciencetostartup.com' + imeritLedger);
+  // Map the public origin to the QA host while leaving the link activation native.
+  await ledger.evaluate((link, destination) => { link.href = destination; }, new URL(imeritLedger, baseURL).href);
+  await ledger.press('Enter');
   await expect(page).toHaveURL(new URL(imeritLedger, baseURL).href);
 }
 
