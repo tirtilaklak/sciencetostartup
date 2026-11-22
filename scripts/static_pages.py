@@ -318,6 +318,14 @@ def financial_period(metric):
 REVENUE_KINDS = ("revenue", "annualized_revenue_run_rate", "arr")
 PERIOD_WEIGHT = {"ttm": 3, "annual": 2, "half": 1}
 METRIC_CORRECTIONS = ("metric_reporting_context", "financial-basis-source-supplement", "historical-offer-source-context")
+RUN_RATE_REPORTING_DATES = {
+    "a-team.claim.growth_metrics-2.metric-0": ("2022-05-17", "a-team.source.ateam-7"),
+    "afterquery.metric.round2-financial-2": ("2026-04-09", "afterquery.source.round2-funding"),
+    "micro1.metric.oct14-q3-run-rate": ("2026-10-12", "micro1.source.oct14-19eb5016dbc6"),
+    "prime_intellect.metric.audit-pi-run-rate": ("2026-07-08", "prime_intellect.source.oct14-13f8e60149ba"),
+    "proximal.metric.oct14-0-revenue-run-rate": ("2026-09-29", "proximal.source.oct14-4e72c4026cdf"),
+    "snorkel_ai.metric.major-growth_metrics-0": ("2026-09-22", "snorkel_ai.source.audit-s5"),
+}
 
 
 def snapshot_matches(actual, expected):
@@ -344,6 +352,7 @@ class Research:
         self.headlines = dict(headlines or {})
         current = isinstance(updates, dict) and updates.get("baseline_dataset_version") == data.get("dataset_version")
         self.corrections = self._corrections(updates) if current else {}
+        self.reviewed_source_dates = self._reviewed_source_dates()
         self.product_updates = [row for row in updates.get("updates") or [] if isinstance(row, dict)] if current else []
 
     def _corrections(self, updates):
@@ -361,6 +370,38 @@ class Research:
 
     def correction(self, metric, field):
         return next((clean(row[field]) for row in self.corrections.get(metric.get("id"), []) if isinstance(row.get(field), str) and row[field].strip()), "")
+
+    def _reviewed_source_dates(self):
+        dates = {}
+        for corrections in self.corrections.values():
+            for update in corrections:
+                snapshot = update["historical_snapshot"]
+                for ref in update.get("sources", []):
+                    day, sid = ref.get("publication_date"), ref.get("source_id")
+                    if not ISO_DAY.fullmatch(str(day or "")) or ref.get("publication_date_basis") != "retained_page_text" or ref.get("access_status") != "retained_readable_page":
+                        continue
+                    source, claim = self.sources.get(sid), self.claims.get(ref.get("claim_id"))
+                    if not source or source.get("published_on") or not claim or sid not in claim.get("source_ids", []):
+                        continue
+                    if source.get("company_id") != update["company_id"] or claim.get("company_id") != update["company_id"]:
+                        continue
+                    if source in snapshot.get("sources", []) and claim in snapshot.get("claims", []):
+                        dates.setdefault(sid, set()).add(day)
+        return {sid: next(iter(days)) for sid, days in dates.items() if len(days) == 1}
+
+    def observation_period(self, observation):
+        source_ids = observation.get("source_ids", [])
+        for update in self.corrections.get(observation["id"], []):
+            target = update["target"]
+            if (update["kind"] == "metric_reporting_context" and observation["company_id"] == update["company_id"]
+                    and observation.get("metric_ids") == [target["metric_id"]] and observation.get("claim_ids") == [target["claim_id"]]
+                    and any(ref.get("role") == "bound_gross_observation" and ref.get("source_id") in source_ids for ref in update.get("sources", []))):
+                return update["display_period"].removesuffix(" · reported")
+        period = observation.get("period", {}).get("label") or observation.get("as_of", "")
+        reporting_day, source_id = RUN_RATE_REPORTING_DATES.get(observation["id"], (None, None))
+        if period == reporting_day and source_id in source_ids:
+            return "Reported " + format_date(period)
+        return period
 
     def claim(self, metric): return self.claims.get(metric.get("claim_id")) or {}
     def status(self, metric): return self.claim(metric).get("status")
@@ -1023,9 +1064,9 @@ def figure_row(research, metric, context=None):
 SOURCE_CHECKS = {"checked": "Checked {}", "summary_only": "Summary only, page not reviewed · recorded {}", "unverified": "Not checked again · recorded {}"}
 
 
-def source_meta(source):
+def source_meta(research, source):
     """Publisher, publication date and when we read the page, in the words of profileSourceMeta() in web/profiles-v2.js."""
-    published = source.get("published_on") if ISO_DAY.fullmatch(str(source.get("published_on") or "")) else ""
+    published = source.get("published_on") if ISO_DAY.fullmatch(str(source.get("published_on") or "")) else research.reviewed_source_dates.get(source["id"])
     read = source.get("accessed_on") if ISO_DAY.fullmatch(str(source.get("accessed_on") or "")) else ""
     check = SOURCE_CHECKS.get(source.get("retrieval_status"), "Recorded {}").format(format_date(read)) if read else ""
     return " · ".join(part for part in (clean(source.get("publisher")), f"Published {format_date(published)}" if published else "", check) if part)
@@ -1043,7 +1084,7 @@ def company_citations(research, claim, primary_id):
         return ""
     lines = []
     for source in sources:
-        meta = source_meta(source)
+        meta = source_meta(research, source)
         lines.append(f'<li data-source-id="{escape(source["id"])}">{company_source_link(research, source)}'
                      + (f'<span class="sub">{escape(meta)}</span>' if meta else "") + '</li>')
     return (f'<details class="company-citations" data-citations-for="{escape(claim["id"])}">'
@@ -1054,7 +1095,7 @@ def source_html(research, metric, inline=False):
     """A primary source and the other records cited by the same claim."""
     source, _ = latest_source(research, metric)
     if not source: return '<span class="muted">No source recorded.</span>' if inline else '<span class="sub">No source recorded</span>'
-    meta = source_meta(source)
+    meta = source_meta(research, source)
     link = company_source_link(research, source)
     rest = company_citations(research, research.claim(metric), source["id"])
     if inline: return "Source: " + link + (f' <span class="muted">({escape(meta)})</span>' if meta else "") + rest
@@ -1417,7 +1458,7 @@ def claim_source_html(research, claim):
     rows = [research.sources[sid] for sid in claim.get("source_ids", []) if sid in research.sources]
     if not rows: return '<span class="sub">No source recorded</span>'
     primary = rows[0]
-    meta = source_meta(primary)
+    meta = source_meta(research, primary)
     return company_source_link(research, primary) + (f'<span class="sub">{escape(meta)}</span>' if meta else '') + company_citations(research, claim, primary["id"])
 
 
@@ -1482,7 +1523,7 @@ def business_observation_html(research, health, company_id, inline=False, compac
     checks = [c for c in health.get("source_checks", {}).get("entries", []) if c.get("source_id") in source_ids]
     failed = row.get("refresh_status") == "source_unavailable" or any(c.get("status") == "unavailable" for c in checks)
     checked = next((c.get("checked_on") for c in checks if c.get("status") == "content_checked"), None)
-    period = row.get("period", {}).get("label") or row.get("as_of", "")
+    period = research.observation_period(row)
     scope = row.get("scope_label") or {"company": "Whole company", "ai_data": "AI data business"}.get(row.get("scope"), row.get("scope", ""))
     if company_id == "rws_trainai" and row.get("scope") in ("company", "parent"): scope = "RWS Holdings plc group"
     kind = "Annualized revenue run rate" if row.get("measure") == "annualized_revenue" else "Revenue"
@@ -1492,12 +1533,14 @@ def business_observation_html(research, health, company_id, inline=False, compac
     link = external_link(source.get("url"), source.get("publisher") or "Original source") if source else ""
     if source and company_id == "snorkel_ai" and row.get("measure") == "annualized_revenue":
         link = external_link(source.get("url"), "Snorkel company disclosure")
+    published = research.reviewed_source_dates.get(source["id"]) if source else None
+    citation = " · ".join(filter(None, (link, escape("Published " + format_date(published)) if published else "", escape(row.get("evidence_assurance") or "Attributed source"))))
     warning = '<span class="sub">Original citation could not be rechecked. Historical source attribution retained.</span>' if failed else ""
     content = (f'<div class="selected-evidence" data-financial-observation="{escape(row["id"])}">'
                + ('' if inline else '<h2>Selected financial evidence</h2>')
                + f'<strong class="selected-value">{escape(value_text(dict(row, qualifier="approximate" if row.get("qualifier") == "approximately" else row.get("qualifier"))))}</strong><span class="sub">{escape(meta)}</span>'
-               + f'<span class="sub">{link} · {escape(row.get("evidence_assurance") or "Attributed source")}</span>' + warning)
-    if checked and not inline: content += f'<span class="sub">Source content checked {escape(format_date(checked))}; reporting period remains {escape(period)}.</span>'
+               + f'<span class="sub">{citation}</span>' + warning)
+    if checked and not inline: content += f'<span class="sub">Source content checked {escape(format_date(checked))}.</span>'
     if not inline: content += f'<details><summary>Source wording and limits</summary><p>{escape(row.get("original_text") or "")}</p><p>{escape(row.get("limitations") or "")}</p></details>'
     content += '</div>'
     dated = re.search(r"\d{4}(?:-\d{2}){0,2}", str(row.get("as_of") or ""))
@@ -1586,7 +1629,8 @@ def company_sources_html(research, company_id, name):
     items = []
     for sid, source in research.sources.items():
         if source.get("company_id") == company_id and is_web_url(source.get("url")):
-            items.append(f'<li data-native-source="{escape(sid)}">{company_source_link(research, source)}</li>')
+            meta = f'<span class="sub">{escape(source_meta(research, source))}</span>' if sid in research.reviewed_source_dates else ""
+            items.append(f'<li data-native-source="{escape(sid)}">{company_source_link(research, source)}{meta}</li>')
     if not items:
         return '<p>No original source links recorded.</p>'
     return f'<h3>Original sources for {escape(name)}</h3><ol data-native-source-list>{"".join(items)}</ol>'
