@@ -64,6 +64,16 @@
       else remember({ workFilterOptionsOpen: filterOptions.open });
     }
 
+    function appendComparisonFields(cell, fields) {
+      for (const value of fields) {
+        if (!value) continue;
+        const field = document.createElement('div');
+        field.textContent = value;
+        if (cell.hasChildNodes()) cell.append('\n');
+        cell.append(field);
+      }
+    }
+
     function comparisonRows(results) {
       const heading = comparison.querySelector('h2');
       comparison.replaceChildren(heading);
@@ -89,14 +99,24 @@
         identity.scope = 'row';
         identity.textContent = [company_name, text(card, 'h3'), text(card, '.work-status')].filter(Boolean).join(' · ');
         row.append(identity);
-        row.insertCell().textContent = text(card, '.work-historical-pay') || text(card, '.work-pay') || 'Pay not listed';
+        const pay = card.querySelector('.work-pay');
+        const amount = pay?.querySelector('strong');
+        const historicalLabel = amount?.previousElementSibling?.textContent.trim();
+        appendComparisonFields(row.insertCell(), [
+          [historicalLabel, amount?.textContent.trim()].filter(Boolean).join(' ') || 'Pay not listed',
+          ...Array.from(pay?.querySelectorAll('strong ~ .sub') || [], note => note.textContent.trim()),
+        ]);
         const detail = row.insertCell();
-        detail.append([text(card, '.work-place'), text(card, '.work-listing-conditions'), text(card, '.work-reviewed')].filter(Boolean).join(' · '));
+        appendComparisonFields(detail, [
+          text(card, '.work-place'),
+          ...Array.from(card.querySelector('.work-listing-conditions').children, field => field.textContent.trim()),
+          text(card, '.work-reviewed'),
+        ]);
         const action = card.querySelector('.work-listing-action a');
         if (action) {
           const copy = action.cloneNode(true);
           copy.removeAttribute('id');
-          detail.append(' ', copy);
+          detail.append('\n', copy);
         }
       }
       region.append(table);
