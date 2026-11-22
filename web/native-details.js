@@ -26,7 +26,7 @@
 
   const navigation = window.navigation;
   if (navigation && document.querySelector('.r-bulk-shortcuts')) {
-    const shortcutVisits = new WeakMap();
+    const shortcutVisits = new Map();
     let activatedShortcut;
     document.addEventListener('click', event => {
       activatedShortcut = event.isTrusted && !event.defaultPrevented && event.button === 0 &&
@@ -38,21 +38,25 @@
       activatedShortcut = null;
       if (!link || event.sourceElement !== link || event.navigationType !== 'push' || !event.hashChange) return;
       navigation.addEventListener('currententrychange', ({ from, navigationType }) => {
-        if (navigationType === 'push') shortcutVisits.set(navigation.currentEntry, { from, link });
+        if (navigationType !== 'push') return;
+        const entry = navigation.currentEntry;
+        const key = entry.key;
+        shortcutVisits.set(key, { from: from.key, link });
+        entry.addEventListener('dispose', () => shortcutVisits.delete(key), { once: true });
       }, { once: true, signal: event.signal });
     });
     navigation.addEventListener('currententrychange', ({ from, navigationType }) => {
       if (navigationType !== 'traverse') return;
-      const entry = navigation.currentEntry;
-      const departure = shortcutVisits.get(from);
-      const arrival = shortcutVisits.get(entry);
-      const target = departure?.from === entry ? departure.link
-        : arrival?.from === from ? document.getElementById(arrival.link.hash.slice(1)) : null;
+      const key = navigation.currentEntry.key;
+      const departure = shortcutVisits.get(from.key);
+      const arrival = shortcutVisits.get(key);
+      const target = departure?.from === key ? departure.link
+        : arrival?.from === from.key ? document.getElementById(arrival.link.hash.slice(1)) : null;
       if (!target) return;
 
       // The browser restores scroll after currententrychange.
       requestAnimationFrame(() => {
-        if (navigation.currentEntry !== entry) return;
+        if (navigation.currentEntry.key !== key) return;
         const { top, bottom } = target.getBoundingClientRect();
         if (bottom > 0 && top < innerHeight) target.focus({ preventScroll: true });
       });
