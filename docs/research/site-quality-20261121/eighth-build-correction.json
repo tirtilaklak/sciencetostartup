@@ -1,0 +1,27 @@
+{
+  "original_candidate": {
+    "commit": "324072f0027873cea084dc05a87c3dd64b8d3d5f",
+    "build_id": "0223193390f17ca8cadc",
+    "manifest_sha256": "3e4ecab1082bf7508608a411c5fd0dea025be910b4de83c62e64834449838a87",
+    "payloads": 1280,
+    "editorial_release_id": "2026-11-22.5"
+  },
+  "replacement_candidate": {
+    "commit": "a6f2ca76aec3a6b28b463d9e7a0d8a51d8890ba2",
+    "build_id": "4b07b7b1f9bbb41d3b80",
+    "manifest_sha256": "f5fc2bf96f57542106b1d9ecd2257cf2e4acb10f158f562da529534dd2c8268d",
+    "payloads": 1280,
+    "editorial_release_id": "2026-11-22.5"
+  },
+  "previous_head": "a6f2ca76aec3a6b28b463d9e7a0d8a51d8890ba2",
+  "failed_workflows": [
+    45021387787,
+    45021387742
+  ],
+  "ci_failure": "Fresh rebuild had a different manifest. The build identity covers scripts/payload_budgets.mjs and quality-budgets.json. Both changed to repair reference detection and include AfterQuery in the mobile measurements.",
+  "previous_journeys": {
+    "passed": 125,
+    "candidate_build": "0223193390f17ca8cadc"
+  },
+  "candidate_status": "New exact-head workflows and end-to-end release verification pending."
+}
