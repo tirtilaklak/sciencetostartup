@@ -8,6 +8,7 @@ const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 const previous = name => name.endsWith('.gz') ? gunzipSync(fs.readFileSync(path.join(root, 'tests/fixtures/previous-search', name))).toString() : read('tests/fixtures/previous-search/' + name);
 const current = name => read('web/search-core.js') + '\n' + read('web/' + name);
 const companies = require('../../data/canonical.json').companies;
+const directoryCount = companies.length + require('../../data/current-companies.json').entries.length;
 const origin = 'http://127.0.0.1:18769';
 const baselineEntries = JSON.parse(previous('index.json.gz')).entries;
 async function home(page, { oldMarkup = false, oldIndex = false, oldComponent = false, oldRuntime = false, query = '', fixtureOrigin = origin } = {}) {
@@ -135,7 +136,7 @@ for(const [routeName, oldScript] of [['companies',false],['companies',true],['wo
     if(routeName==='work') await page.locator('.work-page-filter-options').evaluate(node=>{node.open=true;});
     await page.getByRole('button',{name:'Clear',exact:true}).click();
     await expect(input).toHaveValue('');
-    await expect(page.locator(routeName==='companies'?'[data-company]':'[data-work-route]')).toHaveCount(routeName==='companies'?(oldScript?55:53):135);
+    await expect(page.locator(routeName==='companies'?'[data-company]':'[data-work-route]')).toHaveCount(routeName==='companies'?(oldScript?directoryCount:53):135);
   });
 }
 

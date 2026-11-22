@@ -246,6 +246,20 @@ test('the native Source ledger lands at All sources and Tabs into its sources be
     await expect(source).toBeFocused();
     await expectSourceHeadingInView(heading);
 
+    // Native Tab focus scrolls smoothly; finish that motion before measuring
+    // the user's new position for the exact Back/Forward restoration check.
+    await page.evaluate(() => new Promise(resolve => {
+      let previous = scrollY;
+      let stableFrames = 0;
+      const sample = () => {
+        const current = scrollY;
+        stableFrames = current === previous ? stableFrames + 1 : 0;
+        previous = current;
+        if (stableFrames === 4) resolve();
+        else requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    }));
     const position = await page.evaluate(() => {
       window.scrollBy({ top: 400, behavior: 'instant' });
       return scrollY;

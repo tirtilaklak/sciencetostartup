@@ -1,4 +1,6 @@
 const { test, expect } = require('@playwright/test');
+const directoryCount = require('../../data/canonical.json').companies.length
+  + require('../../data/current-companies.json').entries.length;
 
 test('native Companies carries the exact saved search result into Compare', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -46,7 +48,7 @@ test('the directory offers historical comparisons and current-only profile links
   await expect(results.locator('.directory-compare')).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Compare 39 original profiles' })).toHaveAttribute('href', '/explore/#compare');
   await page.getByRole('button', { name: 'Clear', exact: true }).click();
-  await expect(results).toHaveCount(55);
+  await expect(results).toHaveCount(directoryCount);
   const historical = results.locator('.directory-compare');
   await expect(historical).toHaveCount(39);
   expect(await historical.evaluateAll(links => links.every(link =>
@@ -60,7 +62,7 @@ test.describe('without JavaScript', () => {
   test('the native directory retains its profile links and exact Compare destinations', async ({ page }) => {
     await page.goto('/companies/?q=Mercor');
     await expect(page.locator('#company-filters')).toBeHidden();
-    await expect(page.locator('[data-company]:visible')).toHaveCount(55);
+    await expect(page.locator('[data-company]:visible')).toHaveCount(directoryCount);
     await expect(page.getByRole('navigation', { name: 'Business groups' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Mercor', exact: true })).toHaveAttribute('href', /\/company\/mercor\/$/);
     await page.getByRole('link', { name: 'Compare Mercor', exact: true }).click();
