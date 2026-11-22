@@ -291,7 +291,7 @@
       if (saved?.kind === 'profile') {
         // The exact role visit must be the adjacent entry we just left on Back.
         return Boolean(saved.destinationKey && from?.key === saved.destinationKey &&
-          from.url === saved.href && from.index === entry?.index + 1);
+          from.url === saved.href && from.index === window.navigation.currentEntry?.index + 1);
       }
       return !(from && from.index <= entry?.index);
     }
@@ -400,6 +400,7 @@
       if (!restoreJumpFocus()) revealTarget(true);
     });
     window.addEventListener('popstate', () => {
+      bindProfileArrival();
       restoreFilterOptions();
       if (displayedSearch !== location.search) { readURL(); render(); }
     });
