@@ -115,10 +115,10 @@ function w4Location(route){
 // is conditional on the current route text so future data corrections can
 // remove it. Unmatched routes use short original clauses, never title inference.
 function w4Requirements(route){
-  if(route.id==='ooak.work.data-quality-specialist'&&/conflict/i.test((route.requirements||[]).join(' ')))return ['Experience conflict: 6+ years in header; 4+ in body','Python/SQL, data quality and fluent English'];
   if(route.id==='scale_ai.work.outlier-statistics'&&/Degree conflict/i.test((route.requirements||[]).join(' ')))return ["Degree conflict: master's badge; doctorate in ideal qualifications",'Authorization to work in the country of residence'];
   const originals=(route.requirements||[]).map(w4Text).filter(Boolean),text=originals.join(' ');
   if(!text)return [];
+  if(route.id==='ooak.work.data-quality-specialist'&&route.field_reviews?.requirements?.state==='conflicting')return originals.slice(0,2);
   // The fellowship's alternate qualification needs its project and experience conditions together.
   if(route.id==='aixi.work.research-fellowship')return originals.slice(0,2);
   const age=text.match(/\b(?:aged?\s*)?18\+|\bover\s+18\b|\bat\s+least\s+18\b/i)?.[0];
