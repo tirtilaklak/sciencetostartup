@@ -214,7 +214,7 @@ const companyClaims=id=>DATA.claims.filter(c=>c.company_id===id);
 const companySources=id=>DATA.sources.filter(s=>s.company_id===id||s.id.startsWith(id+'.source.'));
 const brief=text=>String(text||'').split(/(?<=[.!?])\s+(?=[A-Z“])/).slice(0,2).join(' ').trim();
 const editorialFor=id=>DATA.editorial_readouts.find(e=>e.company_id===id)||(window.SEARCH_INDEX?.editorialReadouts||[]).find(e=>e.company_id===id);
-const scopeText=(scope,id)=>({company:['handshake_ai','hackerrank','rws_trainai'].includes(id)?'Parent company':'Whole company',ai_data:'AI business',research:companies[id]?.entity_type==='adjacent_research'?'Research organization':'Research activity',other_segment:id==='rws_trainai'?'Generate segment (includes TrainAI)':'Other business segment'}[scope]||title(scope));
+const scopeText=(scope,id)=>({company:id==='rws_trainai'?profileFinanceProjection(id)?.headline?.scope||'Parent company':['handshake_ai','hackerrank'].includes(id)?'Parent company':'Whole company',ai_data:'AI business',research:companies[id]?.entity_type==='adjacent_research'?'Research organization':'Research activity',other_segment:id==='rws_trainai'?'Generate segment (includes TrainAI)':'Other business segment'}[scope]||title(scope));
 const dateText=s=>s==='undated'?'Source date not stated':s;
 function sourceReviewText(source){
  const date=source.accessed_on;
@@ -291,15 +291,22 @@ function evidenceAccess(ids,label,topicHint=''){
  if(!selected.length)return{attributes:'',description:''};
  const subjects={'financial metrics':'Financial figure','growth metrics':'Growth measure','worker opportunities':'Work opportunity','operating metric':'Operating figure','public application availability':'Application availability','customers':'Relationship evidence','funding rounds':'Financing event','total funding':'Financing total','founders':'Founders and leadership'};
  const gate=selected[0].subject.match(/^ai data gate ([PCRO])$/i),criterion=gate?DATA.rubric.dimensions.find(d=>d.id===gate[1].toUpperCase())?.label:'';
- const topic=publicText(topicHint)||evidenceRecordTopics.get(selected[0].id)||criterion||subjects[selected[0].subject]||title(selected[0].subject.replace(/\s+\d+$/,''));
+ const reviewed=selected.map(profileReviewedObservationForClaim),finance=selected.map(cl=>financeClaimContextFor(cl.id));
+ const topic=publicText(topicHint)||reviewed[0]?.label||finance[0]?.label||evidenceRecordTopics.get(selected[0].id)||criterion||subjects[selected[0].subject]||title(selected[0].subject.replace(/\s+\d+$/,''));
  const companyNames=[...new Set(selected.map(cl=>companies[cl.company_id]?.name).filter(Boolean))];
- const dates=[...new Set(selected.map(cl=>evidenceContextClaimPeriod(cl,cl.as_of&&cl.as_of!=='undated'?cl.as_of:'not stated')))];
- const name=label+' for '+companyNames.join(' and ')+': '+topic+'. Date'+(dates.length>1?'s':'')+' of the evidence: '+dates.map(evidenceDate).join('; ')+'.';
- const description=selected.map(cl=>{
+ const dateInfo=selected.map(cl=>{
+  const heading=evidenceContextDateHeading(cl),prefix=heading+': ';
+  const text=evidenceDate(evidenceContextClaimPeriod(cl,cl.as_of&&cl.as_of!=='undated'?cl.as_of:'not stated'));
+  return profileEvidenceDate(cl,text.startsWith(prefix)?text.slice(prefix.length):text,heading);
+ });
+ const dates=[...new Set(dateInfo.map(({heading,text})=>heading+': '+text))];
+ const name=label+' for '+companyNames.join(' and ')+': '+topic+'. '+dates.join('. ')+'.';
+ const description=selected.map((cl,index)=>{
   const statement=publicText(cl.statement),caveat=publicText(cl.caveat);
-  const details=[...(evidenceMetricScopes.get(cl.id)||[])];
-  const originalScope=scopeText(cl.segment_scope,cl.company_id),scope=evidenceContextScopeLabel(cl,originalScope),context=evidenceContextClaimDescription(cl);
-  return[cl.status!=='supported'?'Status: '+title(cl.status)+'.':'','Evidence label: '+evidenceLabel(cl)+'.','Business covered: '+scope+'.',scope!==originalScope?'Original dataset scope: '+originalScope+'.':'',details.length?'Metric scope detail: '+details.join('; ')+'.':'',context,context?'Original dataset statement: '+statement:statement,caveat&&!statement.includes(caveat)?caveat:''].filter(Boolean).join(' ');
+  const curatedScope=finance[index]?.scope||reviewed[index]?.scope_label;
+  const details=curatedScope?[]:[...(evidenceMetricScopes.get(cl.id)||[])];
+  const originalScope=scopeText(cl.segment_scope,cl.company_id),scope=curatedScope||evidenceContextScopeLabel(cl,originalScope),context=evidenceContextClaimDescription(cl);
+  return[cl.status!=='supported'?'Status: '+title(cl.status)+'.':'','Evidence label: '+profileEvidenceLabel(cl)+'.','Business covered: '+scope+'.',!curatedScope&&scope!==originalScope?'Original dataset scope: '+originalScope+'.':'',details.length?'Metric scope detail: '+details.join('; ')+'.':'',dateInfo[index].description,context,context||reviewed[index]?'Original dataset statement: '+statement:statement,caveat&&!statement.includes(caveat)?caveat:''].filter(Boolean).join(' ');
  }).join(' ');
  const descriptionId='evidence-description-'+(++evidenceDescriptionSequence);
  return{attributes:`aria-label="${esc(name)}" aria-describedby="${descriptionId}" aria-haspopup="dialog" aria-controls="evidence-dialog"`,description:`<span id="${descriptionId}" data-evidence-description hidden style="display:none">${esc(description)}</span>`};
@@ -308,7 +315,12 @@ const claimButton=(id,label='Evidence',topic='')=>{const access=evidenceAccess([
 const numberButton=m=>{const label=metricValue(m),access=evidenceAccess([m.claim_id],label,metricEvidenceTopic(m,m.label||metricLabels[m.kind]));return `<button class="number-button" data-claim="${esc(m.claim_id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;};
 const sourceLinks=cl=>cl.source_ids.map(id=>external(sources[id].url,sources[id].publisher)).join(' ');
 const provenance=cl=>`<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(evidenceContextArchiveDate(cl,dateText(cl.as_of)))}</span><span>· ${esc(evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id)))}</span><span>· ${esc(evidenceLabel(cl))}</span>${claimButton(cl.id)}</div>`;
-function metricMeta(m){const accounting=metricCurrentBasis(m,['revenue','annualized_revenue_run_rate','arr'].includes(m.kind)?m.gross_vs_net==='unspecified'?'Gross or net revenue not stated':title(m.gross_vs_net)+' basis':'');return `${m.currency?m.currency+' · ':''}${metricContextMetaPeriod(m,m.kind==='revenue'?m.period_label||m.as_of:dateText(m.as_of))} · ${m.scope_detail&&m.scope_detail!=='company'&&m.scope_detail!=='ai_data'?m.scope_detail:scopeText(m.segment_scope,m.company_id)}${accounting?' · '+accounting:''}`;}
+function metricMeta(m){
+ const finance=financeClaimContextFor(m.claim_id),accounting=metricCurrentBasis(m,['revenue','annualized_revenue_run_rate','arr'].includes(m.kind)?m.gross_vs_net==='unspecified'?'Gross or net revenue not stated':title(m.gross_vs_net)+' basis':'');
+ const period=finance?.display_date||metricContextMetaPeriod(m,m.kind==='revenue'?m.period_label||m.as_of:dateText(m.as_of));
+ const scope=finance?.scope||(m.scope_detail&&!['company','ai_data'].includes(m.scope_detail)?m.scope_detail:scopeText(m.segment_scope,m.company_id));
+ return [m.currency,period,scope,accounting].filter(Boolean).join(' · ');
+}
 function eligibleMetrics(id,kind){return DATA.metrics.filter(m=>(!id||m.company_id===id)&&(!kind||m.kind===kind)&&m.preferred_for_comparison!==false&&claims[m.claim_id].status==='supported'&&(!m.observation_status||m.observation_status==='reported')).sort(byRecent);}
 function metricFor(id,kind){return eligibleMetrics(id,kind)[0];}
 function companySummaryFor(id){return window.SUMMARY_INDEX?.companySummaries?.[id]||null;}
@@ -571,19 +583,22 @@ const EVIDENCE_DATE_NOTES={
 let evidenceRecordHash='',evidenceReturnHash='';
 // Record links: #company/<id>/claim/<claim-id> opens the profile with this dialog.
 function evidenceRecordLink(cl){return '#company/'+encodeURIComponent(cl.company_id)+'/claim/'+encodeURIComponent(cl.id);}
-let pendingCorrectionRecord='';
-document.addEventListener('click',event=>{
- const link=event.target.closest?.('[data-correction-record]');
- if(normalSelfLinkActivation(event,link))pendingCorrectionRecord=link.dataset.correctionRecord;
-});
+function exploreCorrectionLink(cl){return '#corrections?'+new URLSearchParams({company:cl.company_id,claim:cl.id});}
+function exploreCorrectionTarget(hash=location.hash){
+ const query=hash.indexOf('?');
+ if(query<0||viewAnchorId(hash)!=='corrections')return null;
+ const params=new URLSearchParams(hash.slice(query+1)),[company,...otherCompanies]=params.getAll('company'),[id,...otherIds]=params.getAll('claim');
+ if(otherCompanies.length||otherIds.length||!isCompanyId(company)||!id||!/^[a-z0-9][a-z0-9._-]*$/.test(id))return null;
+ return {company,id};
+}
+function exploreCorrectionClaim(target=exploreCorrectionTarget()){
+ const claim=target&&Object.hasOwn(claims,target.id)?claims[target.id]:null;
+ return claim&&claim.company_id===target.company?claim:null;
+}
 function renderExploreCorrections(atCorrections){
  const panel=$('corrections'),email=panel.querySelector?.('.correction-email a');
  if(!email)return;
- if(atCorrections&&pendingCorrectionRecord){
-  history.replaceState({...history.state,correctionRecord:pendingCorrectionRecord},'');
-  pendingCorrectionRecord='';
- }
- const id=atCorrections?history.state?.correctionRecord:'',claim=Object.hasOwn(claims,id)?claims[id]:null;
+ const request=atCorrections?exploreCorrectionTarget():null,claim=exploreCorrectionClaim(request);
  const dataset='Explore dataset v'+DATA.dataset_version,release=window.SUMMARY_INDEX?.editorialReleaseId;
  const edition=release?`${dataset} · ${release}`:dataset;
  const intake=window.SUMMARY_INDEX?.correctionIntake,origin=intake?.origin||'https://sciencetostartup.com';
@@ -689,7 +704,7 @@ if(!window.navigation)window.addEventListener('popstate',()=>{clearTimeout(entry
 if(!window.navigation)document.addEventListener('click',e=>{const link=e.target?.closest?.('a[href^="#"]');if(normalSelfLinkActivation(e,link))keepEntryScroll();},true);
 // history.replaceState() from any page script clears that state, so keep the position again afterwards.
 window.navigation?.addEventListener('currententrychange',event=>{if(event.navigationType==='replace')keepEntryScroll();});
-window.navigation?.addEventListener('navigate',event=>{if(event.navigationType==='replace')return;if(typeof flushWorkRoute==='function')flushWorkRoute();keepEntryScroll();const key=historyKey();if(key)entryScroll.set(key,window.scrollY);routeTraversal=event.destination.sameDocument&&event.navigationType==='traverse';});
+window.navigation?.addEventListener('navigate',event=>{if(event.navigationType==='replace')return;if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();keepEntryScroll();const key=historyKey();if(key)entryScroll.set(key,window.scrollY);routeTraversal=event.destination.sameDocument&&event.navigationType==='traverse';});
 // Hidden pages are set up the first time they open; idle time fills in their filters and method
 // text. The overview and the company cards render on first visit only. The Node test stub has no
 // requestIdleCallback or requestAnimationFrame, so there initialize() sets everything up at once,
@@ -771,7 +786,7 @@ function renderMissingCompanyProfile(parts){
  $('profile-view').innerHTML=`<div class="page-heading"><h1>Profile not found</h1><p>No company in this historical Explore set uses ${query?'“'+esc(query)+'”':'that address'}.</p>${recovery}<p><a href="${attr(searchUrl)}">Search the company directory</a></p></div>`;
 }
 function route(event){const wasTraversal=routeTraversal;ensureHistoryEntryKey(event?.type==='hashchange'&&!wasTraversal&&location.hash!==lastRoutedHash);if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''||routeTraversal?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=Number.isFinite(kept)?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeRestoredScroll=restore;routeTraversal=false;const closingDialog=event?.closedDialog||event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';if(parts[0]&&parts[0]!=='market'&&view==='market'&&!anchorId)history.replaceState(null,'','#market');if(view!=='company')preparePage(view);if(previousRoute&&view!==previousRoute)viewScroll[previousRoute]=window.scrollY;for(const name of ['market','companies','work','compare','method','profile'])$(name+'-view').hidden=(name!==(view==='company'?'profile':view));document.querySelectorAll('[data-nav]').forEach(a=>{if(a.dataset.nav===(view==='company'?'companies':view))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});if(view==='company'){if(isCompanyId(parts[1])){renderCompanyProfile(parts[1]);document.title=companies[parts[1]].name+' · ScienceToStartup';}else renderMissingCompanyProfile(parts);}
- else{document.title=VIEW_TITLES[view];if(view==='companies'){renderComparisonScope(view);if(typeof syncDirectoryRoute==='function')syncDirectoryRoute(parts.slice(1));showDirectory();}if(view==='method'){showDirectory();renderExploreCorrections(anchorId==='corrections');}else pendingCorrectionRecord='';if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare')renderCompare();}
+ else{document.title=VIEW_TITLES[view];if(view==='companies'){renderComparisonScope(view);if(typeof syncDirectoryRoute==='function')syncDirectoryRoute(parts.slice(1));showDirectory();}if(view==='method'){showDirectory();renderExploreCorrections(anchorId==='corrections');}if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare')renderCompare();}
  renderTray();const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;lastRoutedHash=location.hash;if(wasTraversal&&['work','companies'].includes(view)){const hash=location.hash;queueMicrotask(()=>{if(location.hash!==hash)return;const origin=view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():view==='companies'?companyReturnFocusTarget():null;origin?.focus({preventScroll:true});});}if(wasTraversal&&view==='compare'){const hash=location.hash;queueMicrotask(()=>{if(location.hash===hash)restoreComparisonFocus(key,hash);});}if(closingDialog){const hash=location.hash;requestAnimationFrame(()=>{if(location.hash!==hash)return;focusRouteDestination(hash);});}}
 function download(name,body,type){const url=URL.createObjectURL(new Blob([body],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function csvCell(v){let s=String(v??'');if(/^[\t\r\n]/.test(s)||/^\s*[=+@-]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';}

@@ -216,13 +216,16 @@ route=function(event){
  const view=parts[0],company=view==='company'?profileRouteCompany(parts[1]):'';
  const archive=view==='method'||VIEW_ANCHORS[view]==='method';
  const comparison=view==='compare'?compareRouteSelection(hash):null;
+ const correction=view==='corrections'?exploreCorrectionTarget(hash):null;
+ const correctionCompany=correction&&!exploreCorrectionClaim(correction)?correction.company:'';
  const overview=['','market','venture'].includes(view)||!['companies','work','compare','method','company',...Object.keys(VIEW_ANCHORS)].includes(view);
- const needsSearch=!window.SEARCH_INDEX&&(view==='work'&&Boolean(workCriteriaFromHash(hash).q)||view==='companies'&&Boolean(state.query));
- const ids=company?[company]:comparison?.ids||[];
+ const workCriteria=view==='work'?workCriteriaForRoute(hash,routeTraversal):null;
+ const needsSearch=view==='work'?searchContextPending(workCriteria.q):view==='companies'&&searchContextPending(state.query);
+ const ids=company?[company]:correctionCompany?[correctionCompany]:comparison?.ids||[];
  const cacheKey=archive?'__archive':overview?'__overview':null;
- const cached=cacheKey?detailCache.get(cacheKey):ids.every(id=>detailCache.has(id));
+ const cached=(!cacheKey||detailCache.has(cacheKey))&&ids.every(id=>detailCache.has(id));
  if(cached&&!needsSearch){
-  for(const payload of cacheKey?[cached]:ids.map(id=>detailCache.get(id)))installResearchContext(payload);
+  for(const id of [...(cacheKey?[cacheKey]:[]),...ids])installResearchContext(detailCache.get(id));
   const result=synchronousRoute.call(this,event);presentationState('ready');afterRouteRetry(event,generation);window.APP_ROUTE_READY=Promise.resolve(result);return result;
  }
  const closedDialog=event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);
@@ -236,16 +239,22 @@ route=function(event){
   if(selection.join('|')!==state.selected.join('|')){state.selected=selection;state.mobileCompare=0;syncSelection();renderTray();}
   pendingComparison(comparison);
  }
- if(needsSearch){if(view==='work')applyWorkCriteria(workCriteriaFromHash(hash));pendingSearchRoute(view);}
+ if(needsSearch){if(workCriteria)applyWorkCriteria(workCriteria);pendingSearchRoute(view);}
  const complete=async()=>{
   if(company){await afterProfileIntroductionPaint();if(generation!==navigationGeneration||location.hash!==hash||controller.signal.aborted)return;}
   if(needsSearch)await window.ensureSearchContext();
-  let payloads=[];
-  if(cacheKey){const [payload]=await Promise.all([fetchPresentation(archive?presentationIdentity.archive:presentationIdentity.overview,null,controller.signal),ensureHealthModule()]);payloads=[payload];}
-  else if(company||comparison)payloads=await Promise.all(ids.map(id=>companyContext(id,controller.signal)));
+  let section=cacheKey&&detailCache.get(cacheKey);
+  if(cacheKey&&!section){
+   const descriptor=archive?presentationIdentity.archive:presentationIdentity.overview;
+   section=Promise.all([fetchPresentation(descriptor,null,controller.signal),ensureHealthModule()]).then(([payload])=>payload);
+  }
+  const [sectionContext,...payloads]=await Promise.all([section,...ids.map(id=>{
+   const pending=companyContext(id,controller.signal);
+   return correctionCompany?pending.catch(()=>null):pending;
+  })]);
   if(generation!==navigationGeneration||location.hash!==hash)return;
-  for(const payload of payloads)installResearchContext(payload);
-  if(cacheKey)detailCache.set(cacheKey,payloads[0]);
+  if(sectionContext){installResearchContext(sectionContext);detailCache.set(cacheKey,sectionContext);}
+  for(const payload of payloads)if(payload)installResearchContext(payload);
   restoreSearchRouteControls();
   $('profile-view').removeAttribute('aria-busy');
   $('compare-content').removeAttribute('aria-busy');

@@ -62,7 +62,7 @@ function flushWorkRoute(){
   const criteria=currentWorkCriteria(),key=historyKey();if(key)workEntryCriteria.set(key,criteria);
   updateWorkCompareLink(criteria);
   const hash=workHashFor(criteria);
-  if(location.hash!==hash)history.replaceState({...history.state,workCriteria:criteria},'',hash);
+  if(location.hash!==hash||history.state?.workDraft)history.replaceState({...history.state,workDraft:null},'',hash);
 }
 function queueWorkRoute(immediate=false){
   cancelWorkRouteWrite();
@@ -70,23 +70,30 @@ function queueWorkRoute(immediate=false){
   const criteria=currentWorkCriteria(),key=historyKey();if(key)workEntryCriteria.set(key,criteria);
   updateWorkCompareLink(criteria);
   if(immediate){flushWorkRoute();return;}
-  const generation=workRouteGeneration;
-  workRouteTimer=setTimeout(()=>{if(generation===workRouteGeneration&&key===historyKey()&&routeParts()[0]==='work')flushWorkRoute();},180);
+  // Keep a pending edit on its own entry even if a navigation beats the URL update.
+  const generation=workRouteGeneration,hash=location.hash;
+  try{history.replaceState({...history.state,workDraft:{hash,criteria}},'');}catch{}
+  workRouteTimer=setTimeout(()=>{if(generation===workRouteGeneration&&key===historyKey()&&location.hash===hash)flushWorkRoute();},180);
+}
+function workCriteriaForRoute(hash=location.hash,traversal=false){
+  const draft=history.state?.workDraft,key=historyKey();
+  if(draft?.hash===hash&&draft.criteria)return normalizeWorkCriteria(draft.criteria);
+  if(traversal&&workEntryCriteria.has(key))return workEntryCriteria.get(key);
+  return workCriteriaFromHash(hash);
 }
 function syncWorkRoute(traversal=false){
   cancelWorkRouteWrite();
-  const key=historyKey(),criteria=traversal&&workEntryCriteria.has(key)?workEntryCriteria.get(key):workCriteriaFromHash();
+  const key=historyKey(),criteria=workCriteriaForRoute(location.hash,traversal);
   applyWorkCriteria(criteria);if(key)workEntryCriteria.set(key,criteria);
-  const hash=workHashFor(criteria);if(location.hash!==hash)history.replaceState({...history.state,workCriteria:criteria},'',hash);
+  const hash=workHashFor(criteria);if(location.hash!==hash||history.state?.workDraft)history.replaceState({...history.state,workDraft:null},'',hash);
   renderWork();
 }
-// Capture outgoing state before the browser creates another fragment entry. The router
-// cancels pending replacements on traversal, so late typing cannot rewrite a destination.
-document.addEventListener('click',event=>{const link=event.target?.closest?.('a[href]');if(normalSelfLinkActivation(event,link)&&routeParts()[0]==='work')flushWorkRoute();},true);
-window.addEventListener('pagehide',flushWorkRoute);
+window.addEventListener('pageshow',event=>{
+  if(event.persisted&&routeParts()[0]==='work'&&history.state?.workDraft?.hash===location.hash)route({type:'work-resume'});
+});
 function selectWorkRoutes(input,criteria={}){
   if(searchContextPending(criteria.q))throw new Error('Work search context is not ready');
-  return S2SWork.select(input,normalizeWorkCriteria(criteria),w4SearchText)
+  return S2SWork.select(input,normalizeWorkCriteria(criteria),w4SearchText,w4CompanyName)
     .sort((a,b)=>(WORK_ROUTE_ORDER[a.status]??10)-(WORK_ROUTE_ORDER[b.status]??10)
       || Number(b.numeric_pay)-Number(a.numeric_pay) || w4CompanyName(a).localeCompare(w4CompanyName(b)) || a.role.localeCompare(b.role));
 }
