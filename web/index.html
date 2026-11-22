@@ -33,14 +33,18 @@
 
 <section id="market-view" class="view">
 <header class="market-hero">
-  <h1>AI data market</h1>
-  <p class="intro">Company revenue and growth figures with their reporting periods and sources.</p>
-  <div class="hero-actions"><a class="button-primary" href="#business-health">Revenue &amp; growth</a><a class="button-secondary" href="#companies">Browse companies <svg class="ui-icon" data-icon="right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg></a><a class="button-secondary" href="#work">Find paid work <svg class="ui-icon" data-icon="right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg></a></div>
-  <p class="hero-source-note" id="hero-snapshot"></p>
+  <div>
+    <h1>AI data market</h1>
+    <p class="intro">Company figures with reporting periods and sources.</p>
+  </div>
+  <div class="market-hero-meta">
+    <div class="hero-actions"><a href="#business-health">Revenue &amp; growth</a></div>
+    <p class="hero-source-note" id="hero-snapshot"></p>
+  </div>
   <div class="hero-research" hidden aria-hidden="true"><span id="organization-count">{{COMPANY_COUNT}}</span><span id="source-count">{{SOURCE_COUNT}}</span><span id="hero-work-stat" data-pending><b id="hero-work-count"></b></span></div>
 </header>
 <section data-fragment-id="business-health" aria-labelledby="business-health-heading">
-<header class="bh-heading"><div><p class="eyebrow">THE MARKET, IN NUMBERS</p><h2 id="business-health-heading">Revenue &amp; growth.</h2></div><a href="business-health.json" download>Download data · {{FILE_META_HEALTH}}</a></header>
+<header class="bh-heading"><div><h2 id="business-health-heading">Revenue &amp; growth.</h2></div><a href="business-health.json" download>Download data · {{FILE_META_HEALTH}}</a></header>
 <div id="bh-overview-tabs" class="bh-overview-tabs" role="tablist" aria-label="Revenue views"></div>
 <section id="bh-ledger-panel" role="tabpanel" aria-labelledby="bh-overview-period_revenue"><p id="bh-ledger-note" class="bh-ledger-note"></p><div class="bh-ledger-head" aria-hidden="true"><span>Company / business</span><span>Figure</span><span>Period / snapshot</span><span>Evidence</span></div><div id="bh-ledger"></div><p id="bh-ledger-count" class="bh-ledger-count"></p><button type="button" id="bh-ledger-more" class="bh-ledger-more" aria-expanded="false" aria-controls="bh-ledger" hidden></button></section>
 <details id="bh-advanced" class="bh-advanced"><summary>Compare matching periods &amp; explore more metrics <span>Profit, customers, expert activity and cash</span></summary>
@@ -59,7 +63,7 @@
 <details class="bh-method"><summary id="bh-method-summary">Definitions and evidence limits</summary><div id="bh-method-content"></div><p><a href="business-health.json" download>Download observations and calculations · {{FILE_META_HEALTH}}</a> · <a href="#method">Research method</a></p></details>
 <dialog id="bh-evidence-dialog" class="bh-evidence-dialog" aria-labelledby="bh-detail-title"><div class="bh-dialog-top"><span>Figure &amp; source</span><button type="button" id="bh-close-evidence" aria-label="Close figure details">Close ×</button></div><div id="bh-detail"></div><div id="bh-history" class="bh-history" hidden></div></dialog>
 </section>
-<div class="hero-company-strip"><p>Selected companies</p><nav id="hero-logo-grid" class="hero-logo-grid" aria-label="Selected company profiles"><a href="#company/scale_ai">Scale AI</a><a href="#company/mercor">Mercor</a><a href="#company/surge_ai">Surge AI</a><a href="#company/snorkel_ai">Snorkel AI</a><a href="#company/labelbox">Labelbox</a><a href="#company/prime_intellect">Prime Intellect</a></nav></div>
+<div class="hero-company-strip"><p>Selected companies</p><nav id="hero-logo-grid" class="hero-logo-grid" aria-label="Selected company profiles"><a href="#company/scale_ai">Scale AI</a><a href="#company/mercor">Mercor</a><a href="#company/surge_ai">Surge AI</a><a href="#company/snorkel_ai">Snorkel AI</a><a href="#company/labelbox">Labelbox</a><a href="#company/prime_intellect">Prime Intellect</a></nav><a href="#companies">Historical company comparisons</a></div>
 <section class="product-showcase" aria-labelledby="product-showcase-title">
   <h2 class="product-showcase-heading" id="product-showcase-title">Product examples</h2>
   <div class="product-preview-grid">
@@ -79,7 +83,7 @@
       <p>Most evidence comes from the companies themselves. Every figure keeps its source, date and confidence grade. <a href="#method">Read the method</a>.</p>
       <div class="grade-key"><dl><div><dt>A</dt><dd>Public filing, independent evidence or buyer confirmation.</dd></div><div><dt>B</dt><dd>stated by the company, an investor or another named source</dd></div><div><dt>C</dt><dd>reported by others, or an estimate</dd></div><div><dt>U</dt><dd>unverified or unresolved</dd></div></dl></div>
       <div id="overview-check" class="overview-check-body"></div>
-      <div class="overview-work-audit"><h3>Paid work checks</h3><div id="overview-work" class="overview-work-body"></div><a href="#work">Browse the paid work listings →</a></div>
+      <div class="overview-work-audit"><h3>Paid work checks</h3><div id="overview-work" class="overview-work-body"></div><a href="#work">Paid work in Explore →</a></div>
     </div>
   </details>
   <details class="overview-disclosure publisher-disclosure" open>

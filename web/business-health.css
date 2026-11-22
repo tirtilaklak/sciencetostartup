@@ -1,7 +1,6 @@
 /* Market ledger: dated figures first, comparison tools and source detail on demand. */
-#business-health{--bh-green:#285b46;--bh-dark:#193f2f;--bh-line:#d9dfd7;--bh-soft:#edf2eb;--bh-paper:#fcfcf9;--bh-muted:#5c675f;--bh-amber:#795b2d;--bh-amber-bg:#f5efdf;margin:56px 0 36px;color:var(--ink)}
-.bh-heading{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:26px}
-.bh-heading .eyebrow{font-size:11px;letter-spacing:1.3px;color:var(--bh-green);margin:0 0 10px}
+#business-health{--bh-green:#285b46;--bh-dark:#193f2f;--bh-line:#d9dfd7;--bh-soft:#edf2eb;--bh-paper:#fcfcf9;--bh-muted:#5c675f;--bh-amber:#795b2d;--bh-amber-bg:#f5efdf;margin:28px 0 36px;color:var(--ink)}
+.bh-heading{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-bottom:16px}
 .bh-heading h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:32px;line-height:1.2;letter-spacing:-.7px;margin:0 0 12px;max-width:790px}
 .bh-heading p{font-size:15px;line-height:1.65;color:var(--bh-muted);max-width:700px;margin:0}
 .bh-heading>a{flex-shrink:0;display:inline-flex;align-items:center;min-height:44px;font-size:12px;color:var(--bh-green);text-underline-offset:4px}
@@ -210,7 +209,6 @@ html[data-bh-masthead-scroll]:has(#market-view:not([hidden]) .bh-coverage-disclo
  .bh-heading{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-bottom:10px}
  .bh-heading>div{flex:1 0 auto;max-width:100%}
  .bh-heading h2{font-size:28px;margin:0;letter-spacing:-.7px}
- .bh-heading .eyebrow{font-size:10px;margin-bottom:5px;letter-spacing:.9px}
  .bh-heading>a{display:block;flex:1 0 min-content;max-width:100%;align-content:center;font-size:12px;text-align:end;margin:0;line-height:1.6;text-wrap:balance;overflow-wrap:break-word}
  .bh-overview-tabs{flex-wrap:wrap;gap:0 12px;justify-content:space-between}
  .bh-overview-tabs button{font-size:12px;gap:5px;padding:12px 0;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
