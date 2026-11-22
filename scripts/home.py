@@ -4,6 +4,7 @@ from html import escape
 import json
 
 from editorial_work import RECEIPT_RESULTS, primary_routes
+from static_pages import work_location
 
 RIGHT_ARROW = '<svg class="home-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg>'
 EXTERNAL_ARROW = '<svg class="home-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg>'
@@ -69,7 +70,7 @@ def promotion_candidates(work, release):
 
 def work_promotion(candidate, companies):
     route, receipt = candidate["route"], candidate["receipt"]
-    conditions = [route.get("geography", ""), *route.get("requirements", [])]
+    conditions = [work_location(route) if route.get("geography") else "", *route.get("requirements", [])]
     for value in (route.get("assessment"), route.get("hours"), route.get("duration")):
         if value:
             conditions.append(value)
@@ -122,7 +123,7 @@ def recorded_work_example(work):
             return (f'<article class="example-card work-example" data-recorded-program="{route_id}" data-source="{source_id}">'
                     f'<p class="example-kind">Recorded expert program</p><h3 class="example-title">{title}</h3>'
                     f'<p class="example-pay">Pay {escape(route["pay_label"].lower())}</p>'
-                    f'<p class="example-summary">{escape(route["geography"])}</p>'
+                    f'<p class="example-summary">{escape(work_location(route))}</p>'
                     f'<p class="example-meta">Program page reviewed {date_tag(source["accessed_on"])}.</p>'
                     '<p class="example-note">Check current project availability with the provider.</p>'
                     f'<div class="example-actions"><a class="example-action" href="/company/{escape(route["company_id"], quote=True)}/#{route_id}">Read recorded terms</a>'

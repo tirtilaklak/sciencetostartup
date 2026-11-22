@@ -4,9 +4,9 @@ The audit began at 7:30 PM Pacific on November 21, 2026. The first three hours a
 
 ## Current pass
 
-Ten GPT-6.2 Sol Ultra reviewers completed the first three-hour audit at 10:30 PM Pacific on November 21. Ten different Sol Ultra implementers completed the first patch, with six working at once. A separate cohort is testing the frozen build. They own Home, Work source decisions, native pages, Work filtering and export, research wrappers, search, shared navigation, finance, Compare, and Daily. The production manifest identifies build `d8d18622a82c541129c1`. The repository baseline is main at `4d7dae5d40c1dea7978ab519cd3ac66d547cf29f`, with checked-in build `6d57f30fbf456b1e48a8`. The deployed Daily index contains the November 17 issue. The repository contains the November 18 issue. A push to GitHub alone does not publish the Worker.
+Ten GPT-6.2 Sol Ultra reviewers completed the first three-hour audit at 10:30 PM Pacific on November 21. Ten different Sol Ultra implementers completed the first patch, with six working at once. A separate ten-person cohort completed the first independent retest. The second fix round is underway. They own Home, Work source decisions, native pages, Work filtering and export, research wrappers, search, shared navigation, finance, Compare, and Daily. The production manifest identifies build `d8d18622a82c541129c1`. The repository baseline is main at `4d7dae5d40c1dea7978ab519cd3ac66d547cf29f`, with checked-in build `6d57f30fbf456b1e48a8`. The deployed Daily index contains the November 17 issue. The repository contains the November 18 issue. A push to GitHub alone does not publish the Worker.
 
-The independent verification queue covers H1–H3, W1–W3, S1–S5, E1–E5, R1–R4, N1–N2 and D1. The screenshots and working browser trials below establish candidate behavior during the audit window. Production verification follows the implementation and independent retest.
+The verification ledger covers H1–H3, W1–W3, S1–S5, E1–E5, R1–R4, N1–N2 and D1. The screenshots and working browser trials below establish candidate behavior during the audit window. Production verification follows the implementation and independent retest.
 
 ## Findings and acceptance checks
 
@@ -178,4 +178,10 @@ Candidate `d63382a41cc48c2e33ce` is rendered in 4ae197d0. All 1,276 declared pay
 
 On this candidate the six archived roles passed 276 checks, the source checker passed ten fixtures and twelve captured public responses, and the 41 finance and catalog checks passed. The independent Work reviewer found that a publication condition on the AfterQuery Research Scholar payment was missing from its native card and terms. Several applicant requirements repeat on the same card. These findings go into the second patch. [Implementation checks and receipt hashes](site-quality-20261121/first-implementation-checks.json)
 
-The independent cohort is exercising the frozen artifact. The complete repository checks run against the same commit. Verify fixes to every actionable finding before promotion and confirm the public routes after release. The pass ends at 7:30 PM Pacific on November 22.
+The ten independent reviewers matched all 210 CSV downloads across 70 selections and checked 245 Explore destinations on desktop and phone. The dated research chapters retained all 3,812 authored paragraphs and the 15,206 citations in order. All 69 dedicated mobile performance measurements were valid. Datasets and Methods passed. Native Work was the only route to exceed a budget. Its filter form and toolbar appeared after first paint, moving the list by 111px and producing a layout shift score of 0.0857 against the 0.05 limit. [First retest findings and receipt hashes](site-quality-20261121/first-retest.json)
+
+## Second implementation
+
+The second cohort is addressing the mobile Work layout, navigation and source evidence uncovered by the independent retest. Three examples can be reproduced directly on the first candidate. A rapid search edit followed by Back can cancel navigation. Searching for “RLHF jobs” offers paid Work but misses the recorded AfterQuery role. The native Research Scholar terms omit that the award depends on publication acceptance. Archive navigation and contextual corrections also need to survive a new tab or browser Back. The prior two runtime generations remain available and production still serves the original release.
+
+The next verification runs against the new complete artifact. The pass ends at 7:30 PM Pacific on November 22.
