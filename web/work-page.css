@@ -124,7 +124,8 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
 .work-page-clear{justify-self:start}
 @supports (grid-template-columns:subgrid) and selector(::details-content){
  .work-page-filters{grid-template-columns:minmax(44px,1fr) max-content;grid-template-rows:auto auto;row-gap:0}
- .work-page-search{grid-area:1/1;align-self:end;z-index:1}
+ /* The label sits above the controls and stays on one line as the filter count appears. */
+ .work-page-search{grid-area:1/1;grid-template-columns:minmax(0,1fr);align-self:end;z-index:1;white-space:nowrap}
  .work-page-filter-options{display:grid;grid-column:1/-1;grid-row:1/-1;grid-template-columns:subgrid;grid-template-rows:subgrid}
  .work-page-filter-options>summary{grid-area:1/2;align-self:end}
  .work-page-filter-options::details-content{grid-area:2/1/3/-1}
