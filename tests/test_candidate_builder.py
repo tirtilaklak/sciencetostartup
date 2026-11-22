@@ -1,4 +1,5 @@
 """Offline tests: temporary Git repositories, synthetic public fixture, mocked push only."""
+import base64
 import copy
 import hashlib
 import importlib.util
@@ -6,6 +7,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -60,7 +62,14 @@ class BuilderTests(unittest.TestCase):
         self.put("data/daily-scan/2026-11-16.json", self.edition("2026-11-16", "2026-11-16T16:00:00+00:00"))
         current = {"js/current.js": b"current", "js/data.js": b"data", "js/health.js": b"health", "js/shared.js": b"shared",
                    "presentation/archive.current.json": b'{"buildId":"baseline"}'}
-        summary = json.dumps({"modules": {"health": "/js/health.js", "shared": "/js/shared.js"},
+        work = b'window.WORK_NATIVE_SELECTION=[{"id":"cached-work"}];'
+        work_digest = c.digest(work)
+        work_name = "js/work." + work_digest[:12] + ".js"
+        work_sri = "sha256-" + base64.b64encode(bytes.fromhex(work_digest)).decode()
+        current[work_name] = current["work-page.js"] = work
+        current["work/index.html"] = f'<script data-work-script="/{work_name}" data-work-integrity="{work_sri}"></script>'.encode()
+        work_descriptor = {"href": "/" + work_name, "sha256": work_digest, "bytes": len(work), "integrity": work_sri}
+        summary = json.dumps({"modules": {"health": "/js/health.js", "shared": "/js/shared.js", "nativeWork": work_descriptor},
                               "archive": {"href": "/presentation/archive.current.json"}}).encode()
         current["presentation/summary.current.json"] = summary
         previous = {"js/previous.js": b"previous", "js/shared.js": b"shared"}
@@ -180,6 +189,19 @@ class BuilderTests(unittest.TestCase):
         generations, _ = c.retention(self.repo, c.preflight(self.repo, self.event))
         self.assertIn("js/current.js", generations[0]["sha256"])
         self.assertIn("js/data.js", generations[0]["sha256"])
+
+    def test_cached_work_page_can_fetch_its_original_immutable_script(self):
+        cached_html = (self.repo / "dist/work/index.html").read_text()
+        work_name = re.search(r'data-work-script="/([^"]+)"', cached_html).group(1)
+        original = (self.repo / "dist" / work_name).read_bytes()
+
+        self.build()
+
+        registry = json.loads((self.repo / "release-assets/generations.json").read_bytes())
+        outgoing = registry["generations"][0]["sha256"]
+        self.assertEqual(outgoing[work_name], c.digest(original))
+        self.assertNotIn("work-page.js", outgoing)
+        self.assertEqual((self.root / "built" / work_name).read_bytes(), original)
 
     def test_build_staging_outside_output_is_rejected_before_commit(self):
         real_run = subprocess.run
