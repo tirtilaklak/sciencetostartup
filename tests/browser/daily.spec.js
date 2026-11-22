@@ -545,6 +545,11 @@ classicFirefox.describe('Daily classic Firefox history', () => {
   classicFirefox('cold Forward keeps native scroll after a previous Next-link return', async ({ page }) => {
     await compactFilterHistory(page, { recreated: true, revisit: true });
   });
+
+  classicFirefox('cold Forward restores the open Search after clearing a closed phone filter', async ({ page, request }) => {
+    await verifiedResponse(request, '/daily-scan.js', 'daily-scan.js');
+    await clearedCompactFilterHistory(page);
+  });
 });
 
 test('Daily shows the complete first headline on the first screen', async ({ page }) => {
@@ -647,7 +652,7 @@ test('Daily phone filters leave focus in place and restore saved reading on Back
   await expect(search).toBeVisible();
 });
 
-async function compactFilterHistory(page, { recreated = false, revisit = false } = {}) {
+async function closeFilteredPhonePanel(page) {
   await page.setViewportSize({ width: 320, height: 720 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const { item, query } = previous.date === '2026-11-17' ? {
@@ -655,8 +660,6 @@ async function compactFilterHistory(page, { recreated = false, revisit = false }
   } : distinctiveSearch(previous);
   const summary = filterToggle(page);
   const search = page.locator('#scan-search');
-  const headline = page.locator('.scan-item[id=' + JSON.stringify(item.id) + '] h2 a');
-
   await page.goto('/daily/');
   const start = page.url();
   await page.locator('.scan-day-step[rel="prev"]').press('Enter');
@@ -671,6 +674,43 @@ async function compactFilterHistory(page, { recreated = false, revisit = false }
   await expect(search).toBeHidden();
   const address = page.url();
   expect(new URL(address).searchParams.get('q')).toBe(query);
+  return { item, query, summary, search, start, address };
+}
+
+async function clearedCompactFilterHistory(page) {
+  const { search, start } = await closeFilteredPhonePanel(page);
+  const clear = page.getByRole('button', { name: 'Clear filters', exact: true });
+  const address = new URL(`/daily/${previous.date}/`, start).href;
+  await page.keyboard.press('Tab');
+  await expect(clear).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(address);
+  await expect(search).toBeFocused();
+  await assertSelections(page, previous.items, previous.items.length);
+  const departure = await page.evaluate(() => ({ document: performance.timeOrigin, scrollY }));
+
+  await traversePermalinkHistory(page, 'goBack', start);
+  await expect(search).toBeHidden();
+  await assertSelections(page, latest.items);
+  await traversePermalinkHistory(page, 'goForward', address);
+  expect(await page.evaluate(() => typeof globalThis.navigation)).toBe('undefined');
+  expect(await page.evaluate(() => performance.timeOrigin)).not.toBe(departure.document);
+  await expect(page.getByLabel('Snapshot date')).toHaveValue(previous.date);
+  await assertSelections(page, previous.items, previous.items.length);
+  await expect(search).toBeFocused();
+  await expect(search).toHaveValue('');
+  expect(Math.abs((await settledReading(search)).y - departure.scrollY)).toBeLessThanOrEqual(2);
+  await page.keyboard.press('Tab');
+  await expect(page.getByLabel('Topic', { exact: true })).toBeFocused();
+
+  await traversePermalinkHistory(page, 'goBack', start);
+  await page.goto(address);
+  await expect(search).toBeHidden();
+}
+
+async function compactFilterHistory(page, { recreated = false, revisit = false } = {}) {
+  const { item, query, summary, search, start, address } = await closeFilteredPhonePanel(page);
+  const headline = page.locator('.scan-item[id=' + JSON.stringify(item.id) + '] h2 a');
   if (revisit) {
     const next = page.locator('.scan-day-step[rel="next"]');
     const nextAddress = new URL(await next.getAttribute('href'), address).href;
