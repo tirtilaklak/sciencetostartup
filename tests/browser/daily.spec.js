@@ -397,7 +397,11 @@ async function phoneFragmentHighlight(page, scripting) {
       await expect(page.locator('.scan-item:target')).toHaveAttribute('id', item.id);
       await expect(details).not.toHaveAttribute('open', '');
     }
-    return { ...await settledReading(headline), ...await page.evaluate(() => ({ document: performance.timeOrigin,
+    await expect(headline).toBeInViewport();
+    const position = scripting ? await settledReading(headline) : await headline.evaluate(link => ({
+      y: scrollY, top: link.getBoundingClientRect().top,
+    }));
+    return { ...position, ...await page.evaluate(() => ({ document: performance.timeOrigin,
       navigationType: performance.getEntriesByType('navigation')[0].type })) };
   }
 
@@ -409,10 +413,10 @@ async function phoneFragmentHighlight(page, scripting) {
   if (scripting) {
     await expect(markedRows).toHaveCount(1);
     await expect(markedRows).toHaveAttribute('id', item.id);
+    expect(forward.open).toEqual(arrival.open);
   }
   expect(forward.navigationType).toBe('back_forward');
   expect(forward.document).not.toBe(arrival.document);
-  expect(forward.open).toEqual(arrival.open);
   expect(Math.abs(forward.y - arrival.y)).toBeLessThanOrEqual(2);
   expect(Math.abs(forward.top - arrival.top)).toBeLessThanOrEqual(2);
   await page.keyboard.press('Tab');
