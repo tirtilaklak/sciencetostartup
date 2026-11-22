@@ -17794,7 +17794,7 @@
         "url": "https://terac.com/opportunities/TKd76RUIQxw3wy-x",
         "final_url": "https://terac.com/opportunities/TKd76RUIQxw3wy-x",
         "checked_on": "2026-11-22",
-        "checked_at": "2026-11-22T14:06:09Z",
+        "checked_at": "2026-11-22T14:08:48Z",
         "http_status": 200,
         "response_sha256": "5d6ea75b054f0b271550e1de88500ec64b49d01470e5af2b1e6acaa7f0610880",
         "result": "listing_content_reviewed",
@@ -17871,7 +17871,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "5d6ea75b054f0b271550e1de88500ec64b49d01470e5af2b1e6acaa7f0610880",
             "approved": true,
             "url": "https://terac.com/opportunities/TKd76RUIQxw3wy-x",
@@ -17910,7 +17910,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "9af408f8d7f90af39d71df7b9e506e00e41c7e60b302748b0d47fc01b3c89f5b",
             "approved": true,
             "url": "https://terac.com/opportunities",
@@ -17967,7 +17967,7 @@
           {
             "id": "terac.work.ai-evaluator-shopping-assistant.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -22050,6 +22050,15 @@
           "retrieval_status": "content_reviewed"
         },
         {
+          "id": "afterquery.work.senior-software-engineer-security-infrastructure.board-reconciliation-description-proxy-2026-11-22",
+          "url": "https://jobs.ashbyhq.com/AfterQuery/99afbbe0-5ad1-4f25-a00a-049f14428ac6",
+          "title": "Earlier proxy check of exact description",
+          "publisher": "AfterQuery via Ashby",
+          "purpose": "environment_proxy_failure",
+          "accessed_on": "2026-11-22",
+          "retrieval_status": "blocked"
+        },
+        {
           "id": "afterquery.work.senior-software-engineer-security-infrastructure.board-reconciliation-description-2026-11-22",
           "url": "https://jobs.ashbyhq.com/AfterQuery/99afbbe0-5ad1-4f25-a00a-049f14428ac6",
           "title": "Official role description",
@@ -22060,6 +22069,15 @@
           "published_on": "2026-11-09"
         },
         {
+          "id": "afterquery.work.senior-software-engineer-security-infrastructure.board-reconciliation-application-proxy-2026-11-22",
+          "url": "https://jobs.ashbyhq.com/AfterQuery/99afbbe0-5ad1-4f25-a00a-049f14428ac6/application",
+          "title": "Earlier proxy check of exact application",
+          "publisher": "AfterQuery via Ashby",
+          "purpose": "environment_proxy_failure",
+          "accessed_on": "2026-11-22",
+          "retrieval_status": "blocked"
+        },
+        {
           "id": "afterquery.work.senior-software-engineer-security-infrastructure.board-reconciliation-application-2026-11-22",
           "url": "https://jobs.ashbyhq.com/AfterQuery/99afbbe0-5ad1-4f25-a00a-049f14428ac6/application",
           "title": "Official application URL",
@@ -22067,27 +22085,9 @@
           "purpose": "application",
           "accessed_on": "2026-11-22",
           "retrieval_status": "reachable"
-        },
-        {
-          "id": "afterquery.work.senior-software-engineer-security-infrastructure.board-reconciliation-application-proxy-2026-11-22",
-          "url": "https://jobs.ashbyhq.com/AfterQuery/99afbbe0-5ad1-4f25-a00a-049f14428ac6/application",
-          "title": "Earlier proxy check of exact application",
-          "publisher": "AfterQuery via Ashby",
-          "purpose": "retrieval",
-          "accessed_on": "2026-11-22",
-          "retrieval_status": "blocked"
-        },
-        {
-          "id": "afterquery.work.senior-software-engineer-security-infrastructure.board-reconciliation-description-proxy-2026-11-22",
-          "url": "https://jobs.ashbyhq.com/AfterQuery/99afbbe0-5ad1-4f25-a00a-049f14428ac6",
-          "title": "Earlier proxy check of exact description",
-          "publisher": "AfterQuery via Ashby",
-          "purpose": "retrieval",
-          "accessed_on": "2026-11-22",
-          "retrieval_status": "blocked"
         }
       ],
-      "availability_note": "Both original URLs returned HTTP 404 on 8 November 2026. Ashby gives 9 November 2026 as the publication date for the same listing ID. The listing appears again on both AfterQuery boards. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed.",
+      "availability_note": "Both original URLs returned HTTP 404 on 8 November 2026. Ashby gives 9 November 2026 as the publication date for the same listing ID. The listing appears again on both AfterQuery boards. Earlier exact URL requests hit an environment proxy error. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed.",
       "listed_on_current_company_board": true,
       "application_submitted": false,
       "availability_checked_on": "2026-11-22",
@@ -22109,7 +22109,7 @@
           "rendered_checked_at": "2026-11-22T13:59:23Z",
           "rendered_snapshot_sha256": "2d6a5b2f1809c9bf772a77a5689ee1701d972b3c907d743ec7efe11ba4dc5644",
           "date": "2026-11-22",
-          "note": "The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed."
+          "note": "Earlier exact URL requests hit an environment proxy error. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed."
         }
       },
       "pay_context": "AfterQuery’s structured salary component states a one-year pay period in USD.",
@@ -22142,7 +22142,7 @@
           "date": "2026-11-22",
           "result": "application_form_available",
           "url": "https://jobs.ashbyhq.com/AfterQuery/99afbbe0-5ad1-4f25-a00a-049f14428ac6/application",
-          "note": "The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed.",
+          "note": "Earlier exact URL requests hit an environment proxy error. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed.",
           "source_ids": [
             "afterquery.work.senior-software-engineer-security-infrastructure.board-reconciliation-application-2026-11-22"
           ]
@@ -22213,7 +22213,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "823da5a693b438fdd80545bedd7369864e286fc43de3c6d045f4256b02b39bbf",
             "approved": true,
             "url": "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
@@ -22241,7 +22241,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "eed64cc1dc9a21f16413bdb99e96774248b037cc07f7c4302226eed985152be3",
             "approved": true,
             "url": "https://www.afterquery.com/careers",
@@ -22354,7 +22354,7 @@
           {
             "id": "afterquery.work.senior-software-engineer-security-infrastructure.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -22442,7 +22442,7 @@
             "afterquery.work.senior-software-engineer-security-infrastructure.board-reconciliation-ashby-2026-11-22",
             "afterquery.work.senior-software-engineer-security-infrastructure.board-reconciliation-careers-2026-11-22"
           ],
-          "note": "Both original URLs returned HTTP 404 on 8 November 2026. Ashby gives 9 November 2026 as the publication date for the same listing ID. The listing appears again on both AfterQuery boards. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed."
+          "note": "Both original URLs returned HTTP 404 on 8 November 2026. Ashby gives 9 November 2026 as the publication date for the same listing ID. The listing appears again on both AfterQuery boards. Earlier exact URL requests hit an environment proxy error. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed."
         },
         "pay": {
           "state": "sourced",
@@ -24300,7 +24300,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "823da5a693b438fdd80545bedd7369864e286fc43de3c6d045f4256b02b39bbf",
             "approved": true,
             "url": "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
@@ -24328,7 +24328,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "eed64cc1dc9a21f16413bdb99e96774248b037cc07f7c4302226eed985152be3",
             "approved": true,
             "url": "https://www.afterquery.com/careers",
@@ -24364,7 +24364,7 @@
           {
             "id": "afterquery.work.growth-associate.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -24666,7 +24666,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "823da5a693b438fdd80545bedd7369864e286fc43de3c6d045f4256b02b39bbf",
             "approved": true,
             "url": "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
@@ -24694,7 +24694,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "eed64cc1dc9a21f16413bdb99e96774248b037cc07f7c4302226eed985152be3",
             "approved": true,
             "url": "https://www.afterquery.com/careers",
@@ -24730,7 +24730,7 @@
           {
             "id": "afterquery.work.head-of-growth.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -25056,7 +25056,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "823da5a693b438fdd80545bedd7369864e286fc43de3c6d045f4256b02b39bbf",
             "approved": true,
             "url": "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
@@ -25084,7 +25084,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "eed64cc1dc9a21f16413bdb99e96774248b037cc07f7c4302226eed985152be3",
             "approved": true,
             "url": "https://www.afterquery.com/careers",
@@ -25157,7 +25157,7 @@
           {
             "id": "afterquery.work.business-operations-generalist.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -25382,18 +25382,18 @@
           "retrieval_status": "content_reviewed"
         },
         {
+          "id": "afterquery.work.people-programs-lead.board-reconciliation-description-proxy-2026-11-22",
+          "url": "https://jobs.ashbyhq.com/AfterQuery/2ba013e1-d254-4436-afd7-19d0b451424f",
+          "title": "Earlier proxy check of exact description",
+          "publisher": "AfterQuery via Ashby",
+          "purpose": "environment_proxy_failure",
+          "accessed_on": "2026-11-22",
+          "retrieval_status": "blocked"
+        },
+        {
           "id": "afterquery.work.people-programs-lead.board-reconciliation-description-2026-11-22",
           "url": "https://jobs.ashbyhq.com/AfterQuery/2ba013e1-d254-4436-afd7-19d0b451424f",
           "title": "Official role description",
-          "publisher": "AfterQuery via Ashby",
-          "purpose": "historical_observation",
-          "accessed_on": "2026-11-22",
-          "retrieval_status": "not_found"
-        },
-        {
-          "id": "afterquery.work.people-programs-lead.board-reconciliation-application-2026-11-22",
-          "url": "https://jobs.ashbyhq.com/AfterQuery/2ba013e1-d254-4436-afd7-19d0b451424f/application",
-          "title": "Original application URL",
           "publisher": "AfterQuery via Ashby",
           "purpose": "historical_observation",
           "accessed_on": "2026-11-22",
@@ -25404,21 +25404,21 @@
           "url": "https://jobs.ashbyhq.com/AfterQuery/2ba013e1-d254-4436-afd7-19d0b451424f/application",
           "title": "Earlier proxy check of exact application",
           "publisher": "AfterQuery via Ashby",
-          "purpose": "retrieval",
+          "purpose": "environment_proxy_failure",
           "accessed_on": "2026-11-22",
           "retrieval_status": "blocked"
         },
         {
-          "id": "afterquery.work.people-programs-lead.board-reconciliation-description-proxy-2026-11-22",
-          "url": "https://jobs.ashbyhq.com/AfterQuery/2ba013e1-d254-4436-afd7-19d0b451424f",
-          "title": "Earlier proxy check of exact description",
+          "id": "afterquery.work.people-programs-lead.board-reconciliation-application-2026-11-22",
+          "url": "https://jobs.ashbyhq.com/AfterQuery/2ba013e1-d254-4436-afd7-19d0b451424f/application",
+          "title": "Original application URL",
           "publisher": "AfterQuery via Ashby",
-          "purpose": "retrieval",
+          "purpose": "historical_observation",
           "accessed_on": "2026-11-22",
-          "retrieval_status": "blocked"
+          "retrieval_status": "not_found"
         }
       ],
-      "availability_note": "The original role description and application returned HTTP 404. Neither AfterQuery’s careers page nor its Ashby board contains this exact role ID. The earlier terms describe the past listing. Employer closure remains unconfirmed.",
+      "availability_note": "The original role description and application returned HTTP 404 after an earlier environment proxy failure. Neither AfterQuery’s careers page nor its Ashby board contains this exact role ID. The earlier terms describe the past listing. Employer closure remains unconfirmed.",
       "listed_on_current_company_board": false,
       "application_submitted": false,
       "availability_checked_on": "2026-10-14",
@@ -25435,7 +25435,7 @@
         "rendered_checked_at": "2026-11-22T13:59:37Z",
         "rendered_snapshot_sha256": "16ff2d03ec8d12ff8efc64aa6d37ee40d11ab3d01bb4bf18e6f7929a5bf9ab0e",
         "date": "2026-11-22",
-        "note": "The original role description and application returned HTTP 404. Neither AfterQuery’s careers page nor its Ashby board contains this exact role ID. The earlier terms describe the past listing. Employer closure remains unconfirmed."
+        "note": "The original role description and application returned HTTP 404 after an earlier environment proxy failure. Neither AfterQuery’s careers page nor its Ashby board contains this exact role ID. The earlier terms describe the past listing. Employer closure remains unconfirmed."
       },
       "pay_context": "Employer compensation header checked 28 October 2026: $160K – $230K • Offers Equity.",
       "ai_data_work": false,
@@ -25481,7 +25481,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "823da5a693b438fdd80545bedd7369864e286fc43de3c6d045f4256b02b39bbf",
             "approved": true,
             "url": "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
@@ -25503,7 +25503,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "eed64cc1dc9a21f16413bdb99e96774248b037cc07f7c4302226eed985152be3",
             "approved": true,
             "url": "https://www.afterquery.com/careers",
@@ -25617,7 +25617,7 @@
         "disposition": {
           "state": "historical_page_unavailable",
           "reviewed_on": "2026-11-22",
-          "reviewed_at": "2026-11-22T14:06:09Z",
+          "reviewed_at": "2026-11-22T14:08:48Z",
           "approval_basis": "source_content_review",
           "reviewer": "Codex source review",
           "posting_receipt_id": "afterquery.work.people-programs-lead.board-reconciliation-application-2026-11-22.retrieval",
@@ -25628,13 +25628,13 @@
             "afterquery.work.people-programs-lead.board-reconciliation-ashby-2026-11-22",
             "afterquery.work.people-programs-lead.board-reconciliation-careers-2026-11-22"
           ],
-          "note": "The original role description and application returned HTTP 404. Neither AfterQuery’s careers page nor its Ashby board contains this exact role ID. The earlier terms describe the past listing. Employer closure remains unconfirmed."
+          "note": "The original role description and application returned HTTP 404 after an earlier environment proxy failure. Neither AfterQuery’s careers page nor its Ashby board contains this exact role ID. The earlier terms describe the past listing. Employer closure remains unconfirmed."
         },
         "correction_history": [
           {
             "id": "afterquery.work.people-programs-lead.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -25671,7 +25671,7 @@
             "afterquery.work.people-programs-lead.board-reconciliation-ashby-2026-11-22",
             "afterquery.work.people-programs-lead.board-reconciliation-careers-2026-11-22"
           ],
-          "note": "The original role description and application returned HTTP 404. Neither AfterQuery’s careers page nor its Ashby board contains this exact role ID. The earlier terms describe the past listing. Employer closure remains unconfirmed."
+          "note": "The original role description and application returned HTTP 404 after an earlier environment proxy failure. Neither AfterQuery’s careers page nor its Ashby board contains this exact role ID. The earlier terms describe the past listing. Employer closure remains unconfirmed."
         },
         "pay": {
           "state": "sourced",
@@ -25889,7 +25889,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "823da5a693b438fdd80545bedd7369864e286fc43de3c6d045f4256b02b39bbf",
             "approved": true,
             "url": "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
@@ -25917,7 +25917,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "eed64cc1dc9a21f16413bdb99e96774248b037cc07f7c4302226eed985152be3",
             "approved": true,
             "url": "https://www.afterquery.com/careers",
@@ -25953,7 +25953,7 @@
           {
             "id": "afterquery.work.technical-recruiter.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -26255,7 +26255,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "823da5a693b438fdd80545bedd7369864e286fc43de3c6d045f4256b02b39bbf",
             "approved": true,
             "url": "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
@@ -26283,7 +26283,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "eed64cc1dc9a21f16413bdb99e96774248b037cc07f7c4302226eed985152be3",
             "approved": true,
             "url": "https://www.afterquery.com/careers",
@@ -26319,7 +26319,7 @@
           {
             "id": "afterquery.work.corporate-counsel.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -26621,7 +26621,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "823da5a693b438fdd80545bedd7369864e286fc43de3c6d045f4256b02b39bbf",
             "approved": true,
             "url": "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
@@ -26649,7 +26649,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "eed64cc1dc9a21f16413bdb99e96774248b037cc07f7c4302226eed985152be3",
             "approved": true,
             "url": "https://www.afterquery.com/careers",
@@ -26685,7 +26685,7 @@
           {
             "id": "afterquery.work.recruiter.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -33912,7 +33912,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "823da5a693b438fdd80545bedd7369864e286fc43de3c6d045f4256b02b39bbf",
             "approved": true,
             "url": "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
@@ -33940,7 +33940,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "eed64cc1dc9a21f16413bdb99e96774248b037cc07f7c4302226eed985152be3",
             "approved": true,
             "url": "https://www.afterquery.com/careers",
@@ -33976,7 +33976,7 @@
           {
             "id": "afterquery.work.marketing-lead.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -34278,7 +34278,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "823da5a693b438fdd80545bedd7369864e286fc43de3c6d045f4256b02b39bbf",
             "approved": true,
             "url": "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
@@ -34306,7 +34306,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "eed64cc1dc9a21f16413bdb99e96774248b037cc07f7c4302226eed985152be3",
             "approved": true,
             "url": "https://www.afterquery.com/careers",
@@ -34342,7 +34342,7 @@
           {
             "id": "afterquery.work.gtm-operations-lead.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -34569,6 +34569,15 @@
           "retrieval_status": "content_reviewed"
         },
         {
+          "id": "afterquery.work.engagement-manager.board-reconciliation-description-proxy-2026-11-22",
+          "url": "https://jobs.ashbyhq.com/AfterQuery/79185014-f08f-4520-923f-e6bb67d31973",
+          "title": "Earlier proxy check of exact description",
+          "publisher": "AfterQuery via Ashby",
+          "purpose": "environment_proxy_failure",
+          "accessed_on": "2026-11-22",
+          "retrieval_status": "blocked"
+        },
+        {
           "id": "afterquery.work.engagement-manager.board-reconciliation-description-2026-11-22",
           "url": "https://jobs.ashbyhq.com/AfterQuery/79185014-f08f-4520-923f-e6bb67d31973",
           "title": "Official role description",
@@ -34579,6 +34588,15 @@
           "published_on": "2026-08-06"
         },
         {
+          "id": "afterquery.work.engagement-manager.board-reconciliation-application-proxy-2026-11-22",
+          "url": "https://jobs.ashbyhq.com/AfterQuery/79185014-f08f-4520-923f-e6bb67d31973/application",
+          "title": "Earlier proxy check of exact application",
+          "publisher": "AfterQuery via Ashby",
+          "purpose": "environment_proxy_failure",
+          "accessed_on": "2026-11-22",
+          "retrieval_status": "blocked"
+        },
+        {
           "id": "afterquery.work.engagement-manager.board-reconciliation-application-2026-11-22",
           "url": "https://jobs.ashbyhq.com/AfterQuery/79185014-f08f-4520-923f-e6bb67d31973/application",
           "title": "Official application URL",
@@ -34586,27 +34604,9 @@
           "purpose": "application",
           "accessed_on": "2026-11-22",
           "retrieval_status": "reachable"
-        },
-        {
-          "id": "afterquery.work.engagement-manager.board-reconciliation-application-proxy-2026-11-22",
-          "url": "https://jobs.ashbyhq.com/AfterQuery/79185014-f08f-4520-923f-e6bb67d31973/application",
-          "title": "Earlier proxy check of exact application",
-          "publisher": "AfterQuery via Ashby",
-          "purpose": "retrieval",
-          "accessed_on": "2026-11-22",
-          "retrieval_status": "blocked"
-        },
-        {
-          "id": "afterquery.work.engagement-manager.board-reconciliation-description-proxy-2026-11-22",
-          "url": "https://jobs.ashbyhq.com/AfterQuery/79185014-f08f-4520-923f-e6bb67d31973",
-          "title": "Earlier proxy check of exact description",
-          "publisher": "AfterQuery via Ashby",
-          "purpose": "retrieval",
-          "accessed_on": "2026-11-22",
-          "retrieval_status": "blocked"
         }
       ],
-      "availability_note": "The exact listing appears on AfterQuery’s careers page and its Ashby board. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed.",
+      "availability_note": "The exact listing appears on AfterQuery’s careers page and its Ashby board. Earlier exact URL requests hit an environment proxy error. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed.",
       "listed_on_current_company_board": true,
       "application_submitted": false,
       "availability_checked_on": "2026-11-22",
@@ -34628,7 +34628,7 @@
           "rendered_checked_at": "2026-11-22T13:59:43Z",
           "rendered_snapshot_sha256": "5357adc5e89b7a35591a758af67f5b22711c1cdd1352740fbf28f90d7aee1622",
           "date": "2026-11-22",
-          "note": "The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed."
+          "note": "Earlier exact URL requests hit an environment proxy error. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed."
         }
       },
       "pay_context": "AfterQuery’s structured annual salary field says $225,000–$450,000. The same listing gives annual on-target earnings of $300,000–$450,000, split 50/50 between base and variable pay. That split implies $150,000–$225,000 in base pay. The two salary figures conflict.",
@@ -34651,7 +34651,7 @@
           "date": "2026-11-22",
           "result": "application_form_available",
           "url": "https://jobs.ashbyhq.com/AfterQuery/79185014-f08f-4520-923f-e6bb67d31973/application",
-          "note": "The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed.",
+          "note": "Earlier exact URL requests hit an environment proxy error. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed.",
           "source_ids": [
             "afterquery.work.engagement-manager.board-reconciliation-application-2026-11-22"
           ]
@@ -34686,7 +34686,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "823da5a693b438fdd80545bedd7369864e286fc43de3c6d045f4256b02b39bbf",
             "approved": true,
             "url": "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
@@ -34714,7 +34714,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "eed64cc1dc9a21f16413bdb99e96774248b037cc07f7c4302226eed985152be3",
             "approved": true,
             "url": "https://www.afterquery.com/careers",
@@ -34823,7 +34823,7 @@
           {
             "id": "afterquery.work.engagement-manager.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -34895,7 +34895,7 @@
             "afterquery.work.engagement-manager.board-reconciliation-ashby-2026-11-22",
             "afterquery.work.engagement-manager.board-reconciliation-careers-2026-11-22"
           ],
-          "note": "The exact listing appears on AfterQuery’s careers page and its Ashby board. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed."
+          "note": "The exact listing appears on AfterQuery’s careers page and its Ashby board. Earlier exact URL requests hit an environment proxy error. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed."
         },
         "pay": {
           "state": "conflicting",
@@ -35066,6 +35066,15 @@
           "retrieval_status": "content_reviewed"
         },
         {
+          "id": "afterquery.work.sales-operations-associate.board-reconciliation-description-proxy-2026-11-22",
+          "url": "https://jobs.ashbyhq.com/AfterQuery/d1236ef8-0030-4cbf-bbec-052c6eed971f",
+          "title": "Earlier proxy check of exact description",
+          "publisher": "AfterQuery via Ashby",
+          "purpose": "environment_proxy_failure",
+          "accessed_on": "2026-11-22",
+          "retrieval_status": "blocked"
+        },
+        {
           "id": "afterquery.work.sales-operations-associate.board-reconciliation-description-2026-11-22",
           "url": "https://jobs.ashbyhq.com/AfterQuery/d1236ef8-0030-4cbf-bbec-052c6eed971f",
           "title": "Official role description",
@@ -35076,6 +35085,15 @@
           "published_on": "2026-10-05"
         },
         {
+          "id": "afterquery.work.sales-operations-associate.board-reconciliation-application-proxy-2026-11-22",
+          "url": "https://jobs.ashbyhq.com/AfterQuery/d1236ef8-0030-4cbf-bbec-052c6eed971f/application",
+          "title": "Earlier proxy check of exact application",
+          "publisher": "AfterQuery via Ashby",
+          "purpose": "environment_proxy_failure",
+          "accessed_on": "2026-11-22",
+          "retrieval_status": "blocked"
+        },
+        {
           "id": "afterquery.work.sales-operations-associate.board-reconciliation-application-2026-11-22",
           "url": "https://jobs.ashbyhq.com/AfterQuery/d1236ef8-0030-4cbf-bbec-052c6eed971f/application",
           "title": "Official application URL",
@@ -35083,27 +35101,9 @@
           "purpose": "application",
           "accessed_on": "2026-11-22",
           "retrieval_status": "reachable"
-        },
-        {
-          "id": "afterquery.work.sales-operations-associate.board-reconciliation-application-proxy-2026-11-22",
-          "url": "https://jobs.ashbyhq.com/AfterQuery/d1236ef8-0030-4cbf-bbec-052c6eed971f/application",
-          "title": "Earlier proxy check of exact application",
-          "publisher": "AfterQuery via Ashby",
-          "purpose": "retrieval",
-          "accessed_on": "2026-11-22",
-          "retrieval_status": "blocked"
-        },
-        {
-          "id": "afterquery.work.sales-operations-associate.board-reconciliation-description-proxy-2026-11-22",
-          "url": "https://jobs.ashbyhq.com/AfterQuery/d1236ef8-0030-4cbf-bbec-052c6eed971f",
-          "title": "Earlier proxy check of exact description",
-          "publisher": "AfterQuery via Ashby",
-          "purpose": "retrieval",
-          "accessed_on": "2026-11-22",
-          "retrieval_status": "blocked"
         }
       ],
-      "availability_note": "The exact listing appears on AfterQuery’s careers page and its Ashby board. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed.",
+      "availability_note": "The exact listing appears on AfterQuery’s careers page and its Ashby board. Earlier exact URL requests hit an environment proxy error. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed.",
       "listed_on_current_company_board": true,
       "application_submitted": false,
       "availability_checked_on": "2026-11-22",
@@ -35125,7 +35125,7 @@
           "rendered_checked_at": "2026-11-22T13:59:45Z",
           "rendered_snapshot_sha256": "9193b9763d3aa74f1e85eeaa025b733e1f22ada7de7fb1f176482ac320846200",
           "date": "2026-11-22",
-          "note": "The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed."
+          "note": "Earlier exact URL requests hit an environment proxy error. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed."
         }
       },
       "pay_context": "AfterQuery’s structured salary component states a one-year pay period in USD.",
@@ -35148,7 +35148,7 @@
           "date": "2026-11-22",
           "result": "application_form_available",
           "url": "https://jobs.ashbyhq.com/AfterQuery/d1236ef8-0030-4cbf-bbec-052c6eed971f/application",
-          "note": "The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed.",
+          "note": "Earlier exact URL requests hit an environment proxy error. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed.",
           "source_ids": [
             "afterquery.work.sales-operations-associate.board-reconciliation-application-2026-11-22"
           ]
@@ -35183,7 +35183,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "823da5a693b438fdd80545bedd7369864e286fc43de3c6d045f4256b02b39bbf",
             "approved": true,
             "url": "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
@@ -35211,7 +35211,7 @@
             "scope": "field_review",
             "result": "readable",
             "checked_on": "2026-11-22",
-            "checked_at": "2026-11-22T14:06:09Z",
+            "checked_at": "2026-11-22T14:08:48Z",
             "response_sha256": "eed64cc1dc9a21f16413bdb99e96774248b037cc07f7c4302226eed985152be3",
             "approved": true,
             "url": "https://www.afterquery.com/careers",
@@ -35320,7 +35320,7 @@
           {
             "id": "afterquery.work.sales-operations-associate.board-reconciliation-correction-2026-11-22",
             "corrected_on": "2026-11-22",
-            "reviewed_at": "2026-11-22T14:06:09Z",
+            "reviewed_at": "2026-11-22T14:08:48Z",
             "basis": "source_content_review",
             "reviewer": "Codex source review",
             "previous_values": {
@@ -35391,7 +35391,7 @@
             "afterquery.work.sales-operations-associate.board-reconciliation-ashby-2026-11-22",
             "afterquery.work.sales-operations-associate.board-reconciliation-careers-2026-11-22"
           ],
-          "note": "The exact listing appears on AfterQuery’s careers page and its Ashby board. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed."
+          "note": "The exact listing appears on AfterQuery’s careers page and its Ashby board. Earlier exact URL requests hit an environment proxy error. The original application displayed labeled fields and a Submit Application control. Application acceptance remains unconfirmed."
         },
         "pay": {
           "state": "sourced",
