@@ -28,6 +28,10 @@ CLOSED_TEXT = re.compile(r"^this listing has closed(?:\s*[,!.]|$)", re.I)
 UNPUBLISHED_TEXT = re.compile(r"(?:この求人は現在非公開|非公開の求人です)")
 NO_APPLICATION_TEXT = re.compile(r"応募(?:することができません|を受け付けていません)")
 REGISTRATION_ERROR = re.compile(r"^oops!\s*this url might not be the one you were looking for\.", re.I)
+SECONDARY_SIGNALS = {
+    'application_check': 'linked_application_unpublished',
+    'rendered_observation': 'registration_soft_error',
+}
 
 
 @dataclass(frozen=True)
@@ -132,11 +136,13 @@ def result_and_reason(observation, summary):
         return 'blocked', 'rate_limited'
     if observation.vercel_mitigation.strip().lower() in ('deny', 'challenge'):
         return 'blocked', 'provider_security'
+    if summary['challenge']:
+        return 'blocked', 'access_restricted'
     if status in (404, 410):
         return 'not_found', 'http_not_found'
     if status == 403 and summary['application_unpublished']:
         return 'unavailable', 'application_unpublished'
-    if status in (401, 403, 407) or summary['challenge']:
+    if status in (401, 403, 407):
         return 'blocked', 'access_restricted'
     if status >= 400:
         return 'unavailable', 'http_error'
@@ -179,12 +185,21 @@ def summarize_observation(observation, rendered=None):
     return report
 
 
+def observation_time(value):
+    if isinstance(value, str) and 'T' in value and value.endswith('Z'):
+        try:
+            return datetime.fromisoformat(value.replace('Z', '+00:00'))
+        except ValueError:
+            pass
+    return None
+
+
 def valid_timestamp(value, checked_at):
-    if not isinstance(value, str) or not isinstance(checked_at, str) or not value.endswith('Z'):
+    observed_at = observation_time(value)
+    if observed_at is None or not isinstance(checked_at, str):
         return False
     try:
-        return ('T' in value and datetime.fromisoformat(value.replace('Z', '+00:00'))
-                <= datetime.fromisoformat(checked_at.replace('Z', '+00:00')))
+        return observed_at <= datetime.fromisoformat(checked_at.replace('Z', '+00:00'))
     except (TypeError, ValueError):
         return False
 
@@ -208,27 +223,50 @@ def link_observation(route, receipt, application):
         receipt['review_signals'].append('linked_application_unpublished')
 
 
+def previous_observation(previous, key):
+    observation = (previous or {}).get(key)
+    return observation if isinstance(observation, dict) else {}
+
+
+def discard_superseded_observations(previous, receipt):
+    for key, signal in SECONDARY_SIGNALS.items():
+        current = receipt.get(key)
+        stored = previous_observation(previous, key)
+        if not current or current['url'] != stored.get('url'):
+            continue
+        current_time = observation_time(current['checked_at'])
+        stored_time = observation_time(stored.get('checked_at'))
+        if stored_time is None or stored_time < current_time:
+            continue
+        # A replay of the same receipt is harmless. Conflicting evidence at the
+        # same timestamp cannot establish which observation came later.
+        if stored_time == current_time and all(stored.get(field) == value for field, value in current.items()):
+            continue
+        del receipt[key]
+        if signal in receipt['review_signals']:
+            receipt['review_signals'].remove(signal)
+
+
 def review_state_changed(previous, receipt):
     # A primary-page check has no evidence that an earlier, separate step recovered.
-    excluded = {'linked_application_unpublished', 'registration_soft_error'}
+    excluded = set(SECONDARY_SIGNALS.values())
     if set(previous.get('review_signals', [])) - excluded != set(receipt['review_signals']) - excluded:
         return True
     keys = ('url', 'final_url', 'http_status', 'result', 'retrieval_reason', 'review_signals')
-    left, right = previous.get('application_check', {}), receipt.get('application_check', {})
+    left, right = previous_observation(previous, 'application_check'), receipt.get('application_check')
     if right and any(left.get(key) != right.get(key) for key in keys):
         return True
     rendered = receipt.get('rendered_observation')
-    previous_rendered = previous.get('rendered_observation', {})
+    previous_rendered = previous_observation(previous, 'rendered_observation')
     return bool(rendered) and previous_rendered.get('review_signal') != rendered.get('review_signal')
 
 
 def retain_skipped_observations(previous, receipt):
     """Carry forward evidence with its old URL, timestamp and hash."""
-    if not previous:
-        return
-    for key in ('application_check', 'rendered_observation'):
-        if key not in receipt and previous.get(key):
-            receipt[key] = {**previous[key], 'reobserved': False}
+    for key in SECONDARY_SIGNALS:
+        stored = previous_observation(previous, key)
+        if key not in receipt and stored:
+            receipt[key] = {**stored, 'reobserved': False}
 
 
 def check_route(route, checked_at, previous=None, fetcher=fetch_public, *, application=None, rendered=None):
@@ -239,6 +277,7 @@ def check_route(route, checked_at, previous=None, fetcher=fetch_public, *, appli
             rendered = None
         receipt.update(summarize_observation(fetcher(route['url']), rendered))
         link_observation(route, receipt, application)
+        discard_superseded_observations(previous, receipt)
         if receipt['truncated']:
             receipt["note"] = "Response exceeded the bounded read; no complete content comparison."
         if receipt['result'] != 'readable':
