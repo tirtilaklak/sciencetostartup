@@ -2,43 +2,101 @@ const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 const release = require('../../data/editorial-release.json');
 const work = require('../../data/work-routes.json');
-const sage = work.routes.find(row => row.id === 'appen.work.sage-media');
-const approved = sage.editorial_review.receipts.find(row => row.id === sage.editorial_review.approved_terms_receipt_id);
-const reviewed = Date.parse(approved.checked_on + 'T00:00:00Z');
+const promotionId = release.homepage.work_candidate_route_ids[0];
+const promotion = work.routes.find(row => row.id === promotionId);
+const approved = promotion.editorial_review.receipts.find(row => row.id === promotion.editorial_review.approved_terms_receipt_id);
+const reviewed = Date.parse(approved.checked_at);
 const day = 86_400_000;
+const expires = reviewed + release.publication_policy.homepage_work_max_age_days * day;
+const recordedProgram = '[data-recorded-program="snorkel_ai.work.expert-community"]';
+
+test('home shows both dated sources before the phone portrait and aligns the desktop records', async ({ page }) => {
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 720 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+    const heading = page.getByRole('heading', { level: 1, name: 'Who makes AI training data?', exact: true });
+    await expect(heading).toHaveText('Who makes AI training data?');
+    const company = page.locator('[data-observation="snorkel_ai.metric.major-growth_metrics-0"]');
+    await expect(company).toContainText('$375M annualized revenue run rate');
+    await expect(company.locator('time')).toHaveAttribute('datetime', '2026-09-22');
+    const companySource = company.getByRole('link', { name: 'Original disclosure' });
+    await expect(companySource).toBeInViewport({ ratio: 1 });
+    const program = page.locator(recordedProgram);
+    await expect(program).toContainText('Pay set by project');
+    await expect(program.locator('time')).toHaveAttribute('datetime', '2026-10-28');
+    await expect(program.getByRole('link', { name: 'Read recorded terms' }))
+      .toHaveAttribute('href', '/company/snorkel_ai/#snorkel_ai.work.expert-community');
+    await expect(program.getByRole('link', { name: 'Official program page' })).toBeInViewport({ ratio: 1 });
+    await expect(page.locator('.hero-actions a[href="/companies/"]')).toBeInViewport({ ratio: 1 });
+    await expect(page.locator('.hero-actions a[href="/work/"]')).toBeInViewport({ ratio: 1 });
+    await expect(page.locator('a[href="/research/data/"]')).toHaveCount(1);
+    await expect(page.locator('.proof-strip p').first()).toHaveText('55 companies in the directory');
+
+    if (viewport.width === 390) {
+      const workBox = await program.boundingBox();
+      const portraitBox = await page.locator('.hero-visual').boundingBox();
+      expect(portraitBox.y).toBeGreaterThanOrEqual(workBox.y + workBox.height);
+    } else {
+      expect((await heading.boundingBox()).x).toBeCloseTo((await company.boundingBox()).x, 0);
+    }
+  }
+});
 
 test('home promotes only approved current terms and retains all binding conditions', async ({ page }, info) => {
   await page.clock.setFixedTime(new Date(reviewed + day));
   await page.goto('/');
   const example = page.locator('#home-work-example');
-  await expect(example.locator('[data-home-route]')).toHaveAttribute('data-home-route', sage.id);
-  for (const text of ['15', 'US', 'MacBook Pro', 'qualification', 'identity']) {
-    await expect(example).toContainText(new RegExp(text, 'i'));
+  await expect(example.locator('[data-home-route]')).toHaveAttribute('data-home-route', promotionId);
+  for (const text of [promotion.pay_label, promotion.geography, ...promotion.requirements]) {
+    await expect(example).toContainText(text);
   }
   await expect(page.locator('.example-grid article')).toHaveCount(2);
-  await expect(page.getByRole('link', { name: 'Explore companies' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Find paid work', exact: true })).toBeVisible();
+  await expect(page.locator('.hero').getByRole('link', { name: 'Browse companies' })).toBeVisible();
+  await expect(page.locator('.hero').getByRole('link', { name: 'Paid work', exact: true })).toBeVisible();
   await info.attach(`home-entry-${info.project.name}.png`, {
     body: await page.screenshot({ fullPage: false, animations: 'disabled', scale: 'css' }), contentType: 'image/png',
   });
 });
 
 test('three-day expiry withdraws stale examples and preserves evergreen browse', async ({ page }) => {
-  await page.clock.setFixedTime(new Date(reviewed + (release.publication_policy.homepage_work_max_age_days + 1) * day));
+  await page.clock.setFixedTime(new Date(expires));
   await page.goto('/');
   await expect(page.locator('#home-work-example [data-home-route]')).toHaveCount(0);
   await expect(page.locator('#home-work-example').getByRole('link', { name: 'Browse paid work' })).toBeVisible();
   await expect(page.locator('.example-grid article')).toHaveCount(2);
 });
 
-test('without JavaScript the homepage offers evergreen work and company links', async ({ browser, baseURL }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
+test('expiry moves focus from the promotion to the native Work link', async ({ page }) => {
+  await page.clock.install({ time: new Date(expires - day) });
+  await page.clock.pauseAt(new Date(expires - 1_000));
+  await page.goto('/');
+  const slot = page.locator('#home-work-example');
+  const focused = slot.getByRole('link', { name: /original listing|official program page/i });
+  await focused.focus();
+  await expect(focused).toBeFocused();
+  await page.clock.fastForward(60_000);
+  const fallback = slot.getByRole('link', { name: 'Browse paid work' });
+  await expect(fallback).toBeFocused();
+  await expect(fallback).toBeInViewport();
+  await expect(page.locator(recordedProgram)).toBeVisible();
+});
+
+test('without JavaScript the homepage offers its menu and native browse links', async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL, viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('#home-work-example [data-home-route]')).toHaveCount(0);
   await expect(page.locator('#home-work-example').getByRole('link', { name: 'Browse paid work' })).toHaveAttribute('href', '/work/');
-  await expect(page.getByRole('link', { name: 'Explore companies' })).toHaveAttribute('href', '/companies/');
+  await expect(page.locator('.hero').getByRole('link', { name: 'Browse companies' })).toHaveAttribute('href', '/companies/');
   await expect(page.locator('.example-grid article')).toHaveCount(2);
+  await page.locator('.home-menu summary').press('Enter');
+  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Daily scan' })).toBeVisible();
+  await page.locator('.home-menu summary').press('Enter');
+  await page.locator('#home-search-open').press('Enter');
+  await expect(page).toHaveURL(/#browse-guide$/);
+  await expect(page.getByRole('region', { name: 'Browse the guide' }).getByRole('link', { name: 'Browse companies' }))
+    .toHaveAttribute('href', '/companies/');
   await context.close();
 });
 
@@ -68,12 +126,28 @@ test('failed homepage search keeps usable browse actions and a retry', async ({ 
   await page.goto('/');
   await page.locator('#home-search-open').click();
   await expect(page.locator('#home-search-message')).toContainText('Search could not load');
-  await expect(page.locator('#home-search-message').getByRole('link', { name: 'Browse companies' })).toHaveAttribute('href', '/companies/');
-  await expect(page.locator('#home-search-message').getByRole('link', { name: 'browse paid work' })).toHaveAttribute('href', '/work/');
+  await expect(page.locator('.site-search-fallback').getByRole('link', { name: 'Browse companies' })).toHaveAttribute('href', '/companies/');
+  await page.locator('#home-search-input').fill('RLHF  jobs');
+  await expect(page.getByRole('link', { name: 'Search paid work for this query' })).toHaveAttribute('href', '/work/?q=RLHF++jobs');
   await page.locator('#home-search-close').click();
   await page.unroute('**/presentation/search.*.json');
   await page.locator('#home-search-open').click();
   await expect(page.locator('#home-search-message')).not.toContainText('could not load');
+});
+
+test('a refused Search component retains the query and retries with a new request', async ({ page }) => {
+  await page.route('**/home-search.js', route => route.abort());
+  await page.goto('/');
+  await page.keyboard.press('Control+k');
+  await expect(page.locator('#home-search-message')).toContainText('Search could not load');
+  await page.locator('#home-search-input').fill('RLHF  jobs');
+  const workRecovery = page.getByRole('link', { name: 'Search paid work for this query' });
+  await expect(workRecovery).toHaveCount(1);
+  await expect(workRecovery).toHaveAttribute('href', '/work/?q=RLHF++jobs');
+  const retried = page.waitForResponse(response => /home-search\.js\?retry=1$/.test(response.url()));
+  await page.locator('[data-home-component-retry]').click();
+  expect((await retried).ok()).toBe(true);
+  await expect(page.locator('#home-search-results')).toBeVisible();
 });
 
 test('homepage search times out a stalled index and retries without reporting empty results', async ({ page }) => {
@@ -86,7 +160,7 @@ test('homepage search times out a stalled index and retries without reporting em
   await page.clock.fastForward(15_001);
   await expect(page.locator('#home-search-message')).toContainText('Search could not load');
   await expect(page.locator('#home-search-message')).not.toContainText('No recorded company matches');
-  await expect(page.locator('#home-search-message a[href="/work/"]')).toBeVisible();
+  await expect(page.locator('#home-search-work-recovery')).toBeVisible();
   await stalled.abort().catch(() => {});
   await page.unroute('**/presentation/search.*.json');
   await page.locator('[data-home-search-retry]').click();
