@@ -114,7 +114,10 @@ const isHistorical=o=>!!asOfYear&&!!yearOf(o)&&yearOf(o)<asOfYear-1;
 // The research grade of the weakest cited claim: A strongest, U unverified.
 const gradeText={A:'public filing, independent evidence or buyer confirmation',B:'attributed company, investor or named primary statement',C:'secondary reporting, an estimate or indirect evidence',U:'unverified, undisclosed or unresolved'};
 const grade=o=>o.claim_ids.map(id=>claimRecord(id)?.confidence).filter(g=>gradeText[g]).sort().at(-1)||'';
-const gradeChip=o=>{const g=grade(o);return g?`<i class="bh-grade" title="Research grade ${g}: ${safe(gradeText[g])}"><span class="sr-only">grade </span>${g}</i>`:'';};
+const gradeChip=o=>{
+ const g=grade(o),reason=o.profile_confidence_reason;
+ return g?`<i class="bh-grade" title="${safe(reason||`Research grade ${g}: ${gradeText[g]}`)}"><span class="sr-only">grade </span>${g}${reason?'<span class="sr-only"> for revenue inputs</span>':''}</i>`:'';
+};
 // The tag names the scope and a gross basis when they matter, and marks old figures.
 function cellTag(o){return [columnDefault[o.signal]===o.measure?'':measureShort[o.measure]||measureLabel(o.measure).toLowerCase(),scopeWord(o),o.accounting_basis==='gross'?'gross':'',periodShort(o),isHistorical(o)?'historical':''].filter(Boolean).join(' · ');}
 // Labels for the inspector's lists of a company's other figures: measure, scope, period and value.
@@ -145,7 +148,7 @@ function pickCompanyObservation(company,signal){
 function evidenceLinks(o){
  const canonicalClaims=o.claim_ids.filter(id=>claims[id]);
  const claimLinks=canonicalClaims.map((id,i)=>claimButton(id,canonicalClaims.length>1?'Claim '+(i+1):'Inspect claim'));
- const preferred=o.primary_source_id,sourceIds=preferred?[preferred,...o.source_ids.filter(id=>id!==preferred)]:o.source_ids;
+ const sourceIds=observationSourceIds(o);
  const sourceLinks=sourceIds.slice(0,3).map(id=>{
   const source=sourceRecord(id);
   if(!source)return '';
@@ -161,7 +164,7 @@ function checkedSource(o){
 }
 function freshnessNote(o,sourceId){
  const check=sourceChecks.get(sourceId),fresh=o.claim_ids.map(id=>freshClaims.get(id)).find(c=>c?.source_ids.includes(sourceId));
- if(check?.status==='unavailable')return `<span class="bh-refresh-note is-unavailable"><br>${o.primary_source_id?safe(check.note):`Source could not be retrieved on ${safe(readableDates(check.checked_on))}. The figure retains its earlier attribution.`}</span>`;
+ if(check?.status==='unavailable')return `<span class="bh-refresh-note is-unavailable"><br>${o.primary_source_id?`${safe(readableDates(check.checked_on))} · ${safe(check.note)}`:`Source could not be retrieved on ${safe(readableDates(check.checked_on))}. The figure retains its earlier attribution.`}</span>`;
  return check?.status==='content_checked'?`<span class="bh-refresh-note"><br>Source page read ${safe(readableDates(check.checked_on))}${fresh?.source_locator?' · '+safe(fresh.source_locator):''}.</span>`:'';
 }
 
@@ -252,7 +255,8 @@ function renderDetail(){
  const sparkline=historySeries(id,o.measure).find(list=>list.length>1&&list.some(r=>r.id===o.id));
  const dates=history.filter(r=>!scopes.includes(r)&&!sparkline?.includes(r));
  const g=grade(o),date=figureDate(o);
- $('bh-detail').innerHTML=`<p class="bh-kicker">Selected evidence</p><h3 id="bh-detail-title" tabindex="-1">${safe(name)}</h3><p class="bh-measure-name">${esc(measureLabel(o.measure))}</p>${isHistorical(o)?`<span class="bh-historical">Historical · ${yearOf(o)}</span>`:''}<p class="bh-value${isHistorical(o)?' is-historical':''}">${safe(numeric(o)?valueText(o):'Not quantified')}<span class="bh-pill ${pillClass(o)}">${statusText(o)}</span></p><dl class="bh-facts"><dt>${date.heading}</dt><dd>${safe(date.label)}</dd><dt>Scope</dt><dd>${safe(inspectorScope(o))}</dd><dt>Basis</dt><dd>${safe(basisLabel(o))}</dd><dt>Source</dt><dd>${esc(assuranceText(o))} ${evidenceLinks(o)}</dd></dl>${o.calculation?`<p class="bh-note"><strong>Calculated:</strong> ${esc(o.calculation.formula||o.calculation)}</p>`:''}${o.normalization?`<p class="bh-note">${esc(o.normalization)}</p>`:''}<details class="bh-caveats"><summary>Caveats and source wording</summary>${g?`<p class="bh-note">Research grade ${g}: ${safe(gradeText[g])}.</p>`:''}${basisText(o)&&!o.limitations.includes(o.basis)?`<p>${esc(basisText(o))}</p>`:''}<p class="bh-warning">${esc(limitationsText(o))}</p><p class="bh-quote">“${esc(o.original_text)}”</p></details>${alternateFigures('Other business scopes',scopes)}${alternateFigures('Other dates',dates)}${alternateFigures('Other measures',related,true)}<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`;
+ const gradeNote=o.profile_confidence_reason||(g?`Research grade ${g}: ${gradeText[g]}.`:'');
+ $('bh-detail').innerHTML=`<p class="bh-kicker">Selected evidence</p><h3 id="bh-detail-title" tabindex="-1">${safe(name)}</h3><p class="bh-measure-name">${esc(measureLabel(o.measure))}</p>${isHistorical(o)?`<span class="bh-historical">Historical · ${yearOf(o)}</span>`:''}<p class="bh-value${isHistorical(o)?' is-historical':''}">${safe(numeric(o)?valueText(o):'Not quantified')}<span class="bh-pill ${pillClass(o)}">${statusText(o)}</span></p><dl class="bh-facts"><dt>${date.heading}</dt><dd>${safe(date.label)}</dd><dt>Scope</dt><dd>${safe(inspectorScope(o))}</dd><dt>Basis</dt><dd>${safe(basisLabel(o))}</dd><dt>Source</dt><dd>${esc(assuranceText(o))} ${evidenceLinks(o)}</dd></dl>${o.calculation?`<p class="bh-note"><strong>Calculated:</strong> ${esc(o.calculation.formula||o.calculation)}</p>`:''}${o.normalization?`<p class="bh-note">${esc(o.normalization)}</p>`:''}<details class="bh-caveats"><summary>Caveats and source wording</summary>${gradeNote?`<p class="bh-note">${safe(gradeNote)}</p>`:''}${basisText(o)&&!o.limitations.includes(o.basis)?`<p>${esc(basisText(o))}</p>`:''}<p class="bh-warning">${esc(limitationsText(o))}</p><p class="bh-quote">“${esc(o.original_text)}”</p></details>${alternateFigures('Other business scopes',scopes)}${alternateFigures('Other dates',dates)}${alternateFigures('Other measures',related,true)}<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`;
 }
 function historySeries(company,measure){
  const grouped=new Map();

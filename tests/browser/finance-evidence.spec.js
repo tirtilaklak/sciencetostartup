@@ -372,6 +372,8 @@ test('Snorkel issuer threshold survives Home, profiles, Compare, Market and curr
   const id = 'snorkel_ai.metric.major-growth_metrics-0';
   const claim = 'snorkel_ai.claim.major-growth_metrics-0-metric';
   const issuer = 'https://snorkel.ai/blog/data-2-0-and-the-research-era-of-ai-data/';
+  const selectedSource = 'snorkel_ai.source.audit-s5';
+  const otherSource = 'snorkel_ai.source.oct14-006107ac93e3';
   await page.goto('/');
   await expect(page.locator('[data-observation="' + id + '"] .example-pay')).toHaveText(/(?:(?:more than |over |>\s*)\$375M|\$375M\+) annualized revenue run rate/i);
   await page.goto('/company/snorkel_ai/#financial-record');
@@ -379,17 +381,30 @@ test('Snorkel issuer threshold survives Home, profiles, Compare, Market and curr
   const native = page.locator('[data-metric="' + id + '"]');
   await expect(native.locator('.value')).toHaveText(/^more than \$375M$/i);
   await expect(native).toContainText('22 Sep 2026');
+  const nativeSelected = page.locator('#financial-record .selected-evidence[data-financial-observation="' + id + '"]');
+  await expect(nativeSelected.locator(`[data-source-id="${selectedSource}"] a`)).toHaveAttribute('href', issuer);
+  await expect(nativeSelected).toContainText('Source content checked 22 Nov 2026');
+  await page.goto('/explore/#companies');
+  const companyCard = page.locator('[data-company-card="snorkel_ai"] [data-financial-observation="' + id + '"]');
+  async function checkSelectedSource(row) {
+    await expect(row.locator(`.financial-citation[data-source-id="${selectedSource}"] a`)).toHaveAttribute('href', issuer);
+    await openDisclosure(row.locator('.financial-source-details > summary'));
+    await expect(row).toContainText('Source content checked 22 Nov 2026');
+  }
+  await checkSelectedSource(companyCard);
+  await page.goto('/explore/#compare/snorkel_ai/micro1');
+  const compare = page.locator('[data-comparison-company="snorkel_ai"] [data-financial-observation="' + id + '"]');
+  await expect(compare.locator('.row-number strong')).toHaveText('> $375M');
+  await expect(compare.locator('.row-period')).toContainText('22 Sep 2026');
+  await checkSelectedSource(compare);
+  await page.goBack();
+  await checkSelectedSource(companyCard);
+
   await page.goto('/explore/#company/snorkel_ai/claim/' + claim);
   const exactClaim = page.locator('#evidence-dialog');
   await expect(exactClaim.locator('[data-evidence-metric="' + id + '"] .evidence-metric-value')).toHaveText('> $375M USD');
   await expect(exactClaim.locator('.evidence-statement')).toContainText('crossed an annualized revenue run rate of $375M');
   await expect(exactClaim.locator('.sources-list a[href="' + issuer + '"]')).toHaveCount(2);
-
-  await page.goto('/explore/#compare/snorkel_ai/micro1');
-  const compare = page.locator('[data-comparison-company="snorkel_ai"] [data-financial-observation="' + id + '"]');
-  await expect(compare.locator('.row-number strong')).toHaveText('> $375M');
-  await expect(compare.locator('.row-period')).toContainText('22 Sep 2026');
-  await expect(compare.getByRole('link')).toHaveAttribute('href', issuer);
 
   await openMarket(page);
   const chart = await marketChart(page, 'annualized_revenue');
@@ -400,6 +415,8 @@ test('Snorkel issuer threshold survives Home, profiles, Compare, Market and curr
   const inspector = page.getByRole('dialog', { name: 'Snorkel AI' });
   await expect(inspector.locator('.bh-value')).toHaveText(/> \$375M/);
   await expect(marketFact(inspector, 'Reporting day')).toHaveText('22 Sep 2026');
+  await expect(marketCitation(inspector, selectedSource)).toContainText('Source page read 22 Nov 2026');
+  await expect(marketCitation(inspector, otherSource)).toContainText('Source page read 28 Oct 2026');
   await closeMarketEvidence(page);
 
   const health = await (await request.get('/business-health.json')).json();
@@ -415,6 +432,75 @@ test('Snorkel issuer threshold survives Home, profiles, Compare, Market and curr
   const csv = require('node:fs').readFileSync(await (await pending).path(), 'utf8');
   expect(csv).toMatch(/annualized_revenue_run_rate[^\n]+375000000[^\n]+greater_than[^\n]+> \$375M/);
   expect(csv).toContain(id);
+});
+
+test('Toloka growth figures and claims cite the inputs for an approximate calculation', async ({ page, request }) => {
+  const metric = 'toloka.metric.major-growth_metrics-1';
+  const claim = 'toloka.claim.major-growth_metrics-1-metric';
+  const rawClaim = 'toloka.claim.major-growth_metrics-1';
+  const primary = 'refresh.source.nebius-fy2025-sec-note-3';
+  const historical = 'toloka.source.audit-tol_2025';
+  const sec = 'https://www.sec.gov/Archives/edgar/data/1513845/000110465926052948/nbis-20251231x20f.htm';
+  async function checkCalculation(row) {
+    await expect(row).toContainText('Toloka’s discontinued-operations revenue grew approximately 135.1%');
+    await expect(row).toContainText('rounded revenue of $26.1M in FY2024 and $11.1M in FY2023');
+    await expect(row).toContainText('Grade A applies to the Form 20-F filing that reports the revenue inputs');
+    const citations = row.locator('.sources-list > li');
+    await expect(citations.first()).toHaveAttribute('data-source-id', primary);
+    await expect(citations.first().locator('a')).toHaveAttribute('href', sec);
+    await expect(citations.first()).toContainText('Published 30 Apr 2026 · Checked 22 Nov 2026');
+    const mirror = row.locator(`[data-source-id="${historical}"]`);
+    await expect(mirror).toContainText('Checked 12 Oct 2026');
+    await expect(mirror).toContainText('22 Nov 2026 · The historical Fintel mirror returned HTTP 403');
+  }
+
+  await page.goto('/explore/#company/toloka/traction');
+  const figures = page.locator('#profile-pane-traction .profile-scale-observation').filter({ has: page.locator(`button[data-claim="${claim}"]`) });
+  await expect(figures.locator('button.number-button')).toHaveText('≈ 135.1%');
+  await expect(figures.locator('button.number-button')).toHaveAccessibleDescription(/discontinued-operations.*135\.1%.*rounded revenue/);
+  await expect(figures.locator('.observation-tags')).toContainText('Calculated');
+  await checkCalculation(figures);
+
+  await page.goto('/explore/#company/toloka/observations');
+  const dated = page.locator(`#profile-observations [data-metric="${metric}"]`);
+  await openDisclosure(page.locator('#profile-observations > summary'));
+  await expect(dated.locator('button.number-button')).toHaveText('≈ 135.1%');
+  await expect(dated).toContainText('Calculated');
+  await checkCalculation(dated);
+  await dated.locator('button.number-button').press('Enter');
+  const dialog = page.locator('#evidence-dialog');
+  await expect(dialog.locator(`[data-evidence-metric="${metric}"]`)).toContainText('Calculated');
+  await expect(dialog.locator('.claim-confidence')).toContainText(/Confidence grade for revenue inputs\s*A/);
+  await expect(dialog).toContainText('138%');
+  await checkCalculation(dialog);
+  await page.keyboard.press('Escape');
+
+  await page.goto('/explore/#company/toloka/questions');
+  await openDisclosure(page.locator('#profile-questions').locator('xpath=ancestor::details[1]/summary'));
+  for (const id of [claim, rawClaim]) {
+    await checkCalculation(page.locator(`[data-claim-record="${id}"]`));
+  }
+  await page.goto('/explore/#company/toloka/claim/' + rawClaim);
+  await checkCalculation(dialog);
+
+  const health = await (await request.get('/business-health.json')).json();
+  const research = await (await request.get('/research.json')).json();
+  expect(health.observations.find(row => row.profile_metric_id === metric)).toMatchObject({
+    id: 'dashboard.toloka.fy2024-revenue-growth', evidence_type: 'calculated', primary_source_id: primary,
+    profile_claim_ids: [claim, rawClaim], evidence_checked_on: '2026-11-22',
+  });
+  expect(research.metrics.find(row => row.id === metric)).toMatchObject({ value: 135.1, observation_status: 'reported' });
+  expect(research.claims.find(row => row.id === claim)).toMatchObject({ confidence: 'A', source_ids: [historical] });
+});
+
+test('Current company CSV leads with the selected Toloka and Turing publishers', async ({ page }) => {
+  await page.goto('/explore/#downloads');
+  const pending = page.waitForEvent('download');
+  await page.locator('#download-csv').click();
+  const csv = require('node:fs').readFileSync(await (await pending).path(), 'utf8');
+  const row = id => csv.split('\r\n').find(line => line.startsWith(`"${id}",`));
+  expect(row('toloka')).toMatch(/"FY2024","FY2024","company",.*"https:\/\/www\.sec\.gov\/[^|"]+ \| https:\/\/fintel\.io\//);
+  expect(row('turing')).toMatch(/"2024-12","2024-12","company",.*"https:\/\/www\.turing\.com\/[^|"]+ \| https:\/\/markets\.financialcontent\.com\//);
 });
 
 test('Toloka and Turing pair the original publisher with their historical citation', async ({ page }) => {

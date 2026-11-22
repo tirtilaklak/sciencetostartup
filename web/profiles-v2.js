@@ -24,6 +24,26 @@ function profileReviewedObservationForClaim(cl){
  return (window.BUSINESS_HEALTH?.observations||[]).find(o=>o.evidence_type==='estimate'&&o.company_id===cl.company_id&&
   o.metric_ids?.length===1&&o.id===o.metric_ids[0]&&o.claim_ids?.length===1&&o.claim_ids[0]===cl.id);
 }
+function profileCalculatedObservationForClaim(cl){
+ return cl&&(window.BUSINESS_HEALTH?.observations||[]).find(o=>o.company_id===cl.company_id&&o.profile_claim_ids?.includes(cl.id));
+}
+function profileCalculatedMetric(metric){
+ const calculation=profileCalculatedObservationForClaim(claims[metric.claim_id]);
+ return calculation?.profile_metric_id===metric.id?calculation:null;
+}
+function profileCalculationCitationItems(calculation){
+ const health=window.BUSINESS_HEALTH;
+ return observationSourceIds(calculation).map(id=>{
+  const source=(health.sources||[]).find(record=>record.id===id)||sources[id];
+  if(!source)return '';
+  const check=(health.source_checks?.entries||[]).find(record=>record.source_id===id);
+  const historicalFailure=check?.status==='unavailable'?`<p class="sub">${esc(profileDate(check.checked_on))} · ${esc(check.note)}</p>`:'';
+  return `<li data-source-id="${attr(id)}">${external(source.url,source.title)}<p class="sub">${esc(profileSourceMeta(source))}</p>${historicalFailure}</li>`;
+ }).join('');
+}
+function profileCalculationSources(calculation){
+ return `<ol class="sources-list">${profileCalculationCitationItems(calculation)}</ol>`;
+}
 function profileFinanceReview(cl){
  return cl&&(window.BUSINESS_HEALTH?.observations||[]).find(o=>o.company_id===cl.company_id&&o.claim_ids[0]===cl.id&&
   o.id===o.metric_ids[0]&&(o.qualifier_reviewed_on||o.primary_source_id));
@@ -44,6 +64,8 @@ function profileEvidenceDate(cl){
   return {text:day?profileDate(day):finance.display_date,heading:finance.date_label,
    description:sourceCheck?'The cited statement has no publication date.':''};
  }
+ const calculation=profileCalculatedObservationForClaim(cl);
+ if(calculation)return {text:cl.as_of,heading:'Reporting period',description:''};
  const estimate=profileReviewedObservationForClaim(cl);
  if(estimate)return {text:estimate.period.label,heading:'Reporting period',description:estimate.basis};
  // This risk record uses the shared check date of two undated RWS pages.
@@ -66,7 +88,7 @@ function profileFinancingEvidenceLink(id,fromCompare=false){
 }
 function profileProvenance(cl){
  const finance=financeClaimContextFor(cl.id);
- const scope=finance?.scope||evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id));
+ const scope=finance?.scope||profileCalculatedObservationForClaim(cl)?.scope_detail||evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id));
  return `<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(profileRecordDate(cl))}</span><span>· ${esc(scope)}</span><span>· ${esc(profileEvidenceLabel(cl))}</span>${claimButton(cl.id,'Source')}</div>`;
 }
 // Canonical company id for a route value (case and alias fixes).
@@ -168,6 +190,7 @@ function profileMetricLabel(m){
 }
 function profileMetricDate(m){
  const finance=financeClaimContextFor(m.claim_id);if(finance)return finance.display_date;
+ if(profileCalculatedMetric(m))return m.as_of;
  const estimate=profileMetricEstimate(m);if(estimate)return estimate.period.label;
  const corrected=metricCurrentPeriod(m);if(corrected)return corrected;
  if(m.kind==='revenue')return readableDate(m.period_label||financialPeriod(m));
@@ -177,10 +200,10 @@ function profileMetricDate(m){
 function profileMetricYear(m){const rank=dateRank(m.as_of);return rank==='0000'?null:Number(rank.slice(0,4));}
 // Same Historical rule as compactSignal() on the cards.
 function profileMetricHistory(m){const year=profileMetricYear(m);return year&&year<Number(DATA.meta.as_of.slice(0,4))-1?'Historical · '+year:'';}
-function profileMetricStatus(m,fallback){return profileMetricEstimate(m)?'Third-party estimate':fallback;}
+function profileMetricStatus(m,fallback){return profileCalculatedMetric(m)?'Calculated':profileMetricEstimate(m)?'Third-party estimate':fallback;}
 function profileMetricTags(m){const tags=[profileMetricStatus(m,metricStatusLabel(m)),profileMetricHistory(m)].filter(tag=>tag&&tag!=='Reported');return tags.length?`<p class="observation-tags">${tags.map(tag=>`<span>${esc(tag)}</span>`).join('')}</p>`:'';}
 // Signed growth: +58.6%, −1.5%.
-function profileMetricValue(m){const value=metricValue(m);return m.kind!=='growth_rate'||m.unit!=='percent'?value:m.value>0?value.replace(/\d/,'+$&'):value.replace('-','−');}
+function profileMetricValue(m){const calculation=profileCalculatedMetric(m);if(calculation)return `≈ ${calculation.value.toFixed(1)}%`;const value=metricValue(m);return m.kind!=='growth_rate'||m.unit!=='percent'?value:m.value>0?value.replace(/\d/,'+$&'):value.replace('-','−');}
 function profileNumberButton(m){const label=profileMetricValue(m);if(label===metricValue(m))return numberButton(m);const access=evidenceAccess([m.claim_id],label,metricEvidenceTopic(m,m.label||metricLabels[m.kind]));return `<button class="number-button" data-claim="${esc(m.claim_id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;}
 const PROFILE_METRIC_ATTRIBUTIONS={
  'elorian.claim.core-elorian.claim.growth_metrics-0.metric-0-metric':'Employer job listing',
@@ -190,7 +213,7 @@ const PROFILE_METRIC_ATTRIBUTIONS={
 };
 // Lead decision: TaskUs and Appen figures are annual-report figures, never "audited".
 const PROFILE_EVIDENCE_LABELS={'Audited filing':'Annual report filing','Audited public company':'Public company annual report'};
-function profileEvidenceLabel(cl){const label=evidenceLabel(cl);return financeClaimContextFor(cl.id)?.attribution||profileReviewedObservationForClaim(cl)?.evidence_assurance||(['taskus','appen'].includes(cl.company_id)&&PROFILE_EVIDENCE_LABELS[label])||label;}
+function profileEvidenceLabel(cl){const label=evidenceLabel(cl);return financeClaimContextFor(cl.id)?.attribution||(profileCalculatedObservationForClaim(cl)?'Calculated from filing inputs':'')||profileReviewedObservationForClaim(cl)?.evidence_assurance||(['taskus','appen'].includes(cl.company_id)&&PROFILE_EVIDENCE_LABELS[label])||label;}
 function profileMetricAttribution(m){
  const claim=claims[m.claim_id];
  if(claim.status!=='supported'||claim.source_ids.length&&claim.source_ids.every(id=>sources[id].retrieval_status==='unverified'))return profileEvidenceLabel(claim);

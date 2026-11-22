@@ -381,6 +381,12 @@ def financial_value(row, observation=False):
     return qualifier + text
 
 
+def observation_source_ids(observation):
+    source_ids = observation.get("source_ids", [])
+    primary = observation.get("primary_source_id")
+    return [primary, *(sid for sid in source_ids if sid != primary)] if primary else source_ids
+
+
 def current_company_result(research, health, company_id):
     """Pure Python port of currentCompanyResult; all-company JS parity is tested."""
     from static_pages import selected_business_observation
@@ -394,7 +400,7 @@ def current_company_result(research, health, company_id):
                 "period": observation.get("period", {}).get("label") or observation.get("as_of") or "",
                 "scope": observation.get("scope") or "", "scope_detail": observation.get("scope_detail") or observation.get("scope_label") or "",
                 "accounting_basis": observation.get("accounting_basis") or "",
-                "source_urls": " | ".join(sources[sid]["url"] for sid in observation.get("source_ids", []) if sources.get(sid, {}).get("url")),
+                "source_urls": " | ".join(sources[sid]["url"] for sid in observation_source_ids(observation) if sources.get(sid, {}).get("url")),
                 "scope_label": observation.get("scope_label") or research.scope_text(observation.get("scope"), company_id),
                 "limitations": observation.get("limitations") or ""}
     metric = research.headline(company_id)
@@ -427,6 +433,8 @@ def company_summaries(data, sidecars, root):
     from static_pages import Research, read_js_object, selected_business_observation, date_rank, metric_period, latest_source, basis_text
     research = Research(data, read_js_object(root / "web/app.js", "FINANCIAL_HEADLINES"), sidecars["SOURCE_UPDATES"])
     health = sidecars["BUSINESS_HEALTH"] or {}
+    health_sources = {**research.sources, **{s["id"]: s for s in health.get("sources", [])}}
+    health_checks = {c["source_id"]: c for c in health.get("source_checks", {}).get("entries", [])}
     products_by_company = {}
     result = {}
     for company in data["companies"]:
@@ -440,10 +448,15 @@ def company_summaries(data, sidecars, root):
         financial = None
         if observation:
             primary = observation.get("primary_source_id")
-            source_ids = [primary] if primary else observation["source_ids"]
-            record = next((s for s in health.get("sources", []) if s["id"] in source_ids), None) or research.sources.get(source_ids[0])
+            record = next((health_sources[sid] for sid in observation_source_ids(observation) if sid in health_sources), None)
             fresh = next((c for c in health.get("fresh_claims", []) if c["id"] in observation.get("claim_ids", [])), {})
-            checked = (fresh.get("observed_on") if not primary else None) or next((c.get("checked_on") for c in health.get("source_checks", {}).get("entries", []) if c["source_id"] in source_ids and c.get("status") == "content_checked"), None)
+            checked = None
+            if record:
+                check = health_checks.get(record["id"])
+                if check and check.get("status") == "content_checked":
+                    checked = check.get("checked_on")
+                elif not check and record["id"] in fresh.get("source_ids", []):
+                    checked = fresh.get("observed_on")
             end = observation.get("period", {}).get("end") or next(iter(re.findall(r"\d{4}(?:-\d{2}){0,2}", str(observation.get("as_of") or ""))), "")
             financial = {"recordType": "observation", "id": observation["id"], "claimId": next(iter(observation.get("claim_ids", [])), None),
                          "display": current["display"], "type": "Annualized pace" if observation["measure"] == "annualized_revenue" else "Revenue",
@@ -471,6 +484,8 @@ def company_summaries(data, sidecars, root):
                 financial["historicalYear"] = historical
         if financial is not None:
             citation = {"url": record["url"], "publisher": (record["title"] if observation and observation.get("primary_source_id") else record.get("publisher")) or "Original source"} if record else None
+            if record and observation:
+                citation["id"] = record["id"]
             if record and (published := research.reviewed_source_dates.get(record["id"]) or (record.get("published_on") if observation and observation.get("primary_source_id") else None)):
                 citation.update(id=record["id"], publishedOn=published, accessedOn=record.get("accessed_on"), retrievalStatus=record.get("retrieval_status"))
                 if not observation:
