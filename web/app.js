@@ -568,7 +568,7 @@ function evidenceMetricStatus(m){
 }
 function evidenceMetricContextHTML(m){return detailViewRenderer("evidenceMetricContextHTML",this,arguments);}
 // Grade meanings, as the Method page states them.
-const CONFIDENCE_GRADES={A:'Independent or buyer-side evidence, such as a filing or a customer who confirms the work.',B:'The company, an investor or another named first-hand source says it.',C:'Reporting by others, an estimate, or indirect evidence.',U:'Not confirmed. The fact may be undisclosed or still unresolved.'};
+const CONFIDENCE_GRADES={A:'Public filing, independent evidence or buyer confirmation.',B:'The company, an investor or another named first-hand source says it.',C:'Reporting by others, an estimate, or indirect evidence.',U:'Not confirmed. The fact may be undisclosed or still unresolved.'};
 function claimConfidenceHTML(cl){return detailViewRenderer("claimConfidenceHTML",this,arguments);}
 // Display wording for common research date notes (records unchanged).
 const LEGACY_EVIDENCE_DATE_NOTE='Date label preserved from research; access dates are not substituted.';
@@ -651,10 +651,18 @@ function selectionFact(id){
 }
 function openCompanyStory(id){return detailViewRenderer("openCompanyStory",this,arguments);}
 
+function syncShortlistScroll(){
+ const names=$('tray-text');
+ if(names.clientHeight&&names.scrollHeight>names.clientHeight+1)names.setAttribute('tabindex','0');
+ else names.removeAttribute('tabindex');
+}
 function renderTray(notice=''){
- const count=state.selected.length,comparing=onCompareRoute();
+ const count=state.selected.length,comparing=onCompareRoute(),names=$('tray-text'),status=$('tray-notice');
  $('compare-tray').hidden=!count||comparing;
- $('tray-text').textContent=count?`${count} of 3 selected: ${listText(state.selected.map(id=>companies[id].name))}${notice?'. '+notice:''}`:'';
+ const text=count?`${count} of 3 selected: ${listText(state.selected.map(id=>companies[id].name))}`:'';
+ if(names.textContent!==text)names.textContent=text;
+ if(status.textContent!==notice)status.textContent=notice;
+ syncShortlistScroll();
  if(notice&&comparing)$('compare-status').textContent=notice;
  $('nav-count').textContent=count?`(${count})`:'';
  document.querySelectorAll('[data-nav="compare"],#compare-tray a[href^="#compare"]').forEach(a=>a.setAttribute('href',compareHash()));
@@ -673,7 +681,7 @@ function setSelection(ids){
  }
  renderCompare();
 }
-function chooseCompare(id,on){if(on&&!state.selected.includes(id)&&state.selected.length>=3){syncSelection();renderTray('Remove one first.');return;}setSelection(on?[...state.selected,id]:state.selected.filter(x=>x!==id));}
+function chooseCompare(id,on){if(on&&!state.selected.includes(id)&&state.selected.length>=3){syncSelection();renderTray('Limit of 3. Remove one first.');return;}setSelection(on?[...state.selected,id]:state.selected.filter(x=>x!==id));}
 function reset(){Object.assign(state,{query:'',category:'',stage:'',financial:false,work:false,sort:'name'});$('search').value='';$('category').value='';$('stage').value='';$('financial-only').checked=false;$('work-only').checked=false;$('sort').value='name';renderDirectory();writeDirectoryRoute();$('search').focus({preventScroll:true});}
 
 // previousSection is set after a section link such as #venture, so the next plain view link starts at the top.
@@ -697,6 +705,37 @@ const entryScroll=new Map();let routeTraversal=false,routeRestoredScroll=null;
 const historySessionKey=Date.now().toString(36)+Math.random().toString(36).slice(2);let historyEntrySequence=0,lastRoutedHash='';
 const historyKey=()=>window.navigation?.currentEntry?.key||history.state?.stsEntryKey;
 function ensureHistoryEntryKey(fresh=false){if(!window.navigation&&(fresh||!history.state?.stsEntryKey))history.replaceState({...history.state,stsEntryKey:historySessionKey+':'+(++historyEntrySequence)},'');}
+// Pair the directory entry with the Compare entry opened from its tray. Compare edits replace
+// their own URL, and a reload can still find the originating directory entry on Back.
+let pendingShortlist=null,compareShortlistSource=onCompareRoute()?history.state?.compareShortlistSource:null;
+function rememberShortlistOrigin(event){
+ const link=event.target.closest?.('#compare-tray a');
+ if(!normalSelfLinkActivation(event,link)||routeParts()[0]!=='companies')return;
+ const {query,category,stage,financial,work,sort,selected}=state;
+ const shortlist={query,category,stage,financial,work,sort,selected,notice:$('tray-notice').textContent};
+ history.replaceState({...history.state,shortlist},'');
+ pendingShortlist={hash:link.getAttribute('href'),key:historyKey()};
+}
+window.addEventListener('hashchange',()=>{
+ if(onCompareRoute()){
+  if(!routeTraversal&&pendingShortlist?.hash===location.hash)history.replaceState({...history.state,compareShortlistSource:pendingShortlist.key},'');
+  compareShortlistSource=history.state?.compareShortlistSource;
+ }
+ pendingShortlist=null;
+});
+function shortlistReturnState(wasTraversal=routeTraversal){
+ return wasTraversal&&compareShortlistSource&&historyKey()===compareShortlistSource?history.state?.shortlist:null;
+}
+function restoreDirectoryShortlist({selected,notice,...filters}){
+ Object.assign(state,filters);
+ state.selected=selected.filter(isCompanyId);
+ $('search').value=state.query;
+ for(const key of ['category','stage','sort'])$(key).value=state[key];
+ $('financial-only').checked=state.financial;
+ $('work-only').checked=state.work;
+ renderDirectory();
+}
+window.addEventListener('resize',syncShortlistScroll);
 if('scrollRestoration' in history)history.scrollRestoration='manual';
 // A reload, or Back to this page from another site, also returns to the same place: the entry keeps
 // its scroll position as Navigation API state, which route() reads on its first run.
@@ -780,6 +819,7 @@ function repeatMainRoute(event){
  if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});heading.scrollIntoView({block:'start',behavior:'instant'});}
 }
 document.addEventListener('click',rememberCompanyOrigin);
+document.addEventListener('click',rememberShortlistOrigin);
 document.addEventListener('click',event=>{
  const shortcut=event.target.closest?.('#market-view .hero-actions a[href="#business-health"]');
  if(normalSelfLinkActivation(event,shortcut)&&location.hash!==shortcut.hash)marketShortcutOrigins.set(historyKey(),shortcut);
@@ -795,14 +835,22 @@ function renderMissingCompanyProfile(parts){
  document.title='Profile not found · ScienceToStartup';
  $('profile-view').innerHTML=`<div class="page-heading"><h1>Profile not found</h1><p>No company in this historical Explore set uses ${query?'“'+esc(query)+'”':'that address'}.</p>${recovery}<p><a href="${attr(searchUrl)}">Search the company directory</a></p></div>`;
 }
-function route(event){const wasTraversal=routeTraversal;ensureHistoryEntryKey(event?.type==='hashchange'&&!wasTraversal&&location.hash!==lastRoutedHash);if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''||routeTraversal?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=Number.isFinite(kept)?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeRestoredScroll=restore;routeTraversal=false;const closingDialog=event?.closedDialog||event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';if(parts[0]&&parts[0]!=='market'&&view==='market'&&!anchorId)history.replaceState(null,'','#market');if(view!=='company')preparePage(view);if(previousRoute&&view!==previousRoute)viewScroll[previousRoute]=window.scrollY;for(const name of ['market','companies','work','compare','method','profile'])$(name+'-view').hidden=(name!==(view==='company'?'profile':view));document.querySelectorAll('[data-nav]').forEach(a=>{if(a.dataset.nav===(view==='company'?'companies':view))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});if(view==='company'){if(isCompanyId(parts[1])){renderCompanyProfile(parts[1]);document.title=companies[parts[1]].name+' · ScienceToStartup';}else renderMissingCompanyProfile(parts);}
- else{document.title=VIEW_TITLES[view];if(view==='companies'){renderComparisonScope(view);if(typeof syncDirectoryRoute==='function')syncDirectoryRoute(parts.slice(1));showDirectory();}if(view==='method'){showDirectory();renderExploreCorrections(anchorId==='corrections');}if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare')renderCompare();}
- renderTray();const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;lastRoutedHash=location.hash;
+function route(event){const wasTraversal=routeTraversal;ensureHistoryEntryKey(event?.type==='hashchange'&&!wasTraversal&&location.hash!==lastRoutedHash);if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''||routeTraversal?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=Number.isFinite(kept)?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeRestoredScroll=restore;routeTraversal=false;const closingDialog=event?.closedDialog||event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';
+ const shortlist=view==='companies'?shortlistReturnState(wasTraversal):null;
+ if(view!=='compare')compareShortlistSource=null;
+ if(parts[0]&&parts[0]!=='market'&&view==='market'&&!anchorId)history.replaceState(null,'','#market');if(view!=='company')preparePage(view);if(previousRoute&&view!==previousRoute)viewScroll[previousRoute]=window.scrollY;for(const name of ['market','companies','work','compare','method','profile'])$(name+'-view').hidden=(name!==(view==='company'?'profile':view));document.querySelectorAll('[data-nav]').forEach(a=>{if(a.dataset.nav===(view==='company'?'companies':view))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});if(view==='company'){if(isCompanyId(parts[1])){renderCompanyProfile(parts[1]);document.title=companies[parts[1]].name+' · ScienceToStartup';}else renderMissingCompanyProfile(parts);}
+ else{document.title=VIEW_TITLES[view];if(view==='companies'){renderComparisonScope(view);if(shortlist)restoreDirectoryShortlist(shortlist);if(typeof syncDirectoryRoute==='function')syncDirectoryRoute(parts.slice(1));showDirectory();}if(view==='method'){showDirectory();renderExploreCorrections(anchorId==='corrections');}if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare')renderCompare();}
+ renderTray(shortlist?.notice);const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;lastRoutedHash=location.hash;
  if(wasTraversal&&view==='market'&&!anchorId){
   const hash=location.hash;
   queueMicrotask(()=>{if(location.hash===hash)marketShortcutOrigins.get(key)?.focus({preventScroll:true});});
  }
- if(wasTraversal&&['work','companies'].includes(view)){const hash=location.hash;queueMicrotask(()=>{if(location.hash!==hash)return;const origin=view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():view==='companies'?companyReturnFocusTarget():null;origin?.focus({preventScroll:true});});}if(wasTraversal&&view==='compare'){const hash=location.hash;queueMicrotask(()=>{if(location.hash===hash)restoreComparisonFocus(key,hash);});}if(closingDialog){const hash=location.hash;requestAnimationFrame(()=>{if(location.hash!==hash)return;focusRouteDestination(hash);});}}
+ if(wasTraversal&&!shortlist&&['work','companies'].includes(view)){const hash=location.hash;queueMicrotask(()=>{if(location.hash!==hash)return;const origin=view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():view==='companies'?companyReturnFocusTarget():null;origin?.focus({preventScroll:true});});}if(wasTraversal&&view==='compare'){const hash=location.hash;queueMicrotask(()=>{if(location.hash===hash)restoreComparisonFocus(key,hash);});}if(closingDialog){const hash=location.hash;requestAnimationFrame(()=>{if(location.hash!==hash)return;focusRouteDestination(hash);});}
+ if(shortlist){
+  const opener=$('compare-tray').querySelector?.('a');
+  if(opener?.getClientRects().length){opener.focus({preventScroll:true});return opener;}
+ }
+}
 function download(name,body,type){const url=URL.createObjectURL(new Blob([body],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function csvCell(v){let s=String(v??'');if(/^[\t\r\n]/.test(s)||/^\s*[=+@-]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';}
 // The CSV starts with a byte order mark, so spreadsheet software such as Excel reads it as UTF-8.

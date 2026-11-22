@@ -60,7 +60,7 @@ route=function(event){
   const returningToWork=event?.type==='hashchange'&&location.hash.slice(1).split('/')[0]==='work'&&previousRoute==='company';
   const returningToCompanies=event?.type==='hashchange'&&location.hash.slice(1).split('/')[0].toLowerCase()==='companies'&&previousRoute==='company';
   const result=originalRoute.apply(this,arguments);
-  if(event?.type==='hashchange'&&location.hash!=='#main'&&!viewAnchorId()){
+  if(event?.type==='hashchange'&&!result&&location.hash!=='#main'&&!viewAnchorId()){
     const workLink=returningToWork&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():null;
     const companyOrigin=returningToCompanies?companyReturnFocusTarget():null;
     if(companyOrigin)companyOrigin.focus({preventScroll:true});

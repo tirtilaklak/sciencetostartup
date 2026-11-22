@@ -57,11 +57,13 @@ for(const options of cases){
  check('selection-limit-and-clear-remain-interactive',()=>{
   h.run('chooseCompare("taskus",true)');
   assert.equal(h.run('state.selected.join("|")'),'afterquery|elorian|appen');
-  assert.equal(h.node('tray-text').textContent,'3 of 3 selected: AfterQuery, Elorian and Appen. Remove one first.');
+  assert.equal(h.node('tray-text').textContent,'3 of 3 selected: AfterQuery, Elorian and Appen');
+  assert.equal(h.node('tray-notice').textContent,'Limit of 3. Remove one first.');
   h.run('chooseCompare("elorian",false)');
   h.run('chooseCompare("taskus",true)');
   assert.equal(h.run('state.selected.join("|")'),'afterquery|appen|taskus');
   assert.equal(h.node('tray-text').textContent,'3 of 3 selected: AfterQuery, Appen and TaskUs');
+  assert.equal(h.node('tray-notice').textContent,'');
   h.run('setSelection([])');
   assert.equal(h.run('state.selected.length'),0);
  });
