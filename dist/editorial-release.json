@@ -1,19 +1,19 @@
 {
   "schema_version": "1.0.0",
-  "release_id": "2026-11-18.1",
-  "as_of": "2026-11-18",
-  "publication_as_of": "2026-11-18T18:18:45Z",
+  "release_id": "2026-11-22.1",
+  "as_of": "2026-11-22",
+  "publication_as_of": "2026-11-22T06:47:31Z",
   "canonical_dataset_version": "2.5.0",
   "canonical_sha256": "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061",
-  "work_routes_sha256": "4119e1a739c936a83b15673650b5b0c308da6a32cf3a37d8dbc12fd9e148d789",
+  "work_routes_sha256": "a591ce3ebe5872ee75113796b638cb6b91488793220e7f77885516be298c9dd9",
   "counts": {
     "records": 135,
-    "work_routes": 78,
-    "named_listings": 56,
-    "networks_programs": 22,
-    "providers": 29,
+    "work_routes": 69,
+    "named_listings": 48,
+    "networks_programs": 21,
+    "providers": 28,
     "career_pages": 23,
-    "past_other_records": 23,
+    "past_other_records": 32,
     "other_company_jobs": 11
   },
   "calibration_route_ids": [
@@ -30,7 +30,7 @@
     "terac.work.finance-experts",
     "toloka.work.mindrift-code"
   ],
-  "review_scope": "All 135 records retain their earlier classification and explicit field states. On 18 November 2026, five scoped source-content field reviews, one retained-record country correction with blocked retrieval, and four retained-quote normalizations were recorded. No new full-terms review or hiring, allocation or payment verification is claimed.",
+  "review_scope": "The 22 November review checked 52 distinct routes in the source handoff, plus the two Prolific waitlists and the recorded RWS Polaris board action. Scoped reviews cover employer-posting terms and public destinations. Four exact missing listings, Terac’s explicit closure, APTO’s unpublished application and three superseded or general-intake listings remain as historical or informational records. Prior source checks and terms reviews remain in the record.",
   "publication_policy": {
     "automated_checks_change_facts": false,
     "automated_check_interval_days": 1,
@@ -52,7 +52,6 @@
   },
   "homepage": {
     "work_candidate_route_ids": [
-      "appen.work.sage-media",
       "mercor.work.expert-network"
     ],
     "require_approved_key_terms_receipt": true,
@@ -64,5 +63,5 @@
     "not_researched": "The field has not been reviewed; no successful review date is asserted.",
     "conflicting": "Recorded source statements or field components need reconciliation; no personal eligibility or universal rate is inferred."
   },
-  "retrieval_state_note": "Blocked, missing, unavailable and script-shell responses are retrieval outcomes. They preserve last sourced facts and never establish closure or current intake."
+  "retrieval_state_note": "Retrieval results preserve prior facts. A closure or unpublished notice is a separate source-content observation scoped to its listing or application."
 }

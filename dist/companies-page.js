@@ -7,11 +7,59 @@
   const normalize = value => mathTitle(value).normalize('NFKD').replace(/\p{M}+/gu, '').toLowerCase().replace(/\s+/gu, ' ').trim();
   const aliasName = value => String(value).replace(/\s*\([^()]*\)\s*$/u, '').trim();
   const values = value => Array.isArray(value) ? value.flatMap(values) : value == null ? [] : [String(value)];
+  const arxiv = /^(?:\d{4}\.\d{4,5}|[a-z][a-z.-]*\/\d{7})(?:v[1-9]\d*)?$/u;
+  const doi = /^10\.\d{4,9}\/\S+$/u;
+  const record = /^paper\.[a-z0-9_-]+(?:\.[a-z0-9_-]+)+$/u;
+  function identifier(value) {
+    let text = String(value ?? '').trim().toLowerCase();
+    let type = '';
+    if (/^https?:\/\//u.test(text) || text.startsWith('/research/papers/')) {
+      let url, path;
+      try {
+        url = new URL(text, 'https://sciencetostartup.com');
+        path = decodeURIComponent(url.pathname).toLowerCase();
+      } catch { return ''; }
+      if (url.username || url.password || url.port) return '';
+      if (['arxiv.org', 'www.arxiv.org', 'export.arxiv.org'].includes(url.hostname)) {
+        const match = path.match(/^\/(abs|pdf|html)\/(.+?)\/?$/u);
+        if (!match) return '';
+        type = 'arxiv';
+        text = match[1] === 'pdf' ? match[2].replace(/\.pdf$/u, '') : match[2];
+      } else if (['doi.org', 'dx.doi.org'].includes(url.hostname)) {
+        type = 'doi'; text = path.slice(1);
+      } else if (url.hostname === 'sciencetostartup.com') {
+        type = 'record'; text = path.match(/^\/research\/papers\/([^/]+)\/?$/u)?.[1] || '';
+      } else return '';
+    } else {
+      const prefix = text.match(/^(arxiv|doi):\s*/u);
+      if (prefix) { type = prefix[1]; text = text.slice(prefix[0].length); }
+    }
+    if ((!type || type === 'arxiv') && arxiv.test(text)) return 'arxiv:' + text;
+    if ((!type || type === 'doi') && doi.test(text)) return 'doi:' + text;
+    if ((!type || type === 'record') && record.test(text)) return 'record:' + text;
+    return '';
+  }
+  const identifiers = value => [...new Set(values(value).map(identifier).filter(Boolean))];
+  const leadingWork = /^(?:jobs?|careers?|hiring|vacancies|openings)(?:\s+(?:for|in))?(?=\s|$)/iu;
+  const trailingWork = /(?:^|\s)(?:jobs?|careers?|vacancies|openings)\s*$/iu;
+  const researchTerms = /\b(?:papers?|datasets?|benchmarks?|literature|arxiv|doi)\b/iu;
+  function explicitWork(value) {
+    const text = String(value ?? '').trim();
+    return !researchTerms.test(text) && (leadingWork.test(text) || trailingWork.test(text));
+  }
+  function isWorkQuery(value, titles) {
+    return !identifier(value) && (explicitWork(value) || Boolean(titles?.has(normalize(value))));
+  }
+  function workTerms(value) {
+    const text = String(value ?? '');
+    return explicitWork(text) ? text.trim().replace(leadingWork, '').replace(trailingWork, '').trim() : text;
+  }
+  const workUrl = value => '/work/' + (String(value ?? '').trim() ? '?' + new URLSearchParams({ q: value }) : '');
   function compile(row) {
     const aliases = values(row.aliases).map(raw => ({ raw, key: normalize(aliasName(raw)) }));
     const name = normalize(row.name);
     const text = normalize([row.name, ...aliases.map(item => item.raw), ...values(row.summary), ...values(row.group), ...values(row.products), ...values(row.keywords), ...values(row.text)].join(' '));
-    return { row, name, aliases, text };
+    return { row, name, aliases, text, identifiers: identifiers(row.identifiers) };
   }
   function rank(entry, query) {
     const key = normalize(query);
@@ -34,7 +82,7 @@
     if (!key || entry.name.includes(key)) return '';
     return entry.aliases.find(alias => alias.key === key || alias.key.startsWith(key))?.raw || '';
   }
-  globalThis.S2SSearch = Object.freeze({ normalize, compile, rank, compare, matchedAlias });
+  globalThis.S2SSearch = Object.freeze({ normalize, identifier, identifiers, isWorkQuery, workTerms, workUrl, compile, rank, compare, matchedAlias });
 })();
 
 /* Filtering enhances the complete static directory; no network is needed. */
@@ -46,6 +94,8 @@
   const group=document.getElementById('company-group');
   const count=document.getElementById('company-count');
   const empty=document.getElementById('company-empty');
+  const fullGuide=empty?.querySelector('[data-full-guide-search]');
+  const selectedGroup=document.querySelector('[data-directory-selected-group]');
   const sections=[...document.querySelectorAll('.directory-section')];
   const search=globalThis.S2SSearch;
   if(!search){document.documentElement.removeAttribute('data-page-enhancement');return;}
@@ -76,6 +126,11 @@
     if(sectionParent) [...cards].sort((a,b)=>(key?a.best-b.best:0)||a.order-b.order).forEach(entry=>sectionParent.insertBefore(entry.section,sectionAnchor));
     count.textContent=`${visible} ${visible===1?'company':'companies'}`;
     empty.hidden=visible!==0;
+    if(fullGuide) fullGuide.href='/?'+new URLSearchParams({search:query.value})+'#browse-guide';
+    if(selectedGroup){
+      selectedGroup.hidden=!group.value;
+      selectedGroup.textContent=group.value?group.selectedOptions[0].textContent:'';
+    }
     if(updateURL){
       const url=new URL(location.href);
       if(query.value.trim())url.searchParams.set('q',query.value.trim());else url.searchParams.delete('q');
@@ -86,7 +141,7 @@
   form.addEventListener('submit',event=>event.preventDefault());
   query.addEventListener('input',()=>filter());
   group.addEventListener('change',()=>filter());
-  form.addEventListener('reset',()=>{query.value='';group.value='';filter();});
+  form.addEventListener('reset',event=>{event.preventDefault();query.value='';group.value='';filter();query.focus();});
   window.addEventListener('popstate',()=>{read();filter(false);});
   read();filter(false);form.hidden=false;
   document.documentElement.removeAttribute('data-page-enhancement');

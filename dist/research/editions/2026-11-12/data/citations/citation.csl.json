@@ -1,0 +1,24 @@
+{
+  "DOI": "10.5281/zenodo.24249277",
+  "URL": "https://zenodo.org/records/24249277",
+  "author": [
+    {
+      "family": "Ozdem",
+      "given": "Musa"
+    }
+  ],
+  "id": "sciencetostartup-research-2026-11-12.1",
+  "issued": {
+    "date-parts": [
+      [
+        2026,
+        11,
+        15
+      ]
+    ]
+  },
+  "note": "Published archived edition.",
+  "title": "State of AI Data Labs and Human Feedback",
+  "type": "report",
+  "version": "research-2026-11-12.1"
+}

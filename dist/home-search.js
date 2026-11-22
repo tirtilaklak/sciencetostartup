@@ -7,11 +7,59 @@
   const normalize = value => mathTitle(value).normalize('NFKD').replace(/\p{M}+/gu, '').toLowerCase().replace(/\s+/gu, ' ').trim();
   const aliasName = value => String(value).replace(/\s*\([^()]*\)\s*$/u, '').trim();
   const values = value => Array.isArray(value) ? value.flatMap(values) : value == null ? [] : [String(value)];
+  const arxiv = /^(?:\d{4}\.\d{4,5}|[a-z][a-z.-]*\/\d{7})(?:v[1-9]\d*)?$/u;
+  const doi = /^10\.\d{4,9}\/\S+$/u;
+  const record = /^paper\.[a-z0-9_-]+(?:\.[a-z0-9_-]+)+$/u;
+  function identifier(value) {
+    let text = String(value ?? '').trim().toLowerCase();
+    let type = '';
+    if (/^https?:\/\//u.test(text) || text.startsWith('/research/papers/')) {
+      let url, path;
+      try {
+        url = new URL(text, 'https://sciencetostartup.com');
+        path = decodeURIComponent(url.pathname).toLowerCase();
+      } catch { return ''; }
+      if (url.username || url.password || url.port) return '';
+      if (['arxiv.org', 'www.arxiv.org', 'export.arxiv.org'].includes(url.hostname)) {
+        const match = path.match(/^\/(abs|pdf|html)\/(.+?)\/?$/u);
+        if (!match) return '';
+        type = 'arxiv';
+        text = match[1] === 'pdf' ? match[2].replace(/\.pdf$/u, '') : match[2];
+      } else if (['doi.org', 'dx.doi.org'].includes(url.hostname)) {
+        type = 'doi'; text = path.slice(1);
+      } else if (url.hostname === 'sciencetostartup.com') {
+        type = 'record'; text = path.match(/^\/research\/papers\/([^/]+)\/?$/u)?.[1] || '';
+      } else return '';
+    } else {
+      const prefix = text.match(/^(arxiv|doi):\s*/u);
+      if (prefix) { type = prefix[1]; text = text.slice(prefix[0].length); }
+    }
+    if ((!type || type === 'arxiv') && arxiv.test(text)) return 'arxiv:' + text;
+    if ((!type || type === 'doi') && doi.test(text)) return 'doi:' + text;
+    if ((!type || type === 'record') && record.test(text)) return 'record:' + text;
+    return '';
+  }
+  const identifiers = value => [...new Set(values(value).map(identifier).filter(Boolean))];
+  const leadingWork = /^(?:jobs?|careers?|hiring|vacancies|openings)(?:\s+(?:for|in))?(?=\s|$)/iu;
+  const trailingWork = /(?:^|\s)(?:jobs?|careers?|vacancies|openings)\s*$/iu;
+  const researchTerms = /\b(?:papers?|datasets?|benchmarks?|literature|arxiv|doi)\b/iu;
+  function explicitWork(value) {
+    const text = String(value ?? '').trim();
+    return !researchTerms.test(text) && (leadingWork.test(text) || trailingWork.test(text));
+  }
+  function isWorkQuery(value, titles) {
+    return !identifier(value) && (explicitWork(value) || Boolean(titles?.has(normalize(value))));
+  }
+  function workTerms(value) {
+    const text = String(value ?? '');
+    return explicitWork(text) ? text.trim().replace(leadingWork, '').replace(trailingWork, '').trim() : text;
+  }
+  const workUrl = value => '/work/' + (String(value ?? '').trim() ? '?' + new URLSearchParams({ q: value }) : '');
   function compile(row) {
     const aliases = values(row.aliases).map(raw => ({ raw, key: normalize(aliasName(raw)) }));
     const name = normalize(row.name);
     const text = normalize([row.name, ...aliases.map(item => item.raw), ...values(row.summary), ...values(row.group), ...values(row.products), ...values(row.keywords), ...values(row.text)].join(' '));
-    return { row, name, aliases, text };
+    return { row, name, aliases, text, identifiers: identifiers(row.identifiers) };
   }
   function rank(entry, query) {
     const key = normalize(query);
@@ -34,7 +82,7 @@
     if (!key || entry.name.includes(key)) return '';
     return entry.aliases.find(alias => alias.key === key || alias.key.startsWith(key))?.raw || '';
   }
-  globalThis.S2SSearch = Object.freeze({ normalize, compile, rank, compare, matchedAlias });
+  globalThis.S2SSearch = Object.freeze({ normalize, identifier, identifiers, isWorkQuery, workTerms, workUrl, compile, rank, compare, matchedAlias });
 })();
 
 /* Loaded only when homepage Search is invoked; no application or archive download. */
@@ -43,14 +91,29 @@
   if (typeof window.openHomeSearch === 'function') return;
   const $ = id => document.getElementById(id), dialog = $('home-search'), input = $('home-search-input'), results = $('home-search-results'), message = $('home-search-message');
   const config = JSON.parse($('home-config').textContent), search = globalThis.S2SSearch;
-  let entries = null, pending = null, active = -1, shown = 7, generation = 0;
+  const pageSize = 7, historyField = 's2sHomeSearchReturn';
+  let entries = null, pending = null, active = -1, shown = pageSize, generation = 0;
+  let exactIdentifiers = false, workTitles = new Set(), returnState = null;
+  const fallback = dialog.querySelector('.site-search-fallback');
+  const workRecovery = $('home-search-work-recovery') || fallback?.querySelector('a[href^="/work/"]');
   let more = $('home-search-more');
   if (!more) {
     more = document.createElement('button'); more.id = 'home-search-more'; more.className = 'site-search-more'; more.type = 'button'; more.hidden = true;
     results.after(more);
   }
   const escape = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
-  const announce = value => { const status = $('home-search-status'); if (status) status.textContent = value; };
+  function say(value) {
+    message.textContent = value;
+    const status = $('home-search-status');
+    if (status) status.textContent = value;
+  }
+  const options = () => [...results.querySelectorAll('[role=option]')];
+  function updateFallback() {
+    if (workRecovery) {
+      workRecovery.href = search.workUrl(input.value);
+      workRecovery.textContent = input.value.trim() ? 'Search paid work for this query' : 'Browse paid work';
+    }
+  }
   function clearResults() {
     results.replaceChildren(); results.hidden = true; more.hidden = true; active = -1;
     input.removeAttribute('aria-activedescendant'); input.setAttribute('aria-expanded', 'false');
@@ -58,9 +121,9 @@
   async function load() {
     if (entries) return entries;
     if (pending) return pending;
-    message.textContent = 'Loading the search index…'; clearResults();
+    say('Loading the search index…'); clearResults();
     const controller = new AbortController(), deadline = setTimeout(() => controller.abort(), 15000);
-    pending = fetch(config.search.href, { signal: controller.signal }).then(async response => {
+    pending = fetch(config.search.href, { signal: controller.signal, cache: 'no-cache' }).then(async response => {
       if (!response.ok) throw new Error('Search unavailable');
       const bytes = await response.arrayBuffer();
       if (globalThis.crypto?.subtle) {
@@ -69,63 +132,138 @@
       }
       const data = JSON.parse(new TextDecoder().decode(bytes));
       for (const key of ['schemaVersion', 'buildId', 'editorialReleaseId', 'datasetVersion']) if (data[key] !== config[key]) throw new Error('Search release mismatch');
-      if (!Array.isArray(data.entries) || !data.entries.every(row => typeof row.name === 'string' && typeof row.summary === 'string' && typeof row.group === 'string' && Array.isArray(row.products) && row.products.every(value => typeof value === 'string') && typeof row.href === 'string' && row.href.startsWith('/') && !row.href.startsWith('//') && (row.aliases === undefined || Array.isArray(row.aliases) && row.aliases.every(value => typeof value === 'string')))) throw new Error('Invalid search index');
-      entries = data.entries.map(row => ({ row, compiled: search.compile(row) })); return entries;
+      const strings = value => Array.isArray(value) && value.every(item => typeof item === 'string');
+      const optionalStrings = value => value === undefined || strings(value);
+      const validRow = row => row && typeof row.name === 'string' && typeof row.summary === 'string'
+        && typeof row.group === 'string' && strings(row.products) && typeof row.href === 'string'
+        && /^\/(?!\/)[^\s\\]*$/u.test(row.href) && optionalStrings(row.aliases) && optionalStrings(row.identifiers);
+      if (!Array.isArray(data.entries) || !data.entries.every(validRow) || !optionalStrings(data.workTitles)) throw new Error('Invalid search index');
+      entries = data.entries.map(search.compile);
+      exactIdentifiers = entries.some(entry => entry.identifiers.length);
+      workTitles = new Set((data.workTitles || []).map(search.normalize));
+      return entries;
     }).finally(() => { clearTimeout(deadline); pending = null; });
     return pending;
   }
   function setActive(index) {
-    const options = [...results.querySelectorAll('[role=option]')];
+    const rows = options();
     active = index;
-    options.forEach((node, position) => node.setAttribute('aria-selected', String(position === active)));
-    if (active >= 0 && options[active]) {
-      input.setAttribute('aria-activedescendant', options[active].id); options[active].scrollIntoView({ block: 'nearest' });
+    rows.forEach((node, position) => node.setAttribute('aria-selected', String(position === active)));
+    if (active >= 0 && rows[active]) {
+      input.setAttribute('aria-activedescendant', rows[active].id); rows[active].scrollIntoView({ block: 'nearest' });
     } else input.removeAttribute('aria-activedescendant');
   }
+  function resultType(row) {
+    if (row.href.startsWith('/company/')) return 'Company';
+    if (row.group === 'paper') return row.recordKind === 'paper_version' ? 'Paper source version' : 'Paper';
+    return { dataset: 'Dataset', benchmark: 'Benchmark', report: 'Research report', workflow: 'Workflow', daily: 'Daily scan', data: 'Research data', review: 'Review log' }[row.group] || 'Research';
+  }
+  function option({ name, summary, href, type }, index) {
+    return `<a id="home-result-${index}" class="site-search-option" role="option" aria-selected="false" tabindex="-1" data-result-type="${escape(type)}" href="${escape(href)}"><strong>${escape(name)}</strong><span>${escape(type + ' · ' + summary)}</span></a>`;
+  }
   function render(paging = false) {
-    const raw = input.value.trim(), key = search.normalize(raw);
+    const raw = input.value, key = search.normalize(raw);
+    const exact = exactIdentifiers ? search.identifier(raw) : '';
     const selected = paging ? results.querySelector('[aria-selected=true]')?.getAttribute('href') : null;
-    const matches = key ? entries.map(entry => ({ ...entry, rank: search.rank(entry.compiled, raw) })).filter(entry => entry.rank >= 0).sort((a, b) => a.rank - b.rank || search.compare(a.row, b.row)) : entries.slice(0, 7);
-    const visible = matches.slice(0, shown), work = '/work/' + (raw ? '?' + new URLSearchParams({ q: raw }) : '');
-    results.innerHTML = visible.map(({ row, compiled }, index) => {
-      const alias = search.matchedAlias(compiled, raw);
-      return `<a id="home-result-${index}" class="site-search-option" role="option" aria-selected="false" href="${escape(row.href)}"><strong>${escape(row.name)}</strong><span>${escape(alias ? 'Recorded alias: ' + alias + '. ' + row.summary : row.summary)}</span></a>`;
-    }).join('') + `<a id="home-result-${visible.length}" class="site-search-option" role="option" aria-selected="false" href="${escape(work)}"><strong>${escape(raw ? 'Find paid work matching “' + raw + '”' : 'Browse paid work')}</strong><span>Public listings, expert networks and requirements</span></a>`;
+    const matches = exact ? entries.filter(entry => entry.identifiers.includes(exact))
+      : key ? entries.map(entry => ({ ...entry, rank: search.rank(entry, raw) })).filter(entry => entry.rank >= 0).sort((a, b) => a.rank - b.rank || search.compare(a.row, b.row)) : entries.slice(0, pageSize);
+    if (fallback) fallback.hidden = Boolean(exact || matches.length);
+    if (workRecovery) workRecovery.hidden = true;
+    if (exact && !matches.length) {
+      clearResults(); say('No matching research record for this identifier.'); return;
+    }
+    const visible = matches.slice(0, shown);
+    const rendered = visible.map(entry => {
+      const { row } = entry, alias = search.matchedAlias(entry, raw);
+      return { ...row, type: resultType(row), summary: alias ? 'Recorded alias: ' + alias + '. ' + row.summary : row.summary };
+    });
+    if (!exact) {
+      const work = { name: key ? 'Find paid work matching “' + raw.trim() + '”' : 'Browse paid work', summary: 'Public listings, expert networks and requirements', type: 'Work search', href: search.workUrl(raw) };
+      if (search.isWorkQuery(raw, workTitles)) rendered.unshift(work);
+      else rendered.push(work);
+    }
+    results.innerHTML = rendered.map(option).join('');
     results.hidden = false; input.setAttribute('aria-expanded', 'true');
-    const index = selected ? [...results.querySelectorAll('[role=option]')].findIndex(node => node.getAttribute('href') === selected) : -1;
+    const index = selected ? options().findIndex(node => node.getAttribute('href') === selected) : -1;
     setActive(index);
     more.hidden = !key || visible.length >= matches.length;
-    more.textContent = `Show ${Math.min(7, matches.length - visible.length)} more`;
-    message.textContent = key ? (matches.length ? `Showing ${visible.length} of ${matches.length} matching guide records. Paid work uses its own listing filters.` : 'No recorded guide matches. You can search paid work or browse all companies.') : 'Search research, companies and their offerings, or continue to paid work.';
-    announce(message.textContent);
+    more.textContent = `Show ${Math.min(pageSize, matches.length - visible.length)} more`;
+    if (exact) say(`Showing ${visible.length} of ${matches.length} matching research ${matches.length === 1 ? 'record' : 'records'}.`);
+    else if (!key) say('Search research, companies and their offerings, or continue to paid work.');
+    else if (matches.length) say(`Showing ${visible.length} of ${matches.length} matching guide records. Paid work uses its own listing filters.`);
+    else say('No recorded guide matches. You can search paid work or browse all companies.');
     if (paging && more.hidden) input.focus();
   }
-  window.openHomeSearch = async () => {
+  function restore(snapshot) {
+    const rows = options();
+    const index = rows.findIndex(node => node.getAttribute('href') === snapshot.resultHref);
+    if (index >= 0) setActive(index);
+    if (index >= 0 && snapshot.focus === 'result') rows[index].focus({ preventScroll: true });
+    else input.focus({ preventScroll: true });
+    results.scrollTop = snapshot.resultsScroll;
+  }
+  window.openHomeSearch = async snapshot => {
     const request = ++generation;
     if (!dialog.open) dialog.showModal();
     $('home-search-open').setAttribute('aria-expanded', 'true'); input.focus();
-    try { await load(); if (request === generation && dialog.open) render(); }
-    catch (error) {
+    if (snapshot && typeof snapshot.query === 'string') {
+      returnState = snapshot;
+      input.value = snapshot.query;
+      if (Number.isInteger(snapshot.shown)) shown = Math.max(pageSize, snapshot.shown);
+    }
+    updateFallback();
+    try {
+      await load();
       if (request !== generation || !dialog.open) return;
-      clearResults(); message.innerHTML = 'Search could not load. <button type="button" data-home-search-retry>Try again</button> <a href="/companies/">Browse companies</a> or <a href="/work/">browse paid work</a>.'; announce('Search could not load. Retry or browse the native pages.');
+      render();
+      if (returnState) { restore(returnState); returnState = null; }
+    } catch {
+      if (request !== generation || !dialog.open) return;
+      clearResults();
+      say('Search could not load. Retry or browse the native pages.');
+      message.innerHTML = 'Search could not load. <button type="button" data-home-search-retry>Try again</button>';
+      if (fallback) fallback.hidden = false;
+      if (workRecovery) workRecovery.hidden = false;
     }
   };
+  dialog.addEventListener('click', event => {
+    const link = event.target.closest('#home-search-results a[role=option]');
+    if (!link || event.defaultPrevented || event.button || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || link.origin !== location.origin) return;
+    try {
+      history.replaceState({ ...history.state, [historyField]: {
+        query: input.value, resultHref: link.getAttribute('href'), shown,
+        resultsScroll: results.scrollTop,
+        focus: document.activeElement === link || event.pointerType === 'touch' ? 'result' : 'input'
+      } }, '');
+    } catch {}
+  });
   message.addEventListener('click', event => { if (event.target.closest('[data-home-search-retry]')) window.openHomeSearch(); });
-  $('home-search-close').addEventListener('click', () => dialog.close());
-  dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
-  dialog.addEventListener('close', () => { generation++; $('home-search-open').setAttribute('aria-expanded', 'false'); $('home-search-open').focus(); });
-  input.addEventListener('input', event => { if (event.isComposing) return; shown = 7; if (entries) render(); });
-  input.addEventListener('compositionend', () => { shown = 7; if (entries) render(); });
-  more.addEventListener('click', () => { shown += 7; render(true); });
+  dialog.addEventListener('close', () => {
+    generation++; returnState = null;
+    if (history.state?.[historyField]) {
+      const remaining = { ...history.state }; delete remaining[historyField];
+      try { history.replaceState(remaining, ''); } catch {}
+    }
+  });
+  function edited(event) {
+    if (event.isComposing) return;
+    shown = pageSize; returnState = null; updateFallback();
+    if (entries) render();
+  }
+  input.addEventListener('input', edited);
+  input.addEventListener('compositionend', edited);
+  more.addEventListener('click', () => { shown += pageSize; render(true); });
   input.addEventListener('keydown', event => {
     if (event.isComposing || event.keyCode === 229) return;
     if (event.key === 'Escape') { event.preventDefault(); dialog.close(); return; }
-    const options = [...results.querySelectorAll('[role=option]')]; if (!options.length) return;
-    if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+    if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+    const rows = options(); if (!rows.length) return;
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
-      const next = event.key === 'Home' ? 0 : event.key === 'End' ? options.length - 1 : active < 0 ? (event.key === 'ArrowUp' ? options.length - 1 : 0) : (active + (event.key === 'ArrowDown' ? 1 : options.length - 1)) % options.length;
+      const forward = event.key === 'ArrowDown';
+      const next = active < 0 ? (forward ? 0 : rows.length - 1) : (active + (forward ? 1 : rows.length - 1)) % rows.length;
       setActive(next);
     }
-    if (event.key === 'Enter' && !event.metaKey && !event.ctrlKey && !event.altKey && !event.shiftKey) { event.preventDefault(); options[Math.max(active, 0)].click(); }
+    if (event.key === 'Enter') { event.preventDefault(); rows[Math.max(active, 0)].click(); }
   });
 })();
