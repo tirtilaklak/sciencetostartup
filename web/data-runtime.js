@@ -272,7 +272,15 @@ route=function(event){
   if(company)failedProfile(company,parts[2],error);
   else if(comparison)pendingComparison(comparison,error);
   else if(needsSearch){pendingWorkSearchRoute(true);presentationState('failed','search-request');}
-  else{presentationState('failed','evidence-request');$('app-failure').hidden=false;document.documentElement.removeAttribute('data-route');}
+  else{
+   const lostFocus=document.activeElement?.closest('main>.view');
+   pendingView('');
+   presentationState('failed',evidenceFailure(error));
+   $('app-failure-title').textContent=archive?'Method data could not load.'
+    :overview?'Market data could not load.':'The interactive guide could not load.';
+   $('app-failure').hidden=false;
+   if(lostFocus)$('app-reload').focus();
+  }
   if(event?.type==='company-retry'||event?.type==='compare-retry')document.querySelector('[data-retry-company],[data-retry-compare]')?.focus();
  });
  return window.APP_ROUTE_READY;

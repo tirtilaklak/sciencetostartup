@@ -43,6 +43,64 @@ test('enhanced Market exposes the fragment and focuses the visible heading', asy
   await expectMarketLanding(page);
 });
 
+test('a timed-out app bundle cannot remove the focused recovery action when it finally arrives', async ({ page }) => {
+  let letBundleLoad;
+  let bundleRequested;
+  const requested = new Promise(resolve => { bundleRequested = resolve; });
+  const delayed = new Promise(resolve => { letBundleLoad = resolve; });
+  const appBundle = '**/js/app.*.js';
+  await page.route(appBundle, async route => {
+    bundleRequested();
+    await delayed;
+    await route.continue();
+  });
+  await page.clock.install();
+  try {
+    await page.goto('/explore/#business-health', { waitUntil: 'domcontentloaded' });
+    await requested;
+    await page.clock.fastForward(15_001);
+    const root = page.locator('html');
+    const reload = page.getByRole('button', { name: 'Reload page' });
+    await expect(root).toHaveAttribute('data-app-reason', 'timeout');
+    await reload.focus();
+    letBundleLoad();
+    await page.waitForLoadState('load');
+    await page.clock.runFor(200);
+    await expect(root).toHaveAttribute('data-app', 'failed');
+    await expect(reload).toBeFocused();
+    await page.unroute(appBundle);
+    await page.keyboard.press('Enter');
+    await expect(root).toHaveAttribute('data-app', 'ready');
+    await expectMarketLanding(page);
+  } finally {
+    letBundleLoad();
+  }
+});
+
+test('a failed Market handoff replaces the previous results and allows keyboard reload', async ({ page }) => {
+  await page.goto('/explore/#companies');
+  const companies = page.locator('#companies-view');
+  await expect(companies).toBeVisible();
+  const oldSearch = companies.getByRole('searchbox');
+  await oldSearch.focus();
+
+  const overview = '**/presentation/overview.*.json';
+  await page.route(overview, route => route.fulfill({ status: 503, body: 'Temporarily unavailable' }));
+  await page.evaluate(() => { location.hash = '#business-health'; });
+
+  const fallback = page.locator('#app-failure');
+  await expect(fallback).toBeVisible();
+  await expect(companies).toBeHidden();
+  await expect(fallback.getByRole('heading')).toHaveText('Market data could not load.');
+  const reload = fallback.getByRole('button', { name: 'Reload page' });
+  await expect(reload).toBeFocused();
+  await expect(fallback.getByRole('link', { name: 'Method' })).toHaveAttribute('href', '/method/');
+
+  await page.unroute(overview);
+  await page.keyboard.press('Enter');
+  await expectMarketLanding(page);
+});
+
 for (const bundle of ['data', 'app']) {
   test(`Market retries the bookmark after a blocked ${bundle} bundle`, async ({ page }) => {
     const path = `**/js/${bundle}.*.js`;
