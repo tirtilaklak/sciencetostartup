@@ -490,13 +490,19 @@ let comparisonFocus=null,evidenceReturnFocus=null,pendingComparisonResize=false;
 document.addEventListener('focusin',event=>{comparisonFocus=$('compare-content').contains(event.target)?event.target:null;});
 document.addEventListener('pointerdown',event=>{if(!$('compare-content').contains(event.target))comparisonFocus=null;});
 let comparisonResizeObserver,comparisonObservedHead,comparisonFocusFrame;
+let comparisonReadingFocus=null;
+function preserveComparisonReadingPosition(){
+ const active=document.activeElement;
+ if($('compare-view').contains(active))comparisonReadingFocus=active;
+}
+
 function revealComparisonFocus(){
  const view=$('compare-view');
  if(view.hidden||!view.contains(document.activeElement)||comparisonFocusFrame)return;
  comparisonFocusFrame=requestAnimationFrame(()=>{
   comparisonFocusFrame=0;
   const target=document.activeElement;
-  if(view.hidden||!view.contains(target)||!target.getClientRects().length)return;
+  if(view.hidden||target===comparisonReadingFocus||!view.contains(target)||!target.getClientRects().length)return;
   const pager=target.closest('.mobile-compare-pager');
   if(pager&&pager.scrollHeight>pager.clientHeight){
    const start=pager.getBoundingClientRect().top+pager.clientTop;
@@ -1359,7 +1365,12 @@ function initCompare(){$('clear-compare').addEventListener('click',()=>{setSelec
    revealComparisonFocus();
   }
  });
- view.addEventListener('focusin',event=>{if(event.target.matches(':focus-visible'))revealComparisonFocus();});
+ view.addEventListener('focusin',event=>{
+  comparisonReadingFocus=null;
+  if(event.target.matches(':focus-visible'))revealComparisonFocus();
+ });
+ window.addEventListener('wheel',preserveComparisonReadingPosition,{passive:true});
+ window.addEventListener('touchmove',preserveComparisonReadingPosition,{passive:true});
  if(typeof ResizeObserver==='function'){
   comparisonResizeObserver=new ResizeObserver(syncComparisonLayout);
   const masthead=document.querySelector('body > .topbar');
