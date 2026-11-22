@@ -77,21 +77,45 @@
   const revisiting=saved?.page===location.href&&performance.getEntriesByType('navigation')[0]?.type==='back_forward';
   const returning=revisiting&&
     (window.navigation?!goingForward:window.S2SNativeHandoff?.returnedFrom(saved.entry));
-  if(returning)window.addEventListener('pageshow',event=>{
-    if(event.persisted)return;
-    // The browser applies history scroll restoration after pageshow.
-    requestAnimationFrame(()=>{
-      if(document.activeElement!==document.body||history.state?.directoryReturn?.href!==saved.href)return;
-      const link=[...document.querySelectorAll(handoffs)].find(link=>link.href===saved.href&&!link.closest('[hidden]'));
-      if(!link)return;
-      link.focus({preventScroll:true});
-      const bounds=link.getBoundingClientRect();
-      const headerBottom=Math.max(0,document.querySelector('.site-header')?.getBoundingClientRect().bottom||0);
-      if(saved.top>=headerBottom&&saved.top+bounds.height<=innerHeight){
-        scrollBy({top:bounds.top-saved.top,behavior:'instant'});
-      }else link.scrollIntoView({block:'center',behavior:'instant'});
-    });
-  },{once:true});
+  if(returning){
+    const restoration=new AbortController();
+    const {signal}=restoration;
+    const stop=()=>restoration.abort();
+    const stillReturning=()=>location.href===saved.page&&history.state?.directoryReturn?.href===saved.href;
+    for(const type of ['wheel','keydown','touchstart','touchmove','pointerdown']){
+      window.addEventListener(type,event=>{if(event.isTrusted)stop();},{capture:true,passive:true,signal});
+    }
+    window.addEventListener('pagehide',stop,{once:true,signal});
+    window.addEventListener('pageshow',event=>{
+      if(event.persisted){stop();return;}
+      requestAnimationFrame(()=>{
+        if(signal.aborted)return;
+        if(document.activeElement!==document.body||!stillReturning()){stop();return;}
+        const link=[...document.querySelectorAll(handoffs)].find(link=>link.href===saved.href&&!link.closest('[hidden]'));
+        if(!link){stop();return;}
+        function restorePosition(){
+          const bounds=link.getBoundingClientRect();
+          const headerBottom=Math.max(0,document.querySelector('.site-header')?.getBoundingClientRect().bottom||0);
+          if(saved.top>=headerBottom&&saved.top+bounds.height<=innerHeight){
+            scrollBy({top:bounds.top-saved.top,behavior:'instant'});
+          }else link.scrollIntoView({block:'center',behavior:'instant'});
+        }
+        link.focus({preventScroll:true});
+        restorePosition();
+
+        // WebKit can restore history scroll after the opener has already been positioned.
+        const restoredScroll=scrollY;
+        window.addEventListener('scroll',()=>{
+          if(signal.aborted)return;
+          if(document.activeElement!==link||!stillReturning()||link.closest('[hidden]')){stop();return;}
+          if(Math.abs(scrollY-restoredScroll)<1)return;
+          stop();
+          restorePosition();
+        },{passive:true,signal});
+        setTimeout(stop,250);
+      });
+    },{once:true,signal});
+  }
 
   form.addEventListener('submit',event=>event.preventDefault());
   query.addEventListener('input',()=>filter());
