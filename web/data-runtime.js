@@ -103,7 +103,7 @@ function pendingSearchRoute(view,failed=false){
  if(!failed){searchDisabledControls=[...section.querySelectorAll('input,select,button')].map(control=>[control,control.disabled]);for(const [control]of searchDisabledControls)control.disabled=true;cards?.setAttribute('aria-busy','true');}
  const label=failed?'Search could not load. Your query is preserved.':'Loading the search index…';
  if(count)count.textContent=label;
- const native=view==='work'?'/work/'+workHashFor().slice('#work'.length):'/companies/?'+new URLSearchParams({q:state.query});
+ const native=view==='work'?'/work/'+workHashFor().slice('#work'.length):'/companies/?'+new URLSearchParams({q:shortlistReturnState()?.query??state.query});
  if(cards)cards.innerHTML=`<p role="${failed?'alert':'status'}">${label} ${failed?'<button type="button" data-retry-search>Try again</button> ':''}<a href="${attr(native)}">Open native ${view==='work'?'Work results':'company search'}</a></p>`;
 }
 function installResearchContext(payload){
