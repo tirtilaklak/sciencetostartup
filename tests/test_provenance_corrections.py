@@ -28,7 +28,7 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
     def test_release_binds_exact_work_bytes_and_unchanged_frozen_canonical(self):
         self.assertEqual(hashlib.sha256((ROOT / "data/canonical.json").read_bytes()).hexdigest(),
                          "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061")
-        self.assertEqual(self.release["release_id"], "2026-11-22.4")
+        self.assertEqual(self.release["release_id"], "2026-11-22.5")
         self.assertEqual(self.release["as_of"], "2026-11-22")
         self.assertEqual(self.release["work_routes_sha256"],
                          hashlib.sha256((ROOT / "data/work-routes.json").read_bytes()).hexdigest())
