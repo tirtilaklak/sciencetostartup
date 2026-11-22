@@ -249,7 +249,7 @@
         const { kind, page, href, top, role, termsOpen } = workReturnFocus;
         const card = kind === 'profile' ? cards.get(role) : null;
         const link = kind === 'profile' ? card?.querySelector('a.work-company') : handoffLinks[kind];
-        if (page === location.href && href === link?.href) return { link, top, card, termsOpen };
+        if (link && page === location.href && href === link.href) return { link, top, card, termsOpen };
       } else if (workCompareFocus && compareLink) return { link: compareLink };
       return null;
     }
@@ -273,13 +273,25 @@
       }));
     }
 
+    function bindProfileArrival() {
+      const saved = history.state?.workReturnFocus;
+      const browserHistory = window.navigation;
+      if (!browserHistory || saved?.kind !== 'profile' || saved.page !== location.href || saved.destinationKey !== undefined) return;
+      // The original visit is the next history entry when Work is reactivated.
+      // Keep its key so a new visit to the same profile URL cannot stand in for it.
+      const next = browserHistory.entries()[(browserHistory.currentEntry?.index ?? -2) + 1];
+      const destinationKey = next?.url === saved.href ? next.key : null;
+      try { remember({ workReturnFocus: { ...saved, destinationKey } }); } catch {}
+    }
+
     function followsHandoff() {
       const saved = history.state?.workReturnFocus;
       if (!window.navigation) return window.S2SNativeHandoff?.returnedFrom(saved?.entry);
       const { from, entry } = window.navigation.activation || {};
       if (saved?.kind === 'profile') {
         // The exact role visit must be the adjacent entry we just left on Back.
-        return from?.url === saved.href && from.index === entry?.index + 1;
+        return Boolean(saved.destinationKey && from?.key === saved.destinationKey &&
+          from.url === saved.href && from.index === entry?.index + 1);
       }
       return !(from && from.index <= entry?.index);
     }
@@ -362,6 +374,7 @@
       window.navigation?.addEventListener('navigate', event => {
         if (!event.destination.sameDocument) profileDeparture = event;
       });
+      window.addEventListener('pageshow', event => { if (event.persisted) bindProfileArrival(); });
       window.addEventListener('pagehide', recordProfileDeparture);
       window.addEventListener('pagehide', () => {
         const departure = compareDeparture;
@@ -414,6 +427,7 @@
     if (exportButton) exportButton.hidden = false;
     const retried = loader?.retried;
     const compareArrival = takeCompareArrival() && !loader?.interacted;
+    bindProfileArrival();
     const handoff = !loader?.interacted && performance.getEntriesByType('navigation')[0]?.type === 'back_forward' &&
       followsHandoff() && savedHandoff();
     const revealed = !compareArrival && revealTarget(!handoff && (!loader?.interacted || retried));
