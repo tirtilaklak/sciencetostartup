@@ -52,9 +52,9 @@ function profileRecordDate(cl){
  const date=profileEvidenceDate(cl);
  return financeClaimContextFor(cl.id)?.display_date||date.heading+' · '+date.text;
 }
-function profileFinancingEvidenceLink(id){
+function profileFinancingEvidenceLink(id,fromCompare=false){
  const href=companySummaryFor(id)?.financingEvidenceHref;
- return href?`<a href="${attr(href)}">Read ${esc(companies[id].name)}’s financing evidence ${iconHTML('right')}</a>`:'';
+ return href?`<a href="${attr(href)}"${fromCompare?` data-compare-origin="financing:${attr(id)}"`:''}>Read ${esc(companies[id].name)}’s financing evidence ${iconHTML('right')}</a>`:'';
 }
 function profileProvenance(cl){
  const finance=financeClaimContextFor(cl.id);
@@ -318,11 +318,11 @@ document.addEventListener('toggle',event=>{
 // Keep comparison content aligned with the visible profiles.
 const profileComparisonRows=comparisonRows;
 comparisonRows=function(){return profileComparisonRows().map(([label,render])=>{
-  if(label==='Products')return [label,id=>`<p>${profileProducts(id).slice(0,4).map(p=>esc(p.name)+(p.status?`<span class="sub">${esc(title(p.status))}</span>`:'')+(p.source_updates?.length?`<span class="sub">${esc(p.description)}</span>${productSourceHTML(p)}`:'')).join('<br>')}</p><a href="#company/${attr(id)}/products">Explore products ${iconHTML('right')}</a>`];
-  if(label==='Customer evidence')return ['Relationships',id=>`${profileRelationships(id).slice(0,2).map(r=>`<p><b>${esc(r.name)}</b><span class="sub">${esc(profileRelationshipLabel(id,r))}</span>${profileRelationshipScopeContext(id,r)?`<span class="sub">${esc(profileRelationshipScopeContext(id,r))}</span>`:''}</p>`).join('')||'<p class="sub">No named relationship established.</p>'}<a href="#company/${attr(id)}/customers">Who it works with ${iconHTML('right')}</a>`];
+  if(label==='Products')return [label,id=>`<p>${profileProducts(id).slice(0,4).map(p=>esc(p.name)+(p.status?`<span class="sub">${esc(title(p.status))}</span>`:'')+(p.source_updates?.length?`<span class="sub">${esc(p.description)}</span>${productSourceHTML(p)}`:'')).join('<br>')}</p><a href="#company/${attr(id)}/products" data-compare-origin="products:${attr(id)}">Explore products ${iconHTML('right')}</a>`];
+  if(label==='Customer evidence')return ['Relationships',id=>`${profileRelationships(id).slice(0,2).map(r=>`<p><b>${esc(r.name)}</b><span class="sub">${esc(profileRelationshipLabel(id,r))}</span>${profileRelationshipScopeContext(id,r)?`<span class="sub">${esc(profileRelationshipScopeContext(id,r))}</span>`:''}</p>`).join('')||'<p class="sub">No named relationship established.</p>'}<a href="#company/${attr(id)}/customers" data-compare-origin="relationships:${attr(id)}">Who it works with ${iconHTML('right')}</a>`];
   if(label==='People')return [label,id=>{
     const rows=profilePeopleRows(id);
-    return `<p>${rows.slice(0,3).map(p=>`${esc(people[p.person_id]?.name||p.name)} <span class="sub">${esc(p.role)}</span>`).join('<br>')||'Not established'}</p><a href="#company/${attr(id)}/people">Funding &amp; people ${iconHTML('right')}</a>`;
+    return `<p>${rows.slice(0,3).map(p=>`${esc(people[p.person_id]?.name||p.name)} <span class="sub">${esc(p.role)}</span>`).join('<br>')||'Not established'}</p><a href="#company/${attr(id)}/people" data-compare-origin="people:${attr(id)}">Funding &amp; people ${iconHTML('right')}</a>`;
   }];
   return [label,render];
 });};
