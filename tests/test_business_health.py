@@ -372,7 +372,7 @@ console.log(JSON.stringify({observations:observations.length,filtering:true,cont
         # Minified output is checked against a complete fresh build, while the
         # manifest retains exact provenance for the editable component inputs.
         verify_artifact(ROOT / "dist", ("web/business-health.js", "web/business-health.css"))
-        self.assertIn('id="business-health"', html)
+        self.assertIn('<section data-fragment-id="business-health"', html)
         manifest = json.loads((ROOT / "dist/manifest.json").read_text())["sha256"]
         self.assertEqual(manifest["business-health.json"], hashlib.sha256((ROOT / "dist/business-health.json").read_bytes()).hexdigest())
 

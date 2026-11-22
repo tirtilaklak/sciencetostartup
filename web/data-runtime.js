@@ -220,7 +220,7 @@ route=function(event){
  const correctionCompany=correction&&!exploreCorrectionClaim(correction)?correction.company:'';
  const overview=view===''||view==='market'||VIEW_ANCHORS[view]==='market'||!['companies','work','compare','method','company',...Object.keys(VIEW_ANCHORS)].includes(view);
  const workCriteria=view==='work'?workCriteriaForRoute(hash,routeTraversal):null;
- const needsSearch=view==='work'?searchContextPending(workCriteria.q):view==='companies'&&searchContextPending(state.query);
+ const needsSearch=view==='work'?searchContextPending(workCriteria.q):view==='companies'&&searchContextPending(shortlistReturnState()?.query??state.query);
  const ids=company?[company]:correctionCompany?[correctionCompany]:comparison?.ids||[];
  const cacheKey=archive?'__archive':overview?'__overview':null;
  const cached=(!cacheKey||detailCache.has(cacheKey))&&ids.every(id=>detailCache.has(id));

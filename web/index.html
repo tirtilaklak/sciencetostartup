@@ -29,7 +29,7 @@
 <section id="app-failure" class="availability-notice" hidden role="alert" aria-labelledby="app-failure-title"><h1 id="app-failure-title">The interactive guide could not load.</h1><p>Reload the page or continue with the plain pages.</p><p><button type="button" id="app-reload">Reload page</button> <a href="/?search#browse-guide">Search the plain guide</a> <a href="/companies/">Companies</a> <a href="/work/">Paid work</a> <a href="/method/">Method</a></p></section>
 <noscript><section class="availability-notice" aria-labelledby="noscript-title"><h1 id="noscript-title">ScienceToStartup: the AI data field guide</h1><p>Research on {{COMPANY_COUNT}} AI data companies, with sourced profiles and public work listings. Turn on JavaScript to use the interactive guide. These plain pages work without it:</p><p><a href="/?search#browse-guide">Search the plain guide</a> <a href="/companies/">Company list</a> <a href="/work/">Paid work list</a> <a href="/method/">Method page</a></p><p>Download the research: <a href="research.json" download>Research database · JSON</a> <a href="observatory.sqlite" download>Research database · {{FILE_META_SQLITE}}</a> <a href="source-updates.json" download>Later source corrections · {{FILE_META_SOURCE_UPDATES}}</a></p></section></noscript>
 
-<aside id="compare-tray" hidden aria-label="Comparison shortlist"><span id="tray-text" role="status" aria-live="polite" aria-atomic="true"></span><a href="#compare" class="primary-link"><span>Compare<span class="tray-link-extra"> selection</span></span> <svg class="ui-icon" data-icon="right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg></a><button type="button" data-clear-compare class="quiet">Clear<span class="sr-only"> selection</span></button></aside>
+<aside id="compare-tray" hidden aria-label="Comparison shortlist"><div class="tray-summary"><span id="tray-text" role="status" aria-live="polite" aria-atomic="true"></span><span id="tray-notice" role="status" aria-live="polite" aria-atomic="true"></span></div><a href="#compare" class="primary-link"><span>Compare<span class="tray-link-extra"> selection</span></span> <svg class="ui-icon" data-icon="right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg></a><button type="button" data-clear-compare class="quiet">Clear<span class="sr-only"> selection</span></button></aside>
 
 <section id="market-view" class="view">
 <header class="market-hero">
@@ -57,7 +57,7 @@
     <article class="product-preview product-preview-sama"><a class="product-preview-image" href="#company/sama/business"><img src="assets/products/sama-visual.png" alt="SamaHub reporting interface with illustrative charts" width="2180" height="1117" loading="lazy" decoding="async"></a><div class="product-preview-body"><p class="product-preview-company">Sama</p><h3><a href="#company/sama/business">SamaHub <svg class="ui-icon" data-icon="right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg></a></h3><p class="product-preview-caption">SamaHub reporting interface · Illustrative interface data, not company performance.</p><a class="product-preview-source" href="https://www.sama.com/data-annotation-and-validation-platform" target="_blank" rel="noopener noreferrer">Image: Sama<span class="sr-only"> (opens in a new tab)</span></a></div></article>
   </div>
 </section>
-<section id="business-health" aria-labelledby="business-health-heading">
+<section data-fragment-id="business-health" aria-labelledby="business-health-heading">
 <header class="bh-heading"><div><p class="eyebrow">THE MARKET, IN NUMBERS</p><h2 id="business-health-heading">Revenue &amp; growth.</h2></div><a href="business-health.json" download>Download data · {{FILE_META_HEALTH}}</a></header>
 <div id="bh-overview-tabs" class="bh-overview-tabs" role="tablist" aria-label="Revenue views"></div>
 <section id="bh-ledger-panel" role="tabpanel" aria-labelledby="bh-overview-period_revenue"><p id="bh-ledger-note" class="bh-ledger-note"></p><div class="bh-ledger-head" aria-hidden="true"><span>Company / business</span><span>Figure</span><span>Period / snapshot</span><span>Evidence</span></div><div id="bh-ledger"></div><p id="bh-ledger-count" class="bh-ledger-count"></p><button type="button" id="bh-ledger-more" class="bh-ledger-more" aria-expanded="false" aria-controls="bh-ledger" hidden></button></section>
@@ -130,6 +130,9 @@
 /* DATA_RUNTIME_JS */
 initialize();</script><script>(()=>{
  const files=/* BUNDLES */[],root=document.documentElement;
+ // A fragment on the hidden dashboard would change where Tab starts in the plain guide.
+ const marketSection=document.querySelector('#market-view > [data-fragment-id]');
+ marketSection.id=marketSection.dataset.fragmentId;
  let started=false,finished=false,watchdog=0;
  const fail=(reason='runtime-not-ready')=>{
   if(finished)return;
