@@ -92,7 +92,8 @@
     "companies/findings.md": "f3c9bb4383f23dc5adbcffe8a3ae987df1874f81267895c8572cf0a9eaa2a127",
     "daily/summary.json": "0ca456c83d7103886b1e93dd41854e5a60d37cbc3c300afd4208f8dbd6b00820",
     "daily/report.md": "173586df90be78ca8ac2c6e0a5acdee97e7f8e8a7e8d37dfc512604ff01068b3",
-    "accessibility/README.md": "84df1f2cf84c24135d23e400118ca88a4a313ea64f762412b7a0fb68f859584e"
+    "accessibility/README.md": "84df1f2cf84c24135d23e400118ca88a4a313ea64f762412b7a0fb68f859584e",
+    "release/head-b54e40a5/ci-measurements.json": "c93a2374898e88a0c27a8e58ae26ce67f1404af2cda529d610f341bed570e55e"
   },
   "acceptance_attempts": {
     "acceptance": "724ecdf04ce3b7f68ff1edfe0b1ed44d10c4c304405f6dc388f1e6b151aad165",
@@ -101,5 +102,25 @@
     "public-control-1316": "315da558284b19a9eb0f028311586a075c4d52e2f062ae92a00e184223a74d2e"
   },
   "external_observations": "Two temporary 503 responses from Snorkel caused the second local home check to fail. The later complete candidate and public runs each passed all 86 checks.",
-  "archive_note": "The original downloaded ZIP and deposited archive files retain their verified checksums. Opening the 22.47 MB archived evidence appendix in Firefox took 171 seconds under shared runner load. The current reader includes smaller linked evidence pages."
+  "archive_note": "The original downloaded ZIP and deposited archive files retain their verified checksums. Opening the 22.47 MB archived evidence appendix in Firefox took 171 seconds under shared runner load. The current reader includes smaller linked evidence pages.",
+  "mobiles_on_pr_head": {
+    "headSha": "b54e40a5700262e7ca0fad4d3061f9e2e30bec30",
+    "buildId": "6637c48a4c2a9cd6000e",
+    "manifestSha256": "aeaf890fad5f99b385fc188c8512580206198553e5d3cd190342171d872abdcc",
+    "artifactId": 14756091560,
+    "archiveSha256": "c7442d12a119ef4036342bd4b23b7c97307256e73761abcd9bdfecf0c783941e",
+    "rawReportsVerified": 72,
+    "routesPassed": 24,
+    "passed": true,
+    "afterquery": {
+      "route": "/company/afterquery/",
+      "validRuns": 3,
+      "medians": {
+        "largest-contentful-paint": 1209.2984,
+        "total-blocking-time": 0,
+        "cumulative-layout-shift": 0
+      },
+      "passed": true
+    }
+  }
 }
