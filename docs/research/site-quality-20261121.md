@@ -4,7 +4,7 @@ The audit began at 7:30 PM Pacific on November 21, 2026. The first three hours a
 
 ## Current pass
 
-PR #34 merged at `1cecd451`. Public production serves Worker version 41, build `5dc63fbcf19634a55c66`, on all traffic. The latest approved Daily edition is November 18. Five fix rounds and five independent retests followed the initial three-hour audit, with ten distinct Sol Ultra contributors in each phase and up to six active workers at a time. The sixth candidate is build `81071f0430d00446056b` on branch `codex/site-quality-20261122`, based on the merged main. The closing checkpoint remains November 22 at 7:30 PM Pacific. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Merged PR #34](https://github.com/tirtilaklak/sciencetostartup/pull/34) · [Production receipts](site-quality-20261121/fifth-public-release.json)
+PR #34 merged at `1cecd451`. The public site serves build `5dc63fbcf19634a55c66` on Worker 41. November 18 is the latest approved Daily edition. Ten implementation cohorts and ten independent retests have finished since the initial audit. The tenth build stayed off public traffic after the independent review reproduced a clipped Market figure and a lost Work bookmark. The eleventh repair cohort is working on PR #35. The audit closes November 22 at 7:30 PM Pacific. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Merged PR #34](https://github.com/tirtilaklak/sciencetostartup/pull/34) · [Production receipts](site-quality-20261121/fifth-public-release.json)
 
 ## Initial baseline and first three rounds
 
@@ -319,3 +319,14 @@ The review also measured a Daily keyboard focus jump, missing context on the fir
 Ten contributors repaired the eight findings in build `ea6272946bebf0bf9a35`. Companies waits for the matching results before restoring the saved position on Back and respects a reader who moves while the index loads. Daily restores same-page keyboard focus in time for the first Tab. Explicit Work comparisons open at the results. Returning from a company profile restores the role’s disclosure and its employer link.
 
 On narrow phones the Market matrix keeps the selected financial value readable with its metric heading. The shared header leaves the full wordmark clickable at enlarged text. OOAK’s employer listing remains the primary action, and release `2026-11-22.7` records the linked application’s 404, the alternate 406 and the separate sign-in. The Work export carries the source evidence behind historical destinations. [Tenth source and commits](site-quality-20261121/tenth-implementation.json) · [Ninth findings](site-quality-20261121/ninth-audit-findings.json)
+
+
+## Tenth independent retest
+
+Ten independent reviewers checked all 285 Explore destinations on phone and desktop. All 210 Work CSV downloads matched their 70 visible selections. Candidate and production each passed 86 acceptance checks. All 179 initial targeted browser journeys passed. A later repeat lost the focused employer link on a bookmarked Work return in two of 12 Chromium runs. The browser had focused the fragment’s role card while the page was still loading. [Coverage and failed repeats](site-quality-20261121/tenth-retest.json)
+
+At 390px, Chromium hid 15 focused amounts or headings in the Market matrix. On both the ninth and tenth builds, 135 unavailable-evidence cells opened details only by pointer. The Daily issue’s first headline began at y908 on a 320 × 720 phone. The native Work page’s first hourly rate began at y744. [Findings and acceptance criteria](site-quality-20261121/tenth-audit-findings.json)
+
+The same Mercor profile measured 2,577 ms and 2,232 ms median mobile LCP in separate official runs. The budget is 2,500 ms. Each run retained 72 raw reports. [First official run](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45028659815) · [Repeat](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45029874348)
+
+AfterQuery changed compensation on three named roles. Eleven salary records had an annual period missing in the guide. The employer again lists its Security/Infrastructure role. The People Programs Lead listing and application now return 404. Terac again lists Shopping Assistant at $30 per hour, with LinkedIn sign-in at the application start. The source review checked all 25 previously verified AfterQuery forms and preserved the earlier records. [Dated source checks](site-quality-20261121/tenth-audit-findings.json)
