@@ -232,6 +232,49 @@ def _validate_threshold(row, metric, claim, source, check):
         raise ValueError(f"business-health: {row['id']}: qualifier requires the dated issuer threshold receipt")
 
 
+def _validate_toloka_growth(observations, metrics, claims, sources, checks):
+    identifier = 'dashboard.toloka.fy2024-revenue-growth'
+    row = observations.get(identifier, {})
+    metric = metrics['toloka.metric.major-growth_metrics-1']
+    claim_ids = [metric['claim_id'], 'toloka.claim.major-growth_metrics-1']
+    inputs = ['toloka.metric.major-financial_metrics-2', 'toloka.metric.major-financial_metrics-1']
+    primary = 'refresh.source.nebius-fy2025-sec-note-3'
+    mirror = 'toloka.source.audit-tol_2025'
+    earlier = 'toloka.source.audit-tol_2024'
+    prefix = f'business-health: {identifier}: '
+    if (row.get('profile_metric_id') != metric['id'] or row.get('profile_claim_ids') != claim_ids
+            or any(claims.get(cid, {}).get('source_ids') != [mirror] for cid in claim_ids)
+            or row.get('evidence_type') != 'calculated' or row.get('qualifier') != 'calculated'
+            or row.get('scope_label') != 'Toloka business'
+            or row.get('accounting_basis') != 'latest_discontinued_operations_comparative'
+            or row['calculation'].get('input_observation_ids') != inputs or row.get('metric_ids') != inputs
+            or round(row['value'], 1) != metric['value']
+            or any(not isinstance(row.get(field), str) or not row[field].strip()
+                   for field in ('scope_detail', 'profile_statement', 'profile_confidence_reason'))):
+        raise ValueError(prefix + 'profile growth requires the historical IDs and the audited comparative calculation')
+    current, baseline = [observations[mid] for mid in inputs]
+    if row['calculation'].get('formula') != f"({current['value']} / {baseline['value']} - 1) * 100":
+        raise ValueError(prefix + 'displayed formula differs from the reviewed inputs')
+    for observation in (current, baseline):
+        if (observation.get('primary_source_id') != primary or observation['currency'] != 'USD'
+                or observation['accounting_basis'] != row['accounting_basis']
+                or observation.get('scope_label') != row['scope_label']
+                or observation.get('scope_detail') != row['scope_detail']
+                or observation['value'] != metrics[observation['id']]['value']
+                or not any(cid in row['claim_ids'] and claims[cid]['source_ids'] == [primary]
+                           and claims[cid]['confidence'] == 'A' for cid in observation['claim_ids'])):
+            raise ValueError(prefix + 'both revenue inputs must cite the grade A filing on the same basis')
+    checked_on = row.get('evidence_checked_on')
+    sec_check, mirror_check = checks.get(primary, {}), checks.get(mirror, {})
+    if (row.get('primary_source_id') != primary or row.get('source_ids') != [primary, mirror, earlier]
+            or not checked_on or checked_on != sec_check.get('checked_on') or checked_on != sources[primary].get('accessed_on')
+            or sec_check.get('status') != 'content_checked' or not sec_check.get('source_locator')
+            or mirror_check.get('checked_on') != checked_on or mirror_check.get('url') != sources[mirror]['url']
+            or mirror_check.get('status') != 'unavailable' or mirror_check.get('http_status') != 403
+            or not sources[mirror].get('accessed_on') or sources[mirror]['accessed_on'] >= checked_on):
+        raise ValueError(prefix + 'the checked SEC filing must lead and retain the separately dated mirror failure')
+
+
 def load_business_health(path, data, profile_content=None):
     # Fixtures and other research versions must never inherit this curated layer. After a
     # SIDECAR_DATASET_VERSION bump the source_dataset_version check below fails loudly until
@@ -372,6 +415,7 @@ def load_business_health(path, data, profile_content=None):
             raise ValueError(prefix + 'unknown calculation measure')
         if row['unit'] != 'percent' or not math.isclose(row['value'], expected, rel_tol=1e-10, abs_tol=1e-10):
             raise ValueError(prefix + 'calculated value differs from its cited inputs')
+    _validate_toloka_growth(observations, metrics, claims, sources, checked)
     if 'profile_finance' in health:
         if profile_content is None:
             profile_path = path.with_name('profile-content.json')

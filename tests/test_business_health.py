@@ -198,6 +198,17 @@ class BusinessHealthTests(unittest.TestCase):
         issuer = next(row for row in bad["source_checks"]["entries"] if row["source_id"] == "refresh.source.turing-2024-run-rate-issuer")
         issuer.update(status="content_checked", content_sha256=issuer["direct_body_sha256"])
         mutations.append(("Turing bot response presented as issuer page content", bad))
+        growth_id = "dashboard.toloka.fy2024-revenue-growth"
+        for field, value in (
+                ("profile_metric_id", "toloka.metric.major-growth_metrics-0"),
+                ("profile_claim_ids", ["toloka.claim.major-growth_metrics-1-metric"]),
+                ("scope_label", "Whole company"),
+                ("qualifier", "exact"),
+                ("evidence_checked_on", "2026-10-12"),
+                ("source_ids", ["toloka.source.audit-tol_2025", "refresh.source.nebius-fy2025-sec-note-3"])):
+            bad = copy.deepcopy(self.health)
+            next(row for row in bad["observations"] if row["id"] == growth_id)[field] = value
+            mutations.append(("Toloka growth projection changes " + field, bad))
         for name, value in mutations:
             with self.subTest(mutation=name), self.assertRaises(ValueError):
                 load(value)
@@ -390,6 +401,28 @@ console.log(JSON.stringify({observations:observations.length,filtering:true,cont
         issuer = checks[turing["primary_source_id"]]
         self.assertEqual((issuer["status"], issuer["direct_response"]), ("indexed_content_checked", "bot_challenge"))
         self.assertNotIn("published_on", self.sources[turing["primary_source_id"]])
+
+    def test_toloka_profile_projects_the_calculation_on_its_historical_ids(self):
+        rows = {row["id"]: row for row in self.observations}
+        calculation = rows["dashboard.toloka.fy2024-revenue-growth"]
+        canonical = self.metrics["toloka.metric.major-growth_metrics-1"]
+        previous = self.metrics["toloka.metric.major-growth_metrics-0"]
+        self.assertEqual((canonical["value"], canonical["reported_vs_estimated"], previous["value"]),
+                         (135.1, "reported", 138))
+        self.assertEqual(calculation["profile_metric_id"], canonical["id"])
+        self.assertEqual(calculation["profile_claim_ids"], [canonical["claim_id"], "toloka.claim.major-growth_metrics-1"])
+        self.assertEqual(calculation["calculation"]["input_observation_ids"],
+                         ["toloka.metric.major-financial_metrics-2", "toloka.metric.major-financial_metrics-1"])
+        self.assertAlmostEqual(calculation["value"], (26.1 / 11.1 - 1) * 100)
+        source, mirror, earlier = calculation["source_ids"]
+        self.assertEqual(source, calculation["primary_source_id"])
+        self.assertEqual(self.claims[canonical["claim_id"]]["source_ids"], [mirror])
+        self.assertEqual(self.claims[previous["claim_id"]]["source_ids"], [earlier])
+        checks = {entry["source_id"]: entry for entry in self.health["source_checks"]["entries"]}
+        self.assertEqual(self.sources[source]["published_on"], "2026-04-30")
+        self.assertEqual(checks[source]["checked_on"], "2026-11-22")
+        self.assertEqual((checks[mirror]["checked_on"], checks[mirror]["http_status"], self.sources[mirror]["accessed_on"]),
+                         ("2026-11-22", 403, "2026-10-12"))
 
     def test_missing_information_has_no_zero_placeholder_records(self):
         # Zero may be an actual financial result; unknown observations instead
