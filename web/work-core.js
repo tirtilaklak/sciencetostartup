@@ -371,6 +371,12 @@ const S2SWork = (() => {
     const rows = routes.map(route => {
       const action = destination(route);
       const { original, legacy } = originalUrls(route, action);
+      const qualifications = [w4PayQualification(route)];
+      if (route.pay_terms?.unit === 'conflicting') {
+        const details = route.pay_context || (route.pay_observations || [])
+          .map(observation => observation.label + ': ' + observation.value).join(' · ');
+        if (details && !qualifications.includes(details)) qualifications.push(details);
+      }
       return [
         route.id, route.company_name || route.company_id, route.role, w4OpportunityKind(route), w4Engagement(route),
         w4Status(route) || 'Recorded listing', route.pay_label, route.pay_terms?.unit,
@@ -379,7 +385,7 @@ const S2SWork = (() => {
         w4TermsReviewDate(route), w4ApprovedTermsReceipt(route) ? 'key_terms' : route.terms_checked_on ? 'pay_terms' : '',
         legacy, action.url, action.label, (route.sources || []).map(source => source.url).join(' | '),
         JSON.stringify(fieldReviews(route)), 'https://sciencetostartup.com/company/' + encodeURIComponent(route.company_id) + '/',
-        ...keys.map(key => criteria[key]), w4PayQualification(route), JSON.stringify(reviewEvidence(route, original)),
+        ...keys.map(key => criteria[key]), qualifications.filter(Boolean).join(' '), JSON.stringify(reviewEvidence(route, original)),
         JSON.stringify(original)
       ];
     });

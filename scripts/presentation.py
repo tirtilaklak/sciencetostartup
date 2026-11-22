@@ -648,6 +648,8 @@ def work_export_rows(work, research):
     result = []
     for route in work.get("routes", []):
         row = retain(route, fields)
+        if (route.get("pay_terms") or {}).get("unit") == "conflicting" and route.get("pay_context"):
+            row["pay_context"] = route["pay_context"]
         row["company_name"] = research.companies.get(route["company_id"], {}).get("name") or route["company_id"]
         row["source_actions"] = [{"url": url, "label": label} for url, label in work_actions(route, research)]
         row["uncertain"] = work_uncertain(route)
