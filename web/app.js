@@ -489,23 +489,79 @@ function comparePairOptions(ids){return MOBILE_COMPARE_PAIRS.filter(pair=>pair.e
 let comparisonFocus=null,evidenceReturnFocus=null,pendingComparisonResize=false;
 document.addEventListener('focusin',event=>{comparisonFocus=$('compare-content').contains(event.target)?event.target:null;});
 document.addEventListener('pointerdown',event=>{if(!$('compare-content').contains(event.target))comparisonFocus=null;});
+let comparisonResizeObserver,comparisonObservedHead,comparisonFocusFrame;
+function revealComparisonFocus(){
+ const view=$('compare-view');
+ if(view.hidden||!view.contains(document.activeElement)||comparisonFocusFrame)return;
+ comparisonFocusFrame=requestAnimationFrame(()=>{
+  comparisonFocusFrame=0;
+  const target=document.activeElement;
+  if(view.hidden||!view.contains(target)||!target.getClientRects().length)return;
+  const pager=target.closest('.mobile-compare-pager');
+  if(pager&&pager.scrollHeight>pager.clientHeight){
+   const start=pager.getBoundingClientRect().top+pager.clientTop;
+   const box=target.getBoundingClientRect();
+   const delta=Math.min(0,box.top-start-4)||Math.max(0,box.bottom-start-pager.clientHeight+4);
+   if(delta)pager.scrollBy({top:delta,behavior:'instant'});
+  }
+  const box=target.getBoundingClientRect();
+  const padding=parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop)||0;
+  const margin=parseFloat(getComputedStyle(target).scrollMarginTop)||0;
+  const delta=Math.min(0,box.top-padding-margin)||Math.max(0,box.bottom-window.innerHeight+8);
+  if(delta)window.scrollBy({top:delta,behavior:'instant'});
+ });
+}
+function syncComparisonLayout(){
+ const view=$('compare-view'),masthead=document.querySelector('body > .topbar');
+ if(view.hidden||!masthead)return;
+ const limit=window.innerHeight/2,mastheadHeight=masthead.getBoundingClientRect().height;
+ view.toggleAttribute('data-compare-flow-masthead',mastheadHeight>limit);
+ // The header can change position without changing size, so measure after setting its layout.
+ if(typeof measureSiteHeader==='function')measureSiteHeader(masthead);
+ const table=view.querySelector('.comparison-table'),head=table?.tHead;
+ if(comparisonResizeObserver&&head!==comparisonObservedHead){
+  if(comparisonObservedHead)comparisonResizeObserver.unobserve(comparisonObservedHead);
+  if(head)comparisonResizeObserver.observe(head);
+  comparisonObservedHead=head;
+ }
+ if(head){
+  const headHeight=head.getBoundingClientRect().height;
+  const stickyHeight=getComputedStyle(masthead).position==='sticky'?mastheadHeight:0;
+  table.toggleAttribute('data-compare-flow-head',stickyHeight+headHeight>limit);
+  table.style.setProperty('--compare-head-height',`${headHeight}px`);
+ }
+ comparisonScrollRegion();
+ revealComparisonFocus();
+}
 function resizeComparison(returnFocus=null){
- const container=$('compare-content');
+ const view=$('compare-view'),container=$('compare-content');
+ if(view.hidden)return;
  // Keep the citation's opener connected until the modal closes. Its column may
  // become hidden at the new width, so restore the matching replacement then.
  if($('evidence-dialog').open&&evidenceReturnFocus?.isConnected&&container.contains(evidenceReturnFocus)){pendingComparisonResize=true;return;}
- const active=returnFocus?.isConnected?returnFocus:document.activeElement===document.body&&comparisonFocus?.isConnected?comparisonFocus:document.activeElement;
- if(!container.contains(active)){renderCompare();return;}
+ const current=document.activeElement;
+ const hiddenFocus=current===document.body&&comparisonFocus?.isConnected&&!comparisonFocus.getClientRects().length?comparisonFocus:null;
+ const active=returnFocus?.isConnected?returnFocus:hiddenFocus||current;
+ const picker=container.querySelector('.mobile-column-options[open]');
+ if(picker&&window.innerWidth>700)picker.open=false;
+ if(!container.contains(active))return;
+ if(active.closest('.mobile-column-options')&&window.innerWidth>700){
+  $('compare-preset').focus({preventScroll:true});
+  return;
+ }
  const cell=active.closest('[data-comparison-company]'),row=active.closest('[data-comparison-row]'),header=active.closest('thead th'),company=cell?.dataset.comparisonCompany||active.dataset.remove||header?.querySelector('a[href^="#company/"]')?.getAttribute('href').split('/')[1];
- const identity={tag:active.tagName,claim:active.dataset.claim,remove:active.dataset.remove,href:active.getAttribute('href'),pair:active.dataset.mobileCompare,summary:active.tagName==='SUMMARY',company,row:row?.dataset.comparisonRow};
  const ids=state.selected,index=ids.indexOf(company),pairs=comparePairOptions(ids);
- if(window.innerWidth<=700&&index>=0&&!pairs[state.mobileCompare]?.includes(index))state.mobileCompare=pairs.findIndex(pair=>pair.includes(index));
- renderCompare();
+ if(window.innerWidth>700||index<0||ids.length<3||pairs[state.mobileCompare]?.includes(index)){
+  if(returnFocus&&active.getClientRects().length)active.focus({preventScroll:true});
+  return;
+ }
+ const identity={tag:active.tagName,claim:active.dataset.claim,remove:active.dataset.remove,href:active.getAttribute('href'),summary:active.tagName==='SUMMARY',row:row?.dataset.comparisonRow};
+ state.mobileCompare=pairs.findIndex(pair=>pair.includes(index));
+ renderCompare({pairOnly:true});
  const scope=identity.row?[...container.querySelectorAll('[data-comparison-row]')].find(n=>n.dataset.comparisonRow===identity.row):container.querySelector('thead');
  const candidates=[...(scope||container).querySelectorAll('a,button,summary')];
- const restored=candidates.find(n=>n.getClientRects().length&&n.tagName===identity.tag&&(identity.claim?n.dataset.claim===identity.claim:identity.remove?n.dataset.remove===identity.remove:identity.href?n.getAttribute('href')===identity.href:identity.pair!==undefined?n.dataset.mobileCompare===identity.pair:identity.summary&&n.tagName==='SUMMARY'));
+ const restored=candidates.find(n=>n.getClientRects().length&&n.tagName===identity.tag&&(identity.claim?n.dataset.claim===identity.claim:identity.remove?n.dataset.remove===identity.remove:identity.href?n.getAttribute('href')===identity.href:identity.summary&&n.tagName==='SUMMARY'));
  const pairSummary=container.querySelector('.mobile-column-options summary');(restored||(pairSummary?.getClientRects().length?pairSummary:null)||$('compare-preset')).focus({preventScroll:true});
- const focused=document.activeElement,box=focused.getBoundingClientRect();if(box.top<0||box.bottom>window.innerHeight)focused.scrollIntoView({block:'nearest',behavior:'instant'});
 }
 function syncComparisonPreset(){const presets={scale:['taskus','appen','scale_ai'],work:['surge_ai','toloka','labelbox']},match=Object.keys(presets).find(key=>presets[key].join('|')===state.selected.join('|'));$('compare-preset').value=match||'';const placeholder=$('compare-preset').querySelector?.('option[value=""]');if(placeholder)placeholder.textContent=state.selected.length&&!match?'Custom selection':'Choose an example';}
 // #compare/<id>/<id>/<id> names an explicit selection,
@@ -544,14 +600,15 @@ function renderComparisonScope(view){
  heading.insertAdjacentHTML('beforeend',`<p class="sub" data-comparison-scope>Explore uses a historical set of ${historical} companies. <a href="/companies/">${directory}</a>.${profiles}</p>`);
 }
 function syncCompareAdd(){const select=$('compare-add'),full=state.selected.length>=3;if(!select)return;select.innerHTML=`<option value="">${full?'Remove one to add another':'Choose a company'}</option>`+[...DATA.companies].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option value="${esc(c.id)}"${full||state.selected.includes(c.id)?' disabled':''}>${esc(c.name)}</option>`).join('');select.value='';const add=$('compare-add-button');if(add)add.hidden=true;}
-function renderCompare(){
+function renderCompare({pairOnly=false}={}){
  if(!onCompareRoute()||$('compare-content').hasAttribute?.('aria-busy'))return;
  const selection=syncCompareRoute(),notice=compareRouteNotice(selection),ids=selection.ids;
  renderComparisonScope('compare');
- syncComparisonPreset();syncCompareAdd();
+ if(!pairOnly){syncComparisonPreset();syncCompareAdd();}
  if(!ids.length){
   $('compare-content').innerHTML=compareNoticeHTML(notice)+'<div class="comparison-empty"><h2>Which companies are you considering?</h2><p>Add up to three companies above, or start with a selection.</p><div class="comparison-starts"><button type="button" data-preset="scale">TaskUs, Appen &amp; Scale AI</button><button type="button" data-preset="work">Surge AI, Toloka &amp; Labelbox</button></div></div>';
   $('compare-status').textContent=notice||'No companies selected.';
+  syncComparisonLayout();
   return;
  }
  if(window.COMPANY_CONTEXTS_READY&&ids.some(id=>!window.COMPANY_CONTEXTS_READY.has(id)))return;
@@ -620,7 +677,7 @@ $('evidence-dialog').addEventListener('close',()=>{
  evidenceReturnFocus=null;pendingComparisonResize=false;evidenceRecordHash='';evidenceReturnHash='';
  // Restore the profile address unless navigation closed the dialog.
  if(record&&location.hash===record){history.replaceState(history.state??null,'',back);if(!opener?.isConnected||opener===document.body){const heading=document.querySelector('#profile-view:not([hidden]) h1');heading?.setAttribute('tabindex','-1');heading?.focus({preventScroll:true});}}
- if(resize&&onCompareRoute()&&!$('compare-view').hidden)resizeComparison(opener);
+ if(resize&&onCompareRoute()&&!$('compare-view').hidden){resizeComparison(opener);revealComparisonFocus();}
 });
 
 function storyUnknown(id){const original=unknownFor(id)?.statement||assessmentFor(id)?.stage_limitations||'Current commercial economics are not publicly established.',current=typeof sourceUpdateUnknownText==='function'?sourceUpdateUnknownText(id,original):original,text=publicText(current).split(/[.;]/)[0];const words=text.split(/\s+/);return words.slice(0,18).join(' ')+(words.length>18?'…':'.');}
@@ -1011,6 +1068,7 @@ function route(event){
   }
   renderCompare();
  }}
+ if(view!=='compare'&&previousRoute==='compare'&&typeof measureSiteHeader==='function')measureSiteHeader();
  renderTray(shortlist?.notice);
  const waitForShortlist=shortlist&&restore!==null&&searchContextPending(state.query);
  const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();if(!waitForShortlist)queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;
@@ -1289,8 +1347,32 @@ function initCompare(){$('clear-compare').addEventListener('click',()=>{setSelec
  // browse the list; Enter or the Add button adds the company that is showing.
  const add=$('compare-add'),addButton=$('compare-add-button');let picked=false;const addChosen=()=>{const id=add.value;if(!isCompanyId(id)||state.selected.includes(id))return;add.focus?.({preventScroll:true});state.mobileCompare=Math.max(0,comparePairOptions([...state.selected,id]).findIndex(pair=>pair.includes(state.selected.length)));chooseCompare(id,true);};
  add.addEventListener('pointerdown',()=>{picked=true;});add.addEventListener('keydown',event=>{if(event.key!=='Enter'){picked=false;return;}if(add.value){event.preventDefault();addChosen();}});add.addEventListener('change',()=>{if(picked){picked=false;addChosen();}else addButton.hidden=!add.value;});addButton.addEventListener('click',addChosen);
- document.addEventListener('click',event=>{const button=event.target.closest?.('[data-copy-compare]');if(button)copyCompareLink(button);const more=event.target.closest?.('[data-compare-extra]');if(more){comparisonExpanded=!comparisonExpanded;const extra=$('comparison-extra');if(extra)extra.hidden=!comparisonExpanded;more.setAttribute('aria-expanded',String(comparisonExpanded));more.textContent=comparisonExpanded?'Hide additional details':'Show more evidence';}});
- let compareNarrow=window.innerWidth<=700;window.addEventListener('resize',()=>{const next=window.innerWidth<=700;if(next!==compareNarrow){compareNarrow=next;resizeComparison();}comparisonScrollRegion();});}
+ const view=$('compare-view');
+ view.addEventListener('click',event=>{
+  const button=event.target.closest?.('[data-copy-compare]');if(button)copyCompareLink(button);
+  const more=event.target.closest?.('[data-compare-extra]');if(more){comparisonExpanded=!comparisonExpanded;const extra=$('comparison-extra');if(extra)extra.hidden=!comparisonExpanded;more.setAttribute('aria-expanded',String(comparisonExpanded));more.textContent=comparisonExpanded?'Hide additional details':'Show more evidence';}
+  const pair=event.target.closest?.('[data-mobile-compare]');
+  if(pair){
+   state.mobileCompare=Math.min(Number(pair.dataset.mobileCompare),Math.max(0,comparePairOptions(state.selected).length-1));
+   renderCompare({pairOnly:true});
+   view.querySelector('.mobile-column-options summary')?.focus({preventScroll:true});
+   revealComparisonFocus();
+  }
+ });
+ view.addEventListener('focusin',event=>{if(event.target.matches(':focus-visible'))revealComparisonFocus();});
+ if(typeof ResizeObserver==='function'){
+  comparisonResizeObserver=new ResizeObserver(syncComparisonLayout);
+  const masthead=document.querySelector('body > .topbar');
+  if(masthead)comparisonResizeObserver.observe(masthead);
+  comparisonResizeObserver.observe(view);
+ }
+ let compareNarrow=window.innerWidth<=700;
+ window.addEventListener('resize',()=>{
+  const next=window.innerWidth<=700;
+  if(next!==compareNarrow){compareNarrow=next;resizeComparison();}
+  syncComparisonLayout();
+ });
+}
 
 // Method page: evidence labels, research coverage and downloads.
 function initMethod(){return detailViewRenderer("initMethod",this,arguments);}
@@ -1302,7 +1384,7 @@ function initialize(){$('snapshot').textContent=compiledSnapshotLabel(DATA.meta.
  if(typeof requestIdleCallback!=='function'&&typeof requestAnimationFrame!=='function'){for(const view of ['companies','method','work'])preparePage(view);renderDirectory();preparePage('market');}
  route();initCompare();if(typeof initSiteNav==='function')initSiteNav();
  $('close-company').addEventListener('click',()=>$('company-dialog').close());$('close-evidence').addEventListener('click',()=>$('evidence-dialog').close());
- document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||$('clear-compare');next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.dataset.preset){state.mobileCompare=0;setSelection(b.dataset.preset==='scale'?['taskus','appen','scale_ai']:['surge_ai','toloka','labelbox']);}if(b.dataset.mobileCompare!==undefined){state.mobileCompare=Math.min(Number(b.dataset.mobileCompare),Math.max(0,comparePairOptions(state.selected).length-1));renderCompare();document.querySelector('.mobile-column-options summary')?.focus();}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});window.addEventListener('hashchange',route);
+ document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||$('clear-compare');next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.dataset.preset){state.mobileCompare=0;setSelection(b.dataset.preset==='scale'?['taskus','appen','scale_ai']:['surge_ai','toloka','labelbox']);}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});window.addEventListener('hashchange',route);
  // On small screens the Filters fields open as a panel under the button. A short screen can leave the whole panel
  // below the fold, so bring it into view when it opens. toggle does not bubble, so listen in the capture phase.
  document.addEventListener('toggle',e=>{const panel=e.target;if(!panel?.open||!panel.matches?.('.responsive-filter-panel,.more-filters'))return;if(panel.matches('.responsive-filter-panel')&&window.innerWidth>900)return;const fields=panel.querySelector('.responsive-filter-fields,.more-filters-panel'),box=fields?.getBoundingClientRect();if(box?.height&&box.bottom>window.innerHeight)fields.scrollIntoView({block:'nearest'});},true);
@@ -1320,6 +1402,7 @@ function dismissDisclosure(panel,restoreFocus){
  panel.open=false;
  const target=restoreFocus?panel.querySelector('summary'):document.activeElement;
  if(restoreFocus)target?.focus({preventScroll:true});
+ if(panel.matches('.mobile-column-options')){if(restoreFocus||!overlayPointerFocus)revealComparisonFocus();return;}
  if(!target||target===document.body||!target.getClientRects().length||target.closest('dialog'))return;
  const header=document.querySelector('.topbar');
  if(header?.contains(target))return;

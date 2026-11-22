@@ -220,16 +220,18 @@ function siteSearchShortcut(event){
  event.preventDefault();siteSearchOpen();
 }
 
+function measureSiteHeader(header=document.querySelector('body > header.topbar')){
+ if(!header)return;
+ const root=document.documentElement;
+ if(getComputedStyle(header).position==='sticky')root.style.setProperty('--header-height',header.getBoundingClientRect().height+'px');
+ else root.style.removeProperty('--header-height');
+}
 function initSiteNav(){
  const button=$('site-search-open'),dialog=$('site-search'),input=$('site-search-input'),list=$('site-search-results');
  const header=document.querySelector('body > header.topbar');
- if(header&&typeof ResizeObserver==='function'){
-  const root=document.documentElement;
-  const measure=()=>{
-   if(getComputedStyle(header).position==='sticky')root.style.setProperty('--header-height',header.getBoundingClientRect().height+'px');
-   else root.style.removeProperty('--header-height');
-  };
-  new ResizeObserver(measure).observe(header);
+ if(header){
+  const measure=()=>measureSiteHeader(header);
+  if(typeof ResizeObserver==='function')new ResizeObserver(measure).observe(header);
   window.addEventListener('resize',measure);
   measure();
  }

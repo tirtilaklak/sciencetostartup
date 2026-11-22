@@ -35,3 +35,9 @@
  .financial-source-details summary{min-height:44px;display:flex;align-items:center}
  #compare-view .mobile-column-options>.mobile-compare-pager{top:calc(100% + 4px)}
 }
+@media(max-width:700px) and (min-height:501px){
+ #compare-view .comparison-table:not([data-compare-flow-head]) .mobile-compare-pager{
+  max-height:calc(100dvh - var(--compare-masthead-offset, var(--header-height)) - var(--compare-head-height, 0px) - 12px);
+  overflow-y:auto;
+ }
+}
