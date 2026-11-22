@@ -61,11 +61,14 @@
 }
 .site-header nav a:hover { color: var(--ink); text-decoration: underline; }
 .home-menu { display: none; }
+.landing-page .site-search-panel { overflow-y: auto; }
 .site-search-more {
+  flex: none;
   align-self: flex-start;
   min-height: 44px;
   max-width: calc(100% - 40px);
   margin: 8px 20px 16px;
+  scroll-margin-block: 6px;
   padding: 10px 14px;
   border: 1px solid var(--green);
   background: transparent;
@@ -242,7 +245,7 @@
   .hero .hero-intro { max-width: none; margin-bottom: 8px; }
 }
 @media (max-height: 450px) {
-  .landing-page .site-search { max-height: calc(100dvh - 24px); margin: 12px auto auto; overflow: auto; }
+  .landing-page .site-search { max-height: calc(100dvh - 24px); margin: 12px auto auto; }
   .landing-page .site-search-results { min-height: min(96px, 30dvh); }
 }
 @media (prefers-reduced-motion: reduce) {

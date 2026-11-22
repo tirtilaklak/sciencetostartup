@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect, firefox } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 const release = require('../../data/editorial-release.json');
 const work = require('../../data/work-routes.json');
@@ -44,13 +44,19 @@ test('home shows both dated sources before the phone portrait and aligns the des
 });
 
 test('home promotes only approved current terms and retains all binding conditions', async ({ page }, info) => {
-  await page.clock.setFixedTime(new Date(reviewed + day));
-  await page.goto('/');
-  const example = page.locator('#home-work-example');
-  await expect(example.locator('[data-home-route]')).toHaveAttribute('data-home-route', promotionId);
-  for (const text of [promotion.pay_label, promotion.geography, ...promotion.requirements]) {
-    await expect(example).toContainText(text);
+  const example = page.locator('#home-work-example [data-home-route]');
+  for (const timestamp of [reviewed, expires - 1]) {
+    await page.clock.setFixedTime(new Date(timestamp));
+    await page.goto('/');
+    await expect(example).toHaveAttribute('data-home-route', promotionId);
   }
+  await expect(example.locator('.example-pay')).toHaveText(promotion.pay_label);
+  await expect(example.locator('.example-conditions li')).toHaveText([
+    'Remote · country rules vary by project', ...promotion.requirements,
+    promotion.assessment, promotion.hours, promotion.duration,
+  ]);
+  await expect(example.locator('time')).toHaveAttribute('datetime', approved.checked_on);
+  await expect(example.getByRole('link', { name: /Official program page/ })).toHaveAttribute('href', promotion.url);
   await expect(page.locator('.example-grid article')).toHaveCount(2);
   await expect(page.locator('.hero').getByRole('link', { name: 'Browse companies' })).toBeVisible();
   await expect(page.locator('.hero').getByRole('link', { name: 'Paid work', exact: true })).toBeVisible();
@@ -119,6 +125,49 @@ test('homepage Search loads only its small component and index when invoked', as
   await expect(action).toHaveAttribute('href', '/work/?q=C%2B%2B');
   await page.locator('#home-search-close').click();
   await expect(page.locator('#home-search-open')).toBeFocused();
+});
+
+test('keyboard paging keeps its focused button and outline inside the short dialog at a 28px Firefox minimum', async ({ browserName, baseURL }) => {
+  test.skip(browserName !== 'firefox', 'Uses a Firefox text preference');
+  const browser = await firefox.launch({ firefoxUserPrefs: { 'font.minimum-size.x-western': 28 } });
+  try {
+    const page = await browser.newPage({ baseURL });
+    const opener = page.getByRole('link', { name: 'Search the guide' });
+    const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+    const more = dialog.getByRole('button', { name: 'Show 7 more', exact: true });
+    const outlineFits = button => {
+      const { top, bottom } = button.getBoundingClientRect();
+      const dialog = button.closest('dialog');
+      const dialogBox = dialog.getBoundingClientRect();
+      const { outlineStyle, outlineWidth, outlineOffset } = getComputedStyle(button);
+      const outset = parseFloat(outlineWidth) + parseFloat(outlineOffset);
+      const innerTop = dialogBox.top + dialog.clientTop;
+      return outlineStyle === 'solid' && top - outset >= Math.max(0, innerTop)
+        && bottom + outset <= Math.min(innerHeight, innerTop + dialog.clientHeight);
+    };
+
+    for (const height of [360, 373]) {
+      await page.setViewportSize({ width: 621, height });
+      await page.goto('/');
+      await opener.press('Enter');
+      await dialog.getByRole('combobox').fill('feedback');
+      await expect(more).toBeVisible();
+      await page.keyboard.press('Tab');
+      await expect(dialog.getByRole('button', { name: 'Close search' })).toBeFocused();
+      await page.keyboard.press('Tab');
+      await expect(more).toBeFocused();
+      await expect.poll(() => more.evaluate(outlineFits)).toBe(true);
+      await page.keyboard.press('Enter');
+      await expect(dialog.getByRole('option')).toHaveCount(15);
+      await expect(more).toBeFocused();
+      await expect.poll(() => more.evaluate(outlineFits)).toBe(true);
+      await page.keyboard.press('Escape');
+      await expect(dialog).toBeHidden();
+      await expect(opener).toBeFocused();
+    }
+  } finally {
+    await browser.close();
+  }
 });
 
 test('failed homepage search keeps usable browse actions and a retry', async ({ page }) => {
