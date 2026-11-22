@@ -15,8 +15,8 @@ test('home shows both dated sources before the phone portrait and aligns the des
     await page.setViewportSize(viewport);
     await page.goto('/');
     await page.evaluate(() => document.fonts.ready);
-    const heading = page.getByRole('heading', { level: 1, name: 'Who makes AI training data?', exact: true });
-    await expect(heading).toHaveText('Who makes AI training data?');
+    const heading = page.getByRole('heading', { level: 1, name: 'AI training data', exact: true });
+    await expect(heading).toBeInViewport({ ratio: 1 });
     const company = page.locator('[data-observation="snorkel_ai.metric.major-growth_metrics-0"]');
     await expect(company).toContainText('$375M annualized revenue run rate');
     await expect(company.locator('.example-pay [aria-hidden="true"]')).toHaveText('>');
@@ -32,16 +32,14 @@ test('home shows both dated sources before the phone portrait and aligns the des
     await expect(program.getByRole('link', { name: 'Official program page' })).toBeInViewport({ ratio: 1 });
     await expect(page.locator('.hero-actions a[href="/companies/"]')).toBeInViewport({ ratio: 1 });
     await expect(page.locator('.hero-actions a[href="/work/"]')).toBeInViewport({ ratio: 1 });
+    await expect(page.locator('.hero-actions a[href="/research/"]')).toBeInViewport({ ratio: 1 });
     await expect(page.locator('a[href="/research/data/"]')).toHaveCount(1);
     await expect(page.locator('.proof-strip p').first()).toHaveText('55 companies in the directory');
 
-    if (viewport.width === 390) {
-      const workBox = await program.boundingBox();
-      const portraitBox = await page.locator('.hero-visual').boundingBox();
-      expect(portraitBox.y).toBeGreaterThanOrEqual(workBox.y + workBox.height);
-    } else {
-      expect((await heading.boundingBox()).x).toBeCloseTo((await company.boundingBox()).x, 0);
-    }
+    const workBox = await program.boundingBox();
+    const portraitBox = await page.locator('.hero-visual').boundingBox();
+    expect(portraitBox.y).toBeGreaterThanOrEqual(workBox.y + workBox.height);
+    expect((await heading.boundingBox()).x).toBeCloseTo((await company.boundingBox()).x, 0);
   }
 });
 
@@ -53,7 +51,10 @@ test('both directory actions fit on one row on narrow phones', async ({ page }) 
     const actions = page.locator('.hero-actions');
     const companies = actions.getByRole('link', { name: 'Browse companies', exact: true });
     const work = actions.getByRole('link', { name: 'Find paid work', exact: true });
+    const research = actions.getByRole('link', { name: 'Read research', exact: true });
     await expect(work).toHaveAttribute('href', '/work/');
+    await expect(research).toHaveAttribute('href', '/research/');
+    await expect(research).toBeInViewport({ ratio: 1 });
     const first = await companies.boundingBox();
     const second = await work.boundingBox();
     expect(second.y).toBeCloseTo(first.y, 0);
@@ -88,8 +89,8 @@ test('home promotes only approved current terms and retains all binding conditio
 test('three-day expiry withdraws stale examples and preserves evergreen browse', async ({ page }) => {
   await page.clock.setFixedTime(new Date(expires));
   await page.goto('/');
-  await expect(page.locator('#home-work-example [data-home-route]')).toHaveCount(0);
-  await expect(page.locator('#home-work-example').getByRole('link', { name: 'Browse paid work' })).toBeVisible();
+  await expect(page.locator('#home-work-example')).toBeHidden();
+  await expect(page.locator('.hero-actions').getByRole('link', { name: 'Find paid work' })).toBeVisible();
   await expect(page.locator('.example-grid article')).toHaveCount(2);
 });
 
@@ -102,9 +103,10 @@ test('expiry moves focus from the promotion to the native Work link', async ({ p
   await focused.focus();
   await expect(focused).toBeFocused();
   await page.clock.fastForward(60_000);
-  const fallback = slot.getByRole('link', { name: 'Browse paid work' });
+  const fallback = page.locator('.hero-actions').getByRole('link', { name: 'Find paid work' });
   await expect(fallback).toBeFocused();
   await expect(fallback).toBeInViewport();
+  await expect(slot).toBeHidden();
   await expect(page.locator(recordedProgram)).toBeVisible();
 });
 
@@ -112,8 +114,7 @@ test('without JavaScript the homepage offers its menu and native browse links', 
   const context = await browser.newContext({ javaScriptEnabled: false, baseURL, viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto('/');
-  await expect(page.locator('#home-work-example [data-home-route]')).toHaveCount(0);
-  await expect(page.locator('#home-work-example').getByRole('link', { name: 'Browse paid work' })).toHaveAttribute('href', '/work/');
+  await expect(page.locator('#home-work-example')).toBeHidden();
   await expect(page.locator('.hero').getByRole('link', { name: 'Browse companies' })).toHaveAttribute('href', '/companies/');
   await expect(page.locator('.example-grid article')).toHaveCount(2);
   await page.locator('.home-menu summary').press('Enter');
@@ -121,8 +122,10 @@ test('without JavaScript the homepage offers its menu and native browse links', 
   await page.locator('.home-menu summary').press('Enter');
   await page.locator('#home-search-open').press('Enter');
   await expect(page).toHaveURL(/#browse-guide$/);
-  await expect(page.getByRole('region', { name: 'Browse the guide' }).getByRole('link', { name: 'Browse companies' }))
-    .toHaveAttribute('href', '/companies/');
+  const routes = page.getByRole('navigation', { name: 'Browse the guide' }).getByRole('link');
+  await expect(routes).toHaveText(['Browse companies', 'Find paid work', 'Read research']);
+  expect(await routes.evaluateAll(links => links.map(link => link.getAttribute('href'))))
+    .toEqual(['/companies/', '/work/', '/research/']);
   await context.close();
 });
 
@@ -178,7 +181,7 @@ test.describe('home keyboard controls in compact viewports', () => {
       await page.keyboard.press('Enter');
       await expect(menu).toHaveJSProperty('open', true);
       await tabThrough(page, ...menuLinks, heroActions.getByRole('link', { name: 'Browse companies', exact: true }), work);
-      if (name === 'Sources and data') await tabThrough(page, sources);
+      if (name === 'Sources and data') await tabThrough(page, heroActions.getByRole('link', { name: 'Read research' }), sources);
       await expect(menu).toHaveJSProperty('open', true);
       await expectUncoveredFocus(target);
       await page.keyboard.press('Enter');

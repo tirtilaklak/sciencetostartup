@@ -130,8 +130,7 @@ def recorded_work_example(work):
                     f'<p class="example-kind">Recorded expert program</p><h3 class="example-title">{title}</h3>'
                     f'<p class="example-pay">Pay {escape(route["pay_label"].lower())}</p>'
                     f'<p class="example-summary">{escape(work_location(route))}</p>'
-                    f'<p class="example-meta">Program page reviewed {date_tag(source["accessed_on"])}.</p>'
-                    '<p class="example-note">Check current project availability with the provider.</p>'
+                    f'<p class="example-meta">Page reviewed {date_tag(source["accessed_on"])}. Ask the provider about current projects.</p>'
                     f'<div class="example-actions"><a class="example-action" href="/company/{escape(route["company_id"], quote=True)}/#{route_id}">Read recorded terms</a>'
                     f'<a class="example-action" href="{escape(source["url"], quote=True)}">Official program page</a></div></article>')
     return ('<article class="example-card work-example"><h3 class="example-title">Paid work records</h3>'
@@ -143,9 +142,6 @@ def render_home(html, data, sidecars, release, summary, current_companies=None):
     companies = {c["id"]: c for c in data["companies"]}
     company = company_example(companies, sidecars)
     work = recorded_work_example(sidecars["WORK_ROUTES"])
-    fallback = ('<article class="example-card home-work-fallback"><h2 class="example-title">More paid work</h2>'
-                '<p class="example-summary">Compare pay and requirements for public listings and expert networks.</p>'
-                '<div class="example-actions"><a class="example-action" href="/work/">Browse paid work ' + RIGHT_ARROW + '</a></div></article>')
     candidates = promotion_candidates(sidecars["WORK_ROUTES"], release)
     config = {**{key: summary[key] for key in ("schemaVersion", "buildId", "editorialReleaseId", "datasetVersion")}, "search": summary["homeSearch"], "candidates": []}
     templates = []
@@ -158,7 +154,7 @@ def render_home(html, data, sidecars, release, summary, current_companies=None):
     primary = len(primary_routes(sidecars["WORK_ROUTES"]))
     directory_count = len(companies.keys() | {row["entity_id"] for row in (current_companies or {}).get("entries", [])})
     html = (html.replace("{{HOME_COMPANY_EXAMPLE}}", company).replace("{{HOME_WORK_EXAMPLE}}", work)
-            .replace("{{HOME_WORK_PROMOTION}}", fallback).replace("{{PRIMARY_WORK_COUNT}}", str(primary))
+            .replace("{{PRIMARY_WORK_COUNT}}", str(primary))
             .replace("{{DIRECTORY_COUNT}}", str(directory_count)))
     config_json = json.dumps(config, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
     return html.replace("</body>", ''.join(templates) + '<script id="home-config" type="application/json">' + config_json + '</script></body>')

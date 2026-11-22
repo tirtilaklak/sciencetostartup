@@ -6,7 +6,6 @@
   if (!configNode) return;
   const config = JSON.parse(configNode.textContent);
   const slot = document.getElementById('home-work-example');
-  const fallback = slot?.querySelector('article')?.cloneNode(true);
 
   function refreshPromotion() {
     const now = Date.now();
@@ -16,13 +15,20 @@
     if (route === (slot.dataset.routeId || '')) return;
 
     const hadFocus = slot.contains(document.activeElement);
-    slot.replaceChildren(template ? template.content.cloneNode(true) : fallback.cloneNode(true));
-    if (route) slot.dataset.routeId = route;
-    else delete slot.dataset.routeId;
-    if (hadFocus) slot.querySelector('a[href]')?.focus();
+    if (template) {
+      slot.replaceChildren(template.content.cloneNode(true));
+      slot.hidden = false;
+      slot.dataset.routeId = route;
+      if (hadFocus) slot.querySelector('a[href]')?.focus();
+    } else {
+      if (hadFocus) document.querySelector('.hero-actions a[href="/work/"]')?.focus();
+      slot.replaceChildren();
+      slot.hidden = true;
+      delete slot.dataset.routeId;
+    }
   }
 
-  if (fallback && config.candidates?.length) {
+  if (slot && config.candidates?.length) {
     refreshPromotion();
     setInterval(refreshPromotion, 60_000);
     document.addEventListener('visibilitychange', () => {
