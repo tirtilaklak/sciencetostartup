@@ -653,9 +653,7 @@ function openCompanyStory(id){return detailViewRenderer("openCompanyStory",this,
 
 function renderTray(notice=''){
  const count=state.selected.length,comparing=onCompareRoute();
- const tray=$('compare-tray');
- tray.hidden=!count||comparing;
- if(notice)tray.setAttribute('data-selection-limit','');else tray.removeAttribute?.('data-selection-limit');
+ $('compare-tray').hidden=!count||comparing;
  $('tray-text').textContent=count?`${count} of 3 selected: ${listText(state.selected.map(id=>companies[id].name))}${notice?'. '+notice:''}`:'';
  if(notice&&comparing)$('compare-status').textContent=notice;
  $('nav-count').textContent=count?`(${count})`:'';
