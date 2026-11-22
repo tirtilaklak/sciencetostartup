@@ -8,7 +8,9 @@ html[data-page-enhancement="pending"] .directory-groups{display:none}
 .directory-filters label{display:grid;gap:6px;font-size:.875rem;font-weight:500}
 .directory-filters input,.directory-filters select{width:100%;min-width:0;min-height:44px;font-size:16px}
 .directory-filters button{min-height:44px;border:0;padding:10px 14px;background:transparent;color:var(--green);cursor:pointer}
-.directory-result{margin:14px 0 0;max-width:none}
+.directory-results-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;column-gap:16px}
+.directory-result{margin:0;max-width:none}
+.directory-compare{display:inline-flex;align-items:center;min-height:44px;min-width:44px;max-width:100%;color:var(--green);font-size:.875rem;line-height:1.4;overflow-wrap:anywhere}
 .directory-empty{padding:16px 0}
 .directory-empty a{display:inline-flex;align-items:center;min-height:44px}
 .directory-groups{max-width:none;margin-top:20px}

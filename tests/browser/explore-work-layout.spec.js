@@ -33,6 +33,39 @@ test('Explore Work keeps the result count and controls readable at narrow widths
   }
 });
 
+test('all four Explore Work filters receive desktop pointer input', async ({ page, hasTouch }) => {
+  test.skip(hasTouch, 'Checks the desktop pointer at and above the 901px breakpoint');
+  await page.setViewportSize({ width: 901, height: 844 });
+  await page.goto('/explore/#work');
+  const panel = page.locator('#work-view .responsive-filter-panel');
+  const summary = panel.locator('summary');
+  const ids = ['work-kind', 'work-group', 'work-pay', 'work-eligibility'];
+  await expect(panel).toBeVisible();
+
+  for (const width of [901, 1024, 1280]) {
+    await test.step(`${width}px`, async () => {
+      if (page.viewportSize().width !== width) await page.setViewportSize({ width, height: 844 });
+
+      for (const id of ids) {
+        if (!(await panel.evaluate(node => node.open))) await summary.click();
+        const select = panel.locator(`#${id}`);
+        await expect(select).toBeInViewport({ ratio: 1 });
+        const { hits, center } = await select.evaluate(node => {
+          const box = node.getBoundingClientRect();
+          const hits = [0.2, 0.5, 0.8].flatMap(x => [0.2, 0.5, 0.8].map(y =>
+            document.elementFromPoint(box.left + box.width * x, box.top + box.height * y)?.id
+          ));
+          return { hits, center: { x: box.left + box.width / 2, y: box.top + box.height / 2 } };
+        });
+        expect(hits, `${id} pointer targets`).toEqual(Array(9).fill(id));
+        await page.mouse.click(center.x, center.y);
+        await expect(select).toBeFocused();
+        await page.keyboard.press('Escape');
+      }
+    });
+  }
+});
+
 test('native Work fits every filter option in its closed select at narrow widths', async ({ page }) => {
   test.setTimeout(60_000);
   const form = page.getByRole('search', { name: 'Find paid work' });
@@ -42,11 +75,17 @@ test('native Work fits every filter option in its closed select at narrow widths
     await page.goto(filtered ? '/work/?pay=hourly&sort=hourly' : '/work/', { waitUntil: 'domcontentloaded' });
     await expect(form).toBeVisible();
     await expect(count).toHaveText(filtered ? /^[1-9]\d* matching records?$/ : /^[1-9]\d* records?$/);
+    const options = form.locator('.work-page-filter-options');
+    if (filtered) {
+      await expect(options).toHaveJSProperty('open', false);
+      await expect(options.locator('summary')).toHaveText('Filters (2)');
+      await expect(page.getByRole('link', { name: 'Compare results' })).toBeInViewport({ ratio: 1 });
+      await expect(page.getByRole('button', { name: 'Download CSV' })).toBeInViewport({ ratio: 1 });
+    }
+    await options.locator('summary').click();
     if (filtered) {
       await expect(form.getByRole('combobox', { name: 'Pay unit' })).toHaveValue('hourly');
       await expect(form.getByRole('combobox', { name: 'Sort' })).toHaveValue('hourly');
-    } else {
-      await form.locator('summary').click();
     }
     await expect(form.getByRole('combobox')).toHaveCount(5);
 
