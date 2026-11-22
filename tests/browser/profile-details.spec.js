@@ -210,6 +210,17 @@ test('the native Source ledger lands at All sources and Tabs into its sources be
   let releaseImage;
   const imageGate = new Promise(resolve => { releaseImage = resolve; });
   let imageRequested = false;
+  // Browsers can skip a lazy image already above the newly scrolled viewport.
+  // Start its request so the regression is exercised in every engine.
+  await page.addInitScript(path => {
+    const observer = new MutationObserver(() => {
+      const image = document.querySelector(`.profile-v2 img[src="${path}"]`);
+      if (!image) return;
+      image.loading = 'eager';
+      observer.disconnect();
+    });
+    observer.observe(document, { childList: true, subtree: true });
+  }, imeritImage);
   await page.route('**' + imeritImage, async route => {
     if (new URL(page.url()).pathname === '/explore/') {
       imageRequested = true;
@@ -235,7 +246,10 @@ test('the native Source ledger lands at All sources and Tabs into its sources be
     await expect(source).toBeFocused();
     await expectSourceHeadingInView(heading);
 
-    const position = await page.evaluate(() => { window.scrollBy(0, 400); return scrollY; });
+    const position = await page.evaluate(() => {
+      window.scrollBy({ top: 400, behavior: 'instant' });
+      return scrollY;
+    });
     await page.goBack({ waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(new URL('/company/imerit/', baseURL).href);
     await page.goForward({ waitUntil: 'domcontentloaded' });
