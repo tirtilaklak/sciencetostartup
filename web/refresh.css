@@ -20,9 +20,7 @@
 #compare-view .comparison-table .financial-summary .row-number>strong{font-size:28px}
 #compare-view .comparison-table .category-label{font-size:11px;line-height:1.5}
 #compare-view .comparison-table td>p{font-size:14px;line-height:1.6;margin:8px 0 0}
-#compare-view .comparison-empty{background:var(--pale);padding:36px;border:0;border-radius:5px}
-#compare-view .comparison-context{font-size:13px;line-height:1.65;margin:8px 0 24px}
-#compare-view .compare-controls{padding:0 0 24px;background:transparent;border:0;border-bottom:1px solid var(--border);border-radius:0;gap:20px}
+#compare-view .page-heading{margin-bottom:12px}
 #method-view .review-update{font-size:14px;line-height:1.65;background:var(--pale);border:0;border-radius:5px}
 #method-view .method-principles{background:transparent}
 #method-view .method-layout{column-gap:38px}
@@ -33,4 +31,11 @@
  #compare-view .comparison-table .row-number>span{font-size:12px}
  .financial-summary .row-period,.financial-citation{font-size:12px}
  .financial-source-details summary{min-height:44px;display:flex;align-items:center}
+ #compare-view .mobile-column-options>.mobile-compare-pager{top:calc(100% + 4px)}
+}
+@media(max-width:700px) and (min-height:501px){
+ #compare-view .comparison-table:not([data-compare-flow-head]) .mobile-compare-pager{
+  max-height:calc(100dvh - var(--compare-masthead-offset, var(--header-height)) - var(--compare-head-height, 0px) - 12px);
+  overflow-y:auto;
+ }
 }

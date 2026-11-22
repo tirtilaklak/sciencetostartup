@@ -1,17 +1,35 @@
 /* Detailed views. The verified route-module factory owns registration and readiness. */
 (()=>{
 'use strict';
+function detail_sourceHistory(cl,current){
+ const previous=current?.historical_source_ids;
+ if(!previous?.length)return historicalSourceHTML(cl);
+ const legacy=(cl.historical_source_ids||[]).filter(id=>!previous.includes(id));
+ return profileHistoricalFinanceSourcesHTML(current)+historicalSourceHTML({...cl,historical_source_ids:legacy});
+}
+function detail_reviewedCitations(cl,current=profileFinanceReview(cl)){
+ if(!current?.historical_source_ids?.length)return '';
+ const links=observationSourceIds(current).map(id=>{
+  const source=profileReviewedSource(id);
+  return external(source.url,source.publisher);
+ });
+ return `<div class="source-links">${links.join(' ')}</div>${detail_sourceHistory(cl,current)}`;
+}
 function detail_claimRecord(c){
- const clarified=Boolean(evidenceContextStatementHeading(c)),estimate=profileReviewedObservationForClaim(c);
- return `<article class="record" data-claim-record="${esc(c.id)}">${estimate?`<h3>${esc(estimate.label)}</h3><p>${esc(estimate.basis)}</p><p class="sub"><strong>Original dataset statement</strong></p>`:''}${clarified?evidenceContextClaimHTML(c.id)+evidenceContextStatementHeadingHTML(c):''}<p>${esc(c.statement)}</p>${clarified?'':evidenceContextClaimHTML(c.id)}${profileProvenance(c)}${c.caveat&&!publicText(c.statement).includes(publicText(c.caveat))?`<p class="sub">${esc(c.caveat)}</p>`:''}<div class="source-links">${sourceLinks(c)}</div>${historicalSourceHTML(c)}</article>`;
+ const calculation=profileCalculatedObservationForClaim(c);
+ if(calculation)return `<article class="record" data-claim-record="${esc(c.id)}"><p>${esc(calculation.profile_statement)}</p>${profileProvenance(c)}<p class="sub">${esc(calculation.profile_confidence_reason)}</p><p class="sub">${esc(calculation.basis)}</p>${profileCalculationSources(calculation)}</article>`;
+ const clarified=Boolean(evidenceContextStatementHeading(c)),estimate=profileReviewedObservationForClaim(c),current=profileFinanceReview(c);
+ const citations=detail_reviewedCitations(c,current)||`<div class="source-links">${sourceLinks(c)}</div>${historicalSourceHTML(c)}`;
+ return `<article class="record" data-claim-record="${esc(c.id)}">${estimate?`<h3>${esc(estimate.label)}</h3><p>${esc(estimate.basis)}</p><p class="sub"><strong>Original dataset statement</strong></p>`:''}${clarified?evidenceContextClaimHTML(c.id)+evidenceContextStatementHeadingHTML(c):''}<p>${esc(current?.qualifier_reviewed_on?current.original_text:c.statement)}</p>${clarified?'':evidenceContextClaimHTML(c.id)}${profileProvenance(c)}${c.caveat&&!publicText(c.statement).includes(publicText(c.caveat))?`<p class="sub">${esc(c.caveat)}</p>`:''}${citations}</article>`;
 }
 function detail_metricTile(m,context=''){
- const estimate=profileMetricEstimate(m),finance=profileFinanceMetricContext(m),unconfirmed=unconfirmedValuation(m),cl=claims[m.claim_id];
+ const calculation=profileCalculatedMetric(m),estimate=profileMetricEstimate(m),finance=profileFinanceMetricContext(m),unconfirmed=unconfirmedValuation(m),cl=claims[m.claim_id];
  const heading=unconfirmed?'Unconfirmed valuation · '+title(m.observation_status||cl.status):estimate?.label||finance?.label||metricLabels[m.kind];
  const label=profileSentenceCase(metricPresentationLabel(m,m.label));
- const meta=estimate?[m.currency,estimate.period.label,estimate.scope_label,title(estimate.accounting_basis)+' basis'].join(' · '):readableDate(metricMeta(m));
- const status=[profileMetricStatus(m,metricStatusLabel(m)),profileMetricHistory(m),metricCurrentAttribution(m,profileEvidenceLabel(cl))].filter(Boolean).join(' · ');
- return `<article class="metric-tile ${unconfirmed?'unconfirmed-metric':''}" data-metric="${esc(m.id)}"><h3>${esc(heading)}</h3>${profileNumberButton(m)}${label&&label!==heading?`<span class="sub">${esc(label)}</span>`:''}<span class="sub">${esc(meta)}</span>${context?`<p class="sub">${esc(context)}</p>`:''}<span class="sub">${esc(status)}</span><div class="source-links">${sourceLinks(cl)}</div>${m.duplicate_records?.length?`<details><summary>More sources for this figure</summary>${m.duplicate_records.map(d=>`<div data-metric="${esc(d.id)}">${claimButton(d.claim_id,'Source')} ${sourceLinks(claims[d.claim_id])}</div>`).join('')}</details>`:''}</article>`;
+ const meta=calculation?[profileMetricDate(m),calculation.scope_detail].join(' · '):estimate?[m.currency,estimate.period.label,estimate.scope_label,title(estimate.accounting_basis)+' basis'].join(' · '):readableDate(metricMeta(m));
+ const status=[profileMetricStatus(m,metricStatusLabel(m)),profileMetricHistory(m),calculation?'':metricCurrentAttribution(m,profileEvidenceLabel(cl))].filter(Boolean).join(' · ');
+ const citations=calculation?`<p class="sub">${esc(calculation.profile_statement)}</p><p class="sub">${esc(calculation.profile_confidence_reason)}</p>${profileCalculationSources(calculation)}`:detail_reviewedCitations(cl)||`<div class="source-links">${sourceLinks(cl)}</div>`;
+ return `<article class="metric-tile ${unconfirmed?'unconfirmed-metric':''}" data-metric="${esc(m.id)}"><h3>${esc(heading)}</h3>${profileNumberButton(m)}${label&&label!==heading?`<span class="sub">${esc(label)}</span>`:''}<span class="sub">${esc(meta)}</span>${context?`<p class="sub">${esc(context)}</p>`:''}<span class="sub">${esc(status)}</span>${citations}${m.duplicate_records?.length?`<details><summary>More sources for this figure</summary>${m.duplicate_records.map(d=>`<div data-metric="${esc(d.id)}">${claimButton(d.claim_id,'Source')} ${sourceLinks(claims[d.claim_id])}</div>`).join('')}</details>`:''}</article>`;
 }
 function detail_disclosedPrimarySummary(id){const groups=new Map();for(const r of fundingRows(id).filter(r=>r.include_in_disclosed_primary_sum&&claims[r.claim_id].status==='supported')){if(!groups.has(r.currency))groups.set(r.currency,[]);groups.get(r.currency).push(r);}return [...groups.entries()].map(([currency,rows])=>`<p class="disclosed-sum"><b>${esc(metricValue({value:rows.reduce((n,r)=>n+r.amount,0),currency,unit:'currency',qualifier:'exact'}))}</b><span class="sub">Sum of new money from ${rows.length} disclosed ${rows.length===1?'round':'rounds'}, in ${esc(currency)}. It includes announced rounds that may not have closed. It may not cover every round.</span>${rows.map(r=>claimButton(r.claim_id,r.round_name)).join(' · ')}</p>`).join('');}
 function detail_financingEvent(r){return `<article class="record" data-funding="${esc(r.id)}"><h3>${esc(r.round_name)} · ${'amount'in r?esc(metricValue({value:r.amount,unit:'currency',currency:r.currency,qualifier:r.qualifier})):'Amount not disclosed'}</h3><p class="sub">${esc(profileDate(r.announced_on))} · ${esc(title(r.status))} · ${esc(title(r.capital_type))} · ${esc(scopeText(r.segment_scope,r.company_id))}</p><p>${esc(claims[r.claim_id].statement)}</p><p class="sub">Investors: ${DATA.round_investors.filter(x=>x.round_id===r.id).map(x=>`${esc(investors[x.investor_id].name)} (${esc(x.role)})`).join(', ')||'See the financing statement above; names are not separately structured.'}</p>${profileProvenance(claims[r.claim_id])}${financingDetails(r)}<details><summary>How this amount is counted</summary><p class="sub">${esc(title(r.amount_basis))} · ${esc(r.inclusion_reason)}${r.closed_on?` Closed ${esc(profileDate(r.closed_on))}.`:''}</p></details></article>`;}
@@ -26,21 +44,25 @@ function detail_renderAssessment(a){
 }
 function detail_comparisonRows(){return [
  ['Main offering',id=>`<span class="category-label">${esc(groupLabel(modelGroup(id)))}</span><p>${esc(modelFor(id))}</p>`],
- ['Products',id=>`<p>${DATA.products.filter(p=>p.company_id===id&&p.id.includes('oct14')).slice(0,3).map(p=>esc(p.name)).join('<br>')||esc(brief(DATA.products.find(p=>p.company_id===id)?.work_performed||companies[id].description))}</p><a href="#company/${esc(id)}/products">Product evidence ${iconHTML('right')}</a>`],
- ['Customer evidence',id=>{const rows=DATA.customer_evidence.filter(r=>r.company_id===id);return rows.slice(0,2).map(r=>`<p>${esc(r.organization)} <span class="sub">${esc(title(r.relationship))} · ${claimButton(r.claim_id,'Source')}</span></p>`).join('')+`<a href="#company/${esc(id)}/customers">All relationship evidence ${iconHTML('right')}</a>`;}],
+ ['Products',id=>`<p>${DATA.products.filter(p=>p.company_id===id&&p.id.includes('oct14')).slice(0,3).map(p=>esc(p.name)).join('<br>')||esc(brief(DATA.products.find(p=>p.company_id===id)?.work_performed||companies[id].description))}</p><a href="#company/${attr(id)}/products" data-compare-origin="products:${attr(id)}">Product evidence ${iconHTML('right')}</a>`],
+ ['Customer evidence',id=>{const rows=DATA.customer_evidence.filter(r=>r.company_id===id);return rows.slice(0,2).map(r=>`<p>${esc(r.organization)} <span class="sub">${esc(title(r.relationship))} · ${claimButton(r.claim_id,'Source')}</span></p>`).join('')+`<a href="#company/${attr(id)}/customers" data-compare-origin="relationships:${attr(id)}">All relationship evidence ${iconHTML('right')}</a>`;}],
  ['Published revenue figure',comparisonRevenue],
- ['Growth',id=>{const g=STORY_GROWTH.find(g=>g.id===id);if(!g)return '<p class="sub">No reviewed full-year growth series for this company.</p>';const [a,b]=g.ids.map(id=>DATA.metrics.find(m=>m.id===id)),pct=(b.value/a.value-1)*100;return `<p>≈ ${pct>0?'+':'−'}${Math.abs(pct).toFixed(1)}% · FY2024 to FY2025</p><p class="sub">${g.scope} · USD actual revenue</p><a href="#company/${id}/growth">See yearly figures ${iconHTML('right')}</a>`;}],
- ['People',id=>{const rows=DATA.company_people.filter(p=>p.company_id===id);return `<p>${rows.slice(0,3).map(p=>`${esc(people[p.person_id].name)} <span class="sub">${esc(title(p.role))}</span>`).join('<br>')||'Not established'}</p><a href="#company/${id}/people">People & roles ${iconHTML('right')}</a>`;}],
- ['Funding & investors',id=>{const evidence=profileFinancingEvidenceLink(id);return evidence?`<p>Complete financing total not established in reviewed sources.</p>${evidence}`:compactFundingSummary(id)+`<a href="#company/${id}/finance">${companies[id].entity_type==='adjacent_research'?'Research support':'Rounds & investors'} ${iconHTML('right')}</a>`;}],
+ ['Growth',id=>{const g=STORY_GROWTH.find(g=>g.id===id);if(!g)return '<p class="sub">No reviewed full-year growth series for this company.</p>';const [a,b]=g.ids.map(id=>DATA.metrics.find(m=>m.id===id)),pct=(b.value/a.value-1)*100;return `<p>≈ ${pct>0?'+':'−'}${Math.abs(pct).toFixed(1)}% · FY2024 to FY2025</p><p class="sub">${g.scope} · USD actual revenue</p><a href="#company/${attr(id)}/growth" data-compare-origin="growth:${attr(id)}">See yearly figures ${iconHTML('right')}</a>`;}],
+ ['People',id=>{const rows=DATA.company_people.filter(p=>p.company_id===id);return `<p>${rows.slice(0,3).map(p=>`${esc(people[p.person_id].name)} <span class="sub">${esc(title(p.role))}</span>`).join('<br>')||'Not established'}</p><a href="#company/${attr(id)}/people" data-compare-origin="people:${attr(id)}">People & roles ${iconHTML('right')}</a>`;}],
+ ['Funding & investors',id=>{const evidence=profileFinancingEvidenceLink(id,true);return evidence?`<p>Complete financing total not established in reviewed sources.</p>${evidence}`:compactFundingSummary(id)+`<a href="#company/${attr(id)}/finance" data-compare-origin="financing:${attr(id)}">${companies[id].entity_type==='adjacent_research'?'Research support':'Rounds & investors'} ${iconHTML('right')}</a>`;}],
  ['Risks and disputes',id=>{
   const events=profileEvents(id),risks=profileRiskClaims(id);
   if(!events.length&&!risks.length)return '<p class="sub">No risks or events recorded in the reviewed sources.</p>';
   const recent=risks.slice(0,1).map(cl=>`<p>${esc(cl.statement)} ${claimButton(cl.id,'Claim sources')}</p>`).join('');
   const label=events.length?'Read risks and dated events':'Read the risk notes';
-  return recent+`<a href="/company/${attr(id)}/#risks">${label} ${iconHTML('right')}</a>`;
+  return recent+`<a href="/company/${attr(id)}/#risks" data-compare-origin="risks:${attr(id)}">${label} ${iconHTML('right')}</a>`;
  }],
- ['Paid work',id=>`<p>${esc(workType(id))}</p><a href="#company/${id}/work">Pay & requirements ${iconHTML('right')}</a>`],
- ['Explore',id=>`<a href="#company/${id}">Full profile & sources ${iconHTML('right')}</a>`]
+ ['Paid work',id=>{
+  const summary=workRouteSummary(id);
+  const action=summary.primary.length?'Pay & requirements':summary.careers.length?'See career links':'See work records';
+  return `<p>${esc(workType(id,summary))}</p><a href="#company/${attr(id)}/work" data-compare-origin="paid-work:${attr(id)}">${esc(action)} ${iconHTML('right')}</a>`;
+ }],
+ ['Explore',id=>`<a href="#company/${attr(id)}" data-compare-origin="explore:${attr(id)}">Full profile & sources ${iconHTML('right')}</a>`]
  ];}
 function detail_renderCompare(notice=''){
  const ids=compareIds(),names=listText(ids.map(id=>companies[id].name));
@@ -48,44 +70,62 @@ function detail_renderCompare(notice=''){
  const labels={'Main offering':'Business','Published revenue figure':'Revenue','Growth':'Revenue change'},core=['Main offering','Published revenue figure','Growth','Paid work','Explore'],extra=['Funding & investors','Products','Relationships','People','Risks and disputes'];
  const all=comparisonRows(),renderRows=order=>order.map(label=>all.find(row=>row[0]===label)).filter(Boolean).map(([label,render])=>`<tr data-comparison-row="${esc(label)}"><th scope="row">${esc(labels[label]||label)}</th>${ids.map((id,i)=>`<td data-comparison-company="${esc(id)}" class="${!visiblePair.includes(i)?'mobile-hidden':''}">${render(id)}</td>`).join('')}</tr>`).join('');
  const metrics=ids.map(preferredFinancial).filter(Boolean),bases=new Set(metrics.map(m=>[m.kind,financialPeriod(m),m.currency,m.segment_scope,m.scope_detail,m.as_of,m.gross_vs_net].join('|')));
- const context=metrics.length>1&&bases.size>1?'Reporting dates, business scopes or revenue definitions differ. Read the labels before comparing amounts.':'Figures retain the reporting period and business scope stated by their sources.';
- $('compare-content').innerHTML=`<div class="comparison-mode"><p>${ids.length} of 3 companies selected</p><button type="button" class="text-link" data-copy-compare>Copy comparison link</button></div><p class="comparison-context">${context}</p>${ids.length>2?'<p class="comparison-swipe">On small screens, use Change pair to switch companies.</p>':''}<div class="comparison-scroll"><table class="comparison-table" data-company-count="${ids.length}"><caption class="sr-only">Comparison of ${esc(names)}</caption><thead><tr><th scope="col">At a glance</th>${ids.map((id,i)=>`<th scope="col" class="${!visiblePair.includes(i)?'mobile-hidden':''}"><div class="card-head"><a href="#company/${esc(id)}">${esc(companies[id].name)}</a><button type="button" data-remove="${esc(id)}" aria-label="Remove ${esc(companies[id].name)}">${iconHTML('close')}</button></div>${i===visiblePair.at(-1)&&ids.length>2?`<details class="mobile-column-options"><summary>Change pair</summary><div class="mobile-compare-pager" role="group" aria-label="Choose companies to compare">${pairs.map((pair,i)=>`<button type="button" data-mobile-compare="${i}" aria-pressed="${i===state.mobileCompare}">${esc(companies[ids[pair[0]]].name)} + ${esc(companies[ids[pair[1]]].name)}</button>`).join('')}</div></details>`:''}</th>`).join('')}</tr></thead><tbody>${renderRows(core)}</tbody><tbody id="comparison-extra"${comparisonExpanded?'':' hidden'}>${renderRows(extra)}</tbody></table></div><button type="button" class="comparison-more" data-compare-extra aria-expanded="${comparisonExpanded}" aria-controls="comparison-extra">${comparisonExpanded?'Hide additional details':'Show more evidence'}</button>`;
+ const context=metrics.length>1&&bases.size>1?'<p class="comparison-context">Reporting dates, business scopes or revenue definitions differ.</p>':'';
+ $('compare-content').innerHTML=context+`<div class="comparison-scroll"><table class="comparison-table" data-company-count="${ids.length}"><caption class="sr-only">Comparison of ${esc(names)}</caption><thead><tr><th scope="col">At a glance</th>${ids.map((id,i)=>`<th scope="col" class="${!visiblePair.includes(i)?'mobile-hidden':''}"><div class="card-head"><a href="#company/${attr(id)}" data-compare-origin="header:${attr(id)}">${esc(companies[id].name)}</a><button type="button" data-remove="${esc(id)}" aria-label="Remove ${esc(companies[id].name)}">${iconHTML('close')}</button></div>${i===visiblePair.at(-1)&&ids.length>2?`<details class="mobile-column-options"><summary>Change pair</summary><div class="mobile-compare-pager" role="group" aria-label="Choose companies to compare">${pairs.map((pair,i)=>`<button type="button" data-mobile-compare="${i}" aria-pressed="${i===state.mobileCompare}">${esc(companies[ids[pair[0]]].name)} + ${esc(companies[ids[pair[1]]].name)}</button>`).join('')}</div></details>`:''}</th>`).join('')}</tr></thead><tbody>${renderRows(core)}</tbody><tbody id="comparison-extra"${comparisonExpanded?'':' hidden'}>${renderRows(extra)}</tbody></table></div><button type="button" class="comparison-more" data-compare-extra aria-expanded="${comparisonExpanded}" aria-controls="comparison-extra">${comparisonExpanded?'Hide additional details':'Show more evidence'}</button>`;
  if(notice)$('compare-content').insertAdjacentHTML('afterbegin',compareNoticeHTML(notice));
  $('compare-status').textContent=[notice,`Comparing ${names}.`].filter(Boolean).join(' ');comparisonScrollRegion();
+ syncComparisonLayout();
 }
 function detail_evidenceMetricContextHTML(m){
- const estimate=profileMetricEstimate(m),finance=profileFinanceMetricContext(m);
+ const calculation=profileCalculatedMetric(m),estimate=profileMetricEstimate(m),finance=profileFinanceMetricContext(m);
  const kind=estimate||finance?'':m.kind==='revenue'?'Period revenue':m.kind==='other'?'':metricLabels[m.kind];
  const accounting=metricCurrentBasis(m,['revenue','annualized_revenue_run_rate','arr'].includes(m.kind)?m.gross_vs_net==='unspecified'?'Gross or net revenue not stated':title(m.gross_vs_net)+' revenue basis':'');
  const value=profileMetricValue(m)+(m.unit==='currency'&&m.currency?' '+m.currency:m.unit==='people'?' people':'');
- const scope=finance?.scope||estimate?.scope_label||(m.scope_detail&&!['company','ai_data','research','other_segment'].includes(m.scope_detail)?m.scope_detail:scopeText(m.segment_scope,m.company_id));
+ const scope=calculation?.scope_detail||finance?.scope||estimate?.scope_label||(m.scope_detail&&!['company','ai_data','research','other_segment'].includes(m.scope_detail)?m.scope_detail:scopeText(m.segment_scope,m.company_id));
  return `<div class="evidence-metric-context" data-evidence-metric="${esc(m.id)}"><div class="evidence-metric-heading"><strong>${esc(profileSentenceCase(metricPresentationLabel(m,m.label||metricLabels[m.kind])))}</strong><span class="evidence-metric-value">${esc(value)}</span></div><p>${[kind,profileMetricStatus(m,evidenceMetricStatus(m)),profileMetricHistory(m),scope,profileMetricDate(m),accounting].filter(Boolean).map(esc).join(' · ')}</p></div>`;
 }
 function detail_claimConfidenceHTML(cl){
- const inheritedIndependentReason='Independent or buyer-side evidence. Research label: researcher-assigned evidence grade.';
+ const calculation=profileCalculatedObservationForClaim(cl);
+ if(calculation)return `<div class="claim-confidence"><strong>Confidence grade for revenue inputs</strong>${esc(cl.confidence)}<span class="sub">${esc(calculation.profile_confidence_reason)}</span></div>`;
+ const genericLegacyReason='Independent or buyer-side evidence.';
  const attribution=financeClaimContextFor(cl.id)?.attribution||evidenceLabel(cl);
  let reason=cl.confidence_reason;
- if(cl.confidence==='A'&&reason===inheritedIndependentReason){
+ if(cl.confidence==='A'&&reason===genericLegacyReason+' Research label: researcher-assigned evidence grade.'){
   if(['Company-reported','Investor-reported'].includes(attribution))reason=attribution+' evidence. The research confidence grade is retained from the compiled snapshot.';
   else if(!cl.evidence_label&&['Transaction counsel statement','University incubator statement','Company admission document'].includes(attribution))reason=attribution+'. The research confidence grade is retained from the compiled snapshot.';
  }
- // Drop the researcher-only "Research label" note; show the reason only when it adds to the grade.
+ // The grade definition replaces the generic snapshot reason. Keep specific reasons and source attributions.
  reason=String(reason||'').replace(/\s*Research label:[^.]*\.?\s*$/,'').trim();
+ if(cl.confidence==='A'&&reason===genericLegacyReason)reason='';
  const meaning=CONFIDENCE_GRADES[cl.confidence]||'',plain=text=>publicText(text).replace(/[.\s]+$/,'').toLowerCase();
  return `<div class="claim-confidence"><strong>Confidence grade</strong>${esc(cl.confidence)}${meaning?`<span class="sub">${esc(meaning)}</span>`:''}${reason&&!plain(meaning).startsWith(plain(reason))?`<details><summary>Why this grade</summary><p class="sub">${esc(reason)}</p></details>`:''}</div>`;
+}
+function detail_claimCitation(sid,finance,current){
+ const health=window.BUSINESS_HEALTH,reviewed=profileReviewedSource(sid);
+ const source=sources[sid]||reviewed;
+ const check=current?.source_ids.includes(sid)&&health?.source_checks?.entries?.find(entry=>
+  entry.source_id===sid&&entry.url===source.url&&entry.status==='content_checked');
+ const meta=check?{...finance,source_checked_on:check.checked_on}:finance;
+ return `<li data-source-id="${attr(sid)}">${external(source.url,(check&&reviewed?.title)||source.title)}<p class="sub">${esc(profileSourceMeta(source,meta))}</p>${source.notes?`<p class="sub">${esc(readableDate(publicText(source.notes.replaceAll('_',' '))))}</p>`:''}</li>`;
 }
 function detail_showEvidence(id,group=[]){
  const cl=claims[id];if(!cl)return;
  const dialog=$('evidence-dialog');if(!dialog.open){evidenceReturnFocus=document.activeElement;evidenceReturnHash='';evidenceRecordHash='';}
- const finance=financeClaimContextFor(id),estimate=profileReviewedObservationForClaim(cl);
+ const calculation=profileCalculatedObservationForClaim(cl),finance=financeClaimContextFor(id),estimate=profileReviewedObservationForClaim(cl),current=profileFinanceReview(cl),supplement=profileSupplementalSource(cl);
  const date=profileEvidenceDate(cl);
  const checkedOn=finance?.source_checked_on?profileDate(finance.source_checked_on):'',recordedOn=profileDate(cl.observed_on);
  const check=checkedOn&&(date.heading!=='Source checked'||date.text!==checkedOn)?`<div><strong>Source checked</strong>${esc(checkedOn)}</div>`:'';
  const observation=recordedOn&&recordedOn!==date.text&&recordedOn!==checkedOn?`<div><strong>Research observation recorded</strong>${esc(recordedOn)}</div>`:'';
  const dateNote=date.description||(EVIDENCE_DATE_NOTES[cl.date_note]??readableDate(cl.date_note));
  const originalStatement=estimate?'<p class="sub"><strong>Original dataset statement</strong></p>':evidenceContextStatementHeadingHTML(cl);
- const ms=DATA.metrics.filter(m=>m.claim_id===id),scope=finance?.scope||estimate?.scope_label||[...new Set([scopeText(cl.segment_scope,cl.company_id),...(evidenceMetricScopes.get(id)||[])])].join(' · '),link=evidenceRecordLink(cl),others=group.filter(other=>other!==id&&claims[other]);
- $('evidence-content').innerHTML=`${ms.map(evidenceMetricContextHTML).join('')}${typeof sourceUpdateClaimHTML==='function'?sourceUpdateClaimHTML(id):''}${evidenceContextClaimHTML(id)}${originalStatement}<p class="evidence-statement" id="evidence-statement">${esc(cl.statement)}</p><h3>Sources</h3><ol class="sources-list">${cl.source_ids.map(sid=>{const s=sources[sid];return `<li data-source-id="${attr(sid)}">${external(s.url,s.title)}<p class="sub">${esc(profileSourceMeta(s,finance?.source_id===sid?finance:null))}</p>${s.notes?`<p class="sub">${esc(readableDate(publicText(s.notes.replaceAll('_',' '))))}</p>`:''}</li>`;}).join('')}</ol>${!cl.source_ids.length?'<p>No current source is linked to this claim.</p>':''}${historicalSourceHTML(cl)}<div class="evidence-data"><div><strong>${esc(date.heading)}</strong>${esc(date.text)}</div>${check}${observation}${evidenceContextScopeHTML(cl,scope)}<div><strong>Evidence label</strong>${esc(profileEvidenceLabel(cl))}</div><div><strong>Status</strong>${esc(title(cl.status))}</div>${claimConfidenceHTML(cl)}</div>${finance?.note?`<p class="sub">${esc(finance.note)}</p>`:''}${dateNote?`<p class="sub">${esc(dateNote)}</p>`:''}${[...new Set([cl.caveat,...ms.map(m=>m.basis)].map(publicText))].filter(t=>t&&!publicText(cl.statement).includes(t)).map(t=>`<p class="sub">${esc(t)}</p>`).join('')}${others.length?`<h3>Other claims for this item</h3><ul class="evidence-related">${others.map(other=>`<li><button type="button" class="evidence-action" data-profile-evidence="${attr([other,...group.filter(x=>x!==other)].join('|'))}">Claim ${group.indexOf(other)+1} of ${group.length}: ${esc(profileEvidenceLabel(claims[other]))}</button></li>`).join('')}</ul>`:''}<div class="evidence-actions"><button type="button" class="evidence-copy" data-copy-record="${attr(link)}">${iconHTML('link')} Copy link to this record</button><p class="sub" id="evidence-copy-status" role="status"></p><p class="evidence-correction">Something wrong here? <a href="${attr(exploreCorrectionLink(cl))}" data-correction-record="${attr(cl.id)}">Request a correction ${iconHTML('right')}</a></p></div>`;
+ const ms=DATA.metrics.filter(m=>m.claim_id===id),scope=calculation?.scope_detail||finance?.scope||estimate?.scope_label||[...new Set([scopeText(cl.segment_scope,cl.company_id),...(evidenceMetricScopes.get(id)||[])])].join(' · '),link=evidenceRecordLink(cl),others=group.filter(other=>other!==id&&claims[other]);
+ const reviewedSources=current?.historical_source_ids?.length;
+ const sourceIds=reviewedSources?observationSourceIds(current):cl.source_ids;
+ const supplementaryCitation=supplement&&(!reviewedSources||!sourceIds.includes(supplement.id))?`<li data-source-id="${attr(supplement.id)}">${external(supplement.url,supplement.title)}<p class="sub">${esc(profileSourceMeta(supplement))}</p></li>`:'';
+ const currentWording=calculation?.profile_statement||(current?.qualifier_reviewed_on?current.original_text:cl.statement);
+ const citations=calculation?profileCalculationSources(calculation):`<ol class="sources-list">${supplementaryCitation}${sourceIds.map(sid=>detail_claimCitation(sid,finance?.source_id===sid?finance:null,current)).join('')}</ol>${!sourceIds.length?'<p>No current source is linked to this claim.</p>':''}${detail_sourceHistory(cl,current)}`;
+ const caveats=calculation?[calculation.basis]:[...new Set([cl.caveat,...ms.map(m=>m.basis)].map(publicText))].filter(t=>t&&!publicText(cl.statement).includes(t));
+ $('evidence-content').innerHTML=`${ms.map(evidenceMetricContextHTML).join('')}${typeof sourceUpdateClaimHTML==='function'?sourceUpdateClaimHTML(id):''}${evidenceContextClaimHTML(id)}${originalStatement}<p class="evidence-statement" id="evidence-statement">${esc(currentWording)}</p><h3>Sources</h3>${citations}<div class="evidence-data"><div><strong>${esc(date.heading)}</strong>${esc(date.text)}</div>${check}${observation}${evidenceContextScopeHTML(cl,scope)}<div><strong>Evidence label</strong>${esc(profileEvidenceLabel(cl))}</div><div><strong>Status</strong>${esc(title(cl.status))}</div>${claimConfidenceHTML(cl)}</div>${current?`<p class="sub">${esc(current.limitations)}</p>`:''}${finance?.note?`<p class="sub">${esc(finance.note)}</p>`:''}${dateNote?`<p class="sub">${esc(dateNote)}</p>`:''}${caveats.map(t=>`<p class="sub">${esc(t)}</p>`).join('')}${others.length?`<h3>Other claims for this item</h3><ul class="evidence-related">${others.map(other=>`<li><button type="button" class="evidence-action" data-profile-evidence="${attr([other,...group.filter(x=>x!==other)].join('|'))}">Claim ${group.indexOf(other)+1} of ${group.length}: ${esc(profileEvidenceLabel(claims[other]))}</button></li>`).join('')}</ul>`:''}<div class="evidence-actions"><button type="button" class="evidence-copy" data-copy-record="${attr(link)}">${iconHTML('link')} Copy link to this record</button><p class="sub" id="evidence-copy-status" role="status"></p><p class="evidence-correction">Something wrong here? <a href="${attr(exploreCorrectionLink(cl))}" data-correction-record="${attr(cl.id)}">Request a correction ${iconHTML('right')}</a></p></div>`;
  // On the claim's profile the address bar shows the record link while open.
  const parts=routeParts(),company=String(parts[0]).toLowerCase()==='company'?profileRouteCompany(parts[1]):'';
  if(company&&company===cl.company_id&&!$('profile-view').hidden){if(!evidenceReturnHash)evidenceReturnHash=parts[2]==='claim'?profileTabHash(company):location.hash;if(location.hash!==link)history.replaceState(history.state??null,'',link);evidenceRecordHash=link;}

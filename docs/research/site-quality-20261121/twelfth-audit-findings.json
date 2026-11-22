@@ -1,0 +1,66 @@
+{
+  "build": "96e25098b02da34fdb20",
+  "head": "ec9345d5a2f118e066fc897b3d9e96d7338f1d88",
+  "findings": [
+    {
+      "id": "A12-menu",
+      "observed": "Native Menu opens partly outside a 390px viewport with 32px Firefox text. Links begin at x=-67.38 on four main pages. The 701–720px header also occupies 201px.",
+      "acceptance": "Keep all native links visible and keyboard reachable. Recheck 320px and tablet transitions at default and enlarged text."
+    },
+    {
+      "id": "A12-daily-390",
+      "observed": "Daily’s two 169px phone selects crop visible values at 390px with enlarged text. Company news needs 268px.",
+      "acceptance": "Display full selected values, retain search/reset behavior and preserve the compact default layout."
+    },
+    {
+      "id": "A12-daily-boundary",
+      "observed": "The keyword and filter outlines have 1.26:1 contrast against the page.",
+      "acceptance": "Use a distinguishable field boundary and retain keyboard focus styling."
+    },
+    {
+      "id": "A12-search-hint",
+      "observed": "The 320px search field gives its 226px hint 192px. Firefox’s translucent placeholder has 3.60:1 contrast.",
+      "acceptance": "Use a short legible hint and retain the searchable categories in the existing help text."
+    },
+    {
+      "id": "A12-work-title",
+      "observed": "At 390px the first role title is plain text at y559 and its issuer action starts at y1042. The company link already leads to the exact local role.",
+      "acceptance": "Make the visible title take the reader to the exact local role while preserving the separate issuer action, source history and CSV."
+    },
+    {
+      "id": "A12-companies-cold",
+      "observed": "The official Mobile WebKit trace restored a focused Mercor result at scroll 113, then lost the saved position 33 ms later. The retry passed.",
+      "acceptance": "Restore the exact cold-Back position after a late browser reset. Respect a reader who scrolls and preserve cached and Forward behavior."
+    },
+    {
+      "id": "A12-clear-forward",
+      "observed": "After Clear filters, Firefox classic restores all 16 Daily stories on Forward but closes the previously opened Search field and sends the next Tab to Skip.",
+      "acceptance": "Restore Clear’s open search and correct keyboard focus without reopening a deliberately closed panel."
+    },
+    {
+      "id": "A12-market-skip",
+      "observed": "After opening the Market matrix, keyboard readers traverse 234 controls to reach Definitions.",
+      "acceptance": "Provide a visible keyboard shortcut to the Definitions summary that retains filters and matrix state."
+    },
+    {
+      "id": "A12-market-sort",
+      "observed": "The selected measure announces descending even when sorting is grouped by currency, basis and proxy.",
+      "acceptance": "Announce the grouped ordering accurately and retain financial comparability and row order."
+    },
+    {
+      "id": "A12-market-measure",
+      "observed": "25 unavailable Paid delivery cells use Expert activity as the primary accessible name.",
+      "acceptance": "Name the visible measure in the button and dialog, then explain the underlying concept where appropriate."
+    },
+    {
+      "id": "A12-menu-open",
+      "observed": "After the last link, Tab reaches Work Filters while an open native menu covers six of nine sampled points. The Companies search loses three.",
+      "acceptance": "Keep later focused controls readable and clickable while the menu is open, including without JavaScript."
+    },
+    {
+      "id": "A12-daily-rank-date",
+      "observed": "At 32px minimum text the two-digit Daily rank overlaps its kind by 4.53px. At 601px the topic chips stretch the page to 640px. The archive date needs 224px in a 204px field.",
+      "acceptance": "Let the rank and chips reflow and show the complete selected snapshot date. Preserve default-density and filtering behavior."
+    }
+  ]
+}

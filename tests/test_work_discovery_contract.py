@@ -42,7 +42,7 @@ assert.equal(run(`selectWorkRoutes([discoveryFixture],{q:'C++',type:'employment'
 assert.equal(run(`selectWorkRoutes([discoveryFixture],{pay:'hourly'}).length`),0,'Task equivalents are not actual hourly pay');
 assert.equal(run(`selectWorkRoutes([discoveryFixture],{type:'contract'}).length`),0,'Pay never infers engagement');
 assert.equal(run(`w4HourlyRange(discoveryFixture)`),null);
-for(const id of ['terac.work.ml-scenarios','afterquery.work.senior-software-engineer-security-infrastructure']){const destination=plain(run(`w4Destination(workRouteRows().find(r=>r.id===${JSON.stringify(id)}))`));assert.equal(destination.label,'Browse current company careers');assert.notEqual(destination.url,run(`workRouteRows().find(r=>r.id===${JSON.stringify(id)}).url`));}
+for(const id of ['terac.work.ml-scenarios','afterquery.work.people-programs-lead']){const destination=plain(run(`w4Destination(workRouteRows().find(r=>r.id===${JSON.stringify(id)}))`));assert.equal(destination.label,'Browse current company careers');assert.notEqual(destination.url,run(`workRouteRows().find(r=>r.id===${JSON.stringify(id)}).url`));}
 const sageFront=run("workCard(workRouteRows().find(r=>r.id==='appen.work.sage-media'))").split('<details class="w4-details">')[0];assert.ok(sageFront.includes('Qualification tests and identity verification'));
 const g2iFront=run("workCard(workRouteRows().find(r=>r.id==='g2i.work.senior-swe-training'))").split('<details class="w4-details">')[0];assert.ok(g2iFront.includes('Location sources conflict.'));
 const summary=plain(run('summarizeWorkResults(workRouteRows())'));
@@ -54,6 +54,39 @@ assert.equal(summary.named+summary.programs+summary.careers+summary.outside+summ
 assert.equal(run("w4FreshnessLabel(workRouteRows().find(r=>r.id==='appen.work.sage-media'))"),'Terms checked 8 Nov 2026');
 run(`discoveryFixture.editorial_review={classified_on:'2099-01-01',receipts:[{id:'retrieval',approved:false,scope:'retrieval',result:'readable',checked_on:'2099-01-01'}]}`);
 assert.equal(run('w4TermsReviewDate(discoveryFixture)'),null,'Classification/retrieval never refreshes terms');
+''')
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_reconciled_work_appears_in_its_supported_pay_and_availability_filters(self):
+        result = run_stub(r'''
+run('initialize()');
+const ids = criteria => plain(run(`selectWorkRoutes(workRouteRows(),${JSON.stringify(criteria)}).map(r=>r.id)`));
+const named = ids({kind:'named'});
+const past = ids({kind:'closed'});
+const yearly = ids({type:'employment',pay:'yearly',arrangement:'onsite'});
+const outside = ids({kind:'outside'});
+const hourly = ids({kind:'named',type:'contract',pay:'hourly',arrangement:'remote'});
+for(const slug of [
+  'business-operations-generalist','corporate-counsel','growth-associate','gtm-operations-lead','head-of-growth',
+  'marketing-lead','recruiter','sales-operations-associate','senior-software-engineer-security-infrastructure','technical-recruiter'
+]){
+  const id = 'afterquery.work.' + slug;
+  assert.ok(yearly.includes(id), id);
+  assert.ok(!past.includes(id), id);
+}
+const engagement = 'afterquery.work.engagement-manager';
+assert.ok(outside.includes(engagement));
+assert.ok(!yearly.includes(engagement), 'Conflicting annual salary and OTE cannot enter the yearly filter');
+assert.ok(named.includes('afterquery.work.senior-software-engineer-security-infrastructure'));
+const shopping = 'terac.work.ai-evaluator-shopping-assistant';
+assert.ok(hourly.includes(shopping));
+assert.ok(!past.includes(shopping));
+const range = plain(run(`w4HourlyRange(workRouteRows().find(r=>r.id===${JSON.stringify(shopping)}))`));
+assert.deepEqual(range, {currency:'$',low:30,high:30,open:false});
+for(const id of ['afterquery.work.people-programs-lead', 'terac.work.rl-environment-creation']){
+  assert.ok(past.includes(id), id);
+  assert.ok(!named.includes(id), id);
+}
 ''')
         self.assertEqual(result.returncode, 0, result.stderr)
 

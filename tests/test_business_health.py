@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SIGNALS = {"revenue", "profit", "customers", "delivery", "cash"}
 sys.path.insert(0, str(ROOT / "scripts"))
 from business_health import load_business_health, profile_finance_claim_context
+from presentation import health_subset
 from artifact_verification import verify_artifact
 
 
@@ -191,6 +192,24 @@ class BusinessHealthTests(unittest.TestCase):
         bad = copy.deepcopy(self.health)
         next(row for row in bad["observations"] if row["id"] == "mercor.metric.major-growth_metrics-1")["evidence_type"] = "reported"
         mutations.append(("Sacra estimate promoted to a reported result", bad))
+        bad = copy.deepcopy(self.health)
+        next(row for row in bad["observations"] if row["id"] == "snorkel_ai.metric.major-growth_metrics-0")["qualifier"] = "exact"
+        mutations.append(("issuer threshold presented as an exact amount", bad))
+        bad = copy.deepcopy(self.health)
+        issuer = next(row for row in bad["source_checks"]["entries"] if row["source_id"] == "refresh.source.turing-2024-run-rate-issuer")
+        issuer.update(status="content_checked", content_sha256=issuer["direct_body_sha256"])
+        mutations.append(("Turing bot response presented as issuer page content", bad))
+        growth_id = "dashboard.toloka.fy2024-revenue-growth"
+        for field, value in (
+                ("profile_metric_id", "toloka.metric.major-growth_metrics-0"),
+                ("profile_claim_ids", ["toloka.claim.major-growth_metrics-1-metric"]),
+                ("scope_label", "Whole company"),
+                ("qualifier", "exact"),
+                ("evidence_checked_on", "2026-10-12"),
+                ("source_ids", ["toloka.source.audit-tol_2025", "refresh.source.nebius-fy2025-sec-note-3"])):
+            bad = copy.deepcopy(self.health)
+            next(row for row in bad["observations"] if row["id"] == growth_id)[field] = value
+            mutations.append(("Toloka growth projection changes " + field, bad))
         for name, value in mutations:
             with self.subTest(mutation=name), self.assertRaises(ValueError):
                 load(value)
@@ -357,6 +376,76 @@ console.log(JSON.stringify({observations:observations.length,filtering:true,cont
                 with self.subTest(observation=row["id"]):
                     self.assertEqual(row["original_text"], "\n".join(observations[i]["original_text"] for i in row["calculation"]["input_observation_ids"]))
 
+    def test_reviewed_finance_keeps_original_records_and_qualifies_access(self):
+        rows = {row["id"]: row for row in self.observations}
+        snorkel = rows["snorkel_ai.metric.major-growth_metrics-0"]
+        canonical = self.metrics[snorkel["id"]]
+        self.assertEqual((canonical["qualifier"], snorkel["qualifier"]), ("exact", "greater_than"))
+        self.assertEqual(snorkel["source_ids"], self.claims[canonical["claim_id"]]["source_ids"])
+        self.assertEqual((snorkel["value"], snorkel["currency"], snorkel["as_of"]), (375_000_000, "USD", "2026-09-22"))
+        self.assertIn("crossed an annualized revenue run rate of $375M", snorkel["original_text"])
+
+        checks = {row["source_id"]: row for row in self.health["source_checks"]["entries"]}
+        for period, suffix, amount in (("FY2023", 1, 11_100_000), ("FY2024", 2, 26_100_000)):
+            row = rows[f"toloka.metric.major-financial_metrics-{suffix}"]
+            self.assertIn("toloka.source.audit-tol_2025", row["source_ids"])
+            self.assertEqual(row["primary_source_id"], "refresh.source.nebius-fy2025-sec-note-3")
+            self.assertEqual((row["value"], row["currency"], row["period"]["label"]), (amount, "USD", period))
+            self.assertEqual(row["accounting_basis"], "latest_discontinued_operations_comparative")
+            self.assertEqual(checks[row["primary_source_id"]]["status"], "content_checked")
+
+        turing = rows["turing.metric.major-growth_metrics-1"]
+        prior = "turing.source.oct14-6d7f270a4e05"
+        self.assertEqual((turing["value"], turing["as_of"], turing["measure"]), (300_000_000, "2024-12", "annualized_revenue"))
+        self.assertIn(prior, turing["source_ids"])
+        self.assertEqual(checks[prior]["previous_checks"][0]["checked_on"], "2026-10-28")
+        issuer = checks[turing["primary_source_id"]]
+        self.assertEqual((issuer["status"], issuer["direct_response"]), ("indexed_content_checked", "bot_challenge"))
+        self.assertNotIn("published_on", self.sources[turing["primary_source_id"]])
+
+    def test_imerit_detail_sends_current_and_historical_transcript_checks(self):
+        record_id = "imerit.metric.expansion-imerit-revenue"
+        prior = "imerit.source.audit-im-transcript2"
+        primary = "imerit.source.audit-im-transcript"
+        replacement = "refresh.source.imerit-exl-june-2026-stocksguide"
+        row = next(row for row in self.observations if row["id"] == record_id)
+        canonical = self.claims[self.metrics[record_id]["claim_id"]]
+        self.assertEqual(canonical["source_ids"], [primary, prior])
+        self.assertEqual(row["source_ids"], [primary, replacement])
+        self.assertEqual(row["historical_source_ids"], [prior])
+        self.assertEqual((row["value"], row["currency"], row["period"]["end"]),
+                         (59_000_000, "USD", "2026-03-31"))
+
+        scoped = health_subset(self.health, [row], "imerit")
+        source_urls = {source["id"]: source["url"] for source in scoped["sources"]}
+        self.assertEqual(set(source_urls), {primary, prior, replacement})
+        self.assertIn("earnings_event_id=8916344", source_urls[replacement])
+        checks = {check["source_id"]: check for check in scoped["source_checks"]["entries"]}
+        self.assertEqual(checks[replacement]["status"], "content_checked")
+        self.assertEqual((checks[prior]["status"], checks[prior]["http_status"]), ("unavailable", 404))
+
+    def test_toloka_profile_projects_the_calculation_on_its_historical_ids(self):
+        rows = {row["id"]: row for row in self.observations}
+        calculation = rows["dashboard.toloka.fy2024-revenue-growth"]
+        canonical = self.metrics["toloka.metric.major-growth_metrics-1"]
+        previous = self.metrics["toloka.metric.major-growth_metrics-0"]
+        self.assertEqual((canonical["value"], canonical["reported_vs_estimated"], previous["value"]),
+                         (135.1, "reported", 138))
+        self.assertEqual(calculation["profile_metric_id"], canonical["id"])
+        self.assertEqual(calculation["profile_claim_ids"], [canonical["claim_id"], "toloka.claim.major-growth_metrics-1"])
+        self.assertEqual(calculation["calculation"]["input_observation_ids"],
+                         ["toloka.metric.major-financial_metrics-2", "toloka.metric.major-financial_metrics-1"])
+        self.assertAlmostEqual(calculation["value"], (26.1 / 11.1 - 1) * 100)
+        source, mirror, earlier = calculation["source_ids"]
+        self.assertEqual(source, calculation["primary_source_id"])
+        self.assertEqual(self.claims[canonical["claim_id"]]["source_ids"], [mirror])
+        self.assertEqual(self.claims[previous["claim_id"]]["source_ids"], [earlier])
+        checks = {entry["source_id"]: entry for entry in self.health["source_checks"]["entries"]}
+        self.assertEqual(self.sources[source]["published_on"], "2026-04-30")
+        self.assertEqual(checks[source]["checked_on"], "2026-11-22")
+        self.assertEqual((checks[mirror]["checked_on"], checks[mirror]["http_status"], self.sources[mirror]["accessed_on"]),
+                         ("2026-11-22", 403, "2026-10-12"))
+
     def test_missing_information_has_no_zero_placeholder_records(self):
         # Zero may be an actual financial result; unknown observations instead
         # have no record and are represented by the runtime's missing state.
@@ -372,7 +461,7 @@ console.log(JSON.stringify({observations:observations.length,filtering:true,cont
         # Minified output is checked against a complete fresh build, while the
         # manifest retains exact provenance for the editable component inputs.
         verify_artifact(ROOT / "dist", ("web/business-health.js", "web/business-health.css"))
-        self.assertIn('id="business-health"', html)
+        self.assertIn('<section data-fragment-id="business-health"', html)
         manifest = json.loads((ROOT / "dist/manifest.json").read_text())["sha256"]
         self.assertEqual(manifest["business-health.json"], hashlib.sha256((ROOT / "dist/business-health.json").read_bytes()).hexdigest())
 

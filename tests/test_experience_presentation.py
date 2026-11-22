@@ -70,10 +70,12 @@ class ExperiencePresentationTests(unittest.TestCase):
         names = {company["id"]: company["name"] for company in self.canonical["companies"]}
         html = sp.render_work(sp.Research(self.canonical), work["routes"], names, "2026-11-18")
         scope = json.loads((ROOT / "data/editorial-release.json").read_text())["counts"]
-        providers = len({row["company_id"] for row in work["routes"]})
-        self.assertIn(f'{scope["work_routes"]} listings and networks. '
-                      f'{scope["records"]} records at {providers} companies.', html)
-        self.assertIn("Career pages and past records are grouped below.", html)
+        self.assertIn(f'{scope["named_listings"]} named listings', html)
+        self.assertIn(f'{scope["networks_programs"]} networks and programs', html)
+        self.assertIn(f'{scope["providers"]} companies', html)
+        self.assertIn(f'{scope["records"]} records, including career pages and past listings', html)
+        self.assertIn('data-work-group="boards"', html)
+        self.assertIn('data-work-group="closed"', html)
         self.assertNotIn(f'{scope["work_routes"]} current', html)
 
     def test_mutable_supporting_downloads_keep_links_without_frozen_membership(self):

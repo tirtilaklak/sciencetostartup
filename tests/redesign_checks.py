@@ -78,7 +78,9 @@ def main():
     template = (ROOT / 'web/index.html').read_text()
     tags = Elements(template)
     findings = tags.with_attribute('data-story-finding')
-    assert any(a.get('id') == 'business-health' for _, a in tags.elements), 'Business health dashboard missing'
+    dashboards = [a for tag, a in tags.with_attribute('data-fragment-id')
+                  if tag == 'section' and a['data-fragment-id'] == 'business-health']
+    assert len(dashboards) == 1 and dashboards[0].get('aria-labelledby') == 'business-health-heading', 'Business health dashboard missing'
     assert {a['data-story-finding'] for _, a in findings} == {'products'}, 'Obsolete financial stories remain'
     assert any(a.get('id') == 'companies-view' for _, a in tags.elements), 'Separate directory route missing'
     assert len(re.findall(r'<h1\b', template.split('id="market-view"', 1)[1].split('id="companies-view"', 1)[0])) == 1, 'Overview must have one headline'

@@ -1,0 +1,266 @@
+{
+  "candidate": {
+    "commit": "ec42722a476188ec3ff4d05999f018b53dc7b889",
+    "build_id": "ea6272946bebf0bf9a35",
+    "manifest_sha256": "7e03708d81e839915f025f59dfd07659bdc61b4a55177341ec5497edce330e27",
+    "payloads": 1280,
+    "editorial_release_id": "2026-11-22.7"
+  },
+  "cohort": {
+    "model": "gpt-6.2-sol",
+    "reasoning_effort": "ultra",
+    "reviewers_started": [
+      "retest10_release",
+      "retest10_research",
+      "retest10_work_matrix",
+      "retest10_visual",
+      "retest10_companies",
+      "retest10_daily",
+      "retest10_finance",
+      "retest10_sources",
+      "retest10_navigation",
+      "retest10_accessibility"
+    ]
+  },
+  "acceptance": {
+    "acceptance": {
+      "build": "ea6272946bebf0bf9a35",
+      "manifest": "7e03708d81e839915f025f59dfd07659bdc61b4a55177341ec5497edce330e27",
+      "passed": 86,
+      "receipt_sha256": "d241e5aab11b6ee644db695160b0bc0e2456b5f75fec82860f47357b6c47f705"
+    },
+    "public-before-release": {
+      "build": "5dc63fbcf19634a55c66",
+      "manifest": "11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+      "passed": 86,
+      "receipt_sha256": "0ac1398a76131ce90df40f391ed8b0f5c941b337cd4a77e7215708b7052ecd52"
+    }
+  },
+  "initial_targeted_browser_tests": 179,
+  "later_rebound": {
+    "passed": false,
+    "selected": 10,
+    "failures": [
+      {
+        "file": "work-profile-return.spec.js",
+        "project": "chromium",
+        "title": "cold Back restores the company link on a bookmarked Work entry",
+        "result": "unexpected"
+      }
+    ],
+    "sha256": "9e42aca31072cd5c07b6c5fb61dbc7ea18d28e1cbcf428446303d828efba2c5e"
+  },
+  "release": {
+    "public_promoted": false,
+    "immutable_staged": false,
+    "production_worker": 41,
+    "production_build": "5dc63fbcf19634a55c66",
+    "reason": "Reproducible clipping of focused Market figures, lost employer focus on a bookmarked Back and confirmed issuer corrections.",
+    "prior_runs": {
+      "85ff9754": {
+        "head": "85ff9754765bcca94fef01a9296b6b9e39f13ac7",
+        "as_of_utc": "2026-11-22T13:55:53.173225+00:00",
+        "runs": {
+          "Browser QA": {
+            "id": 45028659815,
+            "html_url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45028659815",
+            "status": "completed",
+            "conclusion": "failure"
+          },
+          "CI": {
+            "id": 45028659779,
+            "html_url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45028659779",
+            "status": "completed",
+            "conclusion": "failure"
+          }
+        },
+        "performance": {
+          "archiveSha256": "0941cd673e7626ea3f8467c033d5ad77e67e71ab6407c2044e5f7ec46b4e896f",
+          "rawReportsVerified": 72,
+          "routesTotal": 24,
+          "routesPassed": 23,
+          "passed": false
+        },
+        "mercor": {
+          "route": "/explore/#company/mercor/work",
+          "validRuns": 3,
+          "medians": {
+            "largest-contentful-paint": 2577.0802999999996,
+            "total-blocking-time": 25,
+            "cumulative-layout-shift": 7.640304785414474e-05
+          },
+          "passed": false
+        }
+      },
+      "37ed52e5": {
+        "head": "37ed52e5fb86dd77297bf32826a80fec8e207f7d",
+        "as_of_utc": "2026-11-22T14:08:43.089844+00:00",
+        "runs": {
+          "Browser QA": {
+            "id": 45029874348,
+            "html_url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45029874348",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          "CI": {
+            "id": 45029874351,
+            "html_url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45029874351",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        },
+        "performance": {
+          "archiveSha256": "9587890d82b91f14e711b37faa9313541341831ef739d94cb8491445b0392513",
+          "rawReportsVerified": 72,
+          "routesTotal": 24,
+          "routesPassed": 24,
+          "passed": true
+        },
+        "mercor": {
+          "route": "/explore/#company/mercor/work",
+          "validRuns": 3,
+          "medians": {
+            "largest-contentful-paint": 2232.1927,
+            "total-blocking-time": 0,
+            "cumulative-layout-shift": 7.640304785414474e-05
+          },
+          "passed": true
+        }
+      }
+    }
+  },
+  "work_csv": {
+    "selections": 70,
+    "downloads": 210,
+    "header_only": [
+      "matrix-10",
+      "matrix-17",
+      "matrix-18",
+      "queries-04",
+      "queries-08",
+      "queries-09",
+      "queries-10",
+      "queries-11",
+      "queries-12",
+      "queries-13",
+      "queries-14",
+      "queries-15",
+      "queries-16"
+    ]
+  },
+  "source_coverage": {
+    "action_and_status_native_company_pairs": 135,
+    "historical_date_field_and_url_bindings_on_each_surface": 77,
+    "afterquery_profile_cards": 45,
+    "dispositions": 33,
+    "exact_pair_ids": 25,
+    "source_audit_union": 52,
+    "exact_pairs_latest_both_http_200": 25,
+    "exact_pairs_latest_public_form_fields": 25,
+    "exact_pairs_initial_both_http_200": 13,
+    "exact_pairs_prior_both_http_200_and_form_fields": 25,
+    "outside_ledger_comparison_findings": 5,
+    "http_status": {
+      "404": 6,
+      "200": 42,
+      "503": 72
+    },
+    "intermediate_retry_http_status": {
+      "503": 80
+    },
+    "latest_http_status": {
+      "200": 108,
+      "404": 11,
+      "403": 9,
+      "401": 1,
+      "406": 1
+    },
+    "records_with_a_useful_fresh_http_observation": 32,
+    "board_jobs": 41,
+    "careers_links": 41
+  },
+  "navigation": {
+    "published_fragments": 285,
+    "fragment_visits": 570,
+    "native_fresh_document_traversals": {
+      "legacy": {
+        "oldest-Back": 6,
+        "edition-skipped-Forward": 6,
+        "edition-ordinary-Back": 6,
+        "ledger-skipped-Forward": 6,
+        "method-skipped-Forward": 6
+      },
+      "modern": {
+        "oldest-Back": 6,
+        "edition-skipped-Forward": 6,
+        "edition-ordinary-Back": 6,
+        "ledger-skipped-Forward": 6,
+        "method-skipped-Forward": 6
+      }
+    },
+    "no_script_journeys": 6,
+    "profile_delay_and_retry_journeys": 12,
+    "keyboard_navigation_and_history_journeys": {
+      "header menu and desktop links": 10,
+      "market-Back-Forward": 2,
+      "profile-Back": 2,
+      "profile-duplicate-profile": 2,
+      "profile-skipped-Forward": 2,
+      "duplicate-directory": 2,
+      "search-close-during-request": 2
+    }
+  },
+  "native_company_profiles": 55,
+  "research": {
+    "chapterRoutes": 24,
+    "browserChapterChecks": 92,
+    "archiveVerifiedMembers": 56,
+    "archiveVerifiedInternalLinks": 45583,
+    "projectionRows": 17763,
+    "archiveReaderLatency": {
+      "localSharedRunnerVisibleMs": [
+        42857,
+        53922
+      ],
+      "ordinaryReaderMaxDOMContentLoadedMs": 760,
+      "originalHtmlChanges": 0
+    },
+    "workerd": {
+      "coreHttpCases": 26,
+      "supplementalHttpChecks": 11,
+      "browserHops": 7,
+      "source": {
+        "source": "source-cohort4.source.osworld.side-effect-gap",
+        "sourceLocator": "Physical PDF p18 lines10-24 discussion; anchor physical p18, pdftotext-layout line 22 (1-based); full paper response SHA-256 8499a6ec06757448687f9e1a4e10bd11a5a561cbe2e52ecc2643e17b17b524a7.",
+        "archiveSourceUrl": "https://arxiv.org/pdf/2404.07972v1"
+      }
+    }
+  },
+  "daily": {
+    "nativeTrustedTabPassed": 40,
+    "tabWithAnimationFramesHeldPassed": 8,
+    "structuredHistoryPassed": 32,
+    "filterPairsPassed": 100,
+    "approvedEditionDates": [
+      "2026-11-18",
+      "2026-11-17",
+      "2026-11-16"
+    ]
+  },
+  "receipt_sha256": {
+    "navigation/summary.json": "088803aebb8a4bf0025501374fa7ec0c4ca5a3818020ef319002682111e3759c",
+    "navigation/work-bookmark-finding.md": "2d2c91be3175345a4e39615debcd33f891e4f3a475ec82970cfae5d07205e46d",
+    "research/verdict.json": "8a430b81631759181404de6b641fa92f28a57cc5d1e798cb4956c4143fca90e6",
+    "visual/report.md": "4a2bbb956ad7d089757bf3a71b49d84b496bfd431e93a9c8eb16b83b2e17e068",
+    "market/findings.md": "6228d29210dd2999b230d3fa7e9a3cb594b1a24be74323d13ae5a99036bdd08a",
+    "companies/findings.md": "fff5f6f91c1571b71d2503d301590155e23e2a22f48a5d2c2a485119ac7ed307",
+    "daily/summary.json": "4fd993b4d69e349ef32f9c7c29232902903b8dd64ce5a05d44c1750ad7c6af2e",
+    "work-matrix/matrix-summary.json": "1ddc28322e749ca10495b70b61dc6044688043b4059a510c437530311ba03aec",
+    "work-matrix/recovery-summary.json": "e88456e86a2fbafb4922b6456faf397f7a20e3882a23e79f5b38efdb95a27273",
+    "work-sources/README.md": "56ba2098014876a48c179338eb6a2c4a911be11b654973cf2e1f32f538660670",
+    "accessibility/README.md": "c9c81643eb7c345b51daef166f459090b9818df99b1dbb2e42414d9972611f14",
+    "release/report.md": "a55e8b264b8fec8b964701fbf54a24123bc70d32f186248ab3c8c27c37e74fc4",
+    "release/head-37ed52e5/ci-measurements.json": "485ed66001489b201cb991de739bb5aa1ca3ab04071d80f76cc8eac22da60948",
+    "release/head-85ff9754/ci-measurements.json": "e4f98e0b9f07f7fce211ec84fe5d358289acd23caa2c61c0cf17ac147be09328"
+  }
+}

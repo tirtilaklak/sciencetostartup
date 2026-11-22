@@ -1,0 +1,98 @@
+{
+  "build": "81071f0430d00446056b",
+  "manifest": "b463473f55949cd41cc67fde90dc247eaa8a46834b02339d7562c126eac65336",
+  "status": "All ten independent reviewers completed. Fifteen findings have assigned seventh-round owners.",
+  "items": [
+    {
+      "id": "A6-hourly-search",
+      "private_evidence_under_candidate_6_final": "retest-design/c6-phone-search_work.json",
+      "observation": "On Home, a bare hourly search ranks A.Team first and the Work option returns only one unlisted hourly rate. The real pay=hourly filter returns 17 published rates.",
+      "acceptance": "Support narrow hourly-pay intent and retain normal named-company and revenue search. Verify exact anchor and live record IDs."
+    },
+    {
+      "id": "W6-coverage-scope",
+      "private_evidence_under_candidate_6_final": "retest-design/c6-phone-visitor.json",
+      "observation": "The adjacent 48 named / 21 program counts and 135 records include other kinds with no scope label. The measured clarification fits without moving the first role.",
+      "acceptance": "Clarify the unfiltered tally and preserve filtered count semantics. Keep totals derived from current records and avoid claiming 48 open jobs."
+    },
+    {
+      "id": "N6-market-failure",
+      "private_evidence_under_candidate_6_final": "retest-navigation/market-runtime-failure-chromium.json",
+      "observation": "On direct Market with data or app bundle refused, the first Tab goes to footer About even though the native recovery is visible. Work control starts at Skip.",
+      "acceptance": "Enable the fragment only when normal routing can show it. Retain native/no-script and delayed/retry behavior, normal heading/focus and next Tab."
+    },
+    {
+      "id": "N6-native-directory-back",
+      "private_evidence_under_candidate_6_final": "retest-navigation/exploratory-c6.json",
+      "observation": "Native Companies Compare and profile departures lose the originating focus on cold Back, while query and scroll are retained. The next Tab reaches Skip; native Work footer does the same.",
+      "acceptance": "Test cold and warm native Back, exact initiating links, next Tab, ordinary direct visits and query filtering. Check primary native Work Compare separately."
+    },
+    {
+      "id": "E6-snorkel-threshold",
+      "private_evidence_under_candidate_6_final": "retest-market/snorkel-threshold-red.log",
+      "observation": "Issuer says annualized revenue run rate crossed $375M. Native, Compare and Market present an exact $375M.",
+      "acceptance": "Keep issuer terms with a qualified $375M run rate across all current views and downloads. Preserve historical canonical snapshot."
+    },
+    {
+      "id": "E6-toloka-source",
+      "private_evidence_under_candidate_6_final": "retest-market/publisher-receipts.json",
+      "observation": "Selected Toloka Fintel mirror rejected direct review; original SEC filing Note 3 explicitly reports the $26.1M FY2024 and $11.1M FY2023 amounts.",
+      "acceptance": "Provide the verified SEC filing while retaining the original source/history, periods, discontinued-ops scope and USD units."
+    },
+    {
+      "id": "E6-turing-source",
+      "private_evidence_under_candidate_6_final": "retest-market/publisher-receipts.json",
+      "observation": "Original syndicated release redirects to unreadable content. Issuer press release substantiates $300M annual revenue run rate; a direct automated request met a bot check.",
+      "acceptance": "Link only to the positively verified original issuer publication and retain the qualification on the old redirected copy; avoid labeling bot access 404."
+    },
+    {
+      "id": "S6-surge-work-terms",
+      "private_evidence_under_candidate_6_final": "retest-sources/targeted-http.json",
+      "observation": "The issuer identifies a named paid fellowship and asks applicants for a CV or relevant work samples. The current profile instead shows Location set per project although its evidence says location not researched.",
+      "acceptance": "Preserve named fellowship classification and evidenced stipend. Present eligibility/location only to the extent the issuer supports, and link the original application instructions."
+    },
+    {
+      "id": "R6-research-archive-actions",
+      "private_evidence_under_candidate_6_final": "retest-downloads",
+      "observation": "Data identifies the archived PDF, but the undated reader still labels it Full report PDF and Complete HTML report, even though both are the fixed pre-registration archive.",
+      "acceptance": "Label archive downloads near the links on the current surface, distinguish the current online edition. Preserve dated historical bytes and citation/edition identifiers."
+    },
+    {
+      "id": "N6-new-directory-fresh-link",
+      "private_evidence_under_candidate_6_final": "retest-navigation/fresh-links-c6-firefoxLegacy.json",
+      "observation": "On a fresh #companies link after previous Back history, Firefox without the Navigation API restores stale Mercor focus.",
+      "acceptance": "Restore on genuine traversal only. Fresh entries must get ordinary focus while retained Back entries remain correct."
+    },
+    {
+      "id": "N6-explore-work-compare-back",
+      "private_evidence_under_candidate_6_final": "retest-navigation/exploratory-c6.json",
+      "observation": "The Explore Work primary Compare results link loses visible initiating focus on cold Back. Native Work primary Compare is a passing control.",
+      "acceptance": "Preserve exact Work state, prior initiating Compare control and first subsequent keyboard action across cold returns without stealing fresh or warm focus."
+    },
+    {
+      "id": "N6-compare-row-back",
+      "private_evidence_under_candidate_6_final": "retest-companies/c6-compare-return.json",
+      "observation": "The full profile action and the Compare column heading share an href. Returning from the row selects the header, so the next Tab removes the company; a unique href returns correctly.",
+      "acceptance": "Identify the exact activating element/row without depending on href alone. Preserve the active column and normal alternate href."
+    },
+    {
+      "id": "N6-compare-financing-back",
+      "private_evidence_under_candidate_6_final": "retest-companies/c6-compare-return.json",
+      "observation": "A link to native financing evidence inside the More disclosure loads the right native fragment, but fresh Back collapses the previously open details and loses keyboard focus.",
+      "acceptance": "Restore the exact More disclosure, link, company selection and scroll on genuine Back. Respect normal fresh and warm navigation."
+    },
+    {
+      "id": "N6-compare-work-label",
+      "private_evidence_under_candidate_6_final": "retest-companies/verified-parity.json",
+      "observation": "Eleven historical Compare profiles use the link text Pay & requirements even when only careers boards, archived or information-only records are present.",
+      "acceptance": "Use accurate route/availability labels for profiles with no payable listing. Derive the label from evidence; keep the correct destination, native fallback and company name."
+    },
+    {
+      "id": "D6-daily-permalink-back",
+      "private_evidence_under_candidate_6_final": "retest-daily/permalink-focus.json",
+      "observation": "Back from an item permalink can leave focus on BODY. On the same dated edition this causes next Tab to repeat the previous headline; a cold filtered latest view moves the next Tab to Skip.",
+      "acceptance": "Preserve the referring item permalink focus across same-document and recreated-document Back with exact filters/open details and sensible next Tab."
+    }
+  ],
+  "updated_utc": "2026-11-22T10:41:00.614014+00:00"
+}

@@ -1,0 +1,266 @@
+{
+  "commit": "08e40919b95e2cc8012dee385335273fb92f1a90",
+  "build_id": "96e25098b02da34fdb20",
+  "manifest_sha256": "3ee2246bc0506c355cbdc00907ff057fda6978631bd0212fc48b8e753885c888",
+  "payloads": 1281,
+  "editorial_release_id": "2026-11-22.9",
+  "predecessor_pr_head": "da0f41ef305bd1f8142c80f3cafbd12c2ec3bf95",
+  "workers": {
+    "fix12_work_loader": {
+      "ownership_recorded_utc": "2026-11-22T15:07:53.650452+00:00",
+      "findings": [
+        "A11-work-early-timeout"
+      ],
+      "paths": [
+        "web/work-page-loader.js",
+        "tests/browser/search-compatibility.spec.js"
+      ],
+      "commits": [
+        "4cf7cdcb"
+      ]
+    },
+    "fix12_work_bookmark": {
+      "ownership_recorded_utc": "2026-11-22T15:07:53.676966+00:00",
+      "findings": [
+        "A11-webkit-scroll",
+        "A11-direct-input"
+      ],
+      "paths": [
+        "web/work-page.js",
+        "tests/browser/work-profile-return.spec.js"
+      ],
+      "commits": [
+        "2d0c6f33",
+        "60cf4557"
+      ]
+    },
+    "fix12_native_header": {
+      "ownership_recorded_utc": "2026-11-22T15:10:06.846992+00:00",
+      "findings": [
+        "A11-masthead",
+        "A11-index-tab-order"
+      ],
+      "paths": [
+        "scripts/static_pages.py",
+        "web/field-guide.css",
+        "tests/browser/native-phone-navigation.spec.js",
+        "tests/browser/research.spec.js",
+        "web/page-layout.css"
+      ],
+      "commits": [
+        "db871c78",
+        "5cdce09b"
+      ]
+    },
+    "fix12_daily_controls": {
+      "ownership_recorded_utc": "2026-11-22T15:10:06.891583+00:00",
+      "findings": [
+        "A11-daily-controls",
+        "A11-daily-marker"
+      ],
+      "paths": [
+        "scripts/daily_scan.py",
+        "web/daily-scan.css",
+        "tests/browser/daily-phone-reflow.spec.js",
+        "tests/test_daily_scan.py"
+      ],
+      "commits": [
+        "1ff93597"
+      ]
+    },
+    "fix12_daily_history": {
+      "ownership_recorded_utc": "2026-11-22T15:10:06.916135+00:00",
+      "findings": [
+        "A11-daily-classic-forward"
+      ],
+      "paths": [
+        "web/daily-scan.js",
+        "tests/browser/daily.spec.js"
+      ],
+      "commits": [
+        "5c8a6817",
+        "c8d6c81d"
+      ]
+    },
+    "fix12_issuer": {
+      "ownership_recorded_utc": "2026-11-22T15:14:08.806943+00:00",
+      "findings": [
+        "A11-terac-closure"
+      ],
+      "paths": [
+        "data/work-routes.json",
+        "data/editorial-release.json",
+        "data/source-updates.json",
+        "data/canonical.json"
+      ],
+      "commits": [
+        "ae52de0a",
+        "0ad2694a",
+        "d59219e9"
+      ]
+    },
+    "fix12_issuer_tests": {
+      "ownership_recorded_utc": "2026-11-22T15:20:53.320958+00:00",
+      "findings": [
+        "A11-terac-closure"
+      ],
+      "paths": [
+        "tests/test_provenance_corrections.py",
+        "tests/test_editorial_work.py",
+        "tests/browser/work-editorial-parity.spec.js",
+        "tests/test_work_export.py",
+        "tests/browser/interactions.spec.js"
+      ],
+      "commits": [
+        "23ab45db",
+        "b2af81d5"
+      ]
+    },
+    "fix12_method": {
+      "ownership_recorded_utc": "2026-11-22T15:20:53.507335+00:00",
+      "findings": [
+        "A11-method-record"
+      ],
+      "paths": [
+        "web/method-page.css",
+        "tests/browser/method-contact-reflow.spec.js"
+      ],
+      "commits": [
+        "064e4bed"
+      ]
+    },
+    "fix12_market": {
+      "ownership_recorded_utc": "2026-11-22T15:20:53.626057+00:00",
+      "findings": [
+        "A11-market-org"
+      ],
+      "paths": [
+        "web/business-health.css",
+        "web/business-health.js"
+      ],
+      "commits": [
+        "ea419975"
+      ]
+    },
+    "fix12_market_tests": {
+      "ownership_recorded_utc": "2026-11-22T15:25:16.502182+00:00",
+      "findings": [
+        "A11-market-org"
+      ],
+      "paths": [
+        "tests/browser/market-phone-accessibility.spec.js",
+        "tests/browser/market-focus.spec.js"
+      ],
+      "commits": [
+        "5e3f545d"
+      ]
+    }
+  },
+  "model": "gpt-6.2-sol",
+  "reasoning_effort": "ultra",
+  "native_page_sizes": {
+    "work": {
+      "bytes": 299289,
+      "gzip9": 42562
+    },
+    "company/afterquery": {
+      "bytes": 154676,
+      "gzip9": 22542
+    }
+  },
+  "eleventh_staged_worker": {
+    "id": "34210d27-0b0f-47cb-9fb1-2d277a9dbc85",
+    "number": 44,
+    "existing": false,
+    "commit": "da0f41ef305bd1f8142c80f3cafbd12c2ec3bf95",
+    "build_id": "8bd4d587e55c30d638a2",
+    "manifest_sha256": "b234d12c9b33cc03819ef697599065f6b1fe86198f4411e7cef4a4628ec0ad59",
+    "preview": "https://34210d27-sciencetostartup.musaeminozdem.workers.dev",
+    "traffic_promoted": false
+  },
+  "eleventh_local_gates": {
+    "passed": true,
+    "commit": "da0f41ef305bd1f8142c80f3cafbd12c2ec3bf95",
+    "source": "f4bcb0c3f7bd001f4ce6fb54d9ec72df4c21f312",
+    "build_id": "8bd4d587e55c30d638a2",
+    "manifest_sha256": "b234d12c9b33cc03819ef697599065f6b1fe86198f4411e7cef4a4628ec0ad59",
+    "total_browser_cases": 208,
+    "browser_cases": {
+      "cutover-journeys": 20,
+      "fifth-journeys": 26,
+      "sixth-journeys": 20,
+      "seventh-journeys": 44,
+      "eighth-journeys": 14,
+      "eighth-desktop": 1,
+      "ninth-journeys": 22,
+      "ninth-desktop": 3,
+      "ninth-market-firefox": 3,
+      "tenth-desktop": 10,
+      "tenth-mobile": 4,
+      "tenth-readable": 12,
+      "eleventh-reading": 8,
+      "eleventh-recovery": 5,
+      "eleventh-market-chromium": 3,
+      "eleventh-market-touch": 1,
+      "eleventh-readable": 8,
+      "eleventh-issuer": 4
+    },
+    "targeted_acceptance": 86,
+    "logic_suites": 9,
+    "payload_caps": 6,
+    "source_and_download_routes": 17,
+    "new_native_pages": 6,
+    "applicant_cards": 30,
+    "checked_utc": "2026-11-22T15:23:18.182288+00:00",
+    "native_source_ids_checked": 93
+  },
+  "official_eleven": {
+    "ci": 45036903655,
+    "browser": 45036903644,
+    "mobile_reports": 72,
+    "mobile_report_archive_sha256": "ba48aaa1954cc880316e1544d44d56fd16e7c6d5d5a92069c045cb566512d609"
+  },
+  "public_at_freeze": {
+    "checked_utc": "2026-11-22T15:23:50.721Z",
+    "deployment": {
+      "id": "6523aad9-1019-4eca-b781-408a55b9f33a",
+      "created_on": "2026-11-22T10:18:22.645027Z",
+      "versions": [
+        {
+          "version_id": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+          "percentage": 100
+        }
+      ]
+    },
+    "version": {
+      "id": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+      "number": 41,
+      "annotations": {
+        "workers/commit_sha": "f8287d077c3a6cd3a70c2fa65db39005e96cb54f",
+        "workers/message": "ScienceToStartup build 5dc63fbcf19634a55c66; editorial 2026-11-22.3; manifest 11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+        "workers/triggered_by": "version_upload"
+      }
+    }
+  },
+  "eleventh_staged_acceptance": {
+    "search": {
+      "total": 10,
+      "passed": 10
+    },
+    "accessibility": {
+      "total": 17,
+      "passed": 17
+    },
+    "home": {
+      "total": 48,
+      "passed": 48
+    },
+    "editorial": {
+      "total": 11,
+      "passed": 11
+    }
+  },
+  "twelfth_provenance": {
+    "work_routes_sha256": "5d060242e7f55f2ce96d6cc949b11ab73b5fea2e247189a71e55350b580250d8"
+  }
+}

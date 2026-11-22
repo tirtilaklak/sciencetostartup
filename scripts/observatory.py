@@ -865,6 +865,32 @@ def root_relative_resources(html):
         return attribute + '="' + ("/" if value in (".", "./") else "/" + value.removeprefix("./")) + '"'
     return re.sub(r'(href|src)="([^"]+)"', reference, html)
 
+def add_native_handoff_to_site_pages(destination):
+    """Witness the previous entry without a request or a change to deposited editions."""
+    source = (ROOT / "web/native-handoff.js").read_text(encoding="utf-8")
+    marker = "NATIVE_HANDOFF_PARTICIPANT"
+    require(source.count(marker) == 1, "build: missing native handoff participant marker")
+    scripts = package_frontend(javascript={
+        "participant": source.replace(marker, "true"),
+        "consumer": source.replace(marker, "false"),
+    })["javascript"]
+    snippets = {}
+    for name, script in scripts.items():
+        require("</script" not in script.lower(), "build: unsafe closing-script text in the native handoff helper")
+        snippets[name] = f"<script data-native-handoff>{script.strip()}</script>"
+    for page in sorted(destination.rglob("index.html")):
+        parts = page.relative_to(destination).parts
+        if parts[0] == "publication" or parts[:2] == ("research", "editions"):
+            continue
+        # The evidence ledgers are intentionally script-free.
+        if parts[:3] in (("research", "data", "assertions"), ("research", "data", "sources")):
+            continue
+        role = "participant" if parts[0] in ("index.html", "company", "companies", "explore", "work") else "consumer"
+        html = page.read_text(encoding="utf-8")
+        charset = '<meta charset="utf-8">'
+        require(charset in html, f"build: missing page charset in {page.relative_to(destination)}")
+        page.write_text(html.replace(charset, charset + snippets[role], 1), encoding="utf-8")
+
 def build(data, destination):
     validate(data)
     work_path = ROOT / "data/work-routes.json"
@@ -1046,6 +1072,7 @@ def build(data, destination):
         (destination / "CITATION.cff").write_bytes((destination / "publication/current-CITATION.cff").read_bytes())
     from daily_scan import write_daily_scan
     write_daily_scan(destination, context=daily_context)
+    add_native_handoff_to_site_pages(destination)
     from presentation import retain_runtime_generations
     retain_runtime_generations(ROOT, destination)
     files = {str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(destination.rglob("*")) if p.is_file() and p.name != "manifest.json"}

@@ -154,7 +154,7 @@ test('fixed gates retain the approved limits across field-guide and research rou
   assert.equal(policy.performance.lighthouseVersion, '13.6.0');
   assert.equal(policy.performance.playwrightVersion, '1.65.0');
   assert.equal(policy.performance.minimumRunsPerRoute, 3);
-  assert.deepEqual(policy.performance.routes, ['/', '/companies/', '/explore/#companies', '/explore/#work', '/explore/#company/mercor/work', '/work/',
+  assert.deepEqual(policy.performance.routes, ['/', '/companies/', '/company/afterquery/', '/explore/#companies', '/explore/#work', '/explore/#company/mercor/work', '/work/',
     '/daily/', '/research/', '/research/papers/', '/research/state-of-ai-data-labs/',
     '/research/state-of-ai-data-labs/chapters/weekly-developments/',
     '/research/state-of-ai-data-labs/chapters/market-structure/',
@@ -286,6 +286,19 @@ test('empty compatibility archive slots are allowed, nonempty canonical inputs a
 test('resource inventory covers relative styles and responsive sources without counting navigation', () => {
   const refs = resourceReferences('<link rel="stylesheet" href="../site.css"><a href="/work/">Browse</a><source srcset="/a.webp 400w, /b.webp 600w"><img src="https://external.test/a.png"><style>x{background:url(../c.svg)}</style>', 'explore/index.html');
   assert.deepEqual(refs.map(ref => ref.path), ['site.css', 'a.webp', 'b.webp', 'c.svg']);
+});
+
+test('script code is not a resource while script sources and styles still are', () => {
+  const html = [
+    '<script src="runtime.js">const url = new URL(t);</script>',
+    `<script>const markup = '<img src="unused.png">';</script>`,
+    '<style>.hero { background: url(hero.webp) }</style>',
+    '<div style="background-image: url(icon.svg)"></div>',
+  ].join('');
+  assert.deepEqual(resourceReferences(html, 'index.html').map(ref => ref.path),
+    ['runtime.js', 'hero.webp', 'icon.svg']);
+  assert.deepEqual(resourceReferences('p { background: URL(icon.svg) }', 'site.css').map(ref => ref.path),
+    ['icon.svg']);
 });
 
 test('payload checks sum independently compressed HTTP files and pass a valid manifested artifact', async t => {

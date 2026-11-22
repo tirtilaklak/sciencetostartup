@@ -15,6 +15,7 @@
     const navigation = document.querySelector('[data-work-section-navigation]');
     const compareLink = document.querySelector('[data-work-compare]');
     const exploreLink = document.querySelector('[data-work-explore]');
+    const handoffLinks = { compare: compareLink, explore: exploreLink };
     const comparison = document.querySelector('[data-work-comparison]');
     const exportButton = document.querySelector('[data-work-export]');
     const exportStatus = document.querySelector('[data-work-export-status]');
@@ -25,6 +26,7 @@
     const groupElements = new Map([...list.querySelectorAll('[data-work-group]')].map(group => [group.dataset.workGroup, group]));
     const fields = Object.fromEntries(S2SWork.keys.map(key => [key, form.elements.namedItem(key)]));
     const cards = new Map([...list.querySelectorAll('[data-work-route]')].map(card => [card.dataset.workRoute, card]));
+    const profileLinkSelector = '.work-heading a[href^="/company/"]';
     const text = (card, selector) => card.querySelector(selector)?.textContent.trim() || '';
     // An older page can still request the current unversioned enhancer. Its own
     // cards supply search terms and groups so a newer release cannot change their facts.
@@ -44,9 +46,17 @@
     }));
     if (records.length !== cards.size) throw new Error('Work selection does not match the page');
     const initialOpen = new Map([...groupElements.values()].filter(group => group.tagName === 'DETAILS').map(group => [group, group.open]));
+    const compareArrivalKey = 's2s.workCompareArrival';
+    let compareDeparture;
+    let profileClick, profileDeparture;
+    let returnBookmark;
     let selection = [];
     let active = false;
     let displayedSearch;
+    let readerInput = 0;
+    for (const type of ['wheel', 'keydown', 'touchstart', 'pointerdown']) {
+      addEventListener(type, event => { if (event.isTrusted) readerInput++; }, { capture: true, passive: true });
+    }
 
     function readURL() {
       const criteria = S2SWork.readCriteria(new URLSearchParams(location.search));
@@ -61,6 +71,16 @@
       const open = history.state?.workFilterOptionsOpen;
       if (typeof open === 'boolean') filterOptions.open = open;
       else remember({ workFilterOptionsOpen: filterOptions.open });
+    }
+
+    function appendComparisonFields(cell, fields) {
+      for (const value of fields) {
+        if (!value) continue;
+        const field = document.createElement('div');
+        field.textContent = value;
+        if (cell.hasChildNodes()) cell.append('\n');
+        cell.append(field);
+      }
     }
 
     function comparisonRows(results) {
@@ -88,14 +108,27 @@
         identity.scope = 'row';
         identity.textContent = [company_name, text(card, 'h3'), text(card, '.work-status')].filter(Boolean).join(' · ');
         row.append(identity);
-        row.insertCell().textContent = text(card, '.work-historical-pay') || text(card, '.work-pay') || 'Pay not listed';
+        const pay = card.querySelector('.work-pay');
+        const amount = pay?.querySelector('strong');
+        const historicalLabel = amount?.previousElementSibling?.textContent.trim();
+        appendComparisonFields(row.insertCell(), [
+          [historicalLabel, amount?.textContent.trim()].filter(Boolean).join(' ') || 'Pay not listed',
+          ...Array.from(pay?.querySelectorAll('strong ~ .sub') || [], note => note.textContent.trim()),
+        ]);
         const detail = row.insertCell();
-        detail.append([text(card, '.work-place'), text(card, '.work-listing-conditions'), text(card, '.work-reviewed')].filter(Boolean).join(' · '));
+        const groupKind = card.closest('[data-work-group]')?.dataset.workKindLabel;
+        const conditionFields = Array.from(card.querySelector('.work-listing-conditions').children, field => field.textContent.trim());
+        if (groupKind && conditionFields.length) conditionFields[0] = groupKind + ' · ' + conditionFields[0];
+        appendComparisonFields(detail, [
+          text(card, '.work-place'),
+          ...conditionFields,
+          text(card, '.work-reviewed'),
+        ]);
         const action = card.querySelector('.work-listing-action a');
         if (action) {
           const copy = action.cloneNode(true);
           copy.removeAttribute('id');
-          detail.append(' ', copy);
+          detail.append('\n', copy);
         }
       }
       region.append(table);
@@ -154,8 +187,12 @@
       if (comparison) comparison.hidden = !showCompare;
       empty.hidden = selection.length !== 0;
       if (showCompare) comparisonRows(selection);
-      count.textContent = legacy && !filtering ? initialCount
-        : `${selection.length} ${filtering ? 'matching ' : ''}${selection.length === 1 ? 'record' : 'records'}`;
+      const matchKeys = S2SWork.keys.filter(key => key !== 'sort' && criteria[key]);
+      const record = selection.length === 1 ? 'record' : 'records';
+      const hourlyOnly = matchKeys.length === 1 && criteria.pay === 'hourly';
+      const countLabel = hourlyOnly ? `${selection.length} ${record} with published hourly pay`
+        : matchKeys.length ? `${selection.length} matching ${record}` : initialCount;
+      if (count.textContent !== countLabel) count.textContent = countLabel;
       if (navigation) {
         navigation.hidden = showCompare || !selection.length;
         for (const link of navigation.querySelectorAll('[data-work-jump]')) {
@@ -196,8 +233,12 @@
       if (group) group.open = true;
       if (focus) {
         // The browser can finish its own fragment scroll after scripts run.
+        const input = readerInput;
+        const previousFocus = document.activeElement;
         requestAnimationFrame(() => requestAnimationFrame(() => {
-          if (target !== targetFromHash() || target.closest('[hidden]')) return;
+          const active = document.activeElement;
+          if (input !== readerInput || target !== targetFromHash() || target.closest('[hidden]') ||
+              (active !== previousFocus && active !== document.body && active !== target)) return;
           target.focus({ preventScroll: true });
           target.scrollIntoView({ block: 'start', behavior: 'instant' });
         }));
@@ -215,16 +256,142 @@
       return true;
     }
 
-    function restoreCompareFocus() {
+    function savedHandoff() {
+      const { workReturnFocus, workCompareFocus } = history.state || {};
+      if (workReturnFocus) {
+        const { kind, page, href, top, role, termsOpen } = workReturnFocus;
+        const card = kind === 'profile' ? cards.get(role) : null;
+        const link = kind === 'profile' ? card?.querySelector(profileLinkSelector) : handoffLinks[kind];
+        if (link && page === location.href && href === link.href) return { link, top, card, termsOpen };
+      } else if (workCompareFocus && compareLink) return { link: compareLink };
+      return null;
+    }
+
+    function restoreHandoff({ link, top, card, termsOpen }) {
       // A warm history traversal keeps this document and its browser-managed focus.
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        if (loader?.interacted || document.activeElement !== document.body || !history.state?.workCompareFocus) return;
-        compareLink.focus({ preventScroll: true });
-        const { top, bottom } = compareLink.getBoundingClientRect();
-        const headerBottom = document.querySelector('.site-header')?.getBoundingClientRect().bottom || 0;
-        if (top < Math.max(0, headerBottom) || bottom > innerHeight) {
-          compareLink.scrollIntoView({ block: 'center', behavior: 'instant' });
+      // On a verified cold return, the browser may focus the opener's bookmark first.
+      const bookmark = card && card === targetFromHash() ? card : null;
+      const bookmarkHandoff = bookmark && { target: bookmark, recover: null };
+      returnBookmark = bookmarkHandoff;
+      const input = readerInput;
+      const canRestore = () => input === readerInput && !loader?.interacted &&
+        savedHandoff()?.link === link && !link.closest('[hidden]');
+
+      function clearBookmark() {
+        if (returnBookmark === bookmarkHandoff) returnBookmark = null;
+      }
+
+      function recoverBookmarkFocus() {
+        if (returnBookmark === bookmarkHandoff && document.activeElement === bookmark && canRestore()) {
+          link.focus({ preventScroll: true });
         }
+      }
+
+      function restorePosition() {
+        const bounds = link.getBoundingClientRect();
+        const headerBottom = Math.max(0, document.querySelector('.site-header')?.getBoundingClientRect().bottom || 0);
+        if (Number.isFinite(top) && top >= headerBottom && top + bounds.height <= innerHeight) {
+          if (Math.abs(bounds.top - top) >= 1) window.scrollBy({ top: bounds.top - top, behavior: 'instant' });
+        } else if (bounds.top < headerBottom || bounds.bottom > innerHeight) {
+          link.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+      }
+
+      function settleBookmarkPosition(event) {
+        if (event?.persisted) return clearBookmark();
+        // WebKit can apply the native fragment focus and scroll after the
+        // opener has already received focus. Leave other focus moves alone.
+        setTimeout(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+          recoverBookmarkFocus();
+          if (document.activeElement === link && canRestore()) restorePosition();
+          clearBookmark();
+        })), 0);
+      }
+
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const focusAvailable = document.activeElement === document.body || document.activeElement === bookmark;
+        if (!focusAvailable || !canRestore()) return clearBookmark();
+        const group = card?.closest('details[data-work-group]');
+        if (group) group.open = true;
+        const terms = termsOpen && card?.querySelector('details.work-terms');
+        if (terms) terms.open = true;
+        if (bookmarkHandoff) bookmarkHandoff.recover = () => queueMicrotask(recoverBookmarkFocus);
+        link.focus({ preventScroll: true });
+        restorePosition();
+        if (bookmark) {
+          if (document.readyState === 'complete') settleBookmarkPosition();
+          else addEventListener('pageshow', settleBookmarkPosition, { once: true });
+        }
+      }));
+    }
+
+    function bindProfileArrival() {
+      const saved = history.state?.workReturnFocus;
+      const browserHistory = window.navigation;
+      if (!browserHistory || saved?.kind !== 'profile' || saved.page !== location.href || saved.destinationKey !== undefined) return;
+      // The original visit is the next history entry when Work is reactivated.
+      // Keep its key so a new visit to the same profile URL cannot stand in for it.
+      const next = browserHistory.entries()[(browserHistory.currentEntry?.index ?? -2) + 1];
+      const destinationKey = next?.url === saved.href ? next.key : null;
+      try { remember({ workReturnFocus: { ...saved, destinationKey } }); } catch {}
+    }
+
+    function followsHandoff() {
+      const saved = history.state?.workReturnFocus;
+      if (!window.navigation) return window.S2SNativeHandoff?.returnedFrom(saved?.entry);
+      const { from, entry } = window.navigation.activation || {};
+      if (saved?.kind === 'profile') {
+        // The exact role visit must be the adjacent entry we just left on Back.
+        return Boolean(saved.destinationKey && from?.key === saved.destinationKey &&
+          from.url === saved.href && from.index === window.navigation.currentEntry?.index + 1);
+      }
+      return !(from && from.index <= entry?.index);
+    }
+
+    function sameTabActivation(event, link) {
+      return event.isTrusted && !event.defaultPrevented && event.button === 0 && !event.metaKey && !event.ctrlKey &&
+        !event.shiftKey && !event.altKey && !link.hasAttribute('download') && (!link.target || link.target.toLowerCase() === '_self');
+    }
+
+    function recordProfileDeparture() {
+      const click = profileClick;
+      const departure = profileDeparture;
+      profileClick = profileDeparture = null;
+      const leaving = departure && ['push', 'replace'].includes(departure.navigationType);
+      const activated = click && !click.event.defaultPrevented && (window.navigation
+        ? leaving && departure.navigationType === 'push' && departure.sourceElement === click.link && departure.destination.url === click.saved.href
+        : click.saved.entry);
+      // Wait for an actual departure before changing the source entry. Retain
+      // it on browser traversals so a repeated Back can restore it again.
+      if (!activated && (!leaving || history.state?.workReturnFocus?.kind !== 'profile')) return;
+      try { remember({ workReturnFocus: activated ? click.saved : null, workCompareFocus: false }); } catch {}
+    }
+
+    function takeCompareArrival() {
+      if (!comparison || window.top !== window) return false;
+      try {
+        if (!sessionStorage.getItem(compareArrivalKey)) return false;
+        sessionStorage.removeItem(compareArrivalKey);
+        if (comparison.hidden || !document.referrer || performance.getEntriesByType('navigation')[0]?.type !== 'navigate') return false;
+        // Match the native same-tab link without storing the reader's search.
+        const expected = new URL(document.referrer);
+        expected.searchParams.set('view', 'compare');
+        const arrival = new URL(location.href);
+        arrival.hash = '';
+        return expected.href === arrival.href;
+      } catch {
+        return false;
+      }
+    }
+
+    function focusComparison() {
+      const heading = comparison.querySelector('h2');
+      const toolbar = compareLink.closest('[data-work-toolbar]');
+      const arrival = location.href;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (loader?.interacted || document.activeElement !== document.body || location.href !== arrival || comparison.hidden) return;
+        heading.focus({ preventScroll: true });
+        toolbar.scrollIntoView({ block: 'start', behavior: 'instant' });
       }));
     }
 
@@ -236,12 +403,43 @@
     filterSummary.addEventListener('click', event => {
       if (!event.defaultPrevented) remember({ workFilterOptionsOpen: !filterOptions.open });
     });
-    compareLink?.addEventListener('click', event => {
-      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      remember({ workCompareFocus: true });
-    });
-    if (compareLink) document.addEventListener('focusin', event => {
-      if (event.target !== compareLink && history.state?.workCompareFocus) remember({ workCompareFocus: false });
+    for (const [kind, link] of Object.entries(handoffLinks)) {
+      link?.addEventListener('click', event => {
+        if (!sameTabActivation(event, link)) return;
+        if (link === compareLink && comparison?.hidden) compareDeparture = event;
+        const entry = window.S2SNativeHandoff?.begin(link.href, event);
+        remember({ workReturnFocus: { kind, page: location.href, href: link.href, top: link.getBoundingClientRect().top, entry }, workCompareFocus: false });
+      });
+    }
+    if (comparison && window.top === window) {
+      list.addEventListener('click', event => {
+        const link = event.target.closest?.(profileLinkSelector);
+        if (!link || !sameTabActivation(event, link)) return;
+        const card = link.closest('[data-work-route]');
+        if (!card) return;
+        const entry = window.S2SNativeHandoff?.begin(link.href, event);
+        profileClick = { link, event, saved: {
+          kind: 'profile', page: location.href, href: link.href, role: card.dataset.workRoute,
+          top: link.getBoundingClientRect().top, termsOpen: Boolean(card.querySelector('details.work-terms')?.open), entry,
+        } };
+      });
+      window.navigation?.addEventListener('navigate', event => {
+        if (!event.destination.sameDocument) profileDeparture = event;
+      });
+      window.addEventListener('pageshow', event => { if (event.persisted) bindProfileArrival(); });
+      window.addEventListener('pagehide', recordProfileDeparture);
+      window.addEventListener('pagehide', () => {
+        const departure = compareDeparture;
+        compareDeparture = null;
+        if (!departure || departure.defaultPrevented) return;
+        try { sessionStorage.setItem(compareArrivalKey, '1'); } catch {}
+      });
+    }
+    document.addEventListener('focusin', event => {
+      const handoff = savedHandoff();
+      const bookmarkFocus = event.target === returnBookmark?.target && !loader?.interacted;
+      if (bookmarkFocus) returnBookmark.recover?.();
+      if (handoff && event.target !== handoff.link && !bookmarkFocus) remember({ workReturnFocus: null, workCompareFocus: false });
     });
     navigation?.addEventListener('click', event => {
       const link = event.target.closest('[data-work-jump]');
@@ -256,6 +454,7 @@
       if (!restoreJumpFocus()) revealTarget(true);
     });
     window.addEventListener('popstate', () => {
+      bindProfileArrival();
       restoreFilterOptions();
       if (displayedSearch !== location.search) { readURL(); render(); }
     });
@@ -282,16 +481,19 @@
     if (compareLink) compareLink.hidden = false;
     if (exportButton) exportButton.hidden = false;
     const retried = loader?.retried;
-    const returningToCompareLink = compareLink && history.state?.workCompareFocus && !loader?.interacted
-      && performance.getEntriesByType('navigation')[0]?.type === 'back_forward';
-    const revealed = revealTarget(!returningToCompareLink && (!loader?.interacted || retried));
-    if (!returningToCompareLink && !revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
+    const compareArrival = takeCompareArrival() && !loader?.interacted;
+    bindProfileArrival();
+    const handoff = !loader?.interacted && performance.getEntriesByType('navigation')[0]?.type === 'back_forward' &&
+      followsHandoff() && savedHandoff();
+    const revealed = !compareArrival && revealTarget(!handoff && (!loader?.interacted || retried));
+    if (!compareArrival && !handoff && !revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
       // A saved anchor can be excluded by the saved criteria.
       count.scrollIntoView({ block: 'start', behavior: 'instant' });
     }
     loader?.complete(script);
     document.documentElement.removeAttribute('data-page-enhancement');
-    if (returningToCompareLink) restoreCompareFocus();
+    if (compareArrival) focusComparison();
+    else if (handoff) restoreHandoff(handoff);
     if (!revealed && retried) {
       // A failed load can leave the reader at a bookmark the filters now hide.
       fields.q.focus({ preventScroll: true });
@@ -302,6 +504,8 @@
     }
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once: true });
-  else initialize();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initialize, { once: true });
+    loader?.waitingForDocument?.(script);
+  } else initialize();
 })();

@@ -171,6 +171,120 @@ test('new work script accepts old native markup', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+async function pauseWorkDocument(page) {
+  const parserBlock = '/qa-work-document-pause.js';
+  const { promise: paused, resolve: resume } = Promise.withResolvers();
+  await page.route('**' + parserBlock, async route => {
+    await paused;
+    await route.fulfill({ contentType: 'text/javascript', body: '' });
+  });
+  await page.route(url => url.pathname === '/work/', async route => {
+    // This fixture edits HTML. Playwright fetch may expose raw zstd when Firefox negotiates it.
+    const response = await route.fetch({ headers: { ...route.request().headers(), 'accept-encoding': 'identity' } });
+    expect(response.ok()).toBe(true);
+    const html = await response.text();
+    expect(html).toContain('</head>');
+    const body = html.replace('</head>', '<script src="' + parserBlock + '"></script></head>');
+    const headers = response.headers();
+    for (const name of ['content-encoding', 'content-length', 'transfer-encoding']) delete headers[name];
+    await route.fulfill({ response, headers, body });
+  });
+  return resume;
+}
+
+test('native Work applies its saved filter when the bundle arrives before slow HTML finishes', async ({ page }) => {
+  const resume = await pauseWorkDocument(page);
+  // Network setup can take longer than the timer on a busy Firefox runner.
+  // Start the simulated delay only after the real bundle has executed.
+  await page.clock.install({ time: new Date('2026-11-22T09:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-11-22T09:01:00Z'));
+  await page.addInitScript(() => {
+    const observer = new MutationObserver(changes => {
+      for (const change of changes) {
+        for (const node of change.addedNodes) {
+          if (node instanceof HTMLScriptElement && /\/js\/work\.[0-9a-f]+\.js$/.test(node.src)) {
+            node.addEventListener('load', () => { window.workBundleReadyState = document.readyState; });
+            observer.disconnect();
+          }
+        }
+      }
+    });
+    observer.observe(document, { childList: true, subtree: true });
+  });
+  try {
+    await page.goto('/work/?q=Sage', { waitUntil: 'commit' });
+    await expect.poll(() => page.evaluate(() => window.workBundleReadyState)).toBe('loading');
+    await page.clock.fastForward(4000);
+  } finally {
+    resume();
+  }
+  await page.waitForLoadState('domcontentloaded');
+  await expect(page.getByRole('searchbox', { name: 'Search listings' })).toHaveValue('Sage');
+  await expect(page.locator('.work-page-list [data-work-route]:visible')).toHaveAttribute('data-work-route', 'appen.work.sage-media');
+  await expect(page.locator('[data-work-retry]')).toBeHidden();
+});
+
+test('native Work keeps the downloaded bundle when slow HTML delays its execution', async ({ page }) => {
+  const resume = await pauseWorkDocument(page);
+  const executionBlock = '/qa-work-execution-pause.js';
+  const { promise: blocked, resolve: unblock } = Promise.withResolvers();
+  await page.clock.install({ time: 0 });
+  await page.clock.pauseAt(60_000);
+  await page.route('**' + executionBlock, async route => {
+    await blocked;
+    await route.fulfill({ contentType: 'text/javascript', body: '' });
+  });
+  await page.addInitScript(block => {
+    const append = Element.prototype.append;
+    Element.prototype.append = function (...nodes) {
+      const [script] = nodes;
+      if (this === document.head && script instanceof HTMLScriptElement && script.src.includes('/js/work.')) {
+        // Fetch the actual SRI bundle even if the browser queues the ordered scripts together.
+        const preload = document.createElement('link');
+        preload.rel = 'preload';
+        preload.as = 'script';
+        preload.href = script.src;
+        preload.integrity = script.integrity;
+        append.call(this, preload);
+
+        const first = document.createElement('script');
+        first.async = false;
+        first.src = block;
+        append.call(this, first);
+        script.async = false;
+      }
+      append.apply(this, nodes);
+    };
+  }, executionBlock);
+
+  try {
+    const response = page.waitForResponse(response => /\/js\/work\.[a-f0-9]{12}\.js$/.test(response.url()));
+    await page.goto('/work/?q=Sage', { waitUntil: 'commit' });
+    const downloaded = await response;
+    expect(downloaded.ok()).toBe(true);
+    expect(await downloaded.finished()).toBeNull();
+
+    await page.clock.fastForward(4000);
+    expect(await page.evaluate(() => {
+      const script = document.querySelector('script[src^="/js/work."]');
+      return {
+        document: document.readyState,
+        state: document.documentElement.dataset.workLoad,
+        active: Boolean(script && window.WorkPageResource.accepts(script)),
+        executed: Boolean(window.WORK_NATIVE_SELECTION),
+      };
+    })).toEqual({ document: 'loading', state: 'pending', active: true, executed: false });
+  } finally {
+    resume();
+    unblock();
+  }
+
+  await page.waitForLoadState('domcontentloaded');
+  await expect(page.getByRole('searchbox', { name: 'Search listings' })).toHaveValue('Sage');
+  await expect(page.locator('.work-page-list [data-work-route]:visible')).toHaveAttribute('data-work-route', 'appen.work.sage-media');
+  await expect(page.locator('[data-work-retry]')).toBeHidden();
+});
+
 test('native work rejects a stale script and restores the selected record and CSV after retry', async ({ page, request }) => {
   test.setTimeout(45_000);
   const sageId = 'appen.work.sage-media';

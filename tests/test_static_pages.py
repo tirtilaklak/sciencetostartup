@@ -123,6 +123,18 @@ def png_size(data):
     return struct.unpack(">II", data[16:24])
 
 
+class ConfidenceGradeWordingTests(unittest.TestCase):
+    def test_native_and_explore_define_grade_a(self):
+        data = json.loads((ROOT / "data/canonical.json").read_text())
+        native = sp.render_method(sp.Research(data), {}, data["meta"]["as_of"])
+        explore = (ROOT / "web/index.html").read_text()
+        definition = "Public filing, independent evidence or buyer confirmation."
+        for surface, page, count in (("native", native, 1), ("Explore", explore, 2)):
+            with self.subTest(surface=surface):
+                self.assertEqual(re.findall(r"<dt>A</dt><dd>([^<]+)</dd>", page), [definition] * count)
+                self.assertIn("A public filing can come from the company itself.", page)
+
+
 class StaticPageTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -139,6 +151,9 @@ class StaticPageTests(unittest.TestCase):
         observations = json.loads((ROOT / "data/business-health.json").read_text())["observations"]
         cls.reviewed_estimates = {row["id"] for row in observations
                                   if row["evidence_type"] == "estimate" and row["metric_ids"] == [row["id"]]}
+        cls.reviewed_comparatives = {row["id"] for row in observations
+                                    if row.get("primary_source_id") and row.get("accounting_basis") == "latest_discontinued_operations_comparative"}
+        cls.reviewed_profile_growth = {row["profile_metric_id"]: row for row in observations if row.get("profile_metric_id")}
         cls.routes = json.loads((ROOT / "data/work-routes.json").read_text())["routes"]
         cls.events = json.loads((ROOT / "data/company-events.json").read_text())
         cls.editorial = {e["company_id"]: e for e in json.loads((ROOT / "data/editorial.json").read_text())["entries"]}
@@ -206,12 +221,12 @@ class StaticPageTests(unittest.TestCase):
     def test_pages_stay_lean_without_app_script_or_dataset(self):
         for cid, text in self.pages.items():
             page_bytes = text.encode()
-            # AfterQuery's 45 retained listings include compact descriptions,
-            # dated pay evidence, and separate destination checks on the dossier.
-            self.assertLess(len(page_bytes), 140_000 if cid == "afterquery" else PAGE_LIMIT, cid)
+            # AfterQuery's 45 compact cards include eligibility text and separate checks.
+            self.assertLess(len(page_bytes), 160_000 if cid == "afterquery" else PAGE_LIMIT, cid)
             if cid == "afterquery":
-                self.assertLess(len(gzip.compress(page_bytes)), 17_000, cid)
-            self.assertEqual(PageFacts(text).scripts, [{"type": "application/ld+json"}, {"src": "/native-details.js", "defer": None}], cid)
+                self.assertLess(len(gzip.compress(page_bytes)), 23_000, cid)
+            self.assertEqual(PageFacts(text).scripts, [{"data-native-handoff": None}, {"type": "application/ld+json"},
+                                                        {"src": "/native-details.js", "defer": None}], cid)
             self.assertNotIn('id="research-data"', text, cid)
             structured = structured_data(text)
             self.assertEqual(structured["mainEntity"]["name"], self.companies[cid]["name"], cid)
@@ -329,12 +344,29 @@ class StaticPageTests(unittest.TestCase):
             self.assertIn(f'<section class="directory-section" data-group="{slug}">', text)
         nonprofits = sum(1 for e in self.editorial.values() if e["primary_offering"] == "Nonprofit research")
         total = len(self.companies) + len(self.current_companies["entries"])
-        self.assertIn(f"{sp.count_word(nonprofits)} of the {total} are nonprofit research groups.", text)
+        self.assertIn(f"{sp.count_word(nonprofits)} of the {total} companies are nonprofit research groups.", text)
 
     def test_index_states_coverage_limits(self):
         text = (self.dist / "companies/index.html").read_text()
-        self.assertIn("The guide is a selected study of the market. It does not list every company.", text)
-        self.assertIn("The guide is a selected study of the market. It does not list every company.", (self.dist / "method/index.html").read_text())
+        self.assertIn("The guide covers selected companies.", text)
+        method = (self.dist / "method/index.html").read_text()
+        method_coverage = re.search(r'<details class="method-detail" id="coverage-notes">.*?</details>', method, re.S).group(0)
+        compiled = sp.format_date(self.data["meta"]["as_of"])
+        self.assertIn(f'Historical company dataset v{self.data["dataset_version"]} · research compiled {compiled}', method_coverage)
+        self.assertIn(f'This dataset covers {len(self.companies)} company profiles and {len(self.data["sources"])} source records.', method_coverage)
+        self.assertIn(f'Browse the <a href="{ORIGIN}/companies/">current company directory</a> for newer profiles.', method_coverage)
+        count = len(self.current_companies["entries"])
+        supplemental = '<a href="/current-companies.json">Supplemental records for ' + str(count) + ' added companies (JSON)</a>'
+        self.assertEqual(text.count('href="/current-companies.json"'), 1)
+        coverage = re.search(r'<details class="directory-scope">.*?</details>', text, re.S).group(0)
+        self.assertIn(supplemental, coverage)
+        self.assertIn(f'Choose up to three of {len(self.companies)} historical profiles in Compare.', coverage)
+        for addition in self.current_companies["entries"]:
+            slug = addition["entity_id"]
+            card = text.split(f'<li class="directory-company" data-company="{slug}"', 1)[1].split('</section></li>', 1)[0]
+            self.assertIn(f'href="{ORIGIN}/company/{slug}/"', card)
+            for source in addition["sources"]:
+                self.assertIn(f'href="{html.escape(source["url"], quote=True)}"', card)
         missing = re.search(r"Firms not yet listed in this directory include ([^<]+)", text).group(1)
         remaining = [name for name in sp.NOT_YET_PROFILED if not any(name.casefold() in entry["name"].casefold().split(" / ") for entry in self.current_companies["entries"])]
         self.assertEqual(missing, sp.join_words(remaining) + ".")
@@ -492,7 +524,28 @@ class StaticPageTests(unittest.TestCase):
     def test_manifest_covers_the_static_pages(self):
         manifest = json.loads((self.dist / "manifest.json").read_text())["sha256"]
         for name in ("sitemap.xml", "companies/index.html", "company/mercor/index.html", "work/index.html", "method/index.html", "404.html", "favicon.ico", "assets/favicon.svg", "assets/favicon-48.png", "assets/apple-touch-icon.png", "assets/share/sciencetostartup-1200x630.png"): self.assertIn(name, manifest)
-        self.assertEqual(sum(1 for n in manifest if n.startswith("company/") and n.endswith("/index.html")), len(list((self.dist / 'company').glob('*/index.html'))))
+        company_pages = {path.relative_to(self.dist).as_posix()
+                         for path in (self.dist / "company").rglob("index.html")}
+        self.assertIn("company/afterquery/work-sources/index.html", company_pages)
+        self.assertEqual({name for name in manifest if name.startswith("company/") and name.endswith("/index.html")},
+                         company_pages)
+
+    def test_afterquery_native_source_index_preserves_the_original_citations(self):
+        prefix = "company/afterquery/"
+        index_route = "/" + prefix + "work-sources/"
+        profile = self.pages["afterquery"]
+        self.assertIn(index_route, {link.get("href") for link in PageFacts(profile).anchors})
+        index = (self.dist / index_route.lstrip("/") / "index.html").read_text()
+        self.assertEqual(PageFacts(index).canonicals, [ORIGIN + index_route])
+        expected = {source["id"]: source["url"] for source in self.data["sources"]
+                    if source.get("company_id") == "afterquery" and sp.is_web_url(source.get("url"))}
+        rows = []
+        for page in (profile, index):
+            entries = re.findall(r'<li\b[^>]*\bdata-native-source="([^"]+)"><a\b[^>]*\bhref="([^"]+)"', page)
+            self.assertTrue(entries)
+            rows.extend((html.unescape(sid), html.unescape(url)) for sid, url in entries)
+        self.assertEqual(len(rows), len(expected))
+        self.assertEqual(dict(rows), expected)
 
     def test_static_pages_are_reproducible(self):
         with tempfile.TemporaryDirectory(prefix="static-pages-again-") as temp:
@@ -602,7 +655,7 @@ class StaticPageTests(unittest.TestCase):
             if headline: self.assertEqual(shown[0]["id"], headline["id"], cid)
             for kind in REVENUE_KINDS:
                 same = [m for m in shown if m["kind"] == kind]
-                self.assertLessEqual(len(same), 1, (cid, kind))
+                self.assertTrue(all(m["id"] in self.reviewed_comparatives for m in same[1:]), (cid, kind))
                 if headline and same and kind == headline["kind"]: self.assertEqual(same[0]["id"], headline["id"], cid)
             for mid, item in pending:
                 self.assertNotIn(mid, [m["id"] for m in shown], cid)
@@ -636,7 +689,9 @@ class StaticPageTests(unittest.TestCase):
             for mid, row in self.figures(cid)[0]:
                 metric, text = self.metrics[mid], plain(row)
                 claim = self.research.claims[metric["claim_id"]]
-                self.assertIn(sp.figure_scope(self.research, metric, self.contexts.get(mid)), text, mid)
+                growth = self.reviewed_profile_growth.get(mid)
+                scope = growth["scope_detail"] if growth else sp.figure_scope(self.research, metric, self.contexts.get(mid))
+                self.assertIn(scope, text, mid)
                 self.assertEqual("Historical" in text, bool(self.research.historical_year(metric)), mid)
                 is_estimate = mid in self.reviewed_estimates or metric.get("reported_vs_estimated") == "estimated"
                 self.assertEqual(bool(re.search(r'<span class="tag">(?:Third-party estimate|Estimate)</span>', row)), is_estimate, mid)
@@ -770,6 +825,8 @@ class StaticPageTests(unittest.TestCase):
         self.assertEqual(sorted(listed), sorted(r["id"] for r in self.routes))
         order = [key for key, _, _ in sp.WORK_DISPLAY_BUCKETS if any(sp.work_display_bucket(r) == key for r in self.routes)]
         self.assertEqual(re.findall(r'<h2 id="([a-z]+)"', text), order)
+        self.assertIn('<option value="outside">Non-training jobs</option>', text)
+        self.assertIn('<option value="closed">Past &amp; reference</option>', text)
         self.assertIn(f'href="{sp.SCAM_GUIDE}"', text)
         self.assertIn("Never pay to get work.", text)
         self.assertNotIn("JobPosting", text)
@@ -810,18 +867,19 @@ class StaticPageTests(unittest.TestCase):
         paid = [r for r in self.routes if sp.work_primary(r)]
         named = sum(sp.work_display_bucket(r) == "named" for r in self.routes)
         programs = sum(sp.work_display_bucket(r) == "programs" for r in self.routes)
-        paid_companies, all_companies = len({r["company_id"] for r in paid}), len({r["company_id"] for r in self.routes})
+        paid_companies = len({r["company_id"] for r in paid})
         work = (self.dist / "work/index.html").read_text()
         facts = PageFacts(work)
         self.assertEqual(facts.title, f"Paid AI training work: {len(paid)} sourced routes{sp.SUFFIX}")
         self.assertTrue(facts.meta["description"].startswith(f"{named} named listings and {programs} expert networks and programs at {paid_companies} AI data companies,"), facts.meta["description"])
         advice = plain(re.search(r'<details class="work-page-advice">.*?</details>', work, re.S).group(0))
-        self.assertIn("Current openings and individual eligibility are not guaranteed", advice)
+        self.assertIn("Check the employer’s page for current openings and pay.", advice)
+        self.assertIn("The employer sets eligibility.", advice)
         self.assertIn(f'{named} named listings <span>·</span> {programs} networks and programs <span>·</span> {paid_companies} companies', work)
-        self.assertIn(f'{len(self.routes)} records at {all_companies} companies.', work)
+        self.assertIn(f'data-work-count aria-live="polite" aria-atomic="true">{len(self.routes)} records, including career pages and past listings</p>', work)
         self.assertIn(f"See {len(paid)} paid work routes</a>", (self.dist / "companies/index.html").read_text())
         checked = max(d for r in self.routes for d in (r.get("availability_checked_on"), (r.get("last_route_check") or {}).get("date")) if d)
-        self.assertIn(f"Links checked up to {sp.format_date(checked)}", work)
+        self.assertIn(f"The most recent individual link check was on {sp.format_date(checked)}. See each card for available dates.", advice)
         for path in self.html_files():
             self.assertNotRegex(plain(path.read_text()), r"\bopen (?:paid work )?listings?\b", str(path.relative_to(self.dist)))
 
@@ -859,6 +917,8 @@ class StaticPageTests(unittest.TestCase):
 
         work_cards = cards((self.dist / "work/index.html").read_text())
         company_cards = {cid: cards(page) for cid, page in self.pages.items()}
+        self.assertEqual(set(work_cards), {route["id"] for route in self.routes})
+        self.assertEqual(sum(len(rows) for rows in company_cards.values()), len(self.routes))
         scholar = "afterquery.work.research-scholar"
         for route in self.routes:
             rid, cid = route["id"], route["company_id"]
@@ -867,6 +927,24 @@ class StaticPageTests(unittest.TestCase):
                 with self.subTest(route=rid, surface=surface):
                     terms = re.search(r'<details class="work-terms">(.*?)</details>', card, re.S)
                     self.assertIsNotNone(terms)
+                    action_start = re.search(r'<p class="work-(?:listing-)?action">', card)
+                    if surface == "company" and action_start:
+                        self.assertLessEqual(terms.end(), action_start.start())
+                    preview = card[:min(terms.start(), action_start.start()) if action_start else terms.start()]
+                    expanded_eligibility = re.search(r'<ul aria-label="Additional requirements">(.*?)</ul>', terms.group(1), re.S)
+                    eligibility = [html.unescape(plain(preview)), html.unescape(plain(expanded_eligibility.group(1))) if expanded_eligibility else ""]
+                    for requirement in sp.work_requirements(route):
+                        self.assertTrue(any(requirement in region for region in eligibility), requirement)
+                        self.assertFalse(all(requirement in region for region in eligibility), requirement)
+                    if expanded_eligibility:
+                        self.assertIn("More requirements, terms & sources", plain(terms.group(1)))
+                        self.assertIn(f'href="/work/#{rid}"', preview)
+                    if rid == "afterquery.work.software-engineering-intern":
+                        self.assertIn("Able to take a gap semester off and join our team in person in San Francisco", eligibility[0])
+                        if surface == "company": self.assertIn("Any background in AI research", eligibility[1])
+                    if rid == "afterquery.work.world-models":
+                        self.assertIn("PhD or ABD", eligibility[0])
+                        self.assertIn("first-author peer-reviewed publication", eligibility[0])
                     quote = route.get("source_quote")
                     if quote: self.assertIn(f'<blockquote>{html.escape(quote)}</blockquote>', terms.group(1))
                     actions = sp.work_actions(route, self.research)
@@ -875,10 +953,41 @@ class StaticPageTests(unittest.TestCase):
                         self.assertTrue(any(a.get("href") == url and a["text"] == action and
                                             a.get("aria-label") == f"{action} for {role}, {sp.clean(employer)}"
                                             for a in anchors), action)
+                    if surface == "company" and rid == "afterquery.work.ai-ml-research-intern":
+                        self.assertEqual(sum(a.get("href") == actions[0][0] for a in anchors), 1)
+                        evidence = plain(terms.group(1))
+                        self.assertIn("Official role description Recorded 22 Nov 2026", evidence)
+                        self.assertIn("Terms fields reviewed: application destination, pay, location, requirements, commitment", evidence)
+                        self.assertIn('data-field-source="afterquery.work.ai-ml-research-intern.review-2026-10-28"', terms.group(1))
                     if rid == scholar:
-                        before_details = card[:terms.start()]
-                        self.assertIn("$1,000–$10,000 one-time award", before_details)
-                        self.assertIn(route["pay_terms"]["note"], before_details)
+                        self.assertIn("$1,000–$10,000 one-time award", preview)
+                        self.assertIn(route["pay_terms"]["note"], preview)
+
+    def test_native_toloka_growth_shows_the_calculation_and_source_history(self):
+        rid = "toloka.metric.major-growth_metrics-1"
+        page = self.pages["toloka"]
+        row = dict(self.figures("toloka")[0])[rid]
+        text = plain(row)
+        for phrase in ("about 135.1% Calculated", "$26.1M in FY2024 and $11.1M in FY2023",
+                       "Toloka discontinued operations", "Grade A applies to the Form 20-F filing",
+                       "Recheck unavailable 22 Nov 2026 (HTTP 403)"):
+            self.assertIn(phrase, text)
+        self.assertIn('data-label="Grade">A<', row)
+        self.assertEqual(re.findall(r'data-source-id="([^"]+)"', row), [
+            "refresh.source.nebius-fy2025-sec-note-3", "toloka.source.audit-tol_2025", "toloka.source.audit-tol_2024"])
+        self.assertIn("Note 3 SEC EDGAR · Published 30 Apr 2026 · Checked 22 Nov 2026", text)
+        self.assertNotIn("138%", text)
+        self.assertIn("reported 138% growth on a segment basis using $26.4M in FY2024", page)
+        self.assertIn("toloka.metric.major-growth_metrics-0", self.metrics)
+
+    def test_native_snorkel_check_is_bound_to_the_selected_source_record(self):
+        section = self.pages["snorkel_ai"].split('id="financial-record"', 1)[1].split('id="figures"', 1)[0]
+        self.assertIn('data-financial-observation="snorkel_ai.metric.major-growth_metrics-0"', section)
+        self.assertIn('data-source-id="snorkel_ai.source.audit-s5"', section)
+        self.assertIn("more than $375M", section)
+        self.assertIn("Reported 22 Sep 2026", section)
+        self.assertIn("Source content checked 22 Nov 2026.", section)
+        self.assertNotIn("28 Oct 2026", section)
 
     def test_native_mercor_estimate_preserves_metric_and_sacra_citation(self):
         rid = "mercor.metric.major-growth_metrics-1"
@@ -895,6 +1004,9 @@ class StaticPageTests(unittest.TestCase):
         text = (self.dist / "method/index.html").read_text()
         facts = PageFacts(text)
         for anchor in ("about", "figures", "grades", "labels", "coverage", "downloads"): self.assertIn(anchor, facts.ids)
+        self.assertLess(text.index('id="figures"'), text.index('id="downloads"'))
+        self.assertLess(text.index('id="grades"'), text.index('id="downloads"'))
+        self.assertLess(text.index('id="downloads"'), text.index('id="corrections"'))
         nodes = ld_nodes(text)
         self.assertEqual([node["@type"] for node in nodes], ["AboutPage", "Dataset"])
         page, dataset = nodes
@@ -915,7 +1027,11 @@ class StaticPageTests(unittest.TestCase):
         rated = {a["company_id"] for a in self.data["assessments"]}
         unrated = [c for c in self.data["companies"] if c["id"] not in rated]
         self.assertTrue(unrated and all(c["entity_type"] == "adjacent_research" for c in unrated))
-        self.assertIn(f"{len(rated)} companies with a delivery evidence level", text)
+        coverage = text.split('id="coverage-notes"', 1)[1].split('</details>', 1)[0]
+        self.assertIn(f'Historical company dataset v{self.data["dataset_version"]}', coverage)
+        self.assertIn(f'This dataset covers {len(self.data["companies"])} company profiles and {len(self.data["sources"])} source records.', coverage)
+        self.assertIn(f"{len(rated)} companies have a delivery evidence level", coverage)
+        self.assertIn(f'<a href="{ORIGIN}/companies/">current company directory</a>', coverage)
         self.assertIn(f"The {sp.count_word(len(unrated)).lower()} nonprofit research groups get no level.", text)
         self.assertNotIn("delivery evidence rating", text)
         self.assertTrue(50 <= len(dataset["description"]) <= 5000)

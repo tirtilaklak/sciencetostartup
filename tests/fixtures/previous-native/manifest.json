@@ -1,0 +1,17 @@
+{
+  "build": "5dc63fbcf19634a55c66",
+  "files": {
+    "native-details.js": {
+      "fixture": "native-details.js",
+      "sha256": "c0af74f44f9f36084fdbd1c8223e1075448af5207260bcdcd17f3d0a2121597f"
+    },
+    "company/imerit/index.html": {
+      "fixture": "imerit.html.gz",
+      "sha256": "07ecd7a2ce65b76d284dc1b5f5c98c33cf10aead0bd72383a5105f43fa682644"
+    },
+    "research/state-of-ai-data-labs/chapters/technical-landscape/index.html": {
+      "fixture": "technical-landscape.html.gz",
+      "sha256": "fe1b3634a162ad2ca12c068dde81d834eea1c7f54b699f74ef049c2bd4243b04"
+    }
+  }
+}

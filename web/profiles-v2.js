@@ -10,7 +10,7 @@ function readableDate(text){
 function profileDate(value){return readableDate(dateText(value));}
 function profileSourceMeta(s,finance){
  const added=profileDate(s.accessed_on),published=finance?.source_published_on||s.published_on||evidenceContextSourcePublicationDate(s.id),checked=finance?.source_checked_on;
- const original=s.retrieval_status==='checked'?'Checked '+added:s.retrieval_status==='summary_only'?(checked?'Source summary recorded ':'Summary only, page not reviewed · recorded ')+added:s.retrieval_status==='unverified'?'Not checked again · recorded '+added:'Recorded '+added;
+ const original=s.retrieval_status==='checked'?'Checked '+added:s.retrieval_status==='indexed_content_checked'?'Indexed text checked '+added+' · Direct access encountered a bot challenge':s.retrieval_status==='summary_only'?(checked?'Source summary recorded ':'Summary only, page not reviewed · recorded ')+added:s.retrieval_status==='unverified'?'Not checked again · recorded '+added:'Recorded '+added;
  return [s.publisher,published?'Published '+profileDate(published):'Publication date not stated',original,checked&&checked!==s.accessed_on?'Source checked '+profileDate(checked):''].filter(Boolean).join(' · ');
 }
 function profileFinanceProjection(id){return window.BUSINESS_HEALTH?.profile_finance?.[id];}
@@ -24,6 +24,48 @@ function profileReviewedObservationForClaim(cl){
  return (window.BUSINESS_HEALTH?.observations||[]).find(o=>o.evidence_type==='estimate'&&o.company_id===cl.company_id&&
   o.metric_ids?.length===1&&o.id===o.metric_ids[0]&&o.claim_ids?.length===1&&o.claim_ids[0]===cl.id);
 }
+function profileCalculatedObservationForClaim(cl){
+ return cl&&(window.BUSINESS_HEALTH?.observations||[]).find(o=>o.company_id===cl.company_id&&o.profile_claim_ids?.includes(cl.id));
+}
+function profileCalculatedMetric(metric){
+ const calculation=profileCalculatedObservationForClaim(claims[metric.claim_id]);
+ return calculation?.profile_metric_id===metric.id?calculation:null;
+}
+function profileReviewedSource(id){
+ return window.BUSINESS_HEALTH?.sources?.find(source=>source.id===id)||sources[id];
+}
+function profileFinanceSourceCheck(source){
+ return window.BUSINESS_HEALTH?.source_checks?.entries?.find(check=>check.source_id===source.id&&check.url===source.url);
+}
+function profileCalculationCitationItems(calculation){
+ return observationSourceIds(calculation).map(id=>{
+  const source=profileReviewedSource(id);
+  if(!source)return '';
+  const check=profileFinanceSourceCheck(source);
+  const historicalFailure=check?.status==='unavailable'?`<p class="sub">${esc(profileDate(check.checked_on))} · ${esc(check.note)}</p>`:'';
+  return `<li data-source-id="${attr(id)}">${external(source.url,source.title)}<p class="sub">${esc(profileSourceMeta(source))}</p>${historicalFailure}</li>`;
+ }).join('');
+}
+function profileCalculationSources(calculation){
+ return `<ol class="sources-list">${profileCalculationCitationItems(calculation)}</ol>`;
+}
+function profileFinanceReview(cl){
+ return cl&&(window.BUSINESS_HEALTH?.observations||[]).find(o=>o.company_id===cl.company_id&&o.claim_ids[0]===cl.id&&
+  o.id===o.metric_ids[0]&&(o.qualifier_reviewed_on||o.primary_source_id||o.historical_source_ids?.length));
+}
+function profileSupplementalSource(cl){
+ const id=profileFinanceReview(cl)?.primary_source_id;
+ return id&&profileReviewedSource(id);
+}
+function profileHistoricalFinanceSourceStatus(source){
+ const check=profileFinanceSourceCheck(source);
+ return check?.status==='unavailable'?`Historical citation · ${profileDate(check.checked_on)} · ${check.note}`:'Historical citation';
+}
+function profileHistoricalFinanceSourcesHTML(observation){
+ const records=(observation?.historical_source_ids||[]).map(id=>sources[id]||profileReviewedSource(id)).filter(Boolean);
+ if(!records.length)return '';
+ return `<details class="historical-citations"><summary>Previous citations</summary><ul class="sources-list">${records.map(source=>`<li data-source-id="${attr(source.id)}">${external(source.url,source.title)}<p class="sub">${esc(profileHistoricalFinanceSourceStatus(source))}</p></li>`).join('')}</ul></details>`;
+}
 function profileMetricEstimate(metric){
  const reviewed=profileReviewedObservationForClaim(claims[metric.claim_id]);
  return reviewed?.id===metric.id?reviewed:null;
@@ -36,6 +78,8 @@ function profileEvidenceDate(cl){
   return {text:day?profileDate(day):finance.display_date,heading:finance.date_label,
    description:sourceCheck?'The cited statement has no publication date.':''};
  }
+ const calculation=profileCalculatedObservationForClaim(cl);
+ if(calculation)return {text:cl.as_of,heading:'Reporting period',description:''};
  const estimate=profileReviewedObservationForClaim(cl);
  if(estimate)return {text:estimate.period.label,heading:'Reporting period',description:estimate.basis};
  // This risk record uses the shared check date of two undated RWS pages.
@@ -52,13 +96,13 @@ function profileRecordDate(cl){
  const date=profileEvidenceDate(cl);
  return financeClaimContextFor(cl.id)?.display_date||date.heading+' · '+date.text;
 }
-function profileFinancingEvidenceLink(id){
+function profileFinancingEvidenceLink(id,fromCompare=false){
  const href=companySummaryFor(id)?.financingEvidenceHref;
- return href?`<a href="${attr(href)}">Read ${esc(companies[id].name)}’s financing evidence ${iconHTML('right')}</a>`:'';
+ return href?`<a href="${attr(href)}"${fromCompare?` data-compare-origin="financing:${attr(id)}"`:''}>Read ${esc(companies[id].name)}’s financing evidence ${iconHTML('right')}</a>`:'';
 }
 function profileProvenance(cl){
  const finance=financeClaimContextFor(cl.id);
- const scope=finance?.scope||evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id));
+ const scope=finance?.scope||profileCalculatedObservationForClaim(cl)?.scope_detail||evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id));
  return `<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(profileRecordDate(cl))}</span><span>· ${esc(scope)}</span><span>· ${esc(profileEvidenceLabel(cl))}</span>${claimButton(cl.id,'Source')}</div>`;
 }
 // Canonical company id for a route value (case and alias fixes).
@@ -160,6 +204,7 @@ function profileMetricLabel(m){
 }
 function profileMetricDate(m){
  const finance=financeClaimContextFor(m.claim_id);if(finance)return finance.display_date;
+ if(profileCalculatedMetric(m))return m.as_of;
  const estimate=profileMetricEstimate(m);if(estimate)return estimate.period.label;
  const corrected=metricCurrentPeriod(m);if(corrected)return corrected;
  if(m.kind==='revenue')return readableDate(m.period_label||financialPeriod(m));
@@ -169,10 +214,10 @@ function profileMetricDate(m){
 function profileMetricYear(m){const rank=dateRank(m.as_of);return rank==='0000'?null:Number(rank.slice(0,4));}
 // Same Historical rule as compactSignal() on the cards.
 function profileMetricHistory(m){const year=profileMetricYear(m);return year&&year<Number(DATA.meta.as_of.slice(0,4))-1?'Historical · '+year:'';}
-function profileMetricStatus(m,fallback){return profileMetricEstimate(m)?'Third-party estimate':fallback;}
+function profileMetricStatus(m,fallback){return profileCalculatedMetric(m)?'Calculated':profileMetricEstimate(m)?'Third-party estimate':fallback;}
 function profileMetricTags(m){const tags=[profileMetricStatus(m,metricStatusLabel(m)),profileMetricHistory(m)].filter(tag=>tag&&tag!=='Reported');return tags.length?`<p class="observation-tags">${tags.map(tag=>`<span>${esc(tag)}</span>`).join('')}</p>`:'';}
 // Signed growth: +58.6%, −1.5%.
-function profileMetricValue(m){const value=metricValue(m);return m.kind!=='growth_rate'||m.unit!=='percent'?value:m.value>0?value.replace(/\d/,'+$&'):value.replace('-','−');}
+function profileMetricValue(m){const calculation=profileCalculatedMetric(m);if(calculation)return `≈ ${calculation.value.toFixed(1)}%`;const value=metricValue(m);return m.kind!=='growth_rate'||m.unit!=='percent'?value:m.value>0?value.replace(/\d/,'+$&'):value.replace('-','−');}
 function profileNumberButton(m){const label=profileMetricValue(m);if(label===metricValue(m))return numberButton(m);const access=evidenceAccess([m.claim_id],label,metricEvidenceTopic(m,m.label||metricLabels[m.kind]));return `<button class="number-button" data-claim="${esc(m.claim_id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;}
 const PROFILE_METRIC_ATTRIBUTIONS={
  'elorian.claim.core-elorian.claim.growth_metrics-0.metric-0-metric':'Employer job listing',
@@ -182,7 +227,7 @@ const PROFILE_METRIC_ATTRIBUTIONS={
 };
 // Lead decision: TaskUs and Appen figures are annual-report figures, never "audited".
 const PROFILE_EVIDENCE_LABELS={'Audited filing':'Annual report filing','Audited public company':'Public company annual report'};
-function profileEvidenceLabel(cl){const label=evidenceLabel(cl);return financeClaimContextFor(cl.id)?.attribution||profileReviewedObservationForClaim(cl)?.evidence_assurance||(['taskus','appen'].includes(cl.company_id)&&PROFILE_EVIDENCE_LABELS[label])||label;}
+function profileEvidenceLabel(cl){const label=evidenceLabel(cl);return financeClaimContextFor(cl.id)?.attribution||(profileCalculatedObservationForClaim(cl)?'Calculated from filing inputs':'')||profileReviewedObservationForClaim(cl)?.evidence_assurance||(['taskus','appen'].includes(cl.company_id)&&PROFILE_EVIDENCE_LABELS[label])||label;}
 function profileMetricAttribution(m){
  const claim=claims[m.claim_id];
  if(claim.status!=='supported'||claim.source_ids.length&&claim.source_ids.every(id=>sources[id].retrieval_status==='unverified'))return profileEvidenceLabel(claim);
@@ -318,11 +363,11 @@ document.addEventListener('toggle',event=>{
 // Keep comparison content aligned with the visible profiles.
 const profileComparisonRows=comparisonRows;
 comparisonRows=function(){return profileComparisonRows().map(([label,render])=>{
-  if(label==='Products')return [label,id=>`<p>${profileProducts(id).slice(0,4).map(p=>esc(p.name)+(p.status?`<span class="sub">${esc(title(p.status))}</span>`:'')+(p.source_updates?.length?`<span class="sub">${esc(p.description)}</span>${productSourceHTML(p)}`:'')).join('<br>')}</p><a href="#company/${attr(id)}/products">Explore products ${iconHTML('right')}</a>`];
-  if(label==='Customer evidence')return ['Relationships',id=>`${profileRelationships(id).slice(0,2).map(r=>`<p><b>${esc(r.name)}</b><span class="sub">${esc(profileRelationshipLabel(id,r))}</span>${profileRelationshipScopeContext(id,r)?`<span class="sub">${esc(profileRelationshipScopeContext(id,r))}</span>`:''}</p>`).join('')||'<p class="sub">No named relationship established.</p>'}<a href="#company/${attr(id)}/customers">Who it works with ${iconHTML('right')}</a>`];
+  if(label==='Products')return [label,id=>`<p>${profileProducts(id).slice(0,4).map(p=>esc(p.name)+(p.status?`<span class="sub">${esc(title(p.status))}</span>`:'')+(p.source_updates?.length?`<span class="sub">${esc(p.description)}</span>${productSourceHTML(p)}`:'')).join('<br>')}</p><a href="#company/${attr(id)}/products" data-compare-origin="products:${attr(id)}">Explore products ${iconHTML('right')}</a>`];
+  if(label==='Customer evidence')return ['Relationships',id=>`${profileRelationships(id).slice(0,2).map(r=>`<p><b>${esc(r.name)}</b><span class="sub">${esc(profileRelationshipLabel(id,r))}</span>${profileRelationshipScopeContext(id,r)?`<span class="sub">${esc(profileRelationshipScopeContext(id,r))}</span>`:''}</p>`).join('')||'<p class="sub">No named relationship established.</p>'}<a href="#company/${attr(id)}/customers" data-compare-origin="relationships:${attr(id)}">Who it works with ${iconHTML('right')}</a>`];
   if(label==='People')return [label,id=>{
     const rows=profilePeopleRows(id);
-    return `<p>${rows.slice(0,3).map(p=>`${esc(people[p.person_id]?.name||p.name)} <span class="sub">${esc(p.role)}</span>`).join('<br>')||'Not established'}</p><a href="#company/${attr(id)}/people">Funding &amp; people ${iconHTML('right')}</a>`;
+    return `<p>${rows.slice(0,3).map(p=>`${esc(people[p.person_id]?.name||p.name)} <span class="sub">${esc(p.role)}</span>`).join('<br>')||'Not established'}</p><a href="#company/${attr(id)}/people" data-compare-origin="people:${attr(id)}">Funding &amp; people ${iconHTML('right')}</a>`;
   }];
   return [label,render];
 });};
@@ -331,8 +376,8 @@ comparisonRows=function(){return profileComparisonRows().map(([label,render])=>{
 // Leave focus and scroll alone if the reader starts using Explore while it loads.
 const [profileEntryView,,profileEntrySection]=routeParts();
 const profileEntryHash=profileEntryView==='company'&&profileRouteSection(profileEntrySection)?location.hash:'';
-const profileEntryEvents=['focusin','keydown','pointerdown','touchstart','wheel'];
-let profileHasRouted=false,profileEntryInteracted=false;
+const profileEntryEvents=['focusin','keydown','pointerdown','touchstart','wheel','pagehide'];
+let profileRouteCount=0,profileEntryInteracted=false;
 function stopWatchingProfileEntry(){
   for(const name of profileEntryEvents)window.removeEventListener(name,markProfileEntryInteraction,true);
 }
@@ -355,10 +400,11 @@ window.navigation?.addEventListener('navigate',event=>{
 });
 const profileRoute=route;
 route=function(event){
-  const initial=!profileHasRouted;profileHasRouted=true;
-  if(initial&&profileEntryHash)stopWatchingProfileEntry();
+  const run=++profileRouteCount,initial=run===1;
   const entry=initial&&!event&&profileEntryHash&&profileEntryHash===location.hash;
   const readerMoved=entry&&(profileEntryInteracted||(document.activeElement&&document.activeElement!==document.body));
+  const entryTop=entry&&!readerMoved?window.scrollY:null;
+  let deferredScroll=false;
   const previousCompany=previousRoute==='company'?document.querySelector('.profile-v2')?.dataset.profileCompany:null;
   const fragmentNavigation=profileFragmentNavigation;
   if(event?.type==='hashchange')profileFragmentNavigation=null;
@@ -381,12 +427,21 @@ route=function(event){
       if(focusTarget&&focusTarget.tagName!=='SUMMARY')focusTarget.setAttribute('tabindex','-1');
       if(!readerMoved){
         if(event?.type==='hashchange'||transferFocus)focusTarget?.focus({preventScroll:true});
-        // Profile media already reserve their space before loading.
         const anchor=primary?document.querySelector('.profile-tabs'):destination;
-        anchor?.scrollIntoView({block:'start',behavior:'instant'});
+        const scroll=()=>anchor?.scrollIntoView({block:'start',behavior:'instant'});
+        if(entry&&primary&&!transferFocus&&anchor&&document.visibilityState!=='hidden'&&typeof window.requestAnimationFrame==='function'){
+          // Let the new pane paint before the initial tabs scroll brings the old footer into view.
+          deferredScroll=true;
+          const hash=location.hash;
+          window.requestAnimationFrame(()=>window.requestAnimationFrame(()=>{
+            stopWatchingProfileEntry();
+            if(!profileEntryInteracted&&run===profileRouteCount&&location.hash===hash&&anchor.isConnected&&window.scrollY===entryTop)scroll();
+          }));
+        }else scroll();
       }
     }
   }
+  if(initial&&profileEntryHash&&!deferredScroll)stopWatchingProfileEntry();
   if(company&&parts[2]==='claim'&&parts[3])showEvidence(parts[3]);
   return result;
 };

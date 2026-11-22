@@ -5,8 +5,16 @@
   const $ = id => document.getElementById(id), dialog = $('home-search'), input = $('home-search-input'), results = $('home-search-results'), message = $('home-search-message');
   const config = JSON.parse($('home-config').textContent), search = globalThis.S2SSearch;
   const pageSize = 7, historyField = 's2sHomeSearchReturn';
+  const hourlyWork = {
+    name: 'See roles with published hourly pay',
+    summary: 'Includes past listings',
+    type: 'Work search',
+    href: '/work/?pay=hourly'
+  };
+  const isHourlyPayQuery = key => key === 'hourly' || key === 'hourly pay';
   let entries = null, pending = null, active = -1, shown = pageSize, generation = 0;
   let exactIdentifiers = false, workTitles = new Set(), returnState = null;
+  const content = dialog.querySelector('.site-search-content');
   const fallback = dialog.querySelector('.site-search-fallback');
   const workRecovery = $('home-search-work-recovery') || fallback?.querySelector('a[href^="/work/"]');
   let more = $('home-search-more');
@@ -21,10 +29,17 @@
     if (status) status.textContent = value;
   }
   const options = () => [...results.querySelectorAll('[role=option]')];
+  const resultScroller = () => content && getComputedStyle(content).overflowY === 'auto' ? content : results;
+  const scrollField = scroller => scroller === results ? 'resultsScroll' : 'contentScroll';
   function updateFallback() {
-    if (workRecovery) {
-      workRecovery.href = search.workUrl(input.value);
-      workRecovery.textContent = input.value.trim() ? 'Search paid work for this query' : 'Browse paid work';
+    if (!workRecovery) return;
+    const raw = input.value;
+    if (isHourlyPayQuery(search.normalize(raw))) {
+      workRecovery.href = hourlyWork.href;
+      workRecovery.textContent = hourlyWork.name;
+    } else {
+      workRecovery.href = search.workUrl(raw);
+      workRecovery.textContent = raw.trim() ? 'Search paid work for this query' : 'Browse paid work';
     }
   }
   function clearResults() {
@@ -63,19 +78,28 @@
     active = index;
     rows.forEach((node, position) => node.setAttribute('aria-selected', String(position === active)));
     if (active >= 0 && rows[active]) {
-      input.setAttribute('aria-activedescendant', rows[active].id); rows[active].scrollIntoView({ block: 'nearest' });
+      const row = rows[active];
+      input.setAttribute('aria-activedescendant', row.id);
+      const scroller = resultScroller();
+      const viewport = scroller.getBoundingClientRect(), bounds = row.getBoundingClientRect();
+      if (bounds.top < viewport.top || bounds.height > viewport.height) scroller.scrollTop += bounds.top - viewport.top;
+      else if (bounds.bottom > viewport.bottom) scroller.scrollTop += bounds.bottom - viewport.bottom;
     } else input.removeAttribute('aria-activedescendant');
   }
   function resultType(row) {
     if (row.href.startsWith('/company/')) return 'Company';
     if (row.group === 'paper') return row.recordKind === 'paper_version' ? 'Paper source version' : 'Paper';
-    return { dataset: 'Dataset', benchmark: 'Benchmark', report: 'Research report', workflow: 'Workflow', daily: 'Daily scan', data: 'Research data', review: 'Review log', market: 'Market' }[row.group] || 'Research';
+    return {
+      dataset: 'Dataset', benchmark: 'Benchmark', report: 'Research report', workflow: 'Workflow',
+      daily: 'Daily scan', data: 'Research data', review: 'Review log', market: 'Market',
+      directory: 'Company directory', compare: 'Comparison',
+    }[row.group] || 'Research';
   }
   function option({ name, summary, href, type }, index) {
     return `<a id="home-result-${index}" class="site-search-option" role="option" aria-selected="false" tabindex="-1" data-result-type="${escape(type)}" href="${escape(href)}"><strong>${escape(name)}</strong><span>${escape(type + ' · ' + summary)}</span></a>`;
   }
   function render(paging = false) {
-    const raw = input.value, key = search.normalize(raw);
+    const raw = input.value, key = search.normalize(raw), hourly = isHourlyPayQuery(key);
     const exact = exactIdentifiers ? search.identifier(raw) : '';
     const selected = paging ? results.querySelector('[aria-selected=true]')?.getAttribute('href') : null;
     const matches = exact ? entries.filter(entry => entry.identifiers.includes(exact))
@@ -91,20 +115,22 @@
       return { ...row, type: resultType(row), summary: alias ? 'Recorded alias: ' + alias + '. ' + row.summary : row.summary };
     });
     if (!exact) {
-      const work = { name: key ? 'Find paid work matching “' + raw.trim() + '”' : 'Browse paid work', summary: 'Public listings, expert networks and requirements', type: 'Work search', href: search.workUrl(raw) };
-      if (search.isWorkQuery(raw, workTitles)) rendered.unshift(work);
+      const work = hourly ? hourlyWork : { name: key ? 'Find paid work matching “' + raw.trim() + '”' : 'Browse paid work', summary: 'Public listings, expert networks and requirements', type: 'Work search', href: search.workUrl(raw) };
+      if (hourly || search.isWorkQuery(raw, workTitles)) rendered.unshift(work);
       else rendered.push(work);
     }
     results.innerHTML = rendered.map(option).join('');
     results.hidden = false; input.setAttribute('aria-expanded', 'true');
     const index = selected ? options().findIndex(node => node.getAttribute('href') === selected) : -1;
-    setActive(index);
     more.hidden = !key || visible.length >= matches.length;
     more.textContent = `Show ${Math.min(pageSize, matches.length - visible.length)} more`;
     if (exact) say(`Showing ${visible.length} of ${matches.length} matching research ${matches.length === 1 ? 'record' : 'records'}.`);
-    else if (!key) say('Search research, companies and their offerings, or continue to paid work.');
+    else if (hourly) say('The first result opens Work with the Hourly filter selected.');
+    else if (!key) say('Search research or companies and their products. Try a role or skill for paid work.');
     else if (matches.length) say(`Showing ${visible.length} of ${matches.length} matching guide records. Paid work uses its own listing filters.`);
     else say('No recorded guide matches. You can search paid work or browse all companies.');
+    if (!paging && content && resultScroller() === content) content.scrollTop = 0;
+    setActive(index);
     if (paging && more.hidden) input.focus();
   }
   function restore(snapshot) {
@@ -113,7 +139,8 @@
     if (index >= 0) setActive(index);
     if (index >= 0 && snapshot.focus === 'result') rows[index].focus({ preventScroll: true });
     else input.focus({ preventScroll: true });
-    results.scrollTop = snapshot.resultsScroll;
+    const scroller = resultScroller(), scrollTop = snapshot[scrollField(scroller)];
+    if (Number.isFinite(scrollTop)) scroller.scrollTop = scrollTop;
   }
   window.openHomeSearch = async snapshot => {
     const request = ++generation;
@@ -142,10 +169,11 @@
   dialog.addEventListener('click', event => {
     const link = event.target.closest('#home-search-results a[role=option]');
     if (!link || event.defaultPrevented || event.button || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || link.origin !== location.origin) return;
+    const scroller = resultScroller();
     try {
       history.replaceState({ ...history.state, [historyField]: {
         query: input.value, resultHref: link.getAttribute('href'), shown,
-        resultsScroll: results.scrollTop,
+        [scrollField(scroller)]: scroller.scrollTop,
         focus: document.activeElement === link || event.pointerType === 'touch' ? 'result' : 'input'
       } }, '');
     } catch {}
@@ -177,6 +205,13 @@
     if (event.key === 'Escape') { event.preventDefault(); dialog.close(); return; }
     if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
     const rows = options(); if (!rows.length) return;
+    if (event.key === 'PageDown' || event.key === 'PageUp') {
+      event.preventDefault();
+      const direction = event.key === 'PageDown' ? 1 : -1;
+      const scroller = resultScroller();
+      scroller.scrollTop += direction * scroller.clientHeight * .75;
+      return;
+    }
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
       const forward = event.key === 'ArrowDown';

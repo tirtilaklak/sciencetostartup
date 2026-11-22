@@ -1,0 +1,112 @@
+{
+  "reviewed_build": "5dc63fbcf19634a55c66",
+  "reviewed_git": "c23cf7a859866d63423467ea6e495341738ee57f",
+  "manifest_sha256": "11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+  "findings": [
+    {
+      "id": "N5-native-ledger-back",
+      "status": "confirmed on fresh-document Back in two browsers",
+      "route": "/company/imerit/ → Source ledger → Back",
+      "observation": "The original forward handoff now promptly focuses the correct heading. On a cold return to the native page, Sources & data is closed and focus is on BODY. Tab goes to Skip to content. Warm history retains its native disclosure and link.",
+      "target": "Preserve the native originating disclosure, visible link focus and scroll on a cold history return. Leave fresh direct visits and warm browser restoration intact.",
+      "receipts": [
+        "candidate-5-final/retest-navigation/imerit-anchor.json"
+      ],
+      "controls": "All eight cold combinations failed to restore the native disclosure/focus across Chromium/Firefox, desktop/390 and normal/held images. Real Chromium BFCache restored native disclosure/link and Forward citation/scroll."
+    },
+    {
+      "id": "A5-shortlist-limit",
+      "status": "confirmed at 320×720 in Firefox with true 28px minimum text",
+      "route": "/explore/#companies",
+      "observation": "The three selected company IDs are correct and both tray actions can be clicked. With Trajectory Labs, Laude Institute / Terminal-Bench and Invisible Technologies selected, a fourth pick produces 245px of status text in a 216px region. The rejection is partly hidden below that region.",
+      "target": "Keep the reason and recovery instruction visible when a fourth company is rejected, preserve access to all selected names and Compare/Clear.",
+      "receipts": [
+        "candidate-5-final/retest-design/firefox-min320.json",
+        "candidate-5-final/retest-design/screens/c5-firefox-min320-company-shortlist-limit.png"
+      ],
+      "geometry": "Rejection glyphs y640.5–674.5; status region ends at y646. At 390px it fits."
+    },
+    {
+      "id": "N5-shortlist-back",
+      "status": "confirmed on the 320px enlarged Firefox flow, other cases under review",
+      "route": "/explore/#companies → selected companies Compare → Back",
+      "observation": "The saved selection returns, but focus goes to the Companies heading at y=-1532 while scroll is restored to y=1741.",
+      "target": "Restore visible focus to the initiating Compare control and retain the original shortlist and scroll position.",
+      "receipts": [
+        "candidate-5-final/retest-design/firefox-min320.json",
+        "candidate-5-final/retest-design/screens/c5-firefox-min320-shortlist-return.png"
+      ],
+      "next_tab": "First Tab jumps to y208, a 1,533px move to the Browse the 55-company directory link. This also reproduced on C4."
+    },
+    {
+      "id": "D5-market-anchor-offset",
+      "status": "measured in C5, browser-only source of extra scroll spacing confirmed",
+      "observation": "Market shortcut and direct bookmark do focus Revenue & growth, but Firefox 28px at 320 and 390 shows the heading at y364 with a 185px sticky header. The previous card remains visible and no ledger row fits in the 320×720 initial viewport. A diagnostic removal of the section margin alone moves the heading up 90px.",
+      "target": "Avoid applying a second sticky-header offset to the section target, preserve keyboard and history focus.",
+      "receipts": [
+        "candidate-5-final/retest-design/report.md",
+        "candidate-5-final/retest-design/screens/c5-firefox-min320-market-shortcut-arrival.png"
+      ]
+    },
+    {
+      "id": "A5-market-advanced-values",
+      "status": "confirmed on C4 and C5",
+      "observation": "A 320px Firefox viewport at minimum 28px shows Revenue over a c and 9M 2026 · USD · … in advanced Market selects. They provide 207px for selected text that measures 428px and 726px respectively.",
+      "target": "Make the active financial measure and reporting cohort readable while preserving the full source-backed scope and keyboard-selectable controls.",
+      "receipts": [
+        "candidate-5-final/retest-design/diagnostic.json",
+        "candidate-5-final/retest-design/screens/c5-firefox-min320-market-advanced.png"
+      ]
+    },
+    {
+      "id": "N5-market-fallback-tab",
+      "status": "confirmed on Chromium without JavaScript, control URLs passed",
+      "observation": "Direct /explore/#business-health renders the native fallback near y150, but Tab starts in the footer and does not reach Skip to content until the seventh press. Direct /explore/ and /explore/#work reach Skip first.",
+      "target": "Keep the native fallback and first useful keyboard action available on the added Market fragment with JavaScript disabled, and preserve the enhanced shortcut and all existing URLs.",
+      "receipts": [
+        "candidate-5-final/retest-navigation/no-script-sequences.json",
+        "candidate-5-final/retest-navigation/no-script-market.png"
+      ]
+    },
+    {
+      "id": "R5-passage-back-focus",
+      "status": "confirmed in Chromium with and without JavaScript at 390px, and Firefox 159 minimum 28px",
+      "observation": "Enter on a Technical passage shortcut focuses the requested paragraph. Back restores the original y42 position but retains focus on the offscreen paragraph. Next Tab follows a citation around y558500 in enlarged text.",
+      "target": "Allow a keyboard reader to continue from the originating native shortcut after Back in supported cases while preserving direct URLs and authored markup, and accurately document browser-native limits for scripts-disabled use.",
+      "receipts": [
+        "candidate-5-final/retest-reading/history-focus.json",
+        "candidate-5-final/retest-reading/browser-firefox.json"
+      ]
+    },
+    {
+      "id": "E5-grade-a-description",
+      "status": "confirmed in frozen Market inspector, matrix tooltip, Market method and native rubric",
+      "observation": "The Grade A explanatory text groups evidence as independent or buyer-side even for the RWS issuer interim filing. Its PDF explicitly calls the report board-approved and unaudited. The stable record rws_trainai.source.d_rws4 is a filing. A separately checked customer statement supports real buyer-side evidence on the Surge claim.",
+      "target": "Describe the existing A rubric with an explicit public filing category, alongside independent evidence and buyer confirmation. Preserve the grades, source IDs, caveats and business scopes.",
+      "receipts": [
+        "candidate-5-final/retest-market/"
+      ]
+    },
+    {
+      "id": "P5-mercor-profile-scroll-timing",
+      "status": "observed on all three official C5 mobile Lighthouse measurements, within budget, then reproduced in paired local timing replay",
+      "observation": "Mercor Explore Work footer contributed 0.032913 to median CLS 0.032989, versus 0.0000764 on C4. C5 paints results and scrolls to the profile tabs in the same frame. Deferring only that initial tab scroll removed the shift at normal and constrained network, preserving the final 187px offset. Both candidates already had the logo loaded.",
+      "target": "Avoid timing-induced layout shift while preserving prompt iMerit section handoff, late image behavior, visibility, focus and history.",
+      "receipts": [
+        "candidate-5-final/retest-release/mobile-regression-attribution.json",
+        "candidate-5-final/retest-release/mercor-layout-timing-comparison.json"
+      ]
+    }
+  ],
+  "cleared_controls": [
+    {
+      "id": "R5-dated-checksum-inline",
+      "state": "false attribution cleared against the actual fifth candidate HTML and pointer on port 18857",
+      "observation": "The older retained URL used ?download=1, which would cause an attachment. C5 already uses the query-less primary URL verified to return the complete inline checksum. No candidate product correction required.",
+      "receipts": [
+        "candidate-5-final/retest-downloads/zenodo-checksum-preview-variants.json",
+        "candidate-5-final/retest-downloads/"
+      ]
+    }
+  ]
+}

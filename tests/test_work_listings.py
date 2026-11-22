@@ -113,6 +113,18 @@ for(const route of routes){
  assert.ok(card.includes('<span class="sr-only">: '+run(`w4Escape(${JSON.stringify(route.role)})`)),route.id+' link context');
  assert.ok(card.includes('(opens in a new tab)')||!/^https?:/.test(route.url),route.id+' new tab note');
 }
+const ooak=byId['ooak.work.data-quality-specialist'];
+const ooakCard=run(`workCard(${JSON.stringify(ooak)})`);
+const [ooakPreview,ooakDetails]=ooakCard.split('<details class="w4-details">');
+assert.match(ooakPreview,/Application link returned 404/);
+assert.match(ooakPreview,/href="https:\/\/ooakdata\.com\/careers\?job_id=114405#job"[^>]*>Read employer listing/);
+assert.match(ooakPreview,/header says 6\+ years.*description says 4\+ years/);
+assert.match(ooakPreview,/Python, SQL and fluent English are required/);
+assert.match(ooakDetails,/Preferred experience includes privacy or de-identification/);
+assert.match(ooakDetails,/OOAK still lists this role\..*404 Page not found.*empty 406.*Y Combinator sign-in.*Application access remains unconfirmed/);
+const resolvedOoak={...ooak,requirements:['Python and fluent English.'],
+ field_reviews:{...ooak.field_reviews,requirements:{state:'sourced'}}};
+assert.deepEqual(ids(`w4Requirements(${JSON.stringify(resolvedOoak)})`),['Fluent English']);
 // Profiles: same labels; safety note wherever a listing or career page is open.
 let safety=0;
 for(const c of data.companies){const s=run(`workSummary(${JSON.stringify(c.id)})`);if(s.includes('w4-safety'))safety++;assert.ok(!/More listed|Career directories|Other work & research routes|No work route/.test(s),c.id);}

@@ -67,9 +67,9 @@
     "freshness": "Selected financial statements and company disclosures were read on 28 October 2026. Each source check records its outcome separately from the reporting period. Other observations retain the October 15 research review; a page retrieval does not verify every claim. A second primary-source pass added separately dated company operating statements and corrected estimate/accounting-basis classifications; unavailable revenue sources remain flagged. TaskUs Q3 2026 reporting was separately read on 16 November 2026; that review does not refresh other companies or earlier receipts."
   },
   "source_checks": {
-    "checked_on": "2026-11-18",
+    "checked_on": "2026-11-22",
     "status": "partial_content_refresh",
-    "notes": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results published on 4 November were separately reviewed on 16 November; the October receipts retain their original dates. Second pass reviewed private-company primary news indexes; no newer revenue is inferred from product announcements, funding, commitments or network reach. Appen Q3 and nine-month 2026 revenue were separately reviewed on 18 November from the issuer report dated 29 October; prior source-check dates are retained.",
+    "notes": "Selected financial source documents were retrieved and read on 28 October 2026. Individual entries distinguish content checks, page availability and failed retrieval. This is a partial refresh, not a new audit of all 39 companies. TaskUs Q3 results published on 4 November were separately reviewed on 16 November; the October receipts retain their original dates. Second pass reviewed private-company primary news indexes; no newer revenue is inferred from product announcements, funding, commitments or network reach. Appen Q3 and nine-month 2026 revenue were separately reviewed on 18 November from the issuer report dated 29 October; prior source-check dates are retained. On 22 November, the Snorkel announcement and Nebius SEC filing were read directly. Turing’s issuer release was checked in the public index after direct retrieval returned a bot challenge. Earlier receipts retain their original dates.",
     "entries": [
       {
         "source_id": "appen.source.audit-ap_2025",
@@ -146,11 +146,22 @@
       {
         "source_id": "turing.source.oct14-6d7f270a4e05",
         "url": "https://markets.financialcontent.com/wss/article/bizwire-2025-1-28-turing-annual-revenue-runrate-nearly-triples-to-300m-in-profitable-year-as-company-sets-stage-for-agi-advancements-in-2025",
-        "checked_on": "2026-10-28",
+        "checked_on": "2026-11-22",
         "http_status": 301,
         "status": "unavailable",
-        "note": "The source did not return readable content in this check. Historical evidence is retained with the failed refresh disclosed.",
-        "error": "curl: (47) Maximum (50) redirects followed\n"
+        "note": "The historical syndicated copy redirects back to itself. The issuer publication was checked in the public index.",
+        "error": "curl: (47) Maximum (3) redirects followed\n",
+        "previous_checks": [
+          {
+            "source_id": "turing.source.oct14-6d7f270a4e05",
+            "url": "https://markets.financialcontent.com/wss/article/bizwire-2025-1-28-turing-annual-revenue-runrate-nearly-triples-to-300m-in-profitable-year-as-company-sets-stage-for-agi-advancements-in-2025",
+            "checked_on": "2026-10-28",
+            "http_status": 301,
+            "status": "unavailable",
+            "note": "The source did not return readable content in this check. Historical evidence is retained with the failed refresh disclosed.",
+            "error": "curl: (47) Maximum (50) redirects followed\n"
+          }
+        ]
       },
       {
         "source_id": "afterquery.source.round2-funding",
@@ -326,6 +337,65 @@
         "status": "content_checked",
         "note": "Read issuer report dated 29 October 2026, pages 1–2: whole-company Q3 revenue USD73.9M and nine-month revenue USD193.8M. Values are rounded to USD0.1M; January–September information is unaudited management accounts, subject to audit/change. Issuer-hosted YourIR source is bound by Appen’s official announcement feed to announcement2A1706837 and document date29October.",
         "content_sha256": "ac47f92bf13f8af173707ad64593090050d5ce2ae3db5ac4f8ac3735094b402b"
+      },
+      {
+        "source_id": "snorkel_ai.source.audit-s5",
+        "url": "https://snorkel.ai/blog/data-2-0-and-the-research-era-of-ai-data/",
+        "checked_on": "2026-11-22",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Snorkel’s 22 September 2026 announcement says it crossed a $375M annualized revenue run rate.",
+        "content_sha256": "59338187d8c2908556217e461d63d644556c81e65814277a8b7f86bda242d970",
+        "excerpt": "this week crossed an annualized revenue run rate of $375M"
+      },
+      {
+        "source_id": "refresh.source.nebius-fy2025-sec-note-3",
+        "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926052948/nbis-20251231x20f.htm",
+        "checked_on": "2026-11-22",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "Note 3 of the SEC filing reports Toloka discontinued-operations revenue of $11.1M for FY2023 and $26.1M for FY2024, in USD.",
+        "content_sha256": "88955517816e8197aa3a65a8772e639bf9a7e227657b015345dfb3083a323636",
+        "source_locator": "Note 3 · Toloka Deconsolidation and Investment Transaction · F-30 · Revenues",
+        "publication_date_url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926052948/0001104659-26-052948-index.html"
+      },
+      {
+        "source_id": "refresh.source.turing-2024-run-rate-issuer",
+        "url": "https://www.turing.com/press/turing-annual-revenue-runrate-nearly-triples-to-300m",
+        "checked_on": "2026-11-22",
+        "http_status": 200,
+        "status": "indexed_content_checked",
+        "direct_response": "bot_challenge",
+        "note": "The indexed issuer release confirms the annual revenue run rate. Direct retrieval returned a bot challenge.",
+        "direct_body_sha256": "1da118a9899d1257e9d1cf3b9754a9230aefe63aa6d2e91778f0fdbb14621c52",
+        "indexed_excerpt_sha256": "7792e60bec5b4b3fdfb779668e9b3f410ee2bda5c24aa09a3c1ce21fd55fa94f"
+      },
+      {
+        "source_id": "toloka.source.audit-tol_2025",
+        "url": "https://fintel.io/doc/sec-nebius-group-nv-1513845-20f-2026-april-30-20573-500",
+        "checked_on": "2026-11-22",
+        "http_status": 403,
+        "status": "unavailable",
+        "note": "The historical Fintel mirror returned HTTP 403. The original filing was read on SEC EDGAR."
+      },
+      {
+        "source_id": "refresh.source.imerit-exl-june-2026-stocksguide",
+        "url": "https://stocksguide.com/en/stock/ExlService-Holdings-US3020811044?earnings_event_id=8916344",
+        "checked_on": "2026-11-22",
+        "http_status": 200,
+        "status": "content_checked",
+        "note": "The transcript of EXL’s 24 June acquisition call records CFO Maurizio Nicolelli’s preliminary unaudited iMerit revenue figure.",
+        "content_sha256": "f32ffd8cde53eb261d1089a5738128feeaacca5efcc6cb1fcfdf9661f2e76e62",
+        "source_locator": "June 24, 2026 M&A announcement transcript · Maurizio Nicolelli’s prepared remarks",
+        "excerpt": "Preliminary unaudited revenues for iMerit were approximately $59 million the 12 months ended March 31, 2026"
+      },
+      {
+        "source_id": "imerit.source.audit-im-transcript2",
+        "url": "https://earningscalls.dev/transcripts/exlservice-holdings-inc_exls_earnings_call_transcript_2026-06-24",
+        "checked_on": "2026-11-22",
+        "http_status": 404,
+        "status": "unavailable",
+        "note": "The original earningscalls.dev transcript returned HTTP 404 with “Earnings call not found.”"
       }
     ]
   },
@@ -1059,26 +1129,29 @@
       "accounting_basis": "latest_discontinued_operations_comparative",
       "evidence_type": "reported",
       "claim_ids": [
-        "toloka.claim.major-financial_metrics-1-metric"
+        "toloka.claim.major-financial_metrics-1-metric",
+        "refresh.toloka.fy2023-discontinued-revenue.claim"
       ],
       "metric_ids": [
         "toloka.metric.major-financial_metrics-1"
       ],
       "source_ids": [
         "toloka.source.audit-tol_2024",
-        "toloka.source.audit-tol_2025"
+        "toloka.source.audit-tol_2025",
+        "refresh.source.nebius-fy2025-sec-note-3"
       ],
-      "basis": "Revenue: 11,100,000 USD. Period: FY2023. Canonical claim cites both the original FY2024 filing and the latest FY2025 comparative filing; FY2023 remains $11.1M in this comparison.",
-      "limitations": "Definitions, dates and scope are specific to the cited source; disclosure is not independent verification.",
-      "original_text": "Revenue: 11,100,000 USD. Period: FY2023.",
+      "basis": "Nebius FY2025 Form 20-F, Note 3 reports FY2023 Toloka discontinued-operations revenue in USD. The original FY2024 filing also reports $11.1M for FY2023.",
+      "limitations": "Nebius FY2025 Form 20-F, Note 3 reports FY2023 Toloka discontinued-operations revenue in USD. The original FY2024 filing also reports $11.1M for FY2023. The original Fintel citation returned a retrieval error on 22 November 2026. The SEC filing provides the direct evidence.",
+      "original_text": "Revenues · FY2023: 11.1 million USD.",
       "evidence_assurance": "Nebius annual reports (Form 20-F)",
       "currency": "USD",
       "is_context": false,
-      "scope_label": "Whole company",
-      "scope_detail": "Toloka business in parent disclosures",
-      "cohort": "FY2023 · USD · Whole company · latest discontinued operations comparative",
-      "cohort_label": "FY2023 · USD · Whole company · latest discontinued operations comparative",
-      "cohort_key": "period_revenue|annual|2023|2023-12-31|USD|company|latest_discontinued_operations_comparative"
+      "scope_label": "Toloka business",
+      "scope_detail": "Toloka discontinued operations in Nebius disclosures",
+      "cohort": "FY2023 · USD · Toloka business · latest discontinued operations comparative",
+      "cohort_label": "FY2023 · USD · Toloka business · latest discontinued operations comparative",
+      "cohort_key": "period_revenue|annual|2023|2023-12-31|USD|company|latest_discontinued_operations_comparative",
+      "primary_source_id": "refresh.source.nebius-fy2025-sec-note-3"
     },
     {
       "id": "toloka.metric.major-financial_metrics-2",
@@ -1101,25 +1174,28 @@
       "accounting_basis": "latest_discontinued_operations_comparative",
       "evidence_type": "reported",
       "claim_ids": [
-        "toloka.claim.major-financial_metrics-2-metric"
+        "toloka.claim.major-financial_metrics-2-metric",
+        "refresh.toloka.fy2024-discontinued-revenue.claim"
       ],
       "metric_ids": [
         "toloka.metric.major-financial_metrics-2"
       ],
       "source_ids": [
-        "toloka.source.audit-tol_2025"
+        "toloka.source.audit-tol_2025",
+        "refresh.source.nebius-fy2025-sec-note-3"
       ],
-      "basis": "Latest FY2025 20-F comparative discontinued-operations presentation. The earlier FY2024 report showed $26.4M as segment revenue.",
-      "limitations": "Latest FY2025 20-F comparative discontinued-operations presentation. The earlier FY2024 report showed $26.4M as segment revenue.",
-      "original_text": "Revenue: 26,100,000 USD. Period: FY2024.",
+      "basis": "Nebius FY2025 Form 20-F, Note 3 reports FY2024 Toloka discontinued-operations revenue in USD. The earlier FY2024 filing used a $26.4M segment figure.",
+      "limitations": "Nebius FY2025 Form 20-F, Note 3 reports FY2024 Toloka discontinued-operations revenue in USD. The earlier FY2024 filing used a $26.4M segment figure. The original Fintel citation returned a retrieval error on 22 November 2026. The SEC filing provides the direct evidence.",
+      "original_text": "Revenues · FY2024: 26.1 million USD.",
       "evidence_assurance": "Nebius annual report (Form 20-F)",
       "currency": "USD",
       "is_context": false,
-      "scope_label": "Whole company",
-      "scope_detail": "Toloka business in parent disclosures",
-      "cohort": "FY2024 · USD · Whole company · latest discontinued operations comparative",
-      "cohort_label": "FY2024 · USD · Whole company · latest discontinued operations comparative",
-      "cohort_key": "period_revenue|annual|2024|2024-12-31|USD|company|latest_discontinued_operations_comparative"
+      "scope_label": "Toloka business",
+      "scope_detail": "Toloka discontinued operations in Nebius disclosures",
+      "cohort": "FY2024 · USD · Toloka business · latest discontinued operations comparative",
+      "cohort_label": "FY2024 · USD · Toloka business · latest discontinued operations comparative",
+      "cohort_key": "period_revenue|annual|2024|2024-12-31|USD|company|latest_discontinued_operations_comparative",
+      "primary_source_id": "refresh.source.nebius-fy2025-sec-note-3"
     },
     {
       "id": "imerit.metric.expansion-imerit-revenue",
@@ -1142,17 +1218,18 @@
       "accounting_basis": "unspecified",
       "evidence_type": "reported",
       "claim_ids": [
-        "imerit.claim.expansion-imerit-revenue-metric"
+        "imerit.claim.expansion-imerit-revenue-metric",
+        "refresh.claim.imerit-exl-june-2026-revenue-transcript"
       ],
       "metric_ids": [
         "imerit.metric.expansion-imerit-revenue"
       ],
       "source_ids": [
         "imerit.source.audit-im-transcript",
-        "imerit.source.audit-im-transcript2"
+        "refresh.source.imerit-exl-june-2026-stocksguide"
       ],
       "basis": "CFO Maurizio Nicolelli stated this on the June 24 M&A call. Not EXL consolidated revenue, not a 2026 forecast, and not annual recurring revenue.",
-      "limitations": "CFO Maurizio Nicolelli stated this on the June 24 M&A call. Not EXL consolidated revenue, not a 2026 forecast, and not annual recurring revenue.",
+      "limitations": "EXL CFO Maurizio Nicolelli gave this preliminary unaudited figure on the 24 June 2026 acquisition call. It covers iMerit’s standalone revenue for the year ended 31 March 2026. The earlier earningscalls.dev transcript returned HTTP 404 on 22 November 2026. StocksGuide carries the same CFO statement.",
       "original_text": "Approximately $59m revenue, year ended March 2026.",
       "evidence_assurance": "Preliminary unaudited acquisition disclosure, transcribed CFO statement",
       "currency": "USD",
@@ -1161,7 +1238,11 @@
       "scope_detail": "iMerit standalone business; not EXL consolidated group",
       "cohort": "Year ended 31 Mar 2026 · USD · iMerit standalone business · Gross/net undisclosed",
       "cohort_label": "Year ended 31 Mar 2026 · USD · iMerit standalone business · Gross/net undisclosed",
-      "cohort_key": "period_revenue|annual|2026|2026-03-31|USD|company|unspecified"
+      "cohort_key": "period_revenue|annual|2026|2026-03-31|USD|company|unspecified",
+      "historical_source_ids": [
+        "imerit.source.audit-im-transcript2"
+      ],
+      "evidence_checked_on": "2026-11-22"
     },
     {
       "id": "rws_trainai.claim.growth_metrics-0.metric-0",
@@ -1572,7 +1653,7 @@
       "label": "Annualized revenue run rate",
       "value": 375000000,
       "unit": "currency",
-      "qualifier": "exact",
+      "qualifier": "greater_than",
       "as_of": "2026-09-22",
       "period": {
         "type": "run_rate",
@@ -1591,9 +1672,9 @@
         "snorkel_ai.source.audit-s5",
         "snorkel_ai.source.oct14-006107ac93e3"
       ],
-      "basis": "Company-reported annualized revenue run rate as of the September 22 announcement; not realized annual revenue or a separately defined recurring-revenue ARR measure. Gross/net accounting is unspecified.",
-      "limitations": "Definitions, dates and scope are specific to the cited source; disclosure is not independent verification. Annualized snapshot, not completed-year revenue or proven subscription ARR.",
-      "original_text": "Annualized revenue run rate: 375,000,000 USD. Period: 2026-09-22.",
+      "basis": "Snorkel said it crossed a $375M annualized revenue run rate by its 22 September 2026 announcement. Gross/net accounting is unspecified.",
+      "limitations": "The company disclosed a lower bound. The exact pace and crossing date are undisclosed. This is an annualized snapshot, separate from completed-year revenue or subscription ARR.",
+      "original_text": "… this week crossed an annualized revenue run rate of $375M",
       "evidence_assurance": "Company-reported",
       "currency": "USD",
       "is_context": false,
@@ -1601,7 +1682,8 @@
       "scope_detail": "Whole company",
       "cohort": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
-      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified"
+      "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified",
+      "qualifier_reviewed_on": "2026-11-22"
     },
     {
       "id": "afterquery.metric.round2-financial-2",
@@ -1776,17 +1858,19 @@
       "accounting_basis": "unspecified",
       "evidence_type": "reported",
       "claim_ids": [
-        "turing.claim.oct14-major-financial-2"
+        "turing.claim.oct14-major-financial-2",
+        "refresh.turing.year-end-2024-run-rate-issuer.claim"
       ],
       "metric_ids": [
         "turing.metric.major-growth_metrics-1"
       ],
       "source_ids": [
-        "turing.source.oct14-6d7f270a4e05"
+        "turing.source.oct14-6d7f270a4e05",
+        "refresh.source.turing-2024-run-rate-issuer"
       ],
-      "basis": "The primary company release says annual revenue run rate.",
-      "limitations": "The primary company release says annual revenue run rate. Annualized snapshot, not completed-year revenue or proven subscription ARR. The cited page could not be re-read on 28 October 2026; this figure retains its earlier source review.",
-      "original_text": "$300M revenue run rate. The primary company release says annual revenue run rate.",
+      "basis": "Turing’s issuer release describes a $300M annual revenue run rate at 2024 year-end.",
+      "limitations": "The company disclosed an annualized snapshot. The original syndicated citation could not be re-read on 28 October 2026 and still redirected to itself on 22 November. The issuer release was verified through its indexed text. A direct automated request returned a bot challenge.",
+      "original_text": "Turing today announced it achieved profitability in 2024 on $300 million in annual revenue runrate (ARR)",
       "evidence_assurance": "Company-reported",
       "currency": "USD",
       "is_context": false,
@@ -1795,7 +1879,8 @@
       "cohort": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
       "cohort_label": "Annualized snapshots · USD · Whole company · Gross/net undisclosed",
       "cohort_key": "annualized_revenue|run_rate|||USD|company|unspecified",
-      "refresh_status": "source_unavailable"
+      "refresh_status": "source_unavailable",
+      "primary_source_id": "refresh.source.turing-2024-run-rate-issuer"
     },
     {
       "id": "a-team.claim.growth_metrics-2.metric-0",
@@ -2061,6 +2146,13 @@
     {
       "id": "dashboard.toloka.fy2024-revenue-growth",
       "company_id": "toloka",
+      "profile_metric_id": "toloka.metric.major-growth_metrics-1",
+      "profile_claim_ids": [
+        "toloka.claim.major-growth_metrics-1-metric",
+        "toloka.claim.major-growth_metrics-1"
+      ],
+      "profile_statement": "Toloka’s discontinued-operations revenue grew approximately 135.1% year over year, calculated from rounded revenue of $26.1M in FY2024 and $11.1M in FY2023.",
+      "profile_confidence_reason": "Grade A applies to the Form 20-F filing that reports the revenue inputs.",
       "signal": "revenue",
       "measure": "revenue_growth_yoy",
       "label": "Revenue growth · FY2024 comparative basis",
@@ -2080,20 +2172,23 @@
       "evidence_type": "calculated",
       "claim_ids": [
         "toloka.claim.major-financial_metrics-2-metric",
-        "toloka.claim.major-financial_metrics-1-metric"
+        "toloka.claim.major-financial_metrics-1-metric",
+        "refresh.toloka.fy2024-discontinued-revenue.claim",
+        "refresh.toloka.fy2023-discontinued-revenue.claim"
       ],
       "metric_ids": [
         "toloka.metric.major-financial_metrics-2",
         "toloka.metric.major-financial_metrics-1"
       ],
       "source_ids": [
+        "refresh.source.nebius-fy2025-sec-note-3",
         "toloka.source.audit-tol_2025",
         "toloka.source.audit-tol_2024"
       ],
-      "basis": "Latest rounded discontinued-operations comparative revenue; original segment presentation of $26.4M produced a different 138% headline.",
-      "limitations": "Calculated from the displayed source observations; not a separately reported metric. Latest FY2025 20-F comparative discontinued-operations presentation. The earlier FY2024 report showed $26.4M as segment revenue.",
-      "original_text": "Revenue: 26,100,000 USD. Period: FY2024.\nRevenue: 11,100,000 USD. Period: FY2023.",
-      "evidence_assurance": "Nebius annual reports (Form 20-F)",
+      "basis": "The FY2025 Form 20-F provides the discontinued-operations revenue comparatives. The earlier FY2024 Form 20-F reported 138% growth on a segment basis using $26.4M in FY2024 and $11.1M in FY2023.",
+      "limitations": "The FY2025 filing gives revenue rounded to $0.1M. The calculation uses those rounded inputs.",
+      "original_text": "Revenues · FY2024: 26.1 million USD.\nRevenues · FY2023: 11.1 million USD.",
+      "evidence_assurance": "Revenue inputs · Nebius FY2025 Form 20-F, Note 3",
       "calculation": {
         "formula": "(26100000 / 11100000 - 1) * 100",
         "input_observation_ids": [
@@ -2102,11 +2197,13 @@
         ]
       },
       "is_context": false,
-      "scope_label": "Whole company",
-      "scope_detail": "Toloka business in parent disclosures",
-      "cohort": "FY2024 · percent · Whole company · latest discontinued operations comparative",
-      "cohort_label": "FY2024 · percent · Whole company · latest discontinued operations comparative",
-      "cohort_key": "revenue_growth_yoy|annual|2024|2024-12-31||company|latest_discontinued_operations_comparative"
+      "scope_label": "Toloka business",
+      "scope_detail": "Toloka discontinued operations in Nebius disclosures",
+      "cohort": "FY2024 · percent · Toloka business · latest discontinued operations comparative",
+      "cohort_label": "FY2024 · percent · Toloka business · latest discontinued operations comparative",
+      "cohort_key": "revenue_growth_yoy|annual|2024|2024-12-31||company|latest_discontinued_operations_comparative",
+      "primary_source_id": "refresh.source.nebius-fy2025-sec-note-3",
+      "evidence_checked_on": "2026-11-22"
     },
     {
       "id": "appen.metric.major-financial_metrics-9",
@@ -5757,7 +5854,7 @@
     },
     {
       "id": "snorkel_ai.source.audit-s5",
-      "title": "Series E",
+      "title": "Data 2.0 and the research era of AI data",
       "url": "https://snorkel.ai/blog/data-2-0-and-the-research-era-of-ai-data/",
       "publisher": "snorkel.ai",
       "source_type": "company",
@@ -5992,6 +6089,38 @@
       "source_type": "filing",
       "published_on": "2026-10-29",
       "accessed_on": "2026-11-18",
+      "retrieval_status": "checked"
+    },
+    {
+      "id": "refresh.source.nebius-fy2025-sec-note-3",
+      "company_id": "toloka",
+      "title": "Nebius FY2025 Form 20-F · Note 3",
+      "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926052948/nbis-20251231x20f.htm",
+      "publisher": "SEC EDGAR",
+      "source_type": "filing",
+      "published_on": "2026-04-30",
+      "accessed_on": "2026-11-22",
+      "retrieval_status": "checked"
+    },
+    {
+      "id": "refresh.source.turing-2024-run-rate-issuer",
+      "company_id": "turing",
+      "title": "Turing issuer release · $300M annual revenue run rate",
+      "url": "https://www.turing.com/press/turing-annual-revenue-runrate-nearly-triples-to-300m",
+      "publisher": "Turing press release",
+      "source_type": "company",
+      "accessed_on": "2026-11-22",
+      "retrieval_status": "indexed_content_checked"
+    },
+    {
+      "id": "refresh.source.imerit-exl-june-2026-stocksguide",
+      "company_id": "imerit",
+      "title": "EXL June 24, 2026 M&A call transcript (StocksGuide)",
+      "url": "https://stocksguide.com/en/stock/ExlService-Holdings-US3020811044?earnings_event_id=8916344",
+      "publisher": "StocksGuide",
+      "source_type": "other",
+      "published_on": "2026-06-24",
+      "accessed_on": "2026-11-22",
       "retrieval_status": "checked"
     }
   ],
@@ -6551,6 +6680,123 @@
       "qualifier": "exact",
       "reviewer": "Codex current-company source review",
       "approval_basis": "source_content_review"
+    },
+    {
+      "id": "refresh.toloka.fy2023-discontinued-revenue.claim",
+      "company_id": "toloka",
+      "status": "supported",
+      "statement": "Nebius FY2025 Form 20-F, Note 3 reports FY2023 Toloka discontinued-operations revenue in USD. The original FY2024 filing also reports $11.1M for FY2023.",
+      "source_ids": [
+        "refresh.source.nebius-fy2025-sec-note-3"
+      ],
+      "observed_on": "2026-11-22",
+      "confidence": "A",
+      "evidence_label": "Nebius Form 20-F",
+      "excerpt": "2023 2024 2025Revenues 11.1 26.1 6.4",
+      "source_locator": "Note 3 · Toloka Deconsolidation and Investment Transaction · F-30 · Revenues · FY2023 column",
+      "fact": {
+        "measure": "period_revenue",
+        "value": 11100000,
+        "unit": "currency",
+        "currency": "USD",
+        "qualifier": "exact",
+        "period": {
+          "type": "annual",
+          "label": "FY2023",
+          "year": 2023,
+          "start": "2023-01-01",
+          "end": "2023-12-31"
+        },
+        "scope": "company",
+        "accounting_basis": "latest_discontinued_operations_comparative"
+      }
+    },
+    {
+      "id": "refresh.toloka.fy2024-discontinued-revenue.claim",
+      "company_id": "toloka",
+      "status": "supported",
+      "statement": "Nebius FY2025 Form 20-F, Note 3 reports FY2024 Toloka discontinued-operations revenue in USD. The earlier FY2024 filing used a $26.4M segment figure.",
+      "source_ids": [
+        "refresh.source.nebius-fy2025-sec-note-3"
+      ],
+      "observed_on": "2026-11-22",
+      "confidence": "A",
+      "evidence_label": "Nebius Form 20-F",
+      "excerpt": "2023 2024 2025Revenues 11.1 26.1 6.4",
+      "source_locator": "Note 3 · Toloka Deconsolidation and Investment Transaction · F-30 · Revenues · FY2024 column",
+      "fact": {
+        "measure": "period_revenue",
+        "value": 26100000,
+        "unit": "currency",
+        "currency": "USD",
+        "qualifier": "exact",
+        "period": {
+          "type": "annual",
+          "label": "FY2024",
+          "year": 2024,
+          "start": "2024-01-01",
+          "end": "2024-12-31"
+        },
+        "scope": "company",
+        "accounting_basis": "latest_discontinued_operations_comparative"
+      }
+    },
+    {
+      "id": "refresh.turing.year-end-2024-run-rate-issuer.claim",
+      "company_id": "turing",
+      "status": "supported",
+      "statement": "Turing’s issuer release describes a $300M annual revenue run rate at 2024 year-end.",
+      "source_ids": [
+        "refresh.source.turing-2024-run-rate-issuer"
+      ],
+      "observed_on": "2026-11-22",
+      "confidence": "B",
+      "evidence_label": "Company-reported",
+      "excerpt": "Turing today announced it achieved profitability in 2024 on $300 million in annual revenue runrate (ARR)",
+      "source_locator": "Indexed issuer release · opening paragraph",
+      "fact": {
+        "measure": "annualized_revenue",
+        "value": 300000000,
+        "unit": "currency",
+        "currency": "USD",
+        "qualifier": "exact",
+        "period": {
+          "type": "run_rate",
+          "label": "2024-12"
+        },
+        "scope": "company",
+        "accounting_basis": "unspecified"
+      }
+    },
+    {
+      "id": "refresh.claim.imerit-exl-june-2026-revenue-transcript",
+      "company_id": "imerit",
+      "status": "supported",
+      "statement": "EXL CFO Maurizio Nicolelli said iMerit’s standalone revenue was approximately $59 million for the twelve months ended 31 March 2026. The figure was preliminary and unaudited.",
+      "source_ids": [
+        "refresh.source.imerit-exl-june-2026-stocksguide"
+      ],
+      "observed_on": "2026-11-22",
+      "confidence": "B",
+      "evidence_label": "Preliminary unaudited acquisition disclosure, transcribed CFO statement",
+      "excerpt": "Preliminary unaudited revenues for iMerit were approximately $59 million the 12 months ended March 31, 2026",
+      "source_locator": "June 24, 2026 M&A announcement transcript · Maurizio Nicolelli’s prepared remarks",
+      "fact": {
+        "measure": "period_revenue",
+        "value": 59000000,
+        "unit": "currency",
+        "currency": "USD",
+        "qualifier": "approximate",
+        "period": {
+          "type": "annual",
+          "label": "Year ended 31 Mar 2026",
+          "year": 2026,
+          "start": "2025-04-01",
+          "end": "2026-03-31"
+        },
+        "scope": "company",
+        "accounting_basis": "unspecified"
+      }
     }
   ],
   "private_company_review": [

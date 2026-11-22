@@ -140,6 +140,45 @@ class ResearchPageTests(unittest.TestCase):
     def page(self, path):
         return (self.output / path.strip('/') / 'index.html').read_text()
 
+    def test_current_data_explains_the_frozen_pdf_cover(self):
+        self.context['publication_assets'] = ['publication/report.pdf']
+        report = self.context['report']
+        pdf_link = '<a href="/publication/report.pdf">Read the report PDF</a>'
+        self.assertIn(pdf_link, rp._data(self.context))
+        report.update(release_id='research-2026-11-12.1', archive={
+            'status': 'published', 'artifact_sha256': rp.EDITION_MIRROR_ARCHIVE_SHA256})
+        self.assertIn('<a href="/publication/report.pdf">Read the archived report PDF (research-2026-11-12.1)</a>'
+                      '. The cover was prepared before DOI registration.', rp._data(self.context))
+
+    def test_current_citation_does_not_link_a_reserved_doi(self):
+        reserved_doi = '10.5281/zenodo.111111111'
+        self.context['report']['archive']['reserved_doi'] = reserved_doi
+        data = ReaderTree(rp._data(self.context))
+        citation, = (node for node in data.elements if node['attrs'].get('id') == 'citation')
+        self.assertNotIn(reserved_doi, ReaderTree.text(citation))
+        self.assertNotIn('https://doi.org/' + reserved_doi, ReaderTree.links(citation))
+
+    def test_current_reader_labels_only_available_archived_formats(self):
+        html, pdf = 'publication/report.html', 'publication/report.pdf'
+        self.context['publication_assets'] = [html, pdf]
+        self.assertIn('Read offline: <a href="/publication/report.html">Complete HTML report</a> · '
+                      '<a href="/publication/report.pdf">Full report PDF</a>', rp._reader_downloads(self.context))
+
+        self.context['report'].update(updated_on='2026-11-15', archive={
+            'status': 'published', 'artifact_sha256': rp.EDITION_MIRROR_ARCHIVE_SHA256})
+        for available in ([html, pdf], [html], [pdf], []):
+            with self.subTest(available=available):
+                self.context['publication_assets'] = available
+                downloads = ReaderTree(rp._reader_downloads(self.context)).with_class('r-reader-downloads')
+                if not available:
+                    self.assertEqual(downloads, [])
+                    continue
+                control, = downloads
+                self.assertEqual(ReaderTree.links(control), ['/' + path for path in available])
+                labels = {html: 'Archived HTML report', pdf: 'Archived report PDF'}
+                self.assertEqual(ReaderTree.text(control), ' · '.join(labels[path] for path in available)
+                                 + ' · 15 Nov 2026 snapshot. Prepared before DOI registration.')
+
     def test_actual_baseline_lifecycle_has_only_verified_publications(self):
         import research_citations as citations
         from research_report import publication_gate
@@ -189,6 +228,13 @@ class ResearchPageTests(unittest.TestCase):
             self.assertIn('Prelaunch', self.page('/research/'))
         editions = rp._published_editions(self.context)
         data = ReaderTree(self.page('/research/data/'))
+        citation, = (node for node in data.elements if node['attrs'].get('id') == 'citation')
+        if metadata['status'] == 'published':
+            doi = self.context['report']['archive']['doi']
+            citation_links = ReaderTree.links(citation)
+            self.assertIn('Registered version DOI ' + doi, ReaderTree.text(citation))
+            self.assertEqual(citation_links[0], 'https://doi.org/' + doi)
+            self.assertTrue({'/publication/current-' + name for name in rp.EDITION_CITATIONS} <= set(citation_links))
         links = {node['attrs']['href']: node for node in data.elements if node['tag'] == 'a'}
         for url, size in json_sizes.items():
             self.assertIn('download', links[url]['attrs'])
@@ -279,6 +325,10 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         report = self.page(rp.REPORT_PATH)
         facts = Facts(report)
         sections = self.context['report']['sections']
+        shortcuts, = ReaderTree(report).with_class('r-bulk-shortcuts')
+        self.assertEqual(ReaderTree.links(shortcuts), ['#first-paragraph', '#contents'])
+        self.assertIn(f'Browse {len(sections)} chapters', ReaderTree.text(shortcuts))
+        self.assertEqual(facts.ids.count('contents'), 1)
         routes = [rp.REPORT_PATH if index == 0 else rp.REPORT_PATH + 'chapters/' + section['id'] + '/'
                   for index, section in enumerate(sections)]
         early_shortcuts = {'technical-landscape', 'datasets-and-benchmarks', 'methods-and-appendices',

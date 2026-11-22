@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+const {routes}=require('../../data/work-routes.json');
 
 test('static header points to lightweight search and native directory matches contributor brands',async({page})=>{
   await page.goto('/companies/');
@@ -27,7 +28,7 @@ test('a research-only company can be recovered from an empty native directory se
 test('native work search uses company aliases and preserves listing buckets and literal queries',async({page})=>{
   await page.goto('/work/?reader=keep&q=DataAnnotation#main');
   const matches=page.locator('[data-work-route]:visible');expect(await matches.count()).toBeGreaterThan(0);
-  for(const href of await matches.locator('.work-company').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('href'))))expect(href).toContain('/company/surge_ai/');
+  for(const href of await matches.locator('.work-heading h3 a').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('href'))))expect(href).toContain('/company/surge_ai/');
   const query=page.locator('[data-work-filters] input[name=q]');await query.fill('C++');
   await expect(query).toHaveValue('C++');expect(new URL(page.url()).searchParams.get('q')).toBe('C++');expect(new URL(page.url()).hash).toBe('#main');
   await page.locator('.work-page-filter-options').evaluate(node=>{node.open=true;});await page.getByRole('button',{name:'Clear',exact:true}).click();
@@ -43,6 +44,61 @@ test('homepage search transfers a real work query to the native source-backed li
   for(const value of ['MacBook Pro','qualification','identity'])await expect(listing).toContainText(new RegExp(value,'i'));
   await expect(listing.locator('.work-reviewed')).toContainText(/Terms checked|Pay terms reviewed/);
   await expect(listing.locator('.work-listing-action a').first()).toHaveAttribute('href',/^https:\/\//);
+});
+
+test('bare hourly searches lead to published hourly rates by keyboard or touch',async({page,isMobile})=>{
+  const expected=routes.filter(route=>route.pay_terms?.hourly_comparable).map(route=>route.id).sort();
+  const input=page.getByRole('combobox',{name:'Search the guide'});
+  const options=page.locator('#home-search-results').getByRole('option');
+  const status=page.locator('#home-search-status');
+  const first=options.first();
+  await page.goto('/');
+  if(isMobile) await page.getByRole('link',{name:'Search the guide'}).tap();
+  else await page.keyboard.press('Control+k');
+  await expect(input).toBeFocused();
+  for(const [query,href] of [
+    ['A.Team','/company/a-team/'],
+    ['revenue','/explore/#business-health'],
+    ['annualized pace','/explore/#business-health'],
+    ['remote hourly jobs','/work/?q=remote+hourly+jobs'],
+  ]){
+    await input.fill(query);
+    await expect(first).toHaveAttribute('href',href);
+    await expect(options.filter({hasText:'See roles with published hourly pay'})).toHaveCount(0);
+  }
+  await input.fill('zzqxv-no-matching-guide-record');
+  await expect(status).toHaveText('No recorded guide matches. You can search paid work or browse all companies.');
+
+  for(const query of ['hourly','  Hourly   Pay  ']){
+    await input.fill(query);
+    await expect(first.locator('strong')).toHaveText('See roles with published hourly pay');
+    await expect(first).toHaveAttribute('href','/work/?pay=hourly');
+    await expect(status).toHaveText('The first result opens Work with the Hourly filter selected.');
+    if(isMobile) await first.tap();
+    else {
+      await input.press('ArrowDown');
+      await expect(first).toHaveAttribute('aria-selected','true');
+      await input.press('Enter');
+    }
+    await expect(page).toHaveURL(/\/work\/\?pay=hourly$/);
+    await expect(page.locator('[data-work-filters] input[name=q]')).toHaveValue('');
+    await expect(page.locator('[data-work-filters] select[name=pay]')).toHaveValue('hourly');
+    await expect(page.locator('[data-work-count]')).toHaveText(`${expected.length} records with published hourly pay`);
+    await expect.poll(()=>page.locator('[data-work-route]:visible').evaluateAll(cards=>cards.map(card=>card.dataset.workRoute).sort())).toEqual(expected);
+    await page.goBack();
+    await expect(input).toHaveValue(query);
+    await expect(first).toHaveAttribute('aria-selected','true');
+    if(!isMobile) await expect(input).toBeFocused();
+  }
+});
+
+test('the hourly shortcut remains available when the search index cannot load',async({page})=>{
+  await page.route('**/presentation/search.*.json',route=>route.abort());
+  await page.goto('/');
+  await page.getByRole('link',{name:'Search the guide'}).click();
+  await expect(page.getByRole('button',{name:'Try again'})).toBeVisible();
+  await page.getByRole('combobox',{name:'Search the guide'}).fill('hourly pay');
+  await expect(page.getByRole('link',{name:'See roles with published hourly pay'})).toHaveAttribute('href','/work/?pay=hourly');
 });
 
 test('global search finds the Daily hub and displayed Greek paper titles',async({page})=>{

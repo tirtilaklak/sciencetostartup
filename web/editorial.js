@@ -57,18 +57,10 @@ document.addEventListener('click',e=>{
 // In-page anchors such as #about keep the focus that route() gave their element.
 const originalRoute=route;
 route=function(event){
-  const returningToWork=event?.type==='hashchange'&&location.hash.slice(1).split('/')[0]==='work'&&previousRoute==='company';
-  const returningToCompanies=event?.type==='hashchange'&&location.hash.slice(1).split('/')[0].toLowerCase()==='companies'&&previousRoute==='company';
   const result=originalRoute.apply(this,arguments);
-  if(event?.type==='hashchange'&&location.hash!=='#main'&&!viewAnchorId()){
-    const workLink=returningToWork&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():null;
-    const companyOrigin=returningToCompanies?companyReturnFocusTarget():null;
-    if(companyOrigin)companyOrigin.focus({preventScroll:true});
-    else if(workLink)workLink.focus({preventScroll:true});
-    else{
-      const heading=document.querySelector('.view:not([hidden]) h1');
-      if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}
-    }
+  if(event?.type==='hashchange'&&!result&&location.hash!=='#main'&&!viewAnchorId()){
+    const heading=document.querySelector('.view:not([hidden]) h1');
+    if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}
   }
   return result;
 };

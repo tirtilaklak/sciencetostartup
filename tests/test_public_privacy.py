@@ -247,8 +247,16 @@ class PublicPrivacyTests(unittest.TestCase):
         current_path = ROOT / 'data/current-companies.json'
         current = json.loads(current_path.read_text())["entries"] if current_path.exists() else []
         added |= {f"company/{entry['entity_id']}/index.html" for entry in current}
-        self.assertEqual({p for p in self.places if p.startswith("company/")},
-                         {f"company/{c['id']}/index.html" for c in companies} | added)
+        profiles = {f"company/{c['id']}/index.html" for c in companies} | added
+        source_indexes = set()
+        for profile in profiles:
+            source_route = "/" + profile.removesuffix("index.html") + "work-sources/"
+            if f'href="{source_route}"' in (ROOT / "dist" / profile).read_text():
+                source_indexes.add(source_route.lstrip("/") + "index.html")
+        self.assertIn("company/afterquery/work-sources/index.html", source_indexes)
+        for index in source_indexes:
+            self.assertTrue(self.places.get(index, "").strip(), index)
+        self.assertEqual({p for p in self.places if p.startswith("company/")}, profiles | source_indexes)
 
     def test_only_allowlisted_email_addresses_ship(self):
         found = {(address.lower(), place) for place, text in self.places.items() for address in EMAIL.findall(text)}

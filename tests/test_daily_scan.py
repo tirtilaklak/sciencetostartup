@@ -56,6 +56,8 @@ class PageElements(HTMLParser):
         self.details_depth = 0
         self.paragraphs = []
         self.current_paragraph = None
+        self.links = []
+        self.current_link = None
         self.feed(html)
 
     def handle_starttag(self, tag, attrs):
@@ -71,6 +73,9 @@ class PageElements(HTMLParser):
                 "text": "",
             }
             self.paragraphs.append(self.current_paragraph)
+        elif tag == "a":
+            self.current_link = {"attributes": attrs, "text": ""}
+            self.links.append(self.current_link)
         if tag == "select" and attrs.get("id") == "scan-date":
             self.in_date_select = True
         elif tag == "option" and self.in_date_select:
@@ -83,10 +88,14 @@ class PageElements(HTMLParser):
             self.details_depth -= 1
         elif tag == "p":
             self.current_paragraph = None
+        elif tag == "a":
+            self.current_link = None
 
     def handle_data(self, data):
         if self.current_paragraph is not None:
             self.current_paragraph["text"] += data
+        if self.current_link is not None:
+            self.current_link["text"] += data
 
     def date_steps(self):
         return [
@@ -208,6 +217,7 @@ class DailyScanTests(unittest.TestCase):
     def test_original_technical_notes_and_sources_stay_in_expandable_details(self):
         snapshot = edition()
         item = snapshot["items"][0]
+        item["sources"].append({"label": "Methods & data", "url": "https://example.org/methods?a=1&b=2"})
         html = render(snapshot, [snapshot], ORIGIN + "/daily/", self.root)
         article = html.split(f'<article class="scan-item" id="{item["id"]}"', 1)[1].split("</article>", 1)[0]
         visible, details = article.split("<details>", 1)
@@ -215,8 +225,19 @@ class DailyScanTests(unittest.TestCase):
         self.assertNotIn(item["focus"], visible)
         for field in ("focus", "finding", "caveat", "date_basis", "read_scope"):
             self.assertIn(item[field], details)
-        self.assertIn(f'<a href="{item["sources"][0]["url"]}">Primary paper', details)
-        self.assertIn('href="/daily/2026-11-16/#example-0"', details)
+        headline, = PageElements(visible).links
+        self.assertIn("ext", headline["attributes"].get("class", "").split())
+        self.assertEqual(
+            (headline["text"], headline["attributes"]["href"]),
+            (item["title"], item["sources"][0]["url"]),
+        )
+        *sources, permalink = PageElements(details).links
+        self.assertTrue(all("ext" in link["attributes"].get("class", "").split() for link in sources))
+        self.assertEqual(
+            [(link["text"], link["attributes"]["href"]) for link in sources],
+            [(source["label"], source["url"]) for source in item["sources"]],
+        )
+        self.assertEqual(permalink["attributes"]["href"], "/daily/2026-11-16/#example-0")
 
     def test_sources_require_a_nonempty_list(self):
         for value in ("missing", [], None, {}):
@@ -263,11 +284,15 @@ class DailyScanTests(unittest.TestCase):
                 self.assertEqual(actual_targets, expected_targets)
                 self.assertEqual([step["rel"] for step in page.date_steps()],
                                  [rel for rel, target in (("prev", index - 1), ("next", index + 1)) if 0 <= target < len(dates)])
-                navigation = html.split('<nav class="scan-edition-nav"', 1)[1].split("</nav>", 1)[0]
-                self.assertIn('<details class="scan-archive-disclosure" open><summary>Snapshot archive</summary>', navigation)
+                navigation = html.split('<nav class="scan-edition-nav"', 1)[1].split('<details class="scan-filter-disclosure"', 1)[0]
+                archive = navigation.split('<details class="scan-archive-disclosure" open>', 1)[1].split('</details>', 1)[0]
+                self.assertIn('<summary>Snapshot archive and feeds</summary>', archive)
                 self.assertIn(f'<a href="/daily/{snapshot["date"]}/" aria-current="date">', navigation)
+                self.assertIn('<a href="/daily/feed.xml">RSS</a>', archive)
+                self.assertIn('<a href="/daily/feed.json">JSON Feed</a>', archive)
                 self.assertIn('<form class="scan-date-form" hidden>', navigation)
                 self.assertIn('<button id="scan-date-go" type="submit">Go</button>', navigation)
+                self.assertIn('<details class="scan-filter-disclosure" open hidden><summary>Search and filter</summary>', html)
                 self.assertLess(html.index(navigation), html.index('<article class="scan-item"'))
                 self.assertTrue(any(tag == "div" and attrs.get("data-edition") == snapshot["date"] for tag, attrs in page.elements))
 

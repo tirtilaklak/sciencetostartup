@@ -289,7 +289,9 @@ def current_company_html(entry, reviewed_on, compact=False, native_sources=False
     anchor = ' id="sources" data-native-sources' if native_sources else ''
     evidence = (f'<details class="company-current-facts"><summary{anchor}>' + ('Official sources' if compact else 'Current source receipts') + '</summary><ol>'
         + ''.join('<li>' + _link(s["url"], s["title"]) + '<p>' + escape(s["locator"]) + '</p><p>Observed ' + escape(format_date(s["observed_on"])) + ((' · Published ' + escape(format_date(s["published_on"]))) if s["published_on"] else '') + '</p>' + ('' if compact else '<code>SHA-256 ' + escape(s["response_sha256"]) + '</code>') + '</li>' for s in sources)
-        + '</ol>' + ('' if compact else '<p>Wikipedia revision ' + escape(wiki["revision_timestamp"]) + ' · Observed ' + escape(format_date(wiki["observed_on"])) + '</p><code>SHA-256 ' + escape(wiki["response_sha256"]) + '</code>') + '<p><a href="/current-companies.json">Current directory records and provenance · JSON</a></p></details>')
+        + '</ol>' + ('' if compact else '<p>Wikipedia revision ' + escape(wiki["revision_timestamp"]) + ' · Observed '
+        + escape(format_date(wiki["observed_on"])) + '</p><code>SHA-256 ' + escape(wiki["response_sha256"])
+        + '</code><p><a href="/current-companies.json">Supplemental company records (JSON)</a></p>') + '</details>')
     dates = offering_source_dates(entry)
     observed = format_date(dates[0]) + (" to " + format_date(dates[-1]) if len(dates) > 1 else "")
     stamp = '<p class="company-research-snapshot">Current directory addition · Offering sources checked ' + escape(observed) + '</p>'

@@ -207,16 +207,16 @@ def operating_status_notice(context):
     target_label = _label(status.next_edition_date) + " at 9:00 a.m. Pacific"
     if status.state == "held":
         heading = "Next edition delayed"
-        message = (f'At the recorded observation, the edition targeted for <time datetime="{target_iso}">{target_label}</time> '
+        message = (f'The edition scheduled for <time datetime="{target_iso}">{target_label}</time> '
                    "was delayed. " + " ".join(REASONS[code] for code in status.reason_codes))
     else:
         heading = "Next edition preparation"
-        message = f'At the recorded observation, the next edition was being prepared for <time datetime="{target_iso}">{target_label}</time>.'
+        message = f'The next edition was being prepared for <time datetime="{target_iso}">{target_label}</time>.'
     observed_iso = status.observed_on.isoformat().replace("+00:00", "Z")
     observed_label = (_label(status.observed_on.date()) + " at "
                       + status.observed_on.strftime("%H:%M:%S") + " UTC")
     return ('<section class="r-section r-operating-status" aria-label="Edition update">'
             f'<h2>{heading}</h2><p>{message}</p>'
-            f'<p>The edition shown on this website remains {_label(status.current_edition_date)} '
+            f'<p>Latest published edition {_label(status.current_edition_date)} '
             f'({escape(status.current_release_id)}).</p>'
             f'<p class="r-meta">Status observed <time datetime="{observed_iso}">{observed_label}</time>.</p></section>')

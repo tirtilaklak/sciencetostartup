@@ -6,6 +6,9 @@
   const search = document.getElementById('scan-search');
   const topic = document.getElementById('scan-topic');
   const kind = document.getElementById('scan-kind');
+  const filterDisclosure = root.querySelector('.scan-filter-disclosure');
+  const filterSummary = filterDisclosure.querySelector('summary');
+  const compact = matchMedia('(max-width: 600px)');
   const date = document.getElementById('scan-date');
   const dateForm = date.form;
   const dateGo = document.getElementById('scan-date-go');
@@ -17,11 +20,55 @@
   const rows = [...root.querySelectorAll('.scan-item')];
   const rowById = new Map(rows.map(row => [row.id, row]));
   const readingKey = 's2sDailyReading';
+  const filterKey = 's2sDailyFilters';
   const maxPosition = 10000000;
   const navigationAPI = globalThis.navigation;
   const navigationState = typeof navigationAPI?.currentEntry?.getState === 'function' &&
     typeof navigationAPI.updateCurrentEntry === 'function' && typeof navigationAPI.addEventListener === 'function';
+  const timing = globalThis.performance?.getEntriesByType?.('navigation')?.[0];
+  const hashTarget = () => rowById.get(location.hash.slice(1));
+  let markedFragment = null;
+  function syncFragmentHighlight() {
+    // A recreated WebKit document can have a valid fragment without a native :target.
+    let row;
+    try { row = rowById.get(decodeURIComponent(location.hash.slice(1))); }
+    catch (_) { /* Malformed fragment. */ }
+    const visibleTarget = row && !row.hidden ? row : null;
+    if (visibleTarget === markedFragment) return;
+    markedFragment?.removeAttribute('data-fragment-target');
+    visibleTarget?.setAttribute('data-fragment-target', '');
+    markedFragment = visibleTarget;
+  }
+  const disclosureObserver = navigationState ? null : new MutationObserver(mutations => {
+    const details = hashTarget()?.querySelector('details');
+    if (mutations.some(mutation => mutation.target === details)) saveReading();
+  });
+  const filterObserver = navigationState ? null : new MutationObserver(() => {
+    if (compact.matches) saveClassicFilters();
+  });
+  let coldFragmentURL = timing?.type === 'back_forward' && hashTarget() ? location.href : null;
+  let resumedDocument = false;
   let restoration = 0;
+  let compactFiltersOpen = false;
+  function showFilters(open) {
+    compactFiltersOpen = open;
+    filterDisclosure.open = !compact.matches || open;
+    filterObserver?.takeRecords();
+  }
+  function savedClassicFilters() {
+    const state = history.state?.[filterKey];
+    return !navigationState && state?.url === location.href && typeof state.open === 'boolean' ? state : null;
+  }
+  function saveClassicFilters() {
+    try {
+      const state = history.state;
+      if (state != null && Object.prototype.toString.call(state) !== '[object Object]') return;
+      const active = document.activeElement;
+      history.replaceState({ ...state, [filterKey]: { url: location.href,
+        open: filterDisclosure.open, focusSummary: active === filterSummary, focusSearch: active === search } }, '');
+      history.scrollRestoration = 'auto';
+    } catch (_) { /* Keep native disclosure and history behavior. */ }
+  }
   const position = value => Number.isFinite(value) && value >= 0 && value <= maxPosition;
   function savedReading() {
     let entry;
@@ -52,48 +99,99 @@
       open: rows.filter(row => row.querySelector('details').open).map(row => row.id),
       anchor: anchor?.id || null, top: anchor?.getBoundingClientRect().top || 0,
       archiveOpen: archive.open,
+      filtersOpen: compact.matches ? filterDisclosure.open : compactFiltersOpen,
+      returnToFilterSummary: active === filterSummary,
+      returnToPermalink: active?.matches('.scan-permalink') ? active.closest('.scan-item')?.id : null,
       returnToArchive: active?.matches('.scan-archive a') ? new URL(active.href).pathname : null,
       returnToDateGo: active === dateGo };
     try {
-      if (navigationState) navigationAPI.updateCurrentEntry({ state: { ...state, [readingKey]: reading } });
-      else history.replaceState({ ...state, [readingKey]: reading }, '', location.href);
+      const next = { ...state, [readingKey]: reading };
+      if (navigationState) navigationAPI.updateCurrentEntry({ state: next });
+      else {
+        delete next[filterKey];
+        history.replaceState(next, '', location.href);
+      }
       history.scrollRestoration = 'manual';
     }
     catch (_) { /* Native history remains available when state cannot be saved. */ }
   }
-  function restoreReading(scroll = true) {
-    const saved = savedReading();
+  function restoreReading(scroll = true, changedHash = false) {
     const generation = ++restoration;
-    function apply(current) {
+    function apply(current, filters) {
       // Recreated documents lose native disclosure state. Layout and position
       // must be restored together after the browser finishes its traversal.
-      for (const row of rows) row.querySelector('details').open = current.open.includes(row.id);
-      if (typeof current.archiveOpen === 'boolean') archive.open = current.archiveOpen;
-      try { history.scrollRestoration = 'manual'; } catch (_) { /* Restore below. */ }
+      const reading = filters ? null : current;
+      if (current) {
+        for (const row of rows) row.querySelector('details').open = current.open.includes(row.id);
+        if (typeof current.archiveOpen === 'boolean') archive.open = current.archiveOpen;
+        if (reading?.returnToDateGo === true && compact.matches) archive.open = true;
+        disclosureObserver?.takeRecords();
+      }
+      if (reading) {
+        try { history.scrollRestoration = 'manual'; } catch (_) { /* Restore below. */ }
+      }
+      const filtersOpen = filters?.open ?? current?.filtersOpen;
+      if (typeof filtersOpen === 'boolean') showFilters(filtersOpen);
+      let returnFocus;
       if (scroll) {
-        const anchor = rowById.get(current.anchor);
-        const y = anchor && !anchor.hidden ? scrollY + anchor.getBoundingClientRect().top - current.top : current.y;
-        scrollTo({ left: current.x, top: Math.max(0, Math.min(maxPosition, y)), behavior: 'instant' });
-        if (document.activeElement === document.body) {
-          const archiveLink = archive.open ? archiveLinks.get(current.returnToArchive) : null;
-          const returnFocus = current.returnToDateGo === true ? dateGo : archiveLink;
-          returnFocus?.focus({ preventScroll: true });
+        if (reading) {
+          const anchor = rowById.get(reading.anchor);
+          const y = anchor && !anchor.hidden ? scrollY + anchor.getBoundingClientRect().top - reading.top : reading.y;
+          scrollTo({ left: reading.x, top: Math.max(0, Math.min(maxPosition, y)), behavior: 'instant' });
+          const item = rowById.get(reading.returnToPermalink);
+          returnFocus = item && !item.hidden ? item.querySelector('details[open] .scan-permalink') : null;
+        }
+        // Fragment traversal can leave focus or the next Tab at the target
+        // article. Restore the originating link after reopening its details.
+        if (!returnFocus && document.activeElement === document.body) {
+          const archiveLink = archive.open ? archiveLinks.get(reading?.returnToArchive) : null;
+          const focusSummary = compact.matches && (filters?.focusSummary ?? reading?.returnToFilterSummary) === true;
+          const focusSearch = filterDisclosure.open && filters?.focusSearch === true;
+          returnFocus = focusSummary ? filterSummary : focusSearch ? search :
+            reading?.returnToDateGo === true ? dateGo : archiveLink;
+        }
+        returnFocus?.focus({ preventScroll: true });
+      }
+      if (reading?.returnToDateGo === true) date.value = root.dataset.edition;
+      return returnFocus;
+    }
+    if (!scroll) {
+      const saved = savedReading();
+      const filters = timing?.type === 'back_forward' ? savedClassicFilters() : null;
+      if (saved || filters) apply(saved, filters);
+      return Boolean(saved);
+    }
+    function complete() {
+      const current = savedReading();
+      const filters = changedHash || timing?.type === 'back_forward' ? savedClassicFilters() : null;
+      const target = changedHash || coldFragmentURL === location.href ? hashTarget() : null;
+      coldFragmentURL = null;
+      if (!current && target) revealHash(target);
+      const returnFocus = (current || filters) && apply(current, filters);
+
+      // Browsers can retain focus from the previous fragment or lose its
+      // Tab starting point on a cold return. Honor the saved origin first.
+      if (target && !target.hidden && !returnFocus && (changedHash || document.activeElement === document.body)) {
+        const heading = target.querySelector('h2');
+        const box = heading.getBoundingClientRect();
+        if (!current || (box.bottom > 0 && box.top < innerHeight)) {
+          heading.tabIndex = -1;
+          heading.focus({ preventScroll: true });
         }
       }
-      if (current.returnToDateGo === true) date.value = root.dataset.edition;
     }
-    if (!scroll) { if (saved) apply(saved); }
-    else setTimeout(() => {
+    // Hash traversal has already applied native state by hashchange. Set the
+    // Tab starting point now and supersede the pending popstate restoration.
+    if (changedHash) { complete(); return; }
+    setTimeout(() => {
       if (generation !== restoration) return;
       requestAnimationFrame(() => {
         if (generation !== restoration) return;
         // pageshow can precede history.state restoration. Read it in the later
         // task instead of abandoning the return when its early value is null.
-        const current = savedReading();
-        if (current) apply(current);
+        complete();
       });
     }, 0);
-    return Boolean(saved);
   }
   const fold = value => value.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase();
   const wordsIn = value => fold(value).match(/[\p{L}\p{N}]+/gu) || [];
@@ -116,6 +214,7 @@
         Boolean(kind.value && row.dataset.kind !== kind.value);
       if (!row.hidden) visible++;
     }
+    syncFragmentHighlight();
     document.getElementById('scan-count').textContent = `${visible} of ${rows.length} selections`;
     document.getElementById('scan-empty').hidden = visible !== 0;
     reset.hidden = !search.value && !topic.value && !kind.value;
@@ -129,7 +228,9 @@
         // replaceState resets Navigation state, including other components'
         // fields. Carry that independent state across this URL-only change.
         const entry = navigationState ? navigationAPI.currentEntry.getState() : undefined;
-        history.replaceState(history.state, '', url);
+        const filters = savedClassicFilters();
+        const state = filters ? { ...history.state, [filterKey]: { ...filters, url: url.href } } : history.state;
+        history.replaceState(state, '', url);
         if (navigationState) navigationAPI.updateCurrentEntry({ state: entry });
       } catch (_) { /* Filtering still works. */ }
     }
@@ -139,7 +240,23 @@
       link.href = target.href;
     }
   }
-  function clear() { search.value = ''; topic.value = ''; kind.value = ''; filter(); search.focus(); }
+  function clear() {
+    search.value = '';
+    topic.value = '';
+    kind.value = '';
+    filter();
+    if (compact.matches) showFilters(true);
+    search.focus();
+    if (filterObserver && compact.matches) {
+      const saved = savedClassicFilters();
+      if (!saved?.open || !saved.focusSearch) saveClassicFilters();
+    }
+  }
+  compact.addEventListener('change', event => {
+    const active = document.activeElement;
+    showFilters(event.matches ? compactFiltersOpen || filterDisclosure.contains(active) : filterDisclosure.open);
+    if (!event.matches && active === filterSummary) search.focus({ preventScroll: true });
+  });
   search.addEventListener('input', () => filter());
   topic.addEventListener('change', () => filter());
   kind.addEventListener('change', () => filter());
@@ -165,27 +282,51 @@
   if (navigationState) navigationAPI.addEventListener('navigate', event => {
     if (event.navigationType !== 'replace') saveReading();
   });
+  // Classic History has no event before browser Back leaves the entry. Save
+  // a changed fragment disclosure in the same task as its native toggle.
+  disclosureObserver?.observe(root, { subtree: true, attributeFilter: ['open'] });
+  // Record a manual filter toggle on this entry, leaving its scroll to the browser.
+  if (filterObserver) {
+    filterObserver.observe(filterDisclosure, { attributeFilter: ['open'] });
+    document.addEventListener('focusin', event => {
+      const saved = savedClassicFilters();
+      if (compact.matches && saved && (saved.focusSummary !== (event.target === filterSummary) ||
+          (saved.focusSearch === true) !== (event.target === search))) saveClassicFilters();
+    });
+  }
   // During pagehide WebKit can already expose the destination entry. Never
   // write History or Navigation state here; only cancel pending restoration.
-  addEventListener('pagehide', () => { restoration++; });
-  addEventListener('pageshow', () => restoreReading());
-  addEventListener('popstate', () => restoreReading());
-  function revealHash() {
+  addEventListener('pagehide', () => { restoration++; coldFragmentURL = null; });
+  addEventListener('pageshow', event => {
+    resumedDocument = event.persisted;
+    syncFragmentHighlight();
+    if (!resumedDocument) restoreReading();
+  });
+  addEventListener('popstate', () => {
+    syncFragmentHighlight();
+    if (!resumedDocument) restoreReading();
+  });
+  function revealHash(target = hashTarget()) {
     restoration++;
-    const target = document.getElementById(location.hash.slice(1));
-    if (target && target.classList.contains('scan-item')) {
+    coldFragmentURL = null;
+    if (target) {
       if (target.hidden) { search.value = ''; topic.value = ''; kind.value = ''; filter(); }
       target.querySelector('details').open = true;
+      disclosureObserver?.takeRecords();
       target.scrollIntoView({block: 'start'});
     }
   }
-  addEventListener('hashchange', () => { if (!restoreReading()) revealHash(); });
+  addEventListener('hashchange', () => {
+    resumedDocument = false;
+    syncFragmentHighlight();
+    restoreReading(true, true);
+  });
   filter(false);
+  showFilters(Boolean(search.value || topic.value || kind.value));
   if (dateForm) dateForm.hidden = false;
-  root.querySelector('.scan-controls').hidden = false;
+  filterDisclosure.hidden = false;
   document.documentElement.removeAttribute('data-daily-pending');
   // A fresh fragment reveals its target. A saved return first restores its
   // disclosures, then pageshow restores the position in that same layout.
-  const timing = globalThis.performance?.getEntriesByType?.('navigation')?.[0];
   if (!restoreReading(false) && timing?.type !== 'back_forward') revealHash();
 })();

@@ -1,0 +1,248 @@
+{
+  "frozen": {
+    "commit": "08e40919b95e2cc8012dee385335273fb92f1a90",
+    "build_id": "96e25098b02da34fdb20",
+    "manifest_sha256": "3ee2246bc0506c355cbdc00907ff057fda6978631bd0212fc48b8e753885c888",
+    "payloads": 1281,
+    "editorial_release_id": "2026-11-22.9"
+  },
+  "pull_request": 35,
+  "head": "ec9345d5a2f118e066fc897b3d9e96d7338f1d88",
+  "roster": [
+    "retest12_work_matrix",
+    "retest12_navigation",
+    "retest12_sources",
+    "retest12_visual",
+    "retest12_research",
+    "retest12_companies",
+    "retest12_release",
+    "retest12_market",
+    "retest12_daily",
+    "retest12_accessibility"
+  ],
+  "model": "gpt-6.2-sol",
+  "reasoning_effort": "ultra",
+  "production_at_check": {
+    "worker": 41,
+    "build": "5dc63fbcf19634a55c66",
+    "acceptance": 86
+  },
+  "candidate_acceptance": 86,
+  "native_page_bytes": {
+    "AfterQuery": [
+      154676,
+      22542
+    ],
+    "Work": [
+      299289,
+      42562
+    ]
+  },
+  "independent_results": {
+    "explore_published_visits": 570,
+    "work_selections": 70,
+    "exact_work_csv_downloads": 210,
+    "cold_work_returns": 140,
+    "work_bookmark_cases": 19,
+    "exact_live_issuer_responses": 144,
+    "work_cards": 135,
+    "dossiers": 55,
+    "compare_companies": 39,
+    "common_company_source_ids_and_urls": 880,
+    "afterquery_native_citations": 93,
+    "mobile_chapter_reads": 48,
+    "chapter_assertion_links": 15904,
+    "chapter_source_links": 7184,
+    "archived_hops_local_workerd": 8,
+    "market_keyboard_stops": 234,
+    "daily_filter_combinations": 100,
+    "additional_rendered_explore_targets": 230,
+    "total_distinct_explore_targets": 515,
+    "total_explore_phone_desktop_visits": 1030,
+    "unreached_explore_targets": 0,
+    "local_exact_browser_journeys": 228
+  },
+  "official": {
+    "ci": 45039549361,
+    "browser": 45039549372,
+    "python_tests": 1109,
+    "first_pass_browser_cases": 1587,
+    "retry_pass_browser_cases": 1,
+    "skipped_project_cases": 287,
+    "report_accessibility": 60,
+    "mobile_reports": 72,
+    "routes": 24,
+    "raw_scores": [
+      98,
+      100
+    ],
+    "median_lcp_ms": [
+      902.5276,
+      2406.7601
+    ],
+    "artifact_sha256": "bb1312841282e3ca48d2c2a255e7f8b4a16fa56dd1262786637a4d330dfe1008"
+  },
+  "previous_staged_version_44": {
+    "utc": "2026-11-22T15:56:22.945684+00:00",
+    "disposition": "superseded; zero public traffic; confirmed Work timeout",
+    "id": "34210d27-0b0f-47cb-9fb1-2d277a9dbc85",
+    "number": 44,
+    "existing": false,
+    "commit": "da0f41ef305bd1f8142c80f3cafbd12c2ec3bf95",
+    "build_id": "8bd4d587e55c30d638a2",
+    "manifest_sha256": "b234d12c9b33cc03819ef697599065f6b1fe86198f4411e7cef4a4628ec0ad59",
+    "preview": "https://34210d27-sciencetostartup.musaeminozdem.workers.dev",
+    "traffic_promoted": false,
+    "all_cases_eventually_passed": true,
+    "first_full_run_passed": false,
+    "first_full_sha256": "b50384114f87a1ff536240372b86a264a6f042e69b272a95a4f835bad14cc519",
+    "browser_cases": {
+      "journeys": {
+        "passed": 20,
+        "receipt": "immutable-edge/journeys/summary.json",
+        "sha256": "b80ae290c53e8db327febbe63e9d89a6c5c9d744bf2d04e93f9e57954275e454"
+      },
+      "changed-journeys": {
+        "passed": 26,
+        "receipt": "immutable-edge/changed-journeys/summary.json",
+        "sha256": "59dda2ccfe1028b2c69cce166358d4df68ec03b1e14d094a17a3a500237b24db"
+      },
+      "sixth-journeys": {
+        "passed": 20,
+        "receipt": "immutable-edge/sixth-journeys/summary.json",
+        "sha256": "9e8816eba53c1c9ee3ca12448c3ff0ba00337d47e3a451318fa12524f5f38008"
+      },
+      "seventh-journeys": {
+        "passed": 44,
+        "receipt": "immutable-edge/seventh-journeys/summary.json",
+        "sha256": "91e49167bb41e55b7f6f8814924c3ae569681affed89e609621d4c4f34d8a5c8"
+      },
+      "eighth-journeys": {
+        "passed": 14,
+        "receipt": "immutable-edge/eighth-journeys/summary.json",
+        "sha256": "4fab0216cb1d85a8b6117f1ae00f0a3b9d3019b22d30acee8fca02b7bd365753"
+      },
+      "eighth-desktop": {
+        "passed": 1,
+        "receipt": "immutable-edge/eighth-desktop/summary.json",
+        "sha256": "86b671dcf2e9b38670a2c5ac63697414aec2907ff52397ab4470e8e5f32057f4"
+      },
+      "ninth-journeys": {
+        "passed": 22,
+        "receipt": "immutable-edge/ninth-journeys/summary.json",
+        "sha256": "b7f06fc587d5cc164a1e1333abfa179948a1fd3de21fb0d457f98a7140937508"
+      },
+      "ninth-desktop": {
+        "passed": 3,
+        "receipt": "immutable-edge/ninth-desktop/summary.json",
+        "sha256": "7f8d7beec361e63027b0d9ea81927e856fe5db34d85c87f7f084842c06f86541"
+      },
+      "ninth-market-firefox": {
+        "passed": 3,
+        "receipt": "immutable-edge-retries/ninth-market-firefox-profile/summary.json",
+        "sha256": "d18a8ef6fc9f6c6685a28238b350cf3c0d0501394db30f9ce097f5a93a4b3576"
+      },
+      "tenth-desktop": {
+        "passed": 10,
+        "receipt": "immutable-edge/tenth-desktop/summary.json",
+        "sha256": "4882a9e682fa804a8ac56604fc2790fac8992d11d1db91034f2abbd6398a3fed"
+      },
+      "tenth-mobile": {
+        "passed": 4,
+        "receipt": "immutable-edge/tenth-mobile/summary.json",
+        "sha256": "cda856cdf7ee0f09f735969609108c603e198daf0212f767a71e8ad1579a6092"
+      },
+      "tenth-readable": {
+        "passed": 12,
+        "receipt": "immutable-edge-retries/tenth-readable-profile/summary.json",
+        "sha256": "464a131046c17a3e5efc844cf16e95c50ad25784c3d1ff6fc7752a24a4a6f597"
+      },
+      "eleventh-reading": {
+        "passed": 8,
+        "receipt": "immutable-edge/eleventh-reading/summary.json",
+        "sha256": "da694e37669651eff181276a49de828c22a56773b321a9794331bf7ebd9799fa"
+      },
+      "eleventh-recovery": {
+        "passed": 5,
+        "receipt": "immutable-edge/eleventh-recovery/summary.json",
+        "sha256": "9d4adf4805844aebc0d1f1077b73a0cc20cbbcea81e61243a29ba50cf18a0317"
+      },
+      "eleventh-market-chromium": {
+        "passed": 3,
+        "receipt": "immutable-edge/eleventh-market-chromium/summary.json",
+        "sha256": "12512e6279e71aaf85a62d97ac2c116e9f2a4ff4c00c047cd7e0cb37eb6923e0"
+      },
+      "eleventh-market-touch": {
+        "passed": 1,
+        "receipt": "immutable-edge/eleventh-market-touch/summary.json",
+        "sha256": "03ab50de10dfa1540b6bd9a5e7ebf4465825488d27a88cea10af8e6f7fac9905"
+      },
+      "eleventh-readable": {
+        "passed": 8,
+        "receipt": "immutable-edge-retries/eleventh-readable-profile/summary.json",
+        "sha256": "6c7294cb1e112363eef98ca56574988fbc7d79615738b3707d967db92bb44bf1"
+      },
+      "eleventh-issuer": {
+        "passed": 4,
+        "receipt": "immutable-edge/eleventh-issuer/summary.json",
+        "sha256": "d7785c6bcd1afe0c4ebdb2c40991f1b6b8ffe36f38b2da0c8510757a38952372"
+      }
+    },
+    "acceptance": 86,
+    "identity_routes": 11,
+    "header_checks": 28,
+    "dossiers": 55,
+    "afterquery_citations": 93,
+    "work_exports": [
+      135,
+      135,
+      135
+    ],
+    "archive": {
+      "http_checks": 26,
+      "browser_steps": 8,
+      "durations_ms": [
+        1394,
+        309,
+        1965,
+        21013,
+        31192,
+        5901,
+        null,
+        35450
+      ],
+      "original_evidence_limit_ms": 25000,
+      "diagnostic_evidence_limit_ms": 180000
+    },
+    "retest_receipts": {
+      "immutable-edge-retries/archived-hops.identity.json": "3052a3ccbdeb4e81f8462370207239ba9a533e06174e50474e78a6cea49bd889",
+      "immutable-edge-retries/archived-hops.json": "ccafa65a5ece1155957b578ea641dc3b2b91d214c9ffefabd73401e919b774b5",
+      "immutable-edge-retries/work-downloads/verified.json": "203e85faaacd0328d9cd7a87d7902f0fa1a21e0de3cba765b8aa39eeac53ee78"
+    }
+  },
+  "retained_receipts_sha256": {
+    "release/report.md": "6e820a1fa367e9ada4f4ac0527908ef9d1996f06b93bb8b9ed3cb13ee0cf9a36",
+    "release/ci-measurements.json": "4473608fa098baf317dd78479afc94a80381d1568fcb27ce7dffe080c152f1eb",
+    "release/official-test-counts.json": "a6f7bb54734f8201566bb279e7162fe34b5813549e7e8c6691965d79b75c72bc",
+    "release/mobile-webkit-mercor/trace-findings.json": "8ebae85b5178bda5c15ef590caf17f59ecbf2e1fba6d225c740abd5915e7ccb3",
+    "navigation/native-menu-clipping.json": "f0a4cabcd6662cefef7024e5ad2df13cf7f8e5e40bab21e26421f24e65278ffe",
+    "navigation/route-summary.json": "c5a1da19ffb64acafe6355d6911b706254b175929bbd188b3affdb6859227c89",
+    "companies/source-index-local.json": "a73c2503eb05d725f0c0187bfd407271d2ea2d0cdbd3b1b726a3ab548b379559",
+    "daily/cold-clear-first-observation.json": "c34b59f698b8737b679dd959f04a9c33b3ce3a6061195fc83ace5dad1919138c",
+    "market/findings.md": "c4b2027e50c4d7ed35ab988fc3971ac358d884ce854184f9337d382e51c1525e",
+    "research/verdict.json": "9bdd6e11eadaa7975a46b8ea2b144ba23fe8107d51788c71e361e05d729ed38b",
+    "visual/phone390-actual-and-trials.png": "bece92c142327d5d6b2912ca96034d3ed2ef7de1dcd13bf1ab4dc222d5407c71",
+    "work-matrix/completion.json": "61ef44cb2efd78b4d70007512abb293a3da0fc8d7c39c859972e2ef7bacbe552",
+    "work-sources/issuer-reconciliation.json": "bcf8dcb9a1999654d20268f8cd509eaf2ca8deee9657135c12a1b62a5279b63f",
+    "accessibility/font-nojs.json": "fcccd53d8a568be91dba089e6f211b475a0f4e3c12c0d04c8d819a6cfd4aecbe",
+    "accessibility/font-js.json": "9d47da2a38e818dcdda58d279db056c5a9389ea8cabf1341b02d0d57de88f335",
+    "navigation/rendered-summary.json": "73d19e7631af9a370fde85428eae76117f3607435b264e69ec433bfe6f96f2e1",
+    "accessibility/findings.md": "2360d90ec4ba30ba3f267c1fdc36859606044d81c823de0756bee093aa0b8588",
+    "accessibility/chromium-followup.json": "49dbe2b5fbe562d4f9874263e09b9a0db9c51ad09c3e5e7e4958321fe8d1c1ab",
+    "accessibility/font-edges.json": "5a96495ea2bccc2f8f283dff22bbec5de74fdcb5ed347c8736124b06d422d32f",
+    "research/downloaded-archive.json": "cf1f931bb7ffda3cc2f6f49d3962254348fde77fe6757065bb3d3bcec9abc13f",
+    "companies/history-csv-retry.json": "ee54631db4377a3271adb9c2391845fc3dcbeac7e1bfe41f65eb8cf0648a7cda",
+    "work-sources/browser-final.json": "0e7a169639fd9ccef1600684e883a09291a82b595473125d6fee72a6a7018454"
+  },
+  "local_journey_repeat": "Three groups were repeated after browser or local server failures. Each repeat used the exact frozen manifest and identical test IDs."
+}

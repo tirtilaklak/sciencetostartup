@@ -298,7 +298,12 @@ def health_subset(health, observations, company_id=None):
         result["profile_finance"] = {company_id: copy.deepcopy(profiles[company_id])} if company_id in profiles else {}
     result["observations"] = observations
     claim_ids = {cid for observation in observations for cid in observation.get("claim_ids", [])}
-    source_ids = {sid for observation in observations for sid in observation.get("source_ids", [])}
+    source_ids = {
+        sid
+        for observation in observations
+        for field in ("source_ids", "historical_source_ids")
+        for sid in observation.get(field, [])
+    }
     result["fresh_claims"] = [row for row in health.get("fresh_claims", []) if row["id"] in claim_ids]
     result["sources"] = [row for row in health.get("sources", []) if row["id"] in source_ids]
     result["source_checks"]["entries"] = [row for row in health.get("source_checks", {}).get("entries", []) if row["source_id"] in source_ids]
@@ -381,6 +386,17 @@ def financial_value(row, observation=False):
     return qualifier + text
 
 
+def observation_source_ids(observation):
+    source_ids = observation.get("source_ids", [])
+    primary = observation.get("primary_source_id")
+    return [primary, *(sid for sid in source_ids if sid != primary)] if primary else source_ids
+
+
+def financial_source_urls(sources, ids):
+    urls = (sources.get(sid, {}).get("url") for sid in ids)
+    return " | ".join(dict.fromkeys(url for url in urls if url))
+
+
 def current_company_result(research, health, company_id):
     """Pure Python port of currentCompanyResult; all-company JS parity is tested."""
     from static_pages import selected_business_observation
@@ -394,7 +410,7 @@ def current_company_result(research, health, company_id):
                 "period": observation.get("period", {}).get("label") or observation.get("as_of") or "",
                 "scope": observation.get("scope") or "", "scope_detail": observation.get("scope_detail") or observation.get("scope_label") or "",
                 "accounting_basis": observation.get("accounting_basis") or "",
-                "source_urls": " | ".join(sources[sid]["url"] for sid in observation.get("source_ids", []) if sources.get(sid, {}).get("url")),
+                "source_urls": financial_source_urls(sources, observation_source_ids(observation)),
                 "scope_label": observation.get("scope_label") or research.scope_text(observation.get("scope"), company_id),
                 "limitations": observation.get("limitations") or ""}
     metric = research.headline(company_id)
@@ -404,7 +420,7 @@ def current_company_result(research, health, company_id):
             "display": financial_value(metric), "upper_value": metric.get("upper_value", ""), "observation_status": metric.get("observation_status") or "",
             "currency": metric.get("currency") or "", "as_of": metric.get("as_of") or "", "period": metric.get("period_label") or "",
             "scope": metric.get("segment_scope") or "", "scope_detail": metric.get("scope_detail") or "", "accounting_basis": metric.get("gross_vs_net") or "",
-            "source_urls": " | ".join(research.sources[sid]["url"] for sid in research.claim(metric).get("source_ids", []) if research.sources.get(sid, {}).get("url")),
+            "source_urls": financial_source_urls(research.sources, research.claim(metric).get("source_ids", [])),
             "scope_label": research.scope_text(metric.get("segment_scope"), company_id), "limitations": metric.get("limitations") or ""}
 
 
@@ -427,6 +443,8 @@ def company_summaries(data, sidecars, root):
     from static_pages import Research, read_js_object, selected_business_observation, date_rank, metric_period, latest_source, basis_text
     research = Research(data, read_js_object(root / "web/app.js", "FINANCIAL_HEADLINES"), sidecars["SOURCE_UPDATES"])
     health = sidecars["BUSINESS_HEALTH"] or {}
+    health_sources = {**research.sources, **{s["id"]: s for s in health.get("sources", [])}}
+    health_checks = {c["source_id"]: c for c in health.get("source_checks", {}).get("entries", [])}
     products_by_company = {}
     result = {}
     for company in data["companies"]:
@@ -439,18 +457,27 @@ def company_summaries(data, sidecars, root):
         observation = selected_business_observation(health, cid)
         financial = None
         if observation:
-            record = next((s for s in health.get("sources", []) if s["id"] in observation.get("source_ids", [])), None) or research.sources.get(next(iter(observation.get("source_ids", [])), ""))
+            primary = observation.get("primary_source_id")
+            record = next((health_sources[sid] for sid in observation_source_ids(observation) if sid in health_sources), None)
             fresh = next((c for c in health.get("fresh_claims", []) if c["id"] in observation.get("claim_ids", [])), {})
-            checked = fresh.get("observed_on") or next((c.get("checked_on") for c in health.get("source_checks", {}).get("entries", []) if c["source_id"] in observation.get("source_ids", []) and c.get("status") == "content_checked"), None)
+            checked = None
+            if record:
+                check = health_checks.get(record["id"])
+                if check and check.get("status") == "content_checked":
+                    checked = check.get("checked_on")
+                elif not check and record["id"] in fresh.get("source_ids", []):
+                    checked = fresh.get("observed_on")
             end = observation.get("period", {}).get("end") or next(iter(re.findall(r"\d{4}(?:-\d{2}){0,2}", str(observation.get("as_of") or ""))), "")
             financial = {"recordType": "observation", "id": observation["id"], "claimId": next(iter(observation.get("claim_ids", [])), None),
                          "display": current["display"], "type": "Annualized pace" if observation["measure"] == "annualized_revenue" else "Revenue",
                          "period": research.observation_period(observation), "currency": current["currency"], "scope": current["scope_label"],
-                         "basis": "Gross revenue" if observation.get("accounting_basis") == "gross" else "Net revenue" if observation.get("accounting_basis") == "net" else "Gross/net not disclosed" if observation["measure"] == "annualized_revenue" else "",
+                         "basis": {"gross": "Gross revenue", "net": "Net revenue", "latest_discontinued_operations_comparative": "Discontinued operations"}.get(observation.get("accounting_basis"), "Gross/net not disclosed" if observation["measure"] == "annualized_revenue" else ""),
                          "attribution": observation.get("evidence_assurance") or "Attributed source", "limitations": observation.get("limitations") or "",
                          "quote": observation.get("original_text") or fresh.get("excerpt") or "", "checkedOn": checked,
                          "failed": observation.get("refresh_status") == "source_unavailable" or any(c.get("status") == "unavailable" and c["source_id"] in observation.get("source_ids", []) for c in health.get("source_checks", {}).get("entries", [])),
                          "age": "historical" if not end or end < "2025-10-28" else "current"}
+            if primary:
+                financial["primarySource"] = True
         elif metric:
             record, _ = latest_source(research, metric)
             claim = research.claim(metric)
@@ -466,8 +493,10 @@ def company_summaries(data, sidecars, root):
             if historical:
                 financial["historicalYear"] = historical
         if financial is not None:
-            citation = {"url": record["url"], "publisher": record.get("publisher") or "Original source"} if record else None
-            if record and (published := research.reviewed_source_dates.get(record["id"])):
+            citation = {"url": record["url"], "publisher": (record["title"] if observation and observation.get("primary_source_id") else record.get("publisher")) or "Original source"} if record else None
+            if record and observation:
+                citation["id"] = record["id"]
+            if record and (published := research.reviewed_source_dates.get(record["id"]) or (record.get("published_on") if observation and observation.get("primary_source_id") else None)):
                 citation.update(id=record["id"], publishedOn=published, accessedOn=record.get("accessed_on"), retrievalStatus=record.get("retrieval_status"))
                 if not observation:
                     financial["checkedOn"] = None
@@ -629,28 +658,42 @@ def work_export_rows(work, research):
     result = []
     for route in work.get("routes", []):
         row = retain(route, fields)
+        if (route.get("pay_terms") or {}).get("unit") == "conflicting" and route.get("pay_context"):
+            row["pay_context"] = route["pay_context"]
         row["company_name"] = research.companies.get(route["company_id"], {}).get("name") or route["company_id"]
         row["source_actions"] = [{"url": url, "label": label} for url, label in work_actions(route, research)]
         row["uncertain"] = work_uncertain(route)
         row["field_reviews"] = work_field_reviews(route)
         link_keys = ("date", "result", "url", "http_status", "final_url")
-        for key, keys in (("last_link_check", link_keys), ("last_route_check", (*link_keys, "application_check", "application_checks"))):
+        page_keys = (*link_keys, "checked_at", "retrieval_reason", "application_check", "application_checks")
+        for key, keys in (("last_link_check", link_keys), ("last_route_check", page_keys)):
             if route.get(key):
                 row[key] = retain(route[key], keys)
         recorded = retain((route.get("research_record") or {}).get("route"),
-                          ("overview_url", "application_url", "checked_on", "live_application_verified"))
+                          ("url", "overview_url", "application_url", "checked_on", "live_application_verified"))
         if recorded:
             row["research_record"] = {"route": recorded}
         row["sources"] = [retain(source, ("id", "url", "source_type", "title", "accessed_on", "purpose", "field_support"))
                           for source in route.get("sources", [])]
         review = route.get("editorial_review") or {}
         editorial = retain(review, ("approved_terms_receipt_id", "disposition", "alternative_destination", "actions", "recorded_url_purpose"))
-        disposition_ids = (review.get("disposition") or {}).get("source_ids", [])
-        receipts = [retain(receipt, ("id", "source_id", "checked_on", "checked_at", "scope", "result", "http_status",
-                                     "approved", "approval_basis", "reviewed_fields"))
+        action_urls = {action["url"] for action in row["source_actions"]}
+        separate_archive = any(action.get("purpose") == "archived_listing" and action.get("url") != route.get("url")
+                               and action.get("url") in action_urls for action in review.get("actions", []))
+        page_check = route.get("last_route_check") or {}
+        if page_check.get("result") in ("official_role_not_found", "official_role_not_found_redirect"):
+            row["source_ids"] = route.get("source_ids", [])
+        history = route.get("check_history") or []
+        if history:
+            row["check_history"] = [retain(check, ("date", "result", "note", "url", "source_ids")) for check in history]
+        receipt_keys = ("id", "source_id", "checked_on", "checked_at", "scope", "result", "http_status",
+                        "approved", "approval_basis", "reviewed_fields", "url", "final_url",
+                        "retrieval_reason", "rendered_observation")
+        source_ids = {source.get("id") for source in row["sources"] if source.get("id")}
+        receipts = [retain(receipt, receipt_keys)
                     for receipt in review.get("receipts", [])
                     if receipt.get("id") == review.get("approved_terms_receipt_id")
-                    or receipt.get("scope") == "retrieval" and receipt.get("source_id") in disposition_ids]
+                    or receipt.get("source_id") in source_ids and (receipt.get("scope") == "retrieval" or separate_archive)]
         if receipts:
             editorial["receipts"] = receipts
         if editorial:
@@ -725,9 +768,23 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
         if entry["kind"] == "company":
             row["aliases"] = company_search_aliases(entry["url"].strip("/").removeprefix("company/"), entry.get("aliases", []))
         search_rows.append(row)
-    search_rows.append({"id": "market-revenue", "name": "Revenue & growth",
-                        "summary": "Company revenue, annualized pace and growth, with figures linked to their sources.",
-                        "group": "market", "products": [], "aliases": ["market", "revenue"], "href": "/explore/#business-health"})
+    search_rows.extend([
+        {"id": "company-directory", "name": "Companies",
+         "summary": "Browse AI data company profiles by name or business group.",
+         "group": "directory", "products": [], "aliases": ["Company directory", "AI data companies", "Browse companies"],
+         "href": "/companies/"},
+        {"id": "company-compare", "name": "Compare companies",
+         "summary": "Put up to three companies side by side. Figures keep their dates and sources.",
+         "group": "compare", "products": [],
+         "aliases": ["Compare", "Company comparison", "Company comparisons", "Shortlist",
+                     "Company shortlist", "Compare AI data companies"],
+         "href": "/explore/#compare"},
+        {"id": "market-revenue", "name": "Revenue & growth",
+         "summary": "Company revenue, annualized pace and growth, with figures linked to their sources.",
+         "group": "market", "products": [], "aliases": ["Market", "Revenue", "AI data market", "Market overview",
+                                                       "Company revenue", "Revenue and growth"],
+         "href": "/explore/#business-health"},
+    ])
     summary["homeSearch"] = write_asset(destination, "search", dict(identity, entries=search_rows, workTitles=work_titles))
     company_map = {company["id"]: company for company in data["companies"]}
     editorial_map = {entry["company_id"]: entry for entry in sidecars["EDITORIAL"]["entries"]}

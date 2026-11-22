@@ -1,0 +1,142 @@
+{
+  "staged": {
+    "id": "27014a36-75d8-40c4-8eac-b39083bb9a95",
+    "number": 43,
+    "existing": false,
+    "commit": "1f9c38943051e9b4998953a04a7299f5ecf13f7e",
+    "build_id": "d0522f0b467a6a759b76",
+    "manifest_sha256": "322bf59a0e479ce23c4f2e1ab81a6acdc7cbc76c910962d3397d21f7eb94a26d",
+    "preview": "https://27014a36-sciencetostartup.musaeminozdem.workers.dev",
+    "traffic_promoted": false
+  },
+  "initial_provider_readback": {
+    "checked_utc": "2026-11-22T11:51:40.262Z",
+    "deployment": {
+      "id": "6523aad9-1019-4eca-b781-408a55b9f33a",
+      "created_on": "2026-11-22T10:18:22.645027Z",
+      "versions": [
+        {
+          "version_id": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+          "percentage": 100
+        }
+      ]
+    },
+    "version": {
+      "id": "27014a36-75d8-40c4-8eac-b39083bb9a95",
+      "number": 43,
+      "annotations": {
+        "workers/commit_sha": "1f9c38943051e9b4998953a04a7299f5ecf13f7e",
+        "workers/message": "ScienceToStartup build d0522f0b467a6a759b76; editorial 2026-11-22.4; manifest 322bf59a0e479ce23c4f2e1ab81a6acdc7cbc76c910962d3397d21f7eb94a26d",
+        "workers/triggered_by": "version_upload"
+      }
+    }
+  },
+  "checks": {
+    "started_utc": "2026-11-22T11:51:42.789303+00:00",
+    "finished_utc": "2026-11-22T12:02:59.838271+00:00",
+    "target": "https://27014a36-sciencetostartup.musaeminozdem.workers.dev",
+    "version": "27014a36-75d8-40c4-8eac-b39083bb9a95",
+    "commit": "1f9c38943051e9b4998953a04a7299f5ecf13f7e",
+    "build": "d0522f0b467a6a759b76",
+    "manifest_sha256": "322bf59a0e479ce23c4f2e1ab81a6acdc7cbc76c910962d3397d21f7eb94a26d",
+    "passed": false,
+    "return_codes": {
+      "identity": 0,
+      "headers": 0,
+      "content": 1,
+      "acceptance": 0,
+      "journeys": 0,
+      "changed-journeys": 0,
+      "sixth-journeys": 0,
+      "seventh-journeys": 0
+    },
+    "accepted_checks": {
+      "search": 10,
+      "accessibility": 17,
+      "home": 48,
+      "editorial": 11
+    },
+    "browser_cases": {
+      "journeys": 20,
+      "changed-journeys": 26,
+      "sixth-journeys": 20,
+      "seventh-journeys": 44
+    },
+    "identity_routes": 11,
+    "header_checks": 28,
+    "receipts": {
+      "identity.json": "5329b4b6c22544204e4214fea5275e3a64096b455c9863384f8804bc4833be99",
+      "headers.json": "10c7b3723d8ea98f38f0b4824fc15e1a5c7f434aeaba29bf597b4ecf75ec2512",
+      "acceptance/summary.json": "27288cfcc5f30e4c90fe0af68548f207aff6b946335950f87682b0c3685896c0",
+      "journeys/summary.json": "45e3e11f3c0a758f2a4c79f2d6bea2893b8f13899b3d954b764bbbe85cb52a54",
+      "changed-journeys/summary.json": "ed9d517d1aaf79cf69beec085bc73ec2173f2db88f360a91a7db08f6b449a176",
+      "sixth-journeys/summary.json": "389f3ce170912ce594b7940daac5011c30578b3031ce05013dade4296b654dd2",
+      "seventh-journeys/summary.json": "ab30cfef60790470c9cb31e2d998eca86dd952688567465f6c09d97f94e37e16",
+      "content.json": "06d1c21869940a8fa69b566185d3020306924ffc436c09d125546f481858e72d"
+    },
+    "changed_content_routes": 17
+  },
+  "archived_html_findings": [
+    {
+      "route": "/publication/report.html",
+      "final_url": "https://27014a36-sciencetostartup.musaeminozdem.workers.dev/publication/report/",
+      "bytes": 2202352,
+      "sha256": "a6982ae705e98f1ca5555b2d3f55fcd215314e90c82846677e1ef83d2223d093",
+      "raw_sha256": "a6982ae705e98f1ca5555b2d3f55fcd215314e90c82846677e1ef83d2223d093",
+      "edge_beacons_removed": 0,
+      "deposited_bytes_match": true,
+      "archived_relative_links": [
+        {
+          "href": "evidence.html",
+          "resolved": "https://27014a36-sciencetostartup.musaeminozdem.workers.dev/publication/report/evidence.html",
+          "expected_sha256": "e3ce6f93e2f1e349b693a32088a471e2aa940d02e6c791d56e1d960d932dcd58",
+          "http": 404,
+          "final_url": "https://27014a36-sciencetostartup.musaeminozdem.workers.dev/publication/report/evidence.html",
+          "body_sha256": "d9aee01ae2bc794a368a39cbe3cab191264ab8972564ce334b2de9db006773b9",
+          "disposition": "confirmed_site_404",
+          "matches": false
+        },
+        {
+          "href": "executive-brief.html",
+          "resolved": "https://27014a36-sciencetostartup.musaeminozdem.workers.dev/publication/report/executive-brief.html",
+          "expected_sha256": "ed9c03d71a0ed13bd5dd594b5d2e984294a931a8d8d918d4eb2e37611e1bf00d",
+          "http": 404,
+          "final_url": "https://27014a36-sciencetostartup.musaeminozdem.workers.dev/publication/report/executive-brief.html",
+          "body_sha256": "d9aee01ae2bc794a368a39cbe3cab191264ab8972564ce334b2de9db006773b9",
+          "disposition": "confirmed_site_404",
+          "matches": false
+        }
+      ]
+    }
+  ],
+  "public_traffic": 0,
+  "upload_summary": {
+    "confirmed": true,
+    "commit": "1f9c38943051e9b4998953a04a7299f5ecf13f7e",
+    "manifest": "322bf59a0e479ce23c4f2e1ab81a6acdc7cbc76c910962d3397d21f7eb94a26d",
+    "plan": "564c9f81707e8bdc2955416a29edea2a99eae1a2da3000a89e8538d93cc7ad6f",
+    "buckets_sha256": "b0546ad570fdf04a426d71d46a6651940d3b5e0d287e416536147a2c5171fa23",
+    "receipts": [
+      {
+        "index": 0,
+        "http_status": 202,
+        "uploaded_assets": 26,
+        "completion_stored": false
+      },
+      {
+        "index": 1,
+        "http_status": 202,
+        "uploaded_assets": 26,
+        "completion_stored": false
+      },
+      {
+        "index": 2,
+        "http_status": 201,
+        "uploaded_assets": 25,
+        "completion_stored": true
+      }
+    ],
+    "observed_utc": "2026-11-22T11:51:08.456264+00:00"
+  },
+  "rollback_remains": "a5900bbc-ed1c-4f3b-9b14-521425e8974e"
+}

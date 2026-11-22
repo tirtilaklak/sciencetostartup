@@ -57,7 +57,10 @@ test.describe('research without JavaScript', () => {
 
   test('hub opens all twelve complete native chapters without JavaScript', async ({ page }) => {
     await page.goto('/research/');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Research on');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('AI data research');
+    const sections = await page.locator('main [aria-labelledby="browse"], main .r-operating-status')
+      .evaluateAll(nodes => nodes.map(node => node.getAttribute('aria-labelledby') || 'edition update'));
+    expect(sections[0]).toBe('browse');
     await expect(page.locator('.r-chapter-list a')).toHaveCount(12);
     await page.getByRole('link', { name: 'Read the report →', exact: true }).click();
     await expect(page).toHaveURL(new RegExp(reportPath + '$'));
@@ -185,6 +188,13 @@ test.describe('research without JavaScript', () => {
 
   test('data page exposes working graph exports and citation downloads', async ({ page, request }) => {
     await page.goto('/research/data/');
+    const firstFiles = await page.locator('[aria-labelledby="downloads"] .r-downloads a')
+      .evaluateAll(links => links.slice(0, 3).map(link => link.getAttribute('href')));
+    expect(firstFiles).toEqual([
+      '/publication/clean-dataset.json',
+      '/publication/clean-dataset.csv',
+      '/publication/clean-dataset.sqlite',
+    ]);
     const exports = [
       '/research/exports/research-graph.json',
       '/research/exports/research-graph.sqlite',
@@ -410,11 +420,9 @@ test('at 320 pixels the public header, navigation and page fit without horizonta
     await page.goto(path);
     const header = page.locator('body > header.site-header');
     await expect(header).toBeVisible();
-    if (path === '/') {
-      const menu = header.locator('.home-menu > summary');
-      await expect(menu).toBeVisible();
-      await menu.press('Enter');
-    }
+    const menu = header.locator('details > summary');
+    await expect(menu).toBeVisible();
+    await menu.press('Enter');
     const nav = header.getByRole('navigation', { name: 'Main', exact: true });
     for (const name of ['Daily scan', 'Research', 'Companies', 'Paid work', 'About']) {
       const link = nav.getByRole('link', { name, exact: true });
@@ -430,9 +438,9 @@ test('at 320 pixels the public header, navigation and page fit without horizonta
   }
   // Advanced app flows stay available by hash; the primary site nav opens the native pages.
   for (const [name, target, heading] of [
-    ['Daily scan', '/daily/', 'Daily scan.'],
+    ['Daily scan', '/daily/', 'Daily scan'],
     ['Companies', '/companies/', 'AI data companies'],
-    ['Paid work', '/work/', 'Find work in AI training.'],
+    ['Paid work', '/work/', 'Paid work in AI training'],
     ['About', '/method/#about', 'About'],
   ]) {
     await page.goto('/explore/#companies');

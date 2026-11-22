@@ -65,7 +65,7 @@ test('a stale application asset fails visibly instead of presenting an empty res
 test('compact work data preserves every selector and visible condition', async ({ page }) => {
   await ready(page, '#work');
   const original = require('../../data/work-routes.json').routes;
-  const keys = ['id', 'company_id', 'role', 'route_kind', 'engagement_type', 'pay_terms', 'arrangements', 'pay_label', 'pay_basis', 'numeric_pay', 'status', 'geography', 'requirements', 'hours', 'duration', 'assessment'];
+  const keys = ['id', 'company_id', 'role', 'route_kind', 'engagement_type', 'pay_terms', 'arrangements', 'pay_label', 'pay_basis', 'numeric_pay', 'status', 'availability_label', 'geography', 'requirements', 'hours', 'duration', 'assessment'];
   const compact = await page.evaluate(keys => workRouteRows().map(route => Object.fromEntries(keys.map(key => [key, route[key] ?? null]))), keys);
   const expected = original.map(route => Object.fromEntries(keys.map(key => [key, route[key] ?? null])));
   expect(compact).toEqual(expected);
@@ -79,12 +79,16 @@ test('compact work data preserves every selector and visible condition', async (
   await sage.locator('summary').first().click();
   await expect(sage).toContainText('Terms checked 8 Nov 2026');
   await expect(sage.getByRole('list', { name: 'Requirements' })).toContainText('Qualification tests and identity verification');
-  const alternatives = await page.evaluate(() => workRouteRows().filter(route => route.status === 'historical' && ['terac.work.ml-scenarios', 'afterquery.work.senior-software-engineer-security-infrastructure'].includes(route.id)).map(route => ({ id: route.id, original: route.url, action: w4Destination(route), status: w4Status(route) })));
-  expect(alternatives).toHaveLength(2);
+  const alternatives = await page.evaluate(() => workRouteRows().filter(route => route.status === 'historical' && ['terac.work.ml-scenarios', 'afterquery.work.people-programs-lead'].includes(route.id)).map(route => ({ id: route.id, original: route.url, action: w4Destination(route), status: w4Status(route) })));
+  const expectedStatuses = {
+    'afterquery.work.people-programs-lead': 'Past listing · page unavailable',
+    'terac.work.ml-scenarios': 'Closed · employer confirmed',
+  };
+  expect(alternatives.map(item => item.id).sort()).toEqual(Object.keys(expectedStatuses).sort());
   for (const item of alternatives) {
     expect(item.action.label).toBe('Browse current company careers');
     expect(item.action.url).not.toBe(item.original);
-    expect(item.status).toBe('Past listing · page unavailable');
+    expect(item.status).toBe(expectedStatuses[item.id]);
   }
 });
 
@@ -382,6 +386,41 @@ test('global search transfers the literal query and exact work selection', async
   await expect(page.locator('#work-search')).toHaveValue('Python');
   expect(await page.evaluate(() => filteredWork().length)).toBe(total);
   expect(new URLSearchParams((await page.evaluate(() => location.hash)).split('?')[1]).get('q')).toBe('Python');
+});
+
+test('global search opens Home, the company directory, and one search for paid work', async ({ page }) => {
+  await ready(page, '#companies');
+  await expect(page.locator('.topbar nav a[aria-current="page"]')).toHaveCount(0);
+  const search = async query => {
+    await page.locator('#site-search-open').click();
+    const input = page.getByRole('combobox', { name: 'Search the guide' });
+    await input.fill(query);
+    return input;
+  };
+
+  const home = await search('Home');
+  await expect(page.getByRole('option', { name: /^Home\b/ })).toHaveAttribute('href', '/');
+  await home.press('Enter');
+  await expect(page).toHaveURL('/');
+  await expect(page.locator('body')).toHaveClass(/landing-page/);
+
+  await ready(page, '#market');
+  await search('Companies');
+  const directory = page.getByRole('option', { name: /^Companies\b/ });
+  await expect(directory).toHaveAttribute('href', '/companies/');
+  await directory.click();
+  await expect(page.getByRole('heading', { level: 1, name: 'AI data companies' })).toBeVisible();
+  await expect(page.locator('.site-header nav a[aria-current="page"]').first()).toHaveText('Companies');
+
+  await ready(page, '#market');
+  await search('remote jobs');
+  const work = page.getByRole('option', { name: /^Search paid work for “remote jobs”/ });
+  await expect(work).toHaveAttribute('href', '/work/?q=remote+jobs');
+  await expect(page.getByRole('option', { name: /See all .*“remote jobs”/ })).toHaveCount(0);
+  await work.click();
+  await expect(page.locator('#name-filter')).toHaveValue('remote jobs');
+  await expect(page.locator('.site-header nav a[aria-current="page"]').first()).toHaveText('Paid work');
+  await expect(page.locator('[data-work-route="afterquery.work.technical-content-writer-contract"]')).toBeVisible();
 });
 
 test('malformed work links remain usable and canonical', async ({ page }) => {

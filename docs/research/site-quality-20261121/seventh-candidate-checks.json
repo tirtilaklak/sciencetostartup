@@ -1,0 +1,185 @@
+{
+  "private_gates": {
+    "passed": true,
+    "commit": "1f9c38943051e9b4998953a04a7299f5ecf13f7e",
+    "build": "d0522f0b467a6a759b76",
+    "manifest_sha256": "322bf59a0e479ce23c4f2e1ab81a6acdc7cbc76c910962d3397d21f7eb94a26d",
+    "finished_utc": "2026-11-22T11:28:01.566863+00:00",
+    "targeted_acceptance": 86,
+    "browser_cases": {
+      "cutover-journeys-committed": 20,
+      "fifth-journeys": 26,
+      "sixth-journeys": 20,
+      "seventh-journeys-committed": 44
+    },
+    "total_browser_cases": 110,
+    "source_and_download_routes": 17,
+    "logic_suites": 9,
+    "earlier_attempts": "Two journey groups invoked from the pristine unpacked source did not start because Daily reads the Git commit at suite discovery. All 64 cases from those groups ran and passed in the committed release checkout on the same manifest. All original receipts retained. The initial CI head also had three obsolete test fixtures. The updated tests passed locally.",
+    "receipt_sha256": {
+      "root-checks/summary.json": "52deed42485d55723d0c3e7844a51797ed7088d6a2f19bdfe8be69caebdb65f7",
+      "acceptance/summary.json": "bfb5f55e859a1804a83c0b9c343a6a16f41d832ce1850c323fa2d82020df54ca",
+      "payload-budgets.json": "91897f84eed48d8aea9c03460979f794c5349a0ccdb049a8818284bf18ac17d3",
+      "changed-content.json": "22dbd9c466671edf27e23fe888d7497d01cd7169a844b98030be85f05535a60f",
+      "cutover-journeys-committed/summary.json": "ab3473f4c6c550edd93daa92a1eb333b13b0db031b800ec0edc0c6cf7c9f6bac",
+      "fifth-journeys/summary.json": "0260ac90f8f9b8e6ef7a53011d231309d88798d261665cf1929709adb9953802",
+      "sixth-journeys/summary.json": "0f9c6b01e0cdbea8d3a1f789e779f2bf82eb15c2acb4f2546795a3e980d98c38",
+      "seventh-journeys-committed/summary.json": "29f65a1b03074af2a9c3ebb78c655c1ad612ae7621e220443d475acf2c0c432a",
+      "static-turing-test-followup.log": "0a7bc1d16d98ad92cfbd86a8b672e6840b33873d04666089ec61ba8024cab58c",
+      "work-inventory-test-followup.log": "1cdd250c4f148181b550e3cd966d2c769c0aa2d3aa2b8ddfc48686811bc06eaf",
+      "navigation-test-followup.log": "c4fae76532bba9634d558547f29765cce7f190e200a959a552b47f85450bd523"
+    }
+  },
+  "independent_ci_evidence": {
+    "verifiedThroughUtc": "2026-11-22T11:49:52.674597+00:00",
+    "head": "1f9c38943051e9b4998953a04a7299f5ecf13f7e",
+    "pullRequest": 35,
+    "buildId": "d0522f0b467a6a759b76",
+    "manifestSha256": "322bf59a0e479ce23c4f2e1ab81a6acdc7cbc76c910962d3397d21f7eb94a26d",
+    "planSha256": "564c9f81707e8bdc2955416a29edea2a99eae1a2da3000a89e8538d93cc7ad6f",
+    "sourceBlobs": 768,
+    "artifactGitBlobsIncludingManifest": 1281,
+    "cloudflareAssetHashes": 1279,
+    "retainedHttpByOrigin": {
+      "http://127.0.0.1:18971": 96,
+      "https://sciencetostartup.com": 96,
+      "https://a5900bbc-sciencetostartup.musaeminozdem.workers.dev": 96
+    },
+    "rollbackReadbackUtc": "2026-11-22T11:17:09.842Z",
+    "rollbackDeployment": {
+      "id": "6523aad9-1019-4eca-b781-408a55b9f33a",
+      "created_on": "2026-11-22T10:18:22.645027Z",
+      "versions": [
+        {
+          "version_id": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+          "percentage": 100
+        }
+      ]
+    },
+    "workflows": {
+      "Browser QA": {
+        "run": 45017538837,
+        "jobsPassed": 8,
+        "url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45017538837"
+      },
+      "CI": {
+        "run": 45017538921,
+        "jobsPassed": 10,
+        "url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45017538921"
+      }
+    },
+    "browserFirstPass": 1347,
+    "browserPassedOnRetry": 1,
+    "browserSkipped": 37,
+    "reportAccessibilityPassed": 60,
+    "browserRetry": "Mobile Chromium Source ledger scroll restored to y=2876 on the first attempt, against an exact y=2877 assertion. The retry passed.",
+    "mobileArchiveSha256": "ab1bc25a99b38d7112641fab6fb868d04e6565fbf7efbec61f809865fcf2bc00",
+    "mobileRawReportsVerified": 69,
+    "mobileRoutesPassed": 23,
+    "mobilePreflightHashes": 10,
+    "payloads": [
+      {
+        "id": "bootstrap.brotli",
+        "priorBytes": 194245,
+        "candidateBytes": 196600,
+        "deltaBytes": 2355,
+        "maximumBytes": 307200
+      },
+      {
+        "id": "bootstrap.gzip",
+        "priorBytes": 220637,
+        "candidateBytes": 223284,
+        "deltaBytes": 2647,
+        "maximumBytes": 368640
+      },
+      {
+        "id": "home.html.gzip",
+        "priorBytes": 4439,
+        "candidateBytes": 4468,
+        "deltaBytes": 29,
+        "maximumBytes": 12288
+      },
+      {
+        "id": "home.runtime.gzip",
+        "priorBytes": 2086,
+        "candidateBytes": 2086,
+        "deltaBytes": 0,
+        "maximumBytes": 5120
+      },
+      {
+        "id": "home.hero.mobile",
+        "priorBytes": 53202,
+        "candidateBytes": 53202,
+        "deltaBytes": 0,
+        "maximumBytes": 150000
+      },
+      {
+        "id": "home.hero.desktop",
+        "priorBytes": 102940,
+        "candidateBytes": 102940,
+        "deltaBytes": 0,
+        "maximumBytes": 250000
+      }
+    ],
+    "largestRouteMedians": {
+      "largest-contentful-paint": {
+        "route": "/explore/#company/mercor/work",
+        "median": 2394.4212500000003,
+        "limit": 2500
+      },
+      "total-blocking-time": {
+        "route": "/explore/#companies",
+        "median": 129.5,
+        "limit": 200
+      },
+      "cumulative-layout-shift": {
+        "route": "/explore/#companies",
+        "median": 7.640304785414474e-05,
+        "limit": 0.05
+      }
+    },
+    "singleRunsAboveMedianLimits": [
+      {
+        "route": "/explore/#company/mercor/work",
+        "run": 1,
+        "metric": "largest-contentful-paint",
+        "value": 2511.72415,
+        "routeMedianLimit": 2500
+      }
+    ],
+    "receipts": {
+      "gitAndCloudflarePlan": {
+        "path": "head-1f9c3894/source-dist-plan-and-rollback.json",
+        "sha256": "e7191135e9373a6074d26113efcdff8e5a515ae7663c2425a8d22efe3da35a8b"
+      },
+      "retainedRuntimeHttp": {
+        "path": "head-1f9c3894/retained-http.json",
+        "sha256": "87f03326a7c45323f55d65dc657f98a76b4572006df658a3638c14891b7e063a"
+      },
+      "workflows": {
+        "path": "head-1f9c3894/official-workflows.json",
+        "sha256": "dc2848eddaa845613dbb1ea6e50a51c9b1880ca2b18f39601657e088f64d75a9"
+      },
+      "browserCounts": {
+        "path": "head-1f9c3894/browser-test-counts.json",
+        "sha256": "7545027574918bd7b8f68cddd91f0c9eab6b219ef19439116547c0618969271f"
+      },
+      "officialMobileArchive": {
+        "path": "head-1f9c3894/ci-archive-crosscheck.json",
+        "sha256": "5026c664799a31c2ce216e02aaeeb968d17e22fa888a9a55482a03d348fb51f1"
+      },
+      "officialMobileMeasurements": {
+        "path": "head-1f9c3894/ci-measurements.json",
+        "sha256": "a532d0b2313825fd5798485b559fc7d5d0acb8df9bab1fb9e7635a80646a9d5a"
+      },
+      "productionComparison": {
+        "path": "head-1f9c3894/performance-comparison.json",
+        "sha256": "b0a64911cfae0823fba86749595afd4516cebb3633c3b2a0ff85338a6f589c0e"
+      },
+      "rollbackReadback": {
+        "path": "exact-release/rollback-provider-verified.json",
+        "sha256": "ba6610f81e30eb5b97982da70c03b11979e63eb770a87fd6608b9f970c1723ea"
+      }
+    }
+  }
+}

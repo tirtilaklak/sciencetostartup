@@ -1,0 +1,113 @@
+{
+  "version": {
+    "id": "47b6c921-403d-4881-a2cf-7820ee092ed6",
+    "number": 42,
+    "existing": false,
+    "commit": "ac642cf2b9c14737a130a8fdca5f5207d1176ebe",
+    "build_id": "81071f0430d00446056b",
+    "manifest_sha256": "b463473f55949cd41cc67fde90dc247eaa8a46834b02339d7562c126eac65336",
+    "preview": "https://47b6c921-sciencetostartup.musaeminozdem.workers.dev",
+    "traffic_promoted": false
+  },
+  "immutable": {
+    "started_utc": "2026-11-22T10:56:34.894595+00:00",
+    "finished_utc": "2026-11-22T11:03:56.134594+00:00",
+    "target": "https://47b6c921-sciencetostartup.musaeminozdem.workers.dev",
+    "version": "47b6c921-403d-4881-a2cf-7820ee092ed6",
+    "commit": "ac642cf2b9c14737a130a8fdca5f5207d1176ebe",
+    "build": "81071f0430d00446056b",
+    "manifest_sha256": "b463473f55949cd41cc67fde90dc247eaa8a46834b02339d7562c126eac65336",
+    "passed": true,
+    "return_codes": {
+      "identity": 0,
+      "headers": 0,
+      "acceptance": 0,
+      "journeys": 0,
+      "changed-journeys": 0,
+      "sixth-journeys": 0
+    },
+    "accepted_checks": {
+      "search": 10,
+      "accessibility": 17,
+      "home": 48,
+      "editorial": 11
+    },
+    "browser_cases": {
+      "journeys": 20,
+      "changed-journeys": 26,
+      "sixth-journeys": 20
+    },
+    "identity_routes": 11,
+    "header_checks": 28,
+    "receipts": {
+      "identity.json": "542aaafbe700ac29075331ab447d170cbee396371e1a9ad7c746b98fe6800afe",
+      "headers.json": "b3a6fc6a91e9fe8980b7be255d5e58ea4dc4d1f3aa5dd17acea738873e65b252",
+      "acceptance/summary.json": "94ea788669d6cb379bedb7beccaa92f533e4b0ddbdeec5a3f014dc33a5fe0f23",
+      "journeys/summary.json": "b4079d04a95d061ad854f1364faf7a488ba1de774a897c5c5a662d3dc9085518",
+      "changed-journeys/summary.json": "2cb0eb26a9bfd28d38141a64e5c82343ad1609c60e3a2ed0083aab5cfb221e95",
+      "sixth-journeys/summary.json": "84e35c367266711f42a940520b85fbd21d8bcd81690319eb8daf2939c54dd374"
+    }
+  },
+  "official_workflows": {
+    "Browser QA": {
+      "url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45013200844",
+      "jobsPassed": 8
+    },
+    "CI": {
+      "url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45013200775",
+      "jobsPassed": 10
+    }
+  },
+  "provider_readback_after_full_verification": {
+    "checked_utc": "2026-11-22T11:05:19.635Z",
+    "deployment": {
+      "id": "6523aad9-1019-4eca-b781-408a55b9f33a",
+      "created_on": "2026-11-22T10:18:22.645027Z",
+      "versions": [
+        {
+          "version_id": "a5900bbc-ed1c-4f3b-9b14-521425e8974e",
+          "percentage": 100
+        }
+      ]
+    },
+    "version": {
+      "id": "47b6c921-403d-4881-a2cf-7820ee092ed6",
+      "number": 42,
+      "annotations": {
+        "workers/commit_sha": "ac642cf2b9c14737a130a8fdca5f5207d1176ebe",
+        "workers/message": "ScienceToStartup build 81071f0430d00446056b; editorial 2026-11-22.3; manifest b463473f55949cd41cc67fde90dc247eaa8a46834b02339d7562c126eac65336",
+        "workers/triggered_by": "version_upload"
+      }
+    }
+  },
+  "public_build": "5dc63fbcf19634a55c66",
+  "public_sampled_routes": 11,
+  "upload_buckets": [
+    {
+      "index": 0,
+      "http_status": 202,
+      "uploaded_assets": 19,
+      "completion_stored": false
+    },
+    {
+      "index": 1,
+      "http_status": 202,
+      "uploaded_assets": 18,
+      "completion_stored": false
+    },
+    {
+      "index": 2,
+      "http_status": 201,
+      "uploaded_assets": 18,
+      "completion_stored": true
+    }
+  ],
+  "disposition": "Preview only. Version 41 continues to serve public traffic while seventh-round fixes are verified.",
+  "receipt_sha256": {
+    "verified-stage-readback.json": "f815107eb230b3655c4efbac63db9809543d4947ebe970215f984c9b497e32f3",
+    "unchanged-public-readback.json": "73ad2aa10d421c0fa10158f83f528a525775794029c94bb2b841adacb11875ab",
+    "immutable-edge/summary.json": "b57ebcd69aedbe4d8224fc36512058467087d7289a2e57e86ea89533410085a1",
+    "watch-comparison.json": "26e5da3a8d5e1b58bc3f56d9dfeed3c7f23991d5301533519ad275bd362b36b7",
+    "authorization-cleanup.json": "1366de7bbf5838831036879576f08c58d57f31e901d64cdcef728672387fffc6"
+  }
+}

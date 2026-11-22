@@ -238,19 +238,23 @@ class EditorialWorkTests(unittest.TestCase):
         self.assertTrue(source_summary(body)["readable"])
         self.assertFalse(source_summary(body)["challenge"])
 
-    def test_missing_role_pages_keep_old_terms_and_offer_a_separate_board(self):
-        for rid in ["afterquery.work.senior-software-engineer-security-infrastructure", "terac.work.ml-scenarios"]:
-            row = self.routes[rid]
-            self.assertEqual(row["status"], "historical")
-            self.assertEqual(row["editorial_review"]["previous_values"]["status"], "listed")
-            self.assertEqual(row["editorial_review"]["disposition"]["state"], "historical_page_unavailable")
-            self.assertTrue(any(item.get("http_status") == 404 for item in row["editorial_review"]["receipts"]))
-            self.assertTrue(row["pay_label"])
-            self.assertEqual(row["last_link_check"]["date"], "2026-10-28")
-            self.assertNotEqual(row["url"], row["editorial_review"]["alternative_destination"]["url"])
-            self.assertIn("not a claim that the employer stopped hiring", row["availability_note"])
-            candidate = check_route(row, "2026-11-09T12:00:00Z", fetcher=lambda url: (404, url, b"Job not found", False))
-            self.assertEqual(candidate["priority"], "low", "archived destinations must not displace actionable reviews")
+    def test_missing_role_page_keeps_old_terms_and_offers_a_separate_board(self):
+        row = self.routes["terac.work.ml-scenarios"]
+        self.assertEqual(row["status"], "historical")
+        self.assertEqual(row["availability_label"], "Closed · employer confirmed")
+        self.assertEqual(row["editorial_review"]["previous_values"]["status"], "listed")
+        self.assertEqual(row["editorial_review"]["disposition"]["state"], "historical_page_unavailable")
+        self.assertTrue(any(item.get("http_status") == 404 for item in row["editorial_review"]["receipts"]))
+        self.assertEqual(row["pay_label"], "$90 / hour")
+        self.assertEqual(row["last_link_check"]["date"], "2026-10-28")
+        self.assertNotEqual(row["url"], row["editorial_review"]["alternative_destination"]["url"])
+        correction = next(item for item in row["editorial_review"]["correction_history"]
+                          if item["id"] == row["id"] + ".issuer-closure-review-2026-11-22")
+        self.assertIn("not a claim that the employer stopped hiring", correction["previous_values"]["availability_note"])
+        self.assertIn("This listing has closed", row["availability_note"])
+        self.assertIn("The original Ashby posting returned HTTP 404", row["availability_note"])
+        candidate = check_route(row, "2026-11-09T12:00:00Z", fetcher=lambda url: (404, url, b"Job not found", False))
+        self.assertEqual(candidate["priority"], "low", "archived destinations must not displace actionable reviews")
 
     def test_scoped_availability_and_source_bound_actions(self):
         for rid, status, label, amount, old_pay_date in [
@@ -295,6 +299,54 @@ class EditorialWorkTests(unittest.TestCase):
         award = self.routes["afterquery.work.research-scholar"]
         self.assertEqual(award["pay_terms"]["unit"], "one_time")
         self.assertIn("accepted for publication", award["pay_terms"]["note"])
+
+    def test_afterquery_reconciliation_sources_eleven_annual_salary_periods(self):
+        fixed_salary = {
+            "business-operations-generalist": "$160,000–$250,000",
+            "corporate-counsel": "$225,000–$250,000",
+            "growth-associate": "$100,000–$130,000",
+            "gtm-operations-lead": "$190,000–$250,000",
+            "head-of-growth": "$150,000–$230,000",
+            "marketing-lead": "$160,000–$220,000",
+            "recruiter": "$150,000–$225,000",
+            "sales-operations-associate": "$145,000–$175,000",
+            "senior-software-engineer-security-infrastructure": "$200,000–$350,000",
+            "technical-recruiter": "$150,000–$230,000",
+        }
+        source_suffix = ".board-reconciliation-ashby-2026-11-22"
+        rows = {
+            row["id"].removeprefix("afterquery.work."): row
+            for row in self.routes.values()
+            if row["company_id"] == "afterquery" and
+            row["id"] + source_suffix in row["field_reviews"]["pay"]["source_ids"]
+        }
+        self.assertEqual(rows.keys(), fixed_salary.keys() | {"engagement-manager"})
+        for slug, row in rows.items():
+            with self.subTest(route=row["id"]):
+                source_id = row["id"] + source_suffix
+                review = row["editorial_review"]
+                receipt = next(r for r in review["receipts"] if r["source_id"] == source_id and r["approved"])
+                self.assertEqual(receipt["url"], "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true")
+                self.assertIn("pay", receipt["reviewed_fields"])
+                period_evidence = ("USD one-year Salary range" if slug == "engagement-manager"
+                                   else "Salary component with interval 1 YEAR and currency USD")
+                self.assertTrue(any(period_evidence in item for item in receipt["evidence"]))
+                pay_review = row["field_reviews"]["pay"]
+                self.assertEqual((pay_review["basis"], pay_review["reviewed_on"]), ("direct_source", "2026-11-22"))
+                correction = next(c for c in review["correction_history"]
+                                  if c["id"] == row["id"] + ".board-reconciliation-correction-2026-11-22")
+                self.assertEqual(correction["previous_values"]["pay_terms"]["unit"], "undisclosed")
+                self.assertEqual(row["pay_basis"], "annual_salary")
+                self.assertFalse(row["pay_terms"]["hourly_comparable"])
+                self.assertEqual(row["pay_terms"]["currency"], "USD")
+                if slug in fixed_salary:
+                    self.assertEqual(row["pay_label"], fixed_salary[slug] + " annual salary")
+                    self.assertEqual(row["pay_terms"]["unit"], "year")
+                    self.assertEqual(pay_review["state"], "sourced")
+                else:
+                    self.assertEqual(row["pay_label"], "$225,000–$450,000 annual salary field (conflicting)")
+                    self.assertEqual(row["pay_terms"]["unit"], "conflicting")
+                    self.assertEqual(pay_review["state"], "conflicting")
 
     def test_review_timestamp_cannot_create_a_false_future_promotion(self):
         work = copy.deepcopy(self.work)

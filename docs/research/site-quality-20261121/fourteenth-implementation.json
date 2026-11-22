@@ -1,0 +1,174 @@
+{
+  "commit": "60e8af2416c5fa1d701784705556e09ff38e5949",
+  "build_id": "10287cf18e9eb26e118f",
+  "manifest_sha256": "e6fd1a73bb8ba125138bd26848271a97a5c073d531e53e9feabb1a4747478132",
+  "payloads": 1281,
+  "editorial_release_id": "2026-11-22.9",
+  "model": "gpt-6.2-sol",
+  "reasoning_effort": "ultra",
+  "workers": {
+    "fix14_profile_fixtures": {
+      "ownership_recorded_utc": "2026-11-22T16:32:02.870455+00:00",
+      "findings": [
+        "R13-03",
+        "R13-04"
+      ],
+      "paths": [
+        "tests/browser/profile-details.spec.js"
+      ],
+      "commits": [
+        "3b1df1c4f1ce00861b212d90c269762870829dd7"
+      ]
+    },
+    "fix14_reader": {
+      "ownership_recorded_utc": "2026-11-22T16:32:22.392849+00:00",
+      "findings": [
+        "R13-01"
+      ],
+      "paths": [
+        "web/research.css",
+        "web/native-details.js",
+        "scripts/research_pages.py"
+      ],
+      "commits": [
+        "44c6b5faa87dcb7fe3bf78ea97fe7de69a11e942"
+      ]
+    },
+    "fix14_daily_style": {
+      "ownership_recorded_utc": "2026-11-22T16:36:00.790009+00:00",
+      "findings": [
+        "R13-02",
+        "R13-06"
+      ],
+      "paths": [
+        "web/daily-scan.css"
+      ],
+      "commits": [
+        "953d8c6b8fe33147f91f4d75e4d7e59a1fc073a7"
+      ]
+    },
+    "fix14_daily_geometry": {
+      "ownership_recorded_utc": "2026-11-22T16:37:40.779882+00:00",
+      "findings": [
+        "R13-02",
+        "R13-05"
+      ],
+      "paths": [
+        "tests/browser/daily-phone-reflow.spec.js"
+      ],
+      "commits": [
+        "71391c96bc3a6d5df59499483874e8abcb783aaa"
+      ]
+    },
+    "fix14_home": {
+      "ownership_recorded_utc": "2026-11-22T16:39:31.138148+00:00",
+      "findings": [
+        "R13-07",
+        "R13-09"
+      ],
+      "paths": [
+        "web/landing.css",
+        "web/landing.html",
+        "web/home-search.js",
+        "web/home-runtime.js"
+      ],
+      "commits": [
+        "fa6e5d76dc9690bad95df3b1d48114fe5597c277"
+      ]
+    },
+    "fix14_daily_history": {
+      "ownership_recorded_utc": "2026-11-22T16:41:38.560485+00:00",
+      "findings": [
+        "R13-06"
+      ],
+      "paths": [
+        "web/daily-scan.js",
+        "tests/browser/daily.spec.js"
+      ],
+      "commits": [
+        "224698a564e2873e131adac7e8eb19fcb60bbc47",
+        "054c4f7e7354e35714e8733822df80d05e922e6f",
+        "53d2698bf459e996e8062b58ad266723c4746d43"
+      ]
+    },
+    "fix14_market_reload": {
+      "ownership_recorded_utc": "2026-11-22T16:42:33.329481+00:00",
+      "findings": [
+        "R13-08"
+      ],
+      "paths": [
+        "web/index.html",
+        "web/app.js",
+        "tests/browser/market-fallback.spec.js"
+      ],
+      "commits": [
+        "b81212ebafc3848e99f5d9f6cef27e7e41281099",
+        "78f98e801fd44588b31ec88b12f70197ca6ee3b4"
+      ]
+    },
+    "fix14_compare": {
+      "ownership_recorded_utc": "2026-11-22T16:44:16.574881+00:00",
+      "findings": [
+        "R13-10"
+      ],
+      "paths": [
+        "web/edition.css",
+        "web/refresh.css",
+        "tests/browser/compare-return.spec.js",
+        "web/detail-views.js"
+      ],
+      "commits": [
+        "7ab7a1b6e47ef6e930cf20b459c62c8f12245b75"
+      ]
+    },
+    "fix14_reader_tests": {
+      "ownership_recorded_utc": "2026-11-22T16:45:00.380410+00:00",
+      "findings": [
+        "R13-01"
+      ],
+      "paths": [
+        "tests/browser/technical-reading.spec.js"
+      ],
+      "commits": [
+        "012903d1f1f9da95548d51cfef33d58cda1ce462"
+      ]
+    },
+    "fix14_home_tests": {
+      "ownership_recorded_utc": "2026-11-22T16:48:09.693317+00:00",
+      "findings": [
+        "R13-07",
+        "R13-09"
+      ],
+      "paths": [
+        "tests/browser/home.spec.js"
+      ],
+      "commits": [
+        "88e32dae4fbf63bdfcac5086b64d9a565294093b"
+      ]
+    }
+  },
+  "native_page_sizes": {
+    "work": {
+      "bytes": 299700,
+      "gzip9": 42500
+    },
+    "company/afterquery": {
+      "bytes": 154676,
+      "gzip9": 22542
+    }
+  },
+  "previous_candidate": "ea33475d17a8c53ceb65",
+  "corrected_findings": [
+    "R13-01",
+    "R13-02",
+    "R13-03",
+    "R13-04",
+    "R13-05",
+    "R13-06",
+    "R13-07",
+    "R13-08",
+    "R13-09",
+    "R13-10"
+  ],
+  "baseline_pull_request": 35
+}

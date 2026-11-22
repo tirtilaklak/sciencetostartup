@@ -55,11 +55,30 @@ class StaticBusinessSupplementTests(unittest.TestCase):
         chosen = sp.selected_business_observation(health, 'taskus')
         self.assertTrue(chosen is None or chosen['evidence_type'] == 'reported')
         page = sp.business_observation_html(self.research, self.health, 'turing')
-        self.assertIn('Original citation could not be rechecked', page)
+        self.assertIn('data-source-id="refresh.source.turing-2024-run-rate-issuer"', page)
+        self.assertIn('Earlier citation could not be rechecked', page)
+        self.assertIn('verified through its indexed text', page)
+        self.assertIn('direct automated request returned a bot challenge', page)
         self.assertNotIn('Source content checked 28 Oct 2026', page)
         archive = sp.business_observation_html(self.research, self.health, 'a-team')
         self.assertIn('No recent revenue figure', archive)
         self.assertIn('<details', archive)
+
+    def test_dated_source_unavailability_keeps_the_original_financial_claim(self):
+        row = sp.selected_business_observation(self.health, 'prolific')
+        source = self.research.sources[row['source_ids'][0]]
+        health = sp.link_health_index({'entries': [
+            {'url': source['url'], 'status': 'not_found', 'checked_on': '2026-11-22'},
+        ]})
+        research = sp.Research(self.data, health=health)
+        for inline in (False, True):
+            with self.subTest(inline=inline):
+                page = sp.business_observation_html(research, self.health, 'prolific', inline=inline)
+                self.assertIn(f'href="{source["url"]}"', page)
+                self.assertIn('at least $300M', page)
+                self.assertIn('CEO-reported operating figures; unaudited', page)
+                self.assertEqual(page.count('page unavailable when checked 22 Nov 2026'), 1)
+                self.assertNotIn('citation could not be rechecked', page)
 
 
 if __name__ == '__main__':

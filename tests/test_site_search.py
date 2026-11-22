@@ -17,6 +17,27 @@ def run_stub(checks):
 
 
 class SiteSearchTests(unittest.TestCase):
+    def test_navigation_labels_and_work_search_actions_have_one_clear_destination(self):
+        result = run_stub(r'''
+run('initialize()');
+const view=q=>plain(run(`siteSearchView(${JSON.stringify(q)})`));
+assert.equal(view('home')[0].items[0].href,'/');
+assert.equal(view('overview')[0].items[0].name,'Market overview');
+assert.equal(view('overview')[0].items[0].href,'#market');
+assert.equal(view('companies')[0].items[0].href,'/companies/');
+assert.equal(view('historical company comparisons')[0].items[0].href,'#companies');
+const jobs=view('remote jobs');
+assert.equal(jobs.filter(g=>g.label==='Paid work').length,1);
+assert.equal(jobs[0].items[0].href,'/work/?q=remote+jobs');
+assert.equal(jobs.flatMap(g=>g.items).filter(item=>item.type==='action').length,1);
+assert.equal(view('jobs')[0].items[0].href,'/work/');
+assert.equal(view('jobs')[0].items[0].name,'Browse paid work');
+assert.ok(!view('jobs').flatMap(g=>g.items).some(item=>item.id==='work'));
+assert.equal(view('remote')[0].items[0].href,'#work?q=remote');
+assert.equal(view('notfoundzzq jobs')[0].items[0].href,'/work/?q=notfoundzzq+jobs');
+''')
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_exact_identifiers_and_work_intent_use_whole_queries(self):
         checks = r'''
 const assert=require('node:assert/strict');

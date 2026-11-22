@@ -1,0 +1,177 @@
+{
+  "product_source": "d5ee0a26d77d1f790a120104727e6d2633de86a7",
+  "source_blob_count": 784,
+  "build": "6637c48a4c2a9cd6000e",
+  "manifest": "aeaf890fad5f99b385fc188c8512580206198553e5d3cd190342171d872abdcc",
+  "editorial_release": "2026-11-22.6",
+  "compared_with_held_eighth": "4b07b7b1f9bbb41d3b80",
+  "last_verified_public_build": "5dc63fbcf19634a55c66",
+  "afterquery": {
+    "html_bytes": 151350,
+    "gzip_level9_bytes": 22838,
+    "sha256": "57b47ea21721919f3c917c9e009a8e1f16b0aa278157655a305294cd6c06de36"
+  },
+  "additional_source_fixes": [
+    {
+      "commit": "b4d2c847",
+      "finding": "M8-early-market-heading-blur",
+      "paths": [
+        "web/app.js (initial Market focus)",
+        "web/index.html (explicit recovery scroll)",
+        "tests/browser/market-fallback.spec.js"
+      ],
+      "basis": "candidate-9-review/market/findings.md"
+    },
+    {
+      "commit": "a6e46148",
+      "type": "browser assertion selector only",
+      "basis": "Distinct Download data and Export CSV controls in Market",
+      "paths": [
+        "tests/browser/market-fallback.spec.js"
+      ]
+    }
+  ],
+  "cohort": {
+    "model": "gpt-6.2-sol",
+    "reasoning_effort": "ultra",
+    "workers": {
+      "fix9_claim_sources": {
+        "findings": [
+          "M8-snorkel-claim-title-and-checks"
+        ],
+        "paths": [
+          "web/detail-views.js",
+          "data/business-health.json (audit-s5 title only)",
+          "tests/browser/claim-source-checks.spec.js"
+        ],
+        "commits": [
+          "d68addf8",
+          "ece9fffe"
+        ]
+      },
+      "fix9_daily_history": {
+        "findings": [
+          "D8-fragment-forward-next-tab",
+          "D8-legacy-close"
+        ],
+        "paths": [
+          "web/daily-scan.js",
+          "tests/browser/daily.spec.js"
+        ],
+        "commits": [
+          "a5926507"
+        ]
+      },
+      "fix9_ooak_evidence": {
+        "findings": [
+          "W8-ooak-exact-employer"
+        ],
+        "paths": [
+          "data/work-routes.json",
+          "data/editorial-release.json",
+          "tests/test_provenance_corrections.py",
+          "tests/test_work_routes.py",
+          "web/work-v4.js",
+          "tests/test_work_listings.py"
+        ],
+        "commits": [
+          "434d9e79",
+          "a3c37d41"
+        ]
+      },
+      "fix9_company_recovery": {
+        "findings": [
+          "C8-failed-search-focus",
+          "C8-native-fallback-query",
+          "C8-failure-filter-and-export-count"
+        ],
+        "paths": [
+          "web/app.js",
+          "web/data-runtime.js"
+        ],
+        "commits": [
+          "587d682e"
+        ]
+      },
+      "fix9_native_history": {
+        "findings": [
+          "N8-native-skipped-forward"
+        ],
+        "paths": [
+          "web/native-handoff.js",
+          "tests/browser/native-handoff-history.spec.js",
+          "scripts/observatory.py native-handoff insertion only if needed",
+          "web/companies-page.js"
+        ],
+        "commits": [
+          "ff48d825"
+        ]
+      },
+      "fix9_short_work": {
+        "findings": [
+          "H8-work-short-screen"
+        ],
+        "paths": [
+          "web/work-page.css",
+          "scripts/static_pages.py (render_work only)",
+          "tests/browser/explore-work-layout.spec.js"
+        ],
+        "commits": [
+          "94031bfe"
+        ]
+      },
+      "fix9_work_status_parity": {
+        "findings": [
+          "W8-ooak-exact-employer",
+          "W9-work-status-csv-parity"
+        ],
+        "paths": [
+          "tests/browser/work-editorial-parity.spec.js"
+        ],
+        "commits": [
+          "4ab752b1",
+          "72ae3308"
+        ]
+      },
+      "fix9_company_tests": {
+        "findings": [
+          "C8-failed-search-focus",
+          "C8-native-fallback-query",
+          "C8-failure-filter-and-export-count"
+        ],
+        "paths": [
+          "tests/browser/company-search-recovery.spec.js"
+        ],
+        "commits": [
+          "d7f6c8ec",
+          "f03777f5"
+        ]
+      },
+      "fix9_profile_weight": {
+        "findings": [
+          "P8-afterquery-compressed-weight"
+        ],
+        "paths": [
+          "scripts/static_pages.py (compact company profile only)",
+          "tests/test_static_pages.py (if needed)"
+        ],
+        "commits": [
+          "eab84d63"
+        ]
+      },
+      "fix9_work_export_provenance": {
+        "findings": [
+          "W9-work-status-csv-parity"
+        ],
+        "paths": [
+          "web/work-core.js",
+          "scripts/presentation.py (work export projection only)"
+        ],
+        "commits": [
+          "a9a31dbb"
+        ]
+      }
+    }
+  },
+  "phase": "Submitted for exact candidate and independent checks"
+}

@@ -14,6 +14,8 @@ FINANCE_DATE_ROLES = {'announcement', 'company_announcement_context', 'period_en
                       'source_publication', 'source_check', 'undated'}
 MERCOR_H1_ESTIMATE = 'mercor.metric.major-growth_metrics-1'
 RWS_GENERATE_REVENUE = 'rws_trainai.claim.growth_metrics-1.metric-0'
+SNORKEL_RUN_RATE = 'snorkel_ai.metric.major-growth_metrics-0'
+IMERIT_REVENUE = 'imerit.metric.expansion-imerit-revenue'
 
 
 def profile_finance_claim_context(profile):
@@ -203,6 +205,113 @@ def _validate_reviewed_revenue(observations, metrics, claims, sources, checks):
             raise ValueError(f'business-health: {identifier}: the observation must name Generate and its businesses')
 
 
+def _checked_source(source, check):
+    if check.get('url') != source.get('url') or check.get('http_status') != 200:
+        return False
+    if check.get('status') == 'content_checked':
+        return source.get('retrieval_status') != 'indexed_content_checked' and bool(SHA256.fullmatch(check.get('content_sha256', '')))
+    return (check.get('status') == source.get('retrieval_status') == 'indexed_content_checked'
+            and check.get('direct_response') == 'bot_challenge'
+            and check.get('checked_on') == source.get('accessed_on')
+            and bool(SHA256.fullmatch(check.get('direct_body_sha256', '')))
+            and bool(SHA256.fullmatch(check.get('indexed_excerpt_sha256', ''))))
+
+
+def _validate_threshold(row, metric, claim, source, check):
+    fields = ('value', 'currency', 'as_of', 'unit', 'company_id')
+    if (row['id'] != SNORKEL_RUN_RATE or metric.get('qualifier') != 'exact'
+            or any(row.get(key) != metric.get(key) for key in fields)
+            or row.get('measure') != 'annualized_revenue' or row['period'] != {'type': 'run_rate', 'label': metric['as_of']}
+            or row['scope'] != metric.get('segment_scope') or row['accounting_basis'] != metric.get('gross_vs_net')
+            or row['metric_ids'] != [metric['id']] or row['claim_ids'] != [claim['id']]
+            or row['source_ids'] != claim['source_ids'] or row['evidence_assurance'] != 'Company-reported'
+            or row.get('qualifier') != 'greater_than' or check.get('status') != 'content_checked'
+            or not _checked_source(source, check) or source.get('published_on') != metric['as_of']
+            or row.get('qualifier_reviewed_on') != check.get('checked_on')
+            or row['original_text'] != '… ' + check.get('excerpt', '')
+            or 'crossed an annualized revenue run rate of $375M' not in row['original_text']):
+        raise ValueError(f"business-health: {row['id']}: qualifier requires the dated issuer threshold receipt")
+
+
+def _validate_toloka_growth(observations, metrics, claims, sources, checks):
+    identifier = 'dashboard.toloka.fy2024-revenue-growth'
+    row = observations.get(identifier, {})
+    metric = metrics['toloka.metric.major-growth_metrics-1']
+    claim_ids = [metric['claim_id'], 'toloka.claim.major-growth_metrics-1']
+    inputs = ['toloka.metric.major-financial_metrics-2', 'toloka.metric.major-financial_metrics-1']
+    primary = 'refresh.source.nebius-fy2025-sec-note-3'
+    mirror = 'toloka.source.audit-tol_2025'
+    earlier = 'toloka.source.audit-tol_2024'
+    prefix = f'business-health: {identifier}: '
+    if (row.get('profile_metric_id') != metric['id'] or row.get('profile_claim_ids') != claim_ids
+            or any(claims.get(cid, {}).get('source_ids') != [mirror] for cid in claim_ids)
+            or row.get('evidence_type') != 'calculated' or row.get('qualifier') != 'calculated'
+            or row.get('scope_label') != 'Toloka business'
+            or row.get('accounting_basis') != 'latest_discontinued_operations_comparative'
+            or row['calculation'].get('input_observation_ids') != inputs or row.get('metric_ids') != inputs
+            or round(row['value'], 1) != metric['value']
+            or any(not isinstance(row.get(field), str) or not row[field].strip()
+                   for field in ('scope_detail', 'profile_statement', 'profile_confidence_reason'))):
+        raise ValueError(prefix + 'profile growth requires the historical IDs and the audited comparative calculation')
+    current, baseline = [observations[mid] for mid in inputs]
+    if row['calculation'].get('formula') != f"({current['value']} / {baseline['value']} - 1) * 100":
+        raise ValueError(prefix + 'displayed formula differs from the reviewed inputs')
+    for observation in (current, baseline):
+        if (observation.get('primary_source_id') != primary or observation['currency'] != 'USD'
+                or observation['accounting_basis'] != row['accounting_basis']
+                or observation.get('scope_label') != row['scope_label']
+                or observation.get('scope_detail') != row['scope_detail']
+                or observation['value'] != metrics[observation['id']]['value']
+                or not any(cid in row['claim_ids'] and claims[cid]['source_ids'] == [primary]
+                           and claims[cid]['confidence'] == 'A' for cid in observation['claim_ids'])):
+            raise ValueError(prefix + 'both revenue inputs must cite the grade A filing on the same basis')
+    checked_on = row.get('evidence_checked_on')
+    sec_check, mirror_check = checks.get(primary, {}), checks.get(mirror, {})
+    if (row.get('primary_source_id') != primary or row.get('source_ids') != [primary, mirror, earlier]
+            or not checked_on or checked_on != sec_check.get('checked_on') or checked_on != sources[primary].get('accessed_on')
+            or sec_check.get('status') != 'content_checked' or not sec_check.get('source_locator')
+            or mirror_check.get('checked_on') != checked_on or mirror_check.get('url') != sources[mirror]['url']
+            or mirror_check.get('status') != 'unavailable' or mirror_check.get('http_status') != 403
+            or not sources[mirror].get('accessed_on') or sources[mirror]['accessed_on'] >= checked_on):
+        raise ValueError(prefix + 'the checked SEC filing must lead and retain the separately dated mirror failure')
+
+
+def _validate_imerit_transcript(observations, metrics, claims, sources, checks):
+    row = observations.get(IMERIT_REVENUE, {})
+    metric = metrics[IMERIT_REVENUE]
+    claim = claims[metric['claim_id']]
+    primary = 'imerit.source.audit-im-transcript'
+    original = 'imerit.source.audit-im-transcript2'
+    replacement = 'refresh.source.imerit-exl-june-2026-stocksguide'
+    checked_claim = claims.get('refresh.claim.imerit-exl-june-2026-revenue-transcript', {})
+    period = row.get('period', {})
+    prefix = f'business-health: {IMERIT_REVENUE}: '
+    if (claim['source_ids'] != [primary, original] or row.get('source_ids') != [primary, replacement]
+            or row.get('historical_source_ids') != [original] or row.get('metric_ids') != [IMERIT_REVENUE]
+            or row.get('claim_ids') != [claim['id'], checked_claim.get('id')]
+            or checked_claim.get('source_ids') != [replacement]):
+        raise ValueError(prefix + 'the original attribution and checked replacement must be linked separately')
+    if (row.get('measure') != 'period_revenue' or row.get('evidence_type') != 'reported'
+            or any(row.get(field) != metric[field] for field in ('value', 'unit', 'currency', 'qualifier', 'as_of'))
+            or (period.get('type'), period.get('start'), period.get('end')) !=
+               (metric['period_type'], metric['period_start'], metric['period_end'])
+            or (row.get('scope'), row.get('accounting_basis')) != (metric['segment_scope'], metric['gross_vs_net'])
+            or row.get('evidence_assurance') != claim['evidence_label']):
+        raise ValueError(prefix + 'the replacement must preserve the reported amount, scope, period and assurance')
+    new_check, old_check = checks.get(replacement, {}), checks.get(original, {})
+    checked_on = row.get('evidence_checked_on')
+    if (not _finance_day(checked_on) or checked_on != checked_claim['observed_on']
+            or checked_on != new_check.get('checked_on') or checked_on != old_check.get('checked_on')
+            or not _checked_source(sources[replacement], new_check)
+            or sources[replacement].get('accessed_on') != checked_on
+            or sources[replacement].get('published_on') != sources[primary].get('published_on')
+            or new_check.get('excerpt') != checked_claim['excerpt']
+            or new_check.get('source_locator') != checked_claim['source_locator']
+            or (old_check.get('status'), old_check.get('http_status'), old_check.get('url')) !=
+               ('unavailable', 404, sources[original]['url'])):
+        raise ValueError(prefix + 'the checked transcript and historical 404 require dated source receipts')
+
+
 def load_business_health(path, data, profile_content=None):
     # Fixtures and other research versions must never inherit this curated layer. After a
     # SIDECAR_DATASET_VERSION bump the source_dataset_version check below fails loudly until
@@ -220,7 +329,7 @@ def load_business_health(path, data, profile_content=None):
     # Each new claim binds the exact quantity and period to a checked source excerpt.
     checked = {entry['source_id']: entry for entry in health.get('source_checks', {}).get('entries', [])}
     # Supplemental sources may add new primary documents, but must not replace
-    # canonical URLs or bypass the successful content-read receipt requirement.
+    # canonical URLs or bypass the indexed or direct content receipt requirement.
     source_ids = set()
     for source in health.get('sources', []):
         sid = source.get('id')
@@ -237,10 +346,7 @@ def load_business_health(path, data, profile_content=None):
         if (not sid.startswith('refresh.source.') or source.get('company_id') not in companies
                 or parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password
                 or any(ord(char) <= 32 for char in url)
-                or not source.get('title') or not source.get('publisher')
-                or check.get('url') != url or check.get('status') != 'content_checked'
-                or check.get('http_status') != 200
-                or not re.fullmatch(r'[a-f0-9]{64}', check.get('content_sha256', ''))):
+                or not source.get('title') or not source.get('publisher') or not _checked_source(source, check)):
             raise ValueError('business-health: supplemental source requires a valid checked public document')
         sources[sid] = source
     fresh_ids = set()
@@ -258,11 +364,9 @@ def load_business_health(path, data, profile_content=None):
             raise ValueError('business-health: fresh claim requires a source')
         for sid in claim['source_ids']:
             check = checked.get(sid, {})
-            if (sid not in sources or check.get('url') != sources[sid]['url']
-                    or check.get('status') != 'content_checked' or check.get('http_status') != 200
+            if (sid not in sources or not _checked_source(sources[sid], check)
                     or (sources[sid].get('company_id') and sources[sid]['company_id'] != claim['company_id'])
-                    or check.get('checked_on') != claim['observed_on']
-                    or not re.fullmatch(r'[a-f0-9]{64}', check.get('content_sha256', ''))):
+                    or check.get('checked_on') != claim['observed_on']):
                 raise ValueError('business-health: fresh claim requires a successfully checked source')
         claims[cid] = claim
         fresh_ids.add(cid)
@@ -297,15 +401,26 @@ def load_business_health(path, data, profile_content=None):
                 for field in ('measure', 'value', 'unit', 'currency', 'period', 'scope', 'accounting_basis'):
                     if row.get(field) != claims[cid]['fact'].get(field):
                         raise ValueError(prefix + 'fresh quantity or reporting basis differs from checked claim')
+                if 'qualifier' in claims[cid]['fact'] and row['qualifier'] != claims[cid]['fact']['qualifier']:
+                    raise ValueError(prefix + 'qualifier differs from checked claim')
         linked_sources = {sid for cid in row['claim_ids'] for sid in claims[cid]['source_ids']}
         if any(sid not in sources or sid not in linked_sources for sid in row['source_ids']):
             raise ValueError(prefix + 'source must support the cited claim')
+        if 'primary_source_id' in row:
+            supplemental = {sid for cid in row['claim_ids'] if cid in fresh_ids for sid in claims[cid]['source_ids']}
+            if row['primary_source_id'] not in row['source_ids'] or row['primary_source_id'] not in supplemental:
+                raise ValueError(prefix + 'primary source must bind to checked supplemental evidence')
         for mid in row.get('metric_ids', []):
             if mid not in metrics or metrics[mid]['company_id'] != row['company_id'] or metrics[mid]['claim_id'] not in row['claim_ids']:
                 raise ValueError(prefix + 'metric binding differs from cited claim')
         if row['evidence_type'] == 'calculated' and not row.get('calculation'):
             raise ValueError(prefix + 'calculation required')
     observations = {row['id']: row for row in health['observations']}
+    if SNORKEL_RUN_RATE in observations:
+        metric = metrics[SNORKEL_RUN_RATE]
+        issuer_source = 'snorkel_ai.source.audit-s5'
+        _validate_threshold(observations[SNORKEL_RUN_RATE], metric, claims[metric['claim_id']],
+                            sources[issuer_source], checked.get(issuer_source, {}))
     for row in health['observations']:
         if row['evidence_type'] != 'calculated':
             continue
@@ -337,6 +452,8 @@ def load_business_health(path, data, profile_content=None):
             raise ValueError(prefix + 'unknown calculation measure')
         if row['unit'] != 'percent' or not math.isclose(row['value'], expected, rel_tol=1e-10, abs_tol=1e-10):
             raise ValueError(prefix + 'calculated value differs from its cited inputs')
+    _validate_toloka_growth(observations, metrics, claims, sources, checked)
+    _validate_imerit_transcript(observations, metrics, claims, sources, checked)
     if 'profile_finance' in health:
         if profile_content is None:
             profile_path = path.with_name('profile-content.json')

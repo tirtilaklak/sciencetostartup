@@ -38,31 +38,59 @@ class WorkRouteValidationTests(unittest.TestCase):
         content = link_only = blocked = terms = 0
         for route in routes:
             check = route["last_link_check"]
+            previous = [change["previous_values"]
+                        for change in route["editorial_review"].get("correction_history", [])]
             self.assertEqual(check["date"], checked_on)
             self.assertRegex(check["response_sha256"], r"^[a-f0-9]{64}$")
             if check.get("content_reviewed"):
                 content += 1
                 # A later field-scoped review must preserve this historical
                 # content receipt instead of resetting its date or scope.
-                route_checks = route.get("check_history", []) + [route["last_route_check"]]
-                self.assertEqual(sum(item.get("date") == checked_on
-                                     and item.get("result") in {"listing_content_reviewed", "official_listing_closed"}
-                                     for item in route_checks), 1, route["id"])
+                route_checks = [
+                    route["last_route_check"], *route.get("check_history", []),
+                    *(values["last_route_check"] for values in previous if "last_route_check" in values),
+                ]
+                historical = {
+                    (item["result"], item.get("note")) for item in route_checks
+                    if item.get("date") == checked_on
+                    and item.get("result") in {"listing_content_reviewed", "official_listing_closed"}
+                }
+                self.assertEqual(len(historical), 1, route["id"])
                 self.assertGreaterEqual(route["last_route_check"]["date"], checked_on)
+                reviewed_urls = {route["url"], *(values["url"] for values in previous if "url" in values)}
                 self.assertTrue(any(source.get("accessed_on") == checked_on
-                                    and source["url"] == route["url"]
-                                    for source in route["sources"]))
+                                    and source["url"] in reviewed_urls
+                                    for source in route["sources"]), route["id"])
             elif check["result"] == "reachable":
                 link_only += 1
             elif check["result"] == "blocked":
                 blocked += 1
-            if route.get("terms_checked_on") == checked_on:
+            if any(values.get("terms_checked_on") == checked_on for values in [route, *previous]):
                 terms += 1
                 self.assertTrue(check.get("content_reviewed"), route["id"])
         self.assertEqual((content, link_only, blocked, terms),
                          (receipt["listing_content_reviewed"], receipt["link_only"],
                           receipt["blocked"], receipt["pay_terms_reviewed"]))
         self.assertEqual(content + link_only + blocked, len(routes))
+
+    def test_reconciled_exact_checks_keep_their_own_date_and_source(self):
+        checks = {
+            "afterquery.work.senior-software-engineer-security-infrastructure":
+                ("https://jobs.ashbyhq.com/AfterQuery/99afbbe0-5ad1-4f25-a00a-049f14428ac6/application", 200),
+            "afterquery.work.people-programs-lead":
+                ("https://jobs.ashbyhq.com/AfterQuery/2ba013e1-d254-4436-afd7-19d0b451424f/application", 404),
+            "terac.work.ai-evaluator-shopping-assistant":
+                ("https://terac.com/apply/start/58b90b6b-a97d-478e-817c-6666a230e213", 200),
+        }
+        routes = {row["id"]: row for row in self.work["routes"]}
+        for route_id, (url, status) in checks.items():
+            with self.subTest(route=route_id):
+                route = routes[route_id]
+                earlier = route["last_link_check"]
+                self.assertEqual((earlier["date"], earlier["final_url"]), ("2026-10-28", route["url"]))
+                latest = route["last_route_check"]
+                exact = latest.get("application_check", latest)
+                self.assertEqual((exact["date"], exact["url"], exact["http_status"]), ("2026-11-22", url, status))
 
     def test_bad_sidecar_fails_before_destination_is_created(self):
         unknown = copy.deepcopy(self.work)

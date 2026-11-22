@@ -4,6 +4,10 @@ The audit began at 7:30 PM Pacific on November 21, 2026. The first three hours a
 
 ## Current pass
 
+PR #34 merged at `1cecd451`. The public site still serves Worker 41, build `5dc63fbcf19634a55c66`. The follow-up in PR #35 passed both official workflows at `ba844440`. A separate six-hour pass began November 22 at 9:44 AM Pacific to simplify the main pages, correct data and audit links throughout the site. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Public release receipts](site-quality-20261121/fifth-public-release.json)
+
+## Initial baseline and first three rounds
+
 Ten GPT-6.2 Sol Ultra reviewers completed the first three-hour audit at 10:30 PM Pacific on November 21. Ten different Sol Ultra implementers completed the first patch, with six working at once. A separate ten-person cohort completed the first independent retest. Ten second-round contributors delivered the next candidate. Ten independent reviewers completed its retest. The third patch is underway. They own Home, Work source decisions, native pages, Work filtering and export, research wrappers, search, shared navigation, finance, Compare, and Daily. The production manifest identifies build `d8d18622a82c541129c1`. The repository baseline is main at `4d7dae5d40c1dea7978ab519cd3ac66d547cf29f`, with checked-in build `6d57f30fbf456b1e48a8`. The deployed Daily index contains the November 17 issue. The repository contains the November 18 issue. A push to GitHub alone does not publish the Worker.
 
 The verification ledger covers H1–H3, W1–W3, S1–S5, E1–E5, R1–R4, N1–N2 and D1. The screenshots and working browser trials below establish candidate behavior during the audit window. Production verification follows the implementation and independent retest.
@@ -239,3 +243,180 @@ Ten contributors produced build `5dc63fbcf19634a55c66` from f305c436. In native 
 A reader can now reach the Market revenue charts by typing “revenue” on Home. At 320px, Firefox with 28px minimum text shows the overview tabs, chart labels and all three selected comparison names. Selecting Mercor’s $2B observation no longer marks its separate $614M observation as current. Source date corrections apply only to the five verified citation IDs. The AIXI Work listing includes Berkeley and the issuer’s specific condition for a master’s-level applicant. Its monthly stipend remains £2,000–£3,500.
 
 Both Research editions now link directly to four cited passages. The two large JSON downloads save files and show their sizes. The dated edition also links to a byte-identical, commit-pinned copy of its original archive. These changes preserve the archived report and data files. The two-edition paragraph inventory and citation sequence matched in the implementation tests. Independent reviewers are testing the combined build.
+
+## Fifth retest and public release
+
+The public phone homepage now shows Snorkel AI at y=402, previously y=1,084. Its expert program starts at y=646. On the public hourly Work page, the first role starts at y=672 and its pay is visible at y=732. Compare and Back preserve the same 17 records in order. The public phone homepage, desktop homepage and saved Work screenshots matched the frozen candidate byte for byte. [Phone before and after](site-quality-20261121/home-before-after-live-390.png)
+
+Ten reviewers checked all 285 Explore destinations at both phone and desktop sizes. The native Work list, Compare and 210 CSV downloads agreed across 70 selections. They matched 17,763 Research rows across three published file formats and checked the original archive member hashes. Twenty-five exact employer posts still matched the recorded role and compensation. Eight application endpoints denied access or could not be independently confirmed. Those outcomes do not establish closure. [Candidate checks](site-quality-20261121/fifth-candidate-checks.json) · [Independent retest](site-quality-20261121/fifth-retest.json)
+
+At 10:18 UTC, deployment `6523aad9-1019-4eca-b781-408a55b9f33a` assigned all traffic to the previously tested Worker `a5900bbc-ed1c-4f3b-9b14-521425e8974e`. The verified rollback version is `cddaa614-befb-4bfe-81b2-8553bd74afac`. The immutable preview and public domain each passed 86 targeted checks, 46 desktop/mobile browser journeys, 11 HTTP file identity checks and 28 route/header checks. Public domain redirects also passed. Chromium saved both Research JSONs and the pinned archive with their exact hashes. [Public manifest](https://sciencetostartup.com/manifest.json) · [Release receipts](site-quality-20261121/fifth-public-release.json) · [CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45010244776) · [Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45010244739)
+
+## Sixth implementation
+
+The fifth review found that rejecting a fourth shortlist selection clips the recovery message in enlarged Firefox. Back can leave focus on a heading a screen above the list. The Market selectors also truncate the current reporting cohort, and an issuer’s unaudited interim filing appears under a grade definition that implies independent verification. A mobile trace reproduces a 0.0329 layout shift when Mercor’s Work tab appears. Ten sixth-round contributors have implemented repairs or added regression coverage. The release also retains all 96 hashed dependencies used by the previous two public Workers. Independent reviewers are checking the integrated artifact. [Finding IDs and reproductions](site-quality-20261121/fifth-audit-findings.json)
+
+## Sixth independent retest
+
+Ten reviewers tested build `81071f0430d00446056b`. All 285 Explore destinations opened on phone and desktop. The native Work list, Compare and 210 CSV downloads agreed across 70 selections, including empty ones. The 25 previously matched employer posts still matched. Eight application endpoints remain unconfirmed. All 69 official mobile performance measurements passed. The median layout shift on Mercor’s Paid work tab fell from 0.03299 on the public build to 0.0000764. [Candidate and CI](site-quality-20261121/sixth-candidate-checks.json) · [Independent checks](site-quality-20261121/sixth-retest.json)
+
+The review found 15 issues. Searching Home for “hourly” offered a company and sent visitors to one text match with no listed rate. Work’s hourly pay filter showed 17 records with published rates. The report reader labeled its archived PDF as the full report. Following a Daily item link and then pressing Back could send the next Tab to the top of the page. The finance views also displayed Snorkel’s $375M run rate as exact, although the issuer said it had crossed that threshold. The seventh implementation addresses these findings. [Full findings and acceptance criteria](site-quality-20261121/sixth-audit-findings.json)
+
+Both GitHub workflows passed on `ac642cf2`, including all eight Python shards, 1,241 browser tests and 60 report accessibility scans. At 10:56 UTC Cloudflare staged the sixth candidate as version 42. Its immutable URL passed all 86 acceptance checks and 66 browser journeys. Eleven route bodies matched the exact candidate and all 28 routing and header checks passed. [Version and test receipts](site-quality-20261121/sixth-immutable-preview.json) Production continued to serve version 41 while the team repaired the confirmed navigation and content issues. [Immutable preview](https://47b6c921-sciencetostartup.musaeminozdem.workers.dev/) · [CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45013200775) · [Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45013200844)
+
+## Seventh implementation
+
+Ten contributors produced build `d0522f0b467a6a759b76` from `7ee2a7e2`. Searching Home for “hourly pay” now opens the native published-rate filter. The 17 records matched the direct filter in order. The Snorkel example shows a greater-than sign beside $375M and reads “More than $375M” to assistive technology. Both example source links fit in the 390 × 844 phone viewport.
+
+The finance views now link Toloka’s fiscal 2023 and 2024 discontinued-operations revenue to Note 3 of the SEC filing. Turing’s issuer release supplements the redirected syndicated copy. Direct Turing requests received a bot challenge. The issuer text was verified in its indexed page. The Surge fellowship identifies its workplace as unlisted and links to the publisher’s application instructions.
+
+Back returns to the originating link after directory and Compare handoffs, and the Market bookmark survives a blocked bundle and a retry. The Daily reader restores the item permalink and its next keyboard action. The current report labels both archived downloads and dates the pre-DOI snapshot. The previous public build was version 41 at freeze. [Implementation commits and finding IDs](site-quality-20261121/seventh-implementation.json)
+
+## Seventh independent retest
+
+Ten reviewers checked the 285 Explore destinations at both phone and desktop widths. The 210 downloaded CSVs matched the visible record IDs and order across 70 Work selections. The archive matched the original deposit, and an offline browser followed an assertion to its source. On the public site, the same link returned the site's 404 page. Cloudflare had added a slash to the archived report URL, changing where the browser looked for the linked file. Reviewers reproduced the failure on two immutable Worker versions. [Independent checks](site-quality-20261121/seventh-retest.json)
+
+The review recorded 12 findings. Compare ran separate phrases together on 101 of 135 Work records. Thirty AfterQuery profile cards omitted applicant requirements visible in the directory. Toloka's profile presented a calculated 135.1% increase as a figure reported by the issuer. Its SEC filing provides the two revenue amounts used in the calculation. Eight application endpoints returned access-control responses during the source review, leaving their availability unconfirmed. [Finding records and affected IDs](site-quality-20261121/seventh-audit-findings.json)
+
+Both workflows passed on `1f9c3894`. The five browser projects recorded 1,348 passes, including one retry for a one-pixel scroll difference, and the accessibility job passed 60 checks. All 69 mobile reports and all 23 route medians verified. Cloudflare staged the seventh build as Worker 43 with zero public traffic. Its immutable host passed 86 acceptance checks, 110 browser journeys, 11 file identity checks and 28 header and routing checks. Clicking the archived report's evidence and brief links returned the exact site 404. The release stayed on preview. [Candidate and official checks](site-quality-20261121/seventh-candidate-checks.json) · [Immutable preview receipts](site-quality-20261121/seventh-immutable-preview.json)
+
+## Eighth implementation
+
+Ten contributors produced build `0223193390f17ca8cadc` from `324072f0`. Standalone archived HTML now uses slashless URLs so its relative citations resolve to the original files. The current report's citation shortcut leads to its registered version DOI. The deposited files retain their original checksums.
+
+On the homepage, both directory actions fit on one row at 320px. The native Work page shows the first hourly rate on a short desktop, with the filter still editable by keyboard. Compare separates pay qualifications and conditions. AfterQuery now shows the requirements previously missing on 30 company cards, including the San Francisco internship's gap-semester requirement.
+
+Toloka's profile identifies 135.1% as a calculation using the discontinued-operation figures in SEC Note 3. The earlier 138% comparison stays attached to its original reporting basis. Snorkel's selected source carries its November 22 check. Current CSV exports lead with the selected Turing and Toloka publisher URLs and preserve their historical citations. Independent reviewers are checking the combined build. [Implementation commits and finding IDs](site-quality-20261121/eighth-implementation.json)
+
+The first eighth-candidate browser run passed 125 targeted journeys. GitHub then rejected its checked-in manifest after the payload scanner and the mobile route list changed. Both files contribute to the build fingerprint. The regenerated artifact is `4b07b7b1f9bbb41d3b80`. It includes the AfterQuery profile in the mobile measurements. [Build identities and failed workflows](site-quality-20261121/eighth-build-correction.json)
+
+## Eighth independent retest
+
+Ten reviewers exercised all 285 Explore destinations on phone and desktop, compared 210 downloaded CSVs with 70 visible Work selections, and checked all 55 native company profiles. The source review found OOAK’s exact employer listing, with €65,000–€80,000 pay in Paris. Its old YC URL returned 404. Its application endpoint remains unconfirmed. [Review records](site-quality-20261121/eighth-retest.json)
+
+The remaining issues included a role name below the fold at 1024 × 600, an incorrect issuer title in Snorkel’s claim dialog, and a Companies search fallback that discarded the query. In Chromium and WebKit, Daily’s Forward navigation could display the right item while the next Tab moved to a different story. Older Firefox could focus a stale Work or Companies link after a skipped history entry. [Findings and acceptance criteria](site-quality-20261121/eighth-audit-findings.json)
+
+On corrected build `4b07b7b1f9bbb41d3b80`, all 86 acceptance checks and 125 targeted browser journeys passed. All 72 mobile reports across 24 routes met their budgets. AfterQuery’s median LCP was 1.21 seconds, with zero blocking time and layout shift. GitHub's separate static-page check found the page weighed 23,274 bytes compressed against a limit of less than 23,000. The build received no Worker version. Production continued on version 41. [CI failure](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45022217670/job/137207418306) · [Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45022217729)
+
+## Ninth implementation
+
+The native Work page now shows the first hourly role’s name and rate together on a 1024 × 600 screen. The Companies fallback carries the search query and group into the plain directory. A failed retry keeps the button focused, and the export control shows when the result count is unavailable.
+
+OOAK’s record links to the employer’s listing and distinguishes its unconfirmed application from the archived posting. Its Work CSV preserves the dated checks and distinguishes job descriptions from application links. Snorkel’s claim dialog now labels the Data 2.0 article by its verified title and pairs each check with its source ID.
+
+The ninth build is `6637c48a4c2a9cd6000e`, editorial revision `2026-11-22.6`. Its AfterQuery page is 22,838 bytes compressed. The accepted limit is below 23,000. The Firefox Market bookmark now restores its keyboard destination when a late resource finishes loading. The ninth team also repaired Daily history and the stale native focus on cold Forward. Legacy Firefox uses the next Tab at Skip to content when it exposes the same navigation data for both directions. [Implementation commits](site-quality-20261121/ninth-implementation.json)
+
+## Ninth independent retest
+
+Ten reviewers checked build `6637c48a4c2a9cd6000e`. All 70 Work selections matched their 210 CSV downloads. All 285 Explore destinations opened on phone and desktop. Candidate and public production each passed 86 acceptance checks. The hosted archive routing fix passed 26 local Workerd cases and eight actual browser hops, including the archived brief and evidence. The original 22.47 MB archived evidence appendix took 171 seconds to open under shared runner load. [Review receipts](site-quality-20261121/ninth-retest.json)
+
+GitHub CI passed on `b54e40a5`. Desktop Chromium, Firefox and WebKit failed Back navigation to a searched Companies shortlist. Chromium saved the correct 274px position, restored it before the results arrived and left the reader at 18px. The ninth build stayed off Cloudflare. Public version 41 continued to serve `5dc63fbcf19634a55c66`. [CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45025749378) · [Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45025749310)
+
+The review also measured a Daily keyboard focus jump, missing context on the first short-screen Work comparison, and a cold Back that closed a role disclosure. At enlarged phone text, five wordmarks opened Search when the reader clicked their last letter. The Market matrix painted Appen’s revenue over the company column. OOAK’s employer listing remained visible while its linked application returned a readable 404. [Finding IDs and acceptance criteria](site-quality-20261121/ninth-audit-findings.json)
+
+## Tenth implementation
+
+Ten contributors repaired the eight findings in build `ea6272946bebf0bf9a35`. Companies waits for the matching results before restoring the saved position on Back and respects a reader who moves while the index loads. Daily restores same-page keyboard focus in time for the first Tab. Explicit Work comparisons open at the results. Returning from a company profile restores the role’s disclosure and its employer link.
+
+On narrow phones the Market matrix keeps the selected financial value readable with its metric heading. The shared header leaves the full wordmark clickable at enlarged text. OOAK’s employer listing remains the primary action, and release `2026-11-22.7` records the linked application’s 404, the alternate 406 and the separate sign-in. The Work export carries the source evidence behind historical destinations. [Tenth source and commits](site-quality-20261121/tenth-implementation.json) · [Ninth findings](site-quality-20261121/ninth-audit-findings.json)
+
+
+## Tenth independent retest
+
+Ten independent reviewers checked all 285 Explore destinations on phone and desktop. All 210 Work CSV downloads matched their 70 visible selections. Candidate and production each passed 86 acceptance checks. All 179 initial targeted browser journeys passed. A later repeat lost the focused employer link on a bookmarked Work return in two of 12 Chromium runs. The browser had focused the fragment’s role card while the page was still loading. [Coverage and failed repeats](site-quality-20261121/tenth-retest.json)
+
+At 390px, Chromium hid 15 focused amounts or headings in the Market matrix. On both the ninth and tenth builds, 135 unavailable-evidence cells opened details only by pointer. The Daily issue’s first headline began at y908 on a 320 × 720 phone. The native Work page’s first hourly rate began at y744. [Findings and acceptance criteria](site-quality-20261121/tenth-audit-findings.json)
+
+The same Mercor profile measured 2,577 ms and 2,232 ms median mobile LCP in separate official runs. The budget is 2,500 ms. Each run retained 72 raw reports. [First official run](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45028659815) · [Repeat](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45029874348)
+
+AfterQuery changed compensation on three named roles. Eleven salary records had an annual period missing in the guide. The employer again lists its Security/Infrastructure role. The People Programs Lead listing and application now return 404. Terac again lists Shopping Assistant at $30 per hour, with LinkedIn sign-in at the application start. The source review checked all 25 previously verified AfterQuery forms and preserved the earlier records. [Dated source checks](site-quality-20261121/tenth-audit-findings.json)
+
+## Eleventh implementation
+
+Ten contributors implemented the eleventh build `8bd4d587e55c30d638a2`. The first Daily headline fits at 320 × 720. Search and filters remain available in a named phone disclosure. The archive opens the date selector and feed links. The native Work list puts the first role with its rate and keeps directory totals under Jump to section.
+
+On a narrow Market table, keyboard focus scrolls the selected amount clear of its company name. Keyboard readers can open the same unavailable-evidence explanations as touch readers. The Method correction address wraps at enlarged text. A verified Work Back navigation retains the employer link when Chromium first focuses the bookmarked role card. Mercor’s profile gives the sourced introduction time to paint before requesting supporting records.
+
+The first combined .8 build exceeded both native page size limits. AfterQuery now links 48 job-specific citations in a separate native index alongside 45 general citations on the profile. All 45 role cards remain on the profile. The corrected profile weighs 154,246 bytes (22,511 gzip). The native Work page weighs 297,983 bytes (42,392 gzip) and retains its 135 cards. Source-bound CSV rows include prior listing and application responses. The filter bundle now handles streamed HTML that finishes after the script has executed.
+
+Editorial revision `2026-11-22.8` corrects AfterQuery’s pay bands and annual periods, including separately labeled Salary and OTE figures. It records current status for Security/Infrastructure and People Programs Lead. Terac’s Shopping Assistant is listed again at $30/hour with LinkedIn sign-in at the start. Earlier dated checks remain attached. [Implementation records](site-quality-20261121/eleventh-implementation.json) · [Independent findings](site-quality-20261121/tenth-audit-findings.json)
+
+## Eleventh independent retest
+
+Ten independent reviewers tested build `8bd4d587e55c30d638a2`. All 570 phone and desktop Explore visits reached their intended destinations. Every one of the 210 Work CSV downloads matched its visible selection. All 195 Market figure cells opened by keyboard and returned to the same opener. The 93 AfterQuery citations retained their source IDs and URLs. All 48 chapter checks and eight archive browser hops passed on the prepared route configuration. The public Worker 41 archive still returned a 404 for the Executive brief. [Review receipts](site-quality-20261121/eleventh-retest.json)
+
+On a 320px phone, the first Daily story and first Work rate fit. Enlarged text still clipped two Daily filters and a long Method correction link. Reaching the job source index took 46 Tabs. Firefox cold Forward could reopen a closed Daily panel. Two older WebKit builds sometimes scrolled away from a correctly focused employer link. Terac’s first-party ML Scenarios copy explicitly marks its listing closed. [Findings and acceptance checks](site-quality-20261121/eleventh-audit-findings.json)
+
+The first official run passed all 24 mobile performance medians, including Mercor at 2,220 ms. Two repository tests had omitted the nested company source page in their expected inventory. Firefox’s slow-document test exposed a timeout before a fetched Work script executed. The test revisions preserve the dist tree. The twelfth implementation also covers the independently reproduced delayed execution case. [Original CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45034977051) · [Original browser run](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45034977067)
+
+## Twelfth implementation
+
+Ten contributors delivered build `96e25098b02da34fdb20`, editorial revision `2026-11-22.9`. At 320px, the native Menu replaces the five-link header with one keyboard disclosure. The paid-work source index is the first Tab after opening AfterQuery’s source list. Its 93 citations are still present. The Daily filter controls fit at enlarged text sizes, and the Method correction link wraps within the viewport.
+
+Work keeps its filters when a downloaded script executes late. The bookmarked Work page respects keyboard and wheel input during restoration. Daily restores the closed phone filters on a cold Forward visit. Market keeps the full company name and selected figure readable at 32px minimum text. Contributor testing reproduced 12 clipped keyboard stops on Worker 44’s source and found zero on the corrected fixture.
+
+Terac explicitly marks its ML Scenarios listing closed. Work, the company profile, Compare and CSV distinguish this notice from the Ashby listing’s dated 404. The separately listed Shopping Assistant retains its own evidence. [Twelfth source, contributors and page sizes](site-quality-20261121/twelfth-implementation.json)
+
+Worker 44 received zero public traffic. Its immutable preview served the correct build, passed 86 acceptance checks, and opened the archive’s Executive brief. The first attempt to open the 22.47 MB deposited evidence appendix exceeded 25 seconds. The verified public predecessor at the time of this freeze was Worker 41. [Eleventh CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45036903655) · [Eleventh Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45036903644)
+
+## Twelfth independent retest
+
+All 210 Work exports matched their visible selections. The one change in the recently checked ordering was Terac ML Scenarios moving up two places. All 880 company source IDs and URLs matched between the native dossiers and Explore. The 144 employer URL checks confirmed the current commissioning, pay and availability evidence. All 48 phone chapter reads passed. The original archive’s eight navigation steps worked under the prepared routing settings. [Retest receipts](site-quality-20261121/twelfth-retest.json)
+
+Both GitHub workflows passed on `ec9345d5`. The 72 mobile scores ranged from 98 to 100. Explore Companies had the slowest median LCP at 2.41 seconds. One Mobile WebKit case passed on retry. Its trace showed the correctly restored Mercor result jump 113px after Back. [CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45039549361) · [Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45039549372)
+
+At 390px with enlarged text, the native Menu clipped its destination labels and Daily cropped its selected filter values. Global Search’s placeholder clipped at 320px. Clear filters lost the open search field on Forward in classic Firefox. Keyboard readers had to pass 234 Market controls to reach Definitions. [Observed issues and acceptance criteria](site-quality-20261121/twelfth-audit-findings.json) · [Phone screenshots and layout trials](site-quality-20261121/twelfth-phone-menu-and-filters.png)
+
+Reviewers also followed 230 more Explore destinations discovered after rendering. All 515 distinct destinations reached the intended content on phone and desktop, for 1,030 successful visits. The twelfth frozen build passed 228 targeted browser cases. Three groups passed on full repeat after browser or local server failures. The first runs are retained. The thirteenth repair also covers the open Menu obscuring the next focused control and enlarged Daily ranks overlapping the story kind.
+
+## Thirteenth implementation
+
+The native Menu now expands the header so its labels and the next focused page control remain visible. Enlarged Firefox text at 390px previously put the first link 67px outside the viewport. The Daily filters give the selected option its full width. The rank, topic chips and date picker reflow at larger text sizes. The global Home search hint reads “Search” and uses 6.17:1 contrast.
+
+The Work page links each visible job title to its exact company role. All 135 role destinations and the separate issuer actions are preserved. Work weighs 299,700 bytes raw and 42,501 bytes compressed. The Companies page repairs a late WebKit scroll reset after returning from a dossier and respects intervening reader input. Daily restores the open Search field after Clear filters and a cold Forward.
+
+Keyboard users can skip the 234 Market matrix controls directly to Definitions. Grouped sorting announces its actual order. Unavailable Paid delivery buttons and dialogs now name the visible measure. The 39-company results export matched the previous build byte for byte in contributor testing. [Contributors and frozen source](site-quality-20261121/thirteenth-implementation.json) · [Twelfth findings](site-quality-20261121/twelfth-audit-findings.json)
+
+
+## Thirteenth independent retest
+
+All 135 Work titles opened their matching role records. The 210 Work CSVs matched the displayed selections. Reviewers followed 515 distinct Explore destinations on desktop and phone, for 1,030 arrivals, and verified all 93 AfterQuery sources. The 250 targeted browser cases and 86 acceptance checks passed on the frozen build. Four browser groups needed a full repeat after runner failures. [Retest receipts](site-quality-20261121/thirteenth-retest.json) · [Work on a 320px phone](site-quality-20261121/thirteenth-work-phone-comparison.png) · [Enlarged native Menu](site-quality-20261121/thirteenth-readable-menu-comparison.png)
+
+All 1,109 Python tests and 24 mobile performance medians passed. The slowest median was 2.34 seconds LCP on Explore Companies. Official Browser QA caught two test measurement errors. The company ledger restored precisely the scroll position observed when the reader left. The Firefox Daily select width differed from its measurement clone by 0.000015px. [CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45042823507) · [Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45042823520)
+
+A cold phone visit to Technical Landscape lost a citation click or tap in 14 of 16 trials. At 200% zoom Home’s Menu covered most of the next focused link. With enlarged text Daily labels overlapped their values, and Compare left nine of twelve focused controls below a 320 × 568 viewport. The Market data retry placed its focused heading below the fold. This candidate stayed off public traffic. [Reproductions and acceptance criteria](site-quality-20261121/thirteenth-audit-findings.json)
+
+
+## Fourteenth implementation
+
+A single tap on a visible Technical Landscape citation keeps its position until the browser follows it. The previous chapter layout could move the IFEval link nearly 2,915px between pointerdown and click. The repair covers the current chapter and the dated edition.
+
+Daily gives enlarged labels enough space above 600px. Finding and Source date previously overlapped their values in all 47 stories. The selected story keeps its background on mobile WebKit Forward. Home’s Menu makes room for the next focused action at browser zoom, and keyboard readers can reveal the lower lines of a long search result.
+
+The Market retry restores the visible Revenue & growth heading after a failed data or module request. Compare keeps its focused controls readable on a short phone with enlarged text. The browser tests also capture the ledger’s actual scroll position on departure and wait for the failed request before retrying a claim. [Contributors and source](site-quality-20261121/fourteenth-implementation.json) · [Reproductions](site-quality-20261121/thirteenth-audit-findings.json)
+
+## November 22 sitewide pass
+
+Six workers began with live checks on reliability, design, data, copy, navigation and links. The baseline had 940 generated HTML pages and six XML files. All 40,151 declared static fragment targets exist in the captured build. Another 277 Explore routes require JavaScript to verify. The audit checks the actual served destination separately from whether a generated path exists.
+
+Worker 41 listed the unavailable AfterQuery People Programs Lead role, treated two live employer posts as past listings, and showed an outdated Engagement Manager pay range. Worker 45 publishes the corrected dispositions and the employer’s pay disagreement. A fresh pass over all 144 employer URLs found no further changes. All 135 public work records matched across the three browser CSV downloads.
+
+A generic search for “jobs” returned a single literal result. The shared Work selector now respects the requested filters and all eligible listings for a generic query. A literal role or company with the exact title still takes precedence.
+
+The iMerit finance record now links to a second transcript that publishes the same CFO statement, approximately $59 million in preliminary unaudited revenue for the 12 months ended March 31, 2026. The prior transcript is recorded as a historical 404. The canonical dataset and deposited evidence remain available under their original identities.
+
+Verified all 1,013 distinct public paths after retrying 15 proxy errors. The after-check manifest still matches Worker 41. The repository now checks generated paths and static fragments before a release. Explore routes that need JavaScript remain part of the browser sweep.
+
+Home presents Companies, Paid work and Research as the first three choices. The original company and paid-work examples keep their source links. The Market page puts financial figures ahead of product examples. The native pages remove repeated instructions and let readers open release and review details as needed. Checks against the preceding build confirmed that all 103 revised native pages retained their destinations and anchors. All 71 archival assets, Daily snapshots and feeds retained their checksums.
+
+Shared Search now opens Home at the homepage and Companies at the current directory. One paid-work action keeps the query. All 20 browser journeys in the separate Search build passed across the five project configurations.
+
+Two release defects were reproduced on Worker 41. A blocked Market data request left the old Companies results on screen. A timed-out Explore script could erase a focused recovery action when it arrived late. Worker 45 keeps the failure scoped to the requested page, retains the original bookmark and offers a usable Reload page action.
+
+### Worker 45 public release
+
+Worker 45 moved to full public traffic at 11:40 AM Pacific on November 22. Build `cf5b6da2f7fdde7f2595` and its signed manifest matched across the immutable preview and production. The private preview passed 296 browser journeys and 86 acceptance checks. Hosted CI verified 1,112 unit tests and all 24 mobile performance budgets. [Release PR](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45056824579) · [Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45056824546)
+
+All 1,014 live paths worked, including 941 HTML pages with the exact signed bodies and all 40,151 linked static targets. Public checks confirmed the iMerit CFO transcript, changed employer dispositions, conflicting pay figures, and the archived brief’s link to its exact finding. The 22.47 MB evidence appendix matched its verified checksum.
+
+A normal WebKit Back to a bookmarked Work listing ends with focus on the card in both releases. Worker 45 also reopens Terms and briefly restores the exact role link before WebKit moves focus to the card. The follow-up addresses that remaining keyboard behavior.

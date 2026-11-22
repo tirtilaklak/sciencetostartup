@@ -1,0 +1,137 @@
+{
+  "candidate": {
+    "source_and_artifact_commit": "b54e40a5700262e7ca0fad4d3061f9e2e30bec30",
+    "frozen_source": "d5ee0a26d77d1f790a120104727e6d2633de86a7",
+    "git_blobs_verified": 1281,
+    "build_id": "6637c48a4c2a9cd6000e",
+    "manifest_sha256": "aeaf890fad5f99b385fc188c8512580206198553e5d3cd190342171d872abdcc",
+    "plan_sha256": "0f7f74941c59f247926a1049863b5efad7e8168cea2553a606c5c45d34aaaf68",
+    "uploadable_assets": 1279,
+    "dist_tree": "0692a1b673fae6a24bb5e324344f940a50b79afc",
+    "editorial_release_id": "2026-11-22.6"
+  },
+  "public": {
+    "build": "5dc63fbcf19634a55c66",
+    "manifest_sha256": "11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+    "receipt_sha256": "315da558284b19a9eb0f028311586a075c4d52e2f062ae92a00e184223a74d2e"
+  },
+  "cohort": {
+    "model": "gpt-6.2-sol",
+    "reasoning_effort": "ultra",
+    "workers": [
+      "retest9_market",
+      "retest9_visual",
+      "retest9_work_matrix",
+      "retest9_work_sources",
+      "retest9_research",
+      "retest9_release",
+      "retest9_companies",
+      "retest9_navigation",
+      "retest9_daily",
+      "retest9_accessibility"
+    ]
+  },
+  "workflow_runs": {
+    "Browser QA": {
+      "id": 45025749310,
+      "html_url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45025749310",
+      "conclusion": "failure"
+    },
+    "CI": {
+      "id": 45025749378,
+      "html_url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45025749378",
+      "conclusion": "success"
+    }
+  },
+  "coverage": {
+    "candidate_acceptance": 86,
+    "public_acceptance": 86,
+    "local_browser_cases": 153,
+    "local_unexpected_or_flaky": [
+      {
+        "file": "company-handoff.spec.js",
+        "project": "chromium",
+        "title": "Explore shortlist restores the initiating Compare after editing and reloading the comparison",
+        "result": "unexpected"
+      }
+    ],
+    "explore_hashes": 285,
+    "desktop_and_phone_visits": 570,
+    "work_selections": 70,
+    "work_csv_downloads": 210,
+    "native_company_profiles": 55,
+    "research_rows": 17763,
+    "original_archive_file_checksums": 56,
+    "work_dispositions": 33,
+    "afterquery_exact_pairs": 25,
+    "daily_filter_combinations": 100
+  },
+  "release_decision": {
+    "published": false,
+    "provider_version_created": false,
+    "reason": "Companies shortlist Back scroll failed the official desktop browser projects and the exact local browser suite.",
+    "checked_utc": "2026-11-22T13:20:55.214397+00:00",
+    "head": "b54e40a5700262e7ca0fad4d3061f9e2e30bec30",
+    "build": "6637c48a4c2a9cd6000e",
+    "manifest_sha256": "aeaf890fad5f99b385fc188c8512580206198553e5d3cd190342171d872abdcc"
+  },
+  "receipt_sha256": {
+    "work-matrix/matrix-summary.json": "3f80021691df7cd20613f5cda7b06a915d4d64ff5dcda279c3189c54bb90d11b",
+    "work-matrix/recovery-summary.json": "69456821b4f4f3d4d1c583be254ef1f8d28ff6076829a0f514c43014cfeaff85",
+    "work-sources/public-assessment.json": "d2479dbef079025ea51925c984a8b3f500a47e6613d65a5295f73372ae575b39",
+    "release/report.md": "cea08416671d5ec8b42b61b822ad6c38e3a3fc218c28b98d4003a9e5a471d777",
+    "release/head-b54e40a5/official-workflows.json": "e2061f30d5a19f101f75548e0d0f1b3671aa6e54a90a31fe9b86dd9adb9cc33b",
+    "release/ci-measurements.json": "906f5c4a3f48974c764241c67e0c305ae45f0ce2fafb3d02f756d6b99728aa9f",
+    "visual/report.md": "1bbaf322da83d713a12fa7e6ff943db42e879ad040e52c6144f5d42da36f1ec6",
+    "market/ninth-market-validated.json": "73f06662b35cf324d3c16be33d00796da253562efa499199e842ae8bf8b63b60",
+    "navigation/summary.json": "5eb6d99e42c465046c04641af2d8a7293e81cf1ed243f219ea55fa1936cd3c33",
+    "research/byte-parity.json": "ecce63f9764b863651aa3bb38dfe1e18630553fd6459180ffb4fb02cfeb7aac5",
+    "research/hosting-http.json": "01bbc6ff3af3b8df930e5d735c18c15a5b5b0a06a18f996be36c94f8a3797cb8",
+    "research/hosting-0.json": "1c1f0add6e4afc52d02c0e8c595d61912da79729bfc6d617fb71650117a7ddd5",
+    "companies/parity.json": "b374c395db1abfda6543935fb65b9a9538f5086166576d02c2cc4d87bd00159f",
+    "companies/findings.md": "f3c9bb4383f23dc5adbcffe8a3ae987df1874f81267895c8572cf0a9eaa2a127",
+    "daily/summary.json": "0ca456c83d7103886b1e93dd41854e5a60d37cbc3c300afd4208f8dbd6b00820",
+    "daily/report.md": "173586df90be78ca8ac2c6e0a5acdee97e7f8e8a7e8d37dfc512604ff01068b3",
+    "accessibility/README.md": "84df1f2cf84c24135d23e400118ca88a4a313ea64f762412b7a0fb68f859584e",
+    "release/head-b54e40a5/ci-measurements.json": "c93a2374898e88a0c27a8e58ae26ce67f1404af2cda529d610f341bed570e55e",
+    "release/head-b54e40a5/browser-test-counts.json": "bd0f6fbfbe9a59740f45a09ff26d6c76e8ebb1f1dba43ba6de54345971a25399"
+  },
+  "acceptance_attempts": {
+    "acceptance": "724ecdf04ce3b7f68ff1edfe0b1ed44d10c4c304405f6dc388f1e6b151aad165",
+    "acceptance-second": "f296d45d3f01c6df113c6a7c23a19167c0e616e19f4c058994159d630b03d72a",
+    "acceptance-after-proxy": "975e6cd0e16249fdfd2017870b58f02974e813dbb9a5df9a87adb0756909ea8e",
+    "public-control-1316": "315da558284b19a9eb0f028311586a075c4d52e2f062ae92a00e184223a74d2e"
+  },
+  "external_observations": "Two temporary 503 responses from Snorkel caused the second local home check to fail. The later complete candidate and public runs each passed all 86 checks.",
+  "archive_note": "The original downloaded ZIP and deposited archive files retain their verified checksums. Opening the 22.47 MB archived evidence appendix in Firefox took 171 seconds under shared runner load. The current reader includes smaller linked evidence pages.",
+  "mobiles_on_pr_head": {
+    "headSha": "b54e40a5700262e7ca0fad4d3061f9e2e30bec30",
+    "buildId": "6637c48a4c2a9cd6000e",
+    "manifestSha256": "aeaf890fad5f99b385fc188c8512580206198553e5d3cd190342171d872abdcc",
+    "artifactId": 14756091560,
+    "archiveSha256": "c7442d12a119ef4036342bd4b23b7c97307256e73761abcd9bdfecf0c783941e",
+    "rawReportsVerified": 72,
+    "routesPassed": 24,
+    "passed": true,
+    "afterquery": {
+      "route": "/company/afterquery/",
+      "validRuns": 3,
+      "medians": {
+        "largest-contentful-paint": 1209.2984,
+        "total-blocking-time": 0,
+        "cumulative-layout-shift": 0
+      },
+      "passed": true
+    }
+  },
+  "official_browser_core": {
+    "planned": 1585,
+    "firstPass": 1462,
+    "passedOnRetry": 1,
+    "failedAfterRetry": 3,
+    "skipped": 119,
+    "retryAttempts": 4,
+    "totalFailedAttempts": 7
+  },
+  "official_accessibility": 60
+}

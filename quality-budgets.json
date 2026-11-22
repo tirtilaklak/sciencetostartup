@@ -10,6 +10,7 @@
     "routes": [
       "/",
       "/companies/",
+      "/company/afterquery/",
       "/explore/#companies",
       "/explore/#work",
       "/explore/#company/mercor/work",

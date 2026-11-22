@@ -19,21 +19,22 @@ function environment({visibility='visible',animation=true,transport=null}={}){
  const root={dataset:{},removeAttribute(){}};
  const document={visibilityState:visibility,documentElement:root,querySelectorAll(selector){return selector==='main>.view'?[nodes.get('profile-view'),nodes.get('companies-view'),nodes.get('work-view')]:[];}};
  const window={},location={hash:'#company/mercor/work'};
+ const pendingShortlistScroll=new AbortController();
  const context=vm.createContext({window,location,document,AbortController,DOMException,console:{warn:value=>failures.push(value)},
   setTimeout:(callback,delay)=>{const id=++next;timers.set(id,{callback,delay});return id;},clearTimeout:id=>timers.delete(id),
   $:id=>nodes.get(id),attr:value=>String(value),esc:value=>String(value),companies:{mercor:{name:'Mercor'}},profileIntroductionHTML:id=>'<p class="profile-summary">Sourced introduction '+id+'</p>',
   profileRouteCompany:id=>id,routeParts:()=>location.hash.slice(1).split('/'),
   presentationState:(state,reason='')=>{root.dataset.viewState=state;root.dataset.viewReason=reason;},
-  restoreSearchRouteControls(){},synchronousRoute(){rendered.push(location.hash);},
+  cancelShortlistScroll(){pendingShortlistScroll.abort();},restoreSearchRouteControls(){},synchronousRoute(){rendered.push(location.hash);},
   installResearchContext:payload=>installed.push(payload.companyId),
   companyContext:(id,signal)=>{calls.push({id,signal});return transport?transport(id,signal):Promise.resolve({companyId:id});},
   presentationIdentity:{companyDetails:{}},state:{selected:[],query:''},VIEW_ANCHORS:{},
-  workCriteriaForRoute:()=>({q:''}),searchContextPending:()=>false,applyWorkCriteria(){},pendingSearchRoute(){},
+  workCriteriaForRoute:()=>({q:''}),shortlistReturnState:()=>null,searchContextPending:()=>false,applyWorkCriteria(){},pendingSearchRoute(){},
   ensureHealthModule:()=>Promise.resolve(),fetchPresentation:()=>Promise.resolve({data:{}})
  });
  if(animation){context.requestAnimationFrame=callback=>{const id=++next;frames.set(id,callback);return id;};context.cancelAnimationFrame=id=>frames.delete(id);}
  vm.runInContext('let navigationGeneration=0,detailController=null;const detailCache=new Map();'+actual,context);
- return {context,document,window,location,nodes,root,timers,frames,calls,installed,rendered,failures,
+ return {context,document,window,location,nodes,root,timers,frames,calls,installed,rendered,failures,pendingShortlistScroll,
   route:()=>vm.runInContext('route({type:"hashchange"})',context),
   frame(){const entry=frames.entries().next().value;assert(entry,'No pending animation frame');frames.delete(entry[0]);entry[1]();},
   timer(delay=100){const entry=[...timers].find(([,timer])=>timer.delay===delay);assert(entry,'No pending timer '+delay);timers.delete(entry[0]);entry[1].callback();}
@@ -43,10 +44,12 @@ const results={};
 (async()=>{
  {
   let deliver;const e=environment({transport:()=>new Promise(resolve=>{deliver=resolve;})});let settled=false;
-  const ready=e.route();assert.equal(ready,e.window.APP_ROUTE_READY);ready.then(()=>{settled=true;});
+  const ready=e.route();assert.equal(e.pendingShortlistScroll.signal.aborted,true);assert.equal(ready,e.window.APP_ROUTE_READY);ready.then(()=>{settled=true;});
   assert.match(e.nodes.get('profile-view').innerHTML,/Sourced introduction mercor/);
   assert.equal(e.nodes.get('profile-view').attributes.get('aria-busy'),'true');
-  assert.equal(e.calls.length,0);e.frame();await flush();assert.equal(e.calls.length,0);assert.equal(settled,false);
+  for(let frameIndex=0;frameIndex<3;frameIndex++){
+   e.frame();await flush();assert.equal(e.calls.length,0);assert.equal(settled,false);
+  }
   e.frame();await flush();assert.equal(e.calls.length,1);assert.equal(settled,false);assert.equal(e.root.dataset.viewState,'loading');
   deliver({companyId:'mercor'});await ready;assert.deepEqual(e.installed,['mercor']);assert.deepEqual(e.rendered,['#company/mercor/work']);
   assert.equal(e.root.dataset.viewState,'ready');assert.equal(e.nodes.get('profile-view').attributes.has('aria-busy'),false);
@@ -80,7 +83,8 @@ const results={};
   results.same_hash_return_keeps_generation_guard=true;
  }
  {
-  let deliver;const e=environment({transport:()=>new Promise(resolve=>{deliver=resolve;})});const old=e.route();e.frame();e.frame();await flush();
+  let deliver;const e=environment({transport:()=>new Promise(resolve=>{deliver=resolve;})});const old=e.route();
+  while(e.frames.size){e.frame();await flush();}
   assert.equal(e.calls.length,1);e.location.hash='#companies';e.route();const current=e.window.APP_ROUTE_READY;await current;assert.equal(e.calls[0].signal.aborted,true);
   deliver({companyId:'mercor'});await old;assert.equal(e.installed.length,0);assert.deepEqual(e.rendered,['#companies']);assert.equal(e.window.APP_ROUTE_READY,current);
   results.late_response_after_navigation_never_installs=true;

@@ -1,0 +1,133 @@
+{
+  "schema_version": "research-source-recheck-v1",
+  "release_id": "research-2026-11-12.1",
+  "rechecks": [
+    {
+      "original_url": "https://www.trustscale.ai/assets/index-CUMNnpew.js",
+      "original_response_sha256": "4d4794da57f6c656a2b1a6c58156763e7d4a3d26c6135e04690d8e24246c3a19",
+      "checked_on": "2026-11-22",
+      "publisher_homepage": "https://www.trustscale.ai/",
+      "homepage_sha256": "a15cfb1c288b98e71949b9c157b49454c018ebf6c1383716e88a11166c591d2c",
+      "current_url": "https://www.trustscale.ai/assets/index-BPxQN8-8.js",
+      "current_response_sha256": "020a22f569571ea258fa9c4d2544fe0a5eca34fe3d4c777a86861c2adccc04d6",
+      "evidence": [
+        {
+          "claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.annotation-modalities",
+          "source_ids": [
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.humanus-heading",
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.humanus-services",
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.identity-article"
+          ],
+          "support_spans": [
+            {
+              "start": 1364317,
+              "end": 1364450,
+              "sha256": "11a8ef3a59376025536b7bdee39ea5afc263347ecd32c9cff4c5986811678758"
+            }
+          ]
+        },
+        {
+          "claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.current-rebrand",
+          "source_ids": [
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.identity-article"
+          ],
+          "support_spans": [
+            {
+              "start": 2312866,
+              "end": 2313237,
+              "sha256": "f1518a047fc57334e36a07e7518c015a0826d2e9e13be0b116b66a3b7f7040dd"
+            }
+          ]
+        },
+        {
+          "claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.expert-supervised-data",
+          "source_ids": [
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.humanus-heading",
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.humanus-services",
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.identity-article"
+          ],
+          "support_spans": [
+            {
+              "start": 1363570,
+              "end": 1363700,
+              "sha256": "ad3ea7c98edb8bfd9e9752ad4d78beb3196b15b89d0014d8fa4689a921bb8e49"
+            }
+          ]
+        },
+        {
+          "claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.golden-and-review-qa",
+          "source_ids": [
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.humanus-heading",
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.humanus-quality",
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.identity-article"
+          ],
+          "support_spans": [
+            {
+              "start": 1365874,
+              "end": 1365949,
+              "sha256": "14cfd48262b5b05935e5014e455d3b76b65d66a5359fb01f561eba54b1f1b99d"
+            },
+            {
+              "start": 1366240,
+              "end": 1366314,
+              "sha256": "45a8ab01f81ca50d3a5683f8bc0985e6390c2d6dbc35fab7101577059b7d8e4c"
+            },
+            {
+              "start": 1366568,
+              "end": 1366674,
+              "sha256": "958aada34570e260fc966cfd980944feb1069236f89f301fb67eaf4e46438af0"
+            },
+            {
+              "start": 1366952,
+              "end": 1367008,
+              "sha256": "06b72b8f41130b505d39a17d9848043b6184eac655d9f0ecbcf1ce3b470f80c9"
+            }
+          ]
+        },
+        {
+          "claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.human-preference-data",
+          "source_ids": [
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.humanus-heading",
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.humanus-services",
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.identity-article"
+          ],
+          "support_spans": [
+            {
+              "start": 1363198,
+              "end": 1363337,
+              "sha256": "10a07a21c2a0b00018166c2af1be3dd346878c488dc03132163812df13ba9230"
+            }
+          ]
+        },
+        {
+          "claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.independence-disclosure",
+          "source_ids": [
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.identity-article",
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.investor-paragraph"
+          ],
+          "support_spans": [
+            {
+              "start": 1454393,
+              "end": 1454513,
+              "sha256": "501fca2c23fea0a0470e6dfe97c8d4ed760b503eb89c9b41cecf670442b238d9"
+            }
+          ]
+        },
+        {
+          "claim_id": "repair.qualbinding.20261111.v1.candidate.cohort6.e2f.organization-processor-role",
+          "source_ids": [
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.identity-article",
+            "repair.qualbinding.20261111.v1.source.4d4794da57f6.privacy-summary-and-role"
+          ],
+          "support_spans": [
+            {
+              "start": 1839205,
+              "end": 1839527,
+              "sha256": "fb69763fc1ae3b0e9abee829e153d1cad98f03f5eae75dd789f7ff2e42c15eaa"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
