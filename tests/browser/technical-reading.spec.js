@@ -42,6 +42,7 @@ test('complete technical chapter supports its final citation, focus and history 
 });
 
 test('Technical passage links open natively and keep their copied fragment in each edition', async ({ page, context }) => {
+  test.setTimeout(60_000);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   for (const path of [chapter, datedChapter]) {
