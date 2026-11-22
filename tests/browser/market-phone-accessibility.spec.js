@@ -108,8 +108,9 @@ async function closeEvidence(page, dialog, button) {
 const unavailableEvidence = [
   {
     company: 'appen', signal: 'delivery', organization: 'Appen', metric: 'Paid delivery', value: '—',
-    name: /Appen · Expert activity · No reviewed public disclosure/,
-    heading: 'No reviewed public figure', description: /for Appen\. Missing is not zero\./,
+    name: /Appen · Paid delivery · No reviewed public disclosure/,
+    heading: 'No reviewed public figure', description: /paid delivery for Appen\. Missing is not zero\./,
+    dialogName: 'Appen · Paid delivery No reviewed public figure',
     profile: '#company/appen/traction',
   },
   {
@@ -120,9 +121,10 @@ const unavailableEvidence = [
   },
 ];
 
-async function expectUnavailableDialog(page, { heading, description, profile }) {
+async function expectUnavailableDialog(page, { heading, description, profile, dialogName }) {
   const dialog = page.locator('#bh-evidence-dialog');
   await expect(dialog.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+  if (dialogName) await expect(dialog).toHaveAccessibleName(dialogName);
   await expect(dialog.locator('.bh-lede')).toHaveText(description);
   await expect(dialog.getByRole('link', { name: 'Full company profile' })).toHaveAttribute('href', profile);
   await expect(dialog.getByRole('button', { name: 'Close figure details' })).toBeFocused();
@@ -176,6 +178,151 @@ test.describe('390px Chromium matrix', () => {
     await page.mouse.click(point.x, point.y);
     const dialog = await expectUnavailableDialog(page, figure);
     await closeEvidence(page, dialog, button);
+  });
+
+  test('Market skips the matrix body by keyboard and keeps its filters and position', async ({ page }) => {
+    await openMatrix(page);
+    const matrix = page.locator('.bh-coverage-disclosure');
+    const grid = matrix.locator('#bh-grid-wrap');
+    const skip = matrix.getByRole('button', { name: 'Skip to definitions and evidence limits', exact: true });
+    const method = page.locator('.bh-method');
+    const summary = method.locator(':scope > summary');
+    const search = matrix.getByRole('searchbox', { name: 'Find a company' });
+    const order = matrix.getByRole('combobox', { name: 'Order' });
+    const withFigures = matrix.getByRole('checkbox', { name: 'With public figures' });
+    const gridScroll = () => grid.evaluate(element => [element.scrollLeft, element.scrollTop]);
+    const historyLength = () => page.evaluate(() => history.length);
+
+    await expect(grid.locator('tbody :is(a, button)')).toHaveCount(234);
+    await tabTo(page, withFigures);
+    await page.keyboard.press('Tab');
+    await expect(skip).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(grid).toBeFocused();
+
+    await search.fill('a');
+    await order.selectOption('name');
+    await tabTo(page, withFigures);
+    await page.keyboard.press('Space');
+    await expect(withFigures).toBeChecked();
+    await page.keyboard.press('Tab');
+    await expect(skip).toBeFocused();
+    expect(await grid.evaluate(element => element.previousElementSibling === document.activeElement)).toBe(true);
+    const rows = await grid.locator('tbody th a').allTextContents();
+    expect(rows.length).toBeGreaterThan(1);
+    expect(rows.length).toBeLessThan(39);
+    const url = page.url();
+    const entries = await historyLength();
+    await grid.evaluate(element => element.scrollTo({ left: 40, top: 40, behavior: 'instant' }));
+    const position = await gridScroll();
+    expect(position).toEqual([40, 40]);
+
+    await page.keyboard.press('Enter');
+    await expect(summary).toBeFocused();
+    await expect(summary).toBeInViewport({ ratio: 1 });
+    expect(await summary.evaluate(element => {
+      const box = element.getBoundingClientRect();
+      return element.matches(':focus-visible')
+        && element.contains(document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2));
+    })).toBe(true);
+    await expect(method).not.toHaveAttribute('open', '');
+    await expect(matrix).toHaveAttribute('open', '');
+    await expect(search).toHaveValue('a');
+    await expect(order).toHaveValue('name');
+    await expect(withFigures).toBeChecked();
+    await expect(grid.locator('tbody th a')).toHaveText(rows);
+    await expect(page).toHaveURL(url);
+    expect(await historyLength()).toBe(entries);
+    expect(await gridScroll()).toEqual(position);
+
+    await page.keyboard.press('Enter');
+    await expect(method).toHaveAttribute('open', '');
+    await page.keyboard.press('Tab');
+    await expect(method.getByRole('link', { name: /^Download observations and calculations/ })).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(method.getByRole('link', { name: 'Research method', exact: true })).toBeFocused();
+  });
+
+  test('Market exposes the selected Cash order as grouped by reporting basis', async ({ page }) => {
+    await openMatrix(page);
+    const cash = page.locator('#bh-grid-head [data-bh-tab="cash"]');
+    const sortedHeader = page.locator('#bh-grid-head th[aria-sort]');
+    await expect(sortedHeader).toContainText('Organization');
+    await expect(sortedHeader).toHaveAttribute('aria-sort', 'other');
+    await tabTo(page, cash);
+    await page.keyboard.press('Enter');
+    await expect(cash).toBeFocused();
+    await expect(cash).toBeInViewport({ ratio: 0.5 });
+    const firstCashRows = await page.locator('#bh-matrix-body tr').evaluateAll(rows => rows.slice(0, 5).map(row => {
+      const cell = row.querySelector('td[data-bh-signal="cash"]');
+      return [row.querySelector('th a').textContent, cell.querySelector('b').firstChild.textContent, cell.dataset.state];
+    }));
+    expect(firstCashRows).toEqual([
+      ['RWS / TrainAI', '£33.7M', 'observed'],
+      ['TaskUs', '$180.3M', 'observed'],
+      ['Appen', '$44.71M', 'observed'],
+      ['micro1', '≈ 180', 'proxy'],
+      ['iMerit / EXL', '≈ 3,600', 'proxy'],
+    ]);
+    await expect(sortedHeader).toHaveCount(1);
+    await expect(sortedHeader).toContainText('Cash');
+    await expect(sortedHeader).toHaveAttribute('aria-sort', 'other');
+    const explanation = 'Figures run high to low within groups that share a measure and reporting basis, including currency.';
+    const status = page.locator('#bh-matrix-count');
+    await expect(status).toContainText(`Ordered by cash evidence. ${explanation}`);
+    await expect(cash).toHaveAccessibleDescription(await status.innerText());
+    await page.keyboard.press('Tab');
+    await expect(page.locator('#bh-matrix-body th a').first()).toBeFocused();
+  });
+
+  test('Market names all unavailable Paid delivery cells and dialogs for that column', async ({ page }) => {
+    await openMatrix(page);
+    await expect(page.getByRole('columnheader', { name: /^Paid delivery/ })).toBeVisible();
+    const unavailable = page.locator('#bh-matrix-body td[data-bh-signal="delivery"]:is([data-state="missing"], [data-state="n-a"])');
+    await expect(unavailable).toHaveCount(25);
+    await expect(unavailable.getByRole('button', { name: / · Paid delivery · / })).toHaveCount(25);
+    const cells = await unavailable.evaluateAll(nodes => nodes.map(cell => ({
+      company: cell.dataset.bhCompany,
+      organization: cell.parentElement.querySelector('th a').textContent,
+      nonprofit: cell.dataset.state === 'n-a',
+    })));
+
+    const dialog = page.locator('#bh-evidence-dialog');
+    for (const { company, organization, nonprofit } of cells) {
+      await test.step(organization, async () => {
+        const button = matrixButton(page, company, 'delivery');
+        const reason = nonprofit ? 'Nonprofit research: commercial measures are not applied' : 'No reviewed public disclosure. Missing is not zero.';
+        const title = nonprofit ? 'Not applied' : 'No reviewed public figure';
+        await expect(button).toHaveAccessibleName(`${nonprofit ? 'n/a · ' : ''}${organization} · Paid delivery · ${reason}`);
+        await expect(button).toHaveAttribute('aria-haspopup', 'dialog');
+        await button.press('Enter');
+        await expect(dialog).toHaveAccessibleName(`${organization} · Paid delivery ${title}`);
+        await expect(dialog.getByRole('heading', { name: title, exact: true })).toBeVisible();
+        await expect(dialog.locator('.bh-lede')).toContainText(organization);
+        await closeEvidence(page, dialog, button);
+      });
+    }
+
+    await page.locator('#bh-advanced > summary').press('Enter');
+    await expect(page.getByRole('tab', { name: 'Expert activity', exact: true })).toBeVisible();
+
+    const context = matrixButton(page, 'labelbox', 'delivery');
+    await expect(context).toHaveAccessibleName(/Alignerr knowledge contributors.*context only/);
+    await context.press('Enter');
+    await expect(dialog.locator('.bh-value')).toContainText('≥ 2.6M');
+    await closeEvidence(page, dialog, context);
+
+    const mercor = matrixButton(page, 'mercor', 'delivery');
+    await mercor.press('Enter');
+    await expect(dialog).toHaveAccessibleName('Mercor');
+    await expect(dialog.locator('.bh-measure-name')).toHaveText('Daily expert payouts');
+    await expect(dialog.locator('.bh-value')).toContainText('> $4M');
+    await expect(dialog.locator('.bh-facts')).toContainText('AI business / service line');
+    await dialog.getByText('Other dates', { exact: true }).press('Enter');
+    await dialog.getByRole('button', { name: /> \$2M/ }).press('Enter');
+    await expect(dialog.locator('.bh-value')).toContainText('> $2M');
+    await expect(dialog.locator('.bh-facts')).toContainText('Whole company');
+    await closeEvidence(page, dialog, mercor);
   });
 });
 
