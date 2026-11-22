@@ -16,7 +16,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 from schema_def import SCHEMA, TABLES
-from frontend_packaging import ESBUILD_VERSION, package_frontend
+from frontend_packaging import ESBUILD_VERSION, optional_script_source, package_frontend
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIDENCE = {"U": 0, "C": 1, "B": 2, "A": 3}
@@ -711,6 +711,15 @@ def lazy_data(name, value):
     return "lazy(" + json.dumps(name) + ",'" + script_safe(text) + "');"
 
 
+def write_script_asset(destination, family, content):
+    digest = hashlib.sha256(content)
+    name = f"js/{family}.{digest.hexdigest()[:12]}.js"
+    path = destination / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(content)
+    return {"href": "/" + name, "sha256": digest.hexdigest(), "integrity": "sha256-" + base64.b64encode(digest.digest()).decode("ascii"), "bytes": len(content)}
+
+
 def write_business_health_module(destination, build_id):
     """Emit a classic factory without running the workbench or touching the DOM."""
     deferred = "\n".join((ROOT / 'web' / name).read_text() for name in ('detail-views.js', 'source-update-details.js', 'profile-details.js', 'business-health.js'))
@@ -719,12 +728,18 @@ def write_business_health_module(destination, build_id):
     # Independent classic transforms can generate similarly named helpers.
     # Isolate this module's minifier helpers; its public API is on window.
     content = ("(()=>{" + transformed + "})();\n").encode("utf-8")
-    digest = hashlib.sha256(content)
-    name = "js/health." + digest.hexdigest()[:12] + ".js"
-    path = destination / name
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(content)
-    return {"href": "/" + name, "sha256": digest.hexdigest(), "integrity": "sha256-" + base64.b64encode(digest.digest()).decode("ascii"), "bytes": len(content)}
+    return write_script_asset(destination, "health", content)
+
+
+def write_native_work_module(destination, work_data, companies):
+    from presentation import work_native_selection
+    rows = work_native_selection(work_data, {company["id"]: company for company in companies})
+    payload = json.dumps(rows, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    source = "window.WORK_NATIVE_SELECTION=" + script_safe(payload) + ";\n" + optional_script_source(ROOT, "work-page.js")
+    content = source.encode("utf-8")
+    # Cached Work pages still request this compatibility URL.
+    (destination / "work-page.js").write_bytes(content)
+    return write_script_asset(destination, "work", content)
 
 
 def presentation_preload_config(summary, aliases):
@@ -850,7 +865,7 @@ def build(data, destination):
     if release_path.exists() and data["dataset_version"] == SIDECAR_DATASET_VERSION:
         from editorial_work import load_editorial_release
         release = load_editorial_release(release_path, work_data, data)
-    from presentation import build_presentation, public_logo_provenance, work_native_selection, work_search_titles, write_asset
+    from presentation import build_presentation, public_logo_provenance, work_search_titles, write_asset
     summary, summary_asset = build_presentation(data, destination, ROOT, sidecars, release, daily_context=daily_context)
     original_summary = destination / summary_asset["href"].lstrip("/")
     from current_companies import company_path
@@ -862,7 +877,8 @@ def build(data, destination):
     from public_identity import load_identity
     identity = load_identity()
     summary["correctionIntake"] = {"origin": identity["origin"], "issueUrl": identity["contacts"]["issues"].removesuffix("/choose")}
-    summary["modules"] = {"businessHealth": write_business_health_module(destination, summary["buildId"])}
+    summary["modules"] = {"businessHealth": write_business_health_module(destination, summary["buildId"]),
+                          "nativeWork": write_native_work_module(destination, work_data, data["companies"])}
     summary_asset = write_asset(destination, "summary", summary)
     # The pre-module intermediate is not an extra public presentation generation.
     if original_summary != destination / summary_asset["href"].lstrip("/"):
@@ -904,18 +920,11 @@ def build(data, destination):
     (destination / "profile-content.json").write_text(json.dumps(profile_content, indent=2, ensure_ascii=False) + "\n")
     if current_companies and (ROOT / "data/current-companies.json").exists():
         (destination / "current-companies.json").write_text(json.dumps(current_companies, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
-    for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js", "page-layout.css", "native-details.js", "companies-page.css", "companies-page.js", "work-page.css", "work-page.js", "method-page.css", "method-correction.js", "company-profile.css", "daily-scan.css", "daily-scan.js"):
+    for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js", "page-layout.css", "native-details.js", "companies-page.css", "companies-page.js", "work-page.css", "method-page.css", "method-correction.js", "company-profile.css", "daily-scan.css", "daily-scan.js"):
         path = ROOT / "web" / name
         if path.exists():
-            if name in ("home-search.js", "companies-page.js", "work-page.js"):
-                from frontend_packaging import optional_script_source
-                source = optional_script_source(ROOT, name)
-                if name == "work-page.js":
-                    companies_by_id = {company["id"]: company for company in data["companies"]}
-                    rows = work_native_selection(work_data, companies_by_id)
-                    payload = json.dumps(rows, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
-                    source = "window.WORK_NATIVE_SELECTION=" + script_safe(payload) + ";\n" + source
-                (destination / name).write_text(source)
+            if name in ("home-search.js", "companies-page.js"):
+                (destination / name).write_text(optional_script_source(ROOT, name))
             else:
                 shutil.copy2(path, destination / name)
     html = html.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{GROUP_COUNT}}", str(len({e["primary_offering"] for e in editorial["entries"]})))
@@ -934,7 +943,7 @@ def build(data, destination):
     from static_pages import write_static_pages
     write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events,
                        link_health=link_health, business_health=health, current_companies=current_companies,
-                       work_results=summary["workResults"])
+                       work_results=summary["workResults"], work_script=summary["modules"]["nativeWork"])
     if research_context is not None:
         from research_graph import write_exports
         from research_citations import write_publication_assets, publication_asset_inventory

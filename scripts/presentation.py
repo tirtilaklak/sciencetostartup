@@ -170,7 +170,7 @@ def retain_runtime_generations(root, destination):
         summary_names = families.get(("presentation", "summary"), [])
         if len(summary_names) != 1 or any(len(families.get(("js", family), [])) != 1 for family in ("app", "data", "health")):
             raise ValueError("Retained generation requires one summary and app/data/health assets")
-        if {family for directory, family in families if directory == "js"} != {"app", "data", "health"}:
+        if {family for directory, family in families if directory == "js"} - {"app", "data", "health", "work"}:
             raise ValueError("Unexpected retained runtime module")
         summary_name = summary_names[0]
         summary = documents[summary_name]
@@ -228,6 +228,11 @@ def retain_runtime_generations(root, destination):
         health_prefix = '(()=>{window.SCIENCE_HEALTH_MODULE={buildId:' + json.dumps(summary["buildId"]) + ','
         if not payloads[health_name].decode("utf-8").startswith(health_prefix):
             raise ValueError("Retained health module build identity differs")
+        work_names = families.get(("js", "work"), [])
+        if work_names or "nativeWork" in summary["modules"]:
+            work_script = summary["modules"].get("nativeWork")
+            if len(work_names) != 1 or not isinstance(work_script, dict) or work_script.get("href") != "/" + work_names[0]:
+                raise ValueError("Retained native Work module descriptor differs")
         if set(payloads) != referenced | {summary_name, data_name, families[("js", "app")][0]}:
             raise ValueError("Retained runtime dependency closure is incomplete")
         merged.update(payloads)

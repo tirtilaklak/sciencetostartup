@@ -169,7 +169,7 @@ def retention(repo, plan):
     summary = manifest["summary"]
     first = runtime_name(summary["href"].removeprefix("/"))
     queue, current, contents = [first], {}, {}
-    # app/data are HTML entrypoints; the summary can reference only health.js.
+    # App and data are HTML entrypoints. The summary references deferred modules.
     for page in ("index.html", "explore/index.html"):
         html = blob(repo, baseline, "dist/" + page)
         require(digest(html) == manifest["sha256"][page], "baseline_html_digest")

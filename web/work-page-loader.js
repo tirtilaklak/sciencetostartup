@@ -1,6 +1,7 @@
 /* Start the one native enhancer request while the document is still parsing. */
 (() => {
   const root = document.documentElement;
+  const { workScript, workIntegrity } = document.currentScript.dataset;
   const params = new URLSearchParams(location.search);
   const valid = (key, values) => values.includes(params.get(key));
   const hasOptions = valid('kind', ['named', 'programs', 'boards', 'outside', 'closed'])
@@ -10,7 +11,7 @@
     || valid('sort', ['hourly', 'checked']);
   const filtered = Boolean(params.get('q')?.slice(0, 256).trim() || hasOptions || params.get('view') === 'compare');
   const initialHash = location.hash;
-  let current, attempts = 0, deadline, interacted = false;
+  let current, attempts = 0, deadline, interacted = false, retryHadFocus = false;
 
   for (const type of ['wheel', 'keydown', 'touchstart', 'pointerdown']) {
     addEventListener(type, event => { if (event.isTrusted) interacted = true; }, { capture: true, passive: true, once: true });
@@ -37,6 +38,9 @@
     message.textContent = state === 'pending' ? 'Applying your filters…'
       : state === 'failed' ? 'Filters did not load. Showing the full directory.' : '';
     retry.hidden = state !== 'failed';
+    if (state === 'failed' && retryHadFocus && document.activeElement === document.body) {
+      retry.focus({ preventScroll: true });
+    }
     if (!status.hidden && target && !interacted && initialHash === location.hash) {
       requestAnimationFrame(() => target.scrollIntoView({ block: 'start', behavior: 'instant' }));
     }
@@ -61,10 +65,12 @@
     setState('failed');
   }
 
-  function start() {
+  function start(event) {
+    retryHadFocus = event?.currentTarget === document.activeElement;
     setState(filtered ? 'pending' : 'loading');
     const script = document.createElement('script');
-    script.src = '/work-page.js' + (attempts ? '?s2s_retry=' + attempts + '-' + Date.now() : '');
+    script.integrity = workIntegrity;
+    script.src = workScript + (attempts ? '?s2s_retry=' + attempts + '-' + Date.now() : '');
     attempts++;
     current = script;
     script.onerror = () => fail(script);

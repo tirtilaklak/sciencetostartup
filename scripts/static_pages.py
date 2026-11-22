@@ -976,7 +976,7 @@ def page_node(page_type, title, description, canonical, modified, crumbs, **extr
     return node
 
 
-def document(research, title, description, canonical, body, structured=None, current=None, state="page", robots="", note=""):
+def document(research, title, description, canonical, body, structured=None, current=None, state="page", robots="", note="", work_script=None):
     """One static page: its head tags, the site header, the body and the footer."""
     head = ['<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<meta name="color-scheme" content="light">\n',
             f"<title>{escape(title)}</title>\n<meta name=\"description\" content=\"{escape(description)}\">\n"]
@@ -984,9 +984,10 @@ def document(research, title, description, canonical, body, structured=None, cur
     if canonical: head.append(f'<link rel="canonical" href="{escape(canonical)}">\n')
     if canonical == ORIGIN + '/companies/':
         head.append('<script>document.documentElement.setAttribute("data-page-enhancement","pending");addEventListener("error",function(event){if(event.error||event.target.hasAttribute&&event.target.hasAttribute("data-page-enhancement-script"))document.documentElement.removeAttribute("data-page-enhancement")},true)</script>\n')
-    if canonical == ORIGIN + '/work/':
+    if work_script is not None:
         loader = (ROOT / "web/work-page-loader.js").read_text(encoding="utf-8")
-        head.append(f'<script>{loader}</script>\n')
+        head.append(f'<script data-work-script="{escape(work_script["href"])}" '
+                    f'data-work-integrity="{escape(work_script["integrity"])}">{loader}</script>\n')
     head.append(ICON_LINKS)
     if canonical:
         head.append(f'<meta property="og:type" content="website">\n<meta property="og:title" content="{escape(title)}">\n<meta property="og:description" content="{escape(description)}">\n<meta property="og:url" content="{escape(canonical)}">\n<meta property="og:site_name" content="{SITE_NAME}">\n<meta property="og:locale" content="en_US">\n'
@@ -1773,7 +1774,7 @@ def work_table(research, rows, names, key):
     return f'<ul class="work-listings">{"".join(out)}</ul>\n'
 
 
-def render_work(research, routes, names, modified, work_results=None):
+def render_work(research, routes, names, modified, work_results=None, work_script=None):
     canonical = f"{ORIGIN}/work/"
     rows = [r for r in routes if r.get("company_id") in names]
     count, companies = len(rows), len({r["company_id"] for r in rows})
@@ -1824,7 +1825,7 @@ def render_work(research, routes, names, modified, work_results=None):
             body.append(f'<details class="work-page-group work-page-secondary" data-work-group="{key}"><summary>{label} <span>{len(buckets[key])}</span></summary>{contents}</details>\n')
     body.append('</div><p class="work-page-more"><a href="/explore/#work" data-work-explore>Compare pay and download results</a></p>')
     structured = page_node("CollectionPage", title, description, canonical, modified, crumbs)
-    return document(research, title, description, canonical, "".join(body), structured, current="work")
+    return document(research, title, description, canonical, "".join(body), structured, current="work", work_script=work_script)
 
 
 DOWNLOADS = (("research.json", "JSON", "application/json", "The core research data in one file"), ("observatory.sqlite", "SQLite", "application/vnd.sqlite3", "The same data as one database file"),
@@ -1955,7 +1956,7 @@ def read_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8")) if Path(path).is_file() else None
 
 
-def write_static_pages(data, destination, work_data=None, profile_content=None, editorial=None, events=None, link_health=None, root=ROOT, business_health=None, current_companies=None, work_results=None):
+def write_static_pages(data, destination, work_data=None, profile_content=None, editorial=None, events=None, link_health=None, root=ROOT, business_health=None, current_companies=None, work_results=None, work_script=None):
     """Write /company/<id>/, /companies/, /work/, /method/, 404.html and sitemap.xml.
     `events` is the company events sidecar and `link_health` the link checks, both as the build validated them."""
     destination, root = Path(destination), Path(root)
@@ -1993,7 +1994,7 @@ def write_static_pages(data, destination, work_data=None, profile_content=None, 
     work_modified = latest(research.as_of, SITE_REVISED, *(d for r in routes for d in route_dates(r))) or research.as_of
     method_modified = latest(research.as_of, SITE_REVISED) or research.as_of
     sizes = {path.name: file_size(path.stat().st_size) for path in sorted(destination.iterdir()) if path.is_file() and (path.suffix == ".csv" or path.name in {d[0] for d in DOWNLOADS})}
-    pages = {"companies": render_index(research, by_name, editorial_by_id, labels, sum(1 for r in routes if work_primary(r)), index_modified, business_health, profile_by_id, (current_companies or {}).get("entries", []), (current_companies or {}).get("reviewed_on", "")), "work": render_work(research, routes, names, work_modified, work_results), "method": render_method(research, sizes, method_modified)}
+    pages = {"companies": render_index(research, by_name, editorial_by_id, labels, sum(1 for r in routes if work_primary(r)), index_modified, business_health, profile_by_id, (current_companies or {}).get("entries", []), (current_companies or {}).get("reviewed_on", "")), "work": render_work(research, routes, names, work_modified, work_results, work_script), "method": render_method(research, sizes, method_modified)}
     for name, page in pages.items():
         (destination / name).mkdir(parents=True, exist_ok=True)
         (destination / name / "index.html").write_text(page, encoding="utf-8")
