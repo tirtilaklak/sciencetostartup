@@ -29,7 +29,7 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
     def test_release_binds_exact_work_bytes_and_unchanged_frozen_canonical(self):
         self.assertEqual(hashlib.sha256((ROOT / "data/canonical.json").read_bytes()).hexdigest(),
                          "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061")
-        self.assertEqual(self.release["release_id"], "2026-11-22.6")
+        self.assertEqual(self.release["release_id"], "2026-11-22.7")
         self.assertEqual(self.release["as_of"], "2026-11-22")
         self.assertEqual(self.release["work_routes_sha256"],
                          hashlib.sha256((ROOT / "data/work-routes.json").read_bytes()).hexdigest())
@@ -106,8 +106,11 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
         employer_url = "https://ooakdata.com/careers?job_id=114405#job"
         original_url = "https://www.ycombinator.com/companies/ooak-data/jobs/Gr7Gc1x-data-quality-specialist"
         self.assertEqual(row["status"], "listed")
+        self.assertEqual(row["route_kind"], "named_listing")
         self.assertTrue(row["listed_on_current_company_board"])
-        self.assertEqual(row["availability_label"], "Application access unconfirmed")
+        self.assertEqual(row["availability_label"], "Application link returned 404")
+        self.assertIn("OOAK still lists this role", row["availability_note"])
+        self.assertIn("Application access remains unconfirmed", row["availability_note"])
         self.assertTrue(work_uncertain(row))
         self.assertEqual(row["url"], employer_url)
         self.assertEqual(row["research_record"]["route"]["url"], original_url)
@@ -133,6 +136,8 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
         self.assertTrue(employer_receipt["approved"])
         self.assertEqual(employer_receipt["scope"], "field_review")
         self.assertNotIn("approved_terms_receipt_id", review)
+        self.assertNotIn("disposition", review)
+        self.assertNotIn("status_review", review)
         for field, binding in row["field_reviews"].items():
             self.assertIn(field, employer_receipt["reviewed_fields"])
             self.assertEqual(binding["basis"], "direct_source")
@@ -146,17 +151,35 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
         self.assertEqual(archived["last_route_check"]["http_status"], 404)
         self.assertEqual(row["last_route_check"]["url"], employer_url)
         self.assertEqual(row["last_route_check"]["http_status"], 200)
+        self.assertEqual(row["last_route_check"]["checked_at"], "2026-11-22T12:26:53Z")
         application = row["last_route_check"]["application_check"]
         self.assertEqual((application["url"], application["http_status"], application["result"]),
-                         ("https://www.workatastartup.com/jobs/114405", 406, "unavailable"))
-        sign_in, = row["last_route_check"]["application_checks"]
+                         ("https://www.workatastartup.com/jobs/114405", 404, "not_found"))
+        self.assertEqual(application["checked_at"], "2026-11-22T12:56:45Z")
+        self.assertEqual(application["response_sha256"], "56d3c2c604c259de804e820a8c43bb17f32feed21dd35c0e76612b7539c2af2d")
+        self.assertEqual(application["rendered_observation"]["http_status"], 404)
+        self.assertEqual(application["rendered_observation"]["visible_text_sha256"],
+                         "920306a984462aa8b3dc6652ac996c8deb9218a86eaa5c1024b0e43101838b3e")
+        default_headers, sign_in = row["last_route_check"]["application_checks"]
+        self.assertEqual((default_headers["url"], default_headers["http_status"], default_headers["result"]),
+                         (application["url"], 406, "unavailable"))
+        self.assertEqual(default_headers["response_sha256"], hashlib.sha256(b"").hexdigest())
+        self.assertNotEqual(sign_in["url"], application["url"])
         self.assertEqual(sign_in["retrieval_reason"], "sign_in")
         self.assertEqual(sign_in["rendered_observation"]["url"], "https://account.ycombinator.com/")
-        for check in (application, sign_in):
-            receipt = next(item for item in review["receipts"] if item.get("url") == check["url"])
+        previous = prior_values(row, "application-link-404-2026-11-22.correction")
+        old_application = previous["last_route_check"]["application_check"]
+        self.assertEqual(old_application["http_status"], 406)
+        self.assertEqual(old_application["rendered_observation"]["http_status"], 503)
+        self.assertEqual(previous["last_route_check"]["application_checks"], [sign_in])
+        for check in (application, default_headers, sign_in, old_application):
+            receipt = next(item for item in review["receipts"] if item.get("url") == check["url"]
+                           and item["checked_at"] == check["checked_at"])
             self.assertEqual(receipt["scope"], "retrieval")
             self.assertFalse(receipt["approved"])
             self.assertEqual(sources[receipt["source_id"]]["url"], check["url"])
+            for key in ("http_status", "retrieval_reason", "response_sha256", "rendered_observation"):
+                self.assertEqual(receipt.get(key), check.get(key))
 
     def test_five_scoped_reviews_leave_full_terms_and_other_field_clocks_alone(self):
         reviewed = {"mercor.work.expert-network": "pay", "proximal.work.frontierswe-fellowship": "pay",

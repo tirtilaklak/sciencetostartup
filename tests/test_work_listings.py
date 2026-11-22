@@ -116,9 +116,12 @@ for(const route of routes){
 const ooak=byId['ooak.work.data-quality-specialist'];
 const ooakCard=run(`workCard(${JSON.stringify(ooak)})`);
 const [ooakPreview,ooakDetails]=ooakCard.split('<details class="w4-details">');
+assert.match(ooakPreview,/Application link returned 404/);
+assert.match(ooakPreview,/href="https:\/\/ooakdata\.com\/careers\?job_id=114405#job"[^>]*>Read employer listing/);
 assert.match(ooakPreview,/header says 6\+ years.*description says 4\+ years/);
 assert.match(ooakPreview,/Python, SQL and fluent English are required/);
 assert.match(ooakDetails,/Preferred experience includes privacy or de-identification/);
+assert.match(ooakDetails,/OOAK still lists this role\..*404 Page not found.*empty 406.*Y Combinator sign-in.*Application access remains unconfirmed/);
 const resolvedOoak={...ooak,requirements:['Python and fluent English.'],
  field_reviews:{...ooak.field_reviews,requirements:{state:'sourced'}}};
 assert.deepEqual(ids(`w4Requirements(${JSON.stringify(resolvedOoak)})`),['Fluent English']);
