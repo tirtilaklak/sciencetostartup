@@ -270,13 +270,17 @@
 
 .r-bulk-shortcuts{display:flex;flex-wrap:wrap;gap:0 18px;margin:4px 0 14px}
 .r-bulk-shortcuts a,.r-bulk-list a,[data-index-work] a{display:inline-flex;align-items:center;min-height:44px;overflow-wrap:anywhere}
+.r-passage-shortcuts,.r-passage-shortcuts ul{display:flex;flex-wrap:wrap;align-items:center;gap:0 18px;min-width:0}
+.r-passage-shortcuts span{color:var(--r-quiet)}
+.r-passage-shortcuts ul{list-style:none;margin:0;padding:0}
+.r-passage-shortcuts li{min-width:0;margin:0}
 .r-bulk-contents{margin:16px 0 28px}
 .r-bulk-contents summary{display:list-item;min-height:44px;width:fit-content;cursor:pointer}
 .r-bulk-list{max-block-size:min(46vh,24rem);overflow:auto;overscroll-behavior:contain;padding-inline-end:12px;border-bottom:1px solid var(--r-rule)}
 .r-bulk-list ol{padding-inline-start:1.5em}
 .r-bulk-section{margin:24px 0 44px}
-.r-bulk-target,#first-paragraph,#section-contents{scroll-margin-top:24px}
-.r-bulk-target:focus-visible,#first-paragraph:focus-visible{outline:2px solid var(--r-accent);outline-offset:4px}
+.r-bulk-target,.r-paragraph[id],#section-contents{scroll-margin-top:24px}
+:is(.r-bulk-target,.r-paragraph[id]):focus-visible{outline:2px solid var(--r-accent);outline-offset:4px}
 .r-paragraph-originals{font-size:13px;line-height:1.7;color:var(--r-quiet)}
 
 .r-book-reader .r-chapter{content-visibility:visible;contain:none;contain-intrinsic-size:none}
