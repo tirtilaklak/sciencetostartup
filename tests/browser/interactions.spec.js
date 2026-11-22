@@ -164,7 +164,9 @@ test('a failed query deep link preserves its literal query and offers retry and 
   await expect(page.locator('#work-search')).toHaveValue('C++');
   expect(await page.evaluate(() => location.hash)).toBe('#work?q=C%2B%2B');
   await expect(page.locator('#work-cards')).not.toContainText('No recorded matches');
-  await expect(page.locator('#work-cards a[href="/work/"]')).toBeVisible();
+  const native = page.locator('#work-cards').getByRole('link', { name: 'Open native Work results' });
+  await expect(native).toBeVisible();
+  await expect(native).toHaveAttribute('href', '/work/?q=C%2B%2B');
   blocked = false;
   await page.locator('[data-retry-search]').click();
   await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
@@ -172,18 +174,23 @@ test('a failed query deep link preserves its literal query and offers retry and 
   expect(await page.evaluate(() => location.hash)).toBe('#work?q=C%2B%2B');
 });
 
-test('failed global search has working browse actions and can retry the deferred index', async ({ page }) => {
+test('failed global search has working browse actions and can retry the deferred index', async ({ page, context }) => {
   let blocked = true;
   await page.route('**/presentation/full-search.*.json', route => blocked ? route.abort('failed') : route.continue());
   await ready(page);
   await page.locator('#site-search-open').click();
   await expect(page.locator('#site-search-message')).toContainText('Search could not load');
-  await page.locator('#site-search-message a[href="#companies"]').click();
-  await expect(page.locator('#site-search')).not.toBeVisible();
-  await expect(page.locator('#companies-view')).toBeVisible();
-  await page.locator('#site-search-open').click();
+  const message = page.locator('#site-search-message');
+  await expect(message.getByRole('link', { name: 'paid work' })).toHaveAttribute('href', '/work/');
+  const opened = context.waitForEvent('page');
+  await message.getByRole('link', { name: 'companies' }).click({ modifiers: ['ControlOrMeta'] });
+  const directory = await opened;
+  await expect(directory).toHaveURL(/\/companies\/$/);
+  await expect(directory.getByRole('heading', { level: 1, name: 'AI data companies' })).toBeVisible();
+  await directory.close();
   await page.locator('#site-search-input').fill('Python');
-  await expect(page.locator('#site-search-message')).toContainText('Search could not load');
+  await expect(message.getByRole('link', { name: 'companies' })).toHaveAttribute('href', '/companies/?q=Python');
+  await expect(message.getByRole('link', { name: 'paid work' })).toHaveAttribute('href', '/work/?q=Python');
   blocked = false;
   await page.locator('[data-retry-site-search]').click();
   await expect(page.getByRole('option', { name: /See all \d+ matches? for “Python”/ })).toBeVisible();
@@ -495,7 +502,7 @@ test('a pending profile keeps its sourced introduction while withholding evidenc
   await expect(page.locator('#profile-view')).toHaveAttribute('aria-busy', 'true');
   await expect(page.locator('.profile-summary')).toHaveText('Connects specialists with AI training and testing work. It also helps businesses put AI programs to work.');
   await expect(page.locator('[data-profile-loading-content]')).toContainText('Loading the sourced profile');
-  await expect(page.locator('[data-profile-loading-content] a')).toHaveAttribute('href', '/company/mercor/');
+  await expect(page.getByRole('link', { name: 'Read the plain paid work section' })).toHaveAttribute('href', '/company/mercor/#work');
   await expect(page.locator('.profile-tabs, .profile-archive, #profile-work')).toHaveCount(0);
   expect(await page.evaluate(() => window.COMPANY_CONTEXTS_READY.has('mercor'))).toBe(false);
   await page.evaluate(() => { window.pendingProfileIntroduction = document.querySelector('.profile-top'); });
@@ -539,16 +546,32 @@ test('slow stale company response cannot replace the new route', async ({ page }
   await expect(page.locator('#profile-view')).not.toBeVisible();
 });
 
+async function expectMercorWorkRecovery(page, reason) {
+  const profile = page.locator('#profile-view');
+  await expect(profile.getByRole('heading', { name: 'Evidence for Mercor could not load.' })).toBeVisible();
+  await expect(profile.getByRole('link', { name: 'Read the plain paid work section' })).toHaveAttribute('href', '/company/mercor/#work');
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'failed');
+  await expect(page.locator('html')).toHaveAttribute('data-view-reason', reason);
+}
+
+async function retryMercorWork(page) {
+  await page.getByRole('button', { name: 'Try again' }).press('Enter');
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  const work = page.locator('#profile-pane-work');
+  await expect(work).toBeVisible();
+  await expect(work).toBeFocused();
+}
+
 test('company detail failure provides retry and a readable fallback', async ({ page }) => {
   let broken = true;
   await page.route('**/company-mercor*.json', route => broken ? route.abort('failed') : route.continue());
   await page.goto('/explore/#company/mercor/work');
-  await expect(page.getByRole('heading', { name: 'This company’s evidence could not load.' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Read the plain company page' })).toHaveAttribute('href', '/company/mercor/');
+  await expectMercorWorkRecovery(page, 'evidence-request');
+  const fallback = await page.request.get('/company/mercor/');
+  expect(fallback.ok()).toBeTruthy();
+  expect(await fallback.text()).toContain('id="work"');
   broken = false;
-  await page.getByRole('button', { name: 'Try again' }).click();
-  await expect(page.locator('.profile-v2')).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  await retryMercorWork(page);
 });
 
 for (const mode of ['network failure', 'integrity mismatch']) {
@@ -561,15 +584,12 @@ for (const mode of ['network failure', 'integrity mismatch']) {
       return mode === 'network failure' ? route.abort('failed') : route.fulfill({ status: 200, contentType: 'application/javascript', body: 'window.UNTRUSTED_HEALTH_EXECUTED=true;' });
     });
     await page.goto('/explore/#company/mercor/work');
-    await expect(page.getByRole('heading', { name: 'This company’s evidence could not load.' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Read the plain company page' })).toHaveAttribute('href', '/company/mercor/');
+    await expectMercorWorkRecovery(page, 'evidence-request');
     expect(await page.evaluate(() => window.UNTRUSTED_HEALTH_EXECUTED)).toBeUndefined();
     expect(await page.evaluate(() => window.APP_HEALTH_READY)).toBeUndefined();
     const failedRequestCount = healthRequests.length;
     broken = false;
-    await page.getByRole('button', { name: 'Try again' }).click();
-    await expect(page.locator('.profile-v2')).toBeVisible();
-    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    await retryMercorWork(page);
     expect(await page.evaluate(() => window.APP_HEALTH_READY)).toBe(await page.evaluate(() => window.APP_BUILD_ID));
     expect(healthRequests.length).toBeGreaterThan(failedRequestCount);
     expect(new URL(healthRequests.at(-1)).pathname).toBe(new URL(healthRequests[0]).pathname);
@@ -608,14 +628,10 @@ test('an initially stalled financial module reaches its deadline and can retry',
   await expect(page.locator('html')).toHaveAttribute('data-view-state', 'loading');
   await expect(page.locator('script[data-presentation-module="business-health"]')).toHaveCount(1);
   await page.clock.fastForward(15_001);
-  await expect(page.getByRole('heading', { name: 'This company’s evidence could not load.' })).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('data-view-reason', 'evidence-timeout');
-  await expect(page.getByRole('link', { name: 'Read the plain company page' })).toHaveAttribute('href', '/company/mercor/');
+  await expectMercorWorkRecovery(page, 'evidence-timeout');
   blocked = false;
   release();
-  await page.getByRole('button', { name: 'Try again' }).click();
-  await expect(page.locator('.profile-v2')).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  await retryMercorWork(page);
   expect(await page.evaluate(() => window.APP_HEALTH_READY)).toBe(await page.evaluate(() => window.APP_BUILD_ID));
 });
 
@@ -660,15 +676,10 @@ test('an initially stalled profile times out with a plain-page fallback and reco
   await page.clock.runFor(2_000);
   await expect(page.locator('html')).toHaveAttribute('data-view-state', 'loading');
   await page.clock.fastForward(15_001);
-  await expect(page.getByRole('heading', { name: 'This company’s evidence could not load.' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Read the plain company page' })).toHaveAttribute('href', '/company/mercor/');
-  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'failed');
-  await expect(page.locator('html')).toHaveAttribute('data-view-reason', 'evidence-timeout');
+  await expectMercorWorkRecovery(page, 'evidence-timeout');
   blocked = false;
   release();
-  await page.getByRole('button', { name: 'Try again' }).click();
-  await expect(page.locator('.profile-v2')).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  await retryMercorWork(page);
 });
 
 test('a stalled initial profile reserves the viewport and keeps the footer below it', async ({ page }) => {

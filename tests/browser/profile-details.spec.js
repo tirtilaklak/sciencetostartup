@@ -121,11 +121,27 @@ test('a comparison keeps its exact peer request and retries the missing evidence
   await expect(page.locator('#compare-view h1')).toBeFocused();
 });
 
-test('a refused claim bookmark reopens the exact sources on keyboard retry', async ({ page, context, browserName, isMobile }) => {
-  const bookmark = '/explore/#company/a-team/claim/a-team.claim.total_funding';
+const fundingClaim = 'a-team.claim.total_funding';
+const fundingBookmark = '/explore/#company/a-team/claim/' + fundingClaim;
+const fundingCorrection = '#corrections?company=a-team&claim=' + fundingClaim;
+const correctionLink = page => page.locator('#evidence-dialog').getByRole('link', { name: 'Request a correction' });
+
+async function expectFundingCorrectionDrafts(page) {
+  await expect(page.locator('#corrections')).toBeFocused();
+  for (const [label, parameter] of [
+    ['Email a correction for this record', 'body'],
+    ['Start a public GitHub correction', 'target'],
+  ]) {
+    const draft = new URL(await page.getByRole('link', { name: label }).getAttribute('href'));
+    expect(draft.searchParams.get(parameter)).toContain('https://sciencetostartup.com' + fundingBookmark);
+    expect(draft.searchParams.get(parameter)).toContain(fundingClaim);
+  }
+}
+
+test('a refused claim bookmark reopens the exact sources on keyboard retry', async ({ page }) => {
   let refused = true;
   await page.route('**/presentation/company-a-team.*.json', route => refused ? route.abort() : route.continue());
-  await page.goto(bookmark);
+  await page.goto(fundingBookmark, { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: 'A.Team', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Read the plain company sources' })).toHaveAttribute('href', '/company/a-team/#sources');
 
@@ -135,43 +151,34 @@ test('a refused claim bookmark reopens the exact sources on keyboard retry', asy
   await expect(page.locator('#close-evidence')).toBeFocused();
   await expect(page.locator('#evidence-dialog [data-source-id]')).toHaveCount(3);
   await expect(page.locator('#evidence-dialog .evidence-data')).toContainText('Source checked');
-  expect(new URL(page.url()).pathname + new URL(page.url()).hash).toBe(bookmark);
+  expect(new URL(page.url()).pathname + new URL(page.url()).hash).toBe(fundingBookmark);
 
-  const correction = page.locator('#evidence-dialog').getByRole('link', { name: 'Request a correction' });
-  const target = '#corrections?company=a-team&claim=a-team.claim.total_funding';
-  await expect(correction).toHaveAttribute('href', target);
-  const expectDrafts = async tab => {
-    await expect(tab.locator('#corrections')).toBeFocused();
-    for (const [label, parameter] of [
-      ['Email a correction for this record', 'body'],
-      ['Start a public GitHub correction', 'target'],
-    ]) {
-      const draft = new URL(await tab.getByRole('link', { name: label }).getAttribute('href'));
-      expect(draft.searchParams.get(parameter)).toContain('https://sciencetostartup.com' + bookmark);
-      expect(draft.searchParams.get(parameter)).toContain('a-team.claim.total_funding');
-    }
-  };
+  await expect(correctionLink(page)).toHaveAttribute('href', fundingCorrection);
+  await correctionLink(page).press('Enter');
+  await expectFundingCorrectionDrafts(page);
+  await page.goBack();
+  await expect(page.locator('#close-evidence')).toBeFocused();
+  expect(new URL(page.url()).hash).toBe(new URL(fundingBookmark, page.url()).hash);
+  await page.goForward();
+  await expectFundingCorrectionDrafts(page);
+});
+
+test('the correction address restores the exact claim drafts in a fresh tab and on reload', async ({ page, context, browserName, isMobile }) => {
+  await page.goto(fundingBookmark, { waitUntil: 'domcontentloaded' });
+  const correction = correctionLink(page);
+  await expect(correction).toHaveAttribute('href', fundingCorrection);
   let coldTab;
   if (browserName === 'chromium' && !isMobile) {
     [coldTab] = await Promise.all([context.waitForEvent('page'), correction.click({ modifiers: ['ControlOrMeta'] })]);
   } else {
     coldTab = await context.newPage();
-    await coldTab.goto(new URL(await correction.getAttribute('href'), page.url()).href);
+    await coldTab.goto(new URL(await correction.getAttribute('href'), page.url()).href, { waitUntil: 'domcontentloaded' });
   }
-  await expectDrafts(coldTab);
-  await coldTab.reload();
-  await expectDrafts(coldTab);
-  await coldTab.goto('/explore/#corrections?company=mercor&claim=a-team.claim.total_funding');
+  await expectFundingCorrectionDrafts(coldTab);
+  await coldTab.reload({ waitUntil: 'domcontentloaded' });
+  await expectFundingCorrectionDrafts(coldTab);
+  await coldTab.goto('/explore/#corrections?company=mercor&claim=' + fundingClaim);
   await expect(coldTab.getByRole('link', { name: 'Email a correction for this record' })).toHaveCount(0);
   const genericIssue = new URL(await coldTab.getByRole('link', { name: 'Start a public GitHub correction' }).getAttribute('href'));
   expect(genericIssue.searchParams.get('target')).toBeNull();
-  await coldTab.close();
-
-  await correction.press('Enter');
-  await expectDrafts(page);
-  await page.goBack();
-  await expect(page.locator('#close-evidence')).toBeFocused();
-  expect(new URL(page.url()).hash).toBe(new URL(bookmark, page.url()).hash);
-  await page.goForward();
-  await expectDrafts(page);
 });

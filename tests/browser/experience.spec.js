@@ -48,13 +48,13 @@ test('current discovery and historical downloads keep distinct identity and work
   await expect(page.locator('.site-footer').getByRole('link', { name: 'Research data', exact: true })).toHaveAttribute('href', /\/research\/data\/$/);
 });
 
-test('opened source context and decision-critical metadata reflow at 320 pixels', async ({ page }, info) => {
+test('opened company source context and metadata reflow at 320 pixels', async ({ page }, info) => {
   await page.setViewportSize({ width: 320, height: 800 });
   let companyViewport;
   const parentScoped = registry.entries.find(entry => entry.parent_company);
   const longTitle = [...registry.entries].sort((a, b) => Math.max(...b.sources.map(source => source.title.length)) - Math.max(...a.sources.map(source => source.title.length)))[0];
   for (const entry of [...new Set([parentScoped, longTitle].filter(Boolean))]) {
-    await page.goto('/companies/?q=' + encodeURIComponent(entry.name));
+    await page.goto('/companies/?q=' + encodeURIComponent(entry.name), { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#company-query')).toHaveCSS('font-size', '16px');
     await expect(page.locator('#company-group')).toHaveCSS('font-size', '16px');
     const card = page.locator('[data-company="' + entry.entity_id + '"]');
@@ -69,19 +69,28 @@ test('opened source context and decision-critical metadata reflow at 320 pixels'
       companyViewport = await page.screenshot({ fullPage: false, animations: 'disabled', scale: 'css' });
     }
   }
-  await page.goto('/company/mercor/');
+  await page.goto('/company/mercor/', { waitUntil: 'domcontentloaded' });
   await page.locator('#financial-record > summary').click();
   for (const label of await page.locator('.company-fact-label,.company-fact-meta,.company-fact-source,.company-current-fact .sub').all()) {
     await expect(label).toHaveCSS('font-size', '14px');
   }
   await fitsViewport(page.locator('#financial-record p,#financial-record th,#financial-record td,.company-key-facts'));
-  await page.goto('/work/?q=Research%20Engineer');
+  if (companyViewport) await info.attach(`company-context-320-${info.project.name}.png`, { body: companyViewport, contentType: 'image/png' });
+});
+
+test('opened Work terms and archived pay reflow at 320 pixels', async ({ page }, info) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto('/work/?q=Research%20Engineer', { waitUntil: 'domcontentloaded' });
   const conflict = page.locator('[data-work-route="afterquery.work.research-engineer"]');
-  await expect(conflict).toContainText('Pay period not stated');
+  await expect(conflict.locator('.work-pay')).toContainText('Pay period not stated');
+  await expect(conflict.locator('.work-pay')).toContainText('$210K–$450K');
+  await expect(conflict.locator('.work-pay')).toContainText('$250K–$450K total compensation + equity');
   await expect(conflict.locator('.work-reviewed')).toHaveCSS('font-size', '14px');
-  await conflict.locator('.work-terms > summary').click();
-  await expect(conflict.locator('.work-terms')).toContainText('$210K');
-  await expect(conflict.locator('.work-terms')).toContainText('$250K');
+  await conflict.locator('.work-terms > summary').press('Enter');
+  const quote = conflict.locator('.work-terms blockquote');
+  await expect(quote).toBeVisible();
+  await expect(quote).toContainText('$210K – $450K');
+  await expect(quote).toContainText('$250k-450k total compensation + equity');
   await fitsViewport(conflict.locator('h3,p,li,blockquote,a'));
   const review = await conflict.locator('.work-reviewed').boundingBox();
   const action = await conflict.locator('.work-listing-action').boundingBox();
@@ -93,7 +102,5 @@ test('opened source context and decision-critical metadata reflow at 320 pixels'
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(321);
   await conflict.locator('h3').scrollIntoViewIfNeeded();
   const workViewport = await page.screenshot({ fullPage: false, animations: 'disabled', scale: 'css' });
-  // Attach the captured checkpoints only after the complete functional check passes.
-  if (companyViewport) await info.attach(`company-context-320-${info.project.name}.png`, { body: companyViewport, contentType: 'image/png' });
   await info.attach(`work-pay-conflict-320-${info.project.name}.png`, { body: workViewport, contentType: 'image/png' });
 });
