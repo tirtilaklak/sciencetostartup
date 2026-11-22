@@ -4,7 +4,7 @@ The audit began at 7:30 PM Pacific on November 21, 2026. The first three hours a
 
 ## Current pass
 
-PR #34 merged at `1cecd451`. The public site serves build `5dc63fbcf19634a55c66` on Worker 41. November 18 is the latest approved Daily edition. Ten implementation cohorts and ten independent retests have finished since the initial audit. The tenth build stayed off public traffic after the independent review reproduced a clipped Market figure and a lost Work bookmark. The eleventh repair cohort is working on PR #35. The audit closes November 22 at 7:30 PM Pacific. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Merged PR #34](https://github.com/tirtilaklak/sciencetostartup/pull/34) · [Production receipts](site-quality-20261121/fifth-public-release.json)
+PR #34 merged at `1cecd451`. The public site serves build `5dc63fbcf19634a55c66` on Worker 41. November 18 is the latest approved Daily edition. Ten implementation cohorts and ten independent retests have finished since the initial audit. The tenth build stayed off public traffic after the independent review reproduced a clipped Market figure and a lost Work bookmark. Ten eleventh-round contributors completed build `8bd4d587e55c30d638a2` on PR #35. Its independent review is underway. The audit closes November 22 at 7:30 PM Pacific. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Merged PR #34](https://github.com/tirtilaklak/sciencetostartup/pull/34) · [Production receipts](site-quality-20261121/fifth-public-release.json)
 
 ## Initial baseline and first three rounds
 
@@ -330,3 +330,13 @@ At 390px, Chromium hid 15 focused amounts or headings in the Market matrix. On b
 The same Mercor profile measured 2,577 ms and 2,232 ms median mobile LCP in separate official runs. The budget is 2,500 ms. Each run retained 72 raw reports. [First official run](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45028659815) · [Repeat](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45029874348)
 
 AfterQuery changed compensation on three named roles. Eleven salary records had an annual period missing in the guide. The employer again lists its Security/Infrastructure role. The People Programs Lead listing and application now return 404. Terac again lists Shopping Assistant at $30 per hour, with LinkedIn sign-in at the application start. The source review checked all 25 previously verified AfterQuery forms and preserved the earlier records. [Dated source checks](site-quality-20261121/tenth-audit-findings.json)
+
+## Eleventh implementation
+
+Ten contributors implemented the eleventh build `8bd4d587e55c30d638a2`. The first Daily headline fits at 320 × 720. Search and filters remain available in a named phone disclosure. The archive opens the date selector and feed links. The native Work list puts the first role with its rate and keeps directory totals under Jump to section.
+
+On a narrow Market table, keyboard focus scrolls the selected amount clear of its company name. Keyboard readers can open the same unavailable-evidence explanations as touch readers. The Method correction address wraps at enlarged text. A verified Work Back navigation retains the employer link when Chromium first focuses the bookmarked role card. Mercor’s profile gives the sourced introduction time to paint before requesting supporting records.
+
+The first combined .8 build exceeded both native page size limits. AfterQuery now links 48 job-specific citations in a separate native index alongside 45 general citations on the profile. All 45 role cards remain on the profile. The corrected profile weighs 154,246 bytes (22,511 gzip). The native Work page weighs 297,983 bytes (42,392 gzip) and retains its 135 cards. Source-bound CSV rows include prior listing and application responses. The filter bundle now handles streamed HTML that finishes after the script has executed.
+
+Editorial revision `2026-11-22.8` corrects AfterQuery’s pay bands and annual periods, including separately labeled Salary and OTE figures. It records current status for Security/Infrastructure and People Programs Lead. Terac’s Shopping Assistant is listed again at $30/hour with LinkedIn sign-in at the start. Earlier dated checks remain attached. [Implementation records](site-quality-20261121/eleventh-implementation.json) · [Independent findings](site-quality-20261121/tenth-audit-findings.json)

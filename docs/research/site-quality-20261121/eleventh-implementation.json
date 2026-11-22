@@ -1,0 +1,216 @@
+{
+  "source": "f4bcb0c3f7bd001f4ce6fb54d9ec72df4c21f312",
+  "build": "8bd4d587e55c30d638a2",
+  "manifest": "b234d12c9b33cc03819ef697599065f6b1fe86198f4411e7cef4a4628ec0ad59",
+  "editorial_release": "2026-11-22.8",
+  "replaces_held": "ea6272946bebf0bf9a35",
+  "public_predecessor": "5dc63fbcf19634a55c66",
+  "cohort": {
+    "workspace": "/workspace/sciencetostartup-quality-eleventh",
+    "base": "37ed52e5fb86dd77297bf32826a80fec8e207f7d",
+    "model": "gpt-6.2-sol",
+    "reasoning_effort": "ultra",
+    "workers": {
+      "fix11_profile_lcp": {
+        "ownership_recorded_utc": "2026-11-22T13:56:27.528915+00:00",
+        "findings": [
+          "P10-mercor-lcp"
+        ],
+        "paths": [
+          "web/data-runtime.js",
+          "tests/test_profile_introduction_paint.py"
+        ],
+        "commits": [
+          "873faa5f"
+        ]
+      },
+      "fix11_afterquery": {
+        "ownership_recorded_utc": "2026-11-22T14:01:57.674441+00:00",
+        "findings": [
+          "W10-afterquery-pay",
+          "W10-afterquery-status",
+          "W10-terac-relisting"
+        ],
+        "paths": [
+          "data/work-routes.json",
+          "data/editorial-release.json"
+        ],
+        "commits": [
+          "0f0fea92",
+          "98de91dc"
+        ]
+      },
+      "fix11_matrix": {
+        "ownership_recorded_utc": "2026-11-22T14:01:57.714379+00:00",
+        "findings": [
+          "A10-market-clipping",
+          "A10-market-missing"
+        ],
+        "paths": [
+          "web/business-health.js",
+          "web/business-health.css"
+        ],
+        "commits": [
+          "0b23a973",
+          "b81d010c",
+          "ed771da3"
+        ]
+      },
+      "fix11_daily_density": {
+        "ownership_recorded_utc": "2026-11-22T14:01:57.741732+00:00",
+        "findings": [
+          "V10-daily-fold"
+        ],
+        "paths": [
+          "scripts/daily_scan.py",
+          "web/daily-scan.css",
+          "web/daily-scan.js"
+        ],
+        "commits": [
+          "c1690944"
+        ]
+      },
+      "fix11_work_return": {
+        "ownership_recorded_utc": "2026-11-22T14:04:57.346692+00:00",
+        "findings": [
+          "W10-profile-bookmark"
+        ],
+        "paths": [
+          "web/work-page.js",
+          "tests/browser/work-profile-return.spec.js"
+        ],
+        "commits": [
+          "584d3c34"
+        ]
+      },
+      "fix11_work_fold": {
+        "ownership_recorded_utc": "2026-11-22T14:04:57.379064+00:00",
+        "findings": [
+          "V10-work-fold"
+        ],
+        "paths": [
+          "scripts/static_pages.py",
+          "web/work-page.css"
+        ],
+        "commits": [
+          "2f80c0d4",
+          "f4bcb0c3f7bd001f4ce6fb54d9ec72df4c21f312"
+        ]
+      },
+      "fix11_entry_tests": {
+        "ownership_recorded_utc": "2026-11-22T14:06:48.902057+00:00",
+        "findings": [
+          "V10-daily-fold",
+          "V10-work-fold"
+        ],
+        "paths": [
+          "tests/test_daily_scan.py",
+          "tests/browser/daily*.spec.js",
+          "tests/browser/explore-work-layout.spec.js"
+        ],
+        "commits": [
+          "9eff8396",
+          "520a8068"
+        ]
+      },
+      "fix11_work_evidence_tests": {
+        "ownership_recorded_utc": "2026-11-22T14:12:38.701536+00:00",
+        "findings": [
+          "W10-afterquery-pay",
+          "W10-afterquery-status",
+          "W10-terac-relisting"
+        ],
+        "paths": [
+          "tests/test_editorial_work.py",
+          "tests/test_provenance_corrections.py",
+          "tests/test_work_discovery_contract.py",
+          "tests/test_work_export.py",
+          "tests/browser/interactions.spec.js",
+          "tests/browser/work-editorial-parity.spec.js",
+          "tests/test_work_routes.py"
+        ],
+        "commits": [
+          "92db35cd"
+        ]
+      },
+      "fix11_matrix_tests": {
+        "ownership_recorded_utc": "2026-11-22T14:14:12.633076+00:00",
+        "findings": [
+          "A10-market-clipping",
+          "A10-market-missing"
+        ],
+        "paths": [
+          "tests/browser/market-phone-accessibility.spec.js",
+          "tests/browser/market-focus.spec.js"
+        ],
+        "commits": [
+          "e2842e8c"
+        ]
+      },
+      "fix11_method": {
+        "ownership_recorded_utc": "2026-11-22T14:17:55.589578+00:00",
+        "findings": [
+          "A10-method-reflow"
+        ],
+        "paths": [
+          "web/method-page.css",
+          "tests/browser/method-contact-reflow.spec.js"
+        ],
+        "commits": [
+          "d20a2972",
+          "ef4d013d"
+        ]
+      }
+    },
+    "root_supplemental": [
+      {
+        "commit": "e075d99e",
+        "scope": "Tenth independent findings and receipts"
+      },
+      {
+        "commit": "277a3112",
+        "scope": "Carry conflicting pay terms into CSV. The .8 source review found one current annual Salary field whose separate on-target earnings and base components did not appear in pay_qualification."
+      },
+      {
+        "commit": "d78b0185",
+        "scope": "Preserve a valid downloaded Work filter bundle while the rest of the HTML is still streaming; verified exact C10 HTML and already-executed bundle were discarded at the 2.8-second network deadline."
+      },
+      {
+        "commit": "4bafde42",
+        "scope": "Export complete canonically preserved prior Work checks and source-bound retrieval results for reopened records. Keep all prior destination and current check fields."
+      },
+      {
+        "commit": "bfab3caf",
+        "scope": "Regression for visibility and exact pointer focus after the figure changes a sorted Market row position."
+      }
+    ]
+  },
+  "source_blob_count": 794,
+  "afterquery_html_bytes": 154246,
+  "afterquery_gzip9_bytes": 22511,
+  "native_work_html_bytes": 297983,
+  "native_work_gzip9_bytes": 42392,
+  "held_first_capture": {
+    "commit": "d78b01859418cbd30b6856da759618acfb9bf398",
+    "build_id": "18a751236a2122bcf1ed",
+    "manifest_sha256": "5a468beb694c3e87d4ba6a0149b425fefd6fc2cccdfbc41ae2702ceb4757ecb2",
+    "payloads": 1280,
+    "editorial_release_id": "2026-11-22.8"
+  },
+  "held_page_sizes": {
+    "work_raw": 315225,
+    "work_gzip9": 43241,
+    "afterquery_raw": 165391,
+    "afterquery_gzip9": 24125
+  },
+  "source_index": {
+    "native_profile_entries": 45,
+    "linked_paid_work_sources": 48,
+    "work_cards": 45
+  },
+  "extra_checks": [
+    "CSV retains source-bound prior listing and application evidence for reopened roles",
+    "Work filters initialize when HTML streams after a valid bundle has executed",
+    "A sorted Market row keeps its opener visible after closing the detail"
+  ]
+}

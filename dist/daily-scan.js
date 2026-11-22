@@ -6,6 +6,8 @@
   const search = document.getElementById('scan-search');
   const topic = document.getElementById('scan-topic');
   const kind = document.getElementById('scan-kind');
+  const filterDisclosure = root.querySelector('.scan-filter-disclosure');
+  const compact = matchMedia('(max-width: 600px)');
   const date = document.getElementById('scan-date');
   const dateForm = date.form;
   const dateGo = document.getElementById('scan-date-go');
@@ -29,6 +31,11 @@
   });
   let coldFragmentURL = timing?.type === 'back_forward' && hashTarget() ? location.href : null;
   let restoration = 0;
+  let compactFiltersOpen = false;
+  function showFilters(open) {
+    compactFiltersOpen = open;
+    filterDisclosure.open = !compact.matches || open;
+  }
   const position = value => Number.isFinite(value) && value >= 0 && value <= maxPosition;
   function savedReading() {
     let entry;
@@ -59,6 +66,7 @@
       open: rows.filter(row => row.querySelector('details').open).map(row => row.id),
       anchor: anchor?.id || null, top: anchor?.getBoundingClientRect().top || 0,
       archiveOpen: archive.open,
+      filtersOpen: compact.matches ? filterDisclosure.open : compactFiltersOpen,
       returnToPermalink: active?.matches('.scan-permalink') ? active.closest('.scan-item')?.id : null,
       returnToArchive: active?.matches('.scan-archive a') ? new URL(active.href).pathname : null,
       returnToDateGo: active === dateGo };
@@ -76,6 +84,8 @@
       // must be restored together after the browser finishes its traversal.
       for (const row of rows) row.querySelector('details').open = current.open.includes(row.id);
       if (typeof current.archiveOpen === 'boolean') archive.open = current.archiveOpen;
+      if (current.returnToDateGo === true && compact.matches) archive.open = true;
+      if (typeof current.filtersOpen === 'boolean') showFilters(current.filtersOpen);
       disclosureObserver?.takeRecords();
       try { history.scrollRestoration = 'manual'; } catch (_) { /* Restore below. */ }
       let returnFocus;
@@ -176,7 +186,19 @@
       link.href = target.href;
     }
   }
-  function clear() { search.value = ''; topic.value = ''; kind.value = ''; filter(); search.focus(); }
+  function clear() {
+    search.value = '';
+    topic.value = '';
+    kind.value = '';
+    filter();
+    if (compact.matches) showFilters(true);
+    search.focus();
+  }
+  compact.addEventListener('change', event => {
+    const active = document.activeElement;
+    showFilters(event.matches ? compactFiltersOpen || filterDisclosure.contains(active) : filterDisclosure.open);
+    if (!event.matches && active === filterDisclosure.querySelector('summary')) search.focus({ preventScroll: true });
+  });
   search.addEventListener('input', () => filter());
   topic.addEventListener('change', () => filter());
   kind.addEventListener('change', () => filter());
@@ -222,8 +244,9 @@
   }
   addEventListener('hashchange', () => restoreReading(true, true));
   filter(false);
+  showFilters(Boolean(search.value || topic.value || kind.value));
   if (dateForm) dateForm.hidden = false;
-  root.querySelector('.scan-controls').hidden = false;
+  filterDisclosure.hidden = false;
   document.documentElement.removeAttribute('data-daily-pending');
   // A fresh fragment reveals its target. A saved return first restores its
   // disclosures, then pageshow restores the position in that same layout.
