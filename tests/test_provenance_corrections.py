@@ -28,7 +28,7 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
     def test_release_binds_exact_work_bytes_and_unchanged_frozen_canonical(self):
         self.assertEqual(hashlib.sha256((ROOT / "data/canonical.json").read_bytes()).hexdigest(),
                          "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061")
-        self.assertEqual(self.release["release_id"], "2026-11-22.3")
+        self.assertEqual(self.release["release_id"], "2026-11-22.4")
         self.assertEqual(self.release["as_of"], "2026-11-22")
         self.assertEqual(self.release["work_routes_sha256"],
                          hashlib.sha256((ROOT / "data/work-routes.json").read_bytes()).hexdigest())
@@ -36,6 +36,44 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
         counts = editorial_counts(self.work)
         self.assertEqual(counts["records"], 135)
         self.assertEqual(counts["work_routes"], 69)
+
+    def test_surge_fellowship_application_and_unstated_location_have_exact_source(self):
+        row = self.routes["surge_ai.work.research-fellowship"]
+        self.assertEqual(row["geography"], "Location not published")
+        self.assertEqual(row["arrangements"], [])
+        self.assertEqual(row["route_kind"], "named_listing")
+        self.assertEqual(row["status"], "program")
+        self.assertEqual(row["pay_label"], "Hourly; rate not published")
+        self.assertFalse(row["numeric_pay"])
+        self.assertFalse(row["pay_terms"]["hourly_comparable"])
+        directions = "Email a CV or relevant work samples using the address on the official fellowship page."
+        self.assertEqual(row["availability_note"], directions)
+        review = row["editorial_review"]
+        self.assertNotIn("approved_terms_receipt_id", review)
+        receipt_id = f"{row['id']}.application-location-2026-11-22.review"
+        receipt = next(item for item in review["receipts"] if item["id"] == receipt_id)
+        self.assertTrue(receipt["approved"])
+        self.assertEqual(receipt["scope"], "field_review")
+        self.assertEqual(set(receipt["reviewed_fields"]), {"destination", "location"})
+        self.assertEqual(receipt["approval_basis"], "source_content_review")
+        self.assertEqual(receipt["response_sha256"], "afa14a64527ff4377159d5941c13cedcce818a33df4287f194640e8060b31926")
+        source = next(item for item in row["sources"] if item["id"] == receipt["source_id"])
+        self.assertEqual(source["url"], "https://surgehq.ai/fellowship")
+        self.assertEqual(source["accessed_on"], receipt["checked_on"])
+        self.assertEqual(review["actions"], [{
+            "label": "Read application instructions",
+            "url": source["url"],
+            "source_id": source["id"],
+            "purpose": "application",
+        }])
+        for field, state in (("destination", "sourced"), ("location", "source_not_stated")):
+            binding = row["field_reviews"][field]
+            self.assertEqual(binding["state"], state)
+            self.assertEqual(binding["basis"], "direct_source")
+            self.assertEqual(binding["source_ids"], [source["id"]])
+            self.assertEqual(binding["reviewed_on"], receipt["checked_on"])
+        self.assertEqual(prior_values(row, "application-location-2026-11-22.correction")["geography"], "Project-specific")
+        self.assertNotRegex(json.dumps(row), r"mailto:|[\w.+-]+@surgehq\.ai")
 
     def test_retained_quote_normalization_is_not_a_new_source_check(self):
         for rid, currency in [("bespoke_labs.work.mts-post-training", "USD"),
