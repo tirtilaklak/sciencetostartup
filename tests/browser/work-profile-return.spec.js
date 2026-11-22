@@ -7,6 +7,7 @@ const profile = '/company/afterquery/#' + roleId;
 function controls(page) {
   const card = page.locator(`[data-work-route="${roleId}"]`);
   return {
+    card,
     opener: card.getByRole('link', { name: 'AfterQuery · World Models Machine Learning Expert', exact: true }),
     application: card.locator('.work-listing-action a'),
     terms: card.locator('details.work-terms'),
@@ -75,6 +76,61 @@ async function expectNormalWorkLanding(page, departure) {
   await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
 }
 
+async function returnWithEarlyBookmarkFocus(page, whileHeld = async () => {}) {
+  const { promise: heldLoad, resolve: releaseLoad } = Promise.withResolvers();
+  await page.route('**/work-return-test.png', async route => {
+    await heldLoad;
+    await route.fulfill({ status: 204 });
+  });
+  await page.addInitScript(() => {
+    if (location.pathname !== '/work/' || performance.getEntriesByType('navigation')[0]?.type !== 'back_forward') return;
+    const frame = window.requestAnimationFrame;
+    const callbacks = [];
+    window.requestAnimationFrame = callback => callbacks.push(callback);
+    window.releaseWorkReturnFrames = () => {
+      window.requestAnimationFrame = frame;
+      for (const callback of callbacks) frame(callback);
+    };
+    document.addEventListener('DOMContentLoaded', () => {
+      const image = new Image();
+      image.hidden = true;
+      image.src = '/work-return-test.png';
+      document.body.append(image);
+    }, { once: true });
+  });
+  await observeHistory(page, true);
+  await page.goto(work + '#' + roleId);
+  const departure = await activateProfile(page);
+  try {
+    await page.goBack({ waitUntil: 'commit' });
+    await expect(page.locator('[data-work-compare]')).toBeVisible();
+    const entry = await page.evaluate(() => ({
+      key: navigation.currentEntry.key,
+      from: navigation.activation.from.key,
+      saved: history.state?.workReturnFocus?.destinationKey,
+    }));
+    expect(entry.saved).toBe(entry.from);
+    // Run Chromium's fragment focus before the restore frame with no reader input.
+    await page.evaluate(() => location.replace(location.href));
+    await expect(controls(page).card).toBeFocused();
+    expect(await page.evaluate(() => ({
+      key: navigation.currentEntry.key,
+      from: navigation.activation.from.key,
+      ready: document.readyState,
+      interacted: window.WorkPageResource.interacted,
+    }))).toEqual({ key: entry.key, from: entry.from, ready: 'interactive', interacted: false });
+    await whileHeld();
+  } finally {
+    releaseLoad();
+  }
+  await page.waitForLoadState('load');
+  await page.evaluate(() => new Promise(resolve => {
+    window.releaseWorkReturnFrames();
+    requestAnimationFrame(() => requestAnimationFrame(resolve));
+  }));
+  return departure;
+}
+
 test.describe('Work company-profile handoff', () => {
   test.use({ viewport: { width: 1024, height: 600 } });
   test.skip(({ isMobile }) => isMobile, 'Use the audited desktop keyboard layout');
@@ -89,6 +145,31 @@ test.describe('Work company-profile handoff', () => {
       await expectProfileReturn(page, departure, false);
     });
   }
+
+  test('cold Back restores the exact opener when Chromium focuses its bookmark first', async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'Exercise Chromium’s native fragment focus during the held load');
+    const departure = await returnWithEarlyBookmarkFocus(page);
+    await expectProfileReturn(page, departure, false);
+  });
+
+  test('cold Back leaves the bookmark focused after reader input', async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'Exercise reader input during Chromium’s fragment focus');
+    const { card, terms } = controls(page);
+    await returnWithEarlyBookmarkFocus(page, async () => {
+      await page.keyboard.press('ArrowDown');
+      expect(await page.evaluate(() => window.WorkPageResource.interacted)).toBe(true);
+    });
+    await expect(card).toBeFocused();
+    await expect(terms).toHaveJSProperty('open', false);
+  });
+
+  test('cold Back leaves focus on another control when focus moves during the hold', async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'Exercise another focus target during Chromium’s fragment focus');
+    const compare = page.locator('[data-work-compare]');
+    await returnWithEarlyBookmarkFocus(page, () => compare.focus());
+    await expect(compare).toBeFocused();
+    await expect(controls(page).terms).toHaveJSProperty('open', false);
+  });
 
   test('a duplicate profile address and direct Work visits use normal focus', async ({ page, browserName }) => {
     test.skip(browserName !== 'chromium', 'Exercise an adjacent direct visit in the audited browser');

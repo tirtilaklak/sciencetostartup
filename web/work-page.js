@@ -48,6 +48,7 @@
     const compareArrivalKey = 's2s.workCompareArrival';
     let compareDeparture;
     let profileClick, profileDeparture;
+    let returnBookmark;
     let selection = [];
     let active = false;
     let displayedSearch;
@@ -256,8 +257,12 @@
 
     function restoreHandoff({ link, top, card, termsOpen }) {
       // A warm history traversal keeps this document and its browser-managed focus.
+      // On a verified cold return, the browser may focus the opener's bookmark first.
+      returnBookmark = card && card === targetFromHash() ? card : null;
       requestAnimationFrame(() => requestAnimationFrame(() => {
-        if (loader?.interacted || document.activeElement !== document.body || savedHandoff()?.link !== link || link.closest('[hidden]')) return;
+        const focusAvailable = document.activeElement === document.body || document.activeElement === returnBookmark;
+        returnBookmark = null;
+        if (loader?.interacted || !focusAvailable || savedHandoff()?.link !== link || link.closest('[hidden]')) return;
         const group = card?.closest('details[data-work-group]');
         if (group) group.open = true;
         const terms = termsOpen && card?.querySelector('details.work-terms');
@@ -385,7 +390,8 @@
     }
     document.addEventListener('focusin', event => {
       const handoff = savedHandoff();
-      if (handoff && event.target !== handoff.link) remember({ workReturnFocus: null, workCompareFocus: false });
+      const bookmarkFocus = event.target === returnBookmark && !loader?.interacted;
+      if (handoff && event.target !== handoff.link && !bookmarkFocus) remember({ workReturnFocus: null, workCompareFocus: false });
     });
     navigation?.addEventListener('click', event => {
       const link = event.target.closest('[data-work-jump]');
