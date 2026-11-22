@@ -749,6 +749,12 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
     canonical_claim_ids = {claim["id"] for claim in data["claims"]}
     for key in ("assessments", "editorial_readouts", "unknowns"):
         overview_claim_ids.update(value for value in strings(data.get(key, [])) if value in canonical_claim_ids)
+    source_updates = sidecars["SOURCE_UPDATES"] or {}
+    # Retain the claims needed to validate exact financial-basis context in Market.
+    bound_basis_claim_ids = {row["id"] for update in (source_updates.get("evidence_context") or {}).get("corrections", [])
+                             if update.get("kind") == "financial-basis-source-supplement" and update["target"]["claim_id"] in overview_claim_ids
+                             for row in update["historical_snapshot"]["claims"]}
+    overview_claim_ids.update(bound_basis_claim_ids)
     overview_claims = [claim for claim in data["claims"] if claim["id"] in overview_claim_ids]
     overview_source_ids = {sid for claim in overview_claims for field in ("source_ids", "historical_source_ids") for sid in claim.get(field, [])}
     overview_data = {"dataset_version": data["dataset_version"], "claims": overview_claims,
