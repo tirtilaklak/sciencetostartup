@@ -1084,9 +1084,8 @@ function route(event){
   const hash=location.hash;
   queueMicrotask(()=>{
    const active=document.activeElement;
-   const departedHeading=marketLink.hash==='#business-health'&&active?.id==='business-health-heading';
    if(location.hash===hash&&marketLink.getClientRects().length&&
-    (departedHeading||active===document.body||active===document.documentElement||!active?.getClientRects().length))marketLink.focus({preventScroll:true});
+    (active===document.body||active===document.documentElement||!active?.getClientRects().length))marketLink.focus({preventScroll:true});
   });
  }
  const linkedOpener=returnOrigin&&focusExploreOrigin(returnOrigin);
