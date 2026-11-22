@@ -912,6 +912,12 @@ class StaticPageTests(unittest.TestCase):
                         self.assertTrue(any(a.get("href") == url and a["text"] == action and
                                             a.get("aria-label") == f"{action} for {role}, {sp.clean(employer)}"
                                             for a in anchors), action)
+                    if surface == "company" and rid == "afterquery.work.ai-ml-research-intern":
+                        self.assertEqual(sum(a.get("href") == actions[0][0] for a in anchors), 1)
+                        evidence = plain(terms.group(1))
+                        self.assertIn("Official role description Recorded 22 Nov 2026", evidence)
+                        self.assertIn("Terms fields reviewed: application destination, pay, location, requirements, commitment", evidence)
+                        self.assertIn('data-field-source="afterquery.work.ai-ml-research-intern.review-2026-10-28"', terms.group(1))
                     if rid == scholar:
                         self.assertIn("$1,000–$10,000 one-time award", preview)
                         self.assertIn(route["pay_terms"]["note"], preview)

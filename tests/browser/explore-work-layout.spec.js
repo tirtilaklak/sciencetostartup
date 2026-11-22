@@ -100,16 +100,57 @@ test('native Work explains the full count and updates the live count for matchin
   await page.getByRole('button', { name: 'Clear search and filters' }).click();
   await expect(count).toHaveText(fullCount);
 
-  const noScript = await browser.newContext({ javaScriptEnabled: false });
+  const noScript = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1024, height: 600 } });
   try {
     const fallback = await noScript.newPage();
     await fallback.goto(new URL('/work/?q=Sage', page.url()).href);
     await expect(fallback.locator('[data-work-count]')).toBeVisible();
     await expect(fallback.locator('[data-work-count]')).toHaveText(fullCount);
     await expect(fallback.locator('[data-work-route]')).toHaveCount(routes.length);
+    const jump = fallback.getByText('Jump to section', { exact: true });
+    await jump.press('Enter');
+    const named = fallback.getByRole('navigation', { name: 'Work sections' }).getByRole('link', { name: 'Named listings' });
+    await named.press('Enter');
+    await expect(fallback).toHaveURL(/#named$/);
+    await fallback.getByText('Before you apply', { exact: true }).press('Space');
+    await expect(fallback.locator('.work-page-advice .note')).toBeVisible();
   } finally {
     await noScript.close();
   }
+});
+
+test('native Work shows the hourly role and rate together at 1024×600', async ({ page, hasTouch }) => {
+  test.skip(hasTouch, 'Checks the short desktop layout and its keyboard order');
+  await page.setViewportSize({ width: 1024, height: 600 });
+  await page.goto('/work/?pay=hourly&sort=hourly');
+  const summary = page.locator('.work-page-filter-options summary');
+  await expect(summary).toHaveText('Filters (2)');
+  await page.evaluate(() => document.fonts.ready);
+
+  const firstCard = page.locator('[data-work-route]:visible').first();
+  await expect(firstCard).toHaveAttribute('data-work-route', 'afterquery.work.world-models');
+  await expect(firstCard.locator('h3')).toBeInViewport({ ratio: 1 });
+  await expect(firstCard.locator('.work-pay strong')).toBeInViewport({ ratio: 1 });
+
+  const compare = page.getByRole('link', { name: 'Compare results' });
+  const jump = page.getByText('Jump to section', { exact: true });
+  const advice = page.getByText('Before you apply', { exact: true });
+  const [jumpBox, adviceBox] = await Promise.all([jump.boundingBox(), advice.boundingBox()]);
+  expect(jumpBox.y).toBeCloseTo(adviceBox.y);
+  expect(jumpBox.x + jumpBox.width).toBeLessThan(adviceBox.x);
+  for (const box of [jumpBox, adviceBox]) {
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+  }
+  await summary.focus();
+  for (const control of [compare, page.getByRole('button', { name: 'Download CSV' }), jump, advice]) {
+    await page.keyboard.press('Tab');
+    await expect(control).toBeFocused();
+  }
+  await page.keyboard.press('Space');
+  await expect(page.locator('.work-page-advice .note')).toBeVisible();
+  await page.keyboard.press('Space');
+  await expect(page.locator('.work-page-advice .note')).toBeHidden();
 });
 
 test('native Work shows the first hourly result on short desktops and remembers keyboard toggles', async ({ page, hasTouch, request }) => {
@@ -168,6 +209,10 @@ test('native Work shows the first hourly result on short desktops and remembers 
   await page.goto('/work/?pay=hourly');
   await expect(form.getByRole('combobox', { name: 'Pay unit' })).toHaveValue('hourly');
   await expect(options).toHaveJSProperty('open', true);
+  const jump = page.getByText('Jump to section', { exact: true });
+  const advice = page.getByText('Before you apply', { exact: true });
+  const [jumpBox, adviceBox] = await Promise.all([jump.boundingBox(), advice.boundingBox()]);
+  expect(jumpBox.y + jumpBox.height).toBeLessThanOrEqual(adviceBox.y);
   await options.getByText('Filters (1)', { exact: true }).press('Space');
   await page.reload();
   await expect(form).toBeVisible();
@@ -263,16 +308,39 @@ test('native Work fits every filter option in its closed select at narrow widths
   }
 });
 
-const delayedWorkTest = test.extend({
+const enlargedWorkTest = test.extend({
   launchOptions: [async ({ launchOptions, browserName }, use) => {
-    // Firefox's minimum font setting exposes the search label wrap on load.
+    // Firefox's minimum font setting also enlarges text sized in pixels.
     await use(browserName === 'firefox'
       ? { ...launchOptions, firefoxUserPrefs: { ...launchOptions.firefoxUserPrefs, 'font.minimum-size.x-western': 28 } }
       : launchOptions);
   }, { scope: 'worker' }],
 });
 
-delayedWorkTest('native Work reserves the search row while the filter count loads', async ({ page }) => {
+enlargedWorkTest('native Work stacks full disclosure labels at 320px with enlarged text', async ({ page, browserName }) => {
+  test.skip(browserName !== 'firefox', 'Uses the Firefox minimum font setting');
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto('/work/?pay=hourly&sort=hourly');
+  await expect(page.getByRole('searchbox', { name: 'Search listings' })).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  const jump = page.getByText('Jump to section', { exact: true });
+  const advice = page.getByText('Before you apply', { exact: true });
+  const [jumpBox, adviceBox] = await Promise.all([jump.boundingBox(), advice.boundingBox()]);
+  expect(jumpBox.y + jumpBox.height).toBeLessThanOrEqual(adviceBox.y);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+  for (const box of [jumpBox, adviceBox]) {
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    expect(box.x + box.width).toBeLessThanOrEqual(320);
+  }
+  await jump.focus();
+  await page.keyboard.press('Tab');
+  await expect(advice).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.work-page-advice .note')).toBeVisible();
+});
+
+enlargedWorkTest('native Work reserves the search row while the filter count loads', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   // Keep the loader's retry deadline out of this layout check on slow runners.
   await page.clock.install({ time: 0 });

@@ -353,7 +353,7 @@ const datedKeyboardCases = [...new Set([latest, oldest])]
   .map(edition => ({ label: edition.date, route: `/daily/${edition.date}/`, edition }));
 const filteredKeyboardCase = { label: 'filtered latest', route: '/daily/', edition: latest };
 
-async function keyboardPermalinkHistory(page, { route, edition }, recreated = false) {
+async function keyboardPermalinkHistory(page, { route, edition }, { recreated = false, tabBeforeForward = true } = {}) {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const search = page.getByLabel('Search', { exact: true });
   const topic = page.getByLabel('Topic', { exact: true });
@@ -385,6 +385,7 @@ async function keyboardPermalinkHistory(page, { route, edition }, recreated = fa
   await expect(permalink).toBeFocused();
   const startURL = page.url();
   const start = await settledReading(permalink);
+  const startDocument = await page.evaluate(() => performance.timeOrigin);
 
   await page.keyboard.press('Enter');
   const targetURL = new URL(`/daily/${edition.date}/#${item.id}`, startURL).href;
@@ -394,6 +395,7 @@ async function keyboardPermalinkHistory(page, { route, edition }, recreated = fa
   await expect(details).toHaveAttribute('open', '');
   const arrival = await settledReading(headline);
   const arrivalDocument = await page.evaluate(() => performance.timeOrigin);
+  if (!filtered) expect(arrivalDocument).toBe(startDocument);
   await traversePermalinkHistory(page, 'goBack', startURL);
   await expect(permalink).toBeFocused();
   await assertSelections(page, filtered ? [item] : edition.items, edition.items.length);
@@ -405,19 +407,20 @@ async function keyboardPermalinkHistory(page, { route, edition }, recreated = fa
   expect(back.open).toEqual(start.open);
   expect(Math.abs(back.y - start.y)).toBeLessThanOrEqual(2);
   expect(Math.abs(back.top - start.top)).toBeLessThanOrEqual(2);
-  await page.keyboard.press('Tab');
-  await expect(next).toBeFocused();
+  if (tabBeforeForward) {
+    await page.keyboard.press('Tab');
+    await expect(next).toBeFocused();
+  }
   await traversePermalinkHistory(page, 'goForward', targetURL);
   await expect(details).toHaveAttribute('open', '');
   const forward = await settledReading(headline);
   expect(forward.open).toEqual(arrival.open);
   expect(Math.abs(forward.y - arrival.y)).toBeLessThanOrEqual(2);
   expect(Math.abs(forward.top - arrival.top)).toBeLessThanOrEqual(2);
+  if (!filtered) expect(await page.evaluate(() => performance.timeOrigin)).toBe(arrivalDocument);
   if (recreated) expect(await page.evaluate(() => performance.timeOrigin)).not.toBe(arrivalDocument);
-  if (filtered) {
-    await page.keyboard.press('Tab');
-    await expect(headline).toBeFocused();
-  }
+  await page.keyboard.press('Tab');
+  await expect(headline).toBeFocused();
   return { row, details, startURL, targetURL };
 }
 
@@ -427,7 +430,11 @@ for (const scenario of [filteredKeyboardCase, ...datedKeyboardCases]) {
   });
 }
 
-test('Daily classic history cold Forward reveals a fragment and honors a saved close', async ({ browserName, baseURL }, info) => {
+test('Daily dated permalink immediate Forward starts Tab at the target headline', async ({ page }) => {
+  await keyboardPermalinkHistory(page, datedKeyboardCases[0], { tabBeforeForward: false });
+});
+
+test('Daily classic history cold Forward reveals a fragment and honors a direct close', async ({ browserName, baseURL }, info) => {
   test.skip(browserName !== 'firefox', 'Firefox can disable the Navigation API and history cache');
   const browser = await firefox.launch({ firefoxUserPrefs: {
     'dom.navigation.webidl.enabled': false, 'browser.sessionhistory.max_total_viewers': 0,
@@ -435,21 +442,22 @@ test('Daily classic history cold Forward reveals a fragment and honors a saved c
   try {
     const page = await browser.newPage({ baseURL });
     page.on('pageerror', error => info._dailyRuntimeErrors.push(error.message));
-    const { row, details, startURL, targetURL } = await keyboardPermalinkHistory(page, filteredKeyboardCase, true);
+    const { row, details, startURL, targetURL } = await keyboardPermalinkHistory(page, filteredKeyboardCase, { recreated: true });
     expect(await page.evaluate(() => typeof globalThis.navigation)).toBe('undefined');
     await row.locator('summary').press('Enter');
     await expect(details).not.toHaveAttribute('open', '');
+    const closedDocument = await page.evaluate(() => performance.timeOrigin);
+    await traversePermalinkHistory(page, 'goBack', startURL);
+    await expect(row.locator('.scan-permalink')).toBeFocused();
+    await traversePermalinkHistory(page, 'goForward', targetURL);
+    expect(await page.evaluate(() => performance.timeOrigin)).not.toBe(closedDocument);
+    expect((await settledReading(row.locator('h2 a'))).open).toEqual([]);
+
     const previousLink = page.locator('a.scan-day-step[rel="prev"]');
     const previousURL = new URL(await previousLink.getAttribute('href'), targetURL).href;
     await previousLink.press('Enter');
     await expect(page).toHaveURL(previousURL);
     await traversePermalinkHistory(page, 'goBack', targetURL);
-    await expect(previousLink).toBeInViewport();
-    expect((await settledReading(previousLink)).open).toEqual([]);
-
-    await traversePermalinkHistory(page, 'goBack', startURL);
-    await expect(row.locator('.scan-permalink')).toBeFocused();
-    await traversePermalinkHistory(page, 'goForward', targetURL);
     await expect(previousLink).toBeInViewport();
     expect((await settledReading(previousLink)).open).toEqual([]);
   } finally {

@@ -206,7 +206,7 @@ const S2SWork = (() => {
     ]));
   }
 
-  function reviewEvidence(route) {
+  function reviewEvidence(route, original) {
     const { last_link_check: link, last_route_check: page, editorial_review: editorial } = route;
     const review = { status: route.status };
     const add = (key, value) => { if (value != null && value !== '') review[key] = value; };
@@ -225,6 +225,18 @@ const S2SWork = (() => {
     }
     const disposition = editorial?.disposition;
     const getSource = id => route.sources?.find(source => source.id === id);
+    if (original.archived_source_url) {
+      const receipts = (editorial?.receipts || []).flatMap(receipt => {
+        const { id, source_id, checked_on, checked_at, scope, result, final_url, http_status,
+          retrieval_reason, rendered_observation, approved, approval_basis, reviewed_fields } = receipt;
+        const source = getSource(source_id);
+        if (!source?.url || (receipt.url && source.url !== receipt.url)) return [];
+        return [{ id, source_id, url: source.url, purpose: source.purpose, checked_on, checked_at, scope, result,
+          final_url, http_status, retrieval_reason, rendered_observation, approved, approval_basis, reviewed_fields }];
+      });
+      if (receipts.length) add('source_receipts', receipts);
+      if (route.check_history?.length) add('check_history', route.check_history.map(({ date, result, note }) => ({ date, result, note })));
+    }
     if (disposition?.approval_basis === 'source_content_review' && disposition.source_ids?.length
         && disposition.source_ids.every(getSource)) {
       const { state, reviewed_on, source_ids } = disposition;
@@ -240,18 +252,24 @@ const S2SWork = (() => {
   function originalUrls(route) {
     const listed = route.research_record?.route;
     const at = url => (route.sources || []).filter(source => url && source.url === url);
+    const actions = (route.editorial_review?.actions || []).filter(action =>
+      at(action.url).some(source => source.id === action.source_id)
+    );
     const rolePage = at(listed?.overview_url).length ? listed.overview_url : route.url;
     const form = route.form_available === true ? at(route.url).find(source =>
       source.source_type === 'company' && source.title?.endsWith(' — public application form')
     ) : null;
-    const originalAction = route.editorial_review?.actions?.find(action =>
-      action.url === route.url && action.purpose === 'application' && at(action.url).some(source => source.id === action.source_id)
-    );
+    const originalAction = actions.find(action => action.url === route.url && action.purpose === 'application');
+    const archivedAction = actions.find(action => action.url !== route.url && action.purpose === 'archived_listing');
     const application = at(listed?.application_url).length ? listed.application_url : form?.url || originalAction?.url;
     const original = { source_url: at(rolePage).length ? rolePage : null, application_url: application || null };
     const purpose = route.editorial_review?.recorded_url_purpose;
     if (purpose || original.source_url === route.url) original.recorded_url_purpose = purpose || (application === route.url ? 'application' : 'source');
     if (original.source_url) original.source_ids = at(rolePage).map(source => source.id);
+    if (archivedAction) {
+      original.archived_source_url = archivedAction.url;
+      original.archived_source_ids = at(archivedAction.url).map(source => source.id);
+    }
     if (application) {
       original.application_source_ids = at(application).map(source => source.id);
       if (typeof listed?.live_application_verified === 'boolean' && listed.checked_on) {
@@ -266,16 +284,19 @@ const S2SWork = (() => {
   function csvFor(routes, criteria, destination = route => route.source_actions?.[0] || {}) {
     const rows = routes.map(route => {
       const action = destination(route);
+      const original = originalUrls(route);
+      // The legacy column keeps its values unless the recorded URL is explicitly a description.
+      const originalApplication = original.recorded_url_purpose === 'description' ? original.application_url : route.url;
       return [
         route.id, route.company_name || route.company_id, route.role, w4OpportunityKind(route), w4Engagement(route),
         w4Status(route) || 'Recorded listing', route.pay_label, route.pay_terms?.unit,
         route.pay_terms?.hourly_comparable === true, route.pay_terms?.currency, w4Arrangements(route).join(' | '),
         route.geography, (route.requirements || []).join(' | '), route.assessment, route.hours, route.duration,
         w4TermsReviewDate(route), w4ApprovedTermsReceipt(route) ? 'key_terms' : route.terms_checked_on ? 'pay_terms' : '',
-        route.url, action.url, action.label, (route.sources || []).map(source => source.url).join(' | '),
+        originalApplication, action.url, action.label, (route.sources || []).map(source => source.url).join(' | '),
         JSON.stringify(fieldReviews(route)), 'https://sciencetostartup.com/company/' + encodeURIComponent(route.company_id) + '/',
-        ...keys.map(key => criteria[key]), w4PayQualification(route), JSON.stringify(reviewEvidence(route)),
-        JSON.stringify(originalUrls(route))
+        ...keys.map(key => criteria[key]), w4PayQualification(route), JSON.stringify(reviewEvidence(route, original)),
+        JSON.stringify(original)
       ];
     });
     const cell = value => {

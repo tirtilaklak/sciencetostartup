@@ -34,6 +34,18 @@ async function expectReturn(page, source, following, position, cached = false) {
   await expect(following).toBeFocused();
 }
 
+async function expectColdStart(page) {
+  await expect.poll(() => page.evaluate(() => ({
+    api: Boolean(window.navigation), cached: window.nativeHandoffCached,
+    type: performance.getEntriesByType('navigation')[0]?.type,
+    enhancing: document.documentElement.hasAttribute('data-page-enhancement'),
+  }))).toEqual({ api: false, cached: false, type: 'back_forward', enhancing: false });
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(resolve)))));
+  await expect(page.locator('body')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+}
+
 const companyHandoffs = [
   {
     name: 'Compare Mercor', query: 'Mercor', source: compareResult, following: firstMercorSource,
@@ -177,13 +189,17 @@ legacy.describe('native handoffs without the Navigation API', () => {
   ];
 
   for (const { from, opener, destination, next } of cases) {
-    legacy(`${opener} restores on Back after a cold Forward visit`, async ({ page }) => {
+    legacy(`${opener} restores on cold Back to the oldest entry`, async ({ page }) => {
       await trackDocument(page, true);
-      await page.goto('/method/');
-      const previous = page.url();
       await page.goto(from);
-      const source = page.locator(opener);
+      expect(await page.evaluate(() => history.length)).toBe(1);
       const origin = page.url();
+      await page.goto('/method/');
+      await page.goBack({ waitUntil: 'commit' });
+      await expect(page).toHaveURL(origin);
+      await expectColdStart(page);
+
+      const source = page.locator(opener);
       const position = await activate(source);
       const target = page.locator(destination);
       await expect(target).toBeVisible();
@@ -191,22 +207,7 @@ legacy.describe('native handoffs without the Navigation API', () => {
 
       await page.goBack({ waitUntil: 'commit' });
       await expect(page).toHaveURL(origin);
-      await expect(source).toBeFocused();
-      await page.goForward({ waitUntil: 'commit' });
-      await expect(page).toHaveURL(landing);
-      await expect(target).toBeVisible();
-
-      await Promise.all([page.waitForURL(previous), page.evaluate(() => setTimeout(() => history.go(-2), 0))]);
-      await page.goForward({ waitUntil: 'commit' });
-      await expect(page).toHaveURL(origin);
-      await expect(source).toBeVisible();
-      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(resolve)))));
-      expect(await page.evaluate(() => ({
-        api: Boolean(window.navigation), cached: window.nativeHandoffCached,
-        type: performance.getEntriesByType('navigation')[0]?.type,
-      }))).toEqual({ api: false, cached: false, type: 'back_forward' });
-      await expect(page.locator('body')).toBeFocused();
-
+      await expect(source).toBeFocused(); // Leave the stored opener in place for the repeated return.
       await page.goForward({ waitUntil: 'commit' });
       await expect(page).toHaveURL(landing);
       await expect(target).toBeVisible();
@@ -214,6 +215,61 @@ legacy.describe('native handoffs without the Navigation API', () => {
       await expect(page).toHaveURL(origin);
       await expectReturn(page, source, page.locator(next).first(), position);
     });
+  }
+
+  const priors = [
+    { name: 'the original edition', path: '/research/editions/2026-11-12/', scriptFree: true },
+    { name: 'Method', path: '/method/' },
+    { name: 'another origin', path: 'https://history-prior.example/', scriptFree: true },
+  ];
+
+  for (const { name, path, scriptFree } of priors) {
+    for (const { from, opener, destination } of cases) {
+      legacy(`${opener} starts normally on ambiguous cold traversals past ${name}`, async ({ page }) => {
+        await trackDocument(page, true);
+        if (path.startsWith('https://')) await page.route(path, route => route.fulfill({
+          contentType: 'text/html', body: '<!doctype html><title>External page</title><main>Another origin</main>',
+        }));
+
+        const companyQuery = from.startsWith('/companies/') ? page.getByRole('searchbox', { name: 'Search companies' }) : null;
+        const visibleCompanies = () => page.locator('[data-company]:visible').evaluateAll(cards => cards.map(card => card.dataset.company));
+        async function openHandoff() {
+          await page.goto(path);
+          if (scriptFree) await expect(page.locator('script:not([type="application/ld+json"])')).toHaveCount(0);
+          const previous = page.url();
+          await page.goto(from);
+          const origin = page.url();
+          if (companyQuery) {
+            await companyQuery.fill('  Mercor  ');
+            await expect(page).toHaveURL(origin);
+          }
+          const results = companyQuery ? await visibleCompanies() : null;
+          if (results) expect(results).toContain('mercor');
+          await activate(page.locator(opener));
+          await expect(page.locator(destination)).toBeVisible();
+          return { previous, origin, results };
+        }
+
+        async function expectAmbiguousArrival({ origin, results }) {
+          await expect(page).toHaveURL(origin);
+          await expect(page.locator(opener)).toBeVisible();
+          await expectColdStart(page);
+          if (companyQuery) {
+            await expect(companyQuery).toHaveValue('  Mercor  ');
+            expect(await visibleCompanies()).toEqual(results);
+          }
+        }
+
+        const handoff = await openHandoff();
+        await Promise.all([page.waitForURL(handoff.previous), page.evaluate(() => setTimeout(() => history.go(-2), 0))]);
+        await page.goForward({ waitUntil: 'commit' });
+        await expectAmbiguousArrival(handoff);
+
+        const direct = await openHandoff();
+        await page.goBack({ waitUntil: 'commit' });
+        await expectAmbiguousArrival(direct);
+      });
+    }
   }
 
   legacy('a duplicate directory address and another tab keep their own focus', async ({ page }) => {

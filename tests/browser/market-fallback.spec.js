@@ -71,3 +71,57 @@ for (const bundle of ['data', 'app']) {
     await expectMarketLanding(page);
   });
 }
+
+for (const readerTabbed of [false, true]) {
+  test(`Market keeps ${readerTabbed ? 'the selected Download link' : 'the heading'} focused after a late page load`, async ({ page, browserName, isMobile }) => {
+    test.skip(browserName !== 'firefox' || isMobile, 'Exercise Firefox’s native fragment processing at pageshow');
+    const hash = '/explore/#business-health';
+    const bundlePath = '**/js/data.*.js';
+    const heading = page.locator('#business-health-heading');
+    const download = page.locator('#business-health a[download]');
+    let unblockImage;
+    const held = new Promise(resolve => { unblockImage = resolve; });
+    await page.addInitScript(() => {
+      if (performance.getEntriesByType('navigation')[0]?.type !== 'reload') return;
+      const observer = new MutationObserver(() => {
+        if (!document.body) return;
+        observer.disconnect();
+        const image = document.createElement('img');
+        image.hidden = true;
+        image.alt = '';
+        image.src = '/assets/favicon-48.png?market-load-order=1';
+        document.body.append(image);
+      });
+      observer.observe(document, { childList: true, subtree: true });
+    });
+    await page.route('**/favicon-48.png?market-load-order=1', async route => {
+      await held;
+      await route.continue();
+    });
+    await page.route(bundlePath, route => route.abort('failed'));
+    try {
+      await page.goto(hash);
+      await expect(page.locator('#app-failure')).toBeVisible();
+      await page.unroute(bundlePath);
+      await page.locator('#app-reload').focus();
+      await page.keyboard.press('Enter');
+      await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+      await expect(heading).toBeFocused();
+      expect(await page.evaluate(() => document.readyState)).toBe('interactive');
+      if (readerTabbed) {
+        await page.keyboard.press('Tab');
+        await expect(download).toBeFocused();
+      }
+      unblockImage();
+      await page.waitForLoadState('load');
+      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      await expect(readerTabbed ? download : heading).toBeFocused();
+      if (!readerTabbed) {
+        await page.keyboard.press('Tab');
+        await expect(download).toBeFocused();
+      }
+    } finally {
+      unblockImage();
+    }
+  });
+}

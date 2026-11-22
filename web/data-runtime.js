@@ -94,17 +94,17 @@ window.ensureSearchContext=function(){
 function restoreSearchRouteControls(){
  for(const [control,disabled]of searchDisabledControls)if(control.isConnected)control.disabled=disabled;
  searchDisabledControls=[];
- if(searchRouteView){$(searchRouteView==='work'?'work-cards':'company-cards')?.removeAttribute('aria-busy');searchRouteView='';}
+ if(searchRouteView){$('work-cards')?.removeAttribute('aria-busy');searchRouteView='';}
 }
-function pendingSearchRoute(view,failed=false){
- pendingView(view);
- const section=$(view+'-view'),cards=$(view==='work'?'work-cards':'company-cards'),count=$(view==='work'?'work-count':'result-count');
- section.hidden=false;searchRouteView=view;
+function pendingWorkSearchRoute(failed=false){
+ pendingView('work');
+ const section=$('work-view'),cards=$('work-cards'),count=$('work-count');
+ section.hidden=false;searchRouteView='work';
  if(!failed){searchDisabledControls=[...section.querySelectorAll('input,select,button')].map(control=>[control,control.disabled]);for(const [control]of searchDisabledControls)control.disabled=true;cards?.setAttribute('aria-busy','true');}
  const label=failed?'Search could not load. Your query is preserved.':'Loading the search index…';
  if(count)count.textContent=label;
- const native=view==='work'?'/work/'+workHashFor().slice('#work'.length):'/companies/?'+new URLSearchParams({q:shortlistReturnState()?.query??state.query});
- if(cards)cards.innerHTML=`<p role="${failed?'alert':'status'}">${label} ${failed?'<button type="button" data-retry-search>Try again</button> ':''}<a href="${attr(native)}">Open native ${view==='work'?'Work results':'company search'}</a></p>`;
+ const native='/work/'+workHashFor().slice('#work'.length);
+ if(cards)cards.innerHTML=`<p role="${failed?'alert':'status'}">${label} ${failed?'<button type="button" data-retry-search>Try again</button> ':''}<a href="${attr(native)}">Open native Work results</a></p>`;
 }
 function installResearchContext(payload){
  for(const [key,rows]of Object.entries(payload.data)){
@@ -220,7 +220,7 @@ route=function(event){
  const correctionCompany=correction&&!exploreCorrectionClaim(correction)?correction.company:'';
  const overview=view===''||view==='market'||VIEW_ANCHORS[view]==='market'||!['companies','work','compare','method','company',...Object.keys(VIEW_ANCHORS)].includes(view);
  const workCriteria=view==='work'?workCriteriaForRoute(hash,routeTraversal):null;
- const needsSearch=view==='work'?searchContextPending(workCriteria.q):view==='companies'&&searchContextPending(shortlistReturnState()?.query??state.query);
+ const needsSearch=Boolean(workCriteria&&searchContextPending(workCriteria.q));
  const ids=company?[company]:correctionCompany?[correctionCompany]:comparison?.ids||[];
  const cacheKey=archive?'__archive':overview?'__overview':null;
  const cached=(!cacheKey||detailCache.has(cacheKey))&&ids.every(id=>detailCache.has(id));
@@ -239,7 +239,7 @@ route=function(event){
   if(selection.join('|')!==state.selected.join('|')){state.selected=selection;state.mobileCompare=0;syncSelection();renderTray();}
   pendingComparison(comparison);
  }
- if(needsSearch){if(workCriteria)applyWorkCriteria(workCriteria);pendingSearchRoute(view);}
+ if(needsSearch){applyWorkCriteria(workCriteria);pendingWorkSearchRoute();}
  const complete=async()=>{
   if(company){await afterProfileIntroductionPaint();if(generation!==navigationGeneration||location.hash!==hash||controller.signal.aborted)return;}
   if(needsSearch)await window.ensureSearchContext();
@@ -266,7 +266,7 @@ route=function(event){
   restoreSearchRouteControls();
   if(company)failedProfile(company,parts[2],error);
   else if(comparison)pendingComparison(comparison,error);
-  else if(needsSearch){pendingSearchRoute(view,true);presentationState('failed','search-request');}
+  else if(needsSearch){pendingWorkSearchRoute(true);presentationState('failed','search-request');}
   else{presentationState('failed','evidence-request');$('app-failure').hidden=false;document.documentElement.removeAttribute('data-route');}
   if(event?.type==='company-retry'||event?.type==='compare-retry')document.querySelector('[data-retry-company],[data-retry-compare]')?.focus();
  });

@@ -1,0 +1,139 @@
+{
+  "pr": 35,
+  "initial_build": {
+    "commit": "324072f0027873cea084dc05a87c3dd64b8d3d5f",
+    "build_id": "0223193390f17ca8cadc",
+    "manifest_sha256": "3e4ecab1082bf7508608a411c5fd0dea025be910b4de83c62e64834449838a87",
+    "payloads": 1280,
+    "editorial_release_id": "2026-11-22.5"
+  },
+  "current_candidate": {
+    "source_and_artifact_commit": "7549c10013968f0dfd5eba5f3bf8c20ce166d667",
+    "frozen_source": "a6f2ca76aec3a6b28b463d9e7a0d8a51d8890ba2",
+    "git_blobs_verified": 1281,
+    "build_id": "4b07b7b1f9bbb41d3b80",
+    "manifest_sha256": "f5fc2bf96f57542106b1d9ecd2257cf2e4acb10f158f562da529534dd2c8268d",
+    "plan_sha256": "67c11120670aa9aac97ceb7060618b6ed3d5da78058cd925bd0c7c0f48d94ca8",
+    "uploadable_assets": 1279,
+    "dist_tree": "ff1de2b66d0699cb2d96ad6999c8bcd7da0faf38",
+    "editorial_release_id": "2026-11-22.5"
+  },
+  "public_control": "Worker 41, build 5dc63fbcf19634a55c66",
+  "cohort": {
+    "model": "gpt-6.2-sol",
+    "reasoning_effort": "ultra",
+    "reviewers": [
+      "retest8_visual",
+      "retest8_work_sources",
+      "retest8_release",
+      "retest8_work_matrix",
+      "retest8_work_matrix/compare_cells",
+      "retest8_finance",
+      "retest8_research",
+      "retest8_navigation",
+      "retest8_daily",
+      "retest8_companies"
+    ]
+  },
+  "items": [
+    {
+      "id": "H8-work-short-screen",
+      "observed_on": "Original eighth candidate",
+      "observation": "At 1024 by 600, the first hourly rate fits, but its role title starts at y=604. The previous fix improved 1280 by 720.",
+      "acceptance": "Show the title with the rate on short desktops, keep the two controls reachable at enlarged text, and preserve the saved state.",
+      "receipts": {
+        "visual/report.md": "7d23c475d3e48076ce107c8c0d8ae89f9420374241fa90e2ab24bf3363073eaf",
+        "visual/c8-shortest-work.json": "c30184a8165318d87cc12ef5e69483fbcd24e2162a65c3020f9163d6a1321525"
+      }
+    },
+    {
+      "id": "M8-snorkel-claim-title-and-checks",
+      "observed_on": "Original eighth candidate",
+      "observation": "The live Snorkel claim labels the Data 2.0 issuer article “Series E” and shows only the October archival dates.",
+      "acceptance": "Pair the November 22 and October 28 reviews with their respective source IDs. Keep the October snapshot intact.",
+      "receipts": {
+        "finance/findings.md": "a73a9c4665350dcee3ce290a180e4bc02019a62e24ba3b229f907deeb59f09ac",
+        "finance/current-archives.json": "29f045f75a067158c322be568392253bb71bd57c938d4902d9b674bd2c39a0a7"
+      }
+    },
+    {
+      "id": "W8-ooak-exact-employer",
+      "observed_on": "Employer and original eighth candidate",
+      "observation": "The archived YC slug returned 404. The employer still publishes the exact Data Quality Specialist role. The outbound application did not verify.",
+      "acceptance": "Show the employer-listed role and its terms. Preserve the archived 404 and distinguish the unconfirmed application.",
+      "receipts": {
+        "work-sources/README.md": "5bdff02f5b57e8d501401b04d25746a8a623cc1af0c777687bdd1e653399a5ad",
+        "work-sources/public-assessment.json": "805ceba5cef90523485a64613bfec6858a2f59cdccaab19c8479ff7587a28dc3"
+      }
+    },
+    {
+      "id": "N8-native-skipped-forward",
+      "observed_on": "Both eighth builds",
+      "observation": "In legacy Firefox with a recreated document, jump back two entries from Explore to the archived edition, then Forward. Work or Companies falsely focuses the old opener.",
+      "acceptance": "Eliminate the false Forward focus, preserve genuine return focus when the browser supplies sufficient evidence and preserve the original archive.",
+      "receipts": {
+        "navigation/regenerated/README.md": "1fbea53ed3431be4c07a60cc4712e0568d0f80c198dbc95a21134310f0d89425",
+        "navigation/README.md": "87d264789c331cdba85d54b1d55b510d69b2cc4813a62a2f3a60deb70c9ef8b4"
+      }
+    },
+    {
+      "id": "D8-fragment-forward-next-tab",
+      "observed_on": "Original eighth candidate",
+      "observation": "On same-document Forward in Chromium and WebKit, the target is visible but Tab continues at the previously focused story.",
+      "acceptance": "Return the next Tab to the linked headline across Back, Forward, a second activation, deliberate movement and fresh entry.",
+      "receipts": {
+        "daily/report.md": "b3d7d61ee0bedc35855ade52b9aa2e928310f0c730d7d56f94a8f68a7b1d918f",
+        "daily/summary.json": "9594ccb02e390764339cf076b551e206481fd5f4af85ad90dbb4a371131e56c9"
+      }
+    },
+    {
+      "id": "D8-legacy-close",
+      "observed_on": "Original eighth candidate",
+      "observation": "Classic Firefox can reopen a story manually closed immediately before browser Back and cold Forward.",
+      "acceptance": "Retain the reader’s deliberate closure for that history entry without changing ordinary deep links.",
+      "receipts": {
+        "daily/report.md": "b3d7d61ee0bedc35855ade52b9aa2e928310f0c730d7d56f94a8f68a7b1d918f",
+        "daily/firefox-legacy-cold-direct-close.json": "ef1a99f52ccae2352a4cb6c3c08959cbe7d6d434af266791e98cbcd81bc5675a"
+      }
+    },
+    {
+      "id": "C8-failed-search-focus",
+      "observed_on": "Both eighth builds",
+      "observation": "A failed Companies search removes the focused Compare checkbox. A failed retry removes the focused retry button. Both leave focus on the document body.",
+      "acceptance": "Keep a usable keyboard destination after failure, keep unrelated focus in place and restore the literal query after success.",
+      "receipts": {
+        "companies/findings.md": "d271b90e4d25e771bb1bd97f47779baba2a9bbf9ec1a1198cf2df0e217575d5d",
+        "companies/c8-final-search-journeys.json": "99373b768576628dd672688cc044198c720506a5a1cea41d7e9453dfb0583358"
+      }
+    },
+    {
+      "id": "C8-native-fallback-query",
+      "observed_on": "Both eighth builds",
+      "observation": "The plain Companies fallback opens 55 rows and drops query/group. Cold Back loses the Explore query and focus.",
+      "acceptance": "Carry every supported criterion into the plain directory. Restore exact Explore criteria, rows and the available return focus on Back.",
+      "receipts": {
+        "companies/findings.md": "d271b90e4d25e771bb1bd97f47779baba2a9bbf9ec1a1198cf2df0e217575d5d",
+        "companies/final-native-and-fallback.json": "39d1dc5ed35ca44de631fdcad810a104a3525e36e4b71f73f943e31df1890292"
+      }
+    },
+    {
+      "id": "C8-failure-filter-and-export-count",
+      "observed_on": "Both eighth builds",
+      "observation": "While an index request fails, selected filter values remain in state but their chips and Clear disappear. The export label can show 39 results when the real filtered list is empty.",
+      "acceptance": "Keep applied filters visible and clearable. Label export by the actual row count or make its pending state explicit until the index recovers.",
+      "receipts": {
+        "companies/findings.md": "d271b90e4d25e771bb1bd97f47779baba2a9bbf9ec1a1198cf2df0e217575d5d",
+        "companies/c8-final-search-journeys.json": "99373b768576628dd672688cc044198c720506a5a1cea41d7e9453dfb0583358"
+      }
+    },
+    {
+      "id": "P8-afterquery-compressed-weight",
+      "observed_on": "Corrected eighth candidate and official CI",
+      "observation": "All 45 AfterQuery records produced a 159,574-byte HTML page. At gzip level 9 its size was 23,274 bytes. CI requires fewer than 23,000.",
+      "acceptance": "Keep the existing budget and the applicant conditions, evidence and native navigation. Verify the distributed HTML, the repository payload test, mobile Lighthouse and issuer links.",
+      "receipts": {
+        "release/head-7549c100/official-ci-failure.json": "071a2f1da338f4fc10defd0452a60a45a8b78ac4481ce5219ab9d20159f659cb"
+      }
+    }
+  ]
+}

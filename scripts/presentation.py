@@ -665,11 +665,21 @@ def work_export_rows(work, research):
         review = route.get("editorial_review") or {}
         editorial = retain(review, ("approved_terms_receipt_id", "disposition", "alternative_destination", "actions", "recorded_url_purpose"))
         disposition_ids = (review.get("disposition") or {}).get("source_ids", [])
-        receipts = [retain(receipt, ("id", "source_id", "checked_on", "checked_at", "scope", "result", "http_status",
-                                     "approved", "approval_basis", "reviewed_fields"))
+        action_urls = {action["url"] for action in row["source_actions"]}
+        separate_archive = any(action.get("purpose") == "archived_listing" and action.get("url") != route.get("url")
+                               and action.get("url") in action_urls for action in review.get("actions", []))
+        receipt_keys = ("id", "source_id", "checked_on", "checked_at", "scope", "result", "http_status",
+                        "approved", "approval_basis", "reviewed_fields")
+        source_ids = {source.get("id") for source in row["sources"] if source.get("id")}
+        if separate_archive:
+            receipt_keys += ("url", "final_url", "retrieval_reason", "rendered_observation")
+            if route.get("check_history"):
+                row["check_history"] = [retain(check, ("date", "result", "note")) for check in route["check_history"]]
+        receipts = [retain(receipt, receipt_keys)
                     for receipt in review.get("receipts", [])
                     if receipt.get("id") == review.get("approved_terms_receipt_id")
-                    or receipt.get("scope") == "retrieval" and receipt.get("source_id") in disposition_ids]
+                    or receipt.get("scope") == "retrieval" and receipt.get("source_id") in disposition_ids
+                    or separate_archive and receipt.get("source_id") in source_ids]
         if receipts:
             editorial["receipts"] = receipts
         if editorial:

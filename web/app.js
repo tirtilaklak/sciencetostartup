@@ -693,11 +693,39 @@ const marketShortcutOrigins=new Map();
 // Hashes that name a place inside a page. route() shows that page, then brings the element to the top with focus.
 const VIEW_ANCHORS={'business-health':'market',venture:'market',about:'method',labels:'method',corrections:'method',coverage:'method',downloads:'method'};
 function viewAnchorId(hash=location.hash){const id=String(routeParts(hash)[0]||'').toLowerCase();return Object.hasOwn(VIEW_ANCHORS,id)?id:'';}
+// Firefox can process the native bookmark after the enhanced view is ready.
+function keepInitialMarketFocus(focusTarget){
+ if(document.readyState==='complete')return;
+ const bookmark=location.href;
+ let intended=focusTarget;
+ function remember(event){
+  if(event.target!==document.body&&event.target!==document.documentElement)intended=event.target;
+ }
+ document.addEventListener('focusin',remember,true);
+ window.addEventListener('pageshow',()=>{
+  requestAnimationFrame(()=>{
+   document.removeEventListener('focusin',remember,true);
+   if(location.href!==bookmark||!intended.isConnected||intended.closest('[hidden],[inert]'))return;
+   if(document.activeElement===document.body||document.activeElement===document.documentElement){
+    intended.focus();
+   }
+  });
+ },{once:true});
+}
 function showViewAnchor(target){
  if(!target)return;
  for(let node=target;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;
- const focusTarget=target.id==='business-health'?$('business-health-heading'):target;
+ const market=target.id==='business-health';
+ const focusTarget=market?$('business-health-heading'):target;
  if(!focusTarget.matches?.('a[href],button,input,select,textarea,summary'))focusTarget.setAttribute('tabindex','-1');
+ if(market&&!previousRoute){
+  const active=document.activeElement;
+  if(active&&active!==document.body&&active!==document.documentElement&&active!==target&&active!==focusTarget){
+   keepInitialMarketFocus(active);
+   return;
+  }
+  keepInitialMarketFocus(focusTarget);
+ }
  focusTarget.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});
 }
 // Back and Forward return each history entry to where the reader left it.
@@ -715,8 +743,7 @@ let pendingShortlist=null,compareShortlistSource=onCompareRoute()?history.state?
 function rememberShortlistOrigin(event){
  const link=event.target.closest?.('#compare-tray a');
  if(!normalSelfLinkActivation(event,link)||routeParts()[0]!=='companies')return;
- const {query,category,stage,financial,work,sort,selected}=state;
- const shortlist={query,category,stage,financial,work,sort,selected,notice:$('tray-notice').textContent};
+ const shortlist={...directoryCriteria(),selected:state.selected,notice:$('tray-notice').textContent};
  history.replaceState({...history.state,shortlist},'');
  pendingShortlist={hash:link.getAttribute('href'),key:historyKey()};
 }
@@ -737,13 +764,20 @@ window.addEventListener('hashchange',()=>{
 function shortlistReturnState(wasTraversal=routeTraversal){
  return wasTraversal&&compareShortlistSource&&historyKey()===compareShortlistSource?history.state?.shortlist:null;
 }
-function restoreDirectoryShortlist({selected,notice,...filters}){
- Object.assign(state,filters);
- state.selected=selected.filter(isCompanyId);
+function directoryCriteria(){
+ const {query,category,stage,financial,work,sort}=state;
+ return {query,category,stage,financial,work,sort};
+}
+function applyDirectoryCriteria(criteria){
+ Object.assign(state,criteria);
  $('search').value=state.query;
  for(const key of ['category','stage','sort'])$(key).value=state[key];
  $('financial-only').checked=state.financial;
  $('work-only').checked=state.work;
+}
+function restoreDirectoryShortlist({selected,notice,...criteria}){
+ applyDirectoryCriteria(criteria);
+ state.selected=selected.filter(isCompanyId);
  renderDirectory();
 }
 window.addEventListener('resize',syncShortlistScroll);
@@ -768,10 +802,40 @@ window.navigation?.addEventListener('navigate',event=>{if(event.navigationType==
 // in the original order.
 const PAGE_SETUP={};let directoryShown=false;
 function preparePage(view){const steps=PAGE_SETUP[view];while(steps?.length)steps.shift()();}
-function showDirectory(){if(!directoryShown)renderDirectory();}
+function showDirectory(){
+ const canRecover=window.SEARCH_INDEX&&$('company-cards').querySelector?.(directoryFallbackSelector);
+ if(!directoryShown||canRecover)renderDirectory(true);
+}
 function normalSelfLinkActivation(event,link){
  return Boolean(link&&!event.defaultPrevented&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&(event.button===undefined||event.button===0)&&!link.hasAttribute('download')&&(!link.getAttribute('target')||link.getAttribute('target')==='_self'));
 }
+let directoryFallbackFocus=false;
+const directoryFallbackSelector='[data-company-search-fallback]';
+document.addEventListener('click',event=>{
+ const link=event.target.closest?.(directoryFallbackSelector);
+ if(!normalSelfLinkActivation(event,link)||routeParts()[0]!=='companies')return;
+ const companySearchFallback={page:location.href,href:link.href,criteria:directoryCriteria(),entry:window.S2SNativeHandoff?.begin(link.href,event)};
+ history.replaceState({...history.state,companySearchFallback},'');
+});
+function returnedFromDirectoryFallback(saved){
+ const activation=window.navigation?.activation;
+ if(!activation)return window.S2SNativeHandoff?.returnedFrom(saved.entry);
+ const {from,entry,navigationType}=activation;
+ // The directory can replace its own query string while the reader is there.
+ return navigationType==='traverse'&&from?.url&&from.index===entry?.index+1&&new URL(from.url).pathname===new URL(saved.href).pathname;
+}
+function restoreDirectoryFallbackFocus(){
+ if(!directoryFallbackFocus)return;
+ directoryFallbackFocus=false;
+ if(routeParts()[0]!=='companies'||document.activeElement!==document.body)return;
+ ($('company-cards').querySelector(directoryFallbackSelector)||$('search')).focus();
+}
+window.addEventListener('pageshow',event=>{
+ const saved=history.state?.companySearchFallback;
+ if(!event.persisted||saved?.page!==location.href||!returnedFromDirectoryFallback(saved))return;
+ directoryFallbackFocus=true;
+ restoreDirectoryFallbackFocus();
+});
 // Keep the opener on the history entry it belongs to, including when its DOM is rebuilt.
 function rememberExploreOrigin(event){
  const link=event.target.closest?.('a[href]');
@@ -897,9 +961,21 @@ function route(event){
  const returnOrigin=exploreReturnOrigin({traversedFragment:wasTraversal&&event?.type==='hashchange',initial:!event&&!previousRoute});
  if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''||routeTraversal?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=Number.isFinite(kept)?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeRestoredScroll=restore;routeTraversal=false;const closingDialog=event?.closedDialog||event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';
  const shortlist=view==='companies'?shortlistReturnState(wasTraversal):null;
+ const fallback=history.state?.companySearchFallback;
+ const restoreFallback=view==='companies'&&!event&&!previousRoute&&fallback?.page===location.href&&window.performance?.getEntriesByType?.('navigation')[0]?.type==='back_forward';
+ if(view!=='companies')directoryFallbackFocus=false;
  if(view!=='compare')compareShortlistSource=null;
  if(parts[0]&&parts[0]!=='market'&&view==='market'&&!anchorId)history.replaceState(history.state,'','#market');if(view!=='company')preparePage(view);if(previousRoute&&view!==previousRoute)viewScroll[previousRoute]=window.scrollY;for(const name of ['market','companies','work','compare','method','profile'])$(name+'-view').hidden=(name!==(view==='company'?'profile':view));document.querySelectorAll('[data-nav]').forEach(a=>{if(a.dataset.nav===(view==='company'?'companies':view))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});if(view==='company'){if(isCompanyId(parts[1])){renderCompanyProfile(parts[1]);document.title=companies[parts[1]].name+' · ScienceToStartup';}else renderMissingCompanyProfile(parts);}
- else{document.title=VIEW_TITLES[view];if(view==='companies'){renderComparisonScope(view);if(shortlist)restoreDirectoryShortlist(shortlist);if(typeof syncDirectoryRoute==='function')syncDirectoryRoute(parts.slice(1));showDirectory();}if(view==='method'){showDirectory();renderExploreCorrections(anchorId==='corrections');}if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare'){
+ else{document.title=VIEW_TITLES[view];if(view==='companies'){
+  renderComparisonScope(view);
+  if(shortlist)restoreDirectoryShortlist(shortlist);
+  if(restoreFallback){
+   applyDirectoryCriteria(fallback.criteria);
+   directoryFallbackFocus=returnedFromDirectoryFallback(fallback);
+   directoryShown=false;
+  }
+  syncDirectoryRoute(parts.slice(1));showDirectory();
+ }if(view==='method'){showDirectory();renderExploreCorrections(anchorId==='corrections');}if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare'){
   if(returnOrigin?.compare){
    syncCompareRoute();
    state.mobileCompare=returnOrigin.compare.pair;
@@ -944,7 +1020,11 @@ function exportCsv(){
  companyExportStatus('');
  const head=['company_id','company','business_model','delivery_evidence','assessment_scope','financial_metric','financial_value','financial_qualifier','financial_display','upper_value','observation_status','currency','metric_date','metric_period','metric_scope','scope_detail','accounting_basis','financial_source_urls','work_route','readout','snapshot_as_of','financial_record_id','scope_label','limitations'];
  const rows=filtered().map(c=>{const m=currentCompanyResult(c.id);return[c.id,c.name,modelFor(c.id),stageLabel(stageFor(c.id)),assessmentFor(c.id)?.segment_scope||'',m?.kind||'',m?.value??'',m?.qualifier||'',m?.display||'',m?.upper_value??'',m?.observation_status||'',m?.currency||'',m?.as_of||'',m?.period||'',m?.scope||'',m?.scope_detail||'',m?.accounting_basis||'',m?.source_urls||'',workType(c.id),publicText(editorialFor(c.id)?.readout||''),DATA.meta.as_of,m?.id||'',m?.scope_label||'',m?.limitations||''];});
+ setCompanyExportRows(rows.length);
  download('observatory-current-company-results.csv','\ufeff'+[head,...rows].map(row=>row.map(csvCell).join(',')).join('\r\n')+'\r\n','text/csv;charset=utf-8');
+}
+function setCompanyExportRows(count){
+ $('download-csv').textContent=count===undefined?'Current company results · CSV unavailable until search loads':`Current company results · ${count} ${count===1?'row':'rows'} · CSV (a table format for spreadsheet software)`;
 }
 function companyExportStatus(state){
  const button=$('download-csv');let status=$('company-export-status');
@@ -1064,29 +1144,70 @@ function renderDirectoryCards(cards,rows,active){
  active.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});
 }
 function renderDirectory(preserveFocus=false){
+ directoryShown=true;
+ renderDirectoryFilters();
  if(searchContextPending(state.query)){requestDirectorySearch();return;}
  directorySearchGeneration++;
  const cards=$('company-cards');
  const active=preserveFocus&&cards.contains(document.activeElement)?document.activeElement:null;
  cards.removeAttribute?.('aria-busy');
  companyReturnFocus=null;
- const rows=filtered(),query=state.query.trim(),secondaryCount=[state.stage,state.financial,state.work,state.sort!=='name'].filter(Boolean).length;
+ const rows=filtered();
+ setCompanyExportRows(rows.length);
+ renderDirectoryCards(cards,rows,active);
+ $('result-count').textContent=`Showing ${rows.length} of ${DATA.companies.length} companies`;
+ $('empty-state').hidden=rows.length>0;
+ syncSelection();
+ restoreDirectoryFallbackFocus();
+}
+function renderDirectoryFilters(){
+ const query=state.query.trim(),secondaryCount=[state.stage,state.financial,state.work,state.sort!=='name'].filter(Boolean).length;
  const summary=document.querySelector('.more-filters>summary');if(summary)summary.textContent=secondaryCount?`More filters (${secondaryCount})`:'More filters';
- $('download-csv').textContent=`Current company results · ${rows.length} ${rows.length===1?'row':'rows'} · CSV (a table format for spreadsheet software)`;$('reset').hidden=!(query||state.category||secondaryCount);renderDirectoryCards(cards,rows,active);$('result-count').textContent=`Showing ${rows.length} of ${DATA.companies.length} companies`;$('empty-state').hidden=rows.length>0;
- $('active-filters').innerHTML=[query&&`Search: ${query}`,state.category&&groupLabel(state.category),state.stage&&`Delivery evidence: ${stageLabel(state.stage)}`,state.financial&&'Revenue figures',state.work&&'Has paid work or a career page',state.sort==='name-desc'&&'Name Z–A'].filter(Boolean).map(x=>`<span class="active-filter">${esc(x)}</span>`).join('');syncSelection();
+ $('reset').hidden=!(state.query||state.category||secondaryCount);
+ $('active-filters').innerHTML=[query&&`Search: ${query}`,state.category&&groupLabel(state.category),state.stage&&`Delivery evidence: ${stageLabel(state.stage)}`,state.financial&&'Revenue figures',state.work&&'Has paid work or a career page',state.sort==='name-desc'&&'Name Z–A'].filter(Boolean).map(x=>`<span class="active-filter">${esc(x)}</span>`).join('');
+ const saved=history.state?.companySearchFallback;
+ if(saved&&Object.entries(directoryCriteria()).some(([key,value])=>value!==saved.criteria[key])){
+  const entry={...history.state};
+  delete entry.companySearchFallback;
+  history.replaceState(entry,'');
+  directoryFallbackFocus=false;
+ }
 }
 
 // Shared <select> option helper for page filters.
 function addOptions(id,rows){$(id).innerHTML+=[...rows].map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('');}
 let directorySearchGeneration=0,workSearchGeneration=0;
+function directoryFallbackHref(){
+ const params=new URLSearchParams({q:state.query});
+ if(state.category)params.set('group',groupSlug(state.category));
+ return '/companies/?'+params;
+}
 function requestDirectorySearch(){
  const generation=++directorySearchGeneration;
- $('company-cards').setAttribute?.('aria-busy','true');$('result-count').textContent='Loading search…';
- return window.ensureSearchContext().then(()=>{if(generation!==directorySearchGeneration)return;if(routeParts()[0]==='companies'||VIEW_ANCHORS[routeParts()[0]]==='method')renderDirectory(true);else directoryShown=false;}).catch(()=>{if(generation===directorySearchGeneration)directorySearchFailure();});
+ const cards=$('company-cards'),fallback=cards.querySelector(directoryFallbackSelector);
+ if(fallback)fallback.href=directoryFallbackHref();
+ cards.setAttribute('aria-busy','true');
+ $('result-count').textContent='Loading search…';
+ $('empty-state').hidden=true;
+ setCompanyExportRows();
+ return window.ensureSearchContext().then(()=>{
+  if(generation!==directorySearchGeneration)return;
+  const view=routeParts()[0];
+  if(view==='companies'||view==='method'||VIEW_ANCHORS[view]==='method')renderDirectory(true);
+  else directoryShown=false;
+ }).catch(()=>{if(generation===directorySearchGeneration)directorySearchFailure();});
 }
 function directorySearchFailure(){
- $('company-cards').removeAttribute?.('aria-busy');$('result-count').textContent='Search could not load.';
- $('company-cards').innerHTML='<p class="availability-notice" role="alert">The search index could not load. <button type="button" data-retry-company-search>Try again</button> or <a href="/companies/">browse the plain company list</a>.</p>';
+ const cards=$('company-cards');
+ const fallback=cards.querySelector(directoryFallbackSelector);
+ const hadResultFocus=cards.contains(document.activeElement)&&document.activeElement.closest('[data-company-card]');
+ // Leave the recovery controls attached during retries so they keep keyboard focus.
+ if(fallback)fallback.href=directoryFallbackHref();
+ else cards.innerHTML=`<p class="availability-notice" role="alert">The search index could not load. <button type="button" data-retry-company-search>Try again</button> or <a href="${attr(directoryFallbackHref())}" data-company-search-fallback>browse the plain company list</a>.</p>`;
+ cards.removeAttribute('aria-busy');
+ $('result-count').textContent='Search could not load.';
+ if(hadResultFocus&&!$('companies-view').hidden)$('search').focus();
+ restoreDirectoryFallbackFocus();
 }
 function requestWorkSearch(){
  const generation=++workSearchGeneration;
@@ -1135,7 +1256,6 @@ function initCompare(){$('clear-compare').addEventListener('click',()=>{setSelec
 function initMethod(){return detailViewRenderer("initMethod",this,arguments);}
 
 function initialize(){$('snapshot').textContent=compiledSnapshotLabel(DATA.meta.as_of).replace('Public research · compiled ','Snapshot ');$('footer-version').textContent=`Historical company dataset v${DATA.dataset_version}`;
- const renderCards=renderDirectory;renderDirectory=function(){directoryShown=true;return renderCards.apply(this,arguments);};
  Object.assign(PAGE_SETUP,{companies:[initDirectory],method:[initMethod],work:[initWork],market:[renderStory]});
  // Each route prepares its own controls; browsers need no speculative filter-panel work.
  // Keep the existing fallback for hosts without either browser scheduling API.
