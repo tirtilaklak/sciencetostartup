@@ -11,7 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from editorial_work import (EditorialValidationError, FIELD_NAMES, editorial_counts,
                             load_editorial_release, prepare_editorial_release, validate_editorial_release)
-from check_work_sources import check_route, source_summary
+from check_work_sources import (FetchObservation, LinkedApplicationObservation, RenderedObservation,
+                                check_route, source_summary)
 
 
 class EditorialWorkTests(unittest.TestCase):
@@ -42,11 +43,13 @@ class EditorialWorkTests(unittest.TestCase):
                 if field["state"] == "not_researched":
                     self.assertIsNone(field["reviewed_on"])
                     self.assertEqual(field["basis"], "not_reviewed")
-        # The old research establishes a recorded value, not a new field review.
-        sample = self.routes["afterquery.work.product-manager"]
-        self.assertEqual(sample["field_reviews"]["location"]["state"], "sourced")
-        self.assertIsNone(sample["field_reviews"]["location"]["reviewed_on"])
-        self.assertEqual(sample["field_reviews"]["pay"]["reviewed_on"], "2026-10-28")
+        active = self.routes["afterquery.work.product-manager"]
+        self.assertEqual(active["field_reviews"]["location"]["basis"], "direct_source")
+        self.assertEqual(active["field_reviews"]["pay"]["reviewed_on"], "2026-11-22")
+        self.assertIsNone(active["field_reviews"]["assessment"]["reviewed_on"])
+        historical = self.routes["afterquery.work.research-engineer"]
+        self.assertIsNone(historical["field_reviews"]["location"]["reviewed_on"])
+        self.assertEqual(historical["field_reviews"]["pay"]["reviewed_on"], "2026-10-28")
 
     def test_counts_are_record_types_not_open_job_claims(self):
         counts = editorial_counts(self.work)
@@ -66,7 +69,8 @@ class EditorialWorkTests(unittest.TestCase):
             with self.subTest(route=rid):
                 self.assertTrue({"remote", "onsite"} <= set(self.routes[rid]["arrangements"]))
         self.assertEqual(self.routes["bespoke_labs.work.fulfillment-operations-associate"]["arrangements"], ["remote"])
-        self.assertEqual(self.routes["afterquery.work.product-manager"]["arrangements"], [])
+        self.assertEqual(self.routes["afterquery.work.product-manager"]["arrangements"], ["onsite"])
+        self.assertEqual(self.routes["afterquery.work.technical-content-writer-contract"]["arrangements"], ["remote"])
 
     def test_task_equivalents_and_mixed_pay_are_not_actual_hourly_payment(self):
         for rid in ["toloka.work.mindrift-code", "toloka.work.cad-simulation", "labelbox.work.mechanical-engineering", "terac.work.finance-experts"]:
@@ -98,8 +102,9 @@ class EditorialWorkTests(unittest.TestCase):
         self.assertEqual(len(self.release["calibration_route_ids"]), 12)
         row = self.routes["turing.work.expert-network"]
         attempts = row["editorial_review"]["receipts"]
-        self.assertEqual(attempts[-1]["result"], "unreadable_shell")
-        self.assertFalse(attempts[-1]["approved"])
+        earlier = [attempt for attempt in attempts if attempt["checked_on"] < "2026-11-22"]
+        self.assertEqual(earlier[-1]["result"], "unreadable_shell")
+        self.assertTrue(all(not attempt["approved"] for attempt in attempts))
         self.assertNotIn("approved_terms_receipt_id", row["editorial_review"])
         self.assertEqual(row["status"], "program")
         self.assertEqual(row["last_link_check"]["date"], "2026-10-28")
@@ -144,6 +149,39 @@ class EditorialWorkTests(unittest.TestCase):
                               fetcher=lambda url: (200, url, page("14 hired recently"), False))
         self.assertEqual(receipt["candidate_reason"], "unchanged")
         self.assertFalse(receipt["approved"])
+
+    def test_monitoring_retains_rendered_observation_when_later_check_skips_it(self):
+        url = "https://example.test/register"
+        route = {"id": "fixture", "url": url}
+        fetcher = lambda requested: FetchObservation(200, requested, b"Enable JavaScript to run")
+        observed = RenderedObservation(url, "2026-11-22T05:00:00Z", "Oops! This URL might not be the one you were looking for.")
+        before = check_route(route, "2026-11-22T05:00:05Z", fetcher=fetcher, rendered=observed)
+        skipped = check_route(route, "2026-11-23T05:00:05Z", previous=before, fetcher=fetcher)
+        self.assertEqual(skipped["candidate_reason"], "unchanged_failure")
+        self.assertEqual(skipped["rendered_observation"], {**before["rendered_observation"], "reobserved": False})
+        new_observation = RenderedObservation(url, "2026-11-24T05:00:00Z", "Create an account")
+        result = check_route(route, "2026-11-24T05:00:05Z", previous=skipped, fetcher=fetcher, rendered=new_observation)
+        self.assertEqual(result["candidate_reason"], "recheck_failed")
+        self.assertEqual(result["result"], "unreadable_shell")
+        self.assertIsNone(result["rendered_observation"]["review_signal"])
+
+    def test_monitoring_requires_current_observation_and_exact_bound_application(self):
+        url, form = "https://example.test/listing", "https://example.test/listing/apply"
+        route = {"id": "fixture", "url": url, "sources": [{"url": form}]}
+        fetcher = lambda requested: FetchObservation(200, requested, b"A public role description. " * 12)
+        blocked = FetchObservation(403, form, "この求人は現在非公開になっています。応募することができません。".encode())
+        wrong = LinkedApplicationObservation(url, "https://example.test/elsewhere", "2026-11-22T05:00:00Z", blocked)
+        future = LinkedApplicationObservation(url, form, "2026-11-23T05:00:00Z", blocked)
+        for invalid in (wrong, future):
+            with self.subTest(observation=invalid):
+                result = check_route(route, "2026-11-22T05:00:05Z", fetcher=fetcher, application=invalid)
+                self.assertNotIn("application_check", result)
+        valid = LinkedApplicationObservation(url, form, "2026-11-22T05:00:00Z", blocked)
+        previous = check_route(route, "2026-11-22T05:00:05Z", fetcher=fetcher, application=valid)
+        self.assertEqual(previous["application_check"]["retrieval_reason"], "application_unpublished")
+        skipped = check_route(route, "2026-11-23T05:00:05Z", previous=previous, fetcher=fetcher)
+        self.assertEqual(skipped["candidate_reason"], "unchanged")
+        self.assertEqual(skipped["application_check"], {**previous["application_check"], "reobserved": False})
 
     def test_publication_preparation_is_reproducible_and_does_not_refresh_facts(self):
         original_work = copy.deepcopy(self.work)
@@ -190,6 +228,50 @@ class EditorialWorkTests(unittest.TestCase):
             self.assertIn("not a claim that the employer stopped hiring", row["availability_note"])
             candidate = check_route(row, "2026-11-09T12:00:00Z", fetcher=lambda url: (404, url, b"Job not found", False))
             self.assertEqual(candidate["priority"], "low", "archived destinations must not displace actionable reviews")
+
+    def test_scoped_availability_and_source_bound_actions(self):
+        for rid, status, label, amount, old_pay_date in [
+            ("terac.work.rl-environment-creation", "closed", "Closed", "$90 / hour", None),
+            ("apto.work.ai-data-research-engineer", "historical", "Historical · application unpublished", "¥6M–¥15M / year", None),
+            ("appen.work.sage-media", "historical", "Past listing · project intake superseded", "Up to $15 / hour", "2026-11-08"),
+        ]:
+            with self.subTest(route=rid):
+                row = self.routes[rid]
+                self.assertEqual((row["status"], row["availability_label"], row["pay_label"], row["field_reviews"]["pay"]["reviewed_on"]),
+                                 (status, label, amount, old_pay_date))
+                self.assertNotIn("disposition", row["editorial_review"])
+                self.assertIn("status_review", row["editorial_review"])
+        self.assertNotIn("appen.work.sage-media", self.release["homepage"]["work_candidate_route_ids"])
+        apto = self.routes["apto.work.ai-data-research-engineer"]["last_route_check"]
+        self.assertEqual(apto["http_status"], 200)
+        self.assertEqual(apto["application_check"]["http_status"], 403)
+        self.assertEqual(apto["application_check"]["retrieval_reason"], "application_unpublished")
+
+        work = copy.deepcopy(self.work)
+        archived = next(row for row in work["routes"] if row["id"] == "afterquery.work.research-engineer")
+        disposition = archived["editorial_review"]["disposition"]
+        other_404 = next(receipt for receipt in archived["editorial_review"]["receipts"]
+                         if receipt.get("http_status") == 404 and receipt["id"] != disposition["posting_receipt_id"])
+        disposition["posting_receipt_id"] = other_404["id"]
+        with self.assertRaisesRegex(EditorialValidationError, "original posting receipt"):
+            self.validate(work=work)
+
+    def test_employer_periods_distinguish_salary_target_cash_and_awards(self):
+        afterquery = [row for row in self.work["routes"] if row["company_id"] == "afterquery"
+                      and any(receipt.get("source_id", "").endswith(".w1-employer-board-2026-11-22")
+                              for receipt in row["editorial_review"]["receipts"])]
+        self.assertEqual(len(afterquery), 25)
+        annual = [row for row in afterquery if row["pay_terms"]["unit"] == "year"]
+        self.assertEqual(sum(row["pay_basis"] == "annual_salary" for row in annual), 17)
+        self.assertEqual(len(annual), 18)
+        coding = self.routes["afterquery.work.strategic-projects-associate-coding"]
+        self.assertEqual(coding["pay_label"], "$130,000 annual target cash")
+        self.assertIn("up to $80,000", coding["pay_terms"]["note"])
+        self.assertEqual(sum(row["pay_terms"]["unit"] == "conflicting" for row in afterquery), 2)
+        self.assertEqual(sum(row["pay_basis"] == "monthly_salary" for row in afterquery), 3)
+        award = self.routes["afterquery.work.research-scholar"]
+        self.assertEqual(award["pay_terms"]["unit"], "one_time")
+        self.assertIn("accepted for publication", award["pay_terms"]["note"])
 
     def test_review_timestamp_cannot_create_a_false_future_promotion(self):
         work = copy.deepcopy(self.work)
