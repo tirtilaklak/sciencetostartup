@@ -4,7 +4,7 @@ The audit began at 7:30 PM Pacific on November 21, 2026. The first three hours a
 
 ## Current pass
 
-PR #34 merged at `1cecd451`. The public site serves build `5dc63fbcf19634a55c66` on Worker 41. November 18 is the latest approved Daily edition. Ten implementation cohorts and ten independent retests have finished since the initial audit. The tenth build stayed off public traffic after the independent review reproduced a clipped Market figure and a lost Work bookmark. Ten eleventh-round contributors completed build `8bd4d587e55c30d638a2` on PR #35. Its independent review is underway. The audit closes November 22 at 7:30 PM Pacific. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Merged PR #34](https://github.com/tirtilaklak/sciencetostartup/pull/34) · [Production receipts](site-quality-20261121/fifth-public-release.json)
+PR #34 merged at `1cecd451`. The public site serves build `5dc63fbcf19634a55c66` on Worker 41. November 18 is the latest approved Daily edition. The eleventh build passed both GitHub workflows and staged at zero public traffic as Worker 44. Its independent review reproduced a Work filter timeout on delayed script execution. Ten twelfth-round contributors have delivered fixes in build `96e25098b02da34fdb20`. Independent review of this build is in progress. The audit closes November 22 at 7:30 PM Pacific. [Active PR #35](https://github.com/tirtilaklak/sciencetostartup/pull/35) · [Merged PR #34](https://github.com/tirtilaklak/sciencetostartup/pull/34) · [Production receipts](site-quality-20261121/fifth-public-release.json)
 
 ## Initial baseline and first three rounds
 
@@ -348,3 +348,13 @@ Ten independent reviewers tested build `8bd4d587e55c30d638a2`. All 570 phone and
 On a 320px phone, the first Daily story and first Work rate fit. Enlarged text still clipped two Daily filters and a long Method correction link. Reaching the job source index took 46 Tabs. Firefox cold Forward could reopen a closed Daily panel. Two older WebKit builds sometimes scrolled away from a correctly focused employer link. Terac’s first-party ML Scenarios copy explicitly marks its listing closed. [Findings and acceptance checks](site-quality-20261121/eleventh-audit-findings.json)
 
 The first official run passed all 24 mobile performance medians, including Mercor at 2,220 ms. Two repository tests had omitted the nested company source page in their expected inventory. Firefox’s slow-document test exposed a timeout before a fetched Work script executed. The test revisions preserve the dist tree. The twelfth implementation also covers the independently reproduced delayed execution case. [Original CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45034977051) · [Original browser run](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45034977067)
+
+## Twelfth implementation
+
+Ten contributors delivered build `96e25098b02da34fdb20`, editorial revision `2026-11-22.9`. At 320px, the native Menu replaces the five-link header with one keyboard disclosure. The paid-work source index is the first Tab after opening AfterQuery’s source list. Its 93 citations are still present. The Daily filter controls fit at enlarged text sizes, and the Method correction link wraps within the viewport.
+
+Work keeps its filters when a downloaded script executes late. The bookmarked Work page respects keyboard and wheel input during restoration. Daily restores the closed phone filters on a cold Forward visit. Market keeps the full company name and selected figure readable at 32px minimum text. Contributor testing reproduced 12 clipped keyboard stops on Worker 44’s source and found zero on the corrected fixture.
+
+Terac explicitly marks its ML Scenarios listing closed. Work, the company profile, Compare and CSV distinguish this notice from the Ashby listing’s dated 404. The separately listed Shopping Assistant retains its own evidence. [Twelfth source, contributors and page sizes](site-quality-20261121/twelfth-implementation.json)
+
+Worker 44 received zero public traffic. Its immutable preview served the correct build, passed 86 acceptance checks, and opened the archive’s Executive brief. The first attempt to open the 22.47 MB deposited evidence appendix exceeded 25 seconds. The verified public predecessor at the time of this freeze was Worker 41. [Eleventh CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45036903655) · [Eleventh Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45036903644)
