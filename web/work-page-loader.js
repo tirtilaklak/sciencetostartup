@@ -14,7 +14,7 @@
   const initialOptionsOpen = typeof savedOptionsOpen === 'boolean' ? savedOptionsOpen
     : hasOptions && !matchMedia('(max-width: 600px), (max-height: 820px)').matches;
   const initialHash = location.hash;
-  let current, attempts = 0, deadline, interacted = false, retryHadFocus = false;
+  let current, attempts = 0, deadline, documentReady = null, interacted = false, retryHadFocus = false;
 
   for (const type of ['wheel', 'keydown', 'touchstart', 'pointerdown']) {
     addEventListener(type, event => { if (event.isTrusted) interacted = true; }, { capture: true, passive: true, once: true });
@@ -45,7 +45,11 @@
       retry.focus({ preventScroll: true });
     }
     if (!status.hidden && target && !interacted && initialHash === location.hash) {
-      requestAnimationFrame(() => target.scrollIntoView({ block: 'start', behavior: 'instant' }));
+      requestAnimationFrame(() => {
+        if (!interacted && initialHash === location.hash && root.dataset.workLoad === state) {
+          target.scrollIntoView({ block: 'start', behavior: 'instant' });
+        }
+      });
     }
     retry.onclick = start;
   }
@@ -60,9 +64,20 @@
     } else visitStatus(state);
   }
 
+  function clearDeadline() {
+    clearTimeout(deadline);
+    document.removeEventListener('DOMContentLoaded', documentReady);
+    documentReady = null;
+  }
+
+  function afterParsing(callback) {
+    documentReady = callback;
+    document.addEventListener('DOMContentLoaded', callback, { once: true });
+  }
+
   function fail(script) {
     if (current !== script) return;
-    clearTimeout(deadline);
+    clearDeadline();
     current = null;
     script.remove();
     setState('failed');
@@ -76,12 +91,26 @@
     script.src = workScript + (attempts ? '?s2s_retry=' + attempts + '-' + Date.now() : '');
     attempts++;
     current = script;
-    script.onerror = () => fail(script);
+    const onFailure = () => fail(script);
+    script.onerror = onFailure;
     script.onload = () => {
-      if (document.readyState !== 'loading') fail(script);
-      else document.addEventListener('DOMContentLoaded', () => fail(script), { once: true });
+      if (current !== script) return;
+      if (document.readyState !== 'loading') onFailure();
+      else {
+        clearDeadline();
+        afterParsing(onFailure);
+      }
     };
-    deadline = setTimeout(() => fail(script), 2800);
+    const startReadyDeadline = () => {
+      if (current !== script) return;
+      clearDeadline();
+      deadline = setTimeout(onFailure, 2800);
+    };
+    if (document.readyState === 'loading') {
+      // Some browsers defer the script's execution while the parser is blocked.
+      deadline = setTimeout(onFailure, 15_000);
+      afterParsing(startReadyDeadline);
+    } else startReadyDeadline();
     document.head.append(script);
   }
 
@@ -103,13 +132,13 @@
     waitingForDocument(script) {
       if (current !== script) return;
       // The bundle has executed. Its initialization listener runs when the HTML is complete.
-      clearTimeout(deadline);
+      clearDeadline();
       script.onload = null;
-      document.addEventListener('DOMContentLoaded', () => fail(script), { once: true });
+      afterParsing(() => fail(script));
     },
     complete(script) {
       if (current !== script) return;
-      clearTimeout(deadline);
+      clearDeadline();
       current = null;
       setState('');
     }
