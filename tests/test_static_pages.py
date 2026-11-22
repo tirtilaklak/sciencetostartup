@@ -151,6 +151,8 @@ class StaticPageTests(unittest.TestCase):
         observations = json.loads((ROOT / "data/business-health.json").read_text())["observations"]
         cls.reviewed_estimates = {row["id"] for row in observations
                                   if row["evidence_type"] == "estimate" and row["metric_ids"] == [row["id"]]}
+        cls.reviewed_comparatives = {row["id"] for row in observations
+                                    if row.get("primary_source_id") and row.get("accounting_basis") == "latest_discontinued_operations_comparative"}
         cls.routes = json.loads((ROOT / "data/work-routes.json").read_text())["routes"]
         cls.events = json.loads((ROOT / "data/company-events.json").read_text())
         cls.editorial = {e["company_id"]: e for e in json.loads((ROOT / "data/editorial.json").read_text())["entries"]}
@@ -614,7 +616,7 @@ class StaticPageTests(unittest.TestCase):
             if headline: self.assertEqual(shown[0]["id"], headline["id"], cid)
             for kind in REVENUE_KINDS:
                 same = [m for m in shown if m["kind"] == kind]
-                self.assertLessEqual(len(same), 1, (cid, kind))
+                self.assertTrue(all(m["id"] in self.reviewed_comparatives for m in same[1:]), (cid, kind))
                 if headline and same and kind == headline["kind"]: self.assertEqual(same[0]["id"], headline["id"], cid)
             for mid, item in pending:
                 self.assertNotIn(mid, [m["id"] for m in shown], cid)
