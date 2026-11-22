@@ -434,6 +434,59 @@ test('Daily dated permalink immediate Forward starts Tab at the target headline'
   await keyboardPermalinkHistory(page, datedKeyboardCases[0], { tabBeforeForward: false });
 });
 
+for (const direction of ['back', 'forward']) {
+  test(`Daily dated permalink ${direction} honors the first trusted Tab after hashchange`, async ({ page, request }) => {
+    await verifiedResponse(request, '/daily-scan.js', 'daily-scan.js');
+    const { route, edition } = datedKeyboardCases[0];
+    const index = Math.floor((edition.items.length - 1) / 2);
+    const row = page.locator('.scan-item').nth(index);
+    const permalink = row.locator('.scan-permalink');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(route);
+    const startURL = page.url();
+    const documentStart = await page.evaluate(() => performance.timeOrigin);
+    await row.locator('summary').press('Enter');
+    await permalink.press('Enter');
+    const targetURL = startURL + '#' + edition.items[index].id;
+    await expect(page).toHaveURL(targetURL);
+    await expect(row.locator('h2')).toBeFocused();
+    if (direction === 'forward') {
+      await traversePermalinkHistory(page, 'goBack', startURL);
+      await expect(permalink).toBeFocused();
+    }
+
+    // Hold deferred animation work until after real keyboard input, so the
+    // outcome does not depend on the machine's frame rate or input latency.
+    const finish = await page.evaluateHandle(direction => {
+      const scheduleFrame = window.requestAnimationFrame.bind(window);
+      const heldFrames = [];
+      window.requestAnimationFrame = callback => heldFrames.push(callback);
+      return new Promise(resolve => {
+        addEventListener('hashchange', () => {
+          let trustedTab = false;
+          addEventListener('keydown', event => { trustedTab = event.isTrusted && event.key === 'Tab'; }, { once: true });
+          resolve(async () => {
+            window.requestAnimationFrame = scheduleFrame;
+            for (const frame of heldFrames) scheduleFrame(frame);
+            await new Promise(resolve => scheduleFrame(() => scheduleFrame(resolve)));
+            return trustedTab;
+          });
+        }, { once: true });
+        history[direction]();
+      });
+    }, direction);
+    await page.keyboard.press('Tab');
+    const expected = (direction === 'back' ? page.locator('.scan-item').nth(index + 1) : row).locator('h2 a');
+    const firstTab = await expected.evaluate(link => link === document.activeElement);
+    const trustedTab = await finish.evaluate(resume => resume());
+    await finish.dispose();
+    const settledTab = await expected.evaluate(link => link === document.activeElement);
+    expect({ trustedTab, firstTab, settledTab }).toEqual({ trustedTab: true, firstTab: true, settledTab: true });
+    expect(page.url()).toBe(direction === 'back' ? startURL : targetURL);
+    expect(await page.evaluate(() => performance.timeOrigin)).toBe(documentStart);
+  });
+}
+
 test('Daily classic history cold Forward reveals a fragment and honors a direct close', async ({ browserName, baseURL }, info) => {
   test.skip(browserName !== 'firefox', 'Firefox can disable the Navigation API and history cache');
   const browser = await firefox.launch({ firefoxUserPrefs: {

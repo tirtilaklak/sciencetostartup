@@ -101,28 +101,34 @@
       if (saved) apply(saved);
       return Boolean(saved);
     }
+    function complete() {
+      const current = savedReading();
+      const target = changedHash || coldFragmentURL === location.href ? hashTarget() : null;
+      coldFragmentURL = null;
+      const returnFocus = current && apply(current);
+      if (!current && target) revealHash(target);
+
+      // Browsers can retain focus from the previous fragment or lose its
+      // Tab starting point on a cold return. Honor the saved origin first.
+      if (target && !target.hidden && !returnFocus && (changedHash || document.activeElement === document.body)) {
+        const heading = target.querySelector('h2');
+        const box = heading.getBoundingClientRect();
+        if (!current || (box.bottom > 0 && box.top < innerHeight)) {
+          heading.tabIndex = -1;
+          heading.focus({ preventScroll: true });
+        }
+      }
+    }
+    // Hash traversal has already applied native state by hashchange. Set the
+    // Tab starting point now and supersede the pending popstate restoration.
+    if (changedHash) { complete(); return; }
     setTimeout(() => {
       if (generation !== restoration) return;
       requestAnimationFrame(() => {
         if (generation !== restoration) return;
         // pageshow can precede history.state restoration. Read it in the later
         // task instead of abandoning the return when its early value is null.
-        const current = savedReading();
-        const target = changedHash || coldFragmentURL === location.href ? hashTarget() : null;
-        coldFragmentURL = null;
-        const returnFocus = current && apply(current);
-        if (!current && target) revealHash(target);
-
-        // Browsers can retain focus from the previous fragment or lose its
-        // Tab starting point on a cold return. Honor the saved origin first.
-        if (target && !target.hidden && !returnFocus && (changedHash || document.activeElement === document.body)) {
-          const heading = target.querySelector('h2');
-          const box = heading.getBoundingClientRect();
-          if (!current || (box.bottom > 0 && box.top < innerHeight)) {
-            heading.tabIndex = -1;
-            heading.focus({ preventScroll: true });
-          }
-        }
+        complete();
       });
     }, 0);
   }
