@@ -1909,7 +1909,7 @@ DOWNLOADS = (("research.json", "JSON", "application/json", "The core research da
              ("work-routes.json", "JSON", "application/json", "Paid-work records and editorial updates"), ("source-updates.json", "JSON", "application/json", "Later source corrections and the values they replace"),
              ("profile-content.json", "JSON", "application/json", "Profile summaries and the records they cite"), ("editorial.json", "JSON", "application/json", "Business groups and plain-language summaries"),
              ("business-health.json", "JSON", "application/json", "Each business health dashboard observation, with its sources and calculations"))
-GRADES = (("A", "Independent or buyer-side evidence, such as a filing or a customer who confirms the work."), ("B", "The company, an investor or another named first-hand source says it."), ("C", "Reporting by others, an estimate, or indirect evidence."), ("U", "Not confirmed. The fact may be undisclosed or still unresolved."))
+GRADES = (("A", "Public filing, independent evidence or buyer confirmation."), ("B", "The company, an investor or another named first-hand source says it."), ("C", "Reporting by others, an estimate, or indirect evidence."), ("U", "Not confirmed. The fact may be undisclosed or still unresolved."))
 
 
 def render_method(research, sizes, modified):
@@ -1951,7 +1951,7 @@ def render_method(research, sizes, modified):
             + '<li>Annualized pace projects recent revenue across a full year. Gross or net revenue is stated when the source specifies it.</li>'
             '<li>Estimates are labeled. Forecasts, targets, and older or partial figures appear under other reported figures, never as key figures.</li>'
             '<li>Later corrections appear beside the figure. The original records remain in the downloads.</li></ul></div></details>\n',
-            '<details class="method-detail" id="evidence-notes"><summary>Evidence grades and delivery rules</summary><div class="method-detail-body"><h2 id="grades">Confidence grades</h2>\n<p>A grade describes the strength of a claim’s sources.</p>\n<dl class="grades method-grades">' + "".join(f'<div><dt>{g}</dt><dd>{escape(text)}</dd></div>' for g, text in GRADES) + '</dl>\n']
+            '<details class="method-detail" id="evidence-notes"><summary>Evidence grades and delivery rules</summary><div class="method-detail-body"><h2 id="grades">Confidence grades</h2>\n<p>A grade describes the strength of a claim’s sources.</p>\n<dl class="grades method-grades">' + "".join(f'<div><dt>{g}</dt><dd>{escape(text)}</dd></div>' for g, text in GRADES) + '</dl>\n<p>A public filing can come from the company itself.</p>\n']
     dimensions = (data.get("rubric") or {}).get("dimensions") or []
     if dimensions:
         rows = "".join(f'<tr><th scope="row">{escape(d.get("id"))} · {escape(clean(d.get("label")))}</th>' + "".join(f'<td data-label="Level {n}">{escape(clean((d.get("levels") or {}).get(n)))}</td>' for n in ("1", "2", "3")) + "</tr>" for d in dimensions)

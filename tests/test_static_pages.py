@@ -123,6 +123,18 @@ def png_size(data):
     return struct.unpack(">II", data[16:24])
 
 
+class ConfidenceGradeWordingTests(unittest.TestCase):
+    def test_native_and_explore_define_grade_a(self):
+        data = json.loads((ROOT / "data/canonical.json").read_text())
+        native = sp.render_method(sp.Research(data), {}, data["meta"]["as_of"])
+        explore = (ROOT / "web/index.html").read_text()
+        definition = "Public filing, independent evidence or buyer confirmation."
+        for surface, page, count in (("native", native, 1), ("Explore", explore, 2)):
+            with self.subTest(surface=surface):
+                self.assertEqual(re.findall(r"<dt>A</dt><dd>([^<]+)</dd>", page), [definition] * count)
+                self.assertIn("A public filing can come from the company itself.", page)
+
+
 class StaticPageTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

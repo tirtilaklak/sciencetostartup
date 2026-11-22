@@ -62,15 +62,16 @@ function detail_evidenceMetricContextHTML(m){
  return `<div class="evidence-metric-context" data-evidence-metric="${esc(m.id)}"><div class="evidence-metric-heading"><strong>${esc(profileSentenceCase(metricPresentationLabel(m,m.label||metricLabels[m.kind])))}</strong><span class="evidence-metric-value">${esc(value)}</span></div><p>${[kind,profileMetricStatus(m,evidenceMetricStatus(m)),profileMetricHistory(m),scope,profileMetricDate(m),accounting].filter(Boolean).map(esc).join(' · ')}</p></div>`;
 }
 function detail_claimConfidenceHTML(cl){
- const inheritedIndependentReason='Independent or buyer-side evidence. Research label: researcher-assigned evidence grade.';
+ const genericLegacyReason='Independent or buyer-side evidence.';
  const attribution=financeClaimContextFor(cl.id)?.attribution||evidenceLabel(cl);
  let reason=cl.confidence_reason;
- if(cl.confidence==='A'&&reason===inheritedIndependentReason){
+ if(cl.confidence==='A'&&reason===genericLegacyReason+' Research label: researcher-assigned evidence grade.'){
   if(['Company-reported','Investor-reported'].includes(attribution))reason=attribution+' evidence. The research confidence grade is retained from the compiled snapshot.';
   else if(!cl.evidence_label&&['Transaction counsel statement','University incubator statement','Company admission document'].includes(attribution))reason=attribution+'. The research confidence grade is retained from the compiled snapshot.';
  }
- // Drop the researcher-only "Research label" note; show the reason only when it adds to the grade.
+ // The grade definition replaces the generic snapshot reason. Keep specific reasons and source attributions.
  reason=String(reason||'').replace(/\s*Research label:[^.]*\.?\s*$/,'').trim();
+ if(cl.confidence==='A'&&reason===genericLegacyReason)reason='';
  const meaning=CONFIDENCE_GRADES[cl.confidence]||'',plain=text=>publicText(text).replace(/[.\s]+$/,'').toLowerCase();
  return `<div class="claim-confidence"><strong>Confidence grade</strong>${esc(cl.confidence)}${meaning?`<span class="sub">${esc(meaning)}</span>`:''}${reason&&!plain(meaning).startsWith(plain(reason))?`<details><summary>Why this grade</summary><p class="sub">${esc(reason)}</p></details>`:''}</div>`;
 }
