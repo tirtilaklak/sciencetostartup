@@ -66,6 +66,50 @@ test('all four Explore Work filters receive desktop pointer input', async ({ pag
   }
 });
 
+test('native Work explains the full count and updates the live count for matching records', async ({ page, browser, request }) => {
+  const { routes } = await (await request.get('/work-routes.json')).json();
+  const count = page.locator('[data-work-count]');
+  const fullCount = `${routes.length} records, including career pages and past listings`;
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/');
+    await page.locator('.primary-link.work-link').click();
+    await expect(page).toHaveURL(/\/work\/$/);
+    await expect(page.getByRole('searchbox', { name: 'Search listings' })).toBeVisible();
+    await expect(count).toHaveText(fullCount);
+    await expect(count).toBeInViewport({ ratio: 1 });
+    await page.evaluate(() => document.fonts.ready);
+    expect(await count.evaluate(node => {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      return range.getClientRects().length;
+    })).toBe(1);
+  }
+
+  await page.locator('.work-page-filter-options summary').click();
+  await page.getByRole('combobox', { name: 'Sort', exact: true }).selectOption('checked');
+  await expect(count).toHaveText(fullCount);
+  const search = page.getByRole('searchbox', { name: 'Search listings' });
+  await search.fill('Sage');
+  await expect(count).toHaveText('1 matching record');
+  await search.fill('unfindable-work-record-fixture');
+  await expect(count).toHaveText('0 matching records');
+  await expect(page.locator('[data-work-empty]')).toContainText('No records match.');
+  await page.getByRole('button', { name: 'Clear search and filters' }).click();
+  await expect(count).toHaveText(fullCount);
+
+  const noScript = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const fallback = await noScript.newPage();
+    await fallback.goto(new URL('/work/?q=Sage', page.url()).href);
+    await expect(fallback.locator('[data-work-count]')).toBeVisible();
+    await expect(fallback.locator('[data-work-count]')).toHaveText(fullCount);
+    await expect(fallback.locator('[data-work-route]')).toHaveCount(routes.length);
+  } finally {
+    await noScript.close();
+  }
+});
+
 test('native Work fits every filter option in its closed select at narrow widths', async ({ page }) => {
   test.setTimeout(60_000);
   const form = page.getByRole('search', { name: 'Find paid work' });
@@ -74,7 +118,7 @@ test('native Work fits every filter option in its closed select at narrow widths
   for (const filtered of [false, true]) {
     await page.goto(filtered ? '/work/?pay=hourly&sort=hourly' : '/work/', { waitUntil: 'domcontentloaded' });
     await expect(form).toBeVisible();
-    await expect(count).toHaveText(filtered ? /^[1-9]\d* matching records?$/ : /^[1-9]\d* records?$/);
+    await expect(count).toHaveText(filtered ? /^[1-9]\d* matching records?$/ : /^[1-9]\d* records, including career pages and past listings$/);
     const options = form.locator('.work-page-filter-options');
     if (filtered) {
       await expect(options).toHaveJSProperty('open', false);

@@ -15,6 +15,7 @@
     const navigation = document.querySelector('[data-work-section-navigation]');
     const compareLink = document.querySelector('[data-work-compare]');
     const exploreLink = document.querySelector('[data-work-explore]');
+    const handoffLinks = { compare: compareLink, explore: exploreLink };
     const comparison = document.querySelector('[data-work-comparison]');
     const exportButton = document.querySelector('[data-work-export]');
     const exportStatus = document.querySelector('[data-work-export-status]');
@@ -154,8 +155,9 @@
       if (comparison) comparison.hidden = !showCompare;
       empty.hidden = selection.length !== 0;
       if (showCompare) comparisonRows(selection);
-      count.textContent = legacy && !filtering ? initialCount
-        : `${selection.length} ${filtering ? 'matching ' : ''}${selection.length === 1 ? 'record' : 'records'}`;
+      const matching = S2SWork.keys.some(key => key !== 'sort' && criteria[key]);
+      const countLabel = matching ? `${selection.length} matching ${selection.length === 1 ? 'record' : 'records'}` : initialCount;
+      if (count.textContent !== countLabel) count.textContent = countLabel;
       if (navigation) {
         navigation.hidden = showCompare || !selection.length;
         for (const link of navigation.querySelectorAll('[data-work-jump]')) {
@@ -215,15 +217,26 @@
       return true;
     }
 
-    function restoreCompareFocus() {
+    function savedHandoff() {
+      const { workReturnFocus, workCompareFocus } = history.state || {};
+      if (workReturnFocus) {
+        const link = handoffLinks[workReturnFocus.kind];
+        if (workReturnFocus.page === location.href && workReturnFocus.href === link?.href) return { link, top: workReturnFocus.top };
+      } else if (workCompareFocus && compareLink) return { link: compareLink };
+      return null;
+    }
+
+    function restoreHandoff({ link, top }) {
       // A warm history traversal keeps this document and its browser-managed focus.
       requestAnimationFrame(() => requestAnimationFrame(() => {
-        if (loader?.interacted || document.activeElement !== document.body || !history.state?.workCompareFocus) return;
-        compareLink.focus({ preventScroll: true });
-        const { top, bottom } = compareLink.getBoundingClientRect();
-        const headerBottom = document.querySelector('.site-header')?.getBoundingClientRect().bottom || 0;
-        if (top < Math.max(0, headerBottom) || bottom > innerHeight) {
-          compareLink.scrollIntoView({ block: 'center', behavior: 'instant' });
+        if (loader?.interacted || document.activeElement !== document.body || savedHandoff()?.link !== link || link.closest('[hidden]')) return;
+        link.focus({ preventScroll: true });
+        const bounds = link.getBoundingClientRect();
+        const headerBottom = Math.max(0, document.querySelector('.site-header')?.getBoundingClientRect().bottom || 0);
+        if (Number.isFinite(top) && top >= headerBottom && top + bounds.height <= innerHeight) {
+          window.scrollBy({ top: bounds.top - top, behavior: 'instant' });
+        } else if (bounds.top < headerBottom || bounds.bottom > innerHeight) {
+          link.scrollIntoView({ block: 'center', behavior: 'instant' });
         }
       }));
     }
@@ -236,12 +249,16 @@
     filterSummary.addEventListener('click', event => {
       if (!event.defaultPrevented) remember({ workFilterOptionsOpen: !filterOptions.open });
     });
-    compareLink?.addEventListener('click', event => {
-      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      remember({ workCompareFocus: true });
-    });
-    if (compareLink) document.addEventListener('focusin', event => {
-      if (event.target !== compareLink && history.state?.workCompareFocus) remember({ workCompareFocus: false });
+    for (const [kind, link] of Object.entries(handoffLinks)) {
+      link?.addEventListener('click', event => {
+        if (!event.isTrusted || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ||
+            link.hasAttribute('download') || (link.target && link.target.toLowerCase() !== '_self')) return;
+        remember({ workReturnFocus: { kind, page: location.href, href: link.href, top: link.getBoundingClientRect().top }, workCompareFocus: false });
+      });
+    }
+    document.addEventListener('focusin', event => {
+      const handoff = savedHandoff();
+      if (handoff && event.target !== handoff.link) remember({ workReturnFocus: null, workCompareFocus: false });
     });
     navigation?.addEventListener('click', event => {
       const link = event.target.closest('[data-work-jump]');
@@ -282,16 +299,17 @@
     if (compareLink) compareLink.hidden = false;
     if (exportButton) exportButton.hidden = false;
     const retried = loader?.retried;
-    const returningToCompareLink = compareLink && history.state?.workCompareFocus && !loader?.interacted
-      && performance.getEntriesByType('navigation')[0]?.type === 'back_forward';
-    const revealed = revealTarget(!returningToCompareLink && (!loader?.interacted || retried));
-    if (!returningToCompareLink && !revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
+    const activation = window.navigation?.activation;
+    const goingForward = activation?.from && activation.from.index <= activation.entry?.index;
+    const handoff = !goingForward && !loader?.interacted && performance.getEntriesByType('navigation')[0]?.type === 'back_forward' && savedHandoff();
+    const revealed = revealTarget(!handoff && (!loader?.interacted || retried));
+    if (!handoff && !revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
       // A saved anchor can be excluded by the saved criteria.
       count.scrollIntoView({ block: 'start', behavior: 'instant' });
     }
     loader?.complete(script);
     document.documentElement.removeAttribute('data-page-enhancement');
-    if (returningToCompareLink) restoreCompareFocus();
+    if (handoff) restoreHandoff(handoff);
     if (!revealed && retried) {
       // A failed load can leave the reader at a bookmark the filters now hide.
       fields.q.focus({ preventScroll: true });

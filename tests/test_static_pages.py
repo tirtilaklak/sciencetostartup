@@ -822,7 +822,7 @@ class StaticPageTests(unittest.TestCase):
         paid = [r for r in self.routes if sp.work_primary(r)]
         named = sum(sp.work_display_bucket(r) == "named" for r in self.routes)
         programs = sum(sp.work_display_bucket(r) == "programs" for r in self.routes)
-        paid_companies, all_companies = len({r["company_id"] for r in paid}), len({r["company_id"] for r in self.routes})
+        paid_companies = len({r["company_id"] for r in paid})
         work = (self.dist / "work/index.html").read_text()
         facts = PageFacts(work)
         self.assertEqual(facts.title, f"Paid AI training work: {len(paid)} sourced routes{sp.SUFFIX}")
@@ -830,7 +830,7 @@ class StaticPageTests(unittest.TestCase):
         advice = plain(re.search(r'<details class="work-page-advice">.*?</details>', work, re.S).group(0))
         self.assertIn("Current openings and individual eligibility are not guaranteed", advice)
         self.assertIn(f'{named} named listings <span>·</span> {programs} networks and programs <span>·</span> {paid_companies} companies', work)
-        self.assertIn(f'{len(self.routes)} records at {all_companies} companies.', work)
+        self.assertIn(f'data-work-count aria-live="polite" aria-atomic="true">{len(self.routes)} records, including career pages and past listings</p>', work)
         self.assertIn(f"See {len(paid)} paid work routes</a>", (self.dist / "companies/index.html").read_text())
         checked = max(d for r in self.routes for d in (r.get("availability_checked_on"), (r.get("last_route_check") or {}).get("date")) if d)
         self.assertIn(f"Links checked up to {sp.format_date(checked)}", work)

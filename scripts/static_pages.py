@@ -1847,7 +1847,6 @@ def work_table(research, rows, names, key):
 def render_work(research, routes, names, modified, work_results=None, work_script=None):
     canonical = f"{ORIGIN}/work/"
     rows = [r for r in routes if r.get("company_id") in names]
-    count, companies = len(rows), len({r["company_id"] for r in rows})
     checked = latest(*(d for r in rows for d in (r.get("availability_checked_on"), (r.get("last_route_check") or {}).get("date"))))
     open_rows = [r for r in rows if work_primary(r)]
     open_count, open_companies = len(open_rows), len({r["company_id"] for r in open_rows})
@@ -1857,6 +1856,11 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
     description = truncate(f"{plural(named_count, 'named listing')} and {plural(program_count, 'expert network or program', 'expert networks and programs')} at {plural(open_companies, 'AI data company', 'AI data companies')}, with published pay, requirements, sources and separate review dates.")
     crumbs = [("Overview", f"{ORIGIN}/"), ("Paid work", canonical)]
     buckets = {key: sort_routes([r for r in rows if work_display_bucket(r) == key], names) for key, _, _ in WORK_DISPLAY_BUCKETS}
+    scope = " and ".join(label for present, label in (
+        (bool(buckets["boards"]), "career pages"),
+        (any(row.get("status") in ("historical", "closed") for row in buckets["closed"]), "past listings"),
+    ) if present)
+    count_label = plural(len(rows), "record") + (f", including {scope}" if scope else "")
     export = work_results or {}
     section_links = "".join(f'<li><a data-work-jump="{key}" href="#{key}">{label}</a></li>' for key, label, _ in WORK_DISPLAY_BUCKETS if buckets[key])
     engagement_filter_labels = {
@@ -1882,14 +1886,13 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
             '<noscript><p data-work-native-fallback>Filters need JavaScript. Showing the full directory. Use your browser’s Find command to look for a company or role.</p></noscript>'
             '<div class="work-results-toolbar" data-work-toolbar id="work-results">'
             '<p class="work-page-results" data-work-count aria-live="polite" aria-atomic="true">'
-            f'<span class="work-count-native">{open_count} listings and networks. {count} records at {plural(companies, "company", "companies")}. Career pages and past records are grouped below.</span>'
-            f'<span class="work-count-compact" hidden>{plural(count, "record")}</span></p>'
+            f'{count_label}</p>'
             '<div class="work-results-actions"><a href="/work/?view=compare" data-work-compare hidden>Compare results</a>'
             f'<button type="button" data-work-export data-work-export-asset="{escape(export.get("href"))}" data-work-export-digest="{escape(export.get("sha256"))}" hidden>Download CSV</button></div></div>'
             '<p class="work-export-status" data-work-export-status aria-live="polite"></p>'
             f'<nav class="work-page-groups" aria-label="Work sections" data-work-section-navigation><details class="work-section-disclosure"><summary>Jump to section</summary><ul>{section_links}</ul></details></nav>'
             '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Pay and availability may have changed. Current openings and individual eligibility are not guaranteed. The employer decides who can apply and who is selected. Check the company’s page before applying.' + (f' Links checked up to {escape(format_date(checked))}.' if checked else '') + '</p>\n' + safety_note() + '</details>\n',
-            '<div class="work-page-empty" data-work-empty hidden><p>No listings match. Try another word or clear the filters.</p><button type="button" data-work-clear>Clear search and filters</button></div>\n',
+            '<div class="work-page-empty" data-work-empty hidden><p>No records match. Try another word or clear the filters.</p><button type="button" data-work-clear>Clear search and filters</button></div>\n',
             '<section id="work-integrated-table" data-work-comparison hidden><h2 tabindex="-1">Compare paid work results</h2></section>',
             '<div class="work-page-list">']
     for key, label, note in WORK_DISPLAY_BUCKETS:
