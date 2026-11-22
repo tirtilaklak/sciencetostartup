@@ -62,6 +62,7 @@
 .site-header nav a:hover { color: var(--ink); text-decoration: underline; }
 .home-menu { display: none; }
 .landing-page .site-search-panel { overflow-y: auto; }
+.landing-page .site-search-input::placeholder { color: var(--muted); opacity: 1; }
 .site-search-more {
   flex: none;
   align-self: flex-start;

@@ -134,11 +134,13 @@ test('homepage Search loads only its small component and index when invoked', as
   expect(requests.some(url => /home-search\.js|presentation\/search\.|\/js\/(app|data)\.|research\.json/.test(url))).toBe(false);
   await page.locator('#home-search-open').click();
   await expect(page.getByRole('dialog', { name: 'Search the guide' })).toBeVisible();
-  await expect(page.locator('#home-search-message')).not.toContainText('Loading');
+  const input = page.getByRole('combobox', { name: 'Search the guide' });
+  await expect(input).toHaveAttribute('placeholder', 'Search');
+  await expect(input).toHaveAccessibleDescription('Search research or companies and their products. Try a role or skill for paid work.');
   expect(requests.some(url => /home-search\.js/.test(url))).toBe(true);
   expect(requests.some(url => /presentation\/search\./.test(url))).toBe(true);
   expect(requests.some(url => /\/js\/(app|data)\.|presentation\/(archive|company-|summary)\.|research\.json/.test(url))).toBe(false);
-  await page.locator('#home-search-input').fill('C++');
+  await input.fill('C++');
   const accessibility = await new AxeBuilder({ page }).analyze();
   expect(accessibility.violations.filter(row => ['serious', 'critical'].includes(row.impact))).toEqual([]);
   const action = page.locator('#home-search-results a').filter({ hasText: 'Find paid work matching' });
