@@ -85,6 +85,8 @@ for (const [asset, path] of [
     await expect(root).toHaveAttribute('data-app', 'ready');
     await expect(root).toHaveAttribute('data-view-state', 'failed');
     await expect(reload).toBeVisible();
+    // A browser may start sequential focus at the bookmarked section.
+    await page.getByRole('link', { name: 'Skip to content' }).focus();
     for (let step = 0; step < 25; step++) {
       if (await reload.evaluate(button => button === document.activeElement)) break;
       await page.keyboard.press('Tab');
@@ -111,6 +113,10 @@ test('Market preserves the reading position on ordinary reload and Back', async 
     return window.scrollY;
   });
   await expect(heading).not.toBeInViewport();
+  await expect.poll(() => page.evaluate(() => {
+    const entry = window.navigation ? window.navigation.currentEntry.getState() : history.state;
+    return entry?.scrollY;
+  })).toBe(readingPosition);
 
   const expectReadingPosition = async () => {
     await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
