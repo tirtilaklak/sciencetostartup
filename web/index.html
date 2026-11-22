@@ -69,10 +69,12 @@
 </section></details>
 <details class="bh-coverage-disclosure"><summary>All {{COMPANY_COUNT}} organizations: available evidence <span>Includes missing figures and historical records</span></summary>
 <div class="bh-controls"><label class="bh-search-label">Find a company<input type="search" id="bh-search" placeholder="Company name" autocomplete="off"></label><label>Business group<select id="bh-group"><option value="">All business groups</option></select></label><label>Order<select id="bh-sort"><option value="coverage">Most evidence</option><option value="name">Name A–Z</option><option value="signal">Selected measure</option></select></label><label class="bh-check"><input type="checkbox" id="bh-evidence-only"> With public figures</label></div>
-<p id="bh-matrix-count" class="bh-note" role="status" aria-live="polite"></p><div id="bh-grid-wrap" class="bh-grid-wrap" tabindex="0" role="region" aria-label="All company evidence; scroll horizontally for more measures"><table class="bh-grid"><caption class="sr-only">Public business evidence. Missing disclosure is not zero.</caption><thead><tr id="bh-grid-head"></tr></thead><tbody id="bh-matrix-body"></tbody></table></div>
+<p id="bh-matrix-count" class="bh-note" role="status" aria-live="polite"></p>
+<button id="bh-skip-to-method" type="button" class="text-link">Skip to definitions and evidence limits</button>
+<div id="bh-grid-wrap" class="bh-grid-wrap" tabindex="0" role="region" aria-label="All company evidence; scroll horizontally for more measures"><table class="bh-grid"><caption class="sr-only">Public business evidence. Missing disclosure is not zero.</caption><thead><tr id="bh-grid-head"></tr></thead><tbody id="bh-matrix-body"></tbody></table></div>
 <p class="bh-key"><span>— No reviewed disclosure</span><span>Context: scale or reach, not a direct health measure</span><span>n/a: nonprofit research</span><span>Letters indicate the source grade; select a figure for details.</span></p>
 </details>
-<details class="bh-method"><summary>Definitions and evidence limits</summary><div id="bh-method-content"></div><p><a href="business-health.json" download>Download observations and calculations · {{FILE_META_HEALTH}}</a> · <a href="#method">Research method</a></p></details>
+<details class="bh-method"><summary id="bh-method-summary">Definitions and evidence limits</summary><div id="bh-method-content"></div><p><a href="business-health.json" download>Download observations and calculations · {{FILE_META_HEALTH}}</a> · <a href="#method">Research method</a></p></details>
 <dialog id="bh-evidence-dialog" class="bh-evidence-dialog" aria-labelledby="bh-detail-title"><div class="bh-dialog-top"><span>Figure &amp; source</span><button type="button" id="bh-close-evidence" aria-label="Close figure details">Close ×</button></div><div id="bh-detail"></div><div id="bh-history" class="bh-history" hidden></div></dialog>
 </section>
 <div class="overview-more" aria-label="More from the guide">

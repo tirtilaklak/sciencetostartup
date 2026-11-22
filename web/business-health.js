@@ -245,13 +245,19 @@ function alternateFigures(heading,figures,withMeasure=false){
 }
 function renderDetail(){
  const o=byId(bhState.observation),id=bhState.company||(o?.company_id),name=companies[id]?.name,group=id?groupLabel(modelGroup(id)):'';
- if(id&&evidenceState(id,bhState.signal)==='n-a'){
-  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name)} · ${safe(group)}</p><h3 id="bh-detail-title" tabindex="-1">Not applied</h3><p class="bh-lede">${safe(name)} is a nonprofit research organization. Commercial measures are not applied to it.</p><a class="bh-profile" href="#company/${safe(id)}">Full company profile ${iconHTML('external')}</a>`;
+ const notApplied=id&&evidenceState(id,bhState.signal)==='n-a';
+ const missing=!o||o.company_id!==id||o.signal!==bhState.signal;
+ const paidDelivery=name&&bhState.signal==='delivery'&&(notApplied||missing);
+ const kicker=paidDelivery?`<span id="bh-detail-subject">${safe(name)} · ${columns.delivery}</span> · ${safe(group)}`:safe(name?name+' · '+group:'Read the evidence');
+ $('bh-evidence-dialog').setAttribute('aria-labelledby',paidDelivery?'bh-detail-subject bh-detail-title':'bh-detail-title');
+ if(notApplied){
+  $('bh-detail').innerHTML=`<p class="bh-kicker">${kicker}</p><h3 id="bh-detail-title" tabindex="-1">Not applied</h3><p class="bh-lede">${safe(name)} is a nonprofit research organization. Commercial measures are not applied to it.</p><a class="bh-profile" href="#company/${safe(id)}">Full company profile ${iconHTML('external')}</a>`;
   return;
  }
- if(!o||o.company_id!==id||o.signal!==bhState.signal){
+ if(missing){
   const context=all().filter(r=>r.company_id===id&&r.signal===bhState.signal);
-  $('bh-detail').innerHTML=`<p class="bh-kicker">${safe(name?name+' · '+group:'Read the evidence')}</p><h3 id="bh-detail-title" tabindex="-1">${name?'No reviewed public figure':'Select a figure'}</h3><p class="bh-lede">${name?'The reviewed sources do not establish '+labels[bhState.signal].toLowerCase()+' for '+safe(name)+'. Missing is not zero.':'Select a chart bar to read its source and reporting details.'}</p><p class="bh-note">${esc(definition(bhState.signal).ideal_measure||questions[bhState.signal])}</p>${context.length?`<div class="bh-related"><p><strong>Available context</strong></p>${context.map(r=>`<p>${esc(r.label)}: ${numeric(r)?safe(valueText(r)):esc(r.original_text)} ${evidenceLinks(r)}</p>`).join('')}</div>`:''}${id?`<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`:''}`;
+  const signalLabel=paidDelivery?columns.delivery:labels[bhState.signal];
+  $('bh-detail').innerHTML=`<p class="bh-kicker">${kicker}</p><h3 id="bh-detail-title" tabindex="-1">${name?'No reviewed public figure':'Select a figure'}</h3><p class="bh-lede">${name?'The reviewed sources do not establish '+signalLabel.toLowerCase()+' for '+safe(name)+'. Missing is not zero.':'Select a chart bar to read its source and reporting details.'}</p><p class="bh-note">${esc(definition(bhState.signal).ideal_measure||questions[bhState.signal])}</p>${context.length?`<div class="bh-related"><p><strong>Available context</strong></p>${context.map(r=>`<p>${esc(r.label)}: ${numeric(r)?safe(valueText(r)):esc(r.original_text)} ${evidenceLinks(r)}</p>`).join('')}</div>`:''}${id?`<a class="bh-profile" href="#company/${safe(id)}/traction">Full company profile ${iconHTML('external')}</a>`:''}`;
   return;
  }
  const history=all().filter(r=>r.company_id===id&&r.signal===o.signal&&r.measure===o.measure&&r.id!==o.id).sort((a,b)=>dateKey(b).localeCompare(dateKey(a)));
@@ -319,7 +325,7 @@ function cellHTML(c,signal,state){
  if(!o){
   const notApplied=state==='n-a';
   const reason=notApplied?'Nonprofit research: commercial measures are not applied':'No reviewed public disclosure. Missing is not zero.';
-  const label=safe((notApplied?'n/a · ':'')+c.name+' · '+labels[signal]+' · '+reason);
+  const label=safe((notApplied?'n/a · ':'')+c.name+' · '+columns[signal]+' · '+reason);
   return `<td class="bh-cell" data-state="${state}" ${key}><button ${action} aria-label="${label}" title="${label}">${notApplied?'n/a':'—'}</button></td>`;
  }
  const selected=bhState.observation===o.id;
@@ -330,10 +336,14 @@ function cellHTML(c,signal,state){
 function renderGrid(){
  const {pool,sorted,states}=companyRows(),query=bhState.query.trim();
  const figures=sorted.filter(c=>signals.some(s=>states.get(c.id)[s]==='observed')).length;
- const order={coverage:'ordered by evidence coverage',signal:'ordered by '+labels[bhState.signal].toLowerCase()+' evidence, same basis together',name:'A to Z'}[bhState.sort];
- $('bh-matrix-count').textContent=`${query||bhState.evidenceOnly||bhState.group?`${sorted.length} of ${plural(DATA.companies.length,'organization')}`:plural(sorted.length,'organization')} · ${figures} with a reported figure · ${order}, not by health.`;
+ const order={coverage:'Ordered by evidence coverage.',signal:`Ordered by ${columns[bhState.signal].toLowerCase()} evidence. Figures run high to low within groups that share a measure and reporting basis, including currency.`,name:'Ordered A to Z.'}[bhState.sort];
+ $('bh-matrix-count').textContent=`${query||bhState.evidenceOnly||bhState.group?`${sorted.length} of ${plural(DATA.companies.length,'organization')}`:plural(sorted.length,'organization')} · ${figures} with a reported figure · ${order}`;
  const nextSort=bhState.sort==='name'?'coverage':'name';
- $('bh-grid-head').innerHTML=`<th scope="col"${bhState.sort==='name'?' aria-sort="ascending"':bhState.sort==='coverage'?' aria-sort="other"':''}><button type="button" class="bh-colhead" data-bh-sort="${nextSort}">Organization<small>${nextSort==='name'?'sort A to Z':'sort by most evidence'}</small></button></th>`+signals.map(s=>{const n=new Set(all().filter(o=>o.signal===s&&numeric(o)&&!o.is_context).map(o=>o.company_id)).size;return `<th scope="col"${bhState.sort==='signal'&&bhState.signal===s?' aria-sort="descending"':''}><button type="button" class="bh-colhead${bhState.signal===s?' is-active':''}" data-bh-tab="${s}" title="${esc(questions[s])}">${columns[s]}<small>${n} of ${DATA.companies.length}</small></button></th>`;}).join('');
+ $('bh-grid-head').innerHTML=`<th scope="col"${bhState.sort==='name'?' aria-sort="ascending"':bhState.sort==='coverage'?' aria-sort="other"':''}><button type="button" class="bh-colhead" data-bh-sort="${nextSort}">Organization<small>${nextSort==='name'?'sort A to Z':'sort by most evidence'}</small></button></th>`+signals.map(s=>{
+  const n=new Set(all().filter(o=>o.signal===s&&numeric(o)&&!o.is_context).map(o=>o.company_id)).size;
+  const active=bhState.signal===s,sortedByMeasure=bhState.sort==='signal'&&active;
+  return `<th scope="col"${sortedByMeasure?' aria-sort="other"':''}><button type="button" class="bh-colhead${active?' is-active':''}" data-bh-tab="${s}" title="${esc(questions[s])}"${sortedByMeasure?' aria-describedby="bh-matrix-count"':''}>${columns[s]}<small>${n} of ${DATA.companies.length}</small></button></th>`;
+ }).join('');
  $('bh-matrix-body').innerHTML=sorted.length?sorted.map(c=>`<tr${bhState.company===c.id?' class="is-selected"':''}><th scope="row"><a href="#company/${safe(c.id)}"><span>${safe(c.name)}</span></a><small>${safe(groupLabel(modelGroup(c.id)))}</small></th>${signals.map(s=>cellHTML(c,s,states.get(c.id)[s])).join('')}</tr>`).join(''):`<tr><td colspan="6" class="bh-empty">No organization matches. Clear the search or the group filter.</td></tr>`;
 }
 // After the grid is re-sorted, show the selected cell, or the top of the grid.
@@ -451,6 +461,11 @@ $('bh-group').addEventListener('change',e=>{bhState.group=e.target.value;bhState
 $('bh-sort').addEventListener('change',e=>{bhState.sort=e.target.value;renderGrid();revealSelection();});
 $('bh-search').addEventListener('input',e=>{bhState.query=e.target.value;renderGrid();});
 $('bh-evidence-only').addEventListener('change',e=>{bhState.evidenceOnly=!!e.target.checked;renderGrid();});
+$('bh-skip-to-method').addEventListener('click',()=>{
+ const summary=$('bh-method-summary');
+ summary.focus({preventScroll:true});
+ summary.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});
+});
 document.addEventListener('click',e=>{
  const expand=e.target.closest('#bh-ledger-more');if(expand){overviewExpanded=!overviewExpanded;renderLedger();expand.focus({preventScroll:true});return;}
  const overview=e.target.closest('[data-bh-overview]');if(overview){overviewMeasure=overview.dataset.bhOverview;renderLedger();$('bh-overview-'+overviewMeasure).focus({preventScroll:true});return;}
