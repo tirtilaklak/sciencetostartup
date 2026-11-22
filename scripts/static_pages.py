@@ -1645,11 +1645,12 @@ def business_observation_html(research, health, company_id, inline=False, compac
         link = external_link(source["url"], source["title"])
     if source and company_id == "snorkel_ai" and row.get("measure") == "annualized_revenue":
         link = external_link(source.get("url"), "Snorkel company disclosure")
+    link_check = availability(source.get("url"), research.health) if source else ""
     published = research.reviewed_source_dates.get(source["id"]) if source else None
     dates = f"Published {format_date(published)} · {source_record_status(source)}" if published else ""
-    citation = " · ".join(filter(None, (link, escape(dates), escape(row.get("evidence_assurance") or "Attributed source"))))
+    citation = " · ".join(filter(None, (link + link_check, escape(dates), escape(row.get("evidence_assurance") or "Attributed source"))))
     source_attr = f' data-source-id="{escape(source["id"])}"' if source else ""
-    warning = f'<span class="sub">{"Earlier" if primary else "Original"} citation could not be rechecked. Historical source attribution retained.</span>' if failed else ""
+    warning = f'<span class="sub">{"Earlier" if primary else "Original"} citation could not be rechecked. Historical source attribution retained.</span>' if failed and (primary or not link_check) else ""
     content = (f'<div class="selected-evidence" data-financial-observation="{escape(row["id"])}">'
                + ('' if inline else '<h2>Selected financial evidence</h2>')
                + f'<strong class="selected-value">{escape(value_text(dict(row, qualifier="approximate" if row.get("qualifier") == "approximately" else row.get("qualifier"))))}</strong><span class="sub">{escape(meta)}</span>'
