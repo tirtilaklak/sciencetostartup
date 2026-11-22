@@ -1,0 +1,188 @@
+{
+  "reviewed_build": "ea33475d17a8c53ceb65",
+  "reviewed_head": "987df3c4de13cad605e30764df2e429ee5c1b1e6",
+  "findings": [
+    {
+      "id": "R13-01",
+      "issue": "Cold mobile Reader citation taps can miss when focus reflows off-screen paragraphs. IFEval, GPQA and OSWorld in Technical Landscape were affected, both editions.",
+      "acceptance": "At 390px on a fresh chapter use Find to select the passage, tap the visible citation once and reach the exact same-edition assertion. Preserve keyboard, history and loading performance.",
+      "receipt_path": "candidate-13-review/research/technical-click-attempt1.log",
+      "receipt_sha256": "68f6248ba81ed786011a26231b7878a20eca6bc255fd474896f666044ebf032f"
+    },
+    {
+      "id": "R13-02",
+      "issue": "The fixed Daily label column lets enlarged Finding text overlap the following value, seen on rank 13 at 601px with a 32px minimum font.",
+      "acceptance": "Open Details and sources, verify visible label/value bounds, contrast, links and reflow across 320, 390, 600, 601, 701 and 844px.",
+      "receipt_path": "candidate-13-review/daily/firefox-32-round13-601-details.png",
+      "receipt_sha256": "97d26ccb024e48000d83015ad61e74ea39ca0878d4af6a10f5a7f9c9c65e8266"
+    },
+    {
+      "id": "R13-03",
+      "issue": "The Source ledger test sampled mobile scroll several pixels before departure settled. Six independent cold returns restored actual departure exactly.",
+      "acceptance": "Capture the position at settled departure, keep the under-two-pixel restoration assertion, and verify the same role and visible source.",
+      "receipt_path": "candidate-13-review/companies/source-ledger-forward-summary.json",
+      "receipt_sha256": "4cc9e7ef00ca826a16c17b096269e1575de28b74a9f6d973d7ce002e73dd80b5"
+    },
+    {
+      "id": "R13-04",
+      "issue": "The refused claim test cleared its simulated outage before the request started. The waiting for retry control then timed out.",
+      "acceptance": "Observe real refused fetch and the visible Retry action before lifting the refusal and activating Retry.",
+      "receipt_path": "candidate-13-review/release/profile-and-daily-evidence.json",
+      "receipt_sha256": "5a433d05801a67d818cbc624f5c5eef06aba2aad58d215eda98eafcbc44dacb8"
+    },
+    {
+      "id": "R13-05",
+      "issue": "The Daily test rejected a select whose intrinsic and rendered widths differed by 0.00001525878906 CSS pixels.",
+      "acceptance": "Account only for browser layout precision and continue to detect visible clipping, including at 844px with 28px minimum text.",
+      "receipt_path": "candidate-13-review/release/profile-and-daily-evidence.json",
+      "receipt_sha256": "5a433d05801a67d818cbc624f5c5eef06aba2aad58d215eda98eafcbc44dacb8"
+    },
+    {
+      "id": "R13-06",
+      "issue": "Mobile WebKit cold Forward to a filtered Daily story preserves scroll, focus and URL but drops the green active-story highlight with JavaScript enabled. Native no-script retains it. Reproduced on round 13, round 12 and Worker 41.",
+      "acceptance": "On iPhone WebKit restore the sole fragment’s existing visible highlight together with exact focus, URL, filters and scroll. Clear or update it on subsequent traversal, and retain browser-native behavior when scripts are disabled.",
+      "receipt_path": "candidate-13-review/daily/fragment-highlight.json",
+      "receipt_sha256": "c23fb46c953e4f558196d5731851b1abaab0804a043b016154ee83aacd464e14"
+    },
+    {
+      "id": "R13-07",
+      "issue": "Opening the Homepage Menu covers the keyboard-focused Sources and data action at actual 200 percent Chromium zoom. All nine hit-test points fell under the menu. At 400 percent the panel also covers part of Find paid work.",
+      "acceptance": "Open and tab through the homepage Menu at 200 and 400 percent. The first focused actions after the disclosure are visible and hit-testable, and ordinary desktop and phone masthead still fit.",
+      "receipt_path": "candidate-13-review/accessibility/zoom.json",
+      "receipt_sha256": "bec08b8da4a6bd503e5a8325ce0dc1be058d0036549850287f07db1bdf5ecb2e"
+    },
+    {
+      "id": "R13-08",
+      "issue": "After an overview payload or business-health module outage, Market Reload page recovers the content and focuses its heading while leaving it off screen. On a 390px phone the restored heading sits at y=2454, versus y=124 on clean entry. Also reproduced on desktop and the previous build.",
+      "acceptance": "From a real normal Explore entry, fail each lazy dependency, activate Reload page by keyboard, recover data and leave the heading simultaneously focused and visible on phone and desktop. Keep normal Back and trusted reader scroll intact.",
+      "receipt_path": "candidate-13-review/market/retry-chromium.json",
+      "receipt_sha256": "1393bcaf35c073dcace8e77ce65887920ef50c44d6d51804d1adbed070094077"
+    },
+    {
+      "id": "R13-09",
+      "issue": "At actual 400 percent Home zoom the selected 107px Mercor search option exceeds its 65px scroll area. The last lines are visible with mouse wheel, while PageDown, End, ArrowRight or Tab did not expose them with the selected option.",
+      "acceptance": "A keyboard reader can see the full active result description at the reported zoom and short viewport; choosing the correct action and returning focus still work.",
+      "receipt_path": "candidate-13-review/accessibility/zoom-home.json",
+      "receipt_sha256": "5158fafdb8e59e4608a152b6b6e677d1d24e42275169dcc6131a61437bb710b6"
+    },
+    {
+      "id": "R13-10",
+      "issue": "At 320x568 with 32px minimum text the company comparison left nine of twelve keyboard-focused controls completely below the viewport. The masthead plus sticky comparison header consumed 497px. At 320x720 the second line of Change pair was clipped.",
+      "acceptance": "On the three-company comparison at 320x568 and 320x720, tab through Change pair, company, source and Figure details controls. The focused readable text stays in view after settling. Preserve ordinary sizes, pairs, return focus, metrics and export.",
+      "receipt_path": "candidate-13-review/market/journeys-min32-compare-focus-settled.json",
+      "receipt_sha256": "faba56e48d94db7bb7e56a68c03ea8b3655c71ca40184f775398d1d79382ad5d"
+    }
+  ],
+  "ci_run": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45042823507",
+  "browser_run": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45042823520",
+  "official_trace_cases": {
+    "mobile-chromium": {
+      "artifact": 14763110725,
+      "archiveDigest": "sha256:6aea8785cc32ce6331dc32a58471eb7de017ac0737b770be73a4f0bd69875e0c",
+      "tests": {
+        "ledgerColdForward": [
+          {
+            "retry": 0,
+            "status": "failed",
+            "trace": "results/profile-details-the-native-a412b--sources-before-images-load-mobile-chromium/trace.zip",
+            "traceSha256": "e6288fe3d3cfcb75a3322715dafa8833bfa5225b13eba6b712eaff7545f1be28",
+            "instantScrollSample": {
+              "ms": 90172.522,
+              "scrollY": 2883
+            },
+            "firstFrameAfterSample": {
+              "ms": 90176.338,
+              "scrollY": 2883
+            },
+            "lastFrameBeforeBack": {
+              "ms": 90180.709,
+              "scrollY": 2879
+            },
+            "readyAfterColdForward": {
+              "ms": 90408.071,
+              "scrollY": 2879
+            }
+          },
+          {
+            "retry": 1,
+            "status": "failed",
+            "trace": "results/profile-details-the-native-a412b--sources-before-images-load-mobile-chromium-retry1/trace.zip",
+            "traceSha256": "6c70da9900c26bfee28bcce708a56deddebed24dbbc94d6d9712ed2d9c391bf4",
+            "instantScrollSample": {
+              "ms": 99740.601,
+              "scrollY": 2883
+            },
+            "firstFrameAfterSample": {
+              "ms": 99746.195,
+              "scrollY": 2879
+            },
+            "lastFrameBeforeBack": {
+              "ms": 99751.192,
+              "scrollY": 2879
+            },
+            "readyAfterColdForward": {
+              "ms": 99985.316,
+              "scrollY": 2879
+            }
+          }
+        ],
+        "claimRetry": [
+          {
+            "retry": 0,
+            "status": "timedOut",
+            "trace": "results/profile-details-a-refused--39383-t-sources-on-keyboard-retry-mobile-chromium/trace.zip",
+            "traceSha256": "073a5f4bf44da8754db528ef422118d4bdc97581f40797fb07a45aafb100020c",
+            "pressStartedMs": 87075.264,
+            "requestStartedMs": 87077.592,
+            "requestUrl": "http://127.0.0.1:18766/presentation/company-a-team.d8a5876509ea7ce3.json",
+            "responseStatus": 200
+          },
+          {
+            "retry": 1,
+            "status": "passed"
+          }
+        ]
+      }
+    },
+    "firefox": {
+      "artifact": 14763106305,
+      "archiveDigest": "sha256:9353a9350351727d3253a44f6135d939f1e76fa8b191dc4a0a8b64a8a1da0d04",
+      "tests": {
+        "dailyTopicWidth": [
+          {
+            "retry": 0,
+            "status": "failed",
+            "trace": "results/daily-phone-reflow-Daily-f-0e4ab-s-across-Firefox-text-sizes-firefox/trace.zip",
+            "traceSha256": "6b3a54833c75c111144f96a9c96ba35108a9ca514f730e292219101582a48780",
+            "attachmentSha256": "cd2ce88855b228eaf8f7f07fffba69c56766e0d01b5da5cfd4ca09790e681aad",
+            "topic": {
+              "name": "Topic",
+              "needed": 181.03334045410156,
+              "available": 181.0333251953125,
+              "top": 529.8499755859375,
+              "bottom": 585.8499755859375
+            },
+            "widthDifferenceCssPx": 1.52587890625e-05,
+            "documentWidth": 844
+          },
+          {
+            "retry": 1,
+            "status": "failed",
+            "trace": "results/daily-phone-reflow-Daily-f-0e4ab-s-across-Firefox-text-sizes-firefox-retry1/trace.zip",
+            "traceSha256": "1bc7479672451c93ec52d98c5b3f753cb16ce55aeffa729e30bac5ecbede3c75",
+            "attachmentSha256": "cd2ce88855b228eaf8f7f07fffba69c56766e0d01b5da5cfd4ca09790e681aad",
+            "topic": {
+              "name": "Topic",
+              "needed": 181.03334045410156,
+              "available": 181.0333251953125,
+              "top": 529.8499755859375,
+              "bottom": 585.8499755859375
+            },
+            "widthDifferenceCssPx": 1.52587890625e-05,
+            "documentWidth": 844
+          }
+        ]
+      }
+    }
+  }
+}

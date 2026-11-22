@@ -1,0 +1,222 @@
+{
+  "source": "0632edf1eb2333744b0180cd9bc64fad866e397e",
+  "artifact_commit": "987df3c4de13cad605e30764df2e429ee5c1b1e6",
+  "dist_tree": "35cc09df1ed543b4bf88377aa8b34d81b89b7904",
+  "build": "ea33475d17a8c53ceb65",
+  "manifest_sha256": "302ff62b32ee3c9e8b1e8fec4f5dcdd1ca9a09b7baf480a98ffea4adbca273f1",
+  "editorial_release": "2026-11-22.9",
+  "reviewers": [
+    "retest13_release",
+    "retest13_navigation",
+    "retest13_work_matrix",
+    "retest13_companies",
+    "retest13_visual",
+    "retest13_sources",
+    "retest13_research",
+    "retest13_daily",
+    "retest13_market",
+    "retest13_accessibility"
+  ],
+  "model": "gpt-6.2-sol",
+  "reasoning_effort": "ultra",
+  "work": {
+    "selections": 70,
+    "downloads": 210,
+    "empty_downloads": 39,
+    "full_export_sha256": "b0a0c71ad3fb48e4ebf3472b99c82d87e18bbf0de4d6d9a0f1c93eafddaa9389",
+    "selection_back_checks": 140,
+    "role_title_links": 135,
+    "employer_ctas": 135,
+    "compare_cells_by_viewport": {
+      "1280×720": 270,
+      "390×844": 270
+    },
+    "work_html_bytes": {
+      "sha256": "9665cc90140ad04cbdb399bba790ba28f70b9860e73f9b7b5c732f8642d01337",
+      "raw": 299700,
+      "gzip": 42501
+    },
+    "profile_html_bytes": {
+      "sha256": "084196bdbb9a04d4c93a2e95e281295d0d9f4cffd3ffb3e330ada1dac3b73563",
+      "raw": 154676,
+      "gzip": 22542
+    },
+    "work_history_and_enhancer": {
+      "cold": {
+        "passed": 17,
+        "engines": {
+          "chromium": 7,
+          "firefox": 5,
+          "webkit": 5
+        }
+      },
+      "cached": {
+        "passed": 2,
+        "engines": {
+          "chromium": 2
+        }
+      },
+      "retry": {
+        "passed": 3,
+        "engines": {
+          "chromium": 3
+        }
+      }
+    },
+    "natural_webkit_journeys": 5,
+    "candidate_failures": []
+  },
+  "research": {
+    "nativeChapterChecksWithoutJavaScript": 72,
+    "nativeChapterCasesByViewport": {
+      "320": 24,
+      "390": 24,
+      "1280": 24
+    },
+    "historicalBookmarks": 24,
+    "chapterPaginationAndCitationJourneysWithJavaScript": 48,
+    "chapterContentsChoicesWithJavaScript": 44,
+    "chapterParagraphs": 3812,
+    "chapterAssertionLinks": 15904,
+    "assertionSourceLinks": 7184,
+    "citationFormatByteChecks": 8,
+    "publisherSamples": 7,
+    "archiveBrowserHopsUnderPreparedRouting": 8,
+    "archiveBrowserRouteControls": 13,
+    "workerdCoreHttpCases": 26,
+    "supportingWorkerdHttpCases": 11,
+    "archiveUnchangedFiles": 66,
+    "exportUnchangedFiles": 7,
+    "archiveProjectionRowsMatchingJsonCsvSqlite": 17763,
+    "archiveChecksummedMembers": 56,
+    "sourceSampleBrowserJourneys": 22,
+    "archiveDownloadsByInputType": [
+      "keyboard",
+      "touch"
+    ],
+    "archiveDownloadedFileMembers": 57,
+    "currentCitationBrowserActivations": 4
+  },
+  "frozen_research_tap_failures": 14,
+  "frozen_research_tap_traces": 16,
+  "finance_and_companies": {
+    "native_dossiers": 55,
+    "shared_companies": 39,
+    "matched_native_and_rendered_source_pairs": 880,
+    "matched_revenue_records": 18,
+    "afterquery_general_sources": 45,
+    "afterquery_paid_work_sources": 48
+  },
+  "official": {
+    "CI": "success",
+    "Browser QA": "failure",
+    "unit_tests": 1109,
+    "browser_core_first_pass": 1599,
+    "browser_core_retry_pass": 1,
+    "browser_core_failures": 2,
+    "browser_core_skips": 328,
+    "accessibility_passed": 60,
+    "lighthouse_reports": 72,
+    "route_medians_passing": 24,
+    "median_ranges": {
+      "largest-contentful-paint": {
+        "minimum": {
+          "route": "/",
+          "value": 902.6896999999999
+        },
+        "maximum": {
+          "route": "/explore/#companies",
+          "value": 2342.352
+        }
+      },
+      "total-blocking-time": {
+        "minimum": {
+          "route": "/",
+          "value": 0
+        },
+        "maximum": {
+          "route": "/research/papers/",
+          "value": 70
+        }
+      },
+      "cumulative-layout-shift": {
+        "minimum": {
+          "route": "/",
+          "value": 0
+        },
+        "maximum": {
+          "route": "/daily/",
+          "value": 0.0003382518983905184
+        }
+      },
+      "performanceScore": {
+        "minimum": {
+          "route": "/explore/#companies",
+          "value": 0.98
+        },
+        "maximum": {
+          "route": "/",
+          "value": 1
+        }
+      }
+    },
+    "archive_sha256": "179d54064acae06354939c580afe532f818c1473528aa116fccfb6e45e487f4b"
+  },
+  "previous_public": {
+    "build": "5dc63fbcf19634a55c66",
+    "worker_version": 41,
+    "deployment": "6523aad9-1019-4eca-b781-408a55b9f33a",
+    "comparison_manifest": "11ad0371ba0ccd53549c8d605eabae0b20e9bc991cf05cc75069e5cebc9eb2fe",
+    "pass_counts_in_this_observation": {
+      "search": [
+        10,
+        10
+      ],
+      "accessibility": [
+        17,
+        17
+      ],
+      "home": [
+        46,
+        48
+      ],
+      "editorial": [
+        11,
+        11
+      ]
+    },
+    "receipt_sha256": "85b0e59f2244fed993281ede10ff7c8652991e81e0564d34a22b116b94568316",
+    "scope": "The two source link checks saw transient upstream 503s on this run. Earlier public checks and separate follow-up GETs are retained."
+  },
+  "receipt_sha256": {
+    "work-matrix/completion.json": "3af59cb90f602fa957f287fb74388395fd5db0c8b7003aef3f1519a250ae8ebf",
+    "research/verdict.json": "ec01a47afff4adfa3769a3cd9fc7ca3cbee2dea64ffd68f5c786a6be3c6d1b2c",
+    "release/ci-measurements.json": "add8e21032a6993b86e3a86fbe9f698bc9dcb14f4f2ec86ddd40ac9ec88c0cb5",
+    "release/profile-and-daily-evidence.json": "5a433d05801a67d818cbc624f5c5eef06aba2aad58d215eda98eafcbc44dacb8",
+    "companies/root-recovery/completed.json": "ebf3658d4ecf63a572311cc9c65b4abcf1c0524d0911f2131f622005cd50f48c",
+    "companies/source-ledger-forward-summary.json": "4cc9e7ef00ca826a16c17b096269e1575de28b74a9f6d973d7ce002e73dd80b5",
+    "daily/fragment-highlight.json": "c23fb46c953e4f558196d5731851b1abaab0804a043b016154ee83aacd464e14",
+    "daily/details-reflow.json": "d4c3e0ba03a5605b0a28278c6ba67be0114965eb3db6d6693c68b545f37f2587",
+    "accessibility/zoom-home.json": "5158fafdb8e59e4608a152b6b6e677d1d24e42275169dcc6131a61437bb710b6",
+    "visual/default-receipt.json": "d262a8e2e9939e99837428893fa7445d9ee37ebd2c7c1ab2f995c0c1effe696e",
+    "visual/min32-receipt.json": "c84e736a5b5194fc2c929806f7c014dccc850e50e3438c5af293f5783b6b0569",
+    "market/retry-chromium.json": "1393bcaf35c073dcace8e77ce65887920ef50c44d6d51804d1adbed070094077",
+    "work-sources/public-sources-review.json": "33b7462beb8a3becbf43fb49be5a96eb75d8f403095c057a1d28578ec055547d",
+    "local-release-gates.json": "79949c1f4508c2c56430384506f93645206f15a7e5f3def4445fd6c345a280ea",
+    "navigation/coverage.json": "a7b30a791e9bd9692d96dc6999bd3285fd5053ab2db708a0839809e94b629edb"
+  },
+  "local_controls": {
+    "total_browser_cases": 250,
+    "targeted_acceptance": 86,
+    "logic_suites": 9,
+    "payload_caps": 6,
+    "source_and_download_routes": 17,
+    "checked_utc": "2026-11-22T16:50:13.973753+00:00"
+  },
+  "explore_destinations": {
+    "published": 285,
+    "additional_after_render": 230,
+    "desktop_and_phone_visits": 1030
+  },
+  "as_of_utc": "2026-11-22T16:52:33.416366+00:00"
+}
