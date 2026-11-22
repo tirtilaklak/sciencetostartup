@@ -160,14 +160,18 @@ function loadingProfile(id,section){
  target.innerHTML=`<div class="profile-v2" data-profile-company="${attr(id)}" data-profile-loading>${profileIntroductionHTML(id)}<div data-profile-loading-content><p role="status">Loading the sourced profile…</p><p>${nativeProfileFallback(id,section)}</p></div></div>`;
 }
 function afterProfileIntroductionPaint(){
- // Let the sourced introduction paint before installing the larger evidence
- // context. Background tabs still complete without waiting for animation frames.
+ // Let the browser present the sourced introduction before starting evidence
+ // requests. Layout and compositor presentation can span successive frames.
  if(typeof requestAnimationFrame!=='function'||document.visibilityState==='hidden')return Promise.resolve();
  return new Promise(resolve=>{
-  let frame=0,timer=0;
+  let frame=0,timer=0,framesRemaining=4;
   const done=()=>{clearTimeout(timer);if(frame&&typeof cancelAnimationFrame==='function')cancelAnimationFrame(frame);resolve();};
+  const nextFrame=()=>{
+   if(--framesRemaining)frame=requestAnimationFrame(nextFrame);
+   else done();
+  };
   timer=setTimeout(done,100);
-  frame=requestAnimationFrame(()=>{frame=requestAnimationFrame(done);});
+  frame=requestAnimationFrame(nextFrame);
  });
 }
 function evidenceFailure(error){

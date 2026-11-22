@@ -47,7 +47,9 @@ const results={};
   const ready=e.route();assert.equal(e.pendingShortlistScroll.signal.aborted,true);assert.equal(ready,e.window.APP_ROUTE_READY);ready.then(()=>{settled=true;});
   assert.match(e.nodes.get('profile-view').innerHTML,/Sourced introduction mercor/);
   assert.equal(e.nodes.get('profile-view').attributes.get('aria-busy'),'true');
-  assert.equal(e.calls.length,0);e.frame();await flush();assert.equal(e.calls.length,0);assert.equal(settled,false);
+  for(let frameIndex=0;frameIndex<3;frameIndex++){
+   e.frame();await flush();assert.equal(e.calls.length,0);assert.equal(settled,false);
+  }
   e.frame();await flush();assert.equal(e.calls.length,1);assert.equal(settled,false);assert.equal(e.root.dataset.viewState,'loading');
   deliver({companyId:'mercor'});await ready;assert.deepEqual(e.installed,['mercor']);assert.deepEqual(e.rendered,['#company/mercor/work']);
   assert.equal(e.root.dataset.viewState,'ready');assert.equal(e.nodes.get('profile-view').attributes.has('aria-busy'),false);
@@ -81,7 +83,8 @@ const results={};
   results.same_hash_return_keeps_generation_guard=true;
  }
  {
-  let deliver;const e=environment({transport:()=>new Promise(resolve=>{deliver=resolve;})});const old=e.route();e.frame();e.frame();await flush();
+  let deliver;const e=environment({transport:()=>new Promise(resolve=>{deliver=resolve;})});const old=e.route();
+  while(e.frames.size){e.frame();await flush();}
   assert.equal(e.calls.length,1);e.location.hash='#companies';e.route();const current=e.window.APP_ROUTE_READY;await current;assert.equal(e.calls[0].signal.aborted,true);
   deliver({companyId:'mercor'});await old;assert.equal(e.installed.length,0);assert.deepEqual(e.rendered,['#companies']);assert.equal(e.window.APP_ROUTE_READY,current);
   results.late_response_after_navigation_never_installs=true;
