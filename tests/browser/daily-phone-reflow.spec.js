@@ -1,6 +1,16 @@
 const { test, expect, firefox } = require('@playwright/test');
 
 const viewport = { width: 320, height: 720 };
+// Independent DOMRect reads can round differently. A thousandth of a CSS pixel
+// covers that difference and stays below Firefox's 1/60px layout unit.
+const selectWidthTolerance = 0.001;
+
+function firefoxWithMinimumText(minimum) {
+  return firefox.launch({ firefoxUserPrefs: {
+    'font.minimum-size.x-western': minimum,
+    'font.minimum-size.x-unicode': minimum,
+  } });
+}
 
 function filterLayout(grid) {
   const input = grid.querySelector('input');
@@ -59,10 +69,7 @@ test('Daily filter controls fit and have visible boundaries across Firefox text 
 
   for (const minimum of [0, 28, 32]) {
     await test.step(`${minimum}px minimum text`, async () => {
-      const browser = await firefox.launch({ firefoxUserPrefs: {
-        'font.minimum-size.x-western': minimum,
-        'font.minimum-size.x-unicode': minimum,
-      } });
+      const browser = await firefoxWithMinimumText(minimum);
       try {
         const page = await browser.newPage({ baseURL, viewport });
         for (const width of [320, 390, 600, 601, 844]) {
@@ -91,7 +98,7 @@ test('Daily filter controls fit and have visible boundaries across Firefox text 
               expect(contrast, name).toBeGreaterThanOrEqual(3);
             }
             for (const { name, needed, available } of layout.selects) {
-              expect(needed, name).toBeLessThanOrEqual(available);
+              expect(needed, name).toBeLessThanOrEqual(available + selectWidthTolerance);
             }
 
             const [topic, type] = layout.selects;
@@ -105,7 +112,7 @@ test('Daily filter controls fit and have visible boundaries across Firefox text 
             if (width === 320 && minimum === 32) {
               await page.getByText('Snapshot archive and feeds', { exact: true }).press('Enter');
               const { date } = await page.locator('.scan-controls').evaluate(filterLayout);
-              expect(date.needed).toBeLessThanOrEqual(date.available);
+              expect(date.needed).toBeLessThanOrEqual(date.available + selectWidthTolerance);
               expect(date.right).toBeLessThanOrEqual(width);
               expect(date.contrast).toBeGreaterThanOrEqual(3);
               await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeVisible();
@@ -116,6 +123,65 @@ test('Daily filter controls fit and have visible boundaries across Firefox text 
         await browser.close();
       }
     });
+  }
+});
+
+test('Daily story details keep enlarged labels and values separate', async ({ browserName, baseURL }, info) => {
+  test.skip(browserName !== 'firefox', 'Firefox provides a minimum font preference');
+  const browser = await firefoxWithMinimumText(32);
+  try {
+    const page = await browser.newPage({ baseURL, viewport });
+    await page.goto('/daily/2026-11-18/');
+    const story = page.locator('#scale-hospital-operations');
+    await story.getByText('Details & sources', { exact: true }).press('Enter');
+    const source = story.getByRole('link', { name: 'Scale Hospital Operations release and evaluation approach' });
+    await expect(source).toHaveAttribute('href', 'https://scale.com/blog/scaleforhospitaloperations');
+    await page.evaluate(() => document.fonts.ready);
+
+    for (const width of [320, 390, 600, 601, 701, 844]) {
+      await test.step(`${width}px viewport`, async () => {
+        await page.setViewportSize({ width, height: viewport.height });
+        await expect(source).toBeVisible();
+        const { documentWidth, fields } = await story.evaluate(article => {
+          const textRects = element => {
+            const range = document.createRange();
+            range.selectNodeContents(element);
+            return [...range.getClientRects()].map(({ left, right, top, bottom }) => ({ left, right, top, bottom }));
+          };
+          return {
+            documentWidth: document.scrollingElement.scrollWidth,
+            fields: [...article.querySelectorAll('dl > div')].map(row => {
+              const label = row.querySelector('dt');
+              return { label: label.textContent, labelRects: textRects(label), valueRects: textRects(row.querySelector('dd')) };
+            }),
+          };
+        });
+        await info.attach(`daily-details-minimum-font-32-width-${width}.json`, {
+          body: JSON.stringify({ documentWidth, fields }), contentType: 'application/json',
+        });
+
+        expect(documentWidth).toBe(width);
+        expect(fields.map(field => field.label)).toEqual(expect.arrayContaining(['Finding', 'Source date']));
+        for (const { label, labelRects, valueRects } of fields) {
+          expect(labelRects.length, `${label} label lines`).toBeGreaterThan(0);
+          expect(valueRects.length, `${label} value lines`).toBeGreaterThan(0);
+          for (const { left, right } of [...labelRects, ...valueRects]) {
+            expect(left, `${label} text left edge`).toBeGreaterThanOrEqual(0);
+            expect(right, `${label} text right edge`).toBeLessThanOrEqual(width);
+          }
+          for (const labelLine of labelRects) {
+            for (const valueLine of valueRects) {
+              if (Math.min(labelLine.bottom, valueLine.bottom) > Math.max(labelLine.top, valueLine.top)) {
+                const overlap = Math.min(labelLine.right, valueLine.right) - Math.max(labelLine.left, valueLine.left);
+                expect(overlap, `${label} label and value overlap`).toBeLessThanOrEqual(0);
+              }
+            }
+          }
+        }
+      });
+    }
+  } finally {
+    await browser.close();
   }
 });
 
