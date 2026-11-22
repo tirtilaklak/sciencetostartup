@@ -41,7 +41,13 @@ html:has(#compare-tray:not([hidden])){scroll-padding-bottom:96px}
 @media(max-width:480px){#compare-tray .tray-link-extra{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
 
 /* Compare page controls: add a company, examples, clear. */
-.compare-controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px 16px;margin:0 0 18px}
+.compare-tools{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:4px 16px;margin-bottom:12px}
+#compare-setup{min-width:0;max-width:100%}
+#compare-setup[open]{flex-basis:100%}
+#compare-setup-toggle{min-height:44px;padding:10px 4px;color:var(--green);cursor:pointer;overflow-wrap:anywhere}
+#copy-compare{min-height:44px;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.compare-scope .sub{margin:0 0 6px}
+.compare-controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px 16px;margin:0 0 12px}
 .compare-add{display:flex;align-items:end;gap:8px}
 .compare-controls label{gap:6px;font-size:12px;color:var(--muted)}
 .compare-controls select{min-width:240px;min-height:44px;background:#fffefa;border:1px solid #7b8978;border-radius:3px;font-size:14px}
@@ -53,10 +59,6 @@ html:has(#compare-tray:not([hidden])){scroll-padding-bottom:96px}
  .compare-controls select{width:100%;min-width:0}
 }
 @media(max-width:420px){.compare-controls{grid-template-columns:minmax(0,1fr)}.compare-controls>button{justify-self:start}}
-.comparison-mode{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px}
-.comparison-mode p{margin:0}
-.comparison-mode .text-link{min-height:32px;font-size:13px}
-@media(max-width:700px){.comparison-swipe{display:block}}
 /* Phones. iOS Safari zooms the page when a field under 16px gets focus, so every field in the
    index, work and compare views is 16px. Compare controls get a 44px tap area. */
 @media(max-width:700px){
@@ -66,7 +68,6 @@ html:has(#compare-tray:not([hidden])){scroll-padding-bottom:96px}
  .mobile-column-options{margin-top:0}
  .mobile-column-options>summary{min-height:44px;line-height:44px}
  .mobile-column-options>.mobile-compare-pager{top:48px}
- .comparison-mode .text-link{min-height:44px}
 }
 
 /* A shorter period shown under the full-year figure (RED-8). */
@@ -76,13 +77,9 @@ html:has(#compare-tray:not([hidden])){scroll-padding-bottom:96px}
 .comparison-table .comparison-later .row-period{display:block;margin-top:2px;font-size:12px;color:var(--muted);white-space:normal}
 
 /* A short comparison first; secondary facts stay one click away. */
-.comparison-empty{padding:40px 32px;border:1px solid var(--border);border-radius:8px;background:var(--paper);max-width:860px}
-.comparison-empty h2{font-size:28px;letter-spacing:-.7px;margin:12px 0}
-.comparison-empty p{max-width:62ch;font-size:16px;line-height:1.6}
-.comparison-starts{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}
-.comparison-starts button,.comparison-more{padding:12px 16px;border:1px solid var(--border);border-radius:5px;background:var(--paper);color:var(--green);font:inherit;min-height:44px;cursor:pointer}
-.comparison-starts button:hover,.comparison-more:hover{background:var(--pale)}
-.comparison-context{max-width:80ch;margin:8px 0 22px;color:var(--muted);font-size:13px;line-height:1.55}
+.comparison-more{padding:12px 16px;border:1px solid var(--border);border-radius:5px;background:var(--paper);color:var(--green);font:inherit;min-height:44px;cursor:pointer}
+.comparison-more:hover{background:var(--pale)}
+.comparison-context{max-width:80ch;margin:0 0 8px;color:var(--muted);font-size:13px;line-height:1.55}
 .comparison-more{margin-top:16px}
 #comparison-extra[hidden]{display:none!important}
 #comparison-extra:not([hidden]) tr:first-child{border-top:2px solid var(--border)}
@@ -96,10 +93,6 @@ html:has(#compare-tray:not([hidden])){scroll-padding-bottom:96px}
 .company-description{max-width:60ch}
 @media(min-width:1101px){.company-card{grid-template-columns:52px minmax(240px,1.7fr) minmax(210px,1fr) 120px;gap:24px;padding:24px 0}}
 @media(max-width:700px){
- .comparison-empty{padding:24px 18px}
- .comparison-empty h2{font-size:24px}
- .comparison-starts{display:grid;gap:10px}
- .comparison-starts button{text-align:left;font-size:14px}
  .comparison-more{width:100%;font-size:14px;text-align:left}
  .comparison-context{font-size:12px}
  .company-work-link,.company-missing-source{min-height:44px;display:inline-flex;align-items:center}

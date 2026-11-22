@@ -1,5 +1,10 @@
 const { test, expect } = require('@playwright/test');
 
+async function openCompareSetup(page) {
+  const setup = page.locator('#compare-setup');
+  if (!await setup.evaluate(element => element.open)) await setup.locator('summary').press('Enter');
+}
+
 test('native Companies carries the exact saved search result into Compare', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/companies/?group=expert-data-evaluation&reader=keep');
@@ -18,6 +23,7 @@ test('native Companies carries the exact saved search result into Compare', asyn
   await action.press('Enter');
   await expect(page).toHaveURL(/\/explore\/#compare\/mercor$/);
   await expect(page.locator('#compare-content [data-remove]')).toHaveAttribute('data-remove', 'mercor');
+  await openCompareSetup(page);
   const add = page.getByRole('combobox', { name: 'Add a company' });
   await expect(add).toBeInViewport({ ratio: 1 });
   await expect(add.locator('option[value=mercor]')).toBeDisabled();
@@ -32,6 +38,7 @@ test('native Companies carries the exact saved search result into Compare', asyn
   await expect(action).toBeInViewport({ ratio: 1 });
   await page.goForward();
   await expect(page.locator('#compare-content [data-remove]')).toHaveAttribute('data-remove', 'mercor');
+  await openCompareSetup(page);
   await add.selectOption('appen');
   await page.getByRole('button', { name: 'Add', exact: true }).click();
   await expect(page).toHaveURL(/\/explore\/#compare\/mercor\/appen$/);
@@ -222,6 +229,7 @@ shortlistTest('Explore shortlist restores the initiating Compare after editing a
   const [first, removed, last] = shortlist;
   await activate(page.getByRole('button', { name: `Remove ${removed.name}`, exact: true }));
   await expectComparison([first.id, last.id]);
+  await openCompareSetup(page);
   await page.getByRole('combobox', { name: 'Add a company' }).selectOption('appen');
   await activate(page.getByRole('button', { name: 'Add', exact: true }));
   const editedIds = [first.id, last.id, 'appen'];

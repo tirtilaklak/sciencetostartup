@@ -103,7 +103,23 @@
 
 <section id="work-view" class="view" hidden><div class="page-heading"><h1>Find paid work.</h1><p class="intro">Paid roles and expert networks, with sources.</p></div><div class="filters work-filters"><label class="search-label">Search paid work<input type="search" id="work-search" placeholder="Role, skill or company" autocomplete="off"></label><details class="responsive-filter-panel"><summary>Filters</summary><div class="responsive-filter-fields"><label>Opportunity type<select id="work-kind"><option value="">All records</option><option value="named">Named listings</option><option value="programs">Network programs</option><option value="boards">Career pages</option><option value="outside">Other jobs</option><option value="closed">Past and other</option></select></label><label>Work type<select id="work-group"><option value="">Any type</option></select></label><label>Pay<select id="work-pay"><option value="">Any pay</option><option value="hourly">Hourly rate published</option><option value="task">Paid per task</option><option value="yearly">Salary or yearly pay</option><option value="monthly">Stipend or monthly pay</option><option value="numeric">Any amount published</option><option value="undisclosed">Pay not published</option></select></label><label>Work arrangement<select id="work-eligibility"><option value="">Any arrangement</option><option value="remote">Remote possible</option><option value="onsite">On-site or hybrid</option><option value="varies">Varies or not stated</option></select></label><button id="work-reset" class="quiet">Clear filters</button></div></details></div><div class="w4-results-bar"><p id="work-count" class="sub" aria-live="polite"></p><div class="w4-results-actions"><a href="/work/?view=compare" id="work-native-compare">Compare results</a><button type="button" id="work-export" class="quiet" aria-describedby="work-count">Download CSV</button></div><label class="w4-sort">Sort<select id="work-sort"><option value="">Best match</option><option value="hourly">Highest hourly rate</option><option value="checked">Recently checked</option></select></label></div><p id="work-export-status" role="status"></p><p id="work-sort-note" class="w4-sort-note" hidden></p><div id="work-overview" class="work-overview"></div><div id="work-safety" class="w4-safety-slot"></div><div id="work-cards" class="card-grid work-grid"></div></section>
 
-<section id="compare-view" class="view" hidden><div class="page-heading"><h1>Compare</h1><p class="intro">Put up to three companies side by side. Each figure keeps its date and links to its source.</p></div><div class="presets compare-controls"><div class="compare-add"><label class="compare-add-label">Add a company<select id="compare-add"><option value="">Choose a company</option></select></label><button type="button" id="compare-add-button" class="quiet" hidden>Add</button></div><label class="compare-preset-label">Examples<select id="compare-preset"><option value="">Choose an example</option><option value="scale">Revenue examples</option><option value="work">Contract work examples</option></select></label><button type="button" id="clear-compare" class="quiet">Clear selection</button></div><p id="compare-status" class="sr-only" role="status" aria-live="polite"></p><div id="compare-content"></div></section>
+<section id="compare-view" class="view" hidden>
+<div class="page-heading"><h1>Compare</h1></div>
+<div class="compare-tools">
+<details id="compare-setup" open>
+<summary id="compare-setup-toggle">Choose up to three companies</summary>
+<div class="compare-controls">
+<div class="compare-add"><label class="compare-add-label">Add a company<select id="compare-add"><option value="">Choose a company</option></select></label><button type="button" id="compare-add-button" class="quiet" hidden>Add</button></div>
+<label class="compare-preset-label">Examples<select id="compare-preset"><option value="">Choose an example</option><option value="scale">Revenue examples</option><option value="work">Contract work examples</option></select></label>
+<button type="button" id="clear-compare" class="quiet" hidden>Clear selection</button>
+</div>
+<div class="compare-scope"></div>
+</details>
+<button type="button" id="copy-compare" class="text-link" data-copy-compare hidden>Copy comparison link</button>
+</div>
+<p id="compare-status" class="sr-only" role="status" aria-live="polite"></p>
+<div id="compare-content"></div>
+</section>
 
 <section id="profile-view" class="view" hidden></section>
 
