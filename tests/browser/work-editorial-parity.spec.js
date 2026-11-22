@@ -52,6 +52,9 @@ async function downloadRows(page) {
 }
 
 test('native Work keeps the open terms and record order when filters load late', async ({ page }) => {
+  // Hold the bundle while exercising the native controls without advancing its watchdog.
+  await page.clock.install({ time: 0 });
+  await page.clock.pauseAt(60_000);
   let resume;
   const delayed = new Promise(resolve => { resume = resolve; });
   await page.route('**/js/work.*.js', async route => {
@@ -66,8 +69,10 @@ test('native Work keeps the open terms and record order when filters load late',
     await terms.press('Enter');
     await expect(first.locator('.work-terms')).toHaveJSProperty('open', true);
     await expect(terms).toBeFocused();
+    await expect(page.locator('[data-work-compare]')).toBeHidden();
     resume();
     await expect(page.getByRole('link', { name: 'Compare results', exact: true })).toBeVisible();
+    await page.clock.resume();
     expect(await orderedIds(page.locator(nativeCards))).toEqual(before);
     await expect(first.locator('.work-terms')).toHaveJSProperty('open', true);
     await expect(terms).toBeFocused();
