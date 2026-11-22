@@ -277,12 +277,12 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
                     self.assertIn(escape(paragraph['text']), chapter)
                 else:
                     self.assertIn(rp.WITHHELD_PARAGRAPH, chapter)
-            self.assertTrue(all('src' not in script for script in chapter_facts.scripts),
-                            'Native chapters must not load external scripts')
+            self.assertEqual([script for script in chapter_facts.scripts if 'src' in script],
+                             [{'src': '/native-details.js', 'defer': None}] if index else [])
             self.assertNotIn('type="module"', chapter)
             tree = ReaderTree(chapter)
             guards = [item for item in tree.elements if item['tag'] == 'script'
-                      and item['attrs'].get('type') != 'application/ld+json']
+                      and 'src' not in item['attrs'] and item['attrs'].get('type') != 'application/ld+json']
             if section['id'] == 'technical-landscape':
                 self.assertEqual(len(guards), 1)
                 self.assertIn(guards[0]['attrs'].get('type', '').strip().lower(),
@@ -434,8 +434,10 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
                               entity['review_depth'].replace('_', ' '), *entity.get('identifiers', {}).values()):
                     self.assertIn(value, scope_text)
                 self.assertIn(rp._meta(self.context), text)
-                for assertion in approved + historical:
+                for assertion in approved:
                     # Full records include source locators, qualifications and actual receipts.
+                    self.assertIn(rp._assertion(self.context, assertion, focusable=True), text)
+                for assertion in historical:
                     self.assertIn(rp._assertion(self.context, assertion), text)
                 linked = [a for a in self.context['graph']['assertions']
                           if entity['id'] in {a.get('subject_id'), a.get('object_id')}]
@@ -528,6 +530,9 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         dated_facts = Facts(dated_data)
         self.assertIn(archive['record_url'] + '/files/report.pdf?download=1', dated_facts.links)
         self.assertIn(archive['record_url'] + '/files/research-archive.zip?download=1', dated_facts.links)
+        manifest = archive['record_url'] + '/files/MANIFEST.json'
+        self.assertIn(manifest, dated_facts.links)
+        self.assertNotIn(manifest + '?download=1', dated_facts.links)
         for filename in rp.EDITION_CITATIONS:
             path = edition + 'data/citations/' + filename
             self.assertIn(path, dated_facts.links)
@@ -546,6 +551,11 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         source_path = edition + 'data/sources/' + hashlib.sha256(source['id'].encode('utf-8')).hexdigest()[0] + '/'
         self.assertIn('href="https://example.org/research/data/frozen-source"', self.page(source_path))
         self.assertIn('Literal /research/data/#quoted-source-title', self.page(source_path))
+        source_record = rp._evidence_url('source', source['id']).replace('/research/data/', edition + 'data/', 1)
+        source_corrections = [parse_qs(urlsplit(link).query) for link in Facts(self.page(source_path)).links
+                              if link.startswith('/method/?correction=')]
+        self.assertIn({'correction': [source['id']], 'edition': [frozen['report']['release_id']],
+                       'record': [source_record]}, source_corrections)
         rss = ET.parse(self.output / 'research/feed.xml').findall('./channel/item')
         atom = ET.parse(self.output / 'research/atom.xml').findall('{http://www.w3.org/2005/Atom}entry')
         self.assertEqual(len(rss), 1)
@@ -644,12 +654,28 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         stable_id = 'fixture.target+version'
         path = rp._evidence_url('assertion', stable_id)
         title = 'τ² API + Tools & Data'
-        links = Facts(rp._record_correction(self.context, stable_id, path, title)).links
-        mail, issue = (parse_qs(urlsplit(url).query) for url in links)
-        for value in (mail['body'][0], issue['target'][0]):
-            self.assertIn(rp.sp.ORIGIN + path, value)
-            self.assertIn(stable_id, value)
-            self.assertIn(title, value)
+        disclosure = rp._record_correction(self.context, stable_id, path, title)
+        contact, issue = (urlsplit(url) for url in Facts(disclosure).links)
+        edition = self.context['report']['release_id']
+        permalink = rp.sp.ORIGIN + path
+        self.assertEqual((contact.netloc, contact.path, contact.fragment), ('', '/method/', 'corrections'))
+        self.assertEqual(parse_qs(contact.query), {'correction': [stable_id], 'edition': [edition],
+                                                'record': [path], 'title': [title]})
+        self.assertEqual(parse_qs(issue.query), {'template': ['correction.yml'],
+                                                'target': [' · '.join((edition, stable_id, permalink, title))]})
+        tree = ReaderTree(disclosure)
+        self.assertNotIn('open', tree.with_class('r-record-correction')[0]['attrs'])
+        subject = next(item for item in tree.elements if item['tag'] == 'input')
+        message = next(item for item in tree.elements if item['tag'] == 'textarea')
+        self.assertIn('readonly', subject['attrs'])
+        self.assertIn('readonly', message['attrs'])
+        self.assertEqual(subject['attrs']['value'], 'ScienceToStartup correction · ' + stable_id)
+        self.assertEqual(ReaderTree.text(message).splitlines()[:4],
+                         ['Edition: ' + edition, 'Stable record ID: ' + stable_id,
+                          'Record URL: ' + permalink, 'Record: ' + title])
+        self.assertNotIn(rp.sp.CORRECTION_EMAIL, disclosure)
+        self.assertIn('/method/#corrections', Facts(rp._review(self.context)).links)
+        self.assertNotIn(rp.sp.CORRECTION_EMAIL, rp._review(self.context))
 
     def test_ledger_destination_is_stable_after_unrelated_records_are_added(self):
         vectors = ['claim.alpha', 'source.example/α:version1', 'entity.unchanged']

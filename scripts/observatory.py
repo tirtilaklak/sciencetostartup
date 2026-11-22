@@ -904,7 +904,7 @@ def build(data, destination):
     (destination / "profile-content.json").write_text(json.dumps(profile_content, indent=2, ensure_ascii=False) + "\n")
     if current_companies and (ROOT / "data/current-companies.json").exists():
         (destination / "current-companies.json").write_text(json.dumps(current_companies, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
-    for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js", "page-layout.css", "native-details.js", "companies-page.css", "companies-page.js", "work-page.css", "work-page.js", "method-page.css", "company-profile.css", "daily-scan.css", "daily-scan.js"):
+    for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js", "page-layout.css", "native-details.js", "companies-page.css", "companies-page.js", "work-page.css", "work-page.js", "method-page.css", "method-correction.js", "company-profile.css", "daily-scan.css", "daily-scan.js"):
         path = ROOT / "web" / name
         if path.exists():
             if name in ("home-search.js", "companies-page.js", "work-page.js"):

@@ -8,12 +8,32 @@ const { evidenceURL } = require('./research-ledger');
 test.use({ trace: { mode: 'retain-on-failure', snapshots: false, screenshots: true, sources: true } });
 
 const reportPath = '/research/state-of-ai-data-labs/';
+const datedReportPath = '/research/editions/2026-11-12/';
 const chapterIds = ['executive-assessment', 'weekly-developments', 'market-structure',
   'technical-landscape', 'provider-dossiers', 'datasets-and-benchmarks',
   'human-expertise-and-operations', 'commercial-evidence', 'governance',
   'buyer-decision-guides', 'research-outlook', 'methods-and-appendices'];
 const readingPages = chapterIds.map((id, index) => index ? reportPath + 'chapters/' + id + '/' : reportPath);
 const publicPages = ['/', '/daily/', '/daily/2026-11-16/', '/research/', ...readingPages, '/research/data/', '/review/', '/company/scale_ai/'];
+
+async function openRecordCorrection(page, report) {
+  await page.goto(report);
+  const evidence = page.locator('.r-paragraph-citations a').first();
+  const path = await evidence.getAttribute('href');
+  const fragment = decodeURIComponent(path.split('#')[1]);
+  const id = fragment.slice('assertion-'.length);
+  await evidence.press('Enter');
+  const correction = page.locator('[id=' + JSON.stringify(fragment) + '] .r-record-correction');
+  await correction.getByText('Request a correction', { exact: true }).press('Enter');
+  const contact = correction.getByRole('link', { name: 'Continue to private email' });
+  const contactURL = new URL(await contact.getAttribute('href'), page.url());
+  const edition = contactURL.searchParams.get('edition');
+  expect(edition).toMatch(/^research-/);
+  expect(contactURL.pathname + contactURL.hash).toBe('/method/#corrections');
+  expect(contactURL.searchParams.get('record')).toBe(path);
+  expect(contactURL.searchParams.get('correction')).toBe(id);
+  return { correction, contact, contactURL, edition, id, path };
+}
 
 test.beforeEach(async ({ page, request }, info) => {
   const response = await request.get('/manifest.json');
@@ -83,6 +103,32 @@ test.describe('research without JavaScript', () => {
       await expect(source.locator('dt').filter({ hasText: new RegExp('^' + label + '$') })).toBeVisible();
     }
     await expect(source).toContainText('Assertion-specific review is recorded separately');
+  });
+
+  test('current and dated records keep usable private drafts and direct public links without scripts', async ({ page }) => {
+    for (const report of [reportPath, datedReportPath]) {
+      const { correction, contact, contactURL, edition, id, path } = await openRecordCorrection(page, report);
+      const permalink = 'https://sciencetostartup.com' + path;
+      const issue = new URL(await correction.getByRole('link', { name: 'Start a public GitHub correction' }).getAttribute('href'));
+      expect(issue.hostname).toBe('github.com');
+      expect(issue.searchParams.get('template')).toBe('correction.yml');
+      expect(issue.searchParams.get('target')).toBe([edition, id, permalink].join(' · '));
+      await correction.getByText('Copy the email draft', { exact: true }).press('Enter');
+      const subject = correction.getByRole('textbox', { name: 'Subject' });
+      const message = correction.getByRole('textbox', { name: 'Message' });
+      await expect(subject).toHaveValue('ScienceToStartup correction · ' + id);
+      await expect(subject).toHaveAttribute('readonly', '');
+      await expect(message).toHaveAttribute('readonly', '');
+      expect((await message.inputValue()).split('\n').slice(0, 3)).toEqual([
+        'Edition: ' + edition, 'Stable record ID: ' + id, 'Record URL: ' + permalink,
+      ]);
+      await expect(correction.locator('a[href^="mailto:"]')).toHaveCount(0);
+      await contact.press('Enter');
+      await expect(page).toHaveURL(contactURL.href);
+      const approvedContact = page.locator('#corrections');
+      await expect(approvedContact.getByRole('link', { name: 'Email a correction' })).toHaveAttribute('href', /^mailto:/);
+      await expect(approvedContact).toContainText('Email address');
+    }
   });
 
   test('data page exposes working graph exports and citation downloads', async ({ page, request }) => {
@@ -164,6 +210,34 @@ test.describe('research without JavaScript', () => {
     await sourceParts.first().click();
     expect(await page.locator('.r-source').count()).toBeGreaterThan(0);
   });
+});
+
+test('a fresh Method tab prepares the original edition and record in private email', async ({ page }) => {
+  const fresh = await page.context().newPage();
+  for (const report of [reportPath, datedReportPath]) {
+    const { contactURL, edition, id, path } = await openRecordCorrection(page, report);
+    await fresh.goto(contactURL.href);
+    const record = fresh.locator('#correction-record a');
+    await expect(record).toBeVisible();
+    await expect(record).toHaveText(id);
+    await expect(record).toHaveAttribute('href', path);
+    const email = fresh.locator('#correction-email');
+    const draft = new URL(await email.getAttribute('href'));
+    expect(draft.protocol).toBe('mailto:');
+    expect(draft.searchParams.get('subject')).toBe('ScienceToStartup correction · ' + id);
+    expect(draft.searchParams.get('body').split('\r\n').slice(0, 3)).toEqual([
+      'Edition: ' + edition, 'Stable record ID: ' + id, 'Record URL: https://sciencetostartup.com' + path,
+    ]);
+    await fresh.reload();
+    await expect(email).toHaveAttribute('href', draft.href);
+
+    contactURL.searchParams.set('record', 'https://example.invalid/research/');
+    await fresh.goto(contactURL.href);
+    await expect(record).toBeHidden();
+    const generic = new URL(await email.getAttribute('href'));
+    expect(generic.pathname).toBe(draft.pathname);
+    expect(generic.searchParams.get('subject')).toBe('ScienceToStartup correction');
+  }
 });
 
 test('home search finds human feedback research and opens its native report', async ({ page }) => {

@@ -168,6 +168,11 @@
 .r-assertion-text{font-size:16px;line-height:1.75}
 .r-record-id{font:11px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--r-quiet);overflow-wrap:anywhere;word-break:break-word}
 .r-record-id a{color:var(--r-quiet)}
+.r-record-correction{margin-block:8px;font-size:14px}
+.r-record-correction summary{display:list-item;min-height:44px;padding-block:10px;color:var(--r-accent);cursor:pointer}
+.r-correction-draft label{display:block;margin-bottom:12px}
+.r-correction-draft :is(input,textarea){display:block;box-sizing:border-box;width:100%;max-width:38rem;margin-top:4px;padding:6px 8px;border:1px solid var(--r-rule);border-radius:3px;background:var(--r-paper);color:inherit;font:inherit;font-size:16px}
+.r-correction-draft textarea{resize:vertical}
 .r-qualifications{font-size:13px;line-height:1.7;color:var(--r-quiet);padding-left:18px;margin-block:14px}
 .r-evidence-links{list-style:none;padding:0;margin:16px 0 0;font-size:13px;line-height:1.6}
 .r-evidence-links li{margin:0 0 12px}

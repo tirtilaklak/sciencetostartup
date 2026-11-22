@@ -9,7 +9,7 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
-from urllib.parse import unquote
+from urllib.parse import unquote, urljoin
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -172,7 +172,7 @@ class PublicCorrectionTests(unittest.TestCase):
         parsed = Links(text)
         self.assertEqual(parsed.ids.count('assertion-' + row['claim_id']), 1)
         destination = pages._evidence_url('assertion', row['claim_id'])
-        self.assertIn(destination, parsed.hrefs)
+        self.assertIn(destination, [urljoin('/research/data/', href) for href in parsed.hrefs])
         ledger = next(body for path, _, _, body, _, _ in pages._ledger_pages(context)
                       if path == destination.split('#')[0])
         record = Links(ledger)
