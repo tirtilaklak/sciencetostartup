@@ -230,10 +230,13 @@ function restoreEvidenceFocus(){
   trigger=document.querySelector(origin.selector);
  }
  const grid=trigger?.closest('#bh-grid-wrap');
+ const pointerScroll=origin.pointerScroll;
+ const rowMoved=grid&&pointerScroll&&trigger.closest('tr').rowIndex!==pointerScroll.rowIndex;
  // WebKit can reset the grid's scroll position when a pointer opens the modal.
- if(grid&&origin.pointerScroll)grid.scrollTo({...origin.pointerScroll,behavior:'instant'});
+ if(grid&&pointerScroll&&!rowMoved)grid.scrollTo({left:pointerScroll.left,top:pointerScroll.top,behavior:'instant'});
  trigger?.focus({preventScroll:!!grid});
  evidenceOrigin=null;
+ if(rowMoved)revealGridFocus(trigger,grid);
 }
 function alternateFigures(heading,figures,withMeasure=false){
  if(!figures.length)return '';
@@ -371,6 +374,11 @@ function keepGridFocusVisible(target, wrap, heading, masthead){
  const gridScroll=Math.min(0,start-top)||Math.max(0,start+visibleHeight-bottom);
  if(gridScroll)wrap.scrollBy({top:gridScroll,behavior:'instant'});
 }
+function revealGridFocus(target,grid){
+ requestAnimationFrame(()=>{
+  if(document.activeElement===target)keepGridFocusVisible(target,grid,grid.querySelector('thead'),document.querySelector('body > .topbar'));
+ });
+}
 
 function renderCompareSelect(id,options,selected){
  const select=$(id);
@@ -421,9 +429,7 @@ $('bh-evidence-dialog').addEventListener('click',e=>{
 const matrix=$('bh-grid-wrap');
 matrix.addEventListener('focusin',({target})=>{
  if(evidenceOrigin?.pointerScroll||!target.matches(':is(thead button,tbody a,tbody button):focus-visible'))return;
- requestAnimationFrame(()=>{
-  if(document.activeElement===target)keepGridFocusVisible(target,matrix,matrix.querySelector('thead'),document.querySelector('body > .topbar'));
- });
+ revealGridFocus(target,matrix);
 });
 $('bh-overview-tabs').addEventListener('keydown',e=>{if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;e.preventDefault();const ids=Object.keys(overviewMeasures);let i=ids.indexOf(overviewMeasure);i=e.key==='Home'?0:e.key==='End'?ids.length-1:(i+(e.key==='ArrowRight'?1:-1)+ids.length)%ids.length;overviewMeasure=ids[i];renderLedger();$('bh-overview-'+overviewMeasure).focus();});
 $('bh-measure').addEventListener('change',e=>{bhState.measure=e.target.value;bhState.cohort=null;bhState.company='';bhState.observation='';render();});
@@ -450,7 +456,7 @@ document.addEventListener('click',e=>{
  const cell=e.target.closest('.bh-cell');
  if(cell){
   const {bhCompany:company,bhSignal:signal}=cell.dataset;
-  const pointerScroll=e.detail?{left:matrix.scrollLeft,top:matrix.scrollTop}:null;
+  const pointerScroll=e.detail?{left:matrix.scrollLeft,top:matrix.scrollTop,rowIndex:cell.parentElement.rowIndex}:null;
   selectSignal(signal,company);
   openEvidence(`#bh-matrix-body button[data-bh-company="${CSS.escape(company)}"][data-bh-signal="${CSS.escape(signal)}"]`,pointerScroll);
   return;
