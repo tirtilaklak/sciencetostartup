@@ -146,7 +146,7 @@ process.stdout.write(S2SWork.csvFor(rows, {}));
             "g2i.work.senior-swe-training": "2026-10-23",
             "afterquery.work.research-engineer": "2026-10-14",
             "afterquery.work.research-scientist-frontier-evaluations": "2026-10-14",
-            "afterquery.work.senior-software-engineer-security-infrastructure": "2026-10-14",
+            "afterquery.work.people-programs-lead": "2026-10-14",
         }
         rows = self.csv_rows([route for route in self.routes if route["id"] in observed])
         self.assertEqual(len(rows), len(observed))
@@ -164,6 +164,80 @@ process.stdout.write(S2SWork.csvFor(rows, {}));
                 checks = evidence["archive_disposition"]["checks"]
                 self.assertTrue(any(check["url"] == exact and check.get("http_status") == 404
                                     and check["date"] > observed[row["route_id"]] for check in checks))
+
+    def test_reconciled_afterquery_csv_retains_exact_actions_and_pay_fields(self):
+        expected = {
+            "senior-software-engineer-security-infrastructure":
+                ("99afbbe0-5ad1-4f25-a00a-049f14428ac6", "$200,000–$350,000 annual salary", "year"),
+            "business-operations-generalist":
+                ("30b3dddf-9804-4e80-8fc6-2e2b2a511ca7", "$160,000–$250,000 annual salary", "year"),
+            "sales-operations-associate":
+                ("d1236ef8-0030-4cbf-bbec-052c6eed971f", "$145,000–$175,000 annual salary", "year"),
+            "engagement-manager":
+                ("79185014-f08f-4520-923f-e6bb67d31973", "$225,000–$450,000 annual salary field (conflicting)", "conflicting"),
+        }
+        routes = {r["id"].removeprefix("afterquery.work."): r for r in self.routes if r["company_id"] == "afterquery"}
+        rows = self.csv_rows([routes[slug] for slug in expected])
+        for row, (slug, (job_id, amount, unit)) in zip(rows, expected.items(), strict=True):
+            with self.subTest(route=row["route_id"]):
+                exact = "https://jobs.ashbyhq.com/AfterQuery/" + job_id
+                application = exact + "/application"
+                urls = json.loads(row["original_url_details"])
+                check = json.loads(row["review_evidence"])["application_check"]
+                self.assertEqual(row["route_id"], "afterquery.work." + slug)
+                self.assertEqual((row["advertised_pay"], row["pay_unit"], row["currency"]), (amount, unit, "USD"))
+                self.assertEqual((row["current_action_url"], row["current_action_label"]), (exact, "Read role details"))
+                self.assertEqual(urls["current_action_purpose"], "description")
+                self.assertEqual(row["original_application_url"], application)
+                self.assertEqual(urls["application_url"], application)
+                self.assertEqual(urls["application_check"], {"date": "2026-11-22", "verified_in_research": True,
+                                 "result": "application_form_available", "url": application})
+                self.assertEqual((check["url"], check["http_status"], check["retrieval_reason"]),
+                                 (application, 200, "application_form_rendered"))
+                self.assertTrue({exact, application} <= set(row["source_urls"].split(" | ")))
+
+        engagement = rows[-1]
+        self.assertEqual(engagement["availability"], "Pay conflict")
+        self.assertIn("$300,000–$450,000", engagement["pay_qualification"])
+        self.assertIn("$150,000–$225,000", engagement["pay_qualification"])
+        self.assertIn("split 50/50 between base and variable pay", engagement["pay_qualification"])
+        self.assertEqual(json.loads(engagement["field_review_metadata"])["pay"], {
+            "state": "conflicting", "reviewed_on": "2026-11-22", "basis": "direct_source",
+            "source_ids": ["afterquery.work.engagement-manager.board-reconciliation-ashby-2026-11-22"],
+        })
+        self.assertIn("https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true",
+                      engagement["source_urls"].split(" | "))
+
+        people, = self.csv_rows([routes["people-programs-lead"]])
+        exact = "https://jobs.ashbyhq.com/AfterQuery/2ba013e1-d254-4436-afd7-19d0b451424f"
+        self.assertEqual(people["current_action_url"], "https://www.afterquery.com/careers")
+        self.assertEqual(people["original_application_url"], exact + "/application")
+        self.assertEqual(people["availability"], "Past listing · page unavailable")
+        checks = json.loads(people["review_evidence"])["archive_disposition"]["checks"]
+        self.assertEqual([(c["url"], c["date"], c["http_status"]) for c in checks],
+                         [(exact, "2026-11-22", 404), (exact + "/application", "2026-11-22", 404)])
+
+    def test_terac_csv_keeps_sign_in_start_separate_from_archived_rl_listing(self):
+        shopping_id = "terac.work.ai-evaluator-shopping-assistant"
+        closed_id = "terac.work.rl-environment-creation"
+        rows = {r["route_id"]: r for r in self.csv_rows([r for r in self.routes if r["id"] in (shopping_id, closed_id)])}
+        shopping = rows[shopping_id]
+        self.assertEqual((shopping["availability"], shopping["advertised_pay"], shopping["pay_unit"]),
+                         ("Application start available", "$30 / hour", "hour"))
+        self.assertEqual(shopping["current_action_url"], "https://terac.com/opportunities/TKd76RUIQxw3wy-x")
+        self.assertEqual(shopping["original_application_url"], "")
+        urls = json.loads(shopping["original_url_details"])
+        start = "https://terac.com/apply/start/58b90b6b-a97d-478e-817c-6666a230e213"
+        self.assertEqual([(x["url"], x["purpose"]) for x in urls["checked_destinations"]], [(start, "application")])
+        self.assertNotIn("application_check", urls)
+        check = json.loads(shopping["review_evidence"])["application_check"]
+        self.assertEqual((check["url"], check["http_status"], check["retrieval_reason"]),
+                         (start, 200, "application_start_requires_linkedin"))
+        self.assertIn("Continue with LinkedIn", check["rendered_observation"])
+        closed = rows[closed_id]
+        self.assertEqual((closed["availability"], closed["current_action_label"], closed["current_action_url"]),
+                         ("Closed", "Read archived listing", "https://terac.com/opportunities/KZwfXOQhfpdjGT8k"))
+        self.assertIsNone(json.loads(closed["original_url_details"])["application_url"])
 
     def test_archived_descriptions_and_checked_form_destinations_keep_distinct_roles(self):
         expected = {

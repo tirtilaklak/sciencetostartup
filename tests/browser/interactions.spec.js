@@ -79,8 +79,8 @@ test('compact work data preserves every selector and visible condition', async (
   await sage.locator('summary').first().click();
   await expect(sage).toContainText('Terms checked 8 Nov 2026');
   await expect(sage.getByRole('list', { name: 'Requirements' })).toContainText('Qualification tests and identity verification');
-  const alternatives = await page.evaluate(() => workRouteRows().filter(route => route.status === 'historical' && ['terac.work.ml-scenarios', 'afterquery.work.senior-software-engineer-security-infrastructure'].includes(route.id)).map(route => ({ id: route.id, original: route.url, action: w4Destination(route), status: w4Status(route) })));
-  expect(alternatives).toHaveLength(2);
+  const alternatives = await page.evaluate(() => workRouteRows().filter(route => route.status === 'historical' && ['terac.work.ml-scenarios', 'afterquery.work.people-programs-lead'].includes(route.id)).map(route => ({ id: route.id, original: route.url, action: w4Destination(route), status: w4Status(route) })));
+  expect(alternatives.map(item => item.id).sort()).toEqual(['afterquery.work.people-programs-lead', 'terac.work.ml-scenarios']);
   for (const item of alternatives) {
     expect(item.action.label).toBe('Browse current company careers');
     expect(item.action.url).not.toBe(item.original);

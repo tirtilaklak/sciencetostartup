@@ -11,6 +11,10 @@ from editorial_work import editorial_counts, validate_editorial_release
 from observatory import validate_company_events
 from presentation import work_uncertain
 
+AFTERQUERY_CAREERS = "https://www.afterquery.com/careers"
+AFTERQUERY_BOARD = "https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true"
+RECONCILIATION = "board-reconciliation-correction-2026-11-22"
+
 
 def prior_values(route, correction_id):
     return next(correction["previous_values"] for correction in route["editorial_review"]["correction_history"]
@@ -29,14 +33,144 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
     def test_release_binds_exact_work_bytes_and_unchanged_frozen_canonical(self):
         self.assertEqual(hashlib.sha256((ROOT / "data/canonical.json").read_bytes()).hexdigest(),
                          "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061")
-        self.assertEqual(self.release["release_id"], "2026-11-22.7")
+        self.assertEqual(self.release["release_id"], "2026-11-22.8")
         self.assertEqual(self.release["as_of"], "2026-11-22")
+        self.assertEqual(self.release["publication_as_of"], "2026-11-22T14:08:49Z")
         self.assertEqual(self.release["work_routes_sha256"],
                          hashlib.sha256((ROOT / "data/work-routes.json").read_bytes()).hexdigest())
         validate_editorial_release(self.work, self.release, self.canonical)
         counts = editorial_counts(self.work)
         self.assertEqual(counts["records"], 135)
-        self.assertEqual(counts["work_routes"], 70)
+        self.assertEqual(counts["work_routes"], 72)
+        self.assertEqual(counts["named_listings"], 51)
+        self.assertEqual(counts["past_other_records"], 30)
+        self.assertEqual(counts["other_company_jobs"], 10)
+
+    def test_security_and_people_keep_exact_retrievals_and_prior_forms_separate(self):
+        exact_roles = {
+            "senior-software-engineer-security-infrastructure": ("99afbbe0-5ad1-4f25-a00a-049f14428ac6", 200),
+            "people-programs-lead": ("2ba013e1-d254-4436-afd7-19d0b451424f", 404),
+        }
+        for role, (job_id, status) in exact_roles.items():
+            with self.subTest(role=role):
+                row = self.routes[f"afterquery.work.{role}"]
+                review = row["editorial_review"]
+                sources = {s["id"]: s for s in row["sources"]}
+                exact = f"https://jobs.ashbyhq.com/AfterQuery/{job_id}"
+                application = exact + "/application"
+                self.assertEqual(row["url"], application)
+                prior_form = sources["afterquery.source.round2-form-" + job_id]
+                self.assertEqual((prior_form["url"], prior_form["accessed_on"]), (application, "2026-10-14"))
+                self.assertIn("10 inputs and a visible Submit Application control", prior_form["notes"])
+                self.assertFalse(row["application_submitted"])
+
+                for url in (exact, application):
+                    checks = [r for r in review["receipts"] if r.get("url") == url and r["scope"] == "retrieval"
+                              and r["checked_on"] == "2026-11-22"]
+                    self.assertEqual([(r["http_status"], r["result"], r["approved"]) for r in checks],
+                                     [(503, "blocked", False), (status, "readable" if status == 200 else "not_found", False)])
+                    self.assertEqual(checks[0]["retrieval_reason"], "environment_proxy_failure")
+                    for receipt in checks:
+                        self.assertEqual(sources[receipt["source_id"]]["url"], url)
+                    self.assertLess(checks[0]["checked_at"], checks[1]["checked_at"])
+
+                destination = row["field_reviews"]["destination"]
+                self.assertEqual(destination["reviewed_on"], "2026-11-22")
+                self.assertEqual([sources[sid]["url"] for sid in destination["source_ids"]],
+                                 [AFTERQUERY_BOARD, AFTERQUERY_CAREERS])
+                board_receipts = [r for r in review["receipts"] if r["source_id"] in destination["source_ids"]]
+                self.assertEqual({r["source_id"] for r in board_receipts}, set(destination["source_ids"]))
+                self.assertTrue(all(r["approved"] and "destination" in r["reviewed_fields"] for r in board_receipts))
+                self.assertTrue(all(job_id in " ".join(r["evidence"]) for r in board_receipts))
+
+        security = self.routes["afterquery.work.senior-software-engineer-security-infrastructure"]
+        old_security = prior_values(security, RECONCILIATION)
+        self.assertEqual(old_security["status"], "historical")
+        self.assertEqual(old_security["disposition"]["state"], "historical_page_unavailable")
+        self.assertEqual(old_security["disposition"]["reviewed_on"], "2026-11-08")
+        old_checks = [r for r in security["editorial_review"]["receipts"]
+                      if r["source_id"] in old_security["disposition"]["source_ids"]]
+        self.assertEqual([r["http_status"] for r in old_checks], [404, 404, 200])
+        self.assertEqual(old_security["alternative_destination"]["url"], "https://jobs.ashbyhq.com/AfterQuery")
+        self.assertEqual((security["status"], security["availability_label"]), ("listed", "Listed again"))
+        self.assertTrue(security["listed_on_current_company_board"])
+        self.assertTrue(security["form_available"])
+        new_board = next(r for r in security["editorial_review"]["receipts"] if r.get("url") == AFTERQUERY_BOARD)
+        self.assertIn("publishedAt 2026-11-09T17:22:34.994+00:00", " ".join(new_board["evidence"]))
+        new_form = security["last_route_check"]["application_check"]
+        self.assertEqual((new_form["url"], new_form["retrieval_reason"], new_form["rendered_checked_at"]),
+                         (security["url"], "application_form_rendered", "2026-11-22T13:59:23Z"))
+        self.assertIn("labeled fields and a Submit Application control", new_form["rendered_observation"])
+        self.assertIn("Application acceptance remains unconfirmed", security["availability_note"])
+
+        people = self.routes["afterquery.work.people-programs-lead"]
+        old_people = prior_values(people, RECONCILIATION)
+        self.assertEqual((old_people["status"], old_people["form_available"]), ("listed", True))
+        self.assertEqual(people["status"], "historical")
+        self.assertFalse(people["listed_on_current_company_board"])
+        self.assertEqual(people["pay_label"], "$160K–$230K salary band + equity")
+        self.assertNotIn("pay", old_people["field_reviews"])
+        self.assertEqual(people["field_reviews"]["pay"], {
+            "state": "sourced", "reviewed_on": "2026-10-28", "basis": "stored_evidence",
+            "source_ids": [people["id"] + ".review-2026-10-28"],
+        })
+        archived = people["editorial_review"]["disposition"]
+        self.assertEqual((archived["state"], archived["reviewed_on"]), ("historical_page_unavailable", "2026-11-22"))
+        latest = people["last_route_check"]
+        self.assertEqual((latest["url"], latest["http_status"], latest["retrieval_reason"]),
+                         (people["url"], 404, "http_not_found"))
+        self.assertIn("Job not found", latest["rendered_observation"])
+        self.assertIn("Employer closure remains unconfirmed", people["availability_note"])
+
+    def test_changed_afterquery_quotes_keep_equity_bonus_and_ote_separate(self):
+        roles = [
+            ("business-operations-generalist", "Business Operations Generalist", "$150K–$250K salary band + equity",
+             "$160K – $250K • Offers Equity", {"Equity": "Offered"}),
+            ("sales-operations-associate", "Associate", "$130K–$150K salary band + equity; bonus offered",
+             "$145K – $175K • Offers Equity • Offers Bonus", {"Equity": "Offered", "Bonus": "Offered"}),
+            ("engagement-manager", "Engagement Manager", "$150K–$225K salary band + equity; bonus offered",
+             "$225K – $450K • Offers Equity • Offers Bonus • Annual Target Compensation: "
+             "$300-450k OTE (50% base / 50% variable) depending on experience.",
+             {"Equity": "Offered", "Bonus": "Offered", "Annual salary field": "$225,000–$450,000",
+              "Annual on-target earnings": "$300,000–$450,000", "Annual base implied by the 50/50 split": "$150,000–$225,000"}),
+        ]
+        for role, title, previous_label, quote, observations in roles:
+            with self.subTest(role=role):
+                row = self.routes[f"afterquery.work.{role}"]
+                self.assertEqual(row["role"], title)
+                self.assertEqual(prior_values(row, RECONCILIATION)["pay_label"], previous_label)
+                self.assertEqual(row["source_quote"], quote)
+                self.assertEqual({o["label"]: o["value"] for o in row["pay_observations"]}, observations)
+        self.assertEqual(self.routes["afterquery.work.engagement-manager"]["status"], "pay_conflict")
+
+    def test_terac_shopping_sign_in_and_separate_rl_closure(self):
+        shopping = self.routes["terac.work.ai-evaluator-shopping-assistant"]
+        description = "https://terac.com/opportunities/TKd76RUIQxw3wy-x"
+        start = "https://terac.com/apply/start/58b90b6b-a97d-478e-817c-6666a230e213"
+        self.assertEqual((shopping["status"], shopping["url"], shopping["pay_label"], shopping["hours"]),
+                         ("listed", description, "$30 / hour", "20+ hours/week"))
+        self.assertEqual(shopping["arrangements"], ["remote"])
+        self.assertEqual(shopping["engagement_type"], "contract")
+        self.assertEqual(shopping["pay_terms"], {"unit": "hour", "hourly_comparable": True, "basis": "hour", "currency": "USD"})
+        previous = prior_values(shopping, RECONCILIATION)
+        self.assertEqual((previous["status"], previous["last_route_check"]["date"], previous["last_route_check"]["result"]),
+                         ("closed", "2026-10-28", "official_listing_closed"))
+        review = shopping["editorial_review"]
+        pay_receipt = next(r for r in review["receipts"] if r["source_id"] in shopping["field_reviews"]["pay"]["source_ids"])
+        self.assertEqual((pay_receipt["url"], pay_receipt["checked_on"], pay_receipt["approved"]),
+                         (description, "2026-11-22", True))
+        self.assertIn("pay", pay_receipt["reviewed_fields"])
+        check = shopping["last_route_check"]["application_check"]
+        self.assertEqual((check["url"], check["http_status"], check["retrieval_reason"]),
+                         (start, 200, "application_start_requires_linkedin"))
+        self.assertIn("Continue with LinkedIn", check["rendered_observation"])
+        self.assertIn("Screening and submission were unverified", check["note"])
+
+        closed = self.routes["terac.work.rl-environment-creation"]
+        self.assertEqual((closed["status"], closed["url"], closed["pay_label"]),
+                         ("closed", "https://terac.com/opportunities/KZwfXOQhfpdjGT8k", "$90 / hour"))
+        self.assertEqual(closed["last_route_check"]["review_signals"], ["explicitly_closed"])
+        self.assertIn("This listing has closed", closed["availability_note"])
 
     def test_surge_fellowship_application_and_unstated_location_have_exact_source(self):
         row = self.routes["surge_ai.work.research-fellowship"]

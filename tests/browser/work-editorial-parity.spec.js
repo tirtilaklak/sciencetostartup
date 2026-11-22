@@ -10,6 +10,13 @@ const originalPosting = 'https://www.ycombinator.com/companies/ooak-data/jobs/Gr
 const applicationLink = 'https://www.workatastartup.com/jobs/114405';
 const signInLink = 'https://www.workatastartup.com/application?signup_job_id=114405';
 const applicationStatus = 'Application link returned 404';
+const security = 'afterquery.work.senior-software-engineer-security-infrastructure';
+const people = 'afterquery.work.people-programs-lead';
+const operations = 'afterquery.work.business-operations-generalist';
+const associate = 'afterquery.work.sales-operations-associate';
+const engagement = 'afterquery.work.engagement-manager';
+const shopping = 'terac.work.ai-evaluator-shopping-assistant';
+const closedTerac = 'terac.work.rl-environment-creation';
 
 const nativeCards = '.work-page-list [data-work-route]';
 const exploreCards = '#work-cards [data-work-route]';
@@ -43,10 +50,12 @@ async function downloadRows(page) {
 const cases = [
   { name: 'all records', criteria: {}, includes: [role, yearlyStaff, monthlyStaff, pastStaff], excludes: [] },
   { name: 'yearly on-site or hybrid staff listings', criteria: { kind: 'named', type: 'employment', pay: 'yearly', arrangement: 'onsite' },
-    includes: [role, yearlyStaff], excludes: [monthlyStaff, pastStaff] },
+    includes: [role, yearlyStaff, security], excludes: [monthlyStaff, pastStaff, people, engagement] },
+  { name: 'yearly on-site or hybrid other company jobs', criteria: { kind: 'outside', type: 'employment', pay: 'yearly', arrangement: 'onsite' },
+    includes: [operations, associate], excludes: [security, people, engagement] },
   { name: 'yearly remote staff listings', criteria: { kind: 'named', type: 'employment', pay: 'yearly', arrangement: 'remote' },
     includes: [yearlyStaff], excludes: [role, monthlyStaff, pastStaff] },
-  { name: 'past records', criteria: { kind: 'closed' }, includes: [pastStaff], excludes: [role, yearlyStaff, monthlyStaff] },
+  { name: 'past records', criteria: { kind: 'closed' }, includes: [pastStaff, people, closedTerac], excludes: [role, yearlyStaff, monthlyStaff, security, shopping] },
 ];
 
 for (const { name, criteria, includes, excludes } of cases) {
@@ -102,6 +111,15 @@ for (const { name, criteria, includes, excludes } of cases) {
     expect(exploreLabel).toBe(countParts.join(' · '));
     expect(explore).toEqual(ids);
     expect(exploreCsv).toEqual(nativeCsv);
+    if (!search) {
+      const exported = nativeCsv.find(row => row.route_id === engagement);
+      expect(exported).toMatchObject({
+        advertised_pay: '$225,000–$450,000 annual salary field (conflicting)',
+        availability: 'Pay conflict',
+        pay_unit: 'conflicting',
+      });
+      expect(exported.pay_qualification).toMatch(/\$300,000–\$450,000.*50\/50.*\$150,000–\$225,000/);
+    }
     await testInfo.attach('ordered-route-ids', {
       contentType: 'application/json', body: JSON.stringify({
         criteria, nativeLabel, exploreLabel, native: ids, compare: compared, explore,
@@ -205,4 +223,84 @@ test('OOAK’s exact employer listing and application checks keep separate statu
     expect.objectContaining({ url: applicationLink, checked_at: '2026-11-22T12:57:37Z', http_status: 406, result: 'unavailable' }),
     expect.objectContaining({ url: signInLink, checked_at: '2026-11-22T11:56:48Z', http_status: 200, result: 'blocked' }),
   ]));
+});
+
+const ashby = 'https://jobs.ashbyhq.com/AfterQuery/';
+const afterqueryBoard = 'https://api.ashbyhq.com/posting-api/job-board/AfterQuery?includeCompensation=true';
+const peopleDescription = ashby + '2ba013e1-d254-4436-afd7-19d0b451424f';
+const shoppingStart = 'https://terac.com/apply/start/58b90b6b-a97d-478e-817c-6666a230e213';
+const reconciled = [
+  { id: security, jobId: '99afbbe0-5ad1-4f25-a00a-049f14428ac6',
+    pay: '$200,000–$350,000 annual salary', status: 'Listed again', note: /labeled fields and a Submit Application control/ },
+  { id: operations, jobId: '30b3dddf-9804-4e80-8fc6-2e2b2a511ca7', pay: '$160,000–$250,000 annual salary' },
+  { id: associate, jobId: 'd1236ef8-0030-4cbf-bbec-052c6eed971f', pay: '$145,000–$175,000 annual salary' },
+  { id: engagement, jobId: '79185014-f08f-4520-923f-e6bb67d31973',
+    pay: 'Rate conflict', status: 'Pay conflict' },
+  { id: people, pay: '$160K–$230K salary band + equity', status: 'Past listing · page unavailable',
+    action: ['Browse current company careers', 'https://www.afterquery.com/careers'],
+    secondary: ['Original unavailable posting', peopleDescription + '/application'],
+    note: /original role description and application returned HTTP 404.*Employer closure remains unconfirmed/ },
+  { id: shopping, pay: '$30 / hour', status: 'Application start available',
+    action: ['Read role details', 'https://terac.com/opportunities/TKd76RUIQxw3wy-x'],
+    secondary: ['Open application start', shoppingStart], note: /Continue with LinkedIn.*Screening and submission were unverified/ },
+  { id: closedTerac, pay: '$90 / hour', status: 'Closed',
+    action: ['Read archived listing', 'https://terac.com/opportunities/KZwfXOQhfpdjGT8k'],
+    note: /This listing has closed/ },
+];
+
+test('Reconciled employer listings render scoped pay and exact source actions in Work and Explore', async ({ browser, page, baseURL }) => {
+  test.slow();
+  const checkCards = async (page, native) => {
+    for (const { id, jobId, pay, status, note, action, secondary } of reconciled) {
+      await test.step(id, async () => {
+        const card = recordFor(page, native ? nativeCards : exploreCards, id);
+        if (native) {
+          const group = card.locator('xpath=ancestor::details[@data-work-group and not(@open)]/summary');
+          if (await group.count()) await group.click();
+        }
+        await expect(card).toBeVisible();
+        const paySelector = native ? '.work-pay > strong' : '.w4-pay > strong, .w4-compact-pay > strong';
+        await expect(card.locator(paySelector)).toHaveText(pay);
+        if (status) await expect(card.getByText(status, { exact: true }).first()).toBeVisible();
+        const compact = card.locator('.w4-compact-toggle:not([open]) > summary');
+        if (await compact.count()) await compact.click();
+        const primary = card.locator(native ? '.work-listing-action > a' : '.w4-open');
+        const [label, url] = action || ['Read role details', ashby + jobId];
+        await expect(primary).toHaveAccessibleName(new RegExp('^' + label));
+        await expect(primary).toHaveAttribute('href', url);
+
+        const details = card.locator(native ? '.work-terms' : '.w4-details');
+        const summary = details.locator(':scope > summary');
+        await expect(summary).toBeVisible();
+        await summary.click();
+        const linkedAction = secondary || (jobId && ['View official application', url + '/application']);
+        if (linkedAction) {
+          const [label, url] = linkedAction;
+          const links = native ? details : details.locator('.w4-secondary-actions');
+          await expect(links.getByRole('link', { name: new RegExp('^' + label) })).toHaveAttribute('href', url);
+        }
+        if (note) await expect(details.getByText(note).first()).toBeVisible();
+        if (jobId) {
+          await expect(details.locator(`a[href="${afterqueryBoard}"]`)).toBeVisible();
+          await expect(card.locator(paySelector).locator('..')).not.toContainText('Pay period not stated.');
+        }
+        if (id === people && native) {
+          for (const url of [peopleDescription, peopleDescription + '/application']) {
+            await expect(details.locator(`a[href="${url}"]`).locator('..')).toContainText('HTTP 404');
+          }
+        }
+        if (id === engagement) {
+          await expect(card.getByText(/\$225,000–\$450,000.*\$300,000–\$450,000.*\$150,000–\$225,000/).first()).toBeVisible();
+        }
+        if (id === shopping) await expect(card.getByText(/20\+ h(?:ours)?\/week/).first()).toBeVisible();
+      });
+    }
+  };
+  await noScriptWork(browser, baseURL, page => checkCards(page, true));
+
+  await page.goto('/explore/#work');
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  const unopened = page.locator('#work-cards [data-w4-routes]').locator('xpath=../summary');
+  while (await unopened.count()) await unopened.first().click();
+  await checkCards(page, false);
 });
