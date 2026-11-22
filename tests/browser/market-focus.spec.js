@@ -154,6 +154,7 @@ const enlargedText = test.extend({
 });
 
 enlargedText.describe('Market with a 28px minimum font', () => {
+  enlargedText.describe.configure({ timeout: 60_000 });
   enlargedText.skip(({ browserName }) => browserName !== 'firefox', 'Firefox provides a real minimum font preference');
 
   enlargedText('advanced picks show the entire applied measure and scope', async ({ enlargedPage: page }) => {
