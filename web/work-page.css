@@ -7,12 +7,12 @@
 .work-page-filter-slot{display:grid;grid-template-columns:minmax(0,1fr)}
 html[data-work-load] .work-page-filter-slot,.work-page-filter-slot:has(.work-page-filters:not([hidden])){margin-top:12px}
 .work-page-filter-slot>*{grid-area:1/1}
-.work-page-filters{position:relative;display:block;margin:0;padding:8px 0;border:0;border-block:1px solid var(--border);border-radius:0;background:transparent}
+.work-page-filters{display:grid;grid-template-columns:minmax(0,1fr);gap:8px 12px;margin:0;padding:8px 0;border:0;border-block:1px solid var(--border);border-radius:0;background:transparent}
 main>.work-page-filter-slot,main>.work-page-list,main>.work-page-groups,main>.work-results-toolbar,main>[data-work-comparison]{max-width:none}
 .work-page-filters[hidden],.work-page-empty[hidden],.work-page-group[hidden],.work-listing[hidden],.work-page-groups[hidden],.work-results-actions>[hidden],.work-load-status[hidden]{display:none}
 /* Keep the real controls in the layout while the enhancer loads. The failure
    notice shares the search slot without making unavailable controls tabbable. */
-html[data-work-load] .work-page-filters[hidden]{display:block!important;visibility:hidden}
+html[data-work-load] .work-page-filters[hidden]{display:grid!important;visibility:hidden}
 html[data-work-load] .work-results-actions>[hidden]{display:inline-flex!important;visibility:hidden}
 html[data-work-load] .work-count-native{display:none}
 html[data-work-load] .work-count-compact[hidden]{display:inline!important}
@@ -25,7 +25,7 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
 .work-page-filters label{display:grid;gap:6px;font-size:12px;line-height:1.5;font-weight:500}
 .work-page-filters input,.work-page-filters select{width:100%;min-width:0;min-height:44px;padding:9px 12px;font:inherit;font-size:14px;font-weight:400;color:var(--ink);border:1px solid #69796d;border-radius:4px;background:var(--bg,#f8f8f4)}
 .work-page-filters button,.work-page-empty button{min-height:44px;padding:9px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
-.work-page-filters :is(input,select,button):focus-visible,.work-page-empty button:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+.work-page-filters :is(input,select,button,summary):focus-visible,.work-page-empty button:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 .work-page-results{color:var(--muted);font-size:13px;line-height:1.6;margin:0 auto 0 0}
 .work-results-toolbar,.work-results-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;min-width:0}
 .work-results-toolbar{padding:8px 0}
@@ -101,13 +101,20 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
 }
 
 /* Search stays exposed; the secondary controls use a native disclosure. */
-.work-page-search{max-width:calc(100% - 112px)}
+.work-page-search{min-width:0}
 .work-page-filter-options{margin:0;padding:0;border:0;background:none}
-.work-page-filter-options>summary{position:absolute;top:32px;right:0;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:9px 12px;border:1px solid #69796d;border-radius:4px;background:transparent;color:var(--ink);font-size:14px;line-height:1.5;font-weight:500;list-style:none;cursor:pointer}
+.work-page-filter-options>summary{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:fit-content;min-width:44px;min-height:44px;padding:9px 12px;border:1px solid #69796d;border-radius:4px;background:transparent;color:var(--ink);font-size:14px;line-height:1.5;font-weight:500;list-style:none;cursor:pointer}
 .work-page-filter-options>summary::-webkit-details-marker{display:none}
 .work-page-filter-options>summary::after{content:'+';font-size:18px;line-height:1}
 .work-page-filter-options[open]>summary::after{content:'−'}
 .work-page-filter-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+@supports (grid-template-columns:subgrid) and selector(::details-content){
+ .work-page-filters{grid-template-columns:minmax(44px,1fr) max-content;grid-template-rows:auto auto;row-gap:0}
+ .work-page-search{grid-area:1/1;align-self:end;z-index:1}
+ .work-page-filter-options{display:grid;grid-column:1/-1;grid-row:1/-1;grid-template-columns:subgrid;grid-template-rows:subgrid}
+ .work-page-filter-options>summary{grid-area:1/2;align-self:end}
+ .work-page-filter-options::details-content{grid-area:2/1/3/-1}
+}
 .work-page-advice{max-width:780px;margin:0 0 6px;padding:0;border:0}
 .work-page-advice>summary{display:list-item;min-height:44px;padding:11px 0;font-size:14px;line-height:1.5;color:var(--green);cursor:pointer}
 .work-page-advice[open]{padding-bottom:8px}
