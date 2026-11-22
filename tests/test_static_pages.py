@@ -350,6 +350,17 @@ class StaticPageTests(unittest.TestCase):
         text = (self.dist / "companies/index.html").read_text()
         self.assertIn("The guide covers selected companies.", text)
         self.assertIn("The guide covers selected companies.", (self.dist / "method/index.html").read_text())
+        count = len(self.current_companies["entries"])
+        supplemental = '<a href="/current-companies.json">Supplemental records for ' + str(count) + ' added companies (JSON)</a>'
+        self.assertEqual(text.count('href="/current-companies.json"'), 1)
+        coverage = re.search(r'<details class="directory-scope">.*?</details>', text, re.S).group(0)
+        self.assertIn(supplemental, coverage)
+        for addition in self.current_companies["entries"]:
+            slug = addition["entity_id"]
+            card = text.split(f'<li class="directory-company" data-company="{slug}"', 1)[1].split('</section></li>', 1)[0]
+            self.assertIn(f'href="{ORIGIN}/company/{slug}/"', card)
+            for source in addition["sources"]:
+                self.assertIn(f'href="{html.escape(source["url"], quote=True)}"', card)
         missing = re.search(r"Firms not yet listed in this directory include ([^<]+)", text).group(1)
         remaining = [name for name in sp.NOT_YET_PROFILED if not any(name.casefold() in entry["name"].casefold().split(" / ") for entry in self.current_companies["entries"])]
         self.assertEqual(missing, sp.join_words(remaining) + ".")
