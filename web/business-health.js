@@ -208,7 +208,7 @@ function renderLedger(){
  const more=$('bh-ledger-more');
  if(more){more.hidden=list.length<=overviewLimit;more.textContent=overviewExpanded?'Show fewer companies':'Show all '+list.length+' companies';more.setAttribute('aria-expanded',String(overviewExpanded));}
 }
-function openEvidence(selector){
+function openEvidence(selector,pointerScroll){
  const dialog=$('bh-evidence-dialog');
  dialog.scrollTop=0;
  if(dialog.open){
@@ -216,12 +216,11 @@ function openEvidence(selector){
   return;
  }
  const {signal,measure,cohort,company,observation}=bhState;
- evidenceOrigin={selector,selection:{signal,measure,cohort,company,observation}};
+ evidenceOrigin={selector,pointerScroll,selection:{signal,measure,cohort,company,observation}};
  dialog.showModal();
 }
 function restoreEvidenceFocus(){
  const origin=evidenceOrigin;
- evidenceOrigin=null;
  if(!origin)return;
  let trigger=document.querySelector(origin.selector);
  // An alternate measure or scope can remove an invoking chart bar.
@@ -230,7 +229,11 @@ function restoreEvidenceFocus(){
   render();
   trigger=document.querySelector(origin.selector);
  }
- trigger?.focus({preventScroll:!!trigger.closest('#bh-matrix-body')});
+ const grid=trigger?.closest('#bh-grid-wrap');
+ // WebKit can reset the grid's scroll position when a pointer opens the modal.
+ if(grid&&origin.pointerScroll)grid.scrollTo({...origin.pointerScroll,behavior:'instant'});
+ trigger?.focus({preventScroll:!!grid});
+ evidenceOrigin=null;
 }
 function alternateFigures(heading,figures,withMeasure=false){
  if(!figures.length)return '';
@@ -417,7 +420,7 @@ $('bh-evidence-dialog').addEventListener('click',e=>{
 });
 const matrix=$('bh-grid-wrap');
 matrix.addEventListener('focusin',({target})=>{
- if(!target.matches(':is(thead button,tbody a,tbody button):focus-visible'))return;
+ if(evidenceOrigin?.pointerScroll||!target.matches(':is(thead button,tbody a,tbody button):focus-visible'))return;
  requestAnimationFrame(()=>{
   if(document.activeElement===target)keepGridFocusVisible(target,matrix,matrix.querySelector('thead'),document.querySelector('body > .topbar'));
  });
@@ -447,8 +450,9 @@ document.addEventListener('click',e=>{
  const cell=e.target.closest('.bh-cell');
  if(cell){
   const {bhCompany:company,bhSignal:signal}=cell.dataset;
+  const pointerScroll=e.detail?{left:matrix.scrollLeft,top:matrix.scrollTop}:null;
   selectSignal(signal,company);
-  openEvidence(`#bh-matrix-body button[data-bh-company="${CSS.escape(company)}"][data-bh-signal="${CSS.escape(signal)}"]`);
+  openEvidence(`#bh-matrix-body button[data-bh-company="${CSS.escape(company)}"][data-bh-signal="${CSS.escape(signal)}"]`,pointerScroll);
   return;
  }
  const mark=e.target.closest('[data-bh-observation], [data-bh-context]');
