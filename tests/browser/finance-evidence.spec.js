@@ -432,6 +432,49 @@ test('Snorkel issuer threshold survives Home, profiles, Compare, Market and curr
   const csv = require('node:fs').readFileSync(await (await pending).path(), 'utf8');
   expect(csv).toMatch(/annualized_revenue_run_rate[^\n]+375000000[^\n]+greater_than[^\n]+> \$375M/);
   expect(csv).toContain(id);
+  expect(csv.split(issuer)).toHaveLength(2);
+});
+
+test('iMerit current financial citations replace a dead transcript while keeping its history', async ({ page }) => {
+  const metric = 'imerit.metric.expansion-imerit-revenue';
+  const claim = 'imerit.claim.expansion-imerit-revenue-metric';
+  const primary = 'imerit.source.audit-im-transcript';
+  const history = 'imerit.source.audit-im-transcript2';
+  const replacement = 'refresh.source.imerit-exl-june-2026-stocksguide';
+  const liveTranscript = 'https://stocksguide.com/en/stock/ExlService-Holdings-US3020811044?earnings_event_id=8916344';
+  const pastTranscript = 'https://earningscalls.dev/transcripts/exlservice-holdings-inc_exls_earnings_call_transcript_2026-06-24';
+  await page.goto('/company/imerit/#financial-record');
+  await openDisclosure(page.locator('#financial-record > summary'));
+  const native = page.locator(`[data-metric="${metric}"]`);
+  await expect(native).toContainText('$59M');
+  await openDisclosure(native.locator('details > summary'));
+  await expect(native.locator(`[data-source-id="${replacement}"] a`)).toHaveAttribute('href', liveTranscript);
+  await expect(native.locator(`a[href="${pastTranscript}"]`)).toHaveCount(0);
+
+  await page.goto('/explore/#company/imerit/claim/' + claim);
+  const dialog = page.locator('#evidence-dialog');
+  await expect(dialog.locator('.sources-list > li').first()).toHaveAttribute('data-source-id', primary);
+  await expect(dialog.locator(`[data-source-id="${replacement}"] a`)).toHaveAttribute('href', liveTranscript);
+  await openDisclosure(dialog.locator('.historical-citations > summary'));
+  const historical = dialog.locator(`[data-source-id="${history}"]`);
+  await expect(historical).toContainText('HTTP 404');
+  await expect(historical.getByRole('link')).toHaveAttribute('href', pastTranscript);
+  await page.keyboard.press('Escape');
+  await page.goto('/explore/#company/imerit/sources');
+  const ledger = page.locator('#profile-sources');
+  await expect(ledger.locator(`[data-source="${history}"]`)).toContainText('HTTP 404');
+  await expect(ledger.locator(`[data-source="${replacement}"] a`)).toHaveAttribute('href', liveTranscript);
+
+  await page.goto('/explore/#companies');
+  await page.locator('#search').fill('iMerit');
+  await page.goto('/explore/#downloads');
+  await expect(page.locator('#download-csv')).toContainText('1 row');
+  const download = page.waitForEvent('download');
+  await page.locator('#download-csv').click();
+  const csv = require('node:fs').readFileSync(await (await download).path(), 'utf8');
+  expect(csv).toContain(metric);
+  expect(csv).toContain(liveTranscript);
+  expect(csv).not.toContain(pastTranscript);
 });
 
 test('Toloka growth figures and claims cite the inputs for an approximate calculation', async ({ page, request }) => {

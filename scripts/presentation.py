@@ -392,6 +392,11 @@ def observation_source_ids(observation):
     return [primary, *(sid for sid in source_ids if sid != primary)] if primary else source_ids
 
 
+def financial_source_urls(sources, ids):
+    urls = (sources.get(sid, {}).get("url") for sid in ids)
+    return " | ".join(dict.fromkeys(url for url in urls if url))
+
+
 def current_company_result(research, health, company_id):
     """Pure Python port of currentCompanyResult; all-company JS parity is tested."""
     from static_pages import selected_business_observation
@@ -405,7 +410,7 @@ def current_company_result(research, health, company_id):
                 "period": observation.get("period", {}).get("label") or observation.get("as_of") or "",
                 "scope": observation.get("scope") or "", "scope_detail": observation.get("scope_detail") or observation.get("scope_label") or "",
                 "accounting_basis": observation.get("accounting_basis") or "",
-                "source_urls": " | ".join(sources[sid]["url"] for sid in observation_source_ids(observation) if sources.get(sid, {}).get("url")),
+                "source_urls": financial_source_urls(sources, observation_source_ids(observation)),
                 "scope_label": observation.get("scope_label") or research.scope_text(observation.get("scope"), company_id),
                 "limitations": observation.get("limitations") or ""}
     metric = research.headline(company_id)
@@ -415,7 +420,7 @@ def current_company_result(research, health, company_id):
             "display": financial_value(metric), "upper_value": metric.get("upper_value", ""), "observation_status": metric.get("observation_status") or "",
             "currency": metric.get("currency") or "", "as_of": metric.get("as_of") or "", "period": metric.get("period_label") or "",
             "scope": metric.get("segment_scope") or "", "scope_detail": metric.get("scope_detail") or "", "accounting_basis": metric.get("gross_vs_net") or "",
-            "source_urls": " | ".join(research.sources[sid]["url"] for sid in research.claim(metric).get("source_ids", []) if research.sources.get(sid, {}).get("url")),
+            "source_urls": financial_source_urls(research.sources, research.claim(metric).get("source_ids", [])),
             "scope_label": research.scope_text(metric.get("segment_scope"), company_id), "limitations": metric.get("limitations") or ""}
 
 
