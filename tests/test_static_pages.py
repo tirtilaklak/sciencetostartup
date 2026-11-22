@@ -996,6 +996,9 @@ class StaticPageTests(unittest.TestCase):
         text = (self.dist / "method/index.html").read_text()
         facts = PageFacts(text)
         for anchor in ("about", "figures", "grades", "labels", "coverage", "downloads"): self.assertIn(anchor, facts.ids)
+        self.assertLess(text.index('id="figures"'), text.index('id="downloads"'))
+        self.assertLess(text.index('id="grades"'), text.index('id="downloads"'))
+        self.assertLess(text.index('id="downloads"'), text.index('id="corrections"'))
         nodes = ld_nodes(text)
         self.assertEqual([node["@type"] for node in nodes], ["AboutPage", "Dataset"])
         page, dataset = nodes

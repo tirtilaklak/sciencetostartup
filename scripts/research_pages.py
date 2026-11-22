@@ -501,10 +501,10 @@ def _hub(context, editions=()):
             f'<h2>{sp.escape(report["title"])}</h2>'
             f'<p>{len(report["sections"])} chapters on suppliers, human feedback, research methods and paid pilots.</p>'
             f'{_link(REPORT_PATH, "Read the report →", "r-button")}</aside></header>'
-            + operating_status_notice(context) +
             '<section class="r-section" aria-labelledby="browse"><div class="r-section-head">'
             '<h2 id="browse">Browse the research</h2>'
             f'{_link("/research/data/", "Sources & downloads →", "r-text-link")}</div>' + _browse(context) + '</section>'
+            + operating_status_notice(context) +
             '<section class="r-section r-hub-details" aria-label="Report details">'
             '<details class="r-disclosure" id="chapters">'
             f'<summary>Report contents <span>{len(report["sections"])} chapters</span></summary>'
@@ -1186,10 +1186,10 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
     rows = [("Privacy-filtered research JSON", "/publication/clean-dataset.json"), ("CSV", "/publication/clean-dataset.csv"),
             ("SQLite", "/publication/clean-dataset.sqlite"), ("Full evidence graph JSON · explicit statuses", "/research/exports/research-graph.json"),
             ("Evidence graph SQLite", "/research/exports/research-graph.sqlite"), ("Export checksums", "/research/exports/research-exports-manifest.json")]
-    if 'publication/report.pdf' in context.get('publication_assets', []):
-        rows.insert(0, ('Read the report PDF', '/publication/report.pdf'))
     if 'publication/executive-brief.html' in context.get('publication_assets', []):
-        rows.insert(0, ('Read the executive brief', '/publication/executive-brief.html'))
+        rows.append(('Read the executive brief', '/publication/executive-brief.html'))
+    if 'publication/report.pdf' in context.get('publication_assets', []):
+        rows.append(('Read the report PDF', '/publication/report.pdf'))
     if 'publication/current-REUSE.md' in context.get('publication_assets', []):
         rows.append(('Working JSON and SQLite examples', '/publication/current-REUSE.md'))
         rows.append(('Original archived reuse guide', '/publication/REUSE.md'))
@@ -1224,9 +1224,8 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
         doi = publication_metadata(context).get('doi')
         download_citation = (
             '<section class="r-section" aria-labelledby="downloads"><h2 id="downloads">Download the research</h2>'
-            '<p>The privacy-filtered projection retains explicit research status and historical qualifications. '
-            'Historical records are not fresh verification. Source retrieval is not claim approval. The original canonical dataset stays at version '
-            f'{sp.escape(graph.get("canonical_dataset_version"))}, with its existing identity and downloads.</p>'
+            '<p>Downloads keep each record’s review status and source notes. Historical records reflect earlier reviews. '
+            f'The separate company dataset remains at version {sp.escape(graph.get("canonical_dataset_version"))}.</p>'
             '<ul class="r-downloads">' + ''.join(links) + '</ul>'
             f'<p class="r-meta">Research release: {sp.escape(graph["release_id"])}.</p></section>'
             '<section class="r-section" id="citation"><h2>Cite and reproduce</h2>'

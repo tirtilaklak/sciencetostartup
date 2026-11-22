@@ -58,6 +58,9 @@ test.describe('research without JavaScript', () => {
   test('hub opens all twelve complete native chapters without JavaScript', async ({ page }) => {
     await page.goto('/research/');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('AI data research');
+    const sections = await page.locator('main [aria-labelledby="browse"], main .r-operating-status')
+      .evaluateAll(nodes => nodes.map(node => node.getAttribute('aria-labelledby') || 'edition update'));
+    expect(sections[0]).toBe('browse');
     await expect(page.locator('.r-chapter-list a')).toHaveCount(12);
     await page.getByRole('link', { name: 'Read the report →', exact: true }).click();
     await expect(page).toHaveURL(new RegExp(reportPath + '$'));
@@ -185,6 +188,13 @@ test.describe('research without JavaScript', () => {
 
   test('data page exposes working graph exports and citation downloads', async ({ page, request }) => {
     await page.goto('/research/data/');
+    const firstFiles = await page.locator('[aria-labelledby="downloads"] .r-downloads a')
+      .evaluateAll(links => links.slice(0, 3).map(link => link.getAttribute('href')));
+    expect(firstFiles).toEqual([
+      '/publication/clean-dataset.json',
+      '/publication/clean-dataset.csv',
+      '/publication/clean-dataset.sqlite',
+    ]);
     const exports = [
       '/research/exports/research-graph.json',
       '/research/exports/research-graph.sqlite',

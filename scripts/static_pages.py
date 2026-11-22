@@ -2073,19 +2073,7 @@ def render_method(research, sizes, modified):
     body = ['<link rel="stylesheet" href="/method-page.css">\n<div class="method-page">\n',
             '<header class="method-intro"><h1 id="about">About</h1>\n'
             f'<p>A public-source guide to AI data companies and paid work, published by {escape(PUBLISHER_NAME)}.</p></header>\n',
-            '<aside id="corrections" tabindex="-1" aria-labelledby="corrections-title"><h2 id="corrections-title">Corrections</h2>'
-            '<p>Include the record or page link, what needs correcting, and a source. We review requests within seven days.</p>'
-            '<p id="correction-record" hidden>Record to correct <a href="#corrections"></a></p>'
-            f'<div class="method-contact">{external_link(github_link, "Submit a correction on GitHub")}'
-            f'<a id="correction-email" href="{escape(email_link)}">Email a correction</a>'
-            f'<p>Email address <span>{escape(CORRECTION_EMAIL)}</span></p>'
-            f'<a href="{ORIGIN}/research/corrections/">Read the accepted correction log</a></div></aside>\n',
-            '<div class="method-sections"><details class="method-detail" id="disclosures"><summary>Publisher and disclosures</summary><div class="method-detail-body">\n'
-            '<p>No profiled company has paid for coverage, and none is a customer, investor or affiliate of the publisher.</p>\n'
-            f'<p>{escape(WORK_DISCLOSURE)}</p>\n'
-            f'<p><strong>Disclosure.</strong> {disclosure_html()}</p>\n'
-            '<p><strong>Personal data and removal.</strong> Company profiles name founders and executives from public company sources only. Profiles do not show personal contact details. If you are named here and want a record corrected or removed, <a href="#corrections">send a correction request</a>. '
-            f'{VISITS_NOTE}</p></div></details>\n',
+            '<div class="method-sections">',
             '<details class="method-detail" id="method-notes"><summary>How we check figures</summary><div class="method-detail-body"><h2 id="figures">How figures are shown</h2>\n'
             '<p>Each claim links to its evidence. Missing figures stay unknown.</p><ul>'
             '<li>Figures keep their reporting period and business scope, whether they cover a segment or the whole company.</li>'
@@ -2126,7 +2114,20 @@ def render_method(research, sizes, modified):
         body.append(f'<details class="method-detail" id="download-files"><summary>Data and license</summary><div class="method-detail-body"><h2 id="downloads">Download the data</h2>\n<p>Dataset version {escape(version)}{escape(compiled.replace(" · research", ", research"))}. The research data files keep every claim that later research replaced.</p>\n'
                     f'<p>{SITE_NAME} licenses this data under the <a class="ext" rel="license" href="{DATA_LICENSE}">CC BY 4.0 license</a> (any use is allowed if you credit us). Cite {SITE_NAME} and the original sources. Company names and logos belong to their owners. The license does not cover them. It also leaves out product images, photos of people, text quoted from sources and personal contact details.</p>\n'
                     + ''.join(tables) + '</div></details>\n')
-    body.append('</div></div>\n<script src="/method-correction.js" defer></script>\n')
+    body.append('<details class="method-detail" id="disclosures"><summary>Publisher and disclosures</summary><div class="method-detail-body">\n'
+                '<p>No profiled company has paid for coverage, and none is a customer, investor or affiliate of the publisher.</p>\n'
+                f'<p>{escape(WORK_DISCLOSURE)}</p>\n'
+                f'<p><strong>Disclosure.</strong> {disclosure_html()}</p>\n'
+                '<p><strong>Personal data and removal.</strong> Company profiles name founders and executives from public company sources only. Profiles do not show personal contact details. If you are named here and want a record corrected or removed, <a href="#corrections">send a correction request</a>. '
+                f'{VISITS_NOTE}</p></div></details></div>\n'
+                '<aside id="corrections" tabindex="-1" aria-labelledby="corrections-title"><h2 id="corrections-title">Corrections</h2>'
+                '<p>Include the record or page link, what needs correcting, and a source. We review requests within seven days.</p>'
+                '<p id="correction-record" hidden>Record to correct <a href="#corrections"></a></p>'
+                f'<div class="method-contact">{external_link(github_link, "Submit a correction on GitHub")}'
+                f'<a id="correction-email" href="{escape(email_link)}">Email a correction</a>'
+                f'<p>Email address <span>{escape(CORRECTION_EMAIL)}</span></p>'
+                f'<a href="{ORIGIN}/research/corrections/">Read the accepted correction log</a></div></aside></div>\n'
+                '<script src="/method-correction.js" defer></script>\n')
     counts = {key: len(data.get(key, [])) for key in ("companies", "claims", "sources", "metrics", "funding_rounds", "products")}
     counts["current_claims"] = sum(1 for claim in data.get("claims", []) if claim.get("status") != "superseded")
     measured = sorted({KIND_LABELS.get(m.get("kind"), "") for m in data.get("metrics", [])} - {"", KIND_LABELS["other"]})
