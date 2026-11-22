@@ -214,4 +214,12 @@ All five browser projects and the dedicated Research accessibility job passed. T
 
 ## Fourth implementation
 
-The fourth round covers the reproduced native filter and Retry issues, the Market dates, and keyboard return after inspecting evidence. The RWS control must identify the selected business scope when two figures cover the same period.
+The fourth candidate is `43337bbf50aa5f39ee75` at 1af4dead. Ten contributors fixed the mobile filter controls and the offscreen Retry result. When the actual Chromium tab was hidden during Retry, the excluded bookmark left Search visible at 33px on return; the matched bookmark focused the Sage record. The CSV matched the expected 4,259 bytes in both cases.
+
+Market now distinguishes the period, article publication and subsequent read for Handshake. Selecting the RWS Generate segment identifies the change in business scope. The real Close button works on a 412px phone after opening the evidence matrix. The upgraded build passed all 86 targeted checks, 20 desktop and mobile cutover journeys and seven cached-session release rehearsals. All 1,279 local files matched over HTTP. [Candidate checks and receipt hashes](site-quality-20261121/fourth-candidate-checks.json) · [Browser checks](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45005364254) · [Repository checks](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45005364232)
+
+## Fourth independent retest
+
+Opening a saved hourly Work search at 390px expands the entire filter panel. The first matching title sits at y=1,141. Collapsing Filters brings it to y=672 and makes its $150–$200 hourly range visible on that screen. The selection still contains the same 17 records. The earlier candidate placed the first title at y=925 on the same direct link, and the default unfiltered page is unchanged. [Saved mobile page](site-quality-20261121/work-build-43337bb-saved-hourly-390.png) · [After collapsing Filters](site-quality-20261121/work-build-43337bb-collapsed-hourly-390.png)
+
+The separate Explore Work view has an ordinary desktop pointer failure. At widths of 901px and above, Search covers 34.5px of each 44px filter control. The centers of all four selectors hit Search. At 900px the same centers reach their controls. This also reproduces on the preceding candidate. The independent reviewer is retaining the full keyboard and pointer traces.
