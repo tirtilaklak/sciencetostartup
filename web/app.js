@@ -342,8 +342,8 @@ function workRouteSummary(id){
  const rows=typeof workRoutesFor==='function'?workRoutesFor(id):[];
  return {rows,...(typeof w4RouteGroups==='function'?w4RouteGroups(rows):{primary:[],careers:[],other:rows})};
 }
-function workType(id){
- const {rows,primary,careers}=workRouteSummary(id);
+function workType(id,summary=workRouteSummary(id)){
+ const {rows,primary,careers}=summary;
  if(primary.length)return [['named_listing','Named listings'],['network_program','Networks and programs']].filter(([kind])=>primary.some(route=>w4OpportunityKind(route)===kind)).map(([,label])=>label).join(' · ');
  if(careers.length)return 'Career page only';
  return rows.length?'No confirmed paid listing':'Paid work not reviewed yet';
@@ -687,7 +687,6 @@ function reset(){Object.assign(state,{query:'',category:'',stage:'',financial:fa
 // previousSection is set after a section link such as #venture, so the next plain view link starts at the top.
 let previousRoute='',previousSection='';const viewScroll={};
 let companyReturnFocus=null;
-const comparisonOrigins=new Map();
 const marketShortcutOrigins=new Map();
 // Hashes that name a place inside a page. route() shows that page, then brings the element to the top with focus.
 const VIEW_ANCHORS={'business-health':'market',venture:'market',about:'method',labels:'method',corrections:'method',coverage:'method',downloads:'method'};
@@ -702,9 +701,12 @@ function showViewAnchor(target){
 // Back and Forward return each history entry to where the reader left it.
 // The Navigation API identifies entries; other browsers store the position in history.state.
 const entryScroll=new Map();let routeTraversal=false,routeRestoredScroll=null;
-const historySessionKey=Date.now().toString(36)+Math.random().toString(36).slice(2);let historyEntrySequence=0,lastRoutedHash='';
+const historySessionKey=Date.now().toString(36)+Math.random().toString(36).slice(2);let historyEntrySequence=0;
 const historyKey=()=>window.navigation?.currentEntry?.key||history.state?.stsEntryKey;
-function ensureHistoryEntryKey(fresh=false){if(!window.navigation&&(fresh||!history.state?.stsEntryKey))history.replaceState({...history.state,stsEntryKey:historySessionKey+':'+(++historyEntrySequence)},'');}
+function ensureHistoryEntryKey(){if(!window.navigation&&!history.state?.stsEntryKey)history.replaceState({...history.state,stsEntryKey:historySessionKey+':'+(++historyEntrySequence)},'');}
+// Pair a fragment opener with the entry it actually opened before async rendering runs.
+const exploreFragmentDestinations=new Map();
+let exploreEntryKey,explorePreviousKey,pendingExploreLink;
 // Pair the directory entry with the Compare entry opened from its tray. Compare edits replace
 // their own URL, and a reload can still find the originating directory entry on Back.
 let pendingShortlist=null,compareShortlistSource=onCompareRoute()?history.state?.compareShortlistSource:null;
@@ -717,8 +719,14 @@ function rememberShortlistOrigin(event){
  pendingShortlist={hash:link.getAttribute('href'),key:historyKey()};
 }
 window.addEventListener('hashchange',()=>{
+ ensureHistoryEntryKey();
+ explorePreviousKey=exploreEntryKey;
+ exploreEntryKey=historyKey();
+ if(!routeTraversal&&pendingExploreLink&&pendingExploreLink.key===explorePreviousKey&&pendingExploreLink.destination===location.href){
+  exploreFragmentDestinations.set(explorePreviousKey,exploreEntryKey);
+ }
+ pendingExploreLink=null;
  if(onCompareRoute()){
-  // Browsers without the Navigation API can emit popstate on a new fragment link, too.
   if(pendingShortlist?.hash===location.hash)history.replaceState({...history.state,compareShortlistSource:pendingShortlist.key},'');
   compareShortlistSource=history.state?.compareShortlistSource;
  }
@@ -744,7 +752,8 @@ let entryScrollTimer=0;
 const keepEntryScroll=()=>{clearTimeout(entryScrollTimer);try{if(window.navigation)window.navigation.updateCurrentEntry({state:{...(window.navigation.currentEntry?.getState?.()||{}),scrollY:window.scrollY}});else history.replaceState({...(history.state||{}),scrollY:window.scrollY},'');}catch{}};
 window.addEventListener('scroll',()=>{clearTimeout(entryScrollTimer);entryScrollTimer=setTimeout(keepEntryScroll,300);},{passive:true});
 window.addEventListener('pagehide',keepEntryScroll);
-if(!window.navigation)window.addEventListener('popstate',()=>{clearTimeout(entryScrollTimer);if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();routeTraversal=true;});
+// A new fragment can also fire popstate. Only an existing Explore entry carries its key.
+if(!window.navigation)window.addEventListener('popstate',event=>{clearTimeout(entryScrollTimer);if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();routeTraversal=Boolean(event.state?.stsEntryKey);});
 // An in-page link saves the position at once, before the new entry exists. So an entry the reader left by a link
 // always has one, and a new entry has none until the reader scrolls it (profiles-v2.js reads that).
 if(!window.navigation)document.addEventListener('click',e=>{const link=e.target?.closest?.('a[href^="#"]');if(normalSelfLinkActivation(e,link))keepEntryScroll();},true);
@@ -761,13 +770,59 @@ function showDirectory(){if(!directoryShown)renderDirectory();}
 function normalSelfLinkActivation(event,link){
  return Boolean(link&&!event.defaultPrevented&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&(event.button===undefined||event.button===0)&&!link.hasAttribute('download')&&(!link.getAttribute('target')||link.getAttribute('target')==='_self'));
 }
-function rememberCompanyOrigin(event){
- if(event.defaultPrevented||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(event.button!==undefined&&event.button!==0))return;
- const peer=event.target.closest?.('#compare-content a[href^="#company/"]');
- if(onCompareRoute()&&normalSelfLinkActivation(event,peer)){
-  comparisonOrigins.set(historyKey(),{hash:location.hash,href:peer.getAttribute('href')});
+// Keep the opener on the history entry it belongs to, including when its DOM is rebuilt.
+function rememberExploreOrigin(event){
+ const link=event.target.closest?.('a[href]');
+ if(!normalSelfLinkActivation(event,link)||link.href===location.href)return;
+ const href=link.getAttribute('href'),view=routeParts()[0];
+ const work=view==='work'&&link.id==='work-native-compare';
+ const compare=view==='compare'&&link.closest('#compare-content')&&(link.dataset.compareOrigin||href.startsWith('#company/'));
+ if(!work&&!compare){
+  if(history.state?.exploreReturnOrigin){const {exploreReturnOrigin,...rest}=history.state;history.replaceState(rest,'');}
   return;
  }
+ if(work)flushWorkRoute();
+ const destination=link.href,key=historyKey();
+ const opener=compare?{action:link.dataset.compareOrigin,pair:state.mobileCompare,expanded:comparisonExpanded,left:link.closest('.comparison-scroll')?.scrollLeft||0}:null;
+ history.replaceState({...history.state,exploreReturnOrigin:{href,destination,work,compare:opener}},'');
+ pendingExploreLink=href.startsWith('#')?{key,destination}:null;
+ keepEntryScroll();
+}
+window.addEventListener('click',rememberExploreOrigin);
+function exploreReturnOrigin({traversedFragment=false,initial=false,persisted=false}){
+ const origin=history.state?.exploreReturnOrigin;
+ if(!origin||routeParts()[0]!==(origin.work?'work':'compare'))return null;
+ if(traversedFragment)return explorePreviousKey&&exploreFragmentDestinations.get(historyKey())===explorePreviousKey?origin:null;
+ if(!(initial||persisted)||document.activeElement!==document.body)return null;
+ const activation=window.navigation?.activation;
+ if(activation){
+  const departed=activation.from;
+  if(activation.navigationType!=='traverse'||!departed?.url||departed.index!==activation.entry?.index+1)return null;
+  // Native pages can update the query or fragment within the entry opened by this link.
+  if(new URL(departed.url).pathname!==new URL(origin.destination).pathname)return null;
+ }else if(!persisted&&window.performance?.getEntriesByType?.('navigation')[0]?.type!=='back_forward')return null;
+ return origin;
+}
+function focusExploreOrigin({work,compare,href}){
+ const links=work?[$('work-native-compare')]:[...$('compare-content').querySelectorAll('a[href]')];
+ const target=links.find(link=>link?.getAttribute('href')===href&&link.dataset.compareOrigin===compare?.action&&link.getClientRects().length);
+ if(!target)return null;
+ const scrollbox=compare&&target.closest('.comparison-scroll');
+ if(scrollbox)scrollbox.scrollLeft=compare.left;
+ target.focus({preventScroll:true});
+ const bounds=target.getBoundingClientRect();
+ if(bounds.top<0||bounds.bottom>window.innerHeight)queueMicrotask(()=>{
+  if(document.activeElement===target)target.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});
+ });
+ return target;
+}
+window.addEventListener('pageshow',event=>{
+ if(!event.persisted)return;
+ const origin=exploreReturnOrigin({persisted:true});
+ if(origin)focusExploreOrigin(origin);
+});
+function rememberCompanyOrigin(event){
+ if(event.defaultPrevented||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(event.button!==undefined&&event.button!==0))return;
  const origin=event.target.closest?.('#company-cards a[href^="#company/"],#company-cards [data-open-company]');
  if(!origin||(origin.tagName==='A'&&!normalSelfLinkActivation(event,origin)))return;
  // The logo link is out of the tab order, so Back returns focus to the card's name link instead.
@@ -793,12 +848,6 @@ function focusRouteDestination(hash){
  if(target&&target.tagName!=='SUMMARY')target.setAttribute('tabindex','-1');
  target?.focus({preventScroll:true});
  (destination&&primary?document.querySelector('.profile-tabs'):destination||target)?.scrollIntoView({block:'start',behavior:'instant'});
-}
-function restoreComparisonFocus(key,hash){
- const origin=comparisonOrigins.get(key);
- if(origin?.hash!==hash)return;
- const target=[...document.querySelectorAll('#compare-content a[href]')].find(link=>link.getAttribute('href')===origin.href&&link.getClientRects().length);
- target?.focus({preventScroll:true});
 }
 function repeatCompanyRoute(event){
  if(event.defaultPrevented||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(event.button!==undefined&&event.button!==0))return;
@@ -836,21 +885,33 @@ function renderMissingCompanyProfile(parts){
  document.title='Profile not found · ScienceToStartup';
  $('profile-view').innerHTML=`<div class="page-heading"><h1>Profile not found</h1><p>No company in this historical Explore set uses ${query?'“'+esc(query)+'”':'that address'}.</p>${recovery}<p><a href="${attr(searchUrl)}">Search the company directory</a></p></div>`;
 }
-function route(event){const wasTraversal=routeTraversal;ensureHistoryEntryKey(event?.type==='hashchange'&&!wasTraversal&&location.hash!==lastRoutedHash);if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''||routeTraversal?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=Number.isFinite(kept)?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeRestoredScroll=restore;routeTraversal=false;const closingDialog=event?.closedDialog||event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';
+function route(event){
+ const wasTraversal=routeTraversal;
+ ensureHistoryEntryKey();
+ exploreEntryKey=historyKey();
+ const returnOrigin=exploreReturnOrigin({traversedFragment:wasTraversal&&event?.type==='hashchange',initial:!event&&!previousRoute});
+ if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''||routeTraversal?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=Number.isFinite(kept)?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeRestoredScroll=restore;routeTraversal=false;const closingDialog=event?.closedDialog||event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';
  const shortlist=view==='companies'?shortlistReturnState(wasTraversal):null;
  if(view!=='compare')compareShortlistSource=null;
- if(parts[0]&&parts[0]!=='market'&&view==='market'&&!anchorId)history.replaceState(null,'','#market');if(view!=='company')preparePage(view);if(previousRoute&&view!==previousRoute)viewScroll[previousRoute]=window.scrollY;for(const name of ['market','companies','work','compare','method','profile'])$(name+'-view').hidden=(name!==(view==='company'?'profile':view));document.querySelectorAll('[data-nav]').forEach(a=>{if(a.dataset.nav===(view==='company'?'companies':view))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});if(view==='company'){if(isCompanyId(parts[1])){renderCompanyProfile(parts[1]);document.title=companies[parts[1]].name+' · ScienceToStartup';}else renderMissingCompanyProfile(parts);}
- else{document.title=VIEW_TITLES[view];if(view==='companies'){renderComparisonScope(view);if(shortlist)restoreDirectoryShortlist(shortlist);if(typeof syncDirectoryRoute==='function')syncDirectoryRoute(parts.slice(1));showDirectory();}if(view==='method'){showDirectory();renderExploreCorrections(anchorId==='corrections');}if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare')renderCompare();}
- renderTray(shortlist?.notice);const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;lastRoutedHash=location.hash;
+ if(parts[0]&&parts[0]!=='market'&&view==='market'&&!anchorId)history.replaceState(history.state,'','#market');if(view!=='company')preparePage(view);if(previousRoute&&view!==previousRoute)viewScroll[previousRoute]=window.scrollY;for(const name of ['market','companies','work','compare','method','profile'])$(name+'-view').hidden=(name!==(view==='company'?'profile':view));document.querySelectorAll('[data-nav]').forEach(a=>{if(a.dataset.nav===(view==='company'?'companies':view))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});if(view==='company'){if(isCompanyId(parts[1])){renderCompanyProfile(parts[1]);document.title=companies[parts[1]].name+' · ScienceToStartup';}else renderMissingCompanyProfile(parts);}
+ else{document.title=VIEW_TITLES[view];if(view==='companies'){renderComparisonScope(view);if(shortlist)restoreDirectoryShortlist(shortlist);if(typeof syncDirectoryRoute==='function')syncDirectoryRoute(parts.slice(1));showDirectory();}if(view==='method'){showDirectory();renderExploreCorrections(anchorId==='corrections');}if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare'){
+  if(returnOrigin?.compare){
+   syncCompareRoute();
+   state.mobileCompare=returnOrigin.compare.pair;
+   comparisonExpanded=returnOrigin.compare.expanded;
+  }
+  renderCompare();
+ }}
+ renderTray(shortlist?.notice);const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;
  if(wasTraversal&&view==='market'&&!anchorId){
   const hash=location.hash;
   queueMicrotask(()=>{if(location.hash===hash)marketShortcutOrigins.get(key)?.focus({preventScroll:true});});
  }
- if(wasTraversal&&!shortlist&&['work','companies'].includes(view)){const hash=location.hash;queueMicrotask(()=>{if(location.hash!==hash)return;const origin=view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():view==='companies'?companyReturnFocusTarget():null;origin?.focus({preventScroll:true});});}if(wasTraversal&&view==='compare'){const hash=location.hash;queueMicrotask(()=>{if(location.hash===hash)restoreComparisonFocus(key,hash);});}if(closingDialog){const hash=location.hash;requestAnimationFrame(()=>{if(location.hash!==hash)return;focusRouteDestination(hash);});}
- if(shortlist){
-  const opener=$('compare-tray').querySelector?.('a');
-  if(opener?.getClientRects().length){opener.focus({preventScroll:true});return opener;}
- }
+ const linkedOpener=returnOrigin&&focusExploreOrigin(returnOrigin);
+ if(linkedOpener)return linkedOpener;
+ const opener=shortlist?$('compare-tray').querySelector?.('a'):wasTraversal&&view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():wasTraversal&&view==='companies'?companyReturnFocusTarget():null;
+ if(opener?.getClientRects().length){opener.focus({preventScroll:true});return opener;}
+ if(closingDialog){const hash=location.hash;requestAnimationFrame(()=>{if(location.hash===hash)focusRouteDestination(hash);});}
 }
 function download(name,body,type){const url=URL.createObjectURL(new Blob([body],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function csvCell(v){let s=String(v??'');if(/^[\t\r\n]/.test(s)||/^\s*[=+@-]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';}

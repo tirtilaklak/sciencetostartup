@@ -51,6 +51,22 @@ for(const options of cases){
  const h=harness(options),before=h.run('JSON.stringify(DATA)'),checks=[];
  const check=(name,fn)=>{fn();checks.push(name);};
  check('startup-registers-handlers',()=>{h.run('initialize()');assert.equal(typeof h.node('search').callbacks.input,'function');assert.equal(typeof h.node('compare-preset').callbacks.change,'function');assert.ok(h.windowCallbacks.hashchange?.length);});
+ if(options.name==='blocked-storage')check('legacy-fragment-links-create-different-entries-from-back-and-forward',()=>{
+  const visit=(hash,state,traversal)=>{
+   h.location.hash=hash;h.history.state=state;
+   h.windowCallbacks.popstate.forEach(fn=>fn({state}));
+   assert.equal(h.run('routeTraversal'),traversal);
+   h.windowCallbacks.hashchange.forEach(fn=>fn({type:'hashchange'}));
+   return h.history.state;
+  };
+  const market=h.history.state,companies=visit('#companies',null,false);
+  assert.ok(companies.stsEntryKey);
+  assert.notEqual(companies.stsEntryKey,market.stsEntryKey);
+  assert.equal(visit('#market',market,true).stsEntryKey,market.stsEntryKey);
+  assert.equal(visit('#companies',companies,true).stsEntryKey,companies.stsEntryKey);
+  visit('#market',market,true);
+  assert.notEqual(visit('#companies',null,false).stsEntryKey,companies.stsEntryKey);
+ });
  check('all-company-results-remain',()=>{assert.equal(h.run('filtered().length'),39);assert.equal((h.node('company-cards').innerHTML.match(/data-company-card=/g)||[]).length,39);assert.ok(!h.node('company-cards').innerHTML.includes('[object Object]'));});
  check('search-remains-interactive',()=>{h.node('search').callbacks.input({target:{value:'AfterQuery'}});assert.equal(h.run('filtered().length'),1);h.run('reset()');assert.equal(h.run('filtered().length'),39);});
  check('selection-rejects-invalid-ids-and-deduplicates',()=>{h.run('setSelection(["constructor","__proto__","afterquery","afterquery","elorian","appen","taskus"])');assert.equal(h.run('state.selected.join("|")'),'afterquery|elorian|appen');assert.equal(h.node('nav-count').textContent,'(3)');});
