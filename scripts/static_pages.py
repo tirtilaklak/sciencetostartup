@@ -1833,17 +1833,24 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
     buckets = {key: sort_routes([r for r in rows if work_display_bucket(r) == key], names) for key, _, _ in WORK_DISPLAY_BUCKETS}
     export = work_results or {}
     section_links = "".join(f'<li><a data-work-jump="{key}" href="#{key}">{label}</a></li>' for key, label, _ in WORK_DISPLAY_BUCKETS if buckets[key])
+    engagement_filter_labels = {
+        "employment": "Staff jobs", "bounty": "Bounty", "varies": "Varies", "unknown": "Unconfirmed",
+    }
+    engagement_options = "".join(
+        f'<option value="{key}">{escape(engagement_filter_labels.get(key, label))}</option>'
+        for key, label in WORK_ENGAGEMENT_LABELS.items()
+    )
     body = ['<link rel="stylesheet" href="/work-page.css">\n', crumb_nav(crumbs, "work-crumbs"),
             '<header class="work-page-heading" id="work-directory"><h1>Find work in AI training.</h1>\n',
             f'<p class="work-page-counts">{plural(named_count, "named listing")} <span>·</span> {plural(program_count, "network or program", "networks and programs")} <span>·</span> {plural(open_companies, "company", "companies")}</p></header>\n',
             '<div class="work-page-filter-slot" data-work-filter-slot><form class="work-page-filters" data-work-filters hidden role="search" aria-label="Find paid work" id="work-filters">'
             '<label class="work-page-search">Search listings<input name="q" type="search" placeholder="Role, skill or company" maxlength="256" autocomplete="off" id="name-filter"></label>'
             '<details class="work-page-filter-options"><summary>Filters</summary><div class="work-page-filter-fields">'
-            '<label>Listing type<select name="kind"><option value="">All records</option><option value="named">Named listings</option><option value="programs">Network programs</option><option value="boards">Career pages</option><option value="outside">Other jobs</option><option value="closed">Past &amp; other</option></select></label>'
-            '<label>Work arrangement<select name="arrangement"><option value="">Any arrangement</option><option value="remote">Remote possible</option><option value="onsite">On-site or hybrid</option><option value="varies">Varies or not stated</option></select></label>'
-            '<label>Engagement<select name="type"><option value="">Any engagement</option>' + ''.join(f'<option value="{key}">{label}</option>' for key, label in WORK_ENGAGEMENT_LABELS.items()) + '</select></label>'
-            '<label>Pay unit<select name="pay"><option value="">Any pay</option><option value="hourly">Hourly</option><option value="task">Per task</option><option value="yearly">Yearly</option><option value="monthly">Monthly</option><option value="numeric">Published amount</option><option value="undisclosed">Pay unlisted</option></select></label>'
-            '<label>Sort<select name="sort"><option value="">Default order</option><option value="hourly">Highest stated hourly pay</option><option value="checked">Recently checked</option></select></label>'
+            '<label>Listing type<select name="kind"><option value="">All records</option><option value="named">Named listings</option><option value="programs">Network/program</option><option value="boards">Career pages</option><option value="outside">Other jobs</option><option value="closed">Past &amp; other</option></select></label>'
+            '<label>Work arrangement<select name="arrangement"><option value="">Any arrangement</option><option value="remote">Remote possible</option><option value="onsite">On-site or hybrid</option><option value="varies">Varies or unlisted</option></select></label>'
+            f'<label>Engagement<select name="type"><option value="">Any engagement</option>{engagement_options}</select></label>'
+            '<label>Pay unit<select name="pay"><option value="">Any pay</option><option value="hourly">Hourly</option><option value="task">Per task</option><option value="yearly">Yearly</option><option value="monthly">Monthly</option><option value="numeric">Listed amount</option><option value="undisclosed">Pay unlisted</option></select></label>'
+            '<label>Sort<select name="sort"><option value="">Default order</option><option value="hourly">Top listed pay/hr</option><option value="checked">Last checked</option></select></label>'
             '<button type="reset" class="work-page-clear">Clear</button></div></details></form>'
             '<div class="work-load-status" data-work-load-status hidden><p data-work-load-message role="status"></p><button type="button" data-work-retry hidden>Retry filters</button></div></div>'
             '<noscript><p data-work-native-fallback>Filters need JavaScript. Showing the full directory. Use your browser’s Find command to look for a company or role.</p></noscript>'
