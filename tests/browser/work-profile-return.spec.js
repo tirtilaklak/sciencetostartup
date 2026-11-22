@@ -186,9 +186,9 @@ test.describe('Work company-profile handoff', () => {
     test(`cold bookmarked Back ${readerScroll ? 'honors a wheel scroll after pageshow' : 'recovers from a late history scroll'}`, async ({ page, browserName }) => {
       test.skip(browserName !== 'webkit', 'Exercise the reported WebKit timing');
       await observeHistory(page, true);
-      await page.addInitScript(`if (location.pathname === '/work/' &&
-        performance.getEntriesByType('navigation')[0]?.type === 'back_forward') {
+      await page.addInitScript(`if (location.pathname === '/work/') {
         document.addEventListener('focusin', function openerFocused(event) {
+          if (performance.getEntriesByType('navigation')[0]?.type !== 'back_forward') return;
           if (!event.target.matches('[data-work-route="${roleId}"] .work-company')) return;
           document.removeEventListener('focusin', openerFocused);
           (${holdWorkFrames})();
@@ -208,6 +208,7 @@ test.describe('Work company-profile handoff', () => {
       await page.goBack({ waitUntil: 'commit' });
       await expect(opener).toBeFocused();
       await expect(terms).toHaveJSProperty('open', true);
+      expect(await page.evaluate(() => typeof window.releaseWorkFrames)).toBe('function');
       await expect.poll(() => page.evaluate(() => window.workReturnPersisted)).toBe(false);
       if (readerScroll) {
         await page.mouse.move(700, 350);
@@ -219,7 +220,7 @@ test.describe('Work company-profile handoff', () => {
         await expect(opener).toBeFocused();
         await expect(terms).toHaveJSProperty('open', true);
       } else {
-        await expect.poll(() => page.evaluate(() => window.workLateScroll)).toBeGreaterThan(departure.position.scroll + 300);
+        await expect.poll(() => page.evaluate(() => window.workLateScroll ?? 0)).toBeGreaterThan(departure.position.scroll + 300);
         await releaseWorkFrames(page);
         await expectProfileReturn(page, departure, false);
       }
