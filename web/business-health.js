@@ -112,7 +112,7 @@ const asOfYear=Number(String(DATA.meta?.as_of||'').slice(0,4))||0;
 const yearOf=o=>Number(dateKey(o).slice(0,4))||0;
 const isHistorical=o=>!!asOfYear&&!!yearOf(o)&&yearOf(o)<asOfYear-1;
 // The research grade of the weakest cited claim: A strongest, U unverified.
-const gradeText={A:'independent or buyer-side evidence',B:'attributed company, investor or named primary statement',C:'secondary reporting, an estimate or indirect evidence',U:'unverified, undisclosed or unresolved'};
+const gradeText={A:'public filing, independent evidence or buyer confirmation',B:'attributed company, investor or named primary statement',C:'secondary reporting, an estimate or indirect evidence',U:'unverified, undisclosed or unresolved'};
 const grade=o=>o.claim_ids.map(id=>claimRecord(id)?.confidence).filter(g=>gradeText[g]).sort().at(-1)||'';
 const gradeChip=o=>{const g=grade(o);return g?`<i class="bh-grade" title="Research grade ${g}: ${safe(gradeText[g])}"><span class="sr-only">grade </span>${g}</i>`:'';};
 // The tag names the scope and a gross basis when they matter, and marks old figures.
@@ -324,15 +324,23 @@ function revealSelection(){
  if(pressed)pressed.scrollIntoView({block:'nearest',inline:'nearest'});else wrap.scrollTop=0;
 }
 
+function renderCompareSelect(id,options,selected){
+ const select=$(id);
+ select.innerHTML=options;
+ select.value=selected;
+ const value=select.nextElementSibling;
+ if(value)value.textContent=select.selectedOptions[0]?.text||'';
+}
+
 function render(){
  if(!bundle||!DATA.companies.some(c=>c.id==='mercor'))return;
  const ids=measures(bhState.signal);if(!ids.includes(bhState.measure))bhState.measure=bestMeasure(bhState.signal,bhState.group);
  $('bh-tabs').innerHTML=signals.map(id=>`<button type="button" class="bh-tile" id="bh-tab-${id}" role="tab" aria-controls="bh-inspector" aria-selected="${id===bhState.signal}" tabindex="${id===bhState.signal?0:-1}" data-bh-tab="${id}"><strong>${labels[id]}</strong></button>`).join('');
  $('bh-inspector').setAttribute('aria-labelledby','bh-tab-'+bhState.signal);
- $('bh-measure').innerHTML=ids.map(id=>`<option value="${safe(id)}">${esc(measureLabel(id))}</option>`).join('');$('bh-measure').value=bhState.measure;
+ renderCompareSelect('bh-measure',ids.map(id=>`<option value="${safe(id)}">${esc(measureLabel(id))}</option>`).join(''),bhState.measure);
  const cohortRows=rows(bhState.signal,bhState.measure,{group:bhState.group,history:true}),cohorts=[...new Set(cohortRows.map(cohort))];
  if(bhState.cohort===null||(bhState.cohort&&!cohorts.includes(bhState.cohort)))bhState.cohort=defaultCohort(cohortRows);
- $('bh-cohort').innerHTML='<option value="">All reporting periods (separate charts)</option>'+cohorts.map(c=>`<option value="${safe(c)}">${safe(cohortDisplay(c,cohortRows.find(o=>cohort(o)===c)))}</option>`).join('');$('bh-cohort').value=bhState.cohort;
+ renderCompareSelect('bh-cohort','<option value="">All reporting periods (separate charts)</option>'+cohorts.map(c=>`<option value="${safe(c)}">${safe(cohortDisplay(c,cohortRows.find(o=>cohort(o)===c)))}</option>`).join(''),bhState.cohort);
  $('bh-group').innerHTML='<option value="">All business groups</option>'+Object.keys(MODEL_GROUPS).map(g=>`<option value="${safe(g)}">${safe(groupLabel(g))}</option>`).join('');$('bh-group').value=bhState.group;
  $('bh-sort').value=bhState.sort;
  renderCompare();renderDetail();renderHistory();renderGrid();renderLedger();
@@ -350,6 +358,10 @@ function selectObservation(o){
 }
 window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries,latestFigures,refreshBundle};
 if(!bundle)return;
+// The native picker handles input while its closed value can wrap in the visible field.
+for(const id of ['bh-measure','bh-cohort']){
+ $(id).insertAdjacentHTML('afterend','<span class="bh-selected-value" aria-hidden="true"></span>');
+}
 const ledgerDateHeading=document.querySelector('.bh-ledger-head > :nth-child(3)');
 if(ledgerDateHeading)ledgerDateHeading.textContent='Period / date';
 $('bh-close-evidence').addEventListener('click',()=>$('bh-evidence-dialog').close());
@@ -400,5 +412,5 @@ document.addEventListener('click',e=>{
 $('bh-tabs').addEventListener('keydown',e=>{
  if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;e.preventDefault();let i=signals.indexOf(bhState.signal);i=e.key==='Home'?0:e.key==='End'?4:(i+(e.key==='ArrowRight'?1:-1)+5)%5;selectSignal(signals[i]);const active=$('bh-tab-'+signals[i]);active.focus({preventScroll:true});active.scrollIntoView({block:'nearest',inline:'nearest'});
 });
-$('bh-method-content').innerHTML=`<p><strong>Reported</strong> means the source states the number. <strong>Calculated</strong> means arithmetic from cited inputs, shown with its formula. <strong>Context</strong> covers customer counts, registered expert networks, headcount and profitability claims: proxies, never a measured margin, retention rate or cash figure. The letter on each figure is the research grade of its claim: A independent or buyer-side evidence, B an attributed primary statement, C secondary reporting or an estimate.</p><p>Run rate (annualized pace), completed-period revenue, gross billings and net revenue mean different things, so the overview labels each row and matching comparisons keep their own panels and scales. Missing disclosure is not zero and not a sign of weakness. Nonprofit research organizations are not scored on commercial measures.</p><p>Curated ${safe(bundle.dashboard_curated_on||'23 October 2026')} from research dataset ${safe(DATA.dataset_version)}, reviewed ${safe(bundle.source_dataset_reviewed_on)}; review dates stay attached to each claim. Follow the original source before acting on a figure.</p>`;
+$('bh-method-content').innerHTML=`<p><strong>Reported</strong> means the source states the number. <strong>Calculated</strong> means arithmetic from cited inputs, shown with its formula. <strong>Context</strong> covers customer counts, registered expert networks, headcount and profitability claims: proxies, never a measured margin, retention rate or cash figure. Grade A covers ${safe(gradeText.A)}. Grade B marks an attributed primary statement. Grade C marks secondary reporting or an estimate.</p><p>Run rate (annualized pace), completed-period revenue, gross billings and net revenue mean different things, so the overview labels each row and matching comparisons keep their own panels and scales. Missing disclosure is not zero and not a sign of weakness. Nonprofit research organizations are not scored on commercial measures.</p><p>Curated ${safe(bundle.dashboard_curated_on||'23 October 2026')} from research dataset ${safe(DATA.dataset_version)}, reviewed ${safe(bundle.source_dataset_reviewed_on)}; review dates stay attached to each claim. Follow the original source before acting on a figure.</p>`;
 })();
