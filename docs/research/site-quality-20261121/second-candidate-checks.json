@@ -1,0 +1,126 @@
+{
+  "build_id": "bd112c3ccc17282c5d59",
+  "editorial_release_id": "2026-11-22.2",
+  "manifest_sha256": "21709d30cf8850ea9646325ddcbae62b192e54e9c25fcff5a244279743cf7b1d",
+  "product_source": "530785ddb207ff6cc568c27ad245fef51513650a",
+  "artifact_commit": "7c88072e0fe792f821876c8cfe4fc61f9a85d649",
+  "declared_payloads": 1277,
+  "active_production_version_at_freeze": "cddaa614-befb-4bfe-81b2-8553bd74afac",
+  "targeted_acceptance": {
+    "search": {
+      "passed": 10,
+      "total": 10
+    },
+    "accessibility": {
+      "passed": 17,
+      "total": 17
+    },
+    "home": {
+      "passed": 48,
+      "total": 48
+    },
+    "editorial": {
+      "passed": 11,
+      "total": 11
+    }
+  },
+  "work_selection": {
+    "cases": {
+      "matrix": 24,
+      "queries": 29,
+      "paid": 17
+    },
+    "download_count": 210,
+    "differences_from_first_candidate": [
+      {
+        "case": "queries-26",
+        "criteria": {
+          "q": "RLHF  jobs"
+        },
+        "before": [],
+        "after": [
+          "afterquery.work.software-engineer-rl-environments"
+        ]
+      }
+    ],
+    "empty_downloads": 13,
+    "failures": []
+  },
+  "finance": {
+    "scoped_checks": 41,
+    "native_metric_ids": 28,
+    "shared_amounts": 18,
+    "keyboard_followed_compare_links": 6
+  },
+  "archive": {
+    "real_gets": 18,
+    "verified_zip_members_including_manifest": 57
+  },
+  "upgrade_replay": {
+    "old_version_tabs": 5,
+    "problems": []
+  },
+  "payload_budget": {
+    "passed": true,
+    "resource_references": 6851
+  },
+  "open_review_findings": [
+    {
+      "id": "W3",
+      "conditions": "320 and 390 CSS pixels, Chromium default font size 32px",
+      "observation": "The selected Highest hourly rate label clips and the active Filters control covers the search field edge. Standard 200% page zoom passed."
+    },
+    {
+      "id": "E1",
+      "observation": "Risk dialogs attribute an intake date to a source even though its cited records have no publication date. Reproduced on 25 specific dialogs.",
+      "confirmed_claim_ids": [
+        "a-team.claim.risks-0",
+        "afterquery.claim.risks-1",
+        "aixi.claim.risks-0",
+        "aixi.claim.risks-1",
+        "appen.claim.risks-2",
+        "benchflow.claim.risks-0",
+        "datacurve.claim.risks-1",
+        "datacurve.claim.risks-2",
+        "g2i.claim.risks-0",
+        "g2i.claim.risks-1",
+        "giskard.claim.risks-1",
+        "invisible.claim.risks-0",
+        "laude.claim.risks-1",
+        "pareto.claim.risks-1",
+        "polymath_ai_labs.claim.risks-0",
+        "prolific.claim.risks-1",
+        "quesma.claim.risks-1",
+        "refresh.claim.risks-0",
+        "refresh.claim.risks-1",
+        "surge_ai.claim.risks-1",
+        "terac.claim.risks-0",
+        "terac.claim.risks-1",
+        "terac.claim.risks-2",
+        "trajectory_labs_pbc.claim.risks-0",
+        "trajectory_labs_pbc.claim.risks-1"
+      ],
+      "controls": [
+        "rws_trainai.claim.risks-1",
+        "quesma.claim.risks-0",
+        "elorian.claim.valuation"
+      ]
+    },
+    {
+      "id": "N2",
+      "observation": "An older native Home shell lacks the search-more hook, and the older Work markup lacks Compare and export hooks. Both need the current unversioned enhancer to handle the earlier HTML."
+    }
+  ],
+  "receipt_sha256": {
+    "acceptance/summary.json": "55607f60df708676ba4687ce8a11dab495d4a6510ee62defa318cf2ef2c81bf8",
+    "retest-work/matrix-summary.json": "d0f769a471314da1f8f3ed66c24a0be064005932e2d08b999cbc4dbd1b675c0e",
+    "retest-work/text-size.json": "5b9026ac609216f1872205ae4b4f1c545904b52b878617dce23e2e2068d744d5",
+    "retest-finance/manifest-bound-gate.json": "c0f828b41adfc3cf562c2d6c72c57191efbb22de044ac31be80e9be9f2e41142",
+    "retest-finance/native-row-sources.json": "29fb044dbb9e28afdfff1301bb1b6934b206308ce3b2c382fce6c8ca43365a14",
+    "retest-finance/date-origin-browser.json": "0c82f170ae9baaf9c1372c027cb4ed5f2a0d4ab43fd983f8ee8a0d70d52d9e7b",
+    "retest-contacts/archive-identity.json": "662dee3707e7563f978a1c551dc13c03a7c2ad18f8a36a86e79c829c5af1551f",
+    "upgrade-replay.json": "95f4c1e4b60566574f60e4a3621875eb81afeaf135cd60f255db7d27ac31248f",
+    "payload-budgets.json": "35fe0104456842aaea37ee50ded5823d4a26fd61474e2a19ed132ff15cda8a34",
+    "active-at-freeze.json": "f82aea25e0ece67aaec6146cb011fdf256e355198d85ac7fc22ff3b3ed9536b8"
+  }
+}
