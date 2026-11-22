@@ -227,7 +227,19 @@ class ResearchPageTests(unittest.TestCase):
             self.assertNotIn('published_on', metadata)
             self.assertIn('Prelaunch', self.page('/research/'))
         editions = rp._published_editions(self.context)
-        data = ReaderTree(self.page('/research/data/'))
+        menu_states = [("/research/", "page"), (rp.REPORT_PATH, "true"), ("/research/data/", "true")]
+        menu_states.extend((path, "page") for path, _ in editions)
+        for path, state in menu_states:
+            with self.subTest(path=path):
+                navigation = ReaderTree(self.page(path)).with_class('site-nav')
+                self.assertEqual(len(navigation), 2)
+                for menu in navigation:
+                    research, = (link['attrs'] for link in menu['children'] if isinstance(link, dict)
+                                 and link['attrs'].get('href') == rp.sp.ORIGIN + '/research/')
+                    self.assertEqual(research.get('aria-current'), state)
+        data_page = self.page('/research/data/')
+        self.assertIn('Evidence data version: ' + self.context['graph']['release_id'], data_page)
+        data = ReaderTree(data_page)
         citation, = (node for node in data.elements if node['attrs'].get('id') == 'citation')
         if metadata['status'] == 'published':
             doi = self.context['report']['archive']['doi']

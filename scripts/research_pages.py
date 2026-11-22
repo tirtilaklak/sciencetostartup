@@ -397,10 +397,11 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
         document_title += ' · ' + sp.format_date(edition.group(1)) + ' edition'
     elif parent and parent[0] in {'papers', 'benchmarks'}:
         document_title += ' · ' + ('Research paper' if parent[0] == 'papers' else 'Benchmark')
+    current_state = "page" if path == "/research/" or path.startswith("/research/editions/") else "true"
     text = sp.document(research, document_title + sp.SUFFIX, sp.truncate(description),
                        sp.ORIGIN + path, '<div class="research wide">' + crumbs_html
                        + (_nav(path, historical=bool(edition)) if path != "/research/" and not company_page else "") + body + "</div>",
-                       structured=structured, current="companies" if company_page else "research")
+                       structured=structured, current="companies" if company_page else "research", state=current_state)
     extra = ('<link rel="stylesheet" href="/research.css">\n'
              '<link rel="alternate" type="application/rss+xml" title="Published research editions" href="/research/feed.xml">\n'
              '<link rel="alternate" type="application/atom+xml" title="Published research editions" href="/research/atom.xml">\n'
@@ -1330,12 +1331,13 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
         download_citation = _edition_downloads(context, metadata, ledger_path, reuse_path)
     else:
         doi = publication_metadata(context).get('doi')
+        version_label = 'Evidence data version' if ledger_path == '/research/data/' else 'Research release'
         download_citation = (
             '<section class="r-section" aria-labelledby="downloads"><h2 id="downloads">Download the research</h2>'
             '<p>Downloads keep each record’s review status and source notes. Historical records reflect earlier reviews. '
             f'The separate company dataset remains at version {sp.escape(graph.get("canonical_dataset_version"))}.</p>'
             '<ul class="r-downloads">' + ''.join(links) + '</ul>'
-            f'<p class="r-meta">Research release: {sp.escape(graph["release_id"])}.</p></section>'
+            f'<p class="r-meta">{version_label}: {sp.escape(graph["release_id"])}.</p></section>'
             '<section class="r-section" id="citation"><h2>Cite and reproduce</h2>'
             f'<p>{sp.escape(context["identity"].get("publisher", {}).get("name", sp.PUBLISHER_NAME))}. <cite>{sp.escape(report["title"])}</cite>. '
             f'{sp.escape(report["release_id"])}. {_date(report["updated_on"])}.</p>'
