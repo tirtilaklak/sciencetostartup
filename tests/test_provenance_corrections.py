@@ -11,6 +11,11 @@ from editorial_work import editorial_counts, validate_editorial_release
 from observatory import validate_company_events
 
 
+def prior_values(route, correction_id):
+    return next(correction["previous_values"] for correction in route["editorial_review"]["correction_history"]
+                if correction["id"] == f"{route['id']}.{correction_id}")
+
+
 class ProvenanceCorrectionsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -23,12 +28,14 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
     def test_release_binds_exact_work_bytes_and_unchanged_frozen_canonical(self):
         self.assertEqual(hashlib.sha256((ROOT / "data/canonical.json").read_bytes()).hexdigest(),
                          "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061")
-        self.assertEqual(self.release["release_id"], "2026-11-18.1")
-        self.assertEqual(self.release["as_of"], "2026-11-18")
+        self.assertEqual(self.release["release_id"], "2026-11-22.2")
+        self.assertEqual(self.release["as_of"], "2026-11-22")
         self.assertEqual(self.release["work_routes_sha256"],
                          hashlib.sha256((ROOT / "data/work-routes.json").read_bytes()).hexdigest())
         validate_editorial_release(self.work, self.release, self.canonical)
-        self.assertEqual(editorial_counts(self.work)["work_routes"], 78)
+        counts = editorial_counts(self.work)
+        self.assertEqual(counts["records"], 135)
+        self.assertEqual(counts["work_routes"], 69)
 
     def test_retained_quote_normalization_is_not_a_new_source_check(self):
         for rid, currency in [("bespoke_labs.work.mts-post-training", "USD"),
@@ -65,8 +72,11 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
                 self.assertEqual(receipt["approval_basis"], "source_content_review")
                 self.assertEqual(receipt["reviewer"], "Codex source review")
                 self.assertLessEqual(receipt["retrieved_at"], receipt["checked_at"])
-                self.assertEqual(row["field_reviews"][field]["reviewed_on"], "2026-11-18")
-                self.assertEqual(row["field_reviews"][field]["source_ids"], [receipt["source_id"]])
+                field_review = row["field_reviews"][field]
+                if rid == "mercor.work.expert-network":
+                    field_review = prior_values(row, "w1-correction-2026-11-22")["field_reviews"][field]
+                self.assertEqual(field_review["reviewed_on"], "2026-11-18")
+                self.assertEqual(field_review["source_ids"], [receipt["source_id"]])
                 self.assertEqual(row["last_link_check"]["date"], "2026-10-28")
                 if rid != "mercor.work.expert-network":
                     self.assertNotIn("approved_terms_receipt_id", row["editorial_review"])
@@ -77,7 +87,13 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
         self.assertEqual(mercor["editorial_review"]["approved_terms_receipt_id"], "mercor.work.expert-network.key-terms-2026-11-08")
         self.assertFalse(mercor["numeric_pay"])
         self.assertFalse(mercor["pay_terms"]["hourly_comparable"])
-        self.assertIn("Network context", mercor["pay_context"])
+        previous = prior_values(mercor, "w1-correction-2026-11-22")
+        self.assertIn("$91/hour", previous["pay_context"])
+        self.assertIn("Network context", previous["pay_context"])
+        self.assertIn("$94/hour average contracted rate on 22 November 2026", mercor["pay_context"])
+        current = mercor["field_reviews"]["pay"]
+        self.assertEqual(current["reviewed_on"], "2026-11-22")
+        self.assertEqual(current["source_ids"], ["mercor.work.expert-network.w1-expert-network-2026-11-22"])
         self.assertTrue(any("$90" in h["note"] for h in mercor["check_history"]))
         self.assertTrue(any("$97" in h["note"] for h in mercor["check_history"]))
         self.assertEqual(self.routes["proximal.work.frontierswe-fellowship"]["pay_terms"]["unit"], "undisclosed")
@@ -85,16 +101,18 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
     def test_turing_withdrawal_does_not_turn_a_block_into_fresh_eligibility(self):
         row = self.routes["turing.work.machine-learning"]
         self.assertEqual(row["geography"], "Country eligibility unverified")
-        self.assertEqual(row["status"], "unverified")
+        self.assertEqual(row["status"], "information")
+        self.assertEqual(prior_values(row, "w1-correction-2026-11-22")["status"], "unverified")
         self.assertEqual(row["field_reviews"]["location"]["state"], "not_researched")
         self.assertIsNone(row["field_reviews"]["location"]["reviewed_on"])
         self.assertEqual(row["field_reviews"]["location"]["basis"], "not_reviewed")
-        receipt = row["editorial_review"]["receipts"][-1]
+        receipt = next(item for item in row["editorial_review"]["receipts"]
+                       if item["id"] == "turing.work.machine-learning.retained-country-correction-2026-11-18")
         self.assertFalse(receipt["approved"])
         self.assertEqual(receipt["result"], "blocked")
         self.assertEqual(receipt["scope"], "retrieval")
         self.assertEqual(receipt["correction_basis"], "retained_record_review")
-        old = row["editorial_review"]["correction_history"][-1]["previous_values"]
+        old = prior_values(row, "correction-2026-11-18")
         self.assertEqual(old["geography"], "Pakistan / Turkey listing")
         self.assertEqual(old["field_reviews"]["location"]["state"], "sourced")
         claim = next(c for c in self.canonical["claims"] if c["id"] == "turing.claim.worker_opportunities")
@@ -111,7 +129,7 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
         invisible = self.routes["invisible.work.full-stack-trainer"]
         self.assertIn("were not tested", invisible["availability_note"])
         self.assertEqual(invisible["field_reviews"]["pay"]["reviewed_on"], "2026-10-28")
-        old = invisible["editorial_review"]["correction_history"][-1]["previous_values"]
+        old = prior_values(invisible, "correction-2026-11-18")
         self.assertIn("could not be loaded", old["availability_note"])
 
     def test_aixi_currency_and_amount_change_does_not_rewrite_original_evidence(self):
@@ -121,9 +139,31 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
         self.assertFalse(row["pay_terms"]["hourly_comparable"])
         self.assertEqual(row["geography"], "London / Berkeley")
         self.assertEqual(row["research_record"]["route"]["pay"]["currency"], "GBP")
-        old = row["editorial_review"]["correction_history"][-1]["previous_values"]
+        old = prior_values(row, "correction-2026-11-18")
         self.assertEqual(old["source_quote"], "£120,000 – £160,000 / year")
         self.assertEqual(row["terms_checked_on"], "2026-10-28")
+
+    def test_prolific_participant_policy_and_program_signup_keep_distinct_scope(self):
+        participant = self.routes["prolific.work.study-participant"]
+        expert = self.routes["prolific.work.expert-network"]
+        self.assertEqual(participant["requirements"], ["Over 18."])
+        self.assertIn("with occasional exceptions", participant["geography"])
+        old = prior_values(participant, "eligibility-copy-correction-2026-11-22")
+        self.assertIn("Age 18+", old["assessment"])
+        self.assertEqual(participant["field_reviews"]["assessment"]["reviewed_on"], "2026-10-14")
+        self.assertEqual(expert["field_reviews"]["requirements"]["state"], "not_researched")
+        for route in (participant, expert):
+            with self.subTest(route=route["id"]):
+                self.assertEqual(route["availability_note"], "Join the waitlist, accept an invitation, then verify your account.")
+                receipt = next(item for item in route["editorial_review"]["receipts"]
+                               if item["id"] == f"{route['id']}.w1-waitlist-recheck-2026-11-22.retrieval")
+                self.assertEqual(receipt["url"], route["url"])
+                self.assertFalse(receipt["approved"])
+        policy_id = participant["field_reviews"]["requirements"]["source_ids"][0]
+        policy = next(item for item in participant["editorial_review"]["receipts"] if item["source_id"] == policy_id)
+        self.assertEqual(policy["reviewed_fields"], ["requirements", "location"])
+        self.assertEqual(policy["checked_on"], "2026-11-22")
+        self.assertIn("over 18 years old", policy["evidence"][0]["quote"])
 
     def test_events_preserve_filing_dates_and_qualify_procedural_outcomes(self):
         validate_company_events(self.events, self.canonical)
