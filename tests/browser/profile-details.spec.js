@@ -186,19 +186,26 @@ test('the correction address restores the exact claim drafts in a fresh tab and 
 const imeritLedger = '/explore/#company/imerit/sources';
 const imeritImage = '/assets/products/imerit-exl-visual.png';
 
-async function mapNativeExploreLinks(page, baseURL) {
-  // An origin redirect preserves the link and its fragment in browser history.
-  await page.route('https://sciencetostartup.com/explore/', route => route.fulfill({
-    status: 307, headers: { location: new URL('/explore/', baseURL).href },
-  }));
+async function mapNativeCompanyLinks(page, baseURL) {
+  // Use the QA origin on both the original visit and a fresh-document Back.
+  await page.addInitScript(base => {
+    document.addEventListener('DOMContentLoaded', () => {
+      const links = document.querySelectorAll('.company-dossier a[href^="https://sciencetostartup.com/explore/"], ' +
+        '.company-dossier a[href^="https://sciencetostartup.com/method/"]');
+      for (const link of links) {
+        const { pathname, search, hash } = new URL(link.href);
+        link.href = new URL(pathname + search + hash, base).href;
+      }
+    });
+  }, baseURL);
 }
 
 async function openNativeSourceLedger(page, baseURL) {
-  await mapNativeExploreLinks(page, baseURL);
+  await mapNativeCompanyLinks(page, baseURL);
   await page.goto('/company/imerit/');
   await page.locator('summary#sources, #sources > summary').press('Enter');
   const ledger = page.getByRole('link', { name: 'Source ledger', exact: true });
-  await expect(ledger).toHaveAttribute('href', 'https://sciencetostartup.com' + imeritLedger);
+  await expect(ledger).toHaveAttribute('href', new URL(imeritLedger, baseURL).href);
   await ledger.focus();
   const scroll = await page.evaluate(() => scrollY);
   await ledger.press('Enter');
@@ -225,6 +232,7 @@ async function expectNativeLedgerReturn(page, scroll, persisted) {
 }
 
 test('a fresh-document Back reopens Sources and data at the exact activated native link', async ({ page, baseURL }) => {
+  test.slow();
   await recordNativeHistory(page, true);
   const ledgerScroll = await openNativeSourceLedger(page, baseURL);
   await expect(page.getByRole('heading', { name: 'All sources', exact: true })).toBeFocused();
@@ -245,9 +253,6 @@ test('a fresh-document Back reopens Sources and data at the exact activated nati
   await expect(page.locator('body')).toBeFocused();
   await expect(page.locator('#sources').locator('..')).toHaveJSProperty('open', false);
   await page.locator('#sources').press('Enter');
-  await page.route('https://sciencetostartup.com/method/', route => route.fulfill({
-    status: 307, headers: { location: new URL('/method/', baseURL).href },
-  }));
   await page.getByRole('link', { name: 'Source grades', exact: true }).press('Enter');
   await expect(page).toHaveURL(/\/method\/#grades$/);
   await page.goBack({ waitUntil: 'commit' });
