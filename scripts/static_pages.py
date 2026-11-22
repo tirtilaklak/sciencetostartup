@@ -1322,6 +1322,17 @@ def work_source_lines(research, route, employer, detailed, primary_action_url=No
         # links that compare current and archived destinations in the disclosure.
         link = escape(label) if repeats_action else external_link(url, label, work_action_name(label, route, employer) if url in secondary else "")
         observations = []
+        link_check = research.health.get(health_key(url)) if not repeats_action else None
+        if link_check:
+            checked = link_check["checked_on"]
+            code = {"not_found": 404, "gone": 410}.get(link_check["status"])
+            displayed = code and any(
+                record.get("checked_on") == checked and record.get("http_status") == code
+                for source in sources for record in receipts.get(source.get("id"), [])
+            )
+            if not displayed:
+                status = LINK_STATES[link_check["status"]].removeprefix("page ").capitalize()
+                observations.append(f'<small>{escape(status)} {escape(format_date(checked))}</small>')
         for index, source in enumerate(sources):
             sid = source.get("id")
             published = next((source[k] for k in ("published_on", "source_publication_date", "published_at") if source.get(k) and source[k] != "undated"), None)

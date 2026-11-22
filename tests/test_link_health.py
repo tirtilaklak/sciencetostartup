@@ -14,6 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from observatory import ValidationError, build, validate_link_health
+import static_pages as sp
 
 
 class LinkHealthTests(unittest.TestCase):
@@ -42,6 +43,28 @@ class LinkHealthTests(unittest.TestCase):
             with self.assertRaises(ValidationError): validate_link_health(data)
         data = self.valid(); data["entries"].append(copy.deepcopy(data["entries"][0]))
         with self.assertRaises(ValidationError): validate_link_health(data)
+
+    def test_work_source_disclosure_dates_only_the_unavailable_evidence(self):
+        data = json.loads((ROOT / 'data/canonical.json').read_bytes())
+        routes = {row['id']: row for row in json.loads((ROOT / 'data/work-routes.json').read_bytes())['routes']}
+        old_source = 'https://jobs.ashbyhq.com/datacurve/ce95a1ce-957e-4482-805e-964c4690ba9a'
+        previous = routes['g2i.work.senior-swe-training']
+        health = sp.link_health_index({'entries': [
+            {'url': url, 'status': 'not_found', 'checked_on': '2026-11-22'}
+            for url in (old_source, previous['url'])
+        ]})
+        research = sp.Research(data, health=health)
+        program = routes['datacurve.work.shipd-bounties']
+        destination, label = sp.work_destination(program, research)
+        self.assertEqual((destination, label), ('https://shipd.ai/sign-up', 'View program'))
+        for detailed in (False, True):
+            with self.subTest(detailed=detailed):
+                terms = sp.work_source_lines(research, program, 'Datacurve', detailed, destination)
+                self.assertRegex(terms, rf'href="{re.escape(old_source)}"[^>]*>[^<]*</a><small>Unavailable 22 Nov 2026</small>')
+                history = sp.work_source_lines(research, previous, 'G2i', detailed,
+                                               sp.work_destination(previous, research)[0])
+                self.assertIn('URL checked 22 Nov 2026 · HTTP 404', history)
+                self.assertNotIn('Unavailable 22 Nov 2026', history)
 
     def test_build_embeds_helper_before_app_and_exports_only_data_file(self):
         data = json.loads((ROOT / "data/canonical.json").read_text())
