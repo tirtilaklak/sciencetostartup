@@ -1981,10 +1981,10 @@ def write_research_pages(output, context):
 def research_search_entries(context):
     """Compact local-search records; candidate wording never enters summaries."""
     entries = [
-        {"title": "Human data research", "summary": "Research evidence, publication progress, methods, and open data.", "url": "/research/", "kind": "research", "keywords": "AI data labs human feedback evidence"},
+        {"title": "AI data research", "summary": "Suppliers, papers and datasets behind AI training.", "url": "/research/", "kind": "research", "keywords": "AI data labs human feedback evidence"},
         {"title": context["report"]["title"], "summary": _status(context) + ". Twelve chapters of methods, historical examples, and research gaps.", "url": REPORT_PATH, "kind": "report", "keywords": "human feedback RLHF annotation suppliers methods"},
-        {"title": "Research data & evidence", "summary": "Coverage, assertion and source records, citations, and versioned downloads.", "url": "/research/data/", "kind": "data", "keywords": "JSON CSV SQLite citation sources provenance"},
-        {"title": "Review & correct the research", "summary": "Submit a source-backed correction, scoped review, or public reuse.", "url": "/review/", "kind": "review", "keywords": "correction contribute review reuse"},
+        {"title": "Research data and sources", "summary": "Download the data or look up a finding and its sources.", "url": "/research/data/", "kind": "data", "keywords": "JSON CSV SQLite citation sources provenance"},
+        {"title": "Review the research", "summary": "Correct a record, review a chapter or share how you used the data.", "url": "/review/", "kind": "review", "keywords": "correction contribute review reuse"},
         {"title": "Research corrections", "summary": "Accepted corrections with affected editions, claims, correction dates and source evidence.", "url": CORRECTIONS_PATH, "kind": "review", "keywords": "corrections errata RSS Atom evidence"},
     ]
     for index, section in enumerate(context['report']['sections'][1:], 2):
