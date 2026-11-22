@@ -725,6 +725,9 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
         if entry["kind"] == "company":
             row["aliases"] = company_search_aliases(entry["url"].strip("/").removeprefix("company/"), entry.get("aliases", []))
         search_rows.append(row)
+    search_rows.append({"id": "market-revenue", "name": "Revenue & growth",
+                        "summary": "Company revenue, annualized pace and growth, with figures linked to their sources.",
+                        "group": "market", "products": [], "aliases": ["market", "revenue"], "href": "/explore/#business-health"})
     summary["homeSearch"] = write_asset(destination, "search", dict(identity, entries=search_rows, workTitles=work_titles))
     company_map = {company["id"]: company for company in data["companies"]}
     editorial_map = {entry["company_id"]: entry for entry in sidecars["EDITORIAL"]["entries"]}
