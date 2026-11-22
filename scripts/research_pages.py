@@ -299,8 +299,8 @@ def _status(context):
     return "Publication requirements passed" if context["gate"].get("ready") else "Prelaunch · evidence in preparation"
 
 
-def _nav(current=""):
-    links = [("Research", "/research/"), ("Report", REPORT_PATH)]
+def _nav(current="", historical=False):
+    links = [("Research", "/research/"), ("Current report" if historical else "Report", REPORT_PATH)]
     links += [(label, "/research/" + slug + "/") for slug, label, _, _ in CATEGORIES]
     links += [("Data & sources", "/research/data/"), ("Review", "/review/")]
     return '<nav class="r-nav" aria-label="Research">' + "".join(
@@ -375,7 +375,7 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
         document_title += ' · ' + ('Research paper' if parent[0] == 'papers' else 'Benchmark')
     text = sp.document(research, document_title + sp.SUFFIX, sp.truncate(description),
                        sp.ORIGIN + path, '<div class="research wide">' + crumbs_html
-                       + (_nav(path) if path != "/research/" and not company_page else "") + body + "</div>",
+                       + (_nav(path, historical=bool(edition)) if path != "/research/" and not company_page else "") + body + "</div>",
                        structured=structured, current="companies" if company_page else "research")
     extra = ('<link rel="stylesheet" href="/research.css">\n'
              '<link rel="alternate" type="application/rss+xml" title="Published research editions" href="/research/feed.xml">\n'

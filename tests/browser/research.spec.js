@@ -83,6 +83,57 @@ test.describe('research without JavaScript', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Methods');
   });
 
+  test('dated reading names the current report link and keeps chapter navigation in the edition', async ({ page }) => {
+    test.setTimeout(45_000);
+    await page.setViewportSize({ width: 320, height: 844 });
+    const chapter = datedReportPath + 'chapters/technical-landscape/';
+    for (const entry of [chapter, datedReportPath + 'data/']) {
+      await page.goto(entry);
+      if (entry === chapter) {
+        const contents = page.getByRole('navigation', { name: 'Report chapters' });
+        await expect(contents.getByRole('link', { name: '1. Executive assessment', exact: true }))
+          .toHaveAttribute('href', datedReportPath);
+      }
+      const current = page.getByRole('navigation', { name: 'Research', exact: true })
+        .getByRole('link', { name: 'Current report', exact: true });
+      await expect(current).toHaveText('Current report');
+      await expect(current).toHaveAttribute('href', reportPath);
+      for (let step = 0; step < 24; step++) {
+        await page.keyboard.press('Tab');
+        if (await current.evaluate(link => link === document.activeElement)) break;
+      }
+      await expect(current).toBeFocused();
+      await expect(current).toBeInViewport();
+      await page.keyboard.press('Enter');
+      await expect(page).toHaveURL(new URL(reportPath, page.url()).href);
+      await page.goBack();
+      await expect(page).toHaveURL(new URL(entry, page.url()).href);
+    }
+  });
+
+  test('reverse keyboard focus reaches the visible final Technical citation from #cite', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 844 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    for (const report of [reportPath, datedReportPath]) {
+      const entry = report + 'chapters/technical-landscape/#cite';
+      await page.goto(entry);
+      await expect(page.locator('#cite:target')).toBeInViewport();
+      const citation = page.locator('.r-reader-chapter-content .r-paragraph-citations a').last();
+      for (let step = 0; step < 7; step++) {
+        await page.keyboard.press('Shift+Tab');
+        if (await citation.evaluate(link => link === document.activeElement)) break;
+      }
+      await expect(citation).toBeFocused();
+      await expect(citation).toBeInViewport({ ratio: 0.95 });
+      const href = await citation.getAttribute('href');
+      await page.keyboard.press('Enter');
+      await expect(page).toHaveURL(new URL(href, page.url()).href);
+      await page.goBack();
+      await expect(page).toHaveURL(new URL(entry, page.url()).href);
+      await expect(citation).toBeInViewport({ ratio: 0.95 });
+    }
+  });
+
   test('report evidence opens the assertion and its source ledger entry', async ({ page }) => {
     await page.goto(reportPath);
     const evidence = page.locator('.r-paragraph-citations a').first();
