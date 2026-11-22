@@ -63,6 +63,28 @@ process.stdout.write(S2SWork.csvFor(rows, {}));
                 self.assertEqual(urls["legacy_url_purpose"], legacy_purpose)
                 self.assertEqual(urls["current_action_purpose"], action_purpose)
 
+    def test_work_history_survives_relisting_and_keeps_temporary_source_errors_distinct(self):
+        records = {route["id"]: route for route in self.routes}
+        exported = {row["route_id"]: row for row in self.csv_rows(self.routes)}
+        for rid, route in records.items():
+            with self.subTest(route=rid):
+                evidence = json.loads(exported[rid]["review_evidence"])
+                history = [{key: item[key] for key in ("date", "result", "url", "note", "source_ids") if key in item}
+                           for item in route.get("check_history", [])]
+                self.assertEqual(evidence.get("check_history", []), history)
+                sources = {source.get("id"): source.get("url") for source in route.get("sources", [])}
+                checks = [receipt for receipt in (route.get("editorial_review") or {}).get("receipts", [])
+                          if receipt.get("scope") == "retrieval" and sources.get(receipt.get("source_id"))
+                          and receipt.get("url", sources[receipt["source_id"]]) == sources[receipt["source_id"]]]
+                exported_checks = {item["id"]: item for item in evidence.get("source_receipts", [])}
+                for check in checks:
+                    actual = exported_checks[check["id"]]
+                    self.assertEqual(actual["url"], sources[check["source_id"]])
+                    for field in ("checked_on", "result", "http_status", "retrieval_reason"):
+                        self.assertEqual(actual.get(field), check.get(field))
+        security = exported["afterquery.work.senior-software-engineer-security-infrastructure"]
+        self.assertEqual(json.loads(security["original_url_details"])["application_check"]["date"], "2026-11-22")
+
     def test_replaced_listing_keeps_each_bound_source_observation(self):
         description, archived = "https://example.org/role", "https://example.org/original"
         sources = [{"id": "description", "url": description}, {"id": "archive", "url": archived}]

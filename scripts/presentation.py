@@ -667,7 +667,6 @@ def work_export_rows(work, research):
                           for source in route.get("sources", [])]
         review = route.get("editorial_review") or {}
         editorial = retain(review, ("approved_terms_receipt_id", "disposition", "alternative_destination", "actions", "recorded_url_purpose"))
-        disposition_ids = (review.get("disposition") or {}).get("source_ids", [])
         action_urls = {action["url"] for action in row["source_actions"]}
         separate_archive = any(action.get("purpose") == "archived_listing" and action.get("url") != route.get("url")
                                and action.get("url") in action_urls for action in review.get("actions", []))
@@ -675,21 +674,16 @@ def work_export_rows(work, research):
         if page_check.get("result") in ("official_role_not_found", "official_role_not_found_redirect"):
             row["source_ids"] = route.get("source_ids", [])
         history = route.get("check_history") or []
-        if not separate_archive:
-            history = [check for check in history if check.get("result") == "application_form_available"
-                       and (route.get("status") == "historical" or check.get("url"))]
         if history:
-            row["check_history"] = [retain(check, ("date", "result", "note", "url")) for check in history]
+            row["check_history"] = [retain(check, ("date", "result", "note", "url", "source_ids")) for check in history]
         receipt_keys = ("id", "source_id", "checked_on", "checked_at", "scope", "result", "http_status",
-                        "approved", "approval_basis", "reviewed_fields")
+                        "approved", "approval_basis", "reviewed_fields", "url", "final_url",
+                        "retrieval_reason", "rendered_observation")
         source_ids = {source.get("id") for source in row["sources"] if source.get("id")}
-        if separate_archive:
-            receipt_keys += ("url", "final_url", "retrieval_reason", "rendered_observation")
         receipts = [retain(receipt, receipt_keys)
                     for receipt in review.get("receipts", [])
                     if receipt.get("id") == review.get("approved_terms_receipt_id")
-                    or receipt.get("scope") == "retrieval" and receipt.get("source_id") in disposition_ids
-                    or separate_archive and receipt.get("source_id") in source_ids]
+                    or receipt.get("source_id") in source_ids and (receipt.get("scope") == "retrieval" or separate_archive)]
         if receipts:
             editorial["receipts"] = receipts
         if editorial:

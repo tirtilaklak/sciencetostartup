@@ -230,8 +230,9 @@ const S2SWork = (() => {
     }
     const disposition = editorial?.disposition;
     const getSource = id => route.sources?.find(source => source.id === id);
-    if (original.archived_source_url) {
-      const receipts = (editorial?.receipts || []).flatMap(receipt => {
+    if (editorial?.receipts?.length) {
+      const receipts = editorial.receipts.flatMap(receipt => {
+        if (receipt.scope !== 'retrieval' && !original.archived_source_url) return [];
         const { id, source_id, checked_on, checked_at, scope, result, final_url, http_status,
           retrieval_reason, rendered_observation, approved, approval_basis, reviewed_fields } = receipt;
         const source = getSource(source_id);
@@ -242,7 +243,7 @@ const S2SWork = (() => {
       if (receipts.length) add('source_receipts', receipts);
     }
     if (route.check_history?.length) {
-      add('check_history', route.check_history.map(({ date, result, url, note }) => ({ date, result, url, note })));
+      add('check_history', route.check_history.map(({ date, result, url, note, source_ids }) => ({ date, result, url, note, source_ids })));
     }
     if (disposition?.approval_basis === 'source_content_review' && disposition.source_ids?.length
         && disposition.source_ids.every(getSource)) {
@@ -274,8 +275,10 @@ const S2SWork = (() => {
     const form = at(route.url).find(source =>
       source.source_type === 'company' && source.title?.endsWith(' — public application form')
     );
-    const earlierForm = (route.check_history || []).find(check => check.result === 'application_form_available' && check.date
-      && (check.url ? at(check.url).length : form?.accessed_on && form.accessed_on === check.date));
+    const earlierForm = (route.check_history || [])
+      .filter(check => check.result === 'application_form_available' && check.date
+        && (check.url ? at(check.url).length : form?.accessed_on && form.accessed_on === check.date))
+      .sort((left, right) => right.date.localeCompare(left.date))[0];
     const originalAction = actions.find(item => item.url === route.url && item.purpose === 'application');
     const recordedApplication = at(listed?.application_url).length ? listed.application_url
       : (route.form_available === true ? form?.url : null) || originalAction?.url;
