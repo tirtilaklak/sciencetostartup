@@ -1914,7 +1914,9 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
     body = ['<link rel="stylesheet" href="/companies-page.css">', crumb_nav(crumbs, "directory-crumbs"),
             '<header class="directory-intro"><h1>AI data companies</h1></header>',
             '<form class="directory-filters" id="company-filters" role="search" hidden><label>Search companies<input type="search" id="company-query" name="q" placeholder="Name, offering, or specialty" autocomplete="off"></label><label>Business group<select id="company-group" name="group"><option value="">All groups</option>' + ''.join(f'<option value="{group_slug(g)}">{escape(labels.get(g, g))}</option>' for g in order) + '</select></label><button type="reset">Clear</button></form>',
-            f'<div class="directory-results-bar"><p class="directory-result" id="company-count" role="status" aria-live="polite">{count} companies</p><a class="directory-compare" href="/explore/#compare">Compare companies</a></div>',
+            f'<div class="directory-results-bar"><p class="directory-result" id="company-count" role="status" aria-live="polite">{count} companies</p>'
+            '<div class="actions"><a class="directory-compare" href="/explore/#compare">Compare companies</a>'
+            '<a class="text-link" href="/explore/#business-health">Revenue &amp; growth</a></div></div>',
             '<p class="directory-selected-group" data-directory-selected-group hidden></p>',
             '<p id="company-empty" class="directory-empty" hidden>No companies in this directory match. <a data-full-guide-search href="/?search=#browse-guide">Search the full guide</a></p>',
             '<nav class="directory-groups" aria-label="Business groups"><ul class="chips">' + "".join(f'<li><a href="#{group_slug(g)}">{escape(labels.get(g, g))} <span>{len(groups[g])}</span></a></li>' for g in order) + "</ul></nav>\n"]

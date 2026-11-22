@@ -60,6 +60,12 @@ test('the directory offers historical comparisons and current-only profile links
   expect(await historical.evaluateAll(links => links.every(link =>
     link.getAttribute('href') === '/explore/#compare/' + link.closest('[data-company]').dataset.company
   ))).toBe(true);
+  const market = page.getByRole('link', { name: 'Revenue & growth', exact: true });
+  await expect(market).toHaveCount(1);
+  await expect(market).toBeInViewport();
+  await market.click();
+  await expect(page).toHaveURL(/\/explore\/#business-health$/);
+  await expect(page.locator('#business-health-heading')).toBeInViewport();
 });
 
 test.describe('without JavaScript', () => {
