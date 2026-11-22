@@ -27,6 +27,18 @@
     typeof navigationAPI.updateCurrentEntry === 'function' && typeof navigationAPI.addEventListener === 'function';
   const timing = globalThis.performance?.getEntriesByType?.('navigation')?.[0];
   const hashTarget = () => rowById.get(location.hash.slice(1));
+  let markedFragment = null;
+  function syncFragmentHighlight() {
+    // A recreated WebKit document can have a valid fragment without a native :target.
+    let row;
+    try { row = rowById.get(decodeURIComponent(location.hash.slice(1))); }
+    catch (_) { /* Malformed fragment. */ }
+    const visibleTarget = row && !row.hidden ? row : null;
+    if (visibleTarget === markedFragment) return;
+    markedFragment?.removeAttribute('data-fragment-target');
+    visibleTarget?.setAttribute('data-fragment-target', '');
+    markedFragment = visibleTarget;
+  }
   const disclosureObserver = navigationState ? null : new MutationObserver(mutations => {
     const details = hashTarget()?.querySelector('details');
     if (mutations.some(mutation => mutation.target === details)) saveReading();
@@ -202,6 +214,7 @@
         Boolean(kind.value && row.dataset.kind !== kind.value);
       if (!row.hidden) visible++;
     }
+    syncFragmentHighlight();
     document.getElementById('scan-count').textContent = `${visible} of ${rows.length} selections`;
     document.getElementById('scan-empty').hidden = visible !== 0;
     reset.hidden = !search.value && !topic.value && !kind.value;
@@ -286,9 +299,13 @@
   addEventListener('pagehide', () => { restoration++; coldFragmentURL = null; });
   addEventListener('pageshow', event => {
     resumedDocument = event.persisted;
+    syncFragmentHighlight();
     if (!resumedDocument) restoreReading();
   });
-  addEventListener('popstate', () => { if (!resumedDocument) restoreReading(); });
+  addEventListener('popstate', () => {
+    syncFragmentHighlight();
+    if (!resumedDocument) restoreReading();
+  });
   function revealHash(target = hashTarget()) {
     restoration++;
     coldFragmentURL = null;
@@ -301,6 +318,7 @@
   }
   addEventListener('hashchange', () => {
     resumedDocument = false;
+    syncFragmentHighlight();
     restoreReading(true, true);
   });
   filter(false);

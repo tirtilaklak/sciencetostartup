@@ -385,3 +385,12 @@ All 135 Work titles opened their matching role records. The 210 Work CSVs matche
 All 1,109 Python tests and 24 mobile performance medians passed. The slowest median was 2.34 seconds LCP on Explore Companies. Official Browser QA caught two test measurement errors. The company ledger restored precisely the scroll position observed when the reader left. The Firefox Daily select width differed from its measurement clone by 0.000015px. [CI](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45042823507) · [Browser QA](https://github.com/tirtilaklak/sciencetostartup/actions/runs/45042823520)
 
 A cold phone visit to Technical Landscape lost a citation click or tap in 14 of 16 trials. At 200% zoom Home’s Menu covered most of the next focused link. With enlarged text Daily labels overlapped their values, and Compare left nine of twelve focused controls below a 320 × 568 viewport. The Market data retry placed its focused heading below the fold. This candidate stayed off public traffic. [Reproductions and acceptance criteria](site-quality-20261121/thirteenth-audit-findings.json)
+
+
+## Fourteenth implementation
+
+A single tap on a visible Technical Landscape citation keeps its position until the browser follows it. The previous chapter layout could move the IFEval link nearly 2,915px between pointerdown and click. The repair covers the current chapter and the dated edition.
+
+Daily gives enlarged labels enough space above 600px. Finding and Source date previously overlapped their values in all 47 stories. The selected story keeps its background on mobile WebKit Forward. Home’s Menu makes room for the next focused action at browser zoom, and keyboard readers can reveal the lower lines of a long search result.
+
+The Market retry restores the visible Revenue & growth heading after a failed data or module request. Compare keeps its focused controls readable on a short phone with enlarged text. The browser tests also capture the ledger’s actual scroll position on departure and wait for the failed request before retrying a claim. [Contributors and source](site-quality-20261121/fourteenth-implementation.json) · [Reproductions](site-quality-20261121/thirteenth-audit-findings.json)

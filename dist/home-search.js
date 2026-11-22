@@ -162,7 +162,11 @@
     active = index;
     rows.forEach((node, position) => node.setAttribute('aria-selected', String(position === active)));
     if (active >= 0 && rows[active]) {
-      input.setAttribute('aria-activedescendant', rows[active].id); rows[active].scrollIntoView({ block: 'nearest' });
+      const row = rows[active];
+      input.setAttribute('aria-activedescendant', row.id);
+      const viewport = results.getBoundingClientRect(), bounds = row.getBoundingClientRect();
+      if (bounds.top < viewport.top || bounds.height > viewport.height) results.scrollTop += bounds.top - viewport.top;
+      else if (bounds.bottom > viewport.bottom) results.scrollTop += bounds.bottom - viewport.bottom;
     } else input.removeAttribute('aria-activedescendant');
   }
   function resultType(row) {
@@ -277,6 +281,12 @@
     if (event.key === 'Escape') { event.preventDefault(); dialog.close(); return; }
     if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
     const rows = options(); if (!rows.length) return;
+    if (event.key === 'PageDown' || event.key === 'PageUp') {
+      event.preventDefault();
+      const direction = event.key === 'PageDown' ? 1 : -1;
+      results.scrollTop += direction * results.clientHeight * .75;
+      return;
+    }
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
       const forward = event.key === 'ArrowDown';

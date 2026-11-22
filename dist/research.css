@@ -297,8 +297,9 @@
 @supports(content-visibility:auto){
  @media screen{
   html[data-reader-enhanced] .r-reader-chapter-content[aria-labelledby="technical-landscape"]>.r-paragraph{content-visibility:auto;contain-intrinsic-block-size:auto 32rem}
-  .r-book-reader:has(:target) .r-reader-chapter-content[aria-labelledby="technical-landscape"]>.r-paragraph,
-  html[data-reader-enhanced] .r-reader-chapter-content[aria-labelledby="technical-landscape"]:focus-within>.r-paragraph{content-visibility:visible;contain-intrinsic-size:none}
+  .r-book-reader:has(:target) .r-reader-chapter-content[aria-labelledby="technical-landscape"]>.r-paragraph{content-visibility:visible;contain-intrinsic-size:none}
+  /* Pointer focus can change between press and click. Keep the link in place. */
+  html[data-reader-enhanced] .r-reader-chapter-content[aria-labelledby="technical-landscape"]:has(:focus-visible)>.r-paragraph{content-visibility:visible}
  }
  @media print{
   .r-reader-chapter-content[aria-labelledby="technical-landscape"]>.r-paragraph{content-visibility:visible;contain:none;contain-intrinsic-size:none}
