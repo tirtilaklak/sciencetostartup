@@ -150,6 +150,27 @@ class ResearchPageTests(unittest.TestCase):
         self.assertIn('<a href="/publication/report.pdf">Read the archived report PDF (research-2026-11-12.1)</a>'
                       '. The cover was prepared before DOI registration.', rp._data(self.context))
 
+    def test_current_reader_labels_only_available_archived_formats(self):
+        html, pdf = 'publication/report.html', 'publication/report.pdf'
+        self.context['publication_assets'] = [html, pdf]
+        self.assertIn('Read offline: <a href="/publication/report.html">Complete HTML report</a> · '
+                      '<a href="/publication/report.pdf">Full report PDF</a>', rp._reader_downloads(self.context))
+
+        self.context['report'].update(updated_on='2026-11-15', archive={
+            'status': 'published', 'artifact_sha256': rp.EDITION_MIRROR_ARCHIVE_SHA256})
+        for available in ([html, pdf], [html], [pdf], []):
+            with self.subTest(available=available):
+                self.context['publication_assets'] = available
+                downloads = ReaderTree(rp._reader_downloads(self.context)).with_class('r-reader-downloads')
+                if not available:
+                    self.assertEqual(downloads, [])
+                    continue
+                control, = downloads
+                self.assertEqual(ReaderTree.links(control), ['/' + path for path in available])
+                labels = {html: 'Archived HTML report', pdf: 'Archived report PDF'}
+                self.assertEqual(ReaderTree.text(control), ' · '.join(labels[path] for path in available)
+                                 + ' · 15 Nov 2026 snapshot. Prepared before DOI registration.')
+
     def test_actual_baseline_lifecycle_has_only_verified_publications(self):
         import research_citations as citations
         from research_report import publication_gate

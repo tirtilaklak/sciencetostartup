@@ -847,8 +847,15 @@ def _reader_toc(context, current, base=REPORT_PATH, legacy_targets=False):
             + _link('/research/data/', 'Inspect coverage & evidence →', 'r-text-link') + '</nav>')
 
 
-def _reader_downloads(context, base=REPORT_PATH, edition=False):
-    archive = _safe_url(context['report'].get('archive', {}).get('record_url'))
+def _has_pre_registration_report(archive):
+    return archive.get('status') == 'published' and archive.get('artifact_sha256') == EDITION_MIRROR_ARCHIVE_SHA256
+
+
+def _reader_downloads(context, *, edition=False):
+    report = context['report']
+    receipt = report.get('archive', {})
+    archive = _safe_url(receipt.get('record_url'))
+    prefix, note = 'Read offline: ', ''
     if edition and archive:
         if publication_metadata(context).get('doi'):
             links = (_link(_deposit_file(archive, 'report.pdf'), 'Download report PDF') + ' · '
@@ -858,12 +865,15 @@ def _reader_downloads(context, base=REPORT_PATH, edition=False):
             links = _link(archive, 'Complete archived report & downloads')
     else:
         available = context.get('publication_assets', [])
-        downloads = []
-        for filename, label in (('report.html', 'Complete HTML report'), ('report.pdf', 'Full report PDF')):
-            if 'publication/' + filename in available:
-                downloads.append(_link('/publication/' + filename, label))
-        links = ' · '.join(downloads)
-    return '<p class="r-reader-downloads">Read offline: ' + links + '</p>' if links else ''
+        labels = ('Complete HTML report', 'Full report PDF')
+        if not edition and _has_pre_registration_report(receipt):
+            labels = ('Archived HTML report', 'Archived report PDF')
+            prefix = ''
+            note = f' · {_date(report["updated_on"])} snapshot. Prepared before DOI registration.'
+        links = ' · '.join(_link('/' + path, label)
+                           for path, label in zip(('publication/report.html', 'publication/report.pdf'), labels)
+                           if path in available)
+    return '<p class="r-reader-downloads">' + prefix + links + note + '</p>' if links else ''
 
 
 def _reader_navigation(context, section_id, base=REPORT_PATH):
@@ -902,7 +912,7 @@ def _report(context, edition=False, base=REPORT_PATH):
               + f'<p class="r-lede">{sp.escape(report.get("subtitle"))}</p>'
               + _meta(context) + '<p class="r-callout">' + sp.escape(report.get('summary')) + '</p>'
               + '<p class="r-meta">' + sp.escape(report.get('review_statement')) + '</p>'
-              + _reader_downloads(context, base, edition) + '</header>')
+              + _reader_downloads(context, edition=edition) + '</header>')
     body = ('<section class="r-chapter" id="' + sp.escape(section['id']) + '" tabindex="-1"><h2>'
             + sp.escape(section['title']) + '</h2>'
             + _chapter_content(context, section, ())
@@ -927,7 +937,7 @@ def _reader_chapter(context, section, base=REPORT_PATH, edition=False):
               + str(len(report['sections'])) + ' · ' + sp.escape(_status(context)) + '</p>'
               + '<p class="r-reader-book-title">' + _link(base, report['title']) + '</p>'
               + '<h1 id="' + sp.escape(section['id']) + '" tabindex="-1">' + sp.escape(section['title']) + '</h1>'
-              + ('' if early_shortcuts else shortcuts) + _meta(context) + _reader_downloads(context, base, edition) + '</header>')
+              + ('' if early_shortcuts else shortcuts) + _meta(context) + _reader_downloads(context, edition=edition) + '</header>')
     body = ('<section class="r-chapter r-reader-chapter-content" aria-labelledby="' + sp.escape(section['id']) + '">'
             + _chapter_content(context, section, outline, passages) + '</section>'
             + _reader_navigation(context, section['id'], base) + _reader_citation(context, edition))
@@ -1194,8 +1204,7 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
             if size is not None:
                 label += f' ({size / 1_000_000:.1f} MB)'
             link = f'<a href="{sp.escape(url)}" download>{sp.escape(label)}</a>'
-        elif (url == '/publication/report.pdf' and archive.get('status') == 'published'
-              and archive.get('artifact_sha256') == EDITION_MIRROR_ARCHIVE_SHA256):
+        elif url == '/publication/report.pdf' and _has_pre_registration_report(archive):
             link = (_link(url, f'Read the archived report PDF ({report["release_id"]})')
                     + '. The cover was prepared before DOI registration.')
         else:
