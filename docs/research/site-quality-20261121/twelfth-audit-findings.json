@@ -51,6 +51,16 @@
       "id": "A12-market-measure",
       "observed": "25 unavailable Paid delivery cells use Expert activity as the primary accessible name.",
       "acceptance": "Name the visible measure in the button and dialog, then explain the underlying concept where appropriate."
+    },
+    {
+      "id": "A12-menu-open",
+      "observed": "After the last link, Tab reaches Work Filters while an open native menu covers six of nine sampled points. The Companies search loses three.",
+      "acceptance": "Keep later focused controls readable and clickable while the menu is open, including without JavaScript."
+    },
+    {
+      "id": "A12-daily-rank-date",
+      "observed": "At 32px minimum text the two-digit Daily rank overlaps its kind by 4.53px. At 601px the topic chips stretch the page to 640px. The archive date needs 224px in a 204px field.",
+      "acceptance": "Let the rank and chips reflow and show the complete selected snapshot date. Preserve default-density and filtering behavior."
     }
   ]
 }

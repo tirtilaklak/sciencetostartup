@@ -55,7 +55,12 @@
     "chapter_source_links": 7184,
     "archived_hops_local_workerd": 8,
     "market_keyboard_stops": 234,
-    "daily_filter_combinations": 100
+    "daily_filter_combinations": 100,
+    "additional_rendered_explore_targets": 230,
+    "total_distinct_explore_targets": 515,
+    "total_explore_phone_desktop_visits": 1030,
+    "unreached_explore_targets": 0,
+    "local_exact_browser_journeys": 228
   },
   "official": {
     "ci": 45039549361,
@@ -230,6 +235,14 @@
     "work-matrix/completion.json": "61ef44cb2efd78b4d70007512abb293a3da0fc8d7c39c859972e2ef7bacbe552",
     "work-sources/issuer-reconciliation.json": "bcf8dcb9a1999654d20268f8cd509eaf2ca8deee9657135c12a1b62a5279b63f",
     "accessibility/font-nojs.json": "fcccd53d8a568be91dba089e6f211b475a0f4e3c12c0d04c8d819a6cfd4aecbe",
-    "accessibility/font-js.json": "9d47da2a38e818dcdda58d279db056c5a9389ea8cabf1341b02d0d57de88f335"
-  }
+    "accessibility/font-js.json": "9d47da2a38e818dcdda58d279db056c5a9389ea8cabf1341b02d0d57de88f335",
+    "navigation/rendered-summary.json": "73d19e7631af9a370fde85428eae76117f3607435b264e69ec433bfe6f96f2e1",
+    "accessibility/findings.md": "2360d90ec4ba30ba3f267c1fdc36859606044d81c823de0756bee093aa0b8588",
+    "accessibility/chromium-followup.json": "49dbe2b5fbe562d4f9874263e09b9a0db9c51ad09c3e5e7e4958321fe8d1c1ab",
+    "accessibility/font-edges.json": "5a96495ea2bccc2f8f283dff22bbec5de74fdcb5ed347c8736124b06d422d32f",
+    "research/downloaded-archive.json": "cf1f931bb7ffda3cc2f6f49d3962254348fde77fe6757065bb3d3bcec9abc13f",
+    "companies/history-csv-retry.json": "ee54631db4377a3271adb9c2391845fc3dcbeac7e1bfe41f65eb8cf0648a7cda",
+    "work-sources/browser-final.json": "0e7a169639fd9ccef1600684e883a09291a82b595473125d6fee72a6a7018454"
+  },
+  "local_journey_repeat": "Three groups were repeated after browser or local server failures. Each repeat used the exact frozen manifest and identical test IDs."
 }
