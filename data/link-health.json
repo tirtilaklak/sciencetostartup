@@ -17,6 +17,11 @@
       "checked_on": "2026-10-23"
     },
     {
+      "url": "https://crowdgen.com/sage-en-us/",
+      "status": "not_found",
+      "checked_on": "2026-11-22"
+    },
+    {
       "url": "https://earningscalls.dev/transcripts/exlservice-holdings-inc_exls_earnings_call_transcript_2026-06-24",
       "status": "not_found",
       "checked_on": "2026-11-22"
@@ -125,6 +130,11 @@
       "url": "https://www.math.ucla.edu/~oak/docs/teaching/170E_20F/170E_20F_W1_typed_discussion_notes.pdf",
       "status": "not_found",
       "checked_on": "2026-10-23"
+    },
+    {
+      "url": "https://www.trustscale.ai/assets/index-CUMNnpew.js",
+      "status": "not_found",
+      "checked_on": "2026-11-22"
     }
   ]
 }
