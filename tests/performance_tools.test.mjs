@@ -23,12 +23,13 @@ function browserJob(name) {
   return lines.slice(start + 1, end < 0 ? undefined : end).join('\n');
 }
 
-function browserSelection(name) {
+function browserSelection(name, project) {
   const command = browserJob(name).match(/^      - run: npm run test:browser -- (.+)$/m);
   assert(command, 'Missing browser command: ' + name);
-  const selection = command[1].match(/^(--grep(?:-invert)?) '([^']+)'( --workers=1)?$/);
+  const selection = command[1].match(/^(--project "\$QA_PROJECT" )?(--grep(?:-invert)?) '([^']+)'( --workers=1)?$/);
   assert(selection, 'Unexpected browser command: ' + command[1]);
-  return [selection[1], selection[2], ...(selection[3] ? ['--workers=1'] : [])];
+  assert.equal(Boolean(selection[1]), Boolean(project), 'Wrong project selection for ' + name);
+  return [...(project ? ['--project', project] : []), selection[2], selection[3], ...(selection[4] ? ['--workers=1'] : [])];
 }
 
 function listBrowserTests(args = []) {
@@ -39,13 +40,15 @@ function listBrowserTests(args = []) {
   const report = JSON.parse(listed.stdout);
   assert.deepEqual(report.errors, []);
   const entries = [];
-  function visit(suites) {
+  function visit(suites, ancestors = []) {
     for (const suite of suites) {
+      const titles = [...ancestors, suite.title];
       for (const spec of suite.specs || []) {
-        for (const check of spec.tests) entries.push({key: check.projectName + '\0' + spec.id,
+        // The merged reporter generates spec.id from the first selected project.
+        for (const check of spec.tests) entries.push({key: JSON.stringify([check.projectName, spec.file, spec.line, spec.column, ...titles, spec.title]),
           project: check.projectName, file: spec.file, title: spec.title, timeout: check.timeout});
       }
-      visit(suite.suites || []);
+      visit(suite.suites || [], titles);
     }
   }
   visit(report.suites);
@@ -54,24 +57,37 @@ function listBrowserTests(args = []) {
 }
 
 test('browser CI partitions preserve every test and isolate all twelve chapter scans on all five engines', () => {
-  const coreArgs = browserSelection('browser-core');
+  const coreJob = browserJob('browser-core');
+  const matrix = coreJob.match(/^        project: \[([^\]]+)\]$/m);
+  assert(matrix, 'Missing core browser project matrix');
+  assert.match(coreJob, /^      fail-fast: false$/m);
+  assert.match(coreJob, /^          QA_PROJECT: \$\{\{ matrix\.project \}\}$/m);
+  assert.match(coreJob, /^          name: browser-core-qa-\$\{\{ matrix\.project \}\}$/m);
+  const projects = matrix[1].split(',').map(name => name.trim());
+  assert.deepEqual([...projects].sort(), ['chromium', 'firefox', 'mobile-chromium', 'mobile-webkit', 'webkit']);
   const reportArgs = browserSelection('report-accessibility');
   const reportTitle = 'no serious or critical accessibility violations on /research/state-of-ai-data-labs/';
   const readingSelection = reportTitle + '($|chapters/)';
-  assert.deepEqual(coreArgs, ['--grep-invert', readingSelection]);
   assert.deepEqual(reportArgs, ['--grep', readingSelection, '--workers=1']);
   const all = listBrowserTests();
-  const core = listBrowserTests(coreArgs);
+  const core = {entries: projects.flatMap(project => {
+    const args = browserSelection('browser-core', project);
+    assert.deepEqual(args, ['--project', project, '--grep-invert', readingSelection]);
+    const suite = listBrowserTests(args);
+    assert(suite.entries.length && suite.entries.every(entry => entry.project === project));
+    assert.equal(suite.config.workers, 2);
+    return suite.entries;
+  })};
   const report = listBrowserTests(reportArgs);
   const keys = inventory => inventory.entries.map(entry => entry.key).sort();
   const coreKeys = new Set(keys(core));
+  assert.equal(coreKeys.size, core.entries.length, 'Core browser projects overlap');
   assert(report.entries.every(entry => !coreKeys.has(entry.key)), 'CI partitions overlap');
   assert.deepEqual([...keys(core), ...keys(report)].sort(), keys(all), 'CI must execute exactly the complete inventory');
   assert(all.entries.length >= 700, 'The original browser inventory must not shrink');
   assert.equal(core.entries.length, all.entries.length - 60);
   assert.equal(report.entries.length, 60);
-  assert.deepEqual(report.entries.map(entry => entry.project).sort(),
-    ['chromium', 'firefox', 'mobile-chromium', 'mobile-webkit', 'webkit'].flatMap(name => Array(12).fill(name)).sort());
+  assert.deepEqual(report.entries.map(entry => entry.project).sort(), projects.flatMap(name => Array(12).fill(name)).sort());
   const readerRoutes = policy.performance.routes.filter(route => route.startsWith('/research/state-of-ai-data-labs/'));
   assert.equal(readerRoutes.length, 12);
   for (const entry of report.entries) {
@@ -79,7 +95,6 @@ test('browser CI partitions preserve every test and isolate all twelve chapter s
     assert(readerRoutes.some(route => entry.title === 'no serious or critical accessibility violations on ' + route));
     assert.equal(entry.timeout, 30_000);
   }
-  assert.equal(core.config.workers, 2);
   assert.equal(report.config.workers, 1);
 });
 

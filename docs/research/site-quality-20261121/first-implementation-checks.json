@@ -1,0 +1,64 @@
+{
+  "scope": "First implementation and initial candidate verification. Disposable build receipts retain their own identities.",
+  "candidate_build": "d63382a41cc48c2e33ce",
+  "candidate_manifest_sha256": "691a43092704c83c3dd01be9d22fa7043e12207ba82d3d52f083320b86b2ade3",
+  "production_at_freeze": "cddaa614-befb-4bfe-81b2-8553bd74afac",
+  "candidate_payloads": 1276,
+  "checks": [
+    {
+      "receipt": "implementation-preview-1/acceptance/summary.json",
+      "receipt_sha256": "ba3eb33c4079046dee84f569380520ecf4062b92c23b572bdc6173cbdff46946",
+      "status": "assertion_failure",
+      "suites": {
+        "search": [
+          8,
+          10
+        ],
+        "accessibility": [
+          17,
+          17
+        ],
+        "home": [
+          48,
+          48
+        ],
+        "editorial": [
+          11,
+          11
+        ]
+      }
+    },
+    {
+      "receipt": "work-evidence/implementation-handoff/provenance-comparison-0526807c.json",
+      "receipt_sha256": "4bbb5655e6d1a72224db634236db88eb48b2be9d8b1a5178750510799e867546",
+      "candidate_work_sha256": "a591ce3ebe5872ee75113796b638cb6b91488793220e7f77885516be298c9dd9",
+      "canonical_sha256": "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061"
+    },
+    {
+      "receipt": "implementation-profile/native-work-six.json",
+      "receipt_sha256": "96167a1246d6945749d803ea7fda24d26df39d4b76a6f221a7e5a93921c3d18a",
+      "build_id": "2ed545e2771819c60a2c",
+      "checked_count": 276,
+      "passed_count": 276,
+      "failure_count": 0
+    },
+    {
+      "receipt": "implementation-profile/native-citations.json",
+      "receipt_sha256": "0e94d362ca170ce0d210ffb978d123f74d6ccd7ba708a6c9b2b6fdcd43a513a0",
+      "build_id": "2ed545e2771819c60a2c"
+    },
+    {
+      "receipt": "implementation-profile/native-corrections.json",
+      "receipt_sha256": "ac95c06d862ca3b8e7164f75797e38a94d8d67ad64d9ac442724439fe5431920"
+    },
+    {
+      "receipt": "candidate-1/finance-acceptance.json",
+      "receipt_sha256": "f5db506b76176f8e9fcfafe46415809ade99b6b6987000955b63d496398b4c96",
+      "build_id": "d63382a41cc48c2e33ce"
+    },
+    {
+      "receipt": "candidate-1/active-at-freeze.json",
+      "receipt_sha256": "f82aea25e0ece67aaec6146cb011fdf256e355198d85ac7fc22ff3b3ed9536b8"
+    }
+  ]
+}

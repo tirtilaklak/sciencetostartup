@@ -21,6 +21,14 @@ FIELD_NAMES = {"destination", "pay", "location", "requirements", "commitment", "
 REVIEW_BASES = {"stored_evidence", "direct_source", "not_reviewed"}
 RECEIPT_RESULTS = {"readable", "blocked", "not_found", "unavailable", "unreadable_shell", "error"}
 ARCHIVE_STATUSES = {"historical", "closed", "contributions", "paused", "no_route", "inquiry", "information"}
+ACTION_PURPOSES = {"application", "archived_listing", "career_board", "description", "network", "registration", "source"}
+SCOPED_DISPOSITIONS = {
+    "listing_closed": ("closed", "readable", "explicitly_closed"),
+    "application_unpublished": ("historical", "unavailable", "application_unpublished"),
+    "specific_intake_superseded": ("historical", "unreadable_shell", "intake_migrated"),
+    "duplicate_careers_redirect": ("historical", "readable", "redirected_to_career_board"),
+    "category_overview": ("information", "readable", "general_intake_link"),
+}
 SHA256 = re.compile(r"^[a-f0-9]{64}$")
 PRIVATE_CAPTURE_FIELDS = {"raw_path", "local_path", "extracted_text_path"}
 PRIVATE_CAPTURE_REFERENCE = re.compile(r"(?<![A-Za-z0-9:/])(?:/(?:workspace|tmp|home|private|mnt)(?:/|$)|file://)")
@@ -208,6 +216,17 @@ def validate_editorial_release(work, release, canonical, *, canonical_sha256=Non
         if terms_id:
             require(any(receipt["id"] == terms_id and receipt.get("approved") and receipt["scope"] == "key_terms" for receipt in editorial.get("receipts", [])), label + ": approved terms pointer is invalid")
         disposition = editorial.get("disposition")
+        sources_by_id = {source["id"]: source for source in row.get("sources", [])}
+        receipts_by_id = {receipt["id"]: receipt for receipt in editorial.get("receipts", [])}
+        actions = editorial.get("actions", [])
+        require(isinstance(actions, list) and len(actions) <= 2, label + ": invalid reviewed actions")
+        for action in actions:
+            source = sources_by_id.get(action.get("source_id"), {})
+            require(bool(action.get("label")) and action.get("purpose") in ACTION_PURPOSES
+                    and bool(action.get("url")) and source.get("url") == action["url"], label + ": action lacks exact source binding")
+        require(len({action["url"] for action in actions}) == len(actions), label + ": duplicate reviewed action URL")
+        if actions:
+            require(editorial.get("recorded_url_purpose") in ACTION_PURPOSES, label + ": original URL purpose missing")
         if disposition:
             require(disposition.get("state") == "historical_page_unavailable" and row.get("status") == "historical", label + ": invalid unavailable-page disposition")
             require(disposition.get("approval_basis") == "source_content_review" and bool(disposition.get("reviewer")), label + ": disposition review missing")
@@ -216,6 +235,42 @@ def validate_editorial_release(work, release, canonical, *, canonical_sha256=Non
             require(any(item.get("result") == "not_found" and item.get("http_status") in {404, 410} for item in editorial.get("receipts", [])), label + ": unavailable page lacks a not-found receipt")
             alternative = editorial.get("alternative_destination", {})
             require(alternative.get("source_id") in available_sources and any(source.get("id") == alternative.get("source_id") and source.get("url") == alternative.get("url") for source in row.get("sources", [])), label + ": career-board alternative lacks its source binding")
+            if disposition.get("posting_receipt_id") or disposition.get("board_receipt_id"):
+                posting = receipts_by_id.get(disposition.get("posting_receipt_id"), {})
+                board = receipts_by_id.get(disposition.get("board_receipt_id"), {})
+                require(posting.get("result") == "not_found" and posting.get("http_status") in {404, 410}
+                        and posting.get("source_id") in disposition["source_ids"]
+                        and sources_by_id.get(posting.get("source_id"), {}).get("url") == row.get("url"),
+                        label + ": disposition lacks the original posting receipt")
+                require(board.get("result") == "readable" and board.get("source_id") in disposition["source_ids"]
+                        and alternative["source_id"] in disposition["source_ids"] and alternative["url"] != row.get("url")
+                        and actions and all(actions[0].get(key) == alternative.get(key) for key in ("url", "label", "source_id")),
+                        label + ": disposition lacks the reviewed board and its action")
+        scoped = editorial.get("status_review")
+        if scoped:
+            kind = scoped.get("state")
+            require(kind in SCOPED_DISPOSITIONS and not disposition, label + ": invalid scoped disposition")
+            expected_status, result, signal = SCOPED_DISPOSITIONS[kind]
+            receipt = receipts_by_id.get(scoped.get("receipt_id"), {})
+            require(row.get("status") == expected_status and receipt.get("result") == result
+                    and signal in receipt.get("review_signals", []) and receipt.get("source_id") in scoped.get("source_ids", [])
+                    and receipt.get("scope") == "retrieval" and not receipt.get("approved")
+                    and sources_by_id.get(receipt.get("source_id"), {}).get("url") == receipt.get("url"),
+                    label + ": scoped disposition lacks the exact source observation")
+            check = row.get("last_route_check", {})
+            if kind in {"application_unpublished", "specific_intake_superseded"}:
+                application = check.get("application_check", {})
+                require(receipt["url"] != row["url"] and all(application.get(key) == receipt.get(key) for key in ("url", "http_status", "response_sha256")),
+                        label + ": scoped disposition lacks its separate application check")
+                if kind == "application_unpublished":
+                    require(receipt["http_status"] == 403 and check.get("url") == row["url"] and check.get("result") == "readable",
+                            label + ": unpublished application requires its readable parent description")
+            else:
+                require(receipt["url"] == row["url"], label + ": scoped disposition evidence identifies another listing")
+            require(bool(scoped.get("note")) and bool(scoped.get("reviewer")) and scoped.get("approval_basis") == "source_content_review"
+                    and set(scoped.get("source_ids", [])) <= set(sources_by_id), label + ": scoped disposition review missing")
+            require(checked_date(receipt.get("checked_on"), label + ": disposition receipt date")
+                    <= checked_date(scoped.get("reviewed_on"), label + ": disposition date") <= as_of, label + ": invalid disposition date")
     homepage = release.get("homepage", {})
     candidates = homepage.get("work_candidate_route_ids", [])
     require(bool(candidates) and len(candidates) == len(set(candidates)) and set(candidates) <= ids, "homepage candidate order is invalid")

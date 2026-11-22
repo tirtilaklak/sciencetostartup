@@ -1,0 +1,133 @@
+{
+  "build_id": "f0975074a40dcf85aacb",
+  "manifest_sha256": "7fcec94e9f7387a67b211d2c5aa33be9e4b742ff157f299661dd70e2614ade3d",
+  "product_source": "b245e03113a331d251c7c13945047f44b6c6fd6f",
+  "source_and_artifact_commit": "1d4f9df640ba59a2e846241857cae072b6118d16",
+  "editorial_release_id": "2026-11-22.2",
+  "declared_payloads": 1278,
+  "production_at_freeze": {
+    "deployment": "f802e85c-4be5-4f9d-be93-07ba3f56e2f4",
+    "created_on": "2026-11-19T03:21:07.619992Z",
+    "versions": [
+      {
+        "version": "cddaa614-befb-4bfe-81b2-8553bd74afac",
+        "percentage": 100
+      }
+    ]
+  },
+  "contributors": [
+    "fix3_dates",
+    "fix3_work_layout",
+    "fix3_edition",
+    "fix3_asset",
+    "fix3_home",
+    "fix3_script_tests",
+    "fix3_date_tests",
+    "fix3_footer",
+    "fix3_retention",
+    "fix3_approved_citations"
+  ],
+  "controls": {
+    "js_logic": 0,
+    "company_search_prefix_logic": 0,
+    "redesign_checks": 0,
+    "revision_app_logic": 0,
+    "revision_work_logic": 0,
+    "work_route_summary_logic": 0,
+    "reliability_copy_context_logic": 0,
+    "reliability_failure_state_logic": 0,
+    "risk_section_logic": 0,
+    "acceptance": 0,
+    "payload": 0
+  },
+  "targeted_assertions": {
+    "search": 10,
+    "accessibility": 17,
+    "homepage": 48,
+    "editorial": 11
+  },
+  "work": {
+    "combinations": 70,
+    "actual_csv": 210,
+    "empty_cases": 13,
+    "retained_records": 135
+  },
+  "navigation": {
+    "unique_locations": 245,
+    "phone_passed": 245,
+    "desktop_passed": 245
+  },
+  "finance": {
+    "native_metrics": 28,
+    "shared_selected_amounts": 18,
+    "exact_citation_dates_checked": 10
+  },
+  "recovery": {
+    "retained_runtime_files": 94,
+    "active_workers_version": "cddaa614-befb-4bfe-81b2-8553bd74afac",
+    "staged_cloudflare_public_files": 1277
+  },
+  "github_browser_workflow": 45003145015,
+  "github_ci_workflow": 45003145001,
+  "verified_findings": [
+    {
+      "id": "W3-native-options",
+      "path": "/work/?pay=hourly&sort=hourly",
+      "css_viewport_width": 390,
+      "available_text_px_upper_bound": 143,
+      "needed_text_px": 180.55,
+      "screenshot": "work-build-f097507-native-sort-390.png"
+    },
+    {
+      "id": "E1-market-period",
+      "path": "/explore/#market",
+      "company": "handshake_ai",
+      "observation": "Nearly $1B gross AI annualized revenue",
+      "reporting_period": "April 2026",
+      "publication": "2026-04-14",
+      "source_content_check": "2026-10-28",
+      "dialog_display": "Date 2026-04-14; no April reporting period"
+    },
+    {
+      "id": "A3-market-return",
+      "url": "/explore/#market",
+      "status": "reproduced",
+      "source": "retest3_finance",
+      "finding": "After an earlier ledger action, Escape from a chart or matrix evidence dialog can return focus to that stale ledger value. Exact focus restored 18/18 ledger, 8/26 chart and 0/23 applicable matrix actions.",
+      "acceptance": "Restore the initiating visible action after rerenders, Escape and Close including nested claims and alternate measurement dialogs."
+    },
+    {
+      "id": "E1-market-scope",
+      "url": "/explore/#market",
+      "status": "reproduced",
+      "source": "retest3_finance",
+      "finding": "RWS Generate \u00a399.4M and group \u00a3360.3M share the half-year period. A button switches scope under the misleading heading Other dates and only says segment.",
+      "acceptance": "Identify the change in business scope, name the Generate segment and preserve the correct observation and issuer."
+    },
+    {
+      "id": "W3-retry-focus",
+      "url": "/work/?reader=keep&q=Sage#mercor.work.company-careers",
+      "status": "reproduced in Chromium, Firefox and WebKit",
+      "source": "retest3_perf",
+      "finding": "After immutable Work script fails then a keyboard retry succeeds, the hydrated Sage filter excludes the Mercor bookmark. Search receives keyboard focus but stays about 414px above the Chromium viewport. Matching Sage bookmark passes.",
+      "acceptance": "On recovery preserve selected records, URL and other query controls. Keep focus fully visible on chosen target, or the sensible Search fallback when the bookmark does not match. Check matched, excluded and absent bookmarks."
+    }
+  ],
+  "private_receipt_hashes": {
+    "candidate-3-final/root-checks/summary.json": "2a021627cf22b8e26d9a880e0cb4c7297d2ff00a7bb6d980f80147f9c0eeff49",
+    "candidate-3-final/acceptance/summary.json": "634039671c16b44eb29239211317659a1b63e34a1b6771f5b92930ffe2871ecb",
+    "candidate-3-final/payload-budgets.json": "d754516d00ff2e92db35e91b7d2aa19ac7b4f408696cc65e0ecda9b6b3d5abba",
+    "candidate-3/retest-release/final/artifact-and-http.json": "05d85da4e3d63398d61dacfa05ba0a84ba61b5b4ebc32829c18ff7f93d60ac7b",
+    "candidate-3/retest-release/final/browser-replay.json": "c24e2dff1af4b9fb7384ac501b27949b1cc4de1f12d1afa3a6944443452bf6c3",
+    "candidate-3/retest-work/final/matrix-summary.json": "cb5e8f3962be69f6cbb5a82ba3db6e9f0c747d1cf80362420bfe73c07ae0ab2a",
+    "candidate-3/retest-work/final/picker.json": "03778ee0336b8ff86e7f66e398128ae732dbf430b74388b8987ff85efaec9fa2",
+    "candidate-3-final/retest-nav/route-summary.json": "2543f7e313a5cd874f27f237ed196a21be6bb27e8557d2e7b9b4ddf9beaa6617",
+    "candidate-3-final/retest-finance/market-period.json": "51b8a07e2256bd0fb9f4fdecd4cc0adccfa9cbca33c09eee059e55d7cab8cab8",
+    "candidate-3-final/retest-finance/approved-citations.json": "6c01df974a41942946bc65634d1139faf3027f44e816e0bb240987c465515326",
+    "candidate-3-final/retest-finance/selected-paths.json": "517ff89cf484b574f745ed3513fc81f7419f3ab797260ff80eac3d9459a85492",
+    "candidate-3/retest-home/final-18854/receipt.json": "55415db005cc017e53abc042d926f57c6096eed8b3e20be4a97fe647e607d939",
+    "candidate-3-final/retest-finance/market-replay.json": "7bdc5fdf2b4a1d117469010dd279ba91a1c7999a8b65252ed54543ff56f75a37",
+    "candidate-3/retest-reading/summary.json": "8668903d8b9821b669a1ce2605a969cbe841b62aa50b365d5dc7435b83bafbae",
+    "candidate-3-final/retest-perf/native-focus-edges-chromium.json": "d2435b38677e0cdaecb3eac8433d636234e9e58d168cf8cd784bd7d374e3d90a"
+  }
+}

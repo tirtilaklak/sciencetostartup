@@ -50,7 +50,7 @@ class PresentationProjectionTests(unittest.TestCase):
  r.termsAge=Object.fromEntries(window.WORK_ROUTES.routes.map(w=>[w.id,['2026-11-07','2026-11-08','2026-11-21','2026-11-22','2026-11-23T01:00:00Z'].map(day=>w4TermsAge(w,day))]));
  r.companySearch=Object.fromEntries(DATA.companies.map(c=>[c.id,[c.name,...(c.aliases||[]),c.description,modelFor(c.id),...DATA.products.filter(p=>p.company_id===c.id).flatMap(p=>[p.name,p.work_performed]),...profileProducts(c.id).flatMap(p=>[p.name,p.description,...(p.aliases||[])])].filter(Boolean).join(' ').toLowerCase()]));
  return r;""")
-        modules = ["web/app.js", "web/editorial.js", "web/work-v3.js"] + ["web/" + name for name in PRESENTATION_JS]
+        modules = ["web/search-core.js", "web/app.js", "web/editorial.js", "web/work-core.js", "web/work-v3.js"] + ["web/" + name for name in PRESENTATION_JS]
         node = shutil.which("node")
         if not node:
             raise AssertionError("Node is required for independent full-JS selector parity tests")
@@ -183,7 +183,7 @@ class PresentationProjectionTests(unittest.TestCase):
          const after={observations:window.BusinessHealth.observations().length,rows:window.BusinessHealth.rows('revenue','period_revenue').length,mercor:window.BusinessHealth.evidenceState('mercor','revenue'),definitions:window.BUSINESS_HEALTH.measure_definitions};
          return {before,after};})())"""
         script += "context.FULL_HEALTH_JSON=read('data/business-health.json');process.stdout.write(vm.runInContext(" + json.dumps(expression) + ",context));"
-        modules = ["web/app.js", "web/editorial.js", "web/work-v3.js"] + ["web/" + name for name in PRESENTATION_JS]
+        modules = ["web/search-core.js", "web/app.js", "web/editorial.js", "web/work-core.js", "web/work-v3.js"] + ["web/" + name for name in PRESENTATION_JS]
         result = subprocess.run(["node", "-e", script, str(ROOT), json.dumps(modules)], capture_output=True, text=True, timeout=120)
         self.assertEqual(result.returncode, 0, result.stderr)
         state = json.loads(result.stdout)
@@ -265,7 +265,7 @@ context.INITIALIZE_RUNTIME=()=>{
         script += "Promise.resolve(vm.runInContext(" + json.dumps(expression) + ",context)).then(result=>process.stdout.write(JSON.stringify(result))).catch(error=>{console.error(error);process.exitCode=1;});"
         self.assertIn("business-health.js", PRESENTATION_JS)
         self.assertNotIn("business-health.js", INITIAL_PRESENTATION_JS)
-        modules = ["web/app.js", "web/editorial.js", "web/work-v3.js"] + ["web/" + name for name in INITIAL_PRESENTATION_JS]
+        modules = ["web/search-core.js", "web/app.js", "web/editorial.js", "web/work-core.js", "web/work-v3.js"] + ["web/" + name for name in INITIAL_PRESENTATION_JS]
         result = subprocess.run(["node", "-e", script, str(ROOT), json.dumps(modules), str(fixture)], capture_output=True, text=True, timeout=120)
         self.assertEqual(result.returncode, 0, result.stderr)
         state = json.loads(result.stdout)

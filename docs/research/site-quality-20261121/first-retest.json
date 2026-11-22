@@ -1,0 +1,175 @@
+{
+  "build_id": "d63382a41cc48c2e33ce",
+  "manifest_sha256": "691a43092704c83c3dd01be9d22fa7043e12207ba82d3d52f083320b86b2ade3",
+  "findings": [
+    {
+      "finding": "W1",
+      "observation": "Native Research Scholar terms omit the publication condition for payment.",
+      "receipt": "retest-work/work-parity.json",
+      "receipt_sha256": "a2f04c392dfb33323257194b8a50ed7929bd48e5c5118ec30ced51ad803923b0"
+    },
+    {
+      "finding": "W1",
+      "observation": "Age and waitlist requirements disagree on Prolific cards.",
+      "receipt": "retest-work/work-parity.json",
+      "receipt_sha256": "a2f04c392dfb33323257194b8a50ed7929bd48e5c5118ec30ced51ad803923b0"
+    },
+    {
+      "finding": "W1",
+      "observation": "Some Work requirements repeat; native terms omit paid-work quotations and Explore omits four field-purpose links.",
+      "receipt": "retest-work/work-parity.json",
+      "receipt_sha256": "a2f04c392dfb33323257194b8a50ed7929bd48e5c5118ec30ced51ad803923b0"
+    },
+    {
+      "finding": "W2",
+      "observation": "Null prior secondary source observations and out-of-order evidence break source checking.",
+      "receipt": "retest-work/checker-additional.json",
+      "receipt_sha256": "3228c39d0b73323dcba150eef01ebae97a93bbebdd1e5e7296c29cddf1313ee4"
+    },
+    {
+      "finding": "W3",
+      "observation": "Explore\u2019s result count overlaps Compare and Download at 320\u2013480px.",
+      "receipt": "retest-selection/explore-breakpoints.json",
+      "receipt_sha256": "65f3b5ea2bc1761326adedffbd988d4e12e55425663aad3b73507ce6bb8ec905"
+    },
+    {
+      "finding": "S1",
+      "observation": "A pending Work query swallows rapid navigation and the first browser Back.",
+      "receipt": "retest-selection/stale-modes.json",
+      "receipt_sha256": "09b7755b737633645461135caf8be2c2ed1d3b5589b92dcb827cb4827953560a"
+    },
+    {
+      "finding": "S4",
+      "observation": "The recommended RLHF jobs search opens an empty directory although a matching job exists.",
+      "receipt": "retest-compare/employment-routing.json",
+      "receipt_sha256": "8afc70ac8dd6b2bbf1f93513b9eb3db1904065c64f4dbf356a88ffac35f4c476"
+    },
+    {
+      "finding": "E3",
+      "observation": "Opening a claim correction in a new tab loses the targeted record.",
+      "receipt": "retest-research/extra-journeys.json",
+      "receipt_sha256": "3fa1521421555f635f8dffa2febcdabecb29936d641e9ed33775b80fafaa557b"
+    },
+    {
+      "finding": "R3",
+      "observation": "View edition checksums downloads an attachment; the same publisher file without the download parameter opens inline.",
+      "receipt": "retest-research/archive-live-browser.json",
+      "receipt_sha256": "bd156a4f67a3068166c472455b5fff46161d34a93294677cbc1b948c8e7f1d71"
+    },
+    {
+      "finding": "N2",
+      "observation": "Native profile action names are missing the employer on 49 of 50 checked actions.",
+      "receipt": "retest-navigation/chromium-layout.json",
+      "receipt_sha256": "15ec034ed36834a0d2191d1565a7d9a609217e7a5142a25d5dbda82785584951"
+    },
+    {
+      "finding": "H1",
+      "observation": "Home\u2019s recorded program example says restrictions vary without naming the country requirement.",
+      "receipt": "retest-home/README.md",
+      "receipt_sha256": "3795b4df476f3247217f5791a9399c1cb4a93e203b6a50adeae4aab4d30064ae"
+    },
+    {
+      "finding": "R1",
+      "observation": "Installed native Work controls move the visible list down 111px and exceed the mobile CLS budget.",
+      "receipt": "retest-release/work-cls.json",
+      "receipt_sha256": "1fbbe6938b16aa50e40b2248d149cb798d9c4cb873545d7b111882fdf35ad9a2"
+    },
+    {
+      "finding": "R1",
+      "observation": "Enhanced Technical Ctrl+End stops short of the footer on some phone layouts.",
+      "receipt": "retest-perf/end-chromium.json",
+      "receipt_sha256": "1ea2734bc60a30fbe96ca9d429e4e83afe63969e9040952f781c98e365268ed3"
+    },
+    {
+      "finding": "D1",
+      "observation": "An archive date link followed by Back closes the disclosure and drops keyboard focus.",
+      "receipt": "retest-daily/keyboard-chromium.json",
+      "receipt_sha256": "b55382f065a576da1df6d0e05b0a4d2cd47205145e40bc11ee5f283992ae4f1d"
+    },
+    {
+      "finding": "N1",
+      "observation": "Returning to Explore from a search result loses the query and keyboard focus.",
+      "receipt": "retest-navigation/README.md",
+      "receipt_sha256": "5038accbbdc86838d193f6c56d37fc0df935beba00afa8607db37d8a35c370a8"
+    },
+    {
+      "finding": "E1/E4/E5",
+      "observation": "Sourced estimate, source-check dates and Generate revenue scope are mislabeled in some archive or accessible views.",
+      "receipt": "retest-finance/findings.md",
+      "receipt_sha256": "0b30cdfc0bf08a36d0ded27ab159cad33f305e71afae831722396ac8581aad72"
+    },
+    {
+      "finding": "E3",
+      "observation": "Record-level email links place the publisher correction address outside the approved contact areas.",
+      "receipt": "retest-release/privacy-record-correction.json",
+      "receipt_sha256": "ccff83ded9717704d91554414bbd9b0137a1e877bf429e5317fb0089d2c3664d"
+    }
+  ],
+  "reviewers": 10,
+  "phase": "Independent first-candidate audit. Production unchanged.",
+  "unchanged_and_passing": {
+    "work_selection_cases": 70,
+    "ordered_selection_csv_downloads": 210,
+    "desktop_and_mobile_explore_routes": 490,
+    "original_research_paragraphs": 3812,
+    "ordered_citations": 15206,
+    "restored_legacy_ids": 3568,
+    "finance_checks": 41,
+    "archived_role_checks": 276,
+    "mobile_lighthouse_routes_passed": 22,
+    "mobile_lighthouse_routes_total": 23,
+    "valid_lighthouse_runs": 69
+  },
+  "private_review_reports": [
+    {
+      "review": "home",
+      "receipt": "retest-home/README.md",
+      "sha256": "3795b4df476f3247217f5791a9399c1cb4a93e203b6a50adeae4aab4d30064ae"
+    },
+    {
+      "review": "work",
+      "receipt": "retest-work/README.md",
+      "sha256": "76be9a4444aa83a6c75f78a6bf414c1f00b7b409fb346eb4ae196b65060de411"
+    },
+    {
+      "review": "selection",
+      "receipt": "retest-selection/README.md",
+      "sha256": "5aa075406dd028ceb9e7c73e998b228d51483f16bc57b31e28a795b7bf3bf341"
+    },
+    {
+      "review": "compare",
+      "receipt": "retest-compare/README.md",
+      "sha256": "52fc1b827ecebf31204d63261fcf88b908aef2fbc5c4863e39e6532100ba421d"
+    },
+    {
+      "review": "navigation",
+      "receipt": "retest-navigation/README.md",
+      "sha256": "5038accbbdc86838d193f6c56d37fc0df935beba00afa8607db37d8a35c370a8"
+    },
+    {
+      "review": "research",
+      "receipt": "retest-research/README.md",
+      "sha256": "cdc5b1175b9a028d9230f2658be73fdec0819496ba7f7af51a7f5f50eca5c7f6"
+    },
+    {
+      "review": "finance",
+      "receipt": "retest-finance/findings.md",
+      "sha256": "0b30cdfc0bf08a36d0ded27ab159cad33f305e71afae831722396ac8581aad72"
+    },
+    {
+      "review": "daily",
+      "receipt": "retest-daily/report.md",
+      "sha256": "a92a68b3cfafe219460587fd33a5f24c435d91c55d42dcb5320f8e6e50f892af"
+    },
+    {
+      "review": "perf",
+      "receipt": "retest-perf/README.md",
+      "sha256": "9f2bd03145ed17b2b652281723db97b7a850340279ec1d37641d846e5424a7bc"
+    },
+    {
+      "review": "release",
+      "receipt": "retest-release/README.md",
+      "sha256": "6c6df004eabb361d8800ee3f4aae07156ad11407f5ec12f75277f658ef1ecb31"
+    }
+  ]
+}

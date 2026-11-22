@@ -11,7 +11,7 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
-from urllib.parse import unquote, urlsplit
+from urllib.parse import parse_qs, unquote, urlsplit
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,8 +39,8 @@ class Facts(HTMLParser):
                 self.records[attrs['id']] = attrs
         if tag == 'a' and attrs.get('href'):
             self.links.append(attrs['href'])
-            if 'r-legacy-ledger-target' in attrs.get('class', '').split():
-                self.aliases[attrs['id']] = attrs['href']
+            if attrs.get('id', '').startswith(('assertion-', 'source-')) and attrs['href'].startswith(('assertions/', 'sources/')):
+                self.aliases[attrs['id']] = '/research/data/' + attrs['href']
         if tag == 'h1':
             self.headings += 1
         if tag == 'link' and attrs.get('rel') == 'canonical':
@@ -156,6 +156,13 @@ class ResearchPageTests(unittest.TestCase):
         else:
             self.assertEqual(self.context['gate'], publication_gate(
                 self.context['graph'], self.context['report'], self.context['policy']))
+        json_sizes = {'/publication/clean-dataset.json': 2_810_000, '/research/exports/research-graph.json': 3_920_000}
+        for url, size in json_sizes.items():
+            file = self.output / url.lstrip('/')
+            file.parent.mkdir(parents=True, exist_ok=True)
+            with file.open('wb') as stream:
+                stream.truncate(size)
+        self.context['publication_assets'] = ['publication/current-REUSE.md']
         records = self.build()
         paths = [r['path'] for r in records]
         for path in ('/research/', rp.REPORT_PATH, '/research/data/', '/review/',
@@ -181,6 +188,22 @@ class ResearchPageTests(unittest.TestCase):
             self.assertNotIn('published_on', metadata)
             self.assertIn('Prelaunch', self.page('/research/'))
         editions = rp._published_editions(self.context)
+        data = ReaderTree(self.page('/research/data/'))
+        links = {node['attrs']['href']: node for node in data.elements if node['tag'] == 'a'}
+        for url, size in json_sizes.items():
+            self.assertIn('download', links[url]['attrs'])
+            self.assertTrue(ReaderTree.text(links[url]).endswith(f'({size / 1_000_000:.1f} MB)'))
+        for url in ('/research/exports/research-exports-manifest.json', '/publication/MANIFEST.json'):
+            self.assertNotIn('download', links[url]['attrs'])
+        for path, snapshot in editions:
+            if snapshot['report']['release_id'] == 'research-2026-11-12.1':
+                edition_data = self.page(path + 'data/')
+                self.assertIn('corrects the Python example for <code>clean-dataset.json</code> to use <code>subject_id</code>', edition_data)
+                self.assertIn('/publication/current-REUSE.md', Facts(edition_data).links)
+                mirror = ('https://raw.githubusercontent.com/tirtilaklak/sciencetostartup/'
+                          'aac87fd94dc86dee4976176fddb0764215898107/data/research/releases/research-2026-11-12.1/publication/')
+                self.assertTrue({mirror + name for name in ('research-archive.zip', 'report.pdf', 'MANIFEST.json')}
+                                <= set(Facts(edition_data).links))
         if metadata['status'] == 'published':
             self.assertIn(self.context['report']['release_id'],
                           [snapshot['report']['release_id'] for _, snapshot in editions])
@@ -209,7 +232,7 @@ const assert = require('node:assert/strict'), vm = require('node:vm');
 const source = JSON.parse(require('node:fs').readFileSync(0, 'utf8')).source;
 const scenarios = ['navigate', 'back_forward', 'reload', 'empty', 'missing-api', 'missing-performance'];
 for (const scenario of scenarios) {
-  const attributes = new Map(), listeners = [], violations = [];
+  const attributes = new Map(), listeners = new Map(), violations = [];
   const element = {
     setAttribute(name, value) { if (name !== 'data-reader-enhanced' || value !== '') violations.push('attribute'); attributes.set(name, value); },
     removeAttribute(name) { if (name !== 'data-reader-enhanced') violations.push('attribute'); attributes.delete(name); },
@@ -219,8 +242,8 @@ for (const scenario of scenarios) {
     if (!(key in target)) violations.push('document access'); return target[key];
   }});
   const sandbox = {document, addEventListener(type, listener) {
-    if (type !== 'pageshow' || typeof listener !== 'function') violations.push('listener');
-    else listeners.push(listener);
+    if (!['pageshow', 'DOMContentLoaded'].includes(type) || typeof listener !== 'function') violations.push('listener');
+    else listeners.set(type, listener);
   }, fetch() { violations.push('network'); throw Error('No network in guard'); },
   XMLHttpRequest: function() { violations.push('network'); },
   WebSocket: function() { violations.push('network'); }};
@@ -231,10 +254,15 @@ for (const scenario of scenarios) {
   assert.deepEqual(violations, [], scenario);
   assert.equal(attributes.has('data-reader-enhanced'), scenario === 'navigate', scenario);
   if (scenario === 'navigate') {
-    assert(listeners.length > 0, 'Fresh navigation needs a persisted-history reset');
-    for (const listener of listeners) listener({persisted: false});
+    assert.equal(listeners.size, 2);
+    listeners.get('DOMContentLoaded')();
+    assert.equal(attributes.has('data-reader-enhanced'), false, 'Unavailable deferred script retains native End');
+    attributes.set('data-reader-enhanced', '');
+    attributes.set('data-reader-end-ready', '');
+    listeners.get('DOMContentLoaded')();
+    listeners.get('pageshow')({persisted: false});
     assert.equal(attributes.has('data-reader-enhanced'), true);
-    for (const listener of listeners) listener({persisted: true});
+    listeners.get('pageshow')({persisted: true});
     assert.equal(attributes.has('data-reader-enhanced'), false);
     assert.deepEqual(violations, []);
   }
@@ -253,6 +281,16 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         sections = self.context['report']['sections']
         routes = [rp.REPORT_PATH if index == 0 else rp.REPORT_PATH + 'chapters/' + section['id'] + '/'
                   for index, section in enumerate(sections)]
+        early_shortcuts = {'technical-landscape', 'datasets-and-benchmarks', 'methods-and-appendices',
+                           'commercial-evidence'}
+        passage_targets = {
+            'technical-landscape': {'scalable-oversight-result':
+                                    'Study result — Measuring Progress on Scalable Oversight for Large Language Models.'},
+            'buyer-decision-guides': {'buyer-statistical-acceptance-rule':
+                                      'A proposed statistical acceptance rule should make its assumptions explicit.'},
+            'commercial-evidence': {'commercial-buyer-calculation': 'Reproducible buyer calculation:',
+                                    'commercial-review-calculation': 'Reproducible review calculation:'},
+        }
         expected_parts = [rp.sp.ORIGIN + route + ('#executive-assessment' if index == 0 else '')
                           for index, route in enumerate(routes)]
         for index, section in enumerate(sections):
@@ -260,22 +298,38 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
             self.assertIn(escape(section['title']), report)
             path = rp.REPORT_PATH if section['id'] == 'executive-assessment' else (
                 rp.REPORT_PATH + 'chapters/' + section['id'] + '/')
-            self.assertIn(path, facts.links)
+            self.assertIn(path + ('#' + section['id'] if index else ''), facts.links)
             chapter = self.page(path)
             chapter_facts = Facts(chapter)
             self.assertEqual(chapter_facts.canonicals, [rp.sp.ORIGIN + path])
             self.assertIn(section['id'], chapter_facts.ids)
+            self.assertEqual(chapter_facts.ids.count('first-paragraph'), 1)
+            self.assertEqual(chapter_facts.links.count('#first-paragraph'), 1)
             for paragraph in section['paragraphs']:
                 if rp.paragraph_supported(self.context, paragraph):
                     self.assertIn(escape(paragraph['text']), chapter)
                 else:
                     self.assertIn(rp.WITHHELD_PARAGRAPH, chapter)
-            self.assertTrue(all('src' not in script for script in chapter_facts.scripts),
-                            'Native chapters must not load external scripts')
+            self.assertEqual([script for script in chapter_facts.scripts if 'src' in script],
+                             [{'src': '/native-details.js', 'defer': None}] if index else [])
             self.assertNotIn('type="module"', chapter)
             tree = ReaderTree(chapter)
+            shortcuts = tree.with_class('r-bulk-shortcuts')[0]
+            if section['id'] in early_shortcuts:
+                self.assertLess(tree.elements.index(shortcuts),
+                                next(index for index, item in enumerate(tree.elements) if item['tag'] == 'h1'))
+            for anchor, lead_in in passage_targets.get(section['id'], {}).items():
+                matching = [paragraph for paragraph in section['paragraphs']
+                            if paragraph['text'].startswith(lead_in) and rp.paragraph_supported(self.context, paragraph)]
+                if not matching:
+                    continue  # The held legacy authoring inputs predate some reviewed passages.
+                self.assertEqual(len(matching), 1)
+                target, = [item for item in tree.with_class('r-paragraph') if item['attrs'].get('id') == anchor]
+                self.assertEqual(target['attrs'].get('tabindex'), '-1')
+                self.assertIn('#' + anchor, ReaderTree.links(shortcuts))
+                self.assertEqual(ReaderTree.text(target['children'][1]), matching[0]['text'])
             guards = [item for item in tree.elements if item['tag'] == 'script'
-                      and item['attrs'].get('type') != 'application/ld+json']
+                      and 'src' not in item['attrs'] and item['attrs'].get('type') != 'application/ld+json']
             if section['id'] == 'technical-landscape':
                 self.assertEqual(len(guards), 1)
                 self.assertIn(guards[0]['attrs'].get('type', '').strip().lower(),
@@ -289,7 +343,9 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
             toc_links = [item['children'][0] for listing in toc['children']
                          if isinstance(listing, dict) and listing['tag'] == 'ol'
                          for item in listing['children'] if isinstance(item, dict)]
-            self.assertEqual([link['attrs']['href'] for link in toc_links], routes)
+            expected_routes = routes if index else [routes[0]] + [route + '#' + item['id']
+                                                                   for route, item in zip(routes[1:], sections[1:])]
+            self.assertEqual([link['attrs']['href'] for link in toc_links], expected_routes)
             self.assertEqual([link['attrs']['href'] for link in toc_links if link['attrs'].get('aria-current') == 'page'], [path])
             node = json.loads(next(ReaderTree.text(item) for item in tree.elements
                                    if item['tag'] == 'script' and item['attrs'].get('type') == 'application/ld+json'))
@@ -314,7 +370,7 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         for section, route in zip(sections[1:], routes[1:]):
             target = next(item for item in entry_tree.elements if item['attrs'].get('id') == section['id'])
             self.assertEqual(target['tag'], 'li')
-            self.assertEqual(target['children'][0]['attrs']['href'], route)
+            self.assertEqual(target['children'][0]['attrs']['href'], route + '#' + section['id'])
             self.assertEqual(ReaderTree.text(target).strip(), section['title'])
 
     def test_native_book_conserves_all_ordered_prose_findings_and_evidence_bindings(self):
@@ -327,6 +383,16 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
             tree = ReaderTree(self.page(path))
             paragraphs = tree.with_class('r-paragraph')
             self.assertEqual(len(paragraphs), len(section['paragraphs']))
+            if section['id'] == 'methods-and-appendices':
+                originals = {
+                    child['attrs']['href'] for original in tree.with_class('r-paragraph-originals')
+                    for child in original['children'] if isinstance(child, dict) and child['tag'] == 'a'
+                }
+                self.assertIn('https://arxiv.org/pdf/2307.13854v1', originals)
+                self.assertIn(
+                    'https://storage.googleapis.com/gweb-research2023-media/pubtools/pdf/0d556e45afc54afeb2eb6b51a9bc1827b9961ff4.pdf',
+                    originals)
+                self.assertIn('https://www.mercor.com/apex/', originals)
             for actual, paragraph in zip(paragraphs, section['paragraphs']):
                 supported = rp.paragraph_supported(self.context, paragraph)
                 main = [child for child in actual['children'] if isinstance(child, dict)
@@ -415,8 +481,10 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
                               entity['review_depth'].replace('_', ' '), *entity.get('identifiers', {}).values()):
                     self.assertIn(value, scope_text)
                 self.assertIn(rp._meta(self.context), text)
-                for assertion in approved + historical:
+                for assertion in approved:
                     # Full records include source locators, qualifications and actual receipts.
+                    self.assertIn(rp._assertion(self.context, assertion, focusable=True), text)
+                for assertion in historical:
                     self.assertIn(rp._assertion(self.context, assertion), text)
                 linked = [a for a in self.context['graph']['assertions']
                           if entity['id'] in {a.get('subject_id'), a.get('object_id')}]
@@ -504,6 +572,21 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         edition = next(path for path in paths if '/editions/' in path)
         self.assertEqual(edition, '/research/editions/2026-11-12/')
         self.assertIn(edition + 'data/', paths)
+        archive = frozen['report']['archive']
+        dated_data = self.page(edition + 'data/')
+        dated_facts = Facts(dated_data)
+        self.assertIn(archive['record_url'] + '/files/report.pdf?download=1', dated_facts.links)
+        self.assertIn(archive['record_url'] + '/files/research-archive.zip?download=1', dated_facts.links)
+        manifest = archive['record_url'] + '/files/MANIFEST.json'
+        self.assertIn(manifest, dated_facts.links)
+        self.assertNotIn(manifest + '?download=1', dated_facts.links)
+        for filename in rp.EDITION_CITATIONS:
+            path = edition + 'data/citations/' + filename
+            self.assertIn(path, dated_facts.links)
+            citation = (self.output / path.strip('/')).read_text()
+            self.assertIn(archive['doi'], citation)
+            self.assertIn(frozen['report']['release_id'], citation)
+        self.assertFalse(set('assertion-' + aid for aid in rp.RETIRED_ASSERTION_IDS) & set(dated_facts.ids))
         for kind in ('assertions', 'sources'):
             for bucket in '0123456789abcdef':
                 route = edition + 'data/' + kind + '/' + bucket + '/'
@@ -515,6 +598,11 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         source_path = edition + 'data/sources/' + hashlib.sha256(source['id'].encode('utf-8')).hexdigest()[0] + '/'
         self.assertIn('href="https://example.org/research/data/frozen-source"', self.page(source_path))
         self.assertIn('Literal /research/data/#quoted-source-title', self.page(source_path))
+        source_record = rp._evidence_url('source', source['id']).replace('/research/data/', edition + 'data/', 1)
+        source_corrections = [parse_qs(urlsplit(link).query) for link in Facts(self.page(source_path)).links
+                              if link.startswith('/method/?correction=')]
+        self.assertIn({'correction': [source['id']], 'edition': [frozen['report']['release_id']],
+                       'record': [source_record]}, source_corrections)
         rss = ET.parse(self.output / 'research/feed.xml').findall('./channel/item')
         atom = ET.parse(self.output / 'research/atom.xml').findall('{http://www.w3.org/2005/Atom}entry')
         self.assertEqual(len(rss), 1)
@@ -551,7 +639,12 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         entries = rp.research_search_entries(self.context)
         self.assertEqual(len(entries), len({row['url'] for row in entries}))
         for entry in entries:
-            self.assertEqual(set(entry), {'title', 'summary', 'url', 'kind', 'keywords'})
+            keys = {'title', 'summary', 'url', 'kind', 'keywords'}
+            if entry['kind'] == 'paper':
+                keys |= {'identifiers', 'recordKind'}
+                self.assertIn(entry['recordKind'], {'paper', 'paper_work', 'paper_version'})
+                self.assertTrue(entry['identifiers'])
+            self.assertEqual(set(entry), keys)
             self.assertIn(entry['url'], paths)
             self.assertLess(len(entry['summary']), 220)
         self.assertEqual((self.output / 'research.css').read_bytes(), (ROOT / 'web/research.css').read_bytes())
@@ -583,6 +676,11 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
                 expected_bucket = hashlib.sha256(row['id'].encode('utf-8')).hexdigest()[0]
                 self.assertIn('/' + expected_bucket + '/#', hub.aliases[anchor])
         self.assertEqual(len(hub.aliases), len(all_records))
+        for stable_id in rp.RETIRED_ASSERTION_IDS:
+            anchor = 'assertion-' + stable_id
+            self.assertEqual(hub.aliases[anchor], rp._evidence_url('assertion', stable_id))
+            self.assertEqual(all_records[anchor].get('data-record-scope'), 'bookmark')
+            self.assertNotIn('data-status', all_records[anchor])
         # An ID and one native link replace each former full record in the hub.
         # The fixed shell/entity register stays bounded independently of receipts.
         self.assertLess(hub.nodes, len(hub.aliases) + 2500)
@@ -598,6 +696,33 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         self.assertEqual(Facts(self.page('/research/data/')).aliases['assertion-fixture.removed-claim'], target)
         self.assertIn('retained as correction metadata', self.page(urlsplit(target).path))
         self.assertIn('Read the approved replacement', self.page(urlsplit(target).path))
+
+    def test_correction_payload_preserves_the_exact_record_url_and_visible_identifier(self):
+        stable_id = 'fixture.target+version'
+        path = rp._evidence_url('assertion', stable_id)
+        title = 'τ² API + Tools & Data'
+        disclosure = rp._record_correction(self.context, stable_id, path, title)
+        contact, issue = (urlsplit(url) for url in Facts(disclosure).links)
+        edition = self.context['report']['release_id']
+        permalink = rp.sp.ORIGIN + path
+        self.assertEqual((contact.netloc, contact.path, contact.fragment), ('', '/method/', 'corrections'))
+        self.assertEqual(parse_qs(contact.query), {'correction': [stable_id], 'edition': [edition],
+                                                'record': [path], 'title': [title]})
+        self.assertEqual(parse_qs(issue.query), {'template': ['correction.yml'],
+                                                'target': [' · '.join((edition, stable_id, permalink, title))]})
+        tree = ReaderTree(disclosure)
+        self.assertNotIn('open', tree.with_class('r-record-correction')[0]['attrs'])
+        subject = next(item for item in tree.elements if item['tag'] == 'input')
+        message = next(item for item in tree.elements if item['tag'] == 'textarea')
+        self.assertIn('readonly', subject['attrs'])
+        self.assertIn('readonly', message['attrs'])
+        self.assertEqual(subject['attrs']['value'], 'ScienceToStartup correction · ' + stable_id)
+        self.assertEqual(ReaderTree.text(message).splitlines()[:4],
+                         ['Edition: ' + edition, 'Stable record ID: ' + stable_id,
+                          'Record URL: ' + permalink, 'Record: ' + title])
+        self.assertNotIn(rp.sp.CORRECTION_EMAIL, disclosure)
+        self.assertIn('/method/#corrections', Facts(rp._review(self.context)).links)
+        self.assertNotIn(rp.sp.CORRECTION_EMAIL, rp._review(self.context))
 
     def test_ledger_destination_is_stable_after_unrelated_records_are_added(self):
         vectors = ['claim.alpha', 'source.example/α:version1', 'entity.unchanged']

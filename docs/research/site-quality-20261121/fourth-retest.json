@@ -1,0 +1,207 @@
+{
+  "build_id": "43337bbf50aa5f39ee75",
+  "manifest_sha256": "ee54de37d315bcca0ab940138186c004c5422c37c2ed81717a73fe5fbca4221e",
+  "source_and_artifact_commit": "1af4deadbb821951bab5f49779adc6cc874ba3f4",
+  "model": "gpt-6.2-sol",
+  "reasoning_effort": "ultra",
+  "independent_reviewers": [
+    "retest4_design",
+    "retest4_work",
+    "retest4_market",
+    "retest4_navigation",
+    "retest4_reading",
+    "retest4_sources",
+    "retest4_daily",
+    "retest4_release",
+    "retest4_companies",
+    "retest4_downloads"
+  ],
+  "controls": {
+    "work_records": 135,
+    "work_combinations": 70,
+    "actual_csv_downloads": 210,
+    "empty_cases": 13,
+    "saved_native_options": 28,
+    "keyboard_retries": 24,
+    "work_dispositions": 33,
+    "exact_employer_records": 25,
+    "distinct_reviewed_records": 52,
+    "historical_field_bindings": 77,
+    "archive_checks": 276,
+    "native_directory_profiles": 55,
+    "compare_eligible_profiles": 39,
+    "shared_revenue_observations": 18,
+    "market_observation_actions": 73,
+    "market_observations": 26,
+    "explore_destinations": 245,
+    "first_pass_desktop_visible": 245,
+    "first_pass_mobile_visible": 244,
+    "mobile_after_isolated_replay": 245,
+    "focused_navigation_journeys": 31,
+    "authored_paragraph_instances": 3812,
+    "ordered_citations": 15206,
+    "historical_data_bookmarks": 3568,
+    "current_and_dated_chapter_mobile_journeys": 48,
+    "projection_rows_matched_in_csv_sqlite_json": 17763,
+    "archive_checksummed_members": 56,
+    "daily_stories": 47,
+    "daily_labelled_source_links": 94,
+    "mobile_performance_reports_hash_verified": 69,
+    "performance_routes_within_budget": 23
+  },
+  "github": {
+    "ci": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45005364232",
+    "browser": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45005364254",
+    "performance": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45005364254/job/137155676932",
+    "matching_commit": "1af4deadbb821951bab5f49779adc6cc874ba3f4",
+    "ci_conclusion": "success",
+    "browser_conclusion": "success"
+  },
+  "confirmed_findings": [
+    {
+      "id": "W4-saved-first-screen",
+      "reproduction": "A fresh saved query opens six full filter rows. C4 Compare y863 and first record title y1141; C3 y647 and y925. Collapsing brings Compare to y394, first title y672 and pay about y739, with exact same records and saved URL. Default route and desktop first screen unchanged.",
+      "acceptance": "Keep filter count and active state legible; a mobile saved-link visitor sees the matches immediately. Preserve explicit manual disclosure, keyboard editing and the native picker. Check no-JS, history and gated initial CLS."
+    },
+    {
+      "id": "E4-afterquery-issuer",
+      "reproduction": "AfterQuery round2-funding records no published date while its exact issuer article HTML exposes April 9 2026 and the $100M milestone. Distinct canonical source IDs cite the same URL but record different intake/check states.",
+      "acceptance": "Bind any corrected date to reviewed exact issuer/article and exact source IDs; previous summary-only 12 Oct recorded, 14 Oct checked and 28 Oct recheck must remain distinct. Keep canonical inputs and unconfirmed claims intact."
+    },
+    {
+      "id": "A4-market-width",
+      "reproduction": "Firefox at 28px minimum font shows a 631px document in a 390px viewport; narrow dialog itself fits in recent checks.",
+      "acceptance": "Bring total page width within viewport across 320–390 at true minimum font; preserve broad table horizontal scroll and actual tap in 412px Chrome."
+    },
+    {
+      "id": "E4-matrix-current",
+      "reproduction": "Selecting Mercor $2B in chart leaves matrix cell containing $614M highlighted and aria-current before that different observation is clicked.",
+      "acceptance": "Current-state affordance accurately represents observation or is explicitly company-signal state, within product semantics. Selecting other scope does not announce incompatible value active."
+    },
+    {
+      "id": "W4-explore-filter-options",
+      "reproduction": "At 390 the closed 350px engagement selector cannot fit its 410px current value. Its open native picker also ellipsizes the selected option. At 320 active Pay and Arrangement need 284–285px and exceed available 280px.",
+      "acceptance": "Full selected words visible in real picker/closed state in separate Explore group with original raw values and independent pay, arrangement and engagement semantics. Do not shorten original sourced listing terms."
+    },
+    {
+      "id": "W4-explore-desktop-overlap",
+      "reproduction": "At ordinary 1024px desktop with filter disclosure open, Search paints over all four selects, including the focused type control and its arrow. Toolbar-only measurements previously missed the expanded filter panel.",
+      "acceptance": "Search and every exposed filter both render and receive pointer at their own hit-tested center across narrow desktop widths, mobile and enlarged states. Keyboard/picker remain native."
+    },
+    {
+      "id": "D4-market-discovery",
+      "reproduction": "Revenue & growth is around y2400 mobile and y1447 desktop. Neither a nearby shortcut nor Home Search for market or revenue takes a reader directly to the charts. Section business-health / heading business-health-heading exists beneath the Market introduction.",
+      "acceptance": "Give visitors a concise actual link/search intent to the existing quantitative view, support stable route & keyboard focus, preserve numbers and existing Meet-the-directory and Work results."
+    },
+    {
+      "id": "R4-first-paragraph",
+      "reproduction": "Actual Firefox 28px minimum at 390: the First paragraph shortcut is at y1110 or y1187, while Buyer/Provider present the same shortcut earlier at y718.",
+      "acceptance": "Make the existing native shortcut discoverable before the long heading block for both editions at enlarged text. Preserve the full authored opening text and existing refs."
+    },
+    {
+      "id": "R4-precise-reading",
+      "reproduction": "The Technical Scalable Oversight passage is 281 paragraphs in, over 100 desktop/170 phone screens after the first prose. Quoted claims and calculations lack a direct, copyable paragraph destination.",
+      "acceptance": "A stable accessible jump/bookmark reaches and identifies these specific existing passages without editorial rewrites; equivalent native reproduction on current/dated and noJS. Keep all existing headings, sources, citations, archived bytes per publication policy."
+    },
+    {
+      "id": "N4-source-ledger-focus",
+      "reproduction": "Normal hash follows to correct ledger with no destination focus; next Tab returns to the Skip link; the focused Skip link becomes fixed and visible. When iMerit image is delayed 1.5s, ledger ready but y2795 with BODY focus, and the reader pressing Tab cancels the pending scroll permanently.",
+      "acceptance": "Focus the meaningful routed destination and make it usable promptly on keyboard activation; preserve default wheel/intent to scroll elsewhere, avoid all-image load gating and keep stable anchor pointing to correct actual record. Test normal, delayed and missing optional image, desktop/mobile and Back navigation."
+    },
+    {
+      "id": "W4-aixi-fellowship",
+      "reproduction": "AIXI Fellowship source currently lists Berkeley as well as London and worldwide remote; native and Explore list only Worldwide remote / London. Current stipend remains £2K–£3,500 monthly.",
+      "acceptance": "Update only verified workplace facts with named source and modality; retain amount, historical record, all other eligibility wording and source IDs."
+    },
+    {
+      "id": "R4-dated-reuse",
+      "reproduction": "Dated wrapper describes the repaired subject_id example as SQLite. Historical REUSE.md lines 18–30 load clean-dataset.json using Python and fail on claim[\"subject\"]; separate SQLite example already runs.",
+      "acceptance": "Correct dated wrapper guidance to identify Python/JSON and link to the current corrected example. Keep the historical file unchanged. For a recovery path use the existing SHA-pinned GitHub raw commit aac87fd94dc86dee4976176fddb0764215898107 only if exact, and identify any real error separately from rehearsed downtime."
+    },
+    {
+      "id": "A4-compare-tray",
+      "reproduction": "Laude Institute / Terminal-Bench, Invisible Technologies, and Trajectory Labs, PBC. At 320/390 the clamped 34px tray name slot hides part of the selection. Firefox min28 gives status 39/109px width and clips 588/510px of wrapping to 78px. Buttons are still usable.",
+      "acceptance": "Expose all selected names to sighted users via deliberate accessible layout/disclosure; retain useful visible compare/clear, full polite live status, exact selection hash and mobile document width."
+    },
+    {
+      "id": "N4-companies-compare-context",
+      "reproduction": "One matching profile. The only Compare action starts at y999 on a 390px phone and opens an empty search with no selection.",
+      "acceptance": "Provide a visible, exact-entity handoff for each historical comparison-eligible company. Preserve the other native profiles and their navigation."
+    },
+    {
+      "id": "R4-json-download",
+      "reproduction": "Two links under Download the research navigate away to 22,412,892 and 18,491,631 bytes of raw JSON. Other data links save files.",
+      "acceptance": "Both data JSON links explicitly download the exact bytes with meaningful filenames and show their sizes. Keep the checksum document readable inline."
+    }
+  ],
+  "public_at_review": {
+    "worker_version": "cddaa614-befb-4bfe-81b2-8553bd74afac",
+    "build_id": "d8d18622a82c541129c1",
+    "daily_issue": "2026-11-17",
+    "candidate_daily_issue": "2026-11-18",
+    "external_limits": "Several requests to the host or to employer URLs produced gateway 503 responses without origin evidence. Live application acceptance and the supplemental DominoBench dataset were unconfirmed. The separately verified Ashby board was last fetched successfully at 08:39 UTC. The archived mirror fallback outage was a simulation."
+  },
+  "private_receipt_sha256": {
+    "retest-design/report.md": "408f69523443b0a65dbf077b10075651a596de841d6f09d3d784e3f829b5324b",
+    "retest-design/candidate-4-layouts.json": "65766c7e231f609964ac59b6aaa0521635b55c3fe27b207ae2a3d57056622e31",
+    "retest-design/candidate-4-history-bf.json": "7925e7396e6d720ae4f2c321901c59d472b62ed9e35b623ac9ec1d9043ee58b3",
+    "retest-design/candidate-4-history-cold.json": "c38517470afaefbdf5ae86aa001f5e78e9b75792ee996bd9a609c90f83e706b1",
+    "retest-design/native-work-replay-new.json": "2d07c8353c6d5512d5dad0ddfa25b5162e6dacab449358dc1ecc724772a7a5c7",
+    "retest-design/market-native-discovery.json": "b3195b3038cc80d11f03533663ee2578386fd394824d840da28eb294a0826cb7",
+    "retest-work/README.md": "282f105954de16edd90800b301ebb0c2f99cd4c163b86adcb9df3990cf397da5",
+    "retest-work/matrix-summary.json": "6ec2a0824bf60a2fa86c9b31ee9e90e2d9b65404d5ca0290e7f88dccd9e96321",
+    "retest-work/ordered-source.json": "87c70032305c830d5fde9d3b24e9baeaebbb9ded74f680894f057d25cdb8fede",
+    "retest-work/filter-tasks.json": "b9be6cc8cb617f75feadca4c553dfc4e749825c0d62e2b9bdc2fb348fb9b29d5",
+    "retest-work/retry.json": "a6e5f8ce03dbe4c7dfcee39ae2595da4bc486dea977572d292c9678270a7b1f5",
+    "retest-work/grid/explore-pointer-fresh.json": "fb92dab91ff0cec7fdb6c8796e691e477198cb06482be51f31bad34dd282d4d0",
+    "retest-work/grid/explore-picker.json": "891dd7a5bed95bb12c51106652a269e15cd243ccb9b1d64f5d3e159893d664d6",
+    "retest-market/findings.md": "01c6aa6c5baf3ea514504d7effeb085f93948fc8f04dbf2fcc0102f96d403966",
+    "retest-market/parity-and-grades.json": "5d2d08db2de56cb7c2a2151f27adb211d6ab2e9487b3d70c4f0b2a853fdcc3fd",
+    "retest-market/focused.json": "95555ae488a20b123168b82ee68cacb5da00c715175e21c56a685e65f6b5691f",
+    "retest-market/market-regression.json": "68b6b2137c8c6d6a45a37435aa0f03e7d1256b2274c930ba76aa568ed04372c5",
+    "retest-market/confirmed-source-ui.json": "ec6c23af97f2b83f9533fa9aaab90f3fa5df34c2c704fc02591645ebd798be08",
+    "retest-market/publisher-receipts.json": "e92388cad27d8c868440ee5de60e8d6038d75b81f4391aa7258c177dccdf197f",
+    "retest-market/same-article-inventory.json": "6b610432069c8078a6dabc5c54fce65afe31f935fe82d780f974675c750e53c9",
+    "retest-navigation/README.md": "5e1801dbd7dccef80eaa8cedf6ea5c5a1a22dd4b78a9711c6b83aafbf2fec93d",
+    "retest-navigation/route-summary.json": "72f8f6dc8c79aadd8cab412eb541ac195440c58915c3c530665014c3b87281c0",
+    "retest-navigation/journeys.json": "d1630a78e4f69c75b27a9c2366ef9e646d080ddd0e8e4cc978466a09b880786a",
+    "retest-navigation/imerit-anchor.json": "03a6d00347723ce188722beadcca6a868a077bffd31e15d4d0cb607e5260e3b3",
+    "retest-reading/README.md": "6eb0d2559827323e6992db80c02543bf839531dfc130e38c59658733e61c4cca",
+    "retest-reading/chapter-navigation.json": "f561993586db5d15c8f9b96eef73ef6d0efb05dba1acb43b33f453f7f6177cdb",
+    "retest-reading/bookmarks.json": "3f9d8e09a761d2c352524eeb76ec4280ce8a549c6560fe04ce36862d83178b67",
+    "retest-reading/exact-bookmark.json": "2b201a1dda289b6406ce3c5d1189cc0f2438c7c1b26ab4f128204aee040081d1",
+    "retest-reading/asset-identity.json": "f1b4de34a19b9dc3793d01fa765ba71451ede96c4a18d098f0670f0a69f573eb",
+    "retest-reading/exact-calculations.json": "23ff0ef392475813bf16623e6a26394ce0f1ac5516c15412cf7ed1f443f1d4bb",
+    "retest-reading/print.json": "9a8481eaf0d3b1c4167f8bd3bb0dce3866759dade6919293f6800add3339aa23",
+    "retest-reading/key-journeys-webkit.json": "47c1315e2e4c3cab9feefc65a41c19fb51b57da175a244dd50771e29f37429ea",
+    "retest-sources/README.md": "5ca05d48a6f00dbcaed8ad46a2c6129005277a4b09dd06bf8a87018816343314",
+    "retest-sources/summary.json": "82e00073ddd4b5b1d0d35f8d35c57894afed27e6445acd09022e534116ffdc3f",
+    "retest-sources/external-observations.json": "91d498d1c5f229997ee574ab1aa941455f21774d8740c8e612855d695164660d",
+    "retest-sources/aixi-fellowship.json": "a345990d54fea21e8e299cd90e9c91ecc7fe7aa8a62db56d7ab7f3495284d390",
+    "retest-sources/reuters-market.json": "9707b6ff8e0b03d108f80651705e0511fa3ac44d0c2d3b3d42451d207f79a1cc",
+    "retest-sources/reuters-sources.json": "9c02ddafc9df6f56c98434ba2583d729bacafbba8eceaca305ac1357c590697a",
+    "retest-sources/work-parity.json": "0081414dac2a9f2541382aa723af501b32c3f0872e62b50e714f1c294ef0d2e3",
+    "retest-daily/report.md": "617e8242a9e80dda1c61ad961d1731ed80684ca828767c9c49c037a5370f4e11",
+    "retest-daily/daily-identity.json": "75ea74f73793be783e88f9ea13b55a128796c6a5d1e8c12f32de52bb3f154c57",
+    "retest-daily/daily-firefox.json": "68705d4bf1e586beeedeac76f880806451fc9d9580faa1db9465763c091035b6",
+    "retest-daily/public-comparison.json": "d66b25adc3dc1711a0af8e5e5023c18b8335258887168d8e8a3b62dc066785ea",
+    "retest-release/README.md": "807c0beaafffd23c3968a226be96f4f17aa5b31ec0874d6d58f2bcc7ce6241e0",
+    "retest-release/ci-measurements.json": "d449c744dd7c832cb85fc0f1c4c71fa348298ced1d44c796aef9922e98fd85f2",
+    "retest-release/prepared-and-rollback.json": "13665aa860717b8c0763d04904107a3024a2b5a67bdd5f4cd609e5df21dd03d6",
+    "retest-release/predecessor-edge.json": "86ecf2cdc03d7d6604b2ed70416c27c4a6f1bcf7eab9243f088060d6093b7cfb",
+    "retest-release/slow-mobile-c4-natural.json": "0ae6e0ba03327685e466812265b303522d4a8098390d2dee66646725b8953516",
+    "retest-release/cloudflare-before.json": "af72550784d533367fd043512c4d8f34ccc4b8a4dbb2847963a783ee9c55aeb7",
+    "retest-companies/findings.md": "85504f1f551728eba70da6d0968e49ee2797be5cdbe931e4c115f079bc7703cd",
+    "retest-companies/coverage.json": "22186b812ef06189173df7a6ac84039da3ea343c54e03e5ad8e6f80f50fd5951",
+    "retest-companies/directory.json": "e9e669d1697dbfda7f65fe7d6ded5184b1f8c7726b943b1956edbab9f3e6144a",
+    "retest-companies/directory-all-titles.json": "e14b86bdedc0147b5a978fdaa3e4729f2c6f0b1f2f93869b99d5c42a8baf1798",
+    "retest-companies/firefox-reflow.json": "5b53b75ac774a3149448c24a9fa0a40d98e42a5cf19948cdcd0f833fc997cc68",
+    "retest-downloads/README.md": "928fe836206fdeacefa203891d67304de0befdb3c1dbc4a15831dce26c7fcdc1",
+    "retest-downloads/byte-parity.json": "c4c1b873b08692c00f5db81f436ae6d0c2805b24559760870dab9d71f734a637",
+    "retest-downloads/browser.json": "533e8101c8852ffc052bbe06b91c6a50b8a9f6755cf4b78c7eb8fc28a529eebd",
+    "retest-downloads/remote-bytes.json": "f828e7e4aa591e0ce52562d6337d27f8dec76aac9e652ffb1fb580795e537b85",
+    "retest-downloads/remote-page-observations.json": "71672e649be5255e480c35fc4a62dbca4be1218763138e6652f4207541b675dc",
+    "official-45005364232.json": "8138f329e80198512912875f345dee954c55ccb37cf8f1b7a9391246af214399",
+    "official-45005364254.json": "c907e58475a074f5350141e08c379d0cf101973f61f4ec586e005ff83eba349f"
+  }
+}

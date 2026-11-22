@@ -261,6 +261,14 @@ class DailyScanTests(unittest.TestCase):
                     if 0 <= target < len(dates)
                 ]
                 self.assertEqual(actual_targets, expected_targets)
+                self.assertEqual([step["rel"] for step in page.date_steps()],
+                                 [rel for rel, target in (("prev", index - 1), ("next", index + 1)) if 0 <= target < len(dates)])
+                navigation = html.split('<nav class="scan-edition-nav"', 1)[1].split("</nav>", 1)[0]
+                self.assertIn('<details class="scan-archive-disclosure" open><summary>Snapshot archive</summary>', navigation)
+                self.assertIn(f'<a href="/daily/{snapshot["date"]}/" aria-current="date">', navigation)
+                self.assertIn('<form class="scan-date-form" hidden>', navigation)
+                self.assertIn('<button id="scan-date-go" type="submit">Go</button>', navigation)
+                self.assertLess(html.index(navigation), html.index('<article class="scan-item"'))
                 self.assertTrue(any(tag == "div" and attrs.get("data-edition") == snapshot["date"] for tag, attrs in page.elements))
 
     def test_writer_keeps_dated_snapshots_and_points_latest_to_newest(self):
@@ -278,6 +286,7 @@ class DailyScanTests(unittest.TestCase):
         for snapshot in snapshots:
             folder = destination / "daily" / snapshot["date"]
             self.assertEqual(json.loads((folder / "snapshot.json").read_text()), snapshot)
+            self.assertEqual((folder / "snapshot.json").read_bytes(), (self.source / f'{snapshot["date"]}.json').read_bytes())
             selected = PageElements((folder / "index.html").read_text()).date_options
             self.assertEqual([row["value"] for row in selected if "selected" in row], [snapshot["date"]])
         latest = PageElements((destination / "daily/index.html").read_text())
@@ -363,7 +372,7 @@ class DailyScanTests(unittest.TestCase):
         (self.source / "wikipedia-context.json").unlink()
         (self.source / (snapshot["date"] + ".json")).unlink()
         destination = self.output()
-        with patch("daily_scan.load_editions", side_effect=AssertionError("second edition load")), \
+        with patch("daily_scan._edition_sources", side_effect=AssertionError("second edition load")), \
                 patch("daily_scan.load_wikipedia_context", side_effect=AssertionError("second context load")):
             write_daily_scan(destination, self.root, context=context)
             search = daily_search_entries(context)

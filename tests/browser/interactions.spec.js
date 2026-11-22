@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 const canonical = require('../../data/canonical.json');
 const workData = require('../../data/work-routes.json');
+const workScope = require('../../data/editorial-release.json').counts;
 
 async function ready(page, hash = '#companies') {
   await page.goto('/explore/' + hash);
@@ -69,10 +70,15 @@ test('compact work data preserves every selector and visible condition', async (
   const expected = original.map(route => Object.fromEntries(keys.map(key => [key, route[key] ?? null])));
   expect(compact).toEqual(expected);
   const summary = await page.evaluate(() => summarizeWorkResults(workRouteRows()));
-  expect(summary).toMatchObject({ total: 135, named: 56, programs: 22, careers: 23, outside: 11 });
+  expect(summary).toMatchObject({
+    total: workScope.records, named: workScope.named_listings, programs: workScope.networks_programs,
+    careers: workScope.career_pages, outside: workScope.other_company_jobs,
+  });
+  await ready(page, '#work?q=Sage&kind=closed');
   const sage = page.locator('[data-work-route="appen.work.sage-media"]');
+  await sage.locator('summary').first().click();
   await expect(sage).toContainText('Terms checked 8 Nov 2026');
-  await expect(sage.locator('.w4-conditions-column')).toContainText('Qualification tests and identity verification');
+  await expect(sage.getByRole('list', { name: 'Requirements' })).toContainText('Qualification tests and identity verification');
   const alternatives = await page.evaluate(() => workRouteRows().filter(route => route.status === 'historical' && ['terac.work.ml-scenarios', 'afterquery.work.senior-software-engineer-security-infrastructure'].includes(route.id)).map(route => ({ id: route.id, original: route.url, action: w4Destination(route), status: w4Status(route) })));
   expect(alternatives).toHaveLength(2);
   for (const item of alternatives) {
@@ -158,7 +164,9 @@ test('a failed query deep link preserves its literal query and offers retry and 
   await expect(page.locator('#work-search')).toHaveValue('C++');
   expect(await page.evaluate(() => location.hash)).toBe('#work?q=C%2B%2B');
   await expect(page.locator('#work-cards')).not.toContainText('No recorded matches');
-  await expect(page.locator('#work-cards a[href="/work/"]')).toBeVisible();
+  const native = page.locator('#work-cards').getByRole('link', { name: 'Open native Work results' });
+  await expect(native).toBeVisible();
+  await expect(native).toHaveAttribute('href', '/work/?q=C%2B%2B');
   blocked = false;
   await page.locator('[data-retry-search]').click();
   await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
@@ -166,18 +174,23 @@ test('a failed query deep link preserves its literal query and offers retry and 
   expect(await page.evaluate(() => location.hash)).toBe('#work?q=C%2B%2B');
 });
 
-test('failed global search has working browse actions and can retry the deferred index', async ({ page }) => {
+test('failed global search has working browse actions and can retry the deferred index', async ({ page, context }) => {
   let blocked = true;
   await page.route('**/presentation/full-search.*.json', route => blocked ? route.abort('failed') : route.continue());
   await ready(page);
   await page.locator('#site-search-open').click();
   await expect(page.locator('#site-search-message')).toContainText('Search could not load');
-  await page.locator('#site-search-message a[href="#companies"]').click();
-  await expect(page.locator('#site-search')).not.toBeVisible();
-  await expect(page.locator('#companies-view')).toBeVisible();
-  await page.locator('#site-search-open').click();
+  const message = page.locator('#site-search-message');
+  await expect(message.getByRole('link', { name: 'paid work' })).toHaveAttribute('href', '/work/');
+  const opened = context.waitForEvent('page');
+  await message.getByRole('link', { name: 'companies' }).click({ modifiers: ['ControlOrMeta'] });
+  const directory = await opened;
+  await expect(directory).toHaveURL(/\/companies\/$/);
+  await expect(directory.getByRole('heading', { level: 1, name: 'AI data companies' })).toBeVisible();
+  await directory.close();
   await page.locator('#site-search-input').fill('Python');
-  await expect(page.locator('#site-search-message')).toContainText('Search could not load');
+  await expect(message.getByRole('link', { name: 'companies' })).toHaveAttribute('href', '/companies/?q=Python');
+  await expect(message.getByRole('link', { name: 'paid work' })).toHaveAttribute('href', '/work/?q=Python');
   blocked = false;
   await page.locator('[data-retry-site-search]').click();
   await expect(page.getByRole('option', { name: /See all \d+ matches? for “Python”/ })).toBeVisible();
@@ -213,8 +226,59 @@ test('current company CSV uses the same financial observation as the visible car
   expect(csv).not.toContain('214218000');
 });
 
-test('work CSV exports the current shared selection and its binding conditions', async ({ page }) => {
-  await ready(page, '#work?q=Sage&kind=named');
+async function downloadedWorkRows(page, button) {
+  const pending = page.waitForEvent('download');
+  await button.click();
+  const download = await pending;
+  const { execFileSync } = require('node:child_process');
+  const parsed = execFileSync('python3', ['-c', [
+    'import csv, json, sys',
+    'with open(sys.argv[1], encoding="utf-8-sig", newline="") as source:',
+    '    reader = csv.DictReader(source)',
+    '    print(json.dumps({"columns": reader.fieldnames, "rows": list(reader)}))',
+  ].join('\n'), await download.path()], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+  return JSON.parse(parsed);
+}
+
+for (const selection of [
+  { query: 'kind=named&arrangement=onsite', matches: true },
+  { query: 'q=' + encodeURIComponent('no such opening + C++ & 研究'), matches: false },
+]) {
+  test('native Work, Compare and both CSV downloads preserve ' + selection.query, async ({ page }) => {
+    await page.goto('/work/?' + selection.query);
+    const compare = page.getByRole('button', { name: 'Compare results', exact: true })
+      .or(page.getByRole('link', { name: 'Compare results', exact: true }));
+    await expect(compare).toBeVisible();
+    const download = page.locator('[data-work-export]');
+    const ids = await page.locator('[data-work-route]:visible').evaluateAll(rows => rows.map(row => row.dataset.workRoute));
+    expect(ids.length > 0).toBe(selection.matches);
+    expect(new Set(ids).size).toBe(ids.length);
+    const nativeCsv = await downloadedWorkRows(page, download);
+    expect(nativeCsv.columns).toEqual(expect.arrayContaining(['route_id', 'pay_qualification', 'review_evidence', 'original_url_details']));
+    expect(nativeCsv.rows.map(row => row.route_id)).toEqual(ids);
+
+    await compare.click();
+    await expect(page.locator('#work-integrated-table')).toBeVisible();
+    const tableIds = () => page.locator('[data-compare-route]:visible').evaluateAll(rows => rows.map(row => row.dataset.compareRoute));
+    expect(await tableIds()).toEqual(ids);
+    await page.reload();
+    await expect(page.locator('#work-integrated-table')).toBeVisible();
+    expect(await tableIds()).toEqual(ids);
+
+    await page.locator('[data-work-explore]').click();
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    const exploreIds = page.locator('#work-cards [data-work-route]:visible');
+    await expect(exploreIds).toHaveCount(ids.length);
+    expect(await exploreIds.evaluateAll(rows => rows.map(row => row.dataset.workRoute))).toEqual(ids);
+    expect(await downloadedWorkRows(page, page.locator('#work-export'))).toEqual(nativeCsv);
+    await page.goBack();
+    await expect(page.locator('#work-integrated-table')).toBeVisible();
+    expect(await tableIds()).toEqual(ids);
+  });
+}
+
+test('work CSV preserves the selected historical Sage terms and their review', async ({ page }) => {
+  await ready(page, '#work?q=Sage&kind=closed');
   await openFilters(page);
   const count = await page.evaluate(() => filteredWork().length);
   expect(count).toBeGreaterThan(0);
@@ -280,16 +344,16 @@ test('suggested work counts and every provider use the approved primary scope', 
       providerParity: DATA.companies.every(company => JSON.stringify(ids(workRouteSummary(company.id).primary).sort()) === JSON.stringify(ids(w4DiscoveryGroups(workRoutesFor(company.id)).primary).sort())),
     };
   });
-  expect(counts.named).toBe(56);
-  expect(counts.programs).toBe(22);
-  expect(counts.primary).toHaveLength(78);
+  expect(counts.named).toBe(workScope.named_listings);
+  expect(counts.programs).toBe(workScope.networks_programs);
+  expect(counts.primary).toHaveLength(workScope.work_routes);
   expect([...counts.legacy].sort()).toEqual([...counts.primary].sort());
   expect(counts.overview).toEqual(counts.primary);
-  expect(counts.providers).toBe(29);
+  expect(counts.providers).toBe(workScope.providers);
   expect(counts.providerParity).toBe(true);
-  expect(counts.allRecords).toBe(135);
+  expect(counts.allRecords).toBe(workScope.records);
   await page.locator('#site-search-open').click();
-  await expect(page.getByRole('option', { name: /Paid work 56 named listings · 22 networks and programs/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: new RegExp(`Paid work ${workScope.named_listings} named listings · ${workScope.networks_programs} networks and programs`) })).toBeVisible();
   await page.locator('#site-search-close').click();
   await expect(page.locator('#work-search')).toHaveValue('Sage');
 });
@@ -438,7 +502,7 @@ test('a pending profile keeps its sourced introduction while withholding evidenc
   await expect(page.locator('#profile-view')).toHaveAttribute('aria-busy', 'true');
   await expect(page.locator('.profile-summary')).toHaveText('Connects specialists with AI training and testing work. It also helps businesses put AI programs to work.');
   await expect(page.locator('[data-profile-loading-content]')).toContainText('Loading the sourced profile');
-  await expect(page.locator('[data-profile-loading-content] a')).toHaveAttribute('href', '/company/mercor/');
+  await expect(page.getByRole('link', { name: 'Read the plain paid work section' })).toHaveAttribute('href', '/company/mercor/#work');
   await expect(page.locator('.profile-tabs, .profile-archive, #profile-work')).toHaveCount(0);
   expect(await page.evaluate(() => window.COMPANY_CONTEXTS_READY.has('mercor'))).toBe(false);
   await page.evaluate(() => { window.pendingProfileIntroduction = document.querySelector('.profile-top'); });
@@ -482,16 +546,32 @@ test('slow stale company response cannot replace the new route', async ({ page }
   await expect(page.locator('#profile-view')).not.toBeVisible();
 });
 
+async function expectMercorWorkRecovery(page, reason) {
+  const profile = page.locator('#profile-view');
+  await expect(profile.getByRole('heading', { name: 'Evidence for Mercor could not load.' })).toBeVisible();
+  await expect(profile.getByRole('link', { name: 'Read the plain paid work section' })).toHaveAttribute('href', '/company/mercor/#work');
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'failed');
+  await expect(page.locator('html')).toHaveAttribute('data-view-reason', reason);
+}
+
+async function retryMercorWork(page) {
+  await page.getByRole('button', { name: 'Try again' }).press('Enter');
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  const work = page.locator('#profile-pane-work');
+  await expect(work).toBeVisible();
+  await expect(work).toBeFocused();
+}
+
 test('company detail failure provides retry and a readable fallback', async ({ page }) => {
   let broken = true;
   await page.route('**/company-mercor*.json', route => broken ? route.abort('failed') : route.continue());
   await page.goto('/explore/#company/mercor/work');
-  await expect(page.getByRole('heading', { name: 'This company’s evidence could not load.' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Read the plain company page' })).toHaveAttribute('href', '/company/mercor/');
+  await expectMercorWorkRecovery(page, 'evidence-request');
+  const fallback = await page.request.get('/company/mercor/');
+  expect(fallback.ok()).toBeTruthy();
+  expect(await fallback.text()).toContain('id="work"');
   broken = false;
-  await page.getByRole('button', { name: 'Try again' }).click();
-  await expect(page.locator('.profile-v2')).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  await retryMercorWork(page);
 });
 
 for (const mode of ['network failure', 'integrity mismatch']) {
@@ -504,15 +584,12 @@ for (const mode of ['network failure', 'integrity mismatch']) {
       return mode === 'network failure' ? route.abort('failed') : route.fulfill({ status: 200, contentType: 'application/javascript', body: 'window.UNTRUSTED_HEALTH_EXECUTED=true;' });
     });
     await page.goto('/explore/#company/mercor/work');
-    await expect(page.getByRole('heading', { name: 'This company’s evidence could not load.' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Read the plain company page' })).toHaveAttribute('href', '/company/mercor/');
+    await expectMercorWorkRecovery(page, 'evidence-request');
     expect(await page.evaluate(() => window.UNTRUSTED_HEALTH_EXECUTED)).toBeUndefined();
     expect(await page.evaluate(() => window.APP_HEALTH_READY)).toBeUndefined();
     const failedRequestCount = healthRequests.length;
     broken = false;
-    await page.getByRole('button', { name: 'Try again' }).click();
-    await expect(page.locator('.profile-v2')).toBeVisible();
-    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    await retryMercorWork(page);
     expect(await page.evaluate(() => window.APP_HEALTH_READY)).toBe(await page.evaluate(() => window.APP_BUILD_ID));
     expect(healthRequests.length).toBeGreaterThan(failedRequestCount);
     expect(new URL(healthRequests.at(-1)).pathname).toBe(new URL(healthRequests[0]).pathname);
@@ -551,14 +628,10 @@ test('an initially stalled financial module reaches its deadline and can retry',
   await expect(page.locator('html')).toHaveAttribute('data-view-state', 'loading');
   await expect(page.locator('script[data-presentation-module="business-health"]')).toHaveCount(1);
   await page.clock.fastForward(15_001);
-  await expect(page.getByRole('heading', { name: 'This company’s evidence could not load.' })).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('data-view-reason', 'evidence-timeout');
-  await expect(page.getByRole('link', { name: 'Read the plain company page' })).toHaveAttribute('href', '/company/mercor/');
+  await expectMercorWorkRecovery(page, 'evidence-timeout');
   blocked = false;
   release();
-  await page.getByRole('button', { name: 'Try again' }).click();
-  await expect(page.locator('.profile-v2')).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  await retryMercorWork(page);
   expect(await page.evaluate(() => window.APP_HEALTH_READY)).toBe(await page.evaluate(() => window.APP_BUILD_ID));
 });
 
@@ -603,15 +676,10 @@ test('an initially stalled profile times out with a plain-page fallback and reco
   await page.clock.runFor(2_000);
   await expect(page.locator('html')).toHaveAttribute('data-view-state', 'loading');
   await page.clock.fastForward(15_001);
-  await expect(page.getByRole('heading', { name: 'This company’s evidence could not load.' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Read the plain company page' })).toHaveAttribute('href', '/company/mercor/');
-  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'failed');
-  await expect(page.locator('html')).toHaveAttribute('data-view-reason', 'evidence-timeout');
+  await expectMercorWorkRecovery(page, 'evidence-timeout');
   blocked = false;
   release();
-  await page.getByRole('button', { name: 'Try again' }).click();
-  await expect(page.locator('.profile-v2')).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  await retryMercorWork(page);
 });
 
 test('a stalled initial profile reserves the viewport and keeps the footer below it', async ({ page }) => {
@@ -638,17 +706,27 @@ test('a stalled initial profile reserves the viewport and keeps the footer below
   await expect(profile).not.toHaveAttribute('aria-busy', 'true');
 });
 
-test('named terms become overdue at the fourteenth UTC day and failed checks do not refresh them', async ({ page }) => {
+test('the previously named Sage listing crosses its fourteenth UTC day without refreshing its review', async ({ page }) => {
   const sage = workData.routes.find(route => route.id === 'appen.work.sage-media');
   const review = sage.editorial_review.receipts.find(receipt => receipt.id === sage.editorial_review.approved_terms_receipt_id);
   const reviewed = Date.parse(review.checked_on + 'T00:00:00Z'), day = 86_400_000;
+  // Replay the approved November 8 listing before its later migration to a general portal.
+  // The durable sidecar continues to publish the resulting historical disposition.
+  const showHistoricalFixture = async () => {
+    await ready(page, '#work');
+    await page.evaluate(() => {
+      const route = workRouteRows().find(entry => entry.id === 'appen.work.sage-media');
+      route.status = 'listed';
+      renderWork();
+    });
+  };
   await page.clock.setFixedTime(new Date(reviewed + 14 * day - 1));
-  await ready(page, '#work?q=Sage&kind=named');
-  let card = page.locator('#work-cards [data-work-route="appen.work.sage-media"]');
+  await showHistoricalFixture();
+  const card = page.locator('#work-cards [data-work-route="appen.work.sage-media"]');
+  await expect(card).toBeVisible();
   await expect(card.locator('[data-work-review-age="needs_recheck"]')).toHaveCount(0);
   await page.clock.setFixedTime(new Date(reviewed + 14 * day));
-  await page.reload();
-  card = page.locator('#work-cards [data-work-route="appen.work.sage-media"]');
+  await showHistoricalFixture();
   await expect(card.locator('[data-work-review-age="needs_recheck"]')).toHaveText('Needs recheck');
   await page.evaluate(() => {
     const route = workRouteRows().find(route => route.id === 'appen.work.sage-media');

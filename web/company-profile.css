@@ -13,7 +13,7 @@ main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:
 .company-actions a{display:inline-flex;align-items:center;gap:8px;min-height:44px;text-underline-offset:4px}
 .company-actions a>span{color:var(--muted);font-size:12px}
 .company-key-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;margin:0 0 28px;padding:24px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.company-key-fact{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
+.company-key-fact{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;overflow-wrap:anywhere}
 .company-key-fact:only-child{grid-column:1/-1}
 .company-key-fact+.company-key-fact{border-left:1px solid var(--border);padding-left:32px}
 .company-fact-label{font-size:14px;line-height:1.5;color:var(--muted)}
@@ -30,10 +30,10 @@ main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:
 .company-fold>summary{display:flex;align-items:center;gap:16px;min-height:64px;padding:16px 0;list-style:none;box-sizing:border-box;font-size:17px;line-height:1.4}
 .company-fold>summary::-webkit-details-marker{display:none}
 .company-fold>summary>span{min-width:0;overflow-wrap:anywhere}
-.company-fold>summary>small{margin-left:auto;font-size:14px;color:var(--muted);text-align:right;line-height:1.6}
+.company-fold>summary>small{margin-left:auto;min-width:0;overflow-wrap:anywhere;font-size:14px;color:var(--muted);text-align:right;line-height:1.6}
 .company-fold>summary::after{content:'+';flex:none;font-size:22px;font-weight:400;color:var(--green)}
 .company-fold[open]>summary::after{content:'−'}
-.company-fold-body{padding:0 0 28px;min-width:0}
+.company-fold-body{padding:0 0 28px;min-width:0;overflow-wrap:anywhere}
 .company-fold-body>h2:first-child{margin-top:4px}
 .company-fold-body :is(h2,h3){font-family:var(--sans);letter-spacing:-.02em}
 .company-fold-body h2{font-size:23px;margin:24px 0 16px}
@@ -50,15 +50,37 @@ main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:
 .company-source-links a,.company-record-links a{display:inline-flex;align-items:center;min-height:44px}
 .company-record-links{display:flex;flex-wrap:wrap;gap:8px 24px;margin:16px 0}
 .company-logo-source{font-size:12px!important;color:var(--muted)}
+.company-citations{margin:4px 0 0;font-size:14px;font-weight:400}
+.company-citations>summary{min-height:44px;padding:10px 0;color:var(--green);cursor:pointer}
+.company-citations>ul{padding-left:16px;margin:0}
+.company-dossier .tag,.company-fold .tag{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.company-fold :is([id],summary){scroll-margin-top:88px}
+.company-fold [data-work-route]:focus{outline:2px solid var(--green);outline-offset:2px}
+.company-fold .work-terms a{display:inline-flex;align-items:center;min-height:44px}
+.company-fold .work-role-link{display:inline-flex;align-items:center;min-height:44px;vertical-align:middle}
+.company-fold .work-terms li>small{display:block;font-size:inherit;color:var(--muted)}
+.company-finance-detail{display:grid;gap:4px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.company-review-highlight{margin:12px 0 0;max-width:560px}
+.company-review-finding{margin:0;line-height:1.5}
+.company-review-context{display:block;margin:6px 0 0;color:var(--muted);font-size:14px;line-height:1.5}
+.company-review-context a{text-underline-offset:3px}
+.company-review-actions{margin:0}
+.company-review-actions a{display:inline-flex;align-items:center;min-height:44px}
+@media(max-width:699px){
+ .company-crumbs li:not(.crumb-parent){display:none}
+ .company-crumbs .crumb-parent::before{display:none}
+ .company-crumbs .crumb-parent a{display:inline-flex;align-items:center;min-height:44px}
+}
 @media(max-width:600px){
- .company-hero{margin-bottom:24px}.company-name{gap:16px}
- .company-logo{flex-basis:88px;width:88px;height:56px;padding:7px}.company-logo img{height:40px}
- .company-hero .lede{font-size:16px;margin-top:16px}.company-actions{font-size:13px;gap:8px 20px}
- .company-key-facts{gap:22px;padding:20px 0;margin-bottom:24px}
+ .company-hero{margin-bottom:12px}.company-name{gap:12px}
+ .company-logo{flex-basis:68px;width:68px;height:44px;padding:7px}.company-logo img{height:32px}
+ .company-hero .lede{font-size:16px;margin:12px 0 8px}.company-actions{font-size:13px;gap:8px 20px}
+ .company-key-facts{gap:22px;padding:12px 0;margin-bottom:16px}
  .company-key-fact+.company-key-fact{padding-left:20px}
  .company-key-fact>strong,.company-current-fact .selected-value{font-size:26px}.company-unreported>strong{font-size:18px}
  .company-fold>summary{min-height:64px;font-size:16px;gap:12px}.company-fold>summary>small{max-width:45%}
  .company-notice{font-size:12px}.company-fold-body h2{font-size:22px}
+ .company-review-highlight{margin-top:8px}
 }
 @media(max-width:380px){
  .company-key-facts{grid-template-columns:1fr;gap:18px}.company-key-fact+.company-key-fact{border-left:0;border-top:1px solid var(--border);padding:18px 0 0}
@@ -66,7 +88,7 @@ main>details.r-company-supplement.company-fold{max-width:960px;margin:0;padding:
 
 /* Research-only companies use the same dossier, with the complete evidence inside. */
 .research-company-dossier{--r-paper:var(--soft);--r-rule:var(--border);--r-accent:var(--green);--r-quiet:var(--muted);max-width:960px;font-family:var(--sans);overflow-wrap:anywhere}
-.research-company-dossier .company-research-snapshot{margin:18px 0 4px;color:var(--muted);font-size:14px;line-height:1.6}
+.research-company-dossier .company-research-snapshot{margin:8px 0 4px;color:var(--muted);font-size:14px;line-height:1.6}
 .research-company-dossier .company-record{border-top:1px solid var(--border)}
 .research-company-dossier .company-fold>summary::after{margin-left:auto}
 .research-company-dossier .company-fold-body .r-record-id{font-size:12px}

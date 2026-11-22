@@ -272,7 +272,7 @@ def offering_source_dates(entry):
     return sorted({entry["sources"][index]["observed_on"] for index in indexes})
 
 
-def current_company_html(entry, reviewed_on, compact=False):
+def current_company_html(entry, reviewed_on, compact=False, native_sources=False):
     """Attribution stays adjacent to the exact quoted text without JavaScript."""
     from static_pages import format_date
     wiki, sources = entry["wikipedia"], entry["sources"]
@@ -286,7 +286,8 @@ def current_company_html(entry, reviewed_on, compact=False):
                    + ' by ' + _link(wiki["history_url"], "Wikipedia contributors") + ' · '
                    + _link(wiki["revision_url"], "Revision " + str(wiki["revision_id"])) + ' · '
                    + _link(LICENSE, "CC BY-SA 4.0") + '. ' + escape(wiki["change_note"]) + '</p>')
-    evidence = ('<details class="company-current-facts"><summary>' + ('Official sources' if compact else 'Current source receipts') + '</summary><ol>'
+    anchor = ' id="sources" data-native-sources' if native_sources else ''
+    evidence = (f'<details class="company-current-facts"><summary{anchor}>' + ('Official sources' if compact else 'Current source receipts') + '</summary><ol>'
         + ''.join('<li>' + _link(s["url"], s["title"]) + '<p>' + escape(s["locator"]) + '</p><p>Observed ' + escape(format_date(s["observed_on"])) + ((' · Published ' + escape(format_date(s["published_on"]))) if s["published_on"] else '') + '</p>' + ('' if compact else '<code>SHA-256 ' + escape(s["response_sha256"]) + '</code>') + '</li>' for s in sources)
         + '</ol>' + ('' if compact else '<p>Wikipedia revision ' + escape(wiki["revision_timestamp"]) + ' · Observed ' + escape(format_date(wiki["observed_on"])) + '</p><code>SHA-256 ' + escape(wiki["response_sha256"]) + '</code>') + '<p><a href="/current-companies.json">Current directory records and provenance · JSON</a></p></details>')
     dates = offering_source_dates(entry)
@@ -317,10 +318,13 @@ def write_current_company_supplements(output, registry):
             description = entry["wikipedia"]["description"]
             canonical = sp.ORIGIN + path
             crumbs = [("Companies", sp.ORIGIN + "/companies/"), (entry["name"], canonical)]
-            body = ('<link rel="stylesheet" href="/company-profile.css">' + sp.crumb_nav(crumbs)
+            body = ('<link rel="stylesheet" href="/company-profile.css">' + sp.crumb_nav(crumbs, "company-crumbs")
                     + '<article class="company-dossier"><header class="company-hero"><p class="eyebrow">Current company profile</p><h1>'
                     + escape(entry["name"]) + '</h1><p>' + _link(entry["website"], "Official website") + '</p></header><div class="company-record">'
-                    + current_company_html(entry, reviewed_on) + '</div></article>')
+                    + current_company_html(entry, reviewed_on, native_sources=True)
+                    + '<details class="company-fold"><summary><span>Paid work</span></summary><div class="company-fold-body">'
+                    + f'<h2 id="work" tabindex="-1">Paid work at {escape(entry["name"])}</h2>'
+                    + '<p>No public work listing is recorded for this company.</p></div></details></div></article>')
             node = sp.page_node("ProfilePage", entry["name"], description, canonical, reviewed_on, crumbs,
                                 mainEntity={"@type": "Organization", "name": entry["name"], "url": entry["website"]})
             target.parent.mkdir(parents=True, exist_ok=True)

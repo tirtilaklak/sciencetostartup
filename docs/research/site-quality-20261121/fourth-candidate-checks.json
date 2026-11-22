@@ -1,0 +1,53 @@
+{
+  "commit": "c5370aca64203b324214c76d3021326d4d9c1a56",
+  "build_id": "43337bbf50aa5f39ee75",
+  "manifest_sha256": "ee54de37d315bcca0ab940138186c004c5422c37c2ed81717a73fe5fbca4221e",
+  "payloads": 1278,
+  "editorial_release_id": "2026-11-22.2",
+  "source_and_artifact_commit": "1af4deadbb821951bab5f49779adc6cc874ba3f4",
+  "plan_sha256": "085e844a269d05b5e18ba2c2bbf5b75688e1b72fd2d2c79b37e1251c20520bca",
+  "uploadable_assets": 1277,
+  "release_state_at_freeze": "No Cloudflare version created for this candidate. Production still serves d8d18622a82c541129c1.",
+  "contributors": [
+    "fix4_market",
+    "fix4_work_grid",
+    "fix4_work_retry",
+    "fix4_work_options",
+    "fix4_market_contract",
+    "fix4_market_focus_test",
+    "fix4_market_css",
+    "fix4_work_retry_test",
+    "fix4_native_grid_test",
+    "fix4_upgrade"
+  ],
+  "targeted_assertions": 86,
+  "cutover_browser_tests": 20,
+  "exact_work_csv_downloads": 210,
+  "cached_generation_journeys": 7,
+  "real_background_tab_checked": true,
+  "committed_browser_run": 45005364254,
+  "committed_ci_run": 45005364232,
+  "saved_work_design": {
+    "phone_width": 390,
+    "previous_first_title_y": 925,
+    "candidate_first_title_y": 1141,
+    "collapsed_first_title_y": 672,
+    "records_in_each_state": 17,
+    "screenshot": "work-build-43337bb-saved-hourly-390.png",
+    "after_tapping_filters": "work-build-43337bb-collapsed-hourly-390.png"
+  },
+  "receipt_sha256": {
+    "candidate-4/frozen-build.json": "5267ab41b0c5d38f5eca188ab155db0f6830be8196d184c2910c5448f4b40283",
+    "candidate-4/acceptance/summary.json": "4cb04c5321cd964442377069bfe001915894cf07f4f90b1166ab2a9843a493de",
+    "candidate-4/cutover-journeys/summary.json": "4975fe69ae5bd4cccf42a2d619d17a15cdede3348aee8d4adfe40aa1c3aec893",
+    "candidate-4/upgrade/final/browser-replay.json": "8852d03b11b5ef421cc5e2f9c10dee8fd0cfe1e518540bc78132864c7d1080d8",
+    "candidate-4/upgrade/final/hidden-retry.json": "bcf1af78579a1039e60b510a982ec82ac657c2afc6aaff8fb25719cab7a982bb",
+    "candidate-4/upgrade/final/artifact-and-http.json": "ade193e2129277d940507207da807714a3b738762466a5bef6864ab0520c138c",
+    "candidate-4/market-css/manifest-binding.json": "ffbff128788239ba2788b5ff2a495f227650c272e6a358ae69b5a281ac9a7eaf",
+    "candidate-4/market-css/matrix-exact.log": "510597ce40a63117250a01896a81d7deb1a873839b3de0a364f34b3e9d265d06",
+    "candidate-4/retest-work/matrix-summary.json": "6ec2a0824bf60a2fa86c9b31ee9e90e2d9b65404d5ca0290e7f88dccd9e96321",
+    "candidate-4/retest-market/findings.md": "01c6aa6c5baf3ea514504d7effeb085f93948fc8f04dbf2fcc0102f96d403966",
+    "candidate-4/retest-design/report.md": "408f69523443b0a65dbf077b10075651a596de841d6f09d3d784e3f829b5324b",
+    "candidate-4/retest-work/grid/explore-pointer-fresh.json": "fb92dab91ff0cec7fdb6c8796e691e477198cb06482be51f31bad34dd282d4d0"
+  }
+}

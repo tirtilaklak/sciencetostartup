@@ -1,4 +1,5 @@
 """Thin browse state must retain financial, filter, search and comparison behavior."""
+import base64
 import json
 from pathlib import Path
 import sys
@@ -24,6 +25,8 @@ class ThinBrowseLogicTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="thin-browse-behavior-") as directory:
             summary, _ = build_presentation(read("canonical.json"), Path(directory), ROOT, sidecars, read("editorial-release.json"))
             search = json.loads((Path(directory) / summary["fullSearch"]["href"].lstrip("/")).read_text())
+            cls.work_results = summary["workResults"]
+            cls.work_results_bytes = base64.b64encode((Path(directory) / cls.work_results["href"].lstrip("/")).read_bytes()).decode("ascii")
         cls.projection = {"bootstrap": summary["bootstrap"], "companySummaries": summary["companySummaries"], "work": summary["work"], "search": search, "statistics": summary["statistics"]}
 
     def test_financial_cards_filters_exports_and_product_search_survive_empty_detail_arrays(self):
@@ -67,19 +70,51 @@ for(const text of ['Up to $15 / hour','US residence','MacBook Pro','Qualificatio
         self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_current_work_csv_is_identical_before_and_after_full_context_hydration(self):
-        result = run_stub("const projection=" + json.dumps(self.projection) + ";" + r'''
+        payload = {**self.projection, "workResults": self.work_results, "workResultsBytes": self.work_results_bytes}
+        result = run_stub("const projection=" + json.dumps(payload) + ";" + r'''
 (async()=>{
 context.projection=projection;
+Object.assign(context,{AbortSignal,TextDecoder,crypto:require('node:crypto').webcrypto});
+const exportButton=node('work-export');
+exportButton.getAttribute=name=>exportButton[name]??null;
+const requests=[];
+context.fetch=async (href,options)=>{
+  requests.push(href);
+  assert.equal(href,projection.workResults.href);
+  assert.equal(options.cache,'no-cache');
+  return {ok:true,arrayBuffer:async ()=>Uint8Array.from(Buffer.from(projection.workResultsBytes,'base64')).buffer};
+};
 run(`globalThis.fullWorkForTest=window.WORK_ROUTES;globalThis.fullClaimsForTest={...claims};globalThis.fullSourcesForTest={...sources};
 window.WORK_ROUTES=projection.work;for(const key of Object.keys(claims))delete claims[key];for(const key of Object.keys(sources))delete sources[key];
-window.SEARCH_INDEX=projection.search;location.hash='#work';applyWorkCriteria({sort:'hourly'});exportWorkCsv();`);
+window.SUMMARY_INDEX={workResults:projection.workResults};window.SEARCH_INDEX=projection.search;
+location.hash='#work';applyWorkCriteria({sort:'hourly'});`);
+const pending=run('exportWorkCsv()');
+assert.equal(downloadedBlob,undefined,'Export must await the integrity-bound data');
+assert.equal(exportButton.getAttribute('aria-busy'),'true');
+await pending;
+assert.equal(exportButton.getAttribute('aria-busy'),null);
+assert.equal(node('work-export-status').textContent,'');
 const before=await downloadedBlob.text();
-run(`Object.assign(claims,fullClaimsForTest);Object.assign(sources,fullSourcesForTest);window.WORK_ROUTES=fullWorkForTest;exportWorkCsv();`);
+downloadedBlob=undefined;
+await run(`Object.assign(claims,fullClaimsForTest);Object.assign(sources,fullSourcesForTest);window.WORK_ROUTES=fullWorkForTest;exportWorkCsv();`);
 const after=await downloadedBlob.text();
+assert.deepEqual(requests,[projection.workResults.href],'Hydration must reuse the same validated export asset');
 assert.equal(before,after,'Profile hydration must not change current-results facts, conditions, metadata or order');
-assert.ok(before.includes('field_review_metadata')&&before.includes('full_research_profile_url'));
-for(const text of ['Qualification tests and identity verification','US residence','MacBook Pro','Up to $15 / hour','2026-11-08','Recorded US location'])assert.ok(before.includes(text),text);
-assert.ok(before.includes('https://sciencetostartup.com/company/appen/'));
+const [header,...records]=before.replace(/^\ufeff/,'').split('\r\n');
+const cells=line=>Array.from(line.matchAll(/"((?:[^"]|"")*)"(?:,|$)/g),match=>match[1].replaceAll('""','"'));
+const sage=records.find(line=>line.startsWith('"appen.work.sage-media",'));
+assert.ok(sage,'The exported results include the recorded Sage listing');
+const values=cells(sage);
+const row=Object.fromEntries(cells(header).map((field,index)=>[field,values[index]]));
+assert.equal(row.advertised_pay,'Up to $15 / hour');
+assert.equal(row.location,'Remote US');
+assert.equal(row.requirements,'US residence and a MacBook Pro.');
+assert.equal(row.assessment,'Qualification tests and identity verification');
+assert.equal(row.terms_reviewed_on,'2026-11-08');
+assert.deepEqual(JSON.parse(row.field_review_metadata).location,{
+  state:'sourced',reviewed_on:'2026-11-08',source_ids:['appen.work.sage-media.terms-source-2026-11-08'],basis:'direct_source'
+});
+assert.equal(row.full_research_profile_url,'https://sciencetostartup.com/company/appen/');
 })().catch(error=>{console.error(error);process.exitCode=1});
 ''')
         self.assertEqual(result.returncode, 0, result.stderr)

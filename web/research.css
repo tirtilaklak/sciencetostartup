@@ -44,7 +44,7 @@
 .research :is(p,li,dd){max-width:78ch}
 .research :is(a,summary):focus-visible{outline:3px solid var(--r-accent);outline-offset:4px}
 .r-nav{display:flex;flex-wrap:wrap;gap:0 24px;margin-bottom:24px;padding-block:4px;border-bottom:1px solid var(--r-rule)}
-.r-nav a{display:inline-flex;align-items:center;min-height:44px;color:var(--r-quiet);font-size:13px;text-decoration:none}
+.r-nav a{display:inline-flex;align-items:center;min-width:0;max-width:100%;min-height:44px;color:var(--r-quiet);font-size:13px;text-decoration:none;overflow-wrap:anywhere}
 .r-nav a:hover,.r-nav a[aria-current]{color:var(--ink);text-decoration:underline;text-underline-offset:7px;text-decoration-color:var(--r-accent)}
 .r-kicker{font-size:11px;font-weight:600;letter-spacing:.095em;text-transform:uppercase;color:var(--r-quiet);margin:0 0 18px;line-height:1.6}
 .r-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:48px;align-items:center;margin:16px 0 32px}
@@ -145,7 +145,10 @@
 .r-ledger-nav{margin:24px 0}
 .r-legacy-ledger-target{display:none}
 .r-legacy-ledger-target:target{display:block;max-width:900px;min-height:44px;margin:24px 0;padding:20px;border-left:2px solid var(--r-accent);overflow-wrap:anywhere}
-.r-assertion,.r-source,.r-source-stub{max-width:900px;padding:24px 0;margin:0;border-bottom:1px solid var(--r-rule)}
+.r-legacy-ledger-aliases>a{display:none}
+.r-legacy-ledger-aliases>a:target{display:block;max-width:900px;min-height:44px;margin:24px 0;padding:20px;border-left:2px solid var(--r-accent);overflow-wrap:anywhere}
+.r-assertion,.r-assertion-stub,.r-source,.r-source-stub{max-width:900px;padding:24px 0;margin:0;border-bottom:1px solid var(--r-rule)}
+.r-assertion-stub:focus-visible{outline:2px solid var(--r-accent);outline-offset:4px}
 /* Every ledger record stays in the native document, including citations and
    disclosures. Let the browser skip offscreen layout, while fragment targets,
    find-in-page, keyboard focus and assistive technology can reveal any record. */
@@ -165,6 +168,11 @@
 .r-assertion-text{font-size:16px;line-height:1.75}
 .r-record-id{font:11px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--r-quiet);overflow-wrap:anywhere;word-break:break-word}
 .r-record-id a{color:var(--r-quiet)}
+.r-record-correction{margin-block:8px;font-size:14px}
+.r-record-correction summary{display:list-item;min-height:44px;padding-block:10px;color:var(--r-accent);cursor:pointer}
+.r-correction-draft label{display:block;margin-bottom:12px}
+.r-correction-draft :is(input,textarea){display:block;box-sizing:border-box;width:100%;max-width:38rem;margin-top:4px;padding:6px 8px;border:1px solid var(--r-rule);border-radius:3px;background:var(--r-paper);color:inherit;font:inherit;font-size:16px}
+.r-correction-draft textarea{resize:vertical}
 .r-qualifications{font-size:13px;line-height:1.7;color:var(--r-quiet);padding-left:18px;margin-block:14px}
 .r-evidence-links{list-style:none;padding:0;margin:16px 0 0;font-size:13px;line-height:1.6}
 .r-evidence-links li{margin:0 0 12px}
@@ -205,8 +213,8 @@
 @media(min-width:1200px){.r-progress.is-compact{grid-template-columns:repeat(6,minmax(0,1fr));gap:24px}.r-progress.is-compact strong{font-size:36px}.r-progress.is-compact .r-progress-item:last-child strong{font-size:25px}}
 @media(max-width:1000px){.r-hero{gap:32px}.r-report-card{padding:4px 0 4px 24px}.r-report-card h2{font-size:28px}.r-browse-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.r-report-layout{grid-template-columns:200px minmax(0,1fr);gap:32px}.r-chapter-list{columns:1}.r-detail-layout{grid-template-columns:minmax(0,1fr) 240px;gap:32px}.r-review-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:700px){
- .r-nav{margin-bottom:20px;padding:8px;gap:0 20px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
- .r-nav a{font-size:12px;flex:none;white-space:nowrap}
+ .r-nav{margin-bottom:20px;padding-block:4px;gap:0 16px}
+ .r-nav a{font-size:12px}
  .r-hero{grid-template-columns:minmax(0,1fr);gap:24px;margin:12px 0 28px}
  .r-hero>div{padding-top:0}
  .r-lede{font-size:16px;line-height:1.65}
@@ -260,6 +268,21 @@
 .r-reader-chapter-content{border-top:0;padding-top:0}
 @media(max-width:720px){.r-reader-pagination{display:block}.r-reader-pagination a{max-width:none;margin:14px 0}.r-reader-toc{position:static}}
 
+.r-bulk-shortcuts{display:flex;flex-wrap:wrap;gap:0 18px;margin:4px 0 14px}
+.r-bulk-shortcuts a,.r-bulk-list a,[data-index-work] a{display:inline-flex;align-items:center;min-height:44px;overflow-wrap:anywhere}
+.r-passage-shortcuts,.r-passage-shortcuts ul{display:flex;flex-wrap:wrap;align-items:center;gap:0 18px;min-width:0}
+.r-passage-shortcuts span{color:var(--r-quiet)}
+.r-passage-shortcuts ul{list-style:none;margin:0;padding:0}
+.r-passage-shortcuts li{min-width:0;margin:0}
+.r-bulk-contents{margin:16px 0 28px}
+.r-bulk-contents summary{display:list-item;min-height:44px;width:fit-content;cursor:pointer}
+.r-bulk-list{max-block-size:min(46vh,24rem);overflow:auto;overscroll-behavior:contain;padding-inline-end:12px;border-bottom:1px solid var(--r-rule)}
+.r-bulk-list ol{padding-inline-start:1.5em}
+.r-bulk-section{margin:24px 0 44px}
+.r-bulk-target,.r-paragraph[id],#section-contents{scroll-margin-top:24px}
+:is(.r-bulk-target,.r-paragraph[id]):focus-visible{outline:2px solid var(--r-accent);outline-offset:4px}
+.r-paragraph-originals{font-size:13px;line-height:1.7;color:var(--r-quiet)}
+
 .r-book-reader .r-chapter{content-visibility:visible;contain:none;contain-intrinsic-size:none}
 
 /* The text-heavy technical chapter uses individual glyphs instead of optional
@@ -280,4 +303,10 @@
  @media print{
   .r-reader-chapter-content[aria-labelledby="technical-landscape"]>.r-paragraph{content-visibility:visible;contain:none;contain-intrinsic-size:none}
  }
+}
+
+/* On narrow screens with enough height, keep the preceding evidence links
+   in view when #cite opens below the stacked chapter navigation. */
+@media screen and (max-width:720px) and (min-height:34rem){
+ .r-reader-chapter-content[aria-labelledby="technical-landscape"]~#cite:target{scroll-margin-block-start:min(24rem,68vh)}
 }

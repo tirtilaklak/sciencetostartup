@@ -1,0 +1,144 @@
+{
+  "build_id": "f0975074a40dcf85aacb",
+  "manifest_sha256": "7fcec94e9f7387a67b211d2c5aa33be9e4b742ff157f299661dd70e2614ade3d",
+  "source_and_artifact_commit": "1d4f9df640ba59a2e846241857cae072b6118d16",
+  "model": "gpt-6.2-sol",
+  "reasoning_effort": "ultra",
+  "independent_reviewers": [
+    "retest3_work",
+    "retest3_release",
+    "retest3_home",
+    "retest3_reading",
+    "retest3_finance",
+    "retest3_nav",
+    "retest3_daily",
+    "retest3_perf",
+    "retest3_native",
+    "retest3_recovery"
+  ],
+  "work": {
+    "source_dispositions": 33,
+    "exact_employer_records": 25,
+    "unique_records_across_groups": 52,
+    "historical_fields_bound": 77,
+    "archived_role_checks_passed": 276,
+    "primary_actions_matched_on_four_surfaces": 52,
+    "secondary_actions_matched_on_four_surfaces": 43,
+    "real_csv_downloads": 210
+  },
+  "financial_claims": {
+    "direct_dialogs": 320,
+    "native_rows": 28,
+    "selected_amounts_across_three_surfaces": 18,
+    "exact_market_actions": 73,
+    "distinct_market_observations": 26,
+    "known_risk_regressions_resolved": 25
+  },
+  "routes": {
+    "unique": 245,
+    "screen_sizes": 2,
+    "focused_browser_journeys": 31
+  },
+  "reading": {
+    "paragraphs": 3812,
+    "citations_in_order": 15206,
+    "historical_ids": 3568,
+    "mobile_chapter_journeys": 48,
+    "historical_keyboard_edition_switches": 13,
+    "webkit_focused_link_checks": 10,
+    "transient": "One no-scroll Chromium Ctrl+End outcome did not recur in six cold paired visits per build."
+  },
+  "performance": {
+    "routes": 23,
+    "mobile_reports_with_verified_bytes": 69,
+    "passed": true,
+    "job_url": "https://github.com/tirtilaklak/sciencetostartup/actions/runs/45003145015/job/137148847439",
+    "medians": {
+      "/work/": {
+        "largest-contentful-paint": 1589.3685,
+        "total-blocking-time": 45.31574999999998,
+        "cumulative-layout-shift": 0
+      },
+      "/research/state-of-ai-data-labs/chapters/datasets-and-benchmarks/": {
+        "largest-contentful-paint": 1509.3305,
+        "total-blocking-time": 101.18515000000002,
+        "cumulative-layout-shift": 0
+      },
+      "/research/state-of-ai-data-labs/chapters/methods-and-appendices/": {
+        "largest-contentful-paint": 1208.9357,
+        "total-blocking-time": 41,
+        "cumulative-layout-shift": 0
+      },
+      "/research/state-of-ai-data-labs/chapters/technical-landscape/": {
+        "largest-contentful-paint": 1656.7741999999998,
+        "total-blocking-time": 18.859450000000038,
+        "cumulative-layout-shift": 0
+      }
+    }
+  },
+  "edition": {
+    "candidate": "2026-11-18",
+    "production": "2026-11-17",
+    "research_correction_drafts": 12760,
+    "daily_enlarged_text_checks": 72
+  },
+  "production_build": "d8d18622a82c541129c1",
+  "public_work_availability": "Four job postings returned 404, one page confirmed closure and one application confirmed it was unpublished. Where access was restricted or a proxy failed, retain the evidence status.",
+  "open_findings": [
+    {
+      "id": "W3-native-options",
+      "source": "retest3_work",
+      "status": "reproduced on corrected candidate f0975074a40dcf85aacb",
+      "url": "/work/?pay=hourly&sort=hourly",
+      "finding": "At CSS width 390, native Work renders the selected hourly sort within a 169px field. Only 143px is available to its label; 180.55px is needed at ordinary Chromium font and 327.4px at Firefox minimum 28. Four long selected values can truncate concurrently.",
+      "acceptance": "Full selected labels visible at 320, 390 and desktop at normal and enlarged text, native picker and keyboard preserved, prior search/Filters and zero delayed-load CLS retained. Exact visible IDs and CSV unchanged."
+    },
+    {
+      "id": "E1-market-period",
+      "source": "retest3_finance",
+      "status": "reproduced on corrected candidate f0975074a40dcf85aacb",
+      "url": "/explore/#market",
+      "finding": "Market \u2192 Annualized revenue \u2192 Handshake \u2192 Inspect still renders generic Date 2026-04-14 and a later source read; the true April 2026 measurement period is omitted. Native and source claim now identify Dealroom April 14 separately.",
+      "acceptance": "Every Market chart/table/drilldown showing the selected observation exposes its approved reporting period, April 14 publication and subsequent check as separate facts. The other selected observations keep their actual supported roles, confidence, source IDs and original values."
+    },
+    {
+      "id": "A3-market-return",
+      "url": "/explore/#market",
+      "status": "reproduced",
+      "source": "retest3_finance",
+      "finding": "After an earlier ledger action, Escape from a chart or matrix evidence dialog can return focus to that stale ledger value. Exact focus restored 18/18 ledger, 8/26 chart and 0/23 applicable matrix actions.",
+      "acceptance": "Restore the initiating visible action after rerenders, Escape and Close including nested claims and alternate measurement dialogs."
+    },
+    {
+      "id": "E1-market-scope",
+      "url": "/explore/#market",
+      "status": "reproduced",
+      "source": "retest3_finance",
+      "finding": "RWS Generate \u00a399.4M and group \u00a3360.3M share the half-year period. A button switches scope under the misleading heading Other dates and only says segment.",
+      "acceptance": "Identify the change in business scope, name the Generate segment and preserve the correct observation and issuer."
+    },
+    {
+      "id": "W3-retry-focus",
+      "url": "/work/?reader=keep&q=Sage#mercor.work.company-careers",
+      "status": "reproduced in Chromium, Firefox and WebKit",
+      "source": "retest3_perf",
+      "finding": "After immutable Work script fails then a keyboard retry succeeds, the hydrated Sage filter excludes the Mercor bookmark. Search receives keyboard focus but stays about 414px above the Chromium viewport. Matching Sage bookmark passes.",
+      "acceptance": "On recovery preserve selected records, URL and other query controls. Keep focus fully visible on chosen target, or the sensible Search fallback when the bookmark does not match. Check matched, excluded and absent bookmarks."
+    }
+  ],
+  "receipt_sha256": {
+    "candidate-3-final/retest-nav/README.md": "de1dab11a4930029792634929a37350baceb75d690c102700e3e9d1ea66b6bd7",
+    "candidate-3-final/retest-finance/findings.md": "ce8cb886dbcf04e27226ada503743d8fbba30e8f96075b01d689237f89f1a28d",
+    "candidate-3-final/retest-finance/inventory-replay.json": "fcc6cb87a059bed252b04d169e8aad189220ed4a647421d5af029387d3e5d07f",
+    "candidate-3-final/retest-daily/report.md": "904c888502621a1e3ad9fa5ceaec6513c643f657676878aabf0237c6fed5e41c",
+    "candidate-3-final/retest-perf/ci-measurements.json": "6acf3def7bc5796a384fa35a33ff323e4a23ed771ca13b8d718f86abc5046a21",
+    "candidate-3-final/retest-perf/native-one-denial.json": "6fe773236d4b2990d99b4a1d4c1ee02d97a852e37252baeca2fddb37e9978d48",
+    "candidate-3-final/retest-recovery/report.md": "13081529378e59ffe985c46cb8c6327361324cb35022d085ac4a9970cd4bc60e",
+    "candidate-3-final/retest-recovery/release-identity.json": "b7c0da92d82a391c234f8e53608cd0bacbb112a887bada4498ed7598d0c1a00f",
+    "candidate-3/retest-home/README.md": "6ca8684dc845d67451a41e1cdbfb1db4015dc5d322750ccf0314177cf9888949",
+    "candidate-3/retest-reading/summary.json": "8668903d8b9821b669a1ce2605a969cbe841b62aa50b365d5dc7435b83bafbae",
+    "candidate-3/retest-release/final/README.md": "14356f2ce0a24457725e5bd98f150718ee67775d3b62a4fcaca261648d76fd2d",
+    "candidate-3/retest-native/summary.json": "90d710894868293953fb6daab730c14d5d1f6bd04b46a9befbad164e3087614b",
+    "candidate-3/retest-work/final/README.md": "cc65e68692643f39c955f18ca2ac1781a01526e356340b0c822fbb470ef86ab1"
+  }
+}

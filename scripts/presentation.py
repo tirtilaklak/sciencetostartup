@@ -170,7 +170,7 @@ def retain_runtime_generations(root, destination):
         summary_names = families.get(("presentation", "summary"), [])
         if len(summary_names) != 1 or any(len(families.get(("js", family), [])) != 1 for family in ("app", "data", "health")):
             raise ValueError("Retained generation requires one summary and app/data/health assets")
-        if {family for directory, family in families if directory == "js"} != {"app", "data", "health"}:
+        if {family for directory, family in families if directory == "js"} - {"app", "data", "health", "work"}:
             raise ValueError("Unexpected retained runtime module")
         summary_name = summary_names[0]
         summary = documents[summary_name]
@@ -228,6 +228,11 @@ def retain_runtime_generations(root, destination):
         health_prefix = '(()=>{window.SCIENCE_HEALTH_MODULE={buildId:' + json.dumps(summary["buildId"]) + ','
         if not payloads[health_name].decode("utf-8").startswith(health_prefix):
             raise ValueError("Retained health module build identity differs")
+        work_names = families.get(("js", "work"), [])
+        if work_names or "nativeWork" in summary["modules"]:
+            work_script = summary["modules"].get("nativeWork")
+            if len(work_names) != 1 or not isinstance(work_script, dict) or work_script.get("href") != "/" + work_names[0]:
+                raise ValueError("Retained native Work module descriptor differs")
         if set(payloads) != referenced | {summary_name, data_name, families[("js", "app")][0]}:
             raise ValueError("Retained runtime dependency closure is incomplete")
         merged.update(payloads)
@@ -284,10 +289,13 @@ def rooted_assets(value):
     return value
 
 
-def health_subset(health, observations):
+def health_subset(health, observations, company_id=None):
     if health is None:
         return None
     result = copy.deepcopy(health)
+    if "profile_finance" in result:
+        profiles = health["profile_finance"]
+        result["profile_finance"] = {company_id: copy.deepcopy(profiles[company_id])} if company_id in profiles else {}
     result["observations"] = observations
     claim_ids = {cid for observation in observations for cid in observation.get("claim_ids", [])}
     source_ids = {sid for observation in observations for sid in observation.get("source_ids", [])}
@@ -437,11 +445,10 @@ def company_summaries(data, sidecars, root):
             end = observation.get("period", {}).get("end") or next(iter(re.findall(r"\d{4}(?:-\d{2}){0,2}", str(observation.get("as_of") or ""))), "")
             financial = {"recordType": "observation", "id": observation["id"], "claimId": next(iter(observation.get("claim_ids", [])), None),
                          "display": current["display"], "type": "Annualized pace" if observation["measure"] == "annualized_revenue" else "Revenue",
-                         "period": current["period"], "currency": current["currency"], "scope": current["scope_label"],
+                         "period": research.observation_period(observation), "currency": current["currency"], "scope": current["scope_label"],
                          "basis": "Gross revenue" if observation.get("accounting_basis") == "gross" else "Net revenue" if observation.get("accounting_basis") == "net" else "Gross/net not disclosed" if observation["measure"] == "annualized_revenue" else "",
                          "attribution": observation.get("evidence_assurance") or "Attributed source", "limitations": observation.get("limitations") or "",
                          "quote": observation.get("original_text") or fresh.get("excerpt") or "", "checkedOn": checked,
-                         "source": {"url": record["url"], "publisher": record.get("publisher") or "Original source"} if record else None,
                          "failed": observation.get("refresh_status") == "source_unavailable" or any(c.get("status") == "unavailable" and c["source_id"] in observation.get("source_ids", []) for c in health.get("source_checks", {}).get("entries", [])),
                          "age": "historical" if not end or end < "2025-10-28" else "current"}
         elif metric:
@@ -454,13 +461,21 @@ def company_summaries(data, sidecars, root):
                          "period": metric_period(research, metric), "currency": metric.get("currency") or "", "scope": current["scope_label"],
                          "basis": basis_text(research, metric), "attribution": research.correction(metric, "display_attribution") or claim.get("evidence_label") or "Attributed source",
                          "limitations": metric.get("limitations") or "", "quote": claim.get("statement") or "", "checkedOn": claim.get("observed_on"),
-                         "source": {"url": record["url"], "publisher": record.get("publisher") or "Original source"} if record else None,
                          "failed": False, "age": "undated" if rank == "0000" else "historical" if end < "2025-10-28" else "current"}
             historical = research.historical_year(metric)
             if historical:
                 financial["historicalYear"] = historical
+        if financial is not None:
+            citation = {"url": record["url"], "publisher": record.get("publisher") or "Original source"} if record else None
+            if record and (published := research.reviewed_source_dates.get(record["id"])):
+                citation.update(id=record["id"], publishedOn=published, accessedOn=record.get("accessed_on"), retrievalStatus=record.get("retrieval_status"))
+                if not observation:
+                    financial["checkedOn"] = None
+            financial["source"] = citation
         result[cid] = {"firstOffering": {"name": products[0]["name"]} if products else None, "hasFinancial": bool(metric),
                        "financial": financial, "currentCompanyResult": current}
+        if health.get("profile_finance", {}).get(cid, {}).get("compare_projection") == "native_evidence_link_only":
+            result[cid]["financingEvidenceHref"] = f"/company/{cid}/#financial-record"
     return result, products_by_company, research
 
 
@@ -468,11 +483,30 @@ def search_fold(value):
     return "".join(ch for ch in unicodedata.normalize("NFKD", value) if not unicodedata.category(ch).startswith("M")).lower()
 
 
+def work_recorded_titles(route):
+    history = (route.get("editorial_review") or {}).get("correction_history", [])
+    previous = ((item.get("previous_values") or {}).get("role") for item in history)
+    return [title for title in (route.get("role"), *previous) if isinstance(title, str) and title]
+
+
 def work_search_text(route, companies):
     from static_pages import work_location
     company = companies.get(route["company_id"], {})
-    values = [company.get("name"), *company.get("aliases", []), route.get("role"), route.get("summary"), route.get("group"), route.get("geography"), work_location(route), route.get("pay_label"), route.get("hours"), route.get("duration"), *route.get("requirements", [])]
+    values = [company.get("name"), *company.get("aliases", []), *work_recorded_titles(route), route.get("summary"), route.get("group"), route.get("geography"), work_location(route), route.get("pay_label"), route.get("hours"), route.get("duration"), *route.get("requirements", [])]
     return search_fold(" ".join(str(value) for value in values if value))
+
+
+def work_search_titles(routes):
+    from static_pages import work_kind
+
+    return sorted({title for route in routes if work_kind(route) in ("named_listing", "network_program")
+                   for title in work_recorded_titles(route)})
+
+
+def company_search_aliases(company_id, aliases=()):
+    # Both labels resolve to the same reviewed TransPerfect subsidiary profile.
+    recorded_names = ("DataForce by TransPerfect", "TransPerfect / DataForce") if company_id == "org.dataforce" else ()
+    return list(dict.fromkeys([*aliases, *recorded_names]))
 
 
 EDITORIAL_RUNTIME_FIELDS = frozenset({'company_id', 'summary', 'primary_offering',
@@ -491,16 +525,54 @@ def compact_editorial(editorial):
     return result
 
 
+def work_uncertain(route):
+    from static_pages import UNCERTAIN_CHECK
+
+    check = route.get("last_route_check") or {}
+    return (route.get("status") in ("unverified", "intake_unverified", "pay_conflict")
+            or (route.get("last_link_check") or {}).get("result") in ("blocked", "not_found", "unavailable")
+            or ((route.get("research_record") or {}).get("route") or {}).get("live_application_verified") is False
+            or bool(UNCERTAIN_CHECK.search(" ".join(str(v) for v in (check.get("result"), check.get("note")) if v))))
+
+
+def work_field_reviews(route):
+    fields = ("state", "reviewed_on", "source_ids", "basis")
+    return {field: {k: v for k, v in value.items() if k in fields or field in ("location", "commitment") and k == "note"}
+            for field, value in route.get("field_reviews", {}).items()}
+
+
+def work_native_selection(work, companies):
+    """Supply the native filter script with selection fields and searchable text."""
+    from static_pages import work_approved_terms_receipt
+
+    fields = ("id", "company_id", "role", "route_kind", "engagement_type", "status", "group", "ai_data_work",
+              "arrangements", "geography", "numeric_pay", "pay_label", "pay_basis", "terms_checked_on",
+              "reviewed_on", "availability_checked_on")
+    rows = []
+    for route in work.get("routes", []):
+        row = {key: value for key, value in route.items() if key in fields}
+        row["company_name"] = companies.get(route["company_id"], {}).get("name") or route["company_id"]
+        row["searchText"] = work_search_text(route, companies)
+        row["uncertain"] = work_uncertain(route)
+        for key, keys in (("pay_terms", ("unit", "currency", "hourly_comparable")),
+                          ("last_route_check", ("date", "result"))):
+            if route.get(key):
+                row[key] = {field: value for field, value in route[key].items() if field in keys}
+        receipt = work_approved_terms_receipt(route)
+        if receipt:
+            fields_to_keep = ("id", "source_id", "checked_on", "scope", "result", "approved", "approval_basis")
+            row["editorial_review"] = {"approved_terms_receipt_id": receipt["id"],
+                                       "receipts": [{key: value for key, value in receipt.items() if key in fields_to_keep}]}
+        rows.append(row)
+    return rows
+
+
 def compact_work(work, research=None):
     result = copy.deepcopy(work)
     for route in result.get("routes", []):
         if research:
-            from static_pages import UNCERTAIN_CHECK, work_action
-            check = route.get("last_route_check") or {}
-            route["uncertain"] = (route.get("status") in ("unverified", "intake_unverified", "pay_conflict")
-                                  or (route.get("last_link_check") or {}).get("result") in ("blocked", "not_found", "unavailable")
-                                  or ((route.get("research_record") or {}).get("route") or {}).get("live_application_verified") is False
-                                  or bool(UNCERTAIN_CHECK.search(" ".join(str(v) for v in (check.get("result"), check.get("note")) if v))))
+            from static_pages import work_action
+            route["uncertain"] = work_uncertain(route)
             route["source_action"] = work_action(route, research)
             route["details_deferred"] = True
         record = route.pop("research_record", None)
@@ -521,11 +593,69 @@ def compact_work(work, research=None):
                 route[key] = {k: v for k, v in route[key].items() if k in ("date", "result")}
         if route.get("entry_point_research"):
             route["entry_point_research"] = {"entry": {k: v for k, v in route["entry_point_research"].get("entry", {}).items() if k in ("url", "type")}}
-        route["field_reviews"] = {field: {k: v for k, v in value.items() if k in ("state", "reviewed_on", "source_ids", "basis") or field == "location" and k == "note"} for field, value in route.get("field_reviews", {}).items()}
+        route["field_reviews"] = work_field_reviews(route)
         review = route.get("editorial_review")
         if review:
-            route["editorial_review"] = {key: value for key, value in review.items() if key in ("triaged_on", "approved_terms_receipt_id", "disposition", "alternative_destination")}
+            route["editorial_review"] = {key: value for key, value in review.items() if key in ("triaged_on", "approved_terms_receipt_id", "disposition", "alternative_destination", "actions", "recorded_url_purpose")}
             route["editorial_review"]["receipts"] = [{k: v for k, v in receipt.items() if k in ("id", "source_id", "checked_on", "checked_at", "scope", "result", "approved", "approval_basis", "reviewer", "reviewed_fields")} for receipt in review.get("receipts", []) if receipt.get("id") == review.get("approved_terms_receipt_id")]
+            history = []
+            for change in review.get("correction_history", []):
+                previous = change.get("previous_values") or {}
+                previous_fields = previous.get("field_reviews") or {}
+                field_sources = {field: {"source_ids": value["source_ids"]} for field, value in previous_fields.items()
+                                 if value and value.get("source_ids")}
+                retained_values = {"role": previous["role"]} if previous.get("role") else {}
+                if field_sources:
+                    retained_values["field_reviews"] = field_sources
+                if retained_values:
+                    history.append({"previous_values": retained_values})
+            if history:
+                route["editorial_review"]["correction_history"] = history
+    return result
+
+
+def work_export_rows(work, research):
+    """Bind CSV evidence to the same release as the filters, on download only."""
+    from static_pages import work_actions
+
+    fields = ("id", "company_id", "role", "route_kind", "engagement_type", "status", "group", "ai_data_work",
+              "arrangements", "geography", "pay_label", "pay_basis", "pay_terms", "pay_observations", "numeric_pay",
+              "requirements", "assessment", "hours", "duration", "terms_checked_on", "availability_label",
+              "availability_note", "availability_checked_on", "url", "form_available")
+
+    def retain(record, keys):
+        return {key: value for key, value in (record or {}).items() if key in keys}
+
+    result = []
+    for route in work.get("routes", []):
+        row = retain(route, fields)
+        row["company_name"] = research.companies.get(route["company_id"], {}).get("name") or route["company_id"]
+        row["source_actions"] = [{"url": url, "label": label} for url, label in work_actions(route, research)]
+        row["uncertain"] = work_uncertain(route)
+        row["field_reviews"] = work_field_reviews(route)
+        link_keys = ("date", "result", "url", "http_status", "final_url")
+        for key, keys in (("last_link_check", link_keys), ("last_route_check", (*link_keys, "application_check", "application_checks"))):
+            if route.get(key):
+                row[key] = retain(route[key], keys)
+        recorded = retain((route.get("research_record") or {}).get("route"),
+                          ("overview_url", "application_url", "checked_on", "live_application_verified"))
+        if recorded:
+            row["research_record"] = {"route": recorded}
+        row["sources"] = [retain(source, ("id", "url", "source_type", "title", "accessed_on", "purpose", "field_support"))
+                          for source in route.get("sources", [])]
+        review = route.get("editorial_review") or {}
+        editorial = retain(review, ("approved_terms_receipt_id", "disposition", "alternative_destination", "actions", "recorded_url_purpose"))
+        disposition_ids = (review.get("disposition") or {}).get("source_ids", [])
+        receipts = [retain(receipt, ("id", "source_id", "checked_on", "checked_at", "scope", "result", "http_status",
+                                     "approved", "approval_basis", "reviewed_fields"))
+                    for receipt in review.get("receipts", [])
+                    if receipt.get("id") == review.get("approved_terms_receipt_id")
+                    or receipt.get("scope") == "retrieval" and receipt.get("source_id") in disposition_ids]
+        if receipts:
+            editorial["receipts"] = receipts
+        if editorial:
+            row["editorial_review"] = editorial
+        result.append(row)
     return result
 
 
@@ -543,7 +673,11 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
         # A fresh root object is installed, invalidating source-context caches safely.
         detail["profileContent"] = rooted_assets({"entries": [e for e in sidecars["PROFILE_CONTENT"].get("entries", []) if e["company_id"] == cid]})
         detail["companyEvents"] = {"events": [e for e in sidecars["COMPANY_EVENTS"].get("events", []) if e["company_id"] == cid or cid in e.get("related_company_ids", [])]}
-        detail["businessHealth"] = health_subset(sidecars["BUSINESS_HEALTH"], [o for o in (sidecars["BUSINESS_HEALTH"] or {}).get("observations", []) if o["company_id"] == cid])
+        health = sidecars["BUSINESS_HEALTH"] or {}
+        detail["businessHealth"] = health_subset(sidecars["BUSINESS_HEALTH"], [o for o in health.get("observations", []) if o["company_id"] == cid], cid)
+        if cid in health.get("profile_finance", {}):
+            from business_health import profile_finance_claim_context
+            detail["financeClaimContext"] = profile_finance_claim_context(health["profile_finance"][cid])
         detail["sourceUpdates"] = source_updates_context(sidecars["SOURCE_UPDATES"], cid)
         detail["workRoutes"] = {**{key: copy.deepcopy(value) for key, value in sidecars["WORK_ROUTES"].items() if key != "routes"}, "routes": [copy.deepcopy(route) for route in sidecars["WORK_ROUTES"].get("routes", []) if route["company_id"] == cid or cid in route.get("related_company_ids", [])]}
         details[cid] = write_asset(destination, "company-" + cid, detail)
@@ -569,20 +703,32 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
     summary = dict(identity, bootstrap=bootstrap, companies=bootstrap["companies"], work=compact_work(sidecars["WORK_ROUTES"], research), companySummaries=summaries,
                    companyDetails=details, statistics=stats, exports=exports,
                    publicationAsOf=release.get("publication_as_of", release.get("published_at", "2026-11-08T20:30:00Z")))
+    summary["workResults"] = write_asset(destination, "work-results", dict(identity, routes=work_export_rows(sidecars["WORK_ROUTES"], research)))
     search_rows = []
     for company in data["companies"]:
         entry = next((e for e in sidecars["EDITORIAL"]["entries"] if e["company_id"] == company["id"]), {})
         products = next((e.get("products", []) for e in sidecars["PROFILE_CONTENT"]["entries"] if e["company_id"] == company["id"]), [])
-        search_rows.append({"id": company["id"], "name": company["name"], "summary": entry.get("summary", company.get("description", "")), "group": entry.get("primary_offering", ""), "products": [value for p in products for value in [p["name"], p.get("description", ""), *p.get("aliases", [])] if value], "aliases": list(company.get("aliases", [])), "href": "/company/" + company["id"] + "/"})
+        search_rows.append({"id": company["id"], "name": company["name"], "summary": entry.get("summary", company.get("description", "")), "group": entry.get("primary_offering", ""), "products": [value for p in products for value in [p["name"], p.get("description", ""), *p.get("aliases", [])] if value], "aliases": company_search_aliases(company["id"], company.get("aliases", [])), "href": "/company/" + company["id"] + "/"})
     from daily_scan import daily_search_entries, daily_search_scope
     public_search_entries = [*sidecars.get("RESEARCH_SEARCH", []), *daily_search_entries(daily_context)]
+    work_titles = work_search_titles(sidecars["WORK_ROUTES"]["routes"])
     summary["dailySearchScope"] = daily_search_scope(daily_context)
     for entry in public_search_entries:
         keywords = entry.get("keywords", [])
         if isinstance(keywords, str):
             keywords = keywords.split()
-        search_rows.append({"id": entry["url"], "name": entry["title"], "summary": entry["summary"], "group": entry["kind"], "products": keywords, "href": entry["url"]})
-    summary["homeSearch"] = write_asset(destination, "search", dict(identity, entries=search_rows))
+        row = {"id": entry["url"], "name": entry["title"], "summary": entry["summary"], "group": entry["kind"], "products": keywords, "href": entry["url"]}
+        if entry.get("identifiers"):
+            row["identifiers"] = entry["identifiers"]
+        if entry.get("recordKind"):
+            row["recordKind"] = entry["recordKind"]
+        if entry["kind"] == "company":
+            row["aliases"] = company_search_aliases(entry["url"].strip("/").removeprefix("company/"), entry.get("aliases", []))
+        search_rows.append(row)
+    search_rows.append({"id": "market-revenue", "name": "Revenue & growth",
+                        "summary": "Company revenue, annualized pace and growth, with figures linked to their sources.",
+                        "group": "market", "products": [], "aliases": ["market", "revenue"], "href": "/explore/#business-health"})
+    summary["homeSearch"] = write_asset(destination, "search", dict(identity, entries=search_rows, workTitles=work_titles))
     company_map = {company["id"]: company for company in data["companies"]}
     editorial_map = {entry["company_id"]: entry for entry in sidecars["EDITORIAL"]["entries"]}
     company_search = {}
@@ -593,7 +739,7 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
         company_search[cid] = " ".join(str(value) for value in values if value).lower()
     summary["fullSearch"] = write_asset(destination, "full-search", dict(identity, data={"dataset_version": data["dataset_version"]}, companySearch=company_search,
                                                                      profileProducts=rooted_assets(current_products), editorialReadouts=copy.deepcopy(data["editorial_readouts"]),
-                                                                     researchSearchEntries=public_search_entries,
+                                                                     researchSearchEntries=public_search_entries, workTitles=work_titles,
                                                                      workSearch={route["id"]: work_search_text(route, company_map) for route in sidecars["WORK_ROUTES"]["routes"]}))
     # The full archive is fetched only by the explicitly opened method/archive view.
     summary["archive"] = write_asset(destination, "archive", dict(identity, data=data, businessHealth=sidecars["BUSINESS_HEALTH"], sourceUpdates=copy.deepcopy(sidecars["SOURCE_UPDATES"])))
@@ -603,6 +749,12 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
     canonical_claim_ids = {claim["id"] for claim in data["claims"]}
     for key in ("assessments", "editorial_readouts", "unknowns"):
         overview_claim_ids.update(value for value in strings(data.get(key, [])) if value in canonical_claim_ids)
+    source_updates = sidecars["SOURCE_UPDATES"] or {}
+    # Retain the claims needed to validate exact financial-basis context in Market.
+    bound_basis_claim_ids = {row["id"] for update in (source_updates.get("evidence_context") or {}).get("corrections", [])
+                             if update.get("kind") == "financial-basis-source-supplement" and update["target"]["claim_id"] in overview_claim_ids
+                             for row in update["historical_snapshot"]["claims"]}
+    overview_claim_ids.update(bound_basis_claim_ids)
     overview_claims = [claim for claim in data["claims"] if claim["id"] in overview_claim_ids]
     overview_source_ids = {sid for claim in overview_claims for field in ("source_ids", "historical_source_ids") for sid in claim.get(field, [])}
     overview_data = {"dataset_version": data["dataset_version"], "claims": overview_claims,

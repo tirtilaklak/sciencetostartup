@@ -22,8 +22,9 @@ class RuntimeRetentionTests(unittest.TestCase):
         self.assets.mkdir(parents=True)
         self.destination = Path(self.temporary.name) / 'destination'
         self.destination.mkdir()
+        self.work_script = self.asset('work', b'window.WORK_NATIVE_SELECTION=[{"id":"cached-work"}];', True)
         self.generations = [self.generation('a' * 20, '11111111-1111-4111-8111-111111111111'),
-                            self.generation('b' * 20, '22222222-2222-4222-8222-222222222222')]
+                            self.generation('b' * 20, '22222222-2222-4222-8222-222222222222', work=self.work_script)]
         self.registry()
 
     def registry(self):
@@ -41,7 +42,8 @@ class RuntimeRetentionTests(unittest.TestCase):
             descriptor['integrity'] = 'sha256-' + base64.b64encode(bytes.fromhex(checksum)).decode()
         return name, descriptor
 
-    def generation(self, build, version, *, mismatch=False, bad_size=False, bad_sri=False, health_build=None, orphan=False):
+    def generation(self, build, version, *, mismatch=False, bad_size=False, bad_sri=False, health_build=None, orphan=False,
+                   work=None, work_role='nativeWork'):
         identity = dict(schemaVersion='1.0.0', buildId=build, editorialReleaseId='review-fixture', datasetVersion='2.5.0', privacyProjectionVersion='1.0.0')
         overview_name, overview = self.asset('overview', {**identity, 'buildId': 'different' if mismatch else build, 'data': {}})
         health_name, health = self.asset('health', ('(()=>{window.SCIENCE_HEALTH_MODULE={buildId:' + json.dumps(health_build or build) + ',initialize:function(){}};})();').encode(), True)
@@ -50,20 +52,26 @@ class RuntimeRetentionTests(unittest.TestCase):
             overview['bytes'] += 1
         if bad_sri:
             health['integrity'] = 'sha256-invalid'
-        summary = {**identity, 'publicationAsOf': '2026-11-18T17:43:00Z', 'overview': overview, 'modules': {'businessHealth': health}, 'bootstrap': {}, 'companies': [], 'work': []}
+        names = [overview_name, health_name, app_name]
+        modules = {'businessHealth': health}
+        if work is not None:
+            work_name, work_descriptor = work
+            names.append(work_name)
+            modules[work_role] = work_descriptor
+        summary = {**identity, 'publicationAsOf': '2026-11-18T17:43:00Z', 'overview': overview, 'modules': modules, 'bootstrap': {}, 'companies': [], 'work': []}
         summary_name, summary_descriptor = self.asset('summary', summary)
         public_summary = {k: v for k, v in summary.items() if k not in ('bootstrap', 'companies', 'work')}
         public_summary['asset'] = summary_descriptor
         data_name, data = self.asset('data', b'window.SUMMARY_INDEX=' + encoded(public_summary) + b';window.EXTRA=true;', True)
-        names = (overview_name, health_name, app_name, summary_name, data_name)
+        names.extend((summary_name, data_name))
         result = {'cloudflare_version': version, 'sha256': {name: hashlib.sha256((self.assets / name).read_bytes()).hexdigest() for name in names}}
         if orphan:
             orphan_name, _ = self.asset('orphan', {**identity, 'data': {}})
             result['sha256'][orphan_name] = hashlib.sha256((self.assets / orphan_name).read_bytes()).hexdigest()
         return result
 
-    def rejected_without_copy(self):
-        with self.assertRaises(ValueError):
+    def rejected_without_copy(self, error=''):
+        with self.assertRaisesRegex(ValueError, error):
             retain_runtime_generations(self.root, self.destination)
         self.assertEqual(list(self.destination.iterdir()), [])
 
@@ -74,6 +82,9 @@ class RuntimeRetentionTests(unittest.TestCase):
         for generation in self.generations:
             for name, checksum in generation['sha256'].items():
                 self.assertEqual(hashlib.sha256((self.destination / name).read_bytes()).hexdigest(), checksum)
+        work_name, _ = self.work_script
+        self.assertNotIn(work_name, self.generations[0]['sha256'])
+        self.assertEqual((self.destination / work_name).read_bytes(), (self.assets / work_name).read_bytes())
         retain_runtime_generations(self.root, self.destination)
 
     def test_retention_requires_two_distinct_versions(self):
@@ -131,6 +142,35 @@ class RuntimeRetentionTests(unittest.TestCase):
             self.generations[1] = self.generation('b' * 20, self.generations[1]['cloudflare_version'], **changes)
             self.registry()
             self.rejected_without_copy()
+
+    def test_retention_rejects_wrong_native_work_digest_integrity_or_role(self):
+        name, descriptor = self.work_script
+        version = self.generations[1]['cloudflare_version']
+        for role, asset, error in (
+            ('nativeWork', {**descriptor, 'sha256': '0' * 64}, 'Retained runtime dependency differs'),
+            ('nativeWork', {**descriptor, 'integrity': 'sha256-invalid'}, 'Retained runtime integrity differs'),
+            ('work', descriptor, 'Retained native Work module descriptor differs'),
+        ):
+            with self.subTest(error=error):
+                self.generations[1] = self.generation('b' * 20, version, work=(name, asset), work_role=role)
+                self.registry()
+                self.rejected_without_copy(error)
+
+    def test_retention_rejects_changed_native_work_bytes_or_filename(self):
+        name, _ = self.work_script
+        path = self.assets / name
+        original = path.read_bytes()
+        error = r'Retained runtime checksum or filename differs: js/work\.'
+        path.write_bytes(b'// changed after registry')
+        self.rejected_without_copy(error)
+
+        wrong_name = 'js/work.000000000000.js'
+        path.write_bytes(original)
+        path.rename(self.assets / wrong_name)
+        checksums = self.generations[1]['sha256']
+        checksums[wrong_name] = checksums.pop(name)
+        self.registry()
+        self.rejected_without_copy(error)
 
     def test_retention_refuses_destination_collision(self):
         name = next(iter(self.generations[1]['sha256']))

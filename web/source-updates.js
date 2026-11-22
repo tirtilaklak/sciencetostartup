@@ -25,6 +25,7 @@ function historicalOfferContextForMetric(metric){return detailViewRenderer("hist
 function metricPresentationLabel(metric,fallback){return detailViewRenderer("metricPresentationLabel",this,arguments);}
 function metricEvidenceTopic(metric,fallback){return detailViewRenderer("metricEvidenceTopic",this,arguments);}
 function evidenceContextForClaim(claim){return detailViewRenderer("evidenceContextForClaim",this,arguments);}
+function evidenceContextSourcePublicationDate(sourceId){return detailViewRenderer("evidenceContextSourcePublicationDate",this,arguments);}
 function relationshipAssessmentContextForClaim(claim){return detailViewRenderer("relationshipAssessmentContextForClaim",this,arguments);}
 function evidenceContextScopeLabel(claim,fallback){return detailViewRenderer("evidenceContextScopeLabel",this,arguments);}
 function evidenceContextClaimDescription(claim){return detailViewRenderer("evidenceContextClaimDescription",this,arguments);}
@@ -39,9 +40,7 @@ function evidenceContextAssessmentHTML(assessment){return detailViewRenderer("ev
 function evidenceContextCriterionHTML(assessment,key){return detailViewRenderer("evidenceContextCriterionHTML",this,arguments);}
 function profileRelationshipScopeContext(id,row){return detailViewRenderer("profileRelationshipScopeContext",this,arguments);}
 function metricCurrentPeriod(metric,fallback=''){return detailViewRenderer("metricCurrentPeriod",this,arguments);}
-function evidenceContextClaimPeriod(claim,fallback){return detailViewRenderer("evidenceContextClaimPeriod",this,arguments);}
 function evidenceContextDateHeading(claim){return detailViewRenderer("evidenceContextDateHeading",this,arguments);}
-function evidenceContextArchiveDate(claim,fallback){return detailViewRenderer("evidenceContextArchiveDate",this,arguments);}
 function metricContextMetaPeriod(metric,fallback){return detailViewRenderer("metricContextMetaPeriod",this,arguments);}
 function evidenceContextUpdateHTML(update,claimId){return detailViewRenderer("evidenceContextUpdateHTML",this,arguments);}
 function evidenceContextClaimHTML(id){return detailViewRenderer("evidenceContextClaimHTML",this,arguments);}

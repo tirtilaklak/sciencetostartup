@@ -433,7 +433,13 @@ class PublishedEditionReplayControls(unittest.TestCase):
                 self.assertEqual(facts.canonicals, [pages.sp.ORIGIN + route])
                 self.assertNotIn('SYNTHETIC later live prose only.', text)
                 self.assertIn(section['paragraphs'][0]['text'], text)
-                self.assertTrue(set(routes) <= set(facts.links))
+                toc = tree.with_class('r-reader-toc')[0]
+                toc_list = next(child for child in toc['children'] if isinstance(child, dict) and child['tag'] == 'ol')
+                expected_toc = routes if index else [base] + [path + '#' + item['id']
+                    for path, item in zip(routes[1:], frozen['report']['sections'][1:])]
+                self.assertEqual(ReaderTree.links(toc_list), expected_toc)
+                self.assertEqual([script for script in facts.scripts if 'src' in script],
+                                 [{'src': '/native-details.js', 'defer': None}] if index else [])
                 self.assertFalse(any(link.startswith('/research/data/') for link in facts.links))
                 reader_navigation = tree.with_class('r-reader-toc') + tree.with_class('r-reader-pagination') + tree.with_class('r-reader-book-title')
                 for item in reader_navigation:
@@ -460,7 +466,9 @@ class PublishedEditionReplayControls(unittest.TestCase):
                     self.assertEqual([item['attrs']['href'] for item in tree.elements
                                       if item['tag'] == 'a' and item['attrs'].get('rel') == relation],
                                      [routes[other]] if 0 <= other < len(routes) else [])
-                self.assertIn(frozen['report']['archive']['record_url'], facts.links)
+                archive = frozen['report']['archive']['record_url']
+                self.assertIn(archive + '/files/report.pdf?download=1', facts.links)
+                self.assertIn(archive + '/files/research-archive.zip?download=1', facts.links)
                 self.assertFalse(any(link.startswith('/publication/') for link in facts.links))
             self.assertEqual(len(routes), 12)
         self.assertEqual({path.name: path.read_bytes() for path in self.package.iterdir() if path.is_file()}, before)

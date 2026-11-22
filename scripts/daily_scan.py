@@ -25,6 +25,7 @@ class DailyContext:
     editions: tuple
     wikipedia: dict
     wikipedia_bytes: bytes
+    edition_bytes: tuple = ()
 
 
 def _day(value):
@@ -121,15 +122,20 @@ def load_wikipedia_context(root=ROOT):
 
 
 def load_daily_context(root=ROOT):
-    editions = load_editions(root)
+    sources = tuple(_edition_sources(root))
     wikipedia, raw = load_wikipedia_context(root)
-    return DailyContext(tuple(editions), wikipedia, raw)
+    return DailyContext(tuple(edition for edition, _ in sources), wikipedia, raw,
+                        tuple(blob for _, blob in sources))
 
 
 def load_editions(root=ROOT):
-    editions = []
+    return [edition for edition, _ in _edition_sources(root)]
+
+
+def _edition_sources(root):
     for path in sorted((Path(root) / "data/daily-scan").glob("????-??-??.json")):
-        edition = json.loads(path.read_text())
+        raw = path.read_bytes()
+        edition = json.loads(raw.decode("utf-8"))
         if not isinstance(edition, dict):
             raise ValueError("Daily scan must be an object")
         day = edition.get("date")
@@ -177,12 +183,15 @@ def load_editions(root=ROOT):
                         or not any(character.isalnum() for character in sentence)
                         or not re.search(r'''[.!?]["'”’\)\]]*$''', sentence.rstrip())):
                     raise ValueError("Daily scan explanation sentences require text and a sentence ending")
-        editions.append(edition)
-    return editions
+        yield edition, raw
+
+
+def _edition_path(edition):
+    return f'/daily/{edition["date"]}/'
 
 
 def edition_url(edition):
-    return ORIGIN + "/daily/" + edition["date"] + "/"
+    return ORIGIN + _edition_path(edition)
 
 
 def item_url(edition, item):
@@ -277,10 +286,14 @@ def card(item, rank, edition):
 def render(edition, editions, canonical, root=ROOT, context=None):
     day = edition["date"]
     current = next(i for i, row in enumerate(editions) if row["date"] == day)
-    def day_link(offset, label):
-        target = current + offset
-        return (f'<a class="scan-day-step" href="/daily/{editions[target]["date"]}/" aria-label="{label}">{"←" if offset < 0 else "→"}</a>'
-                if 0 <= target < len(editions) else f'<span class="scan-day-step" aria-disabled="true">{"←" if offset < 0 else "→"}</span>')
+    steps = "".join(
+        f'<a class="scan-day-step" href="{_edition_path(editions[target])}" rel="{relation}">'
+        f'{label} · {format_date(editions[target]["date"])}</a>'
+        for target, relation, label in ((current - 1, "prev", "Previous snapshot"), (current + 1, "next", "Next snapshot"))
+        if 0 <= target < len(editions)
+    )
+    if steps:
+        steps = f'<div class="scan-edition-steps">{steps}</div>'
     options = "".join(f'<option value="{row["date"]}"' + (' selected' if row["date"] == day else '') + f'>{format_date(row["date"])}</option>' for row in reversed(editions))
     topic_options = "".join(f'<option>{e(topic)}</option>' for topic in TOPICS)
     kind_options = "".join(f'<option>{e(kind)}</option>' for kind in KINDS)
@@ -288,14 +301,25 @@ def render(edition, editions, canonical, root=ROOT, context=None):
     source_dates = [item["published_on"] for item in edition["items"]]
     attribution = context.wikipedia if context is not None else load_wikipedia_context(root)[0]
     contexts = "".join(f'<div><h3>{e(row["label"])}</h3><blockquote>{e(row["sentence"])}</blockquote><p class="scan-credit"><a href="{e(row["revision_url"])}">Wikipedia · {e(row["title"])}</a> · <a href="{e(row["history_url"])}">Authors & history</a> · <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> · Verbatim excerpt</p></div>' for row in attribution["entries"])
-    archive = "".join(f'<a href="/daily/{row["date"]}/">{format_date(row["date"])} <span>{len(row["items"])} items</span></a>' for row in reversed(editions))
+    archive = "".join(
+        f'<a href="{_edition_path(row)}"' + (' aria-current="date"' if row["date"] == day else '') +
+        f'>{format_date(row["date"])} <span>{len(row["items"])} items</span></a>'
+        for row in reversed(editions)
+    )
     body = (f'<div class="daily-scan" data-edition="{day}"><header class="scan-heading"><div><p class="eyebrow">THE DAILY READING LIST</p>'
             '<h1>Daily scan<span>.</span></h1><p class="scan-deck">RLHF, data & the companies behind AI.</p></div>'
             f'<div class="scan-issue"><span>ISSUE {current + 1:03d}</span><strong><time datetime="{day}">{format_date(day)}</time></strong><span>{len(edition["items"])} selections · Pacific time</span></div></header>'
             '<nav class="scan-follow" aria-label="Follow Daily scan"><strong>Follow Daily scan</strong> · '
             '<a href="/daily/feed.xml">RSS</a> · <a href="/daily/feed.json">JSON Feed</a> · '
             '<a href="/research/feed.xml">Research editions</a> · <a href="/research/corrections/feed.xml">Research corrections</a></nav>'
-            f'<div class="scan-controls" hidden><div class="scan-date-control"><label for="scan-date">Snapshot date</label><div>{day_link(-1, "Previous snapshot")}<select id="scan-date">{options}</select>{day_link(1, "Next snapshot")}</div></div>'
+            f'<nav class="scan-edition-nav" aria-label="Snapshots">{steps}'
+            # Keep the links visible on a native history return even when the
+            # browser recreates the document and loses its disclosure state.
+            f'<details class="scan-archive-disclosure" open><summary>Snapshot archive</summary><div class="scan-archive">{archive}</div></details>'
+            '<script>document.currentScript.previousElementSibling.open=false</script>'
+            f'<form class="scan-date-form" hidden><label for="scan-date">Snapshot date</label>'
+            f'<div><select id="scan-date">{options}</select><button id="scan-date-go" type="submit">Go</button></div></form></nav>'
+            '<div class="scan-controls" hidden>'
             '<div class="scan-search-control"><label for="scan-search">Search</label><input id="scan-search" type="search" placeholder="Paper, company or keyword" autocomplete="off"></div>'
             f'<div><label for="scan-topic">Topic</label><select id="scan-topic"><option value="">All topics</option>{topic_options}</select></div>'
             f'<div><label for="scan-kind">Type</label><select id="scan-kind"><option value="">All types</option>{kind_options}</select></div></div>'
@@ -303,8 +327,8 @@ def render(edition, editions, canonical, root=ROOT, context=None):
             f'<div class="scan-list">{items}</div><div id="scan-empty" class="scan-empty" hidden><h2>No matching items</h2><button type="button" id="scan-empty-reset">Clear filters</button></div>'
             '<footer class="scan-notes"><details><summary>Dates, sources & background</summary><dl><div><dt>Snapshot</dt><dd>Selection date in America/Los_Angeles</dd></div><div><dt>Source date</dt><dd>Original publication, release or arXiv submission; updates labeled separately</dd></div><div><dt>Selection</dt><dd>Recent papers, datasets and company announcements; source-linked facts; author and company results attributed</dd></div><div><dt>Coverage</dt><dd>Selected reading list; abstracts and announcements where indicated; no independent replication</dd></div><div><dt>Writing</dt><dd>Plain-language explanations paraphrase original sources; verbatim Wikipedia background excerpts below</dd></div></dl>'
             f'<div class="scan-context">{contexts}</div><a href="/daily/wikipedia-context.json">Wikipedia revision & download records</a></details>'
-            f'<p>Site search covers the latest {RECENT_EDITIONS} Daily editions. This snapshot has its own filters; the full archive remains below.</p>'
-            f'<details><summary>Snapshot archive</summary><div class="scan-archive">{archive}</div></details><a class="scan-download" href="/daily/{day}/snapshot.json" download>Download this snapshot · JSON</a></footer></div>')
+            f'<p>Site search covers the latest {RECENT_EDITIONS} Daily editions.</p>'
+            f'<a class="scan-download" href="{_edition_path(edition)}snapshot.json" download>Download this snapshot · JSON</a></footer></div>')
     latest_label = ' · Latest reading list' if canonical == ORIGIN + '/daily/' else ''
     title = f'Daily scan: {format_date(day)}{latest_label} · ScienceToStartup'
     description = f'{len(edition["items"])} sourced selections for {format_date(day)}: RLHF, data, evaluation and AI company news. Original source dates and limits retained.'
@@ -320,17 +344,19 @@ def write_daily_scan(destination, root=ROOT, context=None):
         return
     folder = destination / "daily"
     folder.mkdir(parents=True, exist_ok=True)
-    for edition in editions:
+    for edition, raw in zip(editions, context.edition_bytes, strict=True):
         dated = folder / edition["date"]
         dated.mkdir(exist_ok=True)
         (dated / "index.html").write_text(render(edition, editions, edition_url(edition), root, context))
-        (dated / "snapshot.json").write_text(json.dumps(edition, ensure_ascii=False, indent=2) + '\n')
+        (dated / "snapshot.json").write_bytes(raw)
     (folder / 'index.html').write_text(render(editions[-1], editions, ORIGIN + '/daily/', root, context))
     (folder / 'wikipedia-context.json').write_bytes(context.wikipedia_bytes)
     write_daily_feeds(folder, context)
-    (folder / 'index.json').write_text(json.dumps({'first_date': editions[0]['date'], 'latest_date': editions[-1]['date'], 'snapshots': [{'date': row['date'], 'count': len(row['items']), 'url': '/daily/' + row['date'] + '/'} for row in reversed(editions)]}, indent=2) + '\n')
+    snapshots = [{'date': row['date'], 'count': len(row['items']), 'url': _edition_path(row)} for row in reversed(editions)]
+    (folder / 'index.json').write_text(json.dumps({'first_date': editions[0]['date'], 'latest_date': editions[-1]['date'],
+                                                 'snapshots': snapshots}, indent=2) + '\n')
     namespace = '{http://www.sitemaps.org/schemas/sitemap/0.9}'
     sitemap = ET.parse(destination / 'sitemap.xml').getroot()
     entries = [(node.findtext(namespace + 'loc'), node.findtext(namespace + 'lastmod')) for node in sitemap]
-    entries += [(ORIGIN + '/daily/', editions[-1]['date'])] + [(ORIGIN + '/daily/' + row['date'] + '/', row['date']) for row in editions]
+    entries += [(ORIGIN + '/daily/', editions[-1]['date'])] + [(edition_url(row), row['date']) for row in editions]
     (destination / 'sitemap.xml').write_text(render_sitemap(entries))

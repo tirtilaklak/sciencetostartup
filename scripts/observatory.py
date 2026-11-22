@@ -16,7 +16,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 from schema_def import SCHEMA, TABLES
-from frontend_packaging import ESBUILD_VERSION, package_frontend
+from frontend_packaging import ESBUILD_VERSION, optional_script_source, package_frontend
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIDENCE = {"U": 0, "C": 1, "B": 2, "A": 3}
@@ -497,6 +497,66 @@ def validate_historical_offer_context(update, data):
     require(product["company_id"] == "ooak" and product["claim_id"] == claim_ids[1] and product["segment_scope"] == "ai_data" and product["work_performed"] == tables["claims"][claim_ids[1]]["statement"], prefix + "original product binding mismatch")
     require(update["sources"] == [{"source_id": source_ids[0], "claim_id": claim_id, "publication_date": None, "publication_date_basis": "not_established", "role": "retained_issuer_offer", "access_status": "retained_readable_page"}], prefix + "invalid source context")
 
+def validate_source_publication_date(update, sources, dataset_version):
+    """Bind a publisher's visible date to one undated original citation."""
+    prefix = "source-updates: source publication date "
+    fields = {"id", "kind", "company_id", "reviewed_on", "checked_at", "reviewer", "review_basis", "target",
+              "publication_date", "publication_date_basis", "evidence", "historical_snapshot"}
+    require(set(update) == fields, prefix + "invalid fields")
+    def day(value):
+        require(isinstance(value, str) and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value), prefix + "invalid date")
+        try: return date.fromisoformat(value)
+        except ValueError: raise ValidationError(prefix + "invalid date")
+    def plain_text(value):
+        return isinstance(value, str) and value.strip() and not UNSAFE_EVENT_TEXT.search(value)
+    def public_url(value):
+        require(isinstance(value, str) and not re.search(r"[\s\x00-\x1f\x7f]", value), prefix + "invalid evidence URL")
+        try: parsed = urlsplit(value); parsed.port
+        except ValueError: raise ValidationError(prefix + "invalid evidence URL")
+        require(parsed.scheme == "https" and parsed.hostname and parsed.username is None and parsed.password is None,
+                prefix + "invalid evidence URL")
+        return parsed
+    target = update["target"]
+    require(isinstance(target, dict) and set(target) == {"source_id"} and isinstance(target["source_id"], str),
+            prefix + "invalid exact source target")
+    source_id = target["source_id"]
+    source = sources.get(source_id)
+    require(source is not None and source["company_id"] == update["company_id"] and source.get("published_on") is None,
+            prefix + "target must be an undated source in that company")
+    require(update["historical_snapshot"] == {"dataset_version": dataset_version, "sources": [source]},
+            prefix + "historical snapshot differs from original source")
+    reviewed, published = day(update["reviewed_on"]), day(update["publication_date"])
+    require(update["id"] == f"{source_id}.publication-date-{reviewed}" and plain_text(update["reviewer"])
+            and update["review_basis"] == "retained_publication_evidence"
+            and update["publication_date_basis"] == "publisher_displayed_date", prefix + "invalid review assertion")
+    checked_at = update["checked_at"]
+    require(isinstance(checked_at, str) and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", checked_at),
+            prefix + "invalid UTC retrieval time")
+    try: checked = datetime.fromisoformat(checked_at.replace("Z", "+00:00"))
+    except ValueError: raise ValidationError(prefix + "invalid UTC retrieval time")
+    now = datetime.now(timezone.utc)
+    require(published <= day(source.get("accessed_on")) <= checked.date() <= reviewed <= now.date() and checked <= now,
+            prefix + "inconsistent publication, record, retrieval or review dates")
+    evidence = update["evidence"]
+    require(isinstance(evidence, dict) and set(evidence) == {"url", "effective_url", "canonical_url", "http_status",
+            "redirects", "content_sha256", "visible_date_text", "date_locator", "retrieval_scope"}, prefix + "invalid evidence fields")
+    require(evidence["url"] == source["url"] and evidence["effective_url"] == evidence["canonical_url"],
+            prefix + "stored URL or canonical destination mismatch")
+    original, effective = public_url(evidence["url"]), public_url(evidence["effective_url"])
+    redirects = evidence["redirects"]
+    require(original.hostname == effective.hostname and type(redirects) is int and redirects >= 0
+            and bool(redirects) == (evidence["url"] != evidence["effective_url"]), prefix + "invalid redirect receipt")
+    require(type(evidence["http_status"]) is int and evidence["http_status"] == 200
+            and evidence["retrieval_scope"] == "publication_date_only" and plain_text(evidence["date_locator"])
+            and isinstance(evidence["content_sha256"], str) and re.fullmatch(r"[a-f0-9]{64}", evidence["content_sha256"]),
+            prefix + "invalid publication-only retrieval receipt")
+    visible = evidence["visible_date_text"]
+    require(plain_text(visible), prefix + "visible dateline required")
+    printed_day = f"{published:%B} {published.day}, {published.year}"
+    require(visible in (printed_day, f"{published:%b} {published.day}, {published.year}")
+            or re.fullmatch(re.escape(f"{published:%a}, {printed_day}") + r" at (?:[1-9]|1[0-2]):[0-5][0-9] [AP]M UTC", visible),
+            prefix + "visible dateline does not match publication date")
+
 def validate_evidence_context(section, data, existing_ids=(), profiles=None):
     """Validate presentation context against complete, unchanged source records."""
     prefix = "source-updates: evidence context "
@@ -514,6 +574,13 @@ def validate_evidence_context(section, data, existing_ids=(), profiles=None):
     for update in section["corrections"]:
         require(isinstance(update, dict), prefix + "invalid correction")
         kind = update.get("kind")
+        if kind == "source_publication_date":
+            validate_source_publication_date(update, tables["sources"], data["dataset_version"])
+            binding = (kind, update["target"]["source_id"])
+            require(update["id"] not in seen and binding not in targets, prefix + "duplicate correction")
+            seen.add(update["id"])
+            targets.add(binding)
+            continue
         if kind == "historical-offer-source-context":
             validate_historical_offer_context(update, data)
             binding = (kind, update["target"]["claim_id"])
@@ -711,6 +778,15 @@ def lazy_data(name, value):
     return "lazy(" + json.dumps(name) + ",'" + script_safe(text) + "');"
 
 
+def write_script_asset(destination, family, content):
+    digest = hashlib.sha256(content)
+    name = f"js/{family}.{digest.hexdigest()[:12]}.js"
+    path = destination / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(content)
+    return {"href": "/" + name, "sha256": digest.hexdigest(), "integrity": "sha256-" + base64.b64encode(digest.digest()).decode("ascii"), "bytes": len(content)}
+
+
 def write_business_health_module(destination, build_id):
     """Emit a classic factory without running the workbench or touching the DOM."""
     deferred = "\n".join((ROOT / 'web' / name).read_text() for name in ('detail-views.js', 'source-update-details.js', 'profile-details.js', 'business-health.js'))
@@ -719,12 +795,18 @@ def write_business_health_module(destination, build_id):
     # Independent classic transforms can generate similarly named helpers.
     # Isolate this module's minifier helpers; its public API is on window.
     content = ("(()=>{" + transformed + "})();\n").encode("utf-8")
-    digest = hashlib.sha256(content)
-    name = "js/health." + digest.hexdigest()[:12] + ".js"
-    path = destination / name
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(content)
-    return {"href": "/" + name, "sha256": digest.hexdigest(), "integrity": "sha256-" + base64.b64encode(digest.digest()).decode("ascii"), "bytes": len(content)}
+    return write_script_asset(destination, "health", content)
+
+
+def write_native_work_module(destination, work_data, companies):
+    from presentation import work_native_selection
+    rows = work_native_selection(work_data, {company["id"]: company for company in companies})
+    payload = json.dumps(rows, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    source = "window.WORK_NATIVE_SELECTION=" + script_safe(payload) + ";\n" + optional_script_source(ROOT, "work-page.js")
+    content = source.encode("utf-8")
+    # Cached Work pages still request this compatibility URL.
+    (destination / "work-page.js").write_bytes(content)
+    return write_script_asset(destination, "work", content)
 
 
 def presentation_preload_config(summary, aliases):
@@ -796,7 +878,10 @@ def build(data, destination):
     write_csv(destination / "classifications.csv", classification_rows, ["company_id", "company", "segment_scope", "stage", "confidence", "rubric_version", "as_of"])
     # JSON is inert and HTML-sensitive characters are escaped before embedding.
     embedded = json.dumps(data, ensure_ascii=False, separators=(",", ":"), sort_keys=True, allow_nan=False).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
-    html = (ROOT / "web/index.html").read_text().replace("/* OBSERVATORY_CSS */", (ROOT / "web/style.css").read_text()).replace("/* OBSERVATORY_JS */", (ROOT / "web/link-health.js").read_text() + "\n" + (ROOT / "web/app.js").read_text()).replace("<!-- OBSERVATORY_DATA -->", embedded)
+    app_source = "\n".join((ROOT / "web" / name).read_text() for name in ("link-health.js", "search-core.js", "app.js"))
+    html = (ROOT / "web/index.html").read_text()
+    html = html.replace("/* OBSERVATORY_CSS */", (ROOT / "web/style.css").read_text())
+    html = html.replace("/* OBSERVATORY_JS */", app_source).replace("<!-- OBSERVATORY_DATA -->", embedded)
     editorial = json.loads((ROOT / "data/editorial.json").read_text())
     logo_path = ROOT / "data/logo-provenance.json"
     logo_data = json.loads(logo_path.read_text()) if logo_path.exists() else {"logos": []}
@@ -820,7 +905,7 @@ def build(data, destination):
     aliases = json.loads((ROOT / "docs/research-id-crosswalk.json").read_text())
     from business_health import load_business_health
     health_path = ROOT / "data/business-health.json"
-    health = load_business_health(health_path, data)
+    health = load_business_health(health_path, data, profile_content=profile_content)
     sidecars = dict(EDITORIAL=editorial, RESEARCH_ALIASES=aliases, LOGOS=logo_data,
                     WORK_ROUTES=work_data, PROFILE_CONTENT=profile_content, COMPANY_EVENTS=company_events,
                     SOURCE_UPDATES=source_updates, BUSINESS_HEALTH=health)
@@ -847,10 +932,20 @@ def build(data, destination):
     if release_path.exists() and data["dataset_version"] == SIDECAR_DATASET_VERSION:
         from editorial_work import load_editorial_release
         release = load_editorial_release(release_path, work_data, data)
-    from presentation import build_presentation, public_logo_provenance, write_asset
+    from presentation import build_presentation, public_logo_provenance, work_search_titles, write_asset
     summary, summary_asset = build_presentation(data, destination, ROOT, sidecars, release, daily_context=daily_context)
     original_summary = destination / summary_asset["href"].lstrip("/")
-    summary["modules"] = {"businessHealth": write_business_health_module(destination, summary["buildId"])}
+    from current_companies import company_path
+    directory_paths = {f"/company/{company['id']}/" for company in data["companies"]}
+    directory_paths.update(company_path(entry) for entry in (current_companies or {}).get("entries", []))
+    research_paths = {entry["url"] for entry in sidecars.get("RESEARCH_SEARCH", [])
+                      if re.fullmatch(r"/company/[^/?#]+/", entry.get("url", ""))}
+    summary["publicCompanyCounts"] = {"directory": len(directory_paths), "publishedProfiles": len(directory_paths | research_paths)}
+    from public_identity import load_identity
+    identity = load_identity()
+    summary["correctionIntake"] = {"origin": identity["origin"], "issueUrl": identity["contacts"]["issues"].removesuffix("/choose")}
+    summary["modules"] = {"businessHealth": write_business_health_module(destination, summary["buildId"]),
+                          "nativeWork": write_native_work_module(destination, work_data, data["companies"])}
     summary_asset = write_asset(destination, "summary", summary)
     # The pre-module intermediate is not an extra public presentation generation.
     if original_summary != destination / summary_asset["href"].lstrip("/"):
@@ -871,8 +966,8 @@ def build(data, destination):
     html = html.replace("/* ICONS_CSS */", (ROOT / "web/icons.css").read_text())
     html = html.replace("/* ICONS_JS */", (ROOT / "web/icons.js").read_text())
     html = html.replace("/* EDITORIAL_JS */", (ROOT / "web/editorial.js").read_text())
-    work_js = ROOT / "web/work-v3.js"
-    html = html.replace("/* WORK_V3_JS */", (work_js.read_text() if work_js.exists() else "") + "".join((ROOT / "web" / name).read_text() for name in INITIAL_PRESENTATION_JS))
+    work_modules = ("work-core.js", "work-v3.js", *INITIAL_PRESENTATION_JS)
+    html = html.replace("/* WORK_V3_JS */", "\n".join((ROOT / "web" / name).read_text() for name in work_modules))
     html = html.replace("/* DATA_RUNTIME_JS */", (ROOT / "web/data-runtime.js").read_text().replace("/* APP_BUILD_ID */null", json.dumps(summary["buildId"])))
     html = html.replace('<html lang="en">', '<html lang="en" data-build-id="' + summary["buildId"] + '" data-editorial-release="' + summary["editorialReleaseId"] + '" data-dataset-version="' + summary["datasetVersion"] + '">')
     import shutil
@@ -892,11 +987,10 @@ def build(data, destination):
     (destination / "profile-content.json").write_text(json.dumps(profile_content, indent=2, ensure_ascii=False) + "\n")
     if current_companies and (ROOT / "data/current-companies.json").exists():
         (destination / "current-companies.json").write_text(json.dumps(current_companies, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
-    for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js", "page-layout.css", "native-details.js", "companies-page.css", "companies-page.js", "work-page.css", "work-page.js", "method-page.css", "company-profile.css", "daily-scan.css", "daily-scan.js"):
+    for name in ("landing.css", "field-guide.css", "home-search.js", "home-runtime.js", "page-layout.css", "native-details.js", "companies-page.css", "companies-page.js", "work-page.css", "method-page.css", "method-correction.js", "company-profile.css", "daily-scan.css", "daily-scan.js"):
         path = ROOT / "web" / name
         if path.exists():
-            if name in ("home-search.js", "companies-page.js", "work-page.js"):
-                from frontend_packaging import optional_script_source
+            if name in ("home-search.js", "companies-page.js"):
                 (destination / name).write_text(optional_script_source(ROOT, name))
             else:
                 shutil.copy2(path, destination / name)
@@ -913,7 +1007,10 @@ def build(data, destination):
     from home import render_home
     landing = render_home(landing, data, sidecars, release, summary, current_companies=current_companies)
     (destination / "index.html").write_text(landing)
-    from static_pages import write_static_pages; write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events, link_health=link_health, business_health=health, current_companies=current_companies)
+    from static_pages import write_static_pages
+    write_static_pages(data, destination, work_data, profile_content, editorial, events=company_events,
+                       link_health=link_health, business_health=health, current_companies=current_companies,
+                       work_results=summary["workResults"], work_script=summary["modules"]["nativeWork"])
     if research_context is not None:
         from research_graph import write_exports
         from research_citations import write_publication_assets, publication_asset_inventory
@@ -925,7 +1022,8 @@ def build(data, destination):
             raise ValueError('Publication files exceed the static asset limit: '
                              + ', '.join(sorted(inventory['oversized']))
                              + '. Prepare a compressed frozen package; keep every research record and export.')
-        research_entries = write_research_pages(destination, research_context)
+        reader_context = {**research_context, "work_search_titles": work_search_titles(work_data["routes"])}
+        research_entries = write_research_pages(destination, reader_context)
         company_updates = {"https://sciencetostartup.com" + row['path']: row.get('lastmod')
                            for row in write_company_supplements(destination, research_context)}
         from current_companies import write_current_company_supplements

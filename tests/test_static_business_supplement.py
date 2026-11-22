@@ -35,7 +35,7 @@ class StaticBusinessSupplementTests(unittest.TestCase):
         self.assertIn('Whole company', page)
         self.assertIn('href="https://www.taskus.com/press-release/taskus-announces-fiscal-third-quarter-2026-results/"', page)
         self.assertIn('Interim company reporting; unaudited', page)
-        self.assertIn('Source content checked 16 Nov 2026; reporting period remains 9M 2026.', page)
+        self.assertIn('Source content checked 16 Nov 2026.</span>', page)
         historical = next(o for o in self.health['observations'] if o['id'] == 'refresh.taskus.h1-2026-group-revenue')
         self.assertEqual((historical['value'], historical['period']['label'], historical['scope']),
                          (615121000, 'H1 2026', 'company'))

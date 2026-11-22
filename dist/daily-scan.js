@@ -7,6 +7,12 @@
   const topic = document.getElementById('scan-topic');
   const kind = document.getElementById('scan-kind');
   const date = document.getElementById('scan-date');
+  const dateForm = date.form;
+  const dateGo = document.getElementById('scan-date-go');
+  const archiveContent = root.querySelector('.scan-archive');
+  const archive = archiveContent.closest('details');
+  const archiveLinks = new Map([...archiveContent.querySelectorAll('a')].map(link => [new URL(link.href).pathname, link]));
+  const editionLinks = root.querySelectorAll('a.scan-day-step, .scan-archive a');
   const reset = document.getElementById('scan-reset');
   const rows = [...root.querySelectorAll('.scan-item')];
   const rowById = new Map(rows.map(row => [row.id, row]));
@@ -40,10 +46,14 @@
     if (state != null && Object.prototype.toString.call(state) !== '[object Object]') return;
     const anchor = rows.find(row => !row.hidden && row.getBoundingClientRect().bottom > 0 &&
       row.getBoundingClientRect().top < innerHeight);
+    const active = document.activeElement;
     const reading = { url: location.href, edition: root.dataset.edition,
       x: Math.max(0, Math.min(maxPosition, scrollX)), y: Math.max(0, Math.min(maxPosition, scrollY)),
       open: rows.filter(row => row.querySelector('details').open).map(row => row.id),
-      anchor: anchor?.id || null, top: anchor?.getBoundingClientRect().top || 0 };
+      anchor: anchor?.id || null, top: anchor?.getBoundingClientRect().top || 0,
+      archiveOpen: archive.open,
+      returnToArchive: active?.matches('.scan-archive a') ? new URL(active.href).pathname : null,
+      returnToDateGo: active === dateGo };
     try {
       if (navigationState) navigationAPI.updateCurrentEntry({ state: { ...state, [readingKey]: reading } });
       else history.replaceState({ ...state, [readingKey]: reading }, '', location.href);
@@ -58,12 +68,19 @@
       // Recreated documents lose native disclosure state. Layout and position
       // must be restored together after the browser finishes its traversal.
       for (const row of rows) row.querySelector('details').open = current.open.includes(row.id);
+      if (typeof current.archiveOpen === 'boolean') archive.open = current.archiveOpen;
       try { history.scrollRestoration = 'manual'; } catch (_) { /* Restore below. */ }
       if (scroll) {
         const anchor = rowById.get(current.anchor);
         const y = anchor && !anchor.hidden ? scrollY + anchor.getBoundingClientRect().top - current.top : current.y;
         scrollTo({ left: current.x, top: Math.max(0, Math.min(maxPosition, y)), behavior: 'instant' });
+        if (document.activeElement === document.body) {
+          const archiveLink = archive.open ? archiveLinks.get(current.returnToArchive) : null;
+          const returnFocus = current.returnToDateGo === true ? dateGo : archiveLink;
+          returnFocus?.focus({ preventScroll: true });
+        }
       }
+      if (current.returnToDateGo === true) date.value = root.dataset.edition;
     }
     if (!scroll) { if (saved) apply(saved); }
     else setTimeout(() => {
@@ -116,7 +133,7 @@
         if (navigationState) navigationAPI.updateCurrentEntry({ state: entry });
       } catch (_) { /* Filtering still works. */ }
     }
-    for (const link of root.querySelectorAll('a.scan-day-step')) {
+    for (const link of editionLinks) {
       const target = new URL(link.href);
       target.search = location.search;
       link.href = target.href;
@@ -128,10 +145,16 @@
   kind.addEventListener('change', () => filter());
   reset.addEventListener('click', clear);
   document.getElementById('scan-empty-reset').addEventListener('click', clear);
-  date.addEventListener('change', () => {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date.value)) return;
+  dateForm?.addEventListener('submit', event => {
+    event.preventDefault();
+    const selected = date.selectedOptions[0];
+    if (!selected || selected.disabled || !/^\d{4}-\d{2}-\d{2}$/.test(selected.value)) return;
+    const target = new URL('/daily/' + selected.value + '/', location.origin);
+    target.search = location.search;
+    if (target.href === location.href) return;
+    dateGo?.focus({ preventScroll: true });
     saveReading();
-    location.assign('/daily/' + date.value + '/' + location.search);
+    location.assign(target);
   });
   root.addEventListener('click', event => {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -158,6 +181,7 @@
   }
   addEventListener('hashchange', () => { if (!restoreReading()) revealHash(); });
   filter(false);
+  if (dateForm) dateForm.hidden = false;
   root.querySelector('.scan-controls').hidden = false;
   document.documentElement.removeAttribute('data-daily-pending');
   // A fresh fragment reveals its target. A saved return first restores its

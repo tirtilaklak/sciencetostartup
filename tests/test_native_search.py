@@ -10,6 +10,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from frontend_packaging import optional_script_source
+from presentation import search_fold, work_native_selection
 import static_pages as sp
 
 
@@ -24,6 +25,11 @@ class NativeSearchTests(unittest.TestCase):
         core = (ROOT / 'web/search-core.js').read_text()
         for name in ('home-search.js', 'companies-page.js', 'work-page.js'):
             delivered = optional_script_source(ROOT, name)
+            if name == 'work-page.js':
+                prefix, suffix = "(() => {\n", "\n})();\n"
+                self.assertTrue(delivered.startswith(prefix) and delivered.endswith(suffix))
+                delivered = delivered[len(prefix):-len(suffix)]
+                self.assertIn((ROOT / 'web/work-core.js').read_text(), delivered)
             self.assertTrue(delivered.startswith(core + '\n'))
             self.assertTrue(delivered.endswith((ROOT / 'web' / name).read_text()))
             self.assertNotIn('src="/search-core.js"', delivered)
@@ -50,11 +56,19 @@ class NativeSearchTests(unittest.TestCase):
         self.assertEqual(len(cards), len(data['companies']))
         self.assertIn('Outlier', cards['scale_ai']['data-search'])
         self.assertTrue(any('contributor brand' in value for value in json.loads(cards['scale_ai']['data-search-aliases'])))
-        self.assertIn('https://sciencetostartup.com/?search', directory)
+        self.assertIn('href="/?search=#browse-guide"', directory)
         html = sp.render_work(research, work['routes'], {row['id']: row['name'] for row in data['companies']}, '2026-11-18')
-        import re
-        aliases = json.loads(re.search(r'<script id="work-search-aliases" type="application/json">(.*?)</script>', html).group(1))
-        self.assertEqual(aliases['scale_ai'], research.companies['scale_ai']['aliases'])
-        self.assertEqual(len(Attributes(html).work_ids), len(work['routes']))
+        projected = work_native_selection(work, research.companies)
+        projected_ids = [row['id'] for row in projected]
+        self.assertCountEqual(Attributes(html).work_ids, projected_ids)
+        self.assertEqual(len(projected_ids), len(work['routes']))
+        self.assertNotIn('data-work-select=', html)
+        scale_rows = [row for row in projected if row['company_id'] == 'scale_ai']
+        self.assertTrue(scale_rows)
+        for row in scale_rows:
+            for alias in research.companies['scale_ai']['aliases']:
+                self.assertIn(search_fold(alias), row['searchText'])
+        rl_rows = {row['id'] for row in projected if 'rlhf' in row['searchText']}
+        self.assertIn('afterquery.work.software-engineer-rl-environments', rl_rows)
         for selector in ('work-heading', 'work-offer', 'work-listing-conditions'):
             self.assertIn('class="' + selector + '"', html)

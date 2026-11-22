@@ -35,7 +35,7 @@ assert.deepEqual([...g.task].sort(),routes.filter(r=>contractRoute(r)&&!g.hourly
 assert.ok(g.hourly.length&&g.task.length&&g.project.length,'fixture lost a pay block');
 // The 23 Oct check found the Elorian safety listing removed, so it is closed; G2i's senior SWE training work is listed again.
 assert.ok(g.closed.includes('elorian.work.model-safety')&&byId['elorian.work.model-safety'].status==='historical','closed listing elorian.work.model-safety');
-assert.ok(g.contract.includes('g2i.work.senior-swe-training')&&byId['g2i.work.senior-swe-training'].status==='listed','listed g2i.work.senior-swe-training');
+assert.ok(g.closed.includes('g2i.work.senior-swe-training')&&byId['g2i.work.senior-swe-training'].status==='historical','missing G2i posting remains accessible in history');
 // Hourly ranges: only labels that state a rate per hour, never a conflict, all read as published.
 const ranged=ids('workRouteRows().filter(w4HourlyRange).map(r=>[r.id,w4HourlyRange(r)])');
 assert.deepEqual(ranged.map(([id])=>id).sort(),routes.filter(statesHourly).map(r=>r.id).sort(),'hourly ranges');
@@ -83,7 +83,10 @@ assert.equal(search('india').length,0);
 run(`resetWorkFilters();state.workQuery='india';renderWork()`);
 const html=node('work-cards').innerHTML;
 assert.ok(html.includes('No listing mentions “india”')&&html.includes('data-work-clear="search"'));
-assert.ok((html.match(/data-work-route=/g)||[]).length>=15,'india shows networks with per-project country rules');
+const suggestions=ids("w4DiscoveryGroups(workRouteRows()).programs.filter(route=>W4_PROJECT_RULES.test(route.geography||'')).map(route=>route.id)");
+assert.ok(suggestions.length>0,'the reviewed data includes networks with project-specific location rules');
+assert.deepEqual([...html.matchAll(/data-work-suggestion="([^"]+)"/g)].map(match=>match[1]),suggestions);
+assert.equal((html.match(/data-work-route=/g)||[]).length,0,'related networks are outside the empty result set');
 run(`resetWorkFilters();state.workQuery='AIXI';renderWork()`);assert.ok(!node('work-cards').innerHTML.includes('work-suggested'),'company searches get no suggestions');
 run(`resetWorkFilters();state.workPay='monthly';state.workGroup='Contributor bounties';renderWork()`);
 assert.ok(node('work-cards').innerHTML.includes('No listing matches these filters.')&&node('work-cards').innerHTML.includes('data-work-clear="filters"'));

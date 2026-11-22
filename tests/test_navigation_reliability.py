@@ -5,6 +5,34 @@ from test_site_search import run_stub
 
 
 class NavigationReliabilityTests(unittest.TestCase):
+    def test_explore_search_routes_papers_and_employment_without_stealing_editing_keys(self):
+        result = run_stub(r'''
+run('initialize()');
+run(`window.SEARCH_INDEX={workTitles:['Research Fellow'],researchSearchEntries:[
+ {title:'InstructGPT',summary:'Approved',url:'/research/papers/paper.arxiv.2203.02155/',kind:'paper',recordKind:'paper',identifiers:['2203.02155','10.48550/arXiv.2203.02155']},
+ {title:'InstructGPT v1',summary:'Approved',url:'/research/papers/paper.arxiv.2203.02155v1/',kind:'paper',recordKind:'paper_version',identifiers:['2203.02155v1']}
+]};siteSearchEntries=null`);
+const view=query=>plain(run(`siteSearchView(${JSON.stringify(query)})`)).flatMap(group=>group.items);
+assert.equal(view('arXiv:2203.02155')[0].href,'/research/papers/paper.arxiv.2203.02155/');
+assert.equal(view('https://arxiv.org/pdf/2203.02155v1.pdf')[0].href,'/research/papers/paper.arxiv.2203.02155v1/');
+assert.deepEqual(view('arXiv:2203.02155v999'),[]);
+assert.equal(view('RLHF  jobs')[0].href,'/work/?q=RLHF++jobs');
+assert.equal(view('Research Fellow')[0].href,'/work/?q=Research+Fellow');
+
+const press=(event,editing=false)=>{
+ context.shortcutEvent={...event,target:{isContentEditable:editing},preventDefault(){this.defaultPrevented=true;}};
+ run('siteSearchShortcut(shortcutEvent)');
+ return Boolean(context.shortcutEvent.defaultPrevented);
+};
+node('site-search-input').select=()=>{};
+assert.equal(press({key:'/'}),false);
+assert.equal(press({key:'End'},true),false);
+assert.equal(press({key:'k',ctrlKey:true},true),false);
+assert.equal(press({key:'k',ctrlKey:true}),true);
+assert.ok(node('site-search').open);
+''')
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_back_forward_restore_each_entry_and_keep_profile_position(self):
         result = run_stub(r'''
 run('initialize()');

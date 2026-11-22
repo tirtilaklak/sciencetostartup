@@ -45,6 +45,112 @@ test.describe('enhanced technical reading', () => {
   test('final citation restores its reading position with scripts enabled', async ({ page }) => {
     await verifyCitationHistory(page);
   });
+
+  test('End reaches the technical footer while leaving text editing to the browser', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(chapter);
+    await expect(page.locator('html')).toHaveAttribute('data-reader-enhanced', '');
+    const shortcut = page.getByRole('link', { name: 'First paragraph', exact: true });
+    await shortcut.focus();
+    await page.keyboard.press('End');
+    await expect(page.locator('footer')).toBeInViewport();
+    await expect(shortcut).toBeFocused();
+    const last = page.locator(paragraphSelector).last();
+    if (await page.evaluate(() => CSS.supports('content-visibility', 'auto'))) {
+      await expect(last).toHaveCSS('content-visibility', 'auto');
+    }
+
+    await page.evaluate(() => {
+      const editor = document.createElement('input');
+      editor.id = 'reader-typing-test';
+      editor.value = 'Preserve the caret';
+      document.querySelector('main').prepend(editor);
+      editor.focus();
+      editor.setSelectionRange(3, 3);
+    });
+    const editor = page.locator('#reader-typing-test');
+    await editor.press('End');
+    const caret = await editor.evaluate(input => ({ position: input.selectionStart, length: input.value.length }));
+    expect(caret.position).toBe(caret.length);
+    await expect(editor).toBeFocused();
+    await expect(page.locator('footer')).not.toBeInViewport();
+  });
+
+  test('Ctrl+End reaches the exact technical document end outside editors', async ({ page, browserName }) => {
+    test.skip(browserName === 'webkit', 'The Linux WebKit control does not map Ctrl+End to document scrolling');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto(chapter);
+      await expect(page.locator('html')).toHaveAttribute('data-reader-enhanced', '');
+      await page.keyboard.press('Control+End');
+      await expect.poll(() => page.evaluate(() => {
+        const root = document.scrollingElement;
+        return root.scrollHeight - root.clientHeight - root.scrollTop;
+      })).toBeLessThanOrEqual(1);
+    }
+  });
+
+  test('Ctrl+End keeps native editor and text selection behavior', async ({ page, browserName }) => {
+    test.skip(browserName === 'webkit', 'The Linux WebKit control does not map Ctrl+End to document scrolling');
+    await page.goto(chapter);
+    const html = page.locator('html');
+    await expect(html).toHaveAttribute('data-reader-enhanced', '');
+    const editor = page.locator('#reader-typing-test');
+    await page.evaluate(() => {
+      const input = document.createElement('textarea');
+      input.id = 'reader-typing-test';
+      input.value = 'First line\nSecond line';
+      document.querySelector('main').prepend(input);
+      input.focus();
+      input.setSelectionRange(0, 0);
+    });
+    await editor.press('Control+End');
+    expect(await editor.evaluate(input => input.selectionStart)).toBe('First line\nSecond line'.length);
+    await expect(editor).toBeFocused();
+    await expect(html).toHaveAttribute('data-reader-enhanced', '');
+
+    await editor.evaluate(input => input.remove());
+    const richEditor = page.locator('#reader-rich-typing-test');
+    await page.evaluate(() => {
+      const editable = document.createElement('div');
+      editable.id = 'reader-rich-typing-test';
+      editable.contentEditable = 'true';
+      editable.textContent = 'Keep this editable';
+      document.querySelector('main').prepend(editable);
+      editable.focus();
+      getSelection().collapse(editable.firstChild, 0);
+    });
+    await richEditor.press('Control+End');
+    expect(await richEditor.evaluate(editable => {
+      const selection = getSelection();
+      return selection.isCollapsed && selection.anchorNode === editable.firstChild &&
+        selection.anchorOffset === editable.textContent.length;
+    })).toBe(true);
+    await expect(html).toHaveAttribute('data-reader-enhanced', '');
+
+    await richEditor.evaluate(editable => editable.remove());
+    await page.locator(paragraphSelector).first().evaluate(node => {
+      const range = document.createRange();
+      range.selectNodeContents(node.firstElementChild);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    });
+    expect(await page.evaluate(() => getSelection().isCollapsed)).toBe(false);
+    await page.keyboard.press('Control+End');
+    await expect(html).toHaveAttribute('data-reader-enhanced', '');
+  });
+
+  test('native End remains usable when the reader script is refused', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.route('**/native-details.js', route => route.abort());
+    await page.goto(chapter);
+    await expect(page.locator('html')).not.toHaveAttribute('data-reader-enhanced', '');
+    await page.keyboard.press('End');
+    await expect(page.locator('footer')).toBeInViewport();
+  });
 });
 
 test('direct final-citation fragment and reload resolve after the complete technical layout', async ({ page }) => {

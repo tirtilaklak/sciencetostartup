@@ -9,15 +9,17 @@ class WorkDiscoveryContractTests(unittest.TestCase):
         result = run_stub(r'''
 run('initialize()');
 const expected=plain(run('w4DiscoveryGroups(workRouteRows())'));
-assert.equal(expected.named.length,56);assert.equal(expected.programs.length,22);assert.equal(expected.primary.length,78);
+const counts=JSON.parse(fs.readFileSync(path.join(root,'data/editorial-release.json'),'utf8')).counts;
+const label=counts.named_listings+' named listings · '+counts.networks_programs+' networks and programs';
+assert.equal(expected.named.length,counts.named_listings);assert.equal(expected.programs.length,counts.networks_programs);assert.equal(expected.primary.length,counts.work_routes);
 assert.deepEqual(plain(run('storyWorkRows().map(r=>r.id)')),expected.primary.map(r=>r.id));
 assert.deepEqual(plain(run('w4RouteGroups(workRouteRows()).primary.map(r=>r.id).sort()')),expected.primary.map(r=>r.id).sort());
-assert.equal(run("siteSearchPages().find(page=>page.id==='work').meta"),'56 named listings · 22 networks and programs');
+assert.equal(run("siteSearchPages().find(page=>page.id==='work').meta"),label);
 run("state.workQuery='Sage';state.workKind='named'");
-assert.equal(run("siteSearchView('').flatMap(group=>group.items).find(item=>item.id==='work').meta"),'56 named listings · 22 networks and programs','Suggested scope ignores prior filters');
+assert.equal(run("siteSearchView('').flatMap(group=>group.items).find(item=>item.id==='work').meta"),label,'Suggested scope ignores prior filters');
 for(const company of data.companies){const id=JSON.stringify(company.id);assert.deepEqual(plain(run(`workRouteSummary(${id}).primary.map(r=>r.id).sort()`)),plain(run(`w4DiscoveryGroups(workRoutesFor(${id})).primary.map(r=>r.id).sort()`)),company.id);}
-assert.equal(run('new Set(storyWorkRows().map(r=>r.company_id)).size'),29);
-assert.equal(run('workRouteRows().length'),135,'All recorded research remains reachable');
+assert.equal(run('new Set(storyWorkRows().map(r=>r.company_id)).size'),counts.providers);
+assert.equal(run('workRouteRows().length'),counts.records,'All recorded research remains reachable');
 for(const row of expected.closed.filter(route=>route.route_kind==='other_record'&&!['historical','closed','contributions','paused','no_route','inquiry','information'].includes(route.status)))assert.ok(!expected.primary.some(primary=>primary.id===row.id),row.id+' informational record cannot count as primary');
 ''')
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -44,8 +46,10 @@ for(const id of ['terac.work.ml-scenarios','afterquery.work.senior-software-engi
 const sageFront=run("workCard(workRouteRows().find(r=>r.id==='appen.work.sage-media'))").split('<details class="w4-details">')[0];assert.ok(sageFront.includes('Qualification tests and identity verification'));
 const g2iFront=run("workCard(workRouteRows().find(r=>r.id==='g2i.work.senior-swe-training'))").split('<details class="w4-details">')[0];assert.ok(g2iFront.includes('Location sources conflict.'));
 const summary=plain(run('summarizeWorkResults(workRouteRows())'));
-assert.equal(summary.named,56);assert.equal(summary.programs,22);assert.equal(summary.careers,23);assert.equal(summary.outside,11);
-assert.equal(summary.total,135);
+const counts=JSON.parse(fs.readFileSync(path.join(root,'data/editorial-release.json'),'utf8')).counts;
+assert.equal(summary.named,counts.named_listings);assert.equal(summary.programs,counts.networks_programs);
+assert.equal(summary.careers,counts.career_pages);assert.equal(summary.outside,counts.other_company_jobs);
+assert.equal(summary.total,counts.records);
 assert.equal(summary.named+summary.programs+summary.careers+summary.outside+summary.other+summary.archived,summary.total);
 assert.equal(run("w4FreshnessLabel(workRouteRows().find(r=>r.id==='appen.work.sage-media'))"),'Terms checked 8 Nov 2026');
 run(`discoveryFixture.editorial_review={classified_on:'2099-01-01',receipts:[{id:'retrieval',approved:false,scope:'retrieval',result:'readable',checked_on:'2099-01-01'}]}`);
@@ -100,7 +104,7 @@ const count=run('filteredWork().length');run('exportWorkCsv()');
 const csv=await downloadedBlob.text();assert.ok(count>0,'Export regression fixture must contain real rows');
 assert.equal(csv.trim().split(/\r?\n/).length,count+1);assert.ok(csv.includes('opportunity_kind'));assert.ok(csv.includes('search_query')&&csv.includes('Surge'));
 assert.ok(csv.includes('terms_review_scope')&&csv.includes('original_application_url')&&csv.includes('assessment'));
-location.hash='#work?q=Sage&kind=named';run('syncWorkRoute();exportWorkCsv()');const sageCsv=await downloadedBlob.text();
+location.hash='#work?q=Sage&kind=closed';run('syncWorkRoute();exportWorkCsv()');const sageCsv=await downloadedBlob.text();
 for(const value of ['Up to $15 / hour','US residence','MacBook Pro','Qualification tests and identity verification','2026-11-08','key_terms'])assert.ok(sageCsv.includes(value),value+' must remain in the Sage export');
 run('state.query="taskus";exportCsv()');const companyCsv=await downloadedBlob.text();
 const companyLines=companyCsv.replace(/^\ufeff/,'').trim().split(/\r?\n/);

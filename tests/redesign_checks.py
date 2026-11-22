@@ -58,7 +58,7 @@ RUNTIME = r'''
  run(`reset()`);const resetCount=run('filtered().length');
  const categoryCounts={};for(const group of Object.keys(groups)){run(`state.category=${JSON.stringify(group)};renderDirectory()`);categoryCounts[group]=run('filtered().map(c=>c.id)');}run('reset()');
  run(`state.sort='name-desc';renderDirectory()`);const reverseNames=run('filtered().map(c=>c.name)');run('reset()');
- run(`setSelection(['mercor','snorkel_ai','labelbox']);chooseCompare('g2i',true)`);const selection=run('state.selected');const comparison=node('compare-content').innerHTML;
+ run(`setSelection(['mercor','snorkel_ai','labelbox']);chooseCompare('g2i',true)`);location.hash=run('compareHash()');run('route()');const selection=run('state.selected');const comparison=node('compare-content').innerHTML;
  const lastPage={dataset:{mobileCompare:'2'},hasAttribute:()=>false};click(lastPage);const lastMobileComparison=node('compare-content').innerHTML;const preservedSelection=run('state.selected');run('setSelection([])');
  node('download-json').callbacks.click();const jsonDownload=JSON.parse(await downloadedBlob.text());const jsonFilename=node('created').download;
  run('exportCsv()');const csvDownload=await downloadedBlob.text();const csvFilename=node('created').download;
@@ -162,6 +162,14 @@ def main():
             assert 'Browse current company careers' in before_details, route_id + ': alternative must be labeled as a different destination'
             assert any(source['url'] == route['url'] for source in route.get('sources', [])), route_id + ': original role URL lost from source history'
             assert any(a.get('href') == route['url'] for tag, a in Elements(details).elements if tag == 'a'), route_id + ': original role URL is no longer accessible in Terms and sources'
+        elif review.get('actions'):
+            primary, *secondary = review['actions']
+            for action in (primary, *secondary):
+                assert any(source['id'] == action['source_id'] and source['url'] == action['url']
+                           for source in route['sources']), route_id + ': action lost its source binding'
+            assert links == [primary['url']] and primary['label'] in before_details, route_id + ': wrong primary action'
+            detail_links = [a.get('href') for tag, a in Elements(details).elements if tag == 'a']
+            assert all(action['url'] in detail_links for action in secondary), route_id + ': alternate action missing'
         else:
             assert links == [route['url']], route_id + ': exact route target changed'
         for claim_id in route.get('claim_ids', []):
@@ -174,10 +182,10 @@ def main():
         # Board absence does not establish closure. The October pay offer remains historical.
         'rws_trainai.work.polaris-asr': ['Historical', '$16 / hour'],
         'afterquery.work.college-swe': ['Rate conflict'],
-        'afterquery.work.technical-content-writer-contract': ['Initial commitment; may expand', 'Schedule conflict: header says full-time'],
+        'afterquery.work.technical-content-writer-contract': ['10–15 hours/week initially', 'Board metadata says full-time'],
         'abundant_ai.work.research-product-manager': ['Pay period not stated.'],
         'bespoke_labs.work.mts-post-training': ['$300K–350K base', 'Pay terms reviewed 28 Oct 2026'],
-        'turing.work.machine-learning': ['Country eligibility unverified', 'Recheck blocked 18 Nov 2026'],
+        'turing.work.machine-learning': ['Country eligibility unverified', 'Recheck blocked 22 Nov 2026', 'vacancy unconfirmed'],
         'aixi.work.machine-learning-research-scientist': ['$150K–$250K / year', 'London / Berkeley', 'Pay terms reviewed 18 Nov 2026'],
         'toloka.work.mindrift-code': ['hour equivalent', 'Paid per completed task'],
     }.items():
@@ -195,7 +203,7 @@ def main():
     turing = route_index['turing.work.machine-learning']
     assert 'Pakistan / Turkey listing' not in visible_work[turing['id']]
     assert turing['field_reviews']['location']['state'] == 'not_researched' and turing['field_reviews']['location']['reviewed_on'] is None
-    assert 'no current opening or application acceptance was verified.' in rendered['workCards'][turing['id']]
+    assert 'A later check could not read the exact overview.' in rendered['workCards'][turing['id']]
     aixi = route_index['aixi.work.machine-learning-research-scientist']
     assert aixi['pay_terms']['currency'] == 'USD' and aixi['pay_terms']['unit'] == 'year' and not aixi['pay_terms']['hourly_comparable']
     assert '£120K–£160K / year' not in visible_work[aixi['id']]
@@ -215,8 +223,8 @@ def main():
     assert rendered['preservedSelection'] == rendered['selection']
     for key in ('comparison', 'lastMobileComparison'):
         cells = Elements(rendered[key]).with_attribute('data-comparison-company')
-        assert len(cells) == 27
-        assert len([a for _, a in cells if 'mobile-hidden' not in a.get('class', '')]) == 18, 'Mobile must retain two visible comparison columns at either end'
+        assert len(cells) == 30
+        assert len([a for _, a in cells if 'mobile-hidden' not in a.get('class', '')]) == 20, 'Mobile must retain two visible comparison columns at either end'
     assert rendered['jsonDownloadMatches'] and rendered['jsonFilename'].endswith('.json')
     csv_rows = list(csv.DictReader(io.StringIO(rendered['csvDownload'])))
     assert rendered['csvFilename'].endswith('.csv') and len(csv_rows) == 39

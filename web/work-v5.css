@@ -136,3 +136,27 @@
 }
 @media(max-width:520px){.work-filters .responsive-filter-panel[open]>.responsive-filter-fields{grid-template-columns:1fr}}
 @media(max-width:380px){.w4-sort select{max-width:156px}.w4-results-bar #work-count{font-size:11px}#work-cards .w4-open{font-size:11px;padding-inline:8px}}
+
+.w4-results-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.w4-results-actions :is(a,button){display:inline-flex;align-items:center;min-width:44px;min-height:44px}
+#work-export-status{margin:0;font-size:13px;color:var(--muted)}
+#work-export-status:empty{display:none}
+#work-cards .w4-action-column{min-width:0;max-width:100%}
+#work-cards .w4-open{max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:center}
+@media (max-width:700px){
+  #work-cards .w4-card-front{grid-template-columns:minmax(0,1fr) minmax(0,auto)}
+  #work-cards .w4-action-column{grid-column:1/-1;grid-row:4;justify-self:start}
+}
+.w4-suggestion-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:0 20px;padding:0;margin:12px 0;list-style:none}
+.w4-suggestion-list li{min-width:0;overflow-wrap:anywhere;padding:8px 0;border-bottom:1px solid var(--border)}
+.w4-suggestion-list h3,.w4-suggestion-list p{margin:0;font-size:14px;line-height:1.5}
+.w4-suggestion-list p{color:var(--muted)}
+.w4-suggestion-list a{display:inline-flex;align-items:center;gap:6px;min-height:44px}
+#work-view :is(input[type=search],select,.responsive-filter-panel>summary){border-color:#69796d}
+@media(max-width:700px){.w4-sort,.w4-sort select{max-width:100%}}
+@media(max-width:380px){#work-view select{padding-inline:8px}}
+@media(forced-colors:active){
+  #work-view :is(input[type=search],select,.responsive-filter-panel>summary){border-color:ButtonText}
+  #work-view select:has(option:checked:not([value=""])){forced-color-adjust:none;border:2px solid Highlight;background:Canvas;color:CanvasText}
+  #work-view :is(input[type=search],select,.responsive-filter-panel>summary):focus-visible{outline:2px solid Highlight;outline-offset:3px}
+}

@@ -97,14 +97,14 @@ function restoreSearchRouteControls(){
  if(searchRouteView){$(searchRouteView==='work'?'work-cards':'company-cards')?.removeAttribute('aria-busy');searchRouteView='';}
 }
 function pendingSearchRoute(view,failed=false){
- document.documentElement.removeAttribute('data-route');
- for(const section of document.querySelectorAll('main>.view'))section.hidden=section.id!==view+'-view';
+ pendingView(view);
  const section=$(view+'-view'),cards=$(view==='work'?'work-cards':'company-cards'),count=$(view==='work'?'work-count':'result-count');
  section.hidden=false;searchRouteView=view;
  if(!failed){searchDisabledControls=[...section.querySelectorAll('input,select,button')].map(control=>[control,control.disabled]);for(const [control]of searchDisabledControls)control.disabled=true;cards?.setAttribute('aria-busy','true');}
  const label=failed?'Search could not load. Your query is preserved.':'Loading the search index…';
  if(count)count.textContent=label;
- if(cards)cards.innerHTML='<p role="'+(failed?'alert':'status')+'">'+label+' '+(failed?'<button type="button" data-retry-search>Try again</button> ':'')+'<a href="/'+(view==='work'?'work':'companies')+'/">Read the plain '+(view==='work'?'work':'company')+' page</a></p>';
+ const native=view==='work'?'/work/'+workHashFor().slice('#work'.length):'/companies/?'+new URLSearchParams({q:state.query});
+ if(cards)cards.innerHTML=`<p role="${failed?'alert':'status'}">${label} ${failed?'<button type="button" data-retry-search>Try again</button> ':''}<a href="${attr(native)}">Open native ${view==='work'?'Work results':'company search'}</a></p>`;
 }
 function installResearchContext(payload){
  for(const [key,rows]of Object.entries(payload.data)){
@@ -127,22 +127,37 @@ function installResearchContext(payload){
  if(payload.businessHealth){
   const merge=(before,after,key='id')=>[...new Map([...(before||[]),...(after||[])].map(row=>[row[key],row])).values()];
   const before=window.BUSINESS_HEALTH||{},next=payload.businessHealth;
-  window.BUSINESS_HEALTH={...before,...next,observations:merge(before.observations,next.observations),fresh_claims:merge(before.fresh_claims,next.fresh_claims),sources:merge(before.sources,next.sources),private_company_review:merge(before.private_company_review,next.private_company_review,'company_id'),source_checks:{...before.source_checks,...next.source_checks,entries:merge(before.source_checks?.entries,next.source_checks?.entries,'source_id')}};
+  window.BUSINESS_HEALTH={...before,...next,observations:merge(before.observations,next.observations),fresh_claims:merge(before.fresh_claims,next.fresh_claims),sources:merge(before.sources,next.sources),private_company_review:merge(before.private_company_review,next.private_company_review,'company_id'),profile_finance:{...before.profile_finance,...next.profile_finance},source_checks:{...before.source_checks,...next.source_checks,entries:merge(before.source_checks?.entries,next.source_checks?.entries,'source_id')}};
   window.BusinessHealth?.refreshBundle();
  }
+ if(payload.financeClaimContext)window.FINANCE_CLAIM_CONTEXT={...window.FINANCE_CLAIM_CONTEXT,...payload.financeClaimContext};
  if(payload.companyId)window.COMPANY_CONTEXTS_READY.add(payload.companyId);
  if(typeof refreshResearchIndexes==='function')refreshResearchIndexes();
 }
 async function companyContext(id,signal){
- const descriptor=presentationIdentity.companyDetails[id];if(!descriptor)throw new Error('Company record is missing');
+ const descriptor=Object.hasOwn(presentationIdentity.companyDetails,id)&&presentationIdentity.companyDetails[id];if(!descriptor)throw new Error('Company record is missing');
  if(detailCache.has(id))return detailCache.get(id);
  const [payload]=await Promise.all([fetchPresentation(descriptor,id,signal),ensureHealthModule()]);detailCache.set(id,payload);return payload;
 }
-function loadingProfile(id){
+function pendingView(view){
  document.documentElement.removeAttribute('data-route');
- for(const view of document.querySelectorAll('main>.view'))view.hidden=view.id!=='profile-view';
- const target=$('profile-view');target.hidden=false;target.setAttribute('aria-busy','true');
- target.innerHTML=`<div class="profile-v2" data-profile-company="${attr(id)}" data-profile-loading>${profileIntroductionHTML(id)}<div data-profile-loading-content role="status"><p>Loading the sourced profile…</p><p><a href="/company/${encodeURIComponent(id)}/">Read the plain company page</a></p></div></div>`;
+ for(const section of document.querySelectorAll('main>.view'))section.hidden=section.id!==view+'-view';
+ for(const link of document.querySelectorAll('[data-nav]')){
+  if(link.dataset.nav===(view==='profile'?'companies':view))link.setAttribute('aria-current','page');
+  else link.removeAttribute('aria-current');
+ }
+}
+function nativeProfileFallback(id,section){
+ const fragment=section==='work'?'work':['claim','sources','method','questions','observations','financing'].includes(section)?'sources':'';
+ const label=fragment==='work'?'Read the plain paid work section':fragment==='sources'?'Read the plain company sources':'Read the plain company page';
+ return `<a data-profile-native-fallback href="/company/${encodeURIComponent(id)}/${fragment?'#'+fragment:''}">${label}</a>`;
+}
+function loadingProfile(id,section){
+ document.title=companies[id].name+' · ScienceToStartup';
+ pendingView('profile');
+ const target=$('profile-view');
+ target.setAttribute('aria-busy','true');
+ target.innerHTML=`<div class="profile-v2" data-profile-company="${attr(id)}" data-profile-loading>${profileIntroductionHTML(id)}<div data-profile-loading-content><p role="status">Loading the sourced profile…</p><p>${nativeProfileFallback(id,section)}</p></div></div>`;
 }
 function afterProfileIntroductionPaint(){
  // Let the sourced introduction paint before installing the larger evidence
@@ -155,69 +170,151 @@ function afterProfileIntroductionPaint(){
   frame=requestAnimationFrame(()=>{frame=requestAnimationFrame(done);});
  });
 }
-function failedProfile(id,error){
+function evidenceFailure(error){
+ return /identity|integrity|Stale/.test(error.message)?'stale-evidence':/timed out/.test(error.message)?'evidence-timeout':'evidence-request';
+}
+function failedProfile(id,section,error){
  const target=$('profile-view');target.removeAttribute('aria-busy');
- target.innerHTML=`<section class="availability-notice" role="alert"><h1>This company’s evidence could not load.</h1><p>Your connection or an older cached file may be responsible. The record has not been removed.</p><p><button type="button" data-retry-company>Try again</button> <a href="/company/${encodeURIComponent(id)}/">Read the plain company page</a> <a href="#companies">Browse companies</a></p></section>`;
- presentationState('failed',/identity|integrity|Stale/.test(error.message)?'stale-evidence':/timed out/.test(error.message)?'evidence-timeout':'evidence-request');
- console.warn('[ScienceToStartup]',{buildId:window.APP_BUILD_ID,state:'failed',reason:document.documentElement.dataset.viewReason});
+ const pending=target.querySelector('[data-profile-loading-content]');
+ const notice=`<section class="availability-notice" data-profile-recovery><div role="alert"><h2>Evidence for ${esc(companies[id].name)} could not load.</h2></div><p><button type="button" data-retry-company>Try again</button> ${nativeProfileFallback(id,section)}</p></section>`;
+ if(pending){pending.parentElement.removeAttribute('data-profile-loading');pending.outerHTML=notice;}
+ else target.innerHTML=`<div class="profile-v2" data-profile-company="${attr(id)}">${profileIntroductionHTML(id)}${notice}</div>`;
+ presentationState('failed',evidenceFailure(error));
+}
+function pendingComparison(selection,error){
+ pendingView('compare');
+ renderComparisonScope('compare');
+ compareTitle(selection.ids);
+ syncComparisonPreset();syncCompareAdd();
+ const names=listText(selection.ids.map(id=>companies[id].name)),target=$('compare-content');
+ const notice=compareNoticeHTML(compareRouteNotice(selection));
+ const nativeLinks=selection.ids.map(id=>`<li><a href="/company/${encodeURIComponent(id)}/">Read the ${esc(companies[id].name)} profile</a></li>`).join('');
+ const status=error?`Evidence for ${names} could not load.`:`Loading evidence for ${names}…`;
+ if(error)target.removeAttribute('aria-busy');else target.setAttribute('aria-busy','true');
+ $('compare-status').textContent=status;
+ target.innerHTML=notice+`<section class="availability-notice"><h2>${esc(status)}</h2>${error?'<p><button type="button" data-retry-compare>Try again</button></p>':''}<ul>${nativeLinks}</ul></section>`;
+ if(error)presentationState('failed',evidenceFailure(error));
+}
+function afterRouteRetry(event,generation){
+ if(!['company-retry','compare-retry'].includes(event?.type))return;
+ const hash=location.hash;
+ queueMicrotask(()=>{
+  if(generation!==navigationGeneration||location.hash!==hash||document.activeElement!==document.body)return;
+  if(event.type==='company-retry'&&routeParts()[2]!=='claim')focusRouteDestination(hash);
+  if(event.type==='compare-retry')focusRouteDestination(hash);
+ });
 }
 route=function(event){
  restoreSearchRouteControls();
  if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();
  if(typeof entryScrollTimer!=='undefined')clearTimeout(entryScrollTimer);
  const generation=++navigationGeneration,hash=location.hash,parts=routeParts();
- if(event?.type==='hashchange')for(const dialog of document.querySelectorAll('dialog[open]'))dialog.close();
  detailController?.abort();detailController=null;
- const company=String(parts[0]).toLowerCase()==='company'?profileRouteCompany(parts[1]):'';
- const view=String(parts[0]).toLowerCase(),archive=view==='method'||VIEW_ANCHORS[view]==='method';
- const comparison=view==='compare';
- const overview=['','market','venture'].includes(view)||!['companies','work','compare','method','company',...Object.keys(VIEW_ANCHORS)].includes(view);
- const needsSearch=!window.SEARCH_INDEX&&(view==='work'&&Boolean(workCriteriaFromHash(hash).q)||view==='companies'&&Boolean(state.query));
- if(!company&&!archive&&!comparison&&!overview&&!needsSearch){presentationState('ready');const result=synchronousRoute.apply(this,arguments);window.APP_ROUTE_READY=Promise.resolve(result);return result;}
- const ids=company?[company]:(state.selected.length?state.selected:['taskus','appen','scale_ai']);
+ $('profile-view').removeAttribute('aria-busy');
+ $('compare-content').removeAttribute('aria-busy');
+ if($('app-failure'))$('app-failure').hidden=true;
+ const view=parts[0],company=view==='company'?profileRouteCompany(parts[1]):'';
+ const archive=view==='method'||VIEW_ANCHORS[view]==='method';
+ const comparison=view==='compare'?compareRouteSelection(hash):null;
+ const correction=view==='corrections'?exploreCorrectionTarget(hash):null;
+ const correctionCompany=correction&&!exploreCorrectionClaim(correction)?correction.company:'';
+ const overview=view===''||view==='market'||VIEW_ANCHORS[view]==='market'||!['companies','work','compare','method','company',...Object.keys(VIEW_ANCHORS)].includes(view);
+ const workCriteria=view==='work'?workCriteriaForRoute(hash,routeTraversal):null;
+ const needsSearch=view==='work'?searchContextPending(workCriteria.q):view==='companies'&&searchContextPending(state.query);
+ const ids=company?[company]:correctionCompany?[correctionCompany]:comparison?.ids||[];
  const cacheKey=archive?'__archive':overview?'__overview':null;
- const cached=cacheKey?detailCache.get(cacheKey):company||comparison?ids.every(id=>detailCache.has(id)):true;
+ const cached=(!cacheKey||detailCache.has(cacheKey))&&ids.every(id=>detailCache.has(id));
  if(cached&&!needsSearch){
-  for(const payload of cacheKey?[cached]:company||comparison?ids.map(id=>detailCache.get(id)):[])installResearchContext(payload);
-  const result=synchronousRoute.apply(this,arguments);presentationState('ready');window.APP_ROUTE_READY=Promise.resolve(result);return result;
+  for(const id of [...(cacheKey?[cacheKey]:[]),...ids])installResearchContext(detailCache.get(id));
+  const result=synchronousRoute.call(this,event);presentationState('ready');afterRouteRetry(event,generation);window.APP_ROUTE_READY=Promise.resolve(result);return result;
  }
+ const closedDialog=event?.type==='hashchange'&&['company-dialog','evidence-dialog'].some(id=>$(id).open);
+ if(event?.type==='hashchange')for(const id of ['company-dialog','evidence-dialog'])if($(id).open)$(id).close();
  const controller=detailController=new AbortController();presentationState('loading');
- if(company)loadingProfile(company);
- if(needsSearch){if(view==='work')applyWorkCriteria(workCriteriaFromHash(hash));pendingSearchRoute(view);}
+ if(company)loadingProfile(company,parts[2]);
+ if(comparison){
+  // Prepare the selection before controls can change it, and normalize only
+  // after the async route has settled so the request's hash guard stays valid.
+  const selection=comparison.ids;
+  if(selection.join('|')!==state.selected.join('|')){state.selected=selection;state.mobileCompare=0;syncSelection();renderTray();}
+  pendingComparison(comparison);
+ }
+ if(needsSearch){if(workCriteria)applyWorkCriteria(workCriteria);pendingSearchRoute(view);}
  const complete=async()=>{
   if(company){await afterProfileIntroductionPaint();if(generation!==navigationGeneration||location.hash!==hash||controller.signal.aborted)return;}
   if(needsSearch)await window.ensureSearchContext();
-  let payloads=[];
-  if(cacheKey){const [payload]=await Promise.all([fetchPresentation(archive?presentationIdentity.archive:presentationIdentity.overview,null,controller.signal),ensureHealthModule()]);payloads=[payload];}
-  else if(company||comparison)payloads=await Promise.all(ids.map(id=>companyContext(id,controller.signal)));
+  let section=cacheKey&&detailCache.get(cacheKey);
+  if(cacheKey&&!section){
+   const descriptor=archive?presentationIdentity.archive:presentationIdentity.overview;
+   section=Promise.all([fetchPresentation(descriptor,null,controller.signal),ensureHealthModule()]).then(([payload])=>payload);
+  }
+  const [sectionContext,...payloads]=await Promise.all([section,...ids.map(id=>{
+   const pending=companyContext(id,controller.signal);
+   return correctionCompany?pending.catch(()=>null):pending;
+  })]);
   if(generation!==navigationGeneration||location.hash!==hash)return;
-  for(const payload of payloads)installResearchContext(payload);
-  if(cacheKey)detailCache.set(cacheKey,payloads[0]);
+  if(sectionContext){installResearchContext(sectionContext);detailCache.set(cacheKey,sectionContext);}
+  for(const payload of payloads)if(payload)installResearchContext(payload);
   restoreSearchRouteControls();
   $('profile-view').removeAttribute('aria-busy');
-  synchronousRoute.call(this,event);presentationState('ready');
+  $('compare-content').removeAttribute('aria-busy');
+  const routeEvent=closedDialog?{type:event.type,newURL:event.newURL,closedDialog}:event;
+  synchronousRoute.call(this,routeEvent);presentationState('ready');afterRouteRetry(event,generation);
  };
- window.APP_ROUTE_READY=complete().catch(error=>{if(error.name==='AbortError'||generation!==navigationGeneration)return;restoreSearchRouteControls();if(company)failedProfile(company,error);else if(needsSearch){pendingSearchRoute(view,true);presentationState('failed','search-request');}else{presentationState('failed','evidence-request');const failure=$('app-failure');failure.hidden=false;document.documentElement.removeAttribute('data-route');}});
+ window.APP_ROUTE_READY=complete().catch(error=>{
+  if(error.name==='AbortError'||generation!==navigationGeneration||location.hash!==hash)return;
+  restoreSearchRouteControls();
+  if(company)failedProfile(company,parts[2],error);
+  else if(comparison)pendingComparison(comparison,error);
+  else if(needsSearch){pendingSearchRoute(view,true);presentationState('failed','search-request');}
+  else{presentationState('failed','evidence-request');$('app-failure').hidden=false;document.documentElement.removeAttribute('data-route');}
+  if(event?.type==='company-retry'||event?.type==='compare-retry')document.querySelector('[data-retry-company],[data-retry-compare]')?.focus();
+ });
  return window.APP_ROUTE_READY;
 };
-document.addEventListener('click',event=>{if(event.target.closest?.('[data-retry-company],[data-retry-search]'))route();});
+document.addEventListener('click',event=>{
+ const button=event.target.closest?.('[data-retry-company],[data-retry-compare],[data-retry-search]');
+ if(button)route({type:button.hasAttribute('data-retry-company')?'company-retry':button.hasAttribute('data-retry-compare')?'compare-retry':'search-retry'});
+});
 const synchronousEvidence=showEvidence,synchronousCompanyStory=openCompanyStory;
-let evidenceGeneration=0,storyGeneration=0;
+let evidenceGeneration=0,storyGeneration=0,retryEvidence=null;
 showEvidence=function(id,...args){
- const company=claims[id]?.company_id||String(id).split('.')[0],generation=++evidenceGeneration,hash=location.hash,navigation=navigationGeneration;
- if(!presentationIdentity.companyDetails[company])return synchronousEvidence.call(this,id,...args);
+ const hash=location.hash,parts=routeParts(hash),bookmark=parts[0]==='company'&&parts[2]==='claim';
+ const company=bookmark?profileRouteCompany(parts[1]):claims[id]?.company_id||String(id).split('.')[0];
+ const generation=++evidenceGeneration,navigation=navigationGeneration;
+ if(!Object.hasOwn(presentationIdentity.companyDetails,company))return synchronousEvidence.call(this,id,...args);
  const dialog=$('evidence-dialog');
- if(!detailCache.has(company)){
+ const current=()=>generation===evidenceGeneration&&location.hash===hash&&navigation===navigationGeneration;
+ const fallback=nativeProfileFallback(company,'claim');
+ const present=(text,pending=false,retry=false)=>{
   if(!dialog.open){evidenceReturnFocus=document.activeElement;evidenceReturnHash='';evidenceRecordHash='';}
-  $('evidence-content').innerHTML='<p id="evidence-statement" role="status">Loading the original source evidence…</p><p><a href="/company/'+encodeURIComponent(company)+'/#sources">Read the plain company page</a></p>';
-  dialog.setAttribute('aria-busy','true');if(!dialog.open)dialog.showModal();$('close-evidence').focus({preventScroll:true});
+  if(pending)dialog.setAttribute('aria-busy','true');else dialog.removeAttribute('aria-busy');
+  $('evidence-content').innerHTML=`<p id="evidence-statement" role="${pending?'status':'alert'}">${esc(text)}</p><p>${retry?'<button type="button" data-retry-evidence>Try again</button> ':''}${fallback}</p>`;
+  if(!dialog.open)dialog.showModal();
+  $('close-evidence').focus({preventScroll:true});
+ };
+ const display=()=>{
+  dialog.removeAttribute('aria-busy');
+  if(claims[id]?.company_id!==company){present('This source record could not be found for '+companies[company].name+'.');return;}
+  synchronousEvidence.call(this,id,...args);
+ };
+ retryEvidence=null;
+ if(detailCache.has(company)){
+  if(!window.COMPANY_CONTEXTS_READY.has(company))installResearchContext(detailCache.get(company));
+  return display();
  }
- companyContext(company).then(payload=>{if(generation!==evidenceGeneration||location.hash!==hash||navigation!==navigationGeneration)return;installResearchContext(payload);dialog.removeAttribute('aria-busy');if(!claims[id])throw new Error('Source record not found');synchronousEvidence.call(this,id,...args);}).catch(error=>{
-  if(generation!==evidenceGeneration||navigation!==navigationGeneration)return;
-  dialog.removeAttribute('aria-busy');$('evidence-content').innerHTML='<p id="evidence-statement" role="alert">'+(error.message==='Source record not found'?'This source record could not be found.':'The source evidence could not load.')+' <a href="/company/'+encodeURIComponent(company)+'/">Read the plain company page</a> or close this dialog and try the source again.</p>';if(!dialog.open)dialog.showModal();
+ present('Loading source evidence for '+companies[company].name+'…',true);
+ companyContext(company).then(payload=>{
+  if(!current())return;
+  installResearchContext(payload);display();
+ }).catch(()=>{
+  if(!current())return;
+  retryEvidence=()=>showEvidence(id,...args);
+  present('The source evidence for '+companies[company].name+' could not load.',false,true);
  });
 };
-$('evidence-dialog').addEventListener('close',()=>{evidenceGeneration++;$('evidence-dialog').removeAttribute('aria-busy');});
+$('evidence-dialog').addEventListener('click',event=>{if(event.target.closest?.('[data-retry-evidence]'))retryEvidence?.();});
+$('evidence-dialog').addEventListener('close',()=>{evidenceGeneration++;retryEvidence=null;$('evidence-dialog').removeAttribute('aria-busy');});
 openCompanyStory=function(id){const generation=++storyGeneration,navigation=navigationGeneration,hash=location.hash;companyContext(id).then(payload=>{if(generation!==storyGeneration||navigation!==navigationGeneration||location.hash!==hash)return;installResearchContext(payload);synchronousCompanyStory.call(this,id);}).catch(()=>{if(generation===storyGeneration&&navigation===navigationGeneration)location.hash='#company/'+encodeURIComponent(id);});};
 const summaryRenderStory=renderStory;
 renderStory=function(){const result=summaryRenderStory.apply(this,arguments);if($('source-count'))$('source-count').textContent=presentationIdentity.statistics.sources;return result;};

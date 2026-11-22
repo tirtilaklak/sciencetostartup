@@ -8,27 +8,27 @@ ROOT = Path(__file__).resolve().parents[1]
 HARNESS = r"""
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const source=fs.readFileSync(path.join(process.argv[1],'web/data-runtime.js'),'utf8');
-const start=source.indexOf('function loadingProfile(id){'),end=source.indexOf("\ndocument.addEventListener('click'",start);
+const start=source.indexOf('function pendingView('),end=source.indexOf("\ndocument.addEventListener('click'",start);
 assert(start>=0&&end>start,'Actual profile paint/route owner functions were not found');
 const actual=source.slice(start,end);
 const flush=async()=>{for(let i=0;i<10;i++)await Promise.resolve();};
 function environment({visibility='visible',animation=true,transport=null}={}){
  const timers=new Map(),frames=new Map(),calls=[],installed=[],rendered=[],failures=[];let next=0;
- const node=id=>({id,hidden:true,attributes:new Map(),innerHTML:'',setAttribute(k,v){this.attributes.set(k,v);},removeAttribute(k){this.attributes.delete(k);}});
- const nodes=new Map(['profile-view','companies-view','work-view','app-failure'].map(id=>[id,node(id)]));
+ const node=id=>({id,hidden:true,open:false,attributes:new Map(),innerHTML:'',setAttribute(k,v){this.attributes.set(k,v);},removeAttribute(k){this.attributes.delete(k);},querySelector(){return null;}});
+ const nodes=new Map(['profile-view','companies-view','work-view','app-failure','compare-content','company-dialog','evidence-dialog'].map(id=>[id,node(id)]));
  const root={dataset:{},removeAttribute(){}};
  const document={visibilityState:visibility,documentElement:root,querySelectorAll(selector){return selector==='main>.view'?[nodes.get('profile-view'),nodes.get('companies-view'),nodes.get('work-view')]:[];}};
  const window={},location={hash:'#company/mercor/work'};
  const context=vm.createContext({window,location,document,AbortController,DOMException,console:{warn:value=>failures.push(value)},
   setTimeout:(callback,delay)=>{const id=++next;timers.set(id,{callback,delay});return id;},clearTimeout:id=>timers.delete(id),
-  $:id=>nodes.get(id),attr:value=>String(value),profileIntroductionHTML:id=>'<p class="profile-summary">Sourced introduction '+id+'</p>',
+  $:id=>nodes.get(id),attr:value=>String(value),esc:value=>String(value),companies:{mercor:{name:'Mercor'}},profileIntroductionHTML:id=>'<p class="profile-summary">Sourced introduction '+id+'</p>',
   profileRouteCompany:id=>id,routeParts:()=>location.hash.slice(1).split('/'),
   presentationState:(state,reason='')=>{root.dataset.viewState=state;root.dataset.viewReason=reason;},
   restoreSearchRouteControls(){},synchronousRoute(){rendered.push(location.hash);},
   installResearchContext:payload=>installed.push(payload.companyId),
   companyContext:(id,signal)=>{calls.push({id,signal});return transport?transport(id,signal):Promise.resolve({companyId:id});},
   presentationIdentity:{companyDetails:{}},state:{selected:[],query:''},VIEW_ANCHORS:{},
-  workCriteriaFromHash:()=>({q:''}),applyWorkCriteria(){},pendingSearchRoute(){},
+  workCriteriaForRoute:()=>({q:''}),searchContextPending:()=>false,applyWorkCriteria(){},pendingSearchRoute(){},
   ensureHealthModule:()=>Promise.resolve(),fetchPresentation:()=>Promise.resolve({data:{}})
  });
  if(animation){context.requestAnimationFrame=callback=>{const id=++next;frames.set(id,callback);return id;};context.cancelAnimationFrame=id=>frames.delete(id);}
@@ -88,6 +88,7 @@ const results={};
  {
   const e=environment({transport:()=>Promise.reject(new Error('Evidence request timed out'))});const ready=e.route();e.timer();await ready;
   assert.equal(e.root.dataset.viewState,'failed');assert.equal(e.root.dataset.viewReason,'evidence-timeout');assert.match(e.nodes.get('profile-view').innerHTML,/role="alert"/);
+  assert.match(e.nodes.get('profile-view').innerHTML,/Sourced introduction mercor/);assert.match(e.nodes.get('profile-view').innerHTML,/\/company\/mercor\/#work/);
   assert.equal(e.nodes.get('profile-view').attributes.has('aria-busy'),false);assert.equal(e.rendered.length,0);assert.equal(e.installed.length,0);
   assert.equal(e.timers.size,0);assert.equal(e.frames.size,0);assert.equal(e.window.APP_ROUTE_READY,ready);results.failure_settles_readiness_with_recovery=true;
  }

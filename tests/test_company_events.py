@@ -191,9 +191,11 @@ class CompanyEventsBuildTests(unittest.TestCase):
 
     def test_dated_events_render_newest_first_with_publisher_links(self):
         text = self.page("scale_ai")
-        self.assertLess(text.index('<h2 id="figures">Key figures</h2>'), text.index('<h2 id="risks">Risks and disputes</h2>'))
-        self.assertLess(text.index('<h2 id="risks">Risks and disputes</h2>'), text.index('<h2 id="work">'))
-        self.assertLess(text.index("Test complaint &amp; reply"), text.index("Test customer pause"))
+        headings = list(re.finditer(r'<h2\b(?=[^>]*\bid="(figures|risks|work)")[^>]*>', text))
+        self.assertEqual([heading.group(1) for heading in headings], ["figures", "risks", "work"])
+        self.assertIn('tabindex="-1"', headings[1].group())
+        text = text[headings[1].end():headings[2].start()]
+        self.assertLess(text.index('data-event="scale_ai.event.test-complaint"'), text.index('data-event="scale_ai.event.test-pause"'))
         for fragment in ["<h3>Dated events</h3>", '<td class="date" data-label="Date">Sep 2025<span class="sub">Lawsuit</span></td>', '<td class="date" data-label="Date">Jun 2025<span class="sub">Customer change</span></td>', '<td data-label="Status">Pending</td>', '<a class="ext" href="https://example.org/docket">Test Court</a>', '<a class="ext" href="https://example.org/report">Test Wire</a>', f'<p class="muted">{EVENTS_NOTE} Statuses were checked on 23 Oct 2026.</p>']:
             self.assertIn(fragment, text)
         related = self.page("mercor")
