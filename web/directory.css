@@ -28,7 +28,7 @@
 html:has(#compare-tray:not([hidden])){scroll-padding-bottom:96px}
 @media(max-width:700px){
  #compare-tray{left:10px;right:10px;bottom:10px;width:auto;max-width:none;transform:none;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:8px 12px}
- #compare-tray #tray-text{grid-column:1/-1;max-height:30dvh;overflow:auto}
+ #compare-tray #tray-text{grid-column:1/-1;max-height:30dvh;overflow:auto;line-height:1.25}
  #compare-tray a{justify-self:end}
  .explore-layout:has(#compare-tray:not([hidden])){padding-bottom:calc(30dvh + 76px)}
  html:has(#compare-tray:not([hidden])){scroll-padding-bottom:calc(30dvh + 76px)}
