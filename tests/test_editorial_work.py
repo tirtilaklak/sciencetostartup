@@ -241,13 +241,18 @@ class EditorialWorkTests(unittest.TestCase):
     def test_missing_role_page_keeps_old_terms_and_offers_a_separate_board(self):
         row = self.routes["terac.work.ml-scenarios"]
         self.assertEqual(row["status"], "historical")
+        self.assertEqual(row["availability_label"], "Closed · employer confirmed")
         self.assertEqual(row["editorial_review"]["previous_values"]["status"], "listed")
         self.assertEqual(row["editorial_review"]["disposition"]["state"], "historical_page_unavailable")
         self.assertTrue(any(item.get("http_status") == 404 for item in row["editorial_review"]["receipts"]))
         self.assertEqual(row["pay_label"], "$90 / hour")
         self.assertEqual(row["last_link_check"]["date"], "2026-10-28")
         self.assertNotEqual(row["url"], row["editorial_review"]["alternative_destination"]["url"])
-        self.assertIn("not a claim that the employer stopped hiring", row["availability_note"])
+        correction = next(item for item in row["editorial_review"]["correction_history"]
+                          if item["id"] == row["id"] + ".issuer-closure-review-2026-11-22")
+        self.assertIn("not a claim that the employer stopped hiring", correction["previous_values"]["availability_note"])
+        self.assertIn("This listing has closed", row["availability_note"])
+        self.assertIn("The original Ashby posting returned HTTP 404", row["availability_note"])
         candidate = check_route(row, "2026-11-09T12:00:00Z", fetcher=lambda url: (404, url, b"Job not found", False))
         self.assertEqual(candidate["priority"], "low", "archived destinations must not displace actionable reviews")
 

@@ -65,7 +65,7 @@ test('a stale application asset fails visibly instead of presenting an empty res
 test('compact work data preserves every selector and visible condition', async ({ page }) => {
   await ready(page, '#work');
   const original = require('../../data/work-routes.json').routes;
-  const keys = ['id', 'company_id', 'role', 'route_kind', 'engagement_type', 'pay_terms', 'arrangements', 'pay_label', 'pay_basis', 'numeric_pay', 'status', 'geography', 'requirements', 'hours', 'duration', 'assessment'];
+  const keys = ['id', 'company_id', 'role', 'route_kind', 'engagement_type', 'pay_terms', 'arrangements', 'pay_label', 'pay_basis', 'numeric_pay', 'status', 'availability_label', 'geography', 'requirements', 'hours', 'duration', 'assessment'];
   const compact = await page.evaluate(keys => workRouteRows().map(route => Object.fromEntries(keys.map(key => [key, route[key] ?? null]))), keys);
   const expected = original.map(route => Object.fromEntries(keys.map(key => [key, route[key] ?? null])));
   expect(compact).toEqual(expected);
@@ -80,11 +80,15 @@ test('compact work data preserves every selector and visible condition', async (
   await expect(sage).toContainText('Terms checked 8 Nov 2026');
   await expect(sage.getByRole('list', { name: 'Requirements' })).toContainText('Qualification tests and identity verification');
   const alternatives = await page.evaluate(() => workRouteRows().filter(route => route.status === 'historical' && ['terac.work.ml-scenarios', 'afterquery.work.people-programs-lead'].includes(route.id)).map(route => ({ id: route.id, original: route.url, action: w4Destination(route), status: w4Status(route) })));
-  expect(alternatives.map(item => item.id).sort()).toEqual(['afterquery.work.people-programs-lead', 'terac.work.ml-scenarios']);
+  const expectedStatuses = {
+    'afterquery.work.people-programs-lead': 'Past listing · page unavailable',
+    'terac.work.ml-scenarios': 'Closed · employer confirmed',
+  };
+  expect(alternatives.map(item => item.id).sort()).toEqual(Object.keys(expectedStatuses).sort());
   for (const item of alternatives) {
     expect(item.action.label).toBe('Browse current company careers');
     expect(item.action.url).not.toBe(item.original);
-    expect(item.status).toBe('Past listing · page unavailable');
+    expect(item.status).toBe(expectedStatuses[item.id]);
   }
 });
 

@@ -17,6 +17,10 @@ const associate = 'afterquery.work.sales-operations-associate';
 const engagement = 'afterquery.work.engagement-manager';
 const shopping = 'terac.work.ai-evaluator-shopping-assistant';
 const closedTerac = 'terac.work.rl-environment-creation';
+const rlScenarios = 'terac.work.ml-scenarios';
+const rlScenariosStatus = 'Closed · employer confirmed';
+const rlScenariosDescription = 'https://terac.com/opportunities/gHZD5v2UVnpSQZv5';
+const rlScenariosOriginal = 'https://jobs.ashbyhq.com/terac/9f8d7438-ffd8-42be-b169-a46437154c79/';
 
 const nativeCards = '.work-page-list [data-work-route]';
 const exploreCards = '#work-cards [data-work-route]';
@@ -55,7 +59,8 @@ const cases = [
     includes: [operations, associate], excludes: [security, people, engagement] },
   { name: 'yearly remote staff listings', criteria: { kind: 'named', type: 'employment', pay: 'yearly', arrangement: 'remote' },
     includes: [yearlyStaff], excludes: [role, monthlyStaff, pastStaff] },
-  { name: 'past records', criteria: { kind: 'closed' }, includes: [pastStaff, people, closedTerac], excludes: [role, yearlyStaff, monthlyStaff, security, shopping] },
+  { name: 'past records', criteria: { kind: 'closed' }, includes: [pastStaff, people, closedTerac, rlScenarios],
+    excludes: [role, yearlyStaff, monthlyStaff, security, shopping] },
 ];
 
 for (const { name, criteria, includes, excludes } of cases) {
@@ -86,12 +91,19 @@ for (const { name, criteria, includes, excludes } of cases) {
     const staticIds = criteria.kind ? staticGroups[criteria.kind] : Object.values(staticGroups).flat();
     if (criteria.type) expect(staticIds).toEqual(expect.arrayContaining(ids));
     else expect([...ids].sort()).toEqual([...staticIds].sort());
+    if (criteria.kind === 'closed') {
+      await expect(recordFor(page, chosen, rlScenarios).locator('.work-status')).toHaveText(rlScenariosStatus);
+    }
 
     await compareLink.click();
     await expect(page.getByRole('region', { name: 'Matching work records' })).toBeVisible();
     await expect(page.locator('[data-work-count]')).toHaveText(nativeLabel);
     const compared = await page.locator('[data-compare-route]').evaluateAll(rows => rows.map(row => row.dataset.compareRoute));
     expect(compared).toEqual(ids);
+    if (criteria.kind === 'closed') {
+      await expect(page.locator(`[data-compare-route="${rlScenarios}"] th`))
+        .toHaveText(`Terac · ML Engineer, RL Scenarios · ${rlScenariosStatus}`);
+    }
     const nativeCsv = await downloadRows(page);
     expect(nativeCsv.map(row => row.route_id)).toEqual(ids);
 
@@ -111,6 +123,21 @@ for (const { name, criteria, includes, excludes } of cases) {
     expect(exploreLabel).toBe(countParts.join(' · '));
     expect(explore).toEqual(ids);
     expect(exploreCsv).toEqual(nativeCsv);
+    if (criteria.kind === 'closed') {
+      const exported = nativeCsv.find(row => row.route_id === rlScenarios);
+      expect(exported).toMatchObject({ availability: rlScenariosStatus });
+      expect(JSON.parse(exported.original_url_details)).toMatchObject({
+        archived_source_url: rlScenariosOriginal,
+        application_url: null,
+        current_action_purpose: 'career_board',
+      });
+      expect(JSON.parse(exported.review_evidence)).toMatchObject({
+        page_check: { url: rlScenariosDescription, result: 'official_listing_closed', http_status: 200 },
+        source_receipts: expect.arrayContaining([
+          expect.objectContaining({ url: rlScenariosOriginal, checked_on: '2026-11-22', result: 'not_found', http_status: 404 }),
+        ]),
+      });
+    }
     if (!search) {
       const exported = nativeCsv.find(row => row.route_id === engagement);
       expect(exported).toMatchObject({
@@ -246,6 +273,9 @@ const reconciled = [
   { id: closedTerac, pay: '$90 / hour', status: 'Closed',
     action: ['Read archived listing', 'https://terac.com/opportunities/KZwfXOQhfpdjGT8k'],
     note: /This listing has closed/ },
+  { id: rlScenarios, pay: '$90 / hour', status: rlScenariosStatus,
+    action: ['Browse current company careers', 'https://jobs.ashbyhq.com/terac'],
+    note: /Terac’s description for this role says “This listing has closed\.” The original Ashby posting returned HTTP 404/ },
 ];
 
 test('Reconciled employer listings render scoped pay and exact source actions in Work and Explore', async ({ browser, page, baseURL }) => {
@@ -287,6 +317,20 @@ test('Reconciled employer listings render scoped pay and exact source actions in
         if (id === people && native) {
           for (const url of [peopleDescription, peopleDescription + '/application']) {
             await expect(details.locator(`a[href="${url}"]`).locator('..')).toContainText('HTTP 404');
+          }
+        }
+        if (id === rlScenarios) {
+          const issuer = details.locator(`a[href="${rlScenariosDescription}"]`).locator('..');
+          const original = details.locator(`a[href="${rlScenariosOriginal}"]`).locator('..');
+          await expect(issuer.getByRole('link')).toBeVisible();
+          await expect(original.getByRole('link')).toBeVisible();
+          if (native) {
+            await expect(issuer.locator('q')).toHaveText('This listing has closed');
+            await expect(issuer).toContainText('HTTP 200');
+            await expect(original).toContainText('22 Nov 2026 · HTTP 404');
+          } else {
+            await expect(issuer.locator(`[data-work-source="${rlScenarios}.issuer-closure-2026-11-22"]`)).toContainText('Retrieval observation');
+            await expect(original.locator(`[data-work-source="${rlScenarios}.ashby-recheck-2026-11-22"]`)).toContainText('Retrieval observation');
           }
         }
         if (id === engagement) {

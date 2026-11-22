@@ -261,6 +261,39 @@ process.stdout.write(S2SWork.csvFor(rows, {}));
                          ("Closed", "Read archived listing", "https://terac.com/opportunities/KZwfXOQhfpdjGT8k"))
         self.assertIsNone(json.loads(closed["original_url_details"])["application_url"])
 
+    def test_terac_rl_scenarios_csv_separates_issuer_closure_from_original_ashby_history(self):
+        route_id = "terac.work.ml-scenarios"
+        row, = self.csv_rows([route for route in self.routes if route["id"] == route_id])
+        original = "https://jobs.ashbyhq.com/terac/9f8d7438-ffd8-42be-b169-a46437154c79/"
+        description = "https://terac.com/opportunities/gHZD5v2UVnpSQZv5"
+        self.assertEqual(row["availability"], "Closed · employer confirmed")
+        self.assertEqual((row["current_action_label"], row["current_action_url"]),
+                         ("Browse current company careers", "https://jobs.ashbyhq.com/terac"))
+        urls = json.loads(row["original_url_details"])
+        self.assertEqual(urls["current_action_purpose"], "career_board")
+        self.assertEqual((urls["source_url"], urls["archived_source_url"], urls["recorded_url_purpose"]),
+                         (original, original, "archived_listing"))
+        self.assertIsNone(urls["application_url"])
+        self.assertIn({"source_id": "terac.source.terac-8", "accessed_on": "2026-10-12"}, urls["source_observations"])
+        self.assertIn(description, row["source_urls"].split(" | "))
+
+        evidence = json.loads(row["review_evidence"])
+        latest = evidence["page_check"]
+        self.assertEqual((latest["url"], latest["http_status"], latest["result"]),
+                         (description, 200, "official_listing_closed"))
+        receipts = {item["source_id"]: item for item in evidence["source_receipts"]}
+        issuer = receipts[route_id + ".issuer-closure-2026-11-22"]
+        self.assertEqual((issuer["url"], issuer["purpose"], issuer["result"]),
+                         (description, "historical_observation", "readable"))
+        self.assertIn("This listing has closed", issuer["rendered_observation"])
+        ashby = receipts[route_id + ".ashby-recheck-2026-11-22"]
+        self.assertEqual((ashby["url"], ashby["scope"], ashby["result"], ashby["http_status"], ashby["retrieval_reason"]),
+                         (original, "retrieval", "not_found", 404, "http_not_found"))
+        prior = evidence["http_check"]
+        self.assertEqual((prior["final_url"], prior["date"], prior["http_status"]), (original, "2026-10-28", 200))
+        archived = evidence["archive_disposition"]
+        self.assertEqual((archived["state"], archived["reviewed_on"]), ("historical_page_unavailable", "2026-11-08"))
+
     def test_archived_descriptions_and_checked_form_destinations_keep_distinct_roles(self):
         expected = {
             "appen.work.sage-media": ("archived_listing", "network", "application_migrated",

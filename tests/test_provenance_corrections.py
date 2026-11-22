@@ -33,11 +33,13 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
     def test_release_binds_exact_work_bytes_and_unchanged_frozen_canonical(self):
         self.assertEqual(hashlib.sha256((ROOT / "data/canonical.json").read_bytes()).hexdigest(),
                          "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061")
-        self.assertEqual(self.release["release_id"], "2026-11-22.8")
+        self.assertEqual(self.release["release_id"], "2026-11-22.9")
         self.assertEqual(self.release["as_of"], "2026-11-22")
-        self.assertEqual(self.release["publication_as_of"], "2026-11-22T14:08:49Z")
+        self.assertEqual(self.release["publication_as_of"], "2026-11-22T15:16:12Z")
         self.assertEqual(self.release["work_routes_sha256"],
-                         hashlib.sha256((ROOT / "data/work-routes.json").read_bytes()).hexdigest())
+                         "5d060242e7f55f2ce96d6cc949b11ab73b5fea2e247189a71e55350b580250d8")
+        self.assertEqual(hashlib.sha256((ROOT / "data/work-routes.json").read_bytes()).hexdigest(),
+                         self.release["work_routes_sha256"])
         validate_editorial_release(self.work, self.release, self.canonical)
         counts = editorial_counts(self.work)
         self.assertEqual(counts["records"], 135)
@@ -171,6 +173,42 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
                          ("closed", "https://terac.com/opportunities/KZwfXOQhfpdjGT8k", "$90 / hour"))
         self.assertEqual(closed["last_route_check"]["review_signals"], ["explicitly_closed"])
         self.assertIn("This listing has closed", closed["availability_note"])
+
+    def test_terac_rl_scenarios_closure_and_original_posting_have_separate_receipts(self):
+        row = self.routes["terac.work.ml-scenarios"]
+        description = "https://terac.com/opportunities/gHZD5v2UVnpSQZv5"
+        original = "https://jobs.ashbyhq.com/terac/9f8d7438-ffd8-42be-b169-a46437154c79/"
+        closure_id = row["id"] + ".issuer-closure-2026-11-22"
+        ashby_id = row["id"] + ".ashby-recheck-2026-11-22"
+        review = row["editorial_review"]
+        sources = {source["id"]: source for source in row["sources"]}
+        receipts = {receipt["source_id"]: receipt for receipt in review["receipts"]}
+
+        self.assertEqual((sources[closure_id]["url"], sources[closure_id]["publisher"]), (description, "Terac"))
+        self.assertEqual((sources[ashby_id]["url"], sources[ashby_id]["publisher"]), (original, "Terac via Ashby"))
+        for source_id, url, status, result in ((closure_id, description, 200, "readable"),
+                                               (ashby_id, original, 404, "not_found")):
+            with self.subTest(source_id=source_id):
+                receipt = receipts[source_id]
+                self.assertEqual((receipt["url"], receipt["final_url"], receipt["http_status"], receipt["result"]),
+                                 (url, url, status, result))
+                self.assertEqual((receipt["scope"], receipt["approved"], receipt["checked_on"]),
+                                 ("retrieval", False, "2026-11-22"))
+
+        closure = receipts[closure_id]
+        self.assertEqual(closure["review_signals"], ["explicitly_closed"])
+        self.assertIn("This listing has closed", [item["quote"] for item in closure["evidence"]])
+        self.assertEqual(receipts[ashby_id]["retrieval_reason"], "http_not_found")
+        self.assertNotIn("explicitly_closed", receipts[ashby_id].get("review_signals", []))
+        latest = row["last_route_check"]
+        self.assertEqual(latest["result"], "official_listing_closed")
+        for key in ("url", "http_status", "response_sha256", "review_signals"):
+            self.assertEqual(latest[key], closure[key])
+
+        prior = prior_values(row, "issuer-closure-review-2026-11-22")["last_route_check"]
+        self.assertEqual((prior["date"], prior["result"]), ("2026-10-28", "listing_content_reviewed"))
+        self.assertEqual((row["url"], row["last_link_check"]["http_status"]), (original, 200))
+        self.assertEqual(row["field_reviews"]["pay"]["source_ids"], [row["id"] + ".review-2026-10-28"])
 
     def test_surge_fellowship_application_and_unstated_location_have_exact_source(self):
         row = self.routes["surge_ai.work.research-fellowship"]
