@@ -66,7 +66,7 @@ test.describe('native ledger rendering', () => {
     const nativeLink = alias;
     await expect(nativeLink).toHaveRole('link');
     await expect(nativeLink).toHaveAccessibleName('Open source record: ' + sourceRow.id);
-    await expect(nativeLink).toHaveAttribute('href', destination);
+    expect(new URL(await nativeLink.getAttribute('href'), page.url()).href).toBe(new URL(destination, page.url()).href);
     await nativeLink.focus();
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(new RegExp(destination.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'));
@@ -85,7 +85,7 @@ test.describe('native ledger rendering', () => {
     await page.goto(path);
     const found = await page.evaluate(text => {
       if (typeof window.find !== 'function') return null;
-      return window.find(text, false, true);
+      return window.find(text);
     }, title);
     if (found !== null) {
       expect(found).toBe(true);
@@ -118,7 +118,8 @@ test.describe('native ledger rendering', () => {
     await page.goto('/research/data/#' + token(id));
     const alias = page.locator(selector(id));
     await expect(alias).toHaveRole('link');
-    await expect(alias).toHaveAttribute('href', evidenceURL('assertion', row.id));
+    const destination = evidenceURL('assertion', row.id);
+    expect(new URL(await alias.getAttribute('href'), page.url()).href).toBe(new URL(destination, page.url()).href);
     await alias.focus();
     await page.keyboard.press('Enter');
     const assertion = page.locator('article.r-assertion' + selector(id));

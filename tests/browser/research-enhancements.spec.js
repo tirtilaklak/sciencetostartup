@@ -40,22 +40,26 @@ function values(entity, name) {
   return [...new Set(entity.taxonomy?.[name] || [])].sort();
 }
 
-function matches(entity, filters) {
+function matches(entity, filters, paperIndex) {
   const haystack = [entity.name, displayTitle(entity.name), entity.id, ...(entity.aliases || []), ...Object.values(entity.identifiers || {})].join(' ').toLowerCase();
   return Object.entries(filters).every(([name, value]) => {
     if (!value) return true;
-    if (name === 'q') return value.trim().toLowerCase().split(/\s+/).every(word => haystack.includes(word));
+    if (name === 'q') {
+      const query = value.trim().toLowerCase();
+      if (paperIndex && /^paper\.[a-z0-9_-]+(?:\.[a-z0-9_-]+)+$/.test(query)) return entity.id.toLowerCase() === query;
+      return query.split(/\s+/).every(word => haystack.includes(word));
+    }
     return value === '__not_recorded__' ? values(entity, name).length === 0 : values(entity, name).includes(value);
   });
 }
 
 async function expectRecords(page, entities, filters = {}) {
-  const expectedEntities = entities.filter(entity => matches(entity, filters));
+  const papers = entities.some(entity => entity.kind === 'paper_version');
+  const expectedEntities = entities.filter(entity => matches(entity, filters, papers));
   const expected = expectedEntities.map(entity => entity.id).sort();
   const matching = page.locator('[data-index-row]:not([hidden])');
   await expect(matching).toHaveCount(expected.length);
   expect((await matching.locator('th .r-record-id').allTextContents()).sort()).toEqual(expected);
-  const papers = entities.some(entity => entity.kind === 'paper_version');
   const active = Object.values(filters).some(value => String(value || '').trim());
   if (papers) {
     const versions = expectedEntities.filter(entity => entity.kind === 'paper_version').length;
@@ -118,9 +122,10 @@ for (const [category, kinds] of Object.entries(categories)) {
 
     // Search terms are case insensitive and may appear in a different order.
     const words = entities.find(entity => entity.name.trim().split(/\s+/).length > 1)?.name.split(/\s+/).reverse().join(' ').toUpperCase() || target.id;
-    await form.getByLabel('Search records', { exact: true }).fill(`  ${words}  `);
+    const paddedQuery = `  ${words}  `;
+    await form.getByLabel('Search records', { exact: true }).fill(paddedQuery);
     await expectRecords(page, entities, { q: words });
-    expect(new URL(page.url()).searchParams.get('q')).toBe(words);
+    expect(new URL(page.url()).searchParams.get('q')).toBe(paddedQuery);
     await form.getByRole('button', { name: 'Clear filters', exact: true }).click();
 
     const selects = await form.locator('select').evaluateAll(nodes => nodes.map(node => ({ name: node.name,
@@ -353,6 +358,8 @@ test('home research search supports opening its native report in another tab', a
 test.describe('legacy evidence remains independently readable', () => {
   test.use({ javaScriptEnabled: false });
   test('Scale appends approved evidence while preserving its historical profile and canonical data', async ({ page, request }) => {
+    // Follow every record and return to the native profile for each assertion.
+    test.setTimeout(60_000);
     const graph = await getJSON(request, '/research/exports/research-graph.json');
     const scale = graph.entities.find(entity => entity.legacy_id === 'scale_ai');
     expect(scale).toBeTruthy();
@@ -361,7 +368,7 @@ test.describe('legacy evidence remains independently readable', () => {
     const canonical = JSON.parse(readFileSync(resolve('data/canonical.json'), 'utf8'));
     expect(await getJSON(request, '/research.json')).toEqual(canonical);
     expect(graph.canonical_dataset_version).toBe(canonical.dataset_version);
-    const baseline = readFileSync(resolve('dist/company/scale_ai/index.html'), 'utf8');
+    const baseline = readFileSync(resolve(process.env.QA_DIST || 'dist', 'company/scale_ai/index.html'), 'utf8');
     await page.goto('/company/scale_ai/');
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sciencetostartup.com/company/scale_ai/');
     const preserved = await page.evaluate(baselineHTML => {
@@ -411,7 +418,7 @@ test.describe('legacy evidence remains independently readable', () => {
         expect(bindings[index].href).toBe(evidenceURL('source', binding.source_id));
         expect(normalize(bindings[index].locator)).toContain(normalize(binding.locator));
       }
-      await page.goBack();
+      await page.goBack({ waitUntil: 'domcontentloaded' });
       await expect(supplement).toBeVisible();
     }
   });

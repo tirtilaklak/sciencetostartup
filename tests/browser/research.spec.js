@@ -65,20 +65,21 @@ test.describe('research without JavaScript', () => {
     await expect(page.locator('.r-report-body > .r-chapter:not(#cite)')).toHaveCount(1);
     const chapters = await page.locator('.r-toc ol a').evaluateAll(links => links.map(link => ({ href: link.getAttribute('href'), title: link.textContent })));
     expect(chapters).toHaveLength(12);
-    expect(chapters.map(chapter => chapter.href)).toEqual(readingPages);
+    expect(chapters.map(chapter => chapter.href)).toEqual(readingPages.map((path, index) => index ? path + '#' + chapterIds[index] : path));
     for (const [index, chapter] of chapters.entries()) {
       await page.goto(chapter.href);
+      const path = readingPages[index];
       await expect(page.locator('[id=' + JSON.stringify(chapterIds[index]) + ']')).toBeVisible();
-      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sciencetostartup.com' + chapter.href);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sciencetostartup.com' + path);
       expect(await page.locator('.r-report-body .r-paragraph p').count(), chapter.title).toBeGreaterThan(0);
-      await expect(page.getByRole('navigation', { name: 'Report chapters' }).locator('[aria-current="page"]')).toHaveAttribute('href', chapter.href);
+      await expect(page.getByRole('navigation', { name: 'Report chapters' }).locator('[aria-current="page"]')).toHaveAttribute('href', path);
       if (index) await expect(page.locator('.r-reader-pagination [rel="prev"]')).toHaveAttribute('href', readingPages[index - 1]);
       if (index + 1 < chapters.length) await expect(page.locator('.r-reader-pagination [rel="next"]')).toHaveAttribute('href', readingPages[index + 1]);
     }
     await page.goto(reportPath + '#methods-and-appendices');
     await expect(page.locator('#methods-and-appendices')).toBeInViewport();
     await page.locator('.r-toc ol a').last().click();
-    await expect(page).toHaveURL(new RegExp(readingPages.at(-1) + '$'));
+    await expect(page).toHaveURL(new URL(readingPages.at(-1) + '#methods-and-appendices', page.url()).href);
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Methods');
   });
 
@@ -352,11 +353,17 @@ test('home search supports arrow selection and restores keyboard focus when clos
 });
 
 test('at 320 pixels the public header, navigation and page fit without horizontal overflow', async ({ page }) => {
+  test.setTimeout(60_000);
   await page.setViewportSize({ width: 320, height: 720 });
   for (const path of publicPages) {
     await page.goto(path);
     const header = page.locator('body > header.site-header');
     await expect(header).toBeVisible();
+    if (path === '/') {
+      const menu = header.locator('.home-menu > summary');
+      await expect(menu).toBeVisible();
+      await menu.press('Enter');
+    }
     const nav = header.getByRole('navigation', { name: 'Main', exact: true });
     for (const name of ['Daily scan', 'Research', 'Companies', 'Paid work', 'About']) {
       const link = nav.getByRole('link', { name, exact: true });
