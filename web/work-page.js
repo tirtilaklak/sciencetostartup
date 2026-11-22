@@ -47,6 +47,7 @@
     const initialOpen = new Map([...groupElements.values()].filter(group => group.tagName === 'DETAILS').map(group => [group, group.open]));
     const compareArrivalKey = 's2s.workCompareArrival';
     let compareDeparture;
+    let profileClick, profileDeparture;
     let selection = [];
     let active = false;
     let displayedSearch;
@@ -245,16 +246,22 @@
     function savedHandoff() {
       const { workReturnFocus, workCompareFocus } = history.state || {};
       if (workReturnFocus) {
-        const link = handoffLinks[workReturnFocus.kind];
-        if (workReturnFocus.page === location.href && workReturnFocus.href === link?.href) return { link, top: workReturnFocus.top };
+        const { kind, page, href, top, role, termsOpen } = workReturnFocus;
+        const card = kind === 'profile' ? cards.get(role) : null;
+        const link = kind === 'profile' ? card?.querySelector('a.work-company') : handoffLinks[kind];
+        if (page === location.href && href === link?.href) return { link, top, card, termsOpen };
       } else if (workCompareFocus && compareLink) return { link: compareLink };
       return null;
     }
 
-    function restoreHandoff({ link, top }) {
+    function restoreHandoff({ link, top, card, termsOpen }) {
       // A warm history traversal keeps this document and its browser-managed focus.
       requestAnimationFrame(() => requestAnimationFrame(() => {
         if (loader?.interacted || document.activeElement !== document.body || savedHandoff()?.link !== link || link.closest('[hidden]')) return;
+        const group = card?.closest('details[data-work-group]');
+        if (group) group.open = true;
+        const terms = termsOpen && card?.querySelector('details.work-terms');
+        if (terms) terms.open = true;
         link.focus({ preventScroll: true });
         const bounds = link.getBoundingClientRect();
         const headerBottom = Math.max(0, document.querySelector('.site-header')?.getBoundingClientRect().bottom || 0);
@@ -264,6 +271,36 @@
           link.scrollIntoView({ block: 'center', behavior: 'instant' });
         }
       }));
+    }
+
+    function followsHandoff() {
+      const saved = history.state?.workReturnFocus;
+      if (!window.navigation) return window.S2SNativeHandoff?.returnedFrom(saved?.entry);
+      const { from, entry } = window.navigation.activation || {};
+      if (saved?.kind === 'profile') {
+        // The exact role visit must be the adjacent entry we just left on Back.
+        return from?.url === saved.href && from.index === entry?.index + 1;
+      }
+      return !(from && from.index <= entry?.index);
+    }
+
+    function sameTabActivation(event, link) {
+      return event.isTrusted && !event.defaultPrevented && event.button === 0 && !event.metaKey && !event.ctrlKey &&
+        !event.shiftKey && !event.altKey && !link.hasAttribute('download') && (!link.target || link.target.toLowerCase() === '_self');
+    }
+
+    function recordProfileDeparture() {
+      const click = profileClick;
+      const departure = profileDeparture;
+      profileClick = profileDeparture = null;
+      const leaving = departure && ['push', 'replace'].includes(departure.navigationType);
+      const activated = click && !click.event.defaultPrevented && (window.navigation
+        ? leaving && departure.navigationType === 'push' && departure.sourceElement === click.link && departure.destination.url === click.saved.href
+        : click.saved.entry);
+      // Wait for an actual departure before changing the source entry. Retain
+      // it on browser traversals so a repeated Back can restore it again.
+      if (!activated && (!leaving || history.state?.workReturnFocus?.kind !== 'profile')) return;
+      try { remember({ workReturnFocus: activated ? click.saved : null, workCompareFocus: false }); } catch {}
     }
 
     function takeCompareArrival() {
@@ -304,14 +341,28 @@
     });
     for (const [kind, link] of Object.entries(handoffLinks)) {
       link?.addEventListener('click', event => {
-        if (!event.isTrusted || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ||
-            link.hasAttribute('download') || (link.target && link.target.toLowerCase() !== '_self')) return;
+        if (!sameTabActivation(event, link)) return;
         if (link === compareLink && comparison?.hidden) compareDeparture = event;
         const entry = window.S2SNativeHandoff?.begin(link.href, event);
         remember({ workReturnFocus: { kind, page: location.href, href: link.href, top: link.getBoundingClientRect().top, entry }, workCompareFocus: false });
       });
     }
     if (comparison && window.top === window) {
+      list.addEventListener('click', event => {
+        const link = event.target.closest?.('a.work-company[href^="/company/"]');
+        if (!link || !sameTabActivation(event, link)) return;
+        const card = link.closest('[data-work-route]');
+        if (!card) return;
+        const entry = window.S2SNativeHandoff?.begin(link.href, event);
+        profileClick = { link, event, saved: {
+          kind: 'profile', page: location.href, href: link.href, role: card.dataset.workRoute,
+          top: link.getBoundingClientRect().top, termsOpen: Boolean(card.querySelector('details.work-terms')?.open), entry,
+        } };
+      });
+      window.navigation?.addEventListener('navigate', event => {
+        if (!event.destination.sameDocument) profileDeparture = event;
+      });
+      window.addEventListener('pagehide', recordProfileDeparture);
       window.addEventListener('pagehide', () => {
         const departure = compareDeparture;
         compareDeparture = null;
@@ -363,10 +414,8 @@
     if (exportButton) exportButton.hidden = false;
     const retried = loader?.retried;
     const compareArrival = takeCompareArrival() && !loader?.interacted;
-    const activation = window.navigation?.activation;
-    const goingForward = activation?.from && activation.from.index <= activation.entry?.index;
-    const returning = window.navigation ? !goingForward : window.S2SNativeHandoff?.returnedFrom(history.state?.workReturnFocus?.entry);
-    const handoff = returning && !loader?.interacted && performance.getEntriesByType('navigation')[0]?.type === 'back_forward' && savedHandoff();
+    const handoff = !loader?.interacted && performance.getEntriesByType('navigation')[0]?.type === 'back_forward' &&
+      followsHandoff() && savedHandoff();
     const revealed = !compareArrival && revealTarget(!handoff && (!loader?.interacted || retried));
     if (!compareArrival && !handoff && !revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
       // A saved anchor can be excluded by the saved criteria.
