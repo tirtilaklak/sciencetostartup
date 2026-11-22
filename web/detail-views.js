@@ -49,6 +49,30 @@ function detail_comparisonRows(){return [
  }],
  ['Explore',id=>`<a href="#company/${attr(id)}" data-compare-origin="explore:${attr(id)}">Full profile & sources ${iconHTML('right')}</a>`]
  ];}
+let compareHeaderObserver;
+function detail_fitCompareHeaders(){
+ const view=$('compare-view');
+ if(view.hidden)return;
+ const mastheadHeight=document.querySelector('body > .topbar').getBoundingClientRect().height;
+ const stickyLimit=window.innerHeight/2;
+ const flowMasthead=mastheadHeight>stickyLimit;
+ view.toggleAttribute('data-compare-flow-masthead',flowMasthead);
+ const table=view.querySelector('.comparison-table');
+ if(!table)return;
+ const headHeight=table.tHead.getBoundingClientRect().height;
+ table.toggleAttribute('data-compare-flow-head',(flowMasthead?0:mastheadHeight)+headHeight>stickyLimit);
+ table.style.setProperty('--compare-head-height',`${headHeight}px`);
+}
+function detail_observeCompareHeaders(head){
+ if(!compareHeaderObserver){
+  compareHeaderObserver=new ResizeObserver(detail_fitCompareHeaders);
+  window.addEventListener('resize',detail_fitCompareHeaders);
+ }
+ compareHeaderObserver.disconnect();
+ compareHeaderObserver.observe(document.querySelector('body > .topbar'));
+ compareHeaderObserver.observe(head);
+ detail_fitCompareHeaders();
+}
 function detail_renderCompare(notice=''){
  const ids=compareIds(),names=listText(ids.map(id=>companies[id].name));
  const pairs=comparePairOptions(ids);state.mobileCompare=Math.min(state.mobileCompare,Math.max(0,pairs.length-1));const visiblePair=pairs[state.mobileCompare]||[0];
@@ -59,6 +83,7 @@ function detail_renderCompare(notice=''){
  $('compare-content').innerHTML=`<div class="comparison-mode"><p>${ids.length} of 3 companies selected</p><button type="button" class="text-link" data-copy-compare>Copy comparison link</button></div><p class="comparison-context">${context}</p>${ids.length>2?'<p class="comparison-swipe">On small screens, use Change pair to switch companies.</p>':''}<div class="comparison-scroll"><table class="comparison-table" data-company-count="${ids.length}"><caption class="sr-only">Comparison of ${esc(names)}</caption><thead><tr><th scope="col">At a glance</th>${ids.map((id,i)=>`<th scope="col" class="${!visiblePair.includes(i)?'mobile-hidden':''}"><div class="card-head"><a href="#company/${attr(id)}" data-compare-origin="header:${attr(id)}">${esc(companies[id].name)}</a><button type="button" data-remove="${esc(id)}" aria-label="Remove ${esc(companies[id].name)}">${iconHTML('close')}</button></div>${i===visiblePair.at(-1)&&ids.length>2?`<details class="mobile-column-options"><summary>Change pair</summary><div class="mobile-compare-pager" role="group" aria-label="Choose companies to compare">${pairs.map((pair,i)=>`<button type="button" data-mobile-compare="${i}" aria-pressed="${i===state.mobileCompare}">${esc(companies[ids[pair[0]]].name)} + ${esc(companies[ids[pair[1]]].name)}</button>`).join('')}</div></details>`:''}</th>`).join('')}</tr></thead><tbody>${renderRows(core)}</tbody><tbody id="comparison-extra"${comparisonExpanded?'':' hidden'}>${renderRows(extra)}</tbody></table></div><button type="button" class="comparison-more" data-compare-extra aria-expanded="${comparisonExpanded}" aria-controls="comparison-extra">${comparisonExpanded?'Hide additional details':'Show more evidence'}</button>`;
  if(notice)$('compare-content').insertAdjacentHTML('afterbegin',compareNoticeHTML(notice));
  $('compare-status').textContent=[notice,`Comparing ${names}.`].filter(Boolean).join(' ');comparisonScrollRegion();
+ detail_observeCompareHeaders($('compare-content').querySelector('thead'));
 }
 function detail_evidenceMetricContextHTML(m){
  const calculation=profileCalculatedMetric(m),estimate=profileMetricEstimate(m),finance=profileFinanceMetricContext(m);

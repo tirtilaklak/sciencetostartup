@@ -33,4 +33,5 @@
  #compare-view .comparison-table .row-number>span{font-size:12px}
  .financial-summary .row-period,.financial-citation{font-size:12px}
  .financial-source-details summary{min-height:44px;display:flex;align-items:center}
+ #compare-view .mobile-column-options>.mobile-compare-pager{top:calc(100% + 4px)}
 }

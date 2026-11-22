@@ -101,5 +101,16 @@ h1[tabindex="-1"]:focus{outline:none}.work-overview button:disabled{opacity:.55;
 }
 /* Keep failure-state guidance and plain-text logo fallbacks legible. */
 .availability-notice{margin:24px 0;padding:18px 20px;border:1px solid var(--border);background:var(--paper);font-size:15px;line-height:1.6}.availability-notice p{margin:0 0 10px}.availability-notice p:last-child{margin:0}.availability-notice a{display:inline-block;margin-right:18px;min-height:32px;overflow-wrap:anywhere}.brand-dark.brand-text{color:#f7f8f3}
-/* Section links (#venture, #about, #labels and the other method sections) move focus there for screen readers; the scroll already shows where it landed, as with headings. */#venture[tabindex="-1"]:focus,#about[tabindex="-1"]:focus,#labels[tabindex="-1"]:focus,#corrections[tabindex="-1"]:focus,#coverage[tabindex="-1"]:focus,#downloads[tabindex="-1"]:focus{outline:none}/* Sticky bars never hide the focused element: each view reserves room for its own bars, and short screens (400% zoom, landscape phones) get static bars. */html:has(#profile-view:not([hidden])){scroll-padding-top:calc(var(--header-height) + 64px)}html:has(#compare-view:not([hidden])){scroll-padding-top:calc(var(--header-height) + 140px)}
+/* Section links (#venture, #about, #labels and the other method sections) move focus there for screen readers; the scroll already shows where it landed, as with headings. */#venture[tabindex="-1"]:focus,#about[tabindex="-1"]:focus,#labels[tabindex="-1"]:focus,#corrections[tabindex="-1"]:focus,#coverage[tabindex="-1"]:focus,#downloads[tabindex="-1"]:focus{outline:none}/* Sticky bars never hide the focused element: each view reserves room for its own bars, and short screens (400% zoom, landscape phones) get static bars. */html:has(#profile-view:not([hidden])){scroll-padding-top:calc(var(--header-height) + 64px)}
+
+/* Reserve the masthead once. Only table body controls need the column header clearance. */
+html:has(#compare-view:not([hidden])){scroll-padding-top:calc(var(--header-height) + 8px)}
+#compare-view :is(a,button,input,select,summary){scroll-margin-top:0}
+html:has(#compare-view:not([hidden])[data-compare-flow-masthead]){scroll-padding-top:8px}
+html:has(#compare-view:not([hidden])[data-compare-flow-masthead]) > body > .topbar{position:static}
+#compare-view[data-compare-flow-masthead] .comparison-table thead{top:0}
+#compare-view .comparison-table[data-compare-flow-head] thead{position:static}
+@media(min-height:501px){
+ #compare-view .comparison-table:not([data-compare-flow-head]) tbody :is(a,button,summary){scroll-margin-top:var(--compare-head-height, 0px)}
+}
 @media(max-height:500px){.topbar,.profile-v2 .profile-tabs,.comparison-table thead{position:static}html,html:has(#profile-view:not([hidden])),html:has(#compare-view:not([hidden])){scroll-padding-top:12px}}

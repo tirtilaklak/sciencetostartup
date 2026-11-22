@@ -111,3 +111,97 @@ test('Compare work links describe career pages, archived records and paid networ
     await expect(link).toBeFocused();
   }
 });
+
+async function expectFocusedTextInView(locator) {
+  await expect(locator).toBeFocused();
+  await expect.poll(() => locator.evaluate(element => {
+    if (!element.matches(':focus-visible')) return ['focus ring missing'];
+    const textNodes = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    const range = document.createRange();
+    const lines = [];
+    while (textNodes.nextNode()) {
+      const node = textNodes.currentNode;
+      if (!node.textContent.trim() || node.parentElement.closest('.sr-only, [aria-hidden="true"]')) continue;
+      range.selectNode(node);
+      lines.push(...[...range.getClientRects()].filter(rect => rect.width && rect.height));
+    }
+    if (!lines.length) return ['no rendered label'];
+    return lines.filter(rect => (
+      rect.left < 0 || rect.right > innerWidth || rect.top < 0 || rect.bottom > innerHeight ||
+      !element.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2))
+    )).map(rect => rect.toJSON());
+  })).toEqual([]);
+}
+
+const enlargedCompare = test.extend({
+  launchOptions: [async ({ launchOptions, browserName }, use) => {
+    await use(browserName === 'chromium' ? {
+      ...launchOptions,
+      args: [...(launchOptions.args || []), '--blink-settings=minimumFontSize=32,minimumLogicalFontSize=32'],
+    } : launchOptions);
+  }, { scope: 'worker' }],
+});
+
+enlargedCompare('trusted Tab reveals Compare labels on a short phone with large text', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'Uses a Chromium minimum font setting');
+
+  for (const height of [568, 720]) await test.step(`320 × ${height}`, async () => {
+    await page.setViewportSize({ width: 320, height });
+    await page.goto('/companies/');
+    await page.getByRole('link', { name: 'Compare Snorkel AI', exact: true }).press('Enter');
+    await expect(page).toHaveURL('/explore/#compare/snorkel_ai');
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+
+    const picker = page.getByRole('combobox', { name: 'Add a company', exact: true });
+    await picker.focus();
+    for (const [company, path] of [['toloka', 'snorkel_ai/toloka'], ['turing', 'snorkel_ai/toloka/turing']]) {
+      await picker.selectOption(company);
+      await page.keyboard.press('Enter');
+      await expect(page).toHaveURL(`/explore/#compare/${path}`);
+      await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    }
+    await expect(picker).toBeFocused();
+
+    const compare = page.locator('#compare-view');
+    const revenue = compareCell(page, 'Published revenue figure', 'snorkel_ai');
+    const changePair = compare.locator('.mobile-column-options summary');
+    const source = revenue.getByRole('link', { name: /snorkel\.ai/ });
+    const figure = revenue.getByText('Figure details', { exact: true });
+    await page.keyboard.press('Tab');
+    await expect(compare.locator('#compare-preset')).toBeFocused();
+
+    for (const target of [
+      compare.getByRole('button', { name: 'Clear selection' }),
+      compare.getByRole('button', { name: 'Copy comparison link' }),
+      compare.getByRole('link', { name: 'Snorkel AI', exact: true }),
+      compare.getByRole('button', { name: 'Remove Snorkel AI' }),
+      compare.getByRole('link', { name: 'Turing', exact: true }),
+      compare.getByRole('button', { name: 'Remove Turing' }),
+      changePair, source, figure,
+    ]) {
+      await page.keyboard.press('Tab');
+      if (await target.getAttribute('data-remove')) {
+        await expect(target).toBeFocused();
+        continue;
+      }
+      await expectFocusedTextInView(target);
+    }
+
+    await page.keyboard.press('Enter');
+    await expect(figure.locator('..')).toHaveJSProperty('open', true);
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Shift+Tab');
+    await expectFocusedTextInView(source);
+    await page.keyboard.press('Shift+Tab');
+    await expectFocusedTextInView(changePair);
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Tab');
+    const tolokaPair = compare.getByRole('button', { name: 'Snorkel AI + Toloka', exact: true });
+    await expectFocusedTextInView(tolokaPair);
+    await page.keyboard.press('Enter');
+    await expectFocusedTextInView(changePair);
+    await expect(compareCell(page, 'Published revenue figure', 'toloka')).toBeVisible();
+    await expect(compareCell(page, 'Published revenue figure', 'turing')).toBeHidden();
+    await expect(page).toHaveURL('/explore/#compare/snorkel_ai/toloka/turing');
+  });
+});
