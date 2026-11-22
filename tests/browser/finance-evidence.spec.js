@@ -59,11 +59,8 @@ test('Mercor keeps the $614M H1 gross estimate attribution and canonical source'
 });
 
 test('the RWS matching chart names Generate and identifies the group separately', async ({ page }) => {
-  await page.goto('/explore/#market');
-  await expect(page.locator('#bh-ledger > article').first()).toBeVisible();
-  await openDisclosure(page.locator('#bh-advanced > summary'));
-  await page.locator('#bh-cohort').selectOption('');
-  const chart = page.locator('#bh-plot');
+  await openMarket(page);
+  const chart = await marketChart(page, 'period_revenue');
   const group = chart.locator('[data-bh-observation="rws_trainai.claim.growth_metrics-0.metric-0"]');
   await expect(group).toContainText('£360.3M');
   await expect(group).toContainText('RWS Holdings plc group');
@@ -214,4 +211,178 @@ test('Mercor binds the reviewed publication date to Felicis and leaves Sacra und
   const sacra = dialog.getByRole('listitem').filter({ hasText: 'Sacra · separate secondary gross estimate' });
   await expect(sacra.getByRole('link')).toHaveAttribute('href', 'https://sacra.com/c/mercor/');
   await expect(sacra).not.toContainText('Published');
+});
+
+async function openMarket(page) {
+  await page.goto('/explore/#market');
+  await expect(page.locator('#bh-ledger > article').first()).toBeVisible();
+}
+
+async function marketLedgerFigure(page, metric, tab) {
+  if (tab) await page.getByRole('tab', { name: tab }).press('Enter');
+  const figure = page.locator(`.bh-ledger-value[data-bh-ledger="${metric}"]`);
+  if (!await figure.isVisible()) {
+    await page.getByRole('button', { name: /^Show all \d+ companies$/ }).press('Enter');
+  }
+  return figure;
+}
+
+async function marketChart(page, measure) {
+  await openDisclosure(page.locator('#bh-advanced > summary'));
+  await page.getByRole('combobox', { name: 'Measure', exact: true }).selectOption(measure);
+  await page.getByRole('combobox', { name: 'Reporting period & scope' }).selectOption('');
+  return page.locator('#bh-plot');
+}
+
+async function marketMatrixRow(page, company) {
+  await openDisclosure(page.locator('.bh-coverage-disclosure > summary'));
+  await page.getByLabel('Find a company').fill(company);
+  return page.locator('#bh-matrix-body').getByRole('row').filter({
+    has: page.getByRole('link', { name: company, exact: true }),
+  });
+}
+
+function marketFact(dialog, label) {
+  return dialog.locator('dl.bh-facts').getByText(label, { exact: true })
+    .locator('xpath=following-sibling::*[1][self::dd]');
+}
+
+function marketCitation(dialog, id) {
+  return marketFact(dialog, 'Source').locator(`[data-bh-source="${id}"]`);
+}
+
+async function closeMarketEvidence(page) {
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#bh-evidence-dialog')).toBeHidden();
+}
+
+const handshakeMetric = 'handshake_ai.metric.major-growth_metrics-0';
+const handshakePeriod = /^Apr(?:il)? 2026$/;
+for (const path of ['ledger', 'chart', 'matrix']) {
+  test(`Market ${path} keeps Handshake’s April period separate from Dealroom’s publication and check`, async ({ page }) => {
+    await openMarket(page);
+    let figure;
+    if (path === 'ledger') {
+      figure = await marketLedgerFigure(page, handshakeMetric, /^Annualized pace/);
+      await expect(figure.locator('..').locator('.bh-ledger-period')).toHaveText(handshakePeriod);
+      await expect(figure).toHaveAccessibleName(/Handshake AI.*Nearly \$1B.*Reporting period Apr(?:il)? 2026/);
+    } else if (path === 'chart') {
+      const chart = await marketChart(page, 'annualized_revenue');
+      figure = chart.locator(`[data-bh-observation="${handshakeMetric}"]`);
+      await expect(figure).toHaveAccessibleName(/Handshake AI.*Nearly \$1B.*Reporting period Apr(?:il)? 2026.*AI business/);
+      await expect(figure).not.toHaveAccessibleName(/14 Apr|2026-04-14/);
+    } else {
+      const row = await marketMatrixRow(page, 'Handshake AI');
+      figure = row.getByRole('button', { name: /^Nearly \$1B\b/ });
+      await expect(figure).toHaveText(/grade C.*Apr(?:il)? 2026$/);
+      await expect(figure).toHaveAccessibleName(/Nearly \$1B.*Reporting period Apr(?:il)? 2026.*grade C/);
+      await expect(figure).not.toHaveAccessibleName(/14 Apr|2026-04-14/);
+    }
+    await figure.press('Enter');
+    const dialog = page.getByRole('dialog', { name: 'Handshake AI' });
+    await expect(dialog.locator('.bh-value')).toHaveText(/Nearly \$1B\s*Reported/);
+    await expect(marketFact(dialog, 'Reporting period')).toHaveText(handshakePeriod);
+    await expect(marketFact(dialog, 'Basis')).toHaveText('Gross');
+    const source = marketCitation(dialog, 'handshake_ai.source.oct14-e0de0f3911dc');
+    await expect(source.getByRole('link', { name: /dealroom\.co/ })).toHaveAttribute('href',
+      'https://dealroom.co/news/127345-handshakes-arr-crosses-1b-as-ai-training-revenue-surges/');
+    await expect(source).toContainText('Published 14 Apr 2026');
+    await expect(source).toContainText(/(?:Source page read|Source content checked) 28 Oct 2026/);
+  });
+}
+
+test('Market keeps the Mercor June $2B investor report separate from the $614M H1 estimate', async ({ page }) => {
+  await openMarket(page);
+  const pace = await marketLedgerFigure(page, 'mercor.metric.oct14-major-financial-2', /^Annualized pace/);
+  await expect(pace.locator('..').locator('.bh-ledger-period')).toHaveText(/^Jun(?:e)? 2026$/);
+  const dialog = page.getByRole('dialog', { name: 'Mercor' });
+  const expectFelicisPace = async () => {
+    await expect(dialog.locator('.bh-value')).toHaveText(/^\$2B\s*Reported$/);
+    await expect(marketFact(dialog, 'Reporting period')).toHaveText(/^Jun(?:e)? 2026$/);
+    await expect(marketFact(dialog, 'Scope')).toHaveText('Whole company');
+    await expect(marketFact(dialog, 'Source')).toContainText('Investor-reported');
+    const felicis = marketCitation(dialog, 'mercor.source.oct14-88dab2271689');
+    await expect(felicis.getByRole('link', { name: /felicis\.com/ })).toHaveAttribute('href',
+      'https://www.felicis.com/blog/mercor-profile-organizing-human-intelligence-to-power-the-ai-economy');
+    await expect(felicis).toContainText('Published 21 Jul 2026');
+  };
+  await pace.press('Enter');
+  await expectFelicisPace();
+  await closeMarketEvidence(page);
+
+  const row = await marketMatrixRow(page, 'Mercor');
+  const estimate = row.getByRole('button', { name: /^\$614M\b/ });
+  await expect(estimate).toHaveText(/grade C.*H1 2026$/);
+  await estimate.press('Enter');
+  await expect(dialog.locator('.bh-value')).toHaveText(/^\$614M\s*Third-party estimate$/);
+  await expect(marketFact(dialog, 'Reporting period')).toHaveText('H1 2026');
+  await expect(marketFact(dialog, 'Basis')).toHaveText('Gross');
+  const sacra = marketCitation(dialog, 'mercor.source.audit-m6');
+  await expect(sacra.getByRole('link', { name: /sacra\.com/ })).toHaveAttribute('href', 'https://sacra.com/c/mercor/');
+  await expect(sacra).not.toContainText(/Published \d/);
+  await openDisclosure(dialog.getByText('Other measures', { exact: true }));
+  await dialog.getByRole('button', { name: /Jun(?:e)? 2026.*\$2B/ }).press('Enter');
+  await expectFelicisPace();
+});
+
+test('Market shows Generate as another RWS business scope in the same reporting period', async ({ page }) => {
+  await openMarket(page);
+  const row = await marketMatrixRow(page, 'RWS / TrainAI');
+  const group = row.getByRole('button', { name: /^£360\.3M\b/ });
+  await expect(group).toHaveText(/grade A.*RWS Holdings plc group.*H1 FY2026/);
+  await group.press('Enter');
+  const dialog = page.getByRole('dialog', { name: 'RWS / TrainAI' });
+  const period = marketFact(dialog, 'Reporting period');
+  const scope = marketFact(dialog, 'Scope');
+  const statement = marketCitation(dialog, 'rws_trainai.source.d_rws4');
+  const statementUrl = 'https://www.rws.com/media/images/RWS-HY26-Results-Statement-Final-260610_tcm228-298858.pdf';
+  await expect(scope).toHaveText('RWS Holdings plc group');
+  const otherDates = dialog.locator('details').filter({ has: page.getByText('Other dates', { exact: true }) });
+  await expect(otherDates.locator('button').filter({ hasText: '£99.4M' })).toHaveCount(0);
+  await expect(period).toHaveText('H1 FY2026 · Oct 2025–Mar 2026');
+  await expect(statement.getByRole('link')).toHaveAttribute('href', statementUrl);
+  await openDisclosure(dialog.getByText('Other business scopes', { exact: true }));
+  await dialog.getByRole('button', { name: /Generate segment.*H1 FY2026.*£99\.4M/ }).press('Enter');
+  await expect(dialog.locator('.bh-value')).toHaveText(/^£99\.4M\s*Reported$/);
+  await expect(scope).toHaveText('Generate segment · Includes TrainAI and Content Technology');
+  await expect(period).toHaveText('H1 FY2026 · Oct 2025–Mar 2026');
+  await expect(statement.getByRole('link')).toHaveAttribute('href', statementUrl);
+  await expect(statement).toContainText('Published 11 Jun 2026');
+  await openDisclosure(dialog.getByText('Caveats and source wording', { exact: true }));
+  await expect(dialog.getByText(/^Research grade A:/)).toBeVisible();
+});
+
+test('Market retains exact reporting days for micro1 and Snorkel', async ({ page }) => {
+  await openMarket(page);
+  const chart = await marketChart(page, 'annualized_revenue');
+  for (const [metric, company, day] of [
+    ['micro1.metric.oct14-q3-run-rate', 'micro1', '12 Oct 2026'],
+    ['snorkel_ai.metric.major-growth_metrics-0', 'Snorkel AI', '22 Sep 2026'],
+  ]) {
+    await page.getByRole('combobox', { name: 'Reporting period & scope' }).selectOption('');
+    const figure = chart.locator(`[data-bh-observation="${metric}"]`);
+    await expect(figure).toHaveAccessibleName(new RegExp(`${company}.*Reporting day ${day}`));
+    await figure.press('Enter');
+    await expect(marketFact(page.getByRole('dialog', { name: company }), 'Reporting day')).toHaveText(day);
+    await closeMarketEvidence(page);
+  }
+});
+
+test('Market distinguishes the July expert payout snapshot from the March reporting day', async ({ page }) => {
+  await openMarket(page);
+  const row = await marketMatrixRow(page, 'Mercor');
+  const july = row.getByRole('button', { name: /^> \$4M\b/ });
+  await expect(july).toHaveText(/grade B.*paid in one day/);
+  await july.press('Enter');
+  const dialog = page.getByRole('dialog', { name: 'Mercor' });
+  await expect(marketFact(dialog, 'Snapshot')).toHaveText(/^21 Jul 2026(?: snapshot)?$/);
+  await closeMarketEvidence(page);
+
+  const chart = await marketChart(page, 'daily_expert_payouts');
+  const march = chart.locator('[data-bh-observation="refresh.mercor.march-2026-daily-payouts"]');
+  await march.press('Enter');
+  await expect(dialog.locator('.bh-value')).toHaveText(/^> \$2M\s*Reported$/);
+  await expect(marketFact(dialog, 'Reporting day')).toHaveText(/^3 Mar 2026$/);
+  await expect(marketFact(dialog, 'Source').getByRole('link', { name: /^Mercor / })).toHaveAttribute('href',
+    'https://www.mercor.com/blog/organizing-human-intelligence-to-power-the-ai-economy/');
 });
