@@ -1492,7 +1492,7 @@ def _record_correction(context, stable_id, path, title=''):
         lines.append(f'Record: {title}')
         target.append(title)
         contact_params['title'] = title
-    lines += ['What should change: ', 'Supporting public evidence: ', '']
+    lines += ['What should change:', 'Supporting public evidence:', '']
     message = '\n'.join(lines)
     contact = '/method/?' + urlencode(contact_params, quote_via=quote) + '#corrections'
     issue = _issue_endpoint(context['identity']) + '?' + urlencode(
