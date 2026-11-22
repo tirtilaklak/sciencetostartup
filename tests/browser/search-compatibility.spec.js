@@ -175,7 +175,10 @@ test('native Work applies its saved filter when the bundle arrives before slow H
   const parserBlock = '/qa-work-document-pause.js';
   let resume;
   const paused = new Promise(resolve => { resume = resolve; });
-  await page.clock.install();
+  // Network setup can take longer than the timer on a busy Firefox runner.
+  // Start the simulated delay only after the real bundle has executed.
+  await page.clock.install({ time: new Date('2026-11-22T09:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-11-22T09:01:00Z'));
   await page.addInitScript(() => {
     const observer = new MutationObserver(changes => {
       for (const change of changes) {
