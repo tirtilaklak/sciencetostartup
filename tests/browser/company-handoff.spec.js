@@ -253,3 +253,77 @@ shortlistTest('Explore shortlist restores the initiating Compare after editing a
   await expect(tray).toBeHidden();
   await expect(search).toHaveValue(fourthName);
 });
+
+test.describe('Explore shortlist Back during company search', () => {
+  test.use({ viewport: { width: 1280, height: 720 } });
+  test.skip(({ isMobile }) => isMobile, 'Use the desktop layout that clamps the saved scroll, with Tab and wheel input');
+
+  for (const [action, description] of Object.entries({
+    wait: 'restores the saved position when the matching result renders',
+    tab: 'keeps Clear focused when the reader tabs while loading',
+    wheel: 'keeps the new position when the reader scrolls while loading',
+  })) {
+    test(description, async ({ page }) => {
+      const { activate, search, fourth, compare, clear } = await fillShortlist(page, false);
+      await activate(fourth, 'Space');
+      await expect(fourth).not.toBeChecked();
+      const directoryURL = page.url();
+      const scrollY = () => page.evaluate(() => window.scrollY);
+      await fourth.evaluate(element => element.closest('[data-company-card]').scrollIntoView({ block: 'start', behavior: 'instant' }));
+      const savedY = await scrollY();
+
+      await activate(compare);
+      const compareURL = new URL(compareHash(originalIds), directoryURL).href;
+      await expect(page).toHaveURL(compareURL);
+      const columns = page.locator('#compare-content thead [data-remove]');
+      await expect(columns).toHaveCount(originalIds.length);
+
+      const index = '**/presentation/full-search.*.json';
+      let release;
+      const hold = new Promise(resolve => { release = resolve; });
+      await page.route(index, async route => {
+        await hold;
+        await route.continue();
+      });
+
+      try {
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await expect(columns).toHaveCount(originalIds.length);
+        await Promise.all([page.waitForRequest(index), page.goBack({ waitUntil: 'commit' })]);
+        await expect(page).toHaveURL(directoryURL);
+        const cards = page.locator('#company-cards');
+        await expect(cards).toHaveAttribute('aria-busy', 'true');
+        await expect(search).toHaveValue(fourthName);
+        await expect(compare).toBeFocused();
+        const loadingY = await scrollY();
+        expect(loadingY).toBeGreaterThan(0);
+        expect(savedY - loadingY, 'The loading view cannot reach the saved position').toBeGreaterThan(100);
+
+        if (action === 'tab') {
+          await page.keyboard.press('Tab');
+          await expect(clear).toBeFocused();
+        }
+        if (action === 'wheel') {
+          await page.mouse.move(15, 100);
+          await page.mouse.wheel(0, -200);
+          await expect.poll(scrollY).toBe(0);
+        }
+        const readerY = await scrollY();
+
+        release();
+        await expect(cards).not.toHaveAttribute('aria-busy', 'true');
+        await expect(cards.locator('[data-company-card]')).toHaveAttribute('data-company-card', 'handshake_ai');
+        await expect(search).toHaveValue(fourthName);
+        await expect(fourth).not.toBeChecked();
+        await expect(compare).toHaveAttribute('href', compareHash(originalIds));
+        const expectedY = action === 'wait' ? savedY : readerY;
+        await expect.poll(async () => Math.abs(await scrollY() - expectedY), {
+          message: 'Back keeps the expected position after company search completes',
+        }).toBeLessThan(1);
+        await expect(action === 'tab' ? clear : compare).toBeFocused();
+      } finally {
+        release();
+      }
+    });
+  }
+});
