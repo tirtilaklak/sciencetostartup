@@ -799,13 +799,14 @@ def _chapter_content(context, section, outline, passages=()):
     return ''.join(blocks)
 
 
-def _reader_shortcuts(outline=(), passages=()):
+def _reader_shortcuts(outline=(), passages=(), *, chapter_count=0):
     jumps = ''
     if passages:
         entries = ''.join('<li>' + _link('#' + anchor, label) + '</li>' for _, anchor, label in passages)
         jumps = '<div class="r-passage-shortcuts"><span>Jump to</span><ul>' + entries + '</ul></div>'
     return ('<nav class="r-bulk-shortcuts r-outline-early" aria-label="Reading shortcuts">'
             + _link('#first-paragraph', 'First paragraph')
+            + (_link('#contents', f'Browse {sp.plural(chapter_count, "chapter")}') if chapter_count else '')
             + (_link('#section-contents', 'Section contents') if outline else '') + jumps + '</nav>')
 
 
@@ -908,8 +909,9 @@ def _report(context, edition=False, base=REPORT_PATH):
     report = context['report']
     section = report['sections'][0]
     state = 'Published edition' if edition else _status(context)
+    shortcuts = _reader_shortcuts(chapter_count=0 if edition else len(report['sections']))
     header = (f'<header class="r-page-head"><p class="r-kicker">{sp.escape(state)}</p>'
-              f'<h1>{sp.escape(report["title"])}</h1>' + _reader_shortcuts()
+              f'<h1>{sp.escape(report["title"])}</h1>' + shortcuts
               + f'<p class="r-lede">{sp.escape(report.get("subtitle"))}</p>'
               + _meta(context) + '<p class="r-callout">' + sp.escape(report.get('summary')) + '</p>'
               + '<p class="r-meta">' + sp.escape(report.get('review_statement')) + '</p>'

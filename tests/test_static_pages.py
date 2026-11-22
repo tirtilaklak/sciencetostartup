@@ -874,7 +874,7 @@ class StaticPageTests(unittest.TestCase):
         self.assertIn(f'data-work-count aria-live="polite" aria-atomic="true">{len(self.routes)} records, including career pages and past listings</p>', work)
         self.assertIn(f"See {len(paid)} paid work routes</a>", (self.dist / "companies/index.html").read_text())
         checked = max(d for r in self.routes for d in (r.get("availability_checked_on"), (r.get("last_route_check") or {}).get("date")) if d)
-        self.assertIn(f"Latest link check {sp.format_date(checked)}", work)
+        self.assertIn(f"The most recent individual link check was on {sp.format_date(checked)}. See each card for available dates.", advice)
         for path in self.html_files():
             self.assertNotRegex(plain(path.read_text()), r"\bopen (?:paid work )?listings?\b", str(path.relative_to(self.dist)))
 
@@ -1022,7 +1022,11 @@ class StaticPageTests(unittest.TestCase):
         rated = {a["company_id"] for a in self.data["assessments"]}
         unrated = [c for c in self.data["companies"] if c["id"] not in rated]
         self.assertTrue(unrated and all(c["entity_type"] == "adjacent_research" for c in unrated))
-        self.assertIn(f"{len(rated)} companies with a delivery evidence level", text)
+        coverage = text.split('id="coverage-notes"', 1)[1].split('</details>', 1)[0]
+        self.assertIn(f'Historical company dataset v{self.data["dataset_version"]}', coverage)
+        self.assertIn(f'This dataset covers {len(self.data["companies"])} company profiles and {len(self.data["sources"])} source records.', coverage)
+        self.assertIn(f"{len(rated)} companies have a delivery evidence level", coverage)
+        self.assertIn(f'<a href="{ORIGIN}/companies/">current company directory</a>', coverage)
         self.assertIn(f"The {sp.count_word(len(unrated)).lower()} nonprofit research groups get no level.", text)
         self.assertNotIn("delivery evidence rating", text)
         self.assertTrue(50 <= len(dataset["description"]) <= 5000)

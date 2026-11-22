@@ -2070,7 +2070,9 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
             '<p class="work-export-status" data-work-export-status aria-live="polite"></p>'
             '<div class="work-page-disclosures"><details class="work-page-groups work-section-disclosure"><summary>Jump to section</summary>'
             f'{directory_counts}<nav aria-label="Work sections" data-work-section-navigation><ul>{section_links}</ul></nav></details>'
-            '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Check the employer’s page for current openings and pay. The employer sets eligibility.' + (f' Latest link check {escape(format_date(checked))}.' if checked else '') + '</p>\n' + safety_note(show_label=False) + '</details></div></div>\n',
+            '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Check the employer’s page for current openings and pay. The employer sets eligibility.'
+            + (f' The most recent individual link check was on {escape(format_date(checked))}.' if checked else '')
+            + ' See each card for available dates.</p>\n' + safety_note(show_label=False) + '</details></div></div>\n',
             '<div class="work-page-empty" data-work-empty hidden><p>No records match. Try another word or clear the filters.</p><button type="button" data-work-clear>Clear search and filters</button></div>\n',
             '<section id="work-integrated-table" data-work-comparison hidden><h2 tabindex="-1">Compare paid work results</h2></section>',
             '<div class="work-page-list">']
@@ -2136,9 +2138,11 @@ def render_method(research, sizes, modified):
     unrated_note = (f" The {count_word(len(unrated)).lower()} nonprofit research {'group gets' if len(unrated) == 1 else 'groups get'} no level." if unrated and all(c.get("entity_type") == "adjacent_research" for c in unrated)
                     else f" {plural(len(unrated), 'company has', 'companies have')} no level yet." if unrated else "")
     body.append('<details class="method-detail" id="coverage-notes"><summary>Coverage and limits</summary><div class="method-detail-body"><h2 id="coverage">Research coverage</h2>\n'
-                f'<p class="method-snapshot">Dataset v{escape(data.get("dataset_version", ""))}{escape(compiled)}</p>\n'
-                f'<p>{plural(len(research.companies), "company profile")} · {plural(len(rated), "company", "companies")} with a delivery evidence level · {plural(len(data.get("sources", [])), "source record")}.{unrated_note}</p>\n'
-                f"<p>{plural(doubtful, 'claim is', 'claims are')} unverified or disputed. Each one is labeled. {COVERAGE}</p></div></details>\n")
+                f'<p class="method-snapshot">Historical company dataset v{escape(data.get("dataset_version", ""))}{escape(compiled)}</p>\n'
+                f'<p>This dataset covers {plural(len(research.companies), "company profile")} and {plural(len(data.get("sources", [])), "source record")}. '
+                f'{plural(len(rated), "company has", "companies have")} a delivery evidence level.{unrated_note}</p>\n'
+                f'<p>{plural(doubtful, "claim is", "claims are")} unverified or disputed. Each one is labeled. '
+                f'Browse the <a href="{ORIGIN}/companies/">current company directory</a> for newer profiles.</p></div></details>\n')
     files = [(name, kind, mime, text) for name, kind, mime, text in DOWNLOADS if name in sizes] + [(name, "CSV", "text/csv", f"The {name[:-4].replace('_', ' ')} table") for name in sorted(n for n in sizes if n.endswith(".csv"))]
     canonical_names = {"research.json", "observatory.sqlite", "classifications.csv"} | {name + ".csv" for name in TABLES}
     historical_files = [item for item in files if item[0] in canonical_names]
