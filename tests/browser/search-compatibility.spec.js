@@ -34,12 +34,15 @@ async function home(page, { oldMarkup = false, oldIndex = false, oldComponent = 
 }
 
 test('new homepage component accepts old markup and old index without optional aliases', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
   await home(page, {oldMarkup:true,oldIndex:true});
   await page.locator('#home-search-open').click();
   await page.locator('#home-search-input').fill('Nexdata');
   await expect(page.locator('#home-search-results a').first()).toHaveAttribute('href','/company/org.nexdata/');
   await expect(page.locator('#home-search-more')).toHaveCount(1);
   await expect(page.locator('#home-search-results #home-search-more')).toHaveCount(0);
+  expect(errors).toEqual([]);
 });
 
 test('preceding homepage component remains usable with new markup and index', async ({ page }) => {
@@ -106,22 +109,54 @@ test('lightweight search prefills and removes only its parameter', async ({ page
 });
 
 for(const routeName of ['companies','work']) for(const oldScript of [false,true]) {
-  test(`${oldScript?'preceding':'new'} ${routeName} script accepts ${oldScript?'new':'old'} native markup`,async({page})=>{
-    let html=previous(routeName+'.html.gz');
-    html=html.replace(/<script\b[^>]*src="[^"]+"[^>]*><\/script>/g,'');
-    await page.route(origin+'/**',route=>route.fulfill({contentType:'text/html',body:html}));await page.goto(origin+'/'+routeName+'/');
-    if(oldScript) await page.evaluate(({companies,routeName})=>{
-      if(routeName==='companies')for(const company of companies){const card=document.querySelector('[data-company="'+company.id+'"]');if(card){card.dataset.search+=' '+(company.aliases||[]).join(' ');card.dataset.searchName=company.name;card.dataset.searchAliases=JSON.stringify(company.aliases||[]);}}
-      else {const script=document.createElement('script');script.id='work-search-aliases';script.type='application/json';script.textContent=JSON.stringify(Object.fromEntries(companies.map(company=>[company.id,company.aliases||[]])));document.body.append(script);}
-    },{companies,routeName});
-    await page.addScriptTag({content:oldScript?previous(routeName+'-page.js'):current(routeName+'-page.js')});
+  test(`${oldScript?'preceding':'new'} ${routeName} script accepts ${oldScript?'new':'old'} native markup`,async({page,request})=>{
+    const pagePath = '/'+routeName+'/';
+    let html;
+    if (oldScript) {
+      const response = await request.get(pagePath);
+      expect(response.ok()).toBe(true);
+      html = await response.text();
+    } else html = previous(routeName+'.html.gz');
+    html = html.replace(/<script\b(?![^>]*\btype="application\/(?:ld\+)?json")[^>]*>[\s\S]*?<\/script>/g,'');
+    const legacyWork = routeName === 'work' && !oldScript;
+    await page.route(origin+'/**',route=>route.fulfill({contentType:'text/html',body:html}));
+    await page.goto(origin+pagePath+(legacyWork?'?reader=keep&pay=hourly#main':''));
+    const recordOrder = () => page.locator('[data-work-route]').evaluateAll(cards => cards.map(card => card.dataset.workRoute));
+    const originalOrder = legacyWork ? await recordOrder() : [];
+    const originalCount = legacyWork ? await page.locator('[data-work-count]').textContent() : '';
+    let source = oldScript?previous(routeName+'-page.js'):current(routeName+'-page.js');
+    if (legacyWork) {
+      const packaged = await request.get('/work-page.js');
+      expect(packaged.ok()).toBe(true);
+      source = await packaged.text();
+    }
+    await page.addScriptTag({content:source});
     const input=page.locator(routeName==='companies'?'#company-query':'[data-work-filters] input[name=q]');await expect(input).toBeVisible();
     await input.fill(oldScript&&routeName==='companies'?'Outlier':routeName==='companies'?'Scale AI':'Sage');
     const records=page.locator(routeName==='companies'?'.directory-company:visible':'[data-work-route]:visible');expect(await records.count()).toBeGreaterThan(0);
+    if (routeName === 'companies') await expect(page.locator('.directory-company[data-company="scale_ai"]')).toBeVisible();
+    if (oldScript && routeName === 'work') {
+      const sage = page.locator('[data-work-group="closed"] [data-work-route="appen.work.sage-media"]');
+      await expect(sage).toBeVisible();
+      await expect(sage).toContainText('MacBook Pro');
+    }
     if(routeName==='work') await page.locator('.work-page-filter-options').evaluate(node=>{node.open=true;});
+    if (legacyWork) {
+      const sage = page.locator('[data-work-group="named"] [data-work-route="appen.work.sage-media"]');
+      await expect(sage).toBeVisible();
+      await expect(sage).toContainText('MacBook Pro');
+      await page.locator('[data-work-filters] select[name=arrangement]').selectOption('onsite');
+      await expect(sage).toBeHidden();
+    }
     await page.getByRole('button',{name:'Clear',exact:true}).click();
     await expect(input).toHaveValue('');
-    await expect(page.locator(routeName==='companies'?'[data-company]':'[data-work-route]')).toHaveCount(routeName==='companies'?53:135);
+    await expect(page.locator(routeName==='companies'?'[data-company]':'[data-work-route]')).toHaveCount(routeName==='companies'?(oldScript?55:53):135);
+    if (legacyWork) {
+      await expect(input).toBeFocused();
+      await expect(page).toHaveURL(origin+'/work/?reader=keep&pay=hourly#main');
+      await expect(page.locator('[data-work-count]')).toHaveText(originalCount);
+      expect(await recordOrder()).toEqual(originalOrder);
+    }
   });
 }
 
@@ -130,7 +165,9 @@ test('stalled component recovery can close and retry without a late reopen', asy
   const hold=route=>{stalled=route;};await page.route('**/home-search.js',hold);
   await page.locator('#home-search-open').click();await expect(page.locator('#home-search-message')).toContainText('Loading search');
   await page.clock.fastForward(15001);await expect(page.locator('[data-home-component-retry]')).toBeVisible();
-  await expect(page.locator('#home-search-message a[href="/companies/"]')).toBeVisible();
+  const browse = page.locator('#home-search').getByRole('link', { name: 'Browse companies' });
+  await expect(browse).toBeVisible();
+  await expect(browse).toHaveAttribute('href','/companies/');
   await page.locator('#home-search-close').click();await expect(page.locator('#home-search-open')).toBeFocused();
   await stalled.fulfill({contentType:'application/javascript',body:current('home-search.js')}).catch(()=>{});
   await expect(page.locator('#home-search')).not.toBeVisible();await page.unroute('**/home-search.js',hold);
@@ -143,7 +180,7 @@ test('empty component load offers retry and native modifier navigation', async (
   const fixtureOrigin=new URL(baseURL).origin;
   await home(page,{fixtureOrigin});const empty=route=>route.fulfill({contentType:'application/javascript',body:''});await page.route('**/home-search.js',empty);
   await page.locator('#home-search-open').click();await expect(page.locator('[data-home-component-retry]')).toBeVisible();
-  const fallback=page.locator('#home-search-message a[href="/companies/"]');await expect(fallback).toHaveAttribute('href','/companies/');
+  const fallback=page.locator('#home-search').getByRole('link',{name:'Browse companies'});await expect(fallback).toHaveAttribute('href','/companies/');
   const opened=context.waitForEvent('page');await fallback.click({modifiers:['ControlOrMeta']});
   const tab=await opened;await expect(tab).toHaveURL(fixtureOrigin+'/companies/');
   await expect(tab.getByRole('heading',{level:1})).toHaveText('AI data companies');
