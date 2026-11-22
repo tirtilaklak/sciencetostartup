@@ -1,0 +1,206 @@
+{
+  "initial_sweep": {
+    "commit": "324072f0027873cea084dc05a87c3dd64b8d3d5f",
+    "build_id": "0223193390f17ca8cadc",
+    "manifest_sha256": "3e4ecab1082bf7508608a411c5fd0dea025be910b4de83c62e64834449838a87",
+    "payloads": 1280,
+    "editorial_release_id": "2026-11-22.5"
+  },
+  "corrected_candidate": {
+    "head": "7549c10013968f0dfd5eba5f3bf8c20ce166d667",
+    "source": "a6f2ca76aec3a6b28b463d9e7a0d8a51d8890ba2",
+    "pr": 35,
+    "branch": "codex/site-quality-20261122",
+    "build": "4b07b7b1f9bbb41d3b80",
+    "manifest": "f5fc2bf96f57542106b1d9ecd2257cf2e4acb10f158f562da529534dd2c8268d",
+    "plan": "67c11120670aa9aac97ceb7060618b6ed3d5da78058cd925bd0c7c0f48d94ca8",
+    "utc": "2026-11-22T12:25:34.879612+00:00",
+    "official_ci": 45022217670,
+    "official_browser": 45022217729
+  },
+  "cohort": {
+    "model": "gpt-6.2-sol",
+    "reasoning_effort": "ultra",
+    "reviewers": [
+      "retest8_visual",
+      "retest8_work_sources",
+      "retest8_release",
+      "retest8_work_matrix",
+      "retest8_work_matrix/compare_cells",
+      "retest8_finance",
+      "retest8_research",
+      "retest8_navigation",
+      "retest8_daily",
+      "retest8_companies"
+    ]
+  },
+  "coverage": {
+    "explore_viewports": [
+      {
+        "viewport": [
+          390,
+          844
+        ],
+        "visits": 285,
+        "http": {
+          "200": 285
+        },
+        "verdicts": {
+          "reached": 285
+        },
+        "page_errors": 0,
+        "initial_body": 277,
+        "initial_body_next_skip": 277,
+        "initial_heading_readable": 265,
+        "next_tab_inside_view": 8,
+        "heading_supplements": [
+          "/explore/#company/a-team/people",
+          "/explore/#company/appen/people",
+          "/explore/#company/benchflow/people",
+          "/explore/#company/datacurve/people",
+          "/explore/#company/giskard/people",
+          "/explore/#company/hackerrank/people",
+          "/explore/#company/handshake_ai/people",
+          "/explore/#company/imerit/business",
+          "/explore/#company/invisible/people",
+          "/explore/#company/labelbox/business",
+          "/explore/#company/labelbox/people",
+          "/explore/#company/mercor/people",
+          "/explore/#company/micro1/people",
+          "/explore/#company/prime_intellect/people",
+          "/explore/#company/sama/business",
+          "/explore/#company/sama/people",
+          "/explore/#company/scale_ai/people",
+          "/explore/#company/snorkel_ai/people",
+          "/explore/#company/taskus/people",
+          "/explore/#company/turing/people"
+        ],
+        "next_focus_center_hit_false": [
+          "/explore/#downloads",
+          "/explore/#coverage"
+        ],
+        "changed_observations": 2
+      },
+      {
+        "viewport": [
+          1280,
+          800
+        ],
+        "visits": 285,
+        "http": {
+          "200": 285
+        },
+        "verdicts": {
+          "reached": 285
+        },
+        "page_errors": 0,
+        "initial_body": 277,
+        "initial_body_next_skip": 277,
+        "initial_heading_readable": 282,
+        "next_tab_inside_view": 8,
+        "heading_supplements": [
+          "/explore/#company/imerit/business",
+          "/explore/#company/labelbox/business",
+          "/explore/#company/sama/business"
+        ],
+        "next_focus_center_hit_false": [],
+        "changed_observations": 2
+      }
+    ],
+    "work_selections": 70,
+    "work_csv_downloads": 210,
+    "header_only_selections": 13,
+    "work_ids": 135,
+    "native_profiles": 55,
+    "compare_profiles": 39,
+    "shared_financial_rows": 18,
+    "employer_destinations": 118,
+    "work_dispositions": 33,
+    "afterquery_description_and_application_pairs": 25,
+    "research_record_comparison": true,
+    "research_rows": 17763,
+    "deposited_members": 57,
+    "checksums": 56,
+    "approved_daily": "2026-11-18",
+    "daily_editions": {
+      "2026-11-18": {
+        "selections": 13,
+        "sourceLinks": 23,
+        "snapshotSha256": "e6c6623cfe2f26f49a2cecdc7c909809092eadbb570348ba9e1563a14fe95159"
+      },
+      "2026-11-17": {
+        "selections": 16,
+        "sourceLinks": 35,
+        "snapshotSha256": "bb2c8f919cfe2448c45bb7d0ea3703f077e73deaa8db51ef5dabe62e4946c22e"
+      },
+      "2026-11-16": {
+        "selections": 18,
+        "sourceLinks": 36,
+        "snapshotSha256": "cf6542de43f6a493d06f4f11d1e47e22981893974ff54e0c2d3a5cde7ca77109"
+      }
+    },
+    "local_acceptance_checks": 86,
+    "local_browser_journeys": 125,
+    "official_browser": {
+      "firstPassCore": 1391,
+      "retriedCore": 1,
+      "skippedCore": 63,
+      "accessibilityPassed": 60
+    },
+    "mobile_routes": 24,
+    "mobile_reports": 72
+  },
+  "artifact_reconciliation": {
+    "original": "0223193390f17ca8cadc",
+    "corrected": "4b07b7b1f9bbb41d3b80",
+    "counts": {
+      "byte_identical": 1229,
+      "identity_and_derived_asset_hashes_only": 51
+    },
+    "manifest_before": "3e4ecab1082bf7508608a411c5fd0dea025be910b4de83c62e64834449838a87",
+    "manifest_after": "f5fc2bf96f57542106b1d9ecd2257cf2e4acb10f158f562da529534dd2c8268d",
+    "proof_sha256": "04e84960f0f4079d11f689513b90d42f6472de9b17f3f7d8bde04e511cec4dc6"
+  },
+  "official_release": {
+    "head": "7549c10013968f0dfd5eba5f3bf8c20ce166d667",
+    "build": "4b07b7b1f9bbb41d3b80",
+    "manifest": "f5fc2bf96f57542106b1d9ecd2257cf2e4acb10f158f562da529534dd2c8268d",
+    "release": "withheld",
+    "official_ci": 45022217670,
+    "official_browser_qa": 45022217729,
+    "failed_job": 137207418306,
+    "case": "StaticPageTests.test_pages_stay_lean_without_app_script_or_dataset",
+    "afterquery_raw": 159574,
+    "afterquery_gzip_level_9": 23274,
+    "required_compressed_bytes_less_than": 23000,
+    "afterquery_page_sha256": "59804ab1edd1f5d5f19bbbce3b7d6f9455d5b5f6675944b02bde8cb687f739d7",
+    "provider_asset_session_dispatched": false,
+    "version_created": false,
+    "traffic_changed": false,
+    "receiver_closed": true,
+    "observed_utc": "2026-11-22T12:43:07.483010+00:00"
+  },
+  "evidence_sha256": {
+    "work-matrix/matrix-summary.json": "c70843ec07f301f7338d8bf347281a7d9d6aa6f45673ba5bda122212f45e21e0",
+    "work-matrix/recovery-summary.json": "ad4f81189d81b11300065c6e72fb7938b758075cdcb95d3a1f0301a989cae490",
+    "work-matrix/compare/README.md": "c30e15000677cae2568a5590dfe7ead7531ca2576b8e53bb1d268d11b643cc4e",
+    "work-sources/public-assessment.json": "805ceba5cef90523485a64613bfec6858a2f59cdccaab19c8479ff7587a28dc3",
+    "work-sources/README.md": "5bdff02f5b57e8d501401b04d25746a8a623cc1af0c777687bdd1e653399a5ad",
+    "visual/report.md": "7d23c475d3e48076ce107c8c0d8ae89f9420374241fa90e2ab24bf3363073eaf",
+    "finance/validated-replay.json": "8603cf119c6d9a53ec73404c3f4a6b53bb63da67a227ae3e3467ce5ac41c9ba9",
+    "finance/findings.md": "a73a9c4665350dcee3ce290a180e4bc02019a62e24ba3b229f907deeb59f09ac",
+    "navigation/route-summary.json": "312751ef5f5df5c0ecfb4267ad8516b790731678ba10108f01ed302f099c89cb",
+    "navigation/regenerated/README.md": "1fbea53ed3431be4c07a60cc4712e0568d0f80c198dbc95a21134310f0d89425",
+    "research/byte-parity.json": "c545345f3bb258ea4aa5bda11390378447abfd3de0e999b6af2e1d01e9652c50",
+    "research/README.md": "64137ae3130debc7a4292e5ae29cfe83e35a829c3ce3476313bc6c1161b3a505",
+    "research/hosting-http.json": "d363038cfdcecdf6c1f7402dd914a58c0773337fd86e7ea11542fba6e32dad09",
+    "research/legacy-bookmarks.json": "a84b9d73694f25f452245722db0c3e7cadd433fe4b450635365a6793a6325823",
+    "daily/summary.json": "9594ccb02e390764339cf076b551e206481fd5f4af85ad90dbb4a371131e56c9",
+    "daily/report.md": "b3d7d61ee0bedc35855ade52b9aa2e928310f0c730d7d56f94a8f68a7b1d918f",
+    "companies/parity.json": "99a1ef1917692b0e30fa4a98057492e8f61940db469464b25e790d9f631579ce",
+    "companies/continuity.json": "e548a5d17cc54cf97399b5ff0107811a5a6738ba23fa65ddbbce7c6437ca3685",
+    "companies/findings.md": "d271b90e4d25e771bb1bd97f47779baba2a9bbf9ec1a1198cf2df0e217575d5d",
+    "release/head-7549c100/browser-test-counts.json": "03686c0c2053131b86ceb9b1835bd6bac9b8201b25912ad920b405ac71abbaf8",
+    "release/head-7549c100/verified-release-evidence.json": "352317f67b2f59cfc3d3d4ea87156714db4d42f0c3078fbfd6ea60f7174401e3"
+  }
+}
