@@ -15,19 +15,34 @@ const [dataPath,root,expectedPath]=process.argv.slice(2),data=JSON.parse(fs.read
 const synthetic=data.companies[0].id==='test-alpha',readJSON=p=>JSON.parse(fs.readFileSync(path.join(root,p),'utf8'));
 const nodes={},boxes=[],documentCallbacks={},windowCallbacks={};
 function node(id){return nodes[id]??={id,textContent:'',innerHTML:'',value:'',hidden:false,dataset:{},callbacks:{},addEventListener(k,f){this.callbacks[k]=f},setAttribute(k,v){this[k]=v},removeAttribute(k){delete this[k]},showModal(){this.open=true},close(){this.open=false},scrollIntoView(){},focus(){},click(){},insertAdjacentHTML(where,html){this.innerHTML=where==='afterbegin'?html+this.innerHTML:this.innerHTML+html}};}
+// Fixed fixture geometry lets the VM exercise Compare's observer and resize logic.
+const masthead={getBoundingClientRect:()=>({height:60})};
+const tableHead={getBoundingClientRect:()=>({height:90})};
+const table=Object.assign(node('comparison-table'),{tHead:tableHead,style:{setProperty(key,value){this[key]=value}}});
+function toggleAttribute(key,enabled){if(enabled)this.setAttribute(key,'');else this.removeAttribute(key);}
+table.toggleAttribute=toggleAttribute;
+Object.assign(node('compare-view'),{toggleAttribute,querySelector:selector=>selector==='.comparison-table'?table:null});
+node('compare-content').querySelector=selector=>selector==='thead'?tableHead:null;
+node('bh-grid-wrap').querySelector=selector=>selector==='thead'?node('market-head'):null;
+const observers=[];
+class ResizeObserver {
+ constructor(callback){this.callback=callback;this.targets=new Set();observers.push(this);}
+ observe(element){assert.ok(element);this.targets.add(element);}
+ disconnect(){this.targets.clear();}
+}
 node('research-data').textContent=JSON.stringify(data);
-const document={getElementById:node,querySelectorAll:s=>s==='[data-compare]'?boxes:[],querySelector:()=>null,createElement:()=>node('created'),addEventListener(k,f){(documentCallbacks[k]??=[]).push(f)}};
+const document={getElementById:node,querySelectorAll:s=>s==='[data-compare]'?boxes:[],querySelector:s=>s==='body > .topbar'?masthead:null,documentElement:Object.assign(node('html'),{toggleAttribute}),createElement:()=>node('created'),addEventListener(k,f){(documentCallbacks[k]??=[]).push(f)}};
 const location={hash:'#market'};
 // Match observatory.py's optional single-company profile overlay exactly.
 const profileData=readJSON('data/profile-content.json'),afterqueryPath=path.join(root,'data/profile-afterquery.json');
 if(fs.existsSync(afterqueryPath))profileData.entries=profileData.entries.filter(entry=>entry.company_id!=='afterquery').concat(JSON.parse(fs.readFileSync(afterqueryPath,'utf8')));
-const window={scrollY:0,scrollTo(){},addEventListener(k,f){(windowCallbacks[k]??=[]).push(f)},EDITORIAL:readJSON('data/editorial.json'),LOGOS:readJSON('data/logo-provenance.json'),WORK_ROUTES:synthetic?{routes:[]}:readJSON('data/work-routes.json'),PROFILE_CONTENT:profileData,RESEARCH_ALIASES:readJSON('docs/research-id-crosswalk.json')};
+const window={innerHeight:800,scrollY:0,scrollTo(){},addEventListener(k,f){(windowCallbacks[k]??=[]).push(f)},EDITORIAL:readJSON('data/editorial.json'),LOGOS:readJSON('data/logo-provenance.json'),WORK_ROUTES:synthetic?{routes:[]}:readJSON('data/work-routes.json'),PROFILE_CONTENT:profileData,RESEARCH_ALIASES:readJSON('docs/research-id-crosswalk.json')};
 window.SOURCE_UPDATES=readJSON('data/source-updates.json');
 window.BUSINESS_HEALTH=synthetic?null:readJSON('data/business-health.json');
 const history={state:null,scrollRestoration:'auto',replaceState(state,title,url){this.state=state;if(url!==undefined)location.hash=String(url).includes('#')?'#'+String(url).split('#').slice(1).join('#'):'';}};
 let downloadedBlob;
 class CaptureURL extends URL {static createObjectURL(blob){downloadedBlob=blob;return 'blob:test'}static revokeObjectURL(){}}
-const context=vm.createContext({document,window,history,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,URLSearchParams,Blob,queueMicrotask,setTimeout:()=>{},clearTimeout:()=>{},console});
+const context=vm.createContext({document,window,history,ResizeObserver,innerHeight:window.innerHeight,location,Intl,Set,Map,Date,JSON,URL:CaptureURL,URLSearchParams,Blob,queueMicrotask,setTimeout:()=>{},clearTimeout:()=>{},console});
 // The icon script runs first. This stub's window is separate from its global.
 // Combining the remaining modules matches declaration hoisting in the build.
 const modules=['web/icons.js','web/search-core.js','web/app.js','web/editorial.js','web/work-core.js','web/work-v3.js','web/work-v4.js','web/profiles-v2.js','web/source-updates.js','web/site-nav.js','web/detail-views.js','web/source-update-details.js','web/profile-details.js','web/business-health.js'];
@@ -175,6 +190,13 @@ const button=dataset=>({dataset,hasAttribute:()=>false});
  boxes.filter(b=>b.dataset.compare==='g2i').forEach(b=>b.checked=true);run(`chooseCompare('g2i',true)`);assert.ok(boxes.filter(b=>b.dataset.compare==='g2i').every(b=>!b.checked));
  assert.ok(!node('compare-content').innerHTML.includes('comparison-table'),'Selecting from another view does not render the hidden table');
  location.hash=run('compareHash()');run('route()');
+ const compareObserver=observers.find(observer=>observer.targets.has(tableHead));
+ assert.deepEqual([...compareObserver.targets],[masthead,tableHead]);
+ assert.equal(table.style['--compare-head-height'],'90px');
+ assert.equal(Object.hasOwn(table,'data-compare-flow-head'),false);
+ window.innerHeight=280;compareObserver.callback();
+ assert.equal(Object.hasOwn(table,'data-compare-flow-head'),true);
+ window.innerHeight=800;compareObserver.callback();
  assert.equal((node('compare-content').innerHTML.match(/data-comparison-row=/g)||[]).length,10);assert.equal((node('compare-content').innerHTML.match(/data-comparison-company=/g)||[]).length,30);
  node('clear-compare').callbacks.click();assert.ok(boxes.every(b=>!b.checked));assert.equal(run('state.selected.length'),0);
  node('compare-preset').value='work';node('compare-preset').callbacks.change({target:node('compare-preset')});assert.deepEqual(plain(run('state.selected')),['surge_ai','toloka','labelbox']);assert.ok(boxes.filter(b=>b.dataset.compare==='surge_ai').every(b=>b.checked));

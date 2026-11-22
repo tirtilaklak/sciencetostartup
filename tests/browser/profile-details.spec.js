@@ -392,6 +392,6 @@ test('an initial section route respects keyboard focus established while its evi
 test('a fresh profile bookmark scrolls to the source heading without setting focus', async ({ page }) => {
   await page.goto(imeritLedger);
   await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
-  await expectSourceHeadingInView(page.getByRole('heading', { name: 'All sources', exact: true }));
+  await expectBelowProfileNavigation(page.getByRole('heading', { name: 'All sources', exact: true }));
   await expect(page.locator('body')).toBeFocused();
 });
