@@ -114,6 +114,10 @@ function attributes(tag) {
 }
 
 export function resourceReferences(text, owner) {
+  // Script bodies are raw text in HTML. Keep the tag so its src is still checked.
+  if (owner.endsWith('.html')) {
+    text = text.replace(/(<script\b(?:"[^"]*"|'[^']*'|[^'">])*>)[\s\S]*?(?:<\/script\s*>|$)/gi, '$1');
+  }
   const found = [];
   const add = (value, kind) => {
     const resolved = localReference(value, owner);
