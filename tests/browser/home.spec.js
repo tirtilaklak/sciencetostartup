@@ -19,6 +19,8 @@ test('home shows both dated sources before the phone portrait and aligns the des
     await expect(heading).toHaveText('Who makes AI training data?');
     const company = page.locator('[data-observation="snorkel_ai.metric.major-growth_metrics-0"]');
     await expect(company).toContainText('$375M annualized revenue run rate');
+    await expect(company.locator('.example-pay [aria-hidden="true"]')).toHaveText('>');
+    await expect(company.locator('.example-pay .sr-only')).toHaveText('More than');
     await expect(company.locator('time')).toHaveAttribute('datetime', '2026-09-22');
     const companySource = company.getByRole('link', { name: 'Original disclosure' });
     await expect(companySource).toBeInViewport({ ratio: 1 });

@@ -102,10 +102,16 @@ def company_example(companies, sidecars):
             and figure["period"]["type"] == "run_rate" and figure["evidence_assurance"] == "Company-reported"):
         return ('<article class="example-card company-example"><h3 class="example-title">AI data companies</h3>'
                 '<div class="example-actions"><a class="example-action" href="/companies/">Browse sourced company profiles</a></div></article>')
+    if figure.get("qualifier") == "greater_than":
+        # Use the same compact bound notation as Market and Compare on the phone.
+        amount = ('<span aria-hidden="true">&gt; </span><span class="sr-only">More than </span>'
+                  + escape(value_text({**figure, "qualifier": None})))
+    else:
+        amount = escape(value_text(figure))
     return (f'<article class="example-card company-example" data-observation="{SNORKEL_METRIC}" data-source="{SNORKEL_METRIC_SOURCE}">'
             f'<p class="example-kind">Company</p><h3 class="example-title">{escape(companies["snorkel_ai"]["name"])}</h3>'
             f'<p class="example-summary">{escape(entry["summary"])}</p>'
-            f'<p class="example-pay">{escape(value_text(figure))} {escape(figure["label"].lower())}</p>'
+            f'<p class="example-pay">{amount} {escape(figure["label"].lower())}</p>'
             f'<p class="example-meta">{escape(figure["evidence_assurance"])} · {date_tag(figure["as_of"])}</p>'
             '<div class="example-actions"><a class="example-action" href="/company/snorkel_ai/">Read profile</a>'
             f'<a class="example-action" href="{escape(source["url"], quote=True)}">Original disclosure</a></div></article>')
