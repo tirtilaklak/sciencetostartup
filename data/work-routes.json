@@ -207,6 +207,11 @@
           "note": "Company expert-page headline: $97/hour average, checked 28 October 2026. Network context, not an offer for a role."
         },
         {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official expert page lists individual roles with different rates. Its $97/hr headline is network context; no single rate applies to the network. No application submitted."
+        },
+        {
           "date": "2026-11-08",
           "result": "historical_network_pay_context",
           "note": "Company expert page reports a $90/hour average contracted rate, checked 2026-11-08. Network context, not an individual offer."
@@ -2049,7 +2054,14 @@
           "note": "The CTA reaches the general roles directory. It was still loading in the latest Chromium view."
         }
       },
-      "availability_label": "Category overview · vacancy unconfirmed"
+      "availability_label": "Category overview · vacancy unconfirmed",
+      "check_history": [
+        {
+          "date": "2026-11-18",
+          "result": "blocked",
+          "note": "The official page returned an Incapsula block with HTTP200. No source terms or current availability were reviewed."
+        }
+      ]
     },
     {
       "id": "labelbox.work.mechanical-engineering",
@@ -2861,7 +2873,14 @@
           "basis": "not_reviewed"
         }
       },
-      "availability_label": "Application access unconfirmed"
+      "availability_label": "Application access unconfirmed",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "blocked_fetch",
+          "note": "Official expert-platform page indexed about two months ago. Expert platform returned 403 in direct reads. World Models route also returned 403 in dot cloud Chrome."
+        }
+      ]
     },
     {
       "id": "afterquery.work.college-swe",
@@ -3182,7 +3201,14 @@
           "basis": "not_reviewed"
         }
       },
-      "availability_label": "Application access unconfirmed"
+      "availability_label": "Application access unconfirmed",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "blocked_fetch",
+          "note": "Official expert-platform page indexed about two months ago. Expert platform returned 403 in direct reads. World Models route also returned 403 in dot cloud Chrome."
+        }
+      ]
     },
     {
       "id": "afterquery.work.research-careers",
@@ -4746,7 +4772,14 @@
           "basis": "stored_evidence"
         }
       },
-      "availability_label": "Application access unconfirmed"
+      "availability_label": "Application access unconfirmed",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "Published route observed",
+          "note": "Published route observed Rolling applications; confidentiality agreement, game assessment, paid work test, founder interview. No public hourly rate."
+        }
+      ]
     },
     {
       "id": "trajectory_labs_pbc.work.cyber-red-teamer",
@@ -5070,7 +5103,14 @@
           "basis": "stored_evidence"
         }
       },
-      "availability_label": "Application access unconfirmed"
+      "availability_label": "Application access unconfirmed",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "Published route observed",
+          "note": "Published route observed Paid work test is explicit. No published weekly hours."
+        }
+      ]
     },
     {
       "id": "trajectory_labs_pbc.work.safety-careers",
@@ -6682,6 +6722,11 @@
           "result": "application_form_available",
           "url": "https://jobs.ashbyhq.com/g2i/6ea6a53a-7689-45f2-b429-1146965d3cd7",
           "note": "The exact official Ashby page rendered the role and a visible Submit Application control, and the public Ashby job board lists it. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official Ashby employer data lists this role and advertises $100–$200/hour depending on experience and location, with 10–20 hours/week. Regional restrictions apply. No application submitted."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -8026,7 +8071,14 @@
           "basis": "not_reviewed"
         }
       },
-      "availability_label": "Registration access unconfirmed"
+      "availability_label": "Registration access unconfirmed",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "Published route observed",
+          "note": "Published route observed Official experts page links registration. Public rates and weekly hours were not published on pages checked. Support guidance is not a research-mentorship promise."
+        }
+      ]
     },
     {
       "id": "pareto.work.investment-analyst",
@@ -8358,6 +8410,11 @@
           "date": "2026-10-15",
           "result": "parent_public_source_review",
           "note": "Paris hybrid listing gives 6+ years in header and4+ in body. Equity wording differs; the separate salary range is retained."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Employer YC listing still shows €65K–€80K EUR. The header and description disagree on required experience; retain that qualification. Application acceptance was not tested."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -10297,7 +10354,14 @@
           "basis": "stored_evidence"
         }
       },
-      "availability_label": "Coding domain quiet for now"
+      "availability_label": "Coding domain quiet for now",
+      "check_history": [
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "The page shows “This domain is quiet for now” alongside rate examples and role links. This does not establish allocated work; task-specific availability must be confirmed."
+        }
+      ]
     },
     {
       "id": "toloka.work.cad-simulation",
@@ -10715,7 +10779,14 @@
           "basis": "not_reviewed"
         }
       },
-      "availability_label": "Waitlist before invitation"
+      "availability_label": "Waitlist before invitation",
+      "check_history": [
+        {
+          "date": "2026-10-15",
+          "result": "parent_public_source_review",
+          "note": "Use expert or participant intake for work. The software-engineering page is buyer-facing. Expert and participant waitlists can apply."
+        }
+      ]
     },
     {
       "id": "prolific.work.study-participant",
@@ -10887,6 +10958,11 @@
           "date": "2026-10-14",
           "result": "public_page_live",
           "note": "public_page_live PayPal cashout from £6/$6; specialized AI tasks may require assessments."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official participant page is readable; it describes study payments and cash-out rules. A cash-out threshold is not an hourly rate, and work allocation is not guaranteed."
         }
       ],
       "route_kind": "network_program",
@@ -11245,6 +11321,11 @@
           "date": "2026-10-14",
           "result": "public_page_live",
           "note": "public_page_live Rolling applications; no prior AIXI expertise required."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official page still advertises £2,000–£3,500 per month plus a compute budget, for roughly a quarter. Application acceptance was not tested."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -11718,7 +11799,14 @@
           "basis": "not_reviewed"
         }
       },
-      "availability_label": "Program · project intake varies"
+      "availability_label": "Program · project intake varies",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "official_entry_point",
+          "note": "Official entry point linked or opened. Specific role availability, pay and application acceptance were not assessed in this check."
+        }
+      ]
     },
     {
       "id": "appen.work.sage-media",
@@ -12108,7 +12196,14 @@
       },
       "assessment": "Qualification tests and identity verification",
       "availability_label": "Past listing · project intake superseded",
-      "availability_note": "The former Sage description now returns 404 after redirect. Its project application shows a migration notice and leads to general Appen Experts account access. Current Sage intake is unconfirmed."
+      "availability_note": "The former Sage description now returns 404 after redirect. Its project application shows a migration notice and leads to general Appen Experts account access. Current Sage intake is unconfirmed.",
+      "check_history": [
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official page still advertises up to $15/hour for US residents with a MacBook Pro; qualification tests and identity verification apply. Availability of allocated tasks was not tested."
+        }
+      ]
     },
     {
       "id": "appen.work.us-job-board",
@@ -13390,6 +13485,11 @@
           "date": "2026-10-14",
           "result": "Official listing indexed within five days; live page responds with JavaScript shell",
           "note": "Official listing indexed within five days; live page responds with JavaScript shell This is not a flexible annotation-gig listing. Listing title says Fellow while body says Intern. Application acceptance was not verified."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Description now states Base Salary $7500/month, 12 weeks, at least 20 hours a week."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -14003,7 +14103,14 @@
           "basis": "not_reviewed"
         }
       },
-      "availability_label": "Application access unconfirmed"
+      "availability_label": "Application access unconfirmed",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "blocked_fetch",
+          "note": "Official expert-platform page indexed about two months ago. Expert platform returned 403 in direct reads. World Models route also returned 403 in dot cloud Chrome."
+        }
+      ]
     },
     {
       "id": "afterquery.work.research-fellow",
@@ -14256,6 +14363,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "Research Fellow: application rendered with Name, Email, Location, LinkedIn, Resume/CV, research-proposal upload, work links, work-authorization/sponsorship questions and Submit Application. No data entered or submitted. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $16K per month."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -15589,6 +15701,11 @@
           "date": "2026-10-28",
           "result": "listing_content_reviewed",
           "note": "Official page still advertises £120,000–£160,000 per year. Application acceptance was not tested."
+        },
+        {
+          "date": "2026-11-18",
+          "result": "pay_content_reviewed",
+          "note": "Visible annual range and JobPosting baseSalary explicitly specify USD150,000–250,000 per year. Location and other terms were not refreshed."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -16140,7 +16257,14 @@
         }
       },
       "availability_label": "Historical · application unpublished",
-      "availability_note": "APTO’s careers page still describes the role. The linked HERP application explicitly says it is unpublished and cannot accept applications."
+      "availability_note": "APTO’s careers page still describes the role. The linked HERP application explicitly says it is unpublished and cannot accept applications.",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "public_page_live",
+          "note": "public_page_live Official careers page describes salaried positions; no verified public harBest contributor onboarding route."
+        }
+      ]
     },
     {
       "id": "laude.work.contribute-to-terminal-bench",
@@ -16684,7 +16808,14 @@
         }
       },
       "availability_label": "Closed",
-      "availability_note": "Terac’s archived description says “This listing has closed.” Its earlier $90/hour rate is historical."
+      "availability_note": "Terac’s archived description says “This listing has closed.” Its earlier $90/hour rate is historical.",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "public_page_live",
+          "note": "public_page_live Remote; screening interview; weekly payment."
+        }
+      ]
     },
     {
       "id": "terac.work.ai-evaluator-shopping-assistant",
@@ -17385,7 +17516,14 @@
           "basis": "not_reviewed"
         }
       },
-      "availability_label": "Past program · redirected to careers"
+      "availability_label": "Past program · redirected to careers",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "official_entry_point",
+          "note": "Official entry point linked or opened. Specific role availability, pay and application acceptance were not assessed in this check."
+        }
+      ]
     },
     {
       "id": "mercor.work.company-careers",
@@ -17940,7 +18078,14 @@
           "basis": "not_reviewed"
         }
       },
-      "availability_label": "General network intake"
+      "availability_label": "General network intake",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "official_entry_point",
+          "note": "Official entry point linked or opened. Specific role availability, pay and application acceptance were not assessed in this check."
+        }
+      ]
     },
     {
       "id": "turing.work.company-careers",
@@ -19120,6 +19265,11 @@
           "date": "2026-10-15",
           "result": "dated_project_entries_current_intake_unverified",
           "note": "June2025 dates on Scholars Immediate Projects entries do not establish October2026 openings or application acceptance."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official Scholars page now lists 18 role entries, with countries and View Job links. Its FAQ says sign-up and assessment do not guarantee contact or task acceptance. No task-level pay rate was established."
         }
       ],
       "source_quote": "Becoming a Scholar, however, does not provide a guarantee that you will be contacted or accepted to work on tasks.",
@@ -19687,6 +19837,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Software Engineer - Platform/Applied AI. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $260K – $290K • Offers Equity • $200K – $400K Bonus."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -20065,6 +20220,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Software Engineering Intern. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $10K per month."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -20422,6 +20582,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Software Engineer - Platform Infrastructure. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $250K – $350K • Offers Equity • $0 – $100K Bonus."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -21148,6 +21313,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Software Engineer - RL Environments. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $260K – $290K • Offers Equity • $200K – $400K Bonus."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -21548,6 +21718,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Machine Learning Engineer, Data Privacy & Anonymization. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $260K – $290K • Offers Equity • Offers Bonus."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -21924,6 +22099,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Software Engineer - Marketplace. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $250K – $300K • Offers Equity • Offers Bonus."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -22302,6 +22482,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Product Manager. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $180K – $300K • Offers Equity • Offers Bonus."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -23946,6 +24131,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $150K – $225K • Offers Equity • Offers Bonus • On average, total cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers)."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -24325,6 +24515,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead - Coding. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $150K – $225K • Offers Equity • Offers Bonus • On average, total cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers)."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -24703,6 +24898,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Associate - Coding. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $130K • Offers Equity • Offers Bonus • Offers performance based bonus of up to $80k."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -25083,6 +25283,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead - Healthcare. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $150K – $225K • Offers Equity • Offers Bonus • On average, total cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -25462,6 +25667,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead - Engineering. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $150K – $225K • Offers Equity • Offers Bonus • On average, total cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers)."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -25843,6 +26053,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Data Acquisition Lead. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $200K – $350K • Offers Equity • Offers Bonus."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -26222,6 +26437,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Quality Control Lead. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $200K – $350K • Offers Equity • Offers Bonus."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -26600,6 +26820,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead - Consulting. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $150K – $225K • Offers Equity • Offers Bonus • On average, total cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers)."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -26980,6 +27205,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead - Legal. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $150K – $225K • Offers Equity • Offers Bonus • On average, total cash cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers)."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -27360,6 +27590,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Strategic Projects Lead - AI Safety. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $150K – $225K • Offers Equity • Offers Bonus • On average, total cash comp regularly exceeds base by 2-3x (and by 4-5x for top performers)."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -27738,6 +27973,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "9 inputs and a visible Submit Application control rendered for Strategic Projects Lead - STEM. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $150K – $225K • Offers Equity • Offers Bonus • On average, total comp regularly exceeds base by 2-3x (and by 4-5x for top performers)."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -28110,6 +28350,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for AI/ML Research Intern. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $8K per month."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -28560,6 +28805,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Research Scientist - Post Training. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $210K – $450K • Offers Equity • Offers Bonus • $250k-450k total compensation + equity."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -28955,6 +29205,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "12 inputs and a visible Submit Application control rendered for Research Scholar. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $1K – $10K once."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -29306,6 +29561,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Research Engineer. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $210K – $450K • Offers Equity • Offers Bonus • $250k-450k total compensation + equity."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -29667,6 +29927,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Research Technical Program Manager. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $210K – $450K • Offers Equity • Offers Bonus • $250k-450k total compensation + equity."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -30051,6 +30316,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Research Scientist – Frontier Evaluations. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $210K – $450K • Offers Equity • Offers Bonus."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -30404,6 +30674,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "10 inputs and a visible Submit Application control rendered for Research Program Manager. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $175K – $191K • Offers Equity • Offers Bonus."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -31585,6 +31860,11 @@
           "date": "2026-10-14",
           "result": "application_form_available",
           "note": "Technical Content Writer (Contract): application rendered with Name, Email, Location, LinkedIn, Resume, authorization/sponsorship questions and Submit Application. No data entered or submitted. No application submitted."
+        },
+        {
+          "date": "2026-10-28",
+          "result": "listing_content_reviewed",
+          "note": "Official employer listing data includes the role title, description and isListed=true. This confirms a published listing, not application acceptance or available work. Compensation header: $60 per hour."
         }
       ],
       "terms_checked_on": "2026-10-28",
@@ -32128,7 +32408,14 @@
           "basis": "not_reviewed"
         }
       },
-      "availability_label": "Application access unconfirmed"
+      "availability_label": "Application access unconfirmed",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "blocked_fetch",
+          "note": "Official expert-platform page indexed about two months ago. Expert platform returned 403 in direct reads. World Models route also returned 403 in dot cloud Chrome."
+        }
+      ]
     },
     {
       "id": "afterquery.work.esl-expert",
@@ -32419,7 +32706,14 @@
           "basis": "stored_evidence"
         }
       },
-      "availability_label": "Application access unconfirmed"
+      "availability_label": "Application access unconfirmed",
+      "check_history": [
+        {
+          "date": "2026-10-14",
+          "result": "blocked_fetch",
+          "note": "Official expert-platform listing indexed about one month ago. Expert platform returned 403 in direct reads. World Models route also returned 403 in dot cloud Chrome."
+        }
+      ]
     }
   ],
   "verification": {

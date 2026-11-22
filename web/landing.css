@@ -202,6 +202,7 @@
   .site-header .wordmark { flex: 1 1 auto; font-size: 20px; }
   .landing-page .site-header .home-nav { display: none; }
   .site-header .site-search-open { flex: none; justify-content: center; width: 44px; min-width: 44px; padding: 0; }
+  .site-header .site-search-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .home-menu { display: block; flex: none; position: relative; margin-left: auto; }
   .home-menu summary { display: flex; align-items: center; min-width: 44px; min-height: 44px; color: var(--green); }
   .home-menu > nav[aria-label="Main"] {
