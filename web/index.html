@@ -128,19 +128,32 @@
 /* EDITORIAL_JS */
 /* WORK_V3_JS */
 /* DATA_RUNTIME_JS */
-initialize();</script><script>(()=>{
- const files=/* BUNDLES */[],root=document.documentElement;
- // A fragment on the hidden dashboard would change where Tab starts in the plain guide.
+{
  const marketSection=document.querySelector('#market-view > [data-fragment-id]');
  marketSection.id=marketSection.dataset.fragmentId;
+}
+initialize();</script><script>(()=>{
+ const files=/* BUNDLES */[],root=document.documentElement;
+ // The dashboard ID belongs to the app. A hidden fragment target can send Tab past recovery.
+ const marketSection=document.querySelector('#market-view > [data-fragment-id]');
  let started=false,finished=false,watchdog=0;
  const fail=(reason='runtime-not-ready')=>{
   if(finished)return;
   clearTimeout(watchdog);root.setAttribute('data-app','failed');root.setAttribute('data-app-reason',reason);root.removeAttribute('data-route');root.style.removeProperty('scroll-behavior');
+  marketSection.removeAttribute('id');
   document.getElementById('app-failure').hidden=false;
   document.querySelectorAll('main>.view').forEach(view=>{view.hidden=true;});
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
  };
+ document.querySelector('.skip').addEventListener('click',event=>{
+  if(root.getAttribute('data-app')==='ready')return;
+  // Keep the requested fragment so Reload page retries the same view.
+  event.preventDefault();
+  event.stopPropagation();
+  const main=document.getElementById('main');
+  main.focus({preventScroll:true});
+  main.scrollIntoView({behavior:'instant'});
+ });
  document.getElementById('app-reload').addEventListener('click',()=>location.reload());
  const load=()=>{
   if(started)return;started=true;root.setAttribute('data-app','loading');watchdog=setTimeout(()=>fail('timeout'),15000);
