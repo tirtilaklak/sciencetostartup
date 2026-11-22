@@ -389,7 +389,8 @@ test('global search transfers the literal query and exact work selection', async
 });
 
 test('global search opens Home, the company directory, and one search for paid work', async ({ page }) => {
-  await ready(page, '#market');
+  await ready(page, '#companies');
+  await expect(page.locator('.topbar nav a[aria-current="page"]')).toHaveCount(0);
   const search = async query => {
     await page.locator('#site-search-open').click();
     const input = page.getByRole('combobox', { name: 'Search the guide' });
@@ -409,6 +410,7 @@ test('global search opens Home, the company directory, and one search for paid w
   await expect(directory).toHaveAttribute('href', '/companies/');
   await directory.click();
   await expect(page.getByRole('heading', { level: 1, name: 'AI data companies' })).toBeVisible();
+  await expect(page.locator('.site-header nav a[aria-current="page"]').first()).toHaveText('Companies');
 
   await ready(page, '#market');
   await search('remote jobs');
@@ -417,6 +419,7 @@ test('global search opens Home, the company directory, and one search for paid w
   await expect(page.getByRole('option', { name: /See all .*“remote jobs”/ })).toHaveCount(0);
   await work.click();
   await expect(page.locator('#name-filter')).toHaveValue('remote jobs');
+  await expect(page.locator('.site-header nav a[aria-current="page"]').first()).toHaveText('Paid work');
   await expect(page.locator('[data-work-route="afterquery.work.technical-content-writer-contract"]')).toBeVisible();
 });
 
