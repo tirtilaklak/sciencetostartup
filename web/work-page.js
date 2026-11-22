@@ -52,6 +52,10 @@
     let selection = [];
     let active = false;
     let displayedSearch;
+    let readerInput = 0;
+    for (const type of ['wheel', 'keydown', 'touchstart', 'pointerdown']) {
+      addEventListener(type, event => { if (event.isTrusted) readerInput++; }, { capture: true, passive: true });
+    }
 
     function readURL() {
       const criteria = S2SWork.readCriteria(new URLSearchParams(location.search));
@@ -225,8 +229,12 @@
       if (group) group.open = true;
       if (focus) {
         // The browser can finish its own fragment scroll after scripts run.
+        const input = readerInput;
+        const previousFocus = document.activeElement;
         requestAnimationFrame(() => requestAnimationFrame(() => {
-          if (target !== targetFromHash() || target.closest('[hidden]')) return;
+          const active = document.activeElement;
+          if (input !== readerInput || target !== targetFromHash() || target.closest('[hidden]') ||
+              (active !== previousFocus && active !== document.body && active !== target)) return;
           target.focus({ preventScroll: true });
           target.scrollIntoView({ block: 'start', behavior: 'instant' });
         }));
@@ -258,22 +266,44 @@
     function restoreHandoff({ link, top, card, termsOpen }) {
       // A warm history traversal keeps this document and its browser-managed focus.
       // On a verified cold return, the browser may focus the opener's bookmark first.
-      returnBookmark = card && card === targetFromHash() ? card : null;
+      const bookmark = card && card === targetFromHash() ? card : null;
+      returnBookmark = bookmark;
+      const input = readerInput;
+      const canRestore = () => input === readerInput && !loader?.interacted &&
+        savedHandoff()?.link === link && !link.closest('[hidden]');
+
+      function restorePosition() {
+        const bounds = link.getBoundingClientRect();
+        const headerBottom = Math.max(0, document.querySelector('.site-header')?.getBoundingClientRect().bottom || 0);
+        if (Number.isFinite(top) && top >= headerBottom && top + bounds.height <= innerHeight) {
+          if (Math.abs(bounds.top - top) >= 1) window.scrollBy({ top: bounds.top - top, behavior: 'instant' });
+        } else if (bounds.top < headerBottom || bounds.bottom > innerHeight) {
+          link.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+      }
+
+      function settleBookmarkPosition(event) {
+        if (event?.persisted) return;
+        // Native history can apply a fragment scroll after pageshow. Focus has
+        // already returned, so only adjust the viewport after it settles.
+        setTimeout(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+          if (document.activeElement === link && canRestore()) restorePosition();
+        })), 0);
+      }
+
       requestAnimationFrame(() => requestAnimationFrame(() => {
         const focusAvailable = document.activeElement === document.body || document.activeElement === returnBookmark;
         returnBookmark = null;
-        if (loader?.interacted || !focusAvailable || savedHandoff()?.link !== link || link.closest('[hidden]')) return;
+        if (!focusAvailable || !canRestore()) return;
         const group = card?.closest('details[data-work-group]');
         if (group) group.open = true;
         const terms = termsOpen && card?.querySelector('details.work-terms');
         if (terms) terms.open = true;
         link.focus({ preventScroll: true });
-        const bounds = link.getBoundingClientRect();
-        const headerBottom = Math.max(0, document.querySelector('.site-header')?.getBoundingClientRect().bottom || 0);
-        if (Number.isFinite(top) && top >= headerBottom && top + bounds.height <= innerHeight) {
-          window.scrollBy({ top: bounds.top - top, behavior: 'instant' });
-        } else if (bounds.top < headerBottom || bounds.bottom > innerHeight) {
-          link.scrollIntoView({ block: 'center', behavior: 'instant' });
+        restorePosition();
+        if (bookmark) {
+          if (document.readyState === 'complete') settleBookmarkPosition();
+          else addEventListener('pageshow', settleBookmarkPosition, { once: true });
         }
       }));
     }

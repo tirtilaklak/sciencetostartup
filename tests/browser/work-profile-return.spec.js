@@ -76,7 +76,24 @@ async function expectNormalWorkLanding(page, departure) {
   await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
 }
 
-async function returnWithEarlyBookmarkFocus(page, whileHeld = async () => {}) {
+function holdWorkFrames() {
+  const frame = window.requestAnimationFrame;
+  const callbacks = [];
+  window.requestAnimationFrame = callback => callbacks.push(callback);
+  window.releaseWorkFrames = () => {
+    window.requestAnimationFrame = frame;
+    for (const callback of callbacks) frame(callback);
+  };
+}
+
+async function releaseWorkFrames(page) {
+  await page.evaluate(() => new Promise(resolve => {
+    window.releaseWorkFrames();
+    requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  }));
+}
+
+async function holdWorkReturnLoad(page) {
   const { promise: heldLoad, resolve: releaseLoad } = Promise.withResolvers();
   await page.route('**/work-return-test.png', async route => {
     await heldLoad;
@@ -84,13 +101,6 @@ async function returnWithEarlyBookmarkFocus(page, whileHeld = async () => {}) {
   });
   await page.addInitScript(() => {
     if (location.pathname !== '/work/' || performance.getEntriesByType('navigation')[0]?.type !== 'back_forward') return;
-    const frame = window.requestAnimationFrame;
-    const callbacks = [];
-    window.requestAnimationFrame = callback => callbacks.push(callback);
-    window.releaseWorkReturnFrames = () => {
-      window.requestAnimationFrame = frame;
-      for (const callback of callbacks) frame(callback);
-    };
     document.addEventListener('DOMContentLoaded', () => {
       const image = new Image();
       image.hidden = true;
@@ -98,6 +108,13 @@ async function returnWithEarlyBookmarkFocus(page, whileHeld = async () => {}) {
       document.body.append(image);
     }, { once: true });
   });
+  return releaseLoad;
+}
+
+async function returnWithEarlyBookmarkFocus(page, whileHeld = async () => {}) {
+  const releaseLoad = await holdWorkReturnLoad(page);
+  await page.addInitScript(`if (location.pathname === '/work/' &&
+    performance.getEntriesByType('navigation')[0]?.type === 'back_forward') (${holdWorkFrames})();`);
   await observeHistory(page, true);
   await page.goto(work + '#' + roleId);
   const departure = await activateProfile(page);
@@ -123,11 +140,8 @@ async function returnWithEarlyBookmarkFocus(page, whileHeld = async () => {}) {
   } finally {
     releaseLoad();
   }
-  await page.waitForLoadState('load');
-  await page.evaluate(() => new Promise(resolve => {
-    window.releaseWorkReturnFrames();
-    requestAnimationFrame(() => requestAnimationFrame(resolve));
-  }));
+  await expect.poll(() => page.evaluate(() => window.workReturnPersisted)).toBe(false);
+  await releaseWorkFrames(page);
   return departure;
 }
 
@@ -143,6 +157,72 @@ test.describe('Work company-profile handoff', () => {
       const departure = await activateProfile(page);
       await page.goBack({ waitUntil: 'commit' });
       await expectProfileReturn(page, departure, false);
+    });
+  }
+
+  test('deferred bookmark placement preserves keyboard focus on open Terms', async ({ page }) => {
+    await page.addInitScript(`if (location.pathname === '/work/') (${holdWorkFrames})();`);
+    await page.goto(work + '#' + roleId);
+    await expect(page.locator('[data-work-compare]')).toBeVisible();
+    const { terms } = controls(page);
+    const summary = terms.locator('summary');
+    for (let tab = 0; tab < 90 && !await summary.evaluate(node => node === document.activeElement); tab++) {
+      await page.keyboard.press('Tab');
+    }
+    await expect(summary).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(terms).toHaveJSProperty('open', true);
+    expect(await page.evaluate(() => window.WorkPageResource.interacted)).toBe(true);
+    const scroll = await page.evaluate(() => scrollY);
+    await releaseWorkFrames(page);
+    await expect(summary).toBeFocused();
+    await expect(terms).toHaveJSProperty('open', true);
+    expect(await page.evaluate(() => scrollY)).toBe(scroll);
+    await page.keyboard.press('Tab');
+    await expect(terms.locator('a').first()).toBeFocused();
+  });
+
+  for (const readerScroll of [false, true]) {
+    test(`cold bookmarked Back ${readerScroll ? 'honors a wheel scroll after pageshow' : 'recovers from a late history scroll'}`, async ({ page, browserName }) => {
+      test.skip(browserName !== 'webkit', 'Exercise the reported WebKit timing');
+      await observeHistory(page, true);
+      await page.addInitScript(`if (location.pathname === '/work/' &&
+        performance.getEntriesByType('navigation')[0]?.type === 'back_forward') {
+        document.addEventListener('focusin', function openerFocused(event) {
+          if (!event.target.matches('[data-work-route="${roleId}"] .work-company')) return;
+          document.removeEventListener('focusin', openerFocused);
+          (${holdWorkFrames})();
+          if (${readerScroll}) return;
+          const displace = () => setTimeout(() => {
+            // Recreate the late native viewport displacement independently of run timing.
+            scrollTo(0, document.documentElement.scrollHeight);
+            window.workLateScroll = scrollY;
+          }, 0);
+          if (window.workReturnPersisted === false) displace();
+          else addEventListener('pageshow', displace, { once: true });
+        });
+      }`);
+      await page.goto(work + '#' + roleId);
+      const departure = await activateProfile(page);
+      const { opener, terms } = controls(page);
+      await page.goBack({ waitUntil: 'commit' });
+      await expect(opener).toBeFocused();
+      await expect(terms).toHaveJSProperty('open', true);
+      await expect.poll(() => page.evaluate(() => window.workReturnPersisted)).toBe(false);
+      if (readerScroll) {
+        await page.mouse.move(700, 350);
+        await page.mouse.wheel(0, 900);
+        await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(departure.position.scroll + 300);
+        expect(await page.evaluate(() => window.WorkPageResource.interacted)).toBe(true);
+        await releaseWorkFrames(page);
+        expect(await page.evaluate(() => scrollY)).toBeGreaterThan(departure.position.scroll + 300);
+        await expect(opener).toBeFocused();
+        await expect(terms).toHaveJSProperty('open', true);
+      } else {
+        await expect.poll(() => page.evaluate(() => window.workLateScroll)).toBeGreaterThan(departure.position.scroll + 300);
+        await releaseWorkFrames(page);
+        await expectProfileReturn(page, departure, false);
+      }
     });
   }
 
@@ -193,20 +273,22 @@ test.describe('Work company-profile handoff', () => {
     await expectNormalWorkLanding(page, departure);
   });
 
-  test('cached Back keeps browser-managed Terms, focus and scroll', async ({ baseURL, browserName }) => {
-    test.skip(browserName !== 'chromium', 'Enable the audited browser’s back-forward cache');
-    const browser = await chromium.launch({ channel: 'chromium', ignoreDefaultArgs: ['--disable-back-forward-cache'] });
-    try {
-      const page = await browser.newPage({ baseURL, viewport: { width: 1024, height: 600 } });
-      await observeHistory(page, false);
-      await page.goto(work);
-      const departure = await activateProfile(page);
-      await page.goBack({ waitUntil: 'commit' });
-      await expectProfileReturn(page, departure, true);
-    } finally {
-      await browser.close();
-    }
-  });
+  for (const hash of ['', '#' + roleId]) {
+    test(`cached Back keeps browser-managed Terms, focus and scroll${hash ? ' on a bookmarked Work entry' : ''}`, async ({ baseURL, browserName }) => {
+      test.skip(browserName !== 'chromium', 'Enable the audited browser’s back-forward cache');
+      const browser = await chromium.launch({ channel: 'chromium', ignoreDefaultArgs: ['--disable-back-forward-cache'] });
+      try {
+        const page = await browser.newPage({ baseURL, viewport: { width: 1024, height: 600 } });
+        await observeHistory(page, false);
+        await page.goto(work + hash);
+        const departure = await activateProfile(page);
+        await page.goBack({ waitUntil: 'commit' });
+        await expectProfileReturn(page, departure, true);
+      } finally {
+        await browser.close();
+      }
+    });
+  }
 });
 
 const legacy = test.extend({
