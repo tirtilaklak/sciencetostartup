@@ -26,14 +26,13 @@
   const navigationState = typeof navigationAPI?.currentEntry?.getState === 'function' &&
     typeof navigationAPI.updateCurrentEntry === 'function' && typeof navigationAPI.addEventListener === 'function';
   const timing = globalThis.performance?.getEntriesByType?.('navigation')?.[0];
-  function hashTarget() {
-    try { return rowById.get(decodeURIComponent(location.hash.slice(1))); }
-    catch (_) { return undefined; }
-  }
+  const hashTarget = () => rowById.get(location.hash.slice(1));
   let markedFragment = null;
   function syncFragmentHighlight() {
     // A recreated WebKit document can have a valid fragment without a native :target.
-    const row = hashTarget();
+    let row;
+    try { row = rowById.get(decodeURIComponent(location.hash.slice(1))); }
+    catch (_) { /* Malformed fragment. */ }
     const visibleTarget = row && !row.hidden ? row : null;
     if (visibleTarget === markedFragment) return;
     markedFragment?.removeAttribute('data-fragment-target');
