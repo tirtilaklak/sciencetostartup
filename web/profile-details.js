@@ -22,7 +22,7 @@ function profileFinancingRecord(fact){
   fact.source_status==='summary_only'?'Source summary recorded '+profileDate(fact.source_accessed_on):'',
   fact.source_checked_on&&fact.source_checked_on!==fact.source_accessed_on?'Source checked '+profileDate(fact.source_checked_on):'',
  ].filter(Boolean);
- return `<article class="capital-event" data-finance-record="${attr(fact.record_id)}"${round}><div class="capital-time"><p class="capital-date">${esc(fact.display_date)}</p></div><div class="capital-data"><p class="capital-label">${esc(fact.label)}</p><h3>${esc(value)}</h3><p class="sub">${esc(fact.scope)} · ${esc(fact.claimant)}</p>${fact.note?`<p class="sub">${esc(fact.note)}</p>`:''}<div class="source-links">${external(fact.source_url,fact.source_title)}${profileReferences(fact.claim_ids,'Claim sources')}</div>${dates.length?`<p class="sub">${dates.map(esc).join(' · ')}</p>`:''}</div></article>`;
+ return `<article class="capital-event" data-finance-record="${attr(fact.record_id)}"${round}><div class="capital-time"><p class="capital-date">${esc(fact.display_date)}</p></div><div class="capital-data"><p class="capital-label">${esc(fact.label)}</p><h3>${esc(value)}</h3><p class="sub">${esc(fact.scope)} · ${esc(fact.claimant)}</p>${fact.note?`<p class="sub">${esc(fact.note)}</p>`:''}<div class="source-links">${external(fact.source_url,fact.source_title)}${profileReferences(fact.claim_ids,'Claim sources',fact.label)}</div>${dates.length?`<p class="sub">${dates.map(esc).join(' · ')}</p>`:''}</div></article>`;
 }
 function profileCapital(id){
  const config=profileContent(id),rounds=fundingRows(id).filter(r=>claims[r.claim_id]?.status!=='superseded'),uncertainStatus=['talks','rumor','rumoured','proposed','cancelled'];

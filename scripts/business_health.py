@@ -12,13 +12,15 @@ SIGNALS = {'revenue', 'profit', 'customers', 'delivery', 'cash'}
 SHA256 = re.compile(r'[a-f0-9]{64}')
 FINANCE_DATE_ROLES = {'announcement', 'company_announcement_context', 'period_end',
                       'source_publication', 'source_check', 'undated'}
+MERCOR_H1_ESTIMATE = 'mercor.metric.major-growth_metrics-1'
+RWS_GENERATE_REVENUE = 'rws_trainai.claim.growth_metrics-1.metric-0'
 
 
 def profile_finance_claim_context(profile):
     """Project the reviewed date and source attribution for exact claim dialogs."""
     if not profile:
         return {}
-    fields = ('date_label', 'date_role', 'display_date', 'evidence_date', 'source_id', 'source_published_on',
+    fields = ('record_id', 'label', 'date_label', 'date_role', 'display_date', 'evidence_date', 'source_id', 'source_published_on',
               'source_accessed_on', 'source_checked_on', 'source_status', 'note', 'scope')
     return {cid: {**{field: fact.get(field) for field in fields}, 'attribution': fact['claimant']}
             for fact in (profile['headline'], *profile['native_detail_records']) if fact
@@ -169,6 +171,38 @@ def _validate_profile_finance(finances, data, claims, metrics, sources, observat
                     'parent scope must identify the group in the headline and reported observations')
 
 
+def _validate_reviewed_revenue(observations, metrics, claims, sources, checks):
+    for identifier, sid, evidence_type, bounds in (
+            (MERCOR_H1_ESTIMATE, 'mercor.source.audit-m6', 'estimate', ('2026-01-01', '2026-06-30')),
+            (RWS_GENERATE_REVENUE, 'rws_trainai.source.d_rws4', 'reported', ('2025-10-01', '2026-03-31'))):
+        row = observations.get(identifier, {})
+        metric = metrics.get(identifier, {})
+        claim = claims.get(metric.get('claim_id'), {})
+        check = checks.get(sid, {})
+        period = row.get('period', {})
+        if (row.get('metric_ids') != [identifier] or row.get('claim_ids') != [claim.get('id')]
+                or row.get('source_ids') != [sid] or row.get('measure') != 'period_revenue'
+                or (row.get('as_of'), row.get('value'), row.get('unit'), row.get('currency'),
+                    row.get('qualifier'), row.get('scope'), row.get('accounting_basis')) !=
+                   (metric['as_of'], metric['value'], metric['unit'], metric['currency'],
+                    metric['qualifier'], metric['segment_scope'], metric['gross_vs_net'])
+                or period.get('type') != 'half_year' or (period.get('start'), period.get('end')) != bounds
+                or row.get('evidence_type') != evidence_type or check.get('status') != 'content_checked'
+                or check.get('http_status') != 200 or check.get('url') != sources[sid]['url']
+                or check.get('checked_on') != row.get('evidence_checked_on')
+                or not SHA256.fullmatch(check.get('content_sha256', ''))):
+            raise ValueError(f'business-health: {identifier}: reviewed revenue requires its exact metric and checked source')
+        if identifier == MERCOR_H1_ESTIMATE and (
+                row['period'].get('label') != 'H1 2026' or 'estimate' not in row['label'].lower()
+                or 'Sacra estimate' not in row.get('evidence_assurance', '')):
+            raise ValueError(f'business-health: {identifier}: the estimate must identify its period and attribution')
+        if identifier == RWS_GENERATE_REVENUE and (
+                row.get('scope_label') != 'Generate segment'
+                or any('Generate segment' not in row.get(field, '') for field in ('cohort', 'cohort_label'))
+                or 'TrainAI and Content Technology' not in row.get('scope_detail', '')):
+            raise ValueError(f'business-health: {identifier}: the observation must name Generate and its businesses')
+
+
 def load_business_health(path, data, profile_content=None):
     # Fixtures and other research versions must never inherit this curated layer. After a
     # SIDECAR_DATASET_VERSION bump the source_dataset_version check below fails loudly until
@@ -310,4 +344,5 @@ def load_business_health(path, data, profile_content=None):
                 profile_path = Path(__file__).resolve().parents[1] / 'data/profile-content.json'
             profile_content = json.loads(profile_path.read_text())
         _validate_profile_finance(health['profile_finance'], data, claims, metrics, sources, observations, profile_content)
+        _validate_reviewed_revenue(observations, metrics, claims, sources, checked)
     return health

@@ -135,8 +135,8 @@ function detail_metricCurrentBasis(metric,fallback){return financialBasisContext
 function detail_metricCurrentAttribution(metric,fallback){return financialBasisContextForMetric(metric)?.display_attribution||fallback;}
 function detail_metricCurrentBasisDescription(metric,fallback){return financialBasisContextForMetric(metric)?'Gross is customer spend before contractor payouts, per Sacra’s estimate.':fallback;}
 function detail_historicalOfferContextForMetric(metric){return evidenceContextCorrections().find(update=>update.kind==='historical-offer-source-context'&&update.target.metric_id===metric?.id&&update.target.claim_id===metric.claim_id&&evidenceContextSnapshotMatches(metric,update.historical_snapshot.metrics[0]));}
-function detail_metricPresentationLabel(metric,fallback){return historicalOfferContextForMetric(metric)?.display_label||fallback;}
-function detail_metricEvidenceTopic(metric,fallback){return historicalOfferContextForMetric(metric)?'Original data-partner offer cap; snapshot recorded 14 October 2026':financialBasisContextForMetric(metric)?fallback+'; gross basis from Sacra estimate':fallback;}
+function detail_metricPresentationLabel(metric,fallback){return historicalOfferContextForMetric(metric)?.display_label||profileMetricEstimate(metric)?.label||profileFinanceMetricContext(metric)?.label||fallback;}
+function detail_metricEvidenceTopic(metric,fallback){return historicalOfferContextForMetric(metric)?'Original data-partner offer cap; snapshot recorded 14 October 2026':financialBasisContextForMetric(metric)?fallback+'; gross basis from Sacra estimate':detail_metricPresentationLabel(metric,fallback);}
 function detail_evidenceContextForClaim(claim){
  return evidenceContextCorrections().filter(update=>update.company_id===claim.company_id&&(update.target.claim_id===claim.id||['relationship-assessment-scope-context','historical-offer-source-context'].includes(update.kind)&&update.affected_claim_ids.includes(claim.id)));
 }

@@ -15,14 +15,45 @@ function profileSourceMeta(s,finance){
 }
 function profileFinanceProjection(id){return window.BUSINESS_HEALTH?.profile_finance?.[id];}
 function financeClaimContextFor(id){return window.FINANCE_CLAIM_CONTEXT?.[id];}
+function profileFinanceMetricContext(metric){
+ const finance=financeClaimContextFor(metric.claim_id);
+ return finance?.record_id===metric.id?finance:null;
+}
+function profileReviewedObservationForClaim(cl){
+ if(!cl)return null;
+ return (window.BUSINESS_HEALTH?.observations||[]).find(o=>o.evidence_type==='estimate'&&o.company_id===cl.company_id&&
+  o.metric_ids?.length===1&&o.id===o.metric_ids[0]&&o.claim_ids?.length===1&&o.claim_ids[0]===cl.id);
+}
+function profileMetricEstimate(metric){
+ const reviewed=profileReviewedObservationForClaim(claims[metric.claim_id]);
+ return reviewed?.id===metric.id?reviewed:null;
+}
+function profileEvidenceDate(cl,fallbackDate,fallbackHeading){
+ const finance=financeClaimContextFor(cl.id);
+ if(finance){
+  const sourceCheck=finance.date_role==='source_check';
+  const day=sourceCheck?finance.source_accessed_on:finance.evidence_date;
+  return {text:day?profileDate(day):finance.display_date,heading:finance.date_label,
+   description:sourceCheck?'The cited statement has no publication date.':''};
+ }
+ const estimate=profileReviewedObservationForClaim(cl);
+ if(estimate)return {text:estimate.period.label,heading:'Reporting period',description:estimate.basis};
+ // This risk record uses the shared check date of two undated RWS pages.
+ const rwsRiskSources=['rws_trainai.source.d_rws3','rws_trainai.source.d_rws6'];
+ if(cl.id==='rws_trainai.claim.risks-1'&&cl.as_of===cl.observed_on&&cl.source_ids.length===rwsRiskSources.length&&
+    rwsRiskSources.every(id=>cl.source_ids.includes(id)&&sources[id]?.accessed_on===cl.observed_on&&!sources[id].published_on)){
+  return {text:profileDate(cl.observed_on),heading:'Source checked',description:'The cited sources give no publication dates.'};
+ }
+ return {text:fallbackDate,heading:fallbackHeading,description:''};
+}
 function profileFinancingEvidenceLink(id){
  const href=companySummaryFor(id)?.financingEvidenceHref;
  return href?`<a href="${attr(href)}">Read ${esc(companies[id].name)}’s financing evidence ${iconHTML('right')}</a>`:'';
 }
 function profileProvenance(cl){
- const finance=financeClaimContextFor(cl.id),date=finance?.display_date||evidenceContextArchiveDate(cl,profileDate(cl.as_of));
+ const finance=financeClaimContextFor(cl.id),date=profileEvidenceDate(cl,evidenceContextArchiveDate(cl,profileDate(cl.as_of)));
  const scope=finance?.scope||evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id));
- return `<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(date)}</span><span>· ${esc(scope)}</span><span>· ${esc(profileEvidenceLabel(cl))}</span>${claimButton(cl.id,'Source')}</div>`;
+ return `<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(finance?.display_date||(date.heading?date.heading+' '+date.text:date.text))}</span><span>· ${esc(scope)}</span><span>· ${esc(profileEvidenceLabel(cl))}</span>${claimButton(cl.id,'Source')}</div>`;
 }
 // Canonical company id for a route value (case and alias fixes).
 function profileRouteCompany(value=routeParts()[1]){const raw=String(value??''),lower=raw.toLowerCase(),aliases=window.RESEARCH_ALIASES;return isCompanyId(raw)?raw:isCompanyId(lower)?lower:aliases&&Object.hasOwn(aliases,lower)&&isCompanyId(aliases[lower])?aliases[lower]:'';}
@@ -115,6 +146,7 @@ function capitalLabel(r){
 function profileCapital(id){return profileDetailRenderer('profileCapital',id);}
 function profileSentenceCase(text){const value=String(text??'');return value.charAt(0).toUpperCase()+value.slice(1);}
 function profileMetricLabel(m){
+  const estimate=profileMetricEstimate(m);if(estimate)return estimate.label;
   if(m.id==='ooak.metric.audit-ooak-headcount-scope'&&m.company_id==='ooak'&&m.kind==='headcount'&&m.label==='directory_team_size')return 'Team size listed by Y Combinator (a startup investor)';
   if(m.kind==='annualized_revenue_run_rate')return 'Annualized revenue pace';
   if(['expert_network','headcount','active_paid_experts','other'].includes(m.kind))return profileSentenceCase(m.label);
@@ -122,6 +154,7 @@ function profileMetricLabel(m){
 }
 function profileMetricDate(m){
  const finance=financeClaimContextFor(m.claim_id);if(finance)return finance.display_date;
+ const estimate=profileMetricEstimate(m);if(estimate)return estimate.period.label;
  const corrected=metricCurrentPeriod(m);if(corrected)return corrected;
  if(m.kind==='revenue')return readableDate(m.period_label||financialPeriod(m));
  if(m.as_of==='undated')return 'Undated · checked '+profileDate(claims[m.claim_id].observed_on);
@@ -130,7 +163,8 @@ function profileMetricDate(m){
 function profileMetricYear(m){const rank=dateRank(m.as_of);return rank==='0000'?null:Number(rank.slice(0,4));}
 // Same Historical rule as compactSignal() on the cards.
 function profileMetricHistory(m){const year=profileMetricYear(m);return year&&year<Number(DATA.meta.as_of.slice(0,4))-1?'Historical · '+year:'';}
-function profileMetricTags(m){const tags=[metricStatusLabel(m),profileMetricHistory(m)].filter(tag=>tag&&tag!=='Reported');return tags.length?`<p class="observation-tags">${tags.map(tag=>`<span>${esc(tag)}</span>`).join('')}</p>`:'';}
+function profileMetricStatus(m,fallback){return profileMetricEstimate(m)?'Third-party estimate':fallback;}
+function profileMetricTags(m){const tags=[profileMetricStatus(m,metricStatusLabel(m)),profileMetricHistory(m)].filter(tag=>tag&&tag!=='Reported');return tags.length?`<p class="observation-tags">${tags.map(tag=>`<span>${esc(tag)}</span>`).join('')}</p>`:'';}
 // Signed growth: +58.6%, −1.5%.
 function profileMetricValue(m){const value=metricValue(m);return m.kind!=='growth_rate'||m.unit!=='percent'?value:m.value>0?value.replace(/\d/,'+$&'):value.replace('-','−');}
 function profileNumberButton(m){const label=profileMetricValue(m);if(label===metricValue(m))return numberButton(m);const access=evidenceAccess([m.claim_id],label,metricEvidenceTopic(m,m.label||metricLabels[m.kind]));return `<button class="number-button" data-claim="${esc(m.claim_id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;}
@@ -142,7 +176,7 @@ const PROFILE_METRIC_ATTRIBUTIONS={
 };
 // Lead decision: TaskUs and Appen figures are annual-report figures, never "audited".
 const PROFILE_EVIDENCE_LABELS={'Audited filing':'Annual report filing','Audited public company':'Public company annual report'};
-function profileEvidenceLabel(cl){const label=evidenceLabel(cl);return financeClaimContextFor(cl.id)?.attribution||(['taskus','appen'].includes(cl.company_id)&&PROFILE_EVIDENCE_LABELS[label])||label;}
+function profileEvidenceLabel(cl){const label=evidenceLabel(cl);return financeClaimContextFor(cl.id)?.attribution||profileReviewedObservationForClaim(cl)?.evidence_assurance||(['taskus','appen'].includes(cl.company_id)&&PROFILE_EVIDENCE_LABELS[label])||label;}
 function profileMetricAttribution(m){
  const claim=claims[m.claim_id];
  if(claim.status!=='supported'||claim.source_ids.length&&claim.source_ids.every(id=>sources[id].retrieval_status==='unverified'))return profileEvidenceLabel(claim);
@@ -160,7 +194,7 @@ function profileHeadlineMetrics(id,all=uniqueMetrics(id)){
  const selected=config.metric_ids?config.metric_ids.map(mid=>all.find(m=>m.id===mid)).filter(Boolean):primary?[primary]:[];if(!config.metric_ids)for(const m of extras)if(!selected.some(x=>x.kind===m.kind)&&selected.length<3)selected.push(m);
  return selected;
 }
-function profileFiguresHeading(id){return profileContent(id).traction_heading||(profileHeadlineMetrics(id).every(m=>metricStatusLabel(m)==='Reported')?'Reported figures':'Key figures');}
+function profileFiguresHeading(id){return profileContent(id).traction_heading||(profileHeadlineMetrics(id).every(m=>profileMetricStatus(m,metricStatusLabel(m))==='Reported')?'Reported figures':'Key figures');}
 function profileTraction(id){return profileDetailRenderer('profileTraction',id);}
 function profileArchive(id){return profileDetailRenderer('profileArchive',id);}
 const PROFILE_ARCHIVE_SECTIONS=['method','questions','sources','observations','financing'];

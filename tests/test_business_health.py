@@ -185,6 +185,12 @@ class BusinessHealthTests(unittest.TestCase):
         bad = copy.deepcopy(self.health)
         next(row for row in bad["observations"] if row["id"] == "rws_trainai.claim.growth_metrics-0.metric-0")["scope_label"] = "Whole company"
         mutations.append(("RWS observation omits the parent group", bad))
+        bad = copy.deepcopy(self.health)
+        next(row for row in bad["observations"] if row["id"] == "rws_trainai.claim.growth_metrics-1.metric-0")["scope_label"] = "Other or mixed segment"
+        mutations.append(("RWS segment revenue omits Generate", bad))
+        bad = copy.deepcopy(self.health)
+        next(row for row in bad["observations"] if row["id"] == "mercor.metric.major-growth_metrics-1")["evidence_type"] = "reported"
+        mutations.append(("Sacra estimate promoted to a reported result", bad))
         for name, value in mutations:
             with self.subTest(mutation=name), self.assertRaises(ValueError):
                 load(value)
@@ -210,10 +216,12 @@ class BusinessHealthTests(unittest.TestCase):
         self.assertEqual(elorian["elorian.claim.valuation"]["source_published_on"], "2026-07-16")
         self.assertEqual(elorian["elorian.claim.valuation"]["attribution"], "TechCrunch founder interview")
         benchflow = profile_finance_claim_context(finance["benchflow"])["benchflow.claim.total_funding"]
+        self.assertEqual((benchflow["record_id"], benchflow["label"]), ("benchflow.claim.total_funding.metric-0", "Reported funding"))
         self.assertEqual(benchflow["evidence_date"], "2025-02-11")
         self.assertEqual(benchflow["source_accessed_on"], "2026-10-12")
         self.assertEqual(benchflow["source_checked_on"], "2026-11-22")
         a_team = profile_finance_claim_context(finance["a-team"])["a-team.claim.total_funding"]
+        self.assertEqual((a_team["record_id"], a_team["label"]), ("a-team.claim.total_funding.metric-0", "Funding claimed"))
         self.assertIsNone(a_team["evidence_date"])
         self.assertEqual(a_team["date_role"], "source_check")
         self.assertEqual(a_team["source_accessed_on"], "2026-10-12")
@@ -223,6 +231,10 @@ class BusinessHealthTests(unittest.TestCase):
         mercor = rows["mercor.metric.major-growth_metrics-1"]
         self.assertEqual(mercor["evidence_type"], "estimate")
         self.assertIn("Sacra", mercor["evidence_assurance"])
+        generate = rows["rws_trainai.claim.growth_metrics-1.metric-0"]
+        self.assertEqual(generate["scope_label"], "Generate segment")
+        self.assertEqual(generate["scope_detail"], "Includes TrainAI and Content Technology")
+        self.assertNotEqual(generate["cohort_key"], rows["rws_trainai.claim.growth_metrics-0.metric-0"]["cohort_key"])
         self.assertEqual(rows["mercor.metric.oct14-major-financial-2"]["accounting_basis"], "unspecified")
         for identifier in ("refresh.prolific.2025-contribution-hours", "refresh.prolific.2025-studies-tasks"):
             row = rows[identifier]
