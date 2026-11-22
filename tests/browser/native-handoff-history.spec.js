@@ -23,8 +23,8 @@ async function activate(link) {
 }
 
 async function expectReturn(page, source, following, position, cached = false) {
-  await expect.poll(() => page.evaluate(() => window.nativeHandoffCached)).toBe(cached);
   await expect(source).toBeFocused();
+  await expect.poll(() => page.evaluate(() => window.nativeHandoffCached)).toBe(cached);
   await expect(source).toBeInViewport({ ratio: 1 });
   await expect.poll(() => source.evaluate((anchor, previous) => Math.max(
     Math.abs(scrollY - previous.scroll), Math.abs(anchor.getBoundingClientRect().top - previous.top)
@@ -211,6 +211,7 @@ legacy.describe('native handoffs without the Navigation API', () => {
       await expect(page).toHaveURL(landing);
       await expect(target).toBeVisible();
       await page.goBack({ waitUntil: 'commit' });
+      await expect(page).toHaveURL(origin);
       await expectReturn(page, source, page.locator(next).first(), position);
     });
   }
