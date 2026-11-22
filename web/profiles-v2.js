@@ -31,12 +31,17 @@ function profileCalculatedMetric(metric){
  const calculation=profileCalculatedObservationForClaim(claims[metric.claim_id]);
  return calculation?.profile_metric_id===metric.id?calculation:null;
 }
+function profileReviewedSource(id){
+ return window.BUSINESS_HEALTH?.sources?.find(source=>source.id===id)||sources[id];
+}
+function profileFinanceSourceCheck(source){
+ return window.BUSINESS_HEALTH?.source_checks?.entries?.find(check=>check.source_id===source.id&&check.url===source.url);
+}
 function profileCalculationCitationItems(calculation){
- const health=window.BUSINESS_HEALTH;
  return observationSourceIds(calculation).map(id=>{
-  const source=(health.sources||[]).find(record=>record.id===id)||sources[id];
+  const source=profileReviewedSource(id);
   if(!source)return '';
-  const check=(health.source_checks?.entries||[]).find(record=>record.source_id===id);
+  const check=profileFinanceSourceCheck(source);
   const historicalFailure=check?.status==='unavailable'?`<p class="sub">${esc(profileDate(check.checked_on))} · ${esc(check.note)}</p>`:'';
   return `<li data-source-id="${attr(id)}">${external(source.url,source.title)}<p class="sub">${esc(profileSourceMeta(source))}</p>${historicalFailure}</li>`;
  }).join('');
@@ -46,11 +51,20 @@ function profileCalculationSources(calculation){
 }
 function profileFinanceReview(cl){
  return cl&&(window.BUSINESS_HEALTH?.observations||[]).find(o=>o.company_id===cl.company_id&&o.claim_ids[0]===cl.id&&
-  o.id===o.metric_ids[0]&&(o.qualifier_reviewed_on||o.primary_source_id));
+  o.id===o.metric_ids[0]&&(o.qualifier_reviewed_on||o.primary_source_id||o.historical_source_ids?.length));
 }
 function profileSupplementalSource(cl){
  const id=profileFinanceReview(cl)?.primary_source_id;
- return id&&(window.BUSINESS_HEALTH?.sources||[]).find(s=>s.id===id);
+ return id&&profileReviewedSource(id);
+}
+function profileHistoricalFinanceSourceStatus(source){
+ const check=profileFinanceSourceCheck(source);
+ return check?.status==='unavailable'?`Historical citation · ${profileDate(check.checked_on)} · ${check.note}`:'Historical citation';
+}
+function profileHistoricalFinanceSourcesHTML(observation){
+ const records=(observation?.historical_source_ids||[]).map(id=>sources[id]||profileReviewedSource(id)).filter(Boolean);
+ if(!records.length)return '';
+ return `<details class="historical-citations"><summary>Previous citations</summary><ul class="sources-list">${records.map(source=>`<li data-source-id="${attr(source.id)}">${external(source.url,source.title)}<p class="sub">${esc(profileHistoricalFinanceSourceStatus(source))}</p></li>`).join('')}</ul></details>`;
 }
 function profileMetricEstimate(metric){
  const reviewed=profileReviewedObservationForClaim(claims[metric.claim_id]);

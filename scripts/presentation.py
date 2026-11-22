@@ -298,7 +298,12 @@ def health_subset(health, observations, company_id=None):
         result["profile_finance"] = {company_id: copy.deepcopy(profiles[company_id])} if company_id in profiles else {}
     result["observations"] = observations
     claim_ids = {cid for observation in observations for cid in observation.get("claim_ids", [])}
-    source_ids = {sid for observation in observations for sid in observation.get("source_ids", [])}
+    source_ids = {
+        sid
+        for observation in observations
+        for field in ("source_ids", "historical_source_ids")
+        for sid in observation.get(field, [])
+    }
     result["fresh_claims"] = [row for row in health.get("fresh_claims", []) if row["id"] in claim_ids]
     result["sources"] = [row for row in health.get("sources", []) if row["id"] in source_ids]
     result["source_checks"]["entries"] = [row for row in health.get("source_checks", {}).get("entries", []) if row["source_id"] in source_ids]

@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SIGNALS = {"revenue", "profit", "customers", "delivery", "cash"}
 sys.path.insert(0, str(ROOT / "scripts"))
 from business_health import load_business_health, profile_finance_claim_context
+from presentation import health_subset
 from artifact_verification import verify_artifact
 
 
@@ -401,6 +402,27 @@ console.log(JSON.stringify({observations:observations.length,filtering:true,cont
         issuer = checks[turing["primary_source_id"]]
         self.assertEqual((issuer["status"], issuer["direct_response"]), ("indexed_content_checked", "bot_challenge"))
         self.assertNotIn("published_on", self.sources[turing["primary_source_id"]])
+
+    def test_imerit_detail_sends_current_and_historical_transcript_checks(self):
+        record_id = "imerit.metric.expansion-imerit-revenue"
+        prior = "imerit.source.audit-im-transcript2"
+        primary = "imerit.source.audit-im-transcript"
+        replacement = "refresh.source.imerit-exl-june-2026-stocksguide"
+        row = next(row for row in self.observations if row["id"] == record_id)
+        canonical = self.claims[self.metrics[record_id]["claim_id"]]
+        self.assertEqual(canonical["source_ids"], [primary, prior])
+        self.assertEqual(row["source_ids"], [primary, replacement])
+        self.assertEqual(row["historical_source_ids"], [prior])
+        self.assertEqual((row["value"], row["currency"], row["period"]["end"]),
+                         (59_000_000, "USD", "2026-03-31"))
+
+        scoped = health_subset(self.health, [row], "imerit")
+        source_urls = {source["id"]: source["url"] for source in scoped["sources"]}
+        self.assertEqual(set(source_urls), {primary, prior, replacement})
+        self.assertIn("earnings_event_id=8916344", source_urls[replacement])
+        checks = {check["source_id"]: check for check in scoped["source_checks"]["entries"]}
+        self.assertEqual(checks[replacement]["status"], "content_checked")
+        self.assertEqual((checks[prior]["status"], checks[prior]["http_status"]), ("unavailable", 404))
 
     def test_toloka_profile_projects_the_calculation_on_its_historical_ids(self):
         rows = {row["id"]: row for row in self.observations}
