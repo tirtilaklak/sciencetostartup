@@ -1944,7 +1944,7 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
     missing = [name for name in NOT_YET_PROFILED if not any(name.casefold() in row["name"].casefold().split(" / ") for row in current_entries)]
     remaining = f' Firms not yet listed in this directory include {escape(join_words(missing))}.' if missing else ''
     scope = (f'Compare uses the {historical_count} historical profiles. The {len(current_entries)} newer profiles cite dated Wikipedia context and official sources for their offerings.' if current_entries else '')
-    body.append(f'<details class="directory-scope"><summary>Coverage and sources</summary><p>{len(groups)} business groups{escape(compiled)}.</p><p>{COVERAGE}{remaining}</p>' + (f'<p>{scope}</p>' if scope else '') + '<p>Figures show their reporting date, business scope and source.' + (f' {count_word(nonprofit)} of the {count} companies are nonprofit research groups.' if nonprofit else '') + f'</p><a href="{ORIGIN}/method/">How we check the research</a></details>')
+    body.append(f'<details class="directory-scope"><summary>Coverage and sources</summary><p>{len(groups)} business groups{escape(compiled)}.</p><p>{COVERAGE}{remaining}</p>' + (f'<p>{scope}</p>' if scope else '') + '<p>Each figure links to its source and keeps the original reporting date and scope.' + (f' {count_word(nonprofit)} of the {count} companies are nonprofit research groups.' if nonprofit else '') + f'</p><a href="{ORIGIN}/method/">How we check the research</a></details>')
     if work_count:
         body.append(f'<p class="actions directory-next"><a href="{ORIGIN}/work/">See {plural(work_count, "paid work route")}</a></p>')
     body.append('<script src="/companies-page.js" data-page-enhancement-script defer></script>')
@@ -2032,7 +2032,7 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
             '<p class="work-export-status" data-work-export-status aria-live="polite"></p>'
             '<div class="work-page-disclosures"><details class="work-page-groups work-section-disclosure"><summary>Jump to section</summary>'
             f'{directory_counts}<nav aria-label="Work sections" data-work-section-navigation><ul>{section_links}</ul></nav></details>'
-            '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Check the employer’s page for current openings, pay and eligibility.' + (f' Latest link check {escape(format_date(checked))}.' if checked else '') + '</p>\n' + safety_note(show_label=False) + '</details></div></div>\n',
+            '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Check the employer’s page for current openings and pay. The employer sets eligibility.' + (f' Latest link check {escape(format_date(checked))}.' if checked else '') + '</p>\n' + safety_note(show_label=False) + '</details></div></div>\n',
             '<div class="work-page-empty" data-work-empty hidden><p>No records match. Try another word or clear the filters.</p><button type="button" data-work-clear>Clear search and filters</button></div>\n',
             '<section id="work-integrated-table" data-work-comparison hidden><h2 tabindex="-1">Compare paid work results</h2></section>',
             '<div class="work-page-list">']

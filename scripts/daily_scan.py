@@ -307,7 +307,7 @@ def render(edition, editions, canonical, root=ROOT, context=None):
         for row in reversed(editions)
     )
     body = (f'<div class="daily-scan" data-edition="{day}"><header class="scan-heading"><div>'
-            '<h1>Daily scan</h1><p class="scan-deck">Papers, datasets and company news on AI training.</p></div>'
+            '<h1>Daily scan</h1><p class="scan-deck">Research and company news on AI training.</p></div>'
             f'<time class="scan-issue" datetime="{day}">{format_date(day)}</time></header>'
             f'<nav class="scan-edition-nav" aria-label="Snapshots">{steps}'
             # Keep the links visible on a native history return even when the
@@ -326,7 +326,7 @@ def render(edition, editions, canonical, root=ROOT, context=None):
             '<script>if(matchMedia("(max-width:600px)").matches)document.currentScript.previousElementSibling.open=false</script>'
             f'<div class="scan-list-heading"><p id="scan-count" role="status" aria-live="polite">{len(edition["items"])} selections</p><span>Source dates: {format_date(min(source_dates))} – {format_date(max(source_dates))}</span><button type="button" id="scan-reset" hidden>Clear filters</button></div>'
             f'<div class="scan-list">{items}</div><div id="scan-empty" class="scan-empty" hidden><h2>No matching items</h2><button type="button" id="scan-empty-reset">Clear filters</button></div>'
-            '<footer class="scan-notes"><details><summary>Dates, sources & background</summary><dl><div><dt>Snapshot</dt><dd>Selection date in Pacific time</dd></div><div><dt>Source date</dt><dd>Original publication, release or arXiv submission. We label later updates.</dd></div><div><dt>Coverage</dt><dd>We attribute results to their authors and flag readings based on abstracts or announcements. The list includes no independent replication.</dd></div><div><dt>Background</dt><dd>Story summaries paraphrase the sources. Wikipedia excerpts below are verbatim.</dd></div></dl>'
+            '<footer class="scan-notes"><details><summary>Dates, sources & background</summary><dl><div><dt>Snapshot</dt><dd>Selection date in Pacific time</dd></div><div><dt>Source date</dt><dd>Original publication or release date, including arXiv submissions. We label later updates.</dd></div><div><dt>Coverage</dt><dd>We attribute results to their authors and flag readings based on abstracts or announcements. The list includes no independent replication.</dd></div><div><dt>Background</dt><dd>Story summaries paraphrase the sources. Wikipedia excerpts below are verbatim.</dd></div></dl>'
             f'<div class="scan-context">{contexts}</div><a href="/daily/wikipedia-context.json">Wikipedia revision & download records</a></details>'
             f'<p>Site search covers the latest {RECENT_EDITIONS} Daily editions.</p>'
             f'<a class="scan-download" href="{_edition_path(edition)}snapshot.json" download>Download this snapshot · JSON</a></footer></div>')

@@ -494,7 +494,7 @@ def _hub(context, editions=()):
                      + ''.join(f'<li>{_link(path, snapshot["report"]["release_id"])} · {_date(snapshot["report"]["updated_on"])}</li>'
                                for path, snapshot in editions) + '</ul></section>') if editions else ''
     return ('<header class="r-hero"><div>'
-            '<h1>AI data research</h1><p class="r-lede">Research on the suppliers, papers and datasets behind AI training.</p>'
+            '<h1>AI data research</h1><p class="r-lede">Papers and datasets on AI training, with evidence about the suppliers.</p>'
             f'<p class="r-status">{_status(context)}</p>'
             f'<p class="r-meta">Evidence snapshot {_date(context["graph"].get("as_of"))}</p></div>'
             '<aside class="r-report-card" aria-label="Current research report">'
@@ -1253,11 +1253,11 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
                  + coverage + '</section>' + download_citation)
     else:
         intro = ('<header class="r-page-head"><h1>Research data and sources</h1>'
-                 '<p class="r-lede">Download the data or look up a finding and its sources.</p>'
-                 + _meta(context) + '</header>' + download_citation
+                 '<p class="r-lede">Download the data or look up a finding and its sources.</p></header>'
+                 + download_citation
                  + operating_status_notice(context)
                  + '<details class="r-section r-disclosure" id="coverage"><summary>Publication checks and coverage</summary>'
-                 + coverage + '</details>')
+                 + _meta(context) + coverage + '</details>')
     return (intro +
             '<section class="r-section" aria-labelledby="assertions"><h2 id="assertions">Assertion records</h2>'
             '<p id="approved">Approved assertions retain their exact source bindings and review receipts.</p>'
@@ -1894,7 +1894,7 @@ def write_research_pages(output, context):
                 context['_page_revisions'].get(path) or observed_day, observed_day)
     download_sizes = {url: file.stat().st_size for url in DATA_JSON_DOWNLOADS
                       if (file := output / url.lstrip('/')).is_file()}
-    pages = [("/research/", "AI data research", "Source-linked research on the suppliers, papers and datasets behind AI training.", _hub(context, editions), "CollectionPage", None),
+    pages = [("/research/", "AI data research", "Papers and datasets on AI training, with evidence about the suppliers.", _hub(context, editions), "CollectionPage", None),
              (REPORT_PATH, context["report"]["title"], context["report"].get("summary", "Research methods and findings."), _report(context), "Book", None),
              ("/research/data/", "Research data and sources", "Download the research data or look up a finding and its sources.", _data(context, download_sizes=download_sizes), "CollectionPage", None),
              ("/review/", "Review & correct the research", "Contribute a source-backed correction, scoped review, or public reuse of ScienceToStartup research.", _review(context), "WebPage", None),
@@ -1981,10 +1981,10 @@ def write_research_pages(output, context):
 def research_search_entries(context):
     """Compact local-search records; candidate wording never enters summaries."""
     entries = [
-        {"title": "AI data research", "summary": "Suppliers, papers and datasets behind AI training.", "url": "/research/", "kind": "research", "keywords": "AI data labs human feedback evidence"},
+        {"title": "AI data research", "summary": "Papers and datasets on AI training, with evidence about the suppliers.", "url": "/research/", "kind": "research", "keywords": "AI data labs human feedback evidence"},
         {"title": context["report"]["title"], "summary": _status(context) + ". Twelve chapters of methods, historical examples, and research gaps.", "url": REPORT_PATH, "kind": "report", "keywords": "human feedback RLHF annotation suppliers methods"},
         {"title": "Research data and sources", "summary": "Download the data or look up a finding and its sources.", "url": "/research/data/", "kind": "data", "keywords": "JSON CSV SQLite citation sources provenance"},
-        {"title": "Review the research", "summary": "Correct a record, review a chapter or share how you used the data.", "url": "/review/", "kind": "review", "keywords": "correction contribute review reuse"},
+        {"title": "Review the research", "summary": "Submit a correction or a chapter review. Share where you used the data.", "url": "/review/", "kind": "review", "keywords": "correction contribute review reuse"},
         {"title": "Research corrections", "summary": "Accepted corrections with affected editions, claims, correction dates and source evidence.", "url": CORRECTIONS_PATH, "kind": "review", "keywords": "corrections errata RSS Atom evidence"},
     ]
     for index, section in enumerate(context['report']['sections'][1:], 2):
