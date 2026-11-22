@@ -72,6 +72,29 @@ class EditorialWorkTests(unittest.TestCase):
         self.assertEqual(self.routes["afterquery.work.product-manager"]["arrangements"], ["onsite"])
         self.assertEqual(self.routes["afterquery.work.technical-content-writer-contract"]["arrangements"], ["remote"])
 
+    def test_fellowship_workplace_and_empirical_qualification_have_scoped_receipt(self):
+        row = self.routes["aixi.work.research-fellowship"]
+        self.assertEqual(row["geography"], "Remote (worldwide), or Berkeley, US or London, UK")
+        self.assertEqual(row["requirements"], [
+            "A research background at the level of a current PhD student.",
+            "For primarily empirical projects, a master’s-level command of the relevant mathematics paired "
+            "with substantial industry or applied research experience can also qualify.",
+        ])
+        receipt = next(item for item in row["editorial_review"]["receipts"]
+                       if set(item.get("reviewed_fields", ())) == {"location", "requirements"})
+        self.assertTrue(receipt["approved"])
+        self.assertEqual(receipt["scope"], "field_review")
+        source = next(item for item in row["sources"] if item["id"] == receipt["source_id"])
+        self.assertEqual(source["url"], "https://www.aixi.uk/team/opportunities/aixi-labs-fellowship/")
+        self.assertEqual(source["accessed_on"], "2026-11-22")
+        for field in receipt["reviewed_fields"]:
+            self.assertEqual(row["field_reviews"][field]["source_ids"], [source["id"]])
+            self.assertEqual(row["field_reviews"][field]["reviewed_on"], receipt["checked_on"])
+        self.assertEqual(row["eligibility"], "Worldwide wording")
+        self.assertEqual(row["pay_label"], "£2K–£3,500 / month")
+        self.assertEqual(row["field_reviews"]["pay"]["reviewed_on"], "2026-10-28")
+        self.assertNotIn("approved_terms_receipt_id", row["editorial_review"])
+
     def test_task_equivalents_and_mixed_pay_are_not_actual_hourly_payment(self):
         for rid in ["toloka.work.mindrift-code", "toloka.work.cad-simulation", "labelbox.work.mechanical-engineering", "terac.work.finance-experts"]:
             self.assertFalse(self.routes[rid]["pay_terms"]["hourly_comparable"], rid)

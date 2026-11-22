@@ -119,6 +119,8 @@ function w4Requirements(route){
   if(route.id==='scale_ai.work.outlier-statistics'&&/Degree conflict/i.test((route.requirements||[]).join(' ')))return ["Degree conflict: master's badge; doctorate in ideal qualifications",'Authorization to work in the country of residence'];
   const originals=(route.requirements||[]).map(w4Text).filter(Boolean),text=originals.join(' ');
   if(!text)return [];
+  // The fellowship's alternate qualification needs its project and experience conditions together.
+  if(route.id==='aixi.work.research-fellowship')return originals.slice(0,2);
   const age=text.match(/\b(?:aged?\s*)?18\+|\bover\s+18\b|\bat\s+least\s+18\b/i)?.[0];
   const preserveAge=rows=>age&&!rows.some(row=>/\b18(?:\+|\b)/.test(row))?(rows.length?[age+' · '+rows[0],...rows.slice(1)]:[age]):rows;
   const tailored={
@@ -144,8 +146,6 @@ function w4Requirements(route){
     'ooak.work.data-quality-specialist':[
       [/6\+ years.*Python\/SQL.*data.quality/i,'6+ years · Python/SQL + data quality'],
       [/fluent English/i,'Fluent English']],
-    'aixi.work.research-fellowship':[
-      [/PhD.level research, or relevant master.s plus substantial applied research/i,'PhD-level research, or relevant master’s + substantial applied research']],
     'abundant_ai.work.research-fellow':[
       [/Research depth in CS\/ML\/NLP/i,'Research in computing, machine learning or language processing'],
       [/requires AI safety\/governance policy experience/i,'AI safety / governance policy experience']],
