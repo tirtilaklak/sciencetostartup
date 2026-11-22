@@ -752,7 +752,7 @@ function reset(){Object.assign(state,{query:'',category:'',stage:'',financial:fa
 // previousSection is set after a section link such as #venture, so the next plain view link starts at the top.
 let previousRoute='',previousSection='';const viewScroll={};
 let companyReturnFocus=null;
-const marketLinkOrigins=new Map();
+const marketShortcutOrigins=new Map();
 // Hashes that name a place inside a page. route() shows that page, then brings the element to the top with focus.
 const VIEW_ANCHORS={'business-health':'market',venture:'market',about:'method',labels:'method',corrections:'method',coverage:'method',downloads:'method'};
 function viewAnchorId(hash=location.hash){const id=String(routeParts(hash)[0]||'').toLowerCase();return Object.hasOwn(VIEW_ANCHORS,id)?id:'';}
@@ -1031,8 +1031,8 @@ function repeatMainRoute(event){
 document.addEventListener('click',rememberCompanyOrigin);
 document.addEventListener('click',rememberShortlistOrigin);
 document.addEventListener('click',event=>{
- const link=event.target.closest?.('#market-view .hero-actions a[href="#business-health"],#market-view .product-showcase h3 a[href^="#company/"]');
- if(normalSelfLinkActivation(event,link)&&location.hash!==link.hash)marketLinkOrigins.set(historyKey(),link);
+ const shortcut=event.target.closest?.('#market-view .hero-actions a[href="#business-health"]');
+ if(normalSelfLinkActivation(event,shortcut)&&location.hash!==shortcut.hash)marketShortcutOrigins.set(historyKey(),shortcut);
 });
 document.addEventListener('click',repeatCompanyRoute);
 document.addEventListener('click',repeatMainRoute);
@@ -1077,16 +1077,10 @@ function route(event){
  if(view!=='compare'&&previousRoute==='compare'&&typeof measureSiteHeader==='function')measureSiteHeader();
  renderTray(shortlist?.notice);
  const waitForShortlist=shortlist&&restore!==null&&searchContextPending(state.query);
- const marketOrigin=wasTraversal&&view==='market'?marketLinkOrigins.get(key):null;
- const marketLink=marketOrigin?.href===event?.oldURL&&marketOrigin;
- const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId&&!marketLink)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();if(!waitForShortlist)queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;
- if(marketLink){
+ const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();if(!waitForShortlist)queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;
+ if(wasTraversal&&view==='market'&&!anchorId){
   const hash=location.hash;
-  queueMicrotask(()=>{
-   const active=document.activeElement;
-   if(location.hash===hash&&marketLink.getClientRects().length&&
-    (active===document.body||active===document.documentElement||!active?.getClientRects().length))marketLink.focus({preventScroll:true});
-  });
+  queueMicrotask(()=>{if(location.hash===hash)marketShortcutOrigins.get(key)?.focus({preventScroll:true});});
  }
  const linkedOpener=returnOrigin&&focusExploreOrigin(returnOrigin);
  if(linkedOpener)return linkedOpener;
