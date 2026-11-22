@@ -4,9 +4,9 @@ The audit began at 7:30 PM Pacific on November 21, 2026. The first three hours a
 
 ## Current pass
 
-The initial three-hour audit is complete. The first implementation cohort started at 10:30 PM Pacific on November 21. Six GPT-6.2 Sol Ultra workers started in parallel on Home, Work source decisions, native pages, Work filtering and export, research wrappers, and search. The remaining assignments cover Compare, financial evidence, shared navigation, and Daily. The production manifest identifies build `d8d18622a82c541129c1`. The repository baseline is main at `4d7dae5d40c1dea7978ab519cd3ac66d547cf29f`, with checked-in build `6d57f30fbf456b1e48a8`. The deployed Daily index contains the November 17 issue. The repository contains the November 18 issue. A push to GitHub alone does not publish the Worker.
+Ten GPT-6.2 Sol Ultra reviewers completed the first three-hour audit at 10:30 PM Pacific on November 21. Ten different Sol Ultra implementers completed the first patch, with six working at once. A separate cohort is testing the frozen build. They own Home, Work source decisions, native pages, Work filtering and export, research wrappers, search, shared navigation, finance, Compare, and Daily. The production manifest identifies build `d8d18622a82c541129c1`. The repository baseline is main at `4d7dae5d40c1dea7978ab519cd3ac66d547cf29f`, with checked-in build `6d57f30fbf456b1e48a8`. The deployed Daily index contains the November 17 issue. The repository contains the November 18 issue. A push to GitHub alone does not publish the Worker.
 
-The open implementation items are H1–H3, W1–W3, S1–S5, E1–E5, R1–R4, N1–N2 and D1. The screenshots and working browser trials below establish candidate behavior during the audit window. Production verification follows the implementation and independent retest.
+The independent verification queue covers H1–H3, W1–W3, S1–S5, E1–E5, R1–R4, N1–N2 and D1. The screenshots and working browser trials below establish candidate behavior during the audit window. Production verification follows the implementation and independent retest.
 
 ## Findings and acceptance checks
 
@@ -159,6 +159,12 @@ Ten GPT-6.2 Sol Ultra reviewers completed the initial audit. The unchanged publi
 - **Corrections and company evidence.** On seven footer routes the original pages reached the corrections area. Thirteen of 30 checks failed on the contact alternatives and precise record context. The keyboard trial opened both correction choices with the originating record intact. Across 68 native company claims, the trial exposed each claim's own sources, preserving the 171 source bindings.
 - **Open tabs.** A release rehearsal switched five existing browser tabs from the actual production predecessor to the original branch build on a local server. Compare, Work, and the Mercor profile still operated on their opening records. A new tab read the branch build. Removing one retained Labelbox asset in a disposable copy made the same test fail on that exact file. The real release must pass the replay with its own manifest.
 
+## First implementation
+
+The editorial release is `2026-11-22.1`. Its recorded scope is 48 named listings and 21 networks or programs across 28 providers. All 135 records remain in the guide. The nine dispositions include the six unusable applications and three roles or networks that led to a different destination. The source checker passed its retained response replay. Thirty-nine field receipts preserve which terms each employer source actually supports. The release retains the earlier historical pay observations.
+
+On disposable builds, all 50 homepage browser tests passed. Both Snorkel examples and their action links fit a 390 × 844 viewport, ahead of the portrait. At desktop width the heading and first record share the same left edge. Native Work, Explore and real CSV downloads agreed on the three Snorkel records, 27 named on-site records after the full workplace corrections, all 23 career boards, and zero matches for a punctuation-heavy query. The 276 checks for the six archived roles passed on the same disposable build as the 104 native company citation and risk-label checks. Final verification will bind the integrated findings to one immutable Worker version.
+
 ## Evidence
 
 - [Live manifest](https://sciencetostartup.com/manifest.json) and [Daily index](https://sciencetostartup.com/daily/)
@@ -166,6 +172,10 @@ Ten GPT-6.2 Sol Ultra reviewers completed the initial audit. The unchanged publi
 - [Mercor Series D](https://www.mercor.com/blog/series-d/) and [Datacurve Series A lead investor](https://www.chemistry.vc/post/staying-ahead-of-the-curve)
 - [Terac closed listing](https://terac.com/opportunities/KZwfXOQhfpdjGT8k) and [APTO application](https://herp.careers/v1/apto/NyufvNJGg7Td)
 
-## Next pass
+## First independent retest
 
-Implement and integrate all 23 open findings on this branch. Each shared source file has one writer. Build one complete artifact, run the repository checks, then give a different cohort its exact URL for independent testing. Record each verified finding against the tested manifest. Preserve the real traffic predecessor at deployment and check the public site after promotion. The 24-hour pass ends at 7:30 PM Pacific on November 22.
+Candidate `d63382a41cc48c2e33ce` is rendered in 4ae197d0. All 1,276 declared payloads validated locally. Its manifest SHA-256 is `691a43092704c83c3dd01be9d22fa7043e12207ba82d3d52f083320b86b2ade3`. At freeze, Cloudflare still routed all production traffic to `cddaa614-befb-4bfe-81b2-8553bd74afac`.
+
+On this candidate the six archived roles passed 276 checks, the source checker passed ten fixtures and twelve captured public responses, and the 41 finance and catalog checks passed. The independent Work reviewer found that a publication condition on the AfterQuery Research Scholar payment was missing from its native card and terms. Several applicant requirements repeat on the same card. These findings go into the second patch. [Implementation checks and receipt hashes](site-quality-20261121/first-implementation-checks.json)
+
+The independent cohort is exercising the frozen artifact. The complete repository checks run against the same commit. Verify fixes to every actionable finding before promotion and confirm the public routes after release. The pass ends at 7:30 PM Pacific on November 22.
