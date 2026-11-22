@@ -1066,8 +1066,7 @@ def figure_row(research, metric, context=None):
     notes = [research.correction(metric, "display_attribution"), clean(context.get("note"))]
     head = f'<th scope="row">{escape(label)}<span class="sub">{escape(" · ".join(d for d in details if d))}</span>' + "".join(f'<span class="sub">{escape(note)}</span>' for note in notes if note and note != "Undated company claim") + "</th>"
     assurance = "Third-party estimate" if context.get("estimated") else "Estimate" if metric.get("reported_vs_estimated") == "estimated" else ""
-    display_metric = {**metric, "qualifier": context.get("qualifier", metric.get("qualifier"))}
-    value = f'<td class="value" data-label="Value">{escape(value_text(display_metric))}' + (f' <span class="tag">{escape(assurance)}</span>' if assurance else "") + "</td>"
+    value = f'<td class="value" data-label="Value">{escape(value_text(metric))}' + (f' <span class="tag">{escape(assurance)}</span>' if assurance else "") + "</td>"
     when = context.get("date") or metric_period(research, metric)
     period = f'<td data-label="Date">{escape("Not stated" if when == "Date not stated" else when)}' + (' <span class="tag">Historical</span>' if research.historical_year(metric) else "") + "</td>"
     citations = source_html(research, metric)
@@ -1152,8 +1151,6 @@ def figures_html(research, company, figures, pending, others, profile_entry, fin
             continue
         if observation.get("evidence_type") == "estimate":
             contexts[rid] = {**(contexts.get(rid) or {}), "display_label": observation["label"], "estimated": True}
-        if observation.get("qualifier_reviewed_on"):
-            contexts[rid] = {**(contexts.get(rid) or {}), "qualifier": observation["qualifier"]}
         if supplemental := sources.get(observation.get("primary_source_id")):
             contexts[rid] = {**(contexts.get(rid) or {}), "supplemental_source": supplemental, "note": observation["limitations"]}
     if figures:
@@ -1681,6 +1678,12 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     group_name = labels.get(group, group)
     summary = clean(entry.get("summary")) or shown_text(research, company.get("description"))
     figures = key_figures(research, cid, profile_entry)
+    figure_ids = {row["id"] for row in figures}
+    reviewed = {row["id"]: row for row in (business_health or {}).get("observations", [])
+                if row["company_id"] == cid and row.get("metric_ids") == [row["id"]]
+                and (row.get("primary_source_id") or row.get("qualifier_reviewed_on"))}
+    figures.extend(row for row in research.by_company.get(cid, []) if row["id"] in reviewed and row["id"] not in figure_ids)
+    figures = [{**row, "qualifier": reviewed[row["id"]]["qualifier"]} if row["id"] in reviewed else row for row in figures]
     pending = unconfirmed_figures(research, cid, figures)
     others = other_figures(research, cid, figures + pending)
     open_routes = [r for r in routes if work_display_bucket(r) in ("named", "programs", "boards", "outside")]
