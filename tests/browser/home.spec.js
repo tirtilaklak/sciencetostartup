@@ -126,6 +126,132 @@ test('without JavaScript the homepage offers its menu and native browse links', 
   await context.close();
 });
 
+test.describe('home keyboard controls in compact viewports', () => {
+  test.skip(({ browserName }) => browserName !== 'chromium', 'Exercise the audited Chromium keyboard behavior');
+  test.use({ reducedMotion: 'reduce' });
+
+  async function tabThrough(page, ...controls) {
+    for (const control of controls) {
+      await page.keyboard.press('Tab');
+      await expect(control).toBeFocused();
+    }
+  }
+
+  function headerLinks(page) {
+    return ['Skip to content', 'ScienceToStartup home', 'Search the guide']
+      .map(name => page.getByRole('link', { name, exact: true }));
+  }
+
+  async function expectUncoveredFocus(control) {
+    await expect(control).toBeFocused();
+    await expect(control).toBeInViewport({ ratio: 1 });
+    await expect.poll(() => control.evaluate(element => {
+      const { left, top, width, height } = element.getBoundingClientRect();
+      const samples = [0.2, 0.5, 0.8];
+      return {
+        focusVisible: element.matches(':focus-visible'),
+        hits: samples.flatMap(x => samples.map(y =>
+          element.contains(document.elementFromPoint(left + width * x, top + height * y)))).filter(Boolean).length,
+      };
+    })).toEqual({ focusVisible: true, hits: 9 });
+  }
+
+  for (const { width, height, name, path } of [
+    { width: 640, height: 436, name: 'Sources and data', path: '/research/data/' },
+    { width: 320, height: 218, name: 'Find paid work', path: '/work/' },
+  ]) {
+    test(`home Menu leaves ${name} operable at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height });
+      await page.goto('/');
+      await page.evaluate(() => document.fonts.ready);
+      const menu = page.locator('.home-menu');
+      const nav = menu.getByRole('navigation', { name: 'Main' });
+      const menuLinks = ['Daily scan', 'Research', 'Companies', 'Paid work', 'About']
+        .map(name => nav.getByRole('link', { name, exact: true }));
+      const main = page.getByRole('main');
+      const heroActions = main.locator('.hero-actions');
+      const work = heroActions.getByRole('link', { name: 'Find paid work', exact: true });
+      const sources = main.getByRole('link', { name: 'Sources and data', exact: true });
+      const target = name === 'Sources and data' ? sources : work;
+
+      await tabThrough(page, ...headerLinks(page), menu.getByText('Menu', { exact: true }));
+      await page.keyboard.press('Enter');
+      await expect(menu).toHaveJSProperty('open', true);
+      await tabThrough(page, ...menuLinks, heroActions.getByRole('link', { name: 'Browse companies', exact: true }), work);
+      if (name === 'Sources and data') await tabThrough(page, sources);
+      await expect(menu).toHaveJSProperty('open', true);
+      await expectUncoveredFocus(target);
+      await page.keyboard.press('Enter');
+      await expect(page).toHaveURL(path);
+    });
+  }
+
+  test('home Search pages a tall selected result without moving focus', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 218 });
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+    const links = headerLinks(page);
+    const opener = links.at(-1);
+    const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+    const input = dialog.getByRole('combobox');
+    const option = dialog.getByRole('option', { name: /^Mercor Company/ });
+
+    await tabThrough(page, ...links);
+    await page.keyboard.press('Enter');
+    await expect(input).toBeFocused();
+    await page.keyboard.type('Mercor');
+    await expect(option).toBeVisible();
+    await page.keyboard.press('ArrowDown');
+
+    const optionId = await option.getAttribute('id');
+    const expectSelection = async () => {
+      await expect(input).toBeFocused();
+      await expect(input).toBeInViewport({ ratio: 1 });
+      await expect(input).toHaveValue('Mercor');
+      await expect(input).toHaveAttribute('aria-activedescendant', optionId);
+      await expect(option).toHaveAttribute('aria-selected', 'true');
+      await expect(option).toHaveAttribute('href', '/company/mercor/');
+    };
+    const readResult = () => option.evaluate(element => {
+      const results = element.closest('[role="listbox"]');
+      const viewport = results.getBoundingClientRect();
+      const top = Math.max(0, viewport.top);
+      const bottom = Math.min(innerHeight, viewport.bottom);
+      const range = document.createRange();
+      const visibleLines = ['strong', 'span'].flatMap(selector => {
+        range.selectNodeContents(element.querySelector(selector));
+        return Array.from(range.getClientRects(), line => line.top >= top - 0.5 && line.bottom <= bottom + 0.5);
+      });
+      return {
+        resultHeight: element.getBoundingClientRect().height,
+        viewportHeight: viewport.height,
+        scrollTop: results.scrollTop,
+        visibleLines,
+      };
+    });
+
+    await expectSelection();
+    const initial = await readResult();
+    expect(initial.resultHeight).toBeGreaterThan(initial.viewportHeight);
+    expect(initial.visibleLines[0]).toBe(true);
+    expect(initial.visibleLines.at(-1)).toBe(false);
+
+    await page.keyboard.press('PageDown');
+    await expect.poll(async () => (await readResult()).scrollTop).toBeGreaterThan(initial.scrollTop);
+    const down = await readResult();
+    expect(down.visibleLines.map((visible, index) => visible || initial.visibleLines[index]))
+      .toEqual(initial.visibleLines.map(() => true));
+    await expectSelection();
+
+    await page.keyboard.press('PageUp');
+    await expect.poll(async () => Math.abs((await readResult()).scrollTop - initial.scrollTop)).toBeLessThan(1);
+    await expectSelection();
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expectUncoveredFocus(opener);
+  });
+});
+
 test('homepage Search loads only its small component and index when invoked', async ({ page }) => {
   const requests = [];
   page.on('request', request => requests.push(request.url()));
