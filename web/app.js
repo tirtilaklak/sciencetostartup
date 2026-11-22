@@ -1044,14 +1044,35 @@ function financialObservationAge(m){
  return end<`${Number(FINANCIAL_RECENCY_REVIEW.slice(0,4))-1}${FINANCIAL_RECENCY_REVIEW.slice(4)}`?'historical':'current';
 }
 function signalFor(id,m,span=''){if(!m)return `<span class="unavailable">${companies[id].entity_type==='adjacent_research'?'Research organization':'Not disclosed'}</span>`;const kind={revenue:'Revenue',annualized_revenue_run_rate:'Annualized pace',arr:'Yearly recurring subscription revenue'}[m.kind]||metricLabels[m.kind];const rank=dateRank(m.as_of),year=rank==='0000'?null:Number(rank.slice(0,4)),historical=year&&year<Number(DATA.meta.as_of.slice(0,4))-1;const html=`${historical?`<span class="signal-history">Historical · ${year}</span>`:''}<div class="row-number ${historical?'is-historical':''}">${numberButton(m)}<span>${esc(kind)}${m.gross_vs_net==='gross'?' · '+esc(metricCurrentBasis(m,'gross')):''}</span></div><span class="row-period">${esc(readableDates(shortPeriod(m)))}${span?' · '+esc(span):''} · ${esc(m.currency||'')} · ${esc(compactMetricScope(m))}${m.gross_vs_net==='net'?' · net':m.gross_vs_net!=='gross'?' · gross or net not stated':''}</span><span class="signal-attribution">${esc(typeof profileMetricAttribution==='function'?profileMetricAttribution(m):evidenceLabel(claims[m.claim_id]))}</span>`;const age=financialObservationAge(m);return age==='current'?html:`<span class="signal-label">${age==='undated'?'No dated revenue figure':'No recent revenue figure'}</span><details class="historical-signal"><summary>${age==='undated'?'Undated financial claim':'Historical figure · '+esc(readableDates(shortPeriod(m)))}</summary>${html}</details>`;}
-function renderDirectory(){
+function renderDirectoryCards(cards,rows,active){
+ const markup=rows.map(card);
+ const focusedCard=active?.closest('[data-company-card]');
+ const index=focusedCard?rows.findIndex(c=>c.id===focusedCard.dataset.companyCard):-1;
+ if(index<0){
+  cards.innerHTML=markup.join('');
+  if(active)$('search').focus();
+  return;
+ }
+ // Keep the focused section attached so an in-progress keypress can still activate it.
+ const template=document.createElement('template');
+ template.innerHTML=markup[index];
+ const sections=[...template.content.firstElementChild.children];
+ [...focusedCard.children].forEach((section,i)=>{if(!section.contains(active))section.replaceWith(sections[i]);});
+ for(const sibling of [...cards.children])if(sibling!==focusedCard)sibling.remove();
+ focusedCard.insertAdjacentHTML('beforebegin',markup.slice(0,index).join(''));
+ focusedCard.insertAdjacentHTML('afterend',markup.slice(index+1).join(''));
+ active.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});
+}
+function renderDirectory(preserveFocus=false){
  if(searchContextPending(state.query)){requestDirectorySearch();return;}
  directorySearchGeneration++;
- $('company-cards').removeAttribute?.('aria-busy');
+ const cards=$('company-cards');
+ const active=preserveFocus&&cards.contains(document.activeElement)?document.activeElement:null;
+ cards.removeAttribute?.('aria-busy');
  companyReturnFocus=null;
  const rows=filtered(),query=state.query.trim(),secondaryCount=[state.stage,state.financial,state.work,state.sort!=='name'].filter(Boolean).length;
  const summary=document.querySelector('.more-filters>summary');if(summary)summary.textContent=secondaryCount?`More filters (${secondaryCount})`:'More filters';
- $('download-csv').textContent=`Current company results · ${rows.length} ${rows.length===1?'row':'rows'} · CSV (a table format for spreadsheet software)`;$('reset').hidden=!(query||state.category||secondaryCount);$('company-cards').innerHTML=rows.map(card).join('');$('result-count').textContent=`Showing ${rows.length} of ${DATA.companies.length} companies`;$('empty-state').hidden=rows.length>0;
+ $('download-csv').textContent=`Current company results · ${rows.length} ${rows.length===1?'row':'rows'} · CSV (a table format for spreadsheet software)`;$('reset').hidden=!(query||state.category||secondaryCount);renderDirectoryCards(cards,rows,active);$('result-count').textContent=`Showing ${rows.length} of ${DATA.companies.length} companies`;$('empty-state').hidden=rows.length>0;
  $('active-filters').innerHTML=[query&&`Search: ${query}`,state.category&&groupLabel(state.category),state.stage&&`Delivery evidence: ${stageLabel(state.stage)}`,state.financial&&'Revenue figures',state.work&&'Has paid work or a career page',state.sort==='name-desc'&&'Name Z–A'].filter(Boolean).map(x=>`<span class="active-filter">${esc(x)}</span>`).join('');syncSelection();
 }
 
@@ -1061,7 +1082,7 @@ let directorySearchGeneration=0,workSearchGeneration=0;
 function requestDirectorySearch(){
  const generation=++directorySearchGeneration;
  $('company-cards').setAttribute?.('aria-busy','true');$('result-count').textContent='Loading search…';
- return window.ensureSearchContext().then(()=>{if(generation!==directorySearchGeneration)return;if(routeParts()[0]==='companies'||VIEW_ANCHORS[routeParts()[0]]==='method')renderDirectory();else directoryShown=false;}).catch(()=>{if(generation===directorySearchGeneration)directorySearchFailure();});
+ return window.ensureSearchContext().then(()=>{if(generation!==directorySearchGeneration)return;if(routeParts()[0]==='companies'||VIEW_ANCHORS[routeParts()[0]]==='method')renderDirectory(true);else directoryShown=false;}).catch(()=>{if(generation===directorySearchGeneration)directorySearchFailure();});
 }
 function directorySearchFailure(){
  $('company-cards').removeAttribute?.('aria-busy');$('result-count').textContent='Search could not load.';
