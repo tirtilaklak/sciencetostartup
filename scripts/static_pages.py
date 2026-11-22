@@ -818,10 +818,13 @@ def work_terms_age(route, as_of):
             "label": "Needs recheck" if age >= 14 else ""}
 
 
-def work_review_label(research, route):
+def work_review_label(research, route, compact=False):
     label = work_freshness(route)
     age = work_terms_age(route, research.publication_as_of)
-    return label + (" · " + age["label"] + " (as of " + format_date(age["as_of"]) + ")" if age["label"] else "")
+    if not age["label"]: return label
+    as_of = format_date(age["as_of"])
+    date_note = "" if compact and label.endswith(" " + as_of) else f" (as of {as_of})"
+    return label + " · " + age["label"] + date_note
 
 
 def work_freshness(route):
@@ -1258,7 +1261,7 @@ def work_action_name(label, route, employer):
     return f"{label} for {clean(route.get('role')) or 'Listing'}, {employer}"
 
 
-def work_source_lines(research, route, employer, detailed):
+def work_source_lines(research, route, employer, detailed, profile_destination=None):
     """One URL per list item with every distinct observation and field binding."""
     fields, earlier_fields, receipts, grouped, prior_quotes = {}, {}, {}, {}, {}
     review = route.get("editorial_review") or {}
@@ -1297,7 +1300,12 @@ def work_source_lines(research, route, employer, detailed):
     for url, sources in grouped.items():
         first = sources[0] if sources else {}
         label = secondary.get(url) or clean(first.get("title") or first.get("publisher")) or ("Application checked" if url in applications else "Source")
-        link = external_link(url, label, work_action_name(label, route, employer) if url in secondary else "")
+        if profile_destination and first.get("purpose") == "terms" and url not in secondary and route.get("role"):
+            # The surrounding card already identifies the role.
+            label = label.removesuffix(" · " + clean(route["role"])) or label
+        repeats_action = url == profile_destination and url not in secondary
+        # The observations still describe this exact page. Its direct link follows the disclosure.
+        link = escape(label) if repeats_action else external_link(url, label, work_action_name(label, route, employer) if url in secondary else "")
         observations = []
         for index, source in enumerate(sources):
             sid = source.get("id")
@@ -1313,17 +1321,26 @@ def work_source_lines(research, route, employer, detailed):
             purpose = source.get("purpose")
             if not index and url == route.get("url"):
                 purpose = purpose or review.get("recorded_url_purpose")
-            if purpose: details.append(WORK_SOURCE_PURPOSES.get(purpose) or readable(purpose))
             entry_receipts = receipts.get(sid, [])
+            terms_review = profile_destination and purpose == "terms" and sid in fields and recorded and any(
+                check.get("scope") == "field_review" and check.get("checked_on") == source.get("accessed_on")
+                for check in entry_receipts
+            )
+            repeats_description = repeats_action and not index and purpose == "description" and label.lower().endswith("description")
+            if purpose and not terms_review and not repeats_description:
+                details.append(WORK_SOURCE_PURPOSES.get(purpose) or readable(purpose))
             if recorded:
                 verb = "URL checked" if any(r.get("scope") == "retrieval" for r in entry_receipts) else "Recorded"
                 if not detailed and index and check_title: verb = "Listing checked"
                 details.append(verb + " " + recorded)
-            if sid in fields: details.append("Source for " + ", ".join(fields[sid]))
+            if sid in fields: details.append(("Terms fields reviewed: " if terms_review else "Source for ") + ", ".join(fields[sid]))
             if sid in earlier_fields: details.append("Earlier source for " + ", ".join(dict.fromkeys(earlier_fields[sid])))
             for check in entry_receipts:
                 reviewed = check.get("checked_on")
-                summary = [WORK_SOURCE_PURPOSES.get(check.get("scope")) or readable(check.get("scope")),
+                scope = check.get("scope")
+                # The source date and exact fields already describe this same terms review.
+                repeated_scope = terms_review and scope == "field_review" and reviewed == source.get("accessed_on")
+                summary = ["" if repeated_scope else WORK_SOURCE_PURPOSES.get(scope) or readable(scope),
                            format_date(reviewed) if reviewed and reviewed != source.get("accessed_on") else "",
                            f'HTTP {check["http_status"]}' if check.get("http_status") else "",
                            readable(check.get("result")) if check.get("result") != "readable" else "",
@@ -1354,16 +1371,18 @@ def work_source_lines(research, route, employer, detailed):
         if record_quote_html and not quote_source and url == quote_url:
             observations.append(record_quote_html)
             record_quote_html = ""
-        lines.append(f'<li>{link}{"".join(observations)}</li>')
+        # Each next item (or the end of the list) closes the item in a compact card.
+        lines.append(f'<li>{link}{"".join(observations)}' + ("" if profile_destination else "</li>"))
     return record_quote_html + ("<ul>" + "".join(lines) + "</ul>" if lines else "")
 
 
-def work_terms_html(research, route, employer, detailed=True, more_requirements=()):
+def work_terms_html(research, route, employer, detailed=True, more_requirements=(), profile_destination=None):
     """One native source disclosure; a replaced original URL remains in its history."""
     label = "More requirements, terms &amp; sources" if more_requirements else "Terms &amp; sources"
     parts = [f'<details class="work-terms"><summary>{label}</summary>']
     if more_requirements:
-        parts.append('<ul aria-label="Additional requirements">' + ''.join(f'<li>{escape(term)}</li>' for term in more_requirements) + '</ul>')
+        # HTML closes each list item at the next item or the end of its list.
+        parts.append('<ul aria-label="Additional requirements">' + ''.join(f'<li>{escape(term)}' for term in more_requirements) + '</ul>')
     if detailed and route.get("summary"): parts.append('<p>' + escape(clean(route["summary"])) + '</p>')
     availability_note = clean(route.get("availability_note"))
     if not detailed:
@@ -1374,7 +1393,11 @@ def work_terms_html(research, route, employer, detailed=True, more_requirements=
         }.get(availability_note, availability_note)
     if availability_note: parts.append(f'<p>{escape(availability_note)}</p>')
     pay_note = clean((route.get("pay_terms") or {}).get("note"))
-    if pay_note and pay_note != work_pay_qualification(route) and pay_note not in availability_note:
+    repeats_salary_unit = profile_destination and any(
+        pay_note == f"The employer lists this component as {period} salary." and work_pay(route).endswith(f" {period} salary")
+        for period in ("monthly", "annual")
+    )
+    if pay_note and not repeats_salary_unit and pay_note != work_pay_qualification(route) and pay_note not in availability_note:
         parts.append(f'<p>{escape(pay_note)}</p>')
     reviews = {}
     source_dates = {source.get("id"): source.get("accessed_on") for source in route.get("sources") or [] if is_web_url(source.get("url"))}
@@ -1398,7 +1421,7 @@ def work_terms_html(research, route, employer, detailed=True, more_requirements=
         parts.append('<ul>' + "".join(f'<li>{escape(f"{text} ({join_words(labels)})")}</li>' for text, labels in reviews.items()) + '</ul>')
     if route.get("as_of") and (detailed or route["as_of"] != "undated"):
         parts.append('<p>Terms recorded · ' + escape(format_date(route["as_of"]) if route["as_of"] != "undated" else "date not stated") + '</p>')
-    parts.append(work_source_lines(research, route, employer, detailed))
+    parts.append(work_source_lines(research, route, employer, detailed, profile_destination))
     disposition = (route.get("editorial_review") or {}).get("disposition") or {}
     if detailed and disposition.get("note"): parts.append('<p>' + escape(clean(disposition["note"])) + '</p>')
     parts.append('</details>')
@@ -1417,7 +1440,7 @@ def work_item(research, route, employer, compact=False):
     if offer and work_pay_qualification(route):
         qualified_offer = f'<span class="sub">{escape(offer)}</span>{pay_notes}'
         offer, pay_notes = "", ""
-    parts = [offer, place if place == NO_PLACE else labelled("Where", place), work_review_label(research, route)]
+    parts = [offer, place if place == NO_PLACE else labelled("Where", place), work_review_label(research, route, compact=compact)]
     tag = f' <span class="tag">{escape(status)}</span>' if status else ""
     destination, action = work_destination(route, research)
     rid, role = escape(route.get("id")), clean(route.get("role")) or "Listing"
@@ -1431,7 +1454,8 @@ def work_item(research, route, employer, compact=False):
             visible -= 1
     conditions = work_conditions(route, requirements[:visible])
     title = f'<a class="work-role-link" href="/work/#{rid}">{escape(role)}</a>' if compact else escape(role)
-    terms = work_terms_html(research, route, employer, detailed=not compact, more_requirements=requirements[visible:])
+    terms = work_terms_html(research, route, employer, detailed=not compact, more_requirements=requirements[visible:],
+                            profile_destination=destination if compact else None)
     return (f'<li id="{rid}" tabindex="-1" data-work-route="{rid}"><strong>{title}</strong>{tag}'
             f'{qualified_offer}<span class="sub">{escape(". ".join(p for p in parts if p))}</span>{pay_notes}'
             f'{conditions}{terms}{link}</li>')
