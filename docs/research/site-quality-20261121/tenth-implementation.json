@@ -1,0 +1,167 @@
+{
+  "source": "ec42722a476188ec3ff4d05999f018b53dc7b889",
+  "build": "ea6272946bebf0bf9a35",
+  "manifest": "7e03708d81e839915f025f59dfd07659bdc61b4a55177341ec5497edce330e27",
+  "editorial_release": "2026-11-22.7",
+  "replaces_held": "6637c48a4c2a9cd6000e",
+  "public_predecessor": "5dc63fbcf19634a55c66",
+  "cohort": {
+    "workspace": "/workspace/sciencetostartup-quality-tenth",
+    "base": "b54e40a5700262e7ca0fad4d3061f9e2e30bec30",
+    "model": "gpt-6.2-sol",
+    "reasoning_effort": "ultra",
+    "workers": {
+      "fix10_shortlist_scroll": {
+        "findings": [
+          "C9-shortlist-back-scroll"
+        ],
+        "paths": [
+          "web/app.js",
+          "web/data-runtime.js"
+        ],
+        "commits": [
+          "539813d9"
+        ],
+        "ownership_recorded_utc": "2026-11-22T13:14:58.248642+00:00"
+      },
+      "fix10_work_landing": {
+        "findings": [
+          "V9-work-compare-landing"
+        ],
+        "paths": [
+          "web/work-page.js"
+        ],
+        "commits": [
+          "516a702b",
+          "b6ac4894",
+          "a3c2919f",
+          "37efbbef"
+        ],
+        "integrates": "Exact role-return patch from fix10_work_profile_back",
+        "ownership_recorded_utc": "2026-11-22T13:14:58.291067+00:00"
+      },
+      "fix10_work_profile_back": {
+        "findings": [
+          "V9-work-profile-cold-back"
+        ],
+        "paths": [
+          "tests/browser/work-profile-return.spec.js",
+          "prepared product patch (committed by web/work-page.js owner)"
+        ],
+        "commits": [
+          "93437858"
+        ],
+        "ownership_recorded_utc": "2026-11-22T13:15:54.154954+00:00"
+      },
+      "fix10_daily_rapid_tab": {
+        "findings": [
+          "D9-daily-rapid-traversal-tab"
+        ],
+        "paths": [
+          "web/daily-scan.js",
+          "tests/browser/daily.spec.js"
+        ],
+        "commits": [
+          "5c06ebb4"
+        ],
+        "ownership_recorded_utc": "2026-11-22T13:19:19.395821+00:00"
+      },
+      "fix10_ooak": {
+        "findings": [
+          "W9-ooak-application-404"
+        ],
+        "paths": [
+          "data/work-routes.json",
+          "data/editorial-release.json",
+          "tests/test_provenance_corrections.py",
+          "tests/test_work_routes.py",
+          "tests/test_work_listings.py"
+        ],
+        "commits": [
+          "94a1d9c9"
+        ],
+        "ownership_recorded_utc": "2026-11-22T13:19:19.480405+00:00"
+      },
+      "fix10_readable_market": {
+        "findings": [
+          "A9-market-matrix-sticky",
+          "A9-brand-hit-region"
+        ],
+        "paths": [
+          "web/business-health.css",
+          "web/business-health.js",
+          "web/field-guide.css"
+        ],
+        "commits": [
+          "d733b62d"
+        ],
+        "ownership_recorded_utc": "2026-11-22T13:20:19.594672+00:00"
+      },
+      "fix10_shortlist_tests": {
+        "findings": [
+          "C9-shortlist-back-scroll"
+        ],
+        "paths": [
+          "tests/browser/company-handoff.spec.js"
+        ],
+        "commits": [
+          "098d0837"
+        ],
+        "ownership_recorded_utc": "2026-11-22T13:23:20.525530+00:00"
+      },
+      "fix10_work_export": {
+        "findings": [
+          "W9-work-csv-link-purpose"
+        ],
+        "paths": [
+          "web/work-core.js",
+          "tests/test_work_export.py",
+          "scripts/presentation.py (work_export_rows)",
+          "README.md (Work CSV)"
+        ],
+        "commits": [
+          "1bf7a665"
+        ],
+        "ownership_recorded_utc": "2026-11-22T13:25:23.021155+00:00"
+      },
+      "fix10_work_entry_tests": {
+        "findings": [
+          "V9-work-compare-landing",
+          "W9-ooak-application-404"
+        ],
+        "paths": [
+          "tests/browser/work-editorial-parity.spec.js",
+          "tests/browser/work-compare-arrival.spec.js"
+        ],
+        "commits": [
+          "ec42722a"
+        ],
+        "ownership_recorded_utc": "2026-11-22T13:27:33.123764+00:00"
+      },
+      "fix10_a11y_regressions": {
+        "findings": [
+          "A9-market-matrix-sticky",
+          "A9-brand-hit-region"
+        ],
+        "paths": [
+          "tests/browser/market-phone-accessibility.spec.js"
+        ],
+        "commits": [
+          "f91b7d73"
+        ],
+        "ownership_recorded_utc": "2026-11-22T13:27:33.153656+00:00"
+      }
+    },
+    "root_supplementary": [
+      {
+        "commit": "cb772eff96e2d5b988386246eb20b2d8c74ae085",
+        "change": "Wait for the real intercepted search-index request in the homepage timeout regression before advancing its clock.",
+        "source": "Ninth mobile Chromium official first attempt. The test raced its own route handler.",
+        "verification": "Five consecutive mobile Chromium runs; product and assertion behavior preserved."
+      }
+    ]
+  },
+  "source_blob_count": 790,
+  "afterquery_html_bytes": 151350,
+  "afterquery_gzip9_bytes": 22838
+}
