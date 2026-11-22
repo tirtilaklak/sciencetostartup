@@ -42,7 +42,7 @@ test('the directory offers historical comparisons and current-only profile links
   const results = page.locator('[data-company]:visible');
   await expect(results).toHaveCount(1);
   await expect(results).toHaveAttribute('data-company', 'org.dataforce');
-  await expect(results.getByRole('link', { name: 'DataForce by TransPerfect' })).toHaveAttribute('href', /\/company\/org\.dataforce\/$/);
+  await expect(results.getByRole('link', { name: 'TransPerfect / DataForce' })).toHaveAttribute('href', /\/company\/org\.dataforce\/$/);
   await expect(results.locator('.directory-compare')).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Compare 39 original profiles' })).toHaveAttribute('href', '/explore/#compare');
   await page.getByRole('button', { name: 'Clear', exact: true }).click();
