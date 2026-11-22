@@ -51,8 +51,16 @@
     function readURL() {
       const criteria = S2SWork.readCriteria(new URLSearchParams(location.search));
       for (const [key, input] of Object.entries(fields)) if (input) input.value = criteria[key];
-      const selectedOption = S2SWork.keys.some(key => key !== 'q' && fields[key] && criteria[key]);
-      if (selectedOption) filterOptions.open = true;
+    }
+
+    function remember(changes) {
+      history.replaceState({ ...history.state, ...changes }, '');
+    }
+
+    function restoreFilterOptions() {
+      const open = history.state?.workFilterOptionsOpen;
+      if (typeof open === 'boolean') filterOptions.open = open;
+      else remember({ workFilterOptionsOpen: filterOptions.open });
     }
 
     function comparisonRows(results) {
@@ -171,6 +179,7 @@
     function reset() {
       for (const input of Object.values(fields)) if (input) input.value = '';
       filterOptions.open = false;
+      remember({ workFilterOptionsOpen: false });
       render(true);
       fields.q.focus();
     }
@@ -206,15 +215,38 @@
       return true;
     }
 
+    function restoreCompareFocus() {
+      // A warm history traversal keeps this document and its browser-managed focus.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (loader?.interacted || document.activeElement !== document.body || !history.state?.workCompareFocus) return;
+        compareLink.focus({ preventScroll: true });
+        const { top, bottom } = compareLink.getBoundingClientRect();
+        const headerBottom = document.querySelector('.site-header')?.getBoundingClientRect().bottom || 0;
+        if (top < Math.max(0, headerBottom) || bottom > innerHeight) {
+          compareLink.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+      }));
+    }
+
     form.addEventListener('submit', event => event.preventDefault());
     form.addEventListener('input', () => render(true));
     form.addEventListener('change', () => render(true));
     form.addEventListener('reset', event => { event.preventDefault(); reset(); });
     empty.querySelector('[data-work-clear]')?.addEventListener('click', reset);
+    filterSummary.addEventListener('click', event => {
+      if (!event.defaultPrevented) remember({ workFilterOptionsOpen: !filterOptions.open });
+    });
+    compareLink?.addEventListener('click', event => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      remember({ workCompareFocus: true });
+    });
+    if (compareLink) document.addEventListener('focusin', event => {
+      if (event.target !== compareLink && history.state?.workCompareFocus) remember({ workCompareFocus: false });
+    });
     navigation?.addEventListener('click', event => {
       const link = event.target.closest('[data-work-jump]');
       if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      history.replaceState({ ...history.state, workJumpFocus: link.hash }, '', location.href);
+      remember({ workJumpFocus: link.hash });
       const target = document.getElementById(link.hash.slice(1));
       const disclosure = target?.closest('details[data-work-group]');
       if (disclosure) disclosure.open = true;
@@ -224,6 +256,7 @@
       if (!restoreJumpFocus()) revealTarget(true);
     });
     window.addEventListener('popstate', () => {
+      restoreFilterOptions();
       if (displayedSearch !== location.search) { readURL(); render(); }
     });
     exportButton?.addEventListener('click', async () => {
@@ -242,18 +275,23 @@
       }
     });
     readURL();
+    filterOptions.open = loader?.initialOptionsOpen ?? S2SWork.keys.some(key => key !== 'q' && fields[key]?.value);
+    restoreFilterOptions();
     render();
     form.hidden = false;
     if (compareLink) compareLink.hidden = false;
     if (exportButton) exportButton.hidden = false;
     const retried = loader?.retried;
-    const revealed = revealTarget(!loader?.interacted || retried);
-    if (!revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
+    const returningToCompareLink = compareLink && history.state?.workCompareFocus && !loader?.interacted
+      && performance.getEntriesByType('navigation')[0]?.type === 'back_forward';
+    const revealed = revealTarget(!returningToCompareLink && (!loader?.interacted || retried));
+    if (!returningToCompareLink && !revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
       // A saved anchor can be excluded by the saved criteria.
       count.scrollIntoView({ block: 'start', behavior: 'instant' });
     }
     loader?.complete(script);
     document.documentElement.removeAttribute('data-page-enhancement');
+    if (returningToCompareLink) restoreCompareFocus();
     if (!revealed && retried) {
       // A failed load can leave the reader at a bookmark the filters now hide.
       fields.q.focus({ preventScroll: true });

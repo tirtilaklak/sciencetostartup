@@ -10,6 +10,9 @@
     || valid('pay', ['hourly', 'task', 'yearly', 'monthly', 'numeric', 'undisclosed'])
     || valid('sort', ['hourly', 'checked']);
   const filtered = Boolean(params.get('q')?.slice(0, 256).trim() || hasOptions || params.get('view') === 'compare');
+  const savedOptionsOpen = history.state?.workFilterOptionsOpen;
+  const initialOptionsOpen = typeof savedOptionsOpen === 'boolean' ? savedOptionsOpen
+    : hasOptions && !matchMedia('(max-width: 600px)').matches;
   const initialHash = location.hash;
   let current, attempts = 0, deadline, interacted = false, retryHadFocus = false;
 
@@ -82,7 +85,7 @@
     document.head.append(script);
   }
 
-  if (hasOptions) {
+  if (initialOptionsOpen) {
     const discoverOptions = new MutationObserver(() => {
       const options = document.querySelector('.work-page-filter-options');
       if (!options) return;
@@ -93,6 +96,7 @@
     addEventListener('DOMContentLoaded', () => discoverOptions.disconnect(), { once: true });
   }
   window.WorkPageResource = {
+    initialOptionsOpen,
     get interacted() { return interacted; },
     get retried() { return attempts > 1; },
     accepts: script => current === script,
