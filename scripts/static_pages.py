@@ -1944,6 +1944,11 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
         (any(row.get("status") in ("historical", "closed") for row in buckets["closed"]), "past listings"),
     ) if present)
     count_label = plural(len(rows), "record") + (f", including {scope}" if scope else "")
+    directory_counts = (
+        f'<p class="work-page-counts">{plural(named_count, "named listing")} <span>·</span> '
+        f'{plural(program_count, "network or program", "networks and programs")} <span>·</span> '
+        f'{plural(open_companies, "company", "companies")}</p>'
+    )
     export = work_results or {}
     section_links = "".join(f'<li><a data-work-jump="{key}" href="#{key}">{label}</a></li>' for key, label, _ in WORK_DISPLAY_BUCKETS if buckets[key])
     engagement_filter_labels = {
@@ -1954,10 +1959,9 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
         for key, label in WORK_ENGAGEMENT_LABELS.items()
     )
     body = ['<link rel="stylesheet" href="/work-page.css">\n', crumb_nav(crumbs, "work-crumbs"),
-            '<header class="work-page-heading" id="work-directory"><h1>Find work in AI training.</h1>\n',
-            f'<p class="work-page-counts">{plural(named_count, "named listing")} <span>·</span> {plural(program_count, "network or program", "networks and programs")} <span>·</span> {plural(open_companies, "company", "companies")}</p></header>\n',
+            '<header class="work-page-heading" id="work-directory"><h1>Find work in AI training.</h1></header>\n',
             '<div class="work-page-filter-slot" data-work-filter-slot><form class="work-page-filters" data-work-filters hidden role="search" aria-label="Find paid work" id="work-filters">'
-            '<label class="work-page-search">Search listings<input name="q" type="search" placeholder="Role, skill or company" maxlength="256" autocomplete="off" id="name-filter"></label>'
+            '<label class="work-page-search">Search listings<input name="q" type="search" placeholder="Role, skill or firm" maxlength="256" autocomplete="off" id="name-filter"></label>'
             '<details class="work-page-filter-options"><summary>Filters</summary><div class="work-page-filter-fields">'
             '<label>Listing type<select name="kind"><option value="">All records</option><option value="named">Named listings</option><option value="programs">Network/program</option><option value="boards">Career pages</option><option value="outside">Other jobs</option><option value="closed">Past &amp; other</option></select></label>'
             '<label>Work arrangement<select name="arrangement"><option value="">Any arrangement</option><option value="remote">Remote possible</option><option value="onsite">On-site or hybrid</option><option value="varies">Varies or unlisted</option></select></label>'
@@ -1973,7 +1977,8 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
             '<div class="work-results-actions"><a href="/work/?view=compare" data-work-compare hidden>Compare results</a>'
             f'<button type="button" data-work-export data-work-export-asset="{escape(export.get("href"))}" data-work-export-digest="{escape(export.get("sha256"))}" hidden>Download CSV</button></div></div>'
             '<p class="work-export-status" data-work-export-status aria-live="polite"></p>'
-            f'<div class="work-page-disclosures"><nav class="work-page-groups" aria-label="Work sections" data-work-section-navigation><details class="work-section-disclosure"><summary>Jump to section</summary><ul>{section_links}</ul></details></nav>'
+            '<div class="work-page-disclosures"><details class="work-page-groups work-section-disclosure"><summary>Jump to section</summary>'
+            f'{directory_counts}<nav aria-label="Work sections" data-work-section-navigation><ul>{section_links}</ul></nav></details>'
             '<details class="work-page-advice"><summary>Before you apply</summary><p class="work-page-note">Pay and availability may have changed. Current openings and individual eligibility are not guaranteed. The employer decides who can apply and who is selected. Check the company’s page before applying.' + (f' Links checked up to {escape(format_date(checked))}.' if checked else '') + '</p>\n' + safety_note() + '</details></div>\n',
             '<div class="work-page-empty" data-work-empty hidden><p>No records match. Try another word or clear the filters.</p><button type="button" data-work-clear>Clear search and filters</button></div>\n',
             '<section id="work-integrated-table" data-work-comparison hidden><h2 tabindex="-1">Compare paid work results</h2></section>',

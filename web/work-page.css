@@ -1,10 +1,10 @@
 /* Work is a readable list first; filters enhance the same records. */
 .work-page-heading{max-width:840px;margin-bottom:10px}
 .work-page-heading h1{max-width:22ch;margin-bottom:6px}
-.work-page-counts{display:flex;flex-wrap:wrap;gap:8px 12px;color:var(--muted);font-size:13px;margin:0}
+.work-page-counts{color:var(--muted);font-size:.8125rem;margin:0;padding:0 4px}
 .work-page-counts span{color:var(--border)}
 .work-page-note{max-width:780px;color:var(--muted);font-size:14px;line-height:1.7}
-.work-page-filter-slot{display:grid;grid-template-columns:minmax(0,1fr)}
+.work-page-filter-slot{display:grid;grid-template-columns:minmax(0,1fr);container:work-filters / inline-size;font-size:1rem}
 html[data-work-load] .work-page-filter-slot,.work-page-filter-slot:has(.work-page-filters:not([hidden])){margin-top:12px}
 .work-page-filter-slot>*{grid-area:1/1}
 .work-page-filters{display:grid;grid-template-columns:minmax(0,1fr);gap:8px 12px;margin:0;padding:8px 0;border:0;border-block:1px solid var(--border);border-radius:0;background:transparent}
@@ -90,7 +90,6 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
 .work-compare-scroll :is(th,td){padding:8px;text-align:left}
 @media(max-width:600px){
  .work-page-filters input{font-size:16px}
- .work-page-counts{font-size:12px;gap:5px 8px}
  .work-results-toolbar{display:grid;grid-template-columns:minmax(0,1fr)}
  .work-listing{grid-template-columns:minmax(0,1fr);padding:16px 0;gap:6px}
  .work-heading h3{font-size:20px}
@@ -102,6 +101,7 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
 
 /* Search stays exposed; the secondary controls use a native disclosure. */
 .work-page-search{min-width:0}
+.work-page-search input:placeholder-shown::-webkit-search-cancel-button{display:none}
 .work-page-filter-options{margin:0;padding:0;border:0;background:none}
 .work-page-filter-options>summary{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:fit-content;min-width:44px;min-height:44px;padding:9px 12px;border:1px solid #69796d;border-radius:4px;background:transparent;color:var(--ink);font-size:14px;line-height:1.5;font-weight:500;list-style:none;cursor:pointer}
 .work-page-filter-options>summary::-webkit-details-marker{display:none}
@@ -129,6 +129,17 @@ html[data-work-load="pending"] [data-work-group] .work-load-status{position:abso
  .work-page-filter-options{display:grid;grid-column:1/-1;grid-row:1/-1;grid-template-columns:subgrid;grid-template-rows:subgrid}
  .work-page-filter-options>summary{grid-area:1/2;align-self:end}
  .work-page-filter-options::details-content{grid-area:2/1/3/-1}
+ /* Stack the search and filter controls if larger text uses up the shared row. */
+ @container work-filters (inline-size < 25ch){
+  .work-page-filters{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;row-gap:8px}
+  .work-page-filter-options{display:block;grid-area:2/1}
+ }
+}
+@media(max-width:380px){
+ .work-page-filters{column-gap:6px}
+ .work-page-search input{padding-inline:7px}
+ .work-page-filter-options>summary{gap:6px;padding-inline:8px}
+ .work-page-group>h2{padding-top:12px}
 }
 .work-page-disclosures{margin-bottom:6px}
 .work-page-advice{max-width:780px;margin:0;padding:0;border:0}
