@@ -65,6 +65,9 @@ class NotFoundRetirementTests(unittest.TestCase):
     def test_asset_configuration_preserves_missing_route_404_handling(self):
         config = json.loads((ROOT / 'deployment.json').read_text())
         self.assertEqual(config['assets']['not_found_handling'], '404-page')
-        self.assertEqual(config['assets']['html_handling'], 'force-trailing-slash')
         self.assertIs(config['assets']['run_worker_first'], False)
         self.assertFalse((ROOT / 'web/404.html').exists())
+
+    def test_asset_configuration_keeps_archive_html_at_sibling_paths(self):
+        config = json.loads((ROOT / 'deployment.json').read_text())
+        self.assertEqual(config['assets']['html_handling'], 'auto-trailing-slash')

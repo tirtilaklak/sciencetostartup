@@ -41,7 +41,7 @@ class ReleaseArtifactTests(unittest.TestCase):
                     'sha256': {name: hashlib.sha256(value).hexdigest() for name, value in files.items()}}
         (directory / 'manifest.json').write_text(json.dumps(manifest))
 
-    def test_preparation_preserves_headers_and_records_non_versioned_settings(self):
+    def test_preparation_preserves_hosting_configuration(self):
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary)
             artifact, prepared = folder / 'artifact', folder / 'prepared'
@@ -51,7 +51,8 @@ class ReleaseArtifactTests(unittest.TestCase):
             metadata = json.loads((prepared / 'version-metadata.json').read_text())
             assets = json.loads((prepared / 'assets-manifest.json').read_text())['manifest']
             self.assertEqual(set(assets), {'/index.html', '/manifest.json'})
-            self.assertEqual(metadata['assets']['config']['_headers'], (artifact / '_headers').read_text())
+            routing = json.loads((ROOT / 'deployment.json').read_text())['assets']
+            self.assertEqual(metadata['assets']['config'], {**routing, '_headers': (artifact / '_headers').read_text()})
             self.assertTrue(receipt['preserved_non_versioned_settings']['observability']['logs']['enabled'])
             self.assertFalse(receipt['preserved_non_versioned_settings']['observability']['traces']['enabled'])
             self.assertEqual(receipt['source_commit'], 'a' * 40)
