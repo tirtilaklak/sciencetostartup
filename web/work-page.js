@@ -246,14 +246,22 @@
     form.hidden = false;
     if (compareLink) compareLink.hidden = false;
     if (exportButton) exportButton.hidden = false;
-    const revealed = revealTarget(!loader?.interacted || loader?.retried);
-    if (!revealed && loader?.retried) fields.q.focus({ preventScroll: true });
+    const retried = loader?.retried;
+    const revealed = revealTarget(!loader?.interacted || retried);
     if (!revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
       // A saved anchor can be excluded by the saved criteria.
       count.scrollIntoView({ block: 'start', behavior: 'instant' });
     }
     loader?.complete(script);
     document.documentElement.removeAttribute('data-page-enhancement');
+    if (!revealed && retried) {
+      // A failed load can leave the reader at a bookmark the filters now hide.
+      fields.q.focus({ preventScroll: true });
+      const { top, bottom } = fields.q.getBoundingClientRect();
+      if (top < 0 || bottom > innerHeight) {
+        form.scrollIntoView({ block: 'start', behavior: 'instant' });
+      }
+    }
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once: true });
