@@ -740,6 +740,7 @@ let exploreEntryKey,explorePreviousKey,pendingExploreLink;
 // Pair the directory entry with the Compare entry opened from its tray. Compare edits replace
 // their own URL, and a reload can still find the originating directory entry on Back.
 let pendingShortlist=null,compareShortlistSource=onCompareRoute()?history.state?.compareShortlistSource:null;
+let deferredShortlistScroll=null;
 function rememberShortlistOrigin(event){
  const link=event.target.closest?.('#compare-tray a');
  if(!normalSelfLinkActivation(event,link)||routeParts()[0]!=='companies')return;
@@ -780,12 +781,38 @@ function restoreDirectoryShortlist({selected,notice,...criteria}){
  state.selected=selected.filter(isCompanyId);
  renderDirectory();
 }
+function cancelShortlistScroll(){
+ deferredShortlistScroll?.controller.abort();
+ deferredShortlistScroll=null;
+}
+function shortlistScrollForEntry(){
+ const pending=deferredShortlistScroll;
+ if(!pending||pending.key!==historyKey()||pending.hash!==location.hash||pending.loadingTop!==window.scrollY)return null;
+ return Object.entries(pending.criteria).every(([key,value])=>state[key]===value)?pending:null;
+}
+function deferShortlistScroll(top,opener){
+ const controller=new AbortController();
+ deferredShortlistScroll={top,opener,controller,key:historyKey(),hash:location.hash,criteria:directoryCriteria(),loadingTop:window.scrollY};
+ // A scroll event may just be the browser clamping the loading view.
+ // Watch reader input and check the actual position before replacing the cards.
+ const options={capture:true,passive:true,signal:controller.signal};
+ for(const type of ['focusin','pointerdown','touchstart','wheel','keydown'])window.addEventListener(type,event=>{
+  if(!event.isTrusted)return;
+  if(type==='keydown'&&!['Tab',' ','ArrowUp','ArrowDown','PageUp','PageDown','Home','End'].includes(event.key))return;
+  cancelShortlistScroll();
+ },options);
+}
 window.addEventListener('resize',syncShortlistScroll);
 if('scrollRestoration' in history)history.scrollRestoration='manual';
 // A reload, or Back to this page from another site, also returns to the same place: the entry keeps
 // its scroll position as Navigation API state, which route() reads on its first run.
 let entryScrollTimer=0;
-const keepEntryScroll=()=>{clearTimeout(entryScrollTimer);try{if(window.navigation)window.navigation.updateCurrentEntry({state:{...(window.navigation.currentEntry?.getState?.()||{}),scrollY:window.scrollY}});else history.replaceState({...(history.state||{}),scrollY:window.scrollY},'');}catch{}};
+const keepEntryScroll=()=>{
+ clearTimeout(entryScrollTimer);
+ const scrollY=shortlistScrollForEntry()?.top??window.scrollY;
+ try{if(window.navigation)window.navigation.updateCurrentEntry({state:{...(window.navigation.currentEntry?.getState?.()||{}),scrollY}});else history.replaceState({...(history.state||{}),scrollY},'');}catch{}
+ return scrollY;
+};
 window.addEventListener('scroll',()=>{clearTimeout(entryScrollTimer);entryScrollTimer=setTimeout(keepEntryScroll,300);},{passive:true});
 window.addEventListener('pagehide',keepEntryScroll);
 // A new fragment can also fire popstate. Only an existing Explore entry carries its key.
@@ -795,7 +822,7 @@ if(!window.navigation)window.addEventListener('popstate',event=>{clearTimeout(en
 if(!window.navigation)document.addEventListener('click',e=>{const link=e.target?.closest?.('a[href^="#"]');if(normalSelfLinkActivation(e,link))keepEntryScroll();},true);
 // history.replaceState() from any page script clears that state, so keep the position again afterwards.
 window.navigation?.addEventListener('currententrychange',event=>{if(event.navigationType==='replace')keepEntryScroll();});
-window.navigation?.addEventListener('navigate',event=>{if(event.navigationType==='replace')return;if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();keepEntryScroll();const key=historyKey();if(key)entryScroll.set(key,window.scrollY);routeTraversal=event.destination.sameDocument&&event.navigationType==='traverse';});
+window.navigation?.addEventListener('navigate',event=>{if(event.navigationType==='replace')return;if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();const top=keepEntryScroll(),key=historyKey();if(key)entryScroll.set(key,top);routeTraversal=event.destination.sameDocument&&event.navigationType==='traverse';});
 // Hidden pages are set up the first time they open; idle time fills in their filters and method
 // text. The overview and the company cards render on first visit only. The Node test stub has no
 // requestIdleCallback or requestAnimationFrame, so there initialize() sets everything up at once,
@@ -983,7 +1010,9 @@ function route(event){
   }
   renderCompare();
  }}
- renderTray(shortlist?.notice);const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;
+ renderTray(shortlist?.notice);
+ const waitForShortlist=shortlist&&restore!==null&&searchContextPending(state.query);
+ const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();if(!waitForShortlist)queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;
  if(wasTraversal&&view==='market'&&!anchorId){
   const hash=location.hash;
   queueMicrotask(()=>{if(location.hash===hash)marketShortcutOrigins.get(key)?.focus({preventScroll:true});});
@@ -991,7 +1020,9 @@ function route(event){
  const linkedOpener=returnOrigin&&focusExploreOrigin(returnOrigin);
  if(linkedOpener)return linkedOpener;
  const opener=shortlist?$('compare-tray').querySelector?.('a'):wasTraversal&&view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():wasTraversal&&view==='companies'?companyReturnFocusTarget():null;
- if(opener?.getClientRects().length){opener.focus({preventScroll:true});return opener;}
+ if(opener?.getClientRects().length)opener.focus({preventScroll:true});
+ if(waitForShortlist)deferShortlistScroll(restore,opener);
+ if(opener?.getClientRects().length)return opener;
  if(closingDialog){const hash=location.hash;requestAnimationFrame(()=>{if(location.hash===hash)focusRouteDestination(hash);});}
 }
 function download(name,body,type){const url=URL.createObjectURL(new Blob([body],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -1145,8 +1176,11 @@ function renderDirectoryCards(cards,rows,active){
 }
 function renderDirectory(preserveFocus=false){
  directoryShown=true;
+ const returnScroll=shortlistScrollForEntry();
+ if(!returnScroll)cancelShortlistScroll();
  renderDirectoryFilters();
  if(searchContextPending(state.query)){requestDirectorySearch();return;}
+ cancelShortlistScroll();
  directorySearchGeneration++;
  const cards=$('company-cards');
  const active=preserveFocus&&cards.contains(document.activeElement)?document.activeElement:null;
@@ -1159,6 +1193,10 @@ function renderDirectory(preserveFocus=false){
  $('empty-state').hidden=rows.length>0;
  syncSelection();
  restoreDirectoryFallbackFocus();
+ if(returnScroll){
+  window.scrollTo({left:0,top:returnScroll.top,behavior:'instant'});
+  if(document.activeElement===document.body&&returnScroll.opener?.getClientRects().length)returnScroll.opener.focus({preventScroll:true});
+ }
 }
 function renderDirectoryFilters(){
  const query=state.query.trim(),secondaryCount=[state.stage,state.financial,state.work,state.sort!=='name'].filter(Boolean).length;
@@ -1198,6 +1236,7 @@ function requestDirectorySearch(){
  }).catch(()=>{if(generation===directorySearchGeneration)directorySearchFailure();});
 }
 function directorySearchFailure(){
+ cancelShortlistScroll();
  const cards=$('company-cards');
  const fallback=cards.querySelector(directoryFallbackSelector);
  const hadResultFocus=cards.contains(document.activeElement)&&document.activeElement.closest('[data-company-card]');

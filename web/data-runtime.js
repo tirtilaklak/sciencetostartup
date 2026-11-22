@@ -205,6 +205,7 @@ function afterRouteRetry(event,generation){
  });
 }
 route=function(event){
+ cancelShortlistScroll();
  restoreSearchRouteControls();
  if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();
  if(typeof entryScrollTimer!=='undefined')clearTimeout(entryScrollTimer);
