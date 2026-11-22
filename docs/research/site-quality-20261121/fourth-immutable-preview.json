@@ -1,0 +1,42 @@
+{
+  "version": {
+    "id": "58eccfdd-e304-4d21-8398-aec4fdab01c3",
+    "number": 40,
+    "existing": false,
+    "commit": "1af4deadbb821951bab5f49779adc6cc874ba3f4",
+    "manifest_sha256": "ee54de37d315bcca0ab940138186c004c5422c37c2ed81717a73fe5fbca4221e",
+    "preview": "https://58eccfdd-sciencetostartup.musaeminozdem.workers.dev",
+    "traffic_promoted": false
+  },
+  "traffic_at_09_36_utc": {
+    "id": "f802e85c-4be5-4f9d-be93-07ba3f56e2f4",
+    "versions": [
+      {
+        "version_id": "cddaa614-befb-4bfe-81b2-8553bd74afac",
+        "percentage": 100
+      }
+    ]
+  },
+  "anonymous_http_files_matched": 11,
+  "http_behavior_checks_passed": 28,
+  "browser_journeys_passed": 20,
+  "targeted_checks_passed": 86,
+  "manifest_stable": true,
+  "proxy_handling": "The first browser-suite run exposed direct Node connections without the workspace proxy. The immutable rerun routed through the configured proxy. Chromium, the HTTP checker and the release probes validated TLS normally. For the three enlarged-text Firefox viewports, the runner accepted the local interception certificate, then matched the downloaded HTML to the release hash.",
+  "transfer": "The first bucket write returned an uncertain transport outcome. Cloudflare\u2019s next admission still listed all 338 of those hashes as missing. In the new session all three separately admitted buckets completed, including final confirmation. No production traffic was assigned to this preview.",
+  "github_commit": "1af4deadbb821951bab5f49779adc6cc874ba3f4",
+  "private_receipt_sha256": {
+    "immutable-version.json": "1d2deda8ff7cd0d9305d3bb423905f56b975f63abfadeb65bcf83c9664d9d9e7",
+    "immutable-traffic-readback.json": "c640890815fd47a937771298f72dc2560fdc0642ff215bdedf16e260deb342bc",
+    "immutable-http.json": "1cfd535217c41a361da4582fb649824a8ede7d8e13279a12e2358219c509f97b",
+    "immutable-headers.json": "8b11e87ca8bf2e012959db4f240f53e4afca0edaf6a56f8bd70174b51fe2e329",
+    "immutable-acceptance/summary.json": "9a0f04c105e1d5a9e93dc8c4faeee08588dbbb69d0f40984912b49812367d7ca",
+    "immutable-acceptance-proxy-ca/summary.json": "a3268e16d63fd4d6a5386fc34f6ec1178d1747505e635d826b122f70c728957c",
+    "immutable-journeys/summary.json": "13e486b572b837be5bb59e8f0c45ff4a8e0e38c51b6b8bb3488308ead1a2c0f9",
+    "immutable-journeys-proxy/summary.json": "aa5c615d57e2984be0f828a4964045848d83dbb619f52a1463ea306f784cd67c",
+    "asset-session-reconciliation/admission-readback.json": "27610424fcdf1c285997543954f2c4dd4ccd1de11a778cb12442162145947300",
+    "asset-session-reconciliation/receipts/bucket-0-transport.json": "0d548906fb6a9fa2ce3c0ea1e138714b1fda67396df28466c5e8ec5088ae61e6",
+    "asset-session-reconciliation/receipts/bucket-1-transport.json": "ce582b8f0fb760b93d8eb55e6ca31d8c6b53302c93868fa7ad0a8e5724a2b5e2",
+    "asset-session-reconciliation/receipts/bucket-2-transport.json": "3ff35f7b6b973d8c7d71efab880ceee6d719eb99d0da339033c7fb54196501ee"
+  }
+}
