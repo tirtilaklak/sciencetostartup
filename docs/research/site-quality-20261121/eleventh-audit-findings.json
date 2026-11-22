@@ -1,0 +1,99 @@
+{
+  "build": {
+    "commit": "f4bcb0c3f7bd001f4ce6fb54d9ec72df4c21f312",
+    "build_id": "8bd4d587e55c30d638a2",
+    "manifest_sha256": "b234d12c9b33cc03819ef697599065f6b1fe86198f4411e7cef4a4628ec0ad59",
+    "payloads": 1281,
+    "editorial_release_id": "2026-11-22.8"
+  },
+  "findings": [
+    {
+      "id": "A11-work-early-timeout",
+      "surface": "Work filters",
+      "observed": "In two official Firefox runs the Work bundle returned HTTP 200 within 61 ms. The loader invalidated it while the parser was blocked, before Firefox executed it. The finished page showed 135 unfiltered records and Retry for the saved Sage search.",
+      "acceptance": "Keep a bounded wait while the document is loading. A completed document must still recover from an unavailable bundle and reject an older response after retry.",
+      "receipt": "work-matrix/ci-firefox/diagnosis.json",
+      "receipt_sha256": "fdebed74caf91913d6fae9ae8f82d2c6cc65fb02c6eb4e0459dcfa8c5076f847"
+    },
+    {
+      "id": "A11-webkit-scroll",
+      "surface": "Work Back",
+      "observed": "In two of five WebKit cold Back trials on each of two predecessor builds, the exact employer link was focused with Terms open but scrolled out of view after pageshow. Six later samples on the eleventh candidate kept the opener visible.",
+      "acceptance": "Protect a matched cold restoration through the browser’s late scroll. Stop when the reader deliberately scrolls or focuses elsewhere.",
+      "receipt": "navigation/inherited-webkit-bookmark.md",
+      "receipt_sha256": "b2d869aabc3adea9611eda47c365f591b921bf14580522f46e9c83bcbf7799a0"
+    },
+    {
+      "id": "A11-direct-input",
+      "surface": "Direct Work bookmark",
+      "observed": "A delayed initial bookmark callback could move focus from a role’s Terms disclosure back to its card after trusted keyboard input.",
+      "acceptance": "Keep the reader’s focused control and scroll position after a deliberate action on a direct bookmark.",
+      "receipt": "navigation/inherited-webkit-bookmark.md",
+      "receipt_sha256": "b2d869aabc3adea9611eda47c365f591b921bf14580522f46e9c83bcbf7799a0"
+    },
+    {
+      "id": "A11-method-record",
+      "surface": "Method",
+      "observed": "At 320px, the long Genebench correction record link expanded the page to 503px with Firefox’s minimum font set to 28px and 572px at 32px. Its separate email address fitted. Also observed on public Worker 41.",
+      "acceptance": "Wrap the full stable identifier within the viewport. Preserve the destination and prefilled correction.",
+      "receipt": "visual/findings.md",
+      "receipt_sha256": "66378ca45cc6b77f4ce474a751273130709bc3fc647e5474569b56ce642d8008"
+    },
+    {
+      "id": "A11-daily-controls",
+      "surface": "Daily",
+      "observed": "At 320px with 28–32px minimum text, the search hint and both selected dropdown values were clipped. Reproduced on Worker 41.",
+      "acceptance": "Display the full values and a usable search hint at both enlarged sizes. Keep filters, keyboard order and first headline usable.",
+      "receipt": "visual/findings.md",
+      "receipt_sha256": "66378ca45cc6b77f4ce474a751273130709bc3fc647e5474569b56ce642d8008"
+    },
+    {
+      "id": "A11-daily-marker",
+      "surface": "Daily",
+      "observed": "The external source marker rendered as a square in Chromium on the candidate and Worker 41.",
+      "acceptance": "Use the existing graphical external-link indicator and preserve the source link name and address.",
+      "receipt": "visual/findings.md",
+      "receipt_sha256": "66378ca45cc6b77f4ce474a751273130709bc3fc647e5474569b56ce642d8008"
+    },
+    {
+      "id": "A11-daily-classic-forward",
+      "surface": "Daily history",
+      "observed": "With Firefox classic history and a fresh document, Forward reopened a deliberately closed filter panel. The search text and one matching selection survived. Stock Chromium and WebKit kept the panel closed.",
+      "acceptance": "Restore the disclosure state on classic cold Forward and retain direct links, keyboard focus and edition navigation.",
+      "receipt": "daily/compact-history-firefox-legacy.json",
+      "receipt_sha256": "83491165679b3aa84ad1b6db4190033302534915169b6db34f14cee6cf9811de"
+    },
+    {
+      "id": "A11-masthead",
+      "surface": "Phone navigation",
+      "observed": "Work and Daily headers used 297px of a 320 × 720 screen with 32px Firefox minimum text. The previous 253px public header overlapped Search and the wordmark. The Menu trial used 101px and kept all five links operable.",
+      "acceptance": "Make the native phone header compact with enlarged text and preserve full Home, Search and navigation hit targets, including without JavaScript.",
+      "receipt": "visual/findings.md",
+      "receipt_sha256": "66378ca45cc6b77f4ce474a751273130709bc3fc647e5474569b56ce642d8008"
+    },
+    {
+      "id": "A11-index-tab-order",
+      "surface": "AfterQuery sources",
+      "observed": "The new 48-item paid work source index took 46 Tabs to reach in the open Sources & data disclosure because it followed all 45 inline source links.",
+      "acceptance": "Move the index link within reach of the first Tab and preserve every one of the 93 original source ID and URL pairs.",
+      "receipt": "companies/trial-index-order.json",
+      "receipt_sha256": "69ad02292e90f500e8d630094aa0e326f0a943ed911677aa246bfa3c744769c9"
+    },
+    {
+      "id": "A11-market-org",
+      "surface": "Market",
+      "observed": "At 320px and 32px minimum text Firefox clipped the full names of Laude Institute / Terminal-Bench and Trajectory Labs, PBC. A wheel revealed both. Nine ArrowDown presses over Laude Cash still did not show the whole name.",
+      "acceptance": "Keep the active organization readable during keyboard travel without obscuring the selected measure and amount.",
+      "receipt": "market/findings.md",
+      "receipt_sha256": "9c00cc174a27f1c0e06a51f36dcab86ee9c2de718c7a0c31bd14d1dee3f3b029"
+    },
+    {
+      "id": "A11-terac-closure",
+      "surface": "Work sources",
+      "observed": "The original Terac ML Engineer, RL Scenarios Ashby URL returns 404. A different first-party copy explicitly says the listing closed. Its record was already in the past group.",
+      "acceptance": "Show the explicit closure against its exact source and keep the historical Ashby response and other Terac roles distinct.",
+      "receipt": "work-sources/issuer-change-scan/README.md",
+      "receipt_sha256": "1f1af5ea5990d27ee66b26731fdd5c03c94e3d0d72a15e5f9b61e89c9e9caf03"
+    }
+  ]
+}

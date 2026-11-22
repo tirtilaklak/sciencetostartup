@@ -1,0 +1,157 @@
+{
+  "frozen": {
+    "commit": "f4bcb0c3f7bd001f4ce6fb54d9ec72df4c21f312",
+    "build_id": "8bd4d587e55c30d638a2",
+    "manifest_sha256": "b234d12c9b33cc03819ef697599065f6b1fe86198f4411e7cef4a4628ec0ad59",
+    "payloads": 1281,
+    "editorial_release_id": "2026-11-22.8"
+  },
+  "cohort": {
+    "model": "gpt-6.2-sol",
+    "reasoning_effort": "ultra",
+    "workers": [
+      "retest11_release",
+      "retest11_work_matrix",
+      "retest11_navigation",
+      "retest11_sources",
+      "retest11_visual",
+      "retest11_companies",
+      "retest11_research",
+      "retest11_market",
+      "retest11_daily",
+      "retest11_market/issuer"
+    ]
+  },
+  "before_public": {
+    "version": 41,
+    "build": "5dc63fbcf19634a55c66",
+    "acceptance": {
+      "search": 10,
+      "accessibility": 17,
+      "home": 48,
+      "editorial": 11
+    }
+  },
+  "candidate_acceptance": {
+    "search": 10,
+    "accessibility": 17,
+    "home": 48,
+    "editorial": 11
+  },
+  "retained_browser_journeys": {
+    "cutover-journeys": 20,
+    "fifth-journeys": 26,
+    "sixth-journeys": 20,
+    "seventh-journeys": 44,
+    "eighth-journeys": 14,
+    "eighth-desktop": 1,
+    "ninth-journeys": 22,
+    "ninth-desktop": 3,
+    "ninth-market-firefox": 3,
+    "tenth-desktop": 10,
+    "tenth-mobile": 4,
+    "tenth-readable": 12,
+    "eleventh-reading": 8,
+    "eleventh-recovery": 5,
+    "eleventh-market-chromium": 3,
+    "eleventh-market-touch": 1,
+    "eleventh-readable": 8,
+    "eleventh-issuer": 4
+  },
+  "explore_destinations": {
+    "phone": 285,
+    "desktop": 285
+  },
+  "work": {
+    "source_rows": 135,
+    "filter_selections": 70,
+    "browser_downloads": 210,
+    "header_only_cases": 13,
+    "recovery_scenarios": 19,
+    "employer_dispositions": 33,
+    "previously_matched_forms": 25
+  },
+  "company": {
+    "native": 55,
+    "interactive": 39,
+    "headlines_crosschecked": 18,
+    "source_index": [
+      45,
+      48
+    ]
+  },
+  "market": {
+    "organizations": 39,
+    "all_figure_cells": 195,
+    "source_links_in_dialogs": 64,
+    "finance_fields_compared": 624
+  },
+  "research": {
+    "researchEdition": "research-2026-11-12.1",
+    "chaptersPerScope": 12,
+    "browserRouteChecks": 48,
+    "assertionLinks": 15904,
+    "sourceLinks": 7184,
+    "archiveBrowserHops": 8
+  },
+  "daily": {
+    "approved_issue": "2026-11-18",
+    "scoped_selection_count": 13,
+    "filter_combinations": 100,
+    "source_unit_checks": 68
+  },
+  "first_official": {
+    "head": "a51816244c7a75e77900a72b665df38054d82d4f",
+    "ci": 45034977051,
+    "browser": 45034977067,
+    "ci_failures": [
+      "Native company path inventory omitted the linked work-sources page in two expectations."
+    ],
+    "browser_failure": "Firefox expired the Work script before its intended simulated delay. Two official failures, reproduced locally.",
+    "raw_performance_reports": 72,
+    "mobile_routes": 24,
+    "mercor_lcp_ms": 2220.1584,
+    "performance_archive_sha256": "1b4802de033f05bc1b7d55452c87db9fd748cdf0eff3c4fa3781ef00025b8c46"
+  },
+  "same_dist_test_heads": [
+    "522f7be0b131fca64a368d8d712642e8884e8a0e",
+    "da0f41ef305bd1f8142c80f3cafbd12c2ec3bf95"
+  ],
+  "archived_observations": "The public archive Executive brief link still returns a verified 404 on Worker 41. Eight prepared Workerd hops passed. The original slow 22.47 MB archival appendix and original reuse guide remain deposited bytes. The current reuse guide works.",
+  "receipt_sha256": {
+    "navigation/audit-status.json": "f28074abeae5566530fd7daf451fa9c8e17456aa836b4ade9980f231810f3bea",
+    "work-matrix/matrix-summary.json": "09239a2b4f904f5f5607cb8cf8877bdf9cd9a6a9ba61b40564d11a97e1d08644",
+    "work-matrix/recovery-summary.json": "e7303edec6d8a03876d07b61b82c5d29289877e0428eb3a34fb41aa853b9d60a",
+    "work-matrix/history-receipt.json": "4d69564938b72373ec987e50aae4e17c5ae690383015fdbe0e7a35c5c5a4ff45",
+    "work-matrix/ci-firefox/diagnosis.json": "fdebed74caf91913d6fae9ae8f82d2c6cc65fb02c6eb4e0459dcfa8c5076f847",
+    "work-sources/frozen-final.json": "b84becddcc9751d548170a3bd99fdb20f41201b8127772461c2f6c41b05a420d",
+    "work-sources/browser-final.json": "3a0d1b295a250c7be0b203e87761af6169f06ea2ced6fded4cad81c8fe244815",
+    "work-sources/exports-final.json": "9871bd52a3e522c0ff4c122463afaef3304d00d8db34a0f97adb8e97d889cc22",
+    "companies/source-index-local.json": "fec93b884c9663d686ee80f124da659ad8cd8c1258f4d26c6d02903d7aeeb5a2",
+    "companies/compact-fidelity.json": "46f9dff228a83d9d7f06aabb3805ef7e4f93710ac4746346f7ce92900825e08b",
+    "companies/trial-index-order.json": "69ad02292e90f500e8d630094aa0e326f0a943ed911677aa246bfa3c744769c9",
+    "research/verdict.json": "e77ee19558cf89939b2724d79c09567788a6cef43633167784035c0fd0e7a432",
+    "visual/report.md": "f59e84c89faeda0c953c08e5b58925a6043eb5bdd7061d9e5c2aeb8f4ef90ba6",
+    "market/matrix-summary.json": "2e15b7638387dc621aa4e1476a57a29be40f71ed7fcd743382515eaa44c1f74f",
+    "market/findings.md": "9c00cc174a27f1c0e06a51f36dcab86ee9c2de718c7a0c31bd14d1dee3f3b029",
+    "market/issuer-static.md": "7e1b9f4eff10c1a634b47b86a0eeb2accf5eb84804497b43c48a3798e82289a0",
+    "daily/summary.json": "02d3104314c2d9f8dd1317324c6bb00d812b55953ce6b8685ab97afcbcec36af",
+    "release/head-a5181624/ci-measurements.json": "c1f9b86414557ff9380518e06d600499a44310bcf9bdc0736a87529b30f5b842",
+    "release/handoff-status.json": "f43015469b59e885bc7c5b4a2671809d99b1a471ee5be850aea60f593697a630",
+    "accessibility/scan.json": "66a23150dfee0cdcdde41805e2c21a14613130e36fb95865d83980b75ad6ef05",
+    "accessibility/explore-names.json": "a66df10ca96de68810dcfc71bbbe2324869560516a4a22aab923e678547b4697"
+  },
+  "finding_ids": [
+    "A11-work-early-timeout",
+    "A11-webkit-scroll",
+    "A11-direct-input",
+    "A11-method-record",
+    "A11-daily-controls",
+    "A11-daily-marker",
+    "A11-daily-classic-forward",
+    "A11-masthead",
+    "A11-index-tab-order",
+    "A11-market-org",
+    "A11-terac-closure"
+  ]
+}
