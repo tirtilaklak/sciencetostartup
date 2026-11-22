@@ -93,7 +93,8 @@
     "daily/summary.json": "0ca456c83d7103886b1e93dd41854e5a60d37cbc3c300afd4208f8dbd6b00820",
     "daily/report.md": "173586df90be78ca8ac2c6e0a5acdee97e7f8e8a7e8d37dfc512604ff01068b3",
     "accessibility/README.md": "84df1f2cf84c24135d23e400118ca88a4a313ea64f762412b7a0fb68f859584e",
-    "release/head-b54e40a5/ci-measurements.json": "c93a2374898e88a0c27a8e58ae26ce67f1404af2cda529d610f341bed570e55e"
+    "release/head-b54e40a5/ci-measurements.json": "c93a2374898e88a0c27a8e58ae26ce67f1404af2cda529d610f341bed570e55e",
+    "release/head-b54e40a5/browser-test-counts.json": "bd0f6fbfbe9a59740f45a09ff26d6c76e8ebb1f1dba43ba6de54345971a25399"
   },
   "acceptance_attempts": {
     "acceptance": "724ecdf04ce3b7f68ff1edfe0b1ed44d10c4c304405f6dc388f1e6b151aad165",
@@ -122,5 +123,15 @@
       },
       "passed": true
     }
-  }
+  },
+  "official_browser_core": {
+    "planned": 1585,
+    "firstPass": 1462,
+    "passedOnRetry": 1,
+    "failedAfterRetry": 3,
+    "skipped": 119,
+    "retryAttempts": 4,
+    "totalFailedAttempts": 7
+  },
+  "official_accessibility": 60
 }

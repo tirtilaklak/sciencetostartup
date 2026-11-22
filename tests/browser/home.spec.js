@@ -221,11 +221,12 @@ test('a refused Search component retains the query and retries with a new reques
 
 test('homepage search times out a stalled index and retries without reporting empty results', async ({ page }) => {
   await page.clock.install({ time: new Date(reviewed + day) });
-  let stalled;
-  await page.route('**/presentation/search.*.json', route => { stalled = route; });
+  const { promise: indexRequest, resolve: holdRequest } = Promise.withResolvers();
+  await page.route('**/presentation/search.*.json', route => holdRequest(route));
   await page.goto('/');
   await page.locator('#home-search-open').click();
   await expect(page.locator('#home-search-message')).toContainText('Loading');
+  const stalled = await indexRequest;
   await page.clock.fastForward(15_001);
   await expect(page.locator('#home-search-message')).toContainText('Search could not load');
   await expect(page.locator('#home-search-message')).not.toContainText('No recorded company matches');
