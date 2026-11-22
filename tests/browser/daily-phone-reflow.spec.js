@@ -2,11 +2,62 @@ const { test, expect, firefox } = require('@playwright/test');
 
 const viewport = { width: 320, height: 720 };
 
-test('Daily phone search and filter values fit at enlarged Firefox text sizes', async ({ browserName, baseURL }, info) => {
+function filterLayout(grid) {
+  const input = grid.querySelector('input');
+  const style = getComputedStyle(input);
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre';
+  grid.append(probe);
+  probe.style.font = getComputedStyle(input, '::placeholder').font;
+  probe.textContent = input.placeholder;
+  const hint = { text: input.placeholder, needed: probe.getBoundingClientRect().width,
+    available: input.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 2 };
+  probe.remove();
+
+  // The native select's intrinsic width includes its longest option, padding and arrow.
+  const measureSelect = select => {
+    const sample = select.cloneNode(true);
+    sample.removeAttribute('id');
+    sample.style.cssText = 'position:absolute;visibility:hidden;width:max-content';
+    select.after(sample);
+    const needed = sample.getBoundingClientRect().width;
+    sample.remove();
+    const { top, bottom, width } = select.getBoundingClientRect();
+    return { name: select.labels[0].textContent, needed, available: width, top, bottom };
+  };
+  const selects = [...grid.querySelectorAll('select')].map(measureSelect);
+
+  const luminance = rgb => rgb.match(/\d+/g).slice(0, 3).reduce((sum, component, i) => {
+    const srgb = Number(component) / 255;
+    const linear = srgb <= .04045 ? srgb / 12.92 : ((srgb + .055) / 1.055) ** 2.4;
+    return sum + linear * [.2126, .7152, .0722][i];
+  }, 0);
+  const background = luminance(getComputedStyle(document.body).backgroundColor);
+  const measureControl = control => {
+    const style = getComputedStyle(control);
+    const border = luminance(style.borderTopColor);
+    const fill = style.backgroundColor === 'rgba(0, 0, 0, 0)' ? background : luminance(style.backgroundColor);
+    const contrast = adjacent => (Math.max(border, adjacent) + .05) / (Math.min(border, adjacent) + .05);
+    const { left, right } = control.getBoundingClientRect();
+    return { name: control.labels[0].textContent, left, right, borderWidth: parseFloat(style.borderTopWidth),
+      contrast: Math.min(contrast(background), contrast(fill)) };
+  };
+  const controls = [...grid.querySelectorAll('input, select')].map(measureControl);
+  const scan = grid.closest('.daily-scan');
+  const date = scan.querySelector('.scan-date-form select');
+  const rank = document.createRange();
+  rank.selectNodeContents(scan.querySelector('.scan-rank'));
+  const kind = scan.querySelector('.scan-kind').getBoundingClientRect();
+  return { hint, selects, controls, searchTop: input.getBoundingClientRect().top,
+    documentWidth: document.scrollingElement.scrollWidth, rankGap: kind.left - rank.getBoundingClientRect().right,
+    date: date.getClientRects().length ? { ...measureSelect(date), ...measureControl(date) } : null };
+}
+
+test('Daily filter controls fit and have visible boundaries across Firefox text sizes', async ({ browserName, baseURL }, info) => {
   test.skip(browserName !== 'firefox', 'Firefox provides a minimum font preference');
   test.setTimeout(90_000);
 
-  for (const minimum of [28, 32]) {
+  for (const minimum of [0, 28, 32]) {
     await test.step(`${minimum}px minimum text`, async () => {
       const browser = await firefox.launch({ firefoxUserPrefs: {
         'font.minimum-size.x-western': minimum,
@@ -14,49 +65,52 @@ test('Daily phone search and filter values fit at enlarged Firefox text sizes', 
       } });
       try {
         const page = await browser.newPage({ baseURL, viewport });
-        await page.goto('/daily/');
-        const search = page.getByRole('searchbox', { name: 'Search', exact: true });
-        await expect(search).toBeHidden();
-        await page.getByText('Search and filter', { exact: true }).press('Enter');
-        await expect(search).toBeVisible();
-        await page.evaluate(() => document.fonts.ready);
+        for (const width of [320, 390, 600, 601, 844]) {
+          await test.step(`${width}px viewport`, async () => {
+            await page.setViewportSize({ width, height: width === 320 ? viewport.height : 844 });
+            await page.goto('/daily/');
+            const search = page.getByRole('searchbox', { name: 'Search', exact: true });
+            if (width <= 600) {
+              await expect(search).toBeHidden();
+              await page.getByText('Search and filter', { exact: true }).press('Enter');
+            }
+            await expect(search).toBeVisible();
+            await page.evaluate(() => document.fonts.ready);
 
-        const controls = await page.locator('.scan-controls').evaluate(grid => {
-          const input = grid.querySelector('input');
-          const style = getComputedStyle(input);
-          const probe = document.createElement('span');
-          probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre';
-          grid.append(probe);
-          probe.style.font = getComputedStyle(input, '::placeholder').font;
-          probe.textContent = input.placeholder;
-          const hint = { text: input.placeholder, needed: probe.getBoundingClientRect().width,
-            available: input.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 2 };
-          probe.remove();
+            const layout = await page.locator('.scan-controls').evaluate(filterLayout);
+            await info.attach(`daily-minimum-font-${minimum}-width-${width}.json`, {
+              body: JSON.stringify(layout), contentType: 'application/json',
+            });
+            expect(layout.hint.text).toBeTruthy();
+            expect(layout.hint.needed).toBeLessThanOrEqual(layout.hint.available);
+            expect(layout.controls.map(control => control.name)).toEqual(['Search', 'Topic', 'Type']);
+            for (const { name, left, right, borderWidth, contrast } of layout.controls) {
+              expect(left, name).toBeGreaterThanOrEqual(0);
+              expect(right, name).toBeLessThanOrEqual(width);
+              expect(borderWidth, name).toBeGreaterThan(0);
+              expect(contrast, name).toBeGreaterThanOrEqual(3);
+            }
+            for (const { name, needed, available } of layout.selects) {
+              expect(needed, name).toBeLessThanOrEqual(available);
+            }
 
-          // The native select's intrinsic width includes its longest option, padding and arrow.
-          const selects = [...grid.querySelectorAll('select')].map(select => {
-            const sample = select.cloneNode(true);
-            sample.removeAttribute('id');
-            sample.style.cssText = 'position:absolute;visibility:hidden;width:max-content';
-            select.after(sample);
-            const needed = sample.getBoundingClientRect().width;
-            sample.remove();
-            const { top, bottom, width } = select.getBoundingClientRect();
-            return { name: select.labels[0].textContent, needed, available: width, top, bottom };
+            const [topic, type] = layout.selects;
+            expect(layout.documentWidth).toBe(width);
+            expect(layout.rankGap).toBeGreaterThanOrEqual(0);
+            if (width === 320 || (width === 390 && minimum > 0)) {
+              expect(type.top).toBeGreaterThanOrEqual(topic.bottom);
+            }
+            if (width > 320 && minimum === 0) expect(type.top).toBe(topic.top);
+            if (width > 600 && minimum === 0) expect(topic.top).toBe(layout.searchTop);
+            if (width === 320 && minimum === 32) {
+              await page.getByText('Snapshot archive and feeds', { exact: true }).press('Enter');
+              const { date } = await page.locator('.scan-controls').evaluate(filterLayout);
+              expect(date.needed).toBeLessThanOrEqual(date.available);
+              expect(date.right).toBeLessThanOrEqual(width);
+              expect(date.contrast).toBeGreaterThanOrEqual(3);
+              await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeVisible();
+            }
           });
-          return { hint, selects, documentWidth: document.scrollingElement.scrollWidth };
-        });
-
-        await info.attach(`daily-minimum-font-${minimum}.json`, {
-          body: JSON.stringify(controls), contentType: 'application/json',
-        });
-        expect(controls.documentWidth).toBe(viewport.width);
-        expect(controls.hint.text).toBeTruthy();
-        expect(controls.hint.needed).toBeLessThanOrEqual(controls.hint.available);
-        expect(controls.selects.map(select => select.name)).toEqual(['Topic', 'Type']);
-        expect(controls.selects[1].top).toBeGreaterThanOrEqual(controls.selects[0].bottom);
-        for (const { name, needed, available } of controls.selects) {
-          expect(needed, name).toBeLessThanOrEqual(available);
         }
       } finally {
         await browser.close();
