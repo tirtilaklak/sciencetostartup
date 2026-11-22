@@ -57,15 +57,11 @@
   const message = document.getElementById('home-search-message');
   const results = document.getElementById('home-search-results');
   const recovery = document.getElementById('home-search-work-recovery') || dialog?.querySelector('.site-search-fallback a[href="/work/"]');
-  if (!opener || !input || !message || !results || !recovery) return;
+  if (!opener || typeof dialog?.showModal !== 'function' || !input || !message || !results || !recovery) return;
   let attempt = null;
   let generation = 0;
   let retries = 0;
   let pendingSnapshot;
-
-  opener.setAttribute('aria-haspopup', 'dialog');
-  opener.setAttribute('aria-expanded', 'false');
-  opener.setAttribute('aria-keyshortcuts', 'Control+K Meta+K');
 
   function syncWorkRecovery() {
     const query = input.value.slice(0, 256);
@@ -173,6 +169,16 @@
       openSearch();
     }
   });
+
+  const openerLabel = opener.querySelector('.site-search-label');
+  if (openerLabel) openerLabel.textContent = 'Search';
+  opener.querySelector('.ui-icon')?.removeAttribute('hidden');
+  opener.querySelector('kbd')?.removeAttribute('hidden');
+  opener.setAttribute('aria-label', 'Search the guide');
+  opener.setAttribute('aria-haspopup', 'dialog');
+  opener.setAttribute('aria-expanded', 'false');
+  opener.setAttribute('aria-keyshortcuts', 'Control+K Meta+K');
+  opener.dataset.searchReady = '';
 
   const url = new URL(location.href);
   if (url.searchParams.has('search')) {

@@ -111,7 +111,8 @@ test('expiry moves focus from the promotion to the native Work link', async ({ p
 });
 
 test('without JavaScript the homepage offers its menu and native browse links', async ({ browser, baseURL }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false, baseURL, viewport: { width: 390, height: 844 } });
+  const viewport = { width: 320, height: 844 };
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL, viewport });
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('#home-work-example')).toBeHidden();
@@ -120,13 +121,59 @@ test('without JavaScript the homepage offers its menu and native browse links', 
   await page.locator('.home-menu summary').press('Enter');
   await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Daily scan' })).toBeVisible();
   await page.locator('.home-menu summary').press('Enter');
-  await page.locator('#home-search-open').press('Enter');
+  const browse = page.getByRole('link', { name: 'Browse the guide', exact: true });
+  const label = browse.locator('.site-search-label');
+  await expect(label).toHaveText('Browse');
+  const bounds = await label.boundingBox();
+  expect(bounds.width).toBeGreaterThan(20);
+  expect(bounds.x).toBeGreaterThanOrEqual(0);
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(viewport.width);
+  await expect(browse.locator('kbd')).toBeHidden();
+  await browse.press('Enter');
   await expect(page).toHaveURL(/#browse-guide$/);
   const routes = page.getByRole('navigation', { name: 'Browse the guide' }).getByRole('link');
   await expect(routes).toHaveText(['Companies', 'Paid work', 'Research']);
   expect(await routes.evaluateAll(links => links.map(link => link.getAttribute('href'))))
     .toEqual(['/companies/', '/work/', '/research/']);
   await context.close();
+});
+
+test('the Home header can browse when the search runtime is blocked', async ({ page }) => {
+  await page.route('**/home-runtime.js', route => route.abort());
+  await page.goto('/');
+  const browse = page.getByRole('link', { name: 'Browse the guide', exact: true });
+  await expect(browse.locator('kbd')).toBeHidden();
+  await expect(browse.locator('.ui-icon')).toBeHidden();
+  await browse.click();
+  await expect(page).toHaveURL(/#browse-guide$/);
+  await expect(page.locator('#home-search')).toBeHidden();
+});
+
+test('the Home header becomes Search when its pending runtime binds', async ({ page }) => {
+  let resume;
+  const pending = new Promise(resolve => { resume = resolve; });
+  await page.route('**/home-runtime.js', async route => {
+    await pending;
+    await route.continue();
+  });
+  try {
+    await page.goto('/', { waitUntil: 'commit' });
+    const opener = page.locator('#home-search-open');
+    await expect(opener).toHaveAccessibleName('Browse the guide');
+    await expect(opener.locator('kbd')).toBeHidden();
+    await opener.click();
+    await expect(page).toHaveURL(/#browse-guide$/);
+    await expect(page.locator('#home-search')).toBeHidden();
+    resume();
+    await page.waitForLoadState('domcontentloaded');
+    await expect(opener).toHaveAccessibleName('Search the guide');
+    await expect(opener).toHaveAttribute('aria-keyshortcuts', 'Control+K Meta+K');
+    await expect(opener.locator('kbd')).not.toHaveAttribute('hidden', '');
+    await opener.click();
+    await expect(page.getByRole('dialog', { name: 'Search the guide' })).toBeVisible();
+  } finally {
+    resume();
+  }
 });
 
 test.describe('home keyboard controls in compact viewports', () => {
