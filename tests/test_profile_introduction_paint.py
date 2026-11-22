@@ -28,7 +28,7 @@ function environment({visibility='visible',animation=true,transport=null}={}){
   installResearchContext:payload=>installed.push(payload.companyId),
   companyContext:(id,signal)=>{calls.push({id,signal});return transport?transport(id,signal):Promise.resolve({companyId:id});},
   presentationIdentity:{companyDetails:{}},state:{selected:[],query:''},VIEW_ANCHORS:{},
-  workCriteriaForRoute:()=>({q:''}),searchContextPending:()=>false,applyWorkCriteria(){},pendingSearchRoute(){},
+  workCriteriaForRoute:()=>({q:''}),shortlistReturnState:()=>null,searchContextPending:()=>false,applyWorkCriteria(){},pendingSearchRoute(){},
   ensureHealthModule:()=>Promise.resolve(),fetchPresentation:()=>Promise.resolve({data:{}})
  });
  if(animation){context.requestAnimationFrame=callback=>{const id=++next;frames.set(id,callback);return id;};context.cancelAnimationFrame=id=>frames.delete(id);}
