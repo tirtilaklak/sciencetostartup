@@ -150,6 +150,14 @@ class ResearchPageTests(unittest.TestCase):
         self.assertIn('<a href="/publication/report.pdf">Read the archived report PDF (research-2026-11-12.1)</a>'
                       '. The cover was prepared before DOI registration.', rp._data(self.context))
 
+    def test_current_citation_does_not_link_a_reserved_doi(self):
+        reserved_doi = '10.5281/zenodo.111111111'
+        self.context['report']['archive']['reserved_doi'] = reserved_doi
+        data = ReaderTree(rp._data(self.context))
+        citation, = (node for node in data.elements if node['attrs'].get('id') == 'citation')
+        self.assertNotIn(reserved_doi, ReaderTree.text(citation))
+        self.assertNotIn('https://doi.org/' + reserved_doi, ReaderTree.links(citation))
+
     def test_current_reader_labels_only_available_archived_formats(self):
         html, pdf = 'publication/report.html', 'publication/report.pdf'
         self.context['publication_assets'] = [html, pdf]
@@ -220,6 +228,13 @@ class ResearchPageTests(unittest.TestCase):
             self.assertIn('Prelaunch', self.page('/research/'))
         editions = rp._published_editions(self.context)
         data = ReaderTree(self.page('/research/data/'))
+        citation, = (node for node in data.elements if node['attrs'].get('id') == 'citation')
+        if metadata['status'] == 'published':
+            doi = self.context['report']['archive']['doi']
+            citation_links = ReaderTree.links(citation)
+            self.assertIn('Registered version DOI ' + doi, ReaderTree.text(citation))
+            self.assertEqual(citation_links[0], 'https://doi.org/' + doi)
+            self.assertTrue({'/publication/current-' + name for name in rp.EDITION_CITATIONS} <= set(citation_links))
         links = {node['attrs']['href']: node for node in data.elements if node['tag'] == 'a'}
         for url, size in json_sizes.items():
             self.assertIn('download', links[url]['attrs'])

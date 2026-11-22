@@ -1222,6 +1222,7 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
     if metadata and metadata.get('doi'):
         download_citation = _edition_downloads(context, metadata, ledger_path, reuse_path)
     else:
+        doi = publication_metadata(context).get('doi')
         download_citation = (
             '<section class="r-section" aria-labelledby="downloads"><h2 id="downloads">Download the research</h2>'
             '<p>The privacy-filtered projection retains explicit research status and historical qualifications. '
@@ -1233,6 +1234,7 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
             f'<p>{sp.escape(context["identity"].get("publisher", {}).get("name", sp.PUBLISHER_NAME))}. <cite>{sp.escape(report["title"])}</cite>. '
             f'{sp.escape(report["release_id"])}. {_date(report["updated_on"])}.</p>'
             + ('' if gate.get("ready") and report.get("status") == "published" else '<p>Prepublication research snapshot. No published edition, permanent archive, or DOI is claimed.</p>')
+            + ('<p>' + _link('https://doi.org/' + doi, 'Registered version DOI ' + doi) + '</p>' if doi else '')
             + f'<ul class="r-downloads">{cite}</ul><p>Reuse owned research under '
             + _link(sp.DATA_LICENSE, "CC BY 4.0") + '. Credit the publisher, release ID, original sources, and your changes. '
             'Source material retains its own rights and qualifications.</p>'
