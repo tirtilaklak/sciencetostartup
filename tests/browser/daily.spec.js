@@ -1,4 +1,4 @@
-const { test, expect, firefox } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 const { readFileSync, readdirSync } = require('node:fs');
 const { createHash } = require('node:crypto');
@@ -109,12 +109,12 @@ async function assertSelections(page, items, total = latest.items.length) {
   await expect(page.locator('#scan-count')).toHaveText(`${items.length} of ${total} selections`);
 }
 
-function distinctiveSearch() {
+function distinctiveSearch(edition = latest) {
   const fold = text => text.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase();
-  for (const item of latest.items) {
+  for (const item of edition.items) {
     for (const word of item.title.match(/[\p{L}\p{N}]{7,}/gu) || []) {
       const query = fold(word).slice(0, -1);
-      if (latest.items.every(other => other === item || !fold(JSON.stringify(other)).includes(query))) {
+      if (edition.items.every(other => other === item || !fold(JSON.stringify(other)).includes(query))) {
         return { item, query };
       }
     }
@@ -506,14 +506,18 @@ for (const direction of ['back', 'forward']) {
   });
 }
 
-test('Daily classic history cold Forward reveals a fragment and honors a direct close', async ({ browserName, baseURL }, info) => {
-  test.skip(browserName !== 'firefox', 'Firefox can disable the Navigation API and history cache');
-  const browser = await firefox.launch({ firefoxUserPrefs: {
-    'dom.navigation.webidl.enabled': false, 'browser.sessionhistory.max_total_viewers': 0,
-  } });
-  try {
-    const page = await browser.newPage({ baseURL });
-    page.on('pageerror', error => info._dailyRuntimeErrors.push(error.message));
+const classicFirefox = test.extend({
+  launchOptions: [async ({ launchOptions }, use) => {
+    await use({ ...launchOptions, firefoxUserPrefs: { ...launchOptions.firefoxUserPrefs,
+      'dom.navigation.webidl.enabled': false, 'browser.sessionhistory.max_total_viewers': 0,
+    } });
+  }, { scope: 'worker' }],
+});
+
+classicFirefox.describe('Daily classic Firefox history', () => {
+  classicFirefox.skip(({ browserName }) => browserName !== 'firefox', 'Firefox can disable the Navigation API and history cache');
+
+  classicFirefox('cold Forward reveals a fragment and honors a direct close', async ({ page }) => {
     const { row, details, startURL, targetURL } = await keyboardPermalinkHistory(page, filteredKeyboardCase, { recreated: true });
     expect(await page.evaluate(() => typeof globalThis.navigation)).toBe('undefined');
     await row.locator('summary').press('Enter');
@@ -532,9 +536,11 @@ test('Daily classic history cold Forward reveals a fragment and honors a direct 
     await traversePermalinkHistory(page, 'goBack', targetURL);
     await expect(previousLink).toBeInViewport();
     expect((await settledReading(previousLink)).open).toEqual([]);
-  } finally {
-    await browser.close();
-  }
+  });
+
+  classicFirefox('cold Forward keeps a manually closed phone filter panel', async ({ page }) => {
+    await compactFilterHistory(page, { recreated: true });
+  });
 });
 
 test('Daily shows the complete first headline on the first screen', async ({ page }) => {
@@ -635,6 +641,63 @@ test('Daily phone filters leave focus in place and restore saved reading on Back
   await page.goForward();
   await expect(page).toHaveURL(`/daily/${previous.date}/?${params}`);
   await expect(search).toBeVisible();
+});
+
+async function compactFilterHistory(page, { recreated = false } = {}) {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const { item, query } = previous.date === '2026-11-17' ? {
+    item: previous.items.find(entry => entry.id === 'openai-embedded-assessments'), query: 'openai',
+  } : distinctiveSearch(previous);
+  const summary = filterToggle(page);
+  const search = page.locator('#scan-search');
+  const headline = page.locator('.scan-item[id=' + JSON.stringify(item.id) + '] h2 a');
+
+  await page.goto('/daily/');
+  const start = page.url();
+  await page.locator('.scan-day-step[rel="prev"]').press('Enter');
+  await expect(page).toHaveURL(`/daily/${previous.date}/`);
+  await summary.press('Enter');
+  await page.keyboard.press('Tab');
+  await expect(search).toBeFocused();
+  await page.keyboard.type(query);
+  await assertSelections(page, [item], previous.items.length);
+  await summary.press('Enter');
+  await expect(summary).toBeFocused();
+  await expect(search).toBeHidden();
+  const address = page.url();
+  expect(new URL(address).searchParams.get('q')).toBe(query);
+  const departure = await page.evaluate(() => {
+    scrollTo({ top: 80, behavior: 'instant' });
+    return { document: performance.timeOrigin, y: scrollY };
+  });
+  expect(departure.y).toBeGreaterThan(0);
+
+  await traversePermalinkHistory(page, 'goBack', start);
+  await assertSelections(page, latest.items, latest.items.length);
+  await traversePermalinkHistory(page, 'goForward', address);
+  if (recreated) {
+    expect(await page.evaluate(() => typeof globalThis.navigation)).toBe('undefined');
+    expect(await page.evaluate(() => performance.timeOrigin)).not.toBe(departure.document);
+  }
+  await assertSelections(page, [item], previous.items.length);
+  await expect(search).toHaveValue(query);
+  await expect(search).toBeHidden();
+  await expect(summary).toBeFocused();
+  await expect.poll(async () => Math.abs(await page.evaluate(() => scrollY) - departure.y)).toBeLessThanOrEqual(2);
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#scan-reset')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(headline).toBeFocused();
+
+  await traversePermalinkHistory(page, 'goBack', start);
+  await page.goto(address);
+  await expect(search).toBeVisible();
+  await assertSelections(page, [item], previous.items.length);
+}
+
+test('Daily phone filter disclosure follows its history entry and a fresh filtered URL opens it', async ({ page }) => {
+  await compactFilterHistory(page);
 });
 
 test('Daily controls, explanations and disclosed sources fit narrow and wide screens', async ({ page }) => {
