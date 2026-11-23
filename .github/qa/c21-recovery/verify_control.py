@@ -67,6 +67,13 @@ else:
         item.write_text(text)
     if target=='companies':
         verifier=scope/'source-index.py'
+        baseline=scope/'baseline-provenance.json'
+        proof=json.loads(baseline.read_bytes())
+        source_file='scripts/static_pages.py'
+        exact_bytes=subprocess.check_output(['git','show',f'{head}:{source_file}'])
+        assert exact_bytes==Path(source_file).read_bytes()
+        proof['frozen_source_sha256'][source_file]=sha256(exact_bytes).hexdigest()
+        baseline.write_text(json.dumps(proof,indent=2)+'\n')
         code_before=verifier.read_text()
         previous="        assert 'source_locations' not in (projection['sourceUpdates'] or {}), name"
         expected="""        observed_locations = (projection['sourceUpdates'] or {}).get('source_locations')
