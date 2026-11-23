@@ -1,0 +1,1074 @@
+window.WORK_NATIVE_SELECTION=[{"id":"mercor.work.expert-network","company_id":"mercor","role":"Expert project network","group":"Expert & contractor projects","pay_label":"Set by role","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"program","geography":"Remote · project-specific","route_kind":"network_program","engagement_type":"varies","arrangements":["remote"],"company_name":"Mercor","searchText":"mercor mercor.io corporation expert project network remote expert projects in professional and technical domains. expert & contractor projects remote · project-specific remote · country rules vary by project set by role flexible schedule; individual projects determine available work. weeks to months; projects may be extended, shortened or ended early. undergraduate-level expertise is typically required; some projects require professional experience or advanced degrees.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"readable","date":"2026-11-22"},"editorial_review":{"approved_terms_receipt_id":"mercor.work.expert-network.key-terms-2026-11-08","receipts":[{"id":"mercor.work.expert-network.key-terms-2026-11-08","source_id":"mercor.work.expert-network.terms-source-2026-11-08","checked_on":"2026-11-08","result":"readable","scope":"key_terms","approved":true,"approval_basis":"source_content_review"}]}},{"id":"snorkel_ai.work.expert-community","company_id":"snorkel_ai","role":"Expert community","group":"Expert & contractor projects","pay_label":"Set by project","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"program","geography":"Remote · restricted by project","route_kind":"network_program","engagement_type":"contract","arrangements":["remote"],"company_name":"Snorkel AI","searchText":"snorkel ai snorkel ai, inc. expert community project-based expert work to develop and evaluate ai systems. expert & contractor projects remote · restricted by project remote · country rules vary by project set by project typically an advanced degree; country and us-state restrictions can apply.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"handshake_ai.work.ai-program","company_id":"handshake_ai","role":"AI training program","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-15","status":"program","geography":"Remote US · work authorization required","route_kind":"network_program","engagement_type":"varies","arrangements":["remote"],"company_name":"Handshake AI","searchText":"handshake ai handshake stryder corp. d/b/a handshake ai training program remote model-training projects for experts and generalists. expert & contractor projects remote us · work authorization required remote us · work authorization required not published applicants must be based in the us and authorized to work there. stem opt (a us work extension for certain international graduates) is not supported.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"micro1.work.expert-projects","company_id":"micro1","role":"Expert projects","group":"Expert & contractor projects","pay_label":"Set by project","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"program","geography":"Remote · project-specific","route_kind":"network_program","engagement_type":"varies","arrangements":["remote"],"company_name":"micro1","searchText":"micro1 micro1, inc. expert projects remote ai projects across coding, finance, law and science. expert & contractor projects remote · project-specific remote · country rules vary by project set by project","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"micro1.work.everyday-tasks","company_id":"micro1","role":"At-home robotics recordings","group":"Expert & contractor projects","pay_label":"Approval-based","pay_basis":"approved_recording","numeric_pay":false,"reviewed_on":"2026-10-12","status":"unverified","geography":"At home · eligibility unverified","route_kind":"network_program","engagement_type":"varies","arrangements":["remote"],"company_name":"micro1","searchText":"micro1 micro1, inc. at-home robotics recordings record everyday activities to support robotics training. expert & contractor projects at home · eligibility unverified at home · country rules not confirmed approval-based","uncertain":true,"pay_terms":{"unit":"task","hourly_comparable":false,"currency":null},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"scale_ai.work.outlier-statistics","company_id":"scale_ai","role":"Outlier statistics expert","group":"Expert & contractor projects","pay_label":"Up to $150 / hour","pay_basis":"advertised_maximum_hourly","numeric_pay":true,"reviewed_on":"2026-10-15","status":"listed","geography":"Remote · US, Canada, Puerto Rico, UK, New Zealand, Australia, Mexico, Argentina","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Scale AI","searchText":"scale ai scale ai, inc. outlier (contributor brand) remotasks (contributor brand) human frontier collective (contributor platform) outlier statistics expert freelance statistical expertise for ai training through outlier. expert & contractor projects remote · us, canada, puerto rico, uk, new zealand, australia, mexico, argentina remote · us, canada, puerto rico, uk, new zealand, australia, mexico, argentina up to $150 / hour degree conflict: the badge says master's; ideal qualifications specify a doctorate. authorization to work in the country of residence is required.","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":"USD"},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"scale_ai.work.remotasks","company_id":"scale_ai","role":"Remotasks contributor route","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"unverified","geography":"Project-specific","route_kind":"other_record","engagement_type":"contract","arrangements":[],"company_name":"Scale AI","searchText":"scale ai scale ai, inc. outlier (contributor brand) remotasks (contributor brand) human frontier collective (contributor platform) remotasks contributor route image, video and 3d work; generative-ai contributors are directed to outlier. expert & contractor projects project-specific location set per project not published","uncertain":true,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null}},{"id":"turing.work.machine-learning","company_id":"turing","role":"Machine learning engineer","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"information","geography":"Country eligibility unverified","route_kind":"other_record","engagement_type":"contract","arrangements":[],"company_name":"Turing","searchText":"turing turing enterprises, inc. turing.com turing frontier machine learning engineer technical and ai-training contract work through turing. expert & contractor projects country eligibility unverified country eligibility unverified not published role-specific technical experience and time overlap.","uncertain":true,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"blocked","date":"2026-11-22"}},{"id":"labelbox.work.mechanical-engineering","company_id":"labelbox","role":"Alignerr mechanical engineer","group":"Expert & contractor projects","pay_label":"$35–60 / hour","pay_basis":"hour_or_accepted_task","numeric_pay":true,"reviewed_on":"2026-10-12","status":"listed","geography":"Remote · country eligibility requires confirmation","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Labelbox","searchText":"labelbox labelbox, inc. alignerr (expert-network brand) alignerr mechanical engineer apply mechanical-engineering expertise to freelance ai projects. expert & contractor projects remote · country eligibility requires confirmation remote · country eligibility requires confirmation $35–60 / hour 10–40 hours/week advertised master’s (pursuing or completed) or phd in mechanical/aerospace engineering or a closely related field. strong technical knowledge and clear written explanations.","uncertain":false,"pay_terms":{"unit":"mixed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"prime_intellect.work.research-careers","company_id":"prime_intellect","role":"Prime Intellect careers","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Project-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Prime Intellect","searchText":"prime intellect prime intellect, inc. prime intellect careers infrastructure and research careers in distributed ai and post-training. employment project-specific location set per project not published rl, inference, distributed systems and compute roles","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"public_page_live"}},{"id":"abundant_ai.work.research-product-manager","company_id":"abundant_ai","role":"Research Product Manager","group":"Employment","pay_label":"$120K–285K salary","pay_basis":"salary_period_unspecified","numeric_pay":true,"reviewed_on":"2026-10-12","status":"unverified","geography":"San Francisco / remote US","availability_checked_on":"2026-10-19","route_kind":"other_record","engagement_type":"employment","arrangements":["onsite","remote"],"company_name":"Abundant","searchText":"abundant abundant ai abundant, inc. research product manager own research products for agent-training environments. employment san francisco / remote us san francisco / remote us $120k–285k salary","uncertain":true,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null}},{"id":"afterquery.work.world-models","company_id":"afterquery","role":"World Models Machine Learning Expert","group":"Expert & contractor projects","pay_label":"$150–$200 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-14","status":"intake_unverified","geography":"Remote","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"AfterQuery","searchText":"afterquery world models machine learning expert develop and evaluate video-prediction and environment-simulation models research learned latent representations and agent planning expert & contractor projects remote remote $150–$200 / hour 10–20 hours/week description says next 2–3 weeks phd or abd in ml, ai, cs or related quantitative field at least one first-author peer-reviewed publication world-model, generative-modeling or model-based rl expertise","uncertain":true,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":"USD"},"last_route_check":{"result":"blocked","date":"2026-11-22"}},{"id":"afterquery.work.college-swe","company_id":"afterquery","role":"College Software Engineering Expert","group":"Expert & contractor projects","pay_label":"$50/hour in header; $40–$60/hour in description","pay_basis":"conflicting_hourly","numeric_pay":true,"reviewed_on":"2026-10-14","status":"pay_conflict","geography":"Remote","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"AfterQuery","searchText":"afterquery college software engineering expert create coding challenges and evaluate model responses cover debugging, api design and system architecture expert & contractor projects remote remote $50/hour in header; $40–$60/hour in description 10 hours/week ongoing label current student or recent graduate in cs/software engineering or related degree strong programming, algorithms and data structures clear analytical and written communication","uncertain":true,"pay_terms":{"unit":"conflicting","hourly_comparable":false,"currency":"USD"},"last_route_check":{"result":"blocked","date":"2026-11-22"}},{"id":"afterquery.work.research-careers","company_id":"afterquery","role":"Research scholar & engineering careers","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"careers","geography":"San Francisco","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"AfterQuery","searchText":"afterquery research scholar & engineering careers corporate research scholar, fellow and engineer roles. employment san francisco san francisco not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null}},{"id":"bespoke_labs.work.devops-sre","company_id":"bespoke_labs","role":"DevOps / SRE contractor","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"historical","geography":"Remote","availability_checked_on":"2026-10-19","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Bespoke Labs","searchText":"bespoke labs bespokelabs.ai, inc. devops / sre contractor build and operate production cloud infrastructure. expert & contractor projects remote remote not published aws, kubernetes and production infrastructure experience.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-17","result":"official_role_not_found"}},{"id":"bespoke_labs.work.corporate-finance","company_id":"bespoke_labs","role":"Corporate Finance expert","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"historical","geography":"Remote","availability_checked_on":"2026-10-19","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Bespoke Labs","searchText":"bespoke labs bespokelabs.ai, inc. corporate finance expert contribute corporate-finance expertise to a short project. expert & contractor projects remote remote not published 35–40 hours/week 1–2 months; possible extension","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-17","result":"official_role_not_found"}},{"id":"bespoke_labs.work.mts-post-training","company_id":"bespoke_labs","role":"MTS, Post-Training","group":"Employment","pay_label":"$300K–350K base","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-12","status":"listed","geography":"On-site preferred · remote considered","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite","remote"],"company_name":"Bespoke Labs","searchText":"bespoke labs bespokelabs.ai, inc. mts, post-training enterprise post-training research and engineering. employment on-site preferred · remote considered on-site preferred · remote considered $300k–350k base","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"polymath_ai_labs.work.software-engineer","company_id":"polymath_ai_labs","role":"Software Engineer contractor","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"listed","geography":"Remote","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Polymath","searchText":"polymath polymath ai labs software engineer contractor build environments, tasks and verifiers for ai agents. expert & contractor projects remote remote not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"polymath_ai_labs.work.research-resident","company_id":"polymath_ai_labs","role":"AI Research Resident","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"historical","geography":"Remote","availability_checked_on":"2026-10-19","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Polymath","searchText":"polymath polymath ai labs ai research resident research reinforcement learning and post-training. expert & contractor projects remote remote not published full- or part-time current ms/phd student with rl or post-training and publication experience.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-17","result":"official_role_not_found"}},{"id":"proximal.work.frontierswe-fellowship","company_id":"proximal","role":"FrontierSWE Research Fellow","group":"Research fellowship","pay_label":"Stipend + compute","pay_basis":"undisclosed_stipend","numeric_pay":false,"reviewed_on":"2026-10-14","status":"listed","geography":"Location not published","route_kind":"named_listing","engagement_type":"fellowship","arrangements":[],"company_name":"Proximal","searchText":"proximal frontierswe (benchmark, not separate company) frontierswe research fellow contribute to long-horizon software-engineering research. research fellowship location not published location not listed stipend + compute a few weeks to multiple months; weekly hours not published weeks to months researchers and engineers proposing benchmark tasks, infrastructure, tooling, or publication work; proposal discussion and possibly technical interview.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"Published route observed"}},{"id":"proximal.work.engineering-careers","company_id":"proximal","role":"Research and engineering careers","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"San Francisco / Bangalore","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Proximal","searchText":"proximal frontierswe (benchmark, not separate company) research and engineering careers full-time roles developing agent research infrastructure. employment san francisco / bangalore san francisco / bangalore not published full-time san francisco and bangalore roles","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"Published route observed"}},{"id":"trajectory_labs_pbc.work.ai-red-teamer","company_id":"trajectory_labs_pbc","role":"AI Red Teamer","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"listed","geography":"Remote","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Trajectory Labs, PBC","searchText":"trajectory labs, pbc ai red teamer find and document ai safety failures. expert & contractor projects remote remote not published remote; demonstrated successful jailbreaks of frontier models; self-directed problem-solving. paid work test; rolling applications.","uncertain":true,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"trajectory_labs_pbc.work.cyber-red-teamer","company_id":"trajectory_labs_pbc","role":"AI Cyber Red Teamer","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"listed","geography":"Remote","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Trajectory Labs, PBC","searchText":"trajectory labs, pbc ai cyber red teamer evaluate ai systems through adversarial cyber testing. expert & contractor projects remote remote not published remote; demonstrated model jailbreaks and security mindset; offensive security experience valued. paid work test; rolling applications.","uncertain":true,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"trajectory_labs_pbc.work.safety-careers","company_id":"trajectory_labs_pbc","role":"Core safety roles","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Berkeley / remote","route_kind":"career_page","engagement_type":"varies","arrangements":["onsite","remote"],"company_name":"Trajectory Labs, PBC","searchText":"trajectory labs, pbc core safety roles full-time evaluation leadership, technical leadership and ai safety roles. employment berkeley / remote berkeley / remote not published full-time berkeley or remote; head of evals, evals lead, tech lead, mts","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"Published route observed"}},{"id":"refresh.work.engineering-careers","company_id":"refresh","role":"Other open roles","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"San Francisco · full-time","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Refresh","searchText":"refresh operative (historical database alias; not primary-verified) other open roles research engineering, benchmarking, gtm and founder-oriented roles. employment san francisco · full-time san francisco · full-time not published full-time san francisco; ex-founder, gtm engineer, or propose a role.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"Published route observed"}},{"id":"surge_ai.work.swe-environments","company_id":"surge_ai","role":"SWE environment contractor","group":"Expert & contractor projects","pay_label":"$100–150+ / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-12","status":"listed","geography":"Remote","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Surge AI","searchText":"surge ai surge labs inc. (reported legal entity) dataannotation (contributor platform) swe environment contractor build reinforcement-learning environments for coding agents. expert & contractor projects remote remote $100–150+ / hour 20–40+ hours/week advertised","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":null},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"surge_ai.work.research-fellowship","company_id":"surge_ai","role":"STEM Research Fellow","group":"Research fellowship","pay_label":"Hourly; rate not published","pay_basis":"hour_undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"program","geography":"Location not published","route_kind":"named_listing","engagement_type":"fellowship","arrangements":[],"company_name":"Surge AI","searchText":"surge ai surge labs inc. (reported legal entity) dataannotation (contributor platform) stem research fellow apply specialist stem research expertise to ai work. research fellowship location not published location not listed hourly; rate not published flexible · nonexclusive phd-level stem expertise.","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":false,"currency":null}},{"id":"surge_ai.work.research-careers","company_id":"surge_ai","role":"Research & operations careers","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"careers","geography":"Remote roles listed","route_kind":"career_page","engagement_type":"varies","arrangements":["remote"],"company_name":"Surge AI","searchText":"surge ai surge labs inc. (reported legal entity) dataannotation (contributor platform) research & operations careers research engineering, coding evaluations and operations roles. employment remote roles listed remote roles listed not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"quesma.work.route-review","company_id":"quesma","role":"Work-route review","group":"Unverified route","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"no_route","geography":"Project-specific","route_kind":"other_record","engagement_type":"unknown","arrangements":[],"company_name":"Quesma","searchText":"quesma refactordb (former name) work-route review no current remote-contract vacancy established by reviewed official pages. unverified route project-specific location set per project not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null}},{"id":"datacurve.work.shipd-bounties","company_id":"datacurve","role":"Shipd contributor signup","group":"Contributor bounties","pay_label":"Per approved submission","pay_basis":"approved_submission","numeric_pay":false,"reviewed_on":"2026-10-14","status":"program","geography":"Global community advertised; specific geographic eligibility not exhaustively verified","route_kind":"network_program","engagement_type":"bounty","arrangements":["remote"],"company_name":"Datacurve","searchText":"datacurve datacurve ai, inc. shipd (contributor platform) shipd contributor signup complete technical bounty projects through shipd. contributor bounties global community advertised; specific geographic eligibility not exhaustively verified global network · country rules vary per approved submission no public minimum verified at least 18, legal capacity to contract, and one active account; project access depends on skills and invitation.","uncertain":false,"pay_terms":{"unit":"task","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"Live public signup landing page verified"}},{"id":"datacurve.work.engineering-careers","company_id":"datacurve","role":"Engineering & operations careers","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"careers","geography":"San Francisco","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Datacurve","searchText":"datacurve datacurve ai, inc. shipd (contributor platform) engineering & operations careers software, research engineering, growth and operations roles. employment san francisco san francisco not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null}},{"id":"benchflow.work.open-research","company_id":"benchflow","role":"PostTrain environment contributions","group":"Unverified route","pay_label":"Paid route not established","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"paused","geography":"Project-specific","route_kind":"other_record","engagement_type":"unknown","arrangements":[],"company_name":"BenchFlow","searchText":"benchflow benchflow inc. benchmarkthing (database alias) posttrain environment contributions contribute rl environments; organizer training runs are paused. unverified route project-specific location set per project paid route not established","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_page"}},{"id":"benchflow.work.historical-internships","company_id":"benchflow","role":"Infrastructure internships","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"historical","geography":"Mainly remote","route_kind":"named_listing","engagement_type":"employment","arrangements":["remote"],"company_name":"BenchFlow","searchText":"benchflow benchflow inc. benchmarkthing (database alias) infrastructure internships historical full-stack and python infrastructure internships. employment mainly remote mainly remote not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null}},{"id":"g2i.work.senior-swe-training","company_id":"g2i","role":"Senior Software Engineer, AI Training","group":"Expert & contractor projects","pay_label":"$100–200 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-12","status":"historical","geography":"Remote US","availability_checked_on":"2026-10-23","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"G2i","searchText":"g2i g2i inc. g2i.ai g2i.co senior software engineer, ai training use senior engineering judgment to evaluate and train coding agents. expert & contractor projects remote us remote us $100–200 / hour 10–20 hours/week senior/staff/principal experience; typescript/javascript or python. take-home evaluation and recorded walkthrough.","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":null},"last_route_check":{"result":"not_found","date":"2026-11-22"}},{"id":"g2i.work.senior-swe-training-7c54f48a","company_id":"g2i","role":"Senior Software Engineer, AI Training","group":"Expert & contractor projects","pay_label":"$100–$200 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-11-22","status":"listed","geography":"Remote worldwide where supported","availability_checked_on":"2026-11-22","terms_checked_on":"2026-11-22","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"G2i","searchText":"g2i g2i inc. g2i.ai g2i.co senior software engineer, ai training evaluate the quality and reasoning of ai coding agents. expert & contractor projects remote worldwide where supported remote worldwide where supported $100–$200 / hour 10–20 hours/week, flexible ongoing projects of about two weeks to a few months each. senior, staff or principal software engineer. typescript/javascript or python, coding-agent experience and english at b2 or higher.","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":"USD"},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"},"editorial_review":{"approved_terms_receipt_id":"g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22.review","receipts":[{"id":"g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22.review","source_id":"g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22","scope":"key_terms","result":"readable","approved":true,"approval_basis":"source_content_review","checked_on":"2026-11-22"}]}},{"id":"g2i.work.talent-network","company_id":"g2i","role":"AI training engineering roles","group":"Expert & contractor projects","pay_label":"Set by engagement","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"program","geography":"Remote · project-specific","route_kind":"network_program","engagement_type":"contract","arrangements":["remote"],"company_name":"G2i","searchText":"g2i g2i inc. g2i.ai g2i.co ai training engineering roles join a vetted roster for remote engineering engagements. expert & contractor projects remote · project-specific remote · country rules vary by project set by engagement flexible; specific commitment varies by role experienced software developers; no prior ai/annotation required; countries supported through deel; vetting may include take-home task vetted independent contractor; engagement through deel.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"a-team.work.expert-network","company_id":"a-team","role":"Apply to A.Team","group":"Expert & contractor projects","pay_label":"Set by engagement","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"program","geography":"Remote","route_kind":"network_program","engagement_type":"contract","arrangements":["remote"],"company_name":"A.Team","searchText":"a.team ateams inc. a•team apply to a.team join contract missions in engineering, ai/ml, architecture and product. expert & contractor projects remote remote set by engagement part-time to full-time; overlap agreed by mission senior production experience; portfolio review, interview, and additional ai evaluation for ai roles senior experience; project review and 30–45 minute ai evaluation.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"hackerrank.work.bench-network","company_id":"hackerrank","role":"Expert community information","group":"Expert & contractor projects","pay_label":"No published offer","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"information","geography":"Project-specific","route_kind":"other_record","engagement_type":"unknown","arrangements":[],"company_name":"HackerRank Bench","searchText":"hackerrank bench hackerrank astra astra hackerrank-bench interviewstreet hackerrank / astra astra hackerrank expert community information buyer-facing information about the bench expert network. expert & contractor projects project-specific location set per project no published offer senior engineers, researchers and domain specialists qualification can include realistic samples and paid trials.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"information_only_not_verified_paid_application"}},{"id":"hackerrank.work.astra-contests","company_id":"hackerrank","role":"ASTRA Human + AI contests","group":"Contributor bounties","pay_label":"Contest prizes","pay_basis":"prize","numeric_pay":false,"reviewed_on":"2026-10-12","status":"historical","geography":"Project-specific","route_kind":"other_record","engagement_type":"bounty","arrangements":[],"company_name":"HackerRank Bench","searchText":"hackerrank bench hackerrank astra astra hackerrank-bench interviewstreet hackerrank / astra astra hackerrank astra human + ai contests historical coding contests with prizes and tool subscriptions. contributor bounties project-specific location set per project contest prizes","uncertain":false,"pay_terms":{"unit":"one_time","hourly_comparable":false,"currency":null}},{"id":"pareto.work.forte-experts","company_id":"pareto","role":"Join as an expert","group":"Expert & contractor projects","pay_label":"Set by project","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"intake_unverified","geography":"Project-specific","route_kind":"network_program","engagement_type":"varies","arrangements":[],"company_name":"Pareto AI","searchText":"pareto ai pareto inc. pareto hello pareto forte (expert platform) join as an expert expert matching across medicine, law, stem, finance, software and humanities. expert & contractor projects project-specific location set per project set by project share a resume that shows your domain expertise. pareto reviews applications as they arrive and contacts applicants when it finds a project match.","uncertain":true,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"pareto.work.investment-analyst","company_id":"pareto","role":"Investment Analyst AI Trainer","group":"Expert & contractor projects","pay_label":"Approx. $100 / approved hour","pay_basis":"approved_hour","numeric_pay":true,"reviewed_on":"2026-10-14","status":"closed","geography":"Remote US","availability_checked_on":"2026-10-14","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Pareto AI","searchText":"pareto ai pareto inc. pareto hello pareto forte (expert platform) investment analyst ai trainer historical finance evaluation and ai-training contract. expert & contractor projects remote us remote us approx. $100 / approved hour 12 hours/week four weeks","uncertain":true,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_closed_notice"}},{"id":"ooak.work.data-quality-specialist","company_id":"ooak","role":"Data Quality Specialist","group":"Employment","pay_label":"€65K–€80K / year","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-15","status":"listed","geography":"Paris, France · hybrid; 1–2 days working from home","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["hybrid"],"company_name":"Ooak Data","searchText":"ooak data ooak ooak data inc. ooak data sas data quality specialist develop and improve data quality for ai systems. employment paris, france · hybrid; 1–2 days working from home paris, france · hybrid; 1–2 days working from home €65k–€80k / year full-time permanent contract (cdi) the listing header says 6+ years. the description says 4+ years in data quality, data operations or qa. python, sql and fluent english are required. experience processing and auditing large datasets and building quality standards. comfort working with engineers, attention to detail and systems thinking. daily use of llms and other ai tools. experience at a data labeling, data provider or ai company is preferred. preferred experience includes privacy or de-identification, annotation quality, how training data is used, or working with vendors or an annotation workforce.","uncertain":true,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"EUR"},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"elorian.work.model-safety","company_id":"elorian","role":"Model Safety Contractor","group":"Expert & contractor projects","pay_label":"$75–125/hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-14","status":"historical","geography":"Remote US / Palo Alto","availability_checked_on":"2026-10-23","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote","onsite"],"company_name":"Elorian","searchText":"elorian elorian ai elorian ai inc. model safety contractor evaluate jailbreaks, harmful outputs and bias; develop safety training data. expert & contractor projects remote us / palo alto remote us / palo alto $75–125/hour estimated 40 hours/week remote or palo alto; experience in llm safety evaluation, red teaming, or safety data annotation; harm taxonomies and clear writing. llm safety, red-teaming or data-annotation experience.","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":null},"last_route_check":{"date":"2026-10-23","result":"official_role_not_found"}},{"id":"terac.work.ml-scenarios","company_id":"terac","role":"ML Engineer, RL Scenarios","group":"Expert & contractor projects","pay_label":"$90 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-12","status":"historical","geography":"Remote US","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Terac","searchText":"terac terac inc. terac.ai (legacy domain) ml engineer, rl scenarios build reinforcement-learning scenarios and assess platform usability. expert & contractor projects remote us remote us $90 / hour ml/research and simulation or reinforcement-learning experience. no h1-b or stem opt support.","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":null},"last_route_check":{"date":"2026-11-22","result":"official_listing_closed"}},{"id":"terac.work.finance-experts","company_id":"terac","role":"Finance expert intake","group":"Expert & contractor projects","pay_label":"$60–160 / hour advertised","pay_basis":"approved_deliverables","numeric_pay":true,"reviewed_on":"2026-10-12","status":"program","geography":"Remote","route_kind":"network_program","engagement_type":"varies","arrangements":["remote"],"company_name":"Terac","searchText":"terac terac inc. terac.ai (legacy domain) finance expert intake contribute finance expertise against approved deliverables. expert & contractor projects remote remote $60–160 / hour advertised","uncertain":false,"pay_terms":{"unit":"mixed","hourly_comparable":false,"currency":null}},{"id":"laude.work.institute-careers","company_id":"laude","role":"Laude careers","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Laude Institute / Terminal-Bench","searchText":"laude institute / terminal-bench laude institute terminal-bench terminal bench laude careers engineering, operations, communications and institute roles. employment role-specific location set per role not published engineering/research, operations, communications and internships","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"public_page_live"}},{"id":"snorkel_ai.work.terminus-training","company_id":"snorkel_ai","role":"Terminus engineering contributions","group":"Expert & contractor projects","pay_label":"Rate not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"intake_unverified","geography":"Project-specific","route_kind":"other_record","engagement_type":"unknown","arrangements":[],"company_name":"Snorkel AI","searchText":"snorkel ai snorkel ai, inc. terminus engineering contributions snorkel-hosted engineering-task contributions with potential paid work. expert & contractor projects project-specific location set per project rate not published","uncertain":true,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null}},{"id":"invisible.work.meridial-network","company_id":"invisible","role":"Meridial expert network","group":"Expert & contractor projects","pay_label":"Agreed before project","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"program","geography":"Remote","route_kind":"network_program","engagement_type":"contract","arrangements":["remote"],"company_name":"Invisible Technologies","searchText":"invisible technologies invisible meridial (expert marketplace brand) meridial expert network independent expert projects delivered remotely through meridial. expert & contractor projects remote remote agreed before project independent contractor; statement of work defines the rate.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"invisible.work.computer-vision","company_id":"invisible","role":"Computer Vision Specialist / AI Trainer","group":"Expert & contractor projects","pay_label":"$8–65 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-12","status":"listed","geography":"Remote US","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Invisible Technologies","searchText":"invisible technologies invisible meridial (expert marketplace brand) computer vision specialist / ai trainer evaluate advanced visual reasoning in ai systems. expert & contractor projects remote us remote us $8–65 / hour","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":null},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"invisible.work.full-stack-trainer","company_id":"invisible","role":"Full Stack Engineering AI Trainer","group":"Expert & contractor projects","pay_label":"$8–65 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-12","status":"listed","geography":"Remote US listing","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Invisible Technologies","searchText":"invisible technologies invisible meridial (expert marketplace brand) full stack engineering ai trainer bring full-stack engineering judgment to coding evaluation. expert & contractor projects remote us listing remote us $8–65 / hour","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":null},"last_route_check":{"date":"2026-11-18","result":"listing_destination_content_reviewed"}},{"id":"toloka.work.mindrift-code","company_id":"toloka","role":"Mindrift coding contributor","group":"Expert & contractor projects","pay_label":"$32–90+ / hour equivalent","pay_basis":"per_completed_task","numeric_pay":true,"reviewed_on":"2026-10-12","status":"intake_unverified","geography":"Remote · project-specific","terms_checked_on":"2026-10-28","route_kind":"network_program","engagement_type":"contract","arrangements":["remote"],"company_name":"Toloka","searchText":"toloka toloka ai bv mindrift (expert community brand) mindrift coding contributor review python, bugs, tests and architecture for ai-training tasks. expert & contractor projects remote · project-specific remote · country rules vary by project $32–90+ / hour equivalent 5–20 hours/week, demand-dependent senior coding experience and assessments.","uncertain":true,"pay_terms":{"unit":"task","hourly_comparable":false,"currency":null},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"toloka.work.cad-simulation","company_id":"toloka","role":"Mechanical CAD & Simulation AI Trainer","group":"Expert & contractor projects","pay_label":"Up to $69 / hour equivalent","pay_basis":"hour_equivalent","numeric_pay":true,"reviewed_on":"2026-10-14","status":"historical","geography":"Remote US","availability_checked_on":"2026-10-14","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Toloka","searchText":"toloka toloka ai bv mindrift (expert community brand) mechanical cad & simulation ai trainer create geometry and simulations and judge long-horizon agent tasks. expert & contractor projects remote us remote us up to $69 / hour equivalent 10–20 active-project hours/week estimated 5+ years of experience and own professional cad license.","uncertain":false,"pay_terms":{"unit":"hour_equivalent","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_role_not_found_redirect"}},{"id":"prolific.work.expert-network","company_id":"prolific","role":"Expert Network","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-15","status":"program","geography":"Project-specific","route_kind":"network_program","engagement_type":"varies","arrangements":[],"company_name":"Prolific","searchText":"prolific prolific academic ltd expert network contribute domain expertise to ai research and evaluation. expert & contractor projects project-specific location set per project not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"prolific.work.study-participant","company_id":"prolific","role":"Prolific paid studies","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"program","geography":"Residents of supported countries, including the US, with occasional exceptions","route_kind":"network_program","engagement_type":"study","arrangements":[],"company_name":"Prolific","searchText":"prolific prolific academic ltd prolific paid studies participate in research studies when matched and eligible. expert & contractor projects residents of supported countries, including the us, with occasional exceptions residents of supported countries, including the us, with occasional exceptions not published opt-in studies; flexible, no guaranteed volume over 18.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"aixi.work.research-fellowship","company_id":"aixi","role":"AIXI research fellowship","group":"Research fellowship","pay_label":"£2K–£3,500 / month","pay_basis":"month_stipend","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"Remote (worldwide), or Berkeley, US or London, UK","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"fellowship","arrangements":["remote","onsite"],"company_name":"AIXI Labs","searchText":"aixi labs aixi aixi research fellowship research foundations of intelligence, reinforcement learning and alignment. research fellowship remote (worldwide), or berkeley, us or london, uk remote (worldwide), or berkeley, us or london, uk £2k–£3,500 / month approximately one quarter; weekly hours unspecified approximately three months a research background at the level of a current phd student. for primarily empirical projects, a master’s-level command of the relevant mathematics paired with substantial industry or applied research experience can also qualify.","uncertain":false,"pay_terms":{"unit":"month","hourly_comparable":false,"currency":"GBP"},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"appen.work.crowdgen","company_id":"appen","role":"CrowdGen project network","group":"Expert & contractor projects","pay_label":"Set by project","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"program","geography":"Remote · project-specific","route_kind":"network_program","engagement_type":"varies","arrangements":["remote"],"company_name":"Appen","searchText":"appen appen limited crowdgen (contributor platform) asx: apx crowdgen project network remote expert and general ai-data projects. expert & contractor projects remote · project-specific remote · country rules vary by project set by project","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"appen.work.sage-media","company_id":"appen","role":"Sage media-quality evaluator","group":"Expert & contractor projects","pay_label":"Up to $15 / hour","pay_basis":"hour_ceiling","numeric_pay":true,"reviewed_on":"2026-10-12","status":"historical","geography":"Remote US","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Appen","searchText":"appen appen limited crowdgen (contributor platform) asx: apx sage media-quality evaluator evaluate media quality for a us data project. expert & contractor projects remote us remote us up to $15 / hour us residence and a macbook pro.","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":null},"last_route_check":{"result":"not_found","date":"2026-11-22"},"editorial_review":{"approved_terms_receipt_id":"appen.work.sage-media.key-terms-2026-11-08","receipts":[{"id":"appen.work.sage-media.key-terms-2026-11-08","source_id":"appen.work.sage-media.terms-source-2026-11-08","checked_on":"2026-11-08","result":"readable","scope":"key_terms","approved":true,"approval_basis":"source_content_review"}]}},{"id":"appen.work.us-job-board","company_id":"appen","role":"US project & career listings","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"careers","geography":"US · role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Appen","searchText":"appen appen limited crowdgen (contributor platform) asx: apx us project & career listings browse appen's us listings, including data collection. employment us · role-specific us · role-specific not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null}},{"id":"giskard.work.engineering-careers","company_id":"giskard","role":"Giskard jobs","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Paris · hybrid","route_kind":"career_page","engagement_type":"varies","arrangements":["onsite","hybrid"],"company_name":"Giskard","searchText":"giskard giskard ai giskard ai sas giskard jobs build ai testing and evaluation software. employment paris · hybrid paris · hybrid not published engineering, ai research, sales and operations; role-specific","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"public_page_live"}},{"id":"alinia.work.research-careers","company_id":"alinia","role":"Alinia careers","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Remote-first · US presence","route_kind":"career_page","engagement_type":"varies","arrangements":["remote"],"company_name":"Alinia AI","searchText":"alinia ai alinia alinia careers research, engineering and legal or ai-governance work. employment remote-first · us presence remote-first · us presence not published research, engineering and commercial roles; requirements vary twice-yearly week-long team gatherings.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"public_page_live"}},{"id":"apto.work.harbest-experts","company_id":"apto","role":"harBest Expert contributor","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-12","status":"unverified","geography":"Japan-focused · US eligibility unverified","route_kind":"network_program","engagement_type":"varies","arrangements":[],"company_name":"APTO","searchText":"apto 株式会社apto harbest harbest expert harbest expert contributor remote specialist contributions matched to project skills. expert & contractor projects japan-focused · us eligibility unverified japan-focused · us eligibility not confirmed not published japanese-language workflow.","uncertain":true,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"rws_trainai.work.community","company_id":"rws_trainai","role":"TrainAI community","group":"Expert & contractor projects","pay_label":"Task-specific fees","pay_basis":"task","numeric_pay":false,"reviewed_on":"2026-10-14","status":"program","geography":"Remote · project-specific","route_kind":"network_program","engagement_type":"contract","arrangements":["remote"],"company_name":"RWS / TrainAI","searchText":"rws / trainai rws holdings plc trainai by rws aim: rws trainai community part-time freelance data projects with task-specific fees. expert & contractor projects remote · project-specific remote · country rules vary by project task-specific fees remote, part-time and flexible; assignments depend on fit 18+; no experience needed for entry; windows/mac computer, chrome and high-speed internet; project-specific qualifications project qualification and training; joining is free.","uncertain":false,"pay_terms":{"unit":"task","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"public_page_live"}},{"id":"rws_trainai.work.polaris-asr","company_id":"rws_trainai","role":"Polaris ASR Data Collection","group":"Expert & contractor projects","pay_label":"$16 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-15","status":"historical","geography":"Remote US","availability_checked_on":"2026-10-19","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"RWS / TrainAI","searchText":"rws / trainai rws holdings plc trainai by rws aim: rws polaris asr data collection collect us english speech data. expert & contractor projects remote us remote us $16 / hour english us project eligibility.","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":null},"last_route_check":{"date":"2026-11-18","result":"public_portal_zero_listings"}},{"id":"abundant_ai.work.research-fellow","company_id":"abundant_ai","role":"Research Fellow","group":"Research fellowship","pay_label":"$7,500 monthly base salary","pay_basis":"monthly_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, onsite","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"fellowship","arrangements":["onsite"],"company_name":"Abundant","searchText":"abundant abundant ai abundant, inc. research fellow full-time research fellowship in agent systems. research fellowship san francisco, onsite san francisco, onsite $7,500 monthly base salary at least 20 hours/week 12 weeks research depth in cs/ml/nlp, production research and agent-system experience; posting also requires ai safety/governance policy experience.","uncertain":true,"pay_terms":{"unit":"month","currency":null,"hourly_comparable":false},"last_route_check":{"result":"unreadable_shell","date":"2026-11-22"}},{"id":"abundant_ai.work.careers-board","company_id":"abundant_ai","role":"Careers board","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Abundant","searchText":"abundant abundant ai abundant, inc. careers board careers board employment role-specific location set per role not published","uncertain":true,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"Linked from current official homepage"}},{"id":"afterquery.work.content-writer-ai-evaluation-specialist-uk-us","company_id":"afterquery","role":"Content Writer & AI Evaluation Specialist (UK/US)","group":"Expert & contractor projects","pay_label":"$35–$50 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-14","status":"intake_unverified","geography":"UK/US remote","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"AfterQuery","searchText":"afterquery content writer & ai evaluation specialist (uk/us) create prompts and model-training text evaluate fluency, factuality and creative writing quality expert & contractor projects uk/us remote uk/us remote $35–$50 / hour 40 hours/week 3–6 months related bachelor’s degree 3+ years in english writing or copywriting strong llm evaluation knowledge availability for 40 hours weekly","uncertain":true,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":"USD"},"last_route_check":{"result":"blocked","date":"2026-11-22"}},{"id":"afterquery.work.research-fellow","company_id":"afterquery","role":"Research Fellow","group":"Research fellowship","pay_label":"$16,000 monthly salary","pay_basis":"monthly_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"fellowship","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery research fellow develop a research project with an afterquery mentor build datasets or benchmarks and work toward a joint publication research fellowship san francisco, california, united states san francisco, california, united states $16,000 monthly salary the requirements say full-time in san francisco. the preferred qualifications list 20+ hours/week and prefer in-person work. 12–16 weeks significant academic, clinical, legal, or industry research experience. clear technical communication and strong scientific writing skills. a strong record of research or publication and demonstrated ability to take a project from initial scoping to rigorous, reproducible results. a passion for advancing frontier ai and some understanding of model evaluation.","uncertain":false,"pay_terms":{"unit":"month","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"bespoke_labs.work.domain-expert-contribution","company_id":"bespoke_labs","role":"Domain expert contribution","group":"Unverified route","pay_label":"Paid opening unconfirmed","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"inquiry","geography":"Role-specific","route_kind":"other_record","engagement_type":"unknown","arrangements":[],"company_name":"Bespoke Labs","searchText":"bespoke labs bespokelabs.ai, inc. domain expert contribution contact bespoke about curating domain-specific rl environments. unverified route role-specific location set per role paid opening unconfirmed domain experts interested in curating rl environments.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"Live official contact page"}},{"id":"bespoke_labs.work.fulfillment-operations-associate","company_id":"bespoke_labs","role":"Fulfillment Operations Associate","group":"Employment","pay_label":"$35K–$55K / year","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"LATAM, remote","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["remote"],"company_name":"Bespoke Labs","searchText":"bespoke labs bespokelabs.ai, inc. fulfillment operations associate manage expert fulfillment, onboarding, matching and retention. employment latam, remote latam, remote $35k–$55k / year full-time experience running scaled expert/contractor fulfillment, onboarding, matching, satisfaction, and retention.","uncertain":true,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"polymath_ai_labs.work.member-of-technical-staff-engineering","company_id":"polymath_ai_labs","role":"Member of Technical Staff — Engineering","group":"Employment","pay_label":"$150,000–300,000/year","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco · US citizen / visa","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":[],"company_name":"Polymath","searchText":"polymath polymath ai labs member of technical staff — engineering build engineering infrastructure for frontier agent research. employment san francisco · us citizen / visa san francisco · us citizen / visa $150,000–300,000/year full-time; weekly hours not specified san francisco; us citizen/visa only; new graduates permitted; strong engineering/full-stack/infrastructure experience.","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"polymath_ai_labs.work.member-of-technical-staff-research","company_id":"polymath_ai_labs","role":"Member of Technical Staff — Research","group":"Employment","pay_label":"$150,000–300,000/year","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco · US citizen / visa","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":[],"company_name":"Polymath","searchText":"polymath polymath ai labs member of technical staff — research research post-training systems and publish results. employment san francisco · us citizen / visa san francisco · us citizen / visa $150,000–300,000/year full-time; weekly hours not specified san francisco; us citizen/visa only; post-training and publication experience requested.","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-28","result":"listing_content_reviewed"}},{"id":"refresh.work.research-engineer-benchmarking","company_id":"refresh","role":"Research Engineer, Benchmarking","group":"Employment","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco","route_kind":"named_listing","engagement_type":"employment","arrangements":[],"company_name":"Refresh","searchText":"refresh operative (historical database alias; not primary-verified) research engineer, benchmarking build research benchmarks and engineering infrastructure. employment san francisco san francisco not published full-time san francisco; engineering and benchmark-building experience; resume required.","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"Published route observed"}},{"id":"elorian.work.rl-infrastructure-engineer","company_id":"elorian","role":"RL Infrastructure Engineer","group":"Employment","pay_label":"$200,000–400,000/year plus equity","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"historical","geography":"Palo Alto · on-site / hybrid wording","availability_checked_on":"2026-10-19","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite","hybrid"],"company_name":"Elorian","searchText":"elorian elorian ai elorian ai inc. rl infrastructure engineer build distributed reinforcement-learning pipelines and gpu infrastructure. employment palo alto · on-site / hybrid wording palo alto · on-site or hybrid $200,000–400,000/year plus equity full-time palo alto; 3+ years distributed systems including rl pipelines; python and pytorch/jax; gpu orchestration.","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_role_not_found_redirect"}},{"id":"aixi.work.machine-learning-research-scientist","company_id":"aixi","role":"Machine Learning Research Scientist","group":"Employment","pay_label":"$150K–$250K / year","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"London / Berkeley","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":[],"company_name":"AIXI Labs","searchText":"aixi labs aixi machine learning research scientist research llm agents and mathematical foundations of intelligence. employment london / berkeley london / berkeley $150k–$250k / year full-time london or berkeley; independent llm-agent experimentation and mathematical foundations","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"apto.work.ai-data-research-engineer","company_id":"apto","role":"AI Data Research Engineer","group":"Employment","pay_label":"¥6M–¥15M / year","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"historical","geography":"Tokyo · role-dependent hybrid","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite","hybrid"],"company_name":"APTO","searchText":"apto 株式会社apto harbest harbest expert ai data research engineer build ai-data systems with machine-learning research and engineering. employment tokyo · role-dependent hybrid tokyo · role-dependent hybrid ¥6m–¥15m / year full-time; flex-time core 10:00–15:00 tokyo; ml/deep learning, python and pytorch/tensorflow; role-dependent hybrid work","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"JPY"},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"laude.work.contribute-to-terminal-bench","company_id":"laude","role":"Contribute to Terminal-Bench","group":"Unverified route","pay_label":"Paid route not established","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"contributions","geography":"Role-specific","route_kind":"other_record","engagement_type":"unknown","arrangements":[],"company_name":"Laude Institute / Terminal-Bench","searchText":"laude institute / terminal-bench laude institute terminal-bench terminal bench contribute to terminal-bench contribute realistic tasks to the open-source agent benchmark. unverified route role-specific location set per role paid route not established experienced practitioners contributing realistic agent tasks","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"information_only_not_verified_paid_application"}},{"id":"prime_intellect.work.contribute-environments","company_id":"prime_intellect","role":"Contribute environments","group":"Unverified route","pay_label":"Compensation not promised","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"contributions","geography":"Role-specific","route_kind":"other_record","engagement_type":"unknown","arrangements":[],"company_name":"Prime Intellect","searchText":"prime intellect prime intellect, inc. contribute environments build reusable open-source reinforcement-learning environments. unverified route role-specific location set per role compensation not promised researchers/developers building reusable rl environments","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"information_only_not_verified_paid_application"}},{"id":"terac.work.rl-environment-creation","company_id":"terac","role":"RL Environment Creation","group":"Expert & contractor projects","pay_label":"$90 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-14","status":"closed","geography":"Remote · eligibility varies","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"Terac","searchText":"terac terac inc. terac.ai (legacy domain) rl environment creation create reinforcement-learning scenarios using professional domain expertise. expert & contractor projects remote · eligibility varies remote · country rules vary $90 / hour minimum 10 hours/week experienced domain professionals; ai background helpful but not required; h1-b and stem opt unsupported","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":"USD"},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"terac.work.ai-evaluator-shopping-assistant","company_id":"terac","role":"AI Evaluators: Assessing a Shopping Assistant","group":"Expert & contractor projects","pay_label":"$30 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"Remote · eligibility varies","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"terms_checked_on":"2026-11-22","company_name":"Terac","searchText":"terac terac inc. terac.ai (legacy domain) ai evaluators: assessing a shopping assistant ai evaluator: shopping assistant review shopping-assistant traces and create evaluation rubrics. expert & contractor projects remote · eligibility varies remote · country rules vary $30 / hour 20+ hours/week ai evaluation, qa or data training experience plus ecommerce familiarity; h1-b and stem opt unsupported","uncertain":false,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":"USD"},"last_route_check":{"result":"listing_content_reviewed","date":"2026-11-22"}},{"id":"toloka.work.toloka-work-now-on-mindrift","company_id":"toloka","role":"Mindrift task contributor","group":"Expert & contractor projects","pay_label":"Fixed reward per task","pay_basis":"accepted_task","numeric_pay":false,"reviewed_on":"2026-10-14","status":"program","geography":"Remote · geographic restrictions","route_kind":"network_program","engagement_type":"varies","arrangements":["remote"],"company_name":"Toloka","searchText":"toloka toloka ai bv mindrift (expert community brand) mindrift task contributor complete general and qualification-gated specialist tasks on mindrift. expert & contractor projects remote · geographic restrictions remote · geographic restrictions fixed reward per task flexible availability; no guaranteed volume general tasks plus qualification-gated specialist projects; geographic restrictions apply","uncertain":false,"pay_terms":{"unit":"task","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"public_page_live"}},{"id":"scale_ai.work.company-careers","company_id":"scale_ai","role":"Company careers","group":"Employment","pay_label":"Role-specific","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Scale AI","searchText":"scale ai scale ai, inc. outlier (contributor brand) remotasks (contributor brand) human frontier collective (contributor platform) company careers browse the official company's employment directory. employment role-specific location set per role role-specific","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"surge_ai.work.expert-network","company_id":"surge_ai","role":"Consultant network","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"historical","geography":"Role-specific","route_kind":"network_program","engagement_type":"varies","arrangements":[],"company_name":"Surge AI","searchText":"surge ai surge labs inc. (reported legal entity) dataannotation (contributor platform) consultant network explore the official expert-work program and its requirements. expert & contractor projects role-specific location set per role not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"mercor.work.company-careers","company_id":"mercor","role":"Company careers","group":"Employment","pay_label":"Role-specific","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Mercor","searchText":"mercor mercor.io corporation company careers browse the official company's employment directory. employment role-specific location set per role role-specific","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"micro1.work.company-careers","company_id":"micro1","role":"Company careers","group":"Employment","pay_label":"Role-specific","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"micro1","searchText":"micro1 micro1, inc. company careers browse the official company's employment directory. employment role-specific location set per role role-specific","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"turing.work.expert-network","company_id":"turing","role":"Expert contract network","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"program","geography":"Role-specific","route_kind":"network_program","engagement_type":"varies","arrangements":[],"company_name":"Turing","searchText":"turing turing enterprises, inc. turing.com turing frontier expert contract network explore the official expert-work program and its requirements. expert & contractor projects role-specific location set per role not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"unreadable_shell","date":"2026-11-22"}},{"id":"turing.work.company-careers","company_id":"turing","role":"Company careers","group":"Employment","pay_label":"Role-specific","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Turing","searchText":"turing turing enterprises, inc. turing.com turing frontier company careers browse the official company's employment directory. employment role-specific location set per role role-specific","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"snorkel_ai.work.company-careers","company_id":"snorkel_ai","role":"Company careers","group":"Employment","pay_label":"Role-specific","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Snorkel AI","searchText":"snorkel ai snorkel ai, inc. company careers browse the official company's employment directory. employment role-specific location set per role role-specific","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"labelbox.work.expert-network","company_id":"labelbox","role":"Alignerr expert network","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"program","geography":"Role-specific","route_kind":"network_program","engagement_type":"varies","arrangements":[],"company_name":"Labelbox","searchText":"labelbox labelbox, inc. alignerr (expert-network brand) alignerr expert network explore the official expert-work program and its requirements. expert & contractor projects role-specific location set per role not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"labelbox.work.company-careers","company_id":"labelbox","role":"Company careers","group":"Employment","pay_label":"Role-specific","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Labelbox","searchText":"labelbox labelbox, inc. alignerr (expert-network brand) company careers browse the official company's employment directory. employment role-specific location set per role role-specific","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"invisible.work.company-careers","company_id":"invisible","role":"Company careers","group":"Employment","pay_label":"Role-specific","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Invisible Technologies","searchText":"invisible technologies invisible meridial (expert marketplace brand) company careers browse the official company's employment directory. employment role-specific location set per role role-specific","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"appen.work.company-careers","company_id":"appen","role":"Company careers","group":"Employment","pay_label":"Role-specific","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Appen","searchText":"appen appen limited crowdgen (contributor platform) asx: apx company careers browse the official company's employment directory. employment role-specific location set per role role-specific","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"taskus.work.company-careers","company_id":"taskus","role":"Company careers","group":"Employment","pay_label":"Role-specific","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"TaskUs","searchText":"taskus company careers browse the official company's employment directory. employment role-specific location set per role role-specific","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"taskus.work.expert-network-information","company_id":"taskus","role":"TaskVerse program information","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"information","geography":"Role-specific","route_kind":"other_record","engagement_type":"unknown","arrangements":[],"company_name":"TaskUs","searchText":"taskus taskverse program information explore the official expert-work program and its requirements. expert & contractor projects role-specific location set per role not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"imerit.work.expert-network","company_id":"imerit","role":"iMerit Scholars expert route","group":"Expert & contractor projects","pay_label":"Not published","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-15","status":"program","geography":"Role-specific","route_kind":"network_program","engagement_type":"varies","arrangements":[],"company_name":"iMerit / EXL","searchText":"imerit / exl imerit scholars expert route explore the official expert-work program and its requirements. expert & contractor projects role-specific location set per role not published","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"readable","date":"2026-11-22"}},{"id":"imerit.work.company-careers","company_id":"imerit","role":"Company careers","group":"Employment","pay_label":"Role-specific","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"iMerit / EXL","searchText":"imerit / exl company careers browse the official company's employment directory. employment role-specific location set per role role-specific","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"sama.work.company-careers","company_id":"sama","role":"Company careers","group":"Employment","pay_label":"Role-specific","pay_basis":"undisclosed","numeric_pay":false,"reviewed_on":"2026-10-14","status":"careers","geography":"Role-specific","route_kind":"career_page","engagement_type":"varies","arrangements":[],"company_name":"Sama","searchText":"sama company careers browse the official company's employment directory. employment role-specific location set per role role-specific","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"date":"2026-10-14","result":"official_entry_point"}},{"id":"afterquery.work.software-engineer-platform-applied-ai","company_id":"afterquery","role":"Software Engineer - Applied AI","group":"Employment","pay_label":"$260,000–$290,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery software engineer - applied ai software engineer - platform/applied ai published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $260,000–$290,000 annual salary full-time proficiency in javascript (next.js) and python, with demonstrated experience building full-stack web applications experience with serverless architecture and cloud functions for implementing heavy data processing (gcp/aws) storage, caching & search: hands‐on with redis (caching), elasticsearch (indexing), and message queues (kafka/rabbitmq) to build scalable, low‐latency pipelines. experience getting your ideas into production (founder experience preferred)","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.software-engineering-intern","company_id":"afterquery","role":"Software Engineering Intern","group":"Employment","pay_label":"$10,000 monthly salary","pay_basis":"monthly_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery software engineering intern published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $10,000 monthly salary able to take a gap semester off and join our team in person in san francisco proficiency in javascript (next.js) and python, with demonstrated experience building full-stack web applications experience with serverless architecture and cloud functions for implementing heavy data processing (gcp/aws) storage, caching & search: hands‐on with redis (caching), elasticsearch (indexing), and message queues (kafka/rabbitmq) to build scalable, low‐latency pipelines. any background in ai research, llm evaluation, or human‐in‐the‐loop systems","uncertain":false,"pay_terms":{"unit":"month","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.software-engineer-platform-infrastructure","company_id":"afterquery","role":"Software Engineer - Platform Infrastructure","group":"Employment","pay_label":"$250,000–$350,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery software engineer - platform infrastructure published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $250,000–$350,000 annual salary full-time strong experience building production distributed systems or platform infrastructure proficiency in python and/or javascript (node.js / next.js) or similar backend technologies experience designing and operating systems in cloud environments (gcp or aws) experience with message queues and event-driven systems (kafka, rabbitmq, pub/sub, etc.) experience working with high-throughput data pipelines and asynchronous processing systems strong understanding of system scalability, performance, and reliability experience owning systems running in production environments","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.senior-software-engineer-security-infrastructure","company_id":"afterquery","role":"Senior Software Engineer - Security/Infrastructure","group":"Employment","pay_label":"$200,000–$350,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-11-22","terms_checked_on":"2026-11-22","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery senior software engineer - security/infrastructure published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $200,000–$350,000 annual salary full-time","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.software-engineer-rl-environments","company_id":"afterquery","role":"Software Engineer - RL Environments","group":"Employment","pay_label":"$260,000–$290,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery software engineer - rl environments construct simulations and tasks exposing model failures build rlhf/rlvr reward signals and evaluate agent trajectories run post-training experiments with researchers employment san francisco, california, united states san francisco, california, united states $260,000–$290,000 annual salary full-time ability to design lightweight experiments, move fast, and extract actionable insights from messy results experience with using docker, or similar containerization tools, to design and monitor systems at scale strong familiarity with common reinforcement learning algorithms and methods, especially with respect to post-training llms","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.machine-learning-engineer-data-privacy-anonymization","company_id":"afterquery","role":"Machine Learning Engineer, Data Privacy & Anonymization","group":"Employment","pay_label":"$260,000–$290,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery machine learning engineer, data privacy & anonymization published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $260,000–$290,000 annual salary full-time 3-6 yoe with relevant experiences strong software engineering background with experience shipping production systems experience building data pipelines at production scale, handling large volumes of data applied nlp: ner, sequence labeling, or information extraction on messy text. fraud or trust/safety detection work where recall on rare events was the objective also counts experience with low-latency inference services: streaming pipelines, sidecars, or event systems ability to move quickly in a high-ownership, fast-changing environment deep care for quality, precision, and customer impact","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.software-engineer-marketplace","company_id":"afterquery","role":"Software Engineer - Marketplace","group":"Employment","pay_label":"$250,000–$300,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery software engineer - marketplace published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $250,000–$300,000 annual salary full-time 3–5 of professional software engineering experience, ideally building high-velocity product, growth, marketplace, or workflow software. strong full-stack engineering ability and a track record of shipping user-facing product from ambiguous requirements. excellent product sense: you can distinguish the real problem from the first requested solution and focus on what will move the metric. comfort working closely with non-technical partners and translating their needs into simple, robust systems. high ownership, strong judgment, and the ability to move quickly without creating unnecessary complexity.","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.product-manager","company_id":"afterquery","role":"Product Manager","group":"Employment","pay_label":"$180,000–$300,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery product manager published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $180,000–$300,000 annual salary full-time strong technical fluency; prior experience in software engineering, ml, or data is a strong plus high ownership and ability to operate independently in ambiguous environments strong product judgment and ability to identify the underlying problem behind user requests excellent communication skills and ability to work across technical and operational teams bias toward action and comfort moving quickly with incomplete information strong user empathy and willingness to spend significant time understanding how people actually work ability to synthesize fragmented feedback into clear priorities and product direction","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.growth-associate","company_id":"afterquery","role":"Growth Associate","group":"Employment","pay_label":"$100,000–$130,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","ai_data_work":false,"terms_checked_on":"2026-11-22","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery growth associate published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $100,000–$130,000 annual salary full-time","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.head-of-growth","company_id":"afterquery","role":"Head of Growth","group":"Employment","pay_label":"$150,000–$230,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","ai_data_work":false,"terms_checked_on":"2026-11-22","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery head of growth published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $150,000–$230,000 annual salary full-time","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.business-operations-generalist","company_id":"afterquery","role":"Business Operations Generalist","group":"Employment","pay_label":"$160,000–$250,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-11-22","ai_data_work":false,"terms_checked_on":"2026-11-22","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery business operations generalist published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $160,000–$250,000 annual salary full-time","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.people-programs-lead","company_id":"afterquery","role":"People Programs Lead","group":"Employment","pay_label":"$160K–$230K salary band + equity","pay_basis":"salary_period_unspecified","numeric_pay":true,"reviewed_on":"2026-10-14","status":"historical","geography":"San Francisco","availability_checked_on":"2026-10-14","ai_data_work":false,"terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":[],"company_name":"AfterQuery","searchText":"afterquery people programs lead published employer listing; compensation and location are shown below. employment san francisco san francisco $160k–$230k salary band + equity","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"not_found","date":"2026-11-22"}},{"id":"afterquery.work.technical-recruiter","company_id":"afterquery","role":"Technical Recruiter","group":"Employment","pay_label":"$150,000–$230,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","ai_data_work":false,"terms_checked_on":"2026-11-22","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery technical recruiter published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $150,000–$230,000 annual salary full-time","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.corporate-counsel","company_id":"afterquery","role":"Corporate Counsel","group":"Employment","pay_label":"$225,000–$250,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","ai_data_work":false,"terms_checked_on":"2026-11-22","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery corporate counsel published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $225,000–$250,000 annual salary full-time","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.recruiter","company_id":"afterquery","role":"Recruiter","group":"Employment","pay_label":"$150,000–$225,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","ai_data_work":false,"terms_checked_on":"2026-11-22","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery recruiter published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $150,000–$225,000 annual salary full-time","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.strategic-projects-lead","company_id":"afterquery","role":"Strategic Projects Lead","group":"Employment","pay_label":"$150,000–$225,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery strategic projects lead published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $150,000–$225,000 annual salary full-time 2+ yoe in a top-tier client-facing role (e.g., investment banking, consulting, private equity), as an ex-founder, or in the human-data industry high agency, drive, and a strong work ethic; thrive in ambiguity and execute with minimal direction passion for ai and interest in entrepreneurship; enjoy experimenting with new tools (experience with claude code is a plus) competitive nature and demonstrated past success strong leadership experience and excellent written and verbal communication skills thrive in fast-moving, high-impact environments with bias towards action, while balancing attention to detail","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.strategic-projects-lead-coding","company_id":"afterquery","role":"Strategic Projects Lead - Coding","group":"Employment","pay_label":"$150,000–$225,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery strategic projects lead - coding published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $150,000–$225,000 annual salary full-time 2+ yoe in a top-tier tech company (faang, frontier ai lab) or quantitative trading firm background in software engineering, ml engineering, ai research, or computer science high agency, drive, and a strong work ethic; thrive in ambiguity and execute with minimal direction passion for ai and interest in entrepreneurship; enjoy experimenting with new tools (experience with claude code is a plus) competitive nature and demonstrated past success strong leadership experience and excellent written and verbal communication skills thrive in fast-moving, high-impact environments with bias towards action, while balancing attention to detail proficiency in python and comfort writing production-quality code","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.strategic-projects-associate-coding","company_id":"afterquery","role":"Strategic Projects Associate - Coding","group":"Employment","pay_label":"$130,000 annual target cash","pay_basis":"annual_target_cash","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery strategic projects associate - coding published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $130,000 annual target cash full-time strong technical background: cs degree, engineering experience, or equivalent demonstrated ability to ship technical projects high agency, drive, and a strong work ethic; thrive in ambiguity and execute with minimal direction passion for ai and interest in entrepreneurship; enjoy experimenting with new tools (experience with claude code is a plus) competitive nature and demonstrated past success strong leadership experience and excellent written and verbal communication skills thrive in fast-moving, high-impact environments with bias towards action, while balancing attention to detail proficiency in python and comfort writing production-quality code","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.strategic-projects-lead-healthcare","company_id":"afterquery","role":"Strategic Projects Lead - Healthcare","group":"Employment","pay_label":"$150,000–$225,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery strategic projects lead - healthcare published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $150,000–$225,000 annual salary full-time 3+ years of experience in healthcare, medical research, health technology, a top-tier biopharma company, or another highly selective healthcare / medicine environment (having an md is a plus) background in medicine, clinical practice, biomedical research, healthcare operations, or another relevant discipline strong understanding of healthcare data, systems, clinical workflows, medical research, or the healthcare industry high agency, drive, and a strong work ethic; thrive in ambiguity and execute with minimal direction passion for healthcare, ai, and entrepreneurship, with an interest in using emerging technology to improve how medical knowledge is developed, evaluated, and applied competitive nature and a demonstrated record of exceptional achievement strong leadership experience and excellent written and verbal communication skills thrive in fast-moving, high-impact environments with bias towards action, while balancing attention to detail comfort working with data, technical systems, and ai tools","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.strategic-projects-lead-engineering","company_id":"afterquery","role":"Strategic Projects Lead - Engineering (MechE / EE / IE)","group":"Employment","pay_label":"$150,000–$225,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery strategic projects lead - engineering (meche / ee / ie) strategic projects lead - engineering published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $150,000–$225,000 annual salary full-time bachelor's degree or higher in electrical engineering, computer engineering, mechanical engineering, industrial engineering, systems engineering, or a closely related technical field. 3+ years of experience in engineering, technical research, hardware development, or software engineering roles involving physical systems. strong technical problem-solving abilities, with the ability to break down unfamiliar engineering problems, understand technical constraints, and reason through how complex systems work. demonstrated hands-on engineering experience through designing, building, simulating, testing, or investigating substantial technical projects. familiarity with engineering design, simulation, testing, or verification processes. high agency and strong work ethic; comfort defining problems and thriving with minimal direction in ambiguous situations. demonstrated leadership excellence and strong communication abilities. genuine passion for ai and an entrepreneurial inclination.","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.data-acquisition-lead","company_id":"afterquery","role":"Data Acquisition Lead","group":"Employment","pay_label":"$200,000–$350,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery data acquisition lead published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $200,000–$350,000 annual salary full-time 5+ years of experience negotiating and closing high-value enterprise deals, in enterprise data acquisition, strategic partnerships, corporate development, enterprise sales, or data/vendor licensing negotiation, including people-leadership experience demonstrated track record personally negotiating and closing complex, high-value enterprise deals, ideally data-purchase agreements (seven figures or more) deep understanding of data licensing structures, data rights/ip considerations, and data governance and compliance frameworks, or the ability to learn them quickly alongside legal. deal-making experience matters more than data experience experience designing a scalable outbound or sourcing motion to reach many potential counterparties, and pricing assets that have few public comparables excellent executive-level negotiation, communication, and relationship-building skills high agency and strong work ethic; comfort operating with minimal direction in ambiguous, fast-moving environments genuine passion for ai and an entrepreneurial inclination demonstrated competitive success","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.quality-control-lead","company_id":"afterquery","role":"Quality Control Lead","group":"Employment","pay_label":"$200,000–$350,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery quality control lead published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $200,000–$350,000 annual salary full-time 3+ years of experience in a technical role (software engineering, data science, ml engineering, or similar) with hands-on proficiency in at least one modern programming language proven ability to review, debug, and evaluate both code and technical data and knowledge work data for correctness, structure, and quality; demonstrated rigor in reviewing others' work experience building or leading a quality assurance/quality control function, ideally for a technical or data-centric product extremely high attention to detail and comfort making judgment calls on ambiguous or contested technical content strong leadership and communication skills; able to translate technical quality issues into clear, actionable feedback across a distributed team high agency and strong work ethic; comfort operating with minimal direction in ambiguous, fast-moving environments genuine passion for ai and an entrepreneurial inclination demonstrated competitive success","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.strategic-projects-lead-consulting","company_id":"afterquery","role":"Strategic Projects Lead - Consulting","group":"Employment","pay_label":"$150,000–$225,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery strategic projects lead - consulting published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $150,000–$225,000 annual salary full-time 3+ years of experience at a top-tier management consulting firm (mbb or similar), big 4 strategy practice, or corporate strategy team background in business strategy, case analysis, market research, or corporate operations strong grasp of structured problem-solving, business frameworks, and financial/quantitative analysis high agency and strong work ethic; comfort defining problems and thriving with minimal direction in ambiguous situations demonstrated leadership excellence and strong client-facing communication abilities genuine passion for ai and an entrepreneurial inclination demonstrated competitive success (e.g., top-tier academic achievement, case competitions, or promotion on an accelerated track)","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.strategic-projects-lead-legal","company_id":"afterquery","role":"Strategic Projects Lead - Legal","group":"Employment","pay_label":"$150,000–$225,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery strategic projects lead - legal published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $150,000–$225,000 annual salary full-time 3+ years practicing law at a leading firm, in-house at a sophisticated company, a government or regulatory body, or a legal ai startup. jd (or equivalent qualification) and a track record of substantive legal work: you have drafted, negotiated, litigated, or advised, not just coordinated. deep command of legal reasoning and research methodology, and strong opinions about what separates rigorous analysis from surface-level answers. high agency and the ability to execute in ambiguity; comfort defining the problem before solving it. analytical ability; can break down complex legal problems and work flows into component parts. genuine passion for ai and interest in entrepreneurship. demonstrated track record of competitive success. strong leadership and communication skills. comfort with data and ai tools.","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.strategic-projects-lead-ai-safety","company_id":"afterquery","role":"Strategic Projects Lead - AI Safety","group":"Employment","pay_label":"$150,000–$225,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery strategic projects lead - ai safety published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $150,000–$225,000 annual salary full-time 2+ years in ai safety, red teaming, trust & safety, adversarial ml, or security research; at a frontier ai lab, faang, top security firm, or equivalent. hands-on adversarial experience: jailbreaking or stress-testing frontier models, prompt injection research, offensive security, penetration testing, bug bounty, ctfs, or trust & safety investigations and enforcement. fluency with how safety work is actually structured (harm taxonomies, evaluation design, safety frameworks and model policy). high agency and the ability to execute in ambiguity; comfort defining the problem before solving it. strong writing. much of this job is specifying risk precisely enough that fifty other people can execute against it. genuine passion for ai and interest in entrepreneurship. demonstrated track record of competitive success. strong leadership and communication skills. python proficiency and the ability to write production-quality code.","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.strategic-projects-lead-stem","company_id":"afterquery","role":"Strategic Projects Lead - STEM","group":"Employment","pay_label":"$150,000–$225,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery strategic projects lead - stem published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $150,000–$225,000 annual salary full-time phd (completed or abd) in biology, chemistry, mathematics, data analytics/statistics, or a related stem field — or equivalent demonstrated excellence as an ioi, imo, or usapho medalist, icpc or usaco finalist, or putnam top 500 finisher background in scientific research, computational modeling, experimental design, or quantitative/statistical analysis within your field deep understanding of core fundamentals in your discipline along with strong quantitative and systems-level reasoning high agency and strong work ethic; comfort defining problems and thriving with minimal direction in ambiguous situations demonstrated leadership excellence and strong communication abilities genuine passion for ai and an entrepreneurial inclination demonstrated competitive success (e.g., publications, research awards, fellowships, or the medals/finals listed above)","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.ai-ml-research-intern","company_id":"afterquery","role":"AI/ML Research Intern","group":"Employment","pay_label":"$8,000 monthly salary","pay_basis":"monthly_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery ai/ml research intern published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $8,000 monthly salary 10–40 hours/week, depending on company needs enrolled in a relevant undergraduate or master’s program.","uncertain":false,"pay_terms":{"unit":"month","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.research-scientist-post-training","company_id":"afterquery","role":"Research Scientist - Post Training","group":"Employment","pay_label":"$210,000–$450,000 annual target cash","pay_basis":"annual_target_cash","numeric_pay":true,"reviewed_on":"2026-10-14","status":"pay_conflict","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery research scientist - post training run controlled sft/rl experiments to measure dataset effects develop public evaluations and publish technical findings employment san francisco, california, united states san francisco, california, united states $210,000–$450,000 annual target cash full-time strong familiarity with llm training and evaluation methodologies. ability to design lightweight experiments, move fast, and extract actionable insights from messy results. comfort working across domains (you'll touch finance, software engineering, policy, and more). a bias toward building over theorizing.","uncertain":true,"pay_terms":{"unit":"conflicting","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.research-scholar","company_id":"afterquery","role":"Research Scholar","group":"Employment","pay_label":"$1,000–$10,000 one-time award","pay_basis":"one_time","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"unknown","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery research scholar published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $1,000–$10,000 one-time award full-time undergraduate/master/phd student with an established publication record ability to participate in an ongoing research collaboration throughout the academic semester.","uncertain":false,"pay_terms":{"unit":"one_time","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.research-engineer","company_id":"afterquery","role":"Research Engineer","group":"Employment","pay_label":"$210K–$450K salary band + equity; bonus offered","pay_basis":"salary_period_unspecified","numeric_pay":true,"reviewed_on":"2026-10-14","status":"historical","geography":"San Francisco","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":[],"company_name":"AfterQuery","searchText":"afterquery research engineer published employer listing; compensation and location are shown below. employment san francisco san francisco $210k–$450k salary band + equity; bonus offered","uncertain":false,"pay_terms":{"unit":"conflicting","hourly_comparable":false,"currency":null},"last_route_check":{"result":"not_found","date":"2026-11-22"}},{"id":"afterquery.work.research-technical-program-manager","company_id":"afterquery","role":"Research Technical Program Manager","group":"Employment","pay_label":"$210,000–$450,000 annual target cash","pay_basis":"annual_target_cash","numeric_pay":true,"reviewed_on":"2026-10-14","status":"pay_conflict","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery research technical program manager published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $210,000–$450,000 annual target cash full-time 2-4 years project/program management experience experience leading complex technical programs across research, machine learning, engineering, or data organizations working knowledge of the llm development lifecycle, including data creation, sft, rl-based post-training, and evaluation strong communication and an ability to turn messy technical information into clear decisions and next steps","uncertain":true,"pay_terms":{"unit":"conflicting","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.research-scientist-frontier-evaluations","company_id":"afterquery","role":"Research Scientist – Frontier Evaluations","group":"Employment","pay_label":"$210K–$450K salary band + equity; bonus offered","pay_basis":"salary_period_unspecified","numeric_pay":true,"reviewed_on":"2026-10-14","status":"historical","geography":"San Francisco","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":[],"company_name":"AfterQuery","searchText":"afterquery research scientist – frontier evaluations published employer listing; compensation and location are shown below. employment san francisco san francisco $210k–$450k salary band + equity; bonus offered","uncertain":false,"pay_terms":{"unit":"undisclosed","hourly_comparable":false,"currency":null},"last_route_check":{"result":"not_found","date":"2026-11-22"}},{"id":"afterquery.work.research-program-manager","company_id":"afterquery","role":"Research Program Manager","group":"Employment","pay_label":"$175,000–$191,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery research program manager published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $175,000–$191,000 annual salary full-time 1-3+ years in research operations, technical program management, or a similar role in a fast-moving research or engineering organization. technical background in computer science, machine learning, statistics, or a related field, with working python and sql. evaluation literacy: you have taken part in evaluating a product, an agent, or a foundation model, can read a results table, and can tell when a number should not be trusted. excellent written and verbal communication. you can distill a technical result into a summary a partner, executive, or academic collaborator can act on, and you write documents people actually read. a track record of running cross-functional programs end to end, including managing external partners, contractors, or collaborators. comfort with ambiguity and building processes from scratch, and the judgment to keep processes light so researchers stay effective.","uncertain":false,"pay_terms":{"unit":"year","currency":"USD","hourly_comparable":false},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.marketing-lead","company_id":"afterquery","role":"Marketing Lead","group":"Employment","pay_label":"$160,000–$220,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","ai_data_work":false,"terms_checked_on":"2026-11-22","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery marketing lead published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $160,000–$220,000 annual salary full-time","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.gtm-operations-lead","company_id":"afterquery","role":"GTM Operations Lead","group":"Employment","pay_label":"$190,000–$250,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-10-14","ai_data_work":false,"terms_checked_on":"2026-11-22","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery gtm operations lead published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $190,000–$250,000 annual salary full-time","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.engagement-manager","company_id":"afterquery","role":"Engagement Manager","group":"Employment","pay_label":"$225,000–$450,000 annual salary field (conflicting)","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"pay_conflict","geography":"San Francisco, California, United States","availability_checked_on":"2026-11-22","ai_data_work":false,"terms_checked_on":"2026-11-22","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery engagement manager published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $225,000–$450,000 annual salary field (conflicting) full-time","uncertain":true,"pay_terms":{"unit":"conflicting","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.sales-operations-associate","company_id":"afterquery","role":"Associate","group":"Employment","pay_label":"$145,000–$175,000 annual salary","pay_basis":"annual_salary","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"San Francisco, California, United States","availability_checked_on":"2026-11-22","ai_data_work":false,"terms_checked_on":"2026-11-22","route_kind":"named_listing","engagement_type":"employment","arrangements":["onsite"],"company_name":"AfterQuery","searchText":"afterquery associate published employer listing; compensation and location are shown below. employment san francisco, california, united states san francisco, california, united states $145,000–$175,000 annual salary full-time","uncertain":false,"pay_terms":{"unit":"year","hourly_comparable":false,"currency":"USD"},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.technical-content-writer-contract","company_id":"afterquery","role":"Technical Content Writer (Contract)","group":"Employment","pay_label":"$60 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-14","status":"listed","geography":"Remote, US-based","availability_checked_on":"2026-10-14","terms_checked_on":"2026-10-28","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"AfterQuery","searchText":"afterquery technical content writer (contract) write research articles and brand/founder communications check technical claims and adapt content for different audiences employment remote, us-based remote, us-based $60 / hour the description lists part-time work at 10–15 hours/week initially, with potential expansion. board metadata says full-time. six months experience writing content for an ai, software, data infrastructure, or other technical organization working understanding of ai and machine learning, with the ability to research unfamiliar topics and explain technical concepts accurately strong writing and editing skills across social media, long-form articles, and company communications ability to adapt between founder, brand, and contributor voices and write for both technical and non-technical audiences a portfolio demonstrating clear thinking, strong storytelling, and attention to detail ability to turn briefs, conversations, and source material into polished drafts while managing a part-time workload independently","uncertain":false,"pay_terms":{"unit":"hour","currency":"USD","hourly_comparable":true},"last_route_check":{"date":"2026-11-22","result":"listing_content_reviewed"}},{"id":"afterquery.work.fullstack-evaluation","company_id":"afterquery","role":"Full-Stack Software Engineer - Testing & Evaluation","group":"Expert & contractor projects","pay_label":"$50–$100 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-14","status":"intake_unverified","geography":"Remote","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"AfterQuery","searchText":"afterquery full-stack software engineer - testing & evaluation build reproducible development challenges write deterministic tests and containerize tasks expert & contractor projects remote remote $50–$100 / hour 20 hours/week ongoing label modern programming language proficiency experience maintaining multi-file projects hands-on docker/containerization technical writing and documentation","uncertain":true,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":"USD"},"last_route_check":{"result":"blocked","date":"2026-11-22"}},{"id":"afterquery.work.esl-expert","company_id":"afterquery","role":"ESL Teacher Expert","group":"Expert & contractor projects","pay_label":"$35–$70 / hour","pay_basis":"hour","numeric_pay":true,"reviewed_on":"2026-10-14","status":"intake_unverified","geography":"Remote","route_kind":"named_listing","engagement_type":"contract","arrangements":["remote"],"company_name":"AfterQuery","searchText":"afterquery esl teacher expert author teaching scenarios and reference answers evaluate pedagogical accuracy and learner suitability expert & contractor projects remote remote $35–$70 / hour 10+ hours/week ongoing project work tefl/tesol/celta certification or state esl license 2+ years teaching esl lesson-planning and proficiency-assessment expertise clear written english","uncertain":true,"pay_terms":{"unit":"hour","hourly_comparable":true,"currency":"USD"},"last_route_check":{"result":"blocked","date":"2026-11-22"}}];
+(() => {
+/* Shared by the optional search components at build time; no extra request. */
+(() => {
+  'use strict';
+  if (globalThis.S2SSearch) return;
+  // Match both recorded TeX titles and the Greek spelling displayed in the UI.
+  const mathTitle = value => String(value ?? '').replace(/\$\\tau(\^2)?\$/gu, (_, squared) => squared ? 'τ²' : 'τ').replace(/\\tau(\^2)?(?![\p{L}\p{N}_])/gu, (_, squared) => squared ? 'τ²' : 'τ');
+  const normalize = value => mathTitle(value).normalize('NFKD').replace(/\p{M}+/gu, '').toLowerCase().replace(/\s+/gu, ' ').trim();
+  const aliasName = value => String(value).replace(/\s*\([^()]*\)\s*$/u, '').trim();
+  const values = value => Array.isArray(value) ? value.flatMap(values) : value == null ? [] : [String(value)];
+  const arxiv = /^(?:\d{4}\.\d{4,5}|[a-z][a-z.-]*\/\d{7})(?:v[1-9]\d*)?$/u;
+  const doi = /^10\.\d{4,9}\/\S+$/u;
+  const record = /^paper\.[a-z0-9_-]+(?:\.[a-z0-9_-]+)+$/u;
+  function identifier(value) {
+    let text = String(value ?? '').trim().toLowerCase();
+    let type = '';
+    if (/^https?:\/\//u.test(text) || text.startsWith('/research/papers/')) {
+      let url, path;
+      try {
+        url = new URL(text, 'https://sciencetostartup.com');
+        path = decodeURIComponent(url.pathname).toLowerCase();
+      } catch { return ''; }
+      if (url.username || url.password || url.port) return '';
+      if (['arxiv.org', 'www.arxiv.org', 'export.arxiv.org'].includes(url.hostname)) {
+        const match = path.match(/^\/(abs|pdf|html)\/(.+?)\/?$/u);
+        if (!match) return '';
+        type = 'arxiv';
+        text = match[1] === 'pdf' ? match[2].replace(/\.pdf$/u, '') : match[2];
+      } else if (['doi.org', 'dx.doi.org'].includes(url.hostname)) {
+        type = 'doi'; text = path.slice(1);
+      } else if (url.hostname === 'sciencetostartup.com') {
+        type = 'record'; text = path.match(/^\/research\/papers\/([^/]+)\/?$/u)?.[1] || '';
+      } else return '';
+    } else {
+      const prefix = text.match(/^(arxiv|doi):\s*/u);
+      if (prefix) { type = prefix[1]; text = text.slice(prefix[0].length); }
+    }
+    if ((!type || type === 'arxiv') && arxiv.test(text)) return 'arxiv:' + text;
+    if ((!type || type === 'doi') && doi.test(text)) return 'doi:' + text;
+    if ((!type || type === 'record') && record.test(text)) return 'record:' + text;
+    return '';
+  }
+  const identifiers = value => [...new Set(values(value).map(identifier).filter(Boolean))];
+  const leadingWork = /^(?:jobs?|careers?|hiring|vacancies|openings)(?:\s+(?:for|in))?(?=\s|$)/iu;
+  const trailingWork = /(?:^|\s)(?:jobs?|careers?|vacancies|openings)\s*$/iu;
+  const researchTerms = /\b(?:papers?|datasets?|benchmarks?|literature|arxiv|doi)\b/iu;
+  function explicitWork(value) {
+    const text = String(value ?? '').trim();
+    return !researchTerms.test(text) && (leadingWork.test(text) || trailingWork.test(text));
+  }
+  function isWorkQuery(value, titles) {
+    return !identifier(value) && (explicitWork(value) || Boolean(titles?.has(normalize(value))));
+  }
+  function workTerms(value) {
+    const text = String(value ?? '');
+    return explicitWork(text) ? text.trim().replace(leadingWork, '').replace(trailingWork, '').trim() : text;
+  }
+  const workUrl = value => '/work/' + (String(value ?? '').trim() ? '?' + new URLSearchParams({ q: value }) : '');
+  function compile(row) {
+    const aliases = values(row.aliases).map(raw => ({ raw, key: normalize(aliasName(raw)) }));
+    const name = normalize(row.name);
+    const text = normalize([row.name, ...aliases.map(item => item.raw), ...values(row.summary), ...values(row.group), ...values(row.products), ...values(row.keywords), ...values(row.text)].join(' '));
+    return { row, name, aliases, text, identifiers: identifiers(row.identifiers) };
+  }
+  function rank(entry, query) {
+    const key = normalize(query);
+    if (!key) return 0;
+    if (entry.name === key || entry.aliases.some(alias => alias.key === key)) return 0;
+    if (entry.name.startsWith(key)) return 1;
+    if (entry.aliases.some(alias => alias.key.startsWith(key))) return 2;
+    const words = key.split(' ');
+    if (words.every(word => entry.name.includes(word))) return 3;
+    return words.every(word => entry.text.includes(word)) ? 4 : -1;
+  }
+  function compare(a, b) {
+    const left = normalize(a.name), right = normalize(b.name);
+    // Equally relevant navigation hubs precede individual source versions.
+    const priority = row => /^\/company\//u.test(row.href || '') ? 0 : ['report', 'research', 'data', 'review', 'daily'].includes(row.group) || /^\/daily\//u.test(row.href || '') ? 1 : 2;
+    return priority(a) - priority(b) || (left < right ? -1 : left > right ? 1 : 0) || String(a.href || a.id || '').localeCompare(String(b.href || b.id || ''), 'en');
+  }
+  function matchedAlias(entry, query) {
+    const key = normalize(query);
+    if (!key || entry.name.includes(key)) return '';
+    return entry.aliases.find(alias => alias.key === key || alias.key.startsWith(key))?.raw || '';
+  }
+  globalThis.S2SSearch = Object.freeze({ normalize, identifier, identifiers, isWorkQuery, workTerms, workUrl, compile, rank, compare, matchedAlias });
+})();
+
+/* Selection, order and data export shared by native Work and Explore. */
+const S2SWork = (() => {
+  const WORK_ROUTE_ARCHIVE=new Set(['historical','closed','contributions','paused','no_route','inquiry','information']);
+
+  const WORK_TYPE_GROUPS={contract:'Expert & contractor projects',employment:'Employment',fellowship:'Research fellowship',bounty:'Contributor bounties',study:'study',varies:'varies',unknown:'Unverified route'};
+  const WORK_FILTER_VALUES={kind:['','named','programs','boards','outside','closed'],type:['',...Object.keys(WORK_TYPE_GROUPS)],pay:['','hourly','task','yearly','monthly','numeric','undisclosed'],arrangement:['','remote','onsite','varies'],sort:['','hourly','checked']};
+  function normalizeWorkCriteria(value={}){
+    const result={q:String(value.q??'').slice(0,256)};
+    for(const key of Object.keys(WORK_FILTER_VALUES)){const raw=String(value[key]??'');result[key]=WORK_FILTER_VALUES[key].includes(raw)?raw:'';}
+    return result;
+  }
+
+  function w4Text(value){return String(value??'').replace(/\s+/g,' ').trim();}
+
+  function w4Checked(route){return [route.availability_checked_on,route.last_route_check?.date].filter(Boolean).sort().at(-1)||null;}
+
+  function w4ApprovedTermsReceipt(route){
+    const review=route.editorial_review,receipt=(review?.receipts||[]).find(item=>item.id===review.approved_terms_receipt_id);
+    return receipt?.approved===true&&receipt.scope==='key_terms'&&receipt.result==='readable'&&receipt.approval_basis==='source_content_review'&&/^\d{4}-\d{2}-\d{2}$/.test(receipt.checked_on||'')?receipt:null;
+  }
+  function w4TermsReviewDate(route){return w4ApprovedTermsReceipt(route)?.checked_on||route.terms_checked_on||null;}
+
+  function w4Uncertain(route){
+    if(typeof route.uncertain==='boolean')return route.uncertain;
+    if(['unverified','intake_unverified','pay_conflict'].includes(route.status))return true;
+    if(['blocked','not_found','unavailable'].includes(route.last_link_check?.result))return true;
+    const check=[route.last_route_check?.result,route.last_route_check?.note].filter(Boolean).join(' ');
+    return route.research_record?.route?.live_application_verified===false||/HTTP 403|blocked.fetch|JavaScript.only|requires JavaScript|JavaScript shell|not verified open|could not be loaded/i.test(check);
+  }
+  function w4Status(route){
+    if(route.availability_label)return route.availability_label;
+    if(route.editorial_review?.disposition?.state==='historical_page_unavailable')return 'Past listing · page unavailable';
+    if(route.status==='program'&&/waitlist/i.test(route.availability_note||''))return 'Waitlist may apply';
+    const labels={intake_unverified:'Availability unconfirmed',unverified:'Availability unconfirmed',pay_conflict:'Pay conflict',historical:'Historical',closed:'Closed',paused:'Training paused',contributions:'Research contribution',no_route:'No confirmed paid listing',inquiry:'Inquiry only',information:'Information only'};
+    if(route.status==='historical'&&['official_role_not_found_redirect','official_role_not_found'].includes(route.last_route_check?.result))return 'Historical · listing unavailable';
+    return labels[route.status]||(w4Uncertain(route)?'Availability unconfirmed':'');
+  }
+
+  function w4PayQualification(route){
+    if(route.pay_terms?.note)return route.pay_terms.note;
+    if(route.pay_basis==='advertised_maximum_hourly')return 'Rates vary by expertise, assessment, location and project. Non-core work can pay less.';
+    if(!route.pay_basis?.endsWith('salary_period_unspecified'))return '';
+    return 'Pay period not stated.'+(/Bonus eligibility and payout terms are undisclosed/i.test(route.availability_note||'')?' Bonus eligibility and payout terms are undisclosed.':'');
+  }
+
+  const W4_TASK_PAY=new Set(['per_completed_task','task','accepted_task','approved_recording','approved_submission']);
+  const W4_REMOTE=/remote|at home|worldwide|global/i,W4_ONSITE=/San Francisco|Palo Alto|Berkeley|London|Paris|Tokyo|Bangalore|on-?site|hybrid|in.person|office/i;
+  function w4OpportunityKind(route){
+    if(['named_listing','network_program','career_page','other_record'].includes(route.route_kind))return route.route_kind;
+    if(route.status==='careers')return 'career_page';
+    if(route.status==='program')return 'network_program';
+    return ['information','inquiry','contributions','no_route'].includes(route.status)?'other_record':'named_listing';
+  }
+  function w4Engagement(route){
+    if(['contract','employment','fellowship','bounty','study','varies','unknown'].includes(route.engagement_type))return route.engagement_type;
+    return {'Expert & contractor projects':'contract',Employment:'employment','Research fellowship':'fellowship','Contributor bounties':'bounty'}[route.group]||'unknown';
+  }
+
+  function w4HourlyRange(route){
+    if(!route?.numeric_pay||route.status==='pay_conflict'||route.pay_basis==='conflicting_hourly')return null;
+    if(route.pay_terms?route.pay_terms.hourly_comparable!==true:['hour_equivalent','per_completed_task','task','accepted_task','approved_recording','approved_submission'].includes(route.pay_basis))return null;
+    const label=w4Text(route.pay_label);
+    if(!/\/\s*(?:approved\s+)?hour/i.test(label))return null;
+    const match=label.match(/([$€£¥])\s*([\d,]+(?:\.\d+)?)(?:\s*[–-]\s*[$€£¥]?\s*([\d,]+(?:\.\d+)?))?(\+)?/);
+    if(!match)return null;
+    const number=value=>Number(value.replace(/,/g,''));
+    return {currency:match[1],low:/^up to\b/i.test(label)?null:number(match[2]),high:number(match[3]||match[2]),open:Boolean(match[4])};
+  }
+
+  function w4PayMatches(route,value){
+    if(!value)return true;
+    if(value==='numeric'||value==='undisclosed')return (value==='numeric')===Boolean(route.numeric_pay);
+    if(value==='hourly')return Boolean(w4HourlyRange(route));
+    if(value==='task')return route.pay_terms?['task','hour_equivalent'].includes(route.pay_terms.unit):W4_TASK_PAY.has(route.pay_basis)||route.pay_basis==='hour_equivalent';
+    if(value==='monthly')return route.pay_terms?route.pay_terms.unit==='month':['month_stipend','undisclosed_stipend'].includes(route.pay_basis);
+    if(value==='yearly')return route.pay_terms?route.pay_terms.unit==='year':/^(?:annual_salary|annual_target_cash)$/.test(route.pay_basis||'');
+    return false;
+  }
+  function w4Arrangements(route){
+    if(Array.isArray(route.arrangements))return route.arrangements.filter(value=>['remote','onsite','hybrid'].includes(value));
+    const place=route.geography||'';return [...(W4_REMOTE.test(place)?['remote']:[]),...(W4_ONSITE.test(place)?['onsite']:[])];
+  }
+
+  function w4WhereMatches(route,value){const values=w4Arrangements(route);return !value||(value==='remote'?values.includes('remote'):value==='onsite'?values.some(item=>['onsite','hybrid'].includes(item)):value==='varies'?!values.length:route.eligibility===value);}
+
+  // Worker words map to the words listings use. Each term must start a word, so "doctor" skips "doctorate".
+  const W4_WORD_START='(?:^|[^\\p{L}\\p{N}])',W4_WORD_END='(?![\\p{L}\\p{N}])';
+  const W4_SEARCH_GROUPS=[
+    {words:['medical','medicine','doctor','doctors','physician','physicians','clinical','clinician','clinicians','health','healthcare','nurse','nurses','nursing'],terms:['medic','clinic','physician','doctors?'+W4_WORD_END,'health','nurs(?:e|es|ing)'+W4_WORD_END]},
+    {words:['code','coding','coder','coders','developer','developers','programmer','programmers','programming','swe','software'],terms:['cod(?:e|es|ing|er|ers)'+W4_WORD_END,'software','swe'+W4_WORD_END,'developers?'+W4_WORD_END,'programm']},
+    {words:['label','labels','labeling','labelling','labeler','labelers','annotation','annotations','annotate','annotator','annotators'],terms:['label(?:s|ed|er|ers|ing|ling)?'+W4_WORD_END,'annotat']},
+    {words:['beginner','beginners','entry','entry-level','novice','junior'],phrases:['no experience','entry level'],terms:['no experience','generalists','general tasks?','general ai','entry[- ]level','beginner']},
+    {words:['student','students','college','intern','interns','internship','internships','graduate','graduates','university'],terms:['student','college','intern(?:s|ship|ships)?'+W4_WORD_END,'graduate','universit','no experience','generalists','general tasks?','entry[- ]level']},
+    {words:['part-time','parttime','flexible'],phrases:['part time'],terms:['part[- ]?time','flexible','opt-in']},
+    {words:['worldwide','global','anywhere','international'],terms:['worldwide','global','anywhere','international']}
+  ];
+  function w4RegExpEscape(value){return value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+  function w4SearchFold(value){return String(value??'').normalize('NFKD').replace(/\p{M}+/gu,'').toLowerCase();}
+  function workSearchTerms(query){return globalThis.S2SSearch?.workTerms(query)??query;}
+  function w4QueryMatcher(query){
+    let text=w4SearchFold(w4Text(query));
+    if(!text)return null;
+    for(const group of W4_SEARCH_GROUPS)for(const phrase of group.phrases||[])text=text.split(phrase).join(group.words[0]);
+    const tokens=text.split(' ').filter(Boolean);
+    const tests=tokens.map(token=>{const group=W4_SEARCH_GROUPS.find(g=>g.words.includes(token));return new RegExp(W4_WORD_START+'(?:'+(group?group.terms.join('|'):w4RegExpEscape(token))+')','u');});
+    const phrase=tokens.length>1?new RegExp(W4_WORD_START+w4RegExpEscape(tokens.join(' ')),'u'):null;
+    return {all:value=>tests.every(test=>test.test(value)),phrase:value=>Boolean(phrase?.test(value))};
+  }
+
+
+  function w4BestRank(route){
+    const uncertainty=w4Uncertain(route)?20:0,terms=w4TermsReviewDate(route)?0:route.last_route_check?.result==='listing_content_reviewed'?2:5;
+    return uncertainty+terms+(w4HourlyRange(route)&&w4Arrangements(route).includes('remote')?0:10);
+  }
+  function w4CurrencyCode(route){const code=route.pay_terms?.currency;return /^[A-Z]{3}$/.test(code||'')?code:null;}
+  function w4RateTie(a,b){const x=w4HourlyRange(a),y=w4HourlyRange(b),currency=w4CurrencyCode(a);return x&&y&&currency&&currency===w4CurrencyCode(b)?y.high-x.high:0;}
+  // English title ties keep the initial HTML, native enhancements and Explore in the same order.
+  function w4BestOrder(a,b, companyName = route => route.company_name || route.company_id){return w4BestRank(a)-w4BestRank(b)||(w4Checked(b)||'').localeCompare(w4Checked(a)||'')||w4RateTie(a,b)||companyName(a).localeCompare(companyName(b),'en')||a.role.localeCompare(b.role,'en')||String(a.id || '').localeCompare(String(b.id || ''),'en');}
+  // Highest hourly rate: top of the published range, then its low end ("up to" last), then open-ended
+  // ranges. Listings without a rate keep best-match order after them. US dollar rates come before other
+  // currencies, and unknown currencies retain best-match order without comparing amounts.
+  function w4RateOrder(a,b, companyName){
+    const x=w4HourlyRange(a),y=w4HourlyRange(b);
+    if(!x||!y)return Number(Boolean(y))-Number(Boolean(x))||w4BestOrder(a,b,companyName);
+    const currencyA=w4CurrencyCode(a),currencyB=w4CurrencyCode(b);
+    if(!currencyA||!currencyB)return Number(Boolean(currencyB))-Number(Boolean(currencyA))||w4BestOrder(a,b,companyName);
+    if(currencyA!==currencyB)return Number(currencyB==='USD')-Number(currencyA==='USD')||currencyA.localeCompare(currencyB);
+    return y.high-x.high||(y.low??-1)-(x.low??-1)||Number(y.open)-Number(x.open)||w4BestOrder(a,b,companyName);
+  }
+  function w4CheckedOrder(a,b, companyName){return (w4Checked(b)||'').localeCompare(w4Checked(a)||'')||(b.reviewed_on||'').localeCompare(a.reviewed_on||'')||w4BestOrder(a,b,companyName);}
+
+  const groups = ['named', 'programs', 'boards', 'outside', 'closed'];
+  const keys = ['q', 'kind', 'type', 'pay', 'arrangement', 'sort'];
+
+  function bucket(route) {
+    if (WORK_ROUTE_ARCHIVE.has(route.status)) return 'closed';
+    const kind = w4OpportunityKind(route);
+    if (kind === 'career_page') return 'boards';
+    if (route.ai_data_work === false) return 'outside';
+    return kind === 'named_listing' ? 'named' : kind === 'network_program' ? 'programs' : 'closed';
+  }
+
+  function readCriteria(params) {
+    const values = Object.fromEntries(keys.map(key => [key, params.get(key) || '']));
+    if (!WORK_FILTER_VALUES.type.includes(values.type)) {
+      values.type = Object.keys(WORK_TYPE_GROUPS).find(key => WORK_TYPE_GROUPS[key] === values.type) || '';
+    }
+    return normalizeWorkCriteria(values);
+  }
+
+  function writeCriteria(params, criteria) {
+    for (const key of keys) {
+      if (criteria[key]) params.set(key, criteria[key]);
+      else params.delete(key);
+    }
+    return params;
+  }
+
+  function select(rows, criteria, searchText, companyName = route => route.company_name || route.company_id) {
+    const { q, kind, type, pay, arrangement } = criteria;
+    const eligible = rows.filter(route => (!kind || bucket(route) === kind)
+      && (!type || w4Engagement(route) === type) && w4PayMatches(route, pay) && w4WhereMatches(route, arrangement));
+    const terms = workSearchTerms(q), matcher = w4QueryMatcher(terms);
+    if (terms !== q) {
+      // Keep a literal employer or role title when a word like “jobs” belongs to its name.
+      const title = w4SearchFold(w4Text(q));
+      const exact = eligible.filter(route => [companyName(route), route.role].some(name => w4SearchFold(w4Text(name)) === title));
+      if (exact.length) return exact;
+    }
+    if (!matcher) return eligible;
+    const text = new Map(eligible.map(route => [route.id, searchText(route)]));
+    const phrase = eligible.filter(route => matcher.phrase(text.get(route.id)));
+    return phrase.length ? phrase : eligible.filter(route => matcher.all(text.get(route.id)));
+  }
+
+  function groupResults(rows, sort = '', query = '', companyName = route => route.company_name || route.company_id) {
+    const grouped = Object.fromEntries(groups.map(key => [key, []]));
+    for (const route of rows) grouped[bucket(route)].push(route);
+    const order = sort === 'hourly' ? w4RateOrder : sort === 'checked' ? w4CheckedOrder : w4BestOrder;
+    const matcher = !sort && w4QueryMatcher(workSearchTerms(query));
+    for (const group of groups) {
+      const list = grouped[group];
+      list.sort((a, b) => order(a, b, companyName));
+      if (matcher && (group === 'named' || group === 'programs')) {
+        const titleMatch = route => matcher.all(w4SearchFold(`${companyName(route)} ${route.role}`));
+        list.sort((a, b) => Number(titleMatch(b)) - Number(titleMatch(a)));
+      }
+    }
+    return grouped;
+  }
+
+  const csvHeader = [
+    'route_id', 'company', 'role', 'opportunity_kind', 'engagement_type', 'availability', 'advertised_pay',
+    'pay_unit', 'hourly_comparable', 'currency', 'arrangements', 'location', 'requirements', 'assessment',
+    'commitment', 'duration', 'terms_reviewed_on', 'terms_review_scope', 'original_application_url',
+    'current_action_url', 'current_action_label', 'source_urls', 'field_review_metadata',
+    'full_research_profile_url', 'search_query', 'opportunity_filter', 'engagement_filter', 'pay_filter',
+    'arrangement_filter', 'sort', 'pay_qualification', 'review_evidence', 'original_url_details'
+  ];
+
+  function fieldReviews(route) {
+    return Object.fromEntries(Object.entries(route.field_reviews || {}).sort(([a], [b]) => a.localeCompare(b)).map(([field, review]) => [
+      field, {
+        state: review.state, reviewed_on: review.reviewed_on ?? null, source_ids: [...(review.source_ids || [])],
+        basis: review.basis, ...(field === 'location' && review.note ? { note: review.note } : {})
+      }
+    ]));
+  }
+
+  function reviewEvidence(route, original) {
+    const { last_link_check: link, last_route_check: page, editorial_review: editorial } = route;
+    const review = { status: route.status };
+    const add = (key, value) => { if (value != null && value !== '') review[key] = value; };
+    add('availability_checked_on', route.availability_checked_on);
+    const checkData = ({ date, result, url, final_url, http_status, checked_at, retrieval_reason }) => ({
+      date, result, ...(url && { url }), ...(final_url && { final_url }), ...(http_status != null && { http_status }),
+      ...(checked_at && { checked_at }), ...(retrieval_reason && { retrieval_reason })
+    });
+    if (link?.date) add('http_check', checkData(link));
+    if (page?.date) {
+      const url = page.url || (original.recorded_url_purpose === 'career_board' && missingRole(page)
+        ? original.archived_source_url : null);
+      add('page_check', checkData({ ...page, url }));
+    }
+    if (page?.application_check) add('application_check', page.application_check);
+    if (page?.application_checks?.length) add('application_checks', page.application_checks);
+    add('key_terms_source_id', w4ApprovedTermsReceipt(route)?.source_id);
+    const commitment = route.field_reviews?.commitment;
+    if (commitment?.note && commitment.source_ids?.length) {
+      add('commitment', { note: commitment.note, reviewed_on: commitment.reviewed_on, source_ids: commitment.source_ids });
+    }
+    const disposition = editorial?.disposition;
+    const getSource = id => route.sources?.find(source => source.id === id);
+    if (editorial?.receipts?.length) {
+      const receipts = editorial.receipts.flatMap(receipt => {
+        if (receipt.scope !== 'retrieval' && !original.archived_source_url) return [];
+        const { id, source_id, checked_on, checked_at, scope, result, final_url, http_status,
+          retrieval_reason, rendered_observation, approved, approval_basis, reviewed_fields } = receipt;
+        const source = getSource(source_id);
+        if (!source?.url || (receipt.url && source.url !== receipt.url)) return [];
+        return [{ id, source_id, url: source.url, purpose: source.purpose, checked_on, checked_at, scope, result,
+          final_url, http_status, retrieval_reason, rendered_observation, approved, approval_basis, reviewed_fields }];
+      });
+      if (receipts.length) add('source_receipts', receipts);
+    }
+    if (route.check_history?.length) {
+      add('check_history', route.check_history.map(({ date, result, url, note, source_ids }) => ({ date, result, url, note, source_ids })));
+    }
+    if (disposition?.approval_basis === 'source_content_review' && disposition.source_ids?.length
+        && disposition.source_ids.every(getSource)) {
+      const { state, reviewed_on, source_ids } = disposition;
+      const checks = (editorial.receipts || []).filter(receipt => receipt.scope === 'retrieval' && source_ids.includes(receipt.source_id))
+        .map(({ source_id, checked_on, result, http_status }) => ({
+          source_id, url: getSource(source_id).url, date: checked_on, result, ...(http_status != null && { http_status })
+        }));
+      add('archive_disposition', { state, reviewed_on, source_ids, ...(checks.length ? { checks } : {}) });
+    }
+    return review;
+  }
+
+  function missingRole(check) {
+    return ['official_role_not_found', 'official_role_not_found_redirect'].includes(check?.result);
+  }
+
+  function originalUrls(route, action) {
+    const listed = route.research_record?.route;
+    const editorial = route.editorial_review;
+    const page = route.last_route_check;
+    const sources = route.sources || [];
+    const at = url => sources.filter(source => url && source.url === url && source.id);
+    const idsAt = url => at(url).map(source => source.id);
+    const actions = (editorial?.actions || []).filter(item =>
+      at(item.url).some(source => source.id === item.source_id)
+    );
+    const kind = w4OpportunityKind(route);
+    const form = at(route.url).find(source =>
+      source.source_type === 'company' && source.title?.endsWith(' — public application form')
+    );
+    const earlierForm = (route.check_history || [])
+      .filter(check => check.result === 'application_form_available' && check.date
+        && (check.url ? at(check.url).length : form?.accessed_on && form.accessed_on === check.date))
+      .sort((left, right) => right.date.localeCompare(left.date))[0];
+    const originalAction = actions.find(item => item.url === route.url && item.purpose === 'application');
+    const recordedApplication = at(listed?.application_url).length ? listed.application_url
+      : (route.form_available === true ? form?.url : null) || originalAction?.url;
+
+    const checkedDestinations = new Map();
+    const formerApplications = new Set();
+    for (const check of [page?.application_check, ...(page?.application_checks || [])]) {
+      const matching = at(check?.url);
+      if (!matching.length) continue;
+      const former = route.status === 'historical'
+        && ['application_migrated', 'application_unpublished'].includes(check.retrieval_reason)
+        && matching.some(source => source.purpose === 'historical_observation');
+      const purpose = former ? 'application' : matching.find(source =>
+        ['application', 'registration', 'network'].includes(source.purpose))?.purpose;
+      if (former) formerApplications.add(check.url);
+      if (purpose) checkedDestinations.set(check.url, { url: check.url, purpose, source_ids: idsAt(check.url) });
+    }
+    const formerApplication = formerApplications.size === 1 ? [...formerApplications][0] : null;
+    const earlierApplication = earlierForm && (earlierForm.url || form?.url);
+    const application = recordedApplication || earlierApplication || formerApplication;
+
+    // Some archived rows replaced the exact URL with a board. Recover the role only from its bound source.
+    let replacedListing;
+    if (route.status === 'historical' && missingRole(page) && !at(route.url).length) {
+      const candidates = new Set(sources.filter(source => source.id && source.url && source.url !== route.url
+        && (route.source_ids?.includes(source.id) || listed?.url === source.url || source.title === route.role))
+        .map(source => source.url));
+      if (candidates.size === 1) [replacedListing] = candidates;
+    }
+    const rolePage = replacedListing || (at(listed?.overview_url).length ? listed.overview_url : route.url);
+    const archived = actions.find(item => item.purpose === 'archived_listing')?.url || replacedListing
+      || (kind === 'named_listing' && at(route.url).length
+        && (missingRole(page) || editorial?.disposition?.state === 'historical_page_unavailable'
+          || ['official_closed_notice', 'official_listing_closed'].includes(page?.result)) ? route.url : null);
+    const isRegistration = kind === 'network_program' && listed?.url === route.url && at(route.url).length
+      && page?.result === 'Live public signup landing page verified';
+    let recordedPurpose = editorial?.recorded_url_purpose;
+    if (!recordedPurpose) {
+      if (kind === 'career_page' || replacedListing) recordedPurpose = 'career_board';
+      else if (application === route.url && application) recordedPurpose = 'application';
+      else if (isRegistration) recordedPurpose = 'registration';
+      else if (kind === 'network_program') recordedPurpose = 'network';
+      else if (archived === route.url && archived) recordedPurpose = 'archived_listing';
+      else if (kind === 'named_listing' && !WORK_ROUTE_ARCHIVE.has(route.status) && at(route.url).length) recordedPurpose = 'description';
+      else recordedPurpose = 'source';
+    }
+
+    // Keep the legacy values, including cells cleared for documented description-only records.
+    const legacy = editorial?.recorded_url_purpose === 'description' ? recordedApplication : route.url;
+    const current = actions.find(item => item.url === action.url && item.label === action.label)
+      || actions.find(item => item.url === action.url);
+    const alternative = editorial?.alternative_destination;
+    let actionPurpose = current?.purpose;
+    if (!actionPurpose && action.url) {
+      if (alternative?.url === action.url && idsAt(action.url).includes(alternative.source_id)) actionPurpose = 'career_board';
+      else if (action.url === route.url) actionPurpose = recordedPurpose;
+      else actionPurpose = checkedDestinations.get(action.url)?.purpose || 'source';
+    }
+    const original = {
+      source_url: at(rolePage).length ? rolePage : null,
+      application_url: application || null,
+      recorded_url: route.url || null,
+      recorded_url_purpose: route.url ? recordedPurpose : null,
+      legacy_url_purpose: legacy ? (legacy === application ? 'application' : recordedPurpose) : null,
+      current_action_purpose: actionPurpose || null
+    };
+    if (original.source_url) original.source_ids = idsAt(rolePage);
+    if (at(action.url).length) original.current_action_source_ids = current ? [current.source_id] : idsAt(action.url);
+    if (archived) {
+      original.archived_source_url = archived;
+      original.archived_source_ids = idsAt(archived);
+    }
+    if (archived || formerApplication) {
+      const observed = new Set([rolePage, archived, application]);
+      original.source_observations = sources.filter(source => source.id && source.accessed_on && observed.has(source.url))
+        .map(({ id, accessed_on }) => ({ source_id: id, accessed_on }));
+    }
+    if (checkedDestinations.size) original.checked_destinations = [...checkedDestinations.values()];
+    if (application) {
+      original.application_source_ids = idsAt(application);
+      if (application === listed?.application_url && typeof listed.live_application_verified === 'boolean' && listed.checked_on) {
+        original.application_check = { date: listed.checked_on, verified_in_research: listed.live_application_verified };
+      } else if (application === earlierApplication) {
+        original.application_check = { date: earlierForm.date, verified_in_research: true, result: earlierForm.result, url: application };
+      } else if (application === form?.url && form.accessed_on) {
+        original.application_check = { date: form.accessed_on, verified_in_research: true };
+      }
+    }
+    return { original, legacy };
+  }
+
+  function csvFor(routes, criteria, destination = route => route.source_actions?.[0] || {}) {
+    const rows = routes.map(route => {
+      const action = destination(route);
+      const { original, legacy } = originalUrls(route, action);
+      const qualifications = [w4PayQualification(route)];
+      if (route.pay_terms?.unit === 'conflicting') {
+        const details = route.pay_context || (route.pay_observations || [])
+          .map(observation => observation.label + ': ' + observation.value).join(' · ');
+        if (details && !qualifications.includes(details)) qualifications.push(details);
+      }
+      return [
+        route.id, route.company_name || route.company_id, route.role, w4OpportunityKind(route), w4Engagement(route),
+        w4Status(route) || 'Recorded listing', route.pay_label, route.pay_terms?.unit,
+        route.pay_terms?.hourly_comparable === true, route.pay_terms?.currency, w4Arrangements(route).join(' | '),
+        route.geography, (route.requirements || []).join(' | '), route.assessment, route.hours, route.duration,
+        w4TermsReviewDate(route), w4ApprovedTermsReceipt(route) ? 'key_terms' : route.terms_checked_on ? 'pay_terms' : '',
+        legacy, action.url, action.label, (route.sources || []).map(source => source.url).join(' | '),
+        JSON.stringify(fieldReviews(route)), 'https://sciencetostartup.com/company/' + encodeURIComponent(route.company_id) + '/',
+        ...keys.map(key => criteria[key]), qualifications.filter(Boolean).join(' '), JSON.stringify(reviewEvidence(route, original)),
+        JSON.stringify(original)
+      ];
+    });
+    const cell = value => {
+      let text = String(value ?? '');
+      if (/^[\t\r\n]/.test(text) || /^\s*[=+@-]/.test(text)) text = "'" + text;
+      return '"' + text.replaceAll('"', '""') + '"';
+    };
+    return '\ufeff' + [csvHeader, ...rows].map(row => row.map(cell).join(',')).join('\r\n') + '\r\n';
+  }
+
+  const requests = new Map();
+  async function fetchExport({ href, sha256 }, ids, criteria) {
+    if (!ids.length) return csvFor([], criteria);
+    if (!href || !sha256) throw new Error('Work results are unavailable');
+    if (!requests.has(href)) {
+      const request = (async () => {
+        const response = await fetch(href, { cache: 'no-cache', signal: AbortSignal.timeout(15000) });
+        if (!response.ok) throw new Error('Work results could not load');
+        const bytes = await response.arrayBuffer();
+        if (globalThis.crypto?.subtle) {
+          const digest = await crypto.subtle.digest('SHA-256', bytes);
+          const actual = Array.from(new Uint8Array(digest), value => value.toString(16).padStart(2, '0')).join('');
+          if (actual !== sha256) throw new Error('Work results integrity mismatch');
+        }
+        const { routes } = JSON.parse(new TextDecoder().decode(bytes));
+        const index = new Map(routes.map(route => [route.id, route]));
+        if (index.size !== routes.length) throw new Error('Duplicate work result');
+        return index;
+      })().catch(error => { requests.delete(href); throw error; });
+      requests.set(href, request);
+    }
+    const index = await requests.get(href);
+    const rows = ids.map(id => index.get(id));
+    if (rows.some(route => !route)) throw new Error('Missing work result');
+    return csvFor(rows, criteria);
+  }
+
+  function downloadCsv(body) {
+    const url = URL.createObjectURL(new Blob([body], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'sciencetostartup-current-work-results.csv';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  return Object.freeze({
+    archive: WORK_ROUTE_ARCHIVE, types: WORK_TYPE_GROUPS, options: WORK_FILTER_VALUES, keys, groups,
+    normalizeCriteria: normalizeWorkCriteria, readCriteria, writeCriteria, select, groupResults, bucket, csvFor, fetchExport, downloadCsv,
+    approvedReceipt: w4ApprovedTermsReceipt, termsReviewDate: w4TermsReviewDate, checked: w4Checked, uncertain: w4Uncertain,
+    status: w4Status, payQualification: w4PayQualification, opportunityKind: w4OpportunityKind, engagement: w4Engagement,
+    hourlyRange: w4HourlyRange, payMatches: w4PayMatches, arrangements: w4Arrangements, whereMatches: w4WhereMatches,
+    queryMatcher: query => w4QueryMatcher(workSearchTerms(query)), fold: w4SearchFold, bestOrder: w4BestOrder, rateTie: w4RateTie, rateOrder: w4RateOrder, checkedOrder: w4CheckedOrder
+  });
+})();
+
+/* The plain work list stays complete when scripts are unavailable. */
+(() => {
+  const loader = window.WorkPageResource;
+  const script = document.currentScript;
+  if (loader && !loader.accepts(script)) return;
+
+  function initialize() {
+    if (loader && !loader.accepts(script)) return;
+    const form = document.querySelector('[data-work-filters]');
+    if (!form) return;
+    const list = document.querySelector('.work-page-list');
+    const count = document.querySelector('[data-work-count]');
+    const initialCount = count.textContent;
+    const empty = document.querySelector('[data-work-empty]');
+    const navigation = document.querySelector('[data-work-section-navigation]');
+    const sectionDetails = navigation?.closest('details');
+    const sectionDisclosure = sectionDetails || navigation;
+    const sectionTotals = sectionDisclosure?.querySelector('[data-work-section-totals]');
+    const compareLink = document.querySelector('[data-work-compare]');
+    const exploreLink = document.querySelector('[data-work-explore]');
+    const handoffLinks = { compare: compareLink, explore: exploreLink };
+    const comparison = document.querySelector('[data-work-comparison]');
+    const exportButton = document.querySelector('[data-work-export]');
+    const exportStatus = document.querySelector('[data-work-export-status]');
+    const legacy = !compareLink && !exportButton;
+    const legacyNavigation = legacy && document.querySelector('.work-page-groups');
+    const filterOptions = form.querySelector('.work-page-filter-options');
+    const filterSummary = filterOptions.querySelector('summary');
+    const groupElements = new Map([...list.querySelectorAll('[data-work-group]')].map(group => [group.dataset.workGroup, group]));
+    const fields = Object.fromEntries(S2SWork.keys.map(key => [key, form.elements.namedItem(key)]));
+    const cards = new Map([...list.querySelectorAll('[data-work-route]')].map(card => [card.dataset.workRoute, card]));
+    const profileLinkSelector = '.work-heading a[href^="/company/"]';
+    const text = (card, selector) => card.querySelector(selector)?.textContent.trim() || '';
+    // An older page can still request the current unversioned enhancer. Its own
+    // cards supply search terms and groups so a newer release cannot change their facts.
+    const legacyKinds = { named: 'named_listing', programs: 'network_program', boards: 'career_page', outside: 'named_listing', closed: 'other_record' };
+    const legacyRecords = () => [...cards].map(([id, card]) => {
+      const group = card.closest('[data-work-group]').dataset.workGroup;
+      const search = ['.work-heading', '.work-offer', '.work-listing-conditions'].map(selector => text(card, selector)).join(' ');
+      return {
+        id, card,
+        route_kind: legacyKinds[group], ai_data_work: group !== 'outside',
+        arrangements: (card.dataset.arrangements || '').split(' '),
+        searchText: S2SWork.fold(search).replace(/\s+/g, ' '),
+      };
+    });
+    const records = legacy ? legacyRecords() : window.WORK_NATIVE_SELECTION.filter(route => cards.has(route.id)).map(route => ({
+      ...route, card: cards.get(route.id)
+    }));
+    if (records.length !== cards.size) throw new Error('Work selection does not match the page');
+    const initialOpen = new Map([...groupElements.values()].filter(group => group.tagName === 'DETAILS').map(group => [group, group.open]));
+    const compareArrivalKey = 's2s.workCompareArrival';
+    let compareDeparture;
+    let profileClick, profileDeparture;
+    let returnBookmark;
+    let selection = [];
+    let active = false;
+    let displayedSearch;
+    let readerInput = 0;
+    for (const type of ['wheel', 'keydown', 'touchstart', 'pointerdown']) {
+      addEventListener(type, event => { if (event.isTrusted) readerInput++; }, { capture: true, passive: true });
+    }
+
+    function readURL() {
+      const criteria = S2SWork.readCriteria(new URLSearchParams(location.search));
+      for (const [key, input] of Object.entries(fields)) if (input) input.value = criteria[key];
+    }
+
+    function remember(changes) {
+      history.replaceState({ ...history.state, ...changes }, '');
+    }
+
+    function restoreFilterOptions() {
+      const open = history.state?.workFilterOptionsOpen;
+      if (typeof open === 'boolean') filterOptions.open = open;
+      else remember({ workFilterOptionsOpen: filterOptions.open });
+    }
+
+    function restoreSectionDisclosure() {
+      const open = history.state?.workSectionDisclosureOpen;
+      if (sectionDetails && typeof open === 'boolean') sectionDetails.open = open;
+    }
+
+    function appendComparisonFields(cell, fields) {
+      for (const value of fields) {
+        if (!value) continue;
+        const field = document.createElement('div');
+        field.textContent = value;
+        if (cell.hasChildNodes()) cell.append('\n');
+        cell.append(field);
+      }
+    }
+
+    function comparisonRows(results) {
+      const heading = comparison.querySelector('h2');
+      comparison.replaceChildren(heading);
+      if (!results.length) return;
+      const region = document.createElement('div');
+      region.className = 'work-compare-scroll';
+      region.tabIndex = 0;
+      region.setAttribute('role', 'region');
+      region.setAttribute('aria-label', 'Matching work records');
+      const table = document.createElement('table');
+      const header = table.createTHead().insertRow();
+      for (const label of ['Listing or program', 'Recorded pay', 'Location and terms']) {
+        const column = document.createElement('th');
+        column.scope = 'col';
+        column.textContent = label;
+        header.append(column);
+      }
+      const body = table.createTBody();
+      for (const { id, card, company_name } of results) {
+        const row = body.insertRow();
+        row.dataset.compareRoute = id;
+        const identity = document.createElement('th');
+        identity.scope = 'row';
+        identity.textContent = [company_name, text(card, 'h3'), text(card, '.work-status')].filter(Boolean).join(' · ');
+        row.append(identity);
+        const pay = card.querySelector('.work-pay');
+        const amount = pay?.querySelector('strong');
+        const historicalLabel = amount?.previousElementSibling?.textContent.trim();
+        appendComparisonFields(row.insertCell(), [
+          [historicalLabel, amount?.textContent.trim()].filter(Boolean).join(' ') || 'Pay not listed',
+          ...Array.from(pay?.querySelectorAll('strong ~ .sub') || [], note => note.textContent.trim()),
+        ]);
+        const detail = row.insertCell();
+        const groupKind = card.closest('[data-work-group]')?.dataset.workKindLabel;
+        const conditionFields = Array.from(card.querySelector('.work-listing-conditions').children, field => field.textContent.trim());
+        if (groupKind && conditionFields.length) conditionFields[0] = groupKind + ' · ' + conditionFields[0];
+        appendComparisonFields(detail, [
+          text(card, '.work-place'),
+          ...conditionFields,
+          text(card, '.work-reviewed'),
+        ]);
+        const action = card.querySelector('.work-listing-action a');
+        if (action) {
+          const copy = action.cloneNode(true);
+          copy.removeAttribute('id');
+          detail.append('\n', copy);
+        }
+      }
+      region.append(table);
+      comparison.append(region);
+    }
+
+    function currentCriteria() {
+      return S2SWork.normalizeCriteria(Object.fromEntries(Object.entries(fields).map(([key, input]) => [key, input?.value])));
+    }
+
+    function render(updateURL = false) {
+      const criteria = currentCriteria();
+      const url = new URL(location.href);
+      if (updateURL) {
+        if (legacy) {
+          for (const key of ['q', 'kind', 'arrangement']) {
+            if (criteria[key]) url.searchParams.set(key, criteria[key]);
+            else url.searchParams.delete(key);
+          }
+        } else S2SWork.writeCriteria(url.searchParams, criteria);
+        if (url.href !== location.href) history.replaceState(history.state, '', url.href);
+      }
+      displayedSearch = location.search;
+      const showCompare = !legacy && url.searchParams.get('view') === 'compare';
+      const matches = S2SWork.select(records, legacy ? { ...criteria, q: '' } : criteria, route => route.searchText);
+      const words = legacy && S2SWork.fold(criteria.q).trim().split(/\s+/).filter(Boolean);
+      const groups = legacy ? Object.fromEntries(S2SWork.groups.map(key => [key, matches.filter(route =>
+        S2SWork.bucket(route) === key && words.every(word => route.searchText.includes(word)))]))
+        : S2SWork.groupResults(matches, criteria.sort, criteria.q);
+      selection = S2SWork.groups.flatMap(key => groups[key]);
+      const selectedIds = new Set(selection.map(route => route.id));
+      const optionCount = S2SWork.keys.filter(key => key !== 'q' && criteria[key]).length;
+      const filtering = Boolean(criteria.q || optionCount);
+      if (filtering && !active) {
+        for (const group of initialOpen.keys()) initialOpen.set(group, group.open);
+      }
+      filterSummary.textContent = optionCount ? `Filters (${optionCount})` : 'Filters';
+      for (const { id, card } of records) card.hidden = !selectedIds.has(id);
+      for (const [key, group] of groupElements) {
+        const matches = groups[key];
+        group.hidden = !matches.length;
+        const headingCount = group.querySelector('[data-work-group-count]');
+        if (headingCount) headingCount.textContent = matches.length;
+        const cards = group.querySelector('.work-listings');
+        if (matches.some(({ card }, index) => index && Boolean(matches[index - 1].card.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_PRECEDING))) {
+          for (const { card } of matches) cards.append(card);
+        }
+        if (group.tagName === 'DETAILS') {
+          const badge = group.querySelector(':scope > summary span');
+          if (!legacy && badge) badge.textContent = matches.length;
+          if (filtering && matches.length) group.open = true;
+          else if (!filtering && active) group.open = initialOpen.get(group);
+        }
+      }
+      active = filtering;
+      if (legacyNavigation) legacyNavigation.hidden = filtering;
+      list.hidden = showCompare;
+      if (comparison) comparison.hidden = !showCompare;
+      empty.hidden = selection.length !== 0;
+      if (showCompare) comparisonRows(selection);
+      const matchKeys = S2SWork.keys.filter(key => key !== 'sort' && criteria[key]);
+      const record = selection.length === 1 ? 'record' : 'records';
+      const hourlyOnly = matchKeys.length === 1 && criteria.pay === 'hourly';
+      const countLabel = hourlyOnly ? `${selection.length} ${record} with published hourly pay`
+        : matchKeys.length ? `${selection.length} matching ${record}` : initialCount;
+      if (count.textContent !== countLabel) count.textContent = countLabel;
+      if (sectionDisclosure) {
+        sectionDisclosure.hidden = showCompare || !selection.length;
+        if (sectionTotals) {
+          const named = groups.named.length, programs = groups.programs.length;
+          const companies = new Set([...groups.named, ...groups.programs].map(route => route.company_id)).size;
+          sectionTotals.hidden = Boolean(matchKeys.length) && !named && !programs;
+          sectionTotals.textContent = `${named} named ${named === 1 ? 'listing' : 'listings'} · ${programs} ${programs === 1 ? 'network or program' : 'networks and programs'} · ${companies} ${companies === 1 ? 'company' : 'companies'}`;
+        }
+        for (const link of navigation.querySelectorAll('[data-work-jump]')) {
+          const key = link.dataset.workJump;
+          const matches = groups[key].length;
+          (link.closest('li') || link).hidden = !matches;
+          const badge = link.querySelector('span');
+          if (badge) badge.textContent = matches;
+        }
+      }
+      if (compareLink) {
+        if (showCompare) url.searchParams.delete('view');
+        else url.searchParams.set('view', 'compare');
+        compareLink.href = url.pathname + url.search + url.hash;
+        compareLink.textContent = showCompare ? 'Back to listings' : 'Compare results';
+      }
+      const search = S2SWork.writeCriteria(new URLSearchParams(), criteria).toString();
+      if (exploreLink) exploreLink.href = '/explore/#work' + (search ? '?' + search : '');
+    }
+
+    function reset() {
+      for (const input of Object.values(fields)) if (input) input.value = '';
+      filterOptions.open = false;
+      remember({ workFilterOptionsOpen: false });
+      render(true);
+      fields.q.focus();
+    }
+
+    function targetFromHash() {
+      try { return document.getElementById(decodeURIComponent(location.hash.slice(1))); }
+      catch { return null; }
+    }
+
+    function revealTarget(focus) {
+      const target = targetFromHash();
+      if (!target?.closest('[data-work-group]') || target.closest('[hidden]')) return false;
+      const group = target.closest('details[data-work-group]');
+      if (group) group.open = true;
+      if (focus) {
+        // The browser can finish its own fragment scroll after scripts run.
+        const input = readerInput;
+        const previousFocus = document.activeElement;
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          const active = document.activeElement;
+          if (input !== readerInput || target !== targetFromHash() || target.closest('[hidden]') ||
+              (active !== previousFocus && active !== document.body && active !== target)) return;
+          target.focus({ preventScroll: true });
+          target.scrollIntoView({ block: 'start', behavior: 'instant' });
+        }));
+      }
+      return true;
+    }
+
+    function restoreJumpFocus() {
+      const key = history.state?.workJumpFocus;
+      const jump = key && [...(navigation?.querySelectorAll('[data-work-jump]') || [])].find(link => link.hash === key);
+      if (!jump || jump.closest('[hidden]')) return false;
+      const disclosure = jump.closest('details');
+      if (disclosure) disclosure.open = true;
+      jump.focus({ preventScroll: true });
+      return true;
+    }
+
+    function savedHandoff() {
+      const { workReturnFocus, workCompareFocus } = history.state || {};
+      if (workReturnFocus) {
+        const { kind, page, href, top, role, termsOpen } = workReturnFocus;
+        const card = kind === 'profile' ? cards.get(role) : null;
+        const link = kind === 'profile' ? card?.querySelector(profileLinkSelector) : handoffLinks[kind];
+        if (link && page === location.href && href === link.href) return { link, top, card, termsOpen };
+      } else if (workCompareFocus && compareLink) return { link: compareLink };
+      return null;
+    }
+
+    function restoreHandoff({ link, top, card, termsOpen }) {
+      // A warm history traversal keeps this document and its browser-managed focus.
+      // On a verified cold return, the browser may focus the opener's bookmark first.
+      const bookmark = card && card === targetFromHash() ? card : null;
+      const bookmarkHandoff = bookmark && { target: bookmark, recover: null };
+      returnBookmark = bookmarkHandoff;
+      const input = readerInput;
+      const canRestore = () => input === readerInput && !loader?.interacted &&
+        savedHandoff()?.link === link && !link.closest('[hidden]');
+
+      function clearBookmark() {
+        if (returnBookmark === bookmarkHandoff) returnBookmark = null;
+      }
+
+      function recoverBookmarkFocus() {
+        if (returnBookmark === bookmarkHandoff && document.activeElement === bookmark && canRestore()) {
+          link.focus({ preventScroll: true });
+        }
+      }
+
+      function restorePosition() {
+        const bounds = link.getBoundingClientRect();
+        const headerBottom = Math.max(0, document.querySelector('.site-header')?.getBoundingClientRect().bottom || 0);
+        if (Number.isFinite(top) && top >= headerBottom && top + bounds.height <= innerHeight) {
+          if (Math.abs(bounds.top - top) >= 1) window.scrollBy({ top: bounds.top - top, behavior: 'instant' });
+        } else if (bounds.top < headerBottom || bounds.bottom > innerHeight) {
+          link.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+      }
+
+      function settleBookmarkPosition(event) {
+        if (event?.persisted) return clearBookmark();
+        // WebKit can apply the native fragment focus and scroll after the
+        // opener has already received focus. Leave other focus moves alone.
+        setTimeout(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+          recoverBookmarkFocus();
+          if (document.activeElement === link && canRestore()) restorePosition();
+          clearBookmark();
+        })), 0);
+      }
+
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const focusAvailable = document.activeElement === document.body || document.activeElement === bookmark;
+        if (!focusAvailable || !canRestore()) return clearBookmark();
+        const group = card?.closest('details[data-work-group]');
+        if (group) group.open = true;
+        const terms = termsOpen && card?.querySelector('details.work-terms');
+        if (terms) terms.open = true;
+        if (bookmarkHandoff) bookmarkHandoff.recover = () => queueMicrotask(recoverBookmarkFocus);
+        link.focus({ preventScroll: true });
+        restorePosition();
+        if (bookmark) {
+          if (document.readyState === 'complete') settleBookmarkPosition();
+          else addEventListener('pageshow', settleBookmarkPosition, { once: true });
+        }
+      }));
+    }
+
+    function bindProfileArrival() {
+      const saved = history.state?.workReturnFocus;
+      const browserHistory = window.navigation;
+      if (!browserHistory || saved?.kind !== 'profile' || saved.page !== location.href || saved.destinationKey !== undefined) return;
+      // The original visit is the next history entry when Work is reactivated.
+      // Keep its key so a new visit to the same profile URL cannot stand in for it.
+      const next = browserHistory.entries()[(browserHistory.currentEntry?.index ?? -2) + 1];
+      const destinationKey = next?.url === saved.href ? next.key : null;
+      try { remember({ workReturnFocus: { ...saved, destinationKey } }); } catch {}
+    }
+
+    function followsHandoff() {
+      const saved = history.state?.workReturnFocus;
+      if (!window.navigation) return window.S2SNativeHandoff?.returnedFrom(saved?.entry);
+      const { from, entry } = window.navigation.activation || {};
+      if (saved?.kind === 'profile') {
+        // The exact role visit must be the adjacent entry we just left on Back.
+        return Boolean(saved.destinationKey && from?.key === saved.destinationKey &&
+          from.url === saved.href && from.index === window.navigation.currentEntry?.index + 1);
+      }
+      return !(from && from.index <= entry?.index);
+    }
+
+    function sameTabActivation(event, link) {
+      return event.isTrusted && !event.defaultPrevented && event.button === 0 && !event.metaKey && !event.ctrlKey &&
+        !event.shiftKey && !event.altKey && !link.hasAttribute('download') && (!link.target || link.target.toLowerCase() === '_self');
+    }
+
+    function recordProfileDeparture() {
+      const click = profileClick;
+      const departure = profileDeparture;
+      profileClick = profileDeparture = null;
+      const leaving = departure && ['push', 'replace'].includes(departure.navigationType);
+      const activated = click && !click.event.defaultPrevented && (window.navigation
+        ? leaving && departure.navigationType === 'push' && departure.sourceElement === click.link && departure.destination.url === click.saved.href
+        : click.saved.entry);
+      // Wait for an actual departure before changing the source entry. Retain
+      // it on browser traversals so a repeated Back can restore it again.
+      if (!activated && (!leaving || history.state?.workReturnFocus?.kind !== 'profile')) return;
+      try { remember({ workReturnFocus: activated ? click.saved : null, workCompareFocus: false }); } catch {}
+    }
+
+    function takeCompareArrival() {
+      if (!comparison || window.top !== window) return false;
+      try {
+        if (!sessionStorage.getItem(compareArrivalKey)) return false;
+        sessionStorage.removeItem(compareArrivalKey);
+        if (comparison.hidden || !document.referrer || performance.getEntriesByType('navigation')[0]?.type !== 'navigate') return false;
+        // Match the native same-tab link without storing the reader's search.
+        const expected = new URL(document.referrer);
+        expected.searchParams.set('view', 'compare');
+        const arrival = new URL(location.href);
+        arrival.hash = '';
+        return expected.href === arrival.href;
+      } catch {
+        return false;
+      }
+    }
+
+    function focusComparison() {
+      const heading = comparison.querySelector('h2');
+      const toolbar = compareLink.closest('[data-work-toolbar]');
+      const arrival = location.href;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (loader?.interacted || document.activeElement !== document.body || location.href !== arrival || comparison.hidden) return;
+        heading.focus({ preventScroll: true });
+        toolbar.scrollIntoView({ block: 'start', behavior: 'instant' });
+      }));
+    }
+
+    form.addEventListener('submit', event => event.preventDefault());
+    form.addEventListener('input', () => render(true));
+    form.addEventListener('change', () => render(true));
+    form.addEventListener('reset', event => { event.preventDefault(); reset(); });
+    empty.querySelector('[data-work-clear]')?.addEventListener('click', reset);
+    filterSummary.addEventListener('click', event => {
+      if (!event.defaultPrevented) remember({ workFilterOptionsOpen: !filterOptions.open });
+    });
+    sectionDetails?.addEventListener('toggle', () => {
+      remember({ workSectionDisclosureOpen: sectionDetails.open });
+    });
+    for (const [kind, link] of Object.entries(handoffLinks)) {
+      link?.addEventListener('click', event => {
+        if (!sameTabActivation(event, link)) return;
+        if (link === compareLink && comparison?.hidden) {
+          compareDeparture = event;
+          if (sectionDetails) remember({ workSectionDisclosureOpen: sectionDetails.open });
+        }
+        const entry = window.S2SNativeHandoff?.begin(link.href, event);
+        remember({ workReturnFocus: { kind, page: location.href, href: link.href, top: link.getBoundingClientRect().top, entry }, workCompareFocus: false });
+      });
+    }
+    if (comparison && window.top === window) {
+      list.addEventListener('click', event => {
+        const link = event.target.closest?.(profileLinkSelector);
+        if (!link || !sameTabActivation(event, link)) return;
+        const card = link.closest('[data-work-route]');
+        if (!card) return;
+        const entry = window.S2SNativeHandoff?.begin(link.href, event);
+        profileClick = { link, event, saved: {
+          kind: 'profile', page: location.href, href: link.href, role: card.dataset.workRoute,
+          top: link.getBoundingClientRect().top, termsOpen: Boolean(card.querySelector('details.work-terms')?.open), entry,
+        } };
+      });
+      window.navigation?.addEventListener('navigate', event => {
+        if (!event.destination.sameDocument) profileDeparture = event;
+      });
+      window.addEventListener('pageshow', event => { if (event.persisted) bindProfileArrival(); });
+      window.addEventListener('pagehide', recordProfileDeparture);
+      window.addEventListener('pagehide', () => {
+        const departure = compareDeparture;
+        compareDeparture = null;
+        if (!departure || departure.defaultPrevented) return;
+        try { sessionStorage.setItem(compareArrivalKey, '1'); } catch {}
+      });
+    }
+    document.addEventListener('focusin', event => {
+      const handoff = savedHandoff();
+      const bookmarkFocus = event.target === returnBookmark?.target && !loader?.interacted;
+      if (bookmarkFocus) returnBookmark.recover?.();
+      if (handoff && event.target !== handoff.link && !bookmarkFocus) remember({ workReturnFocus: null, workCompareFocus: false });
+    });
+    navigation?.addEventListener('click', event => {
+      const link = event.target.closest('[data-work-jump]');
+      if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      remember({ workJumpFocus: link.hash });
+      const target = document.getElementById(link.hash.slice(1));
+      const disclosure = target?.closest('details[data-work-group]');
+      if (disclosure) disclosure.open = true;
+      if (link.hash === location.hash) revealTarget(true);
+    });
+    window.addEventListener('hashchange', () => {
+      if (!restoreJumpFocus()) revealTarget(true);
+    });
+    window.addEventListener('popstate', () => {
+      bindProfileArrival();
+      restoreFilterOptions();
+      if (displayedSearch !== location.search) { readURL(); render(); }
+    });
+    exportButton?.addEventListener('click', async () => {
+      if (exportButton.getAttribute('aria-busy') === 'true') return;
+      const { workExportAsset: href, workExportDigest: sha256 } = exportButton.dataset;
+      exportButton.setAttribute('aria-busy', 'true');
+      if (exportStatus) exportStatus.textContent = 'Preparing your CSV…';
+      try {
+        const body = await S2SWork.fetchExport({ href, sha256 }, selection.map(route => route.id), currentCriteria());
+        S2SWork.downloadCsv(body);
+        if (exportStatus) exportStatus.textContent = '';
+      } catch {
+        if (exportStatus) exportStatus.textContent = 'The CSV could not load. Choose Download CSV to try again.';
+      } finally {
+        exportButton.removeAttribute('aria-busy');
+      }
+    });
+    readURL();
+    filterOptions.open = loader?.initialOptionsOpen ?? S2SWork.keys.some(key => key !== 'q' && fields[key]?.value);
+    restoreFilterOptions();
+    render();
+    restoreSectionDisclosure();
+    form.hidden = false;
+    if (compareLink) compareLink.hidden = false;
+    if (exportButton) exportButton.hidden = false;
+    const retried = loader?.retried;
+    const compareArrival = takeCompareArrival() && !loader?.interacted;
+    bindProfileArrival();
+    const handoff = !loader?.interacted && performance.getEntriesByType('navigation')[0]?.type === 'back_forward' &&
+      followsHandoff() && savedHandoff();
+    const revealed = !compareArrival && revealTarget(!handoff && (!loader?.interacted || retried));
+    if (!compareArrival && !handoff && !revealed && targetFromHash()?.closest('[data-work-group]') && !loader?.interacted) {
+      // A saved anchor can be excluded by the saved criteria.
+      count.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
+    loader?.complete(script);
+    document.documentElement.removeAttribute('data-page-enhancement');
+    if (compareArrival) focusComparison();
+    else if (handoff) restoreHandoff(handoff);
+    if (!revealed && retried) {
+      // A failed load can leave the reader at a bookmark the filters now hide.
+      fields.q.focus({ preventScroll: true });
+      const { top, bottom } = fields.q.getBoundingClientRect();
+      if (top < 0 || bottom > innerHeight) {
+        form.scrollIntoView({ block: 'start', behavior: 'instant' });
+      }
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initialize, { once: true });
+    loader?.waitingForDocument?.(script);
+  } else initialize();
+})();
+
+})();

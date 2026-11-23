@@ -81,6 +81,9 @@ test('native Work explains the full count and updates the live count for matchin
   const programs = current.filter(route => route.route_kind === 'network_program');
   const companies = new Set([...named, ...programs].map(route => route.company_id));
   const totalText = `${named.length} named listings · ${programs.length} networks and programs · ${companies.size} companies`;
+  const hourlyNamed = named.filter(route => route.pay_terms?.hourly_comparable);
+  const hourlyPrograms = programs.filter(route => route.pay_terms?.hourly_comparable);
+  const hourlyCompanies = new Set([...hourlyNamed, ...hourlyPrograms].map(route => route.company_id));
   const sections = page.locator('.work-section-disclosure');
   const jump = sections.getByText('Jump to section', { exact: true });
   const totals = sections.locator('.work-page-counts');
@@ -115,7 +118,9 @@ test('native Work explains the full count and updates the live count for matchin
   const pay = page.getByRole('combobox', { name: 'Pay unit' });
   await pay.selectOption('hourly');
   await expect(count).toHaveText(hourlyCount);
-  await expect(totals).toMatchAriaSnapshot(`- paragraph: ${totalText}`);
+  await expect(totals).toHaveText(new RegExp(`^${hourlyNamed.length} named listings · ${hourlyPrograms.length} network.* · ${hourlyCompanies.size} companies$`));
+  await expect(sections.locator('[data-work-jump=named]')).toHaveText(`Named listings ${hourlyNamed.length}`);
+  await expect(page.locator('#named [data-work-group-count]')).toHaveText(String(hourlyNamed.length));
   await jump.press('Space');
   await expect(totals).toBeHidden();
   await expect(count).toHaveText(hourlyCount);
@@ -123,11 +128,21 @@ test('native Work explains the full count and updates the live count for matchin
   const search = page.getByRole('searchbox', { name: 'Search listings' });
   await search.fill('Sage');
   await expect(count).toHaveText('1 matching record');
+  await jump.press('Enter');
+  await expect(sections.getByRole('link')).toHaveCount(1);
+  await expect(sections.getByRole('link')).toHaveText(/ 1$/);
   await search.fill('unfindable-work-record-fixture');
   await expect(count).toHaveText('0 matching records');
+  await expect(sections).toBeHidden();
   await expect(page.locator('[data-work-empty]')).toContainText('No records match.');
   await page.getByRole('button', { name: 'Clear search and filters' }).click();
   await expect(count).toHaveText(fullCount);
+  await expect(totals).toBeVisible();
+  await page.getByRole('link', { name: 'Compare results' }).click();
+  await expect(page.locator('[data-work-comparison]')).toBeVisible();
+  await expect(sections).toBeHidden();
+  await page.goBack();
+  await expect(sections).toBeVisible();
 
   const noScript = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1024, height: 600 } });
   try {
@@ -148,6 +163,42 @@ test('native Work explains the full count and updates the live count for matchin
   } finally {
     await noScript.close();
   }
+});
+
+test('native Work restores the open section disclosure on cold Back from Compare', async ({ page }) => {
+  await page.addInitScript(() => {
+    if (location.pathname === '/work/') addEventListener('unload', () => {});
+  });
+  const listings = '/work/?pay=hourly';
+  const sections = page.locator('.work-section-disclosure');
+  const totals = sections.locator('[data-work-section-totals]');
+  const compare = page.getByRole('link', { name: 'Compare results' });
+  await page.goto(listings);
+  await expect(compare).toBeVisible();
+  await expect(totals).toBeHidden();
+  await sections.getByText('Jump to section', { exact: true }).press('Enter');
+  await expect(totals).toBeVisible();
+  const hourlyTotals = await totals.innerText();
+  await compare.press('Enter');
+  await expect(page).toHaveURL(`${listings}&view=compare`);
+  await expect(page.locator('[data-work-comparison]')).toBeVisible();
+  await expect(sections).toBeHidden();
+
+  await page.goBack();
+  await expect(page).toHaveURL(listings);
+  await expect(compare).toBeFocused();
+  expect(await page.evaluate(() => performance.getEntriesByType('navigation')[0]?.type)).toBe('back_forward');
+  await expect(sections).toHaveJSProperty('open', true);
+  await expect(totals).toBeVisible();
+  await expect(totals).toHaveText(hourlyTotals);
+
+  await sections.getByText('Jump to section', { exact: true }).press('Space');
+  await expect(totals).toBeHidden();
+  await compare.press('Enter');
+  await expect(page.locator('[data-work-comparison]')).toBeVisible();
+  await page.goBack();
+  await expect(compare).toBeFocused();
+  await expect(sections).toHaveJSProperty('open', false);
 });
 
 test('native Work shows the complete first role and hourly rate on the first screen', async ({ page, request }) => {

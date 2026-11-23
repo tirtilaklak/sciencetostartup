@@ -34,7 +34,9 @@
  .method-page{padding-top:20px}
  .static-page .method-intro h1{font-size:2.25rem}
  .method-intro p{font-size:1rem}
- .method-contact{display:block;margin-bottom:24px}
+ .method-contact{flex-direction:column;align-items:flex-start;margin-bottom:24px}
+ .method-contact>a{max-width:100%;overflow-wrap:anywhere}
+ .method-contact>.ext::after{flex:none}
  .method-contact p{font-size:.8125rem}
  .method-detail>summary{min-height:60px;padding:17px 0;font-size:.9375rem}
  .method-detail-body{padding-bottom:20px}

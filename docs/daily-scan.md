@@ -69,3 +69,20 @@ keeps the last passing scan live and records the precise reason.
 
 The daily local Codex automation targets 08:00 America/Los_Angeles. It requires
 the Codex host to be available; delayed runs retain their actual selection date.
+
+## Production monitoring
+
+The GitHub Actions quality monitor is scheduled for 07:17 UTC, which is 23:17
+Pacific Standard Time on the preceding date or 00:17 Pacific Daylight Time.
+GitHub may start scheduled runs later. The check uses the actual time and
+allows four hours after the 08:00 Pacific target. Before noon Pacific,
+yesterday's selection is due. At noon Pacific, today's selection is due.
+
+The check reads the public Daily page, archive index, and both feeds. The newest
+selection date must agree across all four. The `daily-health` job fails if
+the edition is overdue or the endpoints disagree or cannot be verified. Its
+artifact contains `daily-health.json` with the expected date and each endpoint's
+result. The report distinguishes a stale edition, a date mismatch, a future date,
+a fetch failure and a parse failure.
+Run `python3 .github/scripts/check_daily_health.py` for a live check on demand.
+Editorial review and publication use the workflow above.

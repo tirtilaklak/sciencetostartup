@@ -55,6 +55,24 @@ test.afterEach(async ({}, info) => {
 test.describe('research without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
+  test('correction evidence links have separate tap targets on narrow screens', async ({ page }) => {
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: 720 });
+      await page.goto('/research/corrections/');
+      const evidence = page.locator('.r-correction-evidence').filter({ has: page.locator('li + li') }).first();
+      await evidence.scrollIntoViewIfNeeded();
+      const boxes = await evidence.getByRole('link').evaluateAll(links =>
+        links.map(link => link.getBoundingClientRect().toJSON()));
+      expect(boxes.length).toBeGreaterThan(1);
+      for (const [index, box] of boxes.entries()) {
+        expect(box.height).toBeGreaterThanOrEqual(44);
+        expect(box.left).toBeGreaterThanOrEqual(0);
+        expect(box.right).toBeLessThanOrEqual(width);
+        if (index) expect(box.top - boxes[index - 1].bottom).toBeGreaterThanOrEqual(8);
+      }
+    }
+  });
+
   test('hub opens all twelve complete native chapters without JavaScript', async ({ page }) => {
     await page.goto('/research/');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('AI data research');

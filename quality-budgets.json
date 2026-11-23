@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "policyId": "field-guide-research-book-budgets-2026-11-18",
+  "policyId": "field-guide-research-book-budgets-2026-11-23",
   "performance": {
     "lighthouseVersion": "13.6.0",
     "playwrightVersion": "1.65.0",
@@ -57,11 +57,8 @@
       "maximumGzipBytes": 12288,
       "runtime": "home-runtime.js",
       "maximumRuntimeGzipBytes": 5120,
-      "heroVariants": [
-        { "role": "mobile", "path": "assets/human-depth-portrait-400.webp", "maximumBytes": 150000 },
-        { "role": "desktop", "path": "assets/human-depth-portrait-600.webp", "maximumBytes": 250000 }
-      ],
-      "maximumSelectedMobileHeroBytes": 150000
+      "heroVariants": [],
+      "maximumSelectedMobileHeroBytes": 0
     },
     "requireManifestCoverage": true,
     "verifyAllManifestDigests": true

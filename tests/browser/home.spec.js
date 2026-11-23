@@ -5,17 +5,19 @@ const work = require('../../data/work-routes.json');
 const promotionId = release.homepage.work_candidate_route_ids[0];
 const promotion = work.routes.find(row => row.id === promotionId);
 const approved = promotion.editorial_review.receipts.find(row => row.id === promotion.editorial_review.approved_terms_receipt_id);
+const listing = promotion.editorial_review.actions.find(action => action.purpose === 'description');
 const reviewed = Date.parse(approved.checked_at);
 const day = 86_400_000;
 const expires = reviewed + release.publication_policy.homepage_work_max_age_days * day;
-const recordedProgram = '[data-recorded-program="snorkel_ai.work.expert-community"]';
+const recordedProgram = '[data-recorded-program="invisible.work.meridial-network"]';
 
-test('home shows both dated sources before the phone portrait and aligns the desktop records', async ({ page }) => {
+test('home shows dated evidence from different companies and explains its methods', async ({ page }) => {
+  await page.clock.setFixedTime(new Date(expires));
   for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 720 }]) {
     await page.setViewportSize(viewport);
     await page.goto('/');
     await page.evaluate(() => document.fonts.ready);
-    const heading = page.getByRole('heading', { level: 1, name: 'AI training data', exact: true });
+    const heading = page.getByRole('heading', { level: 1, name: 'Who makes AI training data?', exact: true });
     await expect(heading).toBeInViewport({ ratio: 1 });
     const company = page.locator('[data-observation="snorkel_ai.metric.major-growth_metrics-0"]');
     await expect(company).toContainText('$375M annualized revenue run rate');
@@ -25,25 +27,32 @@ test('home shows both dated sources before the phone portrait and aligns the des
     const companySource = company.getByRole('link', { name: 'Original disclosure' });
     await expect(companySource).toBeInViewport({ ratio: 1 });
     const program = page.locator(recordedProgram);
-    await expect(program).toContainText('Pay set by project');
+    await expect(program).toContainText('Pay agreed before project');
     await expect(program.locator('time')).toHaveAttribute('datetime', '2026-10-28');
     await expect(program.getByRole('link', { name: 'Read recorded terms' }))
-      .toHaveAttribute('href', '/company/snorkel_ai/#snorkel_ai.work.expert-community');
+      .toHaveAttribute('href', '/company/invisible/#invisible.work.meridial-network');
     await expect(program.getByRole('link', { name: 'Official program page' })).toBeInViewport({ ratio: 1 });
     await expect(page.locator('.hero-actions a[href="/companies/"]')).toBeInViewport({ ratio: 1 });
     await expect(page.locator('.hero-actions a[href="/work/"]')).toBeInViewport({ ratio: 1 });
     await expect(page.locator('.hero-actions a[href="/research/"]')).toBeInViewport({ ratio: 1 });
     await expect(page.locator('a[href="/research/data/"]')).toHaveCount(1);
-    await expect(page.locator('.proof-strip p').first()).toHaveText('55 companies');
+    await expect(page.locator('.proof-strip p')).toHaveText(['55 company profiles', `${release.counts.work_routes} listings and programs`]);
+    const methods = page.getByRole('region', { name: 'Sources and methods' });
+    await expect(methods.getByRole('link', { name: 'Read the methods' })).toHaveAttribute('href', '/method/#method-notes');
+    await expect(page.locator('img[src*="human-depth-portrait"]')).toHaveCount(0);
 
     const workBox = await program.boundingBox();
-    const portraitBox = await page.locator('.hero-visual').boundingBox();
-    expect(portraitBox.y).toBeGreaterThanOrEqual(workBox.y + workBox.height);
-    expect((await heading.boundingBox()).x).toBeCloseTo((await company.boundingBox()).x, 0);
+    const companyBox = await company.boundingBox();
+    expect((await heading.boundingBox()).x).toBeCloseTo(companyBox.x, 0);
+    expect((await methods.boundingBox()).y).toBeGreaterThanOrEqual(workBox.y + workBox.height);
+    if (viewport.width > 600) expect(workBox.y).toBeCloseTo(companyBox.y, 0);
   }
+  await page.getByRole('link', { name: 'Read the methods' }).click();
+  await expect(page).toHaveURL(/\/method\/#method-notes$/);
+  await expect(page.getByRole('heading', { name: 'How figures are shown' })).toBeVisible();
 });
 
-test('both directory actions fit on one row on narrow phones', async ({ page }) => {
+test('all three destinations fit on one row on narrow phones', async ({ page }) => {
   for (const width of [320, 360, 375]) {
     await page.setViewportSize({ width, height: 720 });
     await page.goto('/');
@@ -57,14 +66,19 @@ test('both directory actions fit on one row on narrow phones', async ({ page }) 
     await expect(research).toBeInViewport({ ratio: 1 });
     const first = await companies.boundingBox();
     const second = await work.boundingBox();
+    const third = await research.boundingBox();
     expect(second.y).toBeCloseTo(first.y, 0);
+    expect(third.y).toBeCloseTo(first.y, 0);
     expect(second.x).toBeGreaterThanOrEqual(first.x + first.width);
-    expect(second.x + second.width).toBeLessThanOrEqual(width);
-    expect(Math.min(first.height, second.height)).toBeGreaterThanOrEqual(48);
+    expect(third.x).toBeGreaterThanOrEqual(second.x + second.width);
+    expect(third.x + third.width).toBeLessThanOrEqual(width);
+    expect(Math.min(first.height, second.height, third.height)).toBeGreaterThanOrEqual(48);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
   }
 });
 
 test('home promotes only approved current terms and retains all binding conditions', async ({ page }, info) => {
+  expect(promotionId).toBe('g2i.work.senior-swe-training-7c54f48a');
   const example = page.locator('#home-work-example [data-home-route]');
   for (const timestamp of [reviewed, expires - 1]) {
     await page.clock.setFixedTime(new Date(timestamp));
@@ -72,13 +86,21 @@ test('home promotes only approved current terms and retains all binding conditio
     await expect(example).toHaveAttribute('data-home-route', promotionId);
   }
   await expect(example.locator('.example-pay')).toHaveText(promotion.pay_label);
-  await expect(example.locator('.example-conditions li')).toHaveText([
-    'Remote · country rules vary by project', ...promotion.requirements,
-    promotion.assessment, promotion.hours, promotion.duration,
-  ]);
+  await expect(example.locator('.example-summary')).toHaveText(promotion.geography);
+  await expect(example.getByRole('link', { name: 'Full work record' }))
+    .toHaveAttribute('href', `/company/${promotion.company_id}/#${promotionId}`);
+  await expect(example.getByRole('link', { name: /Original listing/ })).toHaveAttribute('href', listing.url);
   await expect(example.locator('time')).toHaveAttribute('datetime', approved.checked_on);
-  await expect(example.getByRole('link', { name: /Official program page/ })).toHaveAttribute('href', promotion.url);
-  await expect(page.locator('.example-grid article')).toHaveCount(2);
+  await expect(page.locator(recordedProgram)).toBeHidden();
+  await expect(page.locator('.example-grid article:visible')).toHaveCount(2);
+  await example.locator('summary').click();
+  await expect(example.locator('q')).toBeVisible();
+  await expect(example.locator('q')).toHaveText(promotion.source_quote);
+  await expect(example.locator('.example-conditions li')).toHaveText([
+    ...promotion.requirements, promotion.eligibility, promotion.assessment,
+    promotion.hours, promotion.duration, promotion.availability_note,
+  ]);
+  await example.locator('summary').click();
   await expect(page.locator('.hero').getByRole('link', { name: 'Companies' })).toBeVisible();
   await expect(page.locator('.hero').getByRole('link', { name: 'Paid work', exact: true })).toBeVisible();
   await info.attach(`home-entry-${info.project.name}.png`, {
@@ -87,11 +109,14 @@ test('home promotes only approved current terms and retains all binding conditio
 });
 
 test('three-day expiry withdraws stale examples and preserves evergreen browse', async ({ page }) => {
-  await page.clock.setFixedTime(new Date(expires));
-  await page.goto('/');
-  await expect(page.locator('#home-work-example')).toBeHidden();
-  await expect(page.locator('.hero-actions').getByRole('link', { name: 'Paid work', exact: true })).toBeVisible();
-  await expect(page.locator('.example-grid article')).toHaveCount(2);
+  for (const timestamp of [reviewed - 1, expires]) {
+    await page.clock.setFixedTime(new Date(timestamp));
+    await page.goto('/');
+    await expect(page.locator('#home-work-example')).toBeHidden();
+    await expect(page.locator(recordedProgram)).toBeVisible();
+    await expect(page.locator('.hero-actions').getByRole('link', { name: 'Paid work', exact: true })).toBeVisible();
+    await expect(page.locator('.example-grid article')).toHaveCount(2);
+  }
 });
 
 test('expiry moves focus from the promotion to the native Work link', async ({ page }) => {

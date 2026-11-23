@@ -1,5 +1,16 @@
 const { test, expect, firefox } = require('@playwright/test');
 
+test('Method correction actions remain separated on narrow screens', async ({ page }) => {
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 720 });
+    await page.goto('/method/#corrections');
+    const contact = page.getByRole('complementary', { name: 'Corrections' });
+    const github = await contact.getByRole('link', { name: 'Submit a correction on GitHub', exact: true }).boundingBox();
+    const email = await contact.getByRole('link', { name: 'Email a correction', exact: true }).boundingBox();
+    expect(email.y - (github.y + github.height)).toBeGreaterThanOrEqual(4);
+  }
+});
+
 test('Method correction contacts and the record link fit at Firefox minimum font sizes', async ({ browserName, baseURL }, info) => {
   test.skip(browserName !== 'firefox', 'Firefox provides a minimum font preference');
   test.setTimeout(120_000);

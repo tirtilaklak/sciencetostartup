@@ -164,10 +164,15 @@ test('Daily latest and bounded archives match complete committed snapshots and f
     await expect(page).toHaveTitle(new RegExp(edition.date.slice(0, 4)));
     await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute('href', '/daily/feed.xml');
     await expect(page.locator('link[rel="alternate"][type="application/feed+json"]')).toHaveAttribute('href', '/daily/feed.json');
-    await archiveToggle(page).click();
     const feeds = page.getByRole('navigation', { name: 'Follow Daily scan' });
-    await expect(feeds.getByRole('link', { name: 'RSS', exact: true })).toHaveAttribute('href', '/daily/feed.xml');
-    await expect(feeds.getByRole('link', { name: 'JSON Feed', exact: true })).toHaveAttribute('href', '/daily/feed.json');
+    const rss = feeds.getByRole('link', { name: 'RSS', exact: true });
+    const archive = page.locator('.scan-archive-disclosure');
+    await expect(archive).toHaveJSProperty('open', false);
+    await expect(rss).toBeVisible();
+    await expect(rss).toHaveAttribute('href', '/daily/feed.xml');
+    await expect(page.locator('.scan-issue')).toHaveAttribute('datetime', edition.date);
+    await archiveToggle(page).click();
+    await expect(archive.getByRole('link', { name: 'JSON Feed', exact: true })).toHaveAttribute('href', '/daily/feed.json');
     await openFilters(page);
     await expect(page.locator('.scan-controls')).toBeVisible();
     await assertContent(page, edition);
@@ -684,7 +689,7 @@ classicFirefox.describe('Daily classic Firefox history', () => {
 
 test('Daily shows the complete first headline on the first screen', async ({ page }) => {
   const first = latest.items[0];
-  for (const [width, height] of [[320, 720], [390, 844], [1024, 600]]) {
+  for (const [width, height] of [[320, 640], [390, 844], [1024, 600]]) {
     await test.step(`${width} × ${height}`, async () => {
       await page.setViewportSize({ width, height });
       await page.goto('/daily/');
@@ -707,8 +712,9 @@ test('Daily shows the complete first headline on the first screen', async ({ pag
         expect(line.bottom, JSON.stringify(lines)).toBeLessThanOrEqual(height);
         expect(line.right, JSON.stringify(lines)).toBeLessThanOrEqual(width);
       }
-      await expect(page.getByRole('link', { name: 'RSS', exact: true })).toBeHidden();
-      await expect(archiveToggle(page)).toBeVisible();
+      await expect(page.locator('.scan-issue')).toBeInViewport({ ratio: 1 });
+      await expect(page.getByRole('link', { name: 'RSS', exact: true })).toBeInViewport({ ratio: 1 });
+      await expect(archiveToggle(page)).toBeInViewport({ ratio: 1 });
       const compact = width <= 600;
       const fields = [page.getByRole('searchbox', { name: 'Search', exact: true }), page.getByLabel('Snapshot date')];
       for (const field of fields) {
@@ -972,13 +978,14 @@ test.describe('Daily without JavaScript', () => {
     const archiveSummary = archiveToggle(page);
     const feeds = navigation.getByRole('navigation', { name: 'Follow Daily scan' });
     const rss = feeds.getByRole('link', { name: 'RSS', exact: true });
-    const json = feeds.getByRole('link', { name: 'JSON Feed', exact: true });
+    const json = navigation.locator('.scan-archive-disclosure').getByRole('link', { name: 'JSON Feed', exact: true });
     await expect(rss).toHaveAttribute('href', '/daily/feed.xml');
     await expect(json).toHaveAttribute('href', '/daily/feed.json');
     await archiveSummary.focus();
     await page.keyboard.press('Enter');
     await expect(archive).toBeHidden();
-    await expect(rss).toBeHidden();
+    await expect(rss).toBeVisible();
+    await expect(json).toBeHidden();
     await page.keyboard.press('Enter');
     await expect(archive).toBeVisible();
     await rss.focus();

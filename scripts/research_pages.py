@@ -8,6 +8,7 @@ coordinator calls these two public functions from the ordinary static build.
 """
 from __future__ import annotations
 
+from collections import Counter
 from pathlib import Path
 from datetime import date, datetime, timedelta, timezone
 from email.utils import format_datetime
@@ -28,6 +29,8 @@ from research_operating_status import with_operating_status, operating_status_no
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = "/research/state-of-ai-data-labs/"
+REPORT_DESCRIPTION = ("Research on AI training data and human feedback. Find the sources behind supplier claims "
+                      "and learn how to evaluate a paid pilot.")
 CORRECTIONS_PATH = "/research/corrections/"
 LEDGER_BUCKETS = "0123456789abcdef"
 SOURCE_ANCHORS = "data/research-source-anchors.json"
@@ -503,10 +506,11 @@ def _hub(context, editions=()):
             '<aside class="r-report-card" aria-label="Current research report">'
             f'<h2>{sp.escape(report["title"])}</h2>'
             f'<p>{len(report["sections"])} chapters on suppliers, human feedback, research methods and paid pilots.</p>'
-            f'{_link(REPORT_PATH, "Read the report →", "r-button")}</aside></header>'
-            '<section class="r-section" aria-labelledby="browse"><div class="r-section-head">'
-            '<h2 id="browse">Browse the research</h2>'
-            f'{_link("/research/data/", "Sources & downloads →", "r-text-link")}</div>' + _browse(context) + '</section>'
+            '<div class="r-report-actions">'
+            f'{_link(REPORT_PATH, "Read the report →", "r-button")}'
+            f'{_link("/research/data/", "Data & sources", "r-text-link")}</div></aside></header>'
+            '<section class="r-section" aria-labelledby="browse">'
+            '<h2 id="browse">Browse the research</h2>' + _browse(context) + '</section>'
             + operating_status_notice(context) +
             '<section class="r-section r-hub-details" aria-label="Report details">'
             '<details class="r-disclosure" id="chapters">'
@@ -1230,14 +1234,18 @@ def _ledger_pages(context, ledger_path='/research/data/'):
     return pages
 
 
-def _legacy_ledger_aliases(assertions, stubs, sources, retired):
+def _legacy_ledger_aliases(assertions, stubs, sources, retired, *, compact):
     # Only ID + native destination are retained at old root fragments. Scientific
     # wording, receipts, locators and source dossiers live on the bounded pages.
+    def label(kind, stable_id):
+        text = 'Open earlier assertion bookmark' if stable_id in retired else 'Open ' + kind + ' record'
+        return text if compact else sp.escape(text + ': ' + stable_id)
+
     return ('<div class="r-legacy-ledger-aliases">' + ''.join(
         '<a id="' + sp.escape(_anchor(kind, stable_id))
         + '" href="' + sp.escape(_evidence_url(kind, stable_id).removeprefix('/research/data/')) + '">'
-        + sp.escape(('Open earlier assertion bookmark: ' if stable_id in retired else 'Open ' + kind + ' record: ') + stable_id)
-        + '</a>' for kind, ids in (('assertion', sorted(assertions.keys() | stubs.keys() | retired)), ('source', sorted(sources)))
+        + label(kind, stable_id) + '</a>'
+        for kind, ids in (('assertion', sorted(assertions.keys() | stubs.keys() | retired)), ('source', sorted(sources)))
         for stable_id in ids) + '</div>')
 
 
@@ -1394,7 +1402,8 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
             + _ledger_parts('source', sources)
             + '</section><section class="r-section" aria-labelledby="organizations"><h2 id="organizations">Organizations & other entities</h2>'
             + f'<ul class="r-entity-register">{entity_rows}</ul></section>'
-            + _legacy_ledger_aliases(assertions, stubs, sources, retired))
+            + _legacy_ledger_aliases(assertions, stubs, sources, retired,
+                                     compact=context.get('_legacy_current_bookmarks', False)))
 
 
 def _entity_card(context, entity):
@@ -1867,17 +1876,32 @@ def _corrections_page(context, rows):
             + _link(CORRECTIONS_PATH + 'atom.xml', 'Subscribe with Atom') + '</p>')
     if not rows:
         return body + '<section class="r-section"><h2>No corrections recorded</h2><p>No accepted or published research corrections are recorded.</p></section>'
+    titles_by_url = {}
+    for source in _ledger_records(context)[2].values():
+        if source.get('url') and source.get('title'):
+            titles_by_url.setdefault(source['url'], set()).add(source['title'])
+    source_titles = {url: next(iter(titles)) for url, titles in titles_by_url.items() if len(titles) == 1}
     for row in rows:
         stamp = row['instant'].isoformat().replace('+00:00', 'Z')
+        replacement = row.get('replacement_claim_id')
+        replacement_path = _evidence_url('assertion', replacement) if replacement else ''
+        evidence_labels = {}
+        if replacement:
+            label = 'Approved replacement claim ' + replacement
+            evidence_labels[sp.ORIGIN + replacement_path] = label
+            evidence_labels[sp.ORIGIN + '/research/data/#' + _token(_anchor('assertion', replacement))] = label
+        links = [(url, evidence_labels.get(url, source_titles.get(url, url))) for url in row['evidence_urls']]
+        label_counts = Counter(label for _, label in links)
+        evidence = ''.join('<li>' + _link(url, label if label_counts[label] == 1 else url) + '</li>'
+                           for url, label in links)
         body += (f'<article class="r-source" id="{sp.escape("correction-" + row["id"])}"><h2>'
                  + _link(_correction_url(row), 'Correction for ' + row['claim_id']) + '</h2><dl class="r-facts">'
                  f'<dt>Status</dt><dd>{sp.escape(row["status"].capitalize())}</dd>'
                  f'<dt>Edition</dt><dd>{sp.escape(row["edition_id"])}</dd>'
                  '<dt>Claim</dt><dd>' + _link(_evidence_url('assertion', row['claim_id']), row['claim_id']) + '</dd>'
-                 + ('<dt>Approved replacement</dt><dd>' + _link(_evidence_url('assertion', row['replacement_claim_id']), row['replacement_claim_id']) + '</dd>' if row.get('replacement_claim_id') else '') +
+                 + ('<dt>Approved replacement</dt><dd>' + _link(replacement_path, replacement) + '</dd>' if replacement else '') +
                  f'<dt>Corrected</dt><dd><time datetime="{stamp}">{stamp}</time></dd></dl>'
-                 '<h3>Supporting evidence</h3><ul>'
-                 + ''.join('<li>' + _link(url, url) + '</li>' for url in row['evidence_urls']) + '</ul>'
+                 f'<h3>Supporting evidence</h3><ul class="r-correction-evidence">{evidence}</ul>'
                  + '<details class="r-disclosure"><summary>Review notes</summary><p>' + sp.escape(row['summary']) + '</p></details></article>')
     return body
 
@@ -2025,7 +2049,7 @@ def write_research_pages(output, context):
     download_sizes = {url: file.stat().st_size for url in DATA_JSON_DOWNLOADS
                       if (file := output / url.lstrip('/')).is_file()}
     pages = [("/research/", "AI data research", "Papers and datasets on AI training, with evidence about the suppliers.", _hub(context, editions), "CollectionPage", None),
-             (REPORT_PATH, context["report"]["title"], context["report"].get("summary", "Research methods and findings."), _report(context), "Book", None),
+             (REPORT_PATH, context["report"]["title"], REPORT_DESCRIPTION, _report(context), "Book", None),
              ("/research/data/", "Research data and sources", "Download the research data or look up a finding and its sources.", _data(context, download_sizes=download_sizes), "CollectionPage", None),
              ("/review/", "Review & correct the research", "Contribute a source-backed correction, scoped review, or public reuse of ScienceToStartup research.", _review(context), "WebPage", None),
              (CORRECTIONS_PATH, "Research corrections", "Accepted research corrections, with affected editions, claims, correction dates and supporting evidence.", _corrections_page(context, corrections), "CollectionPage", None)]
@@ -2108,8 +2132,8 @@ def write_research_pages(output, context):
     return records
 
 
-def research_search_entries(context):
-    """Compact local-search records; candidate wording never enters summaries."""
+def research_search_entries(context, *, include_published_editions=False):
+    """Build search records, verifying the edition ledger when indexing DOI results."""
     entries = [
         {"title": "AI data research", "summary": "Papers and datasets on AI training, with evidence about the suppliers.", "url": "/research/", "kind": "research", "keywords": "AI data labs human feedback evidence"},
         {"title": context["report"]["title"], "summary": _status(context) + ". Twelve chapters of methods, historical examples, and research gaps.", "url": REPORT_PATH, "kind": "report", "keywords": "human feedback RLHF annotation suppliers methods"},
@@ -2117,6 +2141,15 @@ def research_search_entries(context):
         {"title": "Review the research", "summary": "Submit a correction or a chapter review. Share where you used the data.", "url": "/review/", "kind": "review", "keywords": "correction contribute review reuse"},
         {"title": "Research corrections", "summary": "Accepted corrections with affected editions, claims, correction dates and source evidence.", "url": CORRECTIONS_PATH, "kind": "review", "keywords": "corrections errata RSS Atom evidence"},
     ]
+    editions = _published_editions(context) if include_published_editions else ()
+    for path, snapshot in editions:
+        report = snapshot["report"]
+        doi = report.get("archive", {}).get("doi")
+        if doi:
+            edition_date = path.rstrip("/").rsplit("/", 1)[-1][:10]
+            entries.append({"title": report["title"] + " · " + sp.format_date(edition_date) + " edition",
+                            "summary": "Published edition and original citation.",
+                            "url": path, "kind": "report", "keywords": "", "identifiers": [doi]})
     for index, section in enumerate(context['report']['sections'][1:], 2):
         entries.append({"title": section['title'], "summary": _status(context) + '. Chapter ' + str(index) + ' of ' + context['report']['title'] + '.',
                         "url": _reader_path(section), "kind": "report", "keywords": section['id'].replace('-', ' ')})

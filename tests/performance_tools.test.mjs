@@ -125,7 +125,7 @@ async function fixture(t) {
   const webp = Buffer.alloc(32);
   webp.write('RIFF', 0); webp.writeUInt32LE(24, 4); webp.write('WEBP', 8);
   const files = {
-    'index.html': '<!doctype html><picture><source srcset="/assets/human-depth-portrait-400.webp 400w, /assets/human-depth-portrait-600.webp 600w"><img src="/assets/human-depth-portrait-400.webp"></picture><script src="/home-runtime.js"></script>',
+    'index.html': '<!doctype html><script src="/home-runtime.js"></script>',
     'explore/index.html': '<!doctype html><script id="research-data" type="application/json">{"claims":[],"sources":[],"raw_inputs":[]}</script><script src="/js/data.12345678.js"></script><script src="/js/app.87654321.js"></script>',
     'work/index.html': '<!doctype html><p>Browse work</p>',
     'home-runtime.js': 'console.log("small runtime");',
@@ -173,7 +173,8 @@ test('fixed gates retain the approved limits across field-guide and research rou
   assert.equal(policy.payload.bootstrap.maximumGzipBytes, 360 * 1024);
   assert.equal(policy.payload.home.maximumGzipBytes, 12 * 1024);
   assert.equal(policy.payload.home.maximumRuntimeGzipBytes, 5 * 1024);
-  assert.deepEqual(policy.payload.home.heroVariants.map(row => row.maximumBytes), [150000, 250000]);
+  assert.deepEqual(policy.payload.home.heroVariants, []);
+  assert.equal(policy.payload.home.maximumSelectedMobileHeroBytes, 0);
 });
 
 test('median does not convert missing or invalid measurements to passing zeros', () => {
@@ -312,6 +313,15 @@ test('payload checks sum independently compressed HTTP files and pass a valid ma
   assert.equal(report.budgetsSha256, policySha256);
 });
 
+test('homepage fails the payload gate if it references the removed portrait', async t => {
+  const f = await fixture(t);
+  f.files['index.html'] += '<img src="/assets/human-depth-portrait-400.webp">';
+  await f.save();
+  const report = await checkPayloadBudgets({dist: f.directory, budgets: policy});
+  assert.equal(report.passed, false);
+  assert(report.problems.includes('Home references a removed portrait asset: assets/human-depth-portrait-400.webp'));
+});
+
 test('manifest validation rejects byte changes and unlisted assets', async t => {
   const f = await fixture(t);
   await writeFile(path.join(f.directory, 'home-runtime.js'), 'changed after build');
@@ -330,7 +340,7 @@ test('full canonical graph fails even when its raw input slot is empty', async t
   assert(report.problems.includes('Complete canonical claim/source graph is embedded in bootstrap'));
 });
 
-test('mobile hero records report the actually selected variant and uncompressed bytes', () => {
+test('mobile hero records flag bytes spent on the removed portrait even when manifested', () => {
   const artifact = {manifest: {sha256: {'assets/human-depth-portrait-600.webp': 'digest'}}};
   const lhr = {audits: {'network-requests': {details: {items: [{
     url: 'http://localhost/assets/human-depth-portrait-600.webp', resourceSize: 102940, transferSize: 103100,
@@ -339,7 +349,7 @@ test('mobile hero records report the actually selected variant and uncompressed 
   assert.equal(hero.path, 'assets/human-depth-portrait-600.webp');
   assert.equal(hero.manifested, true);
   assert.equal(hero.resourceBytes, 102940);
-  assert.equal(hero.maximumBytes, 150000);
+  assert.equal(hero.maximumBytes, 0);
 });
 
 test('served-artifact preflight compares decoded gzip bytes with the frozen manifest', async t => {

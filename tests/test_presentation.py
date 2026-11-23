@@ -138,6 +138,18 @@ const source=fs.readFileSync(process.argv[2],'utf8');
             self.assertEqual(promotion_candidates({"routes": [{**route, **update}]}, release), [], update)
         self.assertEqual(route["editorial_review"]["receipts"], [receipt])
 
+    def test_failed_listing_description_check_withdraws_promotion(self):
+        work = json.loads((ROOT / "data/work-routes.json").read_text())
+        route_id = "g2i.work.senior-swe-training-7c54f48a"
+        route = next(item for item in work["routes"] if item["id"] == route_id)
+        review = route["editorial_review"]
+        description = next(action for action in review["actions"] if action["purpose"] == "description")
+        release = {"homepage": {"work_candidate_route_ids": [route_id]}}
+        self.assertEqual(promotion_candidates(work, release)[0]["route"]["id"], route_id)
+        review["receipts"].append({"scope": "retrieval", "result": "not_found", "checked_on": "2026-11-23",
+                                   "source_id": description["source_id"]})
+        self.assertEqual(promotion_candidates(work, release), [])
+
     def test_exactly_two_validated_prior_generations_are_retained(self):
         with tempfile.TemporaryDirectory() as temporary:
             destination = Path(temporary)

@@ -205,18 +205,15 @@ def operating_status_notice(context):
     target = datetime.combine(status.next_edition_date, time(9), _PACIFIC)
     target_iso = target.isoformat()
     target_label = _label(status.next_edition_date) + " at 9:00 a.m. Pacific"
-    if status.state == "held":
-        heading = "Next edition delayed"
-        message = (f'The edition scheduled for <time datetime="{target_iso}">{target_label}</time> '
-                   "was delayed. " + " ".join(REASONS[code] for code in status.reason_codes))
-    else:
-        heading = "Next edition preparation"
-        message = f'The next edition was being prepared for <time datetime="{target_iso}">{target_label}</time>.'
+    state = "the scheduled edition was delayed" if status.state == "held" else "the next edition was in preparation"
+    reasons = " ".join(REASONS[code] for code in status.reason_codes)
     observed_iso = status.observed_on.isoformat().replace("+00:00", "Z")
-    observed_label = (_label(status.observed_on.date()) + " at "
-                      + status.observed_on.strftime("%H:%M:%S") + " UTC")
-    return ('<section class="r-section r-operating-status" aria-label="Edition update">'
-            f'<h2>{heading}</h2><p>{message}</p>'
-            f'<p>Latest published edition {_label(status.current_edition_date)} '
+    observed_day = _label(status.observed_on.date())
+    observed_label = observed_day + " at " + status.observed_on.strftime("%H:%M:%S") + " UTC"
+    return ('<details class="r-section r-disclosure r-operating-status">'
+            f'<summary>As of <time datetime="{observed_iso}">{observed_day}</time>, {state}.</summary>'
+            f'<p>The target was <time datetime="{target_iso}">{target_label}</time>.</p>'
+            + (f'<p>{reasons}</p>' if reasons else '')
+            + f'<p>Latest published edition {_label(status.current_edition_date)} '
             f'({escape(status.current_release_id)}).</p>'
-            f'<p class="r-meta">Status observed <time datetime="{observed_iso}">{observed_label}</time>.</p></section>')
+            f'<p class="r-meta">Status observed <time datetime="{observed_iso}">{observed_label}</time>.</p></details>')

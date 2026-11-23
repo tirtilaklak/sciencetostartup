@@ -8,6 +8,7 @@ import {fileURLToPath, pathToFileURL} from 'node:url';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const DEFAULT_BUDGETS = path.join(ROOT, 'quality-budgets.json');
+export const HOME_PORTRAIT = /(?:^|\/)assets\/human-depth-portrait-[^/?]+\.(?:webp|jpe?g)(?:[?#]|$)/i;
 export const sha256 = value => createHash('sha256').update(value).digest('hex');
 
 export function stableJSON(value) {
@@ -204,6 +205,11 @@ export async function checkPayloadBudgets({dist, budgets, budgetsSha256 = null})
   check('home.runtime.gzip', compressedSizes(runtimeBytes, compression).gzipBytes, configuration.home.maximumRuntimeGzipBytes, 'bytes');
   const homeReferences = resourceReferences(home, configuration.home.entry);
   const heroes = [];
+  if (!configuration.home.heroVariants.length) {
+    for (const {path: name} of homeReferences.filter(reference => HOME_PORTRAIT.test(reference.path))) {
+      problems.push('Home references a removed portrait asset: ' + name);
+    }
+  }
   for (const variant of configuration.home.heroVariants) {
     const bytes = await read(variant.path);
     const referenced = homeReferences.some(item => item.path === variant.path);
@@ -231,7 +237,7 @@ export async function checkPayloadBudgets({dist, budgets, budgetsSha256 = null})
       manifestedFiles: Object.keys(artifact.manifest.sha256).length, checkedResourceReferences: referenceCount},
     compression: {...compression, method: 'sum of independently compressed HTTP payloads', node: process.version, zlib: process.versions.zlib},
     bootstrap: {files: bootstrap, total}, heroes, checks, problems,
-    note: 'Variant references do not prove responsive selection. The mobile Lighthouse report records the actual requested hero and applies its mobile byte limit.',
+    note: 'The mobile Lighthouse report checks requests for the removed homepage portrait.',
   };
 }
 

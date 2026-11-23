@@ -60,6 +60,8 @@
 .r-report-card h2 a:hover{text-decoration:underline;text-decoration-thickness:1px}
 .r-report-card>p{font-size:14px;color:var(--r-quiet)}
 .r-report-card>.r-kicker{margin-bottom:12px}
+.r-report-actions{display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;margin-top:12px}
+.r-report-actions>.r-button{margin-top:0}
 .r-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;margin-top:12px;border:1px solid var(--r-accent);border-radius:3px;color:#fff;background:var(--r-accent);font-size:13px;font-weight:500;text-decoration:none}
 .r-button:hover{background:#193f2f}
 .r-text-link{display:inline-flex;align-items:center;min-height:44px;font-size:13px;font-weight:500;text-decoration:none;line-height:1.5}
@@ -93,6 +95,7 @@
 .r-disclosure[open]{padding-bottom:24px}
 .r-disclosure[open]>summary{margin-bottom:12px}
 .r-disclosure>.r-section-intro{font-size:14px}
+.r-section.r-operating-status{margin-bottom:24px;padding-top:0}
 .r-review-link{margin:24px 0 0;font-size:14px;color:var(--r-quiet)}
 .r-review-link a{display:inline-block;min-height:44px;padding-block:10px}
 .r-chapter-list{list-style:none;padding:0;margin:0;columns:2;column-gap:28px}
@@ -149,13 +152,12 @@
 .r-legacy-ledger-aliases>a:target{display:block;max-width:900px;min-height:44px;margin:24px 0;padding:20px;border-left:2px solid var(--r-accent);overflow-wrap:anywhere}
 .r-assertion,.r-assertion-stub,.r-source,.r-source-stub{max-width:900px;padding:24px 0;margin:0;border-bottom:1px solid var(--r-rule)}
 .r-assertion-stub:focus-visible{outline:2px solid var(--r-accent);outline-offset:4px}
-/* Every ledger record stays in the native document, including citations and
-   disclosures. Let the browser skip offscreen layout, while fragment targets,
-   find-in-page, keyboard focus and assistive technology can reveal any record. */
+/* Lay out every record in a bounded ledger part so native End uses the final
+   document height. Larger collections can still skip offscreen layout. */
 @supports(content-visibility:auto){
  @media screen{
-  .research:not(.r-company-supplement) .r-assertion,.research:not(.r-company-supplement) .r-source,.research:not(.r-company-supplement) .r-source-stub{content-visibility:auto;contain-intrinsic-block-size:auto 36rem}
-  .research:not(.r-company-supplement) .r-source,.research:not(.r-company-supplement) .r-source-stub{contain-intrinsic-block-size:auto 28rem}
+  .research:not(.r-company-supplement,:has(.r-ledger-nav)) :is(.r-assertion,.r-source,.r-source-stub){content-visibility:auto;contain-intrinsic-block-size:auto 36rem}
+  .research:not(.r-company-supplement,:has(.r-ledger-nav)) :is(.r-source,.r-source-stub){contain-intrinsic-block-size:auto 28rem}
   /* Resolve every preceding height before a native fragment or keyboard jump.
      This also preserves native Back/Forward positions across browser engines. */
   .research:has(:target) :is(.r-assertion,.r-source,.r-source-stub),.research:has(.r-assertion:focus-within,.r-source:focus-within,.r-source-stub:focus-within) :is(.r-assertion,.r-source,.r-source-stub){content-visibility:visible;contain-intrinsic-size:none}
@@ -173,6 +175,8 @@
 .r-correction-draft label{display:block;margin-bottom:12px}
 .r-correction-draft :is(input,textarea){display:block;box-sizing:border-box;width:100%;max-width:38rem;margin-top:4px;padding:6px 8px;border:1px solid var(--r-rule);border-radius:3px;background:var(--r-paper);color:inherit;font:inherit;font-size:16px}
 .r-correction-draft textarea{resize:vertical}
+.r-correction-evidence{display:grid;gap:8px;margin:0 0 12px;padding-inline-start:20px}
+.r-correction-evidence a{display:grid;align-items:center;min-height:44px;padding-block:6px;overflow-wrap:anywhere}
 .r-qualifications{font-size:13px;line-height:1.7;color:var(--r-quiet);padding-left:18px;margin-block:14px}
 .r-evidence-links{list-style:none;padding:0;margin:16px 0 0;font-size:13px;line-height:1.6}
 .r-evidence-links li{margin:0 0 12px}

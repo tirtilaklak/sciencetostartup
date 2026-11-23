@@ -140,11 +140,10 @@ See [the shared contract](docs/research/CONTRACT.md),
 [contribution policy](CONTRIBUTING.md). No reviewer invitations are sent by the
 implementation or daily preparation.
 
-The homepage introduces two equal journeys: understand AI data companies and find
-paid AI training work. Its portrait collage preserves all three faces in responsive
-WebP derivatives. Two examples show an offer-led company and a recently reviewed
-public work route; stale work promotion falls back to an approved program or an
-evergreen browse link. Without JavaScript the evergreen link remains available.
+The homepage links to company profiles and paid AI training work. Research has its
+own entry point. A dated company disclosure sits alongside a work listing for up to
+three days after its terms review. After the promotion expires or when JavaScript
+is disabled, the work card shows a dated network record.
 
 The interactive guide lives at `/explore/`; existing root hash links redirect there.
 A compact, versioned summary powers discovery. Company evidence loads on demand,

@@ -148,7 +148,7 @@ class PublicEntrypointTests(unittest.TestCase):
 
 
 class DeployedDistTests(unittest.TestCase):
-    """verify() must read the deployed files, not only the rebuilt manifest."""
+    """verify() checks the exact manifest bytes and all deployed payloads."""
     @classmethod
     def setUpClass(cls):
         cls.temp = tempfile.TemporaryDirectory(prefix="verify-dist-")
@@ -173,6 +173,14 @@ class DeployedDistTests(unittest.TestCase):
         result = json.loads(output.getvalue())
         self.assertEqual(result["status"], "passed")
         self.assertEqual(result["deployed_files"], result["payloads"] + 1)
+
+    def test_manifest_format_only_change_fails(self):
+        dist = self.deployed()
+        manifest = dist / "manifest.json"
+        original = manifest.read_bytes()
+        manifest.write_bytes(original + b"\n")
+        self.assertEqual(json.loads(manifest.read_bytes()), json.loads(original))
+        self.assertEqual(self.rejected(dist), "Rebuilt manifest differs from the checked-in public release.")
 
     def test_tampered_entrypoint_fails(self):
         dist = self.deployed()

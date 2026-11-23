@@ -1102,7 +1102,10 @@ def document(research, title, description, canonical, body, structured=None, cur
     head.append('<link rel="stylesheet" href="/static-pages.css">\n<link rel="stylesheet" href="/field-guide.css">\n<link rel="stylesheet" href="/page-layout.css">\n')
     if structured: head.append(f'<script type="application/ld+json">{json_ld(structured)}</script>\n')
     details_script = '<script src="/native-details.js" defer></script>\n' if re.search(r'class="[^"]*\b(?:company-dossier|method-page)\b', body) else ""
-    return "".join(head) + "</head>\n<body class=\"static-page\">\n" + site_header(current, state) + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + details_script + '</body>\n</html>\n'
+    search_exclusions = ("/research/editions/", "/research/data/assertions/", "/research/data/sources/")
+    search_script = ('<script src="/guide-search-shell.js" defer></script>\n'
+                     if canonical and not urlsplit(canonical).path.startswith(search_exclusions) else "")
+    return "".join(head) + "</head>\n<body class=\"static-page\">\n" + site_header(current, state) + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + details_script + search_script + '</body>\n</html>\n'
 
 # ---------------------------------------------------------------------------
 # Company pages
@@ -2089,12 +2092,12 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
     ) if present)
     count_label = plural(len(rows), "record") + (f", including {scope}" if scope else "")
     directory_counts = (
-        f'<p class="work-page-counts">{plural(named_count, "named listing")} <span>·</span> '
+        f'<p class="work-page-counts" data-work-section-totals>{plural(named_count, "named listing")} <span>·</span> '
         f'{plural(program_count, "network or program", "networks and programs")} <span>·</span> '
         f'{plural(open_companies, "company", "companies")}</p>'
     )
     export = work_results or {}
-    section_links = "".join(f'<li><a data-work-jump="{key}" href="#{key}">{escape(label)}</a></li>' for key, label, _ in groups if buckets[key])
+    section_links = "".join(f'<li><a data-work-jump="{key}" href="#{key}">{escape(label)} <span>{len(buckets[key])}</span></a></li>' for key, label, _ in groups if buckets[key])
     kind_options = "".join(f'<option value="{key}">{escape("Network/program" if key == "programs" else label)}</option>'
                            for key, label, _ in groups)
     engagement_filter_labels = {
@@ -2137,7 +2140,10 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
         common_kind = WORK_KIND_LABELS[work_kind(buckets[key][0])] if key in ("named", "programs", "boards") else ""
         kind_attr = f' data-work-kind-label="{escape(common_kind)}"' if common_kind else ""
         cards = work_table(research, buckets[key], names, key, include_kind=not common_kind, ordered_ids=ranked.get(key))
-        contents = f'<h2 id="{key}" tabindex="-1">{escape(label)}</h2>\n{fallback}' + (f'<p class="muted">{note}</p>\n' if note else '') + cards
+        label_html = escape(label)
+        if key in ("named", "programs"):
+            label_html += f' <span class="work-group-count" data-work-group-count>{len(buckets[key])}</span>'
+        contents = f'<h2 id="{key}" tabindex="-1">{label_html}</h2>\n{fallback}' + (f'<p class="muted">{note}</p>\n' if note else '') + cards
         if key in ("named", "programs"):
             body.append(f'<section class="work-page-group" data-work-group="{key}"{kind_attr}>{contents}</section>\n')
         else:
