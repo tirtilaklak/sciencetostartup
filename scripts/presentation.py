@@ -344,6 +344,11 @@ def source_updates_context(updates, company_id=None):
     context = updates.get("evidence_context") or {}
     result["evidence_context"] = {key: copy.deepcopy(value) for key, value in context.items() if key != "corrections"}
     result["evidence_context"]["corrections"] = [copy.deepcopy(row) for row in context.get("corrections", []) if company_id is not None and row.get("company_id") == company_id]
+    locations = {sid: {key: value for key, value in row.items() if key not in ("source_ids", "content_sha256")}
+                 for row in updates.get("source_locations", []) if row["company_id"] == company_id
+                 for sid in row["source_ids"]}
+    if locations:
+        result["source_locations"] = locations
     return result
 
 

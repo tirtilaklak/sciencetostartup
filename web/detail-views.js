@@ -102,11 +102,12 @@ function detail_claimConfidenceHTML(cl){
 }
 function detail_claimCitation(sid,finance,current){
  const health=window.BUSINESS_HEALTH,reviewed=profileReviewedSource(sid);
- const source=sources[sid]||reviewed;
+ const original=sources[sid]||reviewed,copy=profilePublisherCopy(original),source=copy||original;
  const check=current?.source_ids.includes(sid)&&health?.source_checks?.entries?.find(entry=>
   entry.source_id===sid&&entry.url===source.url&&entry.status==='content_checked');
  const meta=check?{...finance,source_checked_on:check.checked_on}:finance;
- return `<li data-source-id="${attr(sid)}">${external(source.url,(check&&reviewed?.title)||source.title)}<p class="sub">${esc(profileSourceMeta(source,meta))}</p>${source.notes?`<p class="sub">${esc(readableDate(publicText(source.notes.replaceAll('_',' '))))}</p>`:''}</li>`;
+ const mirror=copy?profileRecordedMirror(original):'';
+ return `<li data-source-id="${attr(sid)}">${external(source.url,(check&&reviewed?.title)||source.title)}<p class="sub">${esc(profileSourceMeta(source,meta))}</p>${mirror}${source.notes?`<p class="sub">${esc(readableDate(publicText(source.notes.replaceAll('_',' '))))}</p>`:''}</li>`;
 }
 function detail_showEvidence(id,group=[]){
  const cl=claims[id];if(!cl)return;
@@ -121,7 +122,8 @@ function detail_showEvidence(id,group=[]){
  const ms=DATA.metrics.filter(m=>m.claim_id===id),scope=calculation?.scope_detail||finance?.scope||estimate?.scope_label||[...new Set([scopeText(cl.segment_scope,cl.company_id),...(evidenceMetricScopes.get(id)||[])])].join(' · '),link=evidenceRecordLink(cl),others=group.filter(other=>other!==id&&claims[other]);
  const reviewedSources=current?.historical_source_ids?.length;
  const sourceIds=reviewedSources?observationSourceIds(current):cl.source_ids;
- const supplementaryCitation=supplement&&(!reviewedSources||!sourceIds.includes(supplement.id))?`<li data-source-id="${attr(supplement.id)}">${external(supplement.url,supplement.title)}<p class="sub">${esc(profileSourceMeta(supplement))}</p></li>`:'';
+ const duplicateSupplement=supplement&&sourceIds.some(sid=>profilePublisherCopy(sources[sid])?.url===supplement.url);
+ const supplementaryCitation=supplement&&!duplicateSupplement&&(!reviewedSources||!sourceIds.includes(supplement.id))?`<li data-source-id="${attr(supplement.id)}">${external(supplement.url,supplement.title)}<p class="sub">${esc(profileSourceMeta(supplement))}</p></li>`:'';
  const currentWording=calculation?.profile_statement||(current?.qualifier_reviewed_on?current.original_text:cl.statement);
  const citations=calculation?profileCalculationSources(calculation):`<ol class="sources-list">${supplementaryCitation}${sourceIds.map(sid=>detail_claimCitation(sid,finance?.source_id===sid?finance:null,current)).join('')}</ol>${!sourceIds.length?'<p>No current source is linked to this claim.</p>':''}${detail_sourceHistory(cl,current)}`;
  const caveats=calculation?[calculation.basis]:[...new Set([cl.caveat,...ms.map(m=>m.basis)].map(publicText))].filter(t=>t&&!publicText(cl.statement).includes(t));

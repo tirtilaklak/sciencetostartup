@@ -190,6 +190,78 @@ test('Market preserves the reading position on ordinary reload and Back', async 
   await expectReadingPosition();
 });
 
+const lateMarketLoads = [
+  ['reload', false], ['reload', true], ['back_forward', false], ['back_forward', true],
+];
+for (const [navigationType, scrollDuringLoad] of lateMarketLoads) {
+  const readingPosition = scrollDuringLoad ? 'current' : 'saved';
+  test(`Market retains the ${readingPosition} reading position after late native scroll on ${navigationType}`, async ({ page, browserName, isMobile }) => {
+    test.skip(browserName !== 'firefox' || isMobile, 'Firefox defers its native fragment scroll until pageshow');
+    const url = '/explore/#business-health';
+    const root = page.locator('html');
+    const currentScroll = () => page.evaluate(() => scrollY);
+    let releaseImage;
+    const held = new Promise(resolve => { releaseImage = resolve; });
+    await page.route('**/favicon-48.png?market-history-timing=1', async route => {
+      await held;
+      await route.continue();
+    });
+    await page.addInitScript(type => {
+      if (location.pathname !== '/explore/' || performance.getEntriesByType('navigation')[0]?.type !== type) return;
+      const observer = new MutationObserver(() => {
+        if (!document.body) return;
+        observer.disconnect();
+        const image = new Image();
+        image.hidden = true;
+        image.alt = '';
+        image.src = '/assets/favicon-48.png?market-history-timing=1';
+        document.body.append(image);
+      });
+      observer.observe(document, { childList: true, subtree: true });
+      addEventListener('pageshow', () => {
+        document.activeElement?.blur();
+        if (type === 'reload') document.getElementById('business-health').scrollIntoView({ block: 'start', behavior: 'instant' });
+        else scrollTo({ top: 0, behavior: 'instant' });
+      }, { once: true });
+    }, navigationType);
+
+    try {
+      await page.goto(url);
+      await expect(page.locator('#business-health-heading')).toBeInViewport();
+      const saved = await page.evaluate(() => {
+        scrollBy({ top: 680, behavior: 'instant' });
+        return scrollY;
+      });
+      await expect.poll(() => page.evaluate(() => {
+        const state = window.navigation ? window.navigation.currentEntry.getState() : history.state;
+        return state?.scrollY;
+      })).toBe(saved);
+
+      if (navigationType === 'reload') await page.reload({ waitUntil: 'domcontentloaded' });
+      else {
+        await page.goto('/companies/');
+        await page.goBack({ waitUntil: 'domcontentloaded' });
+      }
+      await expect(root).toHaveAttribute('data-view-state', 'ready');
+      expect(await page.evaluate(() => document.readyState)).toBe('interactive');
+      await expect.poll(currentScroll).toBe(saved);
+      let positionBeforeLoad = saved;
+      if (scrollDuringLoad) {
+        await page.mouse.move(1070, 590);
+        await page.mouse.wheel(0, 340);
+        await expect.poll(currentScroll).toBeGreaterThan(saved + 300);
+        positionBeforeLoad = await currentScroll();
+      }
+      releaseImage();
+      await page.waitForLoadState('load');
+      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      await expect.poll(currentScroll).toBe(positionBeforeLoad);
+    } finally {
+      releaseImage();
+    }
+  });
+}
+
 for (const readerTabbed of [false, true]) {
   test(`Market keeps ${readerTabbed ? 'the selected Download link' : 'the heading'} focused after a late page load`, async ({ page, browserName, isMobile }) => {
     test.skip(browserName !== 'firefox' || isMobile, 'Exercise Firefox’s native fragment processing at pageshow');

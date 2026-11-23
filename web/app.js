@@ -311,7 +311,14 @@ function evidenceAccess(ids,label,topicHint=''){
 }
 const claimButton=(id,label='Evidence',topic='')=>{const access=evidenceAccess([id],label,topic);return `<button class="evidence-action" data-claim="${esc(id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;};
 const numberButton=m=>{const label=metricValue(m),access=evidenceAccess([m.claim_id],label,metricEvidenceTopic(m,m.label||metricLabels[m.kind]));return `<button class="number-button" data-claim="${esc(m.claim_id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;};
-const sourceLinks=cl=>{const supplemental=profileSupplementalSource(cl);return [supplemental?external(supplemental.url,supplemental.title):'',...cl.source_ids.map(id=>external(sources[id].url,sources[id].publisher))].filter(Boolean).join(' ');};
+const sourceLinks=cl=>{
+ const supplemental=profileSupplementalSource(cl),copies=cl.source_ids.map(id=>profilePublisherCopy(sources[id]));
+ const extra=supplemental&&!copies.some(source=>source?.url===supplemental.url)?external(supplemental.url,supplemental.title):'';
+ return [extra,...cl.source_ids.map((id,index)=>{
+  const copy=copies[index],source=copy||sources[id];
+  return external(source.url,copy?source.title:source.publisher);
+ })].filter(Boolean).join(' ');
+};
 const provenance=cl=>`<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(profileRecordDate(cl))}</span><span>· ${esc(evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id)))}</span><span>· ${esc(evidenceLabel(cl))}</span>${claimButton(cl.id)}</div>`;
 function metricMeta(m){
  const finance=financeClaimContextFor(m.claim_id),accounting=metricCurrentBasis(m,['revenue','annualized_revenue_run_rate','arr'].includes(m.kind)?m.gross_vs_net==='unspecified'?'Gross or net revenue not stated':title(m.gross_vs_net)+' basis':'');
@@ -777,25 +784,39 @@ const VIEW_ANCHORS={'business-health':'market',venture:'market',about:'method',l
 const MARKET_RETURN_LINKS='.hero-actions a[href="#business-health"], .hero-company-strip a[href="#companies"], .product-preview h3 a[href^="#company/"]';
 function viewAnchorId(hash=location.hash){const id=String(routeParts(hash)[0]||'').toLowerCase();return Object.hasOwn(VIEW_ANCHORS,id)?id:'';}
 // Firefox can process the native bookmark after the enhanced view is ready.
-function keepInitialMarketFocus(focusTarget){
+function keepInitialMarketFocus(focusTarget,readingPosition=null){
  if(document.readyState==='complete')return;
- const bookmark=location.href;
- let intended=focusTarget;
+ const bookmark=location.href,hasReadingPosition=Number.isFinite(readingPosition);
+ const listeners=new AbortController(),options={capture:true,signal:listeners.signal};
+ let intended=focusTarget,readerActivity=0,readerPosition=null;
  function remember(event){
   if(event.target!==document.body&&event.target!==document.documentElement)intended=event.target;
  }
- document.addEventListener('focusin',remember,true);
+ function markReaderMovement(event){
+  if(event.isTrusted)readerActivity++;
+ }
+ document.addEventListener('focusin',remember,options);
+ if(hasReadingPosition){
+  for(const name of ['keydown','pointerdown','touchstart','touchmove','wheel'])window.addEventListener(name,markReaderMovement,options);
+  window.addEventListener('scroll',()=>{
+   if(readerActivity)readerPosition=window.scrollY;
+  },options);
+ }
  window.addEventListener('pageshow',()=>{
+  const activityAtShow=readerActivity,position=readerPosition??readingPosition;
   requestAnimationFrame(()=>{
-   document.removeEventListener('focusin',remember,true);
+   listeners.abort();
    if(location.href!==bookmark||!intended.isConnected||intended.closest('[hidden],[inert]'))return;
+   const preservePosition=hasReadingPosition&&readerActivity===activityAtShow&&intended===focusTarget;
    if(document.activeElement===document.body||document.activeElement===document.documentElement){
-    intended.focus();
+    intended.focus(preservePosition?{preventScroll:true}:undefined);
    }
+   // Firefox can apply the fragment scroll after route() already restored this history entry.
+   if(preservePosition&&window.scrollY!==position)window.scrollTo({left:0,top:position,behavior:'instant'});
   });
  },{once:true});
 }
-function showViewAnchor(target){
+function showViewAnchor(target,readingPosition=null){
  if(!target)return;
  for(let node=target;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;
  const market=target.id==='business-health';
@@ -807,7 +828,7 @@ function showViewAnchor(target){
    keepInitialMarketFocus(active);
    return;
   }
-  keepInitialMarketFocus(focusTarget);
+  keepInitialMarketFocus(focusTarget,readingPosition);
  }
  focusTarget.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'instant'});
 }
@@ -831,14 +852,29 @@ function rememberShortlistOrigin(event){
  history.replaceState({...history.state,shortlist},'');
  pendingShortlist={hash:link.getAttribute('href'),key:historyKey()};
 }
-window.addEventListener('hashchange',()=>{
- ensureHistoryEntryKey();
- explorePreviousKey=exploreEntryKey;
- exploreEntryKey=historyKey();
- if(!routeTraversal&&pendingExploreLink&&pendingExploreLink.key===explorePreviousKey&&pendingExploreLink.destination===location.href){
+// Commit the actual opened entry before a quick Back can overtake hashchange.
+window.navigation?.addEventListener('currententrychange',event=>{
+ const type=event.navigationType;
+ if(type!=='push'&&type!=='traverse')return;
+ const current=window.navigation.currentEntry;
+ explorePreviousKey=event.from?.key;
+ exploreEntryKey=current?.key;
+ if(type==='push'&&pendingExploreLink&&pendingExploreLink.key===explorePreviousKey&&pendingExploreLink.destination===current?.url){
   exploreFragmentDestinations.set(explorePreviousKey,exploreEntryKey);
  }
  pendingExploreLink=null;
+});
+window.addEventListener('hashchange',event=>{
+ if(event.newURL&&event.newURL!==location.href)return;
+ if(!window.navigation){
+  ensureHistoryEntryKey();
+  explorePreviousKey=exploreEntryKey;
+  exploreEntryKey=historyKey();
+  if(!routeTraversal&&pendingExploreLink&&pendingExploreLink.key===explorePreviousKey&&pendingExploreLink.destination===location.href){
+   exploreFragmentDestinations.set(explorePreviousKey,exploreEntryKey);
+  }
+  pendingExploreLink=null;
+ }
  if(onCompareRoute()){
   if(pendingShortlist?.hash===location.hash)history.replaceState({...history.state,compareShortlistSource:pendingShortlist.key},'');
   compareShortlistSource=history.state?.compareShortlistSource;
@@ -1098,7 +1134,7 @@ function route(event){
  if(view!=='compare'&&previousRoute==='compare'&&typeof measureSiteHeader==='function')measureSiteHeader();
  renderTray(shortlist?.notice);
  const waitForShortlist=shortlist&&restore!==null&&searchContextPending(state.query);
- const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();if(!waitForShortlist)queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;
+ const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId),restore);if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();if(!waitForShortlist)queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;
  const linkedOpener=returnOrigin&&focusExploreOrigin(returnOrigin);
  if(linkedOpener)return linkedOpener;
  const opener=shortlist?$('compare-tray').querySelector?.('a'):wasTraversal&&view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():wasTraversal&&view==='companies'?companyReturnFocusTarget():null;
@@ -1412,7 +1448,7 @@ function initialize(){$('snapshot').textContent=compiledSnapshotLabel(DATA.meta.
  if(typeof requestIdleCallback!=='function'&&typeof requestAnimationFrame!=='function'){for(const view of ['companies','method','work'])preparePage(view);renderDirectory();preparePage('market');}
  route();initCompare();if(typeof initSiteNav==='function')initSiteNav();
  $('close-company').addEventListener('click',()=>$('company-dialog').close());$('close-evidence').addEventListener('click',()=>$('evidence-dialog').close());
- document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||(state.selected.length?compareSettingsFocus():$('compare-add'));next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});window.addEventListener('hashchange',route);
+ document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||(state.selected.length?compareSettingsFocus():$('compare-add'));next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});window.addEventListener('hashchange',event=>{if(!event.newURL||event.newURL===location.href)route(event);});
  // On small screens the Filters fields open as a panel under the button. A short screen can leave the whole panel
  // below the fold, so bring it into view when it opens. toggle does not bubble, so listen in the capture phase.
  document.addEventListener('toggle',e=>{const panel=e.target;if(!panel?.open||!panel.matches?.('.responsive-filter-panel,.more-filters'))return;if(panel.matches('.responsive-filter-panel')&&window.innerWidth>900)return;const fields=panel.querySelector('.responsive-filter-fields,.more-filters-panel'),box=fields?.getBoundingClientRect();if(box?.height&&box.bottom>window.innerHeight)fields.scrollIntoView({block:'nearest'});},true);

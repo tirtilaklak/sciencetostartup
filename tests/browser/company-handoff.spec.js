@@ -16,7 +16,7 @@ test('native Companies carries the exact saved search result into Compare', asyn
   await expect(results).toHaveAttribute('data-company', 'mercor');
   await expect(action).toHaveAttribute('href', '/explore/#compare/mercor');
   await expect(action).toBeInViewport({ ratio: 1 });
-  await expect(page.getByRole('link', { name: 'Compare companies', exact: true })).toBeInViewport({ ratio: 1 });
+  await expect(page.getByRole('link', { name: 'Compare historical profiles', exact: true })).toBeInViewport({ ratio: 1 });
   const directoryURL = page.url();
   expect(Object.fromEntries(new URL(directoryURL).searchParams)).toEqual({ group: 'expert-data-evaluation', reader: 'keep', q: 'Mercor' });
 
@@ -52,7 +52,7 @@ test('the directory offers historical comparisons and current-only profile links
   await expect(results).toHaveAttribute('data-company', 'org.dataforce');
   await expect(results.getByRole('link', { name: 'TransPerfect / DataForce' })).toHaveAttribute('href', /\/company\/org\.dataforce\/$/);
   await expect(results.locator('.directory-compare')).toHaveCount(0);
-  await expect(page.getByRole('link', { name: 'Compare companies', exact: true })).toHaveAttribute('href', '/explore/#compare');
+  await expect(page.getByRole('link', { name: 'Compare historical profiles', exact: true })).toHaveAttribute('href', '/explore/#compare');
   await page.getByRole('button', { name: 'Clear', exact: true }).click();
   await expect(results).toHaveCount(55);
   const historical = results.locator('.directory-compare');
@@ -283,10 +283,12 @@ test.describe('Explore shortlist Back during company search', () => {
       await expect(fourth).not.toBeChecked();
       const directoryURL = page.url();
       const scrollY = () => page.evaluate(() => window.scrollY);
+      await compare.focus();
       await fourth.evaluate(element => element.closest('[data-company-card]').scrollIntoView({ block: 'start', behavior: 'instant' }));
       const savedY = await scrollY();
 
-      await activate(compare);
+      await expect(compare).toBeFocused();
+      await page.keyboard.press('Enter');
       const compareURL = new URL(compareHash(originalIds), directoryURL).href;
       await expect(page).toHaveURL(compareURL);
       const columns = page.locator('#compare-content thead [data-remove]');

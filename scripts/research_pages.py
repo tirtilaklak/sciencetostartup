@@ -407,6 +407,12 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
              '<link rel="alternate" type="application/atom+xml" title="Published research editions" href="/research/atom.xml">\n'
              '<link rel="alternate" type="application/rss+xml" title="Research corrections" href="/research/corrections/feed.xml">\n'
              '<link rel="alternate" type="application/atom+xml" title="Research corrections" href="/research/corrections/atom.xml">\n')
+    if path.startswith(('/research/data/assertions/', '/research/data/sources/')):
+        # Chromium can restore the scroll position before matching the fragment to :target.
+        extra = ('<script>(()=>{const root=document.documentElement;'
+                 'const sync=()=>root.toggleAttribute("data-ledger-fragment",'
+                 '/^#(?:assertion|source)-/.test(location.hash));'
+                 'sync();addEventListener("hashchange",sync);})();</script>\n') + extra
     if company_page:
         extra += '<link rel="stylesheet" href="/company-profile.css">\n'
     if page_type == 'Chapter':
@@ -673,7 +679,8 @@ def _assertion(context, assertion, *, compact=False, correction='', focusable=Fa
         body += '<p>Correction: ' + _link(_correction_url(row), row['summary']) + '</p>'
         if row.get('replacement_claim_id'):
             body += '<p>Approved replacement: ' + _link(_evidence_url('assertion', row['replacement_claim_id']), row['replacement_claim_id']) + '</p>'
-    body += f'<p class="r-record-id">Permanent record ID: {_link(_evidence_url("assertion", aid), aid)}</p>'
+    record_id = sp.escape(aid) if compact else _link(_evidence_url("assertion", aid), aid)
+    body += f'<p class="r-record-id">Permanent record ID: {record_id}</p>'
     body += correction
     if assertion.get("qualifications") and status in {"approved", "historical"}:
         body += '<ul class="r-qualifications">' + "".join(
@@ -681,7 +688,7 @@ def _assertion(context, assertion, *, compact=False, correction='', focusable=Fa
             for q in assertion["qualifications"]) + "</ul>"
     if compact:
         body += '<p class="r-meta">' + _link(_evidence_url("assertion", aid),
-                    "Inspect pinned sources, evidence and separate AI review receipts") + '</p>'
+                    "Sources and AI review") + '</p>'
         return f'<article class="r-assertion" data-status="{sp.escape(status)}" id="{sp.escape(_anchor("assertion", aid))}">{body}</article>'
     body += _source_evidence(context, assertion)
     reviews = context.get('_render_reviews')

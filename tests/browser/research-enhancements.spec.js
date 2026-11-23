@@ -405,11 +405,14 @@ test.describe('legacy evidence remains independently readable', () => {
       await expect(record.locator('.r-kicker')).toContainText('Approved evidence · As of');
       const date = await record.locator('.r-kicker').innerText();
       expect(date).toContain(assertion.as_of.slice(0, 4));
-      await expect(record.locator('.r-record-id a')).toHaveAttribute('href', evidenceURL('assertion', assertion.id));
+      await expect(record.locator('.r-record-id')).toHaveText('Permanent record ID: ' + assertion.id);
+      await expect(record.locator('.r-record-id a')).toHaveCount(0);
+      const evidence = record.getByRole('link', { name: 'Sources and AI review', exact: true });
+      await expect(evidence).toHaveAttribute('href', evidenceURL('assertion', assertion.id));
       for (const qualification of assertion.qualifications || []) await expect(record).toContainText(qualification);
       // The compact profile keeps each fact/scope and links its complete source
       // bindings. Follow that native link and retain the original exact count.
-      await record.locator('.r-record-id a').click();
+      await evidence.click();
       const full = page.locator('article.r-assertion' + selector('assertion-' + assertion.id));
       await expect(full.locator('.r-evidence-links li')).toHaveCount(assertion.evidence.length);
       const bindings = await full.locator('.r-evidence-links li').evaluateAll(items => items.map(item => ({

@@ -4675,7 +4675,66 @@
           ]
         }
       ],
-      "notes": []
+      "notes": [],
+      "current_facts": {
+        "reviewed_on": "2026-11-23",
+        "rows": [
+          {
+            "label": "Unaudited FY2026 trading update · 27 Oct 2026",
+            "value": "RWS expected about £700 million in group revenue for the year ended 30 September 2026. Full-year results were scheduled for 15 December 2026.",
+            "source_indexes": [
+              0,
+              1
+            ]
+          },
+          {
+            "label": "Acolad acquisition · 2 Nov 2026",
+            "value": "RWS completed its acquisition of Acogroup, Acolad’s parent company.",
+            "source_indexes": [
+              2,
+              3
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "url": "https://www.tradingview.com/news/reuters.com%2C2026-10-27%3Anewsml_RSa5108Aa%3A0-reg-rws-holdings-plc-trading-statement/",
+            "title": "RWS year-end trading statement, RNS 5108A (via Reuters)",
+            "published_on": "2026-10-27",
+            "observed_on": "2026-11-23",
+            "response_sha256": "bdd35897032edf754b670cef77ef39e84cf492c712666ce209789a7134c69cbe",
+            "locator": "Year End Trading Statement and Notice of Results; FY26 Performance; Notice of Full Year Results",
+            "content_kind": "raw_http_body"
+          },
+          {
+            "url": "https://www.lse.co.uk/rns/RWS/trading-statement-bgo38kxyahrrjkn.html?mobile_view=desktop",
+            "title": "RWS year-end trading statement and notice of results, RNS 5108A",
+            "published_on": "2026-10-27",
+            "observed_on": "2026-11-23",
+            "response_sha256": "5d4cbfc1b54a87dade950812af38ccd7da4ac059da3983244bdaafa4db18c51e",
+            "locator": "Year End Trading Statement and Notice of Results; FY26 Performance; Notice of Full Year Results",
+            "content_kind": "raw_http_body"
+          },
+          {
+            "url": "https://www.londonstockexchange.com/en/news/article/RWS/completion-of-the-acquisition-of-acogroup/e91f-77-82-3d-cc-46438c",
+            "title": "RWS completion of the acquisition of Acogroup, RNS 3692B",
+            "published_on": "2026-11-02",
+            "observed_on": "2026-11-23",
+            "response_sha256": "34f96ec1ce6afa4a500ff50266913142d0ea74031f8e3b41dd3d6661788cac1c",
+            "locator": "Completion of the acquisition of Acogroup, the parent company of Acolad; first paragraph",
+            "content_kind": "raw_http_body"
+          },
+          {
+            "url": "https://www.acolad.com/en/news/acolad-is-part-of-rws",
+            "title": "Acolad confirms it is part of RWS",
+            "published_on": "2026-11-02",
+            "observed_on": "2026-11-23",
+            "response_sha256": "4134e0210776a33cbc4b783a273cbd3ba59a1bc0af74b487deb5b76629b1a591",
+            "locator": "Dated announcement; first paragraph under More becomes possible: Acolad is part of RWS",
+            "content_kind": "raw_http_body"
+          }
+        ]
+      }
     },
     {
       "company_id": "terac",
