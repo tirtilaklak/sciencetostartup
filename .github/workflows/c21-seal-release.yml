@@ -1,0 +1,100 @@
+name: Seal verified C21 candidate
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-seal-release.yml, .github/qa/c21-recovery/seal_candidate.py]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  seal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      C21_HEAD: 020d7f728c0a9ba0dbd4de699cb26bdc4ee665c6
+      C21_INITIAL: 4dcb04128f511822b34eaa287d7e8283e51036d0
+      C21_DIST_TREE: 30b9f32cd3a92505a6a38be7b4d075191e78a13e
+      C21_MANIFEST: 4a743a78e1e7cbe76ca6b097cb9072b6aaa557f0892b9e734aeff10eb36a3103
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45101108581
+          pattern: c21-exact-*
+          path: output/proof/core
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45101845437
+          name: c21-replay-work
+          path: output/proof/work
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45103801290
+          name: c21-company-rebound-companies
+          path: output/proof/companies
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45104737793
+          pattern: c21-loaded-profile-sections-*
+          path: output/proof/explore
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45103073995
+          name: mobile-performance
+          path: output/proof/performance
+      - name: Validate receipts and prepare signed asset pack
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/c21-product" "$C21_HEAD"
+          cd "$RUNNER_TEMP/c21-product"
+          PYTHONPATH=scripts python3 "$GITHUB_WORKSPACE/.github/qa/c21-recovery/seal_candidate.py" "$GITHUB_WORKSPACE/output/proof" "$GITHUB_WORKSPACE/output/ready"
+          python3 -c "import json; print(json.load(open('$GITHUB_WORKSPACE/output/ready/release-ready.json'))['plan_sha256'])"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: c21-release-ready
+          path: output/ready
+          if-no-files-found: error
+          retention-days: 14
+  classify-market:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45104080318
+          name: c21-market-firefox-stock
+          path: output/market
+      - name: Print original failing source location
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          def failures(value):
+              if isinstance(value, list):
+                  for entry in value:
+                      failures(entry)
+              elif isinstance(value, dict):
+                  if value.get('status') in {'failed', 'timedOut'} and value.get('errors'):
+                      for error in value['errors']:
+                          if isinstance(error, dict):
+                              traceback=error.get('stack','')
+                              if 'market-fallback.spec.js' in traceback:
+                                  print(traceback)
+                  for entry in value.values():
+                      failures(entry)
+          for path in Path('output/market').rglob('*.json'):
+              try:
+                  failures(json.loads(path.read_bytes()))
+              except (ValueError, OSError):
+                  continue
+          PY
