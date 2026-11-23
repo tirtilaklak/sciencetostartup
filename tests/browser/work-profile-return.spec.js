@@ -1,6 +1,26 @@
 const { chromium, firefox, test, expect } = require('@playwright/test');
 
 const roleId = 'afterquery.work.world-models';
+const hourlyOrder = [
+  roleId,
+  'g2i.work.senior-swe-training-7c54f48a',
+  'scale_ai.work.outlier-statistics',
+  'afterquery.work.fullstack-evaluation',
+  'afterquery.work.esl-expert',
+  'afterquery.work.technical-content-writer-contract',
+  'afterquery.work.content-writer-ai-evaluation-specialist-uk-us',
+  'terac.work.ai-evaluator-shopping-assistant',
+  'invisible.work.full-stack-trainer',
+  'invisible.work.computer-vision',
+  'surge_ai.work.swe-environments',
+  'terac.work.rl-environment-creation',
+  'appen.work.sage-media',
+  'g2i.work.senior-swe-training',
+  'terac.work.ml-scenarios',
+  'rws_trainai.work.polaris-asr',
+  'elorian.work.model-safety',
+  'pareto.work.investment-analyst',
+];
 const work = '/work/?pay=hourly&sort=hourly&reader=%20A%2Bb%20';
 const profile = '/company/afterquery/#' + roleId;
 
@@ -32,8 +52,7 @@ async function activateProfile(page) {
   await expect(page.locator('[data-work-compare]')).toBeVisible();
   const savedURL = page.url();
   const ids = await matchingRecords(page);
-  expect(ids).toHaveLength(17);
-  expect(ids[0]).toBe(roleId);
+  expect(ids).toEqual(hourlyOrder);
   const { opener, application, terms } = controls(page);
   await expect(opener).toHaveAccessibleDescription('AfterQuery');
   await terms.locator('summary').press('Enter');

@@ -1,5 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
+const firstDefaultRole = 'g2i.work.senior-swe-training-7c54f48a';
+const firstHourlyRole = 'afterquery.work.world-models';
+
 test('Explore Work keeps the result count and controls readable at narrow widths', async ({ page }) => {
   const widths = [320, 360, 390, 480, 540, 600, 700, 844];
   for (const [fragment, label] of [['work', /^\d+ records/], ['work?q=India', 'No recorded matches']]) {
@@ -152,12 +155,12 @@ test('native Work shows the complete first role and hourly rate on the first scr
   const { routes } = await (await request.get('/work-routes.json')).json();
   const hourly = routes.filter(route => route.pay_terms?.hourly_comparable).length;
   const entries = [
-    ['/work/', 'afterquery.work.technical-content-writer-contract', `${routes.length} records, including career pages and past listings`],
-    ['/work/?pay=hourly&sort=hourly', 'afterquery.work.world-models', `${hourly} records with published hourly pay`],
+    ['/work/', firstDefaultRole, 'G2i', `${routes.length} records, including career pages and past listings`],
+    ['/work/?pay=hourly&sort=hourly', firstHourlyRole, 'AfterQuery', `${hourly} records with published hourly pay`],
   ];
   for (const [width, height] of [[320, 720], [390, 844], [760, 390], [844, 390], [1024, 600]]) {
     await page.setViewportSize({ width, height });
-    for (const [url, firstId, scopedCount] of entries) {
+    for (const [url, firstId, employer, scopedCount] of entries) {
       await test.step(`${url} at ${width} × ${height}`, async () => {
         await page.goto(url);
         const search = page.getByRole('searchbox', { name: 'Search listings' });
@@ -174,7 +177,7 @@ test('native Work shows the complete first role and hourly rate on the first scr
           .getByRole('link', { name: role, exact: true });
         const profile = `/company/${company}/#${firstId}`;
         await expect(title).toHaveAttribute('href', profile);
-        await expect(title).toHaveAccessibleDescription('AfterQuery');
+        await expect(title).toHaveAccessibleDescription(employer);
         await expect(title).toHaveCSS('text-decoration-line', 'underline');
         await expect(first.locator(`a[href="${profile}"]`)).toHaveCount(1);
         expect((await title.boundingBox()).height).toBeGreaterThanOrEqual(44);
@@ -205,7 +208,7 @@ test('native Work shows the hourly role and rate together at 1024×600', async (
   await page.evaluate(() => document.fonts.ready);
 
   const firstCard = page.locator('[data-work-route]:visible').first();
-  await expect(firstCard).toHaveAttribute('data-work-route', 'afterquery.work.world-models');
+  await expect(firstCard).toHaveAttribute('data-work-route', firstHourlyRole);
   await expect(firstCard.locator('h3')).toBeInViewport({ ratio: 1 });
   await expect(firstCard.locator('.work-pay strong')).toBeInViewport({ ratio: 1 });
 
@@ -242,7 +245,7 @@ test('native Work shows the first hourly result on short desktops and remembers 
   const ids = () => cards.evaluateAll(nodes => nodes.map(node => node.dataset.workRoute));
 
   await page.setViewportSize({ width: 1280, height: 720 });
-  for (const [sort, firstId] of [['', 'afterquery.work.technical-content-writer-contract'], ['hourly', 'afterquery.work.world-models']]) {
+  for (const [sort, firstId] of [['', firstDefaultRole], ['hourly', firstHourlyRole]]) {
     const params = new URLSearchParams({ pay: 'hourly' });
     if (sort) params.set('sort', sort);
     const url = `/work/?${params}`;
