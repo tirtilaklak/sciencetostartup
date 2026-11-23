@@ -9,6 +9,7 @@ const previous = name => name.endsWith('.gz') ? gunzipSync(fs.readFileSync(path.
 const current = name => read('web/search-core.js') + '\n' + read('web/' + name);
 const companies = require('../../data/canonical.json').companies;
 const currentWorkCount = require('../../data/work-routes.json').routes.length;
+const directoryCount = companies.length + require('../../data/current-companies.json').entries.length;
 const origin = 'http://127.0.0.1:18769';
 const baselineEntries = JSON.parse(previous('index.json.gz')).entries;
 async function home(page, { oldMarkup = false, oldIndex = false, oldComponent = false, oldRuntime = false, query = '', fixtureOrigin = origin } = {}) {
@@ -136,7 +137,7 @@ for(const [routeName, oldScript] of [['companies',false],['companies',true],['wo
     if(routeName==='work') await page.locator('.work-page-filter-options').evaluate(node=>{node.open=true;});
     await page.getByRole('button',{name:'Clear',exact:true}).click();
     await expect(input).toHaveValue('');
-    const count = routeName==='companies'?(oldScript?55:53):currentWorkCount;
+    const count = routeName==='companies'?(oldScript?directoryCount:53):currentWorkCount;
     await expect(page.locator(routeName==='companies'?'[data-company]':'[data-work-route]')).toHaveCount(count);
   });
 }

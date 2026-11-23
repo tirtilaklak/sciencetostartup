@@ -2,6 +2,8 @@ const { test, expect, firefox } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 const release = require('../../data/editorial-release.json');
 const work = require('../../data/work-routes.json');
+const directoryCount = require('../../data/canonical.json').companies.length
+  + require('../../data/current-companies.json').entries.length;
 const promotionId = release.homepage.work_candidate_route_ids[0];
 const promotion = work.routes.find(row => row.id === promotionId);
 const approved = promotion.editorial_review.receipts.find(row => row.id === promotion.editorial_review.approved_terms_receipt_id);
@@ -34,7 +36,7 @@ test('home shows both dated sources before the phone portrait and aligns the des
     await expect(page.locator('.hero-actions a[href="/work/"]')).toBeInViewport({ ratio: 1 });
     await expect(page.locator('.hero-actions a[href="/research/"]')).toBeInViewport({ ratio: 1 });
     await expect(page.locator('a[href="/research/data/"]')).toHaveCount(1);
-    await expect(page.locator('.proof-strip p').first()).toHaveText('55 companies');
+    await expect(page.locator('.proof-strip p').first()).toHaveText(`${directoryCount} companies`);
 
     const workBox = await program.boundingBox();
     const portraitBox = await page.locator('.hero-visual').boundingBox();
