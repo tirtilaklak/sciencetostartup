@@ -1,0 +1,108 @@
+name: Materialize the verified Market reader-position repair
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/market-reader-scroll-materialize.yml]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      BASE_SOURCE: 6cae2f8323f13b39009518c05e9fc5e0e95adbb4
+      BASE_MANIFEST: 8ea9a1b27fc9f9d7121e43d8db95883d3a69ce5808b90ba30684dbc18aac3838
+      MARKET_SOURCE: 8047735ceedd5acd7c7ad831e4204bf878edac7b
+      MARKET_MANIFEST: 8ea9a1b27fc9f9d7121e43d8db95883d3a69ce5808b90ba30684dbc18aac3838
+      MARKET_BUILD: e7dbdca3aef8bba9b6fe
+      PROOF_BRANCH: codex/site-quality-market-position-proof-20261122
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45108818236
+          name: market-reader-scroll-proof-repaired
+          path: output/repaired
+      - name: Apply exactly the already verified output
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$GITHUB_WORKSPACE/output/signed-market"
+          PROOF="$GITHUB_WORKSPACE/output/repaired"
+          PRODUCT="$RUNNER_TEMP/market-proof"
+          mkdir -p "$OUT"
+          test "$(git ls-remote origin "refs/heads/$PROOF_BRANCH" | cut -f1)" = "$MARKET_SOURCE"
+          git worktree add --detach "$PRODUCT" "$MARKET_SOURCE"
+          cd "$PRODUCT"
+          git config --local user.name 'ScienceToStartup QA'
+          git config --local user.email 'qa@sciencetostartup.com'
+          PYTHONPATH=scripts python3 - "$PROOF" "$RUNNER_TEMP/market-dist" <<'PY'
+          from hashlib import sha256
+          import json, os, shutil, sys
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          proof,new=map(Path,sys.argv[1:])
+          result=json.loads((proof/'build-receipt.json').read_bytes())
+          assert result['source']==os.environ['MARKET_SOURCE']
+          assert result['build']==os.environ['MARKET_BUILD']
+          base=Path('dist')
+          validate_artifact(base,os.environ['BASE_MANIFEST'])
+          assert (proof/'manifest-before.json').read_bytes()==(proof/'manifest-after.json').read_bytes()
+          assert sha256((proof/'manifest-before.json').read_bytes()).hexdigest()==os.environ['MARKET_MANIFEST']
+          raw=(proof/'payloads/manifest.json').read_bytes()
+          assert sha256(raw).hexdigest()==os.environ['MARKET_MANIFEST']==result['manifest_sha256']
+          expected=json.loads(raw)['sha256']
+          old=json.loads((base/'manifest.json').read_bytes())['sha256']
+          delta={name:sha for name,sha in expected.items() if old.get(name)!=sha}
+          assert delta==result['changed']
+          assert sorted(set(old)-set(expected))==result['removed']
+          assert len(expected)==1282
+          for name,sha in expected.items():
+              source=proof/'payloads'/name if name in delta else base/name
+              assert sha256(source.read_bytes()).hexdigest()==sha,name
+              target=new/name
+              target.parent.mkdir(parents=True,exist_ok=True)
+              shutil.copyfile(source,target)
+          (new/'manifest.json').write_bytes(raw)
+          validate_artifact(new,os.environ['MARKET_MANIFEST'])
+          archives={name:sha for name,sha in old.items() if name.startswith(('research/editions/','publication/','daily/202'))}
+          assert len(archives)==121 and all(expected.get(name)==sha for name,sha in archives.items())
+          for file in ('controlled.json','market-full.json'):
+              stats=json.loads((proof/file).read_bytes())['stats']
+              assert stats['expected']==(4 if file=='controlled.json' else 17)
+              assert stats['unexpected']==stats['flaky']==0
+          reader=json.loads((proof/'natural-reader-input.json').read_bytes())
+          assert len(reader)==4 and all(row['passed'] and row['lastReaderPosition']==row['settled'] for row in reader)
+          PY
+          mv dist "$RUNNER_TEMP/c21-predecessor-dist"
+          mv "$RUNNER_TEMP/market-dist" dist
+          git add -A -- dist
+          git diff --cached --check
+          if git diff --cached --name-only | grep -v '^dist/'; then exit 1; fi
+          git commit -m 'Build the tested Market reader-position repair' -- dist
+          HEAD="$(git rev-parse HEAD)"
+          TREE="$(git rev-parse HEAD:dist)"
+          python3 scripts/release_artifact.py prepare --dist dist --output "$OUT/worker-prepared" --source-commit "$HEAD"
+          python3 - "$OUT/materialized.json" "$HEAD" "$TREE" <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          path,head,tree=sys.argv[1:]
+          report={'source':os.environ['MARKET_SOURCE'],'head':head,'dist_tree':tree,
+                  'build':os.environ['MARKET_BUILD'],'manifest_sha256':os.environ['MARKET_MANIFEST']}
+          Path(path).write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report))
+          PY
+          git push origin "HEAD:refs/heads/$PROOF_BRANCH"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: market-reader-repair-signed
+          path: output/signed-market/
+          if-no-files-found: error
+          retention-days: 14
