@@ -1,0 +1,42 @@
+name: Read the exact mobile failure receipt
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-reader-mobile-receipt.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45109451088
+          name: c21-reader-exact-mobile-chromium
+          path: output
+      - name: Keep the failed cases and browser stack visible
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('output/mobile-chromium')
+          report=json.loads((root/'summary.json').read_bytes())
+          for row in report['cases']:
+              if not row['passed']:
+                  print('FAILED CASE',json.dumps(row))
+          raw=json.loads((root/'playwright.json').read_bytes())
+          def bad(suite):
+              for spec in suite.get('specs',[]):
+                  for test in spec['tests']:
+                      for result in test['results']:
+                          if result['status']=='passed':
+                              continue
+                          for error in result.get('errors',[]) or [result.get('error',{})]:
+                              print('BROWSER FAILURE',spec['title'],json.dumps(error))
+              for nested in suite.get('suites',[]):
+                  bad(nested)
+          bad(raw)
+          PY
