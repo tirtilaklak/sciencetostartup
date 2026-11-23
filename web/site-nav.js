@@ -17,7 +17,7 @@ function siteSearchPages(){
   ['home','Home','','front page start','/'],
   ['market','Market overview','Revenue and growth charts','charts market overview'],
   ['company-directory','Companies','Current company directory','index directory firms startups organizations organisations','/companies/'],
-  ['companies','Historical company comparisons',`Compare ${DATA.companies.length} profiles`,'historical companies comparisons'],
+  ['companies','Browse historical profiles',`${DATA.companies.length} profiles from the research dataset`,'historical company companies comparisons'],
   ['work','Paid work',`${w4Count(work.named.length,'named listing','named listings')} · ${w4Count(work.programs.length,'network or program','networks and programs')}`,'jobs gigs hiring careers contract contractor freelance hourly pay earn'],
   ['compare','Compare','Put up to three companies side by side','versus vs comparison'],
   ['method','Method','How each figure is checked and graded','methodology sources evidence research'],
