@@ -39,4 +39,19 @@ jobs:
               for nested in suite.get('suites',[]):
                   bad(nested)
           bad(raw)
+          import zipfile
+          for archive in (root/'results').rglob('trace.zip'):
+              with zipfile.ZipFile(archive) as trace:
+                  for name in trace.namelist():
+                      if not name.endswith('.trace'):
+                          continue
+                      for line in trace.read(name).splitlines():
+                          event=json.loads(line)
+                          method=event.get('method','')
+                          api=event.get('apiName','')
+                          snap=event.get('snapshot',{})
+                          if method in {'goto','press','goBack','waitForURL','expect'} or any(key in api for key in ('goto','goBack','press')):
+                              print('TRACE CALL',json.dumps({field:event.get(field) for field in ('type','method','apiName','startTime','endTime','params','error','callId')}))
+                          if event.get('type')=='frame-snapshot':
+                              print('TRACE SNAPSHOT',json.dumps([snap.get('timestamp'),snap.get('snapshotName'),snap.get('frameUrl')]))
           PY
