@@ -80,7 +80,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: c21-profile-sections-${{ matrix.viewport }}
+          name: c21-loaded-profile-sections-${{ matrix.viewport }}
           path: output/explore/
           if-no-files-found: error
           retention-days: 14
