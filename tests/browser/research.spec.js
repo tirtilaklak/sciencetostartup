@@ -77,10 +77,11 @@ test.describe('research without JavaScript', () => {
       expect(await page.locator('.r-report-body .r-paragraph p').count(), chapter.title).toBeGreaterThan(0);
       const contents = page.getByRole('navigation', { name: 'Report chapters' });
       if (index) {
-        const chapterIndex = page.locator('details.r-chapter-index');
-        await expect(chapterIndex).toHaveJSProperty('open', false);
-        await chapterIndex.locator('summary').press('Enter');
-        await expect(chapterIndex).toHaveJSProperty('open', true);
+        const toggle = page.locator('details.r-chapter-index > summary');
+        await expect(toggle).toBeVisible();
+        await expect(contents).toBeHidden();
+        await toggle.press('Enter');
+        await expect(contents).toBeVisible();
       }
       await expect(contents.locator('[aria-current="page"]')).toHaveAttribute('href', path);
       if (index) await expect(page.locator('.r-reader-pagination [rel="prev"]')).toHaveAttribute('href', readingPages[index - 1]);
