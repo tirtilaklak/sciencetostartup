@@ -6,7 +6,7 @@ test('native Work Compare preserves separate pay and terms fields for every reco
   await expect(compareLink).toBeVisible();
   const cardIds = await page.locator('.work-page-list [data-work-route]')
     .evaluateAll(cards => cards.map(card => card.dataset.workRoute));
-  expect(cardIds).toHaveLength(135);
+  expect(cardIds).toHaveLength(136);
   const named = page.locator('[data-work-group="named"] .work-listing-conditions > :first-child').first();
   await expect(named).not.toContainText('Specific listing');
   const duplicatedDates = await page.locator('.work-reviewed:visible > [hidden]').evaluateAll(notes => notes.map(note => ({

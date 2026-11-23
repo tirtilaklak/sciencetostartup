@@ -132,11 +132,11 @@ def main():
     # directory, source, work, comparison and portable-data regression checks.
     claim_index = {c['id']: c for c in data['claims']}
     # v2.0.1 used one prose-derived card per company. The current reviewed
-    # route bundle has 135 individually dated records, including closed routes.
+    # route bundle has 136 individually dated records, including closed routes.
     # Retain pay/source coverage checks against those records instead of the
     # removed work-requirements markup and stale company-level pay summaries.
     route_index = {r['id']: r for r in rendered['workRoutes']}
-    assert len(route_index) == 135
+    assert len(route_index) == 136
     assert set(rendered['workCards']) == set(route_index)
     visible_work = {}
     for route_id, card_html in rendered['workCards'].items():

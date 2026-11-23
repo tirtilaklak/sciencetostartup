@@ -135,7 +135,7 @@ for(const [routeName, oldScript] of [['companies',false],['companies',true],['wo
     if(routeName==='work') await page.locator('.work-page-filter-options').evaluate(node=>{node.open=true;});
     await page.getByRole('button',{name:'Clear',exact:true}).click();
     await expect(input).toHaveValue('');
-    await expect(page.locator(routeName==='companies'?'[data-company]':'[data-work-route]')).toHaveCount(routeName==='companies'?(oldScript?55:53):135);
+    await expect(page.locator(routeName==='companies'?'[data-company]':'[data-work-route]')).toHaveCount(routeName==='companies'?(oldScript?55:53):(oldScript?136:135));
   });
 }
 
@@ -346,7 +346,7 @@ test('native work rejects a stale script and restores the selected record and CS
     load: 'failed',
     message: 'Filters did not load. Showing the full directory.',
     groups: ['named', 'programs', 'boards', 'outside', 'closed'],
-    records: 135,
+    records: 136,
     listVisible: true,
     filterVisible: false,
     exportVisible: false,

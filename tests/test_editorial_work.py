@@ -36,7 +36,7 @@ class EditorialWorkTests(unittest.TestCase):
             self.validate(work_sha256="0" * 64)
 
     def test_all_records_have_explicit_states_without_blanket_field_dates(self):
-        self.assertEqual(len(self.work["routes"]), 135)
+        self.assertEqual(len(self.work["routes"]), 136)
         for row in self.work["routes"]:
             self.assertEqual(set(row["field_reviews"]), FIELD_NAMES, row["id"])
             for field in row["field_reviews"].values():
@@ -61,6 +61,27 @@ class EditorialWorkTests(unittest.TestCase):
         self.assertEqual(self.routes["surge_ai.work.research-fellowship"]["status"], "program")
         for rid in ["scale_ai.work.remotasks", "snorkel_ai.work.terminus-training", "abundant_ai.work.research-product-manager"]:
             self.assertEqual(self.routes[rid]["route_kind"], "other_record")
+
+    def test_g2i_current_contract_has_separate_issuer_identity_and_terms(self):
+        new = self.routes["g2i.work.senior-swe-training-7c54f48a"]
+        past = self.routes["g2i.work.senior-swe-training"]
+        posting = "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1"
+        self.assertEqual(past["url"], "https://jobs.ashbyhq.com/g2i/6ea6a53a-7689-45f2-b429-1146965d3cd7")
+        self.assertEqual((past["status"], past["geography"]), ("historical", "Remote US"))
+        self.assertEqual((new["status"], new["engagement_type"]), ("listed", "contract"))
+        self.assertEqual(new["geography"], "Remote worldwide where supported")
+        self.assertEqual(new["source_quote"], "$100-$200/hour depending on experience and location")
+        self.assertEqual(new["hours"], "10–20 hours/week, flexible")
+        self.assertEqual(new["claim_ids"], [])
+        self.assertEqual((new["url"], new["last_route_check"]["application_check"]["url"]),
+                         (posting + "/application", posting + "/application"))
+        review = new["editorial_review"]
+        self.assertEqual({action["purpose"]: action["url"] for action in review["actions"]},
+                         {"description": posting, "application": posting + "/application"})
+        terms = next(receipt for receipt in review["receipts"] if receipt["id"] == review["approved_terms_receipt_id"])
+        self.assertEqual(set(terms["reviewed_fields"]), FIELD_NAMES)
+        self.assertEqual(terms["reviewer"], "Codex source review")
+        self.assertTrue(all(field["source_ids"] == [terms["source_id"]] for field in new["field_reviews"].values()))
 
     def test_five_mixed_arrangements_keep_both_published_possibilities(self):
         for rid in ["bespoke_labs.work.mts-post-training", "aixi.work.research-fellowship",
@@ -228,8 +249,8 @@ class EditorialWorkTests(unittest.TestCase):
     def test_historical_work_checks_remain_a_complete_distinct_batch(self):
         self.assertEqual(self.work["verification"]["checked_on"], "2026-10-28")
         self.assertEqual(self.work["verification"]["routes_link_checked"], 135)
-        for row in self.work["routes"]:
-            self.assertEqual(row["last_link_check"]["date"], "2026-10-28")
+        original = [row for row in self.work["routes"] if row["last_link_check"]["date"] == "2026-10-28"]
+        self.assertEqual(len(original), self.work["verification"]["routes_link_checked"])
 
     def test_real_job_security_language_is_not_a_bot_challenge(self):
         body = ('<html><body><h1>Security Engineer</h1>' +

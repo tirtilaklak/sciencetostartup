@@ -72,7 +72,7 @@ class PresentationProjectionTests(unittest.TestCase):
                 self.assertEqual((summary["firstOffering"] or {}).get("name"), self.full_js["projections"][cid]["firstOffering"])
 
     def test_135_route_actions_uncertainty_and_search_keep_full_data_semantics(self):
-        self.assertEqual(len(self.lean["routes"]), 135)
+        self.assertEqual(len(self.lean["routes"]), 136)
         companies = {c["id"]: c for c in self.data["companies"]}
         for route in self.lean["routes"]:
             expected = self.full_js["workProjection"][route["id"]]

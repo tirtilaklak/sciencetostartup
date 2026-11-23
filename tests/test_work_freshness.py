@@ -93,7 +93,7 @@ process.stdout.write(vm.runInContext("JSON.stringify(Object.fromEntries(rows.map
         raw = rendered.encode()
         self.assertLess(len(raw), 300_000)
         self.assertLess(len(gzip.compress(raw, mtime=0)), 45_000)
-        self.assertEqual(raw.count(b'data-work-route='), 135)
+        self.assertEqual(raw.count(b'data-work-route='), 136)
         for rid in ("turing.work.machine-learning", "rws_trainai.work.polaris-asr", "invisible.work.full-stack-trainer"):
             self.assertIn(html.escape(self.routes[rid]["availability_note"]), rendered)
         self.assertEqual(self.work, before)

@@ -33,7 +33,7 @@ test('native work search uses company aliases and preserves listing buckets and 
   await expect(query).toHaveValue('C++');expect(new URL(page.url()).searchParams.get('q')).toBe('C++');expect(new URL(page.url()).hash).toBe('#main');
   await page.locator('.work-page-filter-options').evaluate(node=>{node.open=true;});await page.getByRole('button',{name:'Clear',exact:true}).click();
   await expect(query).toHaveValue('');expect(new URL(page.url()).searchParams.get('reader')).toBe('keep');
-  await expect(page.locator('[data-work-route]')).toHaveCount(135);
+  await expect(page.locator('[data-work-route]')).toHaveCount(136);
   const groups=await page.locator('[data-work-group]').evaluateAll(nodes=>nodes.map(node=>node.dataset.workGroup));expect(groups.slice(0,2)).toEqual(['named','programs']);
 });
 

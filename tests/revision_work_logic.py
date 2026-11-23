@@ -69,7 +69,7 @@ function assertFilterView(v,label){
  assert.deepEqual([...v.drawn].sort(),[...v.ids].sort(),label+': every match is drawn once');
 }
 const baseline=typed('');
-assert.equal(baseline.ids.length,135,'Review route-count coverage after a research update');
+assert.equal(baseline.ids.length,136,'Review route-count coverage after a research update');
 assert.equal(baseline.beforeGroups,10,'Default named-listing preview');
 assert.equal(baseline.more,true,'Default view retains reachable additional records');
 assert.equal(baseline.openGroups,0,'Default secondary groups start collapsed');

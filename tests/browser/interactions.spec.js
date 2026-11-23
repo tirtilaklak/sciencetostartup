@@ -436,7 +436,7 @@ test('legacy arrangement links cannot apply a filter absent from the visible sel
     await ready(page, '#work?arrangement=' + encodeURIComponent(arrangement));
     await expect(page.locator('#work-eligibility')).toHaveValue('');
     expect(await page.evaluate(() => state.workEligibility)).toBe('');
-    expect(await page.evaluate(() => filteredWork().length)).toBe(135);
+    expect(await page.evaluate(() => filteredWork().length)).toBe(136);
     expect(await page.evaluate(() => location.hash)).toBe('#work');
   }
 });
