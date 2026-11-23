@@ -1,0 +1,46 @@
+name: C20 isolated immutable browser proof
+on:
+  push:
+    branches: [codex/site-quality-c20-immutable-proof-20261122]
+permissions:
+  contents: read
+jobs:
+  exact-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, mobile-chromium, firefox, webkit, mobile-webkit]
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Use the repository browser environment
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Check the exact product on the immutable Worker preview
+        env:
+          QA_PROJECT: ${{ matrix.project }}
+          PYTHONPATH: scripts
+        run: python3 .github/qa/c20-loopback/verify.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c20-immutable-${{ matrix.project }}
+          path: output/c20-immutable/
+          if-no-files-found: error
+          retention-days: 14
