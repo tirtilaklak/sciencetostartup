@@ -190,8 +190,12 @@ test('Market preserves the reading position on ordinary reload and Back', async 
   await expectReadingPosition();
 });
 
-for (const navigationType of ['reload', 'back_forward']) {
-  test(`Market retains the saved reading position after late native scroll on ${navigationType}`, async ({ page, browserName, isMobile }) => {
+const lateMarketLoads = [
+  ['reload', false], ['reload', true], ['back_forward', false], ['back_forward', true],
+];
+for (const [navigationType, scrollDuringLoad] of lateMarketLoads) {
+  const readingPosition = scrollDuringLoad ? 'current' : 'saved';
+  test(`Market retains the ${readingPosition} reading position after late native scroll on ${navigationType}`, async ({ page, browserName, isMobile }) => {
     test.skip(browserName !== 'firefox' || isMobile, 'Firefox defers its native fragment scroll until pageshow');
     const url = '/explore/#business-health';
     const root = page.locator('html');
@@ -241,10 +245,17 @@ for (const navigationType of ['reload', 'back_forward']) {
       await expect(root).toHaveAttribute('data-view-state', 'ready');
       expect(await page.evaluate(() => document.readyState)).toBe('interactive');
       await expect.poll(currentScroll).toBe(saved);
+      let positionBeforeLoad = saved;
+      if (scrollDuringLoad) {
+        await page.mouse.move(1070, 590);
+        await page.mouse.wheel(0, 340);
+        await expect.poll(currentScroll).toBeGreaterThan(saved + 300);
+        positionBeforeLoad = await currentScroll();
+      }
       releaseImage();
       await page.waitForLoadState('load');
       await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-      await expect.poll(currentScroll).toBe(saved);
+      await expect.poll(currentScroll).toBe(positionBeforeLoad);
     } finally {
       releaseImage();
     }
