@@ -42,9 +42,15 @@ if market_positions and project=='firefox':
     cases.extend({'file':file,'title':f'Market retains the {position} reading position after late native scroll on {kind}',
                   'project':project,'suite':[file]}
                  for kind in ('reload','back_forward') for position in market_positions)
+rapid_compare=int(os.environ.get('QA_COMPARE_RAPID')=='1')
+if rapid_compare and project in ('chromium','mobile-chromium'):
+    file='compare-return.spec.js'
+    cases.append({'file':file,'title':'Rapid Back restores the Compare opener before the fragment change is delivered',
+                  'project':project,'suite':[file]})
 selected={(row['file'],tuple(row['suite']),row['title']):row for row in cases if row['project']==project}
-counts={'chromium':146,'mobile-chromium':121,'firefox':51+2*len(market_positions),'webkit':14,'mobile-webkit':22}
-assert len(selected)==counts[project] and sum(counts.values())==354+2*len(market_positions)
+counts={'chromium':146+rapid_compare,'mobile-chromium':121+rapid_compare,
+        'firefox':51+2*len(market_positions),'webkit':14,'mobile-webkit':22}
+assert len(selected)==counts[project] and sum(counts.values())==354+2*len(market_positions)+2*rapid_compare
 validate_artifact(Path('dist'),digest)
 signed=Path('dist/manifest.json').read_bytes()
 build=json.loads(signed)['build_id']
