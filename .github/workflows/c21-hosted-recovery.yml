@@ -1,0 +1,132 @@
+name: Verify recovered C21 inputs
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-hosted-recovery.yml]
+permissions:
+  contents: read
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      C20_BASE: 2ded7d039d7605b113d1a8dac83af41dbcf3171b
+      C20_SOURCE: 04fd82ccf55bac9e1ed33a08564a9f816786d8c7
+      C21_PREFLIGHT: b799629a2a9c9fdee49e4b32b37e2ddae197ebe8
+      C20_MANIFEST: 1fe217bab088009c4fb30ca3b00987bc3291361808823d9c523729fb648015fc
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Confirm the independent recovery is needed
+        id: guard
+        shell: bash
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          if git show-ref --verify --quiet refs/remotes/origin/codex/site-quality-c21-frozen-build-20261122; then
+            echo "active=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "active=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-python@v5
+        if: steps.guard.outputs.active == 'true'
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        if: steps.guard.outputs.active == 'true'
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+        if: steps.guard.outputs.active == 'true'
+      - name: Rebuild from verified main and the reviewed source changes
+        if: steps.guard.outputs.active == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$GITHUB_WORKSPACE/output/c21-recovered"
+          PRODUCT="$RUNNER_TEMP/c21-recovered-source"
+          mkdir -p "$OUT"
+          git config --local user.name 'ScienceToStartup QA'
+          git config --local user.email 'qa@sciencetostartup.com'
+          git worktree add --detach "$PRODUCT" "$C20_BASE"
+          mapfile -t CHANGES < <(git rev-list --reverse "$C20_SOURCE..$C21_PREFLIGHT")
+          test "${#CHANGES[@]}" -eq 5
+          git -C "$PRODUCT" cherry-pick "${CHANGES[@]}"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$PRODUCT/node_modules"
+          python3 .github/qa/c21-recovery/recover.py "$PRODUCT"
+          git -C "$PRODUCT" add -- data scripts tests web release-assets
+          git -C "$PRODUCT" diff --check "$C20_BASE"
+          git -C "$PRODUCT" diff --binary "$C20_BASE" -- data scripts tests web release-assets > "$OUT/source-update.patch"
+          git -C "$PRODUCT" diff --stat "$C20_BASE" -- data scripts tests web release-assets > "$OUT/scope.txt"
+          cd "$PRODUCT"
+          python3 scripts/build_public_snapshot.py --output "$RUNNER_TEMP/c21-recovered-dist" > "$OUT/build.log" 2>&1
+          PYTHONPATH=scripts python3 - "$OUT" "$RUNNER_TEMP/c21-recovered-dist" <<'PY'
+          from datetime import datetime, timezone
+          from hashlib import sha256
+          from pathlib import Path
+          import json, os, shutil, sys
+          from release_artifact import validate_artifact
+          out, dist=map(Path,sys.argv[1:])
+          body=(dist/'manifest.json').read_bytes()
+          candidate=json.loads(body)
+          digest=sha256(body).hexdigest()
+          validate_artifact(dist,digest)
+          old_body=Path('dist/manifest.json').read_bytes()
+          assert sha256(old_body).hexdigest()==os.environ['C20_MANIFEST']
+          old=json.loads(old_body)
+          unchanged=0
+          changed={}
+          protected=['research/editions/','publication/']
+          for name,checksum in candidate['sha256'].items():
+              if old['sha256'].get(name)==checksum:
+                  unchanged+=1
+                  continue
+              assert not any(name.startswith(p) for p in protected), name
+              changed[name]=checksum
+              target=out/'payloads'/name
+              target.parent.mkdir(parents=True,exist_ok=True)
+              shutil.copyfile(dist/name,target)
+          for name,checksum in old['sha256'].items():
+              if any(name.startswith(p) for p in protected):
+                  assert candidate['sha256'].get(name)==checksum, name
+          (out/'manifest.json').write_bytes(body)
+          report={'build':candidate['build_id'],'sha256':digest,'base':os.environ['C20_BASE'],
+                  'initial_scope':os.environ['C21_PREFLIGHT'],'runner_head':os.environ['GITHUB_SHA'],
+                  'run':int(os.environ['GITHUB_RUN_ID']),'changed':changed,
+                  'unchanged':unchanged,'utc':datetime.now(timezone.utc).isoformat()}
+          (out/'delta.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(digest,candidate['build_id'],len(changed),unchanged)
+          PY
+          python3 -B -m unittest discover -s tests -p test_company_updates.py > "$OUT/company-data.log" 2>&1
+          python3 -B -m unittest discover -s tests -p test_research_pages.py -k full_ledger_is_partitioned > "$OUT/ledger-layout.log" 2>&1
+          mv dist "$RUNNER_TEMP/c20-signed-dist"
+          mv "$RUNNER_TEMP/c21-recovered-dist" dist
+          python3 -B -m unittest discover -s tests -p test_internal_links.py > "$OUT/links.log" 2>&1
+          node scripts/payload_budgets.mjs --dist dist --output "$OUT/payload-budgets.json" > "$OUT/payload-budgets.log" 2>&1
+          QA_DIST="$PWD/dist" python3 scripts/browser_qa_server.py --port 19011 > "$OUT/origin.log" 2>&1 &
+          origin_pid=$!
+          trap 'kill "$origin_pid" 2>/dev/null || true' EXIT
+          for retry in $(seq 1 20); do
+            curl --silent --fail http://127.0.0.1:19011/manifest.json >/dev/null && break
+            sleep 1
+          done
+          QA_BASE_URL=http://127.0.0.1:19011 ./node_modules/.bin/playwright test \
+            tests/browser/home.spec.js tests/browser/technical-reading.spec.js \
+            tests/browser/companies-enhancement-focus.spec.js tests/browser/finance-evidence.spec.js \
+            tests/browser/company-handoff.spec.js --project=chromium --project=mobile-chromium \
+            --workers=1 --retries=0 --timeout=90000 \
+            --grep 'Home opens the figure methods|current Technical GPQA citation opens|native Companies keeps focus|Explore uses publisher copies|restores the saved position' \
+            --reporter=json --output "$OUT/traces" > "$OUT/browser.json"
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.guard.outputs.active == 'true'
+        with:
+          name: c21-recovered-proof
+          path: output/c21-recovered/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
