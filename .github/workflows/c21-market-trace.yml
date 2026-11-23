@@ -1,0 +1,57 @@
+name: Read original Firefox Market failure
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-market-trace.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45104080318
+          name: c21-market-firefox-stock
+          path: output
+      - name: Classify saved trace
+        run: |
+          python3 - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+          import zipfile
+
+          raw=json.loads(Path('output/playwright.json').read_text())
+          def failures(node):
+              if isinstance(node, dict):
+                  error=node.get('error')
+                  if isinstance(error, dict) and '830.283' in error.get('message',''):
+                      selected={key:value for key,value in error.items()
+                                if key in {'message','stack','location','snippet'}}
+                      print('FAILURE', json.dumps(selected))
+                  for child in node.values():
+                      failures(child)
+              elif isinstance(node,list):
+                  for child in node:
+                      failures(child)
+          failures(raw)
+          for path in Path('output/results').rglob('trace.zip'):
+              with zipfile.ZipFile(path) as trace:
+                  for member in trace.namelist():
+                      if not member.endswith('.trace'):
+                          continue
+                      events=[json.loads(line) for line in trace.read(member).splitlines()]
+                      for event in events:
+                          method=event.get('method','')
+                          api=event.get('apiName','')
+                          if not re.search(r'reload|goto|goBack', f'{method} {api}', re.I):
+                              continue
+                          args=event.get('params', {})
+                          print('NAVIGATION',json.dumps({'type':event.get('type'),
+                              'api':api,'method':method,'url':args.get('url'),
+                              'startTime':event.get('startTime'),'stack':event.get('stack')}))
+          PY
