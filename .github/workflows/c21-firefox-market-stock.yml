@@ -1,0 +1,91 @@
+name: Measure the Firefox Market history failure
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-firefox-market-stock.yml]
+permissions:
+  contents: read
+jobs:
+  stock:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      C21_HEAD: 020d7f728c0a9ba0dbd4de699cb26bdc4ee665c6
+      C21_DIST_TREE: 30b9f32cd3a92505a6a38be7b4d075191e78a13e
+      C21_MANIFEST: 4a743a78e1e7cbe76ca6b097cb9072b6aaa557f0892b9e734aeff10eb36a3103
+      QA_BASE_URL: http://127.0.0.1:19011
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare the exact product checkout
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          git worktree add --detach "$RUNNER_TEMP/c21-product" "$C21_HEAD"
+          git config --global --add safe.directory "$RUNNER_TEMP/c21-product"
+          test "$(git -C "$RUNNER_TEMP/c21-product" rev-parse HEAD:dist)" = "$C21_DIST_TREE"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --prefix "$RUNNER_TEMP/c21-product"
+      - name: Repeat the exact Firefox user journey without injecting browser scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$GITHUB_WORKSPACE/output/market-stock"
+          mkdir -p "$OUT"
+          cd "$RUNNER_TEMP/c21-product"
+          PYTHONPATH=scripts python3 - <<'PY'
+          import os
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          validate_artifact(Path('dist'),os.environ['C21_MANIFEST'])
+          PY
+          QA_DIST="$PWD/dist" python3 scripts/browser_qa_server.py --port 19011 > "$OUT/origin.log" 2>&1 &
+          origin_pid=$!
+          trap 'kill "$origin_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 20); do
+            curl --silent --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-before.json" && break
+            sleep 1
+          done
+          cmp "$OUT/manifest-before.json" dist/manifest.json
+          status=0
+          ./node_modules/.bin/playwright test tests/browser/market-fallback.spec.js \
+            --grep 'Market preserves the reading position on ordinary reload and Back' \
+            --project=firefox --workers=1 --repeat-each=12 --retries=0 --timeout=90000 \
+            --trace retain-on-failure --reporter=json --output "$OUT/results" > "$OUT/playwright.json" || status=$?
+          curl --silent --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-after.json"
+          cmp "$OUT/manifest-after.json" dist/manifest.json
+          python3 - "$OUT/playwright.json" <<'PY'
+          import json,sys
+          raw=json.load(open(sys.argv[1]))
+          stats=raw['stats']
+          assert stats['expected']+stats['unexpected']+stats['flaky']+stats['skipped']==12
+          print(json.dumps(stats))
+          def inspect(group):
+              for spec in group.get('specs',[]):
+                  for test in spec['tests']:
+                      for result in test['results']:
+                          error=result.get('error',{}).get('message','')
+                          if error:
+                              print(error[:800])
+              for child in group.get('suites',[]):
+                  inspect(child)
+          inspect(raw)
+          PY
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c21-market-firefox-stock
+          path: output/market-stock/
+          if-no-files-found: error
+          retention-days: 14
