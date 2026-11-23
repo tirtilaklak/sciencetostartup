@@ -1,0 +1,75 @@
+name: Recheck the newest employer and issuer sources
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-employer-issuer-sources.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Read exact public source responses
+        shell: bash
+        run: |
+          mkdir -p output
+          python3 - <<'PY'
+          from html import unescape
+          import json, re
+          from pathlib import Path
+          from urllib.error import HTTPError, URLError
+          from urllib.request import Request, urlopen
+
+          identifier='7c54f48a-bd33-491a-8130-f1c9b1dfccb1'
+          posting=f'https://jobs.ashbyhq.com/g2i/{identifier}'
+          urls={
+              'g2i-board':'https://api.ashbyhq.com/posting-api/job-board/g2i?includeCompensation=true',
+              'g2i-posting':posting,
+              'g2i-application':posting+'/application',
+              'rws-trading':'https://www.lse.co.uk/rns/RWS/trading-statement-bgo38kxyahrrjkn.html?mobile_view=desktop',
+              'rws-acquisition':'https://www.londonstockexchange.com/en/news/article/RWS/completion-of-the-acquisition-of-acogroup/e91f-77-82-3d-cc-46438c',
+              'acolad-confirmation':'https://www.acolad.com/en/news/acolad-is-part-of-rws',
+          }
+          records={}
+          for name,url in urls.items():
+              row={'url':url}
+              try:
+                  with urlopen(Request(url,headers={'Accept':'application/json' if name=='g2i-board' else 'text/html'}),timeout=30) as response:
+                      body=response.read().decode('utf-8','replace')
+                      row.update(http=response.status,final=response.url,classification='reachable')
+                      content=unescape(re.sub(r'<[^>]*>',' ',body))
+                      plain=re.sub(r'\s+',' ',content)
+                      if name=='g2i-board':
+                          payload=json.loads(body)
+                          matches=[job for job in payload.get('jobs',[]) if identifier in job.get('jobUrl','')]
+                          row['exactBoardMatches']=len(matches)
+                          if len(matches)==1:
+                              job=matches[0]
+                              row['exactTitle']=job.get('title')
+                              row['isRemote']=job.get('isRemote')
+                              row['employmentType']=job.get('employmentType')
+                              row['applicationMatches']=job.get('applyUrl')==posting+'/application'
+                              terms=unescape(re.sub(r'<[^>]*>',' ',job.get('descriptionHtml','')))
+                              row['publishedRateInRole']=bool(re.search(r'\$100\s*(?:[-–—]|to)\s*\$?200',terms))
+                      elif name=='rws-trading':
+                          row['regulatoryStatement']=all(token.lower() in plain.lower() for token in ('RWS Holdings','30 September 2026','£700m','15 December 2026'))
+                      elif name in {'rws-acquisition','acolad-confirmation'}:
+                          row['acquisitionContent']=bool(re.search(r'completed.{0,110}acquisition|Acolad is part of RWS',plain,re.I))
+                      else:
+                          row['identityRetained']=identifier in response.url
+              except HTTPError as error:
+                  row.update(http=error.code,final=error.url,classification=(
+                      'access restriction' if error.code in {401,403,451} else
+                      'missing source' if error.code in {404,410} else 'unconfirmed response'))
+              except (URLError, TimeoutError, ValueError) as error:
+                  row.update(classification='unconfirmed transport or format',error=str(error)[:300])
+              records[name]=row
+              print(name,json.dumps(row))
+          Path('output/employer-issuer-links.json').write_text(json.dumps(records,indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: c21-employer-issuer-links
+          path: output
+          if-no-files-found: error
