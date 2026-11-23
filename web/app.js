@@ -788,7 +788,7 @@ function keepInitialMarketFocus(focusTarget,readingPosition=null){
  if(document.readyState==='complete')return;
  const bookmark=location.href,hasReadingPosition=Number.isFinite(readingPosition);
  const listeners=new AbortController(),options={capture:true,signal:listeners.signal};
- let intended=focusTarget,readerActivity=0;
+ let intended=focusTarget,readerActivity=0,readerPosition=null;
  function remember(event){
   if(event.target!==document.body&&event.target!==document.documentElement)intended=event.target;
  }
@@ -798,9 +798,12 @@ function keepInitialMarketFocus(focusTarget,readingPosition=null){
  document.addEventListener('focusin',remember,options);
  if(hasReadingPosition){
   for(const name of ['keydown','pointerdown','touchstart','touchmove','wheel'])window.addEventListener(name,markReaderMovement,options);
+  window.addEventListener('scroll',()=>{
+   if(readerActivity)readerPosition=window.scrollY;
+  },options);
  }
  window.addEventListener('pageshow',()=>{
-  const activityAtShow=readerActivity,position=activityAtShow?window.scrollY:readingPosition;
+  const activityAtShow=readerActivity,position=readerPosition??readingPosition;
   requestAnimationFrame(()=>{
    listeners.abort();
    if(location.href!==bookmark||!intended.isConnected||intended.closest('[hidden],[inert]'))return;
