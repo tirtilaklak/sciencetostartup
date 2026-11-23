@@ -126,15 +126,25 @@ archives={name:digest for name,digest in old.items() if archived(name)}
 assert all(assets.get(name)==digest for name,digest in archives.items())
 
 reports={}
-for file in (base/'performance').rglob('*.json'):
-    try:
-        data=read(file)
-    except (ValueError,OSError):
-        continue
-    if not isinstance(data,dict) or 'lighthouseVersion' not in data or 'categories' not in data:
-        continue
-    reports[str(file.relative_to(base))]=hash_file(file)
-assert len(reports)==72, len(reports)
+summaries=[]
+for path in (base/'performance').rglob('summary.json'):
+    candidate=read(path)
+    if isinstance(candidate,dict) and candidate.get('kind')=='mobile-performance-budget-report':
+        summaries.append(path)
+assert len(summaries)==1,summaries
+performance_path=summaries[0]
+performance=attest(performance_path)
+assert performance['passed'] and performance['payloadPassed'] and not performance['consistencyProblems']
+assert performance['manifestSha256']==manifest and performance['buildId']==build
+assert len(performance['routes'])==24 and performance['runsPerRoute']==3
+for route in performance['routes']:
+    assert route['passed'] and route['complete'] and route['validRuns']==3
+    for measurement in route['runReports']:
+        report=performance_path.parent/measurement['report']
+        digest=hash_file(report)
+        assert digest==measurement['reportSha256']
+        reports[str(report.relative_to(base))]=digest
+assert len(reports)==72
 
 output.mkdir(parents=True,exist_ok=False)
 stage=output/'worker-prepared'
