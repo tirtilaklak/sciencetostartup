@@ -35,7 +35,7 @@ try {
       function returnEarly() {
         if (departed || location.hash !== destination) return;
         departed=true;
-        const goBack = () => { note('request-back'); history.back(); };
+        const goBack = () => { window.qaCompareBackRequested=true; note('request-back'); history.back(); };
         if (delay) setTimeout(goBack,delay);
         else queueMicrotask(goBack);
       }
@@ -64,7 +64,7 @@ try {
       if (phase==='stock') {
         await page.waitForURL(origin+'/explore/'+destination);
         await page.goBack({waitUntil:'commit'});
-      }
+      } else await page.waitForFunction(() => window.qaCompareBackRequested);
       await page.waitForURL(origin+compare);
       await page.waitForFunction(() => document.documentElement.dataset.viewState==='ready');
       const returned = () => page.evaluate(open => ({
