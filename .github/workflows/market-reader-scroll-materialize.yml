@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 12
     env:
       BASE_SOURCE: 6cae2f8323f13b39009518c05e9fc5e0e95adbb4
-      BASE_MANIFEST: 8ea9a1b27fc9f9d7121e43d8db95883d3a69ce5808b90ba30684dbc18aac3838
+      BASE_MANIFEST: c2fca78d019495cafe0673e473ac82105a7dcbcd3720e5d4aa9e2e536c249f0c
       MARKET_SOURCE: 8047735ceedd5acd7c7ad831e4204bf878edac7b
       MARKET_MANIFEST: 8ea9a1b27fc9f9d7121e43d8db95883d3a69ce5808b90ba30684dbc18aac3838
       MARKET_BUILD: e7dbdca3aef8bba9b6fe
