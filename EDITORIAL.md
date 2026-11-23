@@ -117,11 +117,10 @@ Human/editorial triage:
 
 ## Cadence and promotion
 
-The homepage work example is reviewed on each editor day and expires after the
-three-day review window. The same rule applies to an approved network fallback.
-Use the approved candidate order, then a neutral Browse paid work panel. A company
-summary has its own semantic review date; do not borrow a financial date or work
-receipt for it.
+Review the homepage work example on each editor day. Use the approved candidate
+order. Each promoted example expires three days after its approved terms review.
+Once the candidates expire, the homepage shows a dated program record and keeps
+the Paid work link visible. Company summaries keep their own review dates.
 
 Named listings are reviewed weekly. A successful approved key-terms receipt starts
 the review clock: at 14 UTC days the listing is marked Needs recheck. Pay-only
@@ -138,9 +137,9 @@ rule. All dated records remain browsable.
 
 The small homepage runtime guard withdraws expired work examples. A publication
 regenerates the static HTML; the scheduled quality monitor checks the deployed
-release and does not rebuild or deploy it. Without JavaScript the homepage retains
-the neutral Browse paid work panel. Failed publications must alert the release
-owner. Absolute review dates remain attached to the recorded facts.
+release and does not rebuild or deploy it. Without JavaScript the homepage
+retains the dated program record and the Paid work link. Failed publications must
+alert the release owner. Absolute review dates remain attached to the recorded facts.
 
 ## Prepare a reproducible publication
 
@@ -166,6 +165,7 @@ research snapshots; do not silently rewrite their provenance.
 
 Daily monitoring runs at 07:17 UTC through `.github/workflows/quality-monitor.yml`.
 It records source-change candidates and a dated heartbeat as GitHub Actions artifacts.
+The workflow also publishes the [Daily archive health report](docs/daily-scan.md#production-monitoring).
 The editor checks the latest run and heartbeat on each working day. A missing heartbeat
 is a gap in monitoring, not evidence that the website is down. Scheduled checks are
 best effort; existing Cloudflare RUM and logs remain the operational evidence.

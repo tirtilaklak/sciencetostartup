@@ -91,8 +91,12 @@ class OperatingStatusTests(unittest.TestCase):
         html = operating.operating_status_notice(selected)
         parsed = VisibleText(html)
         text = " ".join(parsed.text)
-        self.assertIn("Next edition delayed", text)
+        self.assertEqual(parsed.tags[:2], ["details", "summary"])
+        self.assertIn('<details class="r-section r-disclosure r-operating-status">', html)
+        self.assertIn('<summary>As of <time datetime="2026-11-16T17:10:00Z">November 16, 2026</time>, '
+                      'the scheduled edition was delayed.</summary>', html)
         self.assertIn("November 16, 2026 at 9:00 a.m. Pacific", text)
+        self.assertIn("Research review was still in progress.", text)
         self.assertIn("Latest published edition November 12, 2026", text)
         self.assertIn("Status observed", text)
         self.assertNotIn("script", parsed.tags)
@@ -198,8 +202,8 @@ class OperatingStatusTests(unittest.TestCase):
         preparing = synthetic_status(state="preparing", observed_on="2026-11-15T17:00:00Z", reason_codes=[])
         result = self.validate(preparing, now=before)
         html = operating.operating_status_notice({operating.CONTEXT_KEY: result})
-        self.assertIn("Next edition preparation", html)
-        self.assertIn("The next edition was being prepared for", html)
+        self.assertIn('<summary>As of <time datetime="2026-11-15T17:00:00Z">November 15, 2026</time>, '
+                      'the next edition was in preparation.</summary>', html)
         self.assertEqual(result, self.validate(preparing))
         self.assertEqual(html, operating.operating_status_notice({
             operating.CONTEXT_KEY: self.validate(preparing)}))

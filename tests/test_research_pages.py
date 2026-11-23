@@ -207,6 +207,15 @@ class ResearchPageTests(unittest.TestCase):
         for path in ('/research/', rp.REPORT_PATH, '/research/data/', '/review/',
                      '/research/papers/', '/research/datasets/', '/research/benchmarks/', '/research/workflows/'):
             self.assertIn(path, paths)
+        hub = ReaderTree(self.page('/research/'))
+        actions, = hub.with_class('r-report-actions')
+        self.assertEqual(ReaderTree.links(actions), [rp.REPORT_PATH, '/research/data/'])
+        self.assertEqual([ReaderTree.text(link) for link in actions['children']], ['Read the report →', 'Data & sources'])
+        report_head = [node['attrs'] for node in ReaderTree(self.page(rp.REPORT_PATH)).elements if node['tag'] == 'meta']
+        for key, name in (('name', 'description'), ('property', 'og:description'), ('name', 'twitter:description')):
+            description, = (tag['content'] for tag in report_head if tag.get(key) == name)
+            self.assertEqual(description, rp.REPORT_DESCRIPTION)
+            self.assertLessEqual(len(description), rp.sp.DESCRIPTION_LIMIT)
         metadata = citations.publication_metadata(self.context)
         if self.context['report'].get('archive', {}).get('status') == 'published':
             self.assertEqual(self.context['report']['status'], 'published')
@@ -254,6 +263,8 @@ class ResearchPageTests(unittest.TestCase):
         for url in ('/research/exports/research-exports-manifest.json', '/publication/MANIFEST.json'):
             self.assertNotIn('download', links[url]['attrs'])
         for path, snapshot in editions:
+            description = escape(rp.sp.truncate(snapshot['report'].get('summary', '')))
+            self.assertIn(f'<meta name="description" content="{description}">', self.page(path))
             if snapshot['report']['release_id'] == 'research-2026-11-12.1':
                 edition_data = self.page(path + 'data/')
                 self.assertIn('corrects the Python example for <code>clean-dataset.json</code> to use <code>subject_id</code>', edition_data)
@@ -373,7 +384,8 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
                 else:
                     self.assertIn(rp.WITHHELD_PARAGRAPH, chapter)
             self.assertEqual([script for script in chapter_facts.scripts if 'src' in script],
-                             [{'src': '/native-details.js', 'defer': None}] if index else [])
+                             ([{'src': '/native-details.js', 'defer': None}] if index else [])
+                             + [{'src': '/guide-search-shell.js', 'defer': None}])
             self.assertNotIn('type="module"', chapter)
             tree = ReaderTree(chapter)
             shortcuts = tree.with_class('r-bulk-shortcuts')[0]
@@ -832,7 +844,15 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         self.context['corrections'] = corrections
         paths = {row['path'] for row in self.build()}
         self.assertIn(rp.CORRECTIONS_PATH, paths)
-        self.assertNotIn('No accepted or published research corrections are recorded.', self.page(rp.CORRECTIONS_PATH))
+        page = self.page(rp.CORRECTIONS_PATH)
+        self.assertNotIn('No accepted or published research corrections are recorded.', page)
+        evidence_lists = ReaderTree(page).with_class('r-correction-evidence')
+        ordered = rp._correction_records(self.context)
+        self.assertEqual([ReaderTree.links(node) for node in evidence_lists],
+                         [row['evidence_urls'] for row in ordered])
+        evidence_text = [ReaderTree.text(node) for node in evidence_lists]
+        self.assertTrue(any('Privacy Notice - Labelbox' in text for text in evidence_text))
+        self.assertTrue(any('Approved replacement claim ' in text for text in evidence_text))
         rss = ET.parse(self.output / 'research/corrections/feed.xml')
         atom = ET.parse(self.output / 'research/corrections/atom.xml')
         self.assertEqual(len(rss.findall('./channel/item')), len(corrections))
@@ -852,6 +872,7 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         self.build()
         page = self.page(rp.CORRECTIONS_PATH)
         self.assertIn('Synthetic correction &lt;with markup&gt; &amp; qualification.', page)
+        self.assertIn('>https://example.org/evidence?version=1&amp;part=2</a>', page)
         self.assertNotIn('<with markup>', page)
         for row in (accepted, published):
             self.assertIn('correction-' + row['id'], Facts(page).ids)

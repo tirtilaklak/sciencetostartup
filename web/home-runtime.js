@@ -2,10 +2,19 @@
 (() => {
   'use strict';
 
+  const shell = /* NATIVE_GUIDE_SEARCH */null;
+  if (shell && typeof window.HTMLDialogElement?.prototype.showModal === 'function') {
+    const configNode = document.createElement('script');
+    configNode.id = 'home-config';
+    configNode.type = 'application/json';
+    configNode.textContent = JSON.stringify(shell.config);
+    document.body.append(configNode);
+    document.body.insertAdjacentHTML('beforeend', shell.dialog);
+  }
   const configNode = document.getElementById('home-config');
-  if (!configNode) return;
-  const config = JSON.parse(configNode.textContent);
+  const config = configNode ? JSON.parse(configNode.textContent) : null;
   const slot = document.getElementById('home-work-example');
+  const recorded = document.getElementById('home-work-recorded');
 
   function refreshPromotion() {
     const now = Date.now();
@@ -14,7 +23,8 @@
     const route = template ? candidate.routeId : '';
     if (route === (slot.dataset.routeId || '')) return;
 
-    const hadFocus = slot.contains(document.activeElement);
+    const hadFocus = slot.contains(document.activeElement) || recorded?.contains(document.activeElement);
+    if (recorded) recorded.hidden = Boolean(template);
     if (template) {
       slot.replaceChildren(template.content.cloneNode(true));
       slot.hidden = false;
@@ -32,7 +42,7 @@
     }
   }
 
-  if (slot && config.candidates?.length) {
+  if (slot && config?.candidates?.length) {
     refreshPromotion();
     setInterval(refreshPromotion, 60_000);
     document.addEventListener('visibilitychange', () => {
@@ -40,7 +50,7 @@
     });
   }
 
-  const menu = document.querySelector('.home-menu');
+  const menu = document.querySelector('.home-menu, .site-menu');
   menu?.addEventListener('keydown', event => {
     if (event.key !== 'Escape' || !menu.open) return;
     event.preventDefault();
@@ -51,22 +61,33 @@
     if (menu.open && !menu.contains(event.target)) menu.open = false;
   });
 
-  const opener = document.getElementById('home-search-open');
+  const opener = document.querySelector('.site-header .site-search-open');
   const dialog = document.getElementById('home-search');
   const input = document.getElementById('home-search-input');
   const message = document.getElementById('home-search-message');
   const results = document.getElementById('home-search-results');
   const recovery = document.getElementById('home-search-work-recovery') || dialog?.querySelector('.site-search-fallback a[href="/work/"]');
   if (!opener || typeof dialog?.showModal !== 'function' || !input || !message || !results || !recovery) return;
+  opener.id = 'home-search-open';
   let attempt = null;
   let generation = 0;
   let retries = 0;
   let pendingSnapshot;
+  let returnFocus;
 
   function syncWorkRecovery() {
     const query = input.value.slice(0, 256);
-    recovery.href = query.trim() ? '/work/?' + new URLSearchParams({ q: query }) : '/work/';
-    recovery.textContent = query.trim() ? 'Search paid work for this query' : 'Browse paid work';
+    const key = query.normalize('NFKD').replace(/\p{M}+/gu, '').toLowerCase().replace(/\s+/gu, ' ').trim();
+    if (key === 'hourly' || key === 'hourly pay') {
+      recovery.href = '/work/?pay=hourly';
+      recovery.textContent = 'See roles with published hourly pay';
+    } else if (!key || key === 'paid work') {
+      recovery.href = '/work/';
+      recovery.textContent = 'Browse paid work';
+    } else {
+      recovery.href = '/work/?' + new URLSearchParams({ q: query });
+      recovery.textContent = 'Search paid work for this query';
+    }
   }
 
   function stop() {
@@ -87,7 +108,11 @@
     window.openHomeSearch(snapshot);
   }
 
-  function openSearch(snapshot) {
+  function openSearch(snapshot, trigger = document.activeElement) {
+    if (!dialog.open) {
+      returnFocus = trigger instanceof HTMLElement && trigger !== document.body && !dialog.contains(trigger)
+        ? trigger : opener;
+    }
     if (snapshot) {
       pendingSnapshot = snapshot;
       input.value = snapshot.query.slice(0, 256);
@@ -141,7 +166,7 @@
   opener.addEventListener('click', event => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button > 0) return;
     event.preventDefault();
-    openSearch();
+    openSearch(undefined, opener);
   });
   input.addEventListener('input', event => {
     pendingSnapshot = undefined;
@@ -159,7 +184,19 @@
     stop();
     pendingSnapshot = undefined;
     opener.setAttribute('aria-expanded', 'false');
-    opener.focus();
+    const target = returnFocus;
+    returnFocus = undefined;
+    if (dialog.returnValue === 'search-result') {
+      dialog.returnValue = '';
+      return;
+    }
+    if (target?.isConnected) target.focus({ preventScroll: true });
+    if (document.activeElement !== target) opener.focus({ preventScroll: true });
+    const focused = document.activeElement;
+    const bounds = focused.getBoundingClientRect();
+    if (bounds.bottom <= 0 || bounds.top >= innerHeight || bounds.right <= 0 || bounds.left >= innerWidth) {
+      focused.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
   });
   document.addEventListener('keydown', event => {
     if (event.isComposing || event.keyCode === 229 || event.altKey || event.shiftKey) return;
@@ -181,7 +218,7 @@
   opener.dataset.searchReady = '';
 
   const url = new URL(location.href);
-  if (url.searchParams.has('search')) {
+  if (!shell && url.searchParams.has('search')) {
     input.value = (url.searchParams.get('search') || '').slice(0, 256);
     url.searchParams.delete('search');
     if (url.hash === '#browse-guide') url.hash = '';

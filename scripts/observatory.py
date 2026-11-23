@@ -1028,6 +1028,13 @@ def build(data, destination):
     html = html.replace('<link rel="canonical" href="https://sciencetostartup.com/">', '<link rel="canonical" href="https://sciencetostartup.com/explore/"><meta name="robots" content="noindex,follow">')
     (destination / "explore/index.html").write_text(root_relative_resources(html))
     landing = (ROOT / "web/landing.html").read_text()
+    search_dialog = (ROOT / "web/guide-search.html").read_text()
+    search_config = {key: summary[key] for key in ("schemaVersion", "buildId", "editorialReleaseId", "datasetVersion")}
+    search_config["search"] = summary["homeSearch"]
+    search_shell = json.dumps({"config": search_config, "dialog": search_dialog}, separators=(",", ":"))
+    search_runtime = (ROOT / "web/home-runtime.js").read_text()
+    (destination / "guide-search-shell.js").write_text(search_runtime.replace("/* NATIVE_GUIDE_SEARCH */null", search_shell))
+    landing = landing.replace("{{GUIDE_SEARCH_DIALOG}}", search_dialog.rstrip())
     landing = landing.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{WORK_RECORD_COUNT}}", str(len(work_data["routes"])))
     landing = render_snapshot_metadata(landing, data)
     from home import render_home

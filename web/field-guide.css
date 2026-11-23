@@ -66,6 +66,40 @@ h1,h2,h3,h4{font-family:var(--fg-sans);color:var(--ink)}
 .site-search-fallback a{display:inline-flex;align-items:center;min-height:44px;color:var(--green)}
 .site-search-target{outline:3px solid var(--green);outline-offset:4px}
 
+#home-search .site-search-panel { overflow-y: auto; }
+.site-search-content { display: contents; }
+#home-search .site-search-input::placeholder { color: var(--muted); opacity: 1; }
+.site-search-more {
+  flex: none;
+  align-self: flex-start;
+  min-height: 44px;
+  max-width: calc(100% - 40px);
+  margin: 8px 20px 16px;
+  scroll-margin-block: 6px;
+  padding: 10px 14px;
+  border: 1px solid var(--green);
+  background: transparent;
+  color: var(--green);
+  font-size: .875rem;
+  overflow-wrap: anywhere;
+}
+.site-search-more:hover { background: var(--pale); }
+#home-search .site-search-message { padding-bottom: 8px; }
+#home-search .site-search-fallback { padding-block: 4px; }
+.site-search-fallback a { overflow-wrap: anywhere; }
+@media (max-height: 450px) {
+  #home-search { max-height: calc(100dvh - 24px); margin: 12px auto auto; }
+  #home-search .site-search-results { min-height: min(96px, 30dvh); }
+}
+@media (max-height: 210px) {
+  /* Keep the search controls in view and give the rest of the dialog one scroll area. */
+  #home-search { max-height: calc(100dvh - 8px); margin: 4px auto auto; }
+  #home-search .site-search-panel:has(> .site-search-content) { overflow: clip; }
+  #home-search .site-search-bar:has(+ .site-search-content) { flex: none; padding-block: 6px; }
+  .site-search-content { display: block; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  #home-search .site-search-content .site-search-results { min-height: 0; overflow: visible; }
+}
+
 /* A ruled directory gives offerings and their evidence a stable reading order. */
 #companies-view .page-heading{padding:32px 0 20px;margin:0}
 .filters label{font-size:var(--fg-meta);line-height:1.5;gap:8px}

@@ -551,6 +551,9 @@ const S2SWork = (() => {
     const initialCount = count.textContent;
     const empty = document.querySelector('[data-work-empty]');
     const navigation = document.querySelector('[data-work-section-navigation]');
+    const sectionDetails = navigation?.closest('details');
+    const sectionDisclosure = sectionDetails || navigation;
+    const sectionTotals = sectionDisclosure?.querySelector('[data-work-section-totals]');
     const compareLink = document.querySelector('[data-work-compare]');
     const exploreLink = document.querySelector('[data-work-explore]');
     const handoffLinks = { compare: compareLink, explore: exploreLink };
@@ -609,6 +612,11 @@ const S2SWork = (() => {
       const open = history.state?.workFilterOptionsOpen;
       if (typeof open === 'boolean') filterOptions.open = open;
       else remember({ workFilterOptionsOpen: filterOptions.open });
+    }
+
+    function restoreSectionDisclosure() {
+      const open = history.state?.workSectionDisclosureOpen;
+      if (sectionDetails && typeof open === 'boolean') sectionDetails.open = open;
     }
 
     function appendComparisonFields(cell, fields) {
@@ -708,6 +716,8 @@ const S2SWork = (() => {
       for (const [key, group] of groupElements) {
         const matches = groups[key];
         group.hidden = !matches.length;
+        const headingCount = group.querySelector('[data-work-group-count]');
+        if (headingCount) headingCount.textContent = matches.length;
         const cards = group.querySelector('.work-listings');
         if (matches.some(({ card }, index) => index && Boolean(matches[index - 1].card.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_PRECEDING))) {
           for (const { card } of matches) cards.append(card);
@@ -731,8 +741,14 @@ const S2SWork = (() => {
       const countLabel = hourlyOnly ? `${selection.length} ${record} with published hourly pay`
         : matchKeys.length ? `${selection.length} matching ${record}` : initialCount;
       if (count.textContent !== countLabel) count.textContent = countLabel;
-      if (navigation) {
-        navigation.hidden = showCompare || !selection.length;
+      if (sectionDisclosure) {
+        sectionDisclosure.hidden = showCompare || !selection.length;
+        if (sectionTotals) {
+          const named = groups.named.length, programs = groups.programs.length;
+          const companies = new Set([...groups.named, ...groups.programs].map(route => route.company_id)).size;
+          sectionTotals.hidden = Boolean(matchKeys.length) && !named && !programs;
+          sectionTotals.textContent = `${named} named ${named === 1 ? 'listing' : 'listings'} · ${programs} ${programs === 1 ? 'network or program' : 'networks and programs'} · ${companies} ${companies === 1 ? 'company' : 'companies'}`;
+        }
         for (const link of navigation.querySelectorAll('[data-work-jump]')) {
           const key = link.dataset.workJump;
           const matches = groups[key].length;
@@ -941,10 +957,16 @@ const S2SWork = (() => {
     filterSummary.addEventListener('click', event => {
       if (!event.defaultPrevented) remember({ workFilterOptionsOpen: !filterOptions.open });
     });
+    sectionDetails?.addEventListener('toggle', () => {
+      remember({ workSectionDisclosureOpen: sectionDetails.open });
+    });
     for (const [kind, link] of Object.entries(handoffLinks)) {
       link?.addEventListener('click', event => {
         if (!sameTabActivation(event, link)) return;
-        if (link === compareLink && comparison?.hidden) compareDeparture = event;
+        if (link === compareLink && comparison?.hidden) {
+          compareDeparture = event;
+          if (sectionDetails) remember({ workSectionDisclosureOpen: sectionDetails.open });
+        }
         const entry = window.S2SNativeHandoff?.begin(link.href, event);
         remember({ workReturnFocus: { kind, page: location.href, href: link.href, top: link.getBoundingClientRect().top, entry }, workCompareFocus: false });
       });
@@ -1015,6 +1037,7 @@ const S2SWork = (() => {
     filterOptions.open = loader?.initialOptionsOpen ?? S2SWork.keys.some(key => key !== 'q' && fields[key]?.value);
     restoreFilterOptions();
     render();
+    restoreSectionDisclosure();
     form.hidden = false;
     if (compareLink) compareLink.hidden = false;
     if (exportButton) exportButton.hidden = false;

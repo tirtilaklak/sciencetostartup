@@ -65,7 +65,7 @@ test.describe('native ledger rendering', () => {
     await expect(alias).toBeVisible();
     const nativeLink = alias;
     await expect(nativeLink).toHaveRole('link');
-    await expect(nativeLink).toHaveAccessibleName('Open source record: ' + sourceRow.id);
+    await expect(nativeLink).toHaveAccessibleName('Open source record');
     expect(new URL(await nativeLink.getAttribute('href'), page.url()).href).toBe(new URL(destination, page.url()).href);
     await nativeLink.focus();
     await page.keyboard.press('Enter');
@@ -118,6 +118,7 @@ test.describe('native ledger rendering', () => {
     await page.goto('/research/data/#' + token(id));
     const alias = page.locator(selector(id));
     await expect(alias).toHaveRole('link');
+    await expect(alias).toHaveAccessibleName('Open assertion record');
     const destination = evidenceURL('assertion', row.id);
     expect(new URL(await alias.getAttribute('href'), page.url()).href).toBe(new URL(destination, page.url()).href);
     await alias.focus();

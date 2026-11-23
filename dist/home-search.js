@@ -85,7 +85,7 @@
   globalThis.S2SSearch = Object.freeze({ normalize, identifier, identifiers, isWorkQuery, workTerms, workUrl, compile, rank, compare, matchedAlias });
 })();
 
-/* Loaded only when homepage Search is invoked; no application or archive download. */
+/* Loaded only when guide Search is invoked; no application or archive download. */
 (() => {
   'use strict';
   if (typeof window.openHomeSearch === 'function') return;
@@ -124,6 +124,9 @@
     if (isHourlyPayQuery(search.normalize(raw))) {
       workRecovery.href = hourlyWork.href;
       workRecovery.textContent = hourlyWork.name;
+    } else if (search.normalize(raw) === 'paid work') {
+      workRecovery.href = '/work/';
+      workRecovery.textContent = 'Browse paid work';
     } else {
       workRecovery.href = search.workUrl(raw);
       workRecovery.textContent = raw.trim() ? 'Search paid work for this query' : 'Browse paid work';
@@ -179,7 +182,7 @@
     return {
       dataset: 'Dataset', benchmark: 'Benchmark', report: 'Research report', workflow: 'Workflow',
       daily: 'Daily scan', data: 'Research data', review: 'Review log', market: 'Market',
-      directory: 'Company directory', compare: 'Comparison',
+      directory: 'Company directory', compare: 'Comparison', work: 'Work directory',
     }[row.group] || 'Research';
   }
   function option({ name, summary, href, type }, index) {
@@ -201,9 +204,11 @@
       const { row } = entry, alias = row.href.startsWith('/company/') ? search.matchedAlias(entry, raw) : '';
       return { ...row, type: resultType(row), summary: alias ? 'Recorded alias: ' + alias + '. ' + row.summary : row.summary };
     });
-    if (!exact) {
-      const work = hourly ? hourlyWork : { name: key ? 'Find paid work matching “' + raw.trim() + '”' : 'Browse paid work', summary: 'Public listings, expert networks and requirements', type: 'Work search', href: search.workUrl(raw) };
-      if (hourly || search.isWorkQuery(raw, workTitles)) rendered.unshift(work);
+    const browseWork = key === 'paid work';
+    if (!exact && !(browseWork && rendered.some(result => result.href === '/work/'))) {
+      const browse = !key || browseWork;
+      const work = hourly ? hourlyWork : { name: browse ? 'Browse paid work' : 'Find paid work matching “' + raw.trim() + '”', summary: 'Public listings, expert networks and requirements', type: 'Work search', href: search.workUrl(browse ? '' : raw) };
+      if (hourly || browseWork || search.isWorkQuery(raw, workTitles)) rendered.unshift(work);
       else rendered.push(work);
     }
     results.innerHTML = rendered.map(option).join('');
@@ -253,9 +258,30 @@
       if (workRecovery) workRecovery.hidden = false;
     }
   };
+  function activateLocalResult(event, link) {
+    if (link.pathname !== location.pathname || link.search !== location.search) return false;
+    const target = link.hash ? document.getElementById(link.hash.slice(1)) : document.getElementById('main');
+    const focus = target?.querySelector('h1, h2, h3') || target;
+    dialog.close('search-result');
+    if (link.hash && link.hash !== location.hash) {
+      // Keep native hash navigation so the destination can reveal filtered content.
+      if (focus) addEventListener('hashchange', () => focusResult(focus), { once: true });
+    } else {
+      event.preventDefault();
+      if (!link.hash && location.hash) history.pushState(history.state, '', link.href);
+      target?.scrollIntoView({ block: 'start' });
+      if (focus) focusResult(focus);
+    }
+    return true;
+  }
+  function focusResult(target) {
+    if (target.tabIndex < 0 && !target.hasAttribute('tabindex')) target.tabIndex = -1;
+    target.focus({ preventScroll: true });
+  }
   dialog.addEventListener('click', event => {
     const link = event.target.closest('#home-search-results a[role=option]');
     if (!link || event.defaultPrevented || event.button || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || link.origin !== location.origin) return;
+    if (activateLocalResult(event, link)) return;
     const scroller = resultScroller();
     try {
       history.replaceState({ ...history.state, [historyField]: {

@@ -312,16 +312,16 @@ def render(edition, editions, canonical, root=ROOT, context=None):
         f'>{format_date(row["date"])} <span>{len(row["items"])} items</span></a>'
         for row in reversed(editions)
     )
-    body = (f'<div class="daily-scan" data-edition="{day}"><header class="scan-heading"><div>'
-            '<h1>Daily scan</h1><p class="scan-deck">Research and company news on AI training.</p></div>'
-            f'<time class="scan-issue" datetime="{day}">{format_date(day)}</time></header>'
+    body = (f'<div class="daily-scan" data-edition="{day}"><header class="scan-heading">'
+            f'<time class="scan-issue" datetime="{day}">{format_date(day)}</time>'
+            '<h1>Daily scan</h1><p class="scan-deck">Research and company news on AI training.</p></header>'
             f'<nav class="scan-edition-nav" aria-label="Snapshots">{steps}'
+            '<nav class="scan-follow" aria-label="Follow Daily scan"><a class="scan-rss" href="/daily/feed.xml">RSS</a></nav>'
             # Keep the links visible on a native history return even when the
             # browser recreates the document and loses its disclosure state.
             f'<details class="scan-archive-disclosure" open><summary>Snapshot archive and feeds</summary><div class="scan-archive">{archive}</div>'
-            '<nav class="scan-follow" aria-label="Follow Daily scan">'
-            '<a href="/daily/feed.xml">RSS</a> <a href="/daily/feed.json">JSON Feed</a> '
-            '<a href="/research/feed.xml">Research editions</a> <a href="/research/corrections/feed.xml">Research corrections</a></nav></details>'
+            '<div class="scan-follow"><a href="/daily/feed.json">JSON Feed</a> '
+            '<a href="/research/feed.xml">Research editions</a> <a href="/research/corrections/feed.xml">Research corrections</a></div></details>'
             '<script>document.currentScript.previousElementSibling.open=false</script>'
             f'<form class="scan-date-form" hidden><label for="scan-date">Snapshot date</label>'
             f'<div><select id="scan-date">{options}</select><button id="scan-date-go" type="submit">Go</button></div></form></nav>'

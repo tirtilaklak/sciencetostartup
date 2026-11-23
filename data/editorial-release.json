@@ -52,6 +52,7 @@
   },
   "homepage": {
     "work_candidate_route_ids": [
+      "g2i.work.senior-swe-training-7c54f48a",
       "mercor.work.expert-network"
     ],
     "require_approved_key_terms_receipt": true,

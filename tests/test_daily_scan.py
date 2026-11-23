@@ -285,15 +285,17 @@ class DailyScanTests(unittest.TestCase):
                 self.assertEqual([step["rel"] for step in page.date_steps()],
                                  [rel for rel, target in (("prev", index - 1), ("next", index + 1)) if 0 <= target < len(dates)])
                 navigation = html.split('<nav class="scan-edition-nav"', 1)[1].split('<details class="scan-filter-disclosure"', 1)[0]
-                archive = navigation.split('<details class="scan-archive-disclosure" open>', 1)[1].split('</details>', 1)[0]
+                before_archive, disclosure = navigation.split('<details class="scan-archive-disclosure" open>', 1)
+                archive = disclosure.split('</details>', 1)[0]
                 self.assertIn('<summary>Snapshot archive and feeds</summary>', archive)
                 self.assertIn(f'<a href="/daily/{snapshot["date"]}/" aria-current="date">', navigation)
-                self.assertIn('<a href="/daily/feed.xml">RSS</a>', archive)
+                self.assertIn('<a class="scan-rss" href="/daily/feed.xml">RSS</a>', before_archive)
                 self.assertIn('<a href="/daily/feed.json">JSON Feed</a>', archive)
                 self.assertIn('<form class="scan-date-form" hidden>', navigation)
                 self.assertIn('<button id="scan-date-go" type="submit">Go</button>', navigation)
                 self.assertIn('<details class="scan-filter-disclosure" open hidden><summary>Search and filter</summary>', html)
                 self.assertLess(html.index(navigation), html.index('<article class="scan-item"'))
+                self.assertLess(html.index(f'datetime="{snapshot["date"]}"'), html.index('<h1>Daily scan</h1>'))
                 self.assertTrue(any(tag == "div" and attrs.get("data-edition") == snapshot["date"] for tag, attrs in page.elements))
 
     def test_writer_keeps_dated_snapshots_and_points_latest_to_newest(self):

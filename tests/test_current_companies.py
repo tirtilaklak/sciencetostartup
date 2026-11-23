@@ -219,7 +219,8 @@ class CurrentCompanyRenderingTests(unittest.TestCase):
                 self.assertEqual(page.meta[key], entry["wikipedia"]["description"])
             self.assertIn('"dateModified":"2026-11-16"', text)
             self.assertEqual(hashlib.sha256(archive.read_bytes()).hexdigest(), frozen)
-            self.assertEqual(page.scripts, [{"type": "application/ld+json"}, {"src": "/native-details.js", "defer": None}])
+            self.assertEqual(page.scripts, [{"type": "application/ld+json"}, {"src": "/native-details.js", "defer": None},
+                                            {"src": "/guide-search-shell.js", "defer": None}])
             with self.assertRaisesRegex(cc.CurrentCompaniesValidationError, "already written"):
                 cc.write_current_company_supplements(root, registry)
 

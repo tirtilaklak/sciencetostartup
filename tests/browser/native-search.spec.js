@@ -1,6 +1,137 @@
 const {test,expect}=require('@playwright/test');
 const {routes}=require('../../data/work-routes.json');
 
+test('global search keeps the native reader page, filters and opener when dismissed', async ({ page }) => {
+  const requests = [];
+  page.on('request', request => requests.push(request.url()));
+  for (const path of ['/work/?q=python#main', '/research/papers/', '/method/#about']) {
+    await page.goto(path);
+    const origin = page.url();
+    const opener = page.getByRole('link', { name: 'Search the guide' });
+    await expect(opener).toHaveAttribute('aria-haspopup', 'dialog');
+    expect(requests.splice(0).some(url => /home-search\.js|\/presentation\/search\./.test(url))).toBe(false);
+    await opener.click();
+    const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+    const input = dialog.getByRole('combobox');
+    await expect(input).toBeFocused();
+    await input.fill('Paid work');
+    await expect(dialog.getByRole('option').first()).toHaveAttribute('href', '/work/');
+    await dialog.getByRole('button', { name: 'Close search' }).click();
+    await expect(opener).toBeFocused();
+    await expect(page).toHaveURL(origin);
+    if (path.startsWith('/work/')) await expect(page.getByRole('searchbox', { name: 'Search listings' })).toHaveValue('python');
+    requests.length = 0;
+  }
+});
+
+test('global search shortcut restores the actual focused control and finds the published DOI', async ({ page }) => {
+  for (const path of ['/', '/research/']) {
+    await page.goto(path);
+    const trigger = page.locator('main a[href="/companies/"], main a[href="/research/data/"]').first();
+    await trigger.focus();
+    await expect(trigger).toBeFocused();
+    await page.keyboard.press('Control+k');
+    const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+    const input = dialog.getByRole('combobox');
+    await input.fill('10.5281/zenodo.24249277');
+    await expect(dialog.getByRole('option').first()).toHaveAttribute('href', '/research/editions/2026-11-12/');
+    await input.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(trigger).toBeFocused();
+  }
+});
+
+test('a result on the current day closes Search and focuses its headline', async ({ page, isMobile }) => {
+  const day = '/daily/2026-11-18/';
+  const fragment = '#regularized-score-centering';
+  const title = 'Regularized Score Centering';
+  const opener = page.getByRole('link', { name: 'Search the guide' });
+  const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+  const input = dialog.getByRole('combobox');
+  const first = dialog.getByRole('option').first();
+  const target = page.locator(fragment);
+  const heading = target.getByRole('heading', { name: title, exact: true });
+  await page.goto(day);
+  await opener.click();
+  await input.fill(title);
+  await expect(first).toHaveAttribute('href', day + fragment);
+  if (isMobile) await first.tap();
+  else {
+    await input.press('ArrowDown');
+    await input.press('Enter');
+  }
+  await expect(page).toHaveURL(new RegExp(day + fragment + '$'));
+  await expect(dialog).toBeHidden();
+  await expect(heading).toBeFocused();
+  await expect(heading).toBeInViewport();
+  await expect(target.locator('details')).toHaveAttribute('open', '');
+  await page.goBack();
+  await expect(page).toHaveURL(new RegExp(day + '$'));
+});
+
+test('a same-page hub result clears the fragment, closes Search and focuses the page title', async ({ page }) => {
+  await page.goto('/work/#main');
+  const opener = page.getByRole('link', { name: 'Search the guide' });
+  const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+  await opener.click();
+  await dialog.getByRole('combobox').fill('Paid work');
+  const first = dialog.getByRole('option').first();
+  await expect(first).toHaveAttribute('href', '/work/');
+  await first.click();
+  await expect(page).toHaveURL(/\/work\/$/);
+  await expect(dialog).toBeHidden();
+  await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/work\/#main$/);
+});
+
+test('a failed Search component preserves the work shortcuts and can retry', async ({ page }) => {
+  for (const path of ['/', '/method/']) {
+    const component = '**/home-search.js';
+    await page.route(component, route => route.abort());
+    await page.goto(path);
+    await page.getByRole('link', { name: 'Search the guide' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+    const input = dialog.getByRole('combobox');
+    const retry = dialog.getByRole('button', { name: 'Try again' });
+    await expect(retry).toBeVisible();
+    await input.fill('  Hourly   Pay  ');
+    await expect(dialog.getByRole('link', { name: 'See roles with published hourly pay' })).toHaveAttribute('href', '/work/?pay=hourly');
+    await input.fill('Paid work');
+    await expect(dialog.getByRole('link', { name: 'Browse paid work' })).toHaveAttribute('href', '/work/');
+    await input.fill('Sage');
+    await expect(dialog.getByRole('link', { name: 'Search paid work for this query' })).toHaveAttribute('href', '/work/?q=Sage');
+    await page.unroute(component);
+    await retry.click();
+    await expect(input).toHaveValue('Sage');
+    await expect(dialog.getByRole('option').first()).toHaveAttribute('href', '/work/?q=Sage');
+  }
+});
+
+test('mobile Safari keeps the restored Search opener in view after a cold Back', async ({ page, browserName, isMobile }) => {
+  test.skip(browserName !== 'webkit' || !isMobile, 'Covers mobile Safari fragment scroll restoration');
+  await page.goto('/companies/?q=Mercor#main');
+  const opener = page.getByRole('link', { name: 'Search the guide' });
+  await opener.tap();
+  const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+  const input = dialog.getByRole('combobox');
+  await input.fill('Mercor');
+  const first = dialog.getByRole('option').first();
+  await expect(first).toHaveAttribute('href', '/company/mercor/');
+  await first.tap();
+  await expect(page).toHaveURL(/\/company\/mercor\/$/);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/companies\/\?q=Mercor#main$/);
+  await expect(input).toHaveValue('Mercor');
+  await expect(first).toHaveAttribute('aria-selected', 'true');
+  await expect(opener).not.toBeInViewport();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(opener).toBeFocused();
+  await expect(opener).toBeInViewport();
+  await expect(page.locator('#company-query')).toHaveValue('Mercor');
+});
+
 test('static header points to lightweight search and native directory matches contributor brands',async({page})=>{
   await page.goto('/companies/');
   await expect(page.locator('.site-search-open')).toHaveAttribute('href',/\/\?search=?#browse-guide$/);

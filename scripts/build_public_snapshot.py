@@ -20,10 +20,10 @@ def validate_output_path(destination):
 
 
 def verify(destination, dist=ROOT / "dist"):
-    expected = json.loads((dist / "manifest.json").read_text())
-    actual = json.loads((destination / "manifest.json").read_text())
-    if actual != expected:
+    manifest = (dist / "manifest.json").read_bytes()
+    if (destination / "manifest.json").read_bytes() != manifest:
         raise SystemExit("Rebuilt manifest differs from the checked-in public release.")
+    expected = json.loads(manifest)
     for name, digest in expected["sha256"].items():
         if hashlib.sha256((destination / name).read_bytes()).hexdigest() != digest:
             raise SystemExit("Rebuilt public payload differs: " + name)
@@ -44,7 +44,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "build/public-snapshot")
     parser.add_argument("--verify", action="store_true",
-                        help="Build in a temporary directory, compare it with dist/manifest.json, "
+                        help="Build in a temporary directory, compare manifest bytes with dist/manifest.json, "
                              "then check every file in dist/ against that manifest.")
     args = parser.parse_args()
     data = json.loads((ROOT / "data/canonical.json").read_text())

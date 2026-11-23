@@ -10,7 +10,7 @@ import {pathToFileURL, fileURLToPath} from 'node:url';
 import lighthouse from 'lighthouse';
 import * as chromeLauncher from 'chrome-launcher';
 import {chromium} from '@playwright/test';
-import {ROOT, readBudgets, loadArtifactManifest, checkPayloadBudgets, sha256, stableJSON} from './payload_budgets.mjs';
+import {ROOT, HOME_PORTRAIT, readBudgets, loadArtifactManifest, checkPayloadBudgets, sha256, stableJSON} from './payload_budgets.mjs';
 
 const require = createRequire(import.meta.url);
 const LH_ROOT = path.dirname(require.resolve('lighthouse/package.json'));
@@ -81,7 +81,7 @@ function artifactName(url, base) {
 
 export function mobileHeroRequests(lhr, artifact, budget, base) {
   const items = lhr.audits?.['network-requests']?.details?.items ?? [];
-  return items.filter(item => /\/assets\/human-depth-portrait-[^/?]+\.(?:webp|jpe?g)(?:[?#]|$)/i.test(item.url || ''))
+  return items.filter(item => HOME_PORTRAIT.test(item.url || ''))
     .map(item => {
       const name = artifactName(item.url, base);
       return {url: item.url, path: name, resourceBytes: item.resourceSize ?? null,
@@ -238,8 +238,12 @@ export async function main(args = process.argv.slice(2)) {
           const heroes = mobileHeroRequests(lhr, artifact, policy.payload.home, options.base);
           const heroProblems = [];
           if (route === '/') {
-            if (!heroes.length) heroProblems.push('Mobile homepage did not request the configured collage');
-            if (!heroes.some(hero => hero.webp)) heroProblems.push('Mobile homepage did not request a WebP collage');
+            if (policy.payload.home.heroVariants.length && !heroes.some(hero => hero.webp)) {
+              heroProblems.push('Mobile homepage did not request a WebP hero image');
+            }
+            if (!policy.payload.home.heroVariants.length && heroes.length) {
+              heroProblems.push('Mobile homepage requested a removed portrait asset');
+            }
             for (const hero of heroes) {
               if (!hero.manifested) heroProblems.push('Mobile hero is not manifested: ' + hero.url);
               if (!Number.isFinite(hero.resourceBytes) || hero.resourceBytes > hero.maximumBytes) heroProblems.push('Selected mobile hero exceeds its byte budget: ' + hero.url);

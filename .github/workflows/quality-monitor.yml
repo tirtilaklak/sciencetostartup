@@ -56,3 +56,20 @@ jobs:
           name: monitor-heartbeat-and-review-candidates
           path: output/monitor/
           retention-days: 30
+  daily-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check the live Daily page, archive index, and feeds
+        run: python3 .github/scripts/check_daily_health.py --output output/monitor/daily-health.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: daily-health
+          path: output/monitor/daily-health.json
+          retention-days: 30
+          if-no-files-found: error

@@ -6,13 +6,12 @@ import json
 from editorial_work import RECEIPT_RESULTS, primary_routes
 from static_pages import work_location
 
-RIGHT_ARROW = '<svg class="home-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-7-7 7 7-7 7"/></svg>'
 EXTERNAL_ARROW = '<svg class="home-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg>'
 SNORKEL_METRIC = "snorkel_ai.metric.major-growth_metrics-0"
 SNORKEL_METRIC_SOURCE = "snorkel_ai.source.audit-s5"
 RECORDED_PROGRAMS = (
-    ("snorkel_ai.work.expert-community", "snorkel_ai.work.expert-community.review-2026-10-28", "Snorkel Expert Community"),
     ("invisible.work.meridial-network", "invisible.work.meridial-network.review-2026-10-28", "Meridial expert network"),
+    ("snorkel_ai.work.expert-community", "snorkel_ai.work.expert-community.review-2026-10-28", "Snorkel Expert Community"),
 )
 FAILED_CHECKS = (RECEIPT_RESULTS - {"readable"}) | {"closed", "gone", "unpublished", "official_role_not_found", "official_role_not_found_redirect"}
 
@@ -35,10 +34,20 @@ def receipt_time(receipt):
     return receipt.get("checked_at") or receipt["checked_on"][:10] + "T00:00:00Z"
 
 
+def promotion_source(route):
+    """Link to the employer's description when an application has a separate URL."""
+    if route["route_kind"] == "named_listing":
+        sources = {(row["id"], row.get("url")) for row in route.get("sources", [])}
+        for action in route.get("editorial_review", {}).get("actions", []):
+            if action.get("purpose") == "description" and (action.get("source_id"), action.get("url")) in sources:
+                return action["url"]
+    return route.get("url")
+
+
 def failed_since_review(route, approval):
-    """A later failure at the promoted destination makes that approval ineligible."""
-    url = route.get("url")
-    source_ids = {source["id"] for source in route.get("sources", []) if url and source.get("url") == url}
+    """A later failure at the listing or its destination makes the approval ineligible."""
+    urls = {promotion_source(route), route.get("url")} - {None}
+    source_ids = {source["id"] for source in route.get("sources", []) if source.get("url") in urls}
     receipts = route.get("editorial_review", {}).get("receipts", [])
     if any(receipt.get("scope") == "retrieval" and receipt.get("source_id") in source_ids
            and receipt.get("result") in FAILED_CHECKS and receipt_time(receipt) > receipt_time(approval)
@@ -70,23 +79,32 @@ def promotion_candidates(work, release):
 
 def work_promotion(candidate, companies):
     route, receipt = candidate["route"], candidate["receipt"]
-    conditions = [work_location(route) if route.get("geography") else "", *route.get("requirements", [])]
-    for value in (route.get("assessment"), route.get("hours"), route.get("duration")):
-        if value:
-            conditions.append(value)
-    conditions = list(dict.fromkeys(value for value in conditions if value))
+    location = work_location(route) if route.get("geography") else ""
+    conditions = dict.fromkeys(value for value in (
+        *route.get("requirements", []), route.get("eligibility"), route.get("assessment"),
+        route.get("hours"), route.get("duration"), route.get("availability_note"),
+    ) if value)
+    quote = route.get("source_quote")
+    details = '<p class="example-note">Published rate <q>' + escape(quote) + '</q></p>' if quote else ''
+    if conditions:
+        details += '<ul class="example-conditions">' + ''.join('<li>' + escape(value) + '</li>' for value in conditions) + '</ul>'
+    if details:
+        details = '<details class="example-terms"><summary>Requirements and terms</summary>' + details + '</details>'
     if route["route_kind"] == "named_listing":
-        kind, original = "Public listing", "Original listing"
+        kind, original = "Paid work listing", "Original listing"
     else:
         kind, original = "Expert network", "Official program page"
-    return ('<article class="example-card home-work-current" data-home-route="' + escape(route["id"], quote=True) + '">'
-            '<p class="example-kind">' + kind + ' · ' + escape(companies[route["company_id"]]["name"]) + '</p>'
-            '<h2 class="example-title">' + escape(route["role"]) + '</h2><p class="example-pay">' + escape(route.get("pay_label", "Pay not stated")) + '</p>'
-            '<ul class="example-conditions">' + ''.join('<li>' + escape(value) + '</li>' for value in conditions) + '</ul>'
-            '<p class="example-meta">Terms checked ' + date_tag(receipt["checked_on"]) + '</p>'
-            '<p class="example-note">Check the provider’s current terms, eligibility and project availability.</p>'
-            '<div class="example-actions"><a class="example-action" href="/company/' + escape(route["company_id"], quote=True) + '/#' + escape(route["id"], quote=True) + '">Read requirements and sources ' + RIGHT_ARROW + '</a>'
-            '<a class="example-action" href="' + escape(route["url"], quote=True) + '" target="_blank" rel="noopener noreferrer">' + original + ' ' + EXTERNAL_ARROW + '<span class="sr-only"> (opens in a new tab)</span></a></div></article>')
+    route_id = escape(route["id"], quote=True)
+    company_id = escape(route["company_id"], quote=True)
+    place = f'<p class="example-summary">{escape(location)}</p>' if location else ''
+    return (f'<article class="example-card home-work-current" data-home-route="{route_id}">'
+            f'<p class="example-kind">{kind} · {escape(companies[route["company_id"]]["name"])}</p>'
+            f'<h3 class="example-title">{escape(route["role"])}</h3>'
+            f'<p class="example-pay">{escape(route.get("pay_label", "Pay not stated"))}</p>{place}'
+            f'<p class="example-meta">Terms checked {date_tag(receipt["checked_on"])}</p>{details}'
+            f'<div class="example-actions"><a class="example-action" href="/company/{company_id}/#{route_id}">Full work record</a>'
+            f'<a class="example-action" href="{escape(promotion_source(route), quote=True)}" target="_blank" rel="noopener noreferrer">'
+            f'{original} {EXTERNAL_ARROW}<span class="sr-only"> (opens in a new tab)</span></a></div></article>')
 
 
 def company_example(companies, sidecars):
@@ -109,7 +127,7 @@ def company_example(companies, sidecars):
     else:
         amount = escape(value_text(figure))
     return (f'<article class="example-card company-example" data-observation="{SNORKEL_METRIC}" data-source="{SNORKEL_METRIC_SOURCE}">'
-            f'<p class="example-kind">Company</p><h3 class="example-title">{escape(companies["snorkel_ai"]["name"])}</h3>'
+            f'<p class="example-kind">Company disclosure</p><h3 class="example-title">{escape(companies["snorkel_ai"]["name"])}</h3>'
             f'<p class="example-summary">{escape(entry["summary"])}</p>'
             f'<p class="example-pay">{amount} {escape(figure["label"].lower())}</p>'
             f'<p class="example-meta">{escape(figure["evidence_assurance"])} · {date_tag(figure["as_of"])}</p>'
@@ -127,10 +145,10 @@ def recorded_work_example(work):
         source = next((row for row in route["sources"] if row["id"] == source_id and row.get("retrieval_status") == "content_reviewed"), None)
         if source and source_id in pay.get("source_ids", []) and route.get("pay_label"):
             return (f'<article class="example-card work-example" data-recorded-program="{route_id}" data-source="{source_id}">'
-                    f'<p class="example-kind">Recorded expert program</p><h3 class="example-title">{title}</h3>'
+                    f'<p class="example-kind">Recorded expert network</p><h3 class="example-title">{title}</h3>'
                     f'<p class="example-pay">Pay {escape(route["pay_label"].lower())}</p>'
-                    f'<p class="example-summary">{escape(work_location(route))}</p>'
-                    f'<p class="example-meta">Page reviewed {date_tag(source["accessed_on"])}. Ask the provider about current projects.</p>'
+                    f'<p class="example-meta">{escape(work_location(route))} · Page reviewed {date_tag(source["accessed_on"])}</p>'
+                    '<p class="example-note">Check current project availability.</p>'
                     f'<div class="example-actions"><a class="example-action" href="/company/{escape(route["company_id"], quote=True)}/#{route_id}">Read recorded terms</a>'
                     f'<a class="example-action" href="{escape(source["url"], quote=True)}">Official program page</a></div></article>')
     return ('<article class="example-card work-example"><h3 class="example-title">Paid work records</h3>'
