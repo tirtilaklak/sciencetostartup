@@ -71,7 +71,7 @@ async function reach(page, fragment) {
     if (want.key !== 'company') return true;
     const typed = want.id?.toLowerCase();
     const id = window.RESEARCH_ALIASES?.[typed] || typed;
-    if (document.querySelector('#profile-view .profile-v2')?.dataset.profileCompany !== id) return false;
+    if (document.querySelector('#profile-view .profile-v2:not([data-profile-loading])')?.dataset.profileCompany !== id) return false;
     const section = want.section?.toLowerCase();
     if (section === 'claim') {
       let loaded;
@@ -150,6 +150,21 @@ async function reach(page, fragment) {
                 discovery += 1;
                 newSections += 1;
               }
+            }
+          }
+        }
+        if (process.env.QA_DISCOVER_PROFILE_SECTIONS === '1') {
+          const archive = profile + '/sources';
+          await reach(page, archive);
+          const archiveSections = await page.locator('#profile-view .profile-archive [data-profile-section]').evaluateAll(nodes =>
+            nodes.map(node => node.dataset.profileSection));
+          for (const section of archiveSections) {
+            if (!sections.includes(section)) continue;
+            const typedRoute = profile + '/' + section;
+            if (!routes.has(typedRoute)) {
+              routes.set(typedRoute, ['rendered source section ' + id]);
+              discovery += 1;
+              newSections += 1;
             }
           }
         }
