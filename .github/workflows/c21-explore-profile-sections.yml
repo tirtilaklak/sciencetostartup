@@ -1,0 +1,86 @@
+name: Exercise the C21 company profile sections
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-explore-profile-sections.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  explore:
+    name: Explore (${{ matrix.viewport }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 32
+    strategy:
+      fail-fast: false
+      matrix:
+        viewport: [desktop, phone]
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      C21_HEAD: 020d7f728c0a9ba0dbd4de699cb26bdc4ee665c6
+      QA_PREVIOUS_PROOF_HEAD: 020d7f728c0a9ba0dbd4de699cb26bdc4ee665c6
+      QA_DISCOVER_PROFILE_SECTIONS: '1'
+      C21_DIST_TREE: 30b9f32cd3a92505a6a38be7b4d075191e78a13e
+      C21_MANIFEST: 4a743a78e1e7cbe76ca6b097cb9072b6aaa557f0892b9e734aeff10eb36a3103
+      QA_VIEWPORT: ${{ matrix.viewport }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare exact artifact source
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          git worktree add --detach "$RUNNER_TEMP/c21-product" "$C21_HEAD"
+          git config --global --add safe.directory "$RUNNER_TEMP/c21-product"
+          test "$(git -C "$RUNNER_TEMP/c21-product" rev-parse HEAD:dist)" = "$C21_DIST_TREE"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --prefix "$RUNNER_TEMP/c21-product"
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: '45103726006'
+          github-token: ${{ github.token }}
+          name: c21-expanded-explore-${{ matrix.viewport }}
+          path: output/prior-explore
+      - name: Exercise each signed Explore destination
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA="$GITHUB_WORKSPACE/.github/qa/c21-recovery"
+          export QA_EXPLORE_OUTPUT="$GITHUB_WORKSPACE/output/explore"
+          mkdir -p "$QA_EXPLORE_OUTPUT"
+          export QA_EXPLORE_INVENTORY="$QA_EXPLORE_OUTPUT/inventory.json"
+          export QA_EXPLORE_PRIOR="$GITHUB_WORKSPACE/output/prior-explore/summary.json"
+          cd "$RUNNER_TEMP/c21-product"
+          test "$(git rev-parse "$QA_PREVIOUS_PROOF_HEAD:dist")" = "$C21_DIST_TREE"
+          if git diff --name-only "$QA_PREVIOUS_PROOF_HEAD" HEAD | grep -Fvx -e tests/browser/performance-reading.spec.js -e tests/browser/research-enhancements.spec.js; then exit 1; fi
+          PYTHONPATH=scripts python3 - <<'PY'
+          import os
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          validate_artifact(Path('dist'),os.environ['C21_MANIFEST'])
+          PY
+          python3 "$QA/explore_inventory.py"
+          QA_DIST="$PWD/dist" python3 scripts/browser_qa_server.py --port 19011 > "$QA_EXPLORE_OUTPUT/origin.log" 2>&1 &
+          origin_pid=$!
+          trap 'kill "$origin_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 20); do
+            curl --silent --fail http://127.0.0.1:19011/manifest.json >/dev/null && break
+            sleep 1
+          done
+          node "$QA/explore_routes.cjs"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c21-profile-sections-${{ matrix.viewport }}
+          path: output/explore/
+          if-no-files-found: error
+          retention-days: 14
