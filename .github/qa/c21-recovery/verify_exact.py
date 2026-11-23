@@ -35,14 +35,16 @@ if project in ('chromium','mobile-chromium'):
     }
     for file,titles in additions.items():
         cases.extend({'file':file,'title':title,'project':project,'suite':[file]} for title in titles)
-market_repair=os.environ.get('QA_MARKET_REPAIR')=='1'
-if market_repair and project=='firefox':
+market_variants={'0':(), '1':('saved',), '2':('saved','current')}
+market_positions=market_variants[os.environ.get('QA_MARKET_REPAIR','0')]
+if market_positions and project=='firefox':
     file='market-fallback.spec.js'
-    cases.extend({'file':file,'title':f'Market retains the saved reading position after late native scroll on {kind}',
-                  'project':project,'suite':[file]} for kind in ('reload','back_forward'))
+    cases.extend({'file':file,'title':f'Market retains the {position} reading position after late native scroll on {kind}',
+                  'project':project,'suite':[file]}
+                 for kind in ('reload','back_forward') for position in market_positions)
 selected={(row['file'],tuple(row['suite']),row['title']):row for row in cases if row['project']==project}
-counts={'chromium':146,'mobile-chromium':121,'firefox':53 if market_repair else 51,'webkit':14,'mobile-webkit':22}
-assert len(selected)==counts[project] and sum(counts.values())==(356 if market_repair else 354)
+counts={'chromium':146,'mobile-chromium':121,'firefox':51+2*len(market_positions),'webkit':14,'mobile-webkit':22}
+assert len(selected)==counts[project] and sum(counts.values())==354+2*len(market_positions)
 validate_artifact(Path('dist'),digest)
 signed=Path('dist/manifest.json').read_bytes()
 build=json.loads(signed)['build_id']
