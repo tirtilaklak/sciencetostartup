@@ -1,0 +1,73 @@
+name: Seal PR 38’s verified Compare and Market release
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-seal-compare-candidate.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  seal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      C21_HEAD: fa24bac625b428bf868b2d5259f2837eef6023b5
+      C21_SOURCE: 6dc7a31d975ac0d77d11129c9b26ab6257082560
+      C21_INITIAL: 34c4e96076d0c783279bb889eab2d0d6a5bd5db0
+      C21_DIST_TREE: 0850fd004f028ccf1378dc9203484746fe2359c7
+      C21_MANIFEST: af4eb4073ebd85ec930e080a8745059dce38f5a8ceaeb9def054d4bf9d5724c9
+    steps:
+      - name: Confirm exact official and independent gates
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for run in 45111423996 45111423934; do
+            test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" --jq .head_sha)" = "$C21_HEAD"
+            test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" --jq .conclusion)" = success
+          done
+          for run in 45111444177 45111463643 45110772558 45111278237; do
+            test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" --jq .conclusion)" = success
+          done
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45111444177
+          pattern: c21-compare-exact-*
+          path: output/proof/core
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45111463643
+          pattern: c21-compare-explore-*
+          path: output/proof/explore
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45110772558
+          name: c21-compare-rapid-repair-proof-repaired
+          path: output/proof/compare
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45111423934
+          name: mobile-performance
+          path: output/proof/performance
+      - name: Validate actual receipts and prepare the exact provider asset pack
+        shell: bash
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/c21-product" "$C21_HEAD"
+          cd "$RUNNER_TEMP/c21-product"
+          PYTHONPATH=scripts python3 "$GITHUB_WORKSPACE/.github/qa/c21-recovery/seal_compare_candidate.py" "$GITHUB_WORKSPACE/output/proof" "$GITHUB_WORKSPACE/output/ready"
+          python3 -c "import json; print(json.load(open('$GITHUB_WORKSPACE/output/ready/release-ready.json'))['plan_sha256'])"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: c21-compare-release-ready
+          path: output/ready
+          if-no-files-found: error
+          retention-days: 14
