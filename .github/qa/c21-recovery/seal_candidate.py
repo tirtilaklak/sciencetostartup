@@ -89,11 +89,12 @@ assert companies['sourceIndexClicks'][0]['workSources']==48
 
 explore={}
 for viewport in ('desktop','phone'):
-    report=attest(base/'explore'/f'c21-expanded-explore-{viewport}'/'summary.json')
+    report=attest(base/'explore'/f'c21-loaded-profile-sections-{viewport}'/'summary.json')
     assert report['passed'] and report['head']==head and report['manifest']==manifest
     assert report['before']['sha256']==report['after']['sha256']==manifest
     assert report['destinations']==report['passedDestinations']==len(report['results'])
     assert all(row['passed'] for row in report['results'])
+    assert report['destinations']==595 and report['companiesObserved']==39 and report['tabsObserved']==156
     explore[viewport]=report['destinations']
 
 archived=lambda name: name.startswith(('publication/','research/editions/','daily/202'))
