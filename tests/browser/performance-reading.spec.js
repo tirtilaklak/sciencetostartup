@@ -1,6 +1,12 @@
 const { test, expect } = require('@playwright/test');
 const { evidenceURL, token } = require('./research-ledger');
 const selector = id => '[id=' + JSON.stringify(id) + ']';
+const fragmentLayoutScript = [
+  '(()=>{const root=document.documentElement;',
+  'const sync=()=>root.toggleAttribute("data-ledger-fragment",',
+  '/^#(?:assertion|source)-/.test(location.hash));',
+  'sync();addEventListener("hashchange",sync);})();',
+].join('');
 
 // Full-ledger DOM trace snapshots obscure native navigation timing; screenshots,
 // source and network traces remain available when a functional check fails.
@@ -27,7 +33,10 @@ test.describe('native ledger rendering', () => {
       for (const path of paths) {
         await page.goto(path);
         await expect(page.locator('h1')).toContainText(kind === 'source' ? 'Source ledger' : 'Assertion ledger');
-        await expect(page.locator('script:not([type="application/ld+json"])')).toHaveCount(0);
+        const scripts = page.locator('script:not([type="application/ld+json"])');
+        await expect(scripts).toHaveCount(1);
+        await expect(scripts).not.toHaveAttribute('src', /./);
+        expect(await scripts.textContent()).toBe(fragmentLayoutScript);
         if (kind === 'assertion') {
           await expect(page.locator('.r-assertion:not([data-status="approved"]):not([data-status="historical"]) .r-assertion-text')).toHaveCount(0);
           observed.push(...await page.locator('.r-assertion[data-status="approved"],.r-assertion[data-status="historical"]').evaluateAll(rows => rows.map(row => row.id)));
@@ -70,6 +79,7 @@ test.describe('native ledger rendering', () => {
     await nativeLink.focus();
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(new RegExp(destination.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'));
+    await expect(page.locator('html[data-ledger-fragment]')).toHaveCount(0);
     const last = page.locator('article.r-source' + selector(id));
     const title = (await last.locator('h3 a').textContent()).trim();
     await expect(last.getByRole('link', { name: title, exact: true })).toBeAttached();
