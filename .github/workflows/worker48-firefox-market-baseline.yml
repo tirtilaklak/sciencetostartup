@@ -1,0 +1,85 @@
+name: Check Market history on live Worker 48
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/worker48-firefox-market-baseline.yml]
+permissions:
+  contents: read
+jobs:
+  stock:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      LIVE_HEAD: 2ded7d039d7605b113d1a8dac83af41dbcf3171b
+      LIVE_DIST_TREE: f47cbf7cf557e79bf521905082999cff33c7db70
+      LIVE_MANIFEST: 1fe217bab088009c4fb30ca3b00987bc3291361808823d9c523729fb648015fc
+      QA_BASE_URL: https://sciencetostartup.com
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare the exact product checkout
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          git worktree add --detach "$RUNNER_TEMP/worker48-product" "$LIVE_HEAD"
+          git config --global --add safe.directory "$RUNNER_TEMP/worker48-product"
+          test "$(git -C "$RUNNER_TEMP/worker48-product" rev-parse HEAD:dist)" = "$LIVE_DIST_TREE"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --prefix "$RUNNER_TEMP/worker48-product"
+      - name: Repeat the exact Firefox user journey without injecting browser scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$GITHUB_WORKSPACE/output/live-market-baseline"
+          mkdir -p "$OUT"
+          cd "$RUNNER_TEMP/worker48-product"
+          PYTHONPATH=scripts python3 - <<'PY'
+          import os
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          validate_artifact(Path('dist'),os.environ['LIVE_MANIFEST'])
+          PY
+          curl --silent --show-error --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-before.json"
+          cmp "$OUT/manifest-before.json" dist/manifest.json
+          status=0
+          ./node_modules/.bin/playwright test tests/browser/market-fallback.spec.js \
+            --grep 'Market preserves the reading position on ordinary reload and Back' \
+            --project=firefox --workers=1 --repeat-each=20 --retries=0 --timeout=90000 \
+            --trace retain-on-failure --reporter=json --output "$OUT/results" > "$OUT/playwright.json" || status=$?
+          curl --silent --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-after.json"
+          cmp "$OUT/manifest-after.json" dist/manifest.json
+          python3 - "$OUT/playwright.json" <<'PY'
+          import json,sys
+          raw=json.load(open(sys.argv[1]))
+          stats=raw['stats']
+          assert stats['expected']+stats['unexpected']+stats['flaky']+stats['skipped']==20
+          print(json.dumps(stats))
+          def inspect(group):
+              for spec in group.get('specs',[]):
+                  for test in spec['tests']:
+                      for result in test['results']:
+                          error=result.get('error',{}).get('message','')
+                          if error:
+                              print(result['error'].get('stack',error)[:1600])
+              for child in group.get('suites',[]):
+                  inspect(child)
+          inspect(raw)
+          PY
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c21-market-firefox-stock
+          path: output/live-market-baseline/
+          if-no-files-found: error
+          retention-days: 14
