@@ -2032,7 +2032,8 @@ def work_table(research, rows, names, key, *, include_kind=True, ordered_ids=Non
     for index, r in enumerate(rows):
         cid, status = r.get("company_id"), work_status(r)
         company = names.get(cid, cid)
-        company_label = f"{key}-{index}"
+        # Work groups have distinct initials. Keep these internal ID pairs short on every card.
+        company_label = f"w{key[0]}{index}"
         destination, action = work_destination(r, research)
         role = clean(r.get("role")) or "Listing"
         rid = escape(r["id"])
