@@ -1,0 +1,32 @@
+name: Read the signed release receipt for the recovered workspace
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-release-receipt-readback.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  receipt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45116278370
+          artifact-ids: 14791139755
+          path: release-proof
+      - name: Confirm exact receipt and print public verification metadata
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          file=Path('release-proof/release-ready.json')
+          proof=json.loads(file.read_bytes())
+          assert proof['head']=='eae4770118a9ffb35279c71f4bef061b302e89d7'
+          assert proof['plan_sha256']=='6079f7a2aac6136cf07c09d225eb39292f6b9123a2d1b0a4ee6741ac04c74896'
+          assert proof['manifest_sha256']=='ea4fa51e30eea853e7526bdd62b0117c36c7532da0cb8f471beffd21708a1c45'
+          assert proof['provider_dispatched'] is False and proof['full_signed_paths']==1282
+          print('C21_RELEASE_PROOF '+json.dumps(proof,separators=(',',':')))
+          PY
