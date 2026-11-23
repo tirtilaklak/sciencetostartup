@@ -1,0 +1,3557 @@
+{
+  "target": "public",
+  "head": "8ab0452e5f0576ee9da472b79587607315c12d01",
+  "dist_tree": "f47cbf7cf557e79bf521905082999cff33c7db70",
+  "worker_version": "2382dd9e-ac95-4b90-a1ed-35482a0e7ba8",
+  "manifest": "1fe217bab088009c4fb30ca3b00987bc3291361808823d9c523729fb648015fc",
+  "build": "e4ead044f5b3419c667b",
+  "origin": "https://sciencetostartup.com",
+  "source_proof_plan_sha256": "c9c3a2584b8687044ce8fedb33bd88848710833df54810cf5abf78ad8357646b",
+  "group_slots": 354,
+  "case_counts": {
+    "chromium": 141,
+    "firefox": 51,
+    "mobile-chromium": 116,
+    "mobile-webkit": 22,
+    "webkit": 14
+  },
+  "cases": [
+    {
+      "id": "a807ba3392820fce6bb6-bf08a7553c08e0b67cf0",
+      "file": "claim-source-checks.spec.js",
+      "title": "the Snorkel claim pairs same-URL checks by source ID and preserves the archive",
+      "suite": [
+        "claim-source-checks.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a9065877d05106493a91bf6665c0fb98e77da53b"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-d1f5169c26c07d97304a",
+      "file": "company-handoff.spec.js",
+      "title": "Explore shortlist keeps the fourth-selection instruction and actions readable",
+      "suite": [
+        "company-handoff.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-5bdf439a2083df53343e",
+      "file": "company-handoff.spec.js",
+      "title": "Explore shortlist restores the initiating Compare after editing and reloading the comparison",
+      "suite": [
+        "company-handoff.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-19bf61fe8fec4388cecf",
+      "file": "company-handoff.spec.js",
+      "title": "native Companies carries the exact saved search result into Compare",
+      "suite": [
+        "company-handoff.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-4a51c610b44506089f7a",
+      "file": "company-handoff.spec.js",
+      "title": "the directory offers historical comparisons and current-only profile links",
+      "suite": [
+        "company-handoff.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-ab39f41e8c0b4678ad6b",
+      "file": "company-handoff.spec.js",
+      "title": "keeps Clear focused when the reader tabs while loading",
+      "suite": [
+        "company-handoff.spec.js",
+        "Explore shortlist Back during company search"
+      ],
+      "project": "chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-f3b3d9cac62ae5c34239",
+      "file": "company-handoff.spec.js",
+      "title": "keeps the new position when the reader scrolls while loading",
+      "suite": [
+        "company-handoff.spec.js",
+        "Explore shortlist Back during company search"
+      ],
+      "project": "chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-e69d13b33088f49bc25a",
+      "file": "company-handoff.spec.js",
+      "title": "restores the saved position when the matching result renders",
+      "suite": [
+        "company-handoff.spec.js",
+        "Explore shortlist Back during company search"
+      ],
+      "project": "chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-73bc59d00abfa67fd5eb",
+      "file": "company-handoff.spec.js",
+      "title": "the native directory retains its profile links and exact Compare destinations",
+      "suite": [
+        "company-handoff.spec.js",
+        "without JavaScript"
+      ],
+      "project": "chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "dfcc8b3e025dbca0ea93-7c40a6a0295599779619",
+      "file": "company-search-recovery.spec.js",
+      "title": "HTTP 503 company search keeps keyboard focus through failure and retry",
+      "suite": [
+        "company-search-recovery.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "8663c43e7b2d8c9f1a8f1dd72600d21f6c0f7e1d"
+    },
+    {
+      "id": "dfcc8b3e025dbca0ea93-bfaecbc410885a0df83a",
+      "file": "company-search-recovery.spec.js",
+      "title": "Offline company search keeps keyboard focus through failure and retry",
+      "suite": [
+        "company-search-recovery.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "8663c43e7b2d8c9f1a8f1dd72600d21f6c0f7e1d"
+    },
+    {
+      "id": "dfcc8b3e025dbca0ea93-e3e95b93b8bbd1d50d73",
+      "file": "company-search-recovery.spec.js",
+      "title": "a failed company search leaves focus in the global search, and Clear works during the outage",
+      "suite": [
+        "company-search-recovery.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "8663c43e7b2d8c9f1a8f1dd72600d21f6c0f7e1d"
+    },
+    {
+      "id": "dfcc8b3e025dbca0ea93-58df97ad9f6d78bcf732",
+      "file": "company-search-recovery.spec.js",
+      "title": "failed filters and CSV reflect the current criteria and recovery exports the matching IDs",
+      "suite": [
+        "company-search-recovery.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "8663c43e7b2d8c9f1a8f1dd72600d21f6c0f7e1d"
+    },
+    {
+      "id": "dfcc8b3e025dbca0ea93-d0e97389807e3bde3d89",
+      "file": "company-search-recovery.spec.js",
+      "title": "native Companies receives the query and group and cold Back restores Search",
+      "suite": [
+        "company-search-recovery.spec.js",
+        "company search handoff across a fresh document"
+      ],
+      "project": "chromium",
+      "fixture_blob": "8663c43e7b2d8c9f1a8f1dd72600d21f6c0f7e1d"
+    },
+    {
+      "id": "dfcc8b3e025dbca0ea93-2835ee840a00d714b26c",
+      "file": "company-search-recovery.spec.js",
+      "title": "native Companies receives the query and group and cold Back restores the fallback link",
+      "suite": [
+        "company-search-recovery.spec.js",
+        "company search handoff across a fresh document"
+      ],
+      "project": "chromium",
+      "fixture_blob": "8663c43e7b2d8c9f1a8f1dd72600d21f6c0f7e1d"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-230a7463592216a2aa56",
+      "file": "compare-return.spec.js",
+      "title": "Back restores the opener from a new entry at the same Compare URL",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-37423116af99b7af1fa0",
+      "file": "compare-return.spec.js",
+      "title": "Back returns to the exact Compare link when two links open the same profile",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-12ff04341ed4729a93d5",
+      "file": "compare-return.spec.js",
+      "title": "Compare keeps the reading position after wheel scrolling and a height change",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-f68428562b692812b37c",
+      "file": "compare-return.spec.js",
+      "title": "Compare shows the selected figures on the first phone screen with one selection editor",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-520301be621df8f63a85",
+      "file": "compare-return.spec.js",
+      "title": "Compare work links describe career pages, archived records and paid networks accurately",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-ab7b2d1383126b9dc077",
+      "file": "compare-return.spec.js",
+      "title": "an open Compare pair stays visible and usable after a height change at 32px minimum text",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-6e0dfc675e25422bd9ac",
+      "file": "compare-return.spec.js",
+      "title": "fresh Back from native financing evidence restores More, the Compare pair and keyboard focus",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-3d2d8d0a934bbd7687df",
+      "file": "compare-return.spec.js",
+      "title": "trusted Tab reveals Compare labels on a short phone with large text",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "355b46bdb07955e42bf4-62fa6b2f4b7796ad0130",
+      "file": "daily-phone-reflow.spec.js",
+      "title": "Chromium renders the external marker and retains the native source links",
+      "suite": [
+        "daily-phone-reflow.spec.js",
+        "Daily phone sources without JavaScript"
+      ],
+      "project": "chromium",
+      "fixture_blob": "278dff7280d77edaa92d416f7dd32eb898658c71"
+    },
+    {
+      "id": "0c79256db53caab8858e-4e16b638e346090adf27",
+      "file": "daily.spec.js",
+      "title": "Daily 2026-11-16 permalink Back and Forward restore the reading position",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-fdc9122626f016030197",
+      "file": "daily.spec.js",
+      "title": "Daily 2026-11-18 permalink Back and Forward restore the reading position",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-edd5b9416fc5462e4161",
+      "file": "daily.spec.js",
+      "title": "Daily dated permalink back honors the first trusted Tab after hashchange",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-d50a3fa855460c6cdb95",
+      "file": "daily.spec.js",
+      "title": "Daily dated permalink forward honors the first trusted Tab after hashchange",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-d5ee31a076a8548b5fcd",
+      "file": "daily.spec.js",
+      "title": "Daily dated permalink immediate Forward starts Tab at the target headline",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-3d9de23633d4164b128d",
+      "file": "daily.spec.js",
+      "title": "Daily feeds bind immutable editions without invented publication times",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-3406dfa65b55cc9d7173",
+      "file": "daily.spec.js",
+      "title": "Daily filtered latest permalink Back and Forward restore the reading position",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-d73bef788799e0a15022",
+      "file": "daily.spec.js",
+      "title": "Daily phone filter disclosure follows its history entry and a fresh filtered URL opens it",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-8eab745b765b874e0004",
+      "file": "daily.spec.js",
+      "title": "Daily phone filters leave focus in place and restore saved reading on Back",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-ecb819aa901dc9cd5a5e",
+      "file": "daily.spec.js",
+      "title": "Daily shows the complete first headline on the first screen",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-3db3eefdcdb03f9d66dc",
+      "file": "daily.spec.js",
+      "title": "Daily story highlight follows the visible fragment as filters and history change",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-f499d203f9dfccbdaed2",
+      "file": "daily.spec.js",
+      "title": "Daily topic and type controls select exactly the source-backed items and update URLs",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-a737b2d21efc88337455",
+      "file": "daily.spec.js",
+      "title": "complete explanations, native sources, archive navigation and JSON remain readable",
+      "suite": [
+        "daily.spec.js",
+        "Daily without JavaScript"
+      ],
+      "project": "chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "7e63be9b1836762cd850-329ede05e111bdc266b5",
+      "file": "explore-company-search-focus.spec.js",
+      "title": "a completed search leaves focus in the global search opened by keyboard",
+      "suite": [
+        "explore-company-search-focus.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "bb3088c672434130fb5b6e23e8fb399b8b7f09ae"
+    },
+    {
+      "id": "7e63be9b1836762cd850-6586236527c9957a8cb3",
+      "file": "explore-company-search-focus.spec.js",
+      "title": "a removed result returns keyboard focus to company search",
+      "suite": [
+        "explore-company-search-focus.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "bb3088c672434130fb5b6e23e8fb399b8b7f09ae"
+    },
+    {
+      "id": "7e63be9b1836762cd850-3e7696b1550bdac25761",
+      "file": "explore-company-search-focus.spec.js",
+      "title": "a surviving Compare checkbox keeps focus and completes a Space press across the update",
+      "suite": [
+        "explore-company-search-focus.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "bb3088c672434130fb5b6e23e8fb399b8b7f09ae"
+    },
+    {
+      "id": "64c6dcf800d254c4fdd2-fc4b69e5f59135d0468d",
+      "file": "explore-work-layout.spec.js",
+      "title": "native Work explains the full count and updates the live count for matching records",
+      "suite": [
+        "explore-work-layout.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "050f501ead9f099285ffa63a23e100623850f6bc"
+    },
+    {
+      "id": "64c6dcf800d254c4fdd2-4bc0d208b011fdf896f6",
+      "file": "explore-work-layout.spec.js",
+      "title": "native Work shows the complete first role and hourly rate on the first screen",
+      "suite": [
+        "explore-work-layout.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "050f501ead9f099285ffa63a23e100623850f6bc"
+    },
+    {
+      "id": "64c6dcf800d254c4fdd2-4667ed3a05bd8c39cc16",
+      "file": "explore-work-layout.spec.js",
+      "title": "native Work shows the first hourly result on short desktops and remembers keyboard toggles",
+      "suite": [
+        "explore-work-layout.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "050f501ead9f099285ffa63a23e100623850f6bc"
+    },
+    {
+      "id": "64c6dcf800d254c4fdd2-84e03262bbb7585b99e5",
+      "file": "explore-work-layout.spec.js",
+      "title": "native Work shows the hourly role and rate together at 1024×600",
+      "suite": [
+        "explore-work-layout.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "050f501ead9f099285ffa63a23e100623850f6bc"
+    },
+    {
+      "id": "819abe1b596fb41a0739-9d7b425b5f04054650f6",
+      "file": "finance-evidence.spec.js",
+      "title": "Current company CSV leads with the selected Toloka and Turing publishers",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-a86acf688ff8482f485b",
+      "file": "finance-evidence.spec.js",
+      "title": "Handshake keeps the corrected Dealroom date separate from its reporting period",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-11fd0c7ff6275348fe31",
+      "file": "finance-evidence.spec.js",
+      "title": "Market ledger keeps Handshake’s April period separate from Dealroom’s publication and check",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-ab879e2fd98ec769d455",
+      "file": "finance-evidence.spec.js",
+      "title": "Market shows Generate as another RWS business scope in the same reporting period",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-523fa6956a5bf5d14c3f",
+      "file": "finance-evidence.spec.js",
+      "title": "Snorkel issuer threshold survives Home, profiles, Compare, Market and current exports",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-d940003f2fc2f30d3622",
+      "file": "finance-evidence.spec.js",
+      "title": "Toloka and Turing pair the original publisher with their historical citation",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-e58031a96bcc6fc48fab",
+      "file": "finance-evidence.spec.js",
+      "title": "Toloka growth figures and claims cite the inputs for an approximate calculation",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-b59171a21ede351d914f",
+      "file": "finance-evidence.spec.js",
+      "title": "compact Companies, hydrated Compare and Companies keep exact source dates",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-458ba96a6d4fa21ca9fa",
+      "file": "finance-evidence.spec.js",
+      "title": "iMerit current financial citations replace a dead transcript while keeping its history",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-9eb5ab0f9ea65c1f79bd",
+      "file": "finance-evidence.spec.js",
+      "title": "afterquery.source.oct14-fd3e4675dd42 has the original citation and its own dates without JavaScript",
+      "suite": [
+        "finance-evidence.spec.js",
+        "exact publisher dates on native company pages"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-70d57b6c907766f2f16b",
+      "file": "finance-evidence.spec.js",
+      "title": "afterquery.source.round2-funding has the original citation and its own dates without JavaScript",
+      "suite": [
+        "finance-evidence.spec.js",
+        "exact publisher dates on native company pages"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-977c815152eaa1fcd276",
+      "file": "finance-evidence.spec.js",
+      "title": "datacurve.source.oct14-9b179f419da7 has the original citation and its own dates without JavaScript",
+      "suite": [
+        "finance-evidence.spec.js",
+        "exact publisher dates on native company pages"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-374272d69727d585b20c",
+      "file": "finance-evidence.spec.js",
+      "title": "labelbox.source.audit-lb_firstround has the original citation and its own dates without JavaScript",
+      "suite": [
+        "finance-evidence.spec.js",
+        "exact publisher dates on native company pages"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-7ebb8eac48dacf257bc5",
+      "file": "finance-evidence.spec.js",
+      "title": "scale_ai.source.oct14-891cd0d871ee has the original citation and its own dates without JavaScript",
+      "suite": [
+        "finance-evidence.spec.js",
+        "exact publisher dates on native company pages"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-f7c76fcef4a67eac0e61",
+      "file": "finance-evidence.spec.js",
+      "title": "surge_ai.source.oct14-891cd0d871ee has the original citation and its own dates without JavaScript",
+      "suite": [
+        "finance-evidence.spec.js",
+        "exact publisher dates on native company pages"
+      ],
+      "project": "chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "379953442ddfc3019abd-57f259d8a4b9446633d0",
+      "file": "home.spec.js",
+      "title": "both directory actions fit on one row on narrow phones",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-9d30216d653dae651737",
+      "file": "home.spec.js",
+      "title": "expiry moves focus from the promotion to the native Work link",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-cb1ba86eff21d9375dbe",
+      "file": "home.spec.js",
+      "title": "home shows both dated sources before the phone portrait and aligns the desktop records",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-6ed6fd8792aebe4bc32b",
+      "file": "home.spec.js",
+      "title": "homepage Search leads to the company directory, comparison and market figures",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-c7ebec9fd932ddadfb72",
+      "file": "home.spec.js",
+      "title": "homepage Search loads only its small component and index when invoked",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-0afe8a16492a6f6a0185",
+      "file": "home.spec.js",
+      "title": "the Home header becomes Search when its pending runtime binds",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-c42a647c6acd396683f2",
+      "file": "home.spec.js",
+      "title": "the Home header can browse when the search runtime is blocked",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-85708992a79b42b3edbd",
+      "file": "home.spec.js",
+      "title": "without JavaScript the homepage offers its menu and native browse links",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-6d398d65fc75359f21b1",
+      "file": "home.spec.js",
+      "title": "home Menu leaves Find paid work operable at 320px",
+      "suite": [
+        "home.spec.js",
+        "home keyboard controls in compact viewports"
+      ],
+      "project": "chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-008cc6784a86e7b7ad52",
+      "file": "home.spec.js",
+      "title": "home Menu leaves Sources and data operable at 640px",
+      "suite": [
+        "home.spec.js",
+        "home keyboard controls in compact viewports"
+      ],
+      "project": "chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-f60d811f17e22d89ef1f",
+      "file": "home.spec.js",
+      "title": "home Search pages a tall selected result without moving focus",
+      "suite": [
+        "home.spec.js",
+        "home keyboard controls in compact viewports"
+      ],
+      "project": "chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "0332c50d76e4d567f08a-28f6ce3f867392de3d59",
+      "file": "interactions.spec.js",
+      "title": "current company CSV uses the same financial observation as the visible card",
+      "suite": [
+        "interactions.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a034bf8c32c5b3631aeb808b4034cd74f9d0273d"
+    },
+    {
+      "id": "0332c50d76e4d567f08a-979aac830396a378412f",
+      "file": "interactions.spec.js",
+      "title": "global search opens Home, the company directory, and one search for paid work",
+      "suite": [
+        "interactions.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a034bf8c32c5b3631aeb808b4034cd74f9d0273d"
+    },
+    {
+      "id": "0332c50d76e4d567f08a-2ed5b6a9c2a2c8e4e764",
+      "file": "interactions.spec.js",
+      "title": "native Work, Compare and both CSV downloads preserve kind=named&arrangement=onsite",
+      "suite": [
+        "interactions.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a034bf8c32c5b3631aeb808b4034cd74f9d0273d"
+    },
+    {
+      "id": "0332c50d76e4d567f08a-cf9da2620209061ac144",
+      "file": "interactions.spec.js",
+      "title": "native Work, Compare and both CSV downloads preserve q=no%20such%20opening%20%2B%20C%2B%2B%20%26%20%E7%A0%94%E7%A9%B6",
+      "suite": [
+        "interactions.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a034bf8c32c5b3631aeb808b4034cd74f9d0273d"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-f09378191183ebd4bc13",
+      "file": "market-fallback.spec.js",
+      "title": "Market preserves the reading position on ordinary reload and Back",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-54ca32c835ae7db6b539",
+      "file": "market-fallback.spec.js",
+      "title": "Market reloads the bookmark into view after a blocked business-health module",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-be27318725eaf525d98b",
+      "file": "market-fallback.spec.js",
+      "title": "Market reloads the bookmark into view after a blocked overview response",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-e1c1f52692f371b01224",
+      "file": "market-fallback.spec.js",
+      "title": "Market retries the bookmark after a blocked app bundle",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-fd2d3720c5c308b2d576",
+      "file": "market-fallback.spec.js",
+      "title": "Market retries the bookmark after a blocked data bundle",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-cb163e381f43f7faddd0",
+      "file": "market-fallback.spec.js",
+      "title": "a failed Market handoff replaces the previous results and allows keyboard reload",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-2331b681f0f8bb786186",
+      "file": "market-fallback.spec.js",
+      "title": "a timed-out app bundle cannot remove the focused recovery action when it finally arrives",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-fcecc8076d43ed61597a",
+      "file": "market-fallback.spec.js",
+      "title": "enhanced Market exposes the fragment and focuses the visible heading",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-8ad6f43379ec7eed5c0f",
+      "file": "market-fallback.spec.js",
+      "title": "#business-health starts at the skip link and reaches the plain directory",
+      "suite": [
+        "market-fallback.spec.js",
+        "Explore without JavaScript"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-6e6cafaf6e7de58229da",
+      "file": "market-fallback.spec.js",
+      "title": "#work starts at the skip link and reaches the plain directory",
+      "suite": [
+        "market-fallback.spec.js",
+        "Explore without JavaScript"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-b359f7400c9a2ae33c08",
+      "file": "market-fallback.spec.js",
+      "title": "base URL starts at the skip link and reaches the plain directory",
+      "suite": [
+        "market-fallback.spec.js",
+        "Explore without JavaScript"
+      ],
+      "project": "chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-f4428d1d96a1a79cfb7c",
+      "file": "market-focus.spec.js",
+      "title": "Market Back returns to the product link from both Market addresses",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-d8ef8a5ff939c2daea49",
+      "file": "market-focus.spec.js",
+      "title": "Market marks the current observation by its exact ID",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-115605e64f9403f4fd3a",
+      "file": "market-focus.spec.js",
+      "title": "Market puts two sourced revenue rows on the first desktop screen",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-171bde62a209c89d215f",
+      "file": "market-focus.spec.js",
+      "title": "Market restores Handshake focus to each successive evidence opener",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-983301e88d48b270b598",
+      "file": "market-focus.spec.js",
+      "title": "Market restores RWS focus after an alternate observation and nested claim",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-d07580ed2c7bfd0ec17d",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market exposes the selected Cash order as grouped by reporting basis",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "390px Chromium matrix"
+      ],
+      "project": "chromium",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-7f9f95c8219f3c2644dc",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market names all unavailable Paid delivery cells and dialogs for that column",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "390px Chromium matrix"
+      ],
+      "project": "chromium",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-ac7b66b5ef29c0a6af43",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market opens Appen missing evidence from the visible cell padding",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "390px Chromium matrix"
+      ],
+      "project": "chromium",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-7a6871245be62e117e35",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market reveals the entire Appen Profit and Toloka Revenue figures on Tab and after Escape",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "390px Chromium matrix"
+      ],
+      "project": "chromium",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-ca4f6a2ab49e23fcbcc6",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market skips the matrix body by keyboard and keeps its filters and position",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "390px Chromium matrix"
+      ],
+      "project": "chromium",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-6f9e4f8bfc34c7dd831f",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "closing a figure reveals its opener after the selected measure reorders the rows",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "Market figure return with a sorted table"
+      ],
+      "project": "chromium",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "ef23fb15174ca7321184-699b9191819b05b604fb",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Companies restores Compare A.Team via its alias on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-d5bce3f9828d4191d7da",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Companies restores Compare Mercor on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-1c81898a12727cf227fa",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Companies restores all original profiles on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-3b2e1517828006a0a7db",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Companies restores full guide search on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-a2e21cab1cc21756da00",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Companies restores the Mercor dossier on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-12c45bfb725b1efb298f",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Work restores Compare results on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-ff8f3c32b9a9451d822e",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Work restores its Explore Work handoff on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "e27f8e955978b6337c5e-683d6fdd9d2d6b8ade76",
+      "file": "native-phone-navigation.spec.js",
+      "title": "the open menu leaves focused filters unobscured on /companies/ at 320px",
+      "suite": [
+        "native-phone-navigation.spec.js",
+        "native navigation with standard text"
+      ],
+      "project": "chromium",
+      "fixture_blob": "3eb2439284169d20f7856c4d6540d074635d1d90"
+    },
+    {
+      "id": "e27f8e955978b6337c5e-d2325c53df887c014012",
+      "file": "native-phone-navigation.spec.js",
+      "title": "the open menu leaves focused filters unobscured on /work/ at 320px",
+      "suite": [
+        "native-phone-navigation.spec.js",
+        "native navigation with standard text"
+      ],
+      "project": "chromium",
+      "fixture_blob": "3eb2439284169d20f7856c4d6540d074635d1d90"
+    },
+    {
+      "id": "e27f8e955978b6337c5e-7ba5d8cb068b7dd1e72e",
+      "file": "native-phone-navigation.spec.js",
+      "title": "standard-text navigation stays keyboard reachable at tablet widths",
+      "suite": [
+        "native-phone-navigation.spec.js",
+        "native navigation with standard text",
+        "without scripts"
+      ],
+      "project": "chromium",
+      "fixture_blob": "3eb2439284169d20f7856c4d6540d074635d1d90"
+    },
+    {
+      "id": "f7ac2f226f32ddf23c1c-e666f12086cf97528a2b",
+      "file": "native-search.spec.js",
+      "title": "bare hourly searches lead to published hourly rates by keyboard or touch",
+      "suite": [
+        "native-search.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "69064b671172f83a08722b7a6abb880f2d41cce8"
+    },
+    {
+      "id": "f7ac2f226f32ddf23c1c-759d39d33150bb5c5f75",
+      "file": "native-search.spec.js",
+      "title": "the hourly shortcut remains available when the search index cannot load",
+      "suite": [
+        "native-search.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "69064b671172f83a08722b7a6abb880f2d41cce8"
+    },
+    {
+      "id": "cbead6ff08504803918c-e70dcae60cba34a0e5ae",
+      "file": "profile-details.spec.js",
+      "title": "a fresh-document Back reopens Sources and data at the exact activated native link",
+      "suite": [
+        "profile-details.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "fd96f7a1dd665b2a2902263d70a212c3d2e70247"
+    },
+    {
+      "id": "cbead6ff08504803918c-aacbb768352e7f08e261",
+      "file": "profile-details.spec.js",
+      "title": "a refused claim bookmark reopens the exact sources on keyboard retry",
+      "suite": [
+        "profile-details.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "fd96f7a1dd665b2a2902263d70a212c3d2e70247"
+    },
+    {
+      "id": "cbead6ff08504803918c-de0e670ccf16cce9e46c",
+      "file": "profile-details.spec.js",
+      "title": "an initial section route respects keyboard focus established while its evidence loads",
+      "suite": [
+        "profile-details.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "fd96f7a1dd665b2a2902263d70a212c3d2e70247"
+    },
+    {
+      "id": "cbead6ff08504803918c-7cdc84f2c194f2c32333",
+      "file": "profile-details.spec.js",
+      "title": "the native Source ledger lands at All sources and Tabs into its sources before images load",
+      "suite": [
+        "profile-details.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "fd96f7a1dd665b2a2902263d70a212c3d2e70247"
+    },
+    {
+      "id": "08eef72683f81e24edc9-e8dd778730c504d568d3",
+      "file": "profile-scroll-timing.spec.js",
+      "title": "focus established as the Paid work pane mounts cancels the pending scroll",
+      "suite": [
+        "profile-scroll-timing.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "c3aa793bfe09bdc081d1445a84db046e67d3abcd"
+    },
+    {
+      "id": "e7545a82257e8a18fdcf-7470fa1d331223a69a5f",
+      "file": "research-index-ux.spec.js",
+      "title": "a source version summary keeps its accessible name and shows the parent only where needed",
+      "suite": [
+        "research-index-ux.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "0d81ca2418c8c23d0709f26b4951cca96c2d5d0b"
+    },
+    {
+      "id": "e7545a82257e8a18fdcf-92e19b72ad9b38e9f56f",
+      "file": "research-index-ux.spec.js",
+      "title": "actual preceding script can reach a matching version beneath a hidden approved work",
+      "suite": [
+        "research-index-ux.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "0d81ca2418c8c23d0709f26b4951cca96c2d5d0b"
+    },
+    {
+      "id": "861fbfe47eb9328d135a-06194d38e0e7cb5f02d0",
+      "file": "search-compatibility.spec.js",
+      "title": "native Work applies its saved filter when the bundle arrives before slow HTML finishes",
+      "suite": [
+        "search-compatibility.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "b3801d840b1cee7c86f63054b141ef26dc63f3ff"
+    },
+    {
+      "id": "861fbfe47eb9328d135a-8e2952315cd0f405cc87",
+      "file": "search-compatibility.spec.js",
+      "title": "native Work keeps the downloaded bundle when slow HTML delays its execution",
+      "suite": [
+        "search-compatibility.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "b3801d840b1cee7c86f63054b141ef26dc63f3ff"
+    },
+    {
+      "id": "861fbfe47eb9328d135a-2554c8e00a7516851c1e",
+      "file": "search-compatibility.spec.js",
+      "title": "native work rejects a stale script and restores the selected record and CSV after retry",
+      "suite": [
+        "search-compatibility.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "b3801d840b1cee7c86f63054b141ef26dc63f3ff"
+    },
+    {
+      "id": "fc45065b150b1083e52b-ee2c3625184d9ca285d5",
+      "file": "technical-reading.spec.js",
+      "title": "the current chapter starts with readable prose and keeps a native chapter index",
+      "suite": [
+        "technical-reading.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "fc45065b150b1083e52b-43834898fe8f8fb6e60a",
+      "file": "technical-reading.spec.js",
+      "title": "current Technical passage keeps keyboard focus with browser Back and Forward",
+      "suite": [
+        "technical-reading.spec.js",
+        "enhanced technical reading"
+      ],
+      "project": "chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "fc45065b150b1083e52b-aed700c5d443efc4dc9e",
+      "file": "technical-reading.spec.js",
+      "title": "dated Technical passage keeps keyboard focus with browser Back and Forward",
+      "suite": [
+        "technical-reading.spec.js",
+        "enhanced technical reading"
+      ],
+      "project": "chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "1ab340ea549b317b4f6c-99c77c2e64eb173ef2a3",
+      "file": "work-compare-arrival.spec.js",
+      "title": "a directly opened native Work Compare URL leaves initial focus and scroll alone",
+      "suite": [
+        "work-compare-arrival.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "6a1849237a7c72230d94e67218d3f623f04a1a79"
+    },
+    {
+      "id": "1ab340ea549b317b4f6c-9275cbeff43fd31152e8",
+      "file": "work-compare-arrival.spec.js",
+      "title": "native Work Compare opens on the first full result from the keyboard at 1024×600",
+      "suite": [
+        "work-compare-arrival.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "6a1849237a7c72230d94e67218d3f623f04a1a79"
+    },
+    {
+      "id": "ace53adbdd2ac5870700-6b2b3c9cbbbe68b14829",
+      "file": "work-compare-content.spec.js",
+      "title": "native Work Compare preserves separate pay and terms fields for every record",
+      "suite": [
+        "work-compare-content.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "85094073566b20c194ad5554541a1651eefaf4b4"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-803de4c4b323f66804b5",
+      "file": "work-editorial-parity.spec.js",
+      "title": "OOAK’s exact employer listing and application checks keep separate statuses",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-a77cc1945f54cfd46fe6",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Reconciled employer listings render scoped pay and exact source actions in Work and Explore",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-b98a238e43f55bf2379c",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Work cards, Compare and both CSV downloads agree for all records",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-a62ebafc8016360bc784",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Work cards, Compare and both CSV downloads agree for past records",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-ed4de7a7bd126920fb81",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Work cards, Compare and both CSV downloads agree for yearly on-site or hybrid other company jobs",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-6a0bcb34e3badfdb9b35",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Work cards, Compare and both CSV downloads agree for yearly on-site or hybrid staff listings",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-1071b88808530be59da5",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Work cards, Compare and both CSV downloads agree for yearly remote staff listings",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-a371b4027c533edafc08",
+      "file": "work-editorial-parity.spec.js",
+      "title": "native Work keeps the open terms and record order when filters load late",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-33ef7842aba373409d49",
+      "file": "work-profile-return.spec.js",
+      "title": "a duplicate profile address and direct Work visits use normal focus",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "chromium",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-d7b637043aefb138d53b",
+      "file": "work-profile-return.spec.js",
+      "title": "cached Back keeps browser-managed Terms, focus and scroll",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "chromium",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-1a221427a69fb25c3478",
+      "file": "work-profile-return.spec.js",
+      "title": "cached Back keeps browser-managed Terms, focus and scroll on a bookmarked Work entry",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "chromium",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-1b1c718267478e77436d",
+      "file": "work-profile-return.spec.js",
+      "title": "cold Back leaves focus on another control when focus moves during the hold",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "chromium",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-04c0c9a2e1652c9550a5",
+      "file": "work-profile-return.spec.js",
+      "title": "cold Back leaves the bookmark focused after reader input",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "chromium",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-353cbe2a6328583b5cfe",
+      "file": "work-profile-return.spec.js",
+      "title": "cold Back restores the exact opener when Chromium focuses its bookmark first",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "chromium",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-1367d3f40c0f986b4abb",
+      "file": "work-profile-return.spec.js",
+      "title": "cold Back restores the role title link",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "chromium",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-9f47e6969aaebf53eb52",
+      "file": "work-profile-return.spec.js",
+      "title": "cold Back restores the role title link on a bookmarked Work entry",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "chromium",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-b027f72c405c3983f349",
+      "file": "work-profile-return.spec.js",
+      "title": "deferred bookmark placement preserves keyboard focus on open Terms",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "chromium",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-cfc15c1c62f968a3f7fc",
+      "file": "company-handoff.spec.js",
+      "title": "the directory offers historical comparisons and current-only profile links",
+      "suite": [
+        "company-handoff.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-ed875dc94c4c9b5ea748",
+      "file": "compare-return.spec.js",
+      "title": "Compare shows the selected figures on the first phone screen with one selection editor",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "355b46bdb07955e42bf4-74279d7f572ed3716077",
+      "file": "daily-phone-reflow.spec.js",
+      "title": "Daily filter controls fit and have visible boundaries across Firefox text sizes",
+      "suite": [
+        "daily-phone-reflow.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "278dff7280d77edaa92d416f7dd32eb898658c71"
+    },
+    {
+      "id": "355b46bdb07955e42bf4-96d1d9213265c1dc2d2c",
+      "file": "daily-phone-reflow.spec.js",
+      "title": "Daily story details keep enlarged labels and values separate",
+      "suite": [
+        "daily-phone-reflow.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "278dff7280d77edaa92d416f7dd32eb898658c71"
+    },
+    {
+      "id": "0c79256db53caab8858e-49de3be4e79c47482356",
+      "file": "daily.spec.js",
+      "title": "Daily phone filter disclosure follows its history entry and a fresh filtered URL opens it",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-67317b7f836d4f310d3a",
+      "file": "daily.spec.js",
+      "title": "Daily story highlight follows the visible fragment as filters and history change",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "64c6dcf800d254c4fdd2-9588ce8d3fecace527c4",
+      "file": "explore-work-layout.spec.js",
+      "title": "native Work shows the complete first role and hourly rate on the first screen",
+      "suite": [
+        "explore-work-layout.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "050f501ead9f099285ffa63a23e100623850f6bc"
+    },
+    {
+      "id": "379953442ddfc3019abd-49918296c0c266fe0449",
+      "file": "home.spec.js",
+      "title": "homepage Search leads to the company directory, comparison and market figures",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-5d72bc889b947e31786f",
+      "file": "home.spec.js",
+      "title": "homepage Search loads only its small component and index when invoked",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-ca1d99b17ce7d3b35dad",
+      "file": "home.spec.js",
+      "title": "the Home header becomes Search when its pending runtime binds",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-63df0268d10e7f25edd9",
+      "file": "home.spec.js",
+      "title": "the Home header can browse when the search runtime is blocked",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-6dd4e380d5dad7e21e99",
+      "file": "home.spec.js",
+      "title": "without JavaScript the homepage offers its menu and native browse links",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-63aa385f8141cde15f93",
+      "file": "market-fallback.spec.js",
+      "title": "Market keeps the heading focused after a late page load",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-0de55826809ce35dc312",
+      "file": "market-fallback.spec.js",
+      "title": "Market keeps the selected Download link focused after a late page load",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-4d134b043d103997f40d",
+      "file": "market-fallback.spec.js",
+      "title": "Market retries the bookmark after a blocked data bundle",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-e5df4b6b2d55f300b29d",
+      "file": "market-focus.spec.js",
+      "title": "Market Back returns to the product link from both Market addresses",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-cfe2c34229206d15d9d9",
+      "file": "market-focus.spec.js",
+      "title": "Market puts two sourced revenue rows on the first desktop screen",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-9f2e72967c3f12c97ca4",
+      "file": "market-focus.spec.js",
+      "title": "Market anchors account for the sticky header and Back restores the keyboard shortcut",
+      "suite": [
+        "market-focus.spec.js",
+        "Market with a 28px minimum font"
+      ],
+      "project": "firefox",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-4f8c3bf9e00b83798b53",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "AfterQuery keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-bf9ff1a91e78f9745f11",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Companies keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-91f3ad26b00bc32e6fac",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-ebdf244b3355b0f7ab4e",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market keeps the focused Appen amount alongside its organization and Revenue heading",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-b9c1f40667a321d2b8fc",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market keeps wrapped organization names readable beside short matrix values",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-eaa0e15010e936ddda69",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market opens AIXI Labs Revenue n/a with the keyboard",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-ad697f18bda8c328be14",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market opens Appen Paid delivery — with the keyboard",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-2d54e94b78fb63fa0d3d",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Research keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-207dcb0c9b7cf1d308b3",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Work keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-32b70c2d6ed878ce8fc9",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "AfterQuery keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-9fee04eb5c6657481ee9",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Companies keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-a284b8fccf01cdd03df9",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market includes every unavailable evidence cell in the matrix Tab order",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-182d053e942781154e0e",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-35716ab23ecbd8a9b582",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market keeps the focused Appen amount alongside its organization and Revenue heading",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-818aff2ebaee96c1cce8",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market opens AIXI Labs Revenue n/a with the keyboard",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-71798b19916746fa7b23",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market opens Appen Paid delivery — with the keyboard",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-3b65de5a8a335d06213a",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Research keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-628b0b7d9fda97ea7939",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Work keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "project": "firefox",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "a546f64a9f412d32fbe7-42793d39ec02902126fd",
+      "file": "method-contact-reflow.spec.js",
+      "title": "Method correction contacts and the record link fit at Firefox minimum font sizes",
+      "suite": [
+        "method-contact-reflow.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "1ac98ddc1ab610604e25b6455364db7c386a3582"
+    },
+    {
+      "id": "e27f8e955978b6337c5e-fe9fa41a34f0b1c6a89c",
+      "file": "native-phone-navigation.spec.js",
+      "title": "enlarged Firefox navigation stays keyboard reachable at tablet widths",
+      "suite": [
+        "native-phone-navigation.spec.js",
+        "native navigation with enlarged Firefox text and no scripts"
+      ],
+      "project": "firefox",
+      "fixture_blob": "3eb2439284169d20f7856c4d6540d074635d1d90"
+    },
+    {
+      "id": "e27f8e955978b6337c5e-8a57babd74448b7b95aa",
+      "file": "native-phone-navigation.spec.js",
+      "title": "main links stay in view in a single keyboard disclosure at 320px",
+      "suite": [
+        "native-phone-navigation.spec.js",
+        "native navigation with enlarged Firefox text and no scripts"
+      ],
+      "project": "firefox",
+      "fixture_blob": "3eb2439284169d20f7856c4d6540d074635d1d90"
+    },
+    {
+      "id": "e27f8e955978b6337c5e-657431631cc1f4740b9e",
+      "file": "native-phone-navigation.spec.js",
+      "title": "main links stay in view in a single keyboard disclosure at 390px",
+      "suite": [
+        "native-phone-navigation.spec.js",
+        "native navigation with enlarged Firefox text and no scripts"
+      ],
+      "project": "firefox",
+      "fixture_blob": "3eb2439284169d20f7856c4d6540d074635d1d90"
+    },
+    {
+      "id": "e27f8e955978b6337c5e-9d50ab9486a448d2993a",
+      "file": "native-phone-navigation.spec.js",
+      "title": "paid work source index is the first tab in the dossier source disclosure",
+      "suite": [
+        "native-phone-navigation.spec.js",
+        "native navigation with enlarged Firefox text and no scripts"
+      ],
+      "project": "firefox",
+      "fixture_blob": "3eb2439284169d20f7856c4d6540d074635d1d90"
+    },
+    {
+      "id": "cbead6ff08504803918c-c2def102fd59c54f5ac5",
+      "file": "profile-details.spec.js",
+      "title": "a refused claim bookmark reopens the exact sources on keyboard retry",
+      "suite": [
+        "profile-details.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "fd96f7a1dd665b2a2902263d70a212c3d2e70247"
+    },
+    {
+      "id": "cbead6ff08504803918c-80be9aa3c399f2090ba9",
+      "file": "profile-details.spec.js",
+      "title": "the native Source ledger lands at All sources and Tabs into its sources before images load",
+      "suite": [
+        "profile-details.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "fd96f7a1dd665b2a2902263d70a212c3d2e70247"
+    },
+    {
+      "id": "e7545a82257e8a18fdcf-4a1f261def38c0cfcc91",
+      "file": "research-index-ux.spec.js",
+      "title": "a source version summary keeps its accessible name and shows the parent only where needed",
+      "suite": [
+        "research-index-ux.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "0d81ca2418c8c23d0709f26b4951cca96c2d5d0b"
+    },
+    {
+      "id": "e7545a82257e8a18fdcf-53cd91f9450be14d6356",
+      "file": "research-index-ux.spec.js",
+      "title": "actual preceding script can reach a matching version beneath a hidden approved work",
+      "suite": [
+        "research-index-ux.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "0d81ca2418c8c23d0709f26b4951cca96c2d5d0b"
+    },
+    {
+      "id": "861fbfe47eb9328d135a-9830328b4ee639c9cb95",
+      "file": "search-compatibility.spec.js",
+      "title": "native Work keeps the downloaded bundle when slow HTML delays its execution",
+      "suite": [
+        "search-compatibility.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "b3801d840b1cee7c86f63054b141ef26dc63f3ff"
+    },
+    {
+      "id": "fc45065b150b1083e52b-6a17bca68abb8e2d84a9",
+      "file": "technical-reading.spec.js",
+      "title": "the current chapter starts with readable prose and keeps a native chapter index",
+      "suite": [
+        "technical-reading.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "ace53adbdd2ac5870700-87916ccceb70d3af9770",
+      "file": "work-compare-content.spec.js",
+      "title": "native Work Compare preserves separate pay and terms fields for every record",
+      "suite": [
+        "work-compare-content.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "85094073566b20c194ad5554541a1651eefaf4b4"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-f6ab91c55e37d61e610a",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Work cards, Compare and both CSV downloads agree for past records",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-68cd383857943c198036",
+      "file": "work-editorial-parity.spec.js",
+      "title": "native Work keeps the open terms and record order when filters load late",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "firefox",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-7fd06c87b4c987b782e5",
+      "file": "work-profile-return.spec.js",
+      "title": "deferred bookmark placement preserves keyboard focus on open Terms",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "firefox",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    },
+    {
+      "id": "a807ba3392820fce6bb6-a170025a536273c8c8df",
+      "file": "claim-source-checks.spec.js",
+      "title": "the Snorkel claim pairs same-URL checks by source ID and preserves the archive",
+      "suite": [
+        "claim-source-checks.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a9065877d05106493a91bf6665c0fb98e77da53b"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-c0a6190a580231f296c8",
+      "file": "company-handoff.spec.js",
+      "title": "Explore shortlist keeps the fourth-selection instruction and actions readable",
+      "suite": [
+        "company-handoff.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-0f4cfe8603b5f1c8664c",
+      "file": "company-handoff.spec.js",
+      "title": "Explore shortlist restores the initiating Compare after editing and reloading the comparison",
+      "suite": [
+        "company-handoff.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-cb6385aed6d4b3d455f4",
+      "file": "company-handoff.spec.js",
+      "title": "native Companies carries the exact saved search result into Compare",
+      "suite": [
+        "company-handoff.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-a50ec1391f0f5e5d11c6",
+      "file": "company-handoff.spec.js",
+      "title": "the directory offers historical comparisons and current-only profile links",
+      "suite": [
+        "company-handoff.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-594af624dc9f00ddae47",
+      "file": "company-handoff.spec.js",
+      "title": "the native directory retains its profile links and exact Compare destinations",
+      "suite": [
+        "company-handoff.spec.js",
+        "without JavaScript"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "dfcc8b3e025dbca0ea93-89e8c6d08b15e80bbd96",
+      "file": "company-search-recovery.spec.js",
+      "title": "HTTP 503 company search keeps keyboard focus through failure and retry",
+      "suite": [
+        "company-search-recovery.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "8663c43e7b2d8c9f1a8f1dd72600d21f6c0f7e1d"
+    },
+    {
+      "id": "dfcc8b3e025dbca0ea93-2a5397eb47541312ab9d",
+      "file": "company-search-recovery.spec.js",
+      "title": "Offline company search keeps keyboard focus through failure and retry",
+      "suite": [
+        "company-search-recovery.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "8663c43e7b2d8c9f1a8f1dd72600d21f6c0f7e1d"
+    },
+    {
+      "id": "dfcc8b3e025dbca0ea93-b2c004d1ccaae530e7d6",
+      "file": "company-search-recovery.spec.js",
+      "title": "a failed company search leaves focus in the global search, and Clear works during the outage",
+      "suite": [
+        "company-search-recovery.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "8663c43e7b2d8c9f1a8f1dd72600d21f6c0f7e1d"
+    },
+    {
+      "id": "dfcc8b3e025dbca0ea93-d545b4641b9abe5236d2",
+      "file": "company-search-recovery.spec.js",
+      "title": "failed filters and CSV reflect the current criteria and recovery exports the matching IDs",
+      "suite": [
+        "company-search-recovery.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "8663c43e7b2d8c9f1a8f1dd72600d21f6c0f7e1d"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-464ba9d410c54610255d",
+      "file": "compare-return.spec.js",
+      "title": "Back restores the opener from a new entry at the same Compare URL",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-7e4607ea86dca6222574",
+      "file": "compare-return.spec.js",
+      "title": "Back returns to the exact Compare link when two links open the same profile",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-5cbeb42301710e45082f",
+      "file": "compare-return.spec.js",
+      "title": "Compare keeps the reading position after wheel scrolling and a height change",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-e0f7f8fc516405f40fce",
+      "file": "compare-return.spec.js",
+      "title": "Compare preserves visible keyboard focus when a phone rotates with the pair picker open",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-f6455a01a5d89b65f173",
+      "file": "compare-return.spec.js",
+      "title": "Compare shows the selected figures on the first phone screen with one selection editor",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-b221bc8d1bd6d3b857d0",
+      "file": "compare-return.spec.js",
+      "title": "Compare work links describe career pages, archived records and paid networks accurately",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-379c6ff90c9b472d5b31",
+      "file": "compare-return.spec.js",
+      "title": "an open Compare pair stays visible and usable after a height change at 32px minimum text",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-9082bdc202f436c6bd41",
+      "file": "compare-return.spec.js",
+      "title": "fresh Back from native financing evidence restores More, the Compare pair and keyboard focus",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "0c79256db53caab8858e-aee12a7d0ca68b3580c9",
+      "file": "daily.spec.js",
+      "title": "Daily 2026-11-16 permalink Back and Forward restore the reading position",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-46b4b7493a301e4041af",
+      "file": "daily.spec.js",
+      "title": "Daily 2026-11-18 permalink Back and Forward restore the reading position",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-39030e10541520b82459",
+      "file": "daily.spec.js",
+      "title": "Daily dated permalink back honors the first trusted Tab after hashchange",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-96dbd6bee9d6d2b85156",
+      "file": "daily.spec.js",
+      "title": "Daily dated permalink forward honors the first trusted Tab after hashchange",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-ad79620c79733f2ca027",
+      "file": "daily.spec.js",
+      "title": "Daily dated permalink immediate Forward starts Tab at the target headline",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-782b098e94727511097d",
+      "file": "daily.spec.js",
+      "title": "Daily feeds bind immutable editions without invented publication times",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-290ccd0dba584fa71500",
+      "file": "daily.spec.js",
+      "title": "Daily filtered latest permalink Back and Forward restore the reading position",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-d424480464ec55a4e9f2",
+      "file": "daily.spec.js",
+      "title": "Daily phone filters leave focus in place and restore saved reading on Back",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-ad9663efae3418ae74c8",
+      "file": "daily.spec.js",
+      "title": "Daily shows the complete first headline on the first screen",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-41cd75ea4c8dffe32324",
+      "file": "daily.spec.js",
+      "title": "Daily topic and type controls select exactly the source-backed items and update URLs",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-c805295d1bb4dbd93554",
+      "file": "daily.spec.js",
+      "title": "complete explanations, native sources, archive navigation and JSON remain readable",
+      "suite": [
+        "daily.spec.js",
+        "Daily without JavaScript"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "7e63be9b1836762cd850-ef477db6bdbe7a8b5dd3",
+      "file": "explore-company-search-focus.spec.js",
+      "title": "a completed search leaves focus in the global search opened by keyboard",
+      "suite": [
+        "explore-company-search-focus.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "bb3088c672434130fb5b6e23e8fb399b8b7f09ae"
+    },
+    {
+      "id": "7e63be9b1836762cd850-7a18879ae3663b760d1b",
+      "file": "explore-company-search-focus.spec.js",
+      "title": "a removed result returns keyboard focus to company search",
+      "suite": [
+        "explore-company-search-focus.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "bb3088c672434130fb5b6e23e8fb399b8b7f09ae"
+    },
+    {
+      "id": "7e63be9b1836762cd850-027dca75dcbcdc06e4c2",
+      "file": "explore-company-search-focus.spec.js",
+      "title": "a surviving Compare checkbox keeps focus and completes a Space press across the update",
+      "suite": [
+        "explore-company-search-focus.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "bb3088c672434130fb5b6e23e8fb399b8b7f09ae"
+    },
+    {
+      "id": "64c6dcf800d254c4fdd2-b56d4102486d0b03c2ba",
+      "file": "explore-work-layout.spec.js",
+      "title": "native Work explains the full count and updates the live count for matching records",
+      "suite": [
+        "explore-work-layout.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "050f501ead9f099285ffa63a23e100623850f6bc"
+    },
+    {
+      "id": "64c6dcf800d254c4fdd2-4c2887d30dc6a0afb5a5",
+      "file": "explore-work-layout.spec.js",
+      "title": "native Work shows the complete first role and hourly rate on the first screen",
+      "suite": [
+        "explore-work-layout.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "050f501ead9f099285ffa63a23e100623850f6bc"
+    },
+    {
+      "id": "819abe1b596fb41a0739-38f325f860e9738f3946",
+      "file": "finance-evidence.spec.js",
+      "title": "Current company CSV leads with the selected Toloka and Turing publishers",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-98e8c7c1c3ec2c191215",
+      "file": "finance-evidence.spec.js",
+      "title": "Handshake keeps the corrected Dealroom date separate from its reporting period",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-ba8ac4529a596fd55ea0",
+      "file": "finance-evidence.spec.js",
+      "title": "Market ledger keeps Handshake’s April period separate from Dealroom’s publication and check",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-80f078f7180cccef75c7",
+      "file": "finance-evidence.spec.js",
+      "title": "Market shows Generate as another RWS business scope in the same reporting period",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-ede4e754905da659fed4",
+      "file": "finance-evidence.spec.js",
+      "title": "Snorkel issuer threshold survives Home, profiles, Compare, Market and current exports",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-eef415a26be2b0916c85",
+      "file": "finance-evidence.spec.js",
+      "title": "Toloka and Turing pair the original publisher with their historical citation",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-b88e9e5ee471e195f944",
+      "file": "finance-evidence.spec.js",
+      "title": "Toloka growth figures and claims cite the inputs for an approximate calculation",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-cc620176c02851938804",
+      "file": "finance-evidence.spec.js",
+      "title": "compact Companies, hydrated Compare and Companies keep exact source dates",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-48fa0f583f767efdfdfb",
+      "file": "finance-evidence.spec.js",
+      "title": "iMerit current financial citations replace a dead transcript while keeping its history",
+      "suite": [
+        "finance-evidence.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-a1aa6847542893b897a2",
+      "file": "finance-evidence.spec.js",
+      "title": "afterquery.source.oct14-fd3e4675dd42 has the original citation and its own dates without JavaScript",
+      "suite": [
+        "finance-evidence.spec.js",
+        "exact publisher dates on native company pages"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-8b0d9af644d402e77a8d",
+      "file": "finance-evidence.spec.js",
+      "title": "afterquery.source.round2-funding has the original citation and its own dates without JavaScript",
+      "suite": [
+        "finance-evidence.spec.js",
+        "exact publisher dates on native company pages"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-3ff817f128f23650cf9c",
+      "file": "finance-evidence.spec.js",
+      "title": "datacurve.source.oct14-9b179f419da7 has the original citation and its own dates without JavaScript",
+      "suite": [
+        "finance-evidence.spec.js",
+        "exact publisher dates on native company pages"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-bba012bceec1417dc01a",
+      "file": "finance-evidence.spec.js",
+      "title": "labelbox.source.audit-lb_firstround has the original citation and its own dates without JavaScript",
+      "suite": [
+        "finance-evidence.spec.js",
+        "exact publisher dates on native company pages"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-04f3df4a49c40f766d7e",
+      "file": "finance-evidence.spec.js",
+      "title": "scale_ai.source.oct14-891cd0d871ee has the original citation and its own dates without JavaScript",
+      "suite": [
+        "finance-evidence.spec.js",
+        "exact publisher dates on native company pages"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "819abe1b596fb41a0739-03685d4d4af388a7e1de",
+      "file": "finance-evidence.spec.js",
+      "title": "surge_ai.source.oct14-891cd0d871ee has the original citation and its own dates without JavaScript",
+      "suite": [
+        "finance-evidence.spec.js",
+        "exact publisher dates on native company pages"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "52a1feeb4e102b3fc78f6ac46d832ce208359345"
+    },
+    {
+      "id": "379953442ddfc3019abd-2f44ab3e86c26101b6b5",
+      "file": "home.spec.js",
+      "title": "both directory actions fit on one row on narrow phones",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-e338c50c558b151a1dcd",
+      "file": "home.spec.js",
+      "title": "home shows both dated sources before the phone portrait and aligns the desktop records",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-0b656e31cc90923e24c3",
+      "file": "home.spec.js",
+      "title": "homepage Search leads to the company directory, comparison and market figures",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-4a8d3ec9c13c6bb15165",
+      "file": "home.spec.js",
+      "title": "the Home header becomes Search when its pending runtime binds",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-8820bb6e77862ccff802",
+      "file": "home.spec.js",
+      "title": "the Home header can browse when the search runtime is blocked",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-637e0e0b06b53eb611c9",
+      "file": "home.spec.js",
+      "title": "without JavaScript the homepage offers its menu and native browse links",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-56b93ab2f740b77bc742",
+      "file": "home.spec.js",
+      "title": "home Menu leaves Find paid work operable at 320px",
+      "suite": [
+        "home.spec.js",
+        "home keyboard controls in compact viewports"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-c8dcda94fed13d72b1ad",
+      "file": "home.spec.js",
+      "title": "home Menu leaves Sources and data operable at 640px",
+      "suite": [
+        "home.spec.js",
+        "home keyboard controls in compact viewports"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-0bc7654d68e5f8096328",
+      "file": "home.spec.js",
+      "title": "home Search pages a tall selected result without moving focus",
+      "suite": [
+        "home.spec.js",
+        "home keyboard controls in compact viewports"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "0332c50d76e4d567f08a-020fc9cd0a98d94367d0",
+      "file": "interactions.spec.js",
+      "title": "current company CSV uses the same financial observation as the visible card",
+      "suite": [
+        "interactions.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a034bf8c32c5b3631aeb808b4034cd74f9d0273d"
+    },
+    {
+      "id": "0332c50d76e4d567f08a-356f393f2eb05e805808",
+      "file": "interactions.spec.js",
+      "title": "global search opens Home, the company directory, and one search for paid work",
+      "suite": [
+        "interactions.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a034bf8c32c5b3631aeb808b4034cd74f9d0273d"
+    },
+    {
+      "id": "0332c50d76e4d567f08a-c28d0677f995794ac0c5",
+      "file": "interactions.spec.js",
+      "title": "native Work, Compare and both CSV downloads preserve kind=named&arrangement=onsite",
+      "suite": [
+        "interactions.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a034bf8c32c5b3631aeb808b4034cd74f9d0273d"
+    },
+    {
+      "id": "0332c50d76e4d567f08a-2cf3f25b63f8903f00ac",
+      "file": "interactions.spec.js",
+      "title": "native Work, Compare and both CSV downloads preserve q=no%20such%20opening%20%2B%20C%2B%2B%20%26%20%E7%A0%94%E7%A9%B6",
+      "suite": [
+        "interactions.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a034bf8c32c5b3631aeb808b4034cd74f9d0273d"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-addda3e5ceca92417864",
+      "file": "market-fallback.spec.js",
+      "title": "Market preserves the reading position on ordinary reload and Back",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-94176c23966ec382c901",
+      "file": "market-fallback.spec.js",
+      "title": "Market reloads the bookmark into view after a blocked business-health module",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-e0e3ccadb282b99d09c4",
+      "file": "market-fallback.spec.js",
+      "title": "Market reloads the bookmark into view after a blocked overview response",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-58a5bb2b80dfc8e2ab51",
+      "file": "market-fallback.spec.js",
+      "title": "Market retries the bookmark after a blocked app bundle",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-c13912419f8a98ec95a4",
+      "file": "market-fallback.spec.js",
+      "title": "Market retries the bookmark after a blocked data bundle",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-e7946854607c29917da3",
+      "file": "market-fallback.spec.js",
+      "title": "a failed Market handoff replaces the previous results and allows keyboard reload",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-d0ccafc8b6fcdc23b4d3",
+      "file": "market-fallback.spec.js",
+      "title": "a timed-out app bundle cannot remove the focused recovery action when it finally arrives",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-11541ae6e6730855dc45",
+      "file": "market-fallback.spec.js",
+      "title": "enhanced Market exposes the fragment and focuses the visible heading",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-5e93172b6c81945f615d",
+      "file": "market-fallback.spec.js",
+      "title": "#business-health starts at the skip link and reaches the plain directory",
+      "suite": [
+        "market-fallback.spec.js",
+        "Explore without JavaScript"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-775c095b3ad0757b66b3",
+      "file": "market-fallback.spec.js",
+      "title": "#work starts at the skip link and reaches the plain directory",
+      "suite": [
+        "market-fallback.spec.js",
+        "Explore without JavaScript"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-1574176a9b0006d37a73",
+      "file": "market-fallback.spec.js",
+      "title": "base URL starts at the skip link and reaches the plain directory",
+      "suite": [
+        "market-fallback.spec.js",
+        "Explore without JavaScript"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "a4085bc4c28cffa0b6cc90f0cf3c7503d94184b3"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-1a49cc2f080017ad5009",
+      "file": "market-focus.spec.js",
+      "title": "Market Back returns to the product link from both Market addresses",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-8bcce49f6574563dfb2d",
+      "file": "market-focus.spec.js",
+      "title": "Market marks the current observation by its exact ID",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-200daeff21d5de8ee638",
+      "file": "market-focus.spec.js",
+      "title": "Market restores Handshake focus to each successive evidence opener",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-9e07ed692376d173eb4e",
+      "file": "market-focus.spec.js",
+      "title": "Market restores RWS focus after an alternate observation and nested claim",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-3040643e9737c4179cef",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market exposes the selected Cash order as grouped by reporting basis",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "390px Chromium matrix"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-8a38a2aaa0d5e2c193cc",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market names all unavailable Paid delivery cells and dialogs for that column",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "390px Chromium matrix"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-0c116ea225806d9b3061",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "Market skips the matrix body by keyboard and keeps its filters and position",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "390px Chromium matrix"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "ef23fb15174ca7321184-737d604e742ef120d2ae",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Companies restores Compare A.Team via its alias on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-4b8cedf9a7a63de22da0",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Companies restores Compare Mercor on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-9544a7a773381c1c2f32",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Companies restores all original profiles on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-bc0a1102ff26f09aca3f",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Companies restores full guide search on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-8b5c3138e20efc1bdcb7",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Companies restores the Mercor dossier on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-aa0d1a4ec003a2843b85",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Work restores Compare results on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-509a1bb17143eb82f5c6",
+      "file": "native-handoff-history.spec.js",
+      "title": "native Work restores its Explore Work handoff on cold Back",
+      "suite": [
+        "native-handoff-history.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "f7ac2f226f32ddf23c1c-767b2401426004932b30",
+      "file": "native-search.spec.js",
+      "title": "bare hourly searches lead to published hourly rates by keyboard or touch",
+      "suite": [
+        "native-search.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "69064b671172f83a08722b7a6abb880f2d41cce8"
+    },
+    {
+      "id": "f7ac2f226f32ddf23c1c-95bdcb0cfdeb55af9e42",
+      "file": "native-search.spec.js",
+      "title": "the hourly shortcut remains available when the search index cannot load",
+      "suite": [
+        "native-search.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "69064b671172f83a08722b7a6abb880f2d41cce8"
+    },
+    {
+      "id": "cbead6ff08504803918c-d44ff31d6a2956d469ef",
+      "file": "profile-details.spec.js",
+      "title": "a fresh-document Back reopens Sources and data at the exact activated native link",
+      "suite": [
+        "profile-details.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "fd96f7a1dd665b2a2902263d70a212c3d2e70247"
+    },
+    {
+      "id": "cbead6ff08504803918c-9f3718b7a9565dae40b2",
+      "file": "profile-details.spec.js",
+      "title": "a refused claim bookmark reopens the exact sources on keyboard retry",
+      "suite": [
+        "profile-details.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "fd96f7a1dd665b2a2902263d70a212c3d2e70247"
+    },
+    {
+      "id": "cbead6ff08504803918c-2e090d6dde604bcf0fd4",
+      "file": "profile-details.spec.js",
+      "title": "an initial section route respects keyboard focus established while its evidence loads",
+      "suite": [
+        "profile-details.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "fd96f7a1dd665b2a2902263d70a212c3d2e70247"
+    },
+    {
+      "id": "cbead6ff08504803918c-6e4ba9f02f1170f4728c",
+      "file": "profile-details.spec.js",
+      "title": "the native Source ledger lands at All sources and Tabs into its sources before images load",
+      "suite": [
+        "profile-details.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "fd96f7a1dd665b2a2902263d70a212c3d2e70247"
+    },
+    {
+      "id": "08eef72683f81e24edc9-7f92e1165a0713d5b24f",
+      "file": "profile-scroll-timing.spec.js",
+      "title": "focus established as the Paid work pane mounts cancels the pending scroll",
+      "suite": [
+        "profile-scroll-timing.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "c3aa793bfe09bdc081d1445a84db046e67d3abcd"
+    },
+    {
+      "id": "e7545a82257e8a18fdcf-596a2e7a8c09930195a6",
+      "file": "research-index-ux.spec.js",
+      "title": "a source version summary keeps its accessible name and shows the parent only where needed",
+      "suite": [
+        "research-index-ux.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "0d81ca2418c8c23d0709f26b4951cca96c2d5d0b"
+    },
+    {
+      "id": "e7545a82257e8a18fdcf-e99274f3a5d2ee831de7",
+      "file": "research-index-ux.spec.js",
+      "title": "actual preceding script can reach a matching version beneath a hidden approved work",
+      "suite": [
+        "research-index-ux.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "0d81ca2418c8c23d0709f26b4951cca96c2d5d0b"
+    },
+    {
+      "id": "fc45065b150b1083e52b-e208fd2e6e9f2ee27fee",
+      "file": "technical-reading.spec.js",
+      "title": "the current chapter starts with readable prose and keeps a native chapter index",
+      "suite": [
+        "technical-reading.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "fc45065b150b1083e52b-6a224450ba2bddcdfd47",
+      "file": "technical-reading.spec.js",
+      "title": "current Technical passage keeps keyboard focus with browser Back and Forward",
+      "suite": [
+        "technical-reading.spec.js",
+        "enhanced technical reading"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "fc45065b150b1083e52b-6890256b8c8bf4c971de",
+      "file": "technical-reading.spec.js",
+      "title": "dated Technical passage keeps keyboard focus with browser Back and Forward",
+      "suite": [
+        "technical-reading.spec.js",
+        "enhanced technical reading"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "fc45065b150b1083e52b-41a716f62a2a7cd2497f",
+      "file": "technical-reading.spec.js",
+      "title": "2026-11-12 Technical GPQA citation opens on the first tap after Find",
+      "suite": [
+        "technical-reading.spec.js",
+        "technical citations after native Find on a phone"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "fc45065b150b1083e52b-88d59fbe836251b3689f",
+      "file": "technical-reading.spec.js",
+      "title": "2026-11-12 Technical IFEval citation opens on the first tap after Find",
+      "suite": [
+        "technical-reading.spec.js",
+        "technical citations after native Find on a phone"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "fc45065b150b1083e52b-9b35c25099f1c3d05813",
+      "file": "technical-reading.spec.js",
+      "title": "2026-11-12 Technical OSWorld citation opens on the first tap after Find",
+      "suite": [
+        "technical-reading.spec.js",
+        "technical citations after native Find on a phone"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "fc45065b150b1083e52b-d3bd7e852056bbc3bfde",
+      "file": "technical-reading.spec.js",
+      "title": "current Technical GPQA citation opens on the first tap after Find",
+      "suite": [
+        "technical-reading.spec.js",
+        "technical citations after native Find on a phone"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "fc45065b150b1083e52b-92b7e699acb9a41a0099",
+      "file": "technical-reading.spec.js",
+      "title": "current Technical IFEval citation opens on the first tap after Find",
+      "suite": [
+        "technical-reading.spec.js",
+        "technical citations after native Find on a phone"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "fc45065b150b1083e52b-c91ccefe839a01d51653",
+      "file": "technical-reading.spec.js",
+      "title": "current Technical OSWorld citation opens on the first tap after Find",
+      "suite": [
+        "technical-reading.spec.js",
+        "technical citations after native Find on a phone"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "1ab340ea549b317b4f6c-ed894132d9a3514ca80f",
+      "file": "work-compare-arrival.spec.js",
+      "title": "a directly opened native Work Compare URL leaves initial focus and scroll alone",
+      "suite": [
+        "work-compare-arrival.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "6a1849237a7c72230d94e67218d3f623f04a1a79"
+    },
+    {
+      "id": "1ab340ea549b317b4f6c-feb6b6140e1b45042342",
+      "file": "work-compare-arrival.spec.js",
+      "title": "native Work Compare opens on the first full result from touch at 320×720",
+      "suite": [
+        "work-compare-arrival.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "6a1849237a7c72230d94e67218d3f623f04a1a79"
+    },
+    {
+      "id": "ace53adbdd2ac5870700-a2d18750dd072626a30a",
+      "file": "work-compare-content.spec.js",
+      "title": "native Work Compare preserves separate pay and terms fields for every record",
+      "suite": [
+        "work-compare-content.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "85094073566b20c194ad5554541a1651eefaf4b4"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-af72cda6631dbaed79e8",
+      "file": "work-editorial-parity.spec.js",
+      "title": "OOAK’s exact employer listing and application checks keep separate statuses",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-1d422725f750ad2d1809",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Reconciled employer listings render scoped pay and exact source actions in Work and Explore",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-739ad84800b6f7a571a0",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Work cards, Compare and both CSV downloads agree for all records",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-ac27d3a31d683ad977cf",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Work cards, Compare and both CSV downloads agree for past records",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-4757f93c4303ff3e9fb9",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Work cards, Compare and both CSV downloads agree for yearly on-site or hybrid other company jobs",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-807830d2f88520941081",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Work cards, Compare and both CSV downloads agree for yearly on-site or hybrid staff listings",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-ca138208188045d19767",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Work cards, Compare and both CSV downloads agree for yearly remote staff listings",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-b158e596eee73375092e",
+      "file": "work-editorial-parity.spec.js",
+      "title": "native Work keeps the open terms and record order when filters load late",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "5c8e29925b5a1b29d9da-fab76f36b5cf49634333",
+      "file": "company-handoff.spec.js",
+      "title": "the directory offers historical comparisons and current-only profile links",
+      "suite": [
+        "company-handoff.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "658b81ba16172b8a7fca-14382cf7d9004fb51c64",
+      "file": "compare-return.spec.js",
+      "title": "Compare shows the selected figures on the first phone screen with one selection editor",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "00470f117385ccbd19b9748d98fc32c44c19b2fe"
+    },
+    {
+      "id": "0c79256db53caab8858e-53cb2fbe4e3a46dc7aba",
+      "file": "daily.spec.js",
+      "title": "Daily phone WebKit keeps the story highlight on cold Forward",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-1727830c740501d21d6f",
+      "file": "daily.spec.js",
+      "title": "Daily story highlight follows the visible fragment as filters and history change",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "0c79256db53caab8858e-ad65654ce1a119b1e13e",
+      "file": "daily.spec.js",
+      "title": "phone WebKit keeps the native story highlight on cold Forward",
+      "suite": [
+        "daily.spec.js",
+        "Daily without JavaScript"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "64c6dcf800d254c4fdd2-52a4442bfb23f90797ab",
+      "file": "explore-work-layout.spec.js",
+      "title": "native Work shows the complete first role and hourly rate on the first screen",
+      "suite": [
+        "explore-work-layout.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "050f501ead9f099285ffa63a23e100623850f6bc"
+    },
+    {
+      "id": "379953442ddfc3019abd-e89e2e5249b2cd40f82d",
+      "file": "home.spec.js",
+      "title": "expiry moves focus from the promotion to the native Work link",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-5da5b1706ebb837c6701",
+      "file": "home.spec.js",
+      "title": "homepage Search leads to the company directory, comparison and market figures",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-79ff5a27edf7c0f51e00",
+      "file": "home.spec.js",
+      "title": "homepage Search loads only its small component and index when invoked",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-9c27b01a5332ba7aaa6a",
+      "file": "home.spec.js",
+      "title": "the Home header becomes Search when its pending runtime binds",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-e0c20e0bd6fc5703c1a2",
+      "file": "home.spec.js",
+      "title": "the Home header can browse when the search runtime is blocked",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-04b32d001e8d1dee004d",
+      "file": "home.spec.js",
+      "title": "without JavaScript the homepage offers its menu and native browse links",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-11d34b245ed296bf2bf8",
+      "file": "market-focus.spec.js",
+      "title": "Market Back returns to the product link from both Market addresses",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-cf4439a2107453d81498",
+      "file": "market-phone-accessibility.spec.js",
+      "title": "closing a figure reveals its opener after the selected measure reorders the rows",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "Market figure return with a sorted table"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "546cfc3730bfce1d5193a2679645df540f769207"
+    },
+    {
+      "id": "ef23fb15174ca7321184-d39701886d4cf52db5db",
+      "file": "native-handoff-history.spec.js",
+      "title": "keeps a reader’s scroll after pageshow",
+      "suite": [
+        "native-handoff-history.spec.js",
+        "Mercor dossier viewport on cold Back"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "ef23fb15174ca7321184-2e0ed5cf5175ff1eb6d7",
+      "file": "native-handoff-history.spec.js",
+      "title": "recovers from a late scroll to the top",
+      "suite": [
+        "native-handoff-history.spec.js",
+        "Mercor dossier viewport on cold Back"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "53b8344ed39e8b3d330e3a7519d4429a498d6ed7"
+    },
+    {
+      "id": "e7545a82257e8a18fdcf-8801119563c4578be8bc",
+      "file": "research-index-ux.spec.js",
+      "title": "a source version summary keeps its accessible name and shows the parent only where needed",
+      "suite": [
+        "research-index-ux.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "0d81ca2418c8c23d0709f26b4951cca96c2d5d0b"
+    },
+    {
+      "id": "e7545a82257e8a18fdcf-7da6c06497f6696a3bf2",
+      "file": "research-index-ux.spec.js",
+      "title": "actual preceding script can reach a matching version beneath a hidden approved work",
+      "suite": [
+        "research-index-ux.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "0d81ca2418c8c23d0709f26b4951cca96c2d5d0b"
+    },
+    {
+      "id": "fc45065b150b1083e52b-4e911bd8da7d61657718",
+      "file": "technical-reading.spec.js",
+      "title": "the current chapter starts with readable prose and keeps a native chapter index",
+      "suite": [
+        "technical-reading.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "ace53adbdd2ac5870700-74059a26348999abb8c7",
+      "file": "work-compare-content.spec.js",
+      "title": "native Work Compare preserves separate pay and terms fields for every record",
+      "suite": [
+        "work-compare-content.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "85094073566b20c194ad5554541a1651eefaf4b4"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-6f284fe95f5a8d21f17a",
+      "file": "work-editorial-parity.spec.js",
+      "title": "Work cards, Compare and both CSV downloads agree for past records",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "ee966624015f2ce6c55b-002f195b33ccbdb15955",
+      "file": "work-editorial-parity.spec.js",
+      "title": "native Work keeps the open terms and record order when filters load late",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "project": "mobile-webkit",
+      "fixture_blob": "0d0b35b2bbd90d892fbca984e888ae9b6cd8b595"
+    },
+    {
+      "id": "0c79256db53caab8858e-87cb0158a4f9037a87b9",
+      "file": "daily.spec.js",
+      "title": "Daily phone filter disclosure follows its history entry and a fresh filtered URL opens it",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "project": "webkit",
+      "fixture_blob": "27b4d8b175d395251e4a3fe2401aad2682f38ed7"
+    },
+    {
+      "id": "64c6dcf800d254c4fdd2-ebc9c72871ab11236798",
+      "file": "explore-work-layout.spec.js",
+      "title": "native Work shows the complete first role and hourly rate on the first screen",
+      "suite": [
+        "explore-work-layout.spec.js"
+      ],
+      "project": "webkit",
+      "fixture_blob": "050f501ead9f099285ffa63a23e100623850f6bc"
+    },
+    {
+      "id": "379953442ddfc3019abd-991c6def6f2ae0ac1f54",
+      "file": "home.spec.js",
+      "title": "the Home header becomes Search when its pending runtime binds",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "webkit",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-514fe3beaad214576bc4",
+      "file": "home.spec.js",
+      "title": "the Home header can browse when the search runtime is blocked",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "webkit",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "379953442ddfc3019abd-437a7a3d1ae042671600",
+      "file": "home.spec.js",
+      "title": "without JavaScript the homepage offers its menu and native browse links",
+      "suite": [
+        "home.spec.js"
+      ],
+      "project": "webkit",
+      "fixture_blob": "9449cfe57f34f55ed88096ba320f0a211de6cae2"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-56b0b6fb7935cdec65ca",
+      "file": "market-focus.spec.js",
+      "title": "Market Back returns to the product link from both Market addresses",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "webkit",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-a5273ae4e2cf810f8847",
+      "file": "market-focus.spec.js",
+      "title": "Market puts two sourced revenue rows on the first desktop screen",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "project": "webkit",
+      "fixture_blob": "189b4651dbc80d88d98914cc8fb66c5504d97505"
+    },
+    {
+      "id": "e7545a82257e8a18fdcf-0c93b153d3886c268aa1",
+      "file": "research-index-ux.spec.js",
+      "title": "a source version summary keeps its accessible name and shows the parent only where needed",
+      "suite": [
+        "research-index-ux.spec.js"
+      ],
+      "project": "webkit",
+      "fixture_blob": "0d81ca2418c8c23d0709f26b4951cca96c2d5d0b"
+    },
+    {
+      "id": "e7545a82257e8a18fdcf-0fe1e613f6341840145c",
+      "file": "research-index-ux.spec.js",
+      "title": "actual preceding script can reach a matching version beneath a hidden approved work",
+      "suite": [
+        "research-index-ux.spec.js"
+      ],
+      "project": "webkit",
+      "fixture_blob": "0d81ca2418c8c23d0709f26b4951cca96c2d5d0b"
+    },
+    {
+      "id": "861fbfe47eb9328d135a-d0f415663979b703bcfe",
+      "file": "search-compatibility.spec.js",
+      "title": "native Work keeps the downloaded bundle when slow HTML delays its execution",
+      "suite": [
+        "search-compatibility.spec.js"
+      ],
+      "project": "webkit",
+      "fixture_blob": "b3801d840b1cee7c86f63054b141ef26dc63f3ff"
+    },
+    {
+      "id": "fc45065b150b1083e52b-2b36ebaea46ce315c3ff",
+      "file": "technical-reading.spec.js",
+      "title": "the current chapter starts with readable prose and keeps a native chapter index",
+      "suite": [
+        "technical-reading.spec.js"
+      ],
+      "project": "webkit",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-3f39ea5d8ca09d5f7f4d",
+      "file": "work-profile-return.spec.js",
+      "title": "cold bookmarked Back honors a wheel scroll after pageshow",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "webkit",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-5e9491f4ec2f57a042b0",
+      "file": "work-profile-return.spec.js",
+      "title": "cold bookmarked Back recovers from a late history scroll",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "webkit",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-a1f3dad7258bcad2cc26",
+      "file": "work-profile-return.spec.js",
+      "title": "deferred bookmark placement preserves keyboard focus on open Terms",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "project": "webkit",
+      "fixture_blob": "66cecc1962c315d6b2010eda08e609f665504af2"
+    }
+  ]
+}
