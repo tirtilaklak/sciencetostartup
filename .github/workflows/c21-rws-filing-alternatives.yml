@@ -1,4 +1,4 @@
-name: Verify accessible copies of the same RWS filing
+name: Record the verified accessible copy of RWS RNS 5108A
 on:
   push:
     branches: [codex/site-quality-c21-hosted-recovery-20261122]
@@ -20,18 +20,18 @@ jobs:
         with:
           node-version: '22'
       - run: npm ci
-      - name: Check the issuer identity and terms in both public copies
+      - name: Hash the exact response that shows the issuer's public statement
         shell: bash
         run: |
           mkdir -p output
           node <<'JS'
           const { chromium } = require('playwright');
           const { writeFileSync } = require('node:fs');
+          const { createHash } = require('node:crypto');
           const id='7c54f48a-bd33-491a-8130-f1c9b1dfccb1';
           const posting='https://jobs.ashbyhq.com/g2i/'+id;
           const urls = {
             tradingview:'https://www.tradingview.com/news/reuters.com%2C2026-10-27%3Anewsml_RSa5108Aa%3A0-reg-rws-holdings-plc-trading-statement/',
-            halifax:'https://www.investments.halifax.co.uk/research-centre/news-centre/article/?id=36306440&type=rns'
           };
           (async () => {
             const browser=await chromium.launch();
@@ -68,7 +68,7 @@ jobs:
                       } else {
                         const content=await page.locator('body').innerText();
                         row.primaryClaim=['5108A','RWS Holdings','£700m','15 December 2026'].every(value=>content.includes(value));
-                        row.termsGate=key==='acquisition'&&content.includes('Before Proceeding')&&!row.primaryClaim;
+                        if(row.primaryClaim)row.responseSha256=createHash('sha256').update(await response.body()).digest('hex');
                       }
                     }
                   }
