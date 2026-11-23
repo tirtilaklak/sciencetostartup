@@ -1,0 +1,96 @@
+name: Verify the signed Market repair across browsers
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-repaired-exact-verification.yml]
+permissions:
+  contents: read
+jobs:
+  exact:
+    name: exact (${{ matrix.target }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        include:
+          - {kind: browser, target: chromium}
+          - {kind: browser, target: mobile-chromium}
+          - {kind: browser, target: firefox}
+          - {kind: browser, target: webkit}
+          - {kind: browser, target: mobile-webkit}
+          - {kind: control, target: acceptance}
+          - {kind: control, target: companies}
+          - {kind: control, target: work}
+          - {kind: control, target: routes}
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      C21_HEAD: 6cae2f8323f13b39009518c05e9fc5e0e95adbb4
+      C21_DIST_TREE: 3244b76b491e51400334e72ba233cfa81a8016b7
+      C21_MANIFEST: c2fca78d019495cafe0673e473ac82105a7dcbcd3720e5d4aa9e2e536c249f0c
+      QA_MARKET_REPAIR: '1'
+      QA_BASE_URL: http://127.0.0.1:19011
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare exact source checkout
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          git worktree add --detach "$RUNNER_TEMP/c21-product" "$C21_HEAD"
+          git config --global --add safe.directory "$RUNNER_TEMP/c21-product"
+          test "$(git -C "$RUNNER_TEMP/c21-product" rev-parse HEAD:dist)" = "$C21_DIST_TREE"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install the pinned repository browser runtime
+        run: npm ci --prefix "$RUNNER_TEMP/c21-product"
+      - name: Install validation libraries
+        if: matrix.kind == 'control' && matrix.target != 'routes'
+        run: python3 -m pip --disable-pip-version-check install playwright==1.65.0 lxml==6.1.1
+      - name: Run the exact C21 journeys or release control
+        env:
+          QA_TARGET: ${{ matrix.target }}
+          QA_KIND: ${{ matrix.kind }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          PRODUCT="$RUNNER_TEMP/c21-product"
+          QA="$GITHUB_WORKSPACE/.github/qa/c21-recovery"
+          OUT="$GITHUB_WORKSPACE/output/c21-full"
+          mkdir -p "$OUT"
+          if [ "$QA_KIND" = control ] && [ "$QA_TARGET" != routes ]; then
+            git archive f5682e05c28593da0b9f6529818a058d385641c3 .github/qa/c20-edge-controls |
+              tar -x -C "$PRODUCT"
+          fi
+          cd "$PRODUCT"
+          export QA_OUTPUT="$OUT/$QA_TARGET"
+          export QA_PROJECT="$QA_TARGET"
+          export PYTHONPATH="$PRODUCT/scripts"
+          QA_DIST="$PWD/dist" python3 scripts/browser_qa_server.py --port 19011 > "$OUT/origin.log" 2>&1 &
+          origin_pid=$!
+          trap 'kill "$origin_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 20); do
+            curl --silent --fail "$QA_BASE_URL/manifest.json" >/dev/null && break
+            sleep 1
+          done
+          if [ "$QA_KIND" = browser ]; then
+            python3 "$QA/verify_exact.py"
+          else
+            python3 "$QA/verify_control.py"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c21-repaired-exact-${{ matrix.target }}
+          path: output/c21-full/
+          if-no-files-found: error
+          retention-days: 14
