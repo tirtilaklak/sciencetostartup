@@ -1,0 +1,51 @@
+name: Research ledger fragment layout probe
+on:
+  push:
+    branches: [codex/site-quality-b799-ledger-layout-probe-20261122]
+permissions:
+  contents: read
+jobs:
+  paired-device:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 3
+          persist-credentials: false
+      - name: Use the repository browser environment
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Build the pinned b799 baseline without changing tracked files
+        run: python3 scripts/build_public_snapshot.py --output output/b799-ledger-baseline
+      - name: Compare ordinary mobile visits and delayed ledger layouts
+        run: |
+          mkdir -p output/b799-ledger-layout
+          python3 .github/qa/ledger-layout/server.py > output/b799-ledger-layout/origin.json &
+          proxy_pid=$!
+          trap 'kill "$proxy_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 50); do
+            test ! -s output/b799-ledger-layout/origin.json || break
+            kill -0 "$proxy_pid"
+            sleep .1
+          done
+          node .github/qa/ledger-layout/probe.cjs output/b799-ledger-layout/origin.json output/b799-ledger-layout/browser-results.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: b799-ledger-layout-paired-browser
+          path: output/b799-ledger-layout/
+          if-no-files-found: error
+          retention-days: 14
