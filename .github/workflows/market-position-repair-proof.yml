@@ -1,0 +1,138 @@
+name: Prove the Firefox Market scroll repair
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/market-position-repair-proof.yml]
+permissions:
+  contents: read
+jobs:
+  proof:
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [before, repaired]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      VARIANT: ${{ matrix.variant }}
+      C21_BASE: 020d7f728c0a9ba0dbd4de699cb26bdc4ee665c6
+      C21_MANIFEST: 4a743a78e1e7cbe76ca6b097cb9072b6aaa557f0892b9e734aeff10eb36a3103
+      MARKET_SOURCE: 06a4cc6bfdb7ae46d9a35b0ef01674ae23948999
+      QA_BASE_URL: http://127.0.0.1:19011
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compare the held-load browser race on exact product builds
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          PRODUCT="$RUNNER_TEMP/market-$VARIANT"
+          OUT="$GITHUB_WORKSPACE/output/$VARIANT"
+          mkdir -p "$OUT"
+          SOURCE="$C21_BASE"
+          if [ "$VARIANT" = repaired ]; then SOURCE="$MARKET_SOURCE"; fi
+          git worktree add --detach "$PRODUCT" "$SOURCE"
+          git config --global --add safe.directory "$PRODUCT"
+          cd "$PRODUCT"
+          test "$(git rev-parse HEAD)" = "$SOURCE"
+          git diff --check "$C21_BASE" "$MARKET_SOURCE"
+          test "$(git diff --name-only "$C21_BASE" "$MARKET_SOURCE")" = "$(printf '%s\n' tests/browser/market-fallback.spec.js web/app.js)"
+          npm ci
+          if [ "$VARIANT" = repaired ]; then
+            python3 scripts/build_public_snapshot.py --output "$RUNNER_TEMP/repaired-dist" > "$OUT/build.log" 2>&1 || { tail -100 "$OUT/build.log"; exit 1; }
+            mv dist "$RUNNER_TEMP/c21-before-dist"
+            mv "$RUNNER_TEMP/repaired-dist" dist
+            PYTHONPATH=scripts python3 - "$OUT" "$RUNNER_TEMP/c21-before-dist" <<'PY'
+          from hashlib import sha256
+          import json, os, shutil, sys
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          out, old_dir=map(Path,sys.argv[1:])
+          old_body=(old_dir/'manifest.json').read_bytes()
+          assert sha256(old_body).hexdigest()==os.environ['C21_MANIFEST']
+          old=json.loads(old_body)['sha256']
+          dist=Path('dist')
+          body=(dist/'manifest.json').read_bytes()
+          digest=sha256(body).hexdigest()
+          validate_artifact(dist,digest)
+          current=json.loads(body)
+          assets=current['sha256']
+          archives={name:sha for name,sha in old.items() if name.startswith(('research/editions/','publication/','daily/202'))}
+          assert all(assets.get(name)==sha for name,sha in archives.items())
+          changed={name:sha for name,sha in assets.items() if old.get(name)!=sha}
+          delta=out/'payloads'
+          for name in changed:
+              target=delta/name
+              target.parent.mkdir(parents=True,exist_ok=True)
+              shutil.copyfile(dist/name,target)
+          shutil.copyfile(dist/'manifest.json',delta/'manifest.json')
+          receipt={'build':current['build_id'],'manifest_sha256':digest,'source':os.environ['MARKET_SOURCE'],
+                   'archives':len(archives),'assets':len(assets),'changed':changed,
+                   'removed':sorted(set(old)-set(assets))}
+          (out/'build-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          print(json.dumps({key:value for key,value in receipt.items() if key!='changed'}))
+          PY
+          else
+            printf '%s  %s\n' "$C21_MANIFEST" dist/manifest.json | sha256sum -c -
+            git show "$MARKET_SOURCE:tests/browser/market-fallback.spec.js" > tests/browser/market-fallback.spec.js
+          fi
+          QA_DIST="$PWD/dist" python3 scripts/browser_qa_server.py --port 19011 > "$OUT/origin.log" 2>&1 &
+          origin=$!
+          trap 'kill "$origin" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 15); do
+            curl --silent --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-before.json" && break
+            sleep 1
+          done
+          cmp "$OUT/manifest-before.json" dist/manifest.json
+          status=0
+          ./node_modules/.bin/playwright test tests/browser/market-fallback.spec.js --project=firefox \
+            --grep 'Market retains the saved reading position after late native scroll' \
+            --workers=1 --retries=0 --timeout=90000 --trace retain-on-failure --reporter=json \
+            --output "$OUT/controlled-traces" > "$OUT/controlled.json" || status=$?
+          python3 - "$OUT/controlled.json" "$VARIANT" "$status" <<'PY'
+          import json, sys
+          raw=json.load(open(sys.argv[1]))
+          def cases(suite):
+              for spec in suite.get('specs',[]):
+                  for test in spec['tests']:
+                      for result in test['results']:
+                          yield spec['title'], result
+              for nested in suite.get('suites',[]):
+                  yield from cases(nested)
+          results=list(cases(raw))
+          print('CONTROLLED', raw['stats'])
+          for title, result in results:
+              error=result.get('error',{})
+              print(title, result['status'], error.get('stack','')[:1500])
+          assert len(results)==2
+          if sys.argv[2]=='repaired':
+              assert sys.argv[3]=='0' and all(result['status']=='passed' for _,result in results)
+          else:
+              assert sys.argv[3]=='1' and all(result['status']=='failed' for _,result in results)
+          PY
+          if [ "$VARIANT" = repaired ]; then
+            ./node_modules/.bin/playwright test tests/browser/market-fallback.spec.js --project=firefox --workers=1 \
+              --retries=0 --trace retain-on-failure --reporter=json --output "$OUT/market-traces" > "$OUT/market-full.json"
+            python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['stats'])" "$OUT/market-full.json"
+          fi
+          curl --silent --show-error --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-after.json"
+          cmp "$OUT/manifest-after.json" dist/manifest.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: market-position-proof-${{ matrix.variant }}
+          path: output/${{ matrix.variant }}
+          if-no-files-found: error
+          retention-days: 14
