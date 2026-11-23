@@ -164,10 +164,14 @@ test('Market Back returns to the product link from both Market addresses', async
   async function activate(link) {
     await link.scrollIntoViewIfNeeded();
     await link.focus();
-    const top = await page.evaluate(() => new Promise(resolve => {
-      requestAnimationFrame(() => requestAnimationFrame(() => resolve(window.scrollY)));
-    }));
+    // WebKit may still be scrolling a focused link into view when the test presses Enter.
+    await link.evaluate(anchor => {
+      window.marketActivationScroll = null;
+      anchor.addEventListener('click', () => { window.marketActivationScroll = window.scrollY; }, { once: true });
+    });
     await page.keyboard.press('Enter');
+    const top = await page.evaluate(() => window.marketActivationScroll);
+    expect(top).toEqual(expect.any(Number));
     return top;
   }
 
@@ -198,12 +202,10 @@ test('Market Back returns to the product link from both Market addresses', async
       await expect(productSource).toBeFocused();
     });
 
-    if (hash === 'market') {
-      const companiesTop = await activate(companies);
-      await expect(page).toHaveURL(/#companies$/);
-      await expectBack('market', companiesTop);
-      await expect(product).not.toBeFocused();
-    }
+    const companiesTop = await activate(companies);
+    await expect(page).toHaveURL(/#companies$/);
+    await expectBack(hash, companiesTop);
+    await expect(companies).toBeFocused();
   }
 });
 

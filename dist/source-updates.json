@@ -2,6 +2,30 @@
   "version": "1.0.0",
   "baseline_dataset_version": "2.5.0",
   "description": "Append-only presentation and evidence-context corrections. Original dataset records remain historical snapshot context; metric values, qualifiers and entity scopes are unchanged.",
+  "source_locations": [
+    {
+      "company_id": "turing",
+      "source_ids": ["turing.source.t1", "turing.source.audit-t1"],
+      "recorded_url": "https://markets.financialcontent.com/dowtheoryletters/article/bizwire-2025-3-6-turing-gears-up-to-power-next-wave-of-agi-with-111-million-in-series-e",
+      "url": "https://www.turing.com/press/turing-111-million-series-e",
+      "publisher": "Turing",
+      "title": "Turing’s official Series E release",
+      "published_on": "2025-03-06",
+      "checked_on": "2026-11-22",
+      "content_sha256": "13531b9e0de0e0704d0b4d31207cd5d788c180efc9aa2bbf432c39a34687d2fd"
+    },
+    {
+      "company_id": "bespoke_labs",
+      "source_ids": ["bespoke_labs.source.audit-bl-pr"],
+      "recorded_url": "https://markets.financialcontent.com/buffnews/article/bizwire-2026-7-6-bespoke-labs-announces-40m-to-build-the-environments-that-train-reliable-agents",
+      "url": "https://www.businesswire.com/news/home/20260706827813/en/Bespoke-Labs-Announces-%2440M-to-Build-the-Environments-That-Train-Reliable-Agents",
+      "publisher": "Bespoke Labs via Business Wire",
+      "title": "Bespoke Labs announces $40M",
+      "published_on": "2026-07-06",
+      "checked_on": "2026-11-22",
+      "content_sha256": "0c47f945bda5233dbf8dc308b659f8ec315ce68b0e1da8c648614f4fa4f2c80b"
+    }
+  ],
   "evidence_context": {
     "version": "1.0.0",
     "corrections": [

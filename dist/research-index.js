@@ -103,6 +103,7 @@
     const byId = new Map(rows.map(row => [row.id, row]));
     const versions = Array.from(index.querySelectorAll('[data-index-versions]')).map(node => ({
       node, parent: byId.get(node.dataset.parentRecord), details: node.querySelector('details'),
+      summaryContext: node.querySelector('summary > span'),
       context: node.querySelector('[data-index-context]'), records: rows.filter(row => node.contains(row.node))
     }));
     const initialOpen = new Map(versions.map(group => [group.details, group.details.open]));
@@ -146,6 +147,8 @@
       versions.forEach(group => {
         const hasMatch = group.records.some(row => !row.node.hidden);
         group.node.hidden = !hasMatch;
+        const parentVisible = Boolean(group.parent && !group.parent.node.hidden);
+        group.summaryContext?.classList.toggle('sr-only', parentVisible);
         if (group.context) group.context.hidden = !active || !hasMatch || !group.parent?.node.hidden;
         if (active && hasMatch) group.details.open = true;
         else if (!active && filtering) group.details.open = initialOpen.get(group.details);

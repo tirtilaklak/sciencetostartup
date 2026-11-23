@@ -110,6 +110,26 @@ test('complete technical chapter supports its final citation, focus and history 
   await verifyCitationHistory(page);
 });
 
+test('the current chapter starts with readable prose and keeps a native chapter index', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(chapter);
+  const first = page.locator('#first-paragraph > p').first();
+  await expect(first).toContainText('This chapter separates stages');
+  await expect(first).toBeInViewport({ ratio: 0.08 });
+
+  const index = page.locator('.r-chapter-index');
+  const summary = index.locator('summary');
+  await expect(summary).toBeInViewport();
+  await expect(index.getByRole('navigation', { name: 'Report chapters' })).toBeHidden();
+  await summary.press('Enter');
+  const chapters = index.getByRole('navigation', { name: 'Report chapters' }).locator('ol a');
+  await expect(chapters).toHaveCount(12);
+  await expect(index.locator('[aria-current="page"]')).toHaveAttribute('href', chapter);
+  await index.locator('ol a[href$="/chapters/datasets-and-benchmarks/"]').press('Enter');
+  await expect(page).toHaveURL(/\/chapters\/datasets-and-benchmarks\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/^6\. Dataset and benchmark landscape/);
+});
+
 test('Technical passage links open natively and keep their copied fragment in each edition', async ({ page, context }) => {
   test.setTimeout(60_000);
   await page.setViewportSize({ width: 390, height: 844 });

@@ -702,7 +702,11 @@ class StaticPageTests(unittest.TestCase):
                 if extra > 0: self.assertIn(f"{extra} more source", text, mid)
                 # The source line says when we read the page, in the app's words (B6: the lede promises a checked or recorded date).
                 source, _ = sp.latest_source(self.research, metric)
-                if source: self.assertIn({"checked": "Checked ", "summary_only": "Summary only, page not reviewed · recorded ", "unverified": "Not checked again · recorded "}[source["retrieval_status"]] + sp.format_date(source["accessed_on"]), text, mid)
+                if source:
+                    source = self.research.company_source(source)
+                    prefix = {"checked": "Checked ", "summary_only": "Summary only, page not reviewed · recorded ",
+                              "unverified": "Not checked again · recorded "}[source["retrieval_status"]]
+                    self.assertIn(prefix + sp.format_date(source["accessed_on"]), text, mid)
                 self.assertNotRegex(text, r"\b[a-z]+_[a-z_]+\b", mid)
                 self.assertNotRegex(text, r"[$£€]-|\d{4}-\d{2}(?:-\d{2})?", mid)
 

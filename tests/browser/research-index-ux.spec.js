@@ -32,6 +32,31 @@ test('candidate versions of approved works remain independently visible and coun
   expect(new URL(page.url()).hash).toBe('#main');
 });
 
+test('a source version summary keeps its accessible name and shows the parent only where needed', async ({ page }) => {
+  await page.goto('/research/papers/');
+  const parent = 'paper.arxiv.2603.04370';
+  const parentRow = page.locator(`[data-record-id="${parent}"]`);
+  const group = page.locator(`[data-parent-record="${parent}"]`);
+  const summary = group.locator('summary');
+  const context = summary.locator('span');
+  const filter = page.locator('[data-index-controls] select[name="status"]');
+
+  await expect(parentRow).toBeVisible();
+  await expect(context).toHaveCSS('position', 'absolute');
+  await expect(context).toHaveCSS('width', '1px');
+  await expect(summary).toHaveAccessibleName(/Source versions \(1\).*τ-Knowledge/);
+  await filter.selectOption('candidate');
+  await expect(parentRow).toBeHidden();
+  await expect(context).toHaveCSS('position', 'static');
+  await expect(context).toContainText('τ-Knowledge');
+  await summary.click();
+  await expect(group.locator('[data-index-context]')).toBeHidden();
+  await expect(context).toHaveCSS('position', 'static');
+  await filter.selectOption('');
+  await expect(parentRow).toBeVisible();
+  await expect(context).toHaveCSS('position', 'absolute');
+});
+
 test('advanced URL state opens, manual close retains it, and outside reset clears with focus', async ({ page }) => {
   await page.goto('/research/papers/?type=paper_version&reader=keep#main');
   const details = page.locator('[data-index-advanced]');

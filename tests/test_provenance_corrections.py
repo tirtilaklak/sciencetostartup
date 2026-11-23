@@ -33,18 +33,18 @@ class ProvenanceCorrectionsTests(unittest.TestCase):
     def test_release_binds_exact_work_bytes_and_unchanged_frozen_canonical(self):
         self.assertEqual(hashlib.sha256((ROOT / "data/canonical.json").read_bytes()).hexdigest(),
                          "948e69229fa24a4a1e6b5eed6d9c11570568a3c05bf9512e442d19611061a061")
-        self.assertEqual(self.release["release_id"], "2026-11-22.9")
+        self.assertEqual(self.release["release_id"], "2026-11-22.10")
         self.assertEqual(self.release["as_of"], "2026-11-22")
-        self.assertEqual(self.release["publication_as_of"], "2026-11-22T15:16:12Z")
+        self.assertEqual(self.release["publication_as_of"], "2026-11-22T23:57:15Z")
         self.assertEqual(self.release["work_routes_sha256"],
-                         "5d060242e7f55f2ce96d6cc949b11ab73b5fea2e247189a71e55350b580250d8")
+                         "70c1e632b03320591cee3d54b52b5fe74c6c1962326c82605890b5973911deb7")
         self.assertEqual(hashlib.sha256((ROOT / "data/work-routes.json").read_bytes()).hexdigest(),
                          self.release["work_routes_sha256"])
         validate_editorial_release(self.work, self.release, self.canonical)
         counts = editorial_counts(self.work)
-        self.assertEqual(counts["records"], 135)
-        self.assertEqual(counts["work_routes"], 72)
-        self.assertEqual(counts["named_listings"], 51)
+        self.assertEqual(counts["records"], 136)
+        self.assertEqual(counts["work_routes"], 73)
+        self.assertEqual(counts["named_listings"], 52)
         self.assertEqual(counts["past_other_records"], 30)
         self.assertEqual(counts["other_company_jobs"], 10)
 

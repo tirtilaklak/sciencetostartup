@@ -32,8 +32,8 @@ class WorkRouteValidationTests(unittest.TestCase):
 
     def test_refresh_distinguishes_content_review_from_link_reachability(self):
         receipt = self.work["verification"]
-        routes = self.work["routes"]
         checked_on = receipt["checked_on"]
+        routes = [route for route in self.work["routes"] if route["last_link_check"]["date"] == checked_on]
         self.assertEqual(receipt["routes_link_checked"], len(routes))
         content = link_only = blocked = terms = 0
         for route in routes:

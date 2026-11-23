@@ -7,7 +7,7 @@
   "coverage": {
     "organizations_total": 39,
     "organizations_with_reviewed_routes": 39,
-    "route_count": 135,
+    "route_count": 136,
     "canonical_work_claims_preserved": 157
   },
   "unreviewed_organizations": [],
@@ -229,7 +229,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -639,7 +639,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -864,7 +864,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -1050,7 +1050,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -1204,7 +1204,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -1498,7 +1498,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -1653,7 +1653,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -1812,7 +1812,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -2173,7 +2173,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -2367,7 +2367,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -2496,7 +2496,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -2744,7 +2744,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -3072,7 +3072,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -3272,7 +3272,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -3409,7 +3409,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -3548,7 +3548,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -3694,7 +3694,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -3853,7 +3853,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -3992,7 +3992,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -4164,7 +4164,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -4386,7 +4386,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -4607,7 +4607,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -4938,7 +4938,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -5212,7 +5212,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -5373,7 +5373,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -5532,7 +5532,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -5671,7 +5671,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -5909,7 +5909,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -6043,7 +6043,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -6243,7 +6243,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -6371,7 +6371,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -6508,7 +6508,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -6630,7 +6630,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -6831,7 +6831,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -7031,6 +7031,260 @@
       "listed_on_current_company_board": false
     },
     {
+      "id": "g2i.work.senior-swe-training-7c54f48a",
+      "company_id": "g2i",
+      "role": "Senior Software Engineer, AI Training",
+      "primaryRole": "Senior Software Engineer, AI Training",
+      "group": "Expert & contractor projects",
+      "summary": "Evaluate the quality and reasoning of AI coding agents.",
+      "pay_label": "$100–$200 / hour",
+      "pay_basis": "hour",
+      "numeric_pay": true,
+      "as_of": "2026-11-22",
+      "reviewed_on": "2026-11-22",
+      "status": "listed",
+      "geography": "Remote worldwide where supported",
+      "eligibility": "Eligible locations depend on the client.",
+      "url": "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1/application",
+      "requirements": [
+        "Senior, staff or principal software engineer. TypeScript/JavaScript or Python, coding-agent experience and English at B2 or higher."
+      ],
+      "claim_ids": [],
+      "source_ids": [],
+      "evidence": [],
+      "sources": [
+        {
+          "id": "g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22",
+          "url": "https://api.ashbyhq.com/posting-api/job-board/g2i?includeCompensation=true",
+          "title": "G2i’s public job board",
+          "publisher": "G2i",
+          "purpose": "official_board",
+          "accessed_on": "2026-11-22",
+          "retrieval_status": "readable"
+        },
+        {
+          "id": "g2i.work.senior-swe-training-7c54f48a.description-2026-11-22",
+          "url": "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1",
+          "title": "Official role description",
+          "publisher": "G2i",
+          "purpose": "description",
+          "accessed_on": "2026-11-22",
+          "retrieval_status": "readable",
+          "published_on": "2026-11-22"
+        },
+        {
+          "id": "g2i.work.senior-swe-training-7c54f48a.application-2026-11-22",
+          "url": "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1/application",
+          "title": "Official application",
+          "publisher": "G2i",
+          "purpose": "application",
+          "accessed_on": "2026-11-22",
+          "retrieval_status": "readable"
+        }
+      ],
+      "source_publication_date": "2026-11-22",
+      "hours": "10–20 hours/week, flexible",
+      "duration": "Ongoing projects of about two weeks to a few months each.",
+      "assessment": "One take-home exercise with a recorded walkthrough. No interview.",
+      "availability_note": "Start depends on passing the assessment and an open project seat.",
+      "availability_checked_on": "2026-11-22",
+      "last_route_check": {
+        "date": "2026-11-22",
+        "result": "listing_content_reviewed",
+        "note": "The official board lists this exact new contract.",
+        "application_check": {
+          "checked_on": "2026-11-22",
+          "checked_at": "2026-11-22T23:55:09Z",
+          "response_sha256": "3485d5b3be8eaaac8ef43923267f7c06a9764825c7bb3b40c0875fa7c6250de9",
+          "url": "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1/application",
+          "final_url": "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1/application",
+          "http_status": 200,
+          "result": "readable",
+          "date": "2026-11-22",
+          "retrieval_reason": "application_acceptance_unconfirmed",
+          "note": "The page displayed Submit Application. Application acceptance is unconfirmed."
+        }
+      },
+      "last_link_check": {
+        "date": "2026-11-22",
+        "result": "reachable",
+        "http_status": 200,
+        "final_url": "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1/application",
+        "response_sha256": "3485d5b3be8eaaac8ef43923267f7c06a9764825c7bb3b40c0875fa7c6250de9",
+        "content_reviewed": true
+      },
+      "terms_checked_on": "2026-11-22",
+      "source_quote": "$100-$200/hour depending on experience and location",
+      "route_kind": "named_listing",
+      "engagement_type": "contract",
+      "arrangements": [
+        "remote"
+      ],
+      "pay_terms": {
+        "unit": "hour",
+        "hourly_comparable": true,
+        "basis": "hour",
+        "currency": "USD"
+      },
+      "editorial_review": {
+        "release_id": "2026-11-22.10",
+        "classified_on": "2026-11-22",
+        "classification_basis": "stored_evidence",
+        "classification_source_ids": [
+          "g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22"
+        ],
+        "notes": "The new posting has its own identifier and separately reviewed terms.",
+        "receipts": [
+          {
+            "id": "g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22.review",
+            "source_id": "g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22",
+            "scope": "key_terms",
+            "result": "readable",
+            "retrieved_at": "2026-11-22T23:52:54Z",
+            "response_sha256": "9e703301e6ac9d21f207110ace37fbef3f8f14e4ec616914e9fba7b1926947c3",
+            "approved": true,
+            "approval_basis": "source_content_review",
+            "reviewer": "Codex source review",
+            "reviewed_fields": [
+              "destination",
+              "pay",
+              "location",
+              "requirements",
+              "assessment",
+              "commitment",
+              "duration"
+            ],
+            "evidence": [
+              "destination: /jobs/4 id, isListed, jobUrl and applyUrl",
+              "pay: /jobs/4 descriptionPlain, Engagement details / Rate",
+              "location: /jobs/4 workplaceType, isRemote and descriptionPlain / opening terms",
+              "requirements: /jobs/4 descriptionPlain, Who you are",
+              "assessment: /jobs/4 descriptionPlain, Engagement details / Process",
+              "commitment: /jobs/4 descriptionPlain, Engagement details / Hours",
+              "duration: /jobs/4 descriptionPlain, Engagement details / Duration"
+            ],
+            "checked_at": "2026-11-22T23:57:15Z",
+            "checked_on": "2026-11-22"
+          },
+          {
+            "id": "g2i.work.senior-swe-training-7c54f48a.description-2026-11-22.retrieval",
+            "source_id": "g2i.work.senior-swe-training-7c54f48a.description-2026-11-22",
+            "scope": "retrieval",
+            "result": "readable",
+            "checked_on": "2026-11-22",
+            "checked_at": "2026-11-22T23:53:58Z",
+            "response_sha256": "0d7c3d22eee823b9ea1bf63dc47a5036968fd5fb19f4ac142ef49e38337fc932",
+            "approved": false,
+            "url": "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1",
+            "final_url": "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1",
+            "http_status": 200,
+            "evidence": [
+              "HTTP 200. JobPosting data names G2i Inc. and the exact posting identifier."
+            ]
+          },
+          {
+            "id": "g2i.work.senior-swe-training-7c54f48a.application-2026-11-22.retrieval",
+            "source_id": "g2i.work.senior-swe-training-7c54f48a.application-2026-11-22",
+            "scope": "retrieval",
+            "result": "readable",
+            "checked_on": "2026-11-22",
+            "checked_at": "2026-11-22T23:55:09Z",
+            "response_sha256": "3485d5b3be8eaaac8ef43923267f7c06a9764825c7bb3b40c0875fa7c6250de9",
+            "approved": false,
+            "url": "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1/application",
+            "final_url": "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1/application",
+            "http_status": 200,
+            "evidence": [
+              "HTTP 200. JobPosting ID matches. The public page displayed Submit Application in Chromium."
+            ],
+            "retrieved_at": "2026-11-22T23:53:58Z"
+          }
+        ],
+        "approved_terms_receipt_id": "g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22.review",
+        "actions": [
+          {
+            "label": "Read role details",
+            "url": "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1",
+            "source_id": "g2i.work.senior-swe-training-7c54f48a.description-2026-11-22",
+            "purpose": "description"
+          },
+          {
+            "label": "View official application",
+            "url": "https://jobs.ashbyhq.com/g2i/7c54f48a-bd33-491a-8130-f1c9b1dfccb1/application",
+            "source_id": "g2i.work.senior-swe-training-7c54f48a.application-2026-11-22",
+            "purpose": "application"
+          }
+        ],
+        "recorded_url_purpose": "application"
+      },
+      "field_reviews": {
+        "destination": {
+          "state": "sourced",
+          "basis": "direct_source",
+          "reviewed_on": "2026-11-22",
+          "source_ids": [
+            "g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22"
+          ],
+          "note": "The G2i board lists this exact role and its application URL."
+        },
+        "pay": {
+          "state": "sourced",
+          "basis": "direct_source",
+          "reviewed_on": "2026-11-22",
+          "source_ids": [
+            "g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22"
+          ],
+          "note": "The role body quotes $100–$200 per hour, depending on experience and location."
+        },
+        "location": {
+          "state": "sourced",
+          "basis": "direct_source",
+          "reviewed_on": "2026-11-22",
+          "source_ids": [
+            "g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22"
+          ],
+          "note": "The listing says remote worldwide and notes that some locations may be unsupported."
+        },
+        "requirements": {
+          "state": "sourced",
+          "basis": "direct_source",
+          "reviewed_on": "2026-11-22",
+          "source_ids": [
+            "g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22"
+          ],
+          "note": "The listing specifies senior engineering experience, a relevant programming language, experience with a coding agent and English at B2 or higher."
+        },
+        "assessment": {
+          "state": "sourced",
+          "basis": "direct_source",
+          "reviewed_on": "2026-11-22",
+          "source_ids": [
+            "g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22"
+          ],
+          "note": "The listing specifies one take-home exercise with a recorded walkthrough and no interview."
+        },
+        "commitment": {
+          "state": "sourced",
+          "basis": "direct_source",
+          "reviewed_on": "2026-11-22",
+          "source_ids": [
+            "g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22"
+          ],
+          "note": "The listing specifies a flexible 10–20 hours per week."
+        },
+        "duration": {
+          "state": "sourced",
+          "basis": "direct_source",
+          "reviewed_on": "2026-11-22",
+          "source_ids": [
+            "g2i.work.senior-swe-training-7c54f48a.employer-board-2026-11-22"
+          ],
+          "note": "The listing describes ongoing work on projects lasting about two weeks to a few months each."
+        }
+      },
+      "availability_label": "Listed on employer board"
+    },
+    {
       "id": "g2i.work.talent-network",
       "company_id": "g2i",
       "role": "AI training engineering roles",
@@ -7173,7 +7427,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -7416,7 +7670,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -7609,7 +7863,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -7731,7 +7985,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -7963,7 +8217,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -8296,7 +8550,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -8669,7 +8923,7 @@
         "note": "OOAK lists fixed salary plus BSPCE equity. The annual period comes from the earlier YC listing."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -9325,7 +9579,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -9550,7 +9804,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -9852,7 +10106,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -10040,7 +10294,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -10172,7 +10426,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -10345,7 +10599,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -10492,7 +10746,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -10646,7 +10900,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -10902,7 +11156,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -11170,7 +11424,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -11351,7 +11605,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -11759,7 +12013,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -12245,7 +12499,7 @@
         "currency": "GBP"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -12628,7 +12882,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -12930,7 +13184,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -13236,7 +13490,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -13403,7 +13657,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -13582,7 +13836,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -13727,7 +13981,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -14028,7 +14282,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -14198,7 +14452,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -14478,7 +14732,7 @@
         "note": "The listing calls this monthly base salary. The reviewed text uses the dollar symbol."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -14714,7 +14968,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -14943,7 +15197,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -15354,7 +15608,7 @@
         "note": "The employer lists this component as monthly salary."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -15686,7 +15940,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -15854,7 +16108,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -16031,7 +16285,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -16190,7 +16444,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -16331,7 +16585,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -16486,7 +16740,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -16718,7 +16972,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -17088,7 +17342,7 @@
         "currency": "JPY"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -17344,7 +17598,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -17483,7 +17737,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -17657,7 +17911,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -17977,7 +18231,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -18308,7 +18562,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -18446,7 +18700,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -18606,7 +18860,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -18830,7 +19084,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -18962,7 +19216,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -19158,7 +19412,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -19392,7 +19646,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -19524,7 +19778,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -19656,7 +19910,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -19788,7 +20042,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -19920,7 +20174,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -20052,7 +20306,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -20184,7 +20438,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -20316,7 +20570,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -20516,7 +20770,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -20730,7 +20984,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -20862,7 +21116,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -21092,7 +21346,7 @@
         "note": "The employer advertises a separate $200,000–$400,000 bonus band and offers equity. Confirm bonus eligibility and conditions with the employer."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -21475,7 +21729,7 @@
         "note": "The employer lists this component as monthly salary."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -21837,7 +22091,7 @@
         "note": "The employer advertises a separate $0–$100,000 bonus band and offers equity. Confirm bonus eligibility and conditions with the employer."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -22283,7 +22537,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -22871,7 +23125,7 @@
         "note": "The employer advertises a separate $200,000–$400,000 bonus band and offers equity. Confirm bonus eligibility and conditions with the employer."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -23275,7 +23529,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -23656,7 +23910,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -24039,7 +24293,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -24406,7 +24660,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -24772,7 +25026,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -25162,7 +25416,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -25587,7 +25841,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -25995,7 +26249,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -26361,7 +26615,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -26727,7 +26981,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -27108,7 +27362,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified. The employer says total cash compensation regularly exceeds base by 2–3× on average and by 4–5× for top performers."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -27492,7 +27746,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified. The employer says total cash compensation regularly exceeds base by 2–3× on average and by 4–5× for top performers."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -27875,7 +28129,7 @@
         "note": "The employer separately offers equity and a performance-based bonus of up to $80,000."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -28260,7 +28514,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified. The employer says total cash compensation regularly exceeds base by 2–3× on average and by 4–5× for top performers."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -28644,7 +28898,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified. The employer says total cash compensation regularly exceeds base by 2–3× on average and by 4–5× for top performers."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -29030,7 +29284,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -29414,7 +29668,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -29797,7 +30051,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified. The employer says total cash compensation regularly exceeds base by 2–3× on average and by 4–5× for top performers."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -30182,7 +30436,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified. The employer says total cash compensation regularly exceeds base by 2–3× on average and by 4–5× for top performers."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -30567,7 +30821,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified. The employer says total cash compensation regularly exceeds base by 2–3× on average and by 4–5× for top performers."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -30950,7 +31204,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified. The employer says total compensation regularly exceeds base by 2–3× on average and by 4–5× for top performers."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -31327,7 +31581,7 @@
         "note": "The employer lists this component as monthly salary."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -31783,7 +32037,7 @@
         "note": "The employer also gives $250,000–$450,000 total compensation plus equity. The published ranges use different lower bounds. Clarify the package with the employer."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -32182,7 +32436,7 @@
         "note": "Payable only if a jointly authored paper from the collaboration is accepted for publication."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -32545,7 +32799,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -32914,7 +33168,7 @@
         "note": "The employer also gives $250,000–$450,000 total compensation plus equity. The published ranges use different lower bounds. Clarify the package with the employer."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -33290,7 +33544,7 @@
         "currency": null
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -33651,7 +33905,7 @@
         "note": "The employer also offers equity and a bonus. Individual bonus amounts and eligibility are unspecified."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -34018,7 +34272,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -34384,7 +34638,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -34792,7 +35046,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -35289,7 +35543,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -35826,7 +36080,7 @@
         "note": "The role description states an hourly rate for this contract."
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -36246,7 +36500,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -36541,7 +36795,7 @@
         "currency": "USD"
       },
       "editorial_review": {
-        "release_id": "2026-11-22.9",
+        "release_id": "2026-11-22.10",
         "classified_on": "2026-11-08",
         "classification_basis": "stored_evidence",
         "classification_source_ids": [
@@ -36696,6 +36950,6 @@
     "blocked": 7,
     "scope_note": "Every recorded route URL was requested. Content review and compensation checks cover selected listings only; earlier canonical statements remain historical evidence."
   },
-  "editorial_release_id": "2026-11-22.9",
-  "editorial_note": "Additive editorial classification and field-review states. Original research and October verification dates are retained; new source reviews are separately receipted. Scoped corrections on 18 November 2026 preserve prior source/review history; five readable field reviews do not renew full-terms approvals. Turing country eligibility remains unverified after a blocked retrieval. The 22 November follow-up corrects Prolific participant eligibility and consolidates intake, schedule and expert requirements wording. The AfterQuery reconciliation checks all 45 records against the correct issuer scope. It corrects 11 annual pay periods, records the exact Security/Infrastructure relisting and archives the missing People Programs Lead pages. Terac again lists its Shopping Assistant evaluator role and links to its application start. Terac’s own ML Engineer, RL Scenarios description explicitly says it has closed. The original Ashby posting separately returned HTTP 404."
+  "editorial_release_id": "2026-11-22.10",
+  "editorial_note": "Additive editorial classification and field-review states. Original research and October verification dates are retained; new source reviews are separately receipted. Scoped corrections on 18 November 2026 preserve prior source/review history; five readable field reviews do not renew full-terms approvals. Turing country eligibility remains unverified after a blocked retrieval. The 22 November follow-up corrects Prolific participant eligibility and consolidates intake, schedule and expert requirements wording. The AfterQuery reconciliation checks all 45 records against the correct issuer scope. It corrects 11 annual pay periods, records the exact Security/Infrastructure relisting and archives the missing People Programs Lead pages. Terac again lists its Shopping Assistant evaluator role and links to its application start. Terac’s own ML Engineer, RL Scenarios description explicitly says it has closed. The original Ashby posting separately returned HTTP 404. A separate 22 November G2i listing records the worldwide remote AI training contract and its published regional restrictions. The earlier US listing keeps its original identifier and terms."
 }

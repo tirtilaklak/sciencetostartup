@@ -772,9 +772,9 @@ function reset(){Object.assign(state,{query:'',category:'',stage:'',financial:fa
 // previousSection is set after a section link such as #venture, so the next plain view link starts at the top.
 let previousRoute='',previousSection='';const viewScroll={};
 let companyReturnFocus=null;
-const marketShortcutOrigins=new Map();
 // Hashes that name a place inside a page. route() shows that page, then brings the element to the top with focus.
 const VIEW_ANCHORS={'business-health':'market',venture:'market',about:'method',labels:'method',corrections:'method',coverage:'method',downloads:'method'};
+const MARKET_RETURN_LINKS='.hero-actions a[href="#business-health"], .hero-company-strip a[href="#companies"], .product-preview h3 a[href^="#company/"]';
 function viewAnchorId(hash=location.hash){const id=String(routeParts(hash)[0]||'').toLowerCase();return Object.hasOwn(VIEW_ANCHORS,id)?id:'';}
 // Firefox can process the native bookmark after the enhanced view is ready.
 function keepInitialMarketFocus(focusTarget){
@@ -954,7 +954,7 @@ function rememberExploreOrigin(event){
  const href=link.getAttribute('href'),view=routeParts()[0];
  const work=view==='work'&&link.id==='work-native-compare';
  const compare=view==='compare'&&link.closest('#compare-content')&&(link.dataset.compareOrigin||href.startsWith('#company/'));
- const market=(!view||view==='market'||VIEW_ANCHORS[view]==='market')&&href.startsWith('#company/')&&link.matches('#market-view .product-preview h3 a');
+ const market=(!view||view==='market'||VIEW_ANCHORS[view]==='market')&&link.closest('#market-view')&&link.matches(MARKET_RETURN_LINKS);
  if(!work&&!compare&&!market){
   if(history.state?.exploreReturnOrigin){const {exploreReturnOrigin,...rest}=history.state;history.replaceState(rest,'');}
   return;
@@ -989,7 +989,7 @@ function exploreReturnOrigin({traversedFragment=false,initial=false,persisted=fa
  return origin;
 }
 function focusExploreOrigin({work,compare,market,href}){
- const links=work?[$('work-native-compare')]:[...(market?$('market-view').querySelectorAll('.product-preview h3 a[href]'):$('compare-content').querySelectorAll('a[href]'))];
+ const links=work?[$('work-native-compare')]:[...(market?$('market-view').querySelectorAll(MARKET_RETURN_LINKS):$('compare-content').querySelectorAll('a[href]'))];
  const target=links.find(link=>link?.getAttribute('href')===href&&link.dataset.compareOrigin===compare?.action&&link.getClientRects().length);
  if(!target)return null;
  const scrollbox=compare&&target.closest('.comparison-scroll');
@@ -1055,10 +1055,6 @@ function repeatMainRoute(event){
 }
 document.addEventListener('click',rememberCompanyOrigin);
 document.addEventListener('click',rememberShortlistOrigin);
-document.addEventListener('click',event=>{
- const shortcut=event.target.closest?.('#market-view .hero-actions a[href="#business-health"]');
- if(normalSelfLinkActivation(event,shortcut)&&location.hash!==shortcut.hash)marketShortcutOrigins.set(historyKey(),shortcut);
-});
 document.addEventListener('click',repeatCompanyRoute);
 document.addEventListener('click',repeatMainRoute);
 // Grouped profile citations can also appear in a quick summary. Close that
@@ -1105,10 +1101,6 @@ function route(event){
  const section=profileRouteSection(parts[2]),anchor=view==='company'&&section?$('profile-'+section):null;if(anchorId)showViewAnchor($(anchorId));if(restore!==null){const hash=location.hash,back=()=>{if(location.hash===hash)window.scrollTo({left:0,top:restore,behavior:'instant'});};back();if(!waitForShortlist)queueMicrotask(back);}else if(!anchorId){if(anchor){let p=anchor;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}if(previousRoute)anchor.scrollIntoView({block:'start',behavior:'instant'});}else if(previousRoute&&(view!==previousRoute||previousSection))window.scrollTo({left:0,top:view!==previousRoute&&['market','companies','work'].includes(view)?viewScroll[view]||0:0,behavior:'instant'});}previousRoute=view;previousSection=anchorId;
  const linkedOpener=returnOrigin&&focusExploreOrigin(returnOrigin);
  if(linkedOpener)return linkedOpener;
- if(wasTraversal&&view==='market'&&!anchorId){
-  const hash=location.hash;
-  queueMicrotask(()=>{if(location.hash===hash)marketShortcutOrigins.get(key)?.focus({preventScroll:true});});
- }
  const opener=shortlist?$('compare-tray').querySelector?.('a'):wasTraversal&&view==='work'&&typeof workReturnFocusTarget==='function'?workReturnFocusTarget():wasTraversal&&view==='companies'?companyReturnFocusTarget():null;
  if(opener?.getClientRects().length)opener.focus({preventScroll:true});
  if(waitForShortlist)deferShortlistScroll(restore,opener);
