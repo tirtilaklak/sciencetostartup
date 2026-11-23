@@ -1,0 +1,144 @@
+name: Prove both RWS filing links on the signed candidate
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-rws-mirror-proof.yml]
+permissions:
+  contents: read
+jobs:
+  proof:
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [repaired]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      VARIANT: ${{ matrix.variant }}
+      C21_BASE: fa24bac625b428bf868b2d5259f2837eef6023b5
+      C21_MANIFEST: af4eb4073ebd85ec930e080a8745059dce38f5a8ceaeb9def054d4bf9d5724c9
+      MARKET_SOURCE: 3dc00346d6791920535ecca7df608e35a3aee9e6
+      QA_BASE_URL: http://127.0.0.1:19011
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify the exact data-only RWS source change
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          PRODUCT="$RUNNER_TEMP/market-$VARIANT"
+          OUT="$GITHUB_WORKSPACE/output/$VARIANT"
+          mkdir -p "$OUT"
+          export RWS_RECEIPT="$OUT/rws-parity.json"
+          SOURCE="$C21_BASE"
+          if [ "$VARIANT" = repaired ]; then SOURCE="$MARKET_SOURCE"; fi
+          git worktree add --detach "$PRODUCT" "$SOURCE"
+          git config --global --add safe.directory "$PRODUCT"
+          cd "$PRODUCT"
+          test "$(git rev-parse HEAD)" = "$SOURCE"
+          git diff --check "$C21_BASE" "$MARKET_SOURCE"
+          test "$(git diff --name-only "$C21_BASE" "$MARKET_SOURCE")" = "$(printf '%s\n' data/profile-content.json tests/test_company_updates.py)"
+          npm ci
+          PYTHONPATH=scripts python3 tests/test_company_updates.py
+          if [ "$VARIANT" = repaired ]; then
+            python3 scripts/build_public_snapshot.py --output "$RUNNER_TEMP/repaired-dist" > "$OUT/build.log" 2>&1 || { tail -100 "$OUT/build.log"; exit 1; }
+            mv dist "$RUNNER_TEMP/c21-before-dist"
+            mv "$RUNNER_TEMP/repaired-dist" dist
+            PYTHONPATH=scripts python3 - "$OUT" "$RUNNER_TEMP/c21-before-dist" <<'PY'
+          from hashlib import sha256
+          import json, os, shutil, sys
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          out, old_dir=map(Path,sys.argv[1:])
+          old_body=(old_dir/'manifest.json').read_bytes()
+          assert sha256(old_body).hexdigest()==os.environ['C21_MANIFEST']
+          old=json.loads(old_body)['sha256']
+          dist=Path('dist')
+          body=(dist/'manifest.json').read_bytes()
+          digest=sha256(body).hexdigest()
+          validate_artifact(dist,digest)
+          current=json.loads(body)
+          assets=current['sha256']
+          archives={name:sha for name,sha in old.items() if name.startswith(('research/editions/','publication/','daily/202'))}
+          assert all(assets.get(name)==sha for name,sha in archives.items())
+          changed={name:sha for name,sha in assets.items() if old.get(name)!=sha}
+          delta=out/'payloads'
+          for name in changed:
+              target=delta/name
+              target.parent.mkdir(parents=True,exist_ok=True)
+              shutil.copyfile(dist/name,target)
+          shutil.copyfile(dist/'manifest.json',delta/'manifest.json')
+          receipt={'build':current['build_id'],'manifest_sha256':digest,'source':os.environ['MARKET_SOURCE'],
+                   'archives':len(archives),'assets':len(assets),'changed':changed,
+                   'removed':sorted(set(old)-set(assets))}
+          (out/'build-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          print(json.dumps({key:value for key,value in receipt.items() if key!='changed'}))
+          PY
+          else
+            printf '%s  %s\n' "$C21_MANIFEST" dist/manifest.json | sha256sum -c -
+            git show "$MARKET_SOURCE:tests/browser/market-fallback.spec.js" > tests/browser/market-fallback.spec.js
+          fi
+          QA_DIST="$PWD/dist" python3 scripts/browser_qa_server.py --port 19011 > "$OUT/origin.log" 2>&1 &
+          origin=$!
+          trap 'kill "$origin" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 15); do
+            curl --silent --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-before.json" && break
+            sleep 1
+          done
+          cmp "$OUT/manifest-before.json" dist/manifest.json
+          node <<'JS'
+          const { chromium } = require('playwright');
+          const { writeFileSync } = require('node:fs');
+          const url=process.env.QA_BASE_URL;
+          const alternate="https://www.tradingview.com/news/reuters.com%2C2026-10-27%3Anewsml_RSa5108Aa%3A0-reg-rws-holdings-plc-trading-statement/";
+          const original='https://www.lse.co.uk/rns/RWS/trading-statement-bgo38kxyahrrjkn.html?mobile_view=desktop';
+          (async () => {
+            const browser=await chromium.launch();
+            const result=[];
+            try {
+              for (const width of [390,1280]) {
+                for (const native of [true,false]) {
+                  const context=await browser.newContext({viewport:{width,height:844},javaScriptEnabled:!native});
+                  const page=await context.newPage();
+                  try {
+                    await page.goto(url+(native?'/company/rws_trainai/':'/explore/#company/rws_trainai/business'));
+                    const copy=page.getByRole('link',{name:/RNS 5108A \(via Reuters\)/i});
+                    await copy.waitFor({state:'visible'});
+                    const canonical=page.getByRole('link',{name:/year-end trading statement and notice of results, RNS 5108A/i});
+                    await canonical.waitFor({state:'visible'});
+                    const links=[await copy.getAttribute('href'),await canonical.getAttribute('href')];
+                    const text=await page.locator('body').innerText();
+                    if (links[0]!==alternate||links[1]!==original||!text.includes('expected about £700 million in group revenue')||!text.includes('completed its acquisition of Acogroup')) throw Error('The two exact links did not preserve the verified financial disclosure');
+                    result.push({width,native,links,passed:true});
+                  } finally {await context.close();}
+                }
+              }
+            } finally {
+              await browser.close();
+              writeFileSync(process.env.RWS_RECEIPT,JSON.stringify(result,null,2));
+            }
+            console.log('RWS LINK PARITY',JSON.stringify({cases:result.length,results:result}));
+          })().catch(error=>{console.error(error);process.exitCode=1;});
+          JS
+          node scripts/payload_budgets.mjs --dist dist --output "$OUT/payload-budgets.json"
+          curl --silent --show-error --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-after.json"
+          cmp "$OUT/manifest-after.json" dist/manifest.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c21-rws-mirror-proof-${{ matrix.variant }}
+          path: output/${{ matrix.variant }}
+          if-no-files-found: error
+          retention-days: 14
