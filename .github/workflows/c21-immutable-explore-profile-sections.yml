@@ -1,0 +1,80 @@
+name: Exercise all signed Explore links on Worker 49 preview
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-immutable-explore-profile-sections.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  explore:
+    name: Explore (${{ matrix.viewport }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 32
+    strategy:
+      fail-fast: false
+      matrix:
+        viewport: [desktop, phone]
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      C21_HEAD: eae4770118a9ffb35279c71f4bef061b302e89d7
+      QA_DISCOVER_PROFILE_SECTIONS: '1'
+      C21_DIST_TREE: d47311a994be269c78e4ae4365977fe15e7699b5
+      C21_MANIFEST: ea4fa51e30eea853e7526bdd62b0117c36c7532da0cb8f471beffd21708a1c45
+      QA_VIEWPORT: ${{ matrix.viewport }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare exact artifact source
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          git worktree add --detach "$RUNNER_TEMP/c21-product" "$C21_HEAD"
+          git config --global --add safe.directory "$RUNNER_TEMP/c21-product"
+          test "$(git -C "$RUNNER_TEMP/c21-product" rev-parse HEAD:dist)" = "$C21_DIST_TREE"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --prefix "$RUNNER_TEMP/c21-product"
+      - name: Exercise each signed Explore destination
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA="$GITHUB_WORKSPACE/.github/qa/c21-recovery"
+          export QA_EXPLORE_OUTPUT="$GITHUB_WORKSPACE/output/explore"
+          mkdir -p "$QA_EXPLORE_OUTPUT"
+          export QA_EXPLORE_INVENTORY="$QA_EXPLORE_OUTPUT/inventory.json"
+          cd "$RUNNER_TEMP/c21-product"
+          PYTHONPATH=scripts python3 - <<'PY'
+          import os
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          validate_artifact(Path('dist'),os.environ['C21_MANIFEST'])
+          PY
+          python3 "$QA/explore_inventory.py"
+          python3 - "$QA/explore_routes.cjs" "$QA/explore_immutable_routes.cjs" <<'PY'
+          from pathlib import Path
+          import sys
+          source,output=map(Path,sys.argv[1:])
+          text=source.read_text()
+          assert text.count("const base = 'http://127.0.0.1:19011';")==1
+          assert text.count("context.request.get(base + '/manifest.json')")==1
+          text=text.replace("const base = 'http://127.0.0.1:19011';","const base = 'https://5d917f05-sciencetostartup.musaeminozdem.workers.dev';")
+          text=text.replace("context.request.get(base + '/manifest.json')","context.request.get(base + '/manifest.json', {headers: {'User-Agent': 'ScienceToStartup-ReleaseVerification/1.0 (+https://sciencetostartup.com/method/)'}})")
+          output.write_text(text)
+          PY
+          node "$QA/explore_immutable_routes.cjs"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c21-immutable-explore-${{ matrix.viewport }}
+          path: output/explore/
+          if-no-files-found: error
+          retention-days: 14
