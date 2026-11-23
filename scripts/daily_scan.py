@@ -9,7 +9,7 @@ from types import SimpleNamespace
 from urllib.parse import parse_qsl, unquote, urlsplit, urlunsplit
 import xml.etree.ElementTree as ET
 
-from static_pages import document, escape as e, external_link, format_date, ORIGIN, PUBLISHER_NAME, render_sitemap
+from static_pages import document, escape as e, external_link, format_date, ORIGIN, plural, PUBLISHER_NAME, render_sitemap
 
 ROOT = Path(__file__).resolve().parents[1]
 TOPICS = ("RLHF", "Data", "Evaluation", "Companies")
@@ -285,6 +285,12 @@ def card(item, edition):
 
 def render(edition, editions, canonical, root=ROOT, context=None):
     day = edition["date"]
+    latest_page = canonical == ORIGIN + '/daily/'
+    search_note = f'Site search covers the latest {RECENT_EDITIONS} Daily editions.'
+    if latest_page:
+        count = min(RECENT_EDITIONS, len(editions))
+        scope = 'the latest ' if count < len(editions) else ''
+        search_note = f'Site search covers {scope}{plural(count, "published snapshot")}.'
     current = next(i for i, row in enumerate(editions) if row["date"] == day)
     steps = "".join(
         f'<a class="scan-day-step" href="{_edition_path(editions[target])}" rel="{relation}">'
@@ -328,9 +334,9 @@ def render(edition, editions, canonical, root=ROOT, context=None):
             f'<div class="scan-list">{items}</div><div id="scan-empty" class="scan-empty" hidden><h2>No matching items</h2><button type="button" id="scan-empty-reset">Clear filters</button></div>'
             '<footer class="scan-notes"><details><summary>Dates, sources & background</summary><dl><div><dt>Snapshot</dt><dd>Selection date in Pacific time</dd></div><div><dt>Source date</dt><dd>Original publication or release date, including arXiv submissions. We label later updates.</dd></div><div><dt>Coverage</dt><dd>We attribute results to their authors and flag readings based on abstracts or announcements. The list includes no independent replication.</dd></div><div><dt>Background</dt><dd>Story summaries paraphrase the sources. Wikipedia excerpts below are verbatim.</dd></div></dl>'
             f'<div class="scan-context">{contexts}</div><a href="/daily/wikipedia-context.json">Wikipedia revision & download records</a></details>'
-            f'<p>Site search covers the latest {RECENT_EDITIONS} Daily editions.</p>'
+            f'<p>{search_note}</p>'
             f'<a class="scan-download" href="{_edition_path(edition)}snapshot.json" download>Download this snapshot · JSON</a></footer></div>')
-    latest_label = ' · Latest reading list' if canonical == ORIGIN + '/daily/' else ''
+    latest_label = ' · Latest reading list' if latest_page else ''
     title = f'Daily scan: {format_date(day)}{latest_label} · ScienceToStartup'
     description = f'{len(edition["items"])} sourced selections for {format_date(day)}: RLHF, data, evaluation and AI company news. Original source dates and limits retained.'
     page = document(SimpleNamespace(as_of="", data={}), title, description, canonical, body, current="daily")

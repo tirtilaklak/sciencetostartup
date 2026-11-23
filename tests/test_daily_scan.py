@@ -316,6 +316,7 @@ class DailyScanTests(unittest.TestCase):
             self.assertEqual([row["value"] for row in selected if "selected" in row], [snapshot["date"]])
         latest = PageElements((destination / "daily/index.html").read_text())
         self.assertEqual([row["value"] for row in latest.date_options if "selected" in row], ["2026-11-18"])
+        self.assertIn("Site search covers 2 published snapshots.", [p["text"] for p in latest.paragraphs])
         archive = json.loads((destination / "daily/index.json").read_text())
         self.assertEqual(archive["first_date"], "2026-11-16")
         self.assertEqual(archive["latest_date"], "2026-11-18")
@@ -445,6 +446,8 @@ class DailyScanTests(unittest.TestCase):
         for offset in range(32):
             self.save(edition((date(2026, 11, 16) + timedelta(days=offset)).isoformat()))
         context = load_daily_context(self.root)
+        latest_page = render(context.editions[-1], context.editions, ORIGIN + "/daily/", self.root, context)
+        self.assertIn("Site search covers the latest 30 published snapshots.", latest_page)
         rows = daily_search_entries(context)
         self.assertEqual(len(rows), 301)
         self.assertEqual(len({row["url"] for row in rows}), 301)
