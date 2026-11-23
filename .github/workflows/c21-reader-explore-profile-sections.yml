@@ -1,0 +1,76 @@
+name: Verify all authored and rendered Explore destinations
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-reader-explore-profile-sections.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  explore:
+    name: Explore (${{ matrix.viewport }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 32
+    strategy:
+      fail-fast: false
+      matrix:
+        viewport: [desktop, phone]
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      C21_HEAD: 34c4e96076d0c783279bb889eab2d0d6a5bd5db0
+      QA_DISCOVER_PROFILE_SECTIONS: '1'
+      C21_DIST_TREE: ee7b9c1b84608151a83b784fa37ef74d14591313
+      C21_MANIFEST: 8ea9a1b27fc9f9d7121e43d8db95883d3a69ce5808b90ba30684dbc18aac3838
+      QA_VIEWPORT: ${{ matrix.viewport }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare exact artifact source
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          git worktree add --detach "$RUNNER_TEMP/c21-product" "$C21_HEAD"
+          git config --global --add safe.directory "$RUNNER_TEMP/c21-product"
+          test "$(git -C "$RUNNER_TEMP/c21-product" rev-parse HEAD:dist)" = "$C21_DIST_TREE"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --prefix "$RUNNER_TEMP/c21-product"
+      - name: Exercise each signed Explore destination
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA="$GITHUB_WORKSPACE/.github/qa/c21-recovery"
+          export QA_EXPLORE_OUTPUT="$GITHUB_WORKSPACE/output/explore"
+          mkdir -p "$QA_EXPLORE_OUTPUT"
+          export QA_EXPLORE_INVENTORY="$QA_EXPLORE_OUTPUT/inventory.json"
+          cd "$RUNNER_TEMP/c21-product"
+          PYTHONPATH=scripts python3 - <<'PY'
+          import os
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          validate_artifact(Path('dist'),os.environ['C21_MANIFEST'])
+          PY
+          python3 "$QA/explore_inventory.py"
+          QA_DIST="$PWD/dist" python3 scripts/browser_qa_server.py --port 19011 > "$QA_EXPLORE_OUTPUT/origin.log" 2>&1 &
+          origin_pid=$!
+          trap 'kill "$origin_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 20); do
+            curl --silent --fail http://127.0.0.1:19011/manifest.json >/dev/null && break
+            sleep 1
+          done
+          node "$QA/explore_routes.cjs"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c21-reader-explore-${{ matrix.viewport }}
+          path: output/explore/
+          if-no-files-found: error
+          retention-days: 14
