@@ -1,0 +1,117 @@
+name: Prepare the verified C21 pull request artifact
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-publish-candidate.yml]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      C20_BASE: 2ded7d039d7605b113d1a8dac83af41dbcf3171b
+      C20_MANIFEST: 1fe217bab088009c4fb30ca3b00987bc3291361808823d9c523729fb648015fc
+      EXPECTED_MANIFEST: 4a743a78e1e7cbe76ca6b097cb9072b6aaa557f0892b9e734aeff10eb36a3103
+      EXPECTED_PROOF: f6be796bbe7aa336bb8d5a449ce438d63abda1a9
+      EXPECTED_RECOVERY_RUN: '45099936116'
+      PRODUCT_BRANCH: codex/site-quality-source-focus-20261122
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: '45099936116'
+          github-token: ${{ github.token }}
+          name: c21-recovered-proof
+          path: output/reviewed-recovery
+      - name: Validate and materialize the reviewed candidate without rebuilding
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$GITHUB_WORKSPACE/output/c21-prepared-candidate"
+          REPORT="$GITHUB_WORKSPACE/output/reviewed-recovery"
+          PRODUCT="$RUNNER_TEMP/c21-product"
+          mkdir -p "$OUT"
+          test "$(git ls-remote --exit-code origin refs/heads/main | cut -f 1)" = "$C20_BASE"
+          test -z "$(git ls-remote origin "refs/heads/$PRODUCT_BRANCH")"
+          git config --local user.name 'ScienceToStartup QA'
+          git config --local user.email 'qa@sciencetostartup.com'
+          git worktree add --detach "$PRODUCT" "$C20_BASE"
+          cd "$PRODUCT"
+          git apply --index "$REPORT/source-update.patch"
+          git diff --cached --check
+          if git diff --cached --name-only | grep -vE '^(data|scripts|tests|web|release-assets)/'; then exit 1; fi
+          git commit -m 'Improve Companies focus and Research sources'
+          SOURCE="$(git rev-parse HEAD)"
+          PYTHONPATH=scripts python3 - "$REPORT" "$RUNNER_TEMP/c21-artifact" <<'PY'
+          from hashlib import sha256
+          from pathlib import Path, PurePosixPath
+          import json,os,sys
+          from release_artifact import validate_artifact
+          report,target = map(Path,sys.argv[1:])
+          assembled=(report/'manifest.json').read_bytes()
+          previous=(Path('dist')/'manifest.json').read_bytes()
+          metadata=json.loads((report/'delta.json').read_bytes())
+          expected=os.environ['EXPECTED_MANIFEST']
+          assert sha256(assembled).hexdigest()==expected==metadata['sha256']
+          assert sha256(previous).hexdigest()==os.environ['C20_MANIFEST']
+          assert metadata['base']==os.environ['C20_BASE'] and metadata['runner_head']==os.environ['EXPECTED_PROOF']
+          assert str(metadata['run'])==os.environ['EXPECTED_RECOVERY_RUN']
+          browser=json.loads((report/'browser.json').read_bytes())
+          assert not browser['errors'] and browser['stats']['unexpected']==0 and browser['stats']['flaky']==0
+          assert browser['stats']['expected']>=12, browser['stats']
+          old=json.loads(previous)['sha256']
+          new=json.loads(assembled)['sha256']
+          changes={name:checksum for name,checksum in new.items() if old.get(name)!=checksum}
+          assert changes==metadata['changed'] and len(new)-len(changes)==metadata['unchanged']
+          assert all(new.get(name)==checksum for name,checksum in old.items()
+                     if name.startswith(('publication/','research/editions/','daily/202')))
+          assert set(changes)=={str(path.relative_to(report/'payloads'))
+                               for path in (report/'payloads').rglob('*') if path.is_file()}
+          target.mkdir(exist_ok=False)
+          for name,digest in new.items():
+              path=PurePosixPath(name)
+              assert not path.is_absolute() and '..' not in path.parts
+              source=report/'payloads'/name if name in changes else Path('dist')/name
+              data=source.read_bytes()
+              assert sha256(data).hexdigest()==digest, name
+              result=target/name
+              result.parent.mkdir(parents=True,exist_ok=True)
+              result.write_bytes(data)
+          (target/'manifest.json').write_bytes(assembled)
+          validate_artifact(target,expected)
+          print('Signed C21 artifact',expected,len(new))
+          PY
+          mv dist "$RUNNER_TEMP/c20-dist"
+          mv "$RUNNER_TEMP/c21-artifact" dist
+          git add -A -- dist
+          git diff --cached --check
+          git commit -m 'Build the reviewed ScienceToStartup follow-up candidate' -- dist
+          HEAD_SHA="$(git rev-parse HEAD)"
+          python3 scripts/release_artifact.py prepare --dist dist --output "$OUT/worker-prepared" --source-commit "$HEAD_SHA"
+          DIST_TREE="$(git rev-parse HEAD:dist)"
+          python3 - "$OUT/publish.json" "$SOURCE" "$HEAD_SHA" "$DIST_TREE" <<'PY'
+          from pathlib import Path
+          import json,os,sys
+          out, source, head, tree=sys.argv[1:]
+          body=json.loads(Path('dist/manifest.json').read_bytes())
+          sha=os.environ['EXPECTED_MANIFEST']
+          receipt={'source':source,'head':head,'dist_tree':tree,'build':body['build_id'],'manifest':sha,
+                   'base':os.environ['C20_BASE'],'branch':os.environ['PRODUCT_BRANCH'],'proof':int(os.environ['EXPECTED_RECOVERY_RUN'])}
+          Path(out).write_text(json.dumps(receipt,indent=2)+'\n')
+          print(json.dumps(receipt))
+          PY
+          git push origin "HEAD:refs/heads/$PRODUCT_BRANCH"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c21-prepared-candidate
+          path: output/c21-prepared-candidate/
+          if-no-files-found: error
+          retention-days: 14
