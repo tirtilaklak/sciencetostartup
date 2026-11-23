@@ -216,7 +216,7 @@ for (const navigationType of ['reload', 'back_forward']) {
       observer.observe(document, { childList: true, subtree: true });
       addEventListener('pageshow', () => {
         document.activeElement?.blur();
-        if (type === 'reload') document.getElementById('business-health').scrollIntoView();
+        if (type === 'reload') document.getElementById('business-health').scrollIntoView({ block: 'start', behavior: 'instant' });
         else scrollTo({ top: 0, behavior: 'instant' });
       }, { once: true });
     }, navigationType);
