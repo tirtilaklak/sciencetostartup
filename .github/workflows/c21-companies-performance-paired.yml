@@ -1,0 +1,101 @@
+name: Compare exact Companies mobile performance on one runner
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-companies-performance-paired.yml]
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      BEFORE_HEAD: fa24bac625b428bf868b2d5259f2837eef6023b5
+      BEFORE_MANIFEST: af4eb4073ebd85ec930e080a8745059dce38f5a8ceaeb9def054d4bf9d5724c9
+      CURRENT_HEAD: eae4770118a9ffb35279c71f4bef061b302e89d7
+      CURRENT_MANIFEST: ea4fa51e30eea853e7526bdd62b0117c36c7532da0cb8f471beffd21708a1c45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Keep the official mobile configuration and budget on both exact builds
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          BEFORE="$RUNNER_TEMP/companies-before"
+          CURRENT="$RUNNER_TEMP/companies-current"
+          OUT="$GITHUB_WORKSPACE/output"
+          mkdir -p "$OUT"
+          git worktree add --detach "$BEFORE" "$BEFORE_HEAD"
+          git worktree add --detach "$CURRENT" "$CURRENT_HEAD"
+          git config --global --add safe.directory "$BEFORE"
+          git config --global --add safe.directory "$CURRENT"
+          cd "$CURRENT"
+          printf '%s  %s\n' "$CURRENT_MANIFEST" "$CURRENT/dist/manifest.json" | sha256sum -c -
+          printf '%s  %s\n' "$BEFORE_MANIFEST" "$BEFORE/dist/manifest.json" | sha256sum -c -
+          cmp "$CURRENT/scripts/performance_audit.mjs" "$BEFORE/scripts/performance_audit.mjs"
+          npm ci
+          python3 - <<'PY'
+          from pathlib import Path
+          script=Path('scripts/performance_audit.mjs').read_text()
+          needle='const performance = policy.performance;'
+          assert script.count(needle)==1
+          Path('scripts/paired_performance_probe.mjs').write_text(script.replace(
+              needle,"const performance = {...policy.performance, routes: ['/explore/#companies']};"))
+          PY
+          python3 scripts/preview_server.py --directory "$CURRENT/dist" --port 18770 > "$OUT/current-origin.log" 2>&1 &
+          current_pid=$!
+          python3 scripts/preview_server.py --directory "$BEFORE/dist" --port 18771 > "$OUT/before-origin.log" 2>&1 &
+          before_pid=$!
+          trap 'kill "$current_pid" "$before_pid" 2>/dev/null || true' EXIT
+          for pair in current:18770 before:18771; do
+            label="${pair%:*}"
+            port="${pair#*:}"
+            for attempt in $(seq 1 15); do
+              curl --silent --fail "http://127.0.0.1:$port/manifest.json" --output "$OUT/$label-manifest.json" && break
+              sleep 1
+            done
+          done
+          cmp "$OUT/current-manifest.json" "$CURRENT/dist/manifest.json"
+          cmp "$OUT/before-manifest.json" "$BEFORE/dist/manifest.json"
+          for lane in before:18771 current:18770 current:18770 before:18771; do
+            label="${lane%:*}"
+            port="${lane#*:}"
+            folder="$CURRENT"
+            if [ "$label" = before ]; then folder="$BEFORE"; fi
+            result=0
+            node scripts/paired_performance_probe.mjs --base-url "http://127.0.0.1:$port" --dist "$folder/dist" --runs 3 --output "$OUT/$label" || result=$?
+            printf '%s performance exit %s\n' "$label" "$result"
+          done
+          python3 - "$OUT" <<'PY'
+          import json,statistics,sys
+          from pathlib import Path
+          out=Path(sys.argv[1])
+          for label in ('before','current'):
+              samples=[]
+              for p in sorted((out/label).glob('*/summary.json')):
+                  row=json.loads(p.read_bytes())['routes'][0]
+                  assert row['route']=='/explore/#companies' and row['validRuns']==3
+                  measurements=[entry['metrics']['largest-contentful-paint'] for entry in row['runReports']]
+                  samples.extend(measurements)
+                  print('PAIR TRIPLE',label,json.dumps({'samples':measurements,'median':statistics.median(measurements),'passed':row['passed']}))
+              assert len(samples)==6
+              print('PAIRED ROUTE',label,json.dumps({'median':statistics.median(samples),'samples':samples,'maximumMedian':2500}))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: exact-two-build-companies-performance
+          path: output
+          if-no-files-found: error
