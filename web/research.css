@@ -313,6 +313,187 @@
 :is(.r-bulk-target,.r-paragraph[id]):focus-visible{outline:2px solid var(--r-accent);outline-offset:4px}
 .r-paragraph-originals{font-size:13px;line-height:1.7;color:var(--r-quiet)}
 
+/* Current research index and report cover. Dated editions use the original reader. */
+.research:is(.r-editorial-hub,.r-editorial-report) {
+  --r-rule: var(--print-rule, #cbc7b9);
+  --r-accent: var(--print-link, #205846);
+  --r-quiet: var(--print-muted, #4c5952);
+  --r-editorial-ink: var(--print-ink, #142a29);
+  --r-editorial-display: var(--print-display, Georgia, serif);
+  color: var(--r-editorial-ink);
+}
+.research:is(.r-editorial-hub,.r-editorial-report) a:not(.r-button) {
+  text-decoration-thickness: 1px;
+  text-underline-offset: .22em;
+}
+.r-editorial-front {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  gap: clamp(36px, 6vw, 88px);
+  align-items: start;
+  padding-block: 25px 30px;
+  margin-bottom: 24px;
+  border-block-start: 2px solid var(--r-editorial-ink);
+}
+.static-page main .r-editorial-feature h1 {
+  font: 650 1.125rem/1.35 var(--sans);
+  letter-spacing: -.022em;
+  margin: 0 0 26px;
+}
+.r-editorial-feature .r-kicker,
+.r-editorial-cover .r-kicker {
+  margin-bottom: 14px;
+  letter-spacing: .075em;
+}
+.r-editorial-feature h2,
+.static-page main .r-editorial-cover h1 {
+  max-width: 17ch;
+  margin: 0 0 20px;
+  color: var(--r-editorial-ink);
+  font: 400 clamp(3.5rem, 6vw, 5.5rem)/.96 var(--r-editorial-display);
+  letter-spacing: -.022em;
+  text-wrap: balance;
+}
+.r-editorial-front .r-editorial-deck,
+.r-editorial-reading .r-editorial-deck {
+  max-width: 57ch;
+  margin: 0;
+  color: var(--r-quiet);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+.r-editorial-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 22px;
+  margin-top: 13px;
+}
+.r-editorial-actions a,
+.r-editorial-cover .r-bulk-shortcuts a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--r-accent);
+  font-size: .875rem;
+}
+.r-editorial-actions a:first-child {
+  color: var(--r-editorial-ink);
+  font-weight: 650;
+  font-size: 1rem;
+}
+.r-editorial-directory h2 {
+  margin: 0 0 12px;
+  font: 650 1.125rem/1.35 var(--sans);
+  letter-spacing: -.022em;
+}
+.r-editorial-directory-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.r-editorial-directory-list li {
+  max-width: none;
+  margin: 0;
+  border-top: 1px solid var(--r-rule);
+}
+.r-editorial-directory-list li:last-child { border-bottom: 1px solid var(--r-rule); }
+.r-editorial-directory-list a {
+  display: grid;
+  gap: 3px;
+  min-height: 44px;
+  padding-block: 12px;
+  text-decoration: none;
+  color: var(--r-quiet);
+  line-height: 1.4;
+}
+.r-editorial-directory-list strong {
+  color: var(--r-editorial-ink);
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+.r-editorial-directory-list a:is(:hover,:focus-visible) strong {
+  text-decoration: underline;
+  text-underline-offset: .22em;
+}
+.r-editorial-directory-list span { font-size: .875rem; }
+.r-editorial-directory-list small { font-size: .75rem; }
+.r-editorial-hub .r-hub-details { border-top: 0; }
+.r-editorial-report .r-nav a { color: var(--r-quiet); }
+.r-editorial-report .r-nav a[aria-current] { color: var(--r-editorial-ink); }
+.r-editorial-reading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(225px, 28%);
+  grid-template-areas: "cover contents" "report contents";
+  gap: 22px clamp(28px, 5vw, 70px);
+  align-items: start;
+  border-block-start: 2px solid var(--r-editorial-ink);
+  padding-block-start: 25px;
+}
+.r-editorial-cover { grid-area: cover; min-width: 0; }
+.r-editorial-cover .r-bulk-shortcuts { margin-block: 12px 4px; }
+.r-editorial-cover .r-editorial-edition { margin: 0; }
+.r-editorial-edition > summary,
+.r-editorial-cover .r-operating-status > summary {
+  padding: 7px 0;
+  color: var(--r-quiet);
+  font-size: .875rem;
+}
+.r-editorial-edition[open] { padding-bottom: 9px; }
+.r-editorial-edition > p { font-size: .9375rem; }
+.r-editorial-edition > .r-meta { font-size: .8125rem; }
+.r-editorial-cover .r-operating-status { margin-bottom: 0; }
+.r-editorial-reading > .r-chapter-index {
+  grid-area: contents;
+  margin: 0;
+  border: 0;
+}
+.r-editorial-reading > .r-chapter-index > summary {
+  padding-block: 0 5px;
+  color: var(--r-editorial-ink);
+  font-weight: 650;
+  font-size: 1rem;
+}
+.r-editorial-reading .r-reader-toc ol { columns: auto; }
+.r-editorial-reading .r-reader-toc li { margin: 0; border-top: 1px solid var(--r-rule); }
+.r-editorial-reading .r-reader-toc li a {
+  display: flex;
+  padding-block: 5px;
+  font-size: .8125rem;
+  line-height: 1.35;
+}
+.r-editorial-reading .r-reader-toc > a { color: var(--r-accent); }
+.r-editorial-reading > .r-report-body { grid-area: report; max-width: 46rem; }
+.r-editorial-reading .r-report-body > .r-chapter h2 {
+  color: var(--r-editorial-ink);
+  font: 400 clamp(2.25rem, 4vw, 3.5rem)/1.03 var(--r-editorial-display);
+  letter-spacing: -.015em;
+}
+.r-editorial-reading .r-paragraph > p:first-of-type { max-width: 67ch; }
+.r-editorial-reading .r-paragraph-citations a { color: var(--r-accent); }
+@media (max-width: 720px) {
+  .r-editorial-front { display: block; padding: 19px 0 0; }
+  .static-page main .r-editorial-feature h1 { margin-bottom: 19px; }
+  .r-editorial-feature h2,
+  .static-page main .r-editorial-cover h1 {
+    margin-bottom: 15px;
+    font-size: clamp(2.65rem, 10vw, 4.375rem);
+    text-wrap: pretty;
+  }
+  .r-editorial-front .r-editorial-deck,
+  .r-editorial-reading .r-editorial-deck { font-size: 1rem; }
+  .r-editorial-directory { margin-top: 23px; }
+  .r-editorial-report > .crumbs li:last-child { display: none; }
+  .r-editorial-report > .r-nav { margin-bottom: 14px; }
+  .r-editorial-reading {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "cover" "contents" "report";
+    gap: 9px;
+    padding-block-start: 18px;
+  }
+  .r-editorial-reading > .r-chapter-index > summary { padding-block: 6px; }
+  .r-editorial-reading .r-report-body > .r-chapter { padding-top: 16px; }
+}
+
 .r-book-reader .r-chapter{content-visibility:visible;contain:none;contain-intrinsic-size:none}
 
 /* The text-heavy technical chapter uses individual glyphs instead of optional

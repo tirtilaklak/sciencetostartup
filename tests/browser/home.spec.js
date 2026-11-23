@@ -11,68 +11,65 @@ const day = 86_400_000;
 const expires = reviewed + release.publication_policy.homepage_work_max_age_days * day;
 const recordedProgram = '[data-recorded-program="invisible.work.meridial-network"]';
 
-test('home shows dated evidence from different companies and explains its methods', async ({ page }) => {
+test('home leads with the field guide and links dated examples to their sources', async ({ page }) => {
   await page.clock.setFixedTime(new Date(expires));
   for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 720 }]) {
     await page.setViewportSize(viewport);
     await page.goto('/');
     await page.evaluate(() => document.fonts.ready);
-    const heading = page.getByRole('heading', { level: 1, name: 'Who makes AI training data?', exact: true });
+    const heading = page.getByRole('heading', { level: 1, name: 'The business of AI training data', exact: true });
     await expect(heading).toBeInViewport({ ratio: 1 });
+    const main = page.getByRole('main');
+    await expect(main.getByText('See what suppliers sell. Check the pay and terms for training work.')).toBeVisible();
+    const report = main.getByRole('article', { name: 'State of AI Data Labs and Human Feedback', exact: true });
+    await expect(report).toBeVisible();
+    await expect(report.locator('time')).toHaveAttribute('datetime', '2026-11-12');
+    await expect(report.getByRole('link', { name: 'Read the report' })).toHaveAttribute('href', '/research/state-of-ai-data-labs/');
+    await expect(main.locator('.hero-actions [data-count="work"]')).toHaveText(String(release.counts.work_routes));
+
     const company = page.locator('[data-observation="snorkel_ai.metric.major-growth_metrics-0"]');
+    await expect(company).toBeVisible();
     await expect(company).toContainText('$375M annualized revenue run rate');
     await expect(company.locator('.example-pay [aria-hidden="true"]')).toHaveText('>');
     await expect(company.locator('.example-pay .sr-only')).toHaveText('More than');
     await expect(company.locator('time')).toHaveAttribute('datetime', '2026-09-22');
-    const companySource = company.getByRole('link', { name: 'Original disclosure' });
-    await expect(companySource).toBeInViewport({ ratio: 1 });
+    await expect(company.getByRole('link', { name: 'Original disclosure' }))
+      .toHaveAttribute('href', 'https://snorkel.ai/blog/data-2-0-and-the-research-era-of-ai-data/');
+
     const program = page.locator(recordedProgram);
+    await expect(program).toBeVisible();
     await expect(program).toContainText('Pay agreed before project');
     await expect(program.locator('time')).toHaveAttribute('datetime', '2026-10-28');
     await expect(program.getByRole('link', { name: 'Read recorded terms' }))
       .toHaveAttribute('href', '/company/invisible/#invisible.work.meridial-network');
-    await expect(program.getByRole('link', { name: 'Official program page' })).toBeInViewport({ ratio: 1 });
-    await expect(page.locator('.hero-actions a[href="/companies/"]')).toBeInViewport({ ratio: 1 });
-    await expect(page.locator('.hero-actions a[href="/work/"]')).toBeInViewport({ ratio: 1 });
-    await expect(page.locator('.hero-actions a[href="/research/"]')).toBeInViewport({ ratio: 1 });
-    await expect(page.locator('a[href="/research/data/"]')).toHaveCount(1);
-    await expect(page.locator('.proof-strip p')).toHaveText(['55 company profiles', `${release.counts.work_routes} listings and programs`]);
-    const methods = page.getByRole('region', { name: 'Sources and methods' });
-    await expect(methods.getByRole('link', { name: 'Read the methods' })).toHaveAttribute('href', '/method/#method-notes');
-    await expect(page.locator('img[src*="human-depth-portrait"]')).toHaveCount(0);
-
-    const workBox = await program.boundingBox();
-    const companyBox = await company.boundingBox();
-    expect((await heading.boundingBox()).x).toBeCloseTo(companyBox.x, 0);
-    expect((await methods.boundingBox()).y).toBeGreaterThanOrEqual(workBox.y + workBox.height);
-    if (viewport.width > 600) expect(workBox.y).toBeCloseTo(companyBox.y, 0);
+    await expect(program.getByRole('link', { name: 'Official program page' })).toHaveAttribute('href', 'https://www.meridial.ai/');
+    expect((await report.boundingBox()).y).toBeLessThan((await company.boundingBox()).y);
+    await expect(page.locator('a[href="/research/data/"]').first()).toBeVisible();
   }
-  await page.getByRole('link', { name: 'Read the methods' }).click();
+
+  await page.locator('#research a[href="/method/#method-notes"]').click();
   await expect(page).toHaveURL(/\/method\/#method-notes$/);
   await expect(page.getByRole('heading', { name: 'How figures are shown' })).toBeVisible();
 });
 
-test('all three destinations fit on one row on narrow phones', async ({ page }) => {
+test('the three guide links stay readable and usable on narrow phones', async ({ page }) => {
   for (const width of [320, 360, 375]) {
     await page.setViewportSize({ width, height: 720 });
     await page.goto('/');
     await page.evaluate(() => document.fonts.ready);
-    const actions = page.locator('.hero-actions');
-    const companies = actions.getByRole('link', { name: 'Companies', exact: true });
-    const work = actions.getByRole('link', { name: 'Paid work', exact: true });
-    const research = actions.getByRole('link', { name: 'Research', exact: true });
-    await expect(work).toHaveAttribute('href', '/work/');
-    await expect(research).toHaveAttribute('href', '/research/');
-    await expect(research).toBeInViewport({ ratio: 1 });
-    const first = await companies.boundingBox();
-    const second = await work.boundingBox();
-    const third = await research.boundingBox();
-    expect(second.y).toBeCloseTo(first.y, 0);
-    expect(third.y).toBeCloseTo(first.y, 0);
-    expect(second.x).toBeGreaterThanOrEqual(first.x + first.width);
-    expect(third.x).toBeGreaterThanOrEqual(second.x + second.width);
-    expect(third.x + third.width).toBeLessThanOrEqual(width);
-    expect(Math.min(first.height, second.height, third.height)).toBeGreaterThanOrEqual(48);
+    const actions = page.getByRole('navigation', { name: 'Browse the guide' });
+    let nextRow = 0;
+    for (const [name, path] of [['Companies', '/companies/'], ['Paid work', '/work/'], ['Research', '/research/']]) {
+      const link = actions.getByRole('link', { name, exact: true });
+      await expect(link).toHaveAttribute('href', path);
+      await expect(link).toBeInViewport({ ratio: 1 });
+      const box = await link.boundingBox();
+      expect(box.y).toBeGreaterThanOrEqual(nextRow - 0.5);
+      expect(box.height).toBeGreaterThanOrEqual(43.5);
+      expect(box.x).toBeGreaterThanOrEqual(-0.5);
+      expect(box.x + box.width).toBeLessThanOrEqual(width + 0.5);
+      nextRow = box.y + box.height;
+    }
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
   }
 });
@@ -92,7 +89,7 @@ test('home promotes only approved current terms and retains all binding conditio
   await expect(example.getByRole('link', { name: /Original listing/ })).toHaveAttribute('href', listing.url);
   await expect(example.locator('time')).toHaveAttribute('datetime', approved.checked_on);
   await expect(page.locator(recordedProgram)).toBeHidden();
-  await expect(page.locator('.example-grid article:visible')).toHaveCount(2);
+  await expect(page.locator('#home-work-example [data-home-route]')).toHaveCount(1);
   await example.locator('summary').click();
   await expect(example.locator('q')).toBeVisible();
   await expect(example.locator('q')).toHaveText(promotion.source_quote);
@@ -115,7 +112,7 @@ test('three-day expiry withdraws stale examples and preserves evergreen browse',
     await expect(page.locator('#home-work-example')).toBeHidden();
     await expect(page.locator(recordedProgram)).toBeVisible();
     await expect(page.locator('.hero-actions').getByRole('link', { name: 'Paid work', exact: true })).toBeVisible();
-    await expect(page.locator('.example-grid article')).toHaveCount(2);
+    await expect(page.locator('#home-work-example [data-home-route]')).toHaveCount(0);
   }
 });
 
@@ -142,7 +139,7 @@ test('without JavaScript the homepage offers its menu and native browse links', 
   await page.goto('/');
   await expect(page.locator('#home-work-example')).toBeHidden();
   await expect(page.locator('.hero').getByRole('link', { name: 'Companies', exact: true })).toHaveAttribute('href', '/companies/');
-  await expect(page.locator('.example-grid article')).toHaveCount(2);
+  await expect(page.locator(recordedProgram)).toBeVisible();
   await page.locator('.home-menu summary').press('Enter');
   await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Daily scan' })).toBeVisible();
   await page.locator('.home-menu summary').press('Enter');
@@ -157,7 +154,9 @@ test('without JavaScript the homepage offers its menu and native browse links', 
   await browse.press('Enter');
   await expect(page).toHaveURL(/#browse-guide$/);
   const routes = page.getByRole('navigation', { name: 'Browse the guide' }).getByRole('link');
-  await expect(routes).toHaveText(['Companies', 'Paid work', 'Research']);
+  for (const [index, name] of ['Companies', 'Paid work', 'Research'].entries()) {
+    await expect(routes.nth(index)).toHaveAccessibleName(name);
+  }
   expect(await routes.evaluateAll(links => links.map(link => link.getAttribute('href'))))
     .toEqual(['/companies/', '/work/', '/research/']);
   await context.close();
@@ -246,8 +245,8 @@ test.describe('home keyboard controls in compact viewports', () => {
   }
 
   for (const { width, height, name, path } of [
-    { width: 640, height: 436, name: 'Sources and data', path: '/research/data/' },
-    { width: 320, height: 218, name: 'Find paid work', path: '/work/' },
+    { width: 640, height: 436, name: 'Research data', path: '/research/data/' },
+    { width: 320, height: 218, name: 'Paid work', path: '/work/' },
   ]) {
     test(`home Menu leaves ${name} operable at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height });
@@ -257,17 +256,17 @@ test.describe('home keyboard controls in compact viewports', () => {
       const nav = menu.getByRole('navigation', { name: 'Main' });
       const menuLinks = ['Daily scan', 'Research', 'Companies', 'Paid work', 'About']
         .map(name => nav.getByRole('link', { name, exact: true }));
-      const main = page.getByRole('main');
-      const heroActions = main.locator('.hero-actions');
-      const work = heroActions.getByRole('link', { name: 'Paid work', exact: true });
-      const sources = main.getByRole('link', { name: 'Sources and data', exact: true });
-      const target = name === 'Sources and data' ? sources : work;
+      const target = page.locator(`main a[href="${path}"], footer a[href="${path}"]`).first();
 
       await tabThrough(page, ...headerLinks(page), menu.getByText('Menu', { exact: true }));
       await page.keyboard.press('Enter');
       await expect(menu).toHaveJSProperty('open', true);
-      await tabThrough(page, ...menuLinks, heroActions.getByRole('link', { name: 'Companies', exact: true }), work);
-      if (name === 'Sources and data') await tabThrough(page, heroActions.getByRole('link', { name: 'Research', exact: true }), sources);
+      await tabThrough(page, ...menuLinks);
+      const controls = await page.locator('main :is(a, button, summary):visible, footer a:visible').count();
+      for (let index = 0; index < controls; index++) {
+        await page.keyboard.press('Tab');
+        if (await target.evaluate(link => link === document.activeElement)) break;
+      }
       await expect(menu).toHaveJSProperty('open', true);
       await expectUncoveredFocus(target);
       await page.keyboard.press('Enter');
