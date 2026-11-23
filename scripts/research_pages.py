@@ -31,6 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = "/research/state-of-ai-data-labs/"
 REPORT_DESCRIPTION = ("Research on AI training data and human feedback. Find the sources behind supplier claims "
                       "and learn how to evaluate a paid pilot.")
+DATA_DESCRIPTION = "Browse findings and the sources behind them. Download or cite the research."
 CORRECTIONS_PATH = "/research/corrections/"
 LEDGER_BUCKETS = "0123456789abcdef"
 SOURCE_ANCHORS = "data/research-source-anchors.json"
@@ -962,16 +963,22 @@ def _reader_chapter(context, section, base=REPORT_PATH, edition=False):
                     if paragraph_supported(context, section['paragraphs'][row[0]]))
     passages = tuple(_chapter_shortcuts(context, section, assertions))
     shortcuts = _reader_shortcuts(outline, passages)
-    early_shortcuts = bool(outline or passages) or section['id'] in EARLY_READER_SHORTCUTS
+    early_shortcuts = edition and (bool(outline or passages) or section['id'] in EARLY_READER_SHORTCUTS)
     head_class = 'r-page-head' if edition else 'r-page-head r-current-chapter-head'
     layout_class = 'r-report-layout r-book-reader'
     if not edition:
         layout_class += ' r-current-chapter-layout'
+    downloads = _reader_downloads(context, edition=edition)
+    details = _meta(context) + downloads
+    if not edition:
+        details = ('<details class="r-editorial-edition"><summary>'
+                   + ('Edition details and downloads' if downloads else 'Edition details')
+                   + '</summary>' + details + '</details>')
     header = (f'<header class="{head_class}"><p class="r-kicker">Chapter ' + str(index + 1) + ' of '
               + str(len(report['sections'])) + ' · ' + sp.escape(_status(context)) + '</p>'
               + '<p class="r-reader-book-title">' + _link(base, report['title']) + '</p>'
               + '<h1 id="' + sp.escape(section['id']) + '" tabindex="-1">' + sp.escape(section['title']) + '</h1>'
-              + ('' if early_shortcuts else shortcuts) + _meta(context) + _reader_downloads(context, edition=edition) + '</header>')
+              + ('' if early_shortcuts else shortcuts) + details + '</header>')
     body = ('<section class="r-chapter r-reader-chapter-content" aria-labelledby="' + sp.escape(section['id']) + '">'
             + _chapter_content(context, section, outline, passages) + '</section>'
             + _reader_navigation(context, section['id'], base) + _reader_citation(context, edition))
@@ -1400,7 +1407,13 @@ def _data(context, *, ledger_path='/research/data/', metadata=None, reuse_path='
                  + coverage + '</section>' + download_citation)
     else:
         intro = ('<header class="r-page-head"><h1>Research data and sources</h1>'
-                 '<p class="r-lede">Download the data or look up a finding and its sources.</p></header>'
+                 f'<p class="r-lede">{DATA_DESCRIPTION}</p>'
+                 '<nav class="r-data-jumps" aria-label="On this page">'
+                 + _link('#assertions', 'Assertion records')
+                 + _link('#sources', 'Source records')
+                 + _link('#downloads', 'Downloads')
+                 + _link('#citation', 'Cite and reproduce')
+                 + '</nav></header>'
                  + download_citation
                  + operating_status_notice(context)
                  + '<details class="r-section r-disclosure" id="coverage"><summary>Publication checks and coverage</summary>'
@@ -2074,7 +2087,7 @@ def write_research_pages(output, context):
                       if (file := output / url.lstrip('/')).is_file()}
     pages = [("/research/", "AI data research", "Papers and datasets on AI training, with evidence about the suppliers.", _hub(context, editions), "CollectionPage", None),
              (REPORT_PATH, context["report"]["title"], REPORT_DESCRIPTION, _report(context), "Book", None),
-             ("/research/data/", "Research data and sources", "Download the research data or look up a finding and its sources.", _data(context, download_sizes=download_sizes), "CollectionPage", None),
+             ("/research/data/", "Research data and sources", DATA_DESCRIPTION, _data(context, download_sizes=download_sizes), "CollectionPage", None),
              ("/review/", "Review & correct the research", "Contribute a source-backed correction, scoped review, or public reuse of ScienceToStartup research.", _review(context), "WebPage", None),
              (CORRECTIONS_PATH, "Research corrections", "Accepted research corrections, with affected editions, claims, correction dates and supporting evidence.", _corrections_page(context, corrections), "CollectionPage", None)]
     pages.extend((_reader_path(section), section['title'],
@@ -2161,7 +2174,7 @@ def research_search_entries(context, *, include_published_editions=False):
     entries = [
         {"title": "AI data research", "summary": "Papers and datasets on AI training, with evidence about the suppliers.", "url": "/research/", "kind": "research", "keywords": "AI data labs human feedback evidence"},
         {"title": context["report"]["title"], "summary": _status(context) + ". Twelve chapters of methods, historical examples, and research gaps.", "url": REPORT_PATH, "kind": "report", "keywords": "human feedback RLHF annotation suppliers methods"},
-        {"title": "Research data and sources", "summary": "Download the data or look up a finding and its sources.", "url": "/research/data/", "kind": "data", "keywords": "JSON CSV SQLite citation sources provenance"},
+        {"title": "Research data and sources", "summary": DATA_DESCRIPTION, "url": "/research/data/", "kind": "data", "keywords": "JSON CSV SQLite citation sources provenance"},
         {"title": "Review the research", "summary": "Submit a correction or a chapter review. Share where you used the data.", "url": "/review/", "kind": "review", "keywords": "correction contribute review reuse"},
         {"title": "Research corrections", "summary": "Accepted corrections with affected editions, claims, correction dates and source evidence.", "url": CORRECTIONS_PATH, "kind": "review", "keywords": "corrections errata RSS Atom evidence"},
     ]

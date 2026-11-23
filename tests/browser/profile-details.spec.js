@@ -284,6 +284,36 @@ test('a cached Back preserves the browser’s native ledger restoration', async 
   }
 });
 
+for (const hash of ['', '#afterquery.work.ai-ml-research-intern']) {
+  test(`a fresh-document Back restores native profile Terms and the role link${hash ? ' on a bookmarked entry' : ''}`, async ({ page }) => {
+    test.slow();
+    const profile = '/company/afterquery/';
+    const role = 'afterquery.work.ai-ml-research-intern';
+    await page.addInitScript(path => {
+      if (location.pathname === path) addEventListener('unload', () => {});
+    }, profile);
+    await page.goto(profile + hash);
+    if (!hash) await page.locator('.company-fold > summary').filter({ hasText: /^Paid work/ }).click();
+    const row = page.locator(`[data-work-route="${role}"]`);
+    const terms = row.locator('.work-terms');
+    const opener = row.locator('.work-role-link');
+    await terms.locator('summary').press('Enter');
+    await expect(terms).toHaveJSProperty('open', true);
+    await opener.press('Enter');
+    await expect(page).toHaveURL(`/work/#${role}`);
+    await expect(page.locator(`[data-work-route="${role}"]`)).toBeInViewport();
+
+    await page.goBack({ waitUntil: 'commit' });
+    await expect(page).toHaveURL(profile + hash);
+    expect(await page.evaluate(() => performance.getEntriesByType('navigation')[0].type)).toBe('back_forward');
+    await expect(opener).toBeFocused();
+    await expect(opener).toBeInViewport({ ratio: 1 });
+    await expect(terms).toHaveJSProperty('open', true);
+    await page.keyboard.press('Tab');
+    await expect(terms.locator('summary')).toBeFocused();
+  });
+}
+
 async function expectBelowProfileNavigation(locator) {
   await expect.poll(() => locator.evaluate(node => {
     const { top, bottom } = node.getBoundingClientRect();

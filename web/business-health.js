@@ -228,8 +228,10 @@ function evidenceOpener(){return evidenceOrigin?.selector?evidenceOrigin:null;}
 function focusEvidenceOpener(origin){
  if(!origin?.selector)return null;
  let trigger=document.querySelector(origin.selector);
- // An alternate measure or scope can remove an invoking chart bar.
- if(!trigger){
+ const {signal,measure,cohort}=origin.selection;
+ // Keep the original chart filters when an alternate observation changes them.
+ const chartChanged=trigger?.closest('#bh-plot')&&(bhState.signal!==signal||bhState.measure!==measure||bhState.cohort!==cohort);
+ if(!trigger||chartChanged){
   Object.assign(bhState,origin.selection);
   render();
   trigger=document.querySelector(origin.selector);
@@ -395,12 +397,15 @@ function revealGridFocus(target,grid){
  });
 }
 
-function renderCompareSelect(id,options,selected){
- const select=$(id);
- select.innerHTML=options;
+function setSelectValue(select,selected){
  select.value=selected;
  const value=select.nextElementSibling;
  if(value)value.textContent=select.selectedOptions[0]?.text||'';
+}
+function renderSelect(id,options,selected){
+ const select=$(id);
+ select.innerHTML=options;
+ setSelectValue(select,selected);
 }
 
 function render(){
@@ -408,29 +413,29 @@ function render(){
  const ids=measures(bhState.signal);if(!ids.includes(bhState.measure))bhState.measure=bestMeasure(bhState.signal,bhState.group);
  $('bh-tabs').innerHTML=signals.map(id=>`<button type="button" class="bh-tile" id="bh-tab-${id}" role="tab" aria-controls="bh-inspector" aria-selected="${id===bhState.signal}" tabindex="${id===bhState.signal?0:-1}" data-bh-tab="${id}"><strong>${labels[id]}</strong></button>`).join('');
  $('bh-inspector').setAttribute('aria-labelledby','bh-tab-'+bhState.signal);
- renderCompareSelect('bh-measure',ids.map(id=>`<option value="${safe(id)}">${esc(measureLabel(id))}</option>`).join(''),bhState.measure);
+ renderSelect('bh-measure',ids.map(id=>`<option value="${safe(id)}">${esc(measureLabel(id))}</option>`).join(''),bhState.measure);
  const cohortRows=rows(bhState.signal,bhState.measure,{group:bhState.group,history:true}),cohorts=[...new Set(cohortRows.map(cohort))];
  if(bhState.cohort===null||(bhState.cohort&&!cohorts.includes(bhState.cohort)))bhState.cohort=defaultCohort(cohortRows);
- renderCompareSelect('bh-cohort','<option value="">All reporting periods (separate charts)</option>'+cohorts.map(c=>`<option value="${safe(c)}">${safe(cohortDisplay(c,cohortRows.find(o=>cohort(o)===c)))}</option>`).join(''),bhState.cohort);
- $('bh-group').innerHTML='<option value="">All business groups</option>'+Object.keys(MODEL_GROUPS).map(g=>`<option value="${safe(g)}">${safe(groupLabel(g))}</option>`).join('');$('bh-group').value=bhState.group;
- $('bh-sort').value=bhState.sort;
+ renderSelect('bh-cohort','<option value="">All reporting periods (separate charts)</option>'+cohorts.map(c=>`<option value="${safe(c)}">${safe(cohortDisplay(c,cohortRows.find(o=>cohort(o)===c)))}</option>`).join(''),bhState.cohort);
+ renderSelect('bh-group','<option value="">All business groups</option>'+Object.keys(MODEL_GROUPS).map(g=>`<option value="${safe(g)}">${safe(groupLabel(g))}</option>`).join(''),bhState.group);
+ setSelectValue($('bh-sort'),bhState.sort);
  renderCompare();renderDetail();renderHistory();renderGrid();renderLedger();
 }
 function selectSignal(signal,company=''){
- if(!company){bhState.sort='signal';bhState.measure=bestMeasure(signal,bhState.group);}
+ if(!company)bhState.measure=bestMeasure(signal,bhState.group);
  else if(signal!==bhState.signal)bhState.measure=bestMeasure(signal);
  bhState.signal=signal;bhState.cohort=null;bhState.company=company;bhState.observation='';
  if(company){const o=pickCompanyObservation(company,signal);if(o){bhState.measure=o.measure;bhState.observation=o.id;bhState.cohort=cohort(o);}}
  render();
 }
-function selectObservation(o){
- Object.assign(bhState,{signal:o.signal,company:o.company_id,observation:o.id,measure:o.measure,cohort:cohort(o)});
+function selectObservation(o,fromChart=false){
+ Object.assign(bhState,{signal:o.signal,company:o.company_id,observation:o.id,measure:o.measure,cohort:fromChart?bhState.cohort:cohort(o)});
  render();
 }
 window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries,latestFigures,refreshBundle,evidenceOpener,focusEvidenceOpener};
 if(!bundle)return;
 // The native picker handles input while its closed value can wrap in the visible field.
-for(const id of ['bh-measure','bh-cohort']){
+for(const id of ['bh-measure','bh-cohort','bh-group','bh-sort']){
  $(id).insertAdjacentHTML('afterend','<span class="bh-selected-value" aria-hidden="true"></span>');
 }
 const ledgerDateHeading=document.querySelector('.bh-ledger-head > :nth-child(3)');
@@ -463,7 +468,7 @@ $('bh-overview-tabs').addEventListener('keydown',e=>{if(!['ArrowRight','ArrowLef
 $('bh-measure').addEventListener('change',e=>{bhState.measure=e.target.value;bhState.cohort=null;bhState.company='';bhState.observation='';render();});
 $('bh-cohort').addEventListener('change',e=>{bhState.cohort=e.target.value;bhState.company='';bhState.observation='';render();});
 $('bh-group').addEventListener('change',e=>{bhState.group=e.target.value;bhState.cohort=null;bhState.company='';bhState.observation='';bhState.measure=bestMeasure(bhState.signal,bhState.group);render();revealSelection();});
-$('bh-sort').addEventListener('change',e=>{bhState.sort=e.target.value;renderGrid();revealSelection();});
+$('bh-sort').addEventListener('change',e=>{bhState.sort=e.target.value;setSelectValue(e.target,bhState.sort);renderGrid();revealSelection();});
 $('bh-search').addEventListener('input',e=>{bhState.query=e.target.value;renderGrid();});
 $('bh-evidence-only').addEventListener('change',e=>{bhState.evidenceOnly=!!e.target.checked;renderGrid();});
 $('bh-skip-to-method').addEventListener('click',()=>{
@@ -484,8 +489,8 @@ document.addEventListener('click',e=>{
   return;
  }
  // Header buttons are rebuilt with the grid, so focus returns to the new button in the same place.
- const sort=e.target.closest('[data-bh-sort]');if(sort){bhState.sort=sort.dataset.bhSort;$('bh-sort').value=bhState.sort;renderGrid();revealSelection();$('bh-grid-head').querySelector?.('[data-bh-sort]')?.focus({preventScroll:true});return;}
- const tab=e.target.closest('[data-bh-tab]');if(tab){const inGrid=!!tab.closest('thead');selectSignal(tab.dataset.bhTab);if(inGrid)revealSelection();(inGrid?$('bh-grid-head').querySelector?.(`[data-bh-tab="${tab.dataset.bhTab}"]`):$('bh-tab-'+tab.dataset.bhTab))?.focus({preventScroll:true});return;}
+ const sort=e.target.closest('[data-bh-sort]');if(sort){bhState.sort=sort.dataset.bhSort;setSelectValue($('bh-sort'),bhState.sort);renderGrid();revealSelection();$('bh-grid-head').querySelector?.('[data-bh-sort]')?.focus({preventScroll:true});return;}
+ const tab=e.target.closest('[data-bh-tab]');if(tab){const inGrid=!!tab.closest('thead');if(inGrid)bhState.sort='signal';selectSignal(tab.dataset.bhTab);if(inGrid)revealSelection();(inGrid?$('bh-grid-head').querySelector?.(`[data-bh-tab="${tab.dataset.bhTab}"]`):$('bh-tab-'+tab.dataset.bhTab))?.focus({preventScroll:true});return;}
  const cell=e.target.closest('.bh-cell');
  if(cell){
   const {bhCompany:company,bhSignal:signal}=cell.dataset;
@@ -499,7 +504,7 @@ document.addEventListener('click',e=>{
   const o=byId(mark.dataset.bhObservation||mark.dataset.bhContext);
   if(!o)return;
   const fromChart=mark.closest('#bh-plot');
-  selectObservation(o);
+  selectObservation(o,!!fromChart);
   openEvidence(fromChart?`#bh-plot [data-bh-observation="${CSS.escape(o.id)}"]`:undefined);
  }
 });

@@ -79,7 +79,7 @@
 .hero-actions { border-top: 1px solid var(--border); }
 .hero-actions a {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, auto) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   column-gap: clamp(8px, 2vw, 22px);
   min-height: 44px;
@@ -89,13 +89,21 @@
   font-size: 1rem;
   font-weight: 640;
   text-decoration: none;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .hero-actions a:hover {
   color: var(--green);
   background: var(--pale);
 }
+.hero-link-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: clamp(8px, 2vw, 22px);
+}
+.hero-link-text > span { min-width: 0; max-width: 100%; }
 .hero-link-detail {
+  margin-inline-start: auto;
   color: var(--muted);
   font-size: .8125rem;
   font-weight: 400;

@@ -78,6 +78,8 @@
     });
   }
 
+  const roleLink = 'details a.work-role-link[href^="/work/#"]';
+  const workRole = link => link.matches(roleLink) ? link.closest('[data-work-route]') : null;
   const handoffs = [...document.querySelectorAll('details a[data-disclosure-return][href]')];
   const company = location.pathname.match(/^\/company\/([a-z0-9_.-]+)\/$/)?.[1];
   const dossier = document.querySelector('.company-dossier');
@@ -89,7 +91,7 @@
       return (url.origin === canonical.origin || url.origin === location.origin) &&
         url.pathname === '/explore/' && (url.hash === route || url.hash.startsWith(`${route}/`));
     });
-    handoffs.push(...explore, ...dossier.querySelectorAll('.r-record-correction a[href^="/method/?correction="]'));
+    handoffs.push(...explore, ...dossier.querySelectorAll(`.r-record-correction a[href^="/method/?correction="], ${roleLink}`));
   }
 
   if (handoffs.length) {
@@ -102,7 +104,10 @@
       const { nativeDisclosureReturn, nativeCompanyReturn, ...state } = history.state || {};
       const index = handoffs.indexOf(link);
       if (index !== -1) {
-        state.nativeDisclosureReturn = { page: location.href, href: link.href, index, top: link.getBoundingClientRect().top };
+        state.nativeDisclosureReturn = {
+          page: location.href, href: link.href, index, top: link.getBoundingClientRect().top,
+          termsOpen: Boolean(workRole(link)?.querySelector('.work-terms')?.open),
+        };
       } else if (!(nativeDisclosureReturn || nativeCompanyReturn) ||
           link.hash && link.href.split('#')[0] === location.href.split('#')[0]) {
         return;
@@ -128,10 +133,17 @@
         const from = new URL(departed.url), destination = new URL(link.href);
         if (from.origin !== destination.origin || from.pathname !== destination.pathname) return;
       }
-      // Wait for the browser's history scroll restoration before aligning the reopened link.
-      requestAnimationFrame(() => {
-        if (document.activeElement !== document.body || location.href !== saved.page) return;
-        openDisclosures(link);
+      const role = workRole(link);
+      const bookmark = role && location.hash === `#${role.id}` ? role : null;
+      const input = new AbortController();
+      if (role) {
+        for (const type of ['keydown', 'pointerdown', 'touchstart', 'wheel']) {
+          addEventListener(type, event => { if (event.isTrusted) input.abort(); },
+            { capture: true, passive: true, signal: input.signal });
+        }
+        addEventListener('pagehide', () => input.abort(), { once: true, signal: input.signal });
+      }
+      const restoreLink = () => {
         link.focus({ preventScroll: true });
         const bounds = link.getBoundingClientRect();
         if (saved.top >= 0 && saved.top + bounds.height <= innerHeight) {
@@ -139,6 +151,34 @@
         } else {
           link.scrollIntoView({ block: 'center', behavior: 'instant' });
         }
+      };
+      // Wait for the browser's history scroll restoration before aligning the reopened link.
+      requestAnimationFrame(() => {
+        const active = document.activeElement;
+        // A bookmarked role can receive native fragment focus on Back.
+        if (input.signal.aborted || (active !== document.body && active !== bookmark) || location.href !== saved.page) {
+          input.abort();
+          return;
+        }
+        openDisclosures(link);
+        const terms = saved.termsOpen && role?.querySelector('.work-terms');
+        if (terms) terms.open = true;
+        restoreLink();
+        if (!bookmark) {
+          input.abort();
+          return;
+        }
+        // WebKit can apply fragment focus again after the opener has been focused.
+        addEventListener('focusin', event => {
+          if (event.target !== bookmark) {
+            input.abort();
+            return;
+          }
+          requestAnimationFrame(() => {
+            if (!input.signal.aborted && document.activeElement === bookmark && location.href === saved.page) restoreLink();
+            input.abort();
+          });
+        }, { once: true, signal: input.signal });
       });
     });
   }

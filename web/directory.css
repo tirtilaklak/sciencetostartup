@@ -41,8 +41,8 @@ html:has(#compare-tray:not([hidden])){scroll-padding-bottom:96px}
 @media(max-width:480px){#compare-tray .tray-link-extra{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
 
 /* Compare page controls: add a company, examples, clear. */
-.compare-tools{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:4px 16px;margin-bottom:12px}
-#compare-setup{min-width:0;max-width:100%}
+.compare-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px;margin-bottom:12px}
+#compare-setup{min-width:0;max-width:100%;margin:0}
 #compare-setup[open]{flex-basis:100%}
 #compare-setup-toggle{min-height:44px;padding:10px 4px;color:var(--green);cursor:pointer;overflow-wrap:anywhere}
 #copy-compare{min-height:44px;max-width:100%;white-space:normal;overflow-wrap:anywhere}

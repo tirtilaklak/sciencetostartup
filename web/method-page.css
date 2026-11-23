@@ -1,6 +1,8 @@
 /* A short About page. Readers open the detail they need. */
 .method-page{max-width:760px;margin-inline:auto;padding:28px 0 12px}
 .method-page [id]{scroll-margin-top:28px}
+/* The public About fragment is also the site navigation's page link. */
+.method-page #about{scroll-margin-top:100vh}
 .method-intro{padding:0 0 22px}
 .static-page .method-intro h1{margin:0 0 14px;font-size:2.5rem;line-height:1.1;font-weight:600;letter-spacing:-.045em}
 .method-intro p{max-width:52ch;margin:0;font-size:1.0625rem;line-height:1.65;color:var(--muted)}

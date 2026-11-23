@@ -3,7 +3,8 @@
 .bh-heading{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-bottom:16px}
 .bh-heading h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:32px;line-height:1.2;letter-spacing:-.7px;margin:0 0 12px;max-width:790px}
 .bh-heading p{font-size:15px;line-height:1.65;color:var(--bh-muted);max-width:700px;margin:0}
-.bh-heading>a{flex-shrink:0;display:inline-flex;align-items:center;min-height:44px;font-size:12px;color:var(--bh-green);text-underline-offset:4px}
+.bh-heading>a{flex-shrink:0;display:inline-flex;align-items:center;gap:.35em;min-height:44px;font-size:12px;color:var(--bh-green);text-underline-offset:4px}
+.bh-download-meta::before{content:"· "}
 .bh-tabs{display:flex;gap:5px;padding:5px;background:#e9eee6;border:1px solid var(--bh-line);border-radius:8px 8px 0 0}
 .bh-tile{flex:1;min-width:0;min-height:46px;padding:11px 12px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--bh-muted);font-size:13px;white-space:nowrap}
 .bh-tile strong{font-weight:600}
@@ -14,13 +15,13 @@
 .bh-compare-head h3{font-size:23px;letter-spacing:-.6px;line-height:1.3;margin:0 0 18px}
 .bh-chart-controls{display:grid;grid-template-columns:minmax(190px,1fr) minmax(260px,1.6fr);align-items:start;gap:16px;max-width:100%}
 .bh-chart-controls label,.bh-controls>label{display:flex;flex-direction:column;gap:6px;font-size:11px;font-weight:500;color:var(--bh-muted);min-width:0}
-.bh-chart-controls label:has(.bh-selected-value){display:grid;grid-template-columns:minmax(0,1fr)}
+:is(.bh-chart-controls,.bh-controls) label:has(.bh-selected-value){display:grid;grid-template-columns:minmax(0,1fr)}
 .bh-chart-controls select,.bh-selected-value,.bh-controls select,.bh-controls input[type=search]{background:#fff;border:1px solid #bcc7ba;border-radius:4px;color:var(--ink);min-height:44px;width:100%;min-width:0;font-size:13px;padding:9px 28px 9px 11px}
-.bh-chart-controls select:has(+.bh-selected-value),.bh-selected-value{grid-area:2 / 1}
-.bh-chart-controls select:has(+.bh-selected-value){opacity:0;position:relative;z-index:1;cursor:pointer}
+:is(.bh-chart-controls,.bh-controls) select:has(+.bh-selected-value),.bh-selected-value{grid-area:2 / 1}
+:is(.bh-chart-controls,.bh-controls) select:has(+.bh-selected-value){opacity:0;position:relative;z-index:1;cursor:pointer}
 .bh-selected-value{position:relative;align-content:center;font-weight:400;line-height:1.4;overflow-wrap:anywhere;pointer-events:none}
 .bh-selected-value::after{content:'';position:absolute;inset-inline-end:12px;top:50%;width:7px;height:7px;border:solid currentColor;border-width:0 1px 1px 0;transform:translateY(-70%) rotate(45deg)}
-.bh-chart-controls select:focus-visible+.bh-selected-value{outline:3px solid var(--green);outline-offset:2px}
+:is(.bh-chart-controls,.bh-controls) select:focus-visible+.bh-selected-value{outline:3px solid var(--green);outline-offset:2px}
 .bh-analysis-layout{display:block;min-width:0}
 .bh-chart-main{padding:23px 28px 25px;min-width:0}
 .bh-plot-group+.bh-plot-group{border-top:1px solid var(--bh-line);margin-top:24px;padding-top:22px}
@@ -129,7 +130,7 @@ html[data-bh-masthead-scroll]:has(#market-view:not([hidden]) .bh-coverage-disclo
  .bh-cell b{flex-wrap:wrap}
  .bh-cell .bh-grade{height:auto;min-height:16px}
 }
-@media(max-width:600px){#business-health{margin-top:28px}.bh-heading{margin-bottom:20px}.bh-heading h2{font-size:29px;letter-spacing:-.8px}.bh-heading p{font-size:14px}.bh-tabs{overflow-x:auto;scrollbar-width:thin;scroll-snap-type:x proximity;gap:3px;padding:4px}.bh-tile{flex:0 0 auto;min-width:96px;font-size:12px;min-height:44px;padding:10px 12px;scroll-snap-align:start}.bh-compare-head{padding:20px 16px}.bh-compare-head h3{font-size:21px;margin-bottom:16px}.bh-chart-controls{grid-template-columns:1fr;gap:12px}.bh-chart-controls select{font-size:12px}.bh-chart-main{padding:18px 13px 20px}.bh-bar{min-height:78px;padding:14px 7px}.bh-bar-name{font-size:12px}.bh-bar-value{font-size:17px;letter-spacing:-.45px}.bh-bar-track{height:11px}.bh-bar-fill.is-bound::after{top:2px;width:7px;height:7px}.bh-cohort-heading{font-size:10px}.bh-chart-note{font-size:11px}#bh-detail{padding:20px 18px}#bh-detail .bh-value{font-size:29px}.bh-evidence-links a,.bh-evidence-links button,.bh-profile,.bh-history-points button,.bh-related button{min-height:44px;font-size:12px}.bh-coverage-disclosure>summary{padding:16px 0;font-size:14px}.bh-controls{padding:16px;gap:12px}.bh-controls>label{flex-basis:calc(50% - 6px)}.bh-controls>.bh-search-label{flex-basis:100%}.bh-controls>.bh-check{flex-basis:100%}#bh-matrix-count{padding-inline:16px}.bh-key{padding-inline:16px}.bh-method p{font-size:12px}}
+@media(max-width:600px){.bh-heading p{font-size:14px}.bh-compare-head{padding:20px 16px}.bh-compare-head h3{font-size:21px;margin-bottom:16px}.bh-chart-controls{grid-template-columns:1fr;gap:12px}.bh-chart-controls select{font-size:12px}.bh-chart-main{padding:18px 13px 20px}.bh-bar{min-height:78px;padding:14px 7px}.bh-bar-name{font-size:12px}.bh-bar-value{font-size:17px;letter-spacing:-.45px}.bh-bar-track{height:11px}.bh-bar-fill.is-bound::after{top:2px;width:7px;height:7px}.bh-cohort-heading{font-size:10px}.bh-chart-note{font-size:11px}#bh-detail{padding:20px 18px}#bh-detail .bh-value{font-size:29px}.bh-evidence-links a,.bh-evidence-links button,.bh-profile,.bh-history-points button,.bh-related button{min-height:44px;font-size:12px}.bh-coverage-disclosure>summary{padding:16px 0;font-size:14px}.bh-controls{padding:16px;gap:12px}.bh-controls>label{flex-basis:calc(50% - 6px)}.bh-controls>.bh-search-label{flex-basis:100%}.bh-controls>.bh-check{flex-basis:100%}#bh-matrix-count{padding-inline:16px}.bh-key{padding-inline:16px}.bh-method p{font-size:12px}}
 @media(max-width:360px){.bh-bar-value{font-size:16px}}
 @media(forced-colors:active){.bh-tile[aria-selected=true],.bh-bar[aria-current]{outline:2px solid Highlight;outline-offset:-3px}.bh-bar-track{border:1px solid CanvasText}.bh-bar-fill{background:CanvasText}.bh-bar-fill.is-bound::after{border-color:CanvasText}.bh-bar-zero{background:CanvasText}.bh-svg-line,.bh-svg-point{stroke:CanvasText}}
 /* On phones, keep the first plotted value close to its controls. */
@@ -206,14 +207,17 @@ html[data-bh-masthead-scroll]:has(#market-view:not([hidden]) .bh-coverage-disclo
  .bh-ledger-company>a{font-size:15px}
 }
 @media(max-width:600px){
- .bh-heading{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-bottom:10px}
- .bh-heading>div{flex:1 0 auto;max-width:100%}
+ #business-health{margin-top:20px}
+ .bh-heading{display:flex;align-items:center;gap:6px 12px;margin-bottom:8px}
+ .bh-heading>div{min-width:0;overflow-wrap:anywhere}
  .bh-heading h2{font-size:28px;margin:0;letter-spacing:-.7px}
- .bh-heading>a{display:block;flex:1 0 min-content;max-width:100%;align-content:center;font-size:12px;text-align:end;margin:0;line-height:1.6;text-wrap:balance;overflow-wrap:break-word}
- .bh-overview-tabs{flex-wrap:wrap;gap:0 12px;justify-content:space-between}
- .bh-overview-tabs button{font-size:12px;gap:5px;padding:12px 0;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
- .bh-overview-tabs button span{font-size:10px;min-width:17px;height:auto;padding:0 4px}
- .bh-ledger-note{font-size:13px;margin:14px 0;line-height:1.5}
+ .bh-heading>a{flex-direction:column;align-items:flex-end;justify-content:center;gap:0;max-width:44%;margin:0;line-height:1.4;text-align:end;overflow-wrap:anywhere}
+ .bh-download-meta{font-size:11px;color:var(--bh-muted)}
+ .bh-download-meta::before{content:none}
+ .bh-overview-tabs{flex-wrap:wrap;gap:0 6px;justify-content:space-between}
+ .bh-overview-tabs button{font-size:12px;gap:4px;padding:10px 0;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+ .bh-overview-tabs button span{font-size:10px;min-width:0;height:auto;padding:0}
+ .bh-ledger-note{font-size:13px;margin:12px 0;line-height:1.5}
  .bh-ledger-head{display:none}
  #bh-ledger{border-top:1px solid var(--bh-line)}
  .bh-ledger-row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:'company value' 'period source';gap:6px 12px;padding:16px 0;min-height:100px}
@@ -231,6 +235,8 @@ html[data-bh-masthead-scroll]:has(#market-view:not([hidden]) .bh-coverage-disclo
  .bh-advanced{margin-top:18px}
  .bh-advanced>summary{font-size:14px;padding:16px 0}
  .bh-advanced>summary>span{font-size:12px}
+ .bh-tabs{flex-wrap:wrap;gap:5px;padding:6px}
+ .bh-tile{flex:1 1 30%;min-height:44px;padding:8px 4px;font-size:12px;white-space:normal;overflow-wrap:anywhere}
  .bh-bar{grid-template:"name value" auto "context context" auto "track track" auto / minmax(0,1fr) minmax(0,max-content);gap:4px 12px}
  .bh-bar-label{display:contents}
  .bh-bar-name{grid-area:name;overflow-wrap:anywhere}
@@ -244,10 +250,12 @@ html[data-bh-masthead-scroll]:has(#market-view:not([hidden]) .bh-coverage-disclo
  .bh-evidence-dialog .bh-history{padding:0 20px 24px}
  #business-health select,.bh-selected-value{font-size:16px}
 }
+@media(max-width:400px){
+ .bh-controls>label{flex-basis:100%}
+}
 @media(max-width:360px){
  .bh-heading h2{font-size:25px}
  .bh-overview-tabs{column-gap:4px}
- .bh-overview-tabs button span{padding-inline:2px}
  .bh-ledger-row{padding-inline:0;column-gap:8px}
  .bh-ledger-value{font-size:22px}
  .bh-source-action .ui-icon{display:none}

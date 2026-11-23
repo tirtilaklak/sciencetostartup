@@ -613,7 +613,7 @@ function syncCompareTools(ids){
  const leavingSetup=hasCompanies&&wasEmpty&&document.activeElement&&setup.contains(document.activeElement);
  clear.hidden=copy.hidden=!hasCompanies;
  copy.textContent='Copy comparison link';
- toggle.textContent=hasCompanies?`Edit companies (${ids.length} selected)`:'Choose up to three companies';
+ toggle.textContent=hasCompanies?`Edit ${ids.length} ${ids.length===1?'company':'companies'}`:'Choose up to three companies';
  if(!hasCompanies||wasEmpty)setup.open=!hasCompanies;
  if(leavingSetup)toggle.focus({preventScroll:true});
 }

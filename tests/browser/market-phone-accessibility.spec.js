@@ -131,6 +131,33 @@ async function expectUnavailableDialog(page, { heading, description, profile, di
   return dialog;
 }
 
+test('Market shows every chart tab and the full coverage group at 320px', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await openPage(page, '/explore/#business-health');
+  await expect(page.getByRole('link', { name: /^Download data.*JSON.*kB/ }))
+    .toHaveAttribute('href', '/business-health.json');
+  await page.locator('#bh-advanced > summary').click();
+  const tabs = page.getByRole('tablist', { name: 'Business measures' });
+  await expect(tabs.getByRole('tab')).toHaveCount(5);
+  expect(await tabs.evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
+  await expect(tabs.getByRole('tab', { name: 'Cash', exact: true })).toBeVisible();
+
+  const coverage = page.locator('.bh-coverage-disclosure');
+  await coverage.locator(':scope > summary').click();
+  const group = coverage.getByRole('combobox', { name: 'Business group' });
+  const label = 'AI training data & practice environments';
+  await group.selectOption({ label });
+  const value = group.locator('xpath=following-sibling::span');
+  await expect(value).toHaveText(label);
+  expect(await value.evaluate(node => {
+    const box = node.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    const lines = [...range.getClientRects()];
+    return lines.length > 1 && lines.every(line => line.left >= box.left && line.right <= box.right);
+  })).toBe(true);
+});
+
 test.describe('390px Chromium matrix', () => {
   test.describe.configure({ timeout: 60_000 });
   test.skip(({ browserName }) => browserName !== 'chromium', 'Exercise Chromium keyboard panning');

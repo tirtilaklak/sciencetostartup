@@ -274,6 +274,35 @@ test('Market marks the current observation by its exact ID', async ({ page }) =>
   await expect(cell).toHaveAttribute('aria-current', 'true');
 });
 
+test('Market keeps all reporting periods after inspecting a chart figure', async ({ page }) => {
+  const dialog = await openMarket(page);
+  await page.locator('#bh-advanced > summary').press('Enter');
+  const period = page.getByRole('combobox', { name: 'Reporting period & scope' });
+  await period.selectOption('');
+  const charts = page.locator('#bh-plot .bh-plot-group');
+  const count = await charts.count();
+  expect(count).toBeGreaterThan(1);
+
+  const bar = page.locator('#bh-plot button[data-bh-observation="appen.metric.major-financial_metrics-0"]');
+  await openEvidence(bar, dialog);
+  await page.keyboard.press('Escape');
+  await expect(bar).toBeFocused();
+  await expect(bar).toHaveAttribute('aria-current', 'true');
+  await expect(period).toHaveValue('');
+  await expect(charts).toHaveCount(count);
+});
+
+test('Market chart tabs preserve an explicit evidence matrix order', async ({ page }) => {
+  await openMarket(page);
+  await page.locator('.bh-coverage-disclosure > summary').press('Enter');
+  const order = page.getByRole('combobox', { name: 'Order', exact: true });
+  await order.selectOption('name');
+  await page.locator('#bh-advanced > summary').press('Enter');
+  await page.getByRole('tab', { name: 'Profitability' }).press('Enter');
+  await expect(order).toHaveValue('name');
+  await expect(page.locator('#bh-grid-head th[aria-sort]')).toHaveAttribute('aria-sort', 'ascending');
+});
+
 test('Market Back returns to the product link from both Market addresses', async ({ page }) => {
   await openMarket(page);
   const shortcut = page.getByRole('link', { name: 'Revenue & growth', exact: true });
