@@ -402,8 +402,9 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
     elif parent and parent[0] in {'papers', 'benchmarks'}:
         document_title += ' · ' + ('Research paper' if parent[0] == 'papers' else 'Benchmark')
     current_state = "page" if path == "/research/" or path.startswith("/research/editions/") else "true"
+    surface = {"/research/": " r-editorial-hub", REPORT_PATH: " r-editorial-report"}.get(path, "")
     text = sp.document(research, document_title + sp.SUFFIX, sp.truncate(description),
-                       sp.ORIGIN + path, '<div class="research wide">' + crumbs_html
+                       sp.ORIGIN + path, f'<div class="research wide{surface}">' + crumbs_html
                        + (_nav(path, historical=bool(edition)) if path != "/research/" and not company_page else "") + body + "</div>",
                        structured=structured, current="companies" if company_page else "research", state=current_state)
     extra = ('<link rel="stylesheet" href="/research.css">\n'
@@ -413,7 +414,7 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
              '<link rel="alternate" type="application/atom+xml" title="Research corrections" href="/research/corrections/atom.xml">\n')
     if company_page:
         extra += '<link rel="stylesheet" href="/company-profile.css">\n'
-    if page_type == 'Chapter' or path in {'/research/', '/research/papers/'}:
+    if page_type == 'Chapter' or path in {'/research/', '/research/papers/', REPORT_PATH}:
         extra += '<script src="/native-details.js" defer></script>\n'
     if page_type == 'Chapter' and path.endswith('/chapters/technical-landscape/'):
         # A history restoration needs the complete layout used when the reader
@@ -468,13 +469,7 @@ def _counts(context):
 
 
 def _browse(context):
-    cards = []
-    icons = {
-        "papers": '<path d="M7 3h7l4 4v14H7zM14 3v5h4M10 12h5M10 16h5"/>',
-        "datasets": '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0"/>',
-        "benchmarks": '<path d="M4 20V10h4v10M10 20V4h4v16M16 20v-7h4v7M3 20h18"/>',
-        "workflows": '<rect x="3" y="8" width="6" height="8" rx="1"/><rect x="15" y="8" width="6" height="8" rx="1"/><path d="M9 12h6m-3-3 3 3-3 3"/>',
-    }
+    entries = []
     for slug, title, kinds, description in CATEGORIES:
         rows = [e for e in context["graph"]["entities"] if e.get("kind") in kinds]
         approved = sum(e.get('status') == 'approved' for e in rows)
@@ -485,12 +480,12 @@ def _browse(context):
         elif slug == 'papers':
             approval_label = 'approved works and versions'
         candidate_label = "candidate" if candidate == 1 else "candidates"
-        cards.append(f'<article class="r-browse-card"><a class="r-browse-link" href="/research/{slug}/">'
-                     f'<svg class="r-browse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" '
-                     f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{icons[slug]}</svg>'
-                     f'<h3>{sp.escape(title)} <span aria-hidden="true">→</span></h3><p>{sp.escape(description)}</p>'
-                     f'<span class="r-record-count">{approved} {approval_label} · {candidate} {candidate_label}</span></a></article>')
-    return '<div class="r-browse-grid">' + "".join(cards) + "</div>"
+        candidate_count = f' · {candidate} {candidate_label}' if candidate else ''
+        entries.append(f'<li><a href="/research/{slug}/" aria-labelledby="browse-{slug}">'
+                       f'<strong id="browse-{slug}">{sp.escape(title)}</strong>'
+                       f'<span>{sp.escape(description)}</span>'
+                       f'<small>{approved} {approval_label}{candidate_count}</small></a></li>')
+    return '<ul class="r-editorial-directory-list">' + "".join(entries) + "</ul>"
 
 
 def _hub(context, editions=()):
@@ -500,24 +495,23 @@ def _hub(context, editions=()):
     archive_links = ('<section class="r-section"><h2>Published editions</h2><ul class="r-entity-list">'
                      + ''.join(f'<li>{_link(path, snapshot["report"]["release_id"])} · {_date(snapshot["report"]["updated_on"])}</li>'
                                for path, snapshot in editions) + '</ul></section>') if editions else ''
-    return ('<header class="r-hero"><div>'
-            '<h1>AI data research</h1><p class="r-lede">Papers and datasets on AI training, with evidence about the suppliers.</p>'
-            f'<p class="r-status">{_status(context)}</p>'
-            f'<p class="r-meta">Evidence snapshot {_date(context["graph"].get("as_of"))}</p></div>'
-            '<aside class="r-report-card" aria-label="Current research report">'
+    return ('<div class="r-editorial-front"><header class="r-editorial-feature">'
+            '<h1>AI data research</h1>'
+            f'<p class="r-kicker">Evidence snapshot · {_date(context["graph"].get("as_of"))}</p>'
             f'<h2>{sp.escape(report["title"])}</h2>'
-            f'<p>{len(report["sections"])} chapters on suppliers, human feedback, research methods and paid pilots.</p>'
-            '<div class="r-report-actions">'
-            f'{_link(REPORT_PATH, "Read the report →", "r-button")}'
-            f'{_link("/research/data/", "Data & sources", "r-text-link")}</div></aside></header>'
-            '<section class="r-section" aria-labelledby="browse">'
-            '<h2 id="browse">Browse the research</h2>' + _browse(context) + '</section>'
+            '<p class="r-editorial-deck">The report follows what data suppliers sell and what buyers can verify.</p>'
+            '<div class="r-report-actions r-editorial-actions">'
+            f'{_link(REPORT_PATH, "Read the report →")}'
+            f'{_link("/research/data/", "Data & sources")}</div></header>'
+            '<section class="r-editorial-directory" aria-labelledby="browse">'
+            '<h2 id="browse">Research index</h2>' + _browse(context) + '</section></div>'
             + operating_status_notice(context) +
             '<section class="r-section r-hub-details" aria-label="Report details">'
             '<details class="r-disclosure" id="chapters">'
             f'<summary>Report contents <span>{len(report["sections"])} chapters</span></summary>'
             f'<ol class="r-chapter-list">{chapters}</ol></details>'
             '<details class="r-disclosure" id="coverage"><summary>Publication status and coverage</summary>'
+            f'<p class="r-kicker">{sp.escape(_status(context))}</p>'
             f'{_meta(context)}'
             f'<p class="r-section-intro">{sp.escape(report.get("summary"))}</p>'
             '<p class="r-section-intro">Publication totals count suppliers, distinct paper works and dataset or benchmark families. '
@@ -842,7 +836,7 @@ def _reader_path(section, base=REPORT_PATH):
     return base + 'chapters/' + _path_token(section['id']) + '/'
 
 
-def _reader_toc(context, current, base=REPORT_PATH, legacy_targets=False, *, collapsible=False):
+def _reader_toc(context, current, base=REPORT_PATH, legacy_targets=False, *, collapsible=False, open_by_default=False):
     rows = []
     return_attr = ' data-disclosure-return' if collapsible else ''
     for section in context['report']['sections']:
@@ -857,7 +851,8 @@ def _reader_toc(context, current, base=REPORT_PATH, legacy_targets=False, *, col
                   + '<ol>' + ''.join(rows) + '</ol>'
                   + _link('/research/data/', 'Inspect coverage & evidence →', 'r-text-link', disclosure_return=collapsible) + '</nav>')
     if collapsible:
-        return ('<details class="r-chapter-index"><summary id="contents">In this report '
+        initial_state = ' open' if open_by_default else ''
+        return ('<details class="r-chapter-index"' + initial_state + '><summary id="contents">In this report '
                 + f'<span>{len(rows)} chapters</span></summary>' + navigation + '</details>')
     return navigation
 
@@ -921,23 +916,42 @@ def _reader_citation(context, edition=False):
 def _report(context, edition=False, base=REPORT_PATH):
     report = context['report']
     section = report['sections'][0]
-    state = 'Published edition' if edition else _status(context)
-    shortcuts = _reader_shortcuts(chapter_count=0 if edition else len(report['sections']))
-    header = (f'<header class="r-page-head"><p class="r-kicker">{sp.escape(state)}</p>'
-              f'<h1>{sp.escape(report["title"])}</h1>' + shortcuts
-              + f'<p class="r-lede">{sp.escape(report.get("subtitle"))}</p>'
-              + _meta(context) + '<p class="r-callout">' + sp.escape(report.get('summary')) + '</p>'
-              + '<p class="r-meta">' + sp.escape(report.get('review_statement')) + '</p>'
-              + _reader_downloads(context, edition=edition) + '</header>')
     body = ('<section class="r-chapter" id="' + sp.escape(section['id']) + '" tabindex="-1"><h2>'
             + sp.escape(section['title']) + '</h2>'
             + _chapter_content(context, section, ())
             + _findings(context, edition=edition) + '</section>'
             + _reader_navigation(context, section['id'], base) + _reader_citation(context, edition))
-    return (header + ('' if edition else operating_status_notice(context))
-            + '<div class="r-report-layout r-book-reader">'
-            + _reader_toc(context, section['id'], base, legacy_targets=True)
-            + '<div class="r-report-body">' + body + '</div></div>')
+    if edition:
+        header = ('<header class="r-page-head"><p class="r-kicker">Published edition</p>'
+                  f'<h1>{sp.escape(report["title"])}</h1>' + _reader_shortcuts()
+                  + f'<p class="r-lede">{sp.escape(report.get("subtitle"))}</p>'
+                  + _meta(context) + '<p class="r-callout">' + sp.escape(report.get('summary')) + '</p>'
+                  + '<p class="r-meta">' + sp.escape(report.get('review_statement')) + '</p>'
+                  + _reader_downloads(context, edition=True) + '</header>')
+        return (header + '<div class="r-report-layout r-book-reader">'
+                + _reader_toc(context, section['id'], base, legacy_targets=True)
+                + '<div class="r-report-body">' + body + '</div></div>')
+    header = ('<header class="r-editorial-cover">'
+              f'<p class="r-kicker">{sp.escape(_status(context))}</p>'
+              f'<h1>{sp.escape(report["title"])}</h1>'
+              '<p class="r-editorial-deck">The report compares AI data suppliers by what buyers pay for.</p>'
+              + _reader_shortcuts(chapter_count=len(report['sections']))
+              + '<details class="r-editorial-edition"><summary>Edition details and downloads</summary>'
+              + _meta(context) + f'<p>{sp.escape(report.get("subtitle"))}</p>'
+              + f'<p>{sp.escape(report.get("summary"))}</p>'
+              + f'<p>{sp.escape(report.get("review_statement"))}</p>'
+              + _reader_downloads(context) + '</details>'
+              + operating_status_notice(context) + '</header>')
+    # Default open for script-free browsing and legacy chapter fragments. Close on
+    # narrow initial visits, except when the location targets this chapter index.
+    mobile_contents = (
+        '<script>(()=>{const toc=document.currentScript.previousElementSibling;'
+        'let target=null;try{target=document.getElementById(decodeURIComponent(location.hash.slice(1)));}catch{}'
+        'if(matchMedia("(max-width: 720px)").matches&&!toc.contains(target))toc.open=false;})();</script>'
+    )
+    return ('<div class="r-editorial-reading r-book-reader">' + header
+            + _reader_toc(context, section['id'], base, legacy_targets=True, collapsible=True, open_by_default=True)
+            + mobile_contents + '<div class="r-report-body">' + body + '</div></div>')
 
 
 def _reader_chapter(context, section, base=REPORT_PATH, edition=False):

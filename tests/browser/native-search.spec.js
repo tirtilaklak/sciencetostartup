@@ -17,8 +17,11 @@ test.describe('without JavaScript', () => {
       expect(size.height).toBeGreaterThanOrEqual(44);
       await browse.press('Enter');
       await expect(page).toHaveURL('/#browse-guide');
-      await expect(page.getByRole('navigation', { name: 'Browse the guide' }).getByRole('link'))
-        .toHaveText(['Companies', 'Paid work', 'Research']);
+      const links = page.getByRole('navigation', { name: 'Browse the guide' }).getByRole('link');
+      await expect(links).toHaveCount(3);
+      for (const [index, label] of ['Companies', 'Paid work', 'Research'].entries()) {
+        await expect(links.nth(index)).toHaveAccessibleName(label);
+      }
     });
   }
 });

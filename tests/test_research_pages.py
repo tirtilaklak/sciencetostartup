@@ -384,8 +384,8 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
                 else:
                     self.assertIn(rp.WITHHELD_PARAGRAPH, chapter)
             self.assertEqual([script for script in chapter_facts.scripts if 'src' in script],
-                             ([{'src': '/native-details.js', 'defer': None}] if index else [])
-                             + [{'src': '/guide-search-shell.js', 'defer': None}])
+                             [{'src': '/native-details.js', 'defer': None},
+                              {'src': '/guide-search-shell.js', 'defer': None}])
             self.assertNotIn('type="module"', chapter)
             tree = ReaderTree(chapter)
             shortcuts = tree.with_class('r-bulk-shortcuts')[0]
@@ -411,8 +411,11 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
                 self.assertNotIn('data-reader-enhanced', next(
                     item['attrs'] for item in tree.elements if item['tag'] == 'html'))
                 self.assert_native_reading_guard(ReaderTree.text(guards[0]))
+            elif index == 0:
+                self.assertEqual(len(guards), 1)
+                self.assertIn('toc.open=false', ReaderTree.text(guards[0]))
             else:
-                self.assertEqual(guards, [], 'Only the technical chapter permits the reading guard')
+                self.assertEqual(guards, [], 'Other chapters need no inline enhancement')
             toc = tree.with_class('r-reader-toc')[0]
             toc_links = [item['children'][0] for listing in toc['children']
                          if isinstance(listing, dict) and listing['tag'] == 'ol'

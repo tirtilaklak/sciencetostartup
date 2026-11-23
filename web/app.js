@@ -825,7 +825,7 @@ const historyKey=()=>window.navigation?.currentEntry?.key||history.state?.stsEnt
 function ensureHistoryEntryKey(){if(!window.navigation&&!history.state?.stsEntryKey)history.replaceState({...history.state,stsEntryKey:historySessionKey+':'+(++historyEntrySequence)},'');}
 // Pair a fragment opener with the entry it actually opened before async rendering runs.
 const exploreFragmentDestinations=new Map();
-let exploreEntryKey,explorePreviousKey,pendingExploreLink;
+let exploreEntryKey,explorePreviousKey,exploreFragmentURL,exploreReplacementURL,pendingExploreLink;
 // Pair the directory entry with the Compare entry opened from its tray. Compare edits replace
 // their own URL, and a reload can still find the originating directory entry on Back.
 let pendingShortlist=null,compareShortlistSource=onCompareRoute()?history.state?.compareShortlistSource:null;
@@ -837,10 +837,12 @@ function rememberShortlistOrigin(event){
  history.replaceState({...history.state,shortlist},'');
  pendingShortlist={hash:link.getAttribute('href'),key:historyKey()};
 }
-window.addEventListener('hashchange',()=>{
- ensureHistoryEntryKey();
- explorePreviousKey=exploreEntryKey;
+// Back can commit before the outgoing fragment's hashchange is delivered.
+function rememberExploreEntry(previousKey,traversed){
+ routeTraversal=traversed;
+ explorePreviousKey=previousKey;
  exploreEntryKey=historyKey();
+ exploreFragmentURL=location.href;
  if(!routeTraversal&&pendingExploreLink&&pendingExploreLink.key===explorePreviousKey&&pendingExploreLink.destination===location.href){
   exploreFragmentDestinations.set(explorePreviousKey,exploreEntryKey);
  }
@@ -850,7 +852,7 @@ window.addEventListener('hashchange',()=>{
   compareShortlistSource=history.state?.compareShortlistSource;
  }
  pendingShortlist=null;
-});
+}
 function shortlistReturnState(wasTraversal=routeTraversal){
  return wasTraversal&&compareShortlistSource&&historyKey()===compareShortlistSource?history.state?.shortlist:null;
 }
@@ -916,13 +918,34 @@ const keepEntryScroll=()=>{
 window.addEventListener('scroll',()=>{clearTimeout(entryScrollTimer);entryScrollTimer=setTimeout(keepEntryScroll,300);},{passive:true});
 window.addEventListener('pagehide',keepEntryScroll);
 // A new fragment can also fire popstate. Only an existing Explore entry carries its key.
-if(!window.navigation)window.addEventListener('popstate',event=>{clearTimeout(entryScrollTimer);if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();routeTraversal=Boolean(event.state?.stsEntryKey);});
+if(!window.navigation)window.addEventListener('popstate',event=>{
+ clearTimeout(entryScrollTimer);
+ if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();
+ ensureHistoryEntryKey();
+ rememberExploreEntry(exploreEntryKey,Boolean(event.state?.stsEntryKey));
+});
 // An in-page link saves the position at once, before the new entry exists. So an entry the reader left by a link
 // always has one, and a new entry has none until the reader scrolls it (profiles-v2.js reads that).
 if(!window.navigation)document.addEventListener('click',e=>{const link=e.target?.closest?.('a[href^="#"]');if(normalSelfLinkActivation(e,link))keepEntryScroll();},true);
 // history.replaceState() from any page script clears that state, so keep the position again afterwards.
-window.navigation?.addEventListener('currententrychange',event=>{if(event.navigationType==='replace')keepEntryScroll();});
-window.navigation?.addEventListener('navigate',event=>{if(event.navigationType==='replace')return;if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();const top=keepEntryScroll(),key=historyKey();if(key)entryScroll.set(key,top);routeTraversal=event.destination.sameDocument&&event.navigationType==='traverse';});
+window.navigation?.addEventListener('currententrychange',({from,navigationType})=>{
+ if(navigationType==='replace'){
+  const fragment=exploreReplacementURL===location.href;
+  exploreReplacementURL=null;
+  if(fragment)rememberExploreEntry(from?.key,false);
+  keepEntryScroll();
+ }else if(navigationType==='push'||navigationType==='traverse')rememberExploreEntry(from?.key,navigationType==='traverse');
+});
+window.navigation?.addEventListener('navigate',event=>{
+ if(event.navigationType==='replace'){
+  // A location.replace() fragment fires hashchange. A history.replaceState() edit does not.
+  exploreReplacementURL=event.hashChange?event.destination.url:null;
+  return;
+ }
+ if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();
+ const top=keepEntryScroll(),key=historyKey();
+ if(key)entryScroll.set(key,top);
+});
 // Hidden pages are set up the first time they open; idle time fills in their filters and method
 // text. The overview and the company cards render on first visit only. The Node test stub has no
 // requestIdleCallback or requestAnimationFrame, so there initialize() sets everything up at once,
@@ -1462,7 +1485,10 @@ function initialize(){$('snapshot').textContent=compiledSnapshotLabel(DATA.meta.
  if(typeof requestIdleCallback!=='function'&&typeof requestAnimationFrame!=='function'){for(const view of ['companies','method','work'])preparePage(view);renderDirectory();preparePage('market');}
  route();initCompare();if(typeof initSiteNav==='function')initSiteNav();
  $('close-company').addEventListener('click',()=>$('company-dialog').close());$('close-evidence').addEventListener('click',()=>$('evidence-dialog').close());
- document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||(state.selected.length?compareSettingsFocus():$('compare-add'));next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});window.addEventListener('hashchange',route);
+ document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||(state.selected.length?compareSettingsFocus():$('compare-add'));next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});
+ window.addEventListener('hashchange',event=>{
+  if(!event.newURL||!exploreFragmentURL||event.newURL===exploreFragmentURL)route.call(window,event);
+ });
  // On small screens the Filters fields open as a panel under the button. A short screen can leave the whole panel
  // below the fold, so bring it into view when it opens. toggle does not bubble, so listen in the capture phase.
  document.addEventListener('toggle',e=>{const panel=e.target;if(!panel?.open||!panel.matches?.('.responsive-filter-panel,.more-filters'))return;if(panel.matches('.responsive-filter-panel')&&window.innerWidth>900)return;const fields=panel.querySelector('.responsive-filter-fields,.more-filters-panel'),box=fields?.getBoundingClientRect();if(box?.height&&box.bottom>window.innerHeight)fields.scrollIntoView({block:'nearest'});},true);

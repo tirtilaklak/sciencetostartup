@@ -123,6 +123,46 @@ test('Market Back returns to the exact Appen link in the revenue ledger and evid
   }
 });
 
+test('Market Back restores the ledger link when the profile hashchange arrives late', async ({ page }) => {
+  await page.addInitScript(() => {
+    let pendingProfileChange;
+    addEventListener('hashchange', event => {
+      if (!event.isTrusted) return;
+      const { oldURL, newURL } = event;
+      if (!window.heldMarketProfileChange && oldURL.endsWith('#market') && newURL.endsWith('#company/appen')) {
+        // Delay the profile route until Back has committed, as a busy browser can.
+        pendingProfileChange = { oldURL, newURL };
+        window.heldMarketProfileChange = true;
+        event.stopImmediatePropagation();
+      } else if (pendingProfileChange && oldURL.endsWith('#company/appen') && newURL.endsWith('#market')) {
+        dispatchEvent(new HashChangeEvent('hashchange', pendingProfileChange));
+        pendingProfileChange = null;
+      }
+    }, true);
+  });
+  await openMarket(page);
+  const ledger = page.locator('#bh-ledger').getByRole('link', { name: 'Appen', exact: true });
+  await ledger.press('Enter');
+  await expect(page).toHaveURL(/#company\/appen$/);
+  await page.waitForFunction(() => window.heldMarketProfileChange);
+
+  await page.goBack();
+  await expect(page).toHaveURL(/#market$/);
+  await expect(ledger).toBeFocused();
+  await expect(ledger).toBeInViewport({ ratio: 1 });
+
+  await page.goForward();
+  await expect(page.locator('#profile-view h1')).toHaveText('Appen');
+  await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+  await page.goBack();
+  await expect(ledger).toBeFocused();
+
+  await page.evaluate(() => { location.hash = '#companies'; });
+  await expect(page.locator('#companies-view h1')).toBeFocused();
+  await page.evaluate(() => location.replace('#business-health'));
+  await expect(page.locator('#business-health-heading')).toBeFocused();
+});
+
 test('Market restores RWS focus after an alternate observation and nested claim', async ({ page }) => {
   const dialog = await openMarket(page);
 

@@ -1024,15 +1024,16 @@ def cta(href, label):
     return f'<a class="cta" href="{escape(href)}">{escape(label)}{RIGHT_ARROW}</a>'
 
 
-def site_header(current=None, state="page", *, browse_fallback=False):
+def site_header(current=None, state="page", *, browse_fallback=False, editorial=False):
     links = "".join(f'<a href="{ORIGIN}{path}"' + (f' aria-current="{state}"' if key == current else "") + f">{label}</a>" for key, label, path in NAV)
     nav = f'<nav class="site-nav" aria-label="Main">{links}</nav>'
     search_label = "Browse" if browse_fallback else "Search"
     search_href = "/#browse-guide" if browse_fallback else "/?search=#browse-guide"
     browse_marker = " data-guide-browse" if browse_fallback else ""
     icon_hidden = " hidden" if browse_fallback else ""
+    masthead = "site-header editorial-masthead" if editorial else "site-header"
     return ('<a class="skip" href="#main">Skip to content</a>\n'
-            f'<header class="site-header"><a class="wordmark" href="{ORIGIN}/"><span>{SITE_NAME}<small>The AI data field guide</small></span></a>'
+            f'<header class="{masthead}"><a class="wordmark" href="{ORIGIN}/"><span>{SITE_NAME}<small>The AI data field guide</small></span></a>'
             f'{nav}<a class="site-search-open"{browse_marker} href="{search_href}" aria-label="{search_label} the guide"><svg class="ui-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false"{icon_hidden}><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span class="site-search-label">{search_label}</span></a>'
             f'<details class="site-menu"><summary>Menu</summary>{nav}</details></header>\n')
 
@@ -1112,7 +1113,9 @@ def document(research, title, description, canonical, body, structured=None, cur
                      if canonical and not path.startswith(search_exclusions) else "")
     # Keep the archived Daily header markup in dated issues.
     browse_fallback = bool(search_script) and (path == "/daily/" or not path.startswith("/daily/"))
-    return "".join(head) + "</head>\n<body class=\"static-page\">\n" + site_header(current, state, browse_fallback=browse_fallback) + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + details_script + search_script + '</body>\n</html>\n'
+    editorial = path in ("/companies/", "/work/", "/research/") or path.startswith("/research/state-of-ai-data-labs/")
+    header = site_header(current, state, browse_fallback=browse_fallback, editorial=editorial)
+    return "".join(head) + "</head>\n<body class=\"static-page\">\n" + header + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + details_script + search_script + '</body>\n</html>\n'
 
 # ---------------------------------------------------------------------------
 # Company pages
@@ -1988,7 +1991,6 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
     order = group_order(groups)
     nonprofit = len(groups.get("Nonprofit research", []))
     compiled = f" · {'historical ' if current_entries else ''}research compiled {format_date(research.as_of)}" if research.as_of else ""
-    logos = {row['company_id']: row for row in json.loads((ROOT / 'data/logo-provenance.json').read_text()).get('logos', []) if row.get('status') == 'verified' and row.get('local_path')}
     body = ['<link rel="stylesheet" href="/companies-page.css">', crumb_nav(crumbs, "directory-crumbs"),
             '<header class="directory-intro"><h1>AI data companies</h1></header>',
             '<form class="directory-filters" id="company-filters" role="search" hidden><label>Search companies<input type="search" id="company-query" name="q" placeholder="Name, offering, or specialty" autocomplete="off"></label><label>Business group<select id="company-group" name="group"><option value="">All groups</option>' + ''.join(f'<option value="{group_slug(g)}">{escape(labels.get(g, g))}</option>' for g in order) + '</select></label><button type="reset">Clear</button></form>',
@@ -2003,8 +2005,6 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
         for c in groups[g]:
             cid, name = c['id'], clean(c['name'])
             summary = clean((editorial_by_id.get(cid) or {}).get('summary')) or shown_text(research, c.get('description'))
-            logo = logos.get(cid)
-            brand = (f'<span class="directory-logo {"on-dark" if logo.get("background") == "dark" else ""}"><img src="/{escape(logo["local_path"])}" alt="" width="40" height="40" loading="lazy"></span>' if logo else '')
             current_entry = current_by_id.get(cid)
             aliases = list(c.get("aliases", []))
             if current_entry:
@@ -2018,10 +2018,15 @@ def render_index(research, companies, editorial_by_id, labels, work_count, modif
                 content = current_company_html(current_entry, current_reviewed_on, compact=True)
                 compare_link = ''
             else:
-                content = f'<p>{escape(summary)}</p>{business_observation_html(research, business_health, cid, inline=True)}{current_facts_html((profile_by_id or {}).get(cid))}'
+                evidence = business_observation_html(research, business_health, cid, inline=True) + current_facts_html((profile_by_id or {}).get(cid))
+                content = f'<p class="directory-company-summary">{escape(summary)}</p>'
+                if evidence:
+                    content += f'<div class="directory-company-evidence">{evidence}</div>'
                 compare_link = f'<a class="directory-compare" href="/explore/#compare/{escape(cid)}" aria-label="Compare {escape(name)}">Compare</a>'
-            items.append(f'<li class="directory-company" data-company="{escape(cid)}" data-search="{escape(search_text)}"{matching}><div class="directory-company-heading">{brand}<h3><a href="{ORIGIN}/company/{escape(cid)}/">{escape(name)}{RIGHT_ARROW}</a></h3>{compare_link}</div>{content}</li>')
-        body.append(f'<section class="directory-section" data-group="{group_slug(g)}"><div class="directory-section-heading"><h2 id="{group_slug(g)}" tabindex="-1">{escape(labels.get(g, g))}</h2><span>{plural(len(groups[g]), "company", "companies")}</span></div><ul class="index-list directory-grid">{"".join(items)}</ul></section>\n')
+            items.append(f'<li class="directory-company" data-company="{escape(cid)}" data-search="{escape(search_text)}"{matching}><div class="directory-company-heading"><h3><a href="{ORIGIN}/company/{escape(cid)}/">{escape(name)}{RIGHT_ARROW}</a></h3>{compare_link}</div>{content}</li>')
+        body.append(f'<section class="directory-section" data-group="{group_slug(g)}"><div class="directory-section-heading"><h2 id="{group_slug(g)}" tabindex="-1">{escape(labels.get(g, g))}</h2><span>{plural(len(groups[g]), "company", "companies")}</span></div>'
+                    '<div class="directory-columns" aria-hidden="true"><span>Company</span><span>What it does</span><span>Evidence &amp; sources</span></div>'
+                    f'<ul class="index-list directory-grid">{"".join(items)}</ul></section>\n')
     missing = [name for name in NOT_YET_PROFILED if not any(name.casefold() in row["name"].casefold().split(" / ") for row in current_entries)]
     remaining = f' Firms not yet listed in this directory include {escape(join_words(missing))}.' if missing else ''
     scope = f'<p>Choose up to three of {plural(historical_count, "historical profile")} in Compare.</p>'
@@ -2071,7 +2076,9 @@ def work_table(research, rows, names, key, *, include_kind=True, ordered_ids=Non
     if ordered_ids is not None and (len(ordered_ids) != len(out) or set(ordered_ids) != out.keys()):
         raise ValueError(f"Work card membership differs from the browser's {key} group")
     render_order = out if ordered_ids is None else ordered_ids
-    return f'<ul class="work-listings">{"".join(out[record_id] for record_id in render_order)}</ul>\n'
+    columns = ('<div class="work-listing-columns" aria-hidden="true"><span>Role</span>'
+               '<span>Recorded pay &amp; location</span><span>Review</span></div>') if key == "named" else ""
+    return columns + f'<ul class="work-listings">{"".join(out[record_id] for record_id in render_order)}</ul>\n'
 
 
 def render_work(research, routes, names, modified, work_results=None, work_script=None):
@@ -2143,7 +2150,7 @@ def render_work(research, routes, names, modified, work_results=None, work_scrip
             '<div class="work-page-list">']
     for key, label, note in groups:
         if not buckets[key]: continue
-        fallback = '<noscript><p class="work-no-js-message">Filters need JavaScript. Showing the full directory.</p></noscript>'
+        fallback = '<noscript><p class="work-no-js-message">Filters need JavaScript.</p></noscript>'
         common_kind = WORK_KIND_LABELS[work_kind(buckets[key][0])] if key in ("named", "programs", "boards") else ""
         kind_attr = f' data-work-kind-label="{escape(common_kind)}"' if common_kind else ""
         cards = work_table(research, buckets[key], names, key, include_kind=not common_kind, ordered_ids=ranked.get(key))

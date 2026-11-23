@@ -1,6 +1,22 @@
 /* Shared field-guide components. This is the final public presentation layer.
    Sizes are defaults, not fixed containers: text and binding conditions may grow. */
 :root{--fg-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--fg-body:1rem;--fg-meta:.875rem;--fg-caption:.8125rem;--fg-content:1232px}
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("/assets/fonts/instrument-serif-regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+:root {
+  --print-paper: #f6f3ea;
+  --print-ink: #142a29;
+  --print-link: #205846;
+  --print-rule: #cbc7b9;
+  --print-control: #73766b;
+  --print-muted: #4c5952;
+  --print-display: "Instrument Serif", Georgia, serif;
+}
 *,*::before,*::after{box-sizing:border-box}
 body{font-family:var(--fg-sans);font-size:var(--fg-body);line-height:1.5;-webkit-font-smoothing:antialiased}
 [hidden]{display:none!important}

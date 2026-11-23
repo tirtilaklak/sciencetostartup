@@ -18,7 +18,6 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://sciencetostartup.com/#website","name":"ScienceToStartup","url":"https://sciencetostartup.com/","description":"Explore {{DIRECTORY_COUNT}} AI data companies and paid AI training work with published pay and requirements. Read research and check the original sources.","inLanguage":"en","publisher":{"@id":"https://sciencetostartup.com/#publisher"}},{"@type":"Person","@id":"https://sciencetostartup.com/#publisher","name":"Musa Ozdem","url":"https://sciencetostartup.com/method/#about","sameAs":["https://musaeminozdem.com"]},{"@type":"Dataset","@id":"https://sciencetostartup.com/#dataset","name":"ScienceToStartup research database","description":"Historical public-source research on {{COMPANY_COUNT}} AI data companies. Company claims and financial figures retain their dates, evidence grades and source records.","url":"https://sciencetostartup.com/method/","version":"{{DATASET_VERSION}}","license":"https://creativecommons.org/licenses/by/4.0/","isAccessibleForFree":true,"creator":{"@id":"https://sciencetostartup.com/#publisher"},"publisher":{"@id":"https://sciencetostartup.com/#publisher"},"distribution":[{"@type":"DataDownload","encodingFormat":"application/json","contentUrl":"https://sciencetostartup.com/research.json"},{"@type":"DataDownload","encodingFormat":"application/vnd.sqlite3","contentUrl":"https://sciencetostartup.com/observatory.sqlite"},{"@type":"DataDownload","encodingFormat":"text/csv","contentUrl":"https://sciencetostartup.com/companies.csv"},{"@type":"DataDownload","encodingFormat":"text/csv","contentUrl":"https://sciencetostartup.com/claims.csv"}]}]}</script>
 
 <link rel="preload" href="/assets/fonts/instrument-serif-regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/instrument-serif-italic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/field-guide.css">
 <link rel="stylesheet" href="/landing.css">
 <script src="/home-runtime.js" defer></script>
@@ -53,23 +52,32 @@
 <main id="main" tabindex="-1">
 <div class="home-front">
 <section id="browse-guide" class="hero" aria-labelledby="hero-title" tabindex="-1">
-<h1 id="hero-title">Who makes <em>AI training data?</em></h1>
-<p class="hero-intro">Company profiles and paid AI training work, with original sources.</p>
+<div class="hero-lead">
+<h1 id="hero-title">The business of <span>AI training data</span></h1>
+<p class="hero-intro">See what suppliers sell. Check the pay and terms for training work.</p>
 <nav class="hero-actions" aria-label="Browse the guide">
-<a class="primary-link" href="/companies/">Companies</a>
-<a class="primary-link work-link" href="/work/">Paid work</a>
-<a class="research-link" href="/research/">Research</a>
+<a href="/companies/" aria-labelledby="home-companies" aria-describedby="home-companies-detail"><span id="home-companies">Companies</span><span id="home-companies-detail" class="hero-link-detail"><strong data-count="companies">{{DIRECTORY_COUNT}}</strong> profiles</span><span class="hero-link-arrow" aria-hidden="true">→</span></a>
+<a href="/work/" aria-labelledby="home-work" aria-describedby="home-work-detail"><span id="home-work">Paid work</span><span id="home-work-detail" class="hero-link-detail"><strong data-count="work">{{PRIMARY_WORK_COUNT}}</strong> listings and programs</span><span class="hero-link-arrow" aria-hidden="true">→</span></a>
+<a href="/research/" aria-labelledby="home-library" aria-describedby="home-library-detail"><span id="home-library">Research</span><span id="home-library-detail" class="hero-link-detail">Papers and data</span><span class="hero-link-arrow" aria-hidden="true">→</span></a>
 </nav>
-<div class="proof-strip"><p><strong data-count="companies">{{DIRECTORY_COUNT}}</strong> company profiles</p><p><strong data-count="work">{{PRIMARY_WORK_COUNT}}</strong> listings and programs</p></div>
+</div>
+<article class="home-report" aria-labelledby="home-report-title">
+<div class="home-report-line"><p>Evidence snapshot</p><time datetime="2026-11-12">12 Nov 2026</time></div>
+<h2 id="home-report-title">State of AI Data Labs and Human Feedback</h2>
+<p class="home-report-intro">Prolific offers access to participants and managed data collection. The report shows what buyers get in each case.</p>
+<a href="/research/state-of-ai-data-labs/">Read the report <span aria-hidden="true">→</span></a>
+</article>
 </section>
 <section class="home-examples" aria-labelledby="examples-title">
-<div class="examples-heading"><h2 id="examples-title">From the guide</h2><a href="/research/data/">Sources and data</a></div>
+<h2 id="examples-title" class="sr-only">Selected company and work records</h2>
 <div class="example-grid">{{HOME_COMPANY_EXAMPLE}}<div class="example-work"><div id="home-work-recorded">{{HOME_WORK_EXAMPLE}}</div><div id="home-work-example" hidden></div></div></div>
 </section>
 </div>
-<section id="research" class="research" aria-labelledby="research-title">
+<section id="research" class="home-methods" aria-labelledby="research-title">
 <h2 id="research-title">Sources and methods</h2>
-<div><p>Company figures keep their source and reporting date. Estimates are labeled. Paid work records show when we checked the terms.</p><a href="/method/#method-notes">Read the methods</a></div>
+<p>Figures come with a source and a reporting date.</p>
+<a href="/method/#method-notes">Methods</a>
+<a href="/research/data/">Research data</a>
 </section>
 </main>
 <footer class="site-footer"><div class="footer-line"><p>ScienceToStartup <span>by Musa Ozdem</span></p><nav aria-label="Footer"><a href="/method/#about">About</a><a href="/method/#downloads">Historical company data</a><a href="/method/#corrections">Corrections</a><a href="/method/#disclosures">Disclosures</a></nav></div></footer>
