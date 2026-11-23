@@ -836,7 +836,7 @@ def _reader_path(section, base=REPORT_PATH):
     return base + 'chapters/' + _path_token(section['id']) + '/'
 
 
-def _reader_toc(context, current, base=REPORT_PATH, legacy_targets=False):
+def _reader_toc(context, current, base=REPORT_PATH, legacy_targets=False, *, collapsible=False):
     rows = []
     for section in context['report']['sections']:
         sid = section['id']
@@ -845,9 +845,14 @@ def _reader_toc(context, current, base=REPORT_PATH, legacy_targets=False):
         path = _reader_path(section, base) + ('#' + _token(sid) if target else '')
         rows.append('<li' + target + '><a href="' + sp.escape(path) + '"'
                     + active + '>' + sp.escape(section['title']) + '</a></li>')
-    return ('<nav class="r-toc r-reader-toc" aria-label="Report chapters"><h2 id="contents">In this report</h2>'
-            '<ol>' + ''.join(rows) + '</ol>'
-            + _link('/research/data/', 'Inspect coverage & evidence →', 'r-text-link') + '</nav>')
+    heading = '' if collapsible else '<h2 id="contents">In this report</h2>'
+    navigation = ('<nav class="r-toc r-reader-toc" aria-label="Report chapters">' + heading
+                  + '<ol>' + ''.join(rows) + '</ol>'
+                  + _link('/research/data/', 'Inspect coverage & evidence →', 'r-text-link') + '</nav>')
+    if collapsible:
+        return ('<details class="r-chapter-index"><summary id="contents">In this report '
+                + f'<span>{len(rows)} chapters</span></summary>' + navigation + '</details>')
+    return navigation
 
 
 def _has_pre_registration_report(archive):
@@ -937,7 +942,11 @@ def _reader_chapter(context, section, base=REPORT_PATH, edition=False):
     passages = tuple(_chapter_shortcuts(context, section, assertions))
     shortcuts = _reader_shortcuts(outline, passages)
     early_shortcuts = bool(outline or passages) or section['id'] in EARLY_READER_SHORTCUTS
-    header = ('<header class="r-page-head"><p class="r-kicker">Chapter ' + str(index + 1) + ' of '
+    head_class = 'r-page-head' if edition else 'r-page-head r-current-chapter-head'
+    layout_class = 'r-report-layout r-book-reader'
+    if not edition:
+        layout_class += ' r-current-chapter-layout'
+    header = (f'<header class="{head_class}"><p class="r-kicker">Chapter ' + str(index + 1) + ' of '
               + str(len(report['sections'])) + ' · ' + sp.escape(_status(context)) + '</p>'
               + '<p class="r-reader-book-title">' + _link(base, report['title']) + '</p>'
               + '<h1 id="' + sp.escape(section['id']) + '" tabindex="-1">' + sp.escape(section['title']) + '</h1>'
@@ -945,8 +954,8 @@ def _reader_chapter(context, section, base=REPORT_PATH, edition=False):
     body = ('<section class="r-chapter r-reader-chapter-content" aria-labelledby="' + sp.escape(section['id']) + '">'
             + _chapter_content(context, section, outline, passages) + '</section>'
             + _reader_navigation(context, section['id'], base) + _reader_citation(context, edition))
-    return ((shortcuts if early_shortcuts else '') + header + '<div class="r-report-layout r-book-reader">'
-            + _reader_toc(context, section['id'], base)
+    return ((shortcuts if early_shortcuts else '') + header + f'<div class="{layout_class}">'
+            + _reader_toc(context, section['id'], base, collapsible=not edition)
             + '<div class="r-report-body">' + body + '</div></div>')
 
 
