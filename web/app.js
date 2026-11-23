@@ -311,7 +311,14 @@ function evidenceAccess(ids,label,topicHint=''){
 }
 const claimButton=(id,label='Evidence',topic='')=>{const access=evidenceAccess([id],label,topic);return `<button class="evidence-action" data-claim="${esc(id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;};
 const numberButton=m=>{const label=metricValue(m),access=evidenceAccess([m.claim_id],label,metricEvidenceTopic(m,m.label||metricLabels[m.kind]));return `<button class="number-button" data-claim="${esc(m.claim_id)}" ${access.attributes}>${esc(label)}</button>${access.description}`;};
-const sourceLinks=cl=>{const supplemental=profileSupplementalSource(cl);return [supplemental?external(supplemental.url,supplemental.title):'',...cl.source_ids.map(id=>external(sources[id].url,sources[id].publisher))].filter(Boolean).join(' ');};
+const sourceLinks=cl=>{
+ const supplemental=profileSupplementalSource(cl),copies=cl.source_ids.map(id=>profilePublisherCopy(sources[id]));
+ const extra=supplemental&&!copies.some(source=>source?.url===supplemental.url)?external(supplemental.url,supplemental.title):'';
+ return [extra,...cl.source_ids.map((id,index)=>{
+  const copy=copies[index],source=copy||sources[id];
+  return external(source.url,copy?source.title:source.publisher);
+ })].filter(Boolean).join(' ');
+};
 const provenance=cl=>`<div class="record-meta">${cl.status!=='supported'?`<b>${esc(title(cl.status))}</b>`:''}<span>${esc(profileRecordDate(cl))}</span><span>· ${esc(evidenceContextOriginalScope(cl,scopeText(cl.segment_scope,cl.company_id)))}</span><span>· ${esc(evidenceLabel(cl))}</span>${claimButton(cl.id)}</div>`;
 function metricMeta(m){
  const finance=financeClaimContextFor(m.claim_id),accounting=metricCurrentBasis(m,['revenue','annualized_revenue_run_rate','arr'].includes(m.kind)?m.gross_vs_net==='unspecified'?'Gross or net revenue not stated':title(m.gross_vs_net)+' basis':'');

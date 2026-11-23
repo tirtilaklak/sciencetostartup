@@ -57,6 +57,14 @@ function profileSupplementalSource(cl){
  const id=profileFinanceReview(cl)?.primary_source_id;
  return id&&profileReviewedSource(id);
 }
+function profilePublisherCopy(source){
+ const copy=window.SOURCE_UPDATES?.source_locations?.[source?.id];
+ if(!copy||copy.company_id!==source.company_id||copy.recorded_url!==source.url||copy.published_on!==source.published_on)return null;
+ return {...source,url:copy.url,title:copy.title,publisher:copy.publisher,accessed_on:copy.checked_on,retrieval_status:'checked'};
+}
+function profileRecordedMirror(source){
+ return `<p class="sub">${external(source.url,'Recorded mirror')} · ${esc(profileSourceMeta(source))}</p>`;
+}
 function profileHistoricalFinanceSourceStatus(source){
  const check=profileFinanceSourceCheck(source);
  return check?.status==='unavailable'?`Historical citation · ${profileDate(check.checked_on)} · ${check.note}`:'Historical citation';

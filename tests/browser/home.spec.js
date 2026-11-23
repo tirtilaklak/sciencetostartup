@@ -476,3 +476,23 @@ test('homepage search rejects stale index bytes and offers a usable retry', asyn
   await page.locator('[data-home-search-retry]').click();
   await expect(page.locator('#home-search-results')).toBeVisible();
 });
+
+for (const javaScriptEnabled of [true, false]) {
+  const mode = javaScriptEnabled ? 'with' : 'without';
+  test('Home opens the figure methods ' + mode + ' JavaScript', async ({ browser, baseURL }) => {
+    const context = await browser.newContext({ javaScriptEnabled, baseURL });
+    try {
+      const page = await context.newPage();
+      await page.goto('/');
+      await page.getByRole('link', { name: 'How we check figures', exact: true }).click();
+      await expect(page).toHaveURL(/\/method\/#figures$/);
+      const target = page.locator('#figures');
+      await expect(target).toBeInViewport();
+      if (javaScriptEnabled) {
+        await expect(target.locator('xpath=ancestor-or-self::details[1]')).toHaveJSProperty('open', true);
+      }
+    } finally {
+      await context.close();
+    }
+  });
+}

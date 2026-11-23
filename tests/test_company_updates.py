@@ -1,11 +1,14 @@
 """Current company facts retain company scope and dated, pinned evidence."""
 import copy
+import json
 import sys
 import unittest
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
 from company_updates import CompanyUpdatesValidationError, validate_profile_current_facts
+from static_pages import current_facts_html
 
 
 def example():
@@ -82,6 +85,24 @@ class CurrentCompanyFactsTests(unittest.TestCase):
         content["entries"][0]["current_facts"]["sources"][0]["content_kind"] = "web_tool_text_excerpt"
         validate_profile_current_facts(content, self.data)
         self.rejects(lambda entry: entry["current_facts"]["sources"][0].update(content_kind="raw_page_inferred"), "content_kind is unsupported")
+
+    def test_rws_disclosures_distinguish_group_expectation_and_completed_acquisition(self):
+        profiles = json.loads((ROOT / "data/profile-content.json").read_bytes())
+        canonical = json.loads((ROOT / "data/canonical.json").read_bytes())
+        validate_profile_current_facts(profiles, canonical)
+        entry = next(row for row in profiles["entries"] if row["company_id"] == "rws_trainai")
+        facts = entry["current_facts"]
+        trading, acquisition = facts["rows"]
+        self.assertIn("Unaudited", trading["label"])
+        self.assertIn("expected about £700 million in group revenue", trading["value"])
+        self.assertEqual(trading["source_indexes"], [0])
+        self.assertIn("completed its acquisition of Acogroup", acquisition["value"])
+        self.assertEqual(acquisition["source_indexes"], [1, 2])
+        self.assertEqual([source["published_on"] for source in facts["sources"]],
+                         ["2026-10-27", "2026-11-02", "2026-11-02"])
+        markup = current_facts_html(entry)
+        for source in facts["sources"]:
+            self.assertIn(f'href="{source["url"]}"', markup)
 
 
 if __name__ == "__main__":

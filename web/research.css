@@ -156,9 +156,14 @@
  @media screen{
   .research:not(.r-company-supplement) .r-assertion,.research:not(.r-company-supplement) .r-source,.research:not(.r-company-supplement) .r-source-stub{content-visibility:auto;contain-intrinsic-block-size:auto 36rem}
   .research:not(.r-company-supplement) .r-source,.research:not(.r-company-supplement) .r-source-stub{contain-intrinsic-block-size:auto 28rem}
-  /* Resolve every preceding height before a native fragment or keyboard jump.
-     This also preserves native Back/Forward positions across browser engines. */
-  .research:has(:target) :is(.r-assertion,.r-source,.r-source-stub),.research:has(.r-assertion:focus-within,.r-source:focus-within,.r-source-stub:focus-within) :is(.r-assertion,.r-source,.r-source-stub){content-visibility:visible;contain-intrinsic-size:none}
+  /* Current ledger fragments need real record heights before native history restoration.
+     The target and focus selectors also support script-free reading and keyboard jumps. */
+  html[data-ledger-fragment] .research :is(.r-assertion,.r-source,.r-source-stub),
+  .research:has(:target) :is(.r-assertion,.r-source,.r-source-stub),
+  .research:has(.r-assertion:focus-within,.r-source:focus-within,.r-source-stub:focus-within) :is(.r-assertion,.r-source,.r-source-stub){
+    content-visibility:visible;
+    contain-intrinsic-size:none;
+  }
  }
  @media print{
   .r-assertion,.r-source,.r-source-stub{content-visibility:visible;contain:none;contain-intrinsic-size:none}

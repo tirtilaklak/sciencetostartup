@@ -32,6 +32,51 @@ for (const { company, metric, label, date, check } of financeRecords) {
   });
 }
 
+test('Explore uses publisher copies while retaining the original source records', async ({ page }) => {
+  const turing = {
+    source: 'turing.source.audit-t1',
+    claim: 'turing.claim.major-round-valuation-3-metric',
+    url: 'https://www.turing.com/press/turing-111-million-series-e',
+    mirror: 'https://markets.financialcontent.com/dowtheoryletters/article/bizwire-2025-3-6-turing-gears-up-to-power-next-wave-of-agi-with-111-million-in-series-e',
+    publication: '6 Mar 2025',
+  };
+  const bespoke = {
+    source: 'bespoke_labs.source.audit-bl-pr',
+    claim: 'bespoke_labs.claim.specialist-2-metric',
+    url: 'https://www.businesswire.com/news/home/20260706827813/en/Bespoke-Labs-Announces-%2440M-to-Build-the-Environments-That-Train-Reliable-Agents',
+    mirror: 'https://markets.financialcontent.com/buffnews/article/bizwire-2026-7-6-bespoke-labs-announces-40m-to-build-the-environments-that-train-reliable-agents',
+    publication: '6 Jul 2026',
+  };
+  async function expectCitation(row, record) {
+    await expect(row.getByRole('link').first()).toHaveAttribute('href', record.url);
+    await expect(row.locator('a[href="' + record.url + '"]')).toHaveCount(1);
+    const mirror = row.getByRole('link', { name: 'Recorded mirror (opens in a new tab)', exact: true });
+    await expect(mirror).toHaveAttribute('href', record.mirror);
+    await expect(mirror.locator('..')).toContainText('Checked 12 Oct 2026');
+    await expect(row.locator('p.sub').first()).toContainText(`Published ${record.publication} · Checked 22 Nov 2026`);
+  }
+  const drawer = page.locator('#evidence-dialog');
+  const cite = record => drawer.locator(`[data-source-id="${record.source}"]`);
+  await page.goto('/explore/#company/turing/financing');
+  const panel = page.locator('#profile-financing');
+  await openDisclosure(panel.locator(':scope > summary'));
+  const figure = panel.locator(`[data-claim="${turing.claim}"]`);
+  const foldedFigure = figure.locator('xpath=ancestor::details[not(@open)][1]/summary');
+  if (await foldedFigure.count()) await openDisclosure(foldedFigure);
+  await expect(figure).toBeVisible();
+  await figure.press('Enter');
+  await expect(drawer).toBeVisible();
+  await expectCitation(cite(turing), turing);
+
+  await page.goto(`/explore/#company/bespoke_labs/claim/${bespoke.claim}`);
+  await expectCitation(cite(bespoke), bespoke);
+  await page.goBack();
+  await expectCitation(cite(turing), turing);
+
+  await page.goto('/explore/#company/bespoke_labs/sources');
+  await expectCitation(page.locator(`#profile-sources [data-source="${bespoke.source}"]`), bespoke);
+});
+
 test('Mercor keeps the $614M H1 gross estimate attribution and canonical source', async ({ page }) => {
   const metric = 'mercor.metric.major-growth_metrics-1';
   await page.goto('/company/mercor/#financial-record');

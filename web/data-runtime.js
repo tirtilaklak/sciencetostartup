@@ -117,7 +117,8 @@ function installResearchContext(payload){
  if(payload.companyEvents){const events=new Map((window.COMPANY_EVENTS?.events||[]).map(e=>[e.id,e]));for(const event of payload.companyEvents.events)events.set(event.id,event);window.COMPANY_EVENTS={...window.COMPANY_EVENTS,events:[...events.values()]};}
  if(payload.sourceUpdates){
   const before=window.SOURCE_UPDATES||{},next=payload.sourceUpdates,merge=(a,b)=>[...new Map([...(a||[]),...(b||[])].map(row=>[row.id,row])).values()];
-  window.SOURCE_UPDATES={...before,...next,updates:merge(before.updates,next.updates),evidence_context:{...before.evidence_context,...next.evidence_context,corrections:merge(before.evidence_context?.corrections,next.evidence_context?.corrections)}};
+  const locations=next.source_locations?{source_locations:{...before.source_locations,...next.source_locations}}:{};
+  window.SOURCE_UPDATES={...before,...next,...locations,updates:merge(before.updates,next.updates),evidence_context:{...before.evidence_context,...next.evidence_context,corrections:merge(before.evidence_context?.corrections,next.evidence_context?.corrections)}};
  }
  if(payload.workRoutes){
   const rows=Array.isArray(payload.workRoutes)?payload.workRoutes:payload.workRoutes.routes;

@@ -150,9 +150,21 @@ class PresentationProjectionTests(unittest.TestCase):
 
     def test_source_updates_and_full_work_records_arrive_only_with_company_context(self):
         original_routes = {route["id"]: route for route in self.sidecars["WORK_ROUTES"]["routes"]}
+        original_sources = {row["id"]: row for row in self.data["sources"]}
+        locations = {row["company_id"]: row for row in self.sidecars["SOURCE_UPDATES"]["source_locations"]}
         for cid, descriptor in self.summary["companyDetails"].items():
             detail = json.loads((self.destination / descriptor["href"].lstrip('/')).read_text())
             self.assertEqual(detail["sourceUpdates"], source_updates_context(self.sidecars["SOURCE_UPDATES"], cid))
+            if cid in locations:
+                originals = {row["id"]: row for row in detail["data"]["sources"]}
+                copies = detail["sourceUpdates"]["source_locations"]
+                self.assertEqual(set(copies), set(locations[cid]["source_ids"]))
+                for sid, copy in copies.items():
+                    self.assertEqual(originals[sid], original_sources[sid])
+                    self.assertEqual(copy["recorded_url"], original_sources[sid]["url"])
+                    self.assertEqual(copy["url"], locations[cid]["url"])
+            else:
+                self.assertNotIn("source_locations", detail["sourceUpdates"])
             for route in detail["workRoutes"]["routes"]:
                 self.assertEqual(route, original_routes[route["id"]])
             self.assertTrue(all(entry["company_id"] == cid for entry in detail["profileContent"]["entries"]))
@@ -160,6 +172,10 @@ class PresentationProjectionTests(unittest.TestCase):
         self.assertEqual(empty["updates"], [])
         self.assertEqual(empty["evidence_context"]["corrections"], [])
         self.assertEqual(empty["baseline_dataset_version"], "2.5.0")
+        self.assertNotIn("source_locations", empty)
+        for name in ("archive", "overview"):
+            body = json.loads((self.destination / self.summary[name]["href"].lstrip('/')).read_text())
+            self.assertNotIn("source_locations", body["sourceUpdates"])
 
     def test_health_metadata_remains_truthy_without_initial_observations_or_evidence(self):
         skeleton = health_skeleton(self.sidecars["BUSINESS_HEALTH"])

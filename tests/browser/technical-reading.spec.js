@@ -308,6 +308,7 @@ test.describe('technical citations after native Find on a phone', () => {
   for (const edition of editions) {
     for (const { name, phrase, assertionId, sourceId, sourceShard } of touchCitations) {
       test(`${edition.name} Technical ${name} citation opens on the first tap after Find`, async ({ page }) => {
+        const verifyLedgerLayout = edition.name === 'current' && name === 'GPQA';
         await page.goto(edition.path);
         const chapterURL = page.url();
         expect(new URL(chapterURL).hash).toBe('');
@@ -330,13 +331,21 @@ test.describe('technical citations after native Find on a phone', () => {
 
         const assertion = page.locator(`:target[id="${assertionId}"]`);
         await expect(assertion).toBeInViewport();
+        if (verifyLedgerLayout) await expect(page.locator('html')).toHaveAttribute('data-ledger-fragment', '');
         const sourcePath = `${edition.data}/sources/${sourceShard}/#${sourceId}`;
         await assertion.locator(`a[href="${sourcePath}"]`).tap();
         await expect(page).toHaveURL(new URL(sourcePath, chapterURL).href);
         await expect(page.locator(`:target[id="${sourceId}"]`)).toBeInViewport();
+        if (verifyLedgerLayout) await expect(page.locator('html')).toHaveAttribute('data-ledger-fragment', '');
 
         await page.goBack();
         await expect(page).toHaveURL(assertionURL);
+        if (verifyLedgerLayout) {
+          await expect(page.locator('html')).toHaveAttribute('data-ledger-fragment', '');
+          await page.evaluate(() => new Promise(resolve => {
+            requestAnimationFrame(() => requestAnimationFrame(resolve));
+          }));
+        }
         await expect(assertion).toBeInViewport();
         await page.goBack();
         await expect(page).toHaveURL(chapterURL);

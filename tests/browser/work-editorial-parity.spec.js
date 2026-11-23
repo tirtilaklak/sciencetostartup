@@ -112,6 +112,8 @@ for (const { name, criteria, includes, excludes } of cases) {
     await page.goto(search ? `/work/?${search}` : '/work/');
     const compareLink = page.getByRole('link', { name: 'Compare results', exact: true });
     await expect(compareLink).toBeVisible();
+    const kindLabel = { outside: 'Non-training jobs', closed: 'Past & reference' }[criteria.kind];
+    if (kindLabel) await expect(page.locator('[data-work-filters] select[name="kind"] option:checked')).toHaveText(kindLabel);
     const chosen = `${nativeCards}:not([hidden])`;
     const ids = await orderedIds(page.locator(chosen));
     const nativeLabel = await page.locator('[data-work-count]').innerText();
@@ -141,6 +143,11 @@ for (const { name, criteria, includes, excludes } of cases) {
     await page.locator('[data-work-explore]').click();
     await expect(page).toHaveURL(`/explore/#work${search ? `?${search}` : ''}`);
     await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    if (kindLabel) {
+      await expect(page.locator('#work-kind option:checked')).toHaveText(kindLabel);
+      const group = criteria.kind === 'outside' ? '#work-outside' : '#work-other';
+      await expect(page.locator(`${group} > summary`)).toContainText(kindLabel);
+    }
     const unopened = page.locator('#work-cards [data-w4-routes]').locator('xpath=../summary');
     while (await unopened.count()) await unopened.first().click();
     const exploreLabel = await page.locator('#work-count').innerText();

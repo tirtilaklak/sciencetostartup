@@ -730,7 +730,11 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
                 observed.update(matching)
                 all_records.update(matching)
                 self.assertEqual(facts.canonicals, [rp.sp.ORIGIN + path])
-                self.assertTrue(all(item.get('type') == 'application/ld+json' for item in facts.scripts))
+                markers = [item for item in facts.scripts if item.get('type') != 'application/ld+json']
+                self.assertEqual(markers, [{}])
+                rendered = self.page(path)
+                self.assertEqual(rendered.count('data-ledger-fragment'), 1)
+                self.assertLess(rendered.index('data-ledger-fragment'), rendered.index('href="/research.css"'))
             self.assertTrue(expected <= observed)
             for row in rows:
                 anchor = kind + '-' + row['id']

@@ -72,7 +72,10 @@ function profileArchive(id){
   const method=DATA.assessments.filter(a=>a.company_id===id).map(renderAssessment).join('')+rows('company_relationships').map(r=>`<p>${esc(title(r.relationship))} ${esc(r.related_entity_name)} · ${claimButton(r.claim_id,'Source')}</p>`).join('');
   const scope=method||(c.entity_type==='adjacent_research'?'<p>Research organizations are outside the commercial assessment rules.</p>':'');
   const observations=operatingMetrics.length?`<details id="profile-observations" data-profile-section="observations"><summary>All dated figures</summary><div class="metric-grid">${operatingMetrics.map(metricTile).join('')}</div></details>`:profileRouteSection(routeParts()[2])==='observations'?'<section id="profile-observations" data-profile-section="observations"><h2>All dated figures</h2><p class="profile-empty">No dated figures are established in the reviewed sources.</p></section>':'';
-  const sourceRow=s=>`<li data-source="${attr(s.id)}">${external(s.url,s.title)}<p class="sub">${esc(profileSourceMeta(s))}</p>${historicalIds.has(s.id)?`<p class="sub">${esc(profileHistoricalFinanceSourceStatus(s))}</p>`:''}</li>`;
+  const sourceRow=original=>{
+   const historical=historicalIds.has(original.id),copy=historical?null:profilePublisherCopy(original),source=copy||original;
+   return `<li data-source="${attr(original.id)}">${external(source.url,source.title)}<p class="sub">${esc(profileSourceMeta(source))}</p>${copy?profileRecordedMirror(original):''}${historical?`<p class="sub">${esc(profileHistoricalFinanceSourceStatus(original))}</p>`:''}</li>`;
+  };
   const replacementHTML=replacements.length?`<h3>Replacement sources</h3><ol class="sources-list">${replacements.map(sourceRow).join('')}</ol><h3>Original research sources</h3>`:'';
   const sourceHTML=`<section id="profile-sources" data-profile-section="sources"><h2>All sources</h2>${replacementHTML}<ol class="sources-list">${registry.map(sourceRow).join('')}</ol></section>`;
   const logo=logoFor(id),brand=logo?`<details><summary>Logo source</summary><p>${external(logo.source_page||logo.source_url,'Original source')} · Checked ${esc(profileDate(logo.verified_on||logo.accessed_on||'2026-10-14'))}</p></details>`:'';
