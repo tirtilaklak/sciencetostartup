@@ -15,15 +15,24 @@
   if(!search){document.documentElement.removeAttribute('data-page-enhancement');return;}
   const aliases=node=>{try{const value=JSON.parse(node.dataset.searchAliases||'[]');return Array.isArray(value)?value:[];}catch{return [];}};
   const cards=sections.map((section,order)=>({section,order,rows:[...section.querySelectorAll('[data-company]')].map((node,index)=>({node,index,compiled:search.compile({name:node.dataset.searchName||node.querySelector('.directory-company-heading a')?.textContent||'',aliases:aliases(node),text:node.dataset.search||node.textContent})}))}));
-  const sectionParent=sections[0]?.parentNode,sectionAnchor=sections.at(-1)?.nextSibling;
+  const sectionParent=sections[0]?.parentNode,sectionAnchor=sections.at(-1)?.nextElementSibling;
   let displayedSearch;
   const read=savedQuery=>{
     const params=new URLSearchParams(location.search);
     query.value=savedQuery??params.get('q')??'';
     const selected=params.get('group')||'';group.value=[...group.options].some(option=>option.value===selected)?selected:'';
   };
+  function orderChildren(parent,nodes,next=null){
+    for(let index=nodes.length-1;index>=0;index--){
+      const node=nodes[index];
+      if(node.nextElementSibling!==next)parent.insertBefore(node,next);
+      next=node;
+    }
+  }
   function filter(updateURL=true){
     const key=search.normalize(query.value);
+    const focused=document.activeElement;
+    const focusedLink=focused?.matches('a[href]')&&focused.closest('.directory-section')?focused:null;
     let visible=0;
     cards.forEach(entry=>{
       const {section,rows}=entry;let own=0;entry.best=Infinity;
@@ -34,11 +43,15 @@
         if(match){own++;visible++;entry.best=Math.min(entry.best,row.rank);}
       });
       const list=section.querySelector('.directory-grid')||rows[0]?.node.parentNode;
-      if(list) [...rows].sort((a,b)=>(key?a.rank-b.rank:0)||a.index-b.index).forEach(row=>list.append(row.node));
+      if(list)orderChildren(list,[...rows].sort((a,b)=>(key?a.rank-b.rank:0)||a.index-b.index).map(row=>row.node));
       section.hidden=own===0;
       section.querySelector('.directory-section-heading>span').textContent=`${own} ${own===1?'company':'companies'}`;
     });
-    if(sectionParent) [...cards].sort((a,b)=>(key?a.best-b.best:0)||a.order-b.order).forEach(entry=>sectionParent.insertBefore(entry.section,sectionAnchor));
+    if(sectionParent)orderChildren(sectionParent,[...cards].sort((a,b)=>(key?a.best-b.best:0)||a.order-b.order).map(entry=>entry.section),sectionAnchor);
+    if(focusedLink&&document.activeElement===document.body&&focusedLink.isConnected&&
+      !focusedLink.closest('[hidden]')&&focusedLink.getClientRects().length){
+      focusedLink.focus({preventScroll:true});
+    }
     count.textContent=`${visible} ${visible===1?'company':'companies'}`;
     empty.hidden=visible!==0;
     if(fullGuide) fullGuide.href='/?'+new URLSearchParams({search:query.value})+'#browse-guide';
