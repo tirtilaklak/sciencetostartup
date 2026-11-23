@@ -788,27 +788,28 @@ function keepInitialMarketFocus(focusTarget,readingPosition=null){
  if(document.readyState==='complete')return;
  const bookmark=location.href,hasReadingPosition=Number.isFinite(readingPosition);
  const listeners=new AbortController(),options={capture:true,signal:listeners.signal};
- let intended=focusTarget,readerMoved=false;
+ let intended=focusTarget,readerActivity=0;
  function remember(event){
   if(event.target!==document.body&&event.target!==document.documentElement)intended=event.target;
  }
  function markReaderMovement(event){
-  if(event.isTrusted)readerMoved=true;
+  if(event.isTrusted)readerActivity++;
  }
  document.addEventListener('focusin',remember,options);
  if(hasReadingPosition){
-  for(const name of ['keydown','pointerdown','touchstart','wheel'])window.addEventListener(name,markReaderMovement,options);
+  for(const name of ['keydown','pointerdown','touchstart','touchmove','wheel'])window.addEventListener(name,markReaderMovement,options);
  }
  window.addEventListener('pageshow',()=>{
+  const activityAtShow=readerActivity,position=activityAtShow?window.scrollY:readingPosition;
   requestAnimationFrame(()=>{
    listeners.abort();
    if(location.href!==bookmark||!intended.isConnected||intended.closest('[hidden],[inert]'))return;
-   const preservePosition=hasReadingPosition&&!readerMoved&&intended===focusTarget;
+   const preservePosition=hasReadingPosition&&readerActivity===activityAtShow&&intended===focusTarget;
    if(document.activeElement===document.body||document.activeElement===document.documentElement){
     intended.focus(preservePosition?{preventScroll:true}:undefined);
    }
    // Firefox can apply the fragment scroll after route() already restored this history entry.
-   if(preservePosition&&window.scrollY!==readingPosition)window.scrollTo({left:0,top:readingPosition,behavior:'instant'});
+   if(preservePosition&&window.scrollY!==position)window.scrollTo({left:0,top:position,behavior:'instant'});
   });
  },{once:true});
 }
