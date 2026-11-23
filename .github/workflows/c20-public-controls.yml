@@ -1,0 +1,53 @@
+name: C20 public release controls
+on:
+  push:
+    branches: [codex/site-quality-c20-public-controls-20261122]
+permissions:
+  contents: read
+jobs:
+  release-control:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      matrix:
+        control: [acceptance, archive, companies, work]
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      QA_BASE_URL: https://sciencetostartup.com
+      PYTHONPATH: scripts
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Use the repository browser environment
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: python3 -m pip --disable-pip-version-check install playwright==1.65.0 lxml==6.1.1
+      - name: Check the exact public origin and attached product
+        env:
+          QA_CONTROL: ${{ matrix.control }}
+        run: |
+          bundle=.github/qa/c20-edge-controls
+          python3 "$bundle/identity.py" before "$QA_CONTROL"
+          if bash "$bundle/$QA_CONTROL/run.sh"; then control_status=0; else control_status=$?; fi
+          python3 "$bundle/identity.py" after "$QA_CONTROL"
+          exit "$control_status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c20-public-control-${{ matrix.control }}
+          path: output/c20-controls/
+          if-no-files-found: error
+          retention-days: 14
