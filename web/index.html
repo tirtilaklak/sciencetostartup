@@ -199,7 +199,12 @@ if(document.documentElement.dataset.app!=='failed'){
     finished=true;clearTimeout(watchdog);return;
    }
    const script=currentScript=document.createElement('script');script.src=files[index];script.async=false;
-   script.onerror=()=>fail('script-network');script.onload=()=>next(index+1);document.body.append(script);
+   script.onerror=()=>{
+    const full=window.EXPLORE_FULL_DATA_SCRIPT;
+    if(index===0&&full&&files[0]!==full){script.remove();files[0]=full;next(0);return;}
+    fail('script-network');
+   };
+   script.onload=()=>next(index+1);document.body.append(script);
   };
   next(0);
  };

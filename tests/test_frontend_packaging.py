@@ -131,7 +131,7 @@ process.stdout.write(JSON.stringify({build:window.SCIENCE_HEALTH_MODULE.buildId,
             self.assertEqual((folder / app_href.lstrip('/')).read_text(), minify_javascript(source))
             # The runtime descriptor is the same one referenced by the summary,
             # not a second unbound factory URL embedded only in the page.
-            data_href = re.search(r'href="(/js/data\.[^"]+\.js)"', html).group(1)
+            data_href = re.search(r'const full="(/js/data\.[^"]+\.js)"', html).group(1)
             data_code = (folder / data_href.lstrip('/')).read_text()
             self.assertIn(descriptor['href'], data_code)
             prefetch_source = (ROOT / 'web/presentation-prefetch.js').read_text()

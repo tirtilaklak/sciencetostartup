@@ -170,7 +170,7 @@ def retain_runtime_generations(root, destination):
         summary_names = families.get(("presentation", "summary"), [])
         if len(summary_names) != 1 or any(len(families.get(("js", family), [])) != 1 for family in ("app", "data", "health")):
             raise ValueError("Retained generation requires one summary and app/data/health assets")
-        if {family for directory, family in families if directory == "js"} - {"app", "data", "health", "work"}:
+        if {family for directory, family in families if directory == "js"} - {"app", "data", "health", "work", "companies-data"}:
             raise ValueError("Unexpected retained runtime module")
         summary_name = summary_names[0]
         summary = documents[summary_name]
@@ -222,6 +222,12 @@ def retain_runtime_generations(root, destination):
         if data[end:end + 1] != ";" or encoded(public_summary) != encoded(expected_public):
             raise ValueError("Retained data bootstrap differs from summary")
         descriptors(public_summary)
+        directory_names = families.get(("js", "companies-data"), [])
+        if directory_names:
+            directory = payloads[directory_names[0]].decode("utf-8")
+            if (len(directory_names) != 1 or not directory.startswith(data[:end + 1])
+                    or 'lazy("WORK_ROUTES",' in directory or not directory.endswith("window.EXPLORE_DEFER_WORK=true;")):
+                raise ValueError("Retained Companies bootstrap differs from summary")
         health_name = families[("js", "health")][0]
         if not isinstance(summary.get("modules"), dict) or not isinstance(summary["modules"].get("businessHealth"), dict) or summary["modules"]["businessHealth"].get("href") != "/" + health_name:
             raise ValueError("Retained health module descriptor differs")
@@ -233,7 +239,7 @@ def retain_runtime_generations(root, destination):
             work_script = summary["modules"].get("nativeWork")
             if len(work_names) != 1 or not isinstance(work_script, dict) or work_script.get("href") != "/" + work_names[0]:
                 raise ValueError("Retained native Work module descriptor differs")
-        if set(payloads) != referenced | {summary_name, data_name, families[("js", "app")][0]}:
+        if set(payloads) != referenced | {summary_name, data_name, families[("js", "app")][0], *directory_names}:
             raise ValueError("Retained runtime dependency closure is incomplete")
         merged.update(payloads)
     # Validate every existing destination before creating directories or copying.

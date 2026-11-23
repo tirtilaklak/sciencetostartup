@@ -5,6 +5,7 @@ if(!presentationIdentity||presentationIdentity.schemaVersion!=='1.0.0'||presenta
 const detailCache=new Map();
 window.COMPANY_CONTEXTS_READY=new Set();
 let searchContextPromise=null,searchRouteView='',searchDisabledControls=[];
+let workContextPromise=null,workContextReady=!window.EXPLORE_DEFER_WORK;
 let healthModulePromise=null,healthModuleAttempts=0;
 let navigationGeneration=0,detailController=null;
 const synchronousRoute=route;
@@ -17,7 +18,7 @@ function validatePresentation(payload,companyId){
  if(!payload.data||payload.data.dataset_version!==DATA.dataset_version)throw new Error('Invalid research context');
  return payload;
 }
-async function fetchPresentation(descriptor,companyId,signal){
+async function fetchPresentation(descriptor,companyId,signal,readSummary=false){
  const controller=new AbortController(),cancel=()=>controller.abort();let timedOut=false;
  if(signal?.aborted)cancel();else signal?.addEventListener('abort',cancel,{once:true});
  const deadline=setTimeout(()=>{timedOut=true;controller.abort();},15000);
@@ -37,9 +38,25 @@ async function fetchPresentation(descriptor,companyId,signal){
    const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(b=>b.toString(16).padStart(2,'0')).join('');
    if(digest!==descriptor.sha256)throw new Error('Evidence integrity mismatch');
   }
-  return validatePresentation(JSON.parse(new TextDecoder().decode(bytes)),companyId);
+  const payload=JSON.parse(new TextDecoder().decode(bytes));
+  if(readSummary)return validatePresentation({...payload,data:payload.bootstrap},companyId);
+  return validatePresentation(payload,companyId);
  }catch(error){if(timedOut)throw new Error('Evidence request timed out');throw error;}
  finally{clearTimeout(deadline);signal?.removeEventListener('abort',cancel);}
+}
+function exploreWorkPending(){return !workContextReady;}
+function ensureExploreWork(){
+ if(workContextReady)return Promise.resolve();
+ if(workContextPromise)return workContextPromise;
+ workContextPromise=fetchPresentation(presentationIdentity.asset,null,null,true).then(({work})=>{
+  if(!Array.isArray(work?.routes)||new Set(work.routes.map(row=>row.id)).size!==work.routes.length)
+   throw new Error('Invalid work listings');
+  const rows=new Map(work.routes.map(row=>[row.id,row]));
+  for(const row of workRouteRows())rows.set(row.id,row);
+  window.WORK_ROUTES={...work,routes:[...rows.values()]};
+  workContextReady=true;
+ }).finally(()=>{workContextPromise=null;});
+ return workContextPromise;
 }
 function ensureHealthModule(){
  if(window.APP_HEALTH_READY===window.APP_BUILD_ID)return Promise.resolve();
@@ -77,7 +94,9 @@ window.ensureSearchContext=function(){
  if(window.SEARCH_INDEX)return Promise.resolve(window.SEARCH_INDEX);
  if(searchContextPromise)return searchContextPromise;
  if(!presentationIdentity.fullSearch)return Promise.reject(new Error('Search index is unavailable'));
- searchContextPromise=fetchPresentation(presentationIdentity.fullSearch).then(payload=>{
+ const search=fetchPresentation(presentationIdentity.fullSearch);
+ const prerequisites=exploreWorkPending()?Promise.all([search,ensureExploreWork()]).then(([payload])=>payload):search;
+ searchContextPromise=prerequisites.then(payload=>{
   for(const key of ['companySearch','profileProducts','workSearch'])if(!payload[key]||typeof payload[key]!=='object')throw new Error('Invalid search index');
   if(!Array.isArray(payload.editorialReadouts))throw new Error('Invalid export readouts');
   if(!Array.isArray(payload.researchSearchEntries))throw new Error('Invalid research search index');
@@ -96,12 +115,13 @@ function restoreSearchRouteControls(){
  searchDisabledControls=[];
  if(searchRouteView){$('work-cards')?.removeAttribute('aria-busy');searchRouteView='';}
 }
-function pendingWorkSearchRoute(failed=false){
+function pendingWorkSearchRoute(failed=false,listings=false){
  pendingView('work');
  const section=$('work-view'),cards=$('work-cards'),count=$('work-count');
  section.hidden=false;searchRouteView='work';
  if(!failed){searchDisabledControls=[...section.querySelectorAll('input,select,button')].map(control=>[control,control.disabled]);for(const [control]of searchDisabledControls)control.disabled=true;cards?.setAttribute('aria-busy','true');}
- const label=failed?'Search could not load. Your query is preserved.':'Loading the search index…';
+ const label=listings?(failed?'Work listings could not load. Your filters are preserved.':'Loading work listings…')
+  :(failed?'Search could not load. Your query is preserved.':'Loading the search index…');
  if(count)count.textContent=label;
  const native='/work/'+workHashFor().slice('#work'.length);
  if(cards)cards.innerHTML=`<p role="${failed?'alert':'status'}">${label} ${failed?'<button type="button" data-retry-search>Try again</button> ':''}<a href="${attr(native)}">Open native Work results</a></p>`;
@@ -227,10 +247,12 @@ route=function(event){
  const overview=view===''||view==='market'||VIEW_ANCHORS[view]==='market'||!['companies','work','compare','method','company',...Object.keys(VIEW_ANCHORS)].includes(view);
  const workCriteria=view==='work'?workCriteriaForRoute(hash,routeTraversal):null;
  const needsSearch=Boolean(workCriteria&&searchContextPending(workCriteria.q));
+ const needsWork=exploreWorkPending()&&Boolean(workCriteria);
+ const workListingLoad=needsWork&&Boolean(workCriteria)&&!needsSearch;
  const ids=company?[company]:correctionCompany?[correctionCompany]:comparison?.ids||[];
  const cacheKey=archive?'__archive':overview?'__overview':null;
  const cached=(!cacheKey||detailCache.has(cacheKey))&&ids.every(id=>detailCache.has(id));
- if(cached&&!needsSearch){
+ if(cached&&!needsSearch&&!needsWork){
   for(const id of [...(cacheKey?[cacheKey]:[]),...ids])installResearchContext(detailCache.get(id));
   const result=synchronousRoute.call(this,event);presentationState('ready');afterRouteRetry(event,generation);window.APP_ROUTE_READY=Promise.resolve(result);return result;
  }
@@ -245,16 +267,16 @@ route=function(event){
   if(selection.join('|')!==state.selected.join('|')){state.selected=selection;state.mobileCompare=0;syncSelection();renderTray();}
   pendingComparison(comparison);
  }
- if(needsSearch){applyWorkCriteria(workCriteria);pendingWorkSearchRoute();}
+ if(needsSearch||workListingLoad){applyWorkCriteria(workCriteria);pendingWorkSearchRoute(false,workListingLoad);}
  const complete=async()=>{
   if(company){await afterProfileIntroductionPaint();if(generation!==navigationGeneration||location.hash!==hash||controller.signal.aborted)return;}
-  if(needsSearch)await window.ensureSearchContext();
   let section=cacheKey&&detailCache.get(cacheKey);
   if(cacheKey&&!section){
    const descriptor=archive?presentationIdentity.archive:presentationIdentity.overview;
    section=Promise.all([fetchPresentation(descriptor,null,controller.signal),ensureHealthModule()]).then(([payload])=>payload);
   }
-  const [sectionContext,...payloads]=await Promise.all([section,...ids.map(id=>{
+  const work=needsSearch?window.ensureSearchContext():needsWork?ensureExploreWork():null;
+  const [sectionContext,,...payloads]=await Promise.all([section,work,...ids.map(id=>{
    const pending=companyContext(id,controller.signal);
    return correctionCompany?pending.catch(()=>null):pending;
   })]);
@@ -272,7 +294,7 @@ route=function(event){
   restoreSearchRouteControls();
   if(company)failedProfile(company,parts[2],error);
   else if(comparison)pendingComparison(comparison,error);
-  else if(needsSearch){pendingWorkSearchRoute(true);presentationState('failed','search-request');}
+  else if(needsSearch||workListingLoad){pendingWorkSearchRoute(true,workListingLoad);presentationState('failed',workListingLoad?'work-request':'search-request');}
   else{
    const active=document.activeElement;
    const moveFocus=active?.closest('main>.view')||(event?.type==='hashchange'&&active===document.body);

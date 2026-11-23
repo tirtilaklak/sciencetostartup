@@ -1132,10 +1132,18 @@ function currentCompanyResult(id){
  return {id:metric.id,kind:metric.kind,value:metric.value,qualifier:metric.qualifier||'',display:metricValue(metric),upper_value:metric.upper_value??'',observation_status:metric.observation_status||'',currency:metric.currency||'',as_of:metric.as_of||'',period:metric.period_label||'',scope:metric.segment_scope||'',scope_detail:metric.scope_detail||'',accounting_basis:metric.gross_vs_net||'',source_urls:[...new Set((claims[metric.claim_id]?.source_ids||[]).map(sourceId=>sources[sourceId]?.url).filter(Boolean))].join(' | '),scope_label:scopeText(metric.segment_scope,id),limitations:metric.limitations||''};
 }
 function exportCsv(){
- if(searchContextPending(state.query)||DATA.companies.some(company=>!editorialFor(company.id))){
-  const query=state.query;companyExportStatus('loading');
-  if(typeof window.ensureSearchContext!=='function'){companyExportStatus('failed');return;}
-  return window.ensureSearchContext().then(()=>{if(DATA.companies.some(company=>!editorialFor(company.id)))throw new Error('Company readouts are incomplete');companyExportStatus('');if(state.query===query)exportCsv();}).catch(()=>companyExportStatus('failed'));
+ const needsSearch=searchContextPending(state.query)||DATA.companies.some(company=>!editorialFor(company.id));
+ const needsWork=typeof exploreWorkPending==='function'&&exploreWorkPending();
+ if(needsSearch||needsWork){
+  const query=state.query,hash=location.hash;
+  companyExportStatus('loading');
+  if(needsSearch&&typeof window.ensureSearchContext!=='function'){companyExportStatus('failed');return;}
+  const load=needsSearch?window.ensureSearchContext():ensureExploreWork();
+  return load.then(()=>{
+   if(DATA.companies.some(company=>!editorialFor(company.id)))throw new Error('Company readouts are incomplete');
+   companyExportStatus('');
+   if(state.query===query&&location.hash===hash)exportCsv();
+  }).catch(()=>companyExportStatus('failed'));
  }
  companyExportStatus('');
  const head=['company_id','company','business_model','delivery_evidence','assessment_scope','financial_metric','financial_value','financial_qualifier','financial_display','upper_value','observation_status','currency','metric_date','metric_period','metric_scope','scope_detail','accounting_basis','financial_source_urls','work_route','readout','snapshot_as_of','financial_record_id','scope_label','limitations'];
@@ -1169,7 +1177,19 @@ function storyDateRange(values){const dates=[...new Set(values.filter(Boolean))]
 function shortPeriod(m){const corrected=metricCurrentPeriod(m);if(corrected)return corrected;const s=m.period_label||m.as_of;return /FY ended (\d{4})/.test(s)?'FY'+s.match(/FY ended (\d{4})/)[1]:storyDate(s);}
 // The overview uses the same primary listings/programs as Paid work, without implying vacancies.
 function storyWorkRows(){return typeof w4DiscoveryGroups==='function'?w4DiscoveryGroups(workRouteRows()).primary:[];}
-function renderStoryWork(){const rows=storyWorkRows(),box=$('overview-work');if(!box||!rows.length)return;const count=new Set(rows.map(r=>r.company_id)).size,groups=w4DiscoveryGroups(rows);
+function renderStoryWork(){
+ const box=$('overview-work');
+ if(!box)return;
+ if(typeof exploreWorkPending==='function'&&exploreWorkPending()){
+  box.innerHTML='<p role="status">Loading paid-work records…</p>';
+  ensureExploreWork().then(renderStoryWork).catch(()=>{
+   box.innerHTML='<p>Paid-work records could not load. <a href="/work/">Browse paid work</a>.</p>';
+  });
+  return;
+ }
+ const rows=storyWorkRows();
+ if(!rows.length)return;
+ const count=new Set(rows.map(r=>r.company_id)).size,groups=w4DiscoveryGroups(rows);
  $('hero-work-count').textContent=rows.length;$('hero-work-stat')?.removeAttribute('data-pending');
  box.innerHTML=`<p class="overview-stats"><span><b>${rows.length}</b> work routes</span><span><b>${count}</b> providers</span></p><p>${groups.named.length} named listings and ${groups.programs.length} networks and programs. Each record keeps its own source and review dates. Page checks do not establish current terms or availability.</p><p class="overview-safety"><strong>Before you apply:</strong> never pay to get work, and be careful with job offers that come out of the blue from a stranger. <a href="https://consumer.ftc.gov/articles/job-scams" target="_blank" rel="noopener noreferrer">How to spot a job scam ${iconHTML('external')}<span class="sr-only"> (opens in a new tab)</span></a></p>`;
 }
@@ -1268,7 +1288,7 @@ function renderDirectory(preserveFocus=false){
  const returnScroll=shortlistScrollForEntry();
  if(!returnScroll)cancelShortlistScroll();
  renderDirectoryFilters();
- if(searchContextPending(state.query)){requestDirectorySearch();return;}
+ if(searchContextPending(state.query)||directoryWorkPending()){requestDirectorySearch();return;}
  cancelShortlistScroll();
  directorySearchGeneration++;
  const cards=$('company-cards');
@@ -1304,6 +1324,7 @@ function renderDirectoryFilters(){
 // Shared <select> option helper for page filters.
 function addOptions(id,rows){$(id).innerHTML+=[...rows].map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('');}
 let directorySearchGeneration=0,workSearchGeneration=0;
+function directoryWorkPending(){return state.work&&typeof exploreWorkPending==='function'&&exploreWorkPending();}
 function directoryFallbackHref(){
  const params=new URLSearchParams({q:state.query});
  if(state.category)params.set('group',groupSlug(state.category));
@@ -1312,28 +1333,30 @@ function directoryFallbackHref(){
 function requestDirectorySearch(){
  const generation=++directorySearchGeneration;
  const cards=$('company-cards'),fallback=cards.querySelector(directoryFallbackSelector);
+ const needsSearch=searchContextPending(state.query),workFilter=!needsSearch&&directoryWorkPending();
  if(fallback)fallback.href=directoryFallbackHref();
  cards.setAttribute('aria-busy','true');
- $('result-count').textContent='Loading search…';
+ $('result-count').textContent=workFilter?'Loading paid-work records…':'Loading search…';
  $('empty-state').hidden=true;
  setCompanyExportRows();
- return window.ensureSearchContext().then(()=>{
+ const load=workFilter?ensureExploreWork():needsSearch?window.ensureSearchContext():Promise.resolve();
+ return load.then(()=>{
   if(generation!==directorySearchGeneration)return;
   const view=routeParts()[0];
   if(view==='companies'||view==='method'||VIEW_ANCHORS[view]==='method')renderDirectory(true);
   else directoryShown=false;
- }).catch(()=>{if(generation===directorySearchGeneration)directorySearchFailure();});
+ }).catch(()=>{if(generation===directorySearchGeneration)directorySearchFailure(workFilter);});
 }
-function directorySearchFailure(){
+function directorySearchFailure(workFilter=false){
  cancelShortlistScroll();
  const cards=$('company-cards');
  const fallback=cards.querySelector(directoryFallbackSelector);
  const hadResultFocus=cards.contains(document.activeElement)&&document.activeElement.closest('[data-company-card]');
  // Leave the recovery controls attached during retries so they keep keyboard focus.
  if(fallback)fallback.href=directoryFallbackHref();
- else cards.innerHTML=`<p class="availability-notice" role="alert">The search index could not load. <button type="button" data-retry-company-search>Try again</button> or <a href="${attr(directoryFallbackHref())}" data-company-search-fallback>browse the plain company list</a>.</p>`;
+ else cards.innerHTML=`<p class="availability-notice" role="alert">${workFilter?'Paid-work records could not load.':'The search index could not load.'} <button type="button" data-retry-company-search>Try again</button> or <a href="${attr(directoryFallbackHref())}" data-company-search-fallback>browse the plain company list</a>.</p>`;
  cards.removeAttribute('aria-busy');
- $('result-count').textContent='Search could not load.';
+ $('result-count').textContent=workFilter?'Paid-work records could not load.':'Search could not load.';
  if(hadResultFocus&&!$('companies-view').hidden)$('search').focus();
  restoreDirectoryFallbackFocus();
 }

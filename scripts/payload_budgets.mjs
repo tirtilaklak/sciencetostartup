@@ -171,19 +171,29 @@ export async function checkPayloadBudgets({dist, budgets, budgetsSha256 = null})
   const entryBytes = await read(entry);
   const html = entryBytes.toString('utf8');
   const currentScripts = extractBootstrapScripts(html, configuration.bootstrap.currentScriptFamilies);
+  const directoryScripts = /js\/companies-data\.[a-f0-9]+\.js/.test(html)
+    ? extractBootstrapScripts(html, ['companies-data']) : [];
   const bootstrap = [];
-  for (const name of [entry, ...currentScripts]) {
+  for (const name of [entry, ...currentScripts, ...directoryScripts]) {
     const bytes = await read(name);
     bootstrap.push({path: name, sha256: sha256(bytes), ...compressedSizes(bytes, compression)});
     if (configuration.bootstrap.forbidCanonicalArchive && archiveLeak(bytes.toString('utf8'))) {
       problems.push('Canonical archive raw_inputs found in bootstrap payload: ' + name);
     }
   }
-  const total = bootstrap.reduce((sum, row) => ({rawBytes: sum.rawBytes + row.rawBytes,
+  const total = bootstrap.filter(row => !directoryScripts.includes(row.path)).reduce((sum, row) => ({rawBytes: sum.rawBytes + row.rawBytes,
     gzipBytes: sum.gzipBytes + row.gzipBytes, brotliBytes: sum.brotliBytes + row.brotliBytes}),
   {rawBytes: 0, gzipBytes: 0, brotliBytes: 0});
   check('bootstrap.brotli', total.brotliBytes, configuration.bootstrap.maximumBrotliBytes, 'bytes');
   check('bootstrap.gzip', total.gzipBytes, configuration.bootstrap.maximumGzipBytes, 'bytes');
+  if (directoryScripts.length) {
+    const directory = bootstrap.find(row => row.path === directoryScripts[0]);
+    const data = bootstrap.find(row => /^js\/data\./.test(row.path));
+    check('bootstrap.companies.brotli', total.brotliBytes - data.brotliBytes + directory.brotliBytes,
+      configuration.bootstrap.maximumBrotliBytes, 'bytes');
+    check('bootstrap.companies.gzip', total.gzipBytes - data.gzipBytes + directory.gzipBytes,
+      configuration.bootstrap.maximumGzipBytes, 'bytes');
+  }
   const researchMatch = /<script\b[^>]*id=["']research-data["'][^>]*>([\s\S]*?)<\/script>/i.exec(html);
   if (researchMatch) {
     try {

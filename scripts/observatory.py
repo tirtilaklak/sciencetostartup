@@ -821,7 +821,7 @@ def presentation_preload_config(summary, aliases):
             "aliases": {key: value for key, value in aliases.items() if value in companies}}
 
 
-def externalize_scripts(html, destination, preload_config):
+def externalize_scripts(html, destination, preload_config, companies_data):
     """Discover immutable scripts in the head; execute them sequentially after first paint."""
     app = re.search(r'<script data-bundle="app">(.*?)</script>', html, re.S)
     require(app is not None, "build: missing app script bundle")
@@ -847,13 +847,24 @@ def externalize_scripts(html, destination, preload_config):
         html = html[:match.start()] + html[match.end():]
     require(html.count("/* BUNDLES */[]") == 2, "build: script loader placeholders missing")
     require(html.count("<!-- BOOT_PRELOADS -->") == 1, "build: early script discovery placeholder missing")
-    html = html.replace("<!-- BOOT_PRELOADS -->", "".join('<link rel="preload" as="script" href="' + path + '">' for path in files))
+    companies_script = write_script_asset(destination, "companies-data", companies_data.encode("utf-8"))["href"]
+    data_script, app_script = files
+    bootstrap = (
+        '<link rel="preload" as="script" href="' + app_script + '">'
+        '<script>(()=>{const full=' + json.dumps(data_script) + ',directory=' + json.dumps(companies_script) + ';'
+        'const selected=/^#companies(?:[/?]|$)/i.test(location.hash)?directory:full;'
+        'window.EXPLORE_SCRIPTS=[selected,' + json.dumps(app_script) + '];'
+        'window.EXPLORE_FULL_DATA_SCRIPT=full;'
+        'const link=document.createElement("link");link.rel="preload";link.as="script";'
+        'link.href=selected;document.head.append(link);})();</script>'
+    )
+    html = html.replace("<!-- BOOT_PRELOADS -->", bootstrap)
     require(html.count("<!-- EVIDENCE_PRELOAD -->") == 1, "build: early evidence discovery placeholder missing")
     prefetch = packaged["javascript"]["prefetch"]
     require("</script" not in prefetch.lower(), "build: unsafe closing-script text in the head prefetch helper")
     discovery = '<script>window.PRESENTATION_PRELOAD_CONFIG=' + script_safe(json.dumps(preload_config, separators=(",", ":"))) + ';(()=>{' + prefetch + '})();</script>'
     html = html.replace("<!-- EVIDENCE_PRELOAD -->", discovery)
-    return html.replace("/* BUNDLES */[]", json.dumps(files, separators=(",", ":")))
+    return html.replace("/* BUNDLES */[]", "window.EXPLORE_SCRIPTS")
 
 
 def root_relative_resources(html):
@@ -983,10 +994,14 @@ def build(data, destination):
     compact_sidecars.pop("RESEARCH_SEARCH", None)
     public_summary = {key: value for key, value in summary.items() if key not in ("bootstrap", "companies", "work")}
     public_summary["asset"] = summary_asset
-    injected = "window.SUMMARY_INDEX=" + script_safe(json.dumps(public_summary, separators=(",", ":"))) + ";"
-    injected += LAZY_DATA + "".join(lazy_data(name, value) for name, value in compact_sidecars.items()) + "})();"
+    summary_script = "window.SUMMARY_INDEX=" + script_safe(json.dumps(public_summary, separators=(",", ":"))) + ";"
+    sidecar_scripts = {name: lazy_data(name, value) for name, value in compact_sidecars.items()}
     # link-health.js reads this one while it loads, so it stays a plain assignment.
-    injected += "window.LINK_HEALTH=" + script_safe(json.dumps(link_health)) + ";"
+    link_script = "})();window.LINK_HEALTH=" + script_safe(json.dumps(link_health)) + ";"
+    injected = summary_script + LAZY_DATA + "".join(sidecar_scripts.values()) + link_script
+    companies_data = (summary_script + LAZY_DATA + "".join(script for name, script in sidecar_scripts.items()
+                                                              if name != "WORK_ROUTES") + link_script
+                      + "window.EXPLORE_DEFER_WORK=true;")
     html = html.replace("/* EDITORIAL_DATA */", injected)
     html = html.replace("/* REDESIGN_CSS */", "".join((ROOT / "web" / name).read_text() for name in REDESIGN_CSS))
     html = html.replace("/* ICONS_CSS */", (ROOT / "web/icons.css").read_text())
@@ -1023,7 +1038,7 @@ def build(data, destination):
     html = html.replace("{{COMPANY_COUNT}}", str(len(data["companies"]))).replace("{{SOURCE_COUNT}}", str(len(data["sources"]))).replace("{{GROUP_COUNT}}", str(len({e["primary_offering"] for e in editorial["entries"]})))
     html = render_snapshot_metadata(html, data)
     html = render_static_file_metadata(html, destination)
-    html = externalize_scripts(html, destination, presentation_preload_config(summary, aliases))
+    html = externalize_scripts(html, destination, presentation_preload_config(summary, aliases), companies_data)
     (destination / "explore").mkdir(exist_ok=True)
     html = html.replace('<link rel="canonical" href="https://sciencetostartup.com/">', '<link rel="canonical" href="https://sciencetostartup.com/explore/"><meta name="robots" content="noindex,follow">')
     (destination / "explore/index.html").write_text(root_relative_resources(html))
