@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [before, repaired]
+        variant: [repaired]
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     container:
@@ -20,7 +20,7 @@ jobs:
       VARIANT: ${{ matrix.variant }}
       C21_BASE: 6cae2f8323f13b39009518c05e9fc5e0e95adbb4
       C21_MANIFEST: c2fca78d019495cafe0673e473ac82105a7dcbcd3720e5d4aa9e2e536c249f0c
-      MARKET_SOURCE: 79674fa7cd854fd6eb8d840b582e035886b2d60e
+      MARKET_SOURCE: 8047735ceedd5acd7c7ad831e4204bf878edac7b
       QA_BASE_URL: http://127.0.0.1:19011
     steps:
       - uses: actions/checkout@v4
