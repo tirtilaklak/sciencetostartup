@@ -307,6 +307,28 @@ test('Daily date navigation retains filters and restores the open issue on Back'
   await expect(page).toHaveURL(datedURL(previous));
 });
 
+test('Daily previous and next snapshot links regain focus on cold Back', async ({ page, browserName, isMobile }) => {
+  test.skip(browserName !== 'chromium' && !(browserName === 'webkit' && isMobile),
+    'Exercise cold returns in Chromium and phone WebKit');
+  test.skip(latest === previous, 'Two published snapshots are required');
+  const steps = [
+    { from: '/daily/', to: `/daily/${previous.date}/`, name: /^Previous snapshot · /, width: 320, height: 640 },
+    { from: `/daily/${previous.date}/`, to: `/daily/${latest.date}/`, name: /^Next snapshot · /, width: 390, height: 844 },
+  ];
+  for (const { from, to, name, width, height } of steps) {
+    await page.setViewportSize({ width, height });
+    await page.goto(from);
+    const origin = page.url();
+    const start = await page.evaluate(() => performance.timeOrigin);
+    const link = page.getByRole('link', { name });
+    await link.press('Enter');
+    await expect(page).toHaveURL(to);
+    await traversePermalinkHistory(page, 'goBack', origin);
+    expect(await page.evaluate(() => performance.timeOrigin)).not.toBe(start);
+    await expect(link).toBeFocused();
+  }
+});
+
 async function settledReading(link) {
   await expect(link).toBeInViewport();
   // Focus and fragment scrolling respect the site's smooth-scroll setting.
@@ -683,6 +705,7 @@ classicFirefox.describe('Daily classic Firefox history', () => {
     await previousLink.press('Enter');
     await expect(page).toHaveURL(previousURL);
     await traversePermalinkHistory(page, 'goBack', targetURL);
+    await expect(previousLink).toBeFocused();
     await expect(previousLink).toBeInViewport();
     expect((await settledReading(previousLink)).open).toEqual([]);
   });

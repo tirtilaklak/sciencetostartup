@@ -2,7 +2,7 @@
 (() => {
   'use strict';
 
-  const shell = {"config":{"schemaVersion":"1.0.0","buildId":"8ec2dfe01e94dce321e0","editorialReleaseId":"2026-11-22.10","datasetVersion":"2.5.0","search":{"href":"/presentation/search.f654c944af8a7b9d.json","sha256":"f654c944af8a7b9d89eaf080b9a039a8b1b8874bcf4d4d1d85fa357024551015","bytes":388089}},"dialog":"<dialog id=\"home-search\" class=\"site-search\" aria-labelledby=\"home-search-title\">\n<div class=\"site-search-panel\"><div class=\"site-search-bar\">\n<label id=\"home-search-title\" class=\"sr-only\" for=\"home-search-input\">Search the guide</label>\n<svg class=\"ui-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6.5\"/><path d=\"m16 16 4 4\"/></svg>\n<input id=\"home-search-input\" class=\"site-search-input\" type=\"search\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"false\" aria-controls=\"home-search-results\" aria-describedby=\"home-search-message\" autocomplete=\"off\" autocapitalize=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" placeholder=\"Search\">\n<button type=\"button\" id=\"home-search-close\" class=\"site-search-close\" aria-label=\"Close search\"><svg class=\"ui-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" aria-hidden=\"true\" focusable=\"false\"><path d=\"m6 6 12 12M18 6 6 18\"/></svg></button>\n</div><div class=\"site-search-content\" tabindex=\"-1\">\n<p id=\"home-search-message\" class=\"site-search-message\">Search research or companies and their products. Try a role or skill for paid work.</p>\n<div id=\"home-search-results\" class=\"site-search-results\" role=\"listbox\" aria-label=\"Search results\" tabindex=\"-1\" hidden></div>\n<p class=\"site-search-fallback\"><a href=\"/companies/\">Browse companies</a><a id=\"home-search-work-recovery\" href=\"/work/\">Browse paid work</a></p>\n<button id=\"home-search-more\" class=\"site-search-more\" type=\"button\" hidden>Show more</button>\n</div><p id=\"home-search-status\" class=\"sr-only\" role=\"status\"></p></div>\n</dialog>\n"};
+  const shell = {"config":{"schemaVersion":"1.0.0","buildId":"0e43e5aeb405f063ee1c","editorialReleaseId":"2026-11-22.10","datasetVersion":"2.5.0","search":{"href":"/presentation/search.1d3643eb28bbbf0a.json","sha256":"1d3643eb28bbbf0a7ec857d31d670eed8c6f1a2a98448bb60e7ab3d52c75637c","bytes":388089}},"dialog":"<dialog id=\"home-search\" class=\"site-search\" aria-labelledby=\"home-search-title\">\n<div class=\"site-search-panel\"><div class=\"site-search-bar\">\n<label id=\"home-search-title\" class=\"sr-only\" for=\"home-search-input\">Search the guide</label>\n<svg class=\"ui-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6.5\"/><path d=\"m16 16 4 4\"/></svg>\n<input id=\"home-search-input\" class=\"site-search-input\" type=\"search\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"false\" aria-controls=\"home-search-results\" aria-describedby=\"home-search-message\" autocomplete=\"off\" autocapitalize=\"off\" spellcheck=\"false\" enterkeyhint=\"go\" placeholder=\"Search\">\n<button type=\"button\" id=\"home-search-close\" class=\"site-search-close\" aria-label=\"Close search\"><svg class=\"ui-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" aria-hidden=\"true\" focusable=\"false\"><path d=\"m6 6 12 12M18 6 6 18\"/></svg></button>\n</div><div class=\"site-search-content\" tabindex=\"-1\">\n<p id=\"home-search-message\" class=\"site-search-message\">Search research or companies and their products. Try a role or skill for paid work.</p>\n<div id=\"home-search-results\" class=\"site-search-results\" role=\"listbox\" aria-label=\"Search results\" tabindex=\"-1\" hidden></div>\n<p class=\"site-search-fallback\"><a href=\"/companies/\">Browse companies</a><a id=\"home-search-work-recovery\" href=\"/work/\">Browse paid work</a></p>\n<button id=\"home-search-more\" class=\"site-search-more\" type=\"button\" hidden>Show more</button>\n</div><p id=\"home-search-status\" class=\"sr-only\" role=\"status\"></p></div>\n</dialog>\n"};
   if (shell && typeof window.HTMLDialogElement?.prototype.showModal === 'function') {
     const configNode = document.createElement('script');
     configNode.id = 'home-config';
@@ -69,6 +69,8 @@
   const recovery = document.getElementById('home-search-work-recovery') || dialog?.querySelector('.site-search-fallback a[href="/work/"]');
   if (!opener || typeof dialog?.showModal !== 'function' || !input || !message || !results || !recovery) return;
   opener.id = 'home-search-open';
+  const historyField = 's2sHomeSearchReturn';
+  const recoveryOpener = document.querySelector('[data-full-guide-search]');
   let attempt = null;
   let generation = 0;
   let retries = 0;
@@ -110,22 +112,26 @@
 
   function openSearch(snapshot, trigger = document.activeElement) {
     if (!dialog.open) {
+      if (typeof snapshot?.directoryQuery === 'string' && recoveryOpener) trigger = recoveryOpener;
       returnFocus = trigger instanceof HTMLElement && trigger !== document.body && !dialog.contains(trigger)
         ? trigger : opener;
+      if (returnFocus === recoveryOpener) {
+        dialog.dataset.directoryQuery = document.getElementById('company-query')?.value || '';
+      } else delete dialog.dataset.directoryQuery;
     }
     if (snapshot) {
       pendingSnapshot = snapshot;
       input.value = snapshot.query.slice(0, 256);
     }
     syncWorkRecovery();
+    if (!dialog.open) dialog.showModal();
+    opener.setAttribute('aria-expanded', 'true');
+    input.focus();
     if (typeof window.openHomeSearch === 'function') {
       stop();
       openComponent();
       return;
     }
-    if (!dialog.open) dialog.showModal();
-    opener.setAttribute('aria-expanded', 'true');
-    input.focus();
     if (attempt) return;
 
     const request = ++generation;
@@ -144,6 +150,11 @@
       retries++;
       message.innerHTML = 'Search could not load. <button type="button" data-home-component-retry>Try again</button>';
       document.getElementById('home-search-status').textContent = 'Search could not load. Retry or browse the guide.';
+      const focused = document.activeElement;
+      if (pendingSnapshot?.focus === 'fallback' && (focused === input || !dialog.contains(focused))) {
+        const links = [...dialog.querySelectorAll('.site-search-fallback a[href]')];
+        links.find(link => !link.hidden && link.getAttribute('href') === pendingSnapshot.resultHref)?.focus();
+      }
     };
 
     attempt = { script, deadline: setTimeout(failure, 15_000) };
@@ -163,26 +174,58 @@
     document.head.append(script);
   }
 
+  const ordinaryClick = event => !event.defaultPrevented && event.button === 0
+    && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
   opener.addEventListener('click', event => {
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button > 0) return;
+    if (!ordinaryClick(event)) return;
     event.preventDefault();
     openSearch(undefined, opener);
+  });
+  recoveryOpener?.addEventListener('click', event => {
+    if (!ordinaryClick(event)) return;
+    event.preventDefault();
+    const query = new URL(recoveryOpener.href).searchParams.get('search') || '';
+    openSearch({ query }, recoveryOpener);
   });
   input.addEventListener('input', event => {
     pendingSnapshot = undefined;
     if (!event.isComposing) syncWorkRecovery();
   });
   input.addEventListener('compositionend', syncWorkRecovery);
+  input.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || event.isComposing || event.keyCode === 229) return;
+    event.preventDefault();
+    dialog.close();
+  });
   message.addEventListener('click', event => {
     if (event.target.closest('[data-home-component-retry]')) openSearch();
   });
   document.getElementById('home-search-close').addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', event => {
-    if (event.target === dialog) dialog.close();
+    if (event.target === dialog) {
+      dialog.close();
+      return;
+    }
+    if (!ordinaryClick(event) || typeof window.openHomeSearch === 'function') return;
+    const link = event.target.closest('.site-search-fallback a[href]');
+    if (!link || link.origin !== location.origin) return;
+    try {
+      history.replaceState({ ...history.state, [historyField]: {
+        query: input.value,
+        resultHref: link.getAttribute('href'),
+        focus: 'fallback',
+        directoryQuery: dialog.dataset.directoryQuery
+      } }, '');
+    } catch {}
   });
   dialog.addEventListener('close', () => {
     stop();
     pendingSnapshot = undefined;
+    if (history.state?.[historyField]) {
+      const remaining = { ...history.state };
+      delete remaining[historyField];
+      try { history.replaceState(remaining, ''); } catch {}
+    }
     opener.setAttribute('aria-expanded', 'false');
     const target = returnFocus;
     returnFocus = undefined;
@@ -226,7 +269,7 @@
     history.replaceState(history.state, '', url.pathname + url.search + url.hash);
     openSearch();
   } else if (performance.getEntriesByType('navigation')[0]?.type === 'back_forward') {
-    const snapshot = history.state?.s2sHomeSearchReturn;
+    const snapshot = history.state?.[historyField];
     if (typeof snapshot?.query === 'string') openSearch(snapshot);
   }
 })();

@@ -167,15 +167,108 @@ test('static header points to lightweight search and native directory matches co
   }
 });
 
-test('a research-only company can be recovered from an empty native directory search',async({page})=>{
-  await page.goto('/companies/?q=Humans+in+the+Loop');
-  const recovery=page.getByRole('link',{name:'Search the full guide'});
-  await expect(recovery).toBeVisible();
-  await recovery.focus();
-  await page.keyboard.press('Enter');
-  const input=page.locator('#home-search-input');
-  await expect(input).toHaveValue('Humans in the Loop');
-  await expect(page.locator('#home-search-results [role=option]').first()).toHaveAttribute('href','/company/org.humans_in_the_loop/');
+test('a research-only company can be recovered without leaving the directory', async ({ page, isMobile }) => {
+  await page.goto('/companies/?group=expert-data-evaluation#main');
+  const directorySearch = page.getByRole('searchbox', { name: 'Search companies' });
+  const query = 'Humans in the Loop';
+  const literal = '  ' + query + '  ';
+  await directorySearch.fill(literal);
+  const origin = page.url();
+  const recovery = page.getByRole('link', { name: 'Search the full guide' });
+  const fallbackHref = '/?search=++Humans+in+the+Loop++#browse-guide';
+  await expect(recovery).toHaveAttribute('href', fallbackHref);
+  if (isMobile) await recovery.tap();
+  else await recovery.press('Enter');
+  const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+  const input = dialog.getByRole('combobox');
+  const result = dialog.getByRole('option').first();
+  await expect(input).toHaveValue(literal);
+  await expect(result).toHaveAttribute('href', '/company/org.humans_in_the_loop/');
+  await expect(page).toHaveURL(origin);
+  await input.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(recovery).toBeFocused();
+  await expect(directorySearch).toHaveValue(literal);
+  await expect(page.getByRole('combobox', { name: 'Business group' })).toHaveValue('expert-data-evaluation');
+  await expect(page).toHaveURL(origin);
+
+  if (isMobile) await recovery.tap();
+  else await recovery.press('Enter');
+  await input.fill(query);
+  await expect(result).toBeVisible();
+  if (isMobile) await result.tap();
+  else await input.press('Enter');
+  await expect(page).toHaveURL('/company/org.humans_in_the_loop/');
+  await page.goBack();
+  await expect(page).toHaveURL(origin);
+  await expect(input).toHaveValue(query);
+  await expect(result).toHaveAttribute('aria-selected', 'true');
+  await page.keyboard.press('Escape');
+  await expect(recovery).toBeFocused();
+  await expect(recovery).toBeInViewport();
+  await expect(directorySearch).toHaveValue(literal);
+  await expect(recovery).toHaveAttribute('href', fallbackHref);
+});
+
+test('Back from the company directory restores a no-match Search and its fallback link', async ({ page, isMobile }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Search the guide' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+  const input = dialog.getByRole('combobox');
+  const browse = dialog.getByRole('link', { name: 'Browse companies' });
+  const query = 'zzqxv-no-matching-guide-record';
+  await input.fill(query);
+  await expect(dialog.locator('#home-search-message')).toContainText('No recorded guide matches');
+  if (isMobile) await browse.tap();
+  else await browse.press('Enter');
+  await expect(page).toHaveURL('/companies/');
+  await page.goBack();
+  await expect(page).toHaveURL('/');
+  await expect(input).toHaveValue(query);
+  await expect(browse).toBeFocused();
+  await expect(browse).toBeInViewport();
+});
+
+test('Search shell restores its fallback link on Back when the component is unavailable', async ({ page, isMobile }) => {
+  await page.route('**/home-search.js', route => route.abort());
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Search the guide' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+  const input = dialog.getByRole('combobox');
+  const browse = dialog.getByRole('link', { name: 'Browse companies' });
+  const query = 'zzqxv-no-matching-guide-record';
+  await expect(dialog.getByRole('button', { name: 'Try again' })).toBeVisible();
+  await input.fill(query);
+  if (isMobile) await browse.tap();
+  else await browse.press('Enter');
+  await expect(page).toHaveURL('/companies/');
+  await page.goBack();
+  await expect(dialog.getByRole('button', { name: 'Try again' })).toBeVisible();
+  await expect(input).toHaveValue(query);
+  await expect(browse).toBeFocused();
+});
+
+test('dismissing Search without the component clears the saved Back state', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Search the guide' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Search the guide' });
+  const input = dialog.getByRole('combobox');
+  await input.fill('Paid work');
+  await expect(dialog.getByRole('option').first()).toHaveAttribute('href', '/work/');
+  await input.press('Enter');
+  await expect(page).toHaveURL('/work/');
+  await page.route('**/home-search.js', route => route.abort());
+  await page.goBack();
+  await expect(input).toHaveValue('Paid work');
+  await expect(dialog.getByRole('button', { name: 'Try again' })).toBeVisible();
+  await input.press('Escape');
+  await expect(dialog).toBeHidden();
+  await page.locator('.hero-actions a[href="/companies/"]').click();
+  await expect(page).toHaveURL('/companies/');
+  await page.goBack();
+  await expect(page).toHaveURL('/');
+  await expect(page.getByRole('link', { name: 'Search the guide' })).toHaveAttribute('aria-expanded', 'false');
+  await expect(dialog).toBeHidden();
 });
 
 test('native work search uses company aliases and preserves listing buckets and literal queries',async({page})=>{

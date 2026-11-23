@@ -69,6 +69,8 @@
   const recovery = document.getElementById('home-search-work-recovery') || dialog?.querySelector('.site-search-fallback a[href="/work/"]');
   if (!opener || typeof dialog?.showModal !== 'function' || !input || !message || !results || !recovery) return;
   opener.id = 'home-search-open';
+  const historyField = 's2sHomeSearchReturn';
+  const recoveryOpener = document.querySelector('[data-full-guide-search]');
   let attempt = null;
   let generation = 0;
   let retries = 0;
@@ -110,22 +112,26 @@
 
   function openSearch(snapshot, trigger = document.activeElement) {
     if (!dialog.open) {
+      if (typeof snapshot?.directoryQuery === 'string' && recoveryOpener) trigger = recoveryOpener;
       returnFocus = trigger instanceof HTMLElement && trigger !== document.body && !dialog.contains(trigger)
         ? trigger : opener;
+      if (returnFocus === recoveryOpener) {
+        dialog.dataset.directoryQuery = document.getElementById('company-query')?.value || '';
+      } else delete dialog.dataset.directoryQuery;
     }
     if (snapshot) {
       pendingSnapshot = snapshot;
       input.value = snapshot.query.slice(0, 256);
     }
     syncWorkRecovery();
+    if (!dialog.open) dialog.showModal();
+    opener.setAttribute('aria-expanded', 'true');
+    input.focus();
     if (typeof window.openHomeSearch === 'function') {
       stop();
       openComponent();
       return;
     }
-    if (!dialog.open) dialog.showModal();
-    opener.setAttribute('aria-expanded', 'true');
-    input.focus();
     if (attempt) return;
 
     const request = ++generation;
@@ -144,6 +150,11 @@
       retries++;
       message.innerHTML = 'Search could not load. <button type="button" data-home-component-retry>Try again</button>';
       document.getElementById('home-search-status').textContent = 'Search could not load. Retry or browse the guide.';
+      const focused = document.activeElement;
+      if (pendingSnapshot?.focus === 'fallback' && (focused === input || !dialog.contains(focused))) {
+        const links = [...dialog.querySelectorAll('.site-search-fallback a[href]')];
+        links.find(link => !link.hidden && link.getAttribute('href') === pendingSnapshot.resultHref)?.focus();
+      }
     };
 
     attempt = { script, deadline: setTimeout(failure, 15_000) };
@@ -163,26 +174,58 @@
     document.head.append(script);
   }
 
+  const ordinaryClick = event => !event.defaultPrevented && event.button === 0
+    && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
   opener.addEventListener('click', event => {
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button > 0) return;
+    if (!ordinaryClick(event)) return;
     event.preventDefault();
     openSearch(undefined, opener);
+  });
+  recoveryOpener?.addEventListener('click', event => {
+    if (!ordinaryClick(event)) return;
+    event.preventDefault();
+    const query = new URL(recoveryOpener.href).searchParams.get('search') || '';
+    openSearch({ query }, recoveryOpener);
   });
   input.addEventListener('input', event => {
     pendingSnapshot = undefined;
     if (!event.isComposing) syncWorkRecovery();
   });
   input.addEventListener('compositionend', syncWorkRecovery);
+  input.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || event.isComposing || event.keyCode === 229) return;
+    event.preventDefault();
+    dialog.close();
+  });
   message.addEventListener('click', event => {
     if (event.target.closest('[data-home-component-retry]')) openSearch();
   });
   document.getElementById('home-search-close').addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', event => {
-    if (event.target === dialog) dialog.close();
+    if (event.target === dialog) {
+      dialog.close();
+      return;
+    }
+    if (!ordinaryClick(event) || typeof window.openHomeSearch === 'function') return;
+    const link = event.target.closest('.site-search-fallback a[href]');
+    if (!link || link.origin !== location.origin) return;
+    try {
+      history.replaceState({ ...history.state, [historyField]: {
+        query: input.value,
+        resultHref: link.getAttribute('href'),
+        focus: 'fallback',
+        directoryQuery: dialog.dataset.directoryQuery
+      } }, '');
+    } catch {}
   });
   dialog.addEventListener('close', () => {
     stop();
     pendingSnapshot = undefined;
+    if (history.state?.[historyField]) {
+      const remaining = { ...history.state };
+      delete remaining[historyField];
+      try { history.replaceState(remaining, ''); } catch {}
+    }
     opener.setAttribute('aria-expanded', 'false');
     const target = returnFocus;
     returnFocus = undefined;
@@ -226,7 +269,7 @@
     history.replaceState(history.state, '', url.pathname + url.search + url.hash);
     openSearch();
   } else if (performance.getEntriesByType('navigation')[0]?.type === 'back_forward') {
-    const snapshot = history.state?.s2sHomeSearchReturn;
+    const snapshot = history.state?.[historyField];
     if (typeof snapshot?.query === 'string') openSearch(snapshot);
   }
 })();

@@ -100,7 +100,27 @@ test('Market evidence closes and focuses the profile after following its company
   await followProfile();
   await page.goBack();
   await expect(page).toHaveURL(/#business-health$/);
+  await expect(value).toBeFocused();
   await followProfile();
+});
+
+test('Market Back returns to the exact Appen link in the revenue ledger and evidence matrix', async ({ page }) => {
+  await openMarket(page);
+  const ledger = page.locator('#bh-ledger').getByRole('link', { name: 'Appen', exact: true });
+  const matrix = page.locator('#bh-matrix-body').getByRole('link', { name: 'Appen', exact: true });
+  await page.locator('.bh-coverage-disclosure > summary').press('Enter');
+  await page.getByLabel('Find a company').fill('Appen');
+
+  for (const link of [ledger, matrix]) {
+    await link.scrollIntoViewIfNeeded();
+    await link.press('Enter');
+    await expect(page).toHaveURL(/#company\/appen$/);
+    await expect(page.locator('html')).toHaveAttribute('data-view-state', 'ready');
+    await page.goBack();
+    await expect(page).toHaveURL(/#market$/);
+    await expect(link).toBeFocused();
+    await expect(link).toBeInViewport({ ratio: 1 });
+  }
 });
 
 test('Market restores RWS focus after an alternate observation and nested claim', async ({ page }) => {

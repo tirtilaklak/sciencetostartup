@@ -74,7 +74,7 @@ const companyHandoffs = [
     href: 'https://sciencetostartup.com/company/mercor/', result: '.company-dossier',
   },
   {
-    name: 'full guide search', query: '  Humans in the Loop  ', source: '[data-full-guide-search]',
+    name: 'full guide search without the native search shell', query: '  Humans in the Loop  ', source: '[data-full-guide-search]',
     following: '.directory-scope summary', href: '/?search=++Humans+in+the+Loop++#browse-guide',
     result: '[data-result-type=Company][href="/company/org.humans_in_the_loop/"]',
   },
@@ -85,6 +85,7 @@ for (const handoff of companyHandoffs) {
     await trackDocument(page, true);
     await page.setViewportSize({ width: 390, height: 844 });
     if (handoff.result === '.company-dossier') await routePublishedDossiers(page, baseURL);
+    if (handoff.source === '[data-full-guide-search]') await page.route('**/guide-search-shell.js', route => route.abort());
     const group = handoff.group ?? directoryGroup;
     await page.goto(`/companies/?group=${group}&reader=keep`);
     const search = page.getByRole('searchbox', { name: 'Search companies' });
