@@ -1,0 +1,115 @@
+name: Check the remaining mobile Explore links on Worker 49
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-immutable-explore-phone-tail.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  explore:
+    name: Explore (${{ matrix.viewport }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 32
+    strategy:
+      fail-fast: false
+      matrix:
+        viewport: [phone]
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      C21_HEAD: eae4770118a9ffb35279c71f4bef061b302e89d7
+      QA_DISCOVER_PROFILE_SECTIONS: '0'
+      C21_DIST_TREE: d47311a994be269c78e4ae4365977fe15e7699b5
+      C21_MANIFEST: ea4fa51e30eea853e7526bdd62b0117c36c7532da0cb8f471beffd21708a1c45
+      QA_VIEWPORT: ${{ matrix.viewport }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare exact artifact source
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          git worktree add --detach "$RUNNER_TEMP/c21-product" "$C21_HEAD"
+          git config --global --add safe.directory "$RUNNER_TEMP/c21-product"
+          test "$(git -C "$RUNNER_TEMP/c21-product" rev-parse HEAD:dist)" = "$C21_DIST_TREE"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --prefix "$RUNNER_TEMP/c21-product"
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45113838865
+          name: c21-rws-final-explore-phone
+          path: output/frozen-phone
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45119210440
+          name: c21-immutable-explore-phone
+          path: output/preview-phone
+      - name: Exercise each remaining signed Explore destination
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA="$GITHUB_WORKSPACE/.github/qa/c21-recovery"
+          export QA_EXPLORE_OUTPUT="$GITHUB_WORKSPACE/output/explore"
+          mkdir -p "$QA_EXPLORE_OUTPUT"
+          export QA_EXPLORE_INVENTORY="$QA_EXPLORE_OUTPUT/inventory.json"
+          cd "$RUNNER_TEMP/c21-product"
+          PYTHONPATH=scripts python3 - <<'PY'
+          import os
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          validate_artifact(Path('dist'),os.environ['C21_MANIFEST'])
+          PY
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path(os.environ['GITHUB_WORKSPACE'])/'output'
+          frozen=json.loads((root/'frozen-phone/summary.json').read_bytes())
+          preview=json.loads((root/'preview-phone/summary.json').read_bytes())
+          for proof in (frozen,preview):
+              assert proof['passed'] and proof['head']==os.environ['C21_HEAD']
+              assert proof['manifest']==proof['before']['sha256']==proof['after']['sha256']==os.environ['C21_MANIFEST']
+              assert proof['viewport']=={'width':390,'height':844}
+          assert frozen['destinations']==595 and preview['destinations']==588
+          full={row['fragment']:row['linkedFrom'] for row in frozen['results']}
+          reached={row['fragment'] for row in preview['results'] if row['passed']}
+          assert len(full)==595 and len(reached)==588 and reached<=full.keys()
+          missing={key:full[key] for key in sorted(full.keys()-reached)}
+          assert len(missing)==7
+          print('MOBILE TAIL',json.dumps(list(missing)))
+          Path(os.environ['QA_EXPLORE_INVENTORY']).write_text(json.dumps({
+              'head':frozen['head'],'manifest':frozen['manifest'],'routes':missing
+          }))
+          PY
+          python3 - "$QA/explore_routes.cjs" "$QA/explore_immutable_routes.cjs" <<'PY'
+          from pathlib import Path
+          import sys
+          source,output=map(Path,sys.argv[1:])
+          text=source.read_text()
+          assert text.count("const base = 'http://127.0.0.1:19011';")==1
+          assert text.count("context.request.get(base + '/manifest.json')")==1
+          text=text.replace("const base = 'http://127.0.0.1:19011';","const base = 'https://5d917f05-sciencetostartup.musaeminozdem.workers.dev';")
+          text=text.replace("context.request.get(base + '/manifest.json')","context.request.get(base + '/manifest.json', {headers: {'User-Agent': 'ScienceToStartup-ReleaseVerification/1.0 (+https://sciencetostartup.com/method/)'}})")
+          discovery="for (const section of ['market', 'companies', 'work', 'compare', 'method'])"
+          assert text.count(discovery)==1
+          text=text.replace(discovery,"for (const section of [])")
+          output.write_text(text)
+          PY
+          node "$QA/explore_immutable_routes.cjs"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c21-immutable-explore-phone-tail
+          path: output/explore/
+          if-no-files-found: error
+          retention-days: 14
