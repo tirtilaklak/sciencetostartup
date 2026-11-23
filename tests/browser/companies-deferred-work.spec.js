@@ -35,7 +35,13 @@ test('Companies defers Work and recovers the same ordered listings and export', 
   await expect(page.locator('#work-count')).toHaveText('Loading work listings…');
   release();
   await expect(page.locator('#work-count')).toHaveText('Work listings could not load. Your filters are preserved.');
-  await expect(page.locator('#work-cards a')).toHaveAttribute('href', '/work/?' + workQuery);
+  const fallback = page.locator('#work-cards').getByRole('link', { name: 'Open native Work results' });
+  await expect(fallback).toHaveAttribute('href', '/work/?' + workQuery);
+  const native = await page.context().newPage();
+  await native.goto(new URL(await fallback.getAttribute('href'), page.url()).href);
+  await expect(native.getByRole('heading', { level: 1 })).toBeVisible();
+  expect(new URL(native.url()).search.slice(1)).toBe(workQuery);
+  await native.close();
   expect(attempts).toBe(1);
   badSummary = false;
   await page.locator('[data-retry-search]').click();
@@ -75,7 +81,7 @@ test('Companies Search preserves the query and browse actions when Work data is 
   await expect(input).toHaveValue('Python');
   offline = false;
   await page.locator('[data-retry-site-search]').click();
-  await expect(page.getByRole('option', { name: /See all d+ matches? for “Python”/ })).toBeVisible();
+  await expect(page.getByRole('option', { name: /See all [0-9]+ matches? for “Python”/ })).toBeVisible();
 });
 
 test('a failed Companies bootstrap uses the existing full data script', async ({ page }) => {
