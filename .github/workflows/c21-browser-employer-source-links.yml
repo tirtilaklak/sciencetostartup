@@ -1,0 +1,97 @@
+name: Verify public G2i and RWS links in a browser
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-browser-employer-source-links.yml]
+permissions:
+  contents: read
+jobs:
+  links:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fa24bac625b428bf868b2d5259f2837eef6023b5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - name: Open the exact source pages without submitting anything
+        shell: bash
+        run: |
+          mkdir -p output
+          node <<'JS'
+          const { chromium } = require('playwright');
+          const { writeFileSync } = require('node:fs');
+          const id='7c54f48a-bd33-491a-8130-f1c9b1dfccb1';
+          const posting='https://jobs.ashbyhq.com/g2i/'+id;
+          const urls = {
+            board: 'https://api.ashbyhq.com/posting-api/job-board/g2i?includeCompensation=true',
+            role: posting,
+            application: posting+'/application',
+            trading: 'https://www.lse.co.uk/rns/RWS/trading-statement-bgo38kxyahrrjkn.html?mobile_view=desktop',
+            acquisition: 'https://www.londonstockexchange.com/en/news/article/RWS/completion-of-the-acquisition-of-acogroup/e91f-77-82-3d-cc-46438c',
+            confirmation: 'https://www.acolad.com/en/news/acolad-is-part-of-rws'
+          };
+          (async () => {
+            const browser=await chromium.launch();
+            const context=await browser.newContext();
+            const outcomes={};
+            try {
+              for(const [key,address] of Object.entries(urls)) {
+                const page=await context.newPage();
+                const row={address};
+                outcomes[key]=row;
+                try {
+                  const response=await page.goto(address,{waitUntil:'domcontentloaded',timeout:25000});
+                  const status=response?.status();
+                  const headers=response?.headers()||{};
+                  Object.assign(row,{status,url:page.url(),classification:[401,403,451].includes(status)?'access restriction':[404,410].includes(status)?'missing source':status===200?'reachable':'unconfirmed response'});
+                  row.blockHeader=headers['x-mitmproxy-blocked-reason']||null;
+                  if(status===200) {
+                    if(key==='board') {
+                      const data=JSON.parse(await page.locator('body').innerText());
+                      const matches=data.jobs.filter(job=>job.jobUrl?.includes(id));
+                      row.exactMatches=matches.length;
+                      if(matches.length===1) {
+                        const job=matches[0];
+                        row.exactTitle=job.title;
+                        row.remote=job.isRemote;
+                        row.employmentType=job.employmentType;
+                        row.exactApplication=job.applyUrl===posting+'/application';
+                      }
+                    } else {
+                      if(key==='role'||key==='application') {
+                        await page.waitForFunction(()=>document.body?.innerText.includes('Senior Software Engineer, AI Training')||document.querySelector('form'),null,{timeout:9000}).catch(()=>{});
+                        row.exactListing=page.url().includes(id)&&await page.locator('body').innerText().then(content=>content.includes('Senior Software Engineer, AI Training'));
+                        row.visibleApplicationForm=key==='application'&&await page.locator('form:visible').count()>0;
+                      } else {
+                        const content=await page.locator('body').innerText();
+                        row.primaryClaim=key==='trading'?content.includes('£700m')&&content.includes('15 December 2026'):/completed.{0,100}acquisition|Acolad is part of RWS/i.test(content);
+                        row.termsGate=key==='acquisition'&&content.includes('Before Proceeding')&&!row.primaryClaim;
+                      }
+                    }
+                  }
+                } catch(error) {
+                  row.failure=String(error).slice(0,250);
+                  row.classification='unconfirmed transport or format';
+                } finally {
+                  await page.close();
+                  console.log(key,JSON.stringify(row));
+                }
+              }
+            } finally {
+              await browser.close();
+              writeFileSync('output/browser-source-links.json',JSON.stringify(outcomes,null,2));
+            }
+          })().catch(error=>{console.error(error);process.exitCode=1;});
+          JS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: normal-browser-source-links
+          path: output
+          if-no-files-found: error
