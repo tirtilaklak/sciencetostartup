@@ -8,6 +8,7 @@ const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 const previous = name => name.endsWith('.gz') ? gunzipSync(fs.readFileSync(path.join(root, 'tests/fixtures/previous-search', name))).toString() : read('tests/fixtures/previous-search/' + name);
 const current = name => read('web/search-core.js') + '\n' + read('web/' + name);
 const companies = require('../../data/canonical.json').companies;
+const currentWorkCount = require('../../data/work-routes.json').routes.length;
 const origin = 'http://127.0.0.1:18769';
 const baselineEntries = JSON.parse(previous('index.json.gz')).entries;
 async function home(page, { oldMarkup = false, oldIndex = false, oldComponent = false, oldRuntime = false, query = '', fixtureOrigin = origin } = {}) {
@@ -135,7 +136,8 @@ for(const [routeName, oldScript] of [['companies',false],['companies',true],['wo
     if(routeName==='work') await page.locator('.work-page-filter-options').evaluate(node=>{node.open=true;});
     await page.getByRole('button',{name:'Clear',exact:true}).click();
     await expect(input).toHaveValue('');
-    await expect(page.locator(routeName==='companies'?'[data-company]':'[data-work-route]')).toHaveCount(routeName==='companies'?(oldScript?55:53):(oldScript?136:135));
+    const count = routeName==='companies'?(oldScript?55:53):currentWorkCount;
+    await expect(page.locator(routeName==='companies'?'[data-company]':'[data-work-route]')).toHaveCount(count);
   });
 }
 
@@ -166,7 +168,7 @@ test('new work script accepts old native markup', async ({ page }) => {
   await expect(input).toBeFocused();
   await expect(page).toHaveURL(/\/work\/\?reader=keep&pay=hourly#main$/);
   await expect(page.locator('[data-work-count]')).toHaveText(originalCount);
-  await expect(records).toHaveCount(135);
+  await expect(records).toHaveCount(originalOrder.length);
   expect(await records.evaluateAll(cards => cards.map(card => card.dataset.workRoute))).toEqual(originalOrder);
   expect(errors).toEqual([]);
 });
@@ -346,7 +348,7 @@ test('native work rejects a stale script and restores the selected record and CS
     load: 'failed',
     message: 'Filters did not load. Showing the full directory.',
     groups: ['named', 'programs', 'boards', 'outside', 'closed'],
-    records: 136,
+    records: currentWorkCount,
     listVisible: true,
     filterVisible: false,
     exportVisible: false,
