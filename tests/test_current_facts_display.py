@@ -177,7 +177,7 @@ class CurrentFactsDisplayTests(unittest.TestCase):
         profile = {"fixture": {"summary": "UNSELECTED PARENT ARTICLE PROSE", "current_facts": facts_fixture()}}
         with mock.patch.object(static_pages, "document", side_effect=lambda research, title, description, canonical, body, *args, **kwargs: body):
             markup = static_pages.render_index(SimpleNamespace(as_of="2026-10-15"), companies, editorial, {}, 0, "2026-11-16", profile_by_id=profile)
-        self.assertIn("<p>EXISTING EDITORIAL SUMMARY</p>", markup)
+        self.assertIn('<p class="directory-company-summary">EXISTING EDITORIAL SUMMARY</p>', markup)
         self.assertNotIn("UNSELECTED PARENT ARTICLE PROSE", markup)
         self.assertNotIn("CANONICAL SNAPSHOT DESCRIPTION", markup)
         self.assertIn("Updates checked 16 Nov 2026", markup)
