@@ -1,0 +1,39 @@
+name: Read the exact C21 control failures
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-read-control-evidence.yml]
+permissions:
+  actions: read
+  contents: read
+jobs:
+  evidence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: '45101108581'
+          github-token: ${{ github.token }}
+          name: c21-exact-companies
+          path: output/companies
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: '45101108581'
+          github-token: ${{ github.token }}
+          name: c21-exact-work
+          path: output/work
+      - name: Read the preserved same-build output
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          for target in ('companies','work'):
+              root=Path('output')/target/target
+              receipt=json.loads((root/'summary.json').read_bytes())
+              assert receipt['head']=='4dcb04128f511822b34eaa287d7e8283e51036d0'
+              assert receipt['manifest']=='4a743a78e1e7cbe76ca6b097cb9072b6aaa557f0892b9e734aeff10eb36a3103'
+              print(target)
+              for row in (root/'control.log').read_text().splitlines()[-85:]:
+                  print(row[:420])
+          PY
