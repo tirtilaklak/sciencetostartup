@@ -117,7 +117,7 @@ async function reach(page, fragment) {
         }
       }
     }
-    if (prior) {
+    if (prior || process.env.QA_DISCOVER_PROFILE_SECTIONS === '1') {
       await reach(page, 'companies');
       const companies = await page.evaluate(() => Object.keys(window.SUMMARY_INDEX.companyDetails).sort());
       for (const id of companies) {
