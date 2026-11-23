@@ -852,14 +852,29 @@ function rememberShortlistOrigin(event){
  history.replaceState({...history.state,shortlist},'');
  pendingShortlist={hash:link.getAttribute('href'),key:historyKey()};
 }
-window.addEventListener('hashchange',()=>{
- ensureHistoryEntryKey();
- explorePreviousKey=exploreEntryKey;
- exploreEntryKey=historyKey();
- if(!routeTraversal&&pendingExploreLink&&pendingExploreLink.key===explorePreviousKey&&pendingExploreLink.destination===location.href){
+// Commit the actual opened entry before a quick Back can overtake hashchange.
+window.navigation?.addEventListener('currententrychange',event=>{
+ const type=event.navigationType;
+ if(type!=='push'&&type!=='traverse')return;
+ const current=window.navigation.currentEntry;
+ explorePreviousKey=event.from?.key;
+ exploreEntryKey=current?.key;
+ if(type==='push'&&pendingExploreLink&&pendingExploreLink.key===explorePreviousKey&&pendingExploreLink.destination===current?.url){
   exploreFragmentDestinations.set(explorePreviousKey,exploreEntryKey);
  }
  pendingExploreLink=null;
+});
+window.addEventListener('hashchange',event=>{
+ if(event.newURL&&event.newURL!==location.href)return;
+ if(!window.navigation){
+  ensureHistoryEntryKey();
+  explorePreviousKey=exploreEntryKey;
+  exploreEntryKey=historyKey();
+  if(!routeTraversal&&pendingExploreLink&&pendingExploreLink.key===explorePreviousKey&&pendingExploreLink.destination===location.href){
+   exploreFragmentDestinations.set(explorePreviousKey,exploreEntryKey);
+  }
+  pendingExploreLink=null;
+ }
  if(onCompareRoute()){
   if(pendingShortlist?.hash===location.hash)history.replaceState({...history.state,compareShortlistSource:pendingShortlist.key},'');
   compareShortlistSource=history.state?.compareShortlistSource;
@@ -1433,7 +1448,7 @@ function initialize(){$('snapshot').textContent=compiledSnapshotLabel(DATA.meta.
  if(typeof requestIdleCallback!=='function'&&typeof requestAnimationFrame!=='function'){for(const view of ['companies','method','work'])preparePage(view);renderDirectory();preparePage('market');}
  route();initCompare();if(typeof initSiteNav==='function')initSiteNav();
  $('close-company').addEventListener('click',()=>$('company-dialog').close());$('close-evidence').addEventListener('click',()=>$('evidence-dialog').close());
- document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||(state.selected.length?compareSettingsFocus():$('compare-add'));next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});window.addEventListener('hashchange',route);
+ document.addEventListener('change',e=>{if(e.target.matches('[data-compare]'))chooseCompare(e.target.dataset.compare,e.target.checked);});document.addEventListener('click',e=>{const link=e.target.closest('[data-open-company]');if(link){if(link.tagName==='A'&&(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button))return;e.preventDefault();openCompanyStory(link.dataset.openCompany);return;}const fullProfile=e.target.closest('[data-full-profile]');if(normalSelfLinkActivation(e,fullProfile))$('company-dialog').close();const b=e.target.closest('button');if(!b)return;if(b.dataset.profileTab){activateProfileTab(b.dataset.profileTab);return;}if(b.dataset.claim){$('company-dialog').close();showEvidence(b.dataset.claim);}if(b.hasAttribute('data-clear'))reset();if(b.hasAttribute('data-clear-compare')){setSelection([]);const view=document.querySelector('.view:not([hidden])'),target=view?.querySelector('input[type=search]')||view?.querySelector('.profile-links [data-compare]')||view?.querySelector('h1');if(target){if(target.tagName==='H1')target.setAttribute('tabindex','-1');target.focus();}}if(b.dataset.remove){chooseCompare(b.dataset.remove,false);const surviving=[...document.querySelectorAll('#compare-content [data-remove]:not([hidden])')].find(node=>node.getClientRects().length);const next=surviving||(state.selected.length?compareSettingsFocus():$('compare-add'));next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'instant'});}if(b.hasAttribute('data-runrates')){state.runratesExpanded=!state.runratesExpanded;renderCharts();}});window.addEventListener('hashchange',event=>{if(!event.newURL||event.newURL===location.href)route(event);});
  // On small screens the Filters fields open as a panel under the button. A short screen can leave the whole panel
  // below the fold, so bring it into view when it opens. toggle does not bubble, so listen in the capture phase.
  document.addEventListener('toggle',e=>{const panel=e.target;if(!panel?.open||!panel.matches?.('.responsive-filter-panel,.more-filters'))return;if(panel.matches('.responsive-filter-panel')&&window.innerWidth>900)return;const fields=panel.querySelector('.responsive-filter-fields,.more-filters-panel'),box=fields?.getBoundingClientRect();if(box?.height&&box.bottom>window.innerHeight)fields.scrollIntoView({block:'nearest'});},true);
