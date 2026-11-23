@@ -1,0 +1,48 @@
+name: C20 Back behavior across Worker versions
+on:
+  push:
+    branches: [codex/site-quality-c20-back-controls-20261122]
+permissions:
+  contents: read
+jobs:
+  exact-back:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [worker47-immutable, worker48-public]
+        iteration: [1, 2, 3]
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Use the repository browser environment
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Replay both exact Back controls
+        env:
+          QA_TARGET: ${{ matrix.target }}
+          QA_ITERATION: ${{ matrix.iteration }}
+          PYTHONPATH: scripts
+        run: python3 .github/qa/c20-loopback/verify.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c20-back-ab-${{ matrix.target }}-${{ matrix.iteration }}
+          path: output/c20-back-ab/
+          if-no-files-found: error
+          retention-days: 14

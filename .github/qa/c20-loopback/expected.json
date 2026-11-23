@@ -1,0 +1,50 @@
+{
+  "product_head": "8ab0452e5f0576ee9da472b79587607315c12d01",
+  "dist_tree": "f47cbf7cf557e79bf521905082999cff33c7db70",
+  "product_manifest_sha256": "1fe217bab088009c4fb30ca3b00987bc3291361808823d9c523729fb648015fc",
+  "original_public_proof_head": "4b434cc5f344e7bf47983dbbd976f9fa787b187d",
+  "original_public_proof_run": 45094975500,
+  "cases": [
+    {
+      "id": "5c8e29925b5a1b29d9da-e69d13b33088f49bc25a",
+      "file": "company-handoff.spec.js",
+      "title": "restores the saved position when the matching result renders",
+      "suite": [
+        "company-handoff.spec.js",
+        "Explore shortlist Back during company search"
+      ],
+      "project": "chromium",
+      "fixture_blob": "46903505e3917ceea63824d1f46d51cedc5b4cfe"
+    },
+    {
+      "id": "fc45065b150b1083e52b-d3bd7e852056bbc3bfde",
+      "file": "technical-reading.spec.js",
+      "title": "current Technical GPQA citation opens on the first tap after Find",
+      "suite": [
+        "technical-reading.spec.js",
+        "technical citations after native Find on a phone"
+      ],
+      "project": "mobile-chromium",
+      "fixture_blob": "cdbf18e793bdfcd20dde25d95b45171b597672c1"
+    }
+  ],
+  "targets": {
+    "worker47-immutable": {
+      "origin": "https://9884a3b2-sciencetostartup.musaeminozdem.workers.dev",
+      "worker_version": "9884a3b2-a66d-4919-990f-9ef8fcca8234",
+      "manifest_sha256": "89bc2008e7b3a869f0752c9e0b813c307174f5ca9c2d5366aa8e355d58aa91e7",
+      "build_id": "fdcd18d9bc1267ed17c6"
+    },
+    "worker48-public": {
+      "origin": "https://sciencetostartup.com",
+      "worker_version": "2382dd9e-ac95-4b90-a1ed-35482a0e7ba8",
+      "manifest_sha256": "1fe217bab088009c4fb30ca3b00987bc3291361808823d9c523729fb648015fc",
+      "build_id": "e4ead044f5b3419c667b"
+    }
+  },
+  "iterations": [
+    1,
+    2,
+    3
+  ]
+}
