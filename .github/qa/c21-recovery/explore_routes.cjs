@@ -97,6 +97,9 @@ async function reach(page, fragment) {
   const results = prior ? [...prior.results] : [];
   const alreadyTested = new Set(results.map(row => row.fragment));
   let discovery = 0;
+  let companiesObserved = 0;
+  let tabsObserved = 0;
+  let newSections = 0;
   try {
     for (const section of ['market', 'companies', 'work', 'compare', 'method']) {
       await reach(page, section);
@@ -123,12 +126,31 @@ async function reach(page, fragment) {
         if (!routes.has(profile)) routes.set(profile, ['published company profile']);
         const tabs = await page.locator('#profile-view [data-profile-tab]').evaluateAll(nodes =>
           nodes.map(node => node.dataset.profileTab));
+        if (tabs.length !== primaryPanes.length || !primaryPanes.every(tab => tabs.includes(tab))) {
+          throw Error('Published profile does not show all primary tabs: ' + id);
+        }
+        companiesObserved += 1;
         for (const tab of tabs) {
+          tabsObserved += 1;
           if (!primaryPanes.includes(tab)) throw Error('Unknown profile tab: ' + tab);
           const destination = profile + '/' + tab;
           if (!routes.has(destination)) {
             routes.set(destination, ['rendered company tab ' + id + '/' + tab]);
             discovery += 1;
+          }
+          if (process.env.QA_DISCOVER_PROFILE_SECTIONS === '1') {
+            await reach(page, destination);
+            const landmarks = await page.locator('#profile-view [data-profile-section]').evaluateAll(nodes =>
+              nodes.map(node => node.dataset.profileSection));
+            for (const section of landmarks) {
+              if (!sections.includes(section)) continue;
+              const typedRoute = profile + '/' + section;
+              if (!routes.has(typedRoute)) {
+                routes.set(typedRoute, ['rendered profile section ' + id + '/' + tab]);
+                discovery += 1;
+                newSections += 1;
+              }
+            }
           }
         }
       }
@@ -153,11 +175,12 @@ async function reach(page, fragment) {
     const summary = { passed: results.length === routes.size && results.every(result => result.passed),
       head: inventory.head, manifest: inventory.manifest, viewport, before: first, after: last,
       authored: Object.keys(inventory.routes).length, extraVisibleRoutes: discovery, priorPassed: alreadyTested.size,
+      companiesObserved, tabsObserved, newSections,
       destinations: routes.size, passedDestinations: results.filter(result => result.passed).length, results };
     fs.writeFileSync(path.join(output, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
     const failures = results.filter(result => !result.passed).map(({ fragment, error }) => ({ fragment, error }));
     console.log(JSON.stringify({ viewport, destinations: routes.size,
-      passed: summary.passedDestinations, failures: failures.slice(0, 10) }));
+      passed: summary.passedDestinations, companiesObserved, tabsObserved, newSections, failures: failures.slice(0, 10) }));
     process.exitCode = summary.passed ? 0 : 1;
     await browser.close();
   }
