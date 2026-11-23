@@ -4,6 +4,16 @@ function compareCell(page, row, company) {
   return page.locator(`[data-comparison-row="${row}"] [data-comparison-company="${company}"]`);
 }
 
+async function savedScroll(page) {
+  const scroll = await page.evaluate(() => window.scrollY);
+  expect(scroll).toBeGreaterThan(0);
+  await expect.poll(() => page.evaluate(() => {
+    const entry = window.navigation ? window.navigation.currentEntry.getState() : history.state;
+    return entry?.scrollY;
+  })).toBe(scroll);
+  return scroll;
+}
+
 test('Compare can remove a company whose evidence request keeps failing', async ({ page }) => {
   let requests = 0;
   await page.route('**/presentation/company-mercor.*.json', route => {
@@ -153,6 +163,70 @@ test('fresh Back from native financing evidence restores More, the Compare pair 
     await expect(page).toHaveURL('/company/mercor/#financial-record');
     await expect(page.locator('#financial-record')).toHaveJSProperty('open', true);
   }
+});
+
+test('Compare reload restores the pair, expanded evidence and reading position for this entry', async ({ page, context }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const compare = '/explore/#compare/a-team/sama/mercor';
+  await page.goto(compare);
+  const headers = page.locator('.comparison-table thead .card-head a');
+  await expect(headers.first()).toBeVisible();
+  await page.locator('.mobile-column-options summary').press('Enter');
+  await page.getByRole('button', { name: 'Sama + Mercor', exact: true }).press('Enter');
+
+  const more = page.locator('[data-compare-extra]');
+  await more.press('Enter');
+  const evidence = compareCell(page, 'Funding & investors', 'mercor').getByRole('link', { name: 'Read Mercor’s financing evidence' });
+  await evidence.scrollIntoViewIfNeeded();
+  await expect(evidence).toBeInViewport();
+  const scrollBeforeReload = await savedScroll(page);
+
+  await page.reload();
+  await expect(page).toHaveURL(compare);
+  await expect(more).toHaveAttribute('aria-expanded', 'true');
+  await expect(headers.first()).toBeHidden();
+  await expect(headers.last()).toBeVisible();
+  await expect(evidence).toBeInViewport();
+  await expect.poll(() => page.evaluate(top => Math.abs(window.scrollY - top), scrollBeforeReload)).toBeLessThan(2);
+
+  const copied = await context.newPage();
+  await copied.setViewportSize({ width: 390, height: 844 });
+  await copied.goto(compare);
+  await expect(copied.locator('[data-compare-extra]')).toHaveAttribute('aria-expanded', 'false');
+  await expect(copied.locator('.comparison-table thead .card-head a').first()).toBeVisible();
+  await expect(copied.locator('.comparison-table thead .card-head a').last()).toBeHidden();
+});
+
+test('leaving an interrupted Compare reload keeps the reading position for Back', async ({ page }) => {
+  await page.addInitScript(() => addEventListener('unload', () => {}));
+  await page.setViewportSize({ width: 390, height: 844 });
+  const compare = '/explore/#compare/a-team/sama/mercor';
+  await page.goto(compare);
+  const more = page.locator('[data-compare-extra]');
+  await more.scrollIntoViewIfNeeded();
+  const reading = await savedScroll(page);
+
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  const mercor = '**/presentation/company-mercor.*.json';
+  await page.route(mercor, async route => {
+    await held;
+    await route.continue().catch(() => {});
+  });
+  try {
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#compare-content')).toHaveAttribute('aria-busy', 'true');
+    await page.locator('.topbar a[href="/companies/"]').press('Enter');
+    await expect(page).toHaveURL('/companies/');
+  } finally {
+    release();
+    await page.unroute(mercor);
+  }
+
+  await page.goBack();
+  await expect(page).toHaveURL(compare);
+  await expect(more).toBeInViewport();
+  await expect.poll(() => page.evaluate(top => Math.abs(window.scrollY - top), reading)).toBeLessThan(2);
 });
 
 test('Compare work links describe career pages, archived records and paid networks accurately', async ({ page }) => {

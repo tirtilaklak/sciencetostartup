@@ -14,6 +14,45 @@ test('Company correction email has a full touch target on narrow screens', async
   }
 });
 
+test('Private email correction returns to the same company record on cold Back', async ({ page, hasTouch }) => {
+  const profile = '/company/org.dataforce/';
+  await page.addInitScript(profile => {
+    if (location.pathname !== profile) return;
+    addEventListener('unload', () => {});
+    addEventListener('pageshow', event => { window.companyCorrectionCached = event.persisted; });
+  }, profile);
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto(profile);
+  const scope = page.locator('#company-scope');
+  await scope.getByText('Company and review scope', { exact: true }).press('Enter');
+  const correction = scope.locator('.r-record-correction');
+  await correction.getByText('Request a correction', { exact: true }).press('Enter');
+  const email = correction.getByRole('link', { name: 'Continue to private email', exact: true });
+  const top = await email.evaluate(link => {
+    link.scrollIntoView({ block: 'center', behavior: 'instant' });
+    link.focus({ preventScroll: true });
+    return link.getBoundingClientRect().top;
+  });
+
+  if (hasTouch) await email.tap();
+  else await email.press('Enter');
+  const method = page.getByRole('complementary', { name: 'Corrections' });
+  await expect(method.getByRole('link', { name: 'org.dataforce' })).toHaveAttribute('href', profile);
+  await expect(method.getByRole('link', { name: 'Email a correction' })).toHaveAttribute('href', /subject=[^&]*org\.dataforce/);
+
+  await page.goBack({ waitUntil: 'commit' });
+  await expect(page).toHaveURL(profile);
+  await expect.poll(() => page.evaluate(() => window.companyCorrectionCached)).toBe(false);
+  await expect(scope).toHaveJSProperty('open', true);
+  await expect(correction).toHaveJSProperty('open', true);
+  await expect(email).toBeFocused();
+  await expect(email).toBeInViewport({ ratio: 1 });
+  await expect.poll(() => email.evaluate((link, top) =>
+    Math.abs(link.getBoundingClientRect().top - top), top)).toBeLessThan(3);
+  await page.keyboard.press('Tab');
+  await expect(correction.getByText('Copy the email draft', { exact: true })).toBeFocused();
+});
+
 test('Method correction actions remain separated on narrow screens', async ({ page }) => {
   for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 720 });

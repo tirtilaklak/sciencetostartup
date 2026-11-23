@@ -774,7 +774,13 @@ let previousRoute='',previousSection='';const viewScroll={};
 let companyReturnFocus=null;
 // Hashes that name a place inside a page. route() shows that page, then brings the element to the top with focus.
 const VIEW_ANCHORS={'business-health':'market',venture:'market',about:'method',labels:'method',corrections:'method',coverage:'method',downloads:'method'};
-const MARKET_RETURN_LINKS='.hero-actions a[href="#business-health"], .hero-company-strip a[href="#companies"], .product-preview h3 a[href^="#company/"]';
+const MARKET_RETURN_LINKS=[
+ '.hero-actions a[href="#business-health"]',
+ '.hero-company-strip a[href="#companies"]',
+ '.product-preview h3 a[href^="#company/"]',
+ '.bh-ledger-company a[href^="#company/"]',
+ '#bh-matrix-body a[href^="#company/"]'
+];
 function viewAnchorId(hash=location.hash){const id=String(routeParts(hash)[0]||'').toLowerCase();return Object.hasOwn(VIEW_ANCHORS,id)?id:'';}
 // Firefox can process the native bookmark after the enhanced view is ready.
 function keepInitialMarketFocus(focusTarget){
@@ -894,7 +900,17 @@ const keepEntryScroll=()=>{
  clearTimeout(entryScrollTimer);
  const scrollY=shortlistScrollForEntry()?.top??window.scrollY;
  if(window.APP_RELOADING_MARKET_BOOKMARK)return scrollY;
- try{if(window.navigation)window.navigation.updateCurrentEntry({state:{...(window.navigation.currentEntry?.getState?.()||{}),scrollY}});else history.replaceState({...(history.state||{}),scrollY},'');}catch{}
+ try{
+  const entry=window.navigation?window.navigation.currentEntry?.getState?.():history.state;
+  const comparison=onCompareRoute()&&!$('compare-view').hidden?$('compare-content'):null;
+  const table=comparison?.querySelector?.('.comparison-table');
+  // Keep the saved reading position while the table is replaced by a loading or failure notice.
+  if(comparison&&!table&&entry?.compareReading?.selection===compareHash()&&Number.isFinite(entry.scrollY))return entry.scrollY;
+  const reading={scrollY};
+  // The scroll position only refers to the same rows when the Compare layout is restored with it.
+  if(table)reading.compareReading={selection:compareHash(),pair:state.mobileCompare,expanded:comparisonExpanded};
+  if(window.navigation)window.navigation.updateCurrentEntry({state:{...entry,...reading}});else history.replaceState({...entry,...reading},'');
+ }catch{}
  return scrollY;
 };
 window.addEventListener('scroll',()=>{clearTimeout(entryScrollTimer);entryScrollTimer=setTimeout(keepEntryScroll,300);},{passive:true});
@@ -954,7 +970,12 @@ function rememberExploreOrigin(event){
  const href=link.getAttribute('href'),view=routeParts()[0];
  const work=view==='work'&&link.id==='work-native-compare';
  const compare=view==='compare'&&link.closest('#compare-content')&&(link.dataset.compareOrigin||href.startsWith('#company/'));
- const market=(!view||view==='market'||VIEW_ANCHORS[view]==='market')&&link.closest('#market-view')&&link.matches(MARKET_RETURN_LINKS);
+ let market=null;
+ if((!view||view==='market'||VIEW_ANCHORS[view]==='market')&&link.closest('#market-view')){
+  const selector=MARKET_RETURN_LINKS.find(selector=>link.matches(selector));
+  const evidence=link.matches('#bh-evidence-dialog a.bh-profile')&&window.BusinessHealth?.evidenceOpener?.();
+  if(selector||evidence)market={selector,evidence};
+ }
  if(!work&&!compare&&!market){
   if(history.state?.exploreReturnOrigin){const {exploreReturnOrigin,...rest}=history.state;history.replaceState(rest,'');}
   return;
@@ -989,7 +1010,8 @@ function exploreReturnOrigin({traversedFragment=false,initial=false,persisted=fa
  return origin;
 }
 function focusExploreOrigin({work,compare,market,href}){
- const links=work?[$('work-native-compare')]:[...(market?$('market-view').querySelectorAll(MARKET_RETURN_LINKS):$('compare-content').querySelectorAll('a[href]'))];
+ if(market?.evidence)return window.BusinessHealth?.focusEvidenceOpener?.(market.evidence);
+ const links=work?[$('work-native-compare')]:[...(market?$('market-view').querySelectorAll(market.selector||MARKET_RETURN_LINKS.join(', ')):$('compare-content').querySelectorAll('a[href]'))];
  const target=links.find(link=>link?.getAttribute('href')===href&&link.dataset.compareOrigin===compare?.action&&link.getClientRects().length);
  if(!target)return null;
  const scrollbox=compare&&target.closest('.comparison-scroll');
@@ -1081,7 +1103,12 @@ function route(event){
  ensureHistoryEntryKey();
  exploreEntryKey=historyKey();
  const returnOrigin=exploreReturnOrigin({traversedFragment:wasTraversal&&event?.type==='hashchange',initial:!event&&!previousRoute});
- if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');const key=historyKey(),kept=previousRoute===''||routeTraversal?(window.navigation?window.navigation.currentEntry?.getState?.()?.scrollY:history.state?.scrollY):null,saved=Number.isFinite(kept)?kept:null,restore=routeTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;routeRestoredScroll=restore;routeTraversal=false;
+ if(typeof cancelWorkRouteWrite==='function')cancelWorkRouteWrite();document.documentElement?.removeAttribute?.('data-route');document.documentElement?.style?.removeProperty?.('scroll-behavior');
+ const key=historyKey();
+ const entry=(!previousRoute||wasTraversal)?(window.navigation?window.navigation.currentEntry?.getState?.():history.state):null;
+ const saved=Number.isFinite(entry?.scrollY)?entry.scrollY:null;
+ const restore=wasTraversal&&entryScroll.has(key)?entryScroll.get(key):saved;
+ routeRestoredScroll=restore;routeTraversal=false;
  const closingDialog=(event?.type==='hashchange'&&closeRouteDialogs())||event?.closedDialog;
  const parts=routeParts(),aliases=window.RESEARCH_ALIASES;parts[0]=String(parts[0]||'').toLowerCase();if(parts[0]==='company'&&parts[1]){const lower=String(parts[1]).toLowerCase();if(lower!==parts[1]&&(isCompanyId(lower)||(aliases&&Object.hasOwn(aliases,lower))))parts[1]=lower;}if(parts[0]==='company'&&aliases&&Object.hasOwn(aliases,parts[1])&&isCompanyId(aliases[parts[1]]))parts[1]=aliases[parts[1]];if(parts[0]==='company'&&isCompanyId(parts[1])){const hash='#'+parts.map(encodeURIComponent).join('/');if(location.hash.split('?')[0]!==hash)history.replaceState(history.state,'',hash+(location.hash.match(/\?.*$/)?.[0]||''));}const anchorId=Object.hasOwn(VIEW_ANCHORS,parts[0])?parts[0]:'',view=anchorId?VIEW_ANCHORS[anchorId]:['market','companies','work','compare','method','company'].includes(parts[0])?parts[0]:'market';
  const shortlist=view==='companies'?shortlistReturnState(wasTraversal):null;
@@ -1100,10 +1127,13 @@ function route(event){
   }
   syncDirectoryRoute(parts.slice(1));showDirectory();
  }if(view==='method'){showDirectory();renderExploreCorrections(anchorId==='corrections');}if(view==='work')syncWorkRoute(wasTraversal);if(view==='compare'){
-  if(returnOrigin?.compare){
+  const reading=returnOrigin?.compare||entry?.compareReading;
+  if(reading){
    syncCompareRoute();
-   state.mobileCompare=returnOrigin.compare.pair;
-   comparisonExpanded=returnOrigin.compare.expanded;
+   if(returnOrigin?.compare||reading.selection===compareHash()){
+    state.mobileCompare=reading.pair;
+    comparisonExpanded=reading.expanded;
+   }
   }
   renderCompare();
  }}
@@ -1385,13 +1415,21 @@ function initCompare(){$('clear-compare').addEventListener('click',()=>{setSelec
  const view=$('compare-view');
  view.addEventListener('click',event=>{
   const button=event.target.closest?.('[data-copy-compare]');if(button)copyCompareLink(button);
-  const more=event.target.closest?.('[data-compare-extra]');if(more){comparisonExpanded=!comparisonExpanded;const extra=$('comparison-extra');if(extra)extra.hidden=!comparisonExpanded;more.setAttribute('aria-expanded',String(comparisonExpanded));more.textContent=comparisonExpanded?'Hide additional details':'Show more evidence';}
+  const more=event.target.closest?.('[data-compare-extra]');
+  if(more){
+   comparisonExpanded=!comparisonExpanded;
+   const extra=$('comparison-extra');if(extra)extra.hidden=!comparisonExpanded;
+   more.setAttribute('aria-expanded',String(comparisonExpanded));
+   more.textContent=comparisonExpanded?'Hide additional details':'Show more evidence';
+   keepEntryScroll();
+  }
   const pair=event.target.closest?.('[data-mobile-compare]');
   if(pair){
    state.mobileCompare=Math.min(Number(pair.dataset.mobileCompare),Math.max(0,comparePairOptions(state.selected).length-1));
    renderCompare({pairOnly:true});
    view.querySelector('.mobile-column-options summary')?.focus({preventScroll:true});
    revealComparisonFocus();
+   keepEntryScroll();
   }
  });
  view.addEventListener('focusin',event=>{

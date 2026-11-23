@@ -15,7 +15,8 @@
   const archiveContent = root.querySelector('.scan-archive');
   const archive = archiveContent.closest('details');
   const archiveLinks = new Map([...archiveContent.querySelectorAll('a')].map(link => [new URL(link.href).pathname, link]));
-  const editionLinks = root.querySelectorAll('a.scan-day-step, .scan-archive a');
+  const daySteps = new Map([...root.querySelectorAll('a.scan-day-step')].map(link => [link.rel, link]));
+  const editionLinks = [...daySteps.values(), ...archiveLinks.values()];
   const reset = document.getElementById('scan-reset');
   const rows = [...root.querySelectorAll('.scan-item')];
   const rowById = new Map(rows.map(row => [row.id, row]));
@@ -103,6 +104,7 @@
       filtersOpen: compact.matches ? filterDisclosure.open : compactFiltersOpen,
       returnToFilterSummary: active === filterSummary,
       returnToPermalink: active?.matches('.scan-permalink') ? active.closest('.scan-item')?.id : null,
+      returnToDayStep: active?.matches('.scan-day-step') ? active.rel : null,
       returnToArchive: active?.matches('.scan-archive a') ? new URL(active.href).pathname : null,
       returnToDateGo: active === dateGo };
     try {
@@ -149,7 +151,7 @@
           const focusSummary = compact.matches && (filters?.focusSummary ?? reading?.returnToFilterSummary) === true;
           const focusSearch = filterDisclosure.open && filters?.focusSearch === true;
           returnFocus = focusSummary ? filterSummary : focusSearch ? search :
-            reading?.returnToDateGo === true ? dateGo : archiveLink;
+            reading?.returnToDateGo === true ? dateGo : archiveLink || daySteps.get(reading?.returnToDayStep);
         }
         returnFocus?.focus({ preventScroll: true });
       }

@@ -78,27 +78,33 @@
     });
   }
 
-  const company = location.pathname.match(/^\/company\/([a-z0-9_-]+)\/$/)?.[1];
+  const handoffs = [...document.querySelectorAll('details a[data-disclosure-return][href]')];
+  const company = location.pathname.match(/^\/company\/([a-z0-9_.-]+)\/$/)?.[1];
   const dossier = document.querySelector('.company-dossier');
   if (company && dossier) {
     const canonical = new URL(document.querySelector('link[rel="canonical"]')?.href || location.href);
     const route = `#company/${company}`;
-    const handoffs = [...dossier.querySelectorAll('details a[href*="/explore/#company/"]')].filter(link => {
+    const explore = [...dossier.querySelectorAll('details a[href*="/explore/#company/"]')].filter(link => {
       const url = new URL(link.href);
       return (url.origin === canonical.origin || url.origin === location.origin) &&
         url.pathname === '/explore/' && (url.hash === route || url.hash.startsWith(`${route}/`));
     });
+    handoffs.push(...explore, ...dossier.querySelectorAll('.r-record-correction a[href^="/method/?correction="]'));
+  }
 
+  if (handoffs.length) {
     document.addEventListener('click', event => {
       const link = event.target.closest?.('a[href]');
       if (!link || event.defaultPrevented || event.button !== 0 || event.ctrlKey ||
           event.metaKey || event.shiftKey || event.altKey || link.hasAttribute('download') ||
           (link.target && link.target !== '_self')) return;
 
-      const { nativeCompanyReturn, ...state } = history.state || {};
-      if (handoffs.includes(link)) {
-        state.nativeCompanyReturn = { page: location.href, href: link.href, top: link.getBoundingClientRect().top };
-      } else if (!nativeCompanyReturn || link.hash && link.href.split('#')[0] === location.href.split('#')[0]) {
+      const { nativeDisclosureReturn, nativeCompanyReturn, ...state } = history.state || {};
+      const index = handoffs.indexOf(link);
+      if (index !== -1) {
+        state.nativeDisclosureReturn = { page: location.href, href: link.href, index, top: link.getBoundingClientRect().top };
+      } else if (!(nativeDisclosureReturn || nativeCompanyReturn) ||
+          link.hash && link.href.split('#')[0] === location.href.split('#')[0]) {
         return;
       }
       // The originating entry can share its URL with other entries or tabs.
@@ -106,17 +112,25 @@
     });
 
     addEventListener('pageshow', event => {
-      const saved = history.state?.nativeCompanyReturn;
+      const saved = history.state?.nativeDisclosureReturn || history.state?.nativeCompanyReturn;
       if (event.persisted || saved?.page !== location.href ||
           performance.getEntriesByType('navigation')[0]?.type !== 'back_forward') return;
+      let link = handoffs[saved.index];
+      if (link?.href !== saved.href) {
+        const matches = handoffs.filter(link => link.href === saved.href);
+        if (matches.length !== 1) return;
+        [link] = matches;
+      }
       const activation = navigation?.activation;
-      if (activation?.from && activation.from.index <= activation.entry.index) return;
-      const matches = handoffs.filter(link => link.href === saved.href);
-      if (matches.length !== 1) return;
-      const [link] = matches;
+      const departed = activation?.from;
+      if (departed) {
+        if (departed.index !== activation.entry.index + 1 || !departed.url) return;
+        const from = new URL(departed.url), destination = new URL(link.href);
+        if (from.origin !== destination.origin || from.pathname !== destination.pathname) return;
+      }
       // Wait for the browser's history scroll restoration before aligning the reopened link.
       requestAnimationFrame(() => {
-        if (document.activeElement !== document.body) return;
+        if (document.activeElement !== document.body || location.href !== saved.page) return;
         openDisclosures(link);
         link.focus({ preventScroll: true });
         const bounds = link.getBoundingClientRect();

@@ -221,8 +221,12 @@ function openEvidence(selector,pointerScroll){
 }
 function restoreEvidenceFocus(){
  const origin=evidenceOrigin;
- if(!origin)return;
- if(origin.hash!==location.hash){evidenceOrigin=null;return;}
+ if(origin?.hash===location.hash)focusEvidenceOpener(origin);
+ evidenceOrigin=null;
+}
+function evidenceOpener(){return evidenceOrigin?.selector?evidenceOrigin:null;}
+function focusEvidenceOpener(origin){
+ if(!origin?.selector)return null;
  let trigger=document.querySelector(origin.selector);
  // An alternate measure or scope can remove an invoking chart bar.
  if(!trigger){
@@ -236,8 +240,8 @@ function restoreEvidenceFocus(){
  // WebKit can reset the grid's scroll position when a pointer opens the modal.
  if(grid&&pointerScroll&&!rowMoved)grid.scrollTo({left:pointerScroll.left,top:pointerScroll.top,behavior:'instant'});
  trigger?.focus({preventScroll:!!grid});
- evidenceOrigin=null;
  if(rowMoved)revealGridFocus(trigger,grid);
+ return trigger;
 }
 function alternateFigures(heading,figures,withMeasure=false){
  if(!figures.length)return '';
@@ -423,7 +427,7 @@ function selectObservation(o){
  Object.assign(bhState,{signal:o.signal,company:o.company_id,observation:o.id,measure:o.measure,cohort:cohort(o)});
  render();
 }
-window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries,latestFigures,refreshBundle};
+window.BusinessHealth={observations,rows,evidenceState,estimate,render,valueText,cohort,historySeries,latestFigures,refreshBundle,evidenceOpener,focusEvidenceOpener};
 if(!bundle)return;
 // The native picker handles input while its closed value can wrap in the visible field.
 for(const id of ['bh-measure','bh-cohort']){

@@ -52,6 +52,31 @@ test.afterEach(async ({}, info) => {
   expect(info._researchRuntimeErrors || [], 'Unexpected browser runtime errors').toEqual([]);
 });
 
+for (const [name, start, disclosureSelector, destination] of [
+  ['Research chapter list', '/research/', '#chapters', reportPath + 'chapters/methods-and-appendices/'],
+  ['Research coverage', '/research/', '#coverage', '/research/data/'],
+  ['chapter contents', reportPath + 'chapters/weekly-developments/', '.r-chapter-index', '/research/data/'],
+  ['paper source versions', '/research/papers/', '[data-parent-record="paper.arxiv.2603.04370"] .r-paper-versions',
+    '/research/papers/paper.arxiv.2603.04370v1/#approved-findings'],
+]) {
+  test(`Back returns to the link inside ${name}`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 720 });
+    await page.goto(start);
+    const disclosure = page.locator(disclosureSelector);
+    await disclosure.locator('summary').press('Enter');
+    const link = disclosure.locator(`a[href=${JSON.stringify(destination)}]`);
+    await expect(link).toBeVisible();
+    await link.press('Enter');
+    await expect(page).toHaveURL(url => url.pathname + url.hash === destination);
+
+    await page.goBack({ waitUntil: 'commit' });
+    await expect(page).toHaveURL(url => url.pathname + url.hash === start);
+    await expect(disclosure).toHaveAttribute('open', '');
+    await expect(link).toBeFocused();
+    await expect(link).toBeInViewport();
+  });
+}
+
 test.describe('research without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 

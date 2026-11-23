@@ -148,11 +148,12 @@ def _safe_url(value):
     return str(value) if parsed.scheme == "https" and parsed.hostname and not parsed.username and not parsed.password else ""
 
 
-def _link(url, label, css=""):
+def _link(url, label, css="", *, disclosure_return=False):
     url = str(url or "")
     if not (url.startswith("/") and not url.startswith("//")) and not url.startswith('#') and not _safe_url(url):
         return sp.escape(label)
-    return f'<a href="{sp.escape(url)}"' + (f' class="{sp.escape(css)}"' if css else "") + f'>{sp.escape(label)}</a>'
+    return (f'<a href="{sp.escape(url)}"' + (f' class="{sp.escape(css)}"' if css else '')
+            + (' data-disclosure-return' if disclosure_return else '') + f'>{sp.escape(label)}</a>')
 
 
 def _day(value):
@@ -412,7 +413,7 @@ def _render(context, title, description, path, body, page_type="WebPage", parent
              '<link rel="alternate" type="application/atom+xml" title="Research corrections" href="/research/corrections/atom.xml">\n')
     if company_page:
         extra += '<link rel="stylesheet" href="/company-profile.css">\n'
-    if page_type == 'Chapter':
+    if page_type == 'Chapter' or path in {'/research/', '/research/papers/'}:
         extra += '<script src="/native-details.js" defer></script>\n'
     if page_type == 'Chapter' and path.endswith('/chapters/technical-landscape/'):
         # A history restoration needs the complete layout used when the reader
@@ -494,7 +495,7 @@ def _browse(context):
 
 def _hub(context, editions=()):
     report = context["report"]
-    chapters = "".join(f'<li>{_link(_reader_path(section), section["title"])}</li>'
+    chapters = "".join(f'<li>{_link(_reader_path(section), section["title"], disclosure_return=True)}</li>'
                        for section in report["sections"])
     archive_links = ('<section class="r-section"><h2>Published editions</h2><ul class="r-entity-list">'
                      + ''.join(f'<li>{_link(path, snapshot["report"]["release_id"])} · {_date(snapshot["report"]["updated_on"])}</li>'
@@ -523,7 +524,7 @@ def _hub(context, editions=()):
             'Browse counts also include individual versions. '
             'Only approved, source-reviewed records meet the publication requirements.</p>' + _progress(context, compact=True)
             + f'<p class="r-meta">{sp.escape(_counts(context))}</p>'
-            f'{_link("/research/data/", "Coverage, sources & downloads →", "r-text-link")}</details>'
+            f'{_link("/research/data/", "Coverage, sources & downloads →", "r-text-link", disclosure_return=True)}</details>'
             '<p class="r-review-link">Found something to correct? '
             f'{_link("/review/", "Review a claim or suggest a source →")}</p></section>'
             + archive_links)
@@ -843,17 +844,18 @@ def _reader_path(section, base=REPORT_PATH):
 
 def _reader_toc(context, current, base=REPORT_PATH, legacy_targets=False, *, collapsible=False):
     rows = []
+    return_attr = ' data-disclosure-return' if collapsible else ''
     for section in context['report']['sections']:
         sid = section['id']
         target = (' id="' + sp.escape(sid) + '"') if legacy_targets and sid != 'executive-assessment' else ''
         active = ' aria-current="page"' if sid == current else ''
         path = _reader_path(section, base) + ('#' + _token(sid) if target else '')
         rows.append('<li' + target + '><a href="' + sp.escape(path) + '"'
-                    + active + '>' + sp.escape(section['title']) + '</a></li>')
+                    + active + return_attr + '>' + sp.escape(section['title']) + '</a></li>')
     heading = '' if collapsible else '<h2 id="contents">In this report</h2>'
     navigation = ('<nav class="r-toc r-reader-toc" aria-label="Report chapters">' + heading
                   + '<ol>' + ''.join(rows) + '</ol>'
-                  + _link('/research/data/', 'Inspect coverage & evidence →', 'r-text-link') + '</nav>')
+                  + _link('/research/data/', 'Inspect coverage & evidence →', 'r-text-link', disclosure_return=collapsible) + '</nav>')
     if collapsible:
         return ('<details class="r-chapter-index"><summary id="contents">In this report '
                 + f'<span>{len(rows)} chapters</span></summary>' + navigation + '</details>')
@@ -1451,7 +1453,7 @@ def _pinned_dataset_link(context, entity):
             if pinned and _approved_entity(context, pinned) else '')
 
 
-def _index_row(context, entity):
+def _index_row(context, entity, *, disclosure_return=False):
     """One independently filterable record, including all native evidence links."""
     filters = _index_values(entity)
     claims = _assertions(context, entity)
@@ -1467,14 +1469,16 @@ def _index_row(context, entity):
     return ('<tr data-index-row data-record-id="' + sp.escape(entity['id'])
             + '" data-search="' + sp.escape(search.lower()) + '" data-filters="'
             + sp.escape(json.dumps(filters, ensure_ascii=False, separators=(',', ':'))) + '"' + identity_attr + '>'
-            + '<th scope="row">' + _link(entity_url(entity, context), _display_title(entity['name']))
+            + '<th scope="row">' + _link(entity_url(entity, context), _display_title(entity['name']),
+                                         disclosure_return=disclosure_return)
             + '<span class="r-record-id">' + sp.escape(entity['id']) + '</span></th>'
             + '<td data-label="Review">' + sp.escape(label) + '<span class="r-table-note">'
             + sp.escape(depth) + '</span></td>'
             + '<td data-label="Type">' + sp.escape(entity['kind'].replace('_', ' ')) + '</td>'
             + '<td data-label="Taxonomy">' + sp.escape(taxonomy or 'Not recorded') + '</td>'
             + '<td data-label="Evidence">' + _link(entity_url(entity, context) + '#approved-findings',
-                                                    sp.plural(len(claims), 'approved assertion'))
+                                                    sp.plural(len(claims), 'approved assertion'),
+                                                    disclosure_return=disclosure_return)
             + '</td></tr>')
 
 
@@ -1503,10 +1507,11 @@ def _paper_rows(context, entities):
                     '<summary>Source versions (' + str(len(children)) + ') <span>Work context: '
                     + sp.escape(title) + ' · ' + sp.escape(_label(work)) + '</span></summary>'
                     '<p class="r-version-context" data-index-context hidden>Work context only; not counted as a match: '
-                    + _link(entity_url(work, context), title) + ' · ' + sp.escape(_label(work)) + '.</p>'
+                    + _link(entity_url(work, context), title, disclosure_return=True) + ' · ' + sp.escape(_label(work)) + '.</p>'
                     '<table class="r-evidence-table r-version-table"><caption>Source versions for '
                     + sp.escape(title) + '. Each version retains its own review status.</caption>'
-                    + _index_head() + '<tbody>' + ''.join(_index_row(context, child) for child in children)
+                    + _index_head() + '<tbody>'
+                    + ''.join(_index_row(context, child, disclosure_return=True) for child in children)
                     + '</tbody></table></details></td></tr>')
     # Preserve an unexpected standalone version instead of silently dropping it.
     rows.extend(_index_row(context, entity) for entity in entities
