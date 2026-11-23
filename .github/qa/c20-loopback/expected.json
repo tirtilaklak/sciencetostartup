@@ -1,0 +1,709 @@
+{
+  "head": "8ab0452e5f0576ee9da472b79587607315c12d01",
+  "dist_tree": "f47cbf7cf557e79bf521905082999cff33c7db70",
+  "manifest": "1fe217bab088009c4fb30ca3b00987bc3291361808823d9c523729fb648015fc",
+  "build": "e4ead044f5b3419c667b",
+  "origin": "http://127.0.0.1:19007",
+  "cases": [
+    {
+      "id": "5c8e29925b5a1b29d9da-cfc15c1c62f968a3f7fc",
+      "reporter_id": "5c8e29925b5a1b29d9da-4a51c610b44506089f7a",
+      "file": "company-handoff.spec.js",
+      "project": "firefox",
+      "title": "the directory offers historical comparisons and current-only profile links",
+      "suite": [
+        "company-handoff.spec.js"
+      ],
+      "line": 48,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "658b81ba16172b8a7fca-ed875dc94c4c9b5ea748",
+      "reporter_id": "658b81ba16172b8a7fca-f68428562b692812b37c",
+      "file": "compare-return.spec.js",
+      "project": "firefox",
+      "title": "Compare shows the selected figures on the first phone screen with one selection editor",
+      "suite": [
+        "compare-return.spec.js"
+      ],
+      "line": 7,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "355b46bdb07955e42bf4-74279d7f572ed3716077",
+      "reporter_id": "355b46bdb07955e42bf4-74279d7f572ed3716077",
+      "file": "daily-phone-reflow.spec.js",
+      "project": "firefox",
+      "title": "Daily filter controls fit and have visible boundaries across Firefox text sizes",
+      "suite": [
+        "daily-phone-reflow.spec.js"
+      ],
+      "line": 66,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "355b46bdb07955e42bf4-96d1d9213265c1dc2d2c",
+      "reporter_id": "355b46bdb07955e42bf4-96d1d9213265c1dc2d2c",
+      "file": "daily-phone-reflow.spec.js",
+      "project": "firefox",
+      "title": "Daily story details keep enlarged labels and values separate",
+      "suite": [
+        "daily-phone-reflow.spec.js"
+      ],
+      "line": 133,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "0c79256db53caab8858e-49de3be4e79c47482356",
+      "reporter_id": "0c79256db53caab8858e-d73bef788799e0a15022",
+      "file": "daily.spec.js",
+      "project": "firefox",
+      "title": "Daily phone filter disclosure follows its history entry and a fresh filtered URL opens it",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "line": 885,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "0c79256db53caab8858e-67317b7f836d4f310d3a",
+      "reporter_id": "0c79256db53caab8858e-3db3eefdcdb03f9d66dc",
+      "file": "daily.spec.js",
+      "project": "firefox",
+      "title": "Daily story highlight follows the visible fragment as filters and history change",
+      "suite": [
+        "daily.spec.js"
+      ],
+      "line": 453,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "64c6dcf800d254c4fdd2-9588ce8d3fecace527c4",
+      "reporter_id": "64c6dcf800d254c4fdd2-9588ce8d3fecace527c4",
+      "file": "explore-work-layout.spec.js",
+      "project": "firefox",
+      "title": "native Work shows the complete first role and hourly rate on the first screen",
+      "suite": [
+        "explore-work-layout.spec.js"
+      ],
+      "line": 150,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "379953442ddfc3019abd-49918296c0c266fe0449",
+      "reporter_id": "379953442ddfc3019abd-6ed6fd8792aebe4bc32b",
+      "file": "home.spec.js",
+      "project": "firefox",
+      "title": "homepage Search leads to the company directory, comparison and market figures",
+      "suite": [
+        "home.spec.js"
+      ],
+      "line": 343,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "379953442ddfc3019abd-5d72bc889b947e31786f",
+      "reporter_id": "379953442ddfc3019abd-c7ebec9fd932ddadfb72",
+      "file": "home.spec.js",
+      "project": "firefox",
+      "title": "homepage Search loads only its small component and index when invoked",
+      "suite": [
+        "home.spec.js"
+      ],
+      "line": 320,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "379953442ddfc3019abd-ca1d99b17ce7d3b35dad",
+      "reporter_id": "379953442ddfc3019abd-0afe8a16492a6f6a0185",
+      "file": "home.spec.js",
+      "project": "firefox",
+      "title": "the Home header becomes Search when its pending runtime binds",
+      "suite": [
+        "home.spec.js"
+      ],
+      "line": 152,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "379953442ddfc3019abd-63df0268d10e7f25edd9",
+      "reporter_id": "379953442ddfc3019abd-c42a647c6acd396683f2",
+      "file": "home.spec.js",
+      "project": "firefox",
+      "title": "the Home header can browse when the search runtime is blocked",
+      "suite": [
+        "home.spec.js"
+      ],
+      "line": 141,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "379953442ddfc3019abd-6dd4e380d5dad7e21e99",
+      "reporter_id": "379953442ddfc3019abd-85708992a79b42b3edbd",
+      "file": "home.spec.js",
+      "project": "firefox",
+      "title": "without JavaScript the homepage offers its menu and native browse links",
+      "suite": [
+        "home.spec.js"
+      ],
+      "line": 113,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-63aa385f8141cde15f93",
+      "reporter_id": "5a74ccd544a7fbeddfcc-63aa385f8141cde15f93",
+      "file": "market-fallback.spec.js",
+      "project": "firefox",
+      "title": "Market keeps the heading focused after a late page load",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "line": 194,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-0de55826809ce35dc312",
+      "reporter_id": "5a74ccd544a7fbeddfcc-0de55826809ce35dc312",
+      "file": "market-fallback.spec.js",
+      "project": "firefox",
+      "title": "Market keeps the selected Download link focused after a late page load",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "line": 194,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "5a74ccd544a7fbeddfcc-4d134b043d103997f40d",
+      "reporter_id": "5a74ccd544a7fbeddfcc-4d134b043d103997f40d",
+      "file": "market-fallback.spec.js",
+      "project": "firefox",
+      "title": "Market retries the bookmark after a blocked data bundle",
+      "suite": [
+        "market-fallback.spec.js"
+      ],
+      "line": 107,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-e5df4b6b2d55f300b29d",
+      "reporter_id": "ab2270c2f64cbcd68e5d-f4428d1d96a1a79cfb7c",
+      "file": "market-focus.spec.js",
+      "project": "firefox",
+      "title": "Market Back returns to the product link from both Market addresses",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "line": 157,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-9f2e72967c3f12c97ca4",
+      "reporter_id": "ab2270c2f64cbcd68e5d-9f2e72967c3f12c97ca4",
+      "file": "market-focus.spec.js",
+      "project": "firefox",
+      "title": "Market anchors account for the sticky header and Back restores the keyboard shortcut",
+      "suite": [
+        "market-focus.spec.js",
+        "Market with a 28px minimum font"
+      ],
+      "line": 270,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "ab2270c2f64cbcd68e5d-cfe2c34229206d15d9d9",
+      "reporter_id": "ab2270c2f64cbcd68e5d-115605e64f9403f4fd3a",
+      "file": "market-focus.spec.js",
+      "project": "firefox",
+      "title": "Market puts two sourced revenue rows on the first desktop screen",
+      "suite": [
+        "market-focus.spec.js"
+      ],
+      "line": 42,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-32b70c2d6ed878ce8fc9",
+      "reporter_id": "3f3af9a3b6b368d6d564-32b70c2d6ed878ce8fc9",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "AfterQuery keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "line": 498,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-4f8c3bf9e00b83798b53",
+      "reporter_id": "3f3af9a3b6b368d6d564-4f8c3bf9e00b83798b53",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "AfterQuery keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "line": 498,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-9fee04eb5c6657481ee9",
+      "reporter_id": "3f3af9a3b6b368d6d564-9fee04eb5c6657481ee9",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Companies keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "line": 498,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-bf9ff1a91e78f9745f11",
+      "reporter_id": "3f3af9a3b6b368d6d564-bf9ff1a91e78f9745f11",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Companies keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "line": 498,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-a284b8fccf01cdd03df9",
+      "reporter_id": "3f3af9a3b6b368d6d564-a284b8fccf01cdd03df9",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Market includes every unavailable evidence cell in the matrix Tab order",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "line": 467,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-182d053e942781154e0e",
+      "reporter_id": "3f3af9a3b6b368d6d564-182d053e942781154e0e",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Market keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "line": 498,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-91f3ad26b00bc32e6fac",
+      "reporter_id": "3f3af9a3b6b368d6d564-91f3ad26b00bc32e6fac",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Market keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "line": 498,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-35716ab23ecbd8a9b582",
+      "reporter_id": "3f3af9a3b6b368d6d564-35716ab23ecbd8a9b582",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Market keeps the focused Appen amount alongside its organization and Revenue heading",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "line": 367,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-ebdf244b3355b0f7ab4e",
+      "reporter_id": "3f3af9a3b6b368d6d564-ebdf244b3355b0f7ab4e",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Market keeps the focused Appen amount alongside its organization and Revenue heading",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "line": 367,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-b9c1f40667a321d2b8fc",
+      "reporter_id": "3f3af9a3b6b368d6d564-b9c1f40667a321d2b8fc",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Market keeps wrapped organization names readable beside short matrix values",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "line": 455,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-818aff2ebaee96c1cce8",
+      "reporter_id": "3f3af9a3b6b368d6d564-818aff2ebaee96c1cce8",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Market opens AIXI Labs Revenue n/a with the keyboard",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "line": 383,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-eaa0e15010e936ddda69",
+      "reporter_id": "3f3af9a3b6b368d6d564-eaa0e15010e936ddda69",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Market opens AIXI Labs Revenue n/a with the keyboard",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "line": 383,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-71798b19916746fa7b23",
+      "reporter_id": "3f3af9a3b6b368d6d564-71798b19916746fa7b23",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Market opens Appen Paid delivery — with the keyboard",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "line": 383,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-ad697f18bda8c328be14",
+      "reporter_id": "3f3af9a3b6b368d6d564-ad697f18bda8c328be14",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Market opens Appen Paid delivery — with the keyboard",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "line": 383,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-2d54e94b78fb63fa0d3d",
+      "reporter_id": "3f3af9a3b6b368d6d564-2d54e94b78fb63fa0d3d",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Research keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "line": 498,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-3b65de5a8a335d06213a",
+      "reporter_id": "3f3af9a3b6b368d6d564-3b65de5a8a335d06213a",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Research keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "line": 498,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-207dcb0c9b7cf1d308b3",
+      "reporter_id": "3f3af9a3b6b368d6d564-207dcb0c9b7cf1d308b3",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Work keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at a 32px minimum font"
+      ],
+      "line": 498,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "3f3af9a3b6b368d6d564-628b0b7d9fda97ea7939",
+      "reporter_id": "3f3af9a3b6b368d6d564-628b0b7d9fda97ea7939",
+      "file": "market-phone-accessibility.spec.js",
+      "project": "firefox",
+      "title": "Work keeps Search and the last wordmark letter independently clickable",
+      "suite": [
+        "market-phone-accessibility.spec.js",
+        "320px Firefox at default text size"
+      ],
+      "line": 498,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "a546f64a9f412d32fbe7-42793d39ec02902126fd",
+      "reporter_id": "a546f64a9f412d32fbe7-42793d39ec02902126fd",
+      "file": "method-contact-reflow.spec.js",
+      "project": "firefox",
+      "title": "Method correction contacts and the record link fit at Firefox minimum font sizes",
+      "suite": [
+        "method-contact-reflow.spec.js"
+      ],
+      "line": 3,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "e27f8e955978b6337c5e-fe9fa41a34f0b1c6a89c",
+      "reporter_id": "e27f8e955978b6337c5e-fe9fa41a34f0b1c6a89c",
+      "file": "native-phone-navigation.spec.js",
+      "project": "firefox",
+      "title": "enlarged Firefox navigation stays keyboard reachable at tablet widths",
+      "suite": [
+        "native-phone-navigation.spec.js",
+        "native navigation with enlarged Firefox text and no scripts"
+      ],
+      "line": 197,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "e27f8e955978b6337c5e-8a57babd74448b7b95aa",
+      "reporter_id": "e27f8e955978b6337c5e-8a57babd74448b7b95aa",
+      "file": "native-phone-navigation.spec.js",
+      "project": "firefox",
+      "title": "main links stay in view in a single keyboard disclosure at 320px",
+      "suite": [
+        "native-phone-navigation.spec.js",
+        "native navigation with enlarged Firefox text and no scripts"
+      ],
+      "line": 142,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "e27f8e955978b6337c5e-657431631cc1f4740b9e",
+      "reporter_id": "e27f8e955978b6337c5e-657431631cc1f4740b9e",
+      "file": "native-phone-navigation.spec.js",
+      "project": "firefox",
+      "title": "main links stay in view in a single keyboard disclosure at 390px",
+      "suite": [
+        "native-phone-navigation.spec.js",
+        "native navigation with enlarged Firefox text and no scripts"
+      ],
+      "line": 142,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "e27f8e955978b6337c5e-9d50ab9486a448d2993a",
+      "reporter_id": "e27f8e955978b6337c5e-9d50ab9486a448d2993a",
+      "file": "native-phone-navigation.spec.js",
+      "project": "firefox",
+      "title": "paid work source index is the first tab in the dossier source disclosure",
+      "suite": [
+        "native-phone-navigation.spec.js",
+        "native navigation with enlarged Firefox text and no scripts"
+      ],
+      "line": 202,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "cbead6ff08504803918c-c2def102fd59c54f5ac5",
+      "reporter_id": "cbead6ff08504803918c-aacbb768352e7f08e261",
+      "file": "profile-details.spec.js",
+      "project": "firefox",
+      "title": "a refused claim bookmark reopens the exact sources on keyboard retry",
+      "suite": [
+        "profile-details.spec.js"
+      ],
+      "line": 141,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "cbead6ff08504803918c-80be9aa3c399f2090ba9",
+      "reporter_id": "cbead6ff08504803918c-7cdc84f2c194f2c32333",
+      "file": "profile-details.spec.js",
+      "project": "firefox",
+      "title": "the native Source ledger lands at All sources and Tabs into its sources before images load",
+      "suite": [
+        "profile-details.spec.js"
+      ],
+      "line": 296,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "e7545a82257e8a18fdcf-4a1f261def38c0cfcc91",
+      "reporter_id": "e7545a82257e8a18fdcf-7470fa1d331223a69a5f",
+      "file": "research-index-ux.spec.js",
+      "project": "firefox",
+      "title": "a source version summary keeps its accessible name and shows the parent only where needed",
+      "suite": [
+        "research-index-ux.spec.js"
+      ],
+      "line": 35,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "e7545a82257e8a18fdcf-53cd91f9450be14d6356",
+      "reporter_id": "e7545a82257e8a18fdcf-92e19b72ad9b38e9f56f",
+      "file": "research-index-ux.spec.js",
+      "project": "firefox",
+      "title": "actual preceding script can reach a matching version beneath a hidden approved work",
+      "suite": [
+        "research-index-ux.spec.js"
+      ],
+      "line": 77,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "861fbfe47eb9328d135a-9830328b4ee639c9cb95",
+      "reporter_id": "861fbfe47eb9328d135a-8e2952315cd0f405cc87",
+      "file": "search-compatibility.spec.js",
+      "project": "firefox",
+      "title": "native Work keeps the downloaded bundle when slow HTML delays its execution",
+      "suite": [
+        "search-compatibility.spec.js"
+      ],
+      "line": 229,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "fc45065b150b1083e52b-6a17bca68abb8e2d84a9",
+      "reporter_id": "fc45065b150b1083e52b-ee2c3625184d9ca285d5",
+      "file": "technical-reading.spec.js",
+      "project": "firefox",
+      "title": "the current chapter starts with readable prose and keeps a native chapter index",
+      "suite": [
+        "technical-reading.spec.js"
+      ],
+      "line": 113,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "ace53adbdd2ac5870700-87916ccceb70d3af9770",
+      "reporter_id": "ace53adbdd2ac5870700-6b2b3c9cbbbe68b14829",
+      "file": "work-compare-content.spec.js",
+      "project": "firefox",
+      "title": "native Work Compare preserves separate pay and terms fields for every record",
+      "suite": [
+        "work-compare-content.spec.js"
+      ],
+      "line": 3,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "ee966624015f2ce6c55b-f6ab91c55e37d61e610a",
+      "reporter_id": "ee966624015f2ce6c55b-a62ebafc8016360bc784",
+      "file": "work-editorial-parity.spec.js",
+      "project": "firefox",
+      "title": "Work cards, Compare and both CSV downloads agree for past records",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "line": 97,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "ee966624015f2ce6c55b-68cd383857943c198036",
+      "reporter_id": "ee966624015f2ce6c55b-a371b4027c533edafc08",
+      "file": "work-editorial-parity.spec.js",
+      "project": "firefox",
+      "title": "native Work keeps the open terms and record order when filters load late",
+      "suite": [
+        "work-editorial-parity.spec.js"
+      ],
+      "line": 54,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "7f2a55606e16409c8fc4-7fd06c87b4c987b782e5",
+      "reporter_id": "7f2a55606e16409c8fc4-b027f72c405c3983f349",
+      "file": "work-profile-return.spec.js",
+      "project": "firefox",
+      "title": "deferred bookmark placement preserves keyboard focus on open Terms",
+      "suite": [
+        "work-profile-return.spec.js",
+        "Work company-profile handoff"
+      ],
+      "line": 165,
+      "status": "unexpected",
+      "real_pass": false
+    },
+    {
+      "id": "64c6dcf800d254c4fdd2-b56d4102486d0b03c2ba",
+      "reporter_id": "64c6dcf800d254c4fdd2-fc4b69e5f59135d0468d",
+      "file": "explore-work-layout.spec.js",
+      "project": "mobile-chromium",
+      "title": "native Work explains the full count and updates the live count for matching records",
+      "suite": [
+        "explore-work-layout.spec.js"
+      ],
+      "line": 69,
+      "status": "expected",
+      "real_pass": true
+    }
+  ]
+}
