@@ -75,7 +75,14 @@ test.describe('research without JavaScript', () => {
       await expect(page.locator('[id=' + JSON.stringify(chapterIds[index]) + ']')).toBeVisible();
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sciencetostartup.com' + path);
       expect(await page.locator('.r-report-body .r-paragraph p').count(), chapter.title).toBeGreaterThan(0);
-      await expect(page.getByRole('navigation', { name: 'Report chapters' }).locator('[aria-current="page"]')).toHaveAttribute('href', path);
+      const contents = page.getByRole('navigation', { name: 'Report chapters' });
+      if (index) {
+        const chapterIndex = page.locator('details.r-chapter-index');
+        await expect(chapterIndex).toHaveJSProperty('open', false);
+        await chapterIndex.locator('summary').press('Enter');
+        await expect(chapterIndex).toHaveJSProperty('open', true);
+      }
+      await expect(contents.locator('[aria-current="page"]')).toHaveAttribute('href', path);
       if (index) await expect(page.locator('.r-reader-pagination [rel="prev"]')).toHaveAttribute('href', readingPages[index - 1]);
       if (index + 1 < chapters.length) await expect(page.locator('.r-reader-pagination [rel="next"]')).toHaveAttribute('href', readingPages[index + 1]);
     }
