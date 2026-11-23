@@ -354,8 +354,6 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
         self.assertEqual(facts.ids.count('contents'), 1)
         routes = [rp.REPORT_PATH if index == 0 else rp.REPORT_PATH + 'chapters/' + section['id'] + '/'
                   for index, section in enumerate(sections)]
-        early_shortcuts = {'technical-landscape', 'datasets-and-benchmarks', 'methods-and-appendices',
-                           'commercial-evidence'}
         passage_targets = {
             'technical-landscape': {'scalable-oversight-result':
                                     'Study result — Measuring Progress on Scalable Oversight for Large Language Models.'},
@@ -389,9 +387,8 @@ console.log(JSON.stringify({scenarios: scenarios.length, passed: true}));
             self.assertNotIn('type="module"', chapter)
             tree = ReaderTree(chapter)
             shortcuts = tree.with_class('r-bulk-shortcuts')[0]
-            if section['id'] in early_shortcuts:
-                self.assertLess(tree.elements.index(shortcuts),
-                                next(index for index, item in enumerate(tree.elements) if item['tag'] == 'h1'))
+            self.assertLess(next(index for index, item in enumerate(tree.elements) if item['tag'] == 'h1'),
+                            tree.elements.index(shortcuts))
             for anchor, lead_in in passage_targets.get(section['id'], {}).items():
                 matching = [paragraph for paragraph in section['paragraphs']
                             if paragraph['text'].startswith(lead_in) and rp.paragraph_supported(self.context, paragraph)]

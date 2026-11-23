@@ -120,6 +120,7 @@ test.describe('research without JavaScript', () => {
       expect(await page.locator('.r-report-body .r-paragraph p').count(), chapter.title).toBeGreaterThan(0);
       const contents = page.getByRole('navigation', { name: 'Report chapters' });
       if (index) {
+        await expect(page.getByRole('navigation', { name: 'Reading shortcuts' })).toBeInViewport();
         const toggle = page.locator('details.r-chapter-index > summary');
         await expect(toggle).toBeVisible();
         await expect(contents).toBeHidden();
@@ -238,6 +239,14 @@ test.describe('research without JavaScript', () => {
   });
 
   test('data page exposes working graph exports and citation downloads', async ({ page, request }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const [name, fragment] of [['Assertion records', 'assertions'], ['Source records', 'sources']]) {
+      await page.goto('/research/data/');
+      const jump = page.getByRole('navigation', { name: 'On this page' }).getByRole('link', { name, exact: true });
+      await expect(jump).toBeInViewport();
+      await jump.press('Enter');
+      await expect(page.locator(`#${fragment}:target`)).toBeInViewport();
+    }
     await page.goto('/research/data/');
     const firstFiles = await page.locator('[aria-labelledby="downloads"] .r-downloads a')
       .evaluateAll(links => links.slice(0, 3).map(link => link.getAttribute('href')));

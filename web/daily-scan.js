@@ -20,6 +20,7 @@
   const reset = document.getElementById('scan-reset');
   const rows = [...root.querySelectorAll('.scan-item')];
   const rowById = new Map(rows.map(row => [row.id, row]));
+  const sourceLinks = [...root.querySelectorAll('.scan-item h2 a, .scan-sources a')];
   const readingKey = 's2sDailyReading';
   const filterKey = 's2sDailyFilters';
   const maxPosition = 10000000;
@@ -85,7 +86,7 @@
     }
     return null;
   }
-  function saveReading() {
+  function saveReading(link, mirrorToHistory = false) {
     restoration++;
     // Navigation state is independent of classic History state. Updating it
     // saves this entry without starting another navigation during traversal.
@@ -96,6 +97,7 @@
     const anchor = rows.find(row => !row.hidden && row.getBoundingClientRect().bottom > 0 &&
       row.getBoundingClientRect().top < innerHeight);
     const active = document.activeElement;
+    const sourceIndex = sourceLinks.indexOf(link);
     const reading = { url: location.href, edition: root.dataset.edition,
       x: Math.max(0, Math.min(maxPosition, scrollX)), y: Math.max(0, Math.min(maxPosition, scrollY)),
       open: rows.filter(row => row.querySelector('details').open).map(row => row.id),
@@ -104,13 +106,20 @@
       filtersOpen: compact.matches ? filterDisclosure.open : compactFiltersOpen,
       returnToFilterSummary: active === filterSummary,
       returnToPermalink: active?.matches('.scan-permalink') ? active.closest('.scan-item')?.id : null,
+      returnToSource: sourceIndex < 0 ? null : { index: sourceIndex, href: link.href },
       returnToDayStep: active?.matches('.scan-day-step') ? active.rel : null,
       returnToArchive: active?.matches('.scan-archive a') ? new URL(active.href).pathname : null,
       returnToDateGo: active === dateGo };
     try {
       const next = { ...state, [readingKey]: reading };
-      if (navigationState) navigationAPI.updateCurrentEntry({ state: next });
-      else {
+      if (navigationState) {
+        // A cold cross-origin return can lose Navigation API state in WebKit.
+        const classic = mirrorToHistory ? history.state : undefined;
+        if (mirrorToHistory && (classic == null || Object.prototype.toString.call(classic) === '[object Object]')) {
+          history.replaceState({ ...classic, [readingKey]: reading }, '', location.href);
+        }
+        navigationAPI.updateCurrentEntry({ state: next });
+      } else {
         delete next[filterKey];
         history.replaceState(next, '', location.href);
       }
@@ -147,10 +156,15 @@
         // Fragment traversal can leave focus or the next Tab at the target
         // article. Restore the originating link after reopening its details.
         if (!returnFocus && document.activeElement === document.body) {
+          const source = reading?.returnToSource;
+          const sourceLink = Number.isInteger(source?.index) ? sourceLinks[source.index] : null;
+          if (sourceLink && sourceLink.href === source.href && !sourceLink.closest('[hidden], details:not([open])')) {
+            returnFocus = sourceLink;
+          }
           const archiveLink = archive.open ? archiveLinks.get(reading?.returnToArchive) : null;
           const focusSummary = compact.matches && (filters?.focusSummary ?? reading?.returnToFilterSummary) === true;
           const focusSearch = filterDisclosure.open && filters?.focusSearch === true;
-          returnFocus = focusSummary ? filterSummary : focusSearch ? search :
+          returnFocus ??= focusSummary ? filterSummary : focusSearch ? search :
             reading?.returnToDateGo === true ? dateGo : archiveLink || daySteps.get(reading?.returnToDayStep);
         }
         returnFocus?.focus({ preventScroll: true });
@@ -281,11 +295,12 @@
   root.addEventListener('click', event => {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const link = event.target.closest?.('a[href]');
-    if (link && !link.hasAttribute('download') && (!link.target || link.target === '_self') &&
-        new URL(link.href).origin === location.origin) saveReading();
+    if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) return;
+    const sameOrigin = new URL(link.href).origin === location.origin;
+    if (sameOrigin || sourceLinks.includes(link)) saveReading(link, !sameOrigin || Boolean(history.state?.[readingKey]));
   });
   if (navigationState) navigationAPI.addEventListener('navigate', event => {
-    if (event.navigationType !== 'replace') saveReading();
+    if (event.navigationType !== 'replace') saveReading(event.sourceElement);
   });
   // Classic History has no event before browser Back leaves the entry. Save
   // a changed fragment disclosure in the same task as its native toggle.

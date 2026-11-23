@@ -23,7 +23,7 @@ async function activate(link) {
   return position;
 }
 
-async function routePublishedDossiers(page, baseURL) {
+async function routePublishedPages(page, baseURL) {
   await page.route('https://sciencetostartup.com/**', async route => {
     const { pathname, search } = new URL(route.request().url());
     const response = await route.fetch({ url: new URL(pathname + search, baseURL).href });
@@ -55,6 +55,41 @@ async function expectColdStart(page) {
   await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
 }
 
+test.describe('About navigation without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('the About fragment keeps the current masthead visible', async ({ page }) => {
+    for (const [width, height] of [[320, 640], [390, 844], [1440, 900]]) {
+      await page.setViewportSize({ width, height });
+      await page.goto('/method/#about');
+      await expect(page.locator('.site-header')).toBeInViewport({ ratio: 1 });
+      await expect(page.getByRole('heading', { name: 'About', exact: true })).toBeInViewport();
+      await expect(page.locator('.site-header a[aria-current="page"]')).toHaveText(['About', 'About']);
+      expect(await page.evaluate(() => scrollY)).toBe(0);
+    }
+  });
+});
+
+test('About reopens Coverage and limits on cold Back from the company directory', async ({ page, baseURL, isMobile }) => {
+  await trackDocument(page, false);
+  await page.addInitScript(() => {
+    if (location.pathname === '/method/') addEventListener('unload', () => {});
+  });
+  await page.setViewportSize(isMobile ? { width: 390, height: 844 } : { width: 1440, height: 900 });
+  await routePublishedPages(page, baseURL);
+  const origin = 'https://sciencetostartup.com/method/#about';
+  await page.goto(origin);
+  const coverage = page.locator('#coverage-notes');
+  await coverage.locator('summary').press('Enter');
+  const source = coverage.getByRole('link', { name: 'current company directory' });
+  const position = await activate(source);
+  await expect(page).toHaveURL('https://sciencetostartup.com/companies/');
+  await page.goBack({ waitUntil: 'commit' });
+  await expect(page).toHaveURL(origin);
+  await expect(coverage).toHaveAttribute('open', '');
+  await expectReturn(page, source, page.locator('#download-files > summary'), position);
+});
+
 const companyHandoffs = [
   {
     name: 'Compare Mercor', query: 'Mercor', source: compareResult, following: firstMercorSource,
@@ -84,7 +119,7 @@ for (const handoff of companyHandoffs) {
   test(`native Companies restores ${handoff.name} on cold Back`, async ({ page, baseURL }) => {
     await trackDocument(page, true);
     await page.setViewportSize({ width: 390, height: 844 });
-    if (handoff.result === '.company-dossier') await routePublishedDossiers(page, baseURL);
+    if (handoff.result === '.company-dossier') await routePublishedPages(page, baseURL);
     if (handoff.source === '[data-full-guide-search]') await page.route('**/guide-search-shell.js', route => route.abort());
     const group = handoff.group ?? directoryGroup;
     await page.goto(`/companies/?group=${group}&reader=keep`);
@@ -126,7 +161,7 @@ test.describe('Mercor dossier viewport on cold Back', () => {
     test(userScroll ? 'keeps a reader’s scroll after pageshow' : 'recovers from a late scroll to the top', async ({ page, baseURL }) => {
       await trackDocument(page, true);
       await page.setViewportSize({ width: 390, height: 844 });
-      await routePublishedDossiers(page, baseURL);
+      await routePublishedPages(page, baseURL);
       await page.addInitScript(({ selector, userScroll }) => {
         if (location.pathname !== '/companies/') return;
         const viewport = link => ({ scroll: scrollY, top: link.getBoundingClientRect().top, time: performance.now() });

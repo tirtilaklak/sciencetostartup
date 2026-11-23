@@ -20,18 +20,26 @@
 #compare-view .comparison-table .financial-summary .row-number>strong{font-size:28px}
 #compare-view .comparison-table .category-label{font-size:11px;line-height:1.5}
 #compare-view .comparison-table td>p{font-size:14px;line-height:1.6;margin:8px 0 0}
-#compare-view .page-heading{margin-bottom:12px}
+#compare-view .page-heading{padding-bottom:8px;margin-bottom:0}
+#compare-view .comparison-pair-count{display:none}
+#compare-view .comparison-table .comparison-more-row td{padding:8px 0}
+#compare-view .comparison-more{margin:0}
 #method-view .review-update{font-size:14px;line-height:1.65;background:var(--pale);border:0;border-radius:5px}
 #method-view .method-principles{background:transparent}
 #method-view .method-layout{column-gap:38px}
 @media(max-width:700px){
+ #compare-setup-toggle{padding-inline:0}
  #compare-view .comparison-table th,#compare-view .comparison-table td{padding:14px 10px}
- #compare-view .comparison-table th:first-child{width:76px;min-width:0;font-size:11px}
+ #compare-view .comparison-table thead th{padding-block:8px;font-size:17px}
+ #compare-view .comparison-table tbody th:first-child{width:auto;padding-block:8px;font-size:11px}
+ #compare-view .comparison-pair-count{display:flex;align-items:center;min-height:44px;color:var(--muted);font-size:12px;font-weight:400}
+ #compare-view .comparison-more-row td{grid-column:1/-1}
  #compare-view .comparison-table .financial-summary .row-number>strong{font-size:22px}
  #compare-view .comparison-table .row-number>span{font-size:12px}
  .financial-summary .row-period,.financial-citation{font-size:12px}
  .financial-source-details summary{min-height:44px;display:flex;align-items:center}
  #compare-view .mobile-column-options>.mobile-compare-pager{top:calc(100% + 4px)}
+ #compare-view .mobile-compare-pager button{min-height:44px}
 }
 @media(max-width:700px) and (min-height:501px){
  #compare-view .comparison-table:not([data-compare-flow-head]) .mobile-compare-pager{

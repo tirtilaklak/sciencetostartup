@@ -355,7 +355,7 @@ class StaticPageTests(unittest.TestCase):
         compiled = sp.format_date(self.data["meta"]["as_of"])
         self.assertIn(f'Historical company dataset v{self.data["dataset_version"]} · research compiled {compiled}', method_coverage)
         self.assertIn(f'This dataset covers {len(self.companies)} company profiles and {len(self.data["sources"])} source records.', method_coverage)
-        self.assertIn(f'Browse the <a href="{ORIGIN}/companies/">current company directory</a> for newer profiles.', method_coverage)
+        self.assertIn(f'Browse the <a href="{ORIGIN}/companies/" data-disclosure-return>current company directory</a> for newer profiles.', method_coverage)
         count = len(self.current_companies["entries"])
         supplemental = '<a href="/current-companies.json">Supplemental records for ' + str(count) + ' added companies (JSON)</a>'
         self.assertEqual(text.count('href="/current-companies.json"'), 1)
@@ -1036,7 +1036,7 @@ class StaticPageTests(unittest.TestCase):
         self.assertIn(f'Historical company dataset v{self.data["dataset_version"]}', coverage)
         self.assertIn(f'This dataset covers {len(self.data["companies"])} company profiles and {len(self.data["sources"])} source records.', coverage)
         self.assertIn(f"{len(rated)} companies have a delivery evidence level", coverage)
-        self.assertIn(f'<a href="{ORIGIN}/companies/">current company directory</a>', coverage)
+        self.assertIn(f'<a href="{ORIGIN}/companies/" data-disclosure-return>current company directory</a>', coverage)
         self.assertIn(f"The {sp.count_word(len(unrated)).lower()} nonprofit research groups get no level.", text)
         self.assertNotIn("delivery evidence rating", text)
         self.assertTrue(50 <= len(dataset["description"]) <= 5000)

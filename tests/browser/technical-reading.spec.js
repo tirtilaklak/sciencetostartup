@@ -83,7 +83,9 @@ async function verifyPassageHistory(page, path) {
   await expect(shortcut).toBeInViewport();
   expect(await page.evaluate(() => scrollY)).toBeCloseTo(originalScroll, 0);
   await page.keyboard.press('Tab');
-  const next = page.locator('.r-reader-book-title a');
+  const next = path === chapter
+    ? page.locator('.r-current-chapter-head .r-editorial-edition > summary')
+    : page.locator('.r-reader-book-title a');
   await expect(next).toBeFocused();
   await expect(next).toBeInViewport();
 
@@ -116,6 +118,11 @@ test('the current chapter starts with readable prose and keeps a native chapter 
   const first = page.locator('#first-paragraph > p').first();
   await expect(first).toContainText('This chapter separates stages');
   await expect(first).toBeInViewport({ ratio: 0.08 });
+
+  await page.getByRole('link', { name: 'First paragraph', exact: true }).press('Enter');
+  await expect(page.locator('#first-paragraph:target')).toBeFocused();
+  await expect(first).toBeInViewport();
+  await page.goBack();
 
   const index = page.locator('.r-chapter-index');
   const summary = index.locator('summary');

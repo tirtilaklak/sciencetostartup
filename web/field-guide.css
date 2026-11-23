@@ -420,3 +420,40 @@ h1,h2,h3,h4{font-family:var(--fg-sans);color:var(--ink)}
 @media (max-width: 700px) and (min-height: 501px) {
   html:has(> body > .topbar) { scroll-padding-top: var(--header-height); }
 }
+
+.explore-page {
+  --bg: var(--print-paper);
+  --ink: var(--print-ink);
+  --muted: var(--print-muted);
+  --border: var(--print-rule);
+  --green: var(--print-link);
+  --pale: #ece8db;
+  background: var(--bg);
+  color: var(--ink);
+}
+.explore-page .topbar {
+  border-bottom-color: var(--ink);
+}
+.explore-page .topbar > .site-search-open {
+  border-color: var(--print-control);
+  border-radius: 0;
+  color: var(--ink);
+}
+.explore-page :is(.market-hero h1, .bh-heading h2, #compare-view .page-heading h1) {
+  font-family: var(--print-display);
+  font-weight: 400;
+  letter-spacing: -.025em;
+}
+.static-page:has(> .editorial-masthead) .scan-heading h1 {
+  font-family: var(--print-display);
+  font-weight: 400;
+  letter-spacing: -.025em;
+}
+@media (min-width: 1101px) {
+  .explore-page .topbar {
+    padding-inline: max(48px, calc((100% - 1120px) / 2));
+  }
+  .explore-page .explore-layout {
+    max-width: 1216px;
+  }
+}

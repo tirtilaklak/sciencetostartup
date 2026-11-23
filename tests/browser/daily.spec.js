@@ -348,6 +348,43 @@ async function settledReading(link) {
   }));
 }
 
+test('Daily restores the exact external article link on cold Back', async ({ page, isMobile, request }) => {
+  test.setTimeout(60_000);
+  await verifiedResponse(request, '/daily-scan.js', 'daily-scan.js');
+  await page.setViewportSize(isMobile ? { width: 320, height: 640 } : { width: 1440, height: 900 });
+  await page.addInitScript(() => {
+    if (location.pathname === '/daily/') addEventListener('unload', () => {});
+  });
+  const item = latest.items[0];
+  const destination = new URL(item.sources[0].url);
+  await page.route(url => url.origin === destination.origin && url.pathname === destination.pathname &&
+    url.search === destination.search, route => route.fulfill({ body: 'Original source', contentType: 'text/html' }));
+
+  await page.goto('/daily/');
+  const origin = page.url();
+  const row = page.locator(`.scan-item[id="${item.id}"]`);
+  const details = row.locator('details');
+  await details.locator('summary').press('Enter');
+  await page.evaluate(() => history.replaceState({ ...history.state, reader: 'keep' }, ''));
+  // Both links have the same destination, but Back should return to the one used.
+  for (const link of [row.locator('h2 a'), details.locator('.scan-sources a').first()]) {
+    await expect(link).toHaveAttribute('href', item.sources[0].url);
+    const started = await page.evaluate(() => performance.timeOrigin);
+    await link.evaluate(anchor => anchor.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    const before = await settledReading(link);
+    await link.press('Enter');
+    await expect(page).toHaveURL(destination.href);
+    await traversePermalinkHistory(page, 'goBack', origin);
+    expect(await page.evaluate(() => performance.timeOrigin)).not.toBe(started);
+    await expect(link).toBeFocused();
+    await expect(details).toHaveAttribute('open', '');
+    const after = await settledReading(link);
+    expect(Math.abs(after.top - before.top)).toBeLessThanOrEqual(2);
+    expect(after.open).toEqual(before.open);
+    expect(await page.evaluate(() => history.state.reader)).toBe('keep');
+  }
+});
+
 test('Daily deep links reveal filtered items and native disclosures support keyboard and history', async ({ page }) => {
   async function restoredReading(link, saved) {
     await expect.poll(() => page.locator('.scan-item').evaluateAll(rows => rows

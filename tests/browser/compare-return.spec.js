@@ -50,6 +50,7 @@ test('Compare shows the selected figures on the first phone screen with one sele
   const clear = view.getByRole('button', { name: 'Clear selection' });
   const share = view.locator('#copy-compare');
   await expect(view.locator('.comparison-table')).toBeVisible();
+  await expect(view.getByText('2 of 3 shown')).toBeInViewport({ ratio: 1 });
   await expect(editor).toHaveJSProperty('open', false);
   await expect(view.getByRole('rowheader', { name: 'Business' })).toBeInViewport();
   await expect(compareCell(page, 'Published revenue figure', 'snorkel_ai').locator('.row-number')).toBeInViewport({ ratio: 1 });
@@ -79,6 +80,36 @@ test('Compare shows the selected figures on the first phone screen with one sele
   await expect(editor).toHaveJSProperty('open', false);
   await expect(toggle).toBeFocused();
   await expect(view.locator('.comparison-table')).toBeVisible();
+});
+
+test('Compare disclosure keeps the additional evidence next in the keyboard order', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/explore/#compare/mercor/snorkel_ai/labelbox');
+  const toggle = page.locator('[data-compare-extra]');
+  const extra = page.locator('#comparison-extra');
+  const firstEvidence = compareCell(page, 'Funding & investors', 'mercor')
+    .getByRole('link', { name: 'Read Mercor’s financing evidence' });
+  for (const id of ['mercor', 'snorkel_ai']) {
+    await expect(compareCell(page, 'Published revenue figure', id).locator('.row-number'))
+      .toBeInViewport({ ratio: 1 });
+  }
+  await expect(toggle).toHaveAttribute('aria-controls', 'comparison-extra');
+  await expect(extra).toBeHidden();
+  await toggle.focus();
+  await page.keyboard.press('Enter');
+  await expect(toggle).toBeFocused();
+  await expect(toggle).toBeInViewport({ ratio: 1 });
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(extra).toBeVisible();
+  await page.keyboard.press('Tab');
+  await expect(firstEvidence).toBeFocused();
+  await expect(firstEvidence).toBeInViewport({ ratio: 1 });
+  await page.keyboard.press('Shift+Tab');
+  await expect(toggle).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(toggle).toBeFocused();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(extra).toBeHidden();
 });
 
 test('Back returns to the exact Compare link when two links open the same profile', async ({ page }) => {

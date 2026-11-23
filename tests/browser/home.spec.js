@@ -74,6 +74,51 @@ test('the three guide links stay readable and usable on narrow phones', async ({
   }
 });
 
+test('guide link labels and details wrap between words with enlarged Firefox text', async ({ browserName, baseURL }) => {
+  test.skip(browserName !== 'firefox', 'Uses Firefox minimum font sizes');
+  const browser = await firefox.launch({ firefoxUserPrefs: {
+    'font.minimum-size.x-western': 32,
+    'font.minimum-size.x-unicode': 32,
+  } });
+  try {
+    const page = await browser.newPage({ baseURL, javaScriptEnabled: false, reducedMotion: 'reduce' });
+    for (const width of [320, 775]) {
+      await page.setViewportSize({ width, height: 720 });
+      await page.goto('/');
+      const actions = page.getByRole('navigation', { name: 'Browse the guide' });
+      for (const name of ['Companies', 'Paid work', 'Research']) {
+        const link = actions.getByRole('link', { name, exact: true });
+        const { height } = await link.boundingBox();
+        expect(height).toBeGreaterThanOrEqual(44);
+        const brokenWords = await link.evaluate(element => {
+          const bounds = element.getBoundingClientRect();
+          const range = document.createRange();
+          const broken = [];
+          for (const attribute of ['aria-labelledby', 'aria-describedby']) {
+            const text = document.getElementById(element.getAttribute(attribute));
+            const walker = document.createTreeWalker(text, NodeFilter.SHOW_TEXT);
+            for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+              for (const { 0: word, index } of node.data.matchAll(/\S+/g)) {
+                range.setStart(node, index);
+                range.setEnd(node, index + word.length);
+                const lines = [...range.getClientRects()].filter(line => line.width);
+                if (lines.length !== 1 || lines[0].left < bounds.left - 0.5 || lines[0].right > bounds.right + 0.5) {
+                  broken.push(word);
+                }
+              }
+            }
+          }
+          return broken;
+        });
+        expect(brokenWords, `${name} at ${width}px`).toEqual([]);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
+    }
+  } finally {
+    await browser.close();
+  }
+});
+
 test('home promotes only approved current terms and retains all binding conditions', async ({ page }, info) => {
   expect(promotionId).toBe('g2i.work.senior-swe-training-7c54f48a');
   const example = page.locator('#home-work-example [data-home-route]');

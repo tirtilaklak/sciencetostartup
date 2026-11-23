@@ -44,7 +44,7 @@ TITLE_LIMIT = 59
 METRIC_LIMIT = 8
 PRODUCT_LIMIT = 6
 # Bump by hand when page links, layout, copy or structured data change; it feeds sitemap <lastmod>.
-SITE_REVISED = "2026-11-22"
+SITE_REVISED = "2026-11-23"
 COMPANY_ID = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 ISO_DAY = re.compile(r"\b([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])\b")
 ISO_MONTH = re.compile(r"\b([0-9]{4})-(0[1-9]|1[0-2])\b")
@@ -1113,7 +1113,9 @@ def document(research, title, description, canonical, body, structured=None, cur
                      if canonical and not path.startswith(search_exclusions) else "")
     # Keep the archived Daily header markup in dated issues.
     browse_fallback = bool(search_script) and (path == "/daily/" or not path.startswith("/daily/"))
-    editorial = path in ("/companies/", "/work/", "/research/") or path.startswith("/research/state-of-ai-data-labs/")
+    editorial = (path in ("/companies/", "/work/", "/research/", "/research/data/", "/daily/", "/method/")
+                 or path.startswith("/research/state-of-ai-data-labs/")
+                 or bool(re.fullmatch(r"/company/[^/]+/", path)))
     header = site_header(current, state, browse_fallback=browse_fallback, editorial=editorial)
     return "".join(head) + "</head>\n<body class=\"static-page\">\n" + header + '<main id="main">\n' + body + "</main>\n" + site_footer(research, note) + details_script + search_script + '</body>\n</html>\n'
 
@@ -1713,7 +1715,9 @@ def business_observation_html(research, health, company_id, inline=False, compac
     basis = {"gross": "Gross revenue", "net": "Net revenue", "latest_discontinued_operations_comparative": "Discontinued operations"}.get(row.get("accounting_basis"), "Gross/net not disclosed")
     shown_period = period_text(period) if compact else period
     meta = " · ".join(str(x) for x in (None if compact else kind, shown_period, row.get("currency"), scope, basis) if x)
-    link = external_link(source.get("url"), source.get("publisher") or "Original source") if source else ""
+    publisher = source.get("publisher") if source else None
+    link_name = f"Source from {publisher}" if inline and not compact and publisher else ""
+    link = external_link(source.get("url"), publisher or "Original source", link_name) if source else ""
     if source and primary:
         link = external_link(source["url"], source["title"])
     if source and company_id == "snorkel_ai" and row.get("measure") == "annualized_revenue":
@@ -1949,8 +1953,9 @@ def render_company(research, company, editorial_entry, profile_entry, routes, pe
     body.append(f'<details class="company-fold"><summary id="sources" data-native-sources><span>Sources &amp; data</span><small>{plural(source_count, "source")}</small></summary><div class="company-fold-body"><h2 id="full-profile">Source records</h2>'
                 f'<p>{plural(claim_count, "claim")} · Research compiled {escape(format_date(research.as_of))}</p>'
                 + (f'<p><a href="/company/{cid}/work-sources/">{plural(len(work_source_ids), "paid work source")}</a></p>' if work_source_ids else '')
+                + f'<ul class="company-source-links"><li><a href="{app_url}/sources">Source ledger</a></li><li><a href="{app_url}/people">Funding and people</a></li></ul>'
                 + company_sources_html(research, cid, name, work_source_ids, business_health) +
-                f'<ul class="company-source-links"><li><a href="{app_url}/sources">Source ledger</a></li><li><a href="{app_url}/people">Funding and people</a></li><li><a href="{ORIGIN}/research.json" download>Research JSON</a></li><li><a href="{ORIGIN}/observatory.sqlite" download>SQLite database</a></li></ul>'
+                f'<ul class="company-source-links"><li><a href="{ORIGIN}/research.json" download>Research JSON</a></li><li><a href="{ORIGIN}/observatory.sqlite" download>SQLite database</a></li></ul>'
                 f'<p class="company-record-links"><a href="{app_url}">Interactive record</a><a href="{app_url}/traction">Figures</a><a href="{app_url}/work">Paid work</a><a href="{ORIGIN}/method/#grades">Source grades</a></p>')
     if logo: body.append(f'<p class="company-logo-source">Company logo: {external_link(logo.get("source_page") or logo.get("asset_url"), "official source")}. {LOGO_NOTE}</p>')
     if peers:
@@ -2217,7 +2222,7 @@ def render_method(research, sizes, modified):
                 f'<p>This dataset covers {plural(len(research.companies), "company profile")} and {plural(len(data.get("sources", [])), "source record")}. '
                 f'{plural(len(rated), "company has", "companies have")} a delivery evidence level.{unrated_note}</p>\n'
                 f'<p>{plural(doubtful, "claim is", "claims are")} unverified or disputed. Each one is labeled. '
-                f'Browse the <a href="{ORIGIN}/companies/">current company directory</a> for newer profiles.</p></div></details>\n')
+                f'Browse the <a href="{ORIGIN}/companies/" data-disclosure-return>current company directory</a> for newer profiles.</p></div></details>\n')
     files = [(name, kind, mime, text) for name, kind, mime, text in DOWNLOADS if name in sizes] + [(name, "CSV", "text/csv", f"The {name[:-4].replace('_', ' ')} table") for name in sorted(n for n in sizes if n.endswith(".csv"))]
     canonical_names = {"research.json", "observatory.sqlite", "classifications.csv"} | {name + ".csv" for name in TABLES}
     historical_files = [item for item in files if item[0] in canonical_names]
@@ -2258,7 +2263,7 @@ def render_method(research, sizes, modified):
                "measurementTechnique": "Public-source research. Each claim is graded A, B, C or U by the strength of its sources.", "variableMeasured": measured,
                "distribution": [{"@type": "DataDownload", "name": name, "contentUrl": f"{ORIGIN}/{name}", "encodingFormat": mime} for name, kind, mime, text in historical_files]}
     structured = [page_node("AboutPage", title, description, canonical, modified, crumbs, about={"@id": WEBSITE["@id"]}), dataset]
-    return document(research, title, description, canonical, "".join(body), structured, current="method")
+    return document(research, title, description, canonical, "".join(body), structured, current="about")
 
 
 def render_not_found(research, directory_count=None):
