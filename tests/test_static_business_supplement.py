@@ -101,6 +101,41 @@ class StaticBusinessSupplementTests(unittest.TestCase):
         self.assertIn(f'data-source-id="{issuer_id}"><a class="ext" href="{issuer_url}">Turing’s official Series E release</a>', page)
         self.assertIn(f'href="{self.research.sources[original_id]["url"]}"', page)
 
+    def test_company_sources_link_to_checked_publisher_copies_and_retain_the_mirrors(self):
+        updates = json.loads((ROOT / 'data/source-updates.json').read_text())
+        research = sp.Research(self.data, updates=updates)
+        for company, original_id, publisher_url in (
+            ('turing', 'turing.source.audit-t1', 'https://www.turing.com/press/turing-111-million-series-e'),
+            ('bespoke_labs', 'bespoke_labs.source.audit-bl-pr', 'https://www.businesswire.com/news/home/20260706827813/en/Bespoke-Labs-Announces-%2440M-to-Build-the-Environments-That-Train-Reliable-Agents'),
+        ):
+            with self.subTest(company=company):
+                original = self.research.sources[original_id]
+                page = sp.company_sources_html(research, company, research.companies[company]['name'], [])
+                self.assertIn(f'data-native-source="{original_id}"><a class="ext" href="{publisher_url}">', page)
+                self.assertIn(f'href="{original["url"]}">Recorded mirror</a>', page)
+                self.assertEqual(research.sources[original_id], original)
+                self.assertEqual(self.research.company_source(original), original)
+
+        valuation = next(m for m in self.data['metrics'] if m['id'] == 'turing.metric.major-round-valuation-3')
+        headline = sp.company_metric_fact(research, valuation)
+        self.assertIn('$2.2B', headline)
+        self.assertIn('6 Mar 2025', headline)
+        self.assertIn('href="https://www.turing.com/press/turing-111-million-series-e">Turing</a>', headline)
+        self.assertNotIn('financialcontent.com', headline)
+
+    def test_publisher_copy_rejects_changed_source_bindings(self):
+        updates = json.loads((ROOT / 'data/source-updates.json').read_text())
+        for key, value in (
+            ('company_id', 'bespoke_labs'), ('published_on', '2026-07-06'),
+            ('recorded_url', 'https://example.com/other-article'), ('url', 'https://user@example.com/'),
+            ('source_ids', ['turing.source.t1', 'turing.source.t1']),
+        ):
+            with self.subTest(key=key):
+                changed = copy.deepcopy(updates)
+                changed['source_locations'][0][key] = value
+                with self.assertRaisesRegex(ValueError, 'source-updates:'):
+                    sp.Research(self.data, updates=changed)
+
 
 if __name__ == '__main__':
     unittest.main()

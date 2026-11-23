@@ -354,8 +354,52 @@ class Research:
         self.headlines = dict(headlines or {})
         current = isinstance(updates, dict) and updates.get("baseline_dataset_version") == data.get("dataset_version")
         self.corrections = self._corrections(updates) if current else {}
+        self.source_locations = self._source_locations(updates) if current else {}
         self.reviewed_source_dates = self._reviewed_source_dates(updates if current else {})
         self.product_updates = [row for row in updates.get("updates") or [] if isinstance(row, dict)] if current else []
+
+    def _source_locations(self, updates):
+        """Use checked publisher copies of original documents on current company pages."""
+        locations = updates.get("source_locations", [])
+        if not isinstance(locations, list):
+            raise ValueError("source-updates: source locations must be a list")
+        fields = {"company_id", "source_ids", "recorded_url", "url", "publisher", "title", "published_on", "checked_on", "content_sha256"}
+        indexed = {}
+        for location in locations:
+            if not isinstance(location, dict) or set(location) != fields:
+                raise ValueError("source-updates: invalid source location fields")
+            ids = location["source_ids"]
+            if not isinstance(ids, list) or not ids or any(not isinstance(sid, str) for sid in ids):
+                raise ValueError("source-updates: source locations require recorded source IDs")
+            url = location["url"]
+            if not isinstance(url, str) or re.search(r"[\s\x00-\x1f\x7f]", url):
+                raise ValueError("source-updates: invalid publisher URL")
+            try:
+                parsed = urlsplit(url)
+                port = parsed.port
+            except ValueError as error:
+                raise ValueError("source-updates: invalid publisher URL") from error
+            if parsed.scheme != "https" or not parsed.hostname or parsed.username is not None or parsed.password is not None or parsed.fragment or port not in (None, 443):
+                raise ValueError("source-updates: invalid publisher URL")
+            if not all(isinstance(location[key], str) and clean(location[key]) for key in ("title", "publisher")):
+                raise ValueError("source-updates: source locations require publisher attribution")
+            published, checked, digest = (location[key] for key in ("published_on", "checked_on", "content_sha256"))
+            if (not all(isinstance(day, str) and ISO_DAY.fullmatch(day) for day in (published, checked))
+                    or date.fromisoformat(published) > date.fromisoformat(checked)
+                    or not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest)):
+                raise ValueError("source-updates: source locations require a dated content receipt")
+            for sid in ids:
+                source = self.sources.get(sid)
+                if (sid in indexed or not source or source.get("company_id") != location["company_id"]
+                        or source.get("url") != location["recorded_url"] or source["url"] == url
+                        or source.get("published_on") != published):
+                    raise ValueError("source-updates: source location differs from the recorded document")
+                indexed[sid] = {**source, "url": url, "publisher": location["publisher"], "title": location["title"],
+                                "accessed_on": checked, "retrieval_status": "checked"}
+        return indexed
+
+    def company_source(self, source):
+        return self.source_locations.get(source["id"], source)
 
     def _corrections(self, updates):
         """Display corrections per metric, matched as web/source-updates.js matches them."""
@@ -1079,7 +1123,8 @@ def figure_row(research, metric, context=None):
     if fact and fact.get("source_id") != (original or {}).get("id"):
         origin = external_link(fact["source_url"], fact["source_title"])
         citations += f'<span class="sub">{escape(fact["claimant"])} · {origin}</span>'
-    if supplemental := context.get("supplemental_source"):
+    supplemental = context.get("supplemental_source")
+    if supplemental and (not original or research.company_source(original)["url"] != supplemental["url"]):
         link = external_link(supplemental["url"], supplemental["title"])
         citations = f'<span class="sub" data-source-id="{escape(supplemental["id"])}">{link}</span>' + citations
     confidence = context.get("confidence_reason")
@@ -1130,6 +1175,7 @@ def source_html(research, metric, inline=False, evidence=None, checks=None):
     """A primary source and the other records cited by the same claim."""
     source, rest = (evidence[0], evidence[1:]) if evidence else (latest_source(research, metric)[0], None)
     if not source: return '<span class="muted">No source recorded.</span>' if inline else '<span class="sub">No source recorded</span>'
+    source = research.company_source(source)
     meta = source_meta(research, source, (checks or {}).get(source["id"]))
     link = company_source_link(research, source)
     rest = company_citations(research, research.claim(metric), source["id"], rest, checks)
@@ -1579,7 +1625,7 @@ def claim_source_html(research, claim):
     """A risk claim's cited evidence, with the first source visible by default."""
     rows = [research.sources[sid] for sid in claim.get("source_ids", []) if sid in research.sources]
     if not rows: return '<span class="sub">No source recorded</span>'
-    primary = rows[0]
+    primary = research.company_source(rows[0])
     meta = source_meta(research, primary)
     return company_source_link(research, primary) + (f'<span class="sub">{escape(meta)}</span>' if meta else '') + company_citations(research, claim, primary["id"])
 
@@ -1682,6 +1728,8 @@ def business_observation_html(research, health, company_id, inline=False, compac
 def company_metric_fact(research, metric, context=None):
     """A compact reported fact; its full row and source history stay below."""
     source, _ = latest_source(research, metric)
+    if source:
+        source = research.company_source(source)
     assurance = {"company": "Company-reported", "investor": "Investor-reported", "independent_reporting": "Reported by press", "filing": "Filing", "customer": "Customer-reported", "database": "Database"}.get((source or {}).get("source_type"), "Attributed source")
     attribution = external_link(source.get("url"), clean(source.get("publisher")) or "Source") if source else "Source not recorded"
     qualifiers = ["Estimate"] if metric.get("reported_vs_estimated") == "estimated" else []
@@ -1770,12 +1818,18 @@ def company_work_source_ids(research, company_id, routes):
 
 def company_source_item(research, source, bookmark=False, historical_check=None):
     sid = source["id"]
+    current = research.company_source(source) if not historical_check else source
     meta = source_meta(research, source, historical_check) if bookmark or historical_check or sid in research.reviewed_source_dates else ""
     if historical_check:
         meta = f"Historical citation · {meta}"
     anchor = f' id="{escape(sid)}"' if bookmark else ""
-    annotation = f'<span class="sub">{escape(meta)}</span>' if meta else ""
-    return f'<li{anchor} data-native-source="{escape(sid)}">{company_source_link(research, source, not historical_check)}{annotation}</li>'
+    if current != source:
+        original = external_link(source["url"], "Recorded mirror")
+        meta = escape(source_meta(research, current)) + f" · {original}"
+    else:
+        meta = escape(meta)
+    annotation = f'<span class="sub">{meta}</span>' if meta else ""
+    return f'<li{anchor} data-native-source="{escape(sid)}">{company_source_link(research, current, not historical_check)}{annotation}</li>'
 
 
 def company_sources_html(research, company_id, name, work_source_ids, health=None):

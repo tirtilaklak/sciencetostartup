@@ -339,7 +339,7 @@ def company_graph(data, company_id):
 def source_updates_context(updates, company_id=None):
     if not updates:
         return None
-    result = {key: copy.deepcopy(value) for key, value in updates.items() if key not in ("updates", "evidence_context")}
+    result = {key: copy.deepcopy(value) for key, value in updates.items() if key not in ("updates", "evidence_context", "source_locations")}
     result["updates"] = [copy.deepcopy(row) for row in updates.get("updates", []) if company_id is not None and row.get("company_id") == company_id]
     context = updates.get("evidence_context") or {}
     result["evidence_context"] = {key: copy.deepcopy(value) for key, value in context.items() if key != "corrections"}
@@ -798,17 +798,18 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
                                                                      profileProducts=rooted_assets(current_products), editorialReadouts=copy.deepcopy(data["editorial_readouts"]),
                                                                      researchSearchEntries=public_search_entries, workTitles=work_titles,
                                                                      workSearch={route["id"]: work_search_text(route, company_map) for route in sidecars["WORK_ROUTES"]["routes"]}))
+    source_updates = sidecars["SOURCE_UPDATES"]
+    app_source_updates = {key: value for key, value in source_updates.items() if key != "source_locations"} if source_updates else None
     # The full archive is fetched only by the explicitly opened method/archive view.
-    summary["archive"] = write_asset(destination, "archive", dict(identity, data=data, businessHealth=sidecars["BUSINESS_HEALTH"], sourceUpdates=copy.deepcopy(sidecars["SOURCE_UPDATES"])))
+    summary["archive"] = write_asset(destination, "archive", dict(identity, data=data, businessHealth=sidecars["BUSINESS_HEALTH"], sourceUpdates=copy.deepcopy(app_source_updates)))
     health = sidecars["BUSINESS_HEALTH"] or {}
     financial_metrics = [metric for metric in data["metrics"] if metric["kind"] in ("revenue", "arr", "annualized_revenue_run_rate")]
     overview_claim_ids = {cid for observation in health.get("observations", []) for cid in observation.get("claim_ids", [])} | {metric["claim_id"] for metric in financial_metrics}
     canonical_claim_ids = {claim["id"] for claim in data["claims"]}
     for key in ("assessments", "editorial_readouts", "unknowns"):
         overview_claim_ids.update(value for value in strings(data.get(key, [])) if value in canonical_claim_ids)
-    source_updates = sidecars["SOURCE_UPDATES"] or {}
     # Retain the claims needed to validate exact financial-basis context in Market.
-    bound_basis_claim_ids = {row["id"] for update in (source_updates.get("evidence_context") or {}).get("corrections", [])
+    bound_basis_claim_ids = {row["id"] for update in ((app_source_updates or {}).get("evidence_context") or {}).get("corrections", [])
                              if update.get("kind") == "financial-basis-source-supplement" and update["target"]["claim_id"] in overview_claim_ids
                              for row in update["historical_snapshot"]["claims"]}
     overview_claim_ids.update(bound_basis_claim_ids)
@@ -817,6 +818,6 @@ def build_presentation(data, destination, root, sidecars, release, daily_context
     overview_data = {"dataset_version": data["dataset_version"], "claims": overview_claims,
                      "sources": [source for source in data["sources"] if source["id"] in overview_source_ids], "metrics": financial_metrics,
                      **{key: copy.deepcopy(data.get(key, [])) for key in ("companies", "assessments", "editorial_readouts", "unknowns")}}
-    summary["overview"] = write_asset(destination, "overview", dict(identity, data=overview_data, businessHealth=sidecars["BUSINESS_HEALTH"], sourceUpdates=copy.deepcopy(sidecars["SOURCE_UPDATES"])))
+    summary["overview"] = write_asset(destination, "overview", dict(identity, data=overview_data, businessHealth=sidecars["BUSINESS_HEALTH"], sourceUpdates=copy.deepcopy(app_source_updates)))
     summary_asset = write_asset(destination, "summary", summary)
     return summary, summary_asset
