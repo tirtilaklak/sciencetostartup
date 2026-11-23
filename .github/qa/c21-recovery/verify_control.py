@@ -64,12 +64,37 @@ else:
         for previous,next_value in replacements.items():
             text=text.replace(previous,next_value)
         item.write_text(text)
+    if target=='companies':
+        verifier=scope/'source-index.py'
+        code_before=verifier.read_text()
+        previous="        assert 'source_locations' not in (projection['sourceUpdates'] or {}), name"
+        expected="""        observed_locations = (projection['sourceUpdates'] or {}).get('source_locations')
+        if name in native_locations:
+            expected_locations = {
+                sid: {key: value for key, value in location.items() if key not in ('source_ids','content_sha256')}
+                for sid, location in native_locations[name].items()
+            }
+            assert observed_locations == expected_locations, (name, observed_locations)
+        else:
+            assert observed_locations is None, name"""
+        assert code_before.count(previous)==1
+        verifier.write_text(code_before.replace(previous,expected))
     if target=='work':
-        old_work=subprocess.check_output(['git','show','8ab0452e:data/work-routes.json'])
-        assert old_work==Path('data/work-routes.json').read_bytes()
+        prior_work=subprocess.check_output(['git','show','8ab0452e:data/work-routes.json'])
+        assert prior_work==Path('data/work-routes.json').read_bytes()
+        expected_path=scope/'expected.json'
+        expected=json.loads(expected_path.read_bytes())
+        for source_file in ('scripts/presentation.py','scripts/static_pages.py'):
+            assert source_file in expected['exact_source_sha256']
+            source_bytes=subprocess.check_output(['git','show',f'{head}:{source_file}'])
+            assert source_bytes==Path(source_file).read_bytes()
+            expected['exact_source_sha256'][source_file]=sha256(source_bytes).hexdigest()
+        expected_path.write_text(json.dumps(expected,indent=2)+'\n')
     with (out/'control.log').open('x') as log:
         code=subprocess.run(['bash',str(scope/'run.sh')],stdout=log,stderr=subprocess.STDOUT,
                             timeout=1150).returncode
+    if code:
+        print('\n'.join((out/'control.log').read_text().splitlines()[-28:]))
     reports=Path('output/c20-controls')
     if reports.is_dir():
         shutil.copytree(reports,out/'raw')
