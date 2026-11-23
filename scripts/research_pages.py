@@ -2132,8 +2132,8 @@ def write_research_pages(output, context):
     return records
 
 
-def research_search_entries(context):
-    """Compact local-search records; candidate wording never enters summaries."""
+def research_search_entries(context, *, include_published_editions=False):
+    """Build search records, verifying the edition ledger when indexing DOI results."""
     entries = [
         {"title": "AI data research", "summary": "Papers and datasets on AI training, with evidence about the suppliers.", "url": "/research/", "kind": "research", "keywords": "AI data labs human feedback evidence"},
         {"title": context["report"]["title"], "summary": _status(context) + ". Twelve chapters of methods, historical examples, and research gaps.", "url": REPORT_PATH, "kind": "report", "keywords": "human feedback RLHF annotation suppliers methods"},
@@ -2141,7 +2141,8 @@ def research_search_entries(context):
         {"title": "Review the research", "summary": "Submit a correction or a chapter review. Share where you used the data.", "url": "/review/", "kind": "review", "keywords": "correction contribute review reuse"},
         {"title": "Research corrections", "summary": "Accepted corrections with affected editions, claims, correction dates and source evidence.", "url": CORRECTIONS_PATH, "kind": "review", "keywords": "corrections errata RSS Atom evidence"},
     ]
-    for path, snapshot in _published_editions(context):
+    editions = _published_editions(context) if include_published_editions else ()
+    for path, snapshot in editions:
         report = snapshot["report"]
         doi = report.get("archive", {}).get("doi")
         if doi:

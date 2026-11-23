@@ -35,16 +35,21 @@ for (const [name, digest] of Object.entries(fixtures.sha256)) assert.equal(crypt
 function harness(url = 'https://fixture.test/', { nativeDialog = true } = {}) {
   const timers = new Map(), scripts = [], listeners = new Map(); let timerId = 0;
   const nodes = {};
+  class HTMLElement {}
   function node(id) {
     const callbacks = {};
-    return nodes[id] ||= { id, value:'', textContent:'', innerHTML:'', dataset:{}, hidden:false, open:false, callbacks,
+    return nodes[id] ||= Object.assign(new HTMLElement(), { id, value:'', textContent:'', innerHTML:'', dataset:{}, hidden:false, open:false, callbacks,
       setAttribute(name,value){this[name]=String(value);},removeAttribute(name){delete this[name];},
       addEventListener(name,fn){(callbacks[name] ||= []).push(fn);},focus(){document.activeElement=this;},
+      isConnected:true, contains(element){return element === this;},
+      getBoundingClientRect(){return {top:0,left:0,bottom:44,right:44};},
       showModal(){this.open=true;},close(){if(this.open){this.open=false;this.emit('close');}},
       emit(name,event={}){for(const fn of callbacks[name]||[])fn({target:this,preventDefault(){this.prevented=true;},...event});},
-      remove(){this.removed=true;},closest(){return null;}};
+      remove(){this.removed=true;},closest(){return null;}});
   }
-  const document = {getElementById:id=>id==='home-work-example'?null:node(id), querySelector:()=>null, activeElement:null, hidden:false,
+  const document = {getElementById:id=>id==='home-work-example'?null:node(id),
+    querySelector:selector=>selector==='.site-header .site-search-open'?node('home-search-open'):null,
+    activeElement:node('body'), body:node('body'), hidden:false,
     createElement:()=>({remove(){this.removed=true;}}),head:{append:script=>scripts.push(script)},
     addEventListener(name, fn){(listeners.get(name)||listeners.set(name,[]).get(name)).push(fn);}};
   node('home-config').textContent=JSON.stringify({candidates:[]});
@@ -56,7 +61,7 @@ function harness(url = 'https://fixture.test/', { nativeDialog = true } = {}) {
   parts['.ui-icon'].hidden = parts.kbd.hidden = true;
   if (!nativeDialog) delete node('home-search').showModal;
   const location = new URL(url), history = {state:{kept:true}, replaceState(state,unused,value){this.state=state;const next=new URL(value,location);location.href=next.href;}};
-  const context = {document,location,history,URL,URLSearchParams,performance:{getEntriesByType:()=>[]},Date,window:null,setInterval(){},setTimeout(fn,delay){timers.set(++timerId,{fn,delay});return timerId;},clearTimeout:id=>timers.delete(id)};
+  const context = {document,location,history,URL,URLSearchParams,HTMLElement,innerHeight:768,innerWidth:1024,performance:{getEntriesByType:()=>[]},Date,window:null,setInterval(){},setTimeout(fn,delay){timers.set(++timerId,{fn,delay});return timerId;},clearTimeout:id=>timers.delete(id)};
   context.window=context;
   vm.runInNewContext(read('web/home-runtime.js'),context);
   return {context,document,location,history,node,scripts,timers,click:()=>node('home-search-open').emit('click',{button:0}),
