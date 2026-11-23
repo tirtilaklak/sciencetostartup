@@ -1,0 +1,103 @@
+name: Recheck the exact mobile Compare return
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-mobile-compare-return-replay.yml]
+permissions:
+  contents: read
+jobs:
+  stock:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: predecessor
+            head: 6cae2f8323f13b39009518c05e9fc5e0e95adbb4
+            tree: 3244b76b491e51400334e72ba233cfa81a8016b7
+            manifest: c2fca78d019495cafe0673e473ac82105a7dcbcd3720e5d4aa9e2e536c249f0c
+          - target: current
+            head: 34c4e96076d0c783279bb889eab2d0d6a5bd5db0
+            tree: ee7b9c1b84608151a83b784fa37ef74d14591313
+            manifest: 8ea9a1b27fc9f9d7121e43d8db95883d3a69ce5808b90ba30684dbc18aac3838
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      C21_HEAD: ${{ matrix.head }}
+      C21_DIST_TREE: ${{ matrix.tree }}
+      C21_MANIFEST: ${{ matrix.manifest }}
+      QA_BASE_URL: http://127.0.0.1:19011
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare the exact product checkout
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          git worktree add --detach "$RUNNER_TEMP/c21-product" "$C21_HEAD"
+          git config --global --add safe.directory "$RUNNER_TEMP/c21-product"
+          test "$(git -C "$RUNNER_TEMP/c21-product" rev-parse HEAD:dist)" = "$C21_DIST_TREE"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --prefix "$RUNNER_TEMP/c21-product"
+      - name: Repeat the unchanged Compare history journey without browser instrumentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$GITHUB_WORKSPACE/output/mobile-compare-return"
+          mkdir -p "$OUT"
+          cd "$RUNNER_TEMP/c21-product"
+          PYTHONPATH=scripts python3 - <<'PY'
+          import os
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          validate_artifact(Path('dist'),os.environ['C21_MANIFEST'])
+          PY
+          QA_DIST="$PWD/dist" python3 scripts/browser_qa_server.py --port 19011 > "$OUT/origin.log" 2>&1 &
+          origin_pid=$!
+          trap 'kill "$origin_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 20); do
+            curl --silent --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-before.json" && break
+            sleep 1
+          done
+          cmp "$OUT/manifest-before.json" dist/manifest.json
+          status=0
+          ./node_modules/.bin/playwright test tests/browser/compare-return.spec.js \
+            --grep 'Back restores the opener from a new entry at the same Compare URL' \
+            --project=mobile-chromium --workers=1 --repeat-each=12 --retries=0 --timeout=90000 \
+            --trace retain-on-failure --reporter=json --output "$OUT/results" > "$OUT/playwright.json" || status=$?
+          curl --silent --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-after.json"
+          cmp "$OUT/manifest-after.json" dist/manifest.json
+          python3 - "$OUT/playwright.json" <<'PY'
+          import json,sys
+          raw=json.load(open(sys.argv[1]))
+          stats=raw['stats']
+          assert stats['expected']+stats['unexpected']+stats['flaky']+stats['skipped']==12
+          print(json.dumps(stats))
+          def inspect(group):
+              for spec in group.get('specs',[]):
+                  for test in spec['tests']:
+                      for result in test['results']:
+                          error=result.get('error',{}).get('message','')
+                          if error:
+                              print(result['error'].get('stack',error)[:1600])
+              for child in group.get('suites',[]):
+                  inspect(child)
+          inspect(raw)
+          PY
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c21-mobile-compare-return-${{ matrix.target }}
+          path: output/mobile-compare-return/
+          if-no-files-found: error
+          retention-days: 14
