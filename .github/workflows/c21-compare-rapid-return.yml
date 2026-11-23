@@ -1,0 +1,69 @@
+name: Check rapid mobile Compare Back
+on:
+  push:
+    branches: [codex/site-quality-c21-hosted-recovery-20261122]
+    paths: [.github/workflows/c21-compare-rapid-return.yml, .github/qa/c21-recovery/compare_rapid_return.mjs]
+permissions:
+  contents: read
+jobs:
+  trace:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:f6fe3cf9a493670b9a20f33597a807262abb25c40c31839ba4ac1dbc51fe7366
+      options: --init --ipc=host
+    env:
+      TARGET: candidate
+      HEAD: 34c4e96076d0c783279bb889eab2d0d6a5bd5db0
+      MANIFEST: 8ea9a1b27fc9f9d7121e43d8db95883d3a69ce5808b90ba30684dbc18aac3838
+      QA_BASE_URL: http://127.0.0.1:19011
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Use the original link and position across rapid native Back
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown --reference=/proc/self "$HOME"
+          export PRODUCT_DIR="$RUNNER_TEMP/market-$TARGET"
+          OUT="$GITHUB_WORKSPACE/output/$TARGET"
+          mkdir -p "$OUT"
+          export MARKET_TIMELINE_OUT="$OUT/timeline.json"
+          git worktree add --detach "$PRODUCT_DIR" "$HEAD"
+          git config --global --add safe.directory "$PRODUCT_DIR"
+          cd "$PRODUCT_DIR"
+          npm ci
+          PYTHONPATH=scripts python3 - <<'PY'
+          import os
+          from pathlib import Path
+          from release_artifact import validate_artifact
+          validate_artifact(Path('dist'),os.environ['MANIFEST'])
+          PY
+          if [ "$TARGET" = candidate ]; then
+            QA_DIST="$PWD/dist" python3 scripts/browser_qa_server.py --port 19011 > "$OUT/origin.log" 2>&1 &
+            origin_pid=$!
+            trap 'kill "$origin_pid" 2>/dev/null || true' EXIT
+          fi
+          for attempt in $(seq 1 15); do
+            curl --silent --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-before.json" && break
+            sleep 1
+          done
+          cmp "$OUT/manifest-before.json" dist/manifest.json
+          node "$GITHUB_WORKSPACE/.github/qa/c21-recovery/compare_rapid_return.mjs"
+          curl --silent --show-error --fail "$QA_BASE_URL/manifest.json" --output "$OUT/manifest-after.json"
+          cmp "$OUT/manifest-after.json" dist/manifest.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c21-compare-rapid-return
+          path: output/candidate
+          if-no-files-found: error
+          retention-days: 14
