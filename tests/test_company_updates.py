@@ -95,11 +95,14 @@ class CurrentCompanyFactsTests(unittest.TestCase):
         trading, acquisition = facts["rows"]
         self.assertIn("Unaudited", trading["label"])
         self.assertIn("expected about £700 million in group revenue", trading["value"])
-        self.assertEqual(trading["source_indexes"], [0])
+        self.assertEqual(trading["source_indexes"], [0, 1])
         self.assertIn("completed its acquisition of Acogroup", acquisition["value"])
-        self.assertEqual(acquisition["source_indexes"], [1, 2])
+        self.assertEqual(acquisition["source_indexes"], [2, 3])
         self.assertEqual([source["published_on"] for source in facts["sources"]],
-                         ["2026-10-27", "2026-11-02", "2026-11-02"])
+                         ["2026-10-27", "2026-10-27", "2026-11-02", "2026-11-02"])
+        self.assertTrue(facts["sources"][0]["url"].startswith("https://www.tradingview.com/news/"))
+        self.assertIn("RSa5108Aa", facts["sources"][0]["url"])
+        self.assertTrue(facts["sources"][1]["url"].startswith("https://www.lse.co.uk/rns/RWS/"))
         markup = current_facts_html(entry)
         for source in facts["sources"]:
             self.assertIn(f'href="{source["url"]}"', markup)
